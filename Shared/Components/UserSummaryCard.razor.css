@@ -1,0 +1,56 @@
+﻿.user-summary-card {
+    background: var(--bg-slate);
+    color: var(--text-light);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #0006;
+}
+
+.user-summary-avatar-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.user-summary-avatar {
+    width: 94px;
+    height: 94px;
+    border-radius: 50%;
+    border: 2px solid #4a4a4a;
+}
+
+.user-summary-avatar {
+    object-fit: cover;
+    box-shadow: 0 2px 8px #0006;
+}
+
+.user-summary-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-night);
+    color: var(--link-blue);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.user-summary-status-blocked {
+    color: var(--red);
+    font-weight: 700;
+}
+
+.user-summary-status-active {
+    color: #4caf50;
+    font-weight: 700;
+}
+
+@media (max-width: 700px) {
+    .user-summary-card {
+        padding: 1.1rem;
+    }
+
+    .user-summary-avatar {
+        width: 78px;
+        height: 78px;
+    }
+}

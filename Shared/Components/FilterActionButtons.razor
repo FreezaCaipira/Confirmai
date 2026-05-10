@@ -1,0 +1,10 @@
+@* DEPRECATED/INTERNAL: manter apenas por histórico; não usar em páginas ativas. *@
+<button @onclick="OnApply">@ApplyLabel</button>
+<button @onclick="OnClear">@ClearLabel</button>
+
+@code {
+    [Parameter] public EventCallback OnApply { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+    [Parameter] public string ApplyLabel { get; set; } = "Filtrar";
+    [Parameter] public string ClearLabel { get; set; } = "Limpar";
+}

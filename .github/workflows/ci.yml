@@ -1,0 +1,77 @@
+﻿name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: Build & Test (.NET 9)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Confirmai.sln
+
+      - name: Build
+        run: dotnet build Confirmai.sln --no-restore --configuration Release
+
+      - name: Test with coverage
+        run: >
+          dotnet test Confirmai.Tests/Confirmai.Tests.csproj
+          --no-build
+          --configuration Release
+          --collect "XPlat Code Coverage"
+          --results-directory ./coverage
+          --logger "console;verbosity=normal"
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+
+      - name: Generate coverage report
+        if: always()
+        uses: danielpalme/ReportGenerator-GitHub-Action@5
+        with:
+          reports: coverage/**/coverage.cobertura.xml
+          targetdir: coverage/report
+          reporttypes: HtmlSummary;MarkdownSummary;Badges
+
+      - name: Post coverage summary
+        if: always()
+        run: |
+          if [ -f coverage/report/Summary.md ]; then
+            cat coverage/report/Summary.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No coverage summary available (tests may have failed before producing coverage data)." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Commit coverage badge
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: badges
+          publish_dir: coverage/report
+          destination_dir: badges
+          keep_files: false
+          commit_message: "chore: update coverage badge"
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/report/
+          retention-days: 14

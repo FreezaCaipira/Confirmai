@@ -1,0 +1,34 @@
+@if (IsLoading)
+{
+    <div class="@LoadingCssClass">@LoadingText</div>
+}
+else if (IsEmpty)
+{
+    <div class="admin-empty-state">
+        @if (!string.IsNullOrWhiteSpace(EmptyIcon))
+        {
+            <i class="@EmptyIcon admin-empty-state-icon"></i>
+        }
+        <p class="admin-empty-state-text">@EmptyText</p>
+        @if (!string.IsNullOrWhiteSpace(EmptyHint))
+        {
+            <p class="admin-empty-state-hint">@EmptyHint</p>
+        }
+    </div>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public bool IsEmpty { get; set; }
+    [Parameter] public string LoadingText { get; set; } = "Carregando...";
+    [Parameter] public string LoadingCssClass { get; set; } = "loading-spinner";
+    [Parameter] public string EmptyText { get; set; } = "Nenhum registro encontrado.";
+    [Parameter] public string EmptyCssClass { get; set; } = string.Empty;
+    [Parameter] public string EmptyIcon { get; set; } = "fas fa-inbox";
+    [Parameter] public string EmptyHint { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

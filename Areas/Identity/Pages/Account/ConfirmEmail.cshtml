@@ -1,0 +1,15 @@
+﻿@page
+@model Confirmai.Areas.Identity.Pages.Account.ConfirmEmailModel
+@inject Confirmai.Services.UiTextService T
+@{
+    ViewData["Title"] = T["Identity.ConfirmEmail.Title"];
+}
+
+<h2>@T["Identity.ConfirmEmail.Heading"]</h2>
+<p class="identity-muted">@Model.StatusMessage</p>
+
+<div class="identity-actions">
+    <a asp-page="./Login">@T["Identity.Common.GoToLogin"]</a>
+</div>
+
+

@@ -1,0 +1,42 @@
+﻿.not-found-card {
+    margin: 3rem auto;
+    max-width: 480px;
+    background: var(--bg-slate);
+    color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px #000a;
+    padding: 2.5rem 2rem;
+    text-align: center;
+}
+
+.not-found-icon {
+    font-size: 3rem;
+    color: #ff5252;
+}
+
+.not-found-title {
+    margin: 1rem 0 0.5rem 0;
+    color: var(--gold);
+}
+
+.not-found-description {
+    color: #ccc;
+    margin-bottom: 2rem;
+}
+
+.not-found-home-link {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--bg-slate);
+    font-weight: bold;
+    padding: 0.7rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 8px #0004;
+    transition: background 0.2s;
+}
+
+.not-found-home-link:hover {
+    background: #ffe066;
+}

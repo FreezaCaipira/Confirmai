@@ -1,0 +1,126 @@
+.admin-audit-timeline-shell .timeline-entity-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-night-cool, #1e2635);
+    border: 1px solid var(--border-slate, #3a4255);
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--link-blue, #7eb3e8);
+}
+
+.admin-audit-timeline-shell .timeline-entity-sep {
+    color: var(--border-slate, #3a4255);
+}
+
+.admin-audit-timeline-shell .timeline-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.admin-audit-timeline-shell .timeline-ts {
+    white-space: nowrap;
+    font-size: 0.8rem;
+    color: var(--text-muted, #9aa0ab);
+}
+
+.admin-audit-timeline-shell .timeline-event-type {
+    font-family: monospace;
+    font-size: 0.8rem;
+    background: rgba(126, 179, 232, 0.08);
+    border: 1px solid rgba(126, 179, 232, 0.2);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--link-blue, #7eb3e8);
+    white-space: nowrap;
+}
+
+.admin-audit-timeline-shell .timeline-metadata-cell {
+    max-width: 260px;
+}
+
+.admin-audit-timeline-shell .timeline-metadata-toggle {
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: var(--link-blue, #7eb3e8);
+    user-select: none;
+}
+
+.admin-audit-timeline-shell .timeline-metadata-pre {
+    margin: 0.25rem 0 0;
+    font-size: 0.72rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: var(--bg-night, #171c27);
+    border: 1px solid var(--border-slate, #3a4255);
+    border-radius: 4px;
+    padding: 0.4rem 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    color: #c5d0de;
+}
+
+/* inherit log-table styles from site.css / AdminLogs.razor.css theme */
+.admin-audit-timeline-shell .timeline-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-audit-timeline-shell .timeline-table th {
+    background: var(--bg-night-cool, #1e2635);
+    color: var(--link-blue, #7eb3e8);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid var(--border-slate, #3a4255);
+    text-align: left;
+}
+
+.admin-audit-timeline-shell .timeline-table td {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(58, 66, 85, 0.4);
+    vertical-align: top;
+}
+
+.admin-audit-timeline-shell .timeline-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Responsive: stack on narrow screens */
+@media (max-width: 860px) {
+    .admin-audit-timeline-shell .timeline-table thead {
+        display: none;
+    }
+
+    .admin-audit-timeline-shell .timeline-table tr {
+        display: block;
+        border-bottom: 2px solid var(--border-slate, #3a4255);
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-audit-timeline-shell .timeline-table td {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        border-bottom: 1px solid rgba(58, 66, 85, 0.3);
+        padding: 0.3rem 0.5rem;
+        font-size: 0.82rem;
+    }
+
+    .admin-audit-timeline-shell .timeline-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--link-blue, #7eb3e8);
+        min-width: 90px;
+        font-size: 0.75rem;
+    }
+
+    .admin-audit-timeline-shell .timeline-metadata-cell {
+        max-width: unset;
+    }
+}

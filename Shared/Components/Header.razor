@@ -1,0 +1,23 @@
+﻿@inherits LayoutComponentBase
+
+<div class="header">
+    <div class="header-content">
+        <h1>Confirmai</h1>
+        <div class="header-buttons">
+            <button @onclick="ToggleDarkMode">Toggle Dark Mode</button>
+            <a href="https://instagram.com" target="_blank" class="social-button">Instagram</a>
+            <a href="https://github.com" target="_blank" class="social-button">GitHub</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool isDarkMode = true;
+
+    private void ToggleDarkMode()
+    {
+        isDarkMode = !isDarkMode;
+        // Logic to apply dark mode styles can be added here
+    }
+}
+

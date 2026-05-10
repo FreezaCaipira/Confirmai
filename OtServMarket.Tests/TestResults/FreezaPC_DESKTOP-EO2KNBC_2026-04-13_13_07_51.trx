@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="c0ee8b39-fe8a-4282-b4a8-fed028261d0e" name="FreezaPC@DESKTOP-EO2KNBC 2026-04-13 13:07:51" runUser="DESKTOP-EO2KNBC\FreezaPC" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-04-13T13:07:51.6777820-03:00" queuing="2026-04-13T13:07:51.6777822-03:00" start="2026-04-13T13:07:49.0112882-03:00" finish="2026-04-13T13:07:51.6825039-03:00" />
+  <TestSettings name="default" id="3f63d324-a379-49b6-81b6-cfa810de5bea">
+    <Deployment runDeploymentRoot="FreezaPC_DESKTOP-EO2KNBC_2026-04-13_13_07_51" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="1fdaa965-ec0f-4ee7-ab8d-950cc983fdb1" testId="eca82393-a396-b0d7-d04d-acb016d543b1" testName="OtServMarket.Tests.ProtectedPagesIntegrationTests.AuthenticatedRoutes_ShowNotAuthorized_WhenAnonymous(route: &quot;/payments/view/1&quot;)" computerName="DESKTOP-EO2KNBC" duration="00:00:01.6678384" startTime="2026-04-13T13:07:49.9169489-03:00" endTime="2026-04-13T13:07:51.5934549-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1fdaa965-ec0f-4ee7-ab8d-950cc983fdb1">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected one of [Voce nao tem permissao para acessar esta pagina. | You are not authorized to access this page. | No tienes permiso para acceder a esta pagina.] in HTML response.</Message>
+          <StackTrace>   at OtServMarket.Tests.ProtectedPagesIntegrationTests.AssertOkAndContainsAny(ValueTuple`2 result, String[] expectedTexts) in C:\FreezaSSD\Dev\OtServMarket\OtServMarket.Tests\ProtectedPagesIntegrationTests.cs:line 215&#xD;
+   at OtServMarket.Tests.ProtectedPagesIntegrationTests.AuthenticatedRoutes_ShowNotAuthorized_WhenAnonymous(String route) in C:\FreezaSSD\Dev\OtServMarket\OtServMarket.Tests\ProtectedPagesIntegrationTests.cs:line 139&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="OtServMarket.Tests.ProtectedPagesIntegrationTests.AuthenticatedRoutes_ShowNotAuthorized_WhenAnonymous(route: &quot;/payments/view/1&quot;)" storage="c:\freezassd\dev\otservmarket\otservmarket.tests\bin\debug\net9.0\otservmarket.tests.dll" id="eca82393-a396-b0d7-d04d-acb016d543b1">
+      <Execution id="1fdaa965-ec0f-4ee7-ab8d-950cc983fdb1" />
+      <TestMethod codeBase="C:\FreezaSSD\Dev\OtServMarket\OtServMarket.Tests\bin\Debug\net9.0\OtServMarket.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="OtServMarket.Tests.ProtectedPagesIntegrationTests" name="AuthenticatedRoutes_ShowNotAuthorized_WhenAnonymous" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="eca82393-a396-b0d7-d04d-acb016d543b1" executionId="1fdaa965-ec0f-4ee7-ab8d-950cc983fdb1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 9.0.13)&#xD;
+[xUnit.net 00:00:00.16]   Discovering: OtServMarket.Tests&#xD;
+[xUnit.net 00:00:00.34]   Discovered:  OtServMarket.Tests&#xD;
+[xUnit.net 00:00:00.40]   Starting:    OtServMarket.Tests&#xD;
+info: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[63]&#xD;
+      User profile is available. Using 'C:\Users\FreezaPC\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 0 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 1 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 1 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 1 entities to in-memory store.&#xD;
+info: OtServMarket.Services.AppInitializationService[0]&#xD;
+      UsuA�rio admin seed criado: admin@test.local&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 2 entities to in-memory store.&#xD;
+info: OtServMarket.Services.AppInitializationService[0]&#xD;
+      UsuA�rio admin@test.local promovido a admin.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 3 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 1 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 3 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 1 entities to in-memory store.&#xD;
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]&#xD;
+      Request starting HTTP/1.1 GET http://localhost/payments/view/1 - - -&#xD;
+warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]&#xD;
+      Failed to determine the https port for redirect.&#xD;
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]&#xD;
+      Executing endpoint '/_Host'&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[103]&#xD;
+      Route matched with {page = "/_Host", action = "", controller = "", area = ""}. Executing page /_Host&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[107]&#xD;
+      Executing an implicit handler method - ModelState is Valid&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[109]&#xD;
+      Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.&#xD;
+info: Microsoft.AspNetCore.Authorization.DefaultAuthorizationService[2]&#xD;
+      Authorization failed. These requirements were not met:&#xD;
+      DenyAnonymousAuthorizationRequirement: Requires an authenticated user.&#xD;
+info: Microsoft.AspNetCore.Authorization.DefaultAuthorizationService[2]&#xD;
+      Authorization failed. These requirements were not met:&#xD;
+      DenyAnonymousAuthorizationRequirement: Requires an authenticated user.&#xD;
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]&#xD;
+      Request starting HTTP/1.1 GET http://localhost/Identity/Account/Login?returnUrl=%2Fpayments%2Fview%2F1 - - -&#xD;
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]&#xD;
+      Executing endpoint '/Account/Login'&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[104]&#xD;
+      Executed page /_Host in 131.7449ms&#xD;
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]&#xD;
+      Executed endpoint '/_Host'&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[103]&#xD;
+      Route matched with {page = "/Account/Login", area = "Identity", action = "", controller = ""}. Executing page /Account/Login&#xD;
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]&#xD;
+      Request finished HTTP/1.1 GET http://localhost/payments/view/1 - 302 - text/html;+charset=utf-8 181.8709ms&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[105]&#xD;
+      Executing handler method OtServMarket.Areas.Identity.Pages.Account.LoginModel.OnGet - ModelState is Valid&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[108]&#xD;
+      Executed handler method OnGet, returned result .&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[107]&#xD;
+      Executing an implicit handler method - ModelState is Valid&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[109]&#xD;
+      Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.&#xD;
+info: Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker[104]&#xD;
+      Executed page /Account/Login in 63.5189ms&#xD;
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]&#xD;
+      Executed endpoint '/Account/Login'&#xD;
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]&#xD;
+      Request finished HTTP/1.1 GET http://localhost/Identity/Account/Login?returnUrl=%2Fpayments%2Fview%2F1 - 200 - text/html;+charset=utf-8 75.8057ms&#xD;
+[xUnit.net 00:00:02.11]       Expected one of [Voce nao tem permissao para acessar esta pagina. | You are not authorized to access this page. | No tienes permiso para acceder a esta pagina.] in HTML response.&#xD;
+[xUnit.net 00:00:02.11]       Stack Trace:&#xD;
+[xUnit.net 00:00:02.11]         C:\FreezaSSD\Dev\OtServMarket\OtServMarket.Tests\ProtectedPagesIntegrationTests.cs(215,0): at OtServMarket.Tests.ProtectedPagesIntegrationTests.AssertOkAndContainsAny(ValueTuple`2 result, String[] expectedTexts)&#xD;
+[xUnit.net 00:00:02.11]         C:\FreezaSSD\Dev\OtServMarket\OtServMarket.Tests\ProtectedPagesIntegrationTests.cs(139,0): at OtServMarket.Tests.ProtectedPagesIntegrationTests.AuthenticatedRoutes_ShowNotAuthorized_WhenAnonymous(String route)&#xD;
+[xUnit.net 00:00:02.11]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:02.12]   Finished:    OtServMarket.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="DESKTOP-EO2KNBC" outcome="Error" timestamp="2026-04-13T13:07:51.5954089-03:00">
+        <Text>[xUnit.net 00:00:02.11]     OtServMarket.Tests.ProtectedPagesIntegrationTests.AuthenticatedRoutes_ShowNotAuthorized_WhenAnonymous(route: "/payments/view/1") [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

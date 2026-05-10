@@ -1,0 +1,42 @@
+﻿@* @page "/users"
+
+@inject Confirmai.Services.UserService UserService
+
+<h3>UsuÃ¡rios</h3>
+
+<EditForm Model="@newUser" OnValidSubmit="AddUser">
+    <InputText @bind-value="newUser.Username" placeholder="Username" />
+    <InputText @bind-value="newUser.Password" placeholder="Senha" />
+    <button type="submit">Adicionar</button>
+</EditForm>
+
+<ul>
+    @foreach (var user in users)
+    {
+        <li>@user.Username <button @onclick="() => DeleteUser(user.Id)">Remover</button></li>
+    }
+</ul>
+
+@code {
+    private List<User> users = new();
+    private User newUser = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserService.GetAllAsync();
+    }
+
+    private async Task AddUser()
+    {
+        await UserService.AddAsync(newUser);
+        newUser = new User();
+        users = await UserService.GetAllAsync();
+    }
+
+    private async Task DeleteUser(int id)
+    {
+        await UserService.DeleteAsync(id);
+        users = await UserService.GetAllAsync();
+    }
+} *@
+

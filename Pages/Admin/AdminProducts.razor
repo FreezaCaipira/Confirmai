@@ -1,0 +1,265 @@
+﻿@page "/admin/items"
+@page "/admin/products"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@using Microsoft.EntityFrameworkCore
+@using Confirmai.Shared
+@using Confirmai.Data
+@using System.Globalization
+
+@inject ProductService ProductService
+@inject LogService LogService
+@inject AdminProductsFilterStateService AdminProductsFilterStateService
+@inject UiTextService T
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+<div class="entity-shell parchment-a admin-page admin-items-page">
+
+    <section class="entity-shell-grid" aria-label="@T["AdminProducts.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <h1 class="page-section-title">@T["AdminProducts.Title"]</h1>
+            <div class="filter-bar admin-filter-card">
+                <input type="text" placeholder="@T["AdminProducts.Filter.Name"]" @bind="filterName" @bind:event="oninput" />
+                <div class="filter-action-buttons">
+                    <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">@T["Common.Filter"]</button>
+                    <button type="button" @onclick="@(async () => await ClearFilters())">@T["Common.Clear"]</button>
+                    <button type="button" class="success-btn" @onclick='() => NavigationManager.NavigateTo("/products/create")'>
+                        <i class="fas fa-plus"></i> @T["AdminProducts.NewItem"]
+                    </button>
+                </div>
+            </div>
+
+            @if (showRestoredFiltersNotice)
+            {
+                <div class="orders-review-restored-notice">
+                    <span>Filtros de itens restaurados da sessao anterior.</span>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">&times;—</button>
+                </div>
+            }
+
+            <AdminDataState IsLoading="@isLoading" IsEmpty="@(!pagedProducts.Any())" LoadingText="Carregando itens..." EmptyText="Nenhum item encontrado." EmptyIcon="fas fa-box-open" EmptyHint="Itens cadastrados aparecerao aqui.">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Imagem</th>
+                            <th>@T["AdminProducts.Name"]</th>
+                            <th>Categoria</th>
+                            <th>@T["AdminProducts.CreatedAt"]</th>
+                            <th>@T["Common.Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var p in pagedProducts)
+                    {
+                        <tr>
+                            <td data-label="Imagem">
+                                @if (!string.IsNullOrWhiteSpace(p.ImagePath))
+                                {
+                                    <img class="admin-item-thumb" src="@p.ImagePath" alt="Imagem de @p.Name" />
+                                }
+                                else
+                                {
+                                    <span class="identity-muted">-</span>
+                                }
+                            </td>
+                            <td data-label="@T["AdminProducts.Name"]">@p.Name</td>
+                            <td data-label="Categoria">@(string.IsNullOrWhiteSpace(p.Category) ? "Geral" : p.Category)</td>
+                            <td data-label="@T["AdminProducts.CreatedAt"]">@p.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td data-label="@T["Common.Actions"]">
+                                <div class="admin-actions-row">
+                                    <button class="details-btn action-btn icon-only" @onclick="() => ViewProduct(p.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="edit-btn action-btn icon-only" @onclick="() => EditProduct(p.Id)" title="@T["Products.Edit"]" aria-label="@T["Products.Edit"]">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                    <button class="danger action-btn icon-only" @onclick="() => DeleteProduct(p.Id)" title="@T["Products.Remove"]" aria-label="@T["Products.Remove"]">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                    <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
+                </div>
+            </AdminDataState>
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["Common.Back"]</button>
+    </section>
+</div>
+
+@code {
+    private List<Product> pagedProducts = new();
+    private int totalCount;
+    private bool isLoading = true;
+    private bool filtersLoaded;
+    private bool showRestoredFiltersNotice;
+
+    private string filterName = "";
+
+    private int pageSize = 10;
+    private int currentPage = 1;
+    private int totalPages => Math.Max(1, (int)Math.Ceiling((double)totalCount / pageSize));
+
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] public IJSRuntime JS { get; set; } = default!;
+    [CascadingParameter] public Toast? ToastRef { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        await LoadPageAsync();
+        isLoading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || filtersLoaded)
+        {
+            return;
+        }
+
+        await LoadFilterStateFromStorageAsync();
+        await LoadPageAsync();
+        filtersLoaded = true;
+        StateHasChanged();
+    }
+
+    private async Task LoadPageAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        IQueryable<Product> query = db.Products
+            .AsNoTracking()
+            .Where(p => !string.Equals(p.Category, "legacy-archived") &&
+                        !string.Equals(p.Category, "deleted-archived"));
+
+        if (!string.IsNullOrWhiteSpace(filterName))
+            query = query.Where(p => p.Name.ToLower().Contains(filterName.ToLower()));
+
+        totalCount = await query.CountAsync();
+
+        if (currentPage > totalPages)
+            currentPage = totalPages;
+
+        pagedProducts = await query
+            .OrderByDescending(p => p.Id)
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    private void ViewProduct(int id) => NavigationManager.NavigateTo($"/admin/items/view/{id}");
+    private void EditProduct(int id) => NavigationManager.NavigateTo($"/admin/items/edit/{id}");
+
+    private async Task DeleteProduct(int id)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", T["AdminProducts.ConfirmDelete"])) return;
+        var deleteResult = await ProductService.DeleteAsync(id);
+
+        if (deleteResult == ProductService.ProductDeleteResult.NotFound)
+        {
+            ToastRef?.Show("Item nao encontrado.", "error");
+            return;
+        }
+
+        if (deleteResult == ProductService.ProductDeleteResult.ArchivedWithOrders)
+        {
+            await LogService.LogAsync(
+                $"Item arquivado por possuir pedidos vinculados (ID: {id})",
+                source: "Admin",
+                level: "Warning"
+            );
+            ToastRef?.Show("Item possui pedidos e foi arquivado ao inves de removido.", "warning");
+        }
+        else
+        {
+            await LogService.LogAsync(
+                string.Format(T["AdminProducts.LogDeleted"], id),
+                source: "Admin",
+                level: "Warning"
+            );
+            ToastRef?.Show(T["AdminProducts.DeletedToast"], "info");
+        }
+
+        await LoadPageAsync();
+    }
+
+    private async Task ApplyFiltersAndPersist()
+    {
+        currentPage = 1;
+        showRestoredFiltersNotice = false;
+        await LoadPageAsync();
+        await PersistFilterStateAsync();
+    }
+
+    private async Task ClearFilters()
+    {
+        filterName = "";
+        currentPage = 1;
+        showRestoredFiltersNotice = false;
+        await LoadPageAsync();
+        await PersistFilterStateAsync();
+    }
+
+    private async Task NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            await LoadPageAsync();
+            await PersistFilterStateAsync();
+        }
+    }
+
+    private async Task PrevPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            await LoadPageAsync();
+            await PersistFilterStateAsync();
+        }
+    }
+
+    private async Task LoadFilterStateFromStorageAsync()
+    {
+        var state = await AdminProductsFilterStateService.LoadAsync();
+
+        filterName = state.Name;
+        currentPage = state.Page ?? 1;
+
+        showRestoredFiltersNotice =
+            !string.IsNullOrWhiteSpace(filterName)
+            || currentPage > 1;
+    }
+
+    private async Task PersistFilterStateAsync()
+    {
+        await AdminProductsFilterStateService.SaveAsync(new AdminProductsFilterState
+        {
+            Id = null,
+            Name = filterName,
+            Page = currentPage
+        });
+    }
+
+    private void DismissRestoredNotice()
+    {
+        showRestoredFiltersNotice = false;
+    }
+}
+

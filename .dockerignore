@@ -1,0 +1,13 @@
+bin/
+obj/
+OtServMarket.Tests/
+e2e/
+.git/
+.github/
+*.md
+*.sln
+global.json
+dotnet-install.sh
+fork-unused-files-audit.md
+coverage/
+coverage-test/

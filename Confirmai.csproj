@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Confirmai.Tests\**;obj\resetpw\**;.artifacts\**</DefaultItemExcludes>
+    <UserSecretsId>1eec0f8f-e95e-4ccd-8510-e0af69423b58</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.6" />
+    <PackageReference Include="NBitcoin" Version="8.0.13" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.2" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.15.1" />
+    <PackageReference Include="QRCoder" Version="1.6.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Confirmai.Tests/**" />
+    <Compile Remove="obj/resetpw/**" />
+    <Compile Remove=".artifacts/**" />
+    <EmbeddedResource Remove="Confirmai.Tests/**" />
+    <EmbeddedResource Remove="obj/resetpw/**" />
+    <EmbeddedResource Remove=".artifacts/**" />
+    <Content Remove="Confirmai.Tests/**" />
+    <Content Remove="obj/resetpw/**" />
+    <Content Remove=".artifacts/**" />
+    <None Remove="Confirmai.Tests/**" />
+    <None Remove="obj/resetpw/**" />
+    <None Remove=".artifacts/**" />
+  </ItemGroup>
+
+</Project>
+
+

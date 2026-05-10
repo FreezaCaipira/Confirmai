@@ -1,0 +1,79 @@
+﻿@using Confirmai.Models
+@using Confirmai.Services
+
+@inject CryptoQuoteService CryptoQuoteService
+
+<div class="crypto-quote-row">
+    <div class="crypto-quote-label">
+        <span class="crypto-label-text">@Label</span>
+    </div>
+
+    <div class="crypto-quote-content">
+        <div class="crypto-quote-col crypto-img-col">
+            <img src=@ImageSrc alt=@Currency class="crypto-img" />
+            <span class="crypto-amount">1 @Currency</span>
+        </div>
+
+        <div class="crypto-quote-col crypto-usd-col">
+            <span class="crypto-currency">USD</span>
+            <span class="crypto-value">
+                @if (quote == null || isLoading)
+                {
+                    <span>...</span>
+                }
+                else
+                {
+                    @quote.PriceUsd.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+                }
+            </span>
+        </div>
+        
+        <div class="crypto-quote-col crypto-brl-col">
+            <span class="crypto-currency">BRL</span>
+            <span class="crypto-value">
+                @if (quote == null || isLoading)
+                {
+                    <span>...</span>
+                }
+                else
+                {
+                    @quote.PriceBrl.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
+                }
+            </span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Bitcoin";
+    [Parameter] public string ImageSrc { get; set; } = "";
+    [Parameter] public string Currency { get; set; } = "BTC";
+    [Parameter] public string CryptoId { get; set; } = "bitcoin";
+
+    private CryptoQuote? quote;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadQuoteAsync();
+    }
+
+    private async Task LoadQuoteAsync()
+    {
+        isLoading = true;
+        try
+        {
+            quote = await CryptoQuoteService.GetQuoteAsync(CryptoId, Currency, Label);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading quote for {Currency}: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+}
+

@@ -1,0 +1,30 @@
+<div class="entity-shell">
+    <section class="entity-shell-grid" aria-label="Dados principais">
+        <article class="entity-shell-card entity-shell-main">
+            @MainContent
+        </article>
+
+        @if (SideContent is not null)
+        {
+            <aside class="entity-shell-card entity-shell-side">
+                @SideContent
+            </aside>
+        }
+    </section>
+
+    @if (FooterContent is not null)
+    {
+        <section class="entity-shell-footer" aria-label="Ações adicionais">
+            @FooterContent
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter] public string Kicker { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter, EditorRequired] public RenderFragment MainContent { get; set; } = default!;
+    [Parameter] public RenderFragment? SideContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+}

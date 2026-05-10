@@ -1,0 +1,9 @@
+<div class="dashboard-card">
+    <h3>@Title</h3>
+    <p>@ChildContent</p>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

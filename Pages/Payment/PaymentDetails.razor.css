@@ -1,0 +1,214 @@
+﻿.payment-receipt-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.payment-receipt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border-slate);
+}
+
+.payment-receipt-title {
+    margin: 0;
+    color: var(--gold);
+    font-size: 1.28rem;
+}
+
+.payment-receipt-subtitle {
+    margin: 0.35rem 0 0;
+    color: #b7c4cf;
+    font-size: 0.97rem;
+}
+
+.payment-receipt-status {
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 0.35rem 0.95rem;
+    font-size: 0.92rem;
+    white-space: nowrap;
+}
+
+.payment-receipt-status.paid {
+    background: #2e7d3233;
+    color: #9ff0b3;
+    border: 1px solid #2e7d3299;
+}
+
+.payment-receipt-status.pending {
+    background: #ff980033;
+    color: #ffd699;
+    border: 1px solid #ff980099;
+}
+
+.payment-receipt-grid {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: 1rem;
+}
+
+.payment-receipt-card {
+    background: var(--bg-slate-warm);
+    border: 1px solid var(--border-slate);
+    padding: 1.2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px #0004;
+    min-width: 0;
+}
+
+.payment-receipt-row,
+.payment-reference-item {
+    display: grid;
+    grid-template-columns: 8.8rem minmax(0, 1fr);
+    gap: 0.7rem;
+    margin-bottom: 0.8rem;
+    align-items: start;
+}
+
+.payment-reference-title {
+    margin: 0 0 0.9rem;
+    color: var(--gold);
+    font-size: 1.02rem;
+}
+
+.payment-reference-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.9rem;
+}
+
+.payment-id-label {
+    width: 8.8rem;
+    min-width: 8.8rem;
+}
+
+.payment-receipt-amount {
+    font-size: 1.08rem;
+    font-weight: 700;
+}
+
+.payment-address {
+    font-family: monospace;
+    background: var(--bg-slate-warm);
+    color: var(--gold);
+    border-radius: 4px;
+    padding: 0.2em 0.5em;
+    margin-right: 0.7em;
+    font-size: 0.97em;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    display: inline-block;
+    word-break: break-all;
+    margin-top: 0.3rem;
+}
+
+.system-value {
+    font-size: 1.13em;
+    font-weight: 500;
+}
+
+.payment-address-box {
+    margin: 0;
+    display: block;
+    width: 100%;
+    white-space: normal;
+}
+
+.payment-address-inline {
+    margin: 0;
+    display: block;
+    width: 100%;
+    white-space: normal;
+    overflow-x: visible;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.payment-link-btn {
+    background: #2980b9;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+
+.payment-link-btn:hover {
+    background: #1f5f8a;
+    color: #fff;
+}
+
+.payment-link-text {
+    margin-left: 0.7em;
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+}
+
+.label {
+    color: var(--gold);
+    font-weight: bold;
+    width: 8.8rem;
+    min-width: 8.8rem;
+    display: inline-block;
+}
+
+@media (max-width: 760px) {
+    .payment-receipt-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .payment-receipt-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-receipt-row,
+    .payment-reference-item {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+    }
+}
+
+.payment-reference-actions .payment-btn,
+.payment-reference-actions .payment-btn:visited {
+    background: #43a047;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.payment-reference-actions .payment-btn:hover {
+    background: #388e3c;
+    color: #fff;
+}
+
+/* Extracted from site.css: page-specific rules */
+.payment-id-row .payment-address-flex {
+    min-width: 0;
+}
+
+.payment-id-row .payment-address {
+    white-space: nowrap;
+    overflow-x: auto;
+}

@@ -1,0 +1,152 @@
+﻿@page "/admin/audit/{EntityType}/{EntityId}"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Models
+@using Confirmai.Services
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+
+@inject AdminLogsQueryService AdminLogsQueryService
+@inject AdminLogsExportService AdminLogsExportService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject UiTextService T
+
+<div class="entity-shell parchment-a admin-page admin-audit-timeline-shell">
+
+    <section class="entity-shell-grid" aria-label="@T["AdminAuditTimeline.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <h1 class="page-section-title">@T["AdminAuditTimeline.Title"]</h1>
+
+            <div class="timeline-entity-badge">
+                <span class="timeline-entity-type">@T["AdminAuditTimeline.Entity"]: <strong>@EntityType</strong></span>
+                <span class="timeline-entity-sep">/</span>
+                <span class="timeline-entity-id">@T["AdminAuditTimeline.EntityId"]: <strong>@EntityId</strong></span>
+            </div>
+
+            <div class="timeline-actions">
+                <button class="logs-export-btn" @onclick="ExportCsvAsync" disabled="@(!entries.Any())">@T["AdminAuditTimeline.ExportCsv"]</button>
+                <button class="logs-export-btn" @onclick="ExportJsonAsync" disabled="@(!entries.Any())">@T["AdminAuditTimeline.ExportJson"]</button>
+            </div>
+
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
+            }
+            else if (!entries.Any())
+            {
+                <p class="logs-empty-state">@T["AdminAuditTimeline.Empty"]</p>
+            }
+            else
+            {
+                <table class="log-table timeline-table">
+                    <thead>
+                        <tr>
+                            <th>@T["AdminAuditTimeline.DateTime"]</th>
+                            <th>@T["AdminAuditTimeline.EventType"]</th>
+                            <th>@T["AdminAuditTimeline.Level"]</th>
+                            <th>@T["AdminAuditTimeline.Source"]</th>
+                            <th>@T["AdminAuditTimeline.User"]</th>
+                            <th>@T["AdminAuditTimeline.Message"]</th>
+                            <th>@T["AdminAuditTimeline.Metadata"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var entry in entries)
+                        {
+                            <tr>
+                                <td data-label="@T["AdminAuditTimeline.DateTime"]" class="timeline-ts">@entry.Timestamp.ToLocalTime().ToString("dd MMM yyyy, HH:mm:ss")</td>
+                                <td data-label="@T["AdminAuditTimeline.EventType"]">
+                                    <code class="timeline-event-type">@entry.EventType</code>
+                                </td>
+                                <td data-label="@T["AdminAuditTimeline.Level"]">
+                                    <span class="log-level-badge @GetLevelBadgeClass(entry.Level)">@entry.Level</span>
+                                </td>
+                                <td data-label="@T["AdminAuditTimeline.Source"]">
+                                    <span class="log-source-badge">@entry.Source</span>
+                                </td>
+                                <td data-label="@T["AdminAuditTimeline.User"]">
+                                    @if (entry.User != null)
+                                    {
+                                        <a class="evidence-link" href="@($"/admin/users/view/{entry.User.Id}")">@entry.User.UserName</a>
+                                    }
+                                    else if (!string.IsNullOrEmpty(entry.UserId))
+                                    {
+                                        <span class="text-muted">@entry.UserId</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td data-label="@T["AdminAuditTimeline.Message"]">@entry.Message</td>
+                                <td data-label="@T["AdminAuditTimeline.Metadata"]" class="timeline-metadata-cell">
+                                    @if (!string.IsNullOrWhiteSpace(entry.MetadataJson))
+                                    {
+                                        <details>
+                                            <summary class="timeline-metadata-toggle">JSON</summary>
+                                            <pre class="timeline-metadata-pre">@entry.MetadataJson</pre>
+                                        </details>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/logs")'>@T["AdminAuditTimeline.BackToLogs"]</button>
+    </section>
+</div>
+
+@code {
+    [Parameter] public string EntityType { get; set; } = string.Empty;
+    [Parameter] public string EntityId { get; set; } = string.Empty;
+
+    private List<AppLog> entries = new();
+    private bool isLoading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+        entries = new();
+
+        if (!string.IsNullOrWhiteSpace(EntityType) && !string.IsNullOrWhiteSpace(EntityId))
+        {
+            entries = await AdminLogsQueryService.GetEntityTimelineAsync(EntityType, EntityId);
+        }
+
+        isLoading = false;
+    }
+
+    private async Task ExportCsvAsync()
+    {
+        if (!entries.Any()) return;
+        var csv = AdminLogsExportService.BuildTimelineCsv(entries);
+        var fileName = AdminLogsExportService.BuildTimelineFileName(EntityType, EntityId, "csv");
+        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
+    }
+
+    private async Task ExportJsonAsync()
+    {
+        if (!entries.Any()) return;
+        var json = AdminLogsExportService.BuildTimelineJson(entries);
+        var fileName = AdminLogsExportService.BuildTimelineFileName(EntityType, EntityId, "json");
+        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, json, "application/json;charset=utf-8;");
+    }
+
+    private static string GetLevelBadgeClass(string? level) => (level?.Trim().ToLowerInvariant()) switch
+    {
+        "warning" => "log-level-warning",
+        "error" or "bug" or "critical" or "fatal" => "log-level-error",
+        _ => "log-level-info"
+    };
+}

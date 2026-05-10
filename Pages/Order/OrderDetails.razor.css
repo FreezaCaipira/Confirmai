@@ -1,0 +1,1159 @@
+﻿/* =============================================
+   ORDER DETAILS — Old Parchment / Aged Paper
+   ============================================= */
+
+/* Breadcrumb: uses global styles from site.css */
+
+.entity-shell-card.entity-shell-main {
+    padding: 0.56rem;
+}
+
+/* --- Shared aged-paper card mixin --- */
+.intermediation-item-card,
+.intermediation-meta-card,
+.intermediation-status-card,
+.intermediation-chat-card {
+    background:
+        linear-gradient(180deg,
+            rgba(253, 245, 228, 0.97) 0%,
+            rgba(240, 220, 180, 0.95) 35%,
+            rgba(228, 202, 158, 0.93) 70%,
+            rgba(216, 186, 140, 0.96) 100%);
+    border: 2px solid #9e7a4a;
+    border-radius: 3px;
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 248, 225, 0.45),
+        inset 0 2px 6px rgba(160, 120, 60, 0.12),
+        0 2px 8px rgba(40, 22, 8, 0.18),
+        0 0 0 1px rgba(120, 80, 35, 0.10);
+    position: relative;
+}
+
+/* Subtle aged edge vignette on every card */
+.intermediation-item-card::before,
+.intermediation-meta-card::before,
+.intermediation-status-card::before,
+.intermediation-chat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 2px;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 0% 0%, rgba(140, 100, 50, 0.10) 0%, transparent 55%),
+        radial-gradient(ellipse at 100% 100%, rgba(140, 100, 50, 0.10) 0%, transparent 55%),
+        radial-gradient(ellipse at 100% 0%, rgba(160, 110, 50, 0.06) 0%, transparent 45%),
+        radial-gradient(ellipse at 0% 100%, rgba(160, 110, 50, 0.06) 0%, transparent 45%);
+}
+
+/* --- Main two-column grid --- */
+.intermediation-grid {
+    display: grid;
+    width: min(100%, 860px);
+    margin: 0 auto;
+    grid-template-columns: minmax(180px, 0.55fr) minmax(330px, 1fr);
+    gap: 0.62rem;
+    align-items: center;
+}
+
+/* --- Item card (left) --- */
+.intermediation-item-card {
+    padding: 0.72rem 0.58rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 0.48rem;
+}
+
+.intermediation-item-card .product-img {
+    width: min(100%, 100px);
+    max-height: 100px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    padding: 0.52rem;
+    background:
+        linear-gradient(180deg,
+            rgba(255, 250, 235, 0.95) 0%,
+            rgba(240, 225, 195, 0.90) 100%);
+    border: 2px solid rgba(140, 100, 50, 0.35);
+    border-radius: 3px;
+    box-shadow:
+        inset 0 0 8px rgba(140, 100, 50, 0.12),
+        0 2px 6px rgba(60, 35, 12, 0.16);
+}
+
+.intermediation-item-card .product-info {
+    width: 100%;
+    margin-top: 0.14rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+}
+
+.intermediation-item-card .product-name {
+    color: #2e1508;
+    font-weight: 900;
+    font-size: 1.02rem;
+    font-family: Georgia, "Times New Roman", serif;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 0 rgba(255, 240, 210, 0.5);
+}
+
+.intermediation-item-card .product-price {
+    color: #5c2d10;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    padding: 0.18rem 0.42rem;
+    background: linear-gradient(180deg, rgba(110, 75, 35, 0.12) 0%, rgba(110, 75, 35, 0.06) 100%);
+    border-radius: 2px;
+    border: 1px solid rgba(140, 100, 55, 0.18);
+}
+
+.intermediation-item-card .product-desc {
+    color: #6c4b27;
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
+/* --- Meta card (right) --- */
+.intermediation-meta-card {
+    padding: 0.62rem 0.68rem;
+}
+
+.intermediation-meta-rows {
+    display: grid;
+    gap: 0;
+}
+
+.intermediation-row {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 0.38rem;
+    align-items: center;
+    padding: 0.34rem 0;
+    border-bottom: 1px solid rgba(155, 120, 70, 0.22);
+}
+
+.intermediation-row:last-of-type {
+    border-bottom: 0;
+}
+
+.intermediation-label {
+    color: #5a3015;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.intermediation-value {
+    color: #3e2210;
+    font-weight: 700;
+    font-size: 0.88rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: right;
+}
+
+.intermediation-meta-card .intermediation-value.order-id-value {
+    color: #2a1508;
+    font-weight: 900;
+    font-size: 1rem;
+}
+
+.intermediation-meta-card .evidence-link,
+.intermediation-meta-card .intermediation-value a {
+    color: #7a3510;
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-color: rgba(122, 53, 16, 0.35);
+}
+
+/* Payment ID badge */
+.intermediation-meta-card .payment-address,
+.intermediation-meta-card .payment-address-flex .payment-address {
+    background: linear-gradient(180deg, #5c3a1d 0%, #452a14 100%);
+    color: #f0dfc4;
+    border: 1px solid #6d4422;
+    border-radius: 3px;
+    padding: 0.22rem 0.42rem;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.intermediation-meta-card .payment-address-flex {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+}
+
+.intermediation-meta-card .payment-address-flex .payment-address {
+    max-width: calc(100% - 38px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.intermediation-meta-card .clipboard-btn {
+    background: linear-gradient(180deg, #7a4e28 0%, #5d3a1c 100%);
+    color: #f1ddb7;
+    border: 1px solid #6c4522;
+    border-radius: 2px;
+}
+
+.intermediation-meta-card .clipboard-btn:hover {
+    background: linear-gradient(180deg, #956136 0%, #714826 100%);
+    color: #fff2d4;
+}
+
+/* --- Action buttons --- */
+.intermediation-actions {
+    margin-top: 0.28rem;
+    gap: 0.36rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: end;
+}
+
+.intermediation-actions > * {
+    width: 55%;
+    min-width: 190px;
+}
+
+.intermediation-btn,
+.intermediation-btn:visited {
+    height: 1.92rem;
+    min-height: 1.92rem;
+    padding: 0 0.58rem;
+    font-size: 0.86rem;
+    line-height: 1.15;
+    box-sizing: border-box;
+    border-radius: 3px;
+    border: 1px solid #7a4f27;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 244, 216, 0.88),
+        0 1px 3px rgba(34, 19, 8, 0.18);
+    text-shadow: 0 1px 0 rgba(255, 249, 236, 0.3);
+    cursor: pointer;
+}
+
+.intermediation-btn .payment-link-text {
+    margin-left: 0;
+    display: inline;
+    white-space: normal;
+}
+
+.intermediation-btn-success,
+.intermediation-btn-success:visited {
+    background: linear-gradient(180deg, #5f9b4b 0%, #3f7330 100%);
+    border-color: #35642a;
+    color: #efffe8;
+    text-shadow: 0 1px 0 rgba(20, 50, 10, 0.45);
+}
+
+.intermediation-btn-info,
+.intermediation-btn-info:visited {
+    height: auto;
+    min-height: 2.1rem;
+    padding: 0.24rem 0.54rem;
+    line-height: 1.2;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #f3f8ff;
+    background: linear-gradient(180deg, #6b98bb 0%, #486d8d 100%);
+    border-color: #3a5a75;
+    text-shadow: 0 1px 0 rgba(18, 34, 52, 0.55);
+}
+
+.intermediation-btn-warning,
+.intermediation-btn-warning:visited {
+    background: linear-gradient(180deg, #b8a28a 0%, #8e7660 100%);
+    border-color: #6b5842;
+    color: #2a1d12;
+    text-shadow: 0 1px 0 rgba(210, 190, 160, 0.3);
+}
+
+.intermediation-btn:hover {
+    filter: brightness(1.06);
+}
+
+/* --- Order status notices (awaiting review, disputa, etc.) --- */
+.order-status-notice {
+    margin: 0.5rem 0 0.25rem;
+    border-radius: 3px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.88rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    font-weight: 600;
+}
+
+.order-status-notice i {
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.notice-awaiting-review {
+    border: 1px solid #a07c30;
+    background: linear-gradient(180deg, #fff8e1 0%, #fdefc3 100%);
+    color: #6b4e10;
+}
+
+.notice-awaiting-review i {
+    color: #c8972a;
+}
+
+.notice-disputa {
+    border: 1px solid #b03a2e;
+    background: linear-gradient(180deg, #fdf2f1 0%, #fad7d3 100%);
+    color: #7b2218;
+}
+
+.notice-disputa i {
+    color: #c0392b;
+}
+
+.ingame-delivery-notice {
+    margin: 0.5rem 0 0.25rem;
+    border: 1px solid #2e7d52;
+    border-radius: 3px;
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(180deg, #e8f5ec 0%, #d4edda 100%);
+    color: #1a4a2e;
+    font-size: 0.88rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.ingame-delivery-notice i {
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+    color: #2e7d52;
+}
+
+.intermediation-success-message {
+    margin-top: 0.35rem;
+    border: 1px solid #5f4297;
+    border-radius: 3px;
+    padding: 0.5rem 0.62rem;
+    background: linear-gradient(180deg, #9270d4 0%, #7352b1 100%);
+    color: #f7f0ff;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* --- Status stepper --- */
+.intermediation-status-container,
+.intermediation-chat-card {
+    width: min(100%, 860px);
+    max-width: 860px;
+}
+
+.intermediation-status-container {
+    margin: 0.72rem auto 0;
+}
+
+/* Stepper container */
+.order-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1rem;
+    background:
+        linear-gradient(180deg,
+            rgba(253, 245, 228, 0.97) 0%,
+            rgba(240, 220, 180, 0.95) 100%);
+    border: 2px solid #9e7a4a;
+    border-radius: 3px;
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 248, 225, 0.45),
+        0 2px 8px rgba(40, 22, 8, 0.18);
+    gap: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Individual step */
+.order-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.28rem;
+    flex-shrink: 0;
+}
+
+.order-step-circle {
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border: 2px solid;
+    transition: background 0.2s, color 0.2s;
+}
+
+.order-step-label {
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Step states */
+.order-step--done .order-step-circle {
+    background: linear-gradient(180deg, #5f9b4b 0%, #3f7330 100%);
+    border-color: #35642a;
+    color: #efffe8;
+}
+.order-step--done .order-step-label {
+    color: #3a6822;
+}
+
+.order-step--active .order-step-circle {
+    background: linear-gradient(180deg, #c97c2a 0%, #9a5515 100%);
+    border-color: #7a3d10;
+    color: #fff8ee;
+    box-shadow: 0 0 0 3px rgba(200, 120, 40, 0.25);
+}
+.order-step--active .order-step-label {
+    color: #7a3d10;
+    font-weight: 900;
+}
+
+.order-step--pending .order-step-circle {
+    background: rgba(200, 180, 140, 0.25);
+    border-color: #c0a060;
+    color: #a08040;
+}
+.order-step--pending .order-step-label {
+    color: #9e7a4a;
+}
+
+/* Connector line between steps */
+.order-step-connector {
+    flex: 1;
+    height: 2px;
+    background: rgba(180, 140, 80, 0.35);
+    min-width: 0.5rem;
+    margin-bottom: 1.4rem;
+}
+.order-step-connector--done {
+    background: linear-gradient(90deg, #5f9b4b, #4a8a3a);
+}
+
+/* Terminal state (Cancelado / Disputa / Reembolsado) */
+.order-stepper--terminal {
+    flex-direction: row;
+    gap: 0.75rem;
+    justify-content: flex-start;
+    padding: 0.65rem 0.9rem;
+    background: linear-gradient(180deg, rgba(120, 30, 15, 0.08) 0%, rgba(100, 20, 8, 0.06) 100%);
+    border-color: #8c3020;
+}
+
+.order-stepper-terminal-icon {
+    font-size: 1.5rem;
+    color: #8c3020;
+    flex-shrink: 0;
+}
+
+.order-stepper-terminal-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+}
+
+.order-stepper-terminal-text strong {
+    font-size: 0.92rem;
+    color: #5a1808;
+    font-weight: 800;
+}
+
+.order-stepper-terminal-text span {
+    font-size: 0.8rem;
+    color: #7a3018;
+}
+
+.order-status-label {
+    color: #4a2810;
+    font-weight: 800;
+    font-size: 0.88rem;
+    font-family: Georgia, "Times New Roman", serif;
+    letter-spacing: 0.02em;
+}
+
+.intermediation-status-card .order-status-badge {
+    background: linear-gradient(180deg, #f1cd7a 0%, #ce994d 100%);
+    color: #37200d;
+    border: 1px solid #8f5f2e;
+    box-shadow: inset 0 1px 0 rgba(255, 244, 210, 0.58);
+    font-weight: 800;
+    padding: 0.24rem 0.72rem;
+    border-radius: 3px;
+    font-size: 0.82rem;
+}
+
+.intermediation-status-card .order-status-badge.pago,
+.intermediation-status-card .order-status-badge.entregue {
+    background: linear-gradient(180deg, var(--green-light) 0%, var(--green) 100%);
+    color: #1e2e13;
+    border: 1px solid var(--green-dark);
+}
+
+.intermediation-status-card .order-status-badge.finalizado {
+    background: linear-gradient(180deg, #9270d4 0%, #7352b1 100%);
+    color: #f7f0ff;
+    border: 1px solid #5f4297;
+}
+
+.intermediation-status-card .order-status-badge.aguardandopagamento,
+.intermediation-status-card .order-status-badge.pendente,
+.intermediation-status-card .order-status-badge.aguardandorevisaoadm,
+.intermediation-status-card .order-status-badge.aguardandoentrega {
+    background: linear-gradient(180deg, #f1cd7a 0%, #ce994d 100%);
+    color: #37200d;
+    border: 1px solid #8f5f2e;
+}
+
+.intermediation-status-card .order-status-badge.aguardandoentregaingame {
+    background: linear-gradient(180deg, #3dafb2 0%, #267a7d 100%);
+    color: #e4ffff;
+    border: 1px solid #1f6365;
+}
+
+/* --- Chat card --- */
+.intermediation-chat-card {
+    margin: 0.72rem auto 0;
+    padding: 0.82rem;
+    box-sizing: border-box;
+}
+
+.chat-title {
+    color: #fdf3e0;
+    font-weight: 800;
+    margin: 0 0 0.62rem;
+    font-size: 1rem;
+    font-family: Georgia, "Times New Roman", serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.46rem;
+    background: linear-gradient(180deg, #6a3a18 0%, #4e2810 100%);
+    border: 1px solid #7f4c22;
+    border-radius: 3px;
+    padding: 0.42rem 0.62rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 220, 160, 0.15), 0 1px 3px rgba(30, 15, 5, 0.18);
+}
+
+.chat-title .fa-comments {
+    color: #e8c88a;
+    font-size: 0.88rem;
+}
+
+.chat-messages {
+    max-height: 220px;
+    margin-bottom: 0.58rem;
+    padding: 0.68rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.42rem;
+    background:
+        linear-gradient(180deg,
+            rgba(250, 240, 218, 0.96) 0%,
+            rgba(242, 225, 192, 0.92) 50%,
+            rgba(235, 212, 172, 0.94) 100%);
+    border: 1px solid rgba(140, 100, 55, 0.38);
+    border-radius: 2px;
+    box-shadow:
+        inset 0 2px 6px rgba(120, 80, 30, 0.10),
+        inset 0 -1px 3px rgba(120, 80, 30, 0.06);
+}
+
+.chat-message {
+    border: 1px solid rgba(140, 100, 55, 0.28);
+    border-radius: 3px;
+    padding: 0.38rem 0.52rem;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 248, 228, 0.5),
+        0 1px 2px rgba(28, 15, 6, 0.08);
+    width: fit-content;
+    max-width: 85%;
+}
+
+.chat-message.mine {
+    margin-left: auto;
+}
+
+.chat-message.comprador,
+.chat-message.buyer {
+    background: linear-gradient(180deg, #d4e5cf 0%, #bdd4b6 100%);
+    color: #1e4a2e;
+    border-color: rgba(74, 121, 85, 0.40);
+}
+
+.chat-message.vendedor,
+.chat-message.seller {
+    background: linear-gradient(180deg, #eedcb0 0%, #e0ca92 100%);
+    color: #5c4215;
+    border-color: rgba(143, 106, 55, 0.40);
+}
+
+.chat-message.admin {
+    background: linear-gradient(180deg, #d5e0ea 0%, #c0d0de 100%);
+    color: #2a4560;
+    border-color: rgba(74, 105, 136, 0.38);
+}
+
+.chat-message .chat-user {
+    font-weight: 800;
+    font-size: 0.82rem;
+}
+
+.chat-message .chat-date {
+    color: inherit;
+    opacity: 0.58;
+    font-size: 0.76rem;
+}
+
+.chat-input-row {
+    display: flex;
+    gap: 0.42rem;
+    margin-top: 0.12rem;
+    align-items: stretch;
+}
+
+.chat-input {
+    flex: 1;
+    background: linear-gradient(180deg, #fdf5e4 0%, #f5e8ce 100%);
+    color: #2f1a0a;
+    border: 1px solid rgba(140, 100, 55, 0.45);
+    border-radius: 2px;
+    padding: 0.34rem 0.48rem;
+    font-size: 0.84rem;
+    font-family: Georgia, "Times New Roman", serif;
+    min-height: 0;
+}
+
+.chat-input::placeholder {
+    color: #9a7a52;
+}
+
+.chat-input-row .success-btn {
+    padding: 0.34rem 0.72rem;
+    font-size: 0.84rem;
+    min-height: 0;
+    height: auto;
+    line-height: 1.2;
+    border-radius: 2px;
+}
+
+/* Hide delivery badge on this page */
+.product-delivery-badge-wrap,
+.product-delivery-badge {
+    display: none;
+}
+
+/* --- Responsive --- */
+@media (max-width: 980px) {
+    .intermediation-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .intermediation-status-container,
+    .intermediation-chat-card {
+        max-width: 100%;
+    }
+
+    .intermediation-item-card .product-img {
+        width: min(100%, 116px);
+        max-height: 116px;
+    }
+}
+
+@media (max-width: 680px) {
+    .intermediation-row {
+        grid-template-columns: 1fr;
+        gap: 0.14rem;
+    }
+
+    .intermediation-value {
+        text-align: left;
+    }
+
+    .intermediation-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .intermediation-actions > * {
+        width: 100%;
+    }
+}
+
+
+.confirm-delivery-modal,
+.seller-evidence-modal,
+.seller-evidence-view-modal,
+.buyer-evidence-view-modal {
+    width: min(640px, 94vw);
+    max-width: min(640px, 94vw);
+    min-width: 0;
+    padding: 0.95rem 1.05rem 0.85rem;
+    background: linear-gradient(180deg, #f2e0bf 0%, #dfc090 100%);
+    border: 1px solid var(--brown-border-light);
+    color: #3e250f;
+    box-shadow: inset 0 0 0 1px rgba(255, 245, 221, 0.62), 0 12px 28px rgba(22, 12, 4, 0.38);
+}
+
+.modal-overlay {
+    background: rgba(18, 10, 4, 0.62);
+}
+
+.confirm-delivery-modal .modal-title,
+.seller-evidence-modal .modal-title,
+.seller-evidence-view-modal .modal-title,
+.buyer-evidence-view-modal .modal-title {
+    margin: -0.95rem -1.05rem 0.65rem;
+    padding: 0.35rem 0.5rem;
+    background: linear-gradient(180deg, var(--rust-orange, #7a2f0e) 0%, var(--rust-dark, #57210d) 100%);
+    border-bottom: 1px solid #8f4116;
+    color: #ffe9be;
+    font-size: 1.02rem;
+    font-family: var(--font-display, Georgia, serif);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.confirm-delivery-modal .modal-title-icon,
+.seller-evidence-modal .modal-title-icon,
+.seller-evidence-view-modal .modal-title-icon,
+.buyer-evidence-view-modal .modal-title-icon {
+    color: #f5c66a;
+}
+
+.confirm-delivery-modal .modal-content,
+.seller-evidence-modal .modal-content {
+    display: grid;
+    gap: 0.74rem;
+    padding-right: 0;
+    color: var(--bg-dark-soft);
+}
+
+.confirm-delivery-modal .modal-content label,
+.seller-evidence-modal .modal-content label {
+    margin-top: 0.34rem;
+    margin-bottom: 0.16rem;
+    font-weight: 700;
+    color: #5e3717;
+}
+
+.confirm-delivery-modal .modal-content > div,
+.seller-evidence-modal .modal-content > div {
+    margin-bottom: 0.12rem;
+}
+
+.confirm-delivery-modal .modal-textarea,
+.seller-evidence-modal .modal-textarea {
+    min-height: 86px;
+    margin-bottom: 0;
+    background: #fff7ea;
+    border: 1px solid var(--brown-border-warm);
+    color: var(--bg-deepest);
+}
+
+.confirm-delivery-modal input[type="file"],
+.seller-evidence-modal input[type="file"] {
+    background: #f8ecd6;
+    color: var(--bg-dark-soft);
+    border: 1px solid #9b784a;
+    border-radius: 6px;
+    padding: 0.22rem 0.32rem;
+}
+
+.seller-evidence-view-modal .modal-content,
+.buyer-evidence-view-modal .modal-content {
+    display: grid;
+    gap: 0.55rem;
+    padding: 0.2rem 0 0.15rem;
+    color: var(--bg-dark-soft);
+}
+
+.seller-evidence-view-modal .modal-content .text-muted,
+.buyer-evidence-view-modal .modal-content .text-muted {
+    background: rgba(152, 109, 58, 0.12);
+    border: 1px solid rgba(143, 106, 61, 0.45);
+    border-radius: 8px;
+    color: #6a4525;
+    padding: 0.6rem 0.72rem;
+}
+
+.seller-evidence-view-modal .evidence-link,
+.buyer-evidence-view-modal .evidence-link,
+.confirm-delivery-modal .evidence-link,
+.seller-evidence-modal .evidence-link {
+    color: #7b4518;
+    font-weight: 700;
+}
+
+.confirm-delivery-modal .evidence-link,
+.seller-evidence-modal .evidence-link,
+.seller-evidence-view-modal .evidence-link,
+.buyer-evidence-view-modal .evidence-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.38rem 0.55rem;
+    border-radius: 7px;
+    border: 1px solid #9a7242;
+    background: linear-gradient(180deg, #f4e2be 0%, #e7c88f 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 247, 227, 0.72), 0 1px 3px rgba(47, 27, 10, 0.12);
+    text-decoration: none;
+}
+
+.confirm-delivery-modal .evidence-link:hover,
+.seller-evidence-modal .evidence-link:hover,
+.seller-evidence-view-modal .evidence-link:hover,
+.buyer-evidence-view-modal .evidence-link:hover {
+    filter: brightness(1.04);
+    border-color: #835c32;
+}
+
+.confirm-delivery-modal .modal-actions,
+.seller-evidence-modal .modal-actions,
+.seller-evidence-view-modal .modal-actions,
+.buyer-evidence-view-modal .modal-actions {
+    margin-top: 0.72rem;
+    padding-top: 0.62rem;
+    gap: 0.55rem;
+}
+
+@media (max-width: 700px) {
+    .confirm-delivery-modal,
+    .seller-evidence-modal,
+    .seller-evidence-view-modal,
+    .buyer-evidence-view-modal {
+        width: min(96vw, 560px);
+        max-width: min(96vw, 560px);
+        padding: 0.8rem 0.82rem 0.74rem;
+    }
+}
+
+@media (max-width: 980px) {
+    body .payment-container.tibia-pay-shell .tibia-pay-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Extracted from site.css: page-specific rules --- */
+.release-funds-modal {
+    width: min(860px, 94vw);
+    max-width: min(860px, 94vw);
+    min-width: 0;
+    max-height: calc(100vh - 1rem);
+    padding: 0.95rem 1rem 0.85rem;
+    background: linear-gradient(180deg, #f2e0bf 0%, #ddbe8e 100%);
+    border: 1px solid var(--brown-border-light);
+    color: #3c250f;
+    box-shadow: inset 0 0 0 1px rgba(255, 245, 221, 0.6), 0 12px 28px rgba(22, 12, 4, 0.38);
+}
+
+.release-funds-modal .modal-title {
+    margin: -0.95rem -1rem 0.65rem;
+    padding: 0.35rem 0.5rem;
+    background: linear-gradient(180deg, var(--rust-orange, #7a2f0e) 0%, var(--rust-dark, #57210d) 100%);
+    border-bottom: 1px solid #8f4116;
+    color: #ffe9be;
+    font-size: 1.02rem;
+    font-family: var(--font-display, Georgia, serif);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.release-funds-modal .modal-title-icon {
+    color: #f5c66a;
+}
+
+.release-funds-modal .release-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding-right: 0;
+    color: #4a2d15;
+    overflow-y: auto;
+    max-height: calc(100vh - 190px);
+}
+
+.release-funds-modal .release-modal-question {
+    margin-bottom: 0.45rem;
+    color: #5c3516;
+    font-weight: 700;
+    font-size: 0.96rem;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.release-funds-modal .release-modal-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+}
+
+.release-funds-modal .release-modal-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 0 0 160px;
+    min-width: 0;
+    width: 160px;
+}
+
+.release-funds-modal .release-summary-card.payment-details-card {
+    background: linear-gradient(180deg, #f7ebd2 0%, #ecd3aa 100%);
+    border: 1px solid #9b774a;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 246, 225, 0.74), 0 1px 3px rgba(40, 22, 8, 0.14);
+    padding: 0.55rem 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.release-funds-modal .release-summary-card .details-row {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-bottom: 0;
+    padding: 0.28rem 0.1rem;
+    border-bottom: 1px solid rgba(143, 106, 61, 0.3);
+}
+
+.release-funds-modal .release-summary-card .details-row:last-child {
+    border-bottom: none;
+}
+
+.release-funds-modal .release-summary-card .details-row > span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.release-funds-modal .release-summary-card .label {
+    color: #6f431d;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.release-funds-modal .release-product-preview-img {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+    border: 2px solid #8c6a3f;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #f7ebd2 0%, #ecd3aa 100%);
+    padding: 0.3rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 245, 222, 0.5), 0 3px 8px rgba(40, 22, 8, 0.18);
+}
+
+.release-funds-modal .release-product-preview-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.4rem;
+    background: linear-gradient(168deg, #ebd2a5 0%, #dfbd88 56%, #d0a973 100%);
+    border: 1px solid #9b774a;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(255, 244, 214, 0.45), 0 2px 6px rgba(40, 22, 8, 0.12);
+}
+
+.release-funds-modal .release-evidence-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    align-items: start;
+    margin-top: 0.5rem;
+    gap: 0.45rem;
+    width: 100%;
+}
+
+.release-funds-modal .evidence-card {
+    background: linear-gradient(168deg, #ebd2a5 0%, #dfbd88 56%, #d0a973 100%);
+    border: 1px solid #9a7446;
+    border-radius: 8px;
+    color: #3e250f;
+    padding: 0.55rem 0.65rem;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 96px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.22rem;
+    overflow: hidden;
+    font-size: 0.9rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 244, 214, 0.4), 0 2px 6px rgba(40, 22, 8, 0.1);
+}
+
+.release-funds-modal .evidence-card .evidence-card-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #5a3314;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.2rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid rgba(143, 106, 61, 0.35);
+    width: 100%;
+}
+
+.release-funds-modal .evidence-card .evidence-card-title i,
+.release-funds-modal .evidence-card .evidence-card-title b {
+    color: inherit;
+}
+
+.release-funds-modal .evidence-card .evidence-card-title b {
+    margin: 0;
+    font-weight: inherit;
+}
+
+.release-funds-modal .evidence-card a {
+    color: #7b4518;
+    font-weight: 700;
+}
+
+.release-funds-modal .evidence-card a i {
+    color: inherit;
+}
+
+.release-funds-modal .modal-actions {
+    margin-top: 0.58rem;
+    padding-top: 0.5rem;
+    gap: 0.55rem;
+}
+
+@media (max-width: 900px) {
+    .release-funds-modal {
+        width: min(96vw, 720px);
+        max-width: min(96vw, 720px);
+        max-height: 90vh;
+    }
+
+    .release-funds-modal .release-modal-layout {
+        flex-direction: column;
+    }
+
+    .release-funds-modal .release-modal-side {
+        width: auto;
+        max-width: none;
+        flex-shrink: 0;
+        align-self: center;
+    }
+
+    .release-funds-modal .release-evidence-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Extracted from site.css: page-specific rules */
+
+.evidence-section {
+    display: flex;
+    gap: 1.5em;
+    margin-top: 1em;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.modal-title-with-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+}
+
+.modal-error {
+    color: #e74c3c;
+    margin-bottom: 0.7em;
+    font-weight: 600;
+}
+
+.payment-id-row .payment-address-flex {
+    min-width: 0;
+}
+
+.payment-id-row .payment-address {
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    .evidence-section {
+        gap: 0.8rem;
+    }
+}
+
+/* --- Action-specific button colors --- */
+.intermediation-actions .action-view-payment,
+.intermediation-actions .action-view-proof {
+    background: linear-gradient(180deg, #ebc977 0%, #c3913f 100%);
+    border: 1px solid #84562a;
+    color: #3a230f;
+}
+
+.intermediation-actions .action-send-proof {
+    background: linear-gradient(180deg, #6e99b9 0%, #486c89 100%);
+    border: 1px solid #3a5871;
+    color: #f2f8ff;
+    text-shadow: 0 1px 0 rgba(16, 30, 44, 0.62);
+}
+
+.intermediation-actions .action-back {
+    background: linear-gradient(180deg, #b8a28a 0%, #8e7660 100%);
+    border: 1px solid #6b5842;
+    color: #2a1d12;
+    text-shadow: 0 1px 0 rgba(210, 190, 160, 0.3);
+}
+
+.direct-confirm-warning {
+    font-size: 0.83rem;
+    color: #7b2218;
+    font-weight: 600;
+    margin-top: 0.35rem;
+}

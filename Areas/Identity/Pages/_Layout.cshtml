@@ -1,0 +1,23 @@
+﻿@{
+    Layout = null;
+    var title = ViewData["Title"] ?? "Confirmai";
+}
+@inject Confirmai.Services.LanguagePreferenceService LanguagePreferenceService
+<!DOCTYPE html>
+<html lang="@LanguagePreferenceService.SelectedLanguage">
+<head>
+    <meta charset="utf-8" />
+    <title>@title</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/identity.css" asp-append-version="true" />
+
+</head>
+<body class="identity-body">
+    <div class="identity-container">
+        @RenderBody()
+    </div>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+

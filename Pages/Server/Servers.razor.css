@@ -1,0 +1,193 @@
+﻿.servers-list-market .server-header-row {
+    margin: -1rem -1.05rem 0.65rem;
+    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
+    border-bottom: 1px solid var(--rust);
+}
+
+.servers-list-market .servers-list-title {
+    margin: 0;
+    padding: 0.42rem 0.62rem;
+    text-align: center;
+    font-size: 1.15rem;
+    font-family: var(--font-display);
+    color: #ffe9be;
+    letter-spacing: 0.05em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    text-transform: uppercase;
+}
+
+.servers-list-market .world-select-grid {
+    padding: 0.72rem;
+    border: 1px solid rgba(110, 75, 35, 0.45);
+    border-radius: 4px;
+    background: linear-gradient(180deg, #c9a874 0%, #b89460 100%);
+    box-shadow: inset 0 2px 6px rgba(60, 35, 12, 0.22), inset 0 0 0 1px rgba(255, 240, 200, 0.12);
+}
+
+.servers-list-market .servers-actions-row {
+    margin-top: 0.96rem;
+    padding-top: 0.72rem;
+    border-top: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.56rem;
+    width: 100%;
+}
+
+.servers-list-market .servers-actions-row .save-btn {
+    position: relative;
+    min-width: 190px;
+    min-height: 2.2rem;
+    border: 2px solid #7a3e1f;
+    border-image: linear-gradient(to bottom right, #c9a06a, #7a5028 40%, #4a2e15 70%, #8b6839) 1;
+    border-radius: 0;
+    background: linear-gradient(180deg, #7a2f0e 0%, #57210d 100%);
+    color: #ffe6b6;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 1px rgba(33, 15, 5, 0.55);
+    box-shadow:
+        inset 0 0 0 1px rgba(223, 136, 72, 0.26),
+        0 2px 5px rgba(42, 23, 9, 0.3);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.12s ease;
+}
+
+.servers-list-market .servers-actions-row .save-btn:hover {
+    background: linear-gradient(180deg, #8a3a12 0%, #63270f 100%);
+    box-shadow:
+        inset 0 0 0 1px rgba(223, 136, 72, 0.32),
+        0 3px 8px rgba(42, 23, 9, 0.35);
+    transform: translateY(-1px);
+}
+
+.servers-list-market .servers-actions-row .save-btn:active {
+    transform: translateY(0);
+    background: linear-gradient(180deg, #6a2509 0%, #4a1c0a 100%);
+    box-shadow:
+        inset 0 2px 4px rgba(30, 15, 5, 0.35),
+        0 1px 3px rgba(42, 23, 9, 0.2);
+}
+
+
+body .oldsite-footer {
+    border: 1px solid #7a3e1f;
+    background: linear-gradient(180deg, #7a2f0e 0%, #57210d 100%);
+    color: #ffe6b6;
+    box-shadow: inset 0 0 0 1px rgba(223, 136, 72, 0.26);
+}
+
+/* ---------- Skeleton loading state for server cards ---------- */
+.world-select-card-skeleton {
+    cursor: default;
+    pointer-events: none;
+}
+
+.world-select-card-skeleton .world-select-cover {
+    height: 200px;
+    border-bottom: 1px solid #8b6840;
+}
+
+.world-select-card-skeleton .world-select-body {
+    padding: 0.75rem 0.85rem 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.world-select-card-skeleton .world-select-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.world-select-card-skeleton .world-select-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+}
+
+.world-select-card-skeleton .world-select-metrics > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.world-select-card-skeleton .world-select-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.skeleton-shimmer {
+    position: relative;
+    overflow: hidden;
+    background-color: rgba(110, 75, 35, 0.18);
+    background-image: linear-gradient(
+        90deg,
+        rgba(110, 75, 35, 0.18) 0%,
+        rgba(255, 240, 200, 0.45) 50%,
+        rgba(110, 75, 35, 0.18) 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    border-radius: 3px;
+    animation: serverSkeletonShimmer 1.4s linear infinite;
+}
+
+.skeleton-line {
+    height: 0.7rem;
+    width: 100%;
+    border-radius: 3px;
+}
+
+.skeleton-line-title {
+    height: 1.05rem;
+    width: 60%;
+}
+
+.skeleton-line-strong {
+    height: 1rem;
+    width: 45%;
+}
+
+.skeleton-line-small {
+    height: 0.65rem;
+    width: 70%;
+}
+
+.skeleton-line-meta {
+    height: 0.7rem;
+    width: 85%;
+}
+
+.skeleton-pill {
+    height: 1.05rem;
+    width: 70px;
+    border-radius: 999px;
+}
+
+.skeleton-button {
+    flex: 1 1 0;
+    height: 2rem;
+    min-width: 80px;
+    border-radius: 2px;
+}
+
+@keyframes serverSkeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-shimmer {
+        animation: none;
+        background-image: none;
+    }
+}
+

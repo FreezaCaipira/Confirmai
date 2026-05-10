@@ -1,0 +1,138 @@
+﻿.product-table {
+    width: 100%;
+    background: var(--bg-slate);
+    color: var(--text-light);
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.product-table th,
+.product-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #333;
+    text-align: left;
+}
+
+.product-table th {
+    background: var(--bg-night);
+    color: var(--link-blue);
+}
+
+.product-table img {
+    border-radius: 6px;
+    background: var(--bg-night);
+}
+
+.product-thumbnail {
+    max-width: 60px;
+    max-height: 60px;
+}
+
+button {
+    margin-right: 0.5rem;
+    background: #222;
+    color: var(--link-blue);
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button.danger {
+    background: #a33;
+    color: #fff;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.add-btn {
+    background: var(--link-blue);
+    color: var(--bg-night);
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.add-btn:hover {
+    background: #5a8fd6;
+}
+
+button.edit-btn {
+    background: #444b54;
+    color: var(--text-light);
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    transition: background 0.2s;
+}
+
+button.edit-btn:hover {
+    background: #5a6470;
+}
+
+.primary-btn {
+    background: var(--gold);
+    color: var(--bg-night);
+    font-weight: bold;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px #0004;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.primary-btn:hover {
+    background: var(--gold-dark);
+}
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+}
+
+.loading-spinner .oi {
+    font-size: 2rem;
+    margin-right: 0.5rem;
+}
+
+@media (max-width: 900px) {
+    .primary-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .product-table td[data-label="Ações"] {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    button,
+    button.edit-btn,
+    button.danger {
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .product-thumbnail {
+        max-width: 48px;
+        max-height: 48px;
+    }
+}

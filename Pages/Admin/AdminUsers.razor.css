@@ -1,0 +1,31 @@
+﻿.admin-users-shell .order-status-badge {
+    font-weight: 800;
+}
+
+.admin-users-shell .order-status-badge.pago {
+    background: linear-gradient(180deg, #5f9b4b 0%, #3f7330 100%);
+    color: #efffe8;
+    border: 1px solid #35642a;
+}
+
+.admin-users-shell .order-status-badge.cancelado {
+    background: linear-gradient(180deg, #b04a40 0%, #8c322a 100%);
+    color: #ffe8e5;
+    border: 1px solid #762820;
+}
+
+/* --- Extracted from theme layer --- */
+.admin-users-shell .order-status-badge.pago {
+    background: linear-gradient(180deg, #5d9a47 0%, #3e742e 100%);
+    color: #efffe8;
+    border: 1px solid #346428;
+    font-weight: 800;
+}
+
+.admin-users-shell .order-status-badge.cancelado {
+    background: linear-gradient(180deg, #ad4a3f 0%, #8a3229 100%);
+    color: #ffe8e5;
+    border: 1px solid #762820;
+    font-weight: 800;
+}
+

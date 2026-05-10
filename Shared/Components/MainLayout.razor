@@ -1,0 +1,396 @@
+﻿@namespace Confirmai.Shared
+
+@inherits LayoutComponentBase
+
+@using Confirmai.Models
+@using Confirmai.Services
+@using Confirmai.Shared.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@using Confirmai.Data
+@using Microsoft.JSInterop
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject CurrencyPreferenceService CurrencyPreferenceService
+@inject LanguagePreferenceService LanguagePreferenceService
+@inject UiTextService T
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IDbContextFactory<AppDbContext> DbContextFactory
+
+<Toast @ref="ToastRef" />
+<CookieConsent @key="selectedLanguage" />
+<CascadingValue Value="ToastRef">
+    <CascadingAuthenticationState>
+        <div class="oldsite-page">
+            <header class="oldsite-header">
+                <a href="/servers" class="oldsite-logo-wrap" aria-label="Home">
+                    <div class="oldsite-logo-art" aria-hidden="true"></div>
+                    <img class="header-emblem header-emblem-left" src="/images/tibia/header-left.png" alt="" aria-hidden="true" />
+                    <h1 class="oldsite-logo">OtServ Market</h1>
+                    <p class="oldsite-tagline">Classic Trade Portal</p>
+                    <img class="header-emblem header-emblem-right" src="/images/tibia/header-right.png" alt="" aria-hidden="true" />
+                </a>
+                <div class="oldsite-playerline">
+                    <span class="oldsite-online-dot" aria-hidden="true"></span>
+                    <span>@globalActiveOffers @T["Layout.ActiveOffersSuffix"] @globalActiveServers @T["Layout.ActiveServersSuffix"]</span>
+                </div>
+                <nav class="oldsite-top-nav" aria-label="Main menu">
+                    <a href="/servers">@T["Nav.Servers"]</a>
+                    <AuthorizeView>
+                        <Authorized>
+                            <a href="/payments">@T["Nav.Payments"]</a>
+                            <a href="/orders">@T["Nav.Orders"]</a>
+                            <AuthorizeView Policy="ServerAdmin">
+                            <Authorized Context="gmContext">
+                                <a href="/docs/integration">@T["Nav.Integration"]</a>
+                            </Authorized>
+                        </AuthorizeView>
+                            <AuthorizeView Roles="admin">
+                                <Authorized Context="adminContext">
+                                    <a href="/admin">Admin</a>
+                                </Authorized>
+                            </AuthorizeView>
+
+                            <span class="nav-flex-spacer"></span>
+
+                            <a href="/mailbox" class="oldsite-top-nav-mailbox-icon" title="@T["Nav.Mailbox"]" aria-label="@T["Nav.Mailbox"]">
+                                <img class="oldsite-mailbox-glyph" src="/images/icons/mail-letter.svg" alt="" aria-hidden="true" />
+                                @if (unreadMailboxCount > 0)
+                                {
+                                    <span class="oldsite-top-nav-unread">@unreadMailboxCount</span>
+                                }
+                            </a>
+                            @if (!string.IsNullOrWhiteSpace(currentUserId))
+                            {
+                                <a href="/profile/@currentUserId" class="oldsite-top-nav-profile-link" title="@T["Nav.Profile"]" aria-label="@T["Nav.Profile"]">
+                                    <img class="oldsite-profile-glyph" src="/images/icons/user-profile.svg" alt="" aria-hidden="true" />
+                                </a>
+                            }
+                            <span class="oldsite-top-nav-user">@T["Layout.Hello"], @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? T["Layout.UserFallback"] : context.User.Identity.Name)!</span>
+                            <a href="/Identity/Account/Logout" class="oldsite-top-nav-logout">@T["Layout.Logout"]</a>
+                        </Authorized>
+                        <NotAuthorized>
+                            <a href="/Identity/Account/Login">@T["Nav.Login"]</a>
+                            <a href="/Identity/Account/Register">@T["Nav.Register"]</a>
+                        </NotAuthorized>
+                    </AuthorizeView>
+
+                    <div class="nav-language-flags" role="group" aria-label="@T["Layout.Language"]">
+                        <a class="language-flag-card lang-br @(IsLanguageSelected("pt-BR") ? "active" : string.Empty)"
+                           title="@T["Layout.LanguagePtBr"]"
+                           aria-label="@T["Layout.LanguagePtBr"]"
+                           href="@BuildLanguageUrl("pt-BR")">
+                            <img class="flag-icon" src="/images/flags/br.svg" alt="" aria-hidden="true" />
+                        </a>
+                        <a class="language-flag-card lang-us @(IsLanguageSelected("en-US") ? "active" : string.Empty)"
+                           title="@T["Layout.LanguageEnUs"]"
+                           aria-label="@T["Layout.LanguageEnUs"]"
+                           href="@BuildLanguageUrl("en-US")">
+                            <img class="flag-icon" src="/images/flags/us.svg" alt="" aria-hidden="true" />
+                        </a>
+                        <a class="language-flag-card lang-es @(IsLanguageSelected("es-ES") ? "active" : string.Empty)"
+                           title="@T["Layout.LanguageEsEs"]"
+                           aria-label="@T["Layout.LanguageEsEs"]"
+                           href="@BuildLanguageUrl("es-ES")">
+                            <img class="flag-icon" src="/images/flags/es.svg" alt="" aria-hidden="true" />
+                        </a>
+                    </div>
+                </nav>
+            </header>
+
+            <div class="oldsite-frame">
+                <div class="oldsite-center-column">
+
+                    <div class="layout-news-ticker oldsite-news-ticker" role="status" aria-live="polite">
+                        <strong>News Ticker</strong>
+                        <span class="oldsite-news-ticker-text">@CurrentNewsTickerMessage</span>
+                        <span class="oldsite-news-ticker-dots" aria-hidden="true">
+                            @for (var i = 0; i < newsTickerMessages.Length; i++)
+                            {
+                                <span class="oldsite-news-ticker-dot @(i == newsTickerIndex ? "active" : string.Empty)"></span>
+                            }
+                        </span>
+                    </div>
+
+                    <main class="@($"{MainContentCssClass} oldsite-main-content")">
+                        <Breadcrumb />
+                        @Body
+                    </main>
+                </div>
+
+                <aside class="oldsite-right-column">
+                    <ActivePaymentMethodsWidget />
+
+                    <section class="oldsite-widget">
+                        <h3>@T["Layout.TrendingTitle"]</h3>
+                        <ol>
+                            <li>@T["Layout.Trending1"]</li>
+                            <li>@T["Layout.Trending2"]</li>
+                            <li>@T["Layout.Trending3"]</li>
+                            <li>@T["Layout.Trending4"]</li>
+                            <li>@T["Layout.Trending5"]</li>
+                        </ol>
+                    </section>
+
+                    @if (TryGetServerDetailsId(out var serverDetailsId))
+                    {
+                        <ServerGlobalWidgets ServerId="@serverDetailsId" />
+                    }
+                </aside>
+            </div>
+
+            <footer class="oldsite-footer">
+                <span>&copy; 2025 Freeza</span>
+            </footer>
+        </div>
+    </CascadingAuthenticationState>
+</CascadingValue>
+
+@code {
+    private Toast? ToastRef;
+    private string selectedLanguage = LanguagePreferenceService.DefaultLanguage;
+    private int newsTickerIndex;
+    private int globalActiveOffers;
+    private int globalActiveServers;
+    private System.Threading.Timer? newsTickerTimer;
+    private System.Threading.Timer? mailboxTimer;
+    private string currentUserId = string.Empty;
+    private int unreadMailboxCount;
+    private readonly SemaphoreSlim mailboxRefreshLock = new(1, 1);
+    private bool isDisposed;
+    private string[] newsTickerMessages = [];
+
+    private string[] BuildNewsTickerMessages() =>
+    [
+        T["Layout.NewsTicker1"],
+        T["Layout.NewsTicker2"],
+        T["Layout.NewsTicker3"],
+        T["Layout.NewsTicker4"]
+    ];
+
+    private string CurrentNewsTickerMessage => newsTickerMessages.Length > 0 ? newsTickerMessages[newsTickerIndex % newsTickerMessages.Length] : string.Empty;
+
+    protected override void OnInitialized()
+    {
+        LanguagePreferenceService.Changed += HandleLanguageChanged;
+        newsTickerMessages = BuildNewsTickerMessages();
+        newsTickerTimer = new System.Threading.Timer(_ => RotateNewsTicker(), null, TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(4));
+        mailboxTimer = new System.Threading.Timer(_ => RefreshUnreadMailboxCount(), null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15));
+        NavigationManager.LocationChanged += HandleLocationChanged;
+
+        var hintedLanguage = GetLanguageHintFromUri();
+        if (!string.IsNullOrWhiteSpace(hintedLanguage))
+        {
+            LanguagePreferenceService.SetLanguage(hintedLanguage);
+        }
+
+        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+        _ = LoadCurrentUserAndUnreadCountSafeAsync();
+        _ = LoadGlobalSummaryAsync();
+    }
+
+    private async Task LoadGlobalSummaryAsync()
+    {
+        try
+        {
+            await using var db = await DbContextFactory.CreateDbContextAsync();
+            globalActiveServers = await db.Servers.AsNoTracking().CountAsync(s => s.IsActive);
+            globalActiveOffers = await db.Products.AsNoTracking()
+                .CountAsync(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"));
+            await InvokeAsync(StateHasChanged);
+        }
+        catch { /* Banner falls back to 0 */ }
+    }
+
+    private string MainContentCssClass
+        => HasOwnContentPaddingRoute()
+            ? "main-content main-content-route-padded"
+            : "main-content";
+
+    private bool HasOwnContentPaddingRoute()
+    {
+        var path = NavigationManager
+            .ToBaseRelativePath(NavigationManager.Uri)
+            .Trim()
+            .ToLowerInvariant();
+
+        return string.IsNullOrEmpty(path)
+            || path.StartsWith("servers")
+            || path.StartsWith("marketplace")
+            || path.StartsWith("payments")
+            || path.StartsWith("orders");
+    }
+
+    private bool TryGetServerDetailsId(out int serverId)
+    {
+        serverId = 0;
+
+        var path = NavigationManager
+            .ToBaseRelativePath(NavigationManager.Uri)
+            .Split('?', '#')[0]
+            .Trim('/');
+
+        var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length != 2)
+        {
+            return false;
+        }
+
+        if (!string.Equals(parts[0], "servers", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return int.TryParse(parts[1], out serverId);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        try
+        {
+            var persistedCurrency = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "Confirmai.fiatCurrency");
+            CurrencyPreferenceService.SetCurrency(persistedCurrency);
+
+            var hintedLanguage = GetLanguageHintFromUri();
+            var cookieLanguage = await JSRuntime.InvokeAsync<string?>("ConfirmaiGetCookie", "Confirmai.uiLanguage");
+            var persistedLanguage = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "Confirmai.uiLanguage");
+            LanguagePreferenceService.SetLanguage(hintedLanguage ?? cookieLanguage ?? persistedLanguage);
+
+            await JSRuntime.InvokeVoidAsync("ConfirmaiSetCookie", "Confirmai.uiLanguage", LanguagePreferenceService.SelectedLanguage, 365);
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "Confirmai.uiLanguage", LanguagePreferenceService.SelectedLanguage);
+            selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+        }
+        catch
+        {
+            CurrencyPreferenceService.SetCurrency("USD");
+            selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+        }
+
+        // Ensure descendants receive the @ref-backed toast cascade after first render.
+        StateHasChanged();
+    }
+
+    private string BuildLanguageUrl(string languageCode)
+    {
+        var current = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var returnUrl = string.IsNullOrWhiteSpace(current.AbsolutePath) ? "/" : current.AbsolutePath;
+        var withHint = QueryHelpers.AddQueryString(returnUrl, "uiLang", languageCode);
+        return $"/set-language/{Uri.EscapeDataString(languageCode)}?returnUrl={Uri.EscapeDataString(withHint)}";
+    }
+
+    private string? GetLanguageHintFromUri()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (!QueryHelpers.ParseQuery(uri.Query).TryGetValue("uiLang", out var hinted))
+        {
+            return null;
+        }
+
+        for (var i = hinted.Count - 1; i >= 0; i--)
+        {
+            var value = hinted[i]?.Trim();
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    private bool IsLanguageSelected(string languageCode)
+    {
+        return string.Equals(selectedLanguage, languageCode, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void HandleLanguageChanged()
+    {
+        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+        newsTickerMessages = BuildNewsTickerMessages();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void RotateNewsTicker()
+    {
+        _ = InvokeAsync(() =>
+        {
+            if (newsTickerMessages.Length <= 1)
+            {
+                return;
+            }
+
+            newsTickerIndex = (newsTickerIndex + 1) % newsTickerMessages.Length;
+            StateHasChanged();
+        });
+    }
+
+    private void RefreshUnreadMailboxCount()
+    {
+        _ = LoadCurrentUserAndUnreadCountSafeAsync();
+    }
+
+    private async Task LoadCurrentUserAndUnreadCountSafeAsync()
+    {
+        if (isDisposed)
+        {
+            return;
+        }
+
+        if (!await mailboxRefreshLock.WaitAsync(0))
+        {
+            return;
+        }
+
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? authState.User.FindFirstValue("sub")
+                ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                currentUserId = string.Empty;
+                unreadMailboxCount = 0;
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            currentUserId = userId;
+            await using var db = await DbContextFactory.CreateDbContextAsync();
+            unreadMailboxCount = await db.UserMailboxMessages
+                .AsNoTracking()
+                .CountAsync(m => m.RecipientUserId == currentUserId && !m.IsRead);
+
+            await InvokeAsync(StateHasChanged);
+        }
+        finally
+        {
+            mailboxRefreshLock.Release();
+        }
+    }
+
+    private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        _ = LoadCurrentUserAndUnreadCountSafeAsync();
+    }
+
+    public void Dispose()
+    {
+        isDisposed = true;
+        LanguagePreferenceService.Changed -= HandleLanguageChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+        newsTickerTimer?.Dispose();
+        mailboxTimer?.Dispose();
+        mailboxRefreshLock.Dispose();
+    }
+}
+

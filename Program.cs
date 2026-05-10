@@ -1,0 +1,524 @@
+﻿using Confirmai;
+using Confirmai.Data;
+using Confirmai.Enums;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Confirmai.Models;
+using Confirmai.Services;
+using Confirmai.Config;
+using Confirmai.Configuration;
+using Confirmai.Endpoints;
+using Confirmai.Hubs;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
+using System.Security.Cryptography;
+using Serilog;
+using Serilog.Events;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
+using Serilog.Sinks.OpenTelemetry;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: "logs/Confirmai-.log",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddUserSecrets<Program>(optional: true);
+
+// ── OpenTelemetry / Serilog OTLP ───────────────────────────────────────────
+// Read config early (before Host.UseSerilog) so the OTLP sink can be wired
+// into the bootstrap logger. When Endpoint is empty, OTLP is silently skipped.
+var otelSection = builder.Configuration.GetSection(OtelOptions.Section);
+var otelOptions = otelSection.Get<OtelOptions>() ?? new OtelOptions();
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: "logs/Confirmai-.log",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+    .WriteSerilogOtlpSinkIfEnabled(otelOptions)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor(options =>
+{
+    options.DetailedErrors = builder.Environment.IsDevelopment();
+    options.DisconnectedCircuitMaxRetained = 100;
+    options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
+    options.JSInteropDefaultCallTimeout = TimeSpan.FromSeconds(60);
+    options.MaxBufferedUnacknowledgedRenderBatches = 10;
+});
+
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
+
+builder.Services.AddSingleton<BitcoinQuoteService>();
+builder.Services.AddSingleton<CryptoQuoteService>();
+builder.Services.AddSingleton<PaymentEventBus>();
+
+builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>();
+builder.Services.AddScoped<IBitcoinPaymentService, TestnetBitcoinPaymentService>();
+builder.Services.AddScoped<BitcoinPaymentFactory>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<LogService>();
+builder.Services.AddScoped<GatewayService>();
+builder.Services.AddScoped<PaymentConfirmationService>();
+builder.Services.AddScoped<OrderAccessService>();
+builder.Services.AddScoped<AppInitializationService>();
+builder.Services.AddScoped<BtcPayWebhookService>();
+builder.Services.AddScoped<CurrencyPreferenceService>();
+builder.Services.AddScoped<LanguagePreferenceService>();
+builder.Services.AddScoped<UiTextService>();
+builder.Services.AddScoped<DashboardMetricsService>();
+builder.Services.AddScoped<AdminSettingsService>();
+builder.Services.AddScoped<OperationFeeCalculatorService>();
+builder.Services.AddScoped<AdminOrderReleaseService>();
+builder.Services.AddScoped<AdminLogsQueryService>();
+builder.Services.AddScoped<AdminLogsExportService>();
+builder.Services.AddScoped<AdminLogsFilterStateService>();
+builder.Services.AddScoped<AdminUsersFilterStateService>();
+builder.Services.AddScoped<AdminPaymentsFilterStateService>();
+builder.Services.AddScoped<AdminOrdersFilterStateService>();
+builder.Services.AddScoped<AdminProductsFilterStateService>();
+builder.Services.AddScoped<TibiaServerService>();
+builder.Services.AddScoped<AuthenticationStateProvider,
+    RevalidatingIdentityAuthenticationStateProvider>();
+builder.Services.AddScoped<ServerRegistrationRequestService>();
+builder.Services.AddScoped<ServerApiKeyService>();
+builder.Services.AddHostedService<GameLoginTokenCleanupService>();
+builder.Services.AddHostedService<LogRetentionService>();
+builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
+builder.Services.AddScoped<AdminSecurityPolicyService>();
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+
+var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+if (!builder.Environment.IsEnvironment("Testing") &&
+    (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__")))
+{
+    throw new InvalidOperationException(
+        "DefaultConnection não configurada. Defina em User Secrets com: dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" \"Host=localhost;Port=5432;Database=Confirmai;Username=freeza;Password=...\" --project .\\Confirmai.csproj"
+    );
+}
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(defaultConnection));
+
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
+    options.UseNpgsql(defaultConnection), ServiceLifetime.Scoped);
+
+var isDevelopment = builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing");
+var securityPolicy = SecurityPolicyDefaults.Create(isDevelopment);
+var emailEnabled = builder.Configuration.GetSection("Email").GetValue<bool>("Enabled");
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedEmail = securityPolicy.RequireConfirmedEmail && emailEnabled;
+
+        options.Password.RequiredLength = securityPolicy.PasswordRequiredLength;
+        options.Password.RequireDigit = securityPolicy.PasswordRequireDigit;
+        options.Password.RequireLowercase = securityPolicy.PasswordRequireLowercase;
+        options.Password.RequireUppercase = securityPolicy.PasswordRequireUppercase;
+        options.Password.RequireNonAlphanumeric = securityPolicy.PasswordRequireNonAlphanumeric;
+        options.Password.RequiredUniqueChars = securityPolicy.PasswordRequiredUniqueChars;
+
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.MaxFailedAccessAttempts = securityPolicy.LockoutMaxFailedAccessAttempts;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(securityPolicy.LockoutMinutes);
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders()
+    .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ServerAdmin", policy =>
+        policy.RequireClaim("server_admin", "true"));
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "Confirmai.session";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = isDevelopment ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.Strict;
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(securityPolicy.SessionTimeoutMinutes);
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/Login";
+});
+
+// Validate security stamp every 30 seconds so that sessions invalidated via
+// UpdateSecurityStampAsync (e.g. game-login flow) are kicked out quickly.
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.FromSeconds(30);
+});
+
+builder.Services.Configure<BtcPayOptions>(builder.Configuration.GetSection("BtcPay"));
+
+builder.Services.AddAuthentication()
+    .AddScheme<ApiKeyAuthOptions, ApiKeyAuthHandler>(ApiKeyAuthDefaults.AuthenticationScheme, _ => { });
+
+// S-7: Rate limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("webhook", o =>
+    {
+        o.PermitLimit = 30;
+        o.Window = TimeSpan.FromMinutes(1);
+        o.QueueLimit = 0;
+    });
+
+    options.AddFixedWindowLimiter("auth", o =>
+    {
+        o.PermitLimit = 20;
+        o.Window = TimeSpan.FromMinutes(1);
+        o.QueueLimit = 0;
+    });
+
+    options.AddFixedWindowLimiter("integration", o =>
+    {
+        o.PermitLimit = 60;
+        o.Window = TimeSpan.FromMinutes(1);
+        o.QueueLimit = 0;
+    });
+});
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>();
+
+// ── OpenTelemetry traces + metrics ───────────────────────────────────────────
+// Only registered when an OTLP endpoint is configured; otherwise the app runs
+// normally with console/file logging only (no performance overhead).
+builder.Services.Configure<OtelOptions>(otelSection);
+if (otelOptions.IsEnabled && Uri.IsWellFormedUriString(otelOptions.Endpoint, UriKind.Absolute))
+{
+    var resourceBuilder = ResourceBuilder.CreateDefault()
+        .AddService(
+            serviceName: otelOptions.ServiceName,
+            serviceVersion: otelOptions.ServiceVersion)
+        .AddAttributes(new Dictionary<string, object>
+        {
+            ["deployment.environment"] = otelOptions.Environment
+        });
+
+    var headers = otelOptions.Headers;
+
+    builder.Services.AddOpenTelemetry()
+        .WithTracing(tracing => tracing
+            .SetResourceBuilder(resourceBuilder)
+            .AddAspNetCoreInstrumentation(o =>
+            {
+                o.RecordException = true;
+                // Skip health check and static file spans
+                o.Filter = ctx => !ctx.Request.Path.StartsWithSegments("/health")
+                    && !ctx.Request.Path.StartsWithSegments("/_framework")
+                    && !ctx.Request.Path.StartsWithSegments("/_blazor");
+            })
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri(otelOptions.Endpoint);
+                if (!string.IsNullOrWhiteSpace(headers))
+                    o.Headers = headers;
+            }))
+        .WithMetrics(metrics => metrics
+            .SetResourceBuilder(resourceBuilder)
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri(otelOptions.Endpoint);
+                if (!string.IsNullOrWhiteSpace(headers))
+                    o.Headers = headers;
+            }));
+}
+
+builder.Services.AddHsts(options =>
+{
+    options.MaxAge = TimeSpan.FromDays(365);
+    options.IncludeSubDomains = true;
+});
+
+// P-1: Response compression (Brotli preferred, Gzip fallback) for text payloads.
+// EnableForHttps=true is acceptable here because we don't echo user-controlled
+// secret content into compressed responses (BREACH mitigation: no auth tokens
+// or per-user secrets are reflected into compressible HTML/JSON bodies).
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+    {
+        "application/javascript",
+        "text/css",
+        "application/json",
+        "image/svg+xml"
+    });
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+
+var app = builder.Build();
+
+// S-1: Error handler + HTTPS redirect + HSTS
+if (!isDevelopment)
+{
+    app.UseExceptionHandler("/error");
+    app.UseHsts();
+}
+if (!isDevelopment)
+{
+    app.UseHttpsRedirection();
+}
+
+// P-1: Compress text responses BEFORE static files / endpoints handle them.
+// Disabled in Development so dotnet watch can inject its browser-refresh script.
+if (!isDevelopment)
+{
+    app.UseResponseCompression();
+}
+
+// S-2: Security response headers + per-request CSP nonce
+app.Use(async (context, next) =>
+{
+    // Generate a 128-bit nonce for inline <script> tags so we can drop
+    // 'unsafe-inline' from script-src in our CSP.
+    var nonceBytes = RandomNumberGenerator.GetBytes(16);
+    var nonce = Convert.ToBase64String(nonceBytes);
+    context.Items["csp-nonce"] = nonce;
+
+    var headers = context.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "DENY";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+    headers["Content-Security-Policy"] =
+        "default-src 'self'; " +
+        $"script-src 'self' 'nonce-{nonce}'; " +
+        // style-src keeps 'unsafe-inline' because Blazor injects inline error
+        // styles and component styles cannot easily be nonced at this layer.
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+        "img-src 'self' data: blob:; " +
+        "connect-src 'self' wss: ws:; " +
+        "frame-ancestors 'none'; " +
+        "base-uri 'self'; " +
+        "form-action 'self';";
+    await next();
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider(
+        new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider().Mappings)
+    {
+        Mappings = { [".lua"] = "text/plain" }
+    },
+    OnPrepareResponse = ctx =>
+    {
+        if (ctx.File.Name.EndsWith(".lua", StringComparison.OrdinalIgnoreCase))
+        {
+            // Always force the canonical filename regardless of the URL used
+            var downloadName = ctx.File.Name;
+            ctx.Context.Response.Headers["Content-Disposition"] =
+                $"attachment; filename=\"{downloadName}\"";
+        }
+        else if (!isDevelopment)
+        {
+            ctx.Context.Response.Headers.CacheControl = "public, max-age=31536000";
+        }
+    }
+});
+app.UseRateLimiter();
+app.UseRouting();
+
+app.Use(async (context, next) =>
+{
+    var languagePreference = context.RequestServices.GetRequiredService<LanguagePreferenceService>();
+    context.Request.Cookies.TryGetValue("Confirmai.uiLanguage", out var languageFromCookie);
+    languagePreference.SetLanguage(languageFromCookie);
+    await next();
+});
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapGet("/set-language/{languageCode}", (HttpContext context, string languageCode, string? returnUrl) =>
+{
+    var supported = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "pt-BR",
+        "en-US",
+        "es-ES"
+    };
+
+    var normalized = string.IsNullOrWhiteSpace(languageCode) ? LanguagePreferenceService.DefaultLanguage : languageCode.Trim();
+    if (!supported.Contains(normalized))
+    {
+        normalized = LanguagePreferenceService.DefaultLanguage;
+    }
+
+    context.Response.Cookies.Append("Confirmai.uiLanguage", normalized, new CookieOptions
+    {
+        Path = "/",
+        HttpOnly = false,
+        IsEssential = true,
+        Secure = !isDevelopment,
+        SameSite = SameSiteMode.Lax,
+        Expires = DateTimeOffset.UtcNow.AddDays(365)
+    });
+
+    var target = string.IsNullOrWhiteSpace(returnUrl) ? "/" : returnUrl;
+    if (!Uri.TryCreate(target, UriKind.Relative, out _) || target.StartsWith("//", StringComparison.Ordinal))
+    {
+        target = "/";
+    }
+    else if (!target.StartsWith('/'))
+    {
+        target = "/" + target;
+    }
+
+    return Results.LocalRedirect(target);
+});
+
+// ── Dev-only test seed endpoint ───────────────────────────────────────────────
+// Creates a settled PaymentRecord + OrderModel for E2E tests to assert against.
+// Only registered when running in Development environment — never exposed in prod.
+if (isDevelopment)
+{
+    app.MapPost("/api/test/seed-order", async (
+        HttpContext ctx,
+        AppDbContext db,
+        UserManager<ApplicationUser> userManager) =>
+    {
+        var statusStr = ctx.Request.Query["status"].FirstOrDefault() ?? "AguardandoEntrega";
+        if (!Enum.TryParse<PaymentStatus>(statusStr, ignoreCase: true, out var orderStatus))
+            orderStatus = PaymentStatus.AguardandoEntrega;
+
+        var adminUsers = await userManager.GetUsersInRoleAsync("admin");
+        var admin = adminUsers.FirstOrDefault();
+        if (admin is null)
+            return Results.Problem("No admin user found in database.");
+
+        var product = new Product
+        {
+            Name = "E2E Test Product " + Guid.NewGuid().ToString("N")[..8],
+            Description = "Produto criado automaticamente pelo endpoint de teste E2E.",
+            ShortDescription = "E2E test item",
+            Price = 0.001m,
+            UserId = admin.Id,
+            CreatedAt = DateTime.UtcNow
+        };
+        db.Products.Add(product);
+        await db.SaveChangesAsync();
+
+        var invoiceId = "e2e-" + Guid.NewGuid().ToString("N");
+        var payment = new PaymentRecord
+        {
+            ProductId = product.Id,
+            UserId = admin.Id,
+            Address = "tb1qe2e-test-address",
+            PaymentId = invoiceId,
+            PaymentMethod = "BTCPayServer",
+            Amount = 0.001m,
+            IsPaid = true,
+            PaidAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
+        };
+        db.Payments.Add(payment);
+        await db.SaveChangesAsync();
+
+        var order = new OrderModel
+        {
+            BuyerId = admin.Id,
+            SellerId = admin.Id,
+            ProductId = product.Id,
+            Amount = 0.001m,
+            IsPaid = true,
+            PaymentId = payment.Id,
+            Status = orderStatus,
+            CreatedAt = DateTime.UtcNow
+        };
+        db.Orders.Add(order);
+        await db.SaveChangesAsync();
+
+        payment.OrderId = order.Id;
+        await db.SaveChangesAsync();
+
+        return Results.Ok(new
+        {
+            orderId = order.Id,
+            productId = product.Id,
+            buyerEmail = admin.Email,
+            status = order.Status.ToString()
+        });
+    });
+}
+
+app.MapBlazorHub();
+app.MapRazorPages();
+app.MapFallbackToPage("/_Host");
+
+app.MapPost("/api/btcpay/webhook", async (HttpContext context, BtcPayWebhookService webhookService) =>
+{
+    return await webhookService.HandleAsync(context);
+}).RequireRateLimiting("webhook");
+
+app.MapServerIntegrationApi();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (db.Database.IsRelational())
+    {
+        await db.Database.MigrateAsync();
+    }
+    else
+    {
+        await db.Database.EnsureCreatedAsync();
+    }
+
+    var initializer = scope.ServiceProvider.GetRequiredService<AppInitializationService>();
+    await initializer.SeedAsync();
+}
+
+// PaymentHub is a server-to-client notification channel; [Authorize] on the hub ensures only authenticated users connect
+app.MapHub<PaymentHub>("/paymentHub");
+app.MapHealthChecks("/health");
+app.Run();
+
+public partial class Program { }
+

@@ -1,0 +1,377 @@
+﻿@page "/payments/view/{PaymentId:int}"
+
+@attribute [Authorize]
+
+@using Confirmai.Shared
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+@inject BitcoinPaymentFactory PaymentFactory
+@inject NavigationManager NavigationManager
+@inject LogService LogService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject PaymentConfirmationService PaymentConfirmationService
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
+@inject PaymentEventBus PaymentEventBus
+
+<div class="entity-shell payment-container parchment-b view-pay-shell">
+
+    <section class="entity-shell-grid" aria-label="@T["PaymentView.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            @if (payment == null)
+            {
+                <div class="alert alert-warning">@T["PaymentView.NotFound"]</div>
+            }
+            else
+            {
+                <div class="view-pay-grid">
+                    <section class="view-pay-card view-pay-card-invoice">
+                        <div class="view-pay-card-head">
+                            <h2>@AddressLabel</h2>
+                        </div>
+                        <div class="view-pay-card-body">
+                            @if (payment.PaymentMethod == "BTCPayServer" && payment.Address.StartsWith("http"))
+                            {
+                                <div class="view-pay-field">
+                                    <div class="view-pay-label">@T["PaymentView.Checkout"]</div>
+                                    <a href="@payment.Address" target="_blank" rel="noopener noreferrer" class="view-pay-btn">
+                                        @string.Format(T["PaymentView.OpenCheckout"], payment.PaymentMethod)
+                                    </a>
+                                    <div class="view-pay-hint">@string.Format(T["PaymentView.QrHint"], payment.PaymentMethod)</div>
+                                </div>
+                            }
+                            else
+                            {
+                                @if (!payment.IsPaid && !IsPixPayment)
+                                {
+                                    <div class="view-pay-action-row">
+                                        <button type="button" class="view-pay-btn" @onclick="OnCheckPaymentClick" disabled="@isCheckingPayment">
+                                            @if (isCheckingPayment)
+                                            {
+                                                <span class="oi oi-reload spinning" aria-hidden="true"></span>
+                                                <span>Reconfirmando...</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@T["PaymentBuy.Check"]</span>
+                                            }
+                                        </button>
+                                    </div>
+                                }
+                                <div class="view-pay-qrcode">
+                                    <QRCode Value="@QRCodeValue" />
+                                </div>
+
+                                @if (isCheckingPayment)
+                                {
+                                    <div class="view-pay-checking" role="status" aria-live="polite">
+                                        Consultando gateways para confirmar o pagamento...
+                                    </div>
+                                }
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(feedbackMessage))
+                            {
+                                <div class="payment-inline-feedback payment-inline-feedback-@feedbackType" role="status" aria-live="polite">
+                                    @feedbackMessage
+                                </div>
+                            }
+                        </div>
+                    </section>
+
+                    <section class="view-pay-card view-pay-card-meta">
+                        <div class="view-pay-card-head view-pay-card-head-meta">
+                            <h2>@T["PaymentView.Title"]</h2>
+                        </div>
+                        <div class="view-pay-card-body">
+                            <div class="view-pay-row">
+                                <span class="view-pay-label">@(T["OrderDetails.PaymentId"] == "OrderDetails.PaymentId" ? "ID do pagamento" : T["OrderDetails.PaymentId"])</span>
+                                <span class="view-pay-value view-pay-value-id">@(string.IsNullOrWhiteSpace(payment.PaymentId) ? "-" : payment.PaymentId)</span>
+                            </div>
+                            @{
+                                var sellerUser = payment.Seller
+                                    ?? payment.Order?.Seller
+                                    ?? payment.Product?.User;
+                                var sellerName = sellerUser?.UserName;
+                            }
+                            @if (payment.User != null)
+                            {
+                                <div class="view-pay-row">
+                                    <span class="view-pay-label">@T["Common.Buyer"]</span>
+                                    <span class="view-pay-value"><a href="/profile/@payment.User.Id">@payment.User.UserName</a></span>
+                                </div>
+                            }
+                            @if (sellerUser != null)
+                            {
+                                <div class="view-pay-row">
+                                    <span class="view-pay-label">@T["Common.Seller"]</span>
+                                    <span class="view-pay-value"><a href="/profile/@sellerUser.Id">@sellerName</a></span>
+                                </div>
+                            }
+                            <div class="view-pay-row">
+                                <span class="view-pay-label">@T["Common.Gateway"]</span>
+                                <span class="view-pay-value">@(string.IsNullOrWhiteSpace(payment.PaymentMethod) ? "-" : payment.PaymentMethod)</span>
+                            </div>
+                            <div class="view-pay-row">
+                                <span class="view-pay-label">@T["Common.Date"]</span>
+                                <span class="view-pay-value">@payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            <div class="view-pay-row">
+                                <span class="view-pay-label">@T["Common.Status"]</span>
+                                <span class="view-pay-value">
+                                    <span class="view-pay-status @(payment.IsPaid ? "paid" : "pending")">
+                                        @(payment.IsPaid ? T["Common.Paid"] : T["Common.Pending"])
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="view-pay-row">
+                                <span class="view-pay-label">@T["Common.Address"]</span>
+                                <span class="view-pay-value view-pay-value-address">@payment.Address</span>
+                            </div>
+                            <div class="view-pay-row">
+                                <span class="view-pay-label">@T["Common.Value"]</span>
+                                <span class="view-pay-value view-pay-value-amount">@FormatPaymentAmount(payment.Amount, payment.Currency)</span>
+                            </div>
+                            @if (payment.PaidAt != null)
+                            {
+                                <div class="view-pay-row">
+                                    <span class="view-pay-label">@T["PaymentDetails.PaidAt"]</span>
+                                    <span class="view-pay-value">@payment.PaidAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                            }
+
+                            @if (payment.OrderId.HasValue)
+                            {
+                                <a class="view-pay-btn view-pay-btn-success view-pay-order-link" href="@($"/orders/{payment.OrderId.Value}")" title="@T["PaymentDetails.ViewOrder"]">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span>@T["PaymentDetails.ViewOrder"]</span>
+                                </a>
+                            }
+
+                            @if (IsPixPayment && !payment.IsPaid && isCurrentUserSeller)
+                            {
+                                <div class="view-pay-pix-confirm-wrap">
+                                    <p class="view-pay-pix-confirm-hint">
+                                        <i class="fas fa-info-circle"></i>
+                                        Ao confirmar o recebimento, o pedido sera criado automaticamente e o comprador sera notificado.
+                                    </p>
+                                    <button type="button" class="view-pay-btn-confirm-pix" @onclick="ConfirmPixReceiptAsync" disabled="@isConfirmingPix">
+                                        @if (isConfirmingPix)
+                                        {
+                                            <span class="oi oi-reload spinning" aria-hidden="true"></span>
+                                            <span>Confirmando...</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-check"></i>
+                                            <span>Confirmar recebimento do PIX</span>
+                                        }
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                </div>
+            }
+
+            @if (isLoading)
+            {
+                <div class="loading-spinner">
+                    <span class="oi oi-reload spinning"></span> @T["Common.Loading"]
+                </div>
+            }
+        </article>
+    </section>
+</div>
+
+@code {
+    [Parameter] public int PaymentId { get; set; }
+    private PaymentRecord? payment;
+    [CascadingParameter] public Toast? ToastRef { get; set; }
+    private bool isLoading = false;
+    public string SelectedMethod { get; set; } = "";
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
+    private string? feedbackMessage;
+    private string feedbackType = "info";
+    private bool isCheckingPayment;
+    private bool isConfirmingPix;
+    private string currentUserId = "";
+    private bool isCurrentUserSeller;
+
+    private bool IsPixPayment => string.Equals(payment?.PaymentMethod, "Pix", StringComparison.OrdinalIgnoreCase);
+    private string AddressLabel => IsPixPayment ? T["PaymentBuy.PixCodeLabel"] : T["PaymentBuy.InvoiceAddress"];
+
+    public string QRCodeValue =>
+        IsPixPayment
+            ? payment?.Address ?? string.Empty
+            : payment != null && payment.Address != null && payment.Address.StartsWith("lnbc")
+                ? payment.Address
+                : $"bitcoin:{payment?.Address}?amount={payment?.Amount}";
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
+        payment = await Db.Payments
+            .Include(p => p.User)
+            .Include(p => p.Seller)
+            .Include(p => p.Product)
+            .ThenInclude(prod => prod!.User)
+            .Include(p => p.Order)
+            .ThenInclude(o => o!.Seller)
+            .FirstOrDefaultAsync(p => p.Id == PaymentId);
+        isLoading = false;
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        currentUserId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
+        if (!string.IsNullOrEmpty(currentUserId) && payment != null)
+        {
+            isCurrentUserSeller = currentUserId == payment.SellerId
+                || (string.IsNullOrEmpty(payment.SellerId) && currentUserId == payment.Product?.UserId);
+        }
+
+        var methods = PaymentFactory.GetAvailableMethods().ToList();
+        SelectedMethod = methods.Contains("Pix") ? "Pix" : methods.FirstOrDefault() ?? "";
+
+        PaymentEventBus.OnPaymentConfirmed += OnPaymentConfirmed;
+    }
+
+    private void OnPaymentConfirmed(string userId, string paymentId)
+    {
+        if (paymentId != payment?.PaymentId) return;
+
+        InvokeAsync(async () =>
+        {
+            await CheckPayment();
+            StateHasChanged();
+        });
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        PaymentEventBus.OnPaymentConfirmed -= OnPaymentConfirmed;
+        return ValueTask.CompletedTask;
+    }
+
+    private async Task ConfirmPixReceiptAsync()
+    {
+        if (payment == null || isConfirmingPix) return;
+        isConfirmingPix = true;
+        StateHasChanged();
+        var (success, error) = await PaymentConfirmationService.ConfirmPixReceiptAsync(payment.Id, currentUserId);
+        if (success)
+        {
+            payment.IsPaid = true;
+            payment.PaidAt = DateTime.UtcNow;
+            feedbackMessage = "Pagamento PIX confirmado! O pedido foi criado e o comprador foi notificado.";
+            feedbackType = "success";
+        }
+        else
+        {
+            feedbackMessage = error ?? "Erro ao confirmar pagamento PIX.";
+            feedbackType = "error";
+        }
+        isConfirmingPix = false;
+        StateHasChanged();
+    }
+
+    private async Task OnCheckPaymentClick()
+    {
+        if (isCheckingPayment)
+        {
+            return;
+        }
+
+        await CheckPayment();
+    }
+
+    private async Task CheckPayment()
+    {
+        if (isCheckingPayment)
+        {
+            return;
+        }
+
+        isCheckingPayment = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            if (payment == null)
+            {
+                NotifyUser(T["PaymentView.NotFound"], "error");
+                return;
+            }
+
+            try
+            {
+                var result = await PaymentConfirmationService.ConfirmAsync(payment);
+
+                if (result.AlreadyPaid)
+                {
+                    payment.IsPaid = true;
+                    NotifyUser(T["PaymentBuy.AlreadyConfirmed"], "success");
+                    return;
+                }
+
+                if (result.Confirmed)
+                {
+                    payment.IsPaid = true;
+                    payment.PaidAt = DateTime.UtcNow;
+                    NotifyUser(T["PaymentBuy.Confirmed"], "success");
+                }
+                else
+                {
+                    NotifyUser(string.Format(T["PaymentBuy.NotReceived"], FormatBtcWithUsdText(result.ReceivedAmount), FormatBtcWithUsdText(payment.Amount)), "warning");
+                }
+            }
+            catch
+            {
+                NotifyUser(T["PaymentBuy.CheckError"], "error");
+            }
+        }
+        finally
+        {
+            isCheckingPayment = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void NotifyUser(string message, string type)
+    {
+        feedbackMessage = message;
+        feedbackType = type;
+        ToastRef?.Show(message, type);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private MarkupString FormatBtcWithUsdMarkup(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    }
+
+    private string FormatBtcWithUsdText(decimal amount)
+    {
+        return BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    }
+
+    private string FormatPaymentAmount(decimal amount, string? currency)
+    {
+        return currency switch
+        {
+            "BRL" => $"R$ {amount:N2}",
+            "USD" => $"$ {amount:N2}",
+            _ => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency)
+        };
+    }
+}
+

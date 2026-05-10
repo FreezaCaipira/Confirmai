@@ -1,0 +1,175 @@
+﻿@page "/servers/{ServerId:int}/players"
+
+@attribute [AllowAnonymous]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Web
+@using Confirmai.Enums
+@using Confirmai.Services
+@inject TibiaServerService TibiaServerService
+@inject NavigationManager Navigation
+@inject UiTextService T
+
+<PageTitle>@T["ServerPlayers.Title"]</PageTitle>
+
+<div class="entity-shell parchment-a server-players-page">
+
+    <section class="entity-shell-grid" aria-label="@T["ServerPlayers.Aria"]">
+        <article class="entity-shell-card entity-shell-main form-card server-form-card">
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["ServerPlayers.Loading"]</div>
+            }
+            else if (server == null)
+            {
+                <div class="dashboard-servers-empty">
+                    <h3>@T["ServerPlayers.NotFound"]</h3>
+                    <p>@T["ServerPlayers.NotFoundDesc"]</p>
+                    <button class="mk-btn mk-btn-muted" type="button" @onclick='() => Navigation.NavigateTo("/servers")'>@T["ServerPlayers.Back"]</button>
+                </div>
+            }
+            else
+            {
+                var displayLogoPath = ResolveLogoPath(server);
+
+                <section class="server-players-logo-card" aria-label="Resumo do servidor">
+                    @if (!string.IsNullOrWhiteSpace(displayLogoPath))
+                    {
+                        <img class="server-players-logo" src="@displayLogoPath" alt="Logo de @server.Name" />
+                    }
+                    else
+                    {
+                        <div class="server-players-logo-fallback" aria-hidden="true">@BuildInitials(server.Name)</div>
+                    }
+
+                    <div class="server-players-logo-meta">
+                        <h3>@server.Name</h3>
+                        <p>
+                            @(string.IsNullOrWhiteSpace(server.Region) ? T["Servers.Region.Global"] : server.Region)
+                            | Tibia @(string.IsNullOrWhiteSpace(server.TibiaVersion) ? T["Servers.TibiaVersion.Unknown"] : server.TibiaVersion)
+                        </p>
+                    </div>
+
+                    <div class="server-players-actions">
+                        <button class="mk-btn mk-btn-muted" type="button" @onclick='() => Navigation.NavigateTo("/servers")'>@T["ServerPlayers.Back"]</button>
+                    </div>
+                </section>
+
+                @if (!filteredPlayers.Any())
+                {
+                    <p class="identity-muted">@T["ServerPlayers.NoPlayers"]</p>
+                }
+                else
+                {
+                    <div class="server-players-table-wrap">
+                        <table class="product-table server-players-table">
+                            <thead>
+                                <tr>
+                                    <th>@T["ServerPlayers.ColPlayer"]</th>
+                                    <th>@T["ServerPlayers.ColEmail"]</th>
+                                    <th>@T["ServerPlayers.ColLink"]</th>
+                                    <th>@T["ServerPlayers.ColActions"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var player in filteredPlayers)
+                                {
+                                    <tr>
+                                        <td>@player.UserName</td>
+                                        <td>@player.Email</td>
+                                        <td>@GetLinkTypeLabel(player)</td>
+                                        <td>
+                                            <button class="mk-btn mk-btn-secondary server-players-profile-btn" type="button" @onclick='() => Navigation.NavigateTo(BuildProfileUrl(player.UserId))'>@T["ServerPlayers.ViewProfile"]</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            }
+        </article>
+    </section>
+</div>
+
+@code {
+    [Parameter] public int ServerId { get; set; }
+
+    private TibiaServer? server;
+    private bool isLoading = true;
+    private List<TibiaServerService.ServerLinkedPlayerView> players = new();
+    private IEnumerable<TibiaServerService.ServerLinkedPlayerView> filteredPlayers => players.Where(IsVisiblePlayer);
+
+    protected override async Task OnInitializedAsync()
+    {
+        server = await TibiaServerService.GetByIdAsync(ServerId);
+        if (server != null)
+        {
+            players = await TibiaServerService.GetLinkedPlayersAsync(ServerId);
+        }
+
+        isLoading = false;
+    }
+
+    private static string BuildInitials(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "SV";
+        }
+
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length == 1)
+        {
+            return parts[0].Length >= 2
+                ? parts[0].Substring(0, 2).ToUpperInvariant()
+                : parts[0].ToUpperInvariant();
+        }
+
+        return string.Concat(parts[0][0], parts[^1][0]).ToUpperInvariant();
+    }
+
+    private string GetLinkTypeLabel(TibiaServerService.ServerLinkedPlayerView player)
+    {
+        if (player.HasMarketplaceOffer && player.IsServerMember)
+        {
+            return T["ServerPlayers.RoleMemberSeller"];
+        }
+
+        if (player.HasMarketplaceOffer)
+        {
+            return T["ServerPlayers.RoleSeller"];
+        }
+
+        return T["ServerPlayers.RoleMember"];
+    }
+
+    private static bool IsVisiblePlayer(TibiaServerService.ServerLinkedPlayerView player)
+    {
+        // Public page should not expose administrative accounts in this list.
+        return !player.IsSystemAdmin && player.Role != ServerMemberRole.ServerAdmin;
+    }
+
+    private static string? ResolveLogoPath(TibiaServer currentServer)
+    {
+        if (!string.IsNullOrWhiteSpace(currentServer.LogoPath))
+        {
+            return currentServer.LogoPath;
+        }
+
+        if (string.Equals(currentServer.Name, "Alaria", StringComparison.OrdinalIgnoreCase))
+        {
+            // Visual sample logo for public server card when no custom logo is uploaded.
+            return "/images/servers/alaria-logo-example.svg";
+        }
+
+        return null;
+    }
+
+    private string BuildProfileUrl(string userId)
+    {
+        var safeUserId = Uri.EscapeDataString(userId ?? string.Empty);
+        var currentRelativePath = "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+        return $"/profile/{safeUserId}?serverId={ServerId}&returnUrl={Uri.EscapeDataString(currentRelativePath)}";
+    }
+}

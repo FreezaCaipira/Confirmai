@@ -1,0 +1,346 @@
+.identity-body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 12px;
+    box-sizing: border-box;
+    background:
+        radial-gradient(circle at 12% 10%, rgba(232, 194, 126, 0.14) 0%, rgba(232, 194, 126, 0) 36%),
+        radial-gradient(circle at 88% 14%, rgba(121, 92, 56, 0.15) 0%, rgba(121, 92, 56, 0) 34%),
+        linear-gradient(180deg, #1d1710 0%, #17120d 52%, #120d09 100%);
+    color: #f3e5c8;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+
+.identity-container {
+    --identity-border: #8e6a3b;
+    --identity-rhythm-tight: 0.65rem;
+    --identity-rhythm-base: 0.95rem;
+    --identity-rhythm-loose: 1.2rem;
+    width: min(560px, 100%);
+    margin: 0;
+    background:
+        radial-gradient(circle at 10% -22%, rgba(244, 216, 161, 0.26) 0%, rgba(244, 216, 161, 0) 48%),
+        radial-gradient(circle at 90% 0%, rgba(112, 84, 49, 0.24) 0%, rgba(112, 84, 49, 0) 45%),
+        linear-gradient(154deg, #5f472f 0%, #3d2d1d 62%, #312315 100%);
+    border: 1px solid var(--identity-border);
+    border-radius: 18px;
+    box-shadow: inset 0 0 0 1px rgba(248, 223, 173, 0.12), 0 12px 30px rgba(0, 0, 0, 0.45);
+    padding: 2.25rem 1.9rem 1.7rem;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.identity-container::before {
+    content: "";
+    position: absolute;
+    inset: 0.58rem;
+    border-radius: 12px;
+    border: 1px solid rgba(231, 193, 128, 0.28);
+    pointer-events: none;
+}
+
+.identity-container::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(66, 44, 23, 0.28) 0%, rgba(66, 44, 23, 0) 20%),
+        radial-gradient(circle at 100% 0%, rgba(66, 44, 23, 0.24) 0%, rgba(66, 44, 23, 0) 20%),
+        radial-gradient(circle at 0% 100%, rgba(66, 44, 23, 0.24) 0%, rgba(66, 44, 23, 0) 20%),
+        radial-gradient(circle at 100% 100%, rgba(66, 44, 23, 0.28) 0%, rgba(66, 44, 23, 0) 20%);
+    mix-blend-mode: multiply;
+}
+
+.identity-container h1,
+.identity-container h2,
+.identity-container h3 {
+    color: #f4e3c2;
+    margin-top: 0;
+    font-family: "Times New Roman", Georgia, serif;
+    text-shadow: 0 1px 0 #3f2a12;
+    position: relative;
+    z-index: 1;
+}
+
+.identity-container > h2 {
+    text-align: center;
+    margin-bottom: var(--identity-rhythm-base);
+}
+
+.identity-container > p.identity-muted {
+    text-align: center;
+    margin: 0 0 var(--identity-rhythm-base);
+}
+
+.identity-container > p.identity-muted + p.identity-muted {
+    margin-top: calc(var(--identity-rhythm-tight) * -0.2);
+}
+
+.identity-container form {
+    margin-top: var(--identity-rhythm-tight);
+    position: relative;
+    z-index: 1;
+}
+
+.identity-container label {
+    color: #ead7b2;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+}
+
+.identity-container input,
+.identity-container select,
+.identity-container textarea {
+    width: 100%;
+    margin-bottom: 1.1rem;
+    padding: 0.68rem 0.88rem;
+    font-size: 1rem;
+    box-sizing: border-box;
+    border-radius: 7px;
+    border: 1px solid #8f6f42;
+    background: rgba(255, 248, 231, 0.9);
+    color: #4a2f18;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    z-index: 1;
+}
+
+.identity-container form > div {
+    margin-bottom: var(--identity-rhythm-loose);
+    position: relative;
+    z-index: 1;
+}
+
+.identity-container input::placeholder {
+    color: #7d5a34;
+    opacity: 1;
+}
+
+.identity-container input:focus,
+.identity-container select:focus,
+.identity-container textarea:focus {
+    outline: none;
+    border-color: #7d5b2f;
+    box-shadow: 0 0 0 2px rgba(207, 167, 98, 0.26);
+}
+
+.identity-container button,
+.identity-container input[type="submit"] {
+    background: linear-gradient(180deg, #d6ad66 0%, #b68440 100%);
+    color: #2e1d0b;
+    border: 1px solid #73522a;
+    padding: 0.72rem 1.1rem;
+    border-radius: 8px;
+    margin: var(--identity-rhythm-base) auto 0;
+    cursor: pointer;
+    width: auto;
+    min-width: 180px;
+    min-height: 2.35rem;
+    font-size: 1.02rem;
+    font-weight: 700;
+    display: block;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+    position: relative;
+    z-index: 1;
+}
+
+.identity-container button:hover,
+.identity-container input[type="submit"]:hover {
+    background: linear-gradient(180deg, #e0bc7c 0%, #c28f4d 100%);
+    color: #2e1d0b;
+    border-color: #7c592d;
+    transform: translateY(-1px);
+}
+
+.identity-container a {
+    color: #f0d299;
+}
+
+.identity-home-link {
+    position: absolute;
+    top: 0.9rem;
+    left: 1rem;
+    text-decoration: none;
+    color: #f0d299;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    line-height: 1;
+    z-index: 2;
+}
+
+.identity-home-arrow {
+    font-size: 1.4rem;
+}
+
+.identity-home-text {
+    font-size: 0.95rem;
+}
+
+.identity-home-link.identity-home-link-login {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-bottom: var(--identity-rhythm-base);
+    width: fit-content;
+}
+
+.identity-login-heading {
+    text-align: center;
+    margin: 0 0 var(--identity-rhythm-base);
+}
+
+.identity-remember {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+    width: fit-content;
+}
+
+.identity-remember input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    accent-color: #c99544;
+}
+
+.identity-remember label {
+    margin: 0;
+    font-weight: 500;
+}
+
+.validation-summary-errors,
+.text-danger {
+    color: #ffd0c0;
+}
+
+.identity-container > .validation-summary-errors,
+.identity-container > .text-danger {
+    text-align: center;
+    margin: 0 auto var(--identity-rhythm-base);
+    max-width: 92%;
+    line-height: 1.35;
+}
+
+.text-danger {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+}
+
+.identity-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    justify-content: center;
+    margin-top: var(--identity-rhythm-loose);
+    padding-top: var(--identity-rhythm-tight);
+    border-top: 1px dotted rgba(231, 193, 128, 0.35);
+    font-size: 0.95rem;
+    position: relative;
+    z-index: 1;
+}
+
+.identity-actions a {
+    color: #f0d299;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.identity-actions a:hover {
+    color: #ffe6bd;
+}
+
+.identity-muted {
+    color: #d7c6a7;
+    line-height: 1.45;
+    position: relative;
+    z-index: 1;
+}
+
+.identity-footer {
+    margin-top: calc(var(--identity-rhythm-loose) + 0.2rem);
+    text-align: center;
+    color: #d2be97;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 600px) {
+    .identity-body {
+        align-items: flex-start;
+        padding: 12px 8px;
+    }
+
+    .identity-container {
+        --identity-rhythm-tight: 0.48rem;
+        --identity-rhythm-base: 0.72rem;
+        --identity-rhythm-loose: 0.92rem;
+        width: min(560px, calc(100vw - 16px));
+        margin: 0;
+        padding: 1.2rem 0.78rem 1rem;
+        border-radius: 14px;
+    }
+
+    .identity-container::before {
+        inset: 0.46rem;
+        border-radius: 10px;
+    }
+
+    .identity-container > h2 {
+        font-size: 1.55rem;
+    }
+
+    .identity-container > .validation-summary-errors,
+    .identity-container > .text-danger {
+        max-width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .identity-container form > div {
+        margin-bottom: var(--identity-rhythm-base);
+    }
+
+    .identity-container input,
+    .identity-container select,
+    .identity-container textarea {
+        margin-bottom: 0.72rem;
+        padding: 0.62rem 0.78rem;
+        font-size: 0.96rem;
+    }
+
+    .identity-container button,
+    .identity-container input[type="submit"] {
+        width: 100%;
+        min-height: 44px;
+        margin-top: var(--identity-rhythm-base);
+        font-size: 0.98rem;
+        padding: 0.64rem 0.92rem;
+    }
+
+    .identity-home-link.identity-home-link-login {
+        margin-bottom: var(--identity-rhythm-base);
+    }
+
+    .identity-actions {
+        gap: 0.58rem;
+        margin-top: var(--identity-rhythm-base);
+        padding-top: var(--identity-rhythm-tight);
+        font-size: 0.92rem;
+    }
+
+    .identity-footer {
+        margin-top: var(--identity-rhythm-base);
+        font-size: 0.85rem;
+    }
+}

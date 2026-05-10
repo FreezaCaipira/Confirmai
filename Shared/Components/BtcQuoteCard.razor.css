@@ -1,0 +1,100 @@
+﻿.crypto-quote-row {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(90deg, var(--bg-slate) 60%, #181c20 100%);
+    border: 1px solid var(--border-slate);
+    border-radius: 14px;
+    box-shadow: 0 2px 16px #000a;
+    margin-bottom: 2.5rem;
+    padding: 2rem 2.5rem;
+    width: 100%;
+    min-height: 120px;
+    gap: 2.5rem;
+    box-sizing: border-box;
+}
+
+.crypto-quote-label {
+    min-width: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.crypto-label-text {
+    font-size: 2.1rem;
+    font-weight: bold;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-shadow: 0 2px 12px #000a;
+    text-transform: uppercase;
+}
+
+.crypto-quote-content {
+    display: flex;
+    flex: 1;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.crypto-quote-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+}
+
+.crypto-img-col {
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.crypto-img {
+    width: 64px;
+    height: 64px;
+    margin-right: 0.5rem;
+    filter: drop-shadow(0 2px 8px #0008);
+}
+
+.crypto-amount {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #f8f8f2;
+    letter-spacing: 1px;
+}
+
+.crypto-currency {
+    font-size: 1.1rem;
+    color: #b0b0b0;
+    margin-bottom: 0.2rem;
+    letter-spacing: 1px;
+}
+
+.crypto-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--link-blue);
+    text-shadow: 0 2px 8px #0008;
+}
+
+.crypto-usd-col .crypto-value {
+    color: var(--link-blue);
+}
+
+.crypto-brl-col .crypto-value {
+    color: #4caf50;
+}
+
+@media (max-width: 900px) {
+    .crypto-quote-row {
+        flex-direction: column;
+        gap: 1.2rem;
+        padding: 1.2rem 1rem;
+    }
+
+    .crypto-quote-content {
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+}

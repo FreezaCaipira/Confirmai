@@ -1,0 +1,24 @@
+@* DEPRECATED/INTERNAL: componente mantido apenas para histórico; não usar em páginas ativas. *@
+<div class="pagination">
+    <button type="button" @onclick="HandlePreviousAsync" disabled="@IsPreviousDisabled">@PreviousLabel</button>
+    <span class="pagination-info">Página @CurrentPage de @TotalPages</span>
+    <button type="button" @onclick="HandleNextAsync" disabled="@IsNextDisabled">@NextLabel</button>
+</div>
+
+@code {
+    [Parameter] public int CurrentPage { get; set; } = 1;
+    [Parameter] public int TotalPages { get; set; } = 1;
+    [Parameter] public EventCallback OnPrevious { get; set; }
+    [Parameter] public EventCallback OnNext { get; set; }
+    [Parameter] public string PreviousLabel { get; set; } = "Anterior";
+    [Parameter] public string NextLabel { get; set; } = "Próxima";
+
+    private bool IsPreviousDisabled => CurrentPage <= 1;
+    private bool IsNextDisabled => CurrentPage >= TotalPages;
+
+    private Task HandlePreviousAsync()
+        => OnPrevious.HasDelegate ? OnPrevious.InvokeAsync() : Task.CompletedTask;
+
+    private Task HandleNextAsync()
+        => OnNext.HasDelegate ? OnNext.InvokeAsync() : Task.CompletedTask;
+}

@@ -1,0 +1,34 @@
+﻿.header {
+    background: linear-gradient(180deg, rgba(21, 28, 40, 0.98) 0%, rgba(15, 22, 32, 0.98) 100%);
+    color: #f6e4bf;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #81653f;
+    box-shadow: inset 0 -1px 0 rgba(243, 212, 151, 0.08);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.social-button {
+    color: var(--bg-deep);
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid #73522a;
+    border-radius: 7px;
+    background: linear-gradient(180deg, #d6ad66 0%, #b68440 100%);
+    transition: filter 0.2s;
+}
+
+.social-button:hover {
+    filter: brightness(1.05);
+}

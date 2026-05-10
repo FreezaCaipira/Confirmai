@@ -1,0 +1,110 @@
+﻿@page "/admin/gateways"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+
+@inject BitcoinPaymentFactory PaymentFactory
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject GatewayService GatewayService
+@inject LogService LogService
+@inject UiTextService T
+
+<div class="entity-shell parchment-a admin-page admin-gateways-shell">
+
+    <section class="entity-shell-grid" aria-label="@T["AdminGateways.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <h1 class="page-section-title">@T["AdminGateways.Title"]</h1>
+            @if (isLoading)
+            }
+            else
+            {
+            <table class="product-table gateways-table">
+                <thead>
+                    <tr>
+                        <th>@T["Common.Name"]</th>
+                        <th class="status-col">@T["Common.Status"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var method in methods)
+                {
+                    <tr>
+                        <td>@method.Name</td>
+                        <td class="gateway-status">
+                            <label class="switch-toggle">
+                                <input type="checkbox"
+                                       @bind="method.Enabled"
+                                       @bind:event="onchange"
+                                       @bind:after="async () => await OnSwitchChanged(method)" />
+                                <span class="slider"></span>
+                            </label>
+                            <span class="gateway-status-label @(method.Enabled ? "active" : "inactive")">
+                                @(method.Enabled ? T["AdminGateways.Active"] : T["AdminGateways.Inactive"])
+                            </span>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            }
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["Common.Back"]</button>
+    </section>
+</div>
+
+@code {
+    private List<GatewayInfo> methods = new();
+    private bool isLoading = true;
+    [CascadingParameter] public Toast ToastRef { get; set; } = default!;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        methods = await GatewayService.GetAllAsync();
+        isLoading = false;
+    }
+
+    private async Task OnSwitchChanged(GatewayInfo method)
+    {
+        var newValue = method.Enabled;
+
+        if (!newValue)
+        {
+            var confirm = await JS.InvokeAsync<bool>("confirm", string.Format(T["AdminGateways.ConfirmDisable"], method.Name));
+            if (!confirm)
+            {
+                // Reverte o valor visual do switch
+                method.Enabled = true;
+                StateHasChanged();
+                return;
+            }
+        }
+
+        var success = await GatewayService.SetStatusAsync(method.Name, newValue);
+        if (success)
+        {
+            var actionText = newValue ? T["AdminGateways.EnabledAction"] : T["AdminGateways.DisabledAction"];
+            await LogService.LogAsync(
+                string.Format(T["AdminGateways.LogChanged"], method.Name, actionText),
+                source: "Admin",
+                level: newValue ? "Info" : "Warning"
+            );
+            ToastRef?.Show(string.Format(T["AdminGateways.ToastChanged"], method.Name, actionText), newValue ? "success" : "warning");
+        }
+        else
+        {
+            ToastRef?.Show(T["AdminGateways.SaveError"], "error");
+            method.Enabled = !newValue;
+            StateHasChanged();
+        }
+    }
+}
+
+

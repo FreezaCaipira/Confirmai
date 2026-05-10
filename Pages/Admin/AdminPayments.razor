@@ -1,0 +1,291 @@
+﻿@page "/admin/payments"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
+@using Confirmai.Shared.Helpers
+@using Confirmai.Data
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
+@inject AdminPaymentsFilterStateService AdminPaymentsFilterStateService
+@inject UiTextService T
+
+<div class="entity-shell parchment-a admin-page admin-payments-shell">
+
+    <section class="entity-shell-grid" aria-label="@T["AdminPayments.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <h1 class="page-section-title">@T["AdminPayments.Title"]</h1>
+            <div class="filter-bar admin-filter-card">
+                <input type="text" placeholder="@T["AdminPayments.Filter.User"]" @bind="filterUserId" @bind:event="oninput" />
+                <input type="text" placeholder="@T["AdminPayments.Filter.Product"]" @bind="filterProductId" @bind:event="oninput" />
+                <input type="number" placeholder="@T["AdminPayments.Filter.Min"]" @bind="filterMinAmount" min="0" />
+                <input type="number" placeholder="@T["AdminPayments.Filter.Max"]" @bind="filterMaxAmount" min="0" />
+                <select @bind="filterStatus">
+                    <option value="">@T["AdminPayments.Filter.AllStatuses"]</option>
+                    <option value="paid">@T["Common.Paid"]</option>
+                    <option value="pending">@T["Common.Pending"]</option>
+                </select>
+                <input type="date" @bind="filterDate" />
+                <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">@T["Common.Filter"]</button>
+                <button type="button" @onclick="@(async () => await ClearFilters())">@T["Common.Clear"]</button>
+            </div>
+
+            @if (showRestoredFiltersNotice)
+            {
+                <div class="orders-review-restored-notice">
+                    <span>@T["AdminPayments.RestoredFilters"]</span>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">&times;—</button>
+                </div>
+            }
+
+            <AdminDataState IsLoading="@isLoading" IsEmpty="@(!pagedPayments.Any())" LoadingText="@T["AdminPayments.Loading"]" EmptyText="@T["AdminPayments.Empty"]" EmptyIcon="fas fa-money-bill-wave" EmptyHint="@T["AdminPayments.EmptyHint"]">
+                <table class="payments-table align-right">
+                    <thead>
+                        <tr>
+                            <th>@T["AdminPayments.Product"]</th>
+                            <th>@T["AdminPayments.User"]</th>
+                            <th>@T["Common.Gateway"]</th>
+                            <th>@T["Common.Value"]</th>
+                            <th>@T["Common.Status"]</th>
+                            <th>@T["Common.Date"]</th>
+                            <th>@T["Common.Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var p in pagedPayments)
+                    {
+                        <tr>
+                            <td data-label="@T["AdminPayments.Product"]">
+                                @if (p.Product != null)
+                                {
+                                    <a class="evidence-link" href="@($"/admin/items/view/{p.ProductId}")">
+                                        @p.Product.Name
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">ID: @p.ProductId</span>
+                                }
+                            </td>
+                            <td data-label="@T["AdminPayments.User"]">
+                                @if (p.User != null)
+                                {
+                                    <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
+                                        @p.User.UserName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">ID: @p.UserId</span>
+                                }
+                            </td>
+                            <td data-label="@T["Common.Gateway"]">@p.PaymentMethod</td>
+                            <td data-label="@T["Common.Value"]">@FormatBtcWithUsd(p.Amount)</td>
+                            <td data-label="@T["Common.Status"]">
+                                @if (p.IsPaid)
+                                {
+                                    <span class="order-status-badge pago">@T["Common.Paid"]</span>
+                                }
+                                else
+                                {
+                                    <span class="order-status-badge aguardandopagamento">@T["Common.Pending"]</span>
+                                }
+                            </td>
+                            <td data-label="@T["Common.Date"]">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                            <td data-label="@T["Common.Actions"]">
+                                <div class="admin-actions-row">
+                                    <button class="details-btn action-btn icon-only" @onclick="() => ViewPayment(p.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                    <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
+                </div>
+            </AdminDataState>
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["Common.Back"]</button>
+    </section>
+</div>
+
+@code {
+    private List<PaymentRecord> pagedPayments = new();
+    private int totalCount;
+
+    private string filterUserId = "";
+    private string filterProductId = "";
+    private decimal? filterMinAmount;
+    private decimal? filterMaxAmount;
+    private string filterStatus = "";
+    private DateTime? filterDate;
+
+    private bool isLoading = true;
+    private bool filtersLoaded;
+    private bool showRestoredFiltersNotice;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
+
+    private int pageSize = 10;
+    private int currentPage = 1;
+    private int totalPages => Math.Max(1, (int)Math.Ceiling((double)totalCount / pageSize));
+
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] public IJSRuntime JS { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+        await LoadPageAsync();
+        isLoading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || filtersLoaded) return;
+
+        await LoadFilterStateFromStorageAsync();
+        await LoadPageAsync();
+        filtersLoaded = true;
+        StateHasChanged();
+    }
+
+    private async Task LoadPageAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var query = db.Payments.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filterUserId))
+            query = query.Where(p => (p.User != null && p.User.UserName != null && p.User.UserName.Contains(filterUserId)) || (p.UserId != null && p.UserId.Contains(filterUserId)));
+        if (!string.IsNullOrWhiteSpace(filterProductId))
+            query = query.Where(p => (p.Product != null && p.Product.Name != null && p.Product.Name.Contains(filterProductId)) || p.ProductId.ToString().Contains(filterProductId));
+        if (filterMinAmount.HasValue)
+            query = query.Where(p => p.Amount >= filterMinAmount.Value);
+        if (filterMaxAmount.HasValue)
+            query = query.Where(p => p.Amount <= filterMaxAmount.Value);
+        if (!string.IsNullOrWhiteSpace(filterStatus))
+            query = filterStatus == "paid" ? query.Where(p => p.IsPaid) : query.Where(p => !p.IsPaid);
+        if (filterDate.HasValue)
+            query = query.Where(p => p.CreatedAt.Date == filterDate.Value.Date);
+
+        totalCount = await query.CountAsync();
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        pagedPayments = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Include(p => p.Product)
+            .Include(p => p.User)
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    private void ViewPayment(int id) => NavigationManager.NavigateTo($"/payments/view/{id}");
+
+    private async Task ApplyFiltersAndPersist()
+    {
+        currentPage = 1;
+        showRestoredFiltersNotice = false;
+        await LoadPageAsync();
+        await PersistFilterStateAsync();
+    }
+
+    private async Task ClearFilters()
+    {
+        filterUserId = "";
+        filterProductId = "";
+        filterMinAmount = null;
+        filterMaxAmount = null;
+        filterStatus = "";
+        filterDate = null;
+        currentPage = 1;
+        showRestoredFiltersNotice = false;
+        await LoadPageAsync();
+        await PersistFilterStateAsync();
+    }
+
+    private async Task NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            await LoadPageAsync();
+            await PersistFilterStateAsync();
+        }
+    }
+
+    private async Task PrevPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            await LoadPageAsync();
+            await PersistFilterStateAsync();
+        }
+    }
+
+    private async Task LoadFilterStateFromStorageAsync()
+    {
+        var state = await AdminPaymentsFilterStateService.LoadAsync();
+
+        filterUserId = state.UserId;
+        filterProductId = state.ProductId;
+        filterMinAmount = state.MinAmount;
+        filterMaxAmount = state.MaxAmount;
+        filterStatus = state.Status;
+        filterDate = state.Date;
+        currentPage = state.Page ?? 1;
+
+        showRestoredFiltersNotice =
+            !string.IsNullOrWhiteSpace(filterUserId)
+            || !string.IsNullOrWhiteSpace(filterProductId)
+            || filterMinAmount.HasValue
+            || filterMaxAmount.HasValue
+            || !string.IsNullOrWhiteSpace(filterStatus)
+            || filterDate.HasValue
+            || currentPage > 1;
+    }
+
+    private async Task PersistFilterStateAsync()
+    {
+        await AdminPaymentsFilterStateService.SaveAsync(new AdminPaymentsFilterState
+        {
+            UserId = filterUserId,
+            ProductId = filterProductId,
+            MinAmount = filterMinAmount,
+            MaxAmount = filterMaxAmount,
+            Status = filterStatus,
+            Date = filterDate,
+            Page = currentPage
+        });
+    }
+
+    private void DismissRestoredNotice()
+    {
+        showRestoredFiltersNotice = false;
+    }
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    }
+}
+

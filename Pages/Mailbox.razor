@@ -1,0 +1,1017 @@
+﻿@page "/mailbox"
+
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
+@using System.Globalization
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Models
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject UiTextService T
+
+<PageTitle>@T["Mailbox.PageTitle"]</PageTitle>
+
+<div class="entity-shell parchment-a mailbox-page">
+    <section class="entity-shell-grid" aria-label="@T["Mailbox.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Mailbox.Loading"]</div>
+            }
+            else
+            {
+                <div class="mailbox-page-header">
+                    <h3 class="mailbox-page-title">@T["Mailbox.Title"]</h3>
+                    <button class="mk-btn mk-btn-secondary mailbox-profile-btn" type="button" @onclick='() => Navigation.NavigateTo($"/profile/{currentUserId}")'>@T["Mailbox.MyProfile"]</button>
+                </div>
+
+                <section class="mailbox-filters" aria-label="Filtros da caixa postal">
+                    <div class="mailbox-filter-field">
+                        <label for="mailbox-search">@T["Mailbox.FilterSearch"]</label>
+                        <input id="mailbox-search" class="mailbox-search mk-input" @bind="searchTerm" @bind:event="oninput" />
+                    </div>
+
+                    <div class="mailbox-filter-field mailbox-filter-inline">
+                        <label for="mailbox-page-size">@T["Mailbox.FilterPageSize"]</label>
+                        <select id="mailbox-page-size" class="mk-input" @bind="pageSize">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+
+                    <div class="mailbox-filter-field mailbox-filter-inline">
+                        <label class="mailbox-check-label">
+                            <input type="checkbox" @bind="inboxUnreadOnly" />
+                            <span>@T["Mailbox.FilterUnreadOnly"]</span>
+                        </label>
+                    </div>
+
+                    <div class="mailbox-filter-actions">
+                        <button class="mk-btn mk-btn-primary" type="button" @onclick="ApplyFiltersAsync">@T["Mailbox.FilterApply"]</button>
+                        <button class="mk-btn mk-btn-secondary" type="button" @onclick="ResetFiltersAsync">@T["Mailbox.FilterClear"]</button>
+                    </div>
+                </section>
+
+                <section class="mailbox-workspace" aria-label="Workspace de mensagens">
+                    <aside class="mailbox-list-pane">
+                        <div class="mailbox-folder-tabs" aria-label="Lista de conversas">
+                            <button class="mailbox-folder-tab @(showArchivedConversations ? string.Empty : "active")" type="button" @onclick='() => SwitchConversationFolderAsync(false)'>@T["Mailbox.TabActive"] (@activeConversationTotal)</button>
+                            <button class="mailbox-folder-tab @(showArchivedConversations ? "active" : string.Empty)" type="button" @onclick='() => SwitchConversationFolderAsync(true)'>@T["Mailbox.TabArchived"] (@archivedConversationTotal)</button>
+                        </div>
+
+                        @if (!conversationContacts.Any())
+                        {
+                            <p class="market-empty">@T["Mailbox.NoConversations"]</p>
+                        }
+                        else
+                        {
+                            <div class="mailbox-list mailbox-list-compact">
+                                @foreach (var contact in conversationContacts)
+                                {
+                                    var isSelected = string.Equals(SelectedContact?.ConversationKey, contact.ConversationKey, StringComparison.Ordinal);
+                                    <div class="mailbox-list-item @(contact.HasUnread ? "unread" : string.Empty) @(isSelected ? "active" : string.Empty)">
+                                        <button class="mailbox-list-item-main"
+                                                type="button"
+                                                @onclick='() => SelectConversationAsync(contact.ConversationKey)'>
+                                            <div class="mailbox-list-item-head">
+                                                <div class="mailbox-list-item-contact">
+                                                    <span class="mailbox-avatar" aria-hidden="true">@BuildAvatarInitials(contact.ConversationTitle)</span>
+                                                    <strong>@contact.ConversationTitle</strong>
+                                                    @if (contact.UnreadCount > 0)
+                                                    {
+                                                        <span class="mailbox-unread-count">@contact.UnreadCount</span>
+                                                    }
+                                                </div>
+                                                <span class="mailbox-list-item-time">@FormatRelativeTime(contact.LastCreatedAt)</span>
+                                            </div>
+                                            <div class="mailbox-list-item-peer">@T["Mailbox.ConversationInProgress"]</div>
+                                            @if (contact.HasUnread)
+                                            {
+                                                <div class="mailbox-list-item-status">
+                                                    <span class="mailbox-chip mailbox-chip-alert">@contact.UnreadCount @T["Mailbox.Unread"]</span>
+                                                </div>
+                                            }
+                                            <div class="mailbox-list-item-snippet">@BuildSnippet(contact.LastBody)</div>
+                                        </button>
+
+                                        @if (contact.HasUnread)
+                                        {
+                                            <button class="mk-btn mk-btn-secondary mailbox-list-item-mark-read"
+                                                    type="button"
+                                                    @onclick='() => MarkConversationAsReadAsync(contact.ConversationKey)'>
+                                                @T["Mailbox.MarkAsRead"]
+                                            </button>
+                                        }
+
+                                        <button class="mk-btn mk-btn-secondary mailbox-list-item-mark-read"
+                                                type="button"
+                                                @onclick='() => SetConversationArchivedAsync(contact.ConversationKey, !showArchivedConversations)'>
+                                            @(showArchivedConversations ? T["Mailbox.Unarchive"] : T["Mailbox.Archive"])
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="mailbox-pagination">
+                                <button class="mk-btn mk-btn-secondary" type="button" disabled="@(conversationPage <= 1)" @onclick="PreviousConversationPageAsync">@T["Mailbox.PrevPage"]</button>
+                                <span>Página @conversationPage de @TotalPages(conversationTotal)</span>
+                                <button class="mk-btn mk-btn-secondary" type="button" disabled="@(conversationPage >= TotalPages(conversationTotal))" @onclick="NextConversationPageAsync">@T["Mailbox.NextPage"]</button>
+                            </div>
+                        }
+                    </aside>
+
+                    <article class="mailbox-thread-pane">
+                        @if (SelectedContact == null)
+                        {
+                            <div class="mailbox-thread-empty">@T["Mailbox.SelectConversation"]</div>
+                        }
+                        else
+                        {
+                            var contact = SelectedContact;
+
+                            <header class="mailbox-thread-head">
+                                <div class="mailbox-thread-title-block">
+                                    @if (contact.IsOrderConversation && contact.OrderId.HasValue)
+                                    {
+                                        <span class="mailbox-thread-title-kicker">@T["Mailbox.ThreadKickerOrder"]</span>
+                                        <a class="mailbox-thread-title-user" href="@($"/orders/{contact.OrderId.Value}")">@contact.ConversationTitle</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="mailbox-thread-title-kicker">@T["Mailbox.ThreadKickerUser"]</span>
+                                        <a class="mailbox-thread-title-user" href="@($"/profile/{contact.ContactUserId}")">@contact.ContactName</a>
+                                    }
+                                </div>
+                                <span>@conversationMessages.Count @T["Mailbox.ThreadMessages"]</span>
+                            </header>
+
+                            <div class="mailbox-thread-stream" @ref="threadStreamRef">
+                                @if (isThreadLoading)
+                                {
+                                    <div class="mailbox-thread-empty">@T["Mailbox.ThreadLoading"]</div>
+                                }
+                                else if (!conversationMessages.Any())
+                                {
+                                    <div class="mailbox-thread-empty">@T["Mailbox.ThreadEmpty"]</div>
+                                }
+                                else
+                                {
+                                    @foreach (var threadMsg in conversationMessages)
+                                    {
+                                        <article class="mailbox-thread-bubble @(threadMsg.IsIncoming ? "incoming" : "outgoing") @(string.IsNullOrWhiteSpace(threadMsg.RoleClass) ? string.Empty : $"mailbox-thread-bubble-{threadMsg.RoleClass}")">
+                                            <header class="mailbox-thread-bubble-meta">
+                                                <strong class="mailbox-thread-author">@threadMsg.AuthorName</strong>
+                                                <time class="mailbox-thread-time" datetime="@threadMsg.CreatedAt.ToString("O", CultureInfo.InvariantCulture)">
+                                                    @threadMsg.CreatedAt.ToLocalTime().ToString("dd/MM HH:mm", CultureInfo.InvariantCulture)
+                                                </time>
+                                            </header>
+                                            <p class="mailbox-thread-body">@threadMsg.Body</p>
+                                        </article>
+                                    }
+                                }
+                            </div>
+
+                            <section class="mailbox-composer" aria-label="Enviar mensagem">
+                                @if (!string.IsNullOrWhiteSpace(composerInfoMessage))
+                                {
+                                    <p class="mailbox-composer-info">@composerInfoMessage</p>
+                                }
+
+                                <div class="mailbox-filter-field">
+                                    <label for="composer-body">@T["Mailbox.ComposerLabel"]</label>
+                                    <textarea id="composer-body" class="mk-input mailbox-composer-textarea" @bind="composerBody"></textarea>
+                                </div>
+                            </section>
+
+                            <div class="mailbox-actions">
+                                <button class="mk-btn mk-btn-primary" type="button" disabled="@isSendingReply" @onclick="SendQuickReplyAsync">@(isSendingReply ? T["Mailbox.Sending"] : T["Mailbox.Send"])</button>
+                            </div>
+                        }
+                    </article>
+                </section>
+            }
+        </article>
+    </section>
+</div>
+
+@code {
+    private bool isLoading = true;
+    private string currentUserId = string.Empty;
+    private string searchTerm = string.Empty;
+    private bool inboxUnreadOnly;
+    private bool showArchivedConversations;
+    private int pageSize = 20;
+    private int conversationPage = 1;
+    private int conversationTotal;
+    private int activeConversationTotal;
+    private int archivedConversationTotal;
+    private List<ConversationContactView> conversationContacts = new();
+    private List<ConversationMessageView> conversationMessages = new();
+    private string? selectedConversationKey;
+    private bool isThreadLoading;
+    private bool isSendingReply;
+    private bool shouldAutoScrollThread;
+    private long threadLoadVersion;
+    private string composerBody = string.Empty;
+    private string composerRecipientUserId = string.Empty;
+    private string? composerInfoMessage;
+    private ElementReference threadStreamRef;
+
+    private ConversationContactView? SelectedContact => conversationContacts
+        .FirstOrDefault(c => string.Equals(c.ConversationKey, selectedConversationKey, StringComparison.Ordinal));
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? authState.User.FindFirstValue("sub")
+            ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(currentUserId))
+        {
+            Navigation.NavigateTo("/account/login", true);
+            return;
+        }
+
+        await LoadMessagesAsync();
+        isLoading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!shouldAutoScrollThread)
+        {
+            return;
+        }
+
+        shouldAutoScrollThread = false;
+        await JS.InvokeVoidAsync("ConfirmaiMailbox.scrollThreadToBottom", threadStreamRef);
+    }
+
+    private async Task LoadMessagesAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var normalizedSearch = string.IsNullOrWhiteSpace(searchTerm)
+            ? null
+            : searchTerm.Trim().ToLower();
+
+        var allRows = await db.UserMailboxMessages
+            .AsNoTracking()
+            .Include(m => m.SenderUser)
+            .Include(m => m.RecipientUser)
+            .Where(m => m.RecipientUserId == currentUserId || m.SenderUserId == currentUserId)
+            .OrderByDescending(m => m.CreatedAt)
+            .ToListAsync();
+
+        IEnumerable<UserMailboxMessage> candidateRows = allRows;
+
+        if (inboxUnreadOnly)
+        {
+            candidateRows = candidateRows.Where(m => m.RecipientUserId == currentUserId && !m.IsRead);
+        }
+
+        if (!string.IsNullOrWhiteSpace(normalizedSearch))
+        {
+            candidateRows = candidateRows.Where(m =>
+                !string.IsNullOrWhiteSpace(m.Body) && m.Body.ToLower().Contains(normalizedSearch));
+        }
+
+        var candidateMessages = candidateRows
+            .Select(m => new MailboxMessageView
+            {
+                Id = m.Id,
+                Subject = m.Subject ?? string.Empty,
+                Body = m.Body,
+                SenderUserId = m.SenderUserId,
+                SenderName = m.SenderUser == null ? "(deletado)" : (string.IsNullOrWhiteSpace(m.SenderUser.UserName) ? m.SenderUserId ?? "(deletado)" : m.SenderUser.UserName!),
+                RecipientUserId = m.RecipientUserId,
+                RecipientName = m.RecipientUser == null ? "(deletado)" : (string.IsNullOrWhiteSpace(m.RecipientUser.UserName) ? m.RecipientUserId ?? "(deletado)" : m.RecipientUser.UserName!),
+                IsArchivedBySender = m.IsArchivedBySender,
+                IsArchivedByRecipient = m.IsArchivedByRecipient,
+                IsRead = m.IsRead,
+                CreatedAt = m.CreatedAt
+            })
+            .ToList();
+
+        (activeConversationTotal, archivedConversationTotal) = CountConversationFolders(candidateMessages);
+
+        var allMessages = showArchivedConversations
+            ? candidateMessages.Where(m =>
+                (m.RecipientUserId == currentUserId && m.IsArchivedByRecipient)
+                || (m.SenderUserId == currentUserId && m.IsArchivedBySender))
+            : candidateMessages.Where(m =>
+                (m.RecipientUserId == currentUserId && !m.IsArchivedByRecipient)
+                || (m.SenderUserId == currentUserId && !m.IsArchivedBySender));
+
+        var groupedContacts = allMessages
+            .GroupBy(BuildConversationKey)
+            .Select(g =>
+            {
+                var latest = g.OrderByDescending(x => x.CreatedAt).First();
+                var isOrderConversation = IsOrderConversationSubject(latest.Subject);
+                var normalizedSubject = NormalizeOrderSubject(latest.Subject);
+                var contactId = latest.SenderUserId == currentUserId ? latest.RecipientUserId : latest.SenderUserId;
+                var contactName = latest.SenderUserId == currentUserId ? latest.RecipientName : latest.SenderName;
+                var title = isOrderConversation ? latest.Subject.Trim() : (string.IsNullOrWhiteSpace(contactName) ? contactId : contactName);
+
+                return new ConversationContactView
+                {
+                    ConversationKey = g.Key,
+                    ConversationTitle = title,
+                    ContactUserId = contactId,
+                    ContactName = string.IsNullOrWhiteSpace(contactName) ? contactId : contactName,
+                    IsOrderConversation = isOrderConversation,
+                    OrderSubjectNormalized = normalizedSubject,
+                    OrderId = TryParseOrderId(latest.Subject),
+                    LastBody = latest.Body,
+                    LastCreatedAt = latest.CreatedAt,
+                    UnreadCount = g.Count(x => x.RecipientUserId == currentUserId && !x.IsRead),
+                    HasUnread = g.Any(x => x.RecipientUserId == currentUserId && !x.IsRead)
+                };
+            })
+            .OrderByDescending(c => c.LastCreatedAt)
+            .ToList();
+
+        conversationTotal = groupedContacts.Count;
+        EnsureValidPageBounds();
+
+        var skip = (Math.Max(1, conversationPage) - 1) * pageSize;
+        conversationContacts = groupedContacts
+            .Skip(skip)
+            .Take(pageSize)
+            .ToList();
+
+        EnsureConversationSelection();
+        await LoadThreadForSelectedMessageAsync();
+    }
+
+    private async Task ApplyFiltersAsync()
+    {
+        conversationPage = 1;
+        await LoadMessagesAsync();
+    }
+
+    private async Task ResetFiltersAsync()
+    {
+        searchTerm = string.Empty;
+        inboxUnreadOnly = false;
+        pageSize = 20;
+        conversationPage = 1;
+        showArchivedConversations = false;
+        await LoadMessagesAsync();
+    }
+
+    private async Task SwitchConversationFolderAsync(bool archived)
+    {
+        if (showArchivedConversations == archived)
+        {
+            return;
+        }
+
+        showArchivedConversations = archived;
+        conversationPage = 1;
+        selectedConversationKey = null;
+        await LoadMessagesAsync();
+    }
+
+    private async Task PreviousConversationPageAsync()
+    {
+        if (conversationPage <= 1)
+        {
+            return;
+        }
+
+        conversationPage--;
+        await LoadMessagesAsync();
+    }
+
+    private async Task NextConversationPageAsync()
+    {
+        if (conversationPage >= TotalPages(conversationTotal))
+        {
+            return;
+        }
+
+        conversationPage++;
+        await LoadMessagesAsync();
+    }
+
+    private async Task SelectConversationAsync(string conversationKey)
+    {
+        selectedConversationKey = conversationKey;
+        await LoadThreadForSelectedMessageAsync();
+    }
+
+    private static bool IsOrderConversationSubject(string? subject)
+    {
+        return !string.IsNullOrWhiteSpace(subject)
+            && subject.Trim().StartsWith("Pedido ", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string NormalizeOrderSubject(string? subject)
+    {
+        return (subject ?? string.Empty).Trim().ToLowerInvariant();
+    }
+
+    private string BuildConversationKey(MailboxMessageView message)
+    {
+        if (IsOrderConversationSubject(message.Subject))
+        {
+            return $"order:{NormalizeOrderSubject(message.Subject)}";
+        }
+
+        var contactUserId = message.SenderUserId == currentUserId ? message.RecipientUserId : message.SenderUserId;
+        return $"contact:{contactUserId}";
+    }
+
+    private static int? TryParseOrderId(string? subject)
+    {
+        if (!IsOrderConversationSubject(subject))
+        {
+            return null;
+        }
+
+        var raw = subject!.Trim();
+        var parts = raw.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length < 2)
+        {
+            return null;
+        }
+
+        return int.TryParse(parts[1], out var orderId) ? orderId : null;
+    }
+
+    private string BuildSnippet(string body)
+    {
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            return T["Mailbox.NoContent"];
+        }
+
+        var trimmed = body.Trim();
+        return trimmed.Length <= 96
+            ? trimmed
+            : $"{trimmed[..96]}...";
+    }
+
+    private string BuildAvatarInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "?";
+        }
+
+        var parts = name
+            .Trim()
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (parts.Length == 1)
+        {
+            return parts[0].Length >= 2
+                ? parts[0][..2].ToUpperInvariant()
+                : parts[0][..1].ToUpperInvariant();
+        }
+
+        return string.Concat(parts[0][0], parts[^1][0]).ToUpperInvariant();
+    }
+
+    private string FormatRelativeTime(DateTime utcDate)
+    {
+        var now = DateTime.UtcNow;
+        var delta = now - utcDate;
+        if (delta.TotalMinutes < 1)
+        {
+            return T["Mailbox.Now"];
+        }
+
+        if (delta.TotalMinutes < 60)
+        {
+            return $"{Math.Max(1, (int)Math.Floor(delta.TotalMinutes))}m";
+        }
+
+        var localDate = utcDate.ToLocalTime();
+        var today = DateTime.Now.Date;
+        if (localDate.Date == today)
+        {
+            return $"{localDate:HH:mm}";
+        }
+
+        if (localDate.Date == today.AddDays(-1))
+        {
+            return T["Mailbox.Yesterday"];
+        }
+
+        return localDate.ToString("dd/MM", CultureInfo.InvariantCulture);
+    }
+
+    private int TotalPages(int total)
+    {
+        if (total <= 0)
+        {
+            return 1;
+        }
+
+        return (int)Math.Ceiling(total / (double)pageSize);
+    }
+
+    private void EnsureValidPageBounds()
+    {
+        var maxPage = TotalPages(conversationTotal);
+        if (conversationPage > maxPage)
+        {
+            conversationPage = maxPage;
+        }
+    }
+
+    private void EnsureConversationSelection()
+    {
+        if (!conversationContacts.Any())
+        {
+            selectedConversationKey = null;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(selectedConversationKey) || !conversationContacts.Any(c => string.Equals(c.ConversationKey, selectedConversationKey, StringComparison.Ordinal)))
+        {
+            selectedConversationKey = conversationContacts[0].ConversationKey;
+        }
+    }
+
+    private async Task LoadThreadForSelectedMessageAsync()
+    {
+        var requestedConversationKey = selectedConversationKey;
+        var requestVersion = Interlocked.Increment(ref threadLoadVersion);
+
+        var selected = SelectedContact;
+        if (selected == null)
+        {
+            conversationMessages.Clear();
+            composerRecipientUserId = string.Empty;
+            composerInfoMessage = null;
+            return;
+        }
+
+        composerRecipientUserId = selected.ContactUserId;
+        composerInfoMessage = null;
+
+        if (selected.IsOrderConversation)
+        {
+            composerRecipientUserId = string.Empty;
+        }
+
+        isThreadLoading = true;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var threadQuery = db.UserMailboxMessages
+            .AsNoTracking()
+            .Include(m => m.SenderUser)
+            .Where(m => m.RecipientUserId == currentUserId || m.SenderUserId == currentUserId);
+
+        if (selected.IsOrderConversation && !string.IsNullOrWhiteSpace(selected.OrderSubjectNormalized))
+        {
+            var normalizedSubject = selected.OrderSubjectNormalized;
+            threadQuery = threadQuery.Where(m => m.Subject != null && m.Subject.ToLower() == normalizedSubject);
+        }
+        else
+        {
+            var contactId = selected.ContactUserId;
+            if (string.IsNullOrWhiteSpace(contactId))
+            {
+                conversationMessages.Clear();
+                isThreadLoading = false;
+                return;
+            }
+
+            threadQuery = threadQuery.Where(m =>
+                (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
+                || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
+
+            // Keep direct chat independent from order-linked threads.
+            threadQuery = threadQuery.Where(m => m.Subject == null || !m.Subject.ToLower().StartsWith("pedido "));
+        }
+
+        conversationMessages = await threadQuery
+            .OrderBy(m => m.CreatedAt)
+            .Take(120)
+            .Select(m => new ConversationMessageView
+            {
+                Id = m.Id,
+                Body = m.Body,
+                SenderUserId = m.SenderUserId,
+                AuthorName = m.SenderUserId == currentUserId
+                    ? "Voce"
+                    : (m.SenderUser == null ? "(deletado)" : (string.IsNullOrWhiteSpace(m.SenderUser.UserName) ? m.SenderUserId ?? "(deletado)" : m.SenderUser.UserName!)),
+                IsIncoming = m.SenderUserId != currentUserId,
+                IsRead = m.IsRead,
+                CreatedAt = m.CreatedAt
+            })
+            .ToListAsync();
+
+        if (requestVersion != threadLoadVersion || !string.Equals(requestedConversationKey, selectedConversationKey, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        if (selected.IsOrderConversation)
+        {
+            // One order-chat message can be mirrored to multiple recipients (seller/admins).
+            // Collapse identical mirrored copies in the mailbox thread.
+            conversationMessages = conversationMessages
+                .GroupBy(m => new
+                {
+                    m.SenderUserId,
+                    m.Body,
+                    Timestamp = new DateTime((m.CreatedAt.Ticks / TimeSpan.TicksPerSecond) * TimeSpan.TicksPerSecond, DateTimeKind.Utc)
+                })
+                .Select(g => g.OrderBy(x => x.Id).First())
+                .OrderBy(m => m.CreatedAt)
+                .ToList();
+
+            if (selected.OrderId.HasValue)
+            {
+                var order = await db.Orders
+                    .AsNoTracking()
+                    .Where(o => o.Id == selected.OrderId.Value)
+                    .Select(o => new { o.BuyerId, o.SellerId })
+                    .FirstOrDefaultAsync();
+
+                if (order != null)
+                {
+                    var adminRoleId = await db.Roles
+                        .AsNoTracking()
+                        .Where(r => r.NormalizedName == "ADMIN")
+                        .Select(r => r.Id)
+                        .FirstOrDefaultAsync();
+
+                    var adminUserIds = string.IsNullOrWhiteSpace(adminRoleId)
+                        ? new HashSet<string>(StringComparer.Ordinal)
+                        : (await db.UserRoles
+                            .AsNoTracking()
+                            .Where(ur => ur.RoleId == adminRoleId)
+                            .Select(ur => ur.UserId)
+                            .Distinct()
+                            .ToListAsync())
+                            .ToHashSet(StringComparer.Ordinal);
+
+                    foreach (var message in conversationMessages)
+                    {
+                        if (string.Equals(message.SenderUserId, order.BuyerId, StringComparison.Ordinal))
+                        {
+                            message.RoleClass = "buyer";
+                        }
+                        else if (!string.IsNullOrWhiteSpace(order.SellerId) && string.Equals(message.SenderUserId, order.SellerId, StringComparison.Ordinal))
+                        {
+                            message.RoleClass = "seller";
+                        }
+                        else if (adminUserIds.Contains(message.SenderUserId))
+                        {
+                            message.RoleClass = "admin";
+                        }
+                        else
+                        {
+                            message.RoleClass = "other";
+                        }
+                    }
+                }
+            }
+        }
+
+        isThreadLoading = false;
+        shouldAutoScrollThread = true;
+    }
+
+    private async Task MarkConversationAsReadAsync(string conversationKey)
+    {
+        if (string.IsNullOrWhiteSpace(conversationKey))
+        {
+            return;
+        }
+
+        var selected = conversationContacts.FirstOrDefault(c => string.Equals(c.ConversationKey, conversationKey, StringComparison.Ordinal));
+        if (selected == null)
+        {
+            return;
+        }
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        IQueryable<UserMailboxMessage> unreadQuery = db.UserMailboxMessages
+            .Where(m => m.RecipientUserId == currentUserId && !m.IsRead);
+
+        if (selected.IsOrderConversation && !string.IsNullOrWhiteSpace(selected.OrderSubjectNormalized))
+        {
+            var normalizedSubject = selected.OrderSubjectNormalized;
+            unreadQuery = unreadQuery.Where(m => m.Subject != null && m.Subject.ToLower() == normalizedSubject);
+        }
+        else
+        {
+            unreadQuery = unreadQuery.Where(m => m.SenderUserId == selected.ContactUserId);
+            unreadQuery = unreadQuery.Where(m => m.Subject == null || !m.Subject.ToLower().StartsWith("pedido "));
+        }
+
+        var unreadMessages = await unreadQuery.ToListAsync();
+
+        if (!unreadMessages.Any())
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        foreach (var message in unreadMessages)
+        {
+            message.IsRead = true;
+            message.ReadAt = now;
+        }
+
+        await db.SaveChangesAsync();
+        selectedConversationKey = conversationKey;
+        await LoadMessagesAsync();
+    }
+
+    private async Task SendQuickReplyAsync()
+    {
+        composerInfoMessage = null;
+
+        var selected = SelectedContact;
+        if (selected == null)
+        {
+            composerInfoMessage = "Selecione uma conversa antes de enviar.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(composerBody))
+        {
+            composerInfoMessage = "Digite uma mensagem para enviar.";
+            return;
+        }
+
+        var normalizedBody = composerBody.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedBody))
+        {
+            composerInfoMessage = "Digite uma mensagem para enviar.";
+            return;
+        }
+
+        isSendingReply = true;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        if (selected.IsOrderConversation)
+        {
+            var sent = await SendOrderConversationMessageAsync(db, selected, normalizedBody);
+            if (!sent)
+            {
+                isSendingReply = false;
+                return;
+            }
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(composerRecipientUserId))
+            {
+                composerInfoMessage = "Selecione uma conversa antes de enviar.";
+                isSendingReply = false;
+                return;
+            }
+
+            db.UserMailboxMessages.Add(new UserMailboxMessage
+            {
+                SenderUserId = currentUserId,
+                RecipientUserId = composerRecipientUserId,
+                Subject = "Chat pelo perfil",
+                Body = normalizedBody,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await db.SaveChangesAsync();
+        }
+
+        composerBody = string.Empty;
+        composerInfoMessage = "Mensagem enviada.";
+        isSendingReply = false;
+
+        selectedConversationKey = selected.ConversationKey;
+        conversationPage = 1;
+        await LoadMessagesAsync();
+        EnsureConversationSelection();
+        await LoadThreadForSelectedMessageAsync();
+        shouldAutoScrollThread = true;
+    }
+
+    private async Task SetConversationArchivedAsync(string conversationKey, bool archive)
+    {
+        if (string.IsNullOrWhiteSpace(conversationKey))
+        {
+            return;
+        }
+
+        var selected = conversationContacts.FirstOrDefault(c => string.Equals(c.ConversationKey, conversationKey, StringComparison.Ordinal));
+        if (selected == null)
+        {
+            return;
+        }
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        IQueryable<UserMailboxMessage> query = db.UserMailboxMessages
+            .Where(m => m.RecipientUserId == currentUserId || m.SenderUserId == currentUserId);
+
+        if (selected.IsOrderConversation && !string.IsNullOrWhiteSpace(selected.OrderSubjectNormalized))
+        {
+            var normalizedSubject = selected.OrderSubjectNormalized;
+            query = query.Where(m => m.Subject != null && m.Subject.ToLower() == normalizedSubject);
+        }
+        else
+        {
+            var contactId = selected.ContactUserId;
+            query = query.Where(m =>
+                (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
+                || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
+            query = query.Where(m => m.Subject == null || !m.Subject.ToLower().StartsWith("pedido "));
+        }
+
+        var rows = await query.ToListAsync();
+        if (rows.Count == 0)
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        foreach (var row in rows)
+        {
+            if (row.SenderUserId == currentUserId)
+            {
+                row.IsArchivedBySender = archive;
+                row.ArchivedBySenderAt = archive ? now : null;
+            }
+
+            if (row.RecipientUserId == currentUserId)
+            {
+                row.IsArchivedByRecipient = archive;
+                row.ArchivedByRecipientAt = archive ? now : null;
+            }
+        }
+
+        await db.SaveChangesAsync();
+
+        selectedConversationKey = null;
+        await LoadMessagesAsync();
+    }
+
+    private (int Active, int Archived) CountConversationFolders(IEnumerable<MailboxMessageView> projected)
+    {
+        var active = projected
+            .Where(m =>
+                (m.SenderUserId == currentUserId && !m.IsArchivedBySender)
+                || (m.RecipientUserId == currentUserId && !m.IsArchivedByRecipient))
+            .GroupBy(BuildConversationKey)
+            .Count();
+
+        var archived = projected
+            .Where(m =>
+                (m.SenderUserId == currentUserId && m.IsArchivedBySender)
+                || (m.RecipientUserId == currentUserId && m.IsArchivedByRecipient))
+            .GroupBy(BuildConversationKey)
+            .Count();
+
+        return (active, archived);
+    }
+
+    private async Task<bool> SendOrderConversationMessageAsync(AppDbContext db, ConversationContactView selected, string body)
+    {
+        if (!selected.OrderId.HasValue)
+        {
+            composerInfoMessage = "Conversa de pedido invalida.";
+            return false;
+        }
+
+        var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == selected.OrderId.Value);
+        if (order == null)
+        {
+            composerInfoMessage = "Pedido nao encontrado para esta conversa.";
+            return false;
+        }
+
+        var adminRoleId = await db.Roles
+            .Where(r => r.NormalizedName == "ADMIN")
+            .Select(r => r.Id)
+            .FirstOrDefaultAsync();
+
+        var adminUserIds = string.IsNullOrWhiteSpace(adminRoleId)
+            ? new List<string>()
+            : await db.UserRoles
+                .Where(ur => ur.RoleId == adminRoleId)
+                .Select(ur => ur.UserId)
+                .Distinct()
+                .ToListAsync();
+
+        var isAdmin = adminUserIds.Contains(currentUserId, StringComparer.Ordinal);
+
+        var role = isAdmin
+            ? "admin"
+            : string.Equals(order.BuyerId, currentUserId, StringComparison.Ordinal)
+                ? "buyer"
+                : string.Equals(order.SellerId, currentUserId, StringComparison.Ordinal)
+                    ? "seller"
+                    : "other";
+
+        if (role == "other")
+        {
+            composerInfoMessage = "Voce nao participa deste pedido.";
+            return false;
+        }
+
+        var now = DateTime.UtcNow;
+        db.OrderMessages.Add(new OrderMessage
+        {
+            OrderId = order.Id,
+            UserId = currentUserId,
+            UserRole = role,
+            Text = body,
+            CreatedAt = now
+        });
+
+        var recipients = new HashSet<string>(StringComparer.Ordinal);
+        if (!string.IsNullOrWhiteSpace(order.BuyerId))
+            recipients.Add(order.BuyerId);
+
+        if (!string.IsNullOrWhiteSpace(order.SellerId))
+        {
+            recipients.Add(order.SellerId);
+        }
+
+        foreach (var adminId in adminUserIds)
+        {
+            recipients.Add(adminId);
+        }
+
+        recipients.Remove(currentUserId);
+
+        var subject = $"Pedido {order.Id}";
+        foreach (var recipientId in recipients)
+        {
+            db.UserMailboxMessages.Add(new UserMailboxMessage
+            {
+                SenderUserId = currentUserId,
+                RecipientUserId = recipientId,
+                Subject = subject,
+                Body = body,
+                IsRead = false,
+                CreatedAt = now
+            });
+        }
+
+        await db.SaveChangesAsync();
+        return true;
+    }
+
+    private sealed class MailboxMessageView
+    {
+        public int Id { get; init; }
+        public string Subject { get; init; } = string.Empty;
+        public string Body { get; init; } = string.Empty;
+        public string SenderUserId { get; init; } = string.Empty;
+        public string SenderName { get; init; } = string.Empty;
+        public string RecipientUserId { get; init; } = string.Empty;
+        public string RecipientName { get; init; } = string.Empty;
+        public bool IsArchivedBySender { get; init; }
+        public bool IsArchivedByRecipient { get; init; }
+        public bool IsRead { get; init; }
+        public DateTime CreatedAt { get; init; }
+    }
+
+    private sealed class ConversationMessageView
+    {
+        public int Id { get; init; }
+        public string Body { get; init; } = string.Empty;
+        public string SenderUserId { get; init; } = string.Empty;
+        public string AuthorName { get; init; } = string.Empty;
+        public string RoleClass { get; set; } = string.Empty;
+        public bool IsIncoming { get; init; }
+        public bool IsRead { get; init; }
+        public DateTime CreatedAt { get; init; }
+    }
+
+    private sealed class ConversationContactView
+    {
+        public string ConversationKey { get; init; } = string.Empty;
+        public string ConversationTitle { get; init; } = string.Empty;
+        public string ContactUserId { get; init; } = string.Empty;
+        public string ContactName { get; init; } = string.Empty;
+        public bool IsOrderConversation { get; init; }
+        public string OrderSubjectNormalized { get; init; } = string.Empty;
+        public int? OrderId { get; init; }
+        public string LastBody { get; init; } = string.Empty;
+        public DateTime LastCreatedAt { get; init; }
+        public int UnreadCount { get; init; }
+        public bool HasUnread { get; init; }
+    }
+}

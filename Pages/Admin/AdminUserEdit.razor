@@ -1,0 +1,131 @@
+﻿@page "/admin/users/edit/{UserId}"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Confirmai.Models
+@using Confirmai.Models.Admin
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager NavigationManager
+@inject LogService LogService
+@inject UiTextService T
+
+<div class="entity-shell parchment-a admin-page">
+
+    <section class="entity-shell-grid" aria-label="@T["AdminUserEdit.Aria"]">
+        <article class="entity-shell-card entity-shell-main form-card">
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
+            }
+            else if (user == null)
+            {
+                <p>@T["AdminUserEdit.NotFound"]</p>
+            }
+            else
+            {
+                <EditForm Model="model" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="form-group">
+                        <label>Instagram</label>
+                        <InputText class="input" @bind-Value="model.InstagramHandle" />
+                    </div>
+                    <div class="form-group">
+                        <label>Discord</label>
+                        <InputText class="input" @bind-Value="model.DiscordHandle" />
+                    </div>
+                    <div class="form-group">
+                        <label>PayPal</label>
+                        <InputText class="input" @bind-Value="model.PaypalAddress" />
+                    </div>
+                    <div class="form-group">
+                        <label>Binance</label>
+                        <InputText class="input" @bind-Value="model.BinanceAddress" />
+                    </div>
+                    <div class="form-group">
+                        <label>PIX</label>
+                        <InputText class="input" @bind-Value="model.PixKey" />
+                    </div>
+                    <div class="form-group">
+                        <label>X</label>
+                        <InputText class="input" @bind-Value="model.XHandle" />
+                    </div>
+                    <div class="form-actions">
+                        <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/users")'>@T["Common.Cancel"]</button>
+                        <button class="save-btn" type="submit" disabled="@isSaving">@T["Common.Save"]</button>
+                    </div>
+                </EditForm>
+            }
+        </article>
+    </section>
+</div>
+
+@code {
+    [Parameter] public string UserId { get; set; } = "";
+    private ApplicationUser? user;
+    private bool isLoading = true;
+    private bool isSaving = false;
+    [CascadingParameter] public Toast? ToastRef { get; set; }
+    private EditUserModel model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserManager.FindByIdAsync(UserId);
+        if (user != null)
+        {
+            model = new EditUserModel
+            {
+                InstagramHandle = user.InstagramHandle,
+                DiscordHandle = user.DiscordHandle,
+                PaypalAddress = user.PaypalAddress,
+                BinanceAddress = user.BinanceAddress,
+                PixKey = user.PixKey,
+                XHandle = user.XHandle
+            };
+        }
+        isLoading = false;
+    }
+
+    private async Task Save()
+    {
+        if (user == null)
+        {
+            ToastRef?.Show(T["AdminUserEdit.NotFound"], "error");
+            return;
+        }
+        isSaving = true;
+        user.InstagramHandle = model.InstagramHandle;
+        user.DiscordHandle = model.DiscordHandle;
+        user.PaypalAddress = model.PaypalAddress;
+        user.BinanceAddress = model.BinanceAddress;
+        user.PixKey = model.PixKey;
+        user.XHandle = model.XHandle;
+        var result = await UserManager.UpdateAsync(user);
+        isSaving = false;
+
+        if (result.Succeeded)
+        {
+            await LogService.LogAsync(
+                string.Format(T["AdminUserEdit.LogEdited"], user.Id),
+                source: "Admin",
+                level: "Info",
+                userId: user.Id
+            );
+            ToastRef?.Show(T["AdminUserEdit.UpdatedToast"], "success");
+            NavigationManager.NavigateTo($"/admin/users/view/{user.Id}");
+        }
+        else
+        {
+            ToastRef?.Show(T["AdminUserEdit.UpdateErrorToast"], "error");
+        }
+    }
+}
+
+

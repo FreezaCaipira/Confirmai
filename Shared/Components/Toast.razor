@@ -1,0 +1,39 @@
+@code {
+    private string? message;
+    private string? cssClass;
+    private bool visible;
+    private System.Timers.Timer? timer;
+
+    public void Show(string msg, string type = "info", int timeout = 4000)
+    {
+        message = msg;
+        cssClass = type switch
+        {
+            "success" => "toast-success",
+            "error" => "toast-error",
+            "info" => "toast-info",
+            "warning" => "toast-warning",
+            _ => "toast-info"
+        };
+        visible = true;
+        StateHasChanged();
+
+        timer?.Dispose();
+        timer = new System.Timers.Timer(timeout);
+        timer.Elapsed += (s, e) =>
+        {
+            visible = false;
+            timer?.Dispose();
+            InvokeAsync(StateHasChanged);
+        };
+        timer.AutoReset = false;
+        timer.Start();
+    }
+}
+
+@if (visible)
+{
+    <div class="toast-container @cssClass">
+        @message
+    </div>
+}

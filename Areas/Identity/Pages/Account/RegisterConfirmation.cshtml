@@ -1,0 +1,18 @@
+﻿@page
+@model Confirmai.Areas.Identity.Pages.Account.RegisterConfirmationModel
+@inject Confirmai.Services.UiTextService T
+@{
+    ViewData["Title"] = T["Identity.RegisterConfirmation.Title"];
+}
+
+<h2>@T["Identity.RegisterConfirmation.Heading"]</h2>
+<p class="identity-muted">
+    @string.Format(T["Identity.RegisterConfirmation.Message"], Model.Email)
+</p>
+
+<div class="identity-actions">
+    <a asp-page="./Login">@T["Identity.Common.GoToLogin"]</a>
+    <a asp-page="./ResendEmailConfirmation">@T["Identity.Resend.Title"]</a>
+</div>
+
+

@@ -1,0 +1,114 @@
+.apv-card {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 0.72rem;
+    border: 2px solid #83582f;
+    border-image: linear-gradient(180deg, #c89a58 0%, #6e3e1a 100%) 1;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #f7ead0 0%, #e2c396 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 245, 224, 0.72), 0 2px 8px rgba(60, 30, 10, 0.12);
+}
+
+/* Título do card — igual ao .profile-section-title */
+.apv-title {
+    margin: -0.72rem -0.72rem 0.72rem;
+    padding: 0.38rem 0.62rem;
+    background: linear-gradient(180deg, #5d4024 0%, #4a321c 100%);
+    border-bottom: 1px solid #7f5c35;
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    color: #ffe9be;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    font-weight: 800;
+}
+
+/* Definition list */
+.apv-dl {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid #b08050;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.9rem;
+}
+
+.apv-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+}
+
+.apv-row:nth-child(odd) {
+    background: rgba(255, 245, 224, 0.55);
+}
+
+.apv-row:nth-child(even) {
+    background: rgba(200, 160, 100, 0.22);
+}
+
+.apv-row dt,
+.apv-row dd {
+    padding: 0.5rem 0.75rem;
+    margin: 0;
+    font-size: 0.88rem;
+    color: #2e1e08;
+    line-height: 1.4;
+}
+
+.apv-row dt {
+    font-weight: 700;
+    border-right: 1px solid #b08050;
+    color: #4a2f0e;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+}
+
+.apv-mono {
+    font-family: monospace;
+    font-size: 0.78rem;
+    word-break: break-all;
+}
+
+/* Actions */
+.apv-actions {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+}
+
+.apv-btn-back,
+.apv-btn-edit {
+    padding: 0.42rem 1.1rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.1s;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.apv-btn-back {
+    background: linear-gradient(180deg, #c8a87a 0%, #a8895f 100%);
+    color: #2e1e08;
+    border: 1px solid #83582f;
+}
+
+.apv-btn-edit {
+    background: linear-gradient(180deg, #d96526 0%, #b94817 100%);
+    color: #fff4e2;
+    border: 1px solid #8f3c13;
+    box-shadow: inset 0 0 0 1px rgba(255, 203, 146, 0.28);
+}
+
+.apv-btn-back:hover,
+.apv-btn-edit:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}

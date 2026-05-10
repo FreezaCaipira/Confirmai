@@ -1,0 +1,299 @@
+﻿@page "/docs/integration"
+
+@attribute [Authorize(Policy = "ServerAdmin")]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<PageTitle>Integração via API — Confirmai</PageTitle>
+
+<div class="entity-shell parchment-a integration-shell">
+
+    <div class="page-title-bar integration-title-bar">
+        <h1 class="page-title-bar-title">Integração do Servidor via API</h1>
+        <p class="page-title-bar-subtitle">Conecte seu servidor OpenTibia ao marketplace em poucos minutos</p>
+    </div>
+
+    <section class="entity-shell-grid" aria-label="Documentação de integração">
+        <article class="entity-shell-card entity-shell-main integration-article">
+
+            <!-- Visão geral -->
+            <div class="integration-intro">
+                <p>
+                    A API de integração permite comunicação bidirecional entre seu servidor Tibia e o Confirmai.
+                    O servidor consulta trades pendentes, confirma entregas e sincroniza inventários.
+                    Compatível com <strong>Canary</strong>, <strong>TFS 1.x</strong> e qualquer engine que suporte HTTP.
+                </p>
+                <div class="integration-badges">
+                    <span class="int-badge int-badge-auth">Autenticação por API Key</span>
+                    <span class="int-badge int-badge-secure">HTTPS obrigatório</span>
+                    <span class="int-badge int-badge-rate">Rate limiting ativo</span>
+                </div>
+            </div>
+
+            <hr class="integration-divider" />
+
+            <!-- Passo a passo -->
+            <h2 class="integration-section-title">Como integrar</h2>
+
+            <!-- Passo 1 -->
+            <div class="integration-step">
+                <div class="integration-step-number">1</div>
+                <div class="integration-step-body">
+                    <h3 class="integration-step-title">Cadastre seu servidor e obtenha a API Key</h3>
+                    <p>
+                        Para solicitar a integração do seu servidor, abra um chamado com um administrador
+                        ou entre em contato pelo Discord/e-mail informado no rodapé. O administrador irá:
+                    </p>
+                    <ol class="integration-substeps">
+                        <li>Aprovar seu servidor no painel (caso ainda esteja pendente)</li>
+                        <li>Gerar uma <strong>API Key</strong> exclusiva para o seu servidor</li>
+                        <li>Enviar a chave para você — <strong>guarde-a em local seguro</strong>, ela aparece apenas uma vez</li>
+                    </ol>
+                    <div class="integration-tip">
+                        <span class="int-tip-icon">💡</span>
+                        A chave começa com <code>osm_</code> seguida de 32 caracteres aleatórios.
+                        Ela nunca é armazenada em texto puro no servidor — apenas o hash fica salvo.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Passo 2 -->
+            <div class="integration-step">
+                <div class="integration-step-number">2</div>
+                <div class="integration-step-body">
+                    <h3 class="integration-step-title">Baixe o snippet Lua para sua engine</h3>
+                    <p>Escolha o arquivo correspondente à engine do seu servidor:</p>
+                    <div class="integration-download-row">
+                        <a href="/downloads/market_integration.lua" download class="int-download-btn">
+                            ⬇ Canary / OTCv8
+                        </a>
+                        <a href="/downloads/tfs-Confirmai.lua" download class="int-download-btn">
+                            ⬇ TFS 1.x (LuaSocket)
+                        </a>
+                    </div>
+                    <div class="integration-tip">
+                        <span class="int-tip-icon">⚠️</span>
+                        O snippet para TFS requer <strong>LuaSocket</strong> instalado no servidor.
+                        Se sua engine não suporta HTTP nativo, veja a seção
+                        <a href="#sem-http">"Servidor sem HTTP nativo"</a> abaixo.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Passo 3 -->
+            <div class="integration-step">
+                <div class="integration-step-number">3</div>
+                <div class="integration-step-body">
+                    <h3 class="integration-step-title">Configure a API Key no snippet</h3>
+                    <p>
+                        Abra o arquivo baixado e substitua <code>osm_YOUR_KEY_HERE</code> pela sua chave real.
+                        O bloco de configuração fica no topo do arquivo:
+                    </p>
+                    <pre class="integration-code"><code>local OsmConfig = &#x7B;
+    baseUrl = "https://Confirmai.com",
+    apiKey  = "osm_SuaChaveAqui",   -- &lt;-- substitua aqui
+&#x7D;</code></pre>
+                    <div class="integration-tip int-tip-danger">
+                        <span class="int-tip-icon">🔒</span>
+                        Nunca compartilhe ou exponha sua API Key publicamente.
+                        Se a chave vazar, solicite revogação imediata ao administrador.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Passo 4 -->
+            <div class="integration-step">
+                <div class="integration-step-number">4</div>
+                <div class="integration-step-body">
+                    <h3 class="integration-step-title">Ative o script no servidor</h3>
+
+                    <div class="integration-tab-group">
+                        <div class="integration-tab-label"><strong>Canary</strong></div>
+                        <div class="integration-tab-content">
+                            <p>Coloque o arquivo em <code>data/scripts/</code> — o Canary carrega automaticamente todos os .lua desse diretório.</p>
+                        </div>
+                        <div class="integration-tab-label"><strong>TFS 1.x</strong></div>
+                        <div class="integration-tab-content">
+                            <p>
+                                Coloque o arquivo em <code>data/lib/</code> e adicione ao final de
+                                <code>data/lib/core.lua</code> (ou <code>data/global.lua</code>):
+                            </p>
+                            <pre class="integration-code"><code>dofile("data/lib/tfs-Confirmai.lua")</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Passo 5 -->
+            <div class="integration-step">
+                <div class="integration-step-number">5</div>
+                <div class="integration-step-body">
+                    <h3 class="integration-step-title">Teste a conexão</h3>
+                    <p>
+                        Reinicie o servidor. Nos logs você deve ver:
+                    </p>
+                    <pre class="integration-code"><code>[Confirmai] Conexao OK — &#x7B;"status":"ok","serverName":"Seu Servidor",...&#x7D;</code></pre>
+                    <p>Você também pode testar manualmente via cURL ou browser:</p>
+                    <div class="integration-curl-wrap">
+                        <pre class="integration-code" id="curl-ping"><code>curl -H "X-Api-Key: osm_SuaChaveAqui" \
+     https://Confirmai.com/api/v1/server/ping</code></pre>
+                        <button class="int-copy-btn" @onclick='() => CopyCode("curl-ping")'>Copiar</button>
+                    </div>
+                    <p>Resposta esperada (HTTP 200):</p>
+                    <pre class="integration-code"><code>&#x7B;
+  "status": "ok",
+  "serverId": 42,
+  "serverName": "Seu Servidor",
+  "timestamp": "2026-04-20T12:00:00Z"
+&#x7D;</code></pre>
+                </div>
+            </div>
+
+            <hr class="integration-divider" />
+
+            <!-- Referência de endpoints -->
+            <h2 class="integration-section-title">Referência de endpoints</h2>
+            <p class="integration-endpoints-intro">
+                Todos os endpoints requerem o header <code>X-Api-Key: osm_SuaChave</code>.
+                URL base: <code>https://Confirmai.com/api/v1/server</code>
+            </p>
+
+            <div class="integration-table-wrap">
+                <table class="integration-table">
+                    <thead>
+                        <tr>
+                            <th>Método</th>
+                            <th>Endpoint</th>
+                            <th>Descrição</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="http-method http-get">GET</span></td>
+                            <td><code>/ping</code></td>
+                            <td>Verifica conectividade e validade da API key</td>
+                        </tr>
+                        <tr>
+                            <td><span class="http-method http-get">GET</span></td>
+                            <td><code>/trades/pending</code></td>
+                            <td>Lista pedidos aguardando entrega in-game</td>
+                        </tr>
+                        <tr>
+                            <td><span class="http-method http-post">POST</span></td>
+                            <td><code>/trades/confirm</code></td>
+                            <td>Marca um pedido como entregue ao jogador</td>
+                        </tr>
+                        <tr>
+                            <td><span class="http-method http-post">POST</span></td>
+                            <td><code>/inventory/report</code></td>
+                            <td>Reporta inventário atual de um jogador</td>
+                        </tr>
+                        <tr>
+                            <td><span class="http-method http-get">GET</span></td>
+                            <td><code>/offers?itemKey=</code></td>
+                            <td>Busca ofertas ativas para um item específico</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr class="integration-divider" />
+
+            <!-- Sem HTTP -->
+            <h2 class="integration-section-title" id="sem-http">Servidor sem HTTP nativo</h2>
+            <p>
+                Se sua engine não suporta chamadas HTTP diretamente no Lua (ex.: TFS sem LuaSocket),
+                existem duas alternativas:
+            </p>
+            <div class="integration-alt-cards">
+                <div class="integration-alt-card">
+                    <h4>Opção A — Script externo (Python/Node)</h4>
+                    <p>
+                        Rode um script externo no mesmo servidor que consulta a API do Confirmai e
+                        grava os resultados em um banco local (SQLite/MySQL). Seu script Lua lê esse banco
+                        via <code>db.query()</code>.
+                    </p>
+                </div>
+                <div class="integration-alt-card">
+                    <h4>Opção B — Polling via webhook reverso</h4>
+                    <p>
+                        Configure uma URL de callback no painel do servidor. O Confirmai fará um
+                        POST para essa URL quando houver novos pedidos, e seu servidor pode processar
+                        via script HTTP externo ou proxy.
+                    </p>
+                </div>
+            </div>
+            <p>
+                Se precisar de ajuda para configurar uma dessas alternativas, entre em contato com
+                o suporte — estamos disponíveis para ajudar na adaptação.
+            </p>
+
+            <hr class="integration-divider" />
+
+            <!-- Segurança -->
+            <h2 class="integration-section-title">Segurança</h2>
+            <div class="integration-security-grid">
+                <div class="integration-security-item">
+                    <span class="int-sec-icon">🔑</span>
+                    <div>
+                        <strong>Chave única por servidor</strong>
+                        <p>Cada servidor recebe uma chave exclusiva. Uma chave comprometida não afeta outros servidores.</p>
+                    </div>
+                </div>
+                <div class="integration-security-item">
+                    <span class="int-sec-icon">🛡️</span>
+                    <div>
+                        <strong>Hash no banco</strong>
+                        <p>A raw key é exibida apenas uma vez. O banco armazena somente o hash — nem o admin tem acesso à chave original.</p>
+                    </div>
+                </div>
+                <div class="integration-security-item">
+                    <span class="int-sec-icon">⏱️</span>
+                    <div>
+                        <strong>Rate limiting</strong>
+                        <p>Os endpoints têm limite de requisições por minuto para proteger contra abuso e força bruta.</p>
+                    </div>
+                </div>
+                <div class="integration-security-item">
+                    <span class="int-sec-icon">🚫</span>
+                    <div>
+                        <strong>Permissões isoladas</strong>
+                        <p>A API key dá acesso somente ao servidor cadastrado. Não é possível acessar dados de outros servidores ou o painel admin.</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="integration-divider" />
+
+            <!-- Precisa de ajuda -->
+            <div class="integration-help-box">
+                <h3>Precisa de ajuda?</h3>
+                <p>
+                    Se tiver dúvidas sobre a integração, entre em contato com o suporte.
+                    Também estamos disponíveis para ajudar a adaptar o snippet para engines menos comuns
+                    (OpenTibia 7.4, YurOT, RealOT, etc.).
+                </p>
+                <a href="/servers/admin-request" class="int-help-cta">Solicitar novo servidor</a>
+            </div>
+
+        </article>
+    </section>
+</div>
+
+@code {
+    private async Task CopyCode(string elementId)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText",
+                await JS.InvokeAsync<string>("eval",
+                    $"document.getElementById('{elementId}').innerText"));
+        }
+        catch
+        {
+            // clipboard blocked — silent fail
+        }
+    }
+}

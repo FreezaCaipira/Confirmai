@@ -1,0 +1,67 @@
+﻿# docker-compose.yml — Confirmai
+#
+# Pré-requisito: crie um arquivo .env na raiz com as variáveis abaixo.
+# Consulte docs/deploy.md para o guia completo.
+#
+# NUNCA versione o .env — ele contém segredos.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: Confirmai
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d Confirmai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=Confirmai;Username=app;Password=${DB_PASSWORD};SslMode=Disable"
+      AdminSeed__Email: ${ADMIN_EMAIL}
+      AdminSeed__Password: ${ADMIN_PASSWORD}
+      AdminSeed__FullName: ${ADMIN_FULLNAME}
+      BtcPay__Url: ${BTCPAY_URL}
+      BtcPay__StoreId: ${BTCPAY_STORE_ID}
+      BtcPay__ApiKey: ${BTCPAY_API_KEY}
+      BtcPay__WebhookSecret: ${BTCPAY_WEBHOOK_SECRET}
+      BtcPay__WebhookUrl: "https://${DOMAIN}/api/btcpay/webhook"
+      Email__Host: ${SMTP_HOST}
+      Email__Port: ${SMTP_PORT}
+      Email__UseSsl: "true"
+      Email__Username: ${SMTP_USERNAME}
+      Email__Password: ${SMTP_PASSWORD}
+      Email__FromEmail: ${SMTP_FROM_EMAIL}
+      Email__FromName: "Confirmai"
+      Email__Enabled: "true"
+      # Opcional — OpenTelemetry
+      # OpenTelemetry__Endpoint: ${OTEL_ENDPOINT}
+      # OpenTelemetry__Headers: ${OTEL_HEADERS}
+    volumes:
+      - uploads:/app/wwwroot/uploads
+      - evidences:/app/wwwroot/evidences
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+volumes:
+  pgdata:
+  uploads:
+  evidences:

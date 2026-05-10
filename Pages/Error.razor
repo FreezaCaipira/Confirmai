@@ -1,0 +1,15 @@
+﻿@page "/error"
+@using Confirmai.Services
+
+@inject UiTextService T
+
+<div class="not-found-card">
+    <span class="not-found-icon">&#9888;</span>
+    <h2 class="not-found-title">@T["Error.Title"]</h2>
+    <p class="not-found-description">
+        @T["Error.Description"]
+    </p>
+    <a href="/servers" class="not-found-home-link">
+        &#8592; @T["App.NotFound.BackToDashboard"]
+    </a>
+</div>

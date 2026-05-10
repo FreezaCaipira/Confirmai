@@ -1,0 +1,126 @@
+﻿@attribute [Authorize]
+
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Confirmai.Shared.Helpers
+
+@inject AppDbContext Db
+@inject NavigationManager Navigation
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
+
+<div class="entity-shell parchment-b">
+
+    <section class="entity-shell-grid" aria-label="@T["PaymentDetails.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            @if (payment == null)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
+            }
+            else
+            {
+                <div class="payment-receipt-shell">
+                    <div class="payment-receipt-header">
+                        <div class="payment-receipt-heading">
+                            <h2 class="payment-receipt-title">@T["PaymentDetails.Title"]</h2>
+                            <p class="payment-receipt-subtitle">@T["PaymentDetails.Subtitle"]</p>
+                        </div>
+                        <span class="payment-receipt-status @(payment.IsPaid ? "paid" : "pending")">
+                            @(payment.IsPaid ? T["Common.Paid"] : T["Common.Pending"])
+                        </span>
+                    </div>
+
+                    <div class="payment-receipt-grid">
+                        <section class="payment-receipt-card">
+                            <div class="payment-receipt-row">
+                                <span class="label">@T["Common.Value"]:</span>
+                                <span class="payment-receipt-amount">@FormatBtcWithUsd(payment.Amount)</span>
+                            </div>
+                            <div class="payment-receipt-row">
+                                <span class="label">@T["Common.Gateway"]:</span>
+                                <span class="system-value">@(string.IsNullOrWhiteSpace(payment.PaymentMethod) ? "-" : payment.PaymentMethod)</span>
+                            </div>
+                            <div class="payment-receipt-row payment-id-row">
+                                <span class="label payment-id-label">@(T["OrderDetails.PaymentId"] == "OrderDetails.PaymentId" ? "ID do pagamento" : T["OrderDetails.PaymentId"]):</span>
+                                <span class="payment-address payment-address-inline">@(string.IsNullOrWhiteSpace(payment.PaymentId) ? "-" : payment.PaymentId)</span>
+                            </div>
+                            <div class="payment-receipt-row">
+                                <span class="label">@AddressLabel:</span>
+                                <span class="payment-address payment-address-box">@payment.Address</span>
+                            </div>
+                            <div class="payment-receipt-row">
+                                <span class="label">@T["Common.Date"]:</span>
+                                <span class="system-value">@payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            @if (payment.PaidAt != null)
+                            {
+                                <div class="payment-receipt-row">
+                                    <span class="label">@T["PaymentDetails.PaidAt"]:</span>
+                                    <span class="system-value">@payment.PaidAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                            }
+                        </section>
+
+                        <section class="payment-receipt-card payment-reference-card">
+                            <h3 class="payment-reference-title">@T["Common.Details"]</h3>
+                            <div class="payment-reference-item">
+                                <span class="label">@T["Common.Seller"]:</span>
+                                <span class="system-value">@(payment.Product?.User?.UserName ?? "-")</span>
+                            </div>
+                            <div class="payment-reference-item">
+                                <span class="label">@T["Common.Description"]:</span>
+                                <span class="system-value">@(string.IsNullOrWhiteSpace(payment.Product?.Name) ? "-" : payment.Product!.Name)</span>
+                            </div>
+
+                            <div class="payment-reference-actions">
+                                @if (payment.Order != null)
+                                {
+                                    <a class="payment-link-btn" href="@($"/orders/{payment.Order.Id}")" title="@T["PaymentDetails.ViewOrder"]">
+                                        <span class="payment-link-text">@T["PaymentDetails.ViewOrder"]</span>
+                                    </a>
+                                }
+                                <a class="payment-btn payment-btn-success" href="@($"/payments/view/{payment.Id}")">
+                                    <i class="fas fa-wave-square"></i> @T["PaymentView.Title"]
+                                </a>
+                                <button class="back-btn" @onclick="GoBack">@T["Common.Back"]</button>
+                            </div>
+                        </section>
+                    </div>
+            </div>
+            }
+        </article>
+    </section>
+</div>
+
+@code {
+    [Parameter] public int PaymentId { get; set; }
+    public PaymentRecord? payment;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
+
+    private bool IsPixPayment => string.Equals(payment?.PaymentMethod, "Pix", StringComparison.OrdinalIgnoreCase);
+    private string AddressLabel => IsPixPayment ? T["PaymentBuy.PixCodeLabel"] : T["Common.Address"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
+        payment = await Db.Payments
+            .Include(p => p.Product)
+            .ThenInclude(product => product!.User)
+            .Include(p => p.Order)
+            .FirstOrDefaultAsync(p => p.Id == PaymentId);
+    }
+
+    void GoBack() => Navigation.NavigateTo("/payments");
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    }
+}
+

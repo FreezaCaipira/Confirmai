@@ -1,0 +1,45 @@
+/* AdminPayments — responsive overrides scoped to .admin-payments-shell */
+
+/* Status badges */
+.admin-payments-shell .order-status-badge {
+    font-weight: 800;
+}
+
+.admin-payments-shell .order-status-badge.pago {
+    background: linear-gradient(180deg, #5f9b4b 0%, #3f7330 100%);
+    color: #efffe8;
+    border: 1px solid #35642a;
+}
+
+.admin-payments-shell .order-status-badge.cancelado,
+.admin-payments-shell .order-status-badge.pendente {
+    background: linear-gradient(180deg, #a85040 0%, #7c3528 100%);
+    color: #ffe8e4;
+    border: 1px solid #6c2416;
+}
+
+/* At ≤900px: tighten filter-bar to 2-col grid and let table scroll */
+@media (max-width: 900px) {
+    .admin-payments-shell .filter-bar.admin-filter-card {
+        gap: 0.45rem;
+    }
+
+    .admin-payments-shell .filter-bar.admin-filter-card input,
+    .admin-payments-shell .filter-bar.admin-filter-card select {
+        flex: 1 1 calc(50% - 0.45rem);
+    }
+}
+
+/* At ≤700px: already handled globally by site.css card-stacking (.payments-table) */
+/* Add min-width guard so the card columns stay readable */
+@media (max-width: 700px) {
+    .admin-payments-shell .payments-table td:before {
+        min-width: 80px;
+        flex-shrink: 0;
+    }
+
+    .admin-payments-shell .payments-table td {
+        flex-wrap: wrap;
+        gap: 0.2rem;
+    }
+}

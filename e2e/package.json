@@ -1,0 +1,17 @@
+﻿{
+  "name": "Confirmai-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Playwright browser E2E tests for Confirmai",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "install:browsers": "playwright install"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2"
+  }
+}
+
+

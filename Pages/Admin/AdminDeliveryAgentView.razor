@@ -1,0 +1,86 @@
+@page "/admin/delivery-agents/view/{Id:int}"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+@inject NavigationManager NavigationManager
+@inject UiTextService T
+
+@if (isLoading)
+{
+    <div class="loading-spinner">@T["AdminDeliveryAgentView.Loading"]</div>
+}
+else if (agent == null)
+{
+    <div class="alert alert-info">@T["AdminDeliveryAgentView.NotFound"]</div>
+}
+else
+{
+    <EntityProfileShell
+        Kicker="@T["AdminDeliveryAgentView.Kicker"]"
+        Title="@agent.Name"
+        Subtitle="@T["AdminDeliveryAgentView.Subtitle"]">
+        <MainContent>
+            <h3>@T["AdminDeliveryAgentView.AdminData"]</h3>
+            <dl>
+                <dt>ID</dt>
+                <dd>@agent.Id</dd>
+
+                <dt>@T["AdminDeliveryAgents.Name"]</dt>
+                <dd>@agent.Name</dd>
+
+                <dt>@T["AdminDeliveryAgents.Contact"]</dt>
+                <dd>@(string.IsNullOrWhiteSpace(agent.Contact) ? T["AdminDeliveryAgentView.NotInformed"] : agent.Contact)</dd>
+
+                <dt>@T["AdminDeliveryAgentView.AverageTime"]</dt>
+                <dd>@agent.EstimatedBusinessDays @T["AdminDeliveryAgentView.BusinessDaysValue"]</dd>
+
+                <dt>@T["AdminDeliveryAgents.CreatedAt"]</dt>
+                <dd>@agent.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt>@T["Common.Status"]</dt>
+                <dd>
+                    @if (agent.IsActive)
+                    {
+                        <span class="entity-shell-chip ok">@T["AdminDeliveryAgents.Active"]</span>
+                    }
+                    else
+                    {
+                        <span class="entity-shell-chip warn">@T["AdminDeliveryAgents.Inactive"]</span>
+                    }
+                </dd>
+            </dl>
+        </MainContent>
+
+        <SideContent>
+            <h3>@T["AdminDeliveryAgentView.Operation"]</h3>
+            <p>@T["AdminDeliveryAgentView.OperationHint"]</p>
+            <span class="entity-shell-chip ok">@T["AdminDeliveryAgentView.AdminScope"]</span>
+        </SideContent>
+
+        <FooterContent>
+            <div class="action-row">
+                <button type="button" class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/delivery-agents")'>@T["Common.Back"]</button>
+            </div>
+        </FooterContent>
+    </EntityProfileShell>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private DeliveryAgent? agent;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        agent = await Db.DeliveryAgents
+            .AsNoTracking()
+            .FirstOrDefaultAsync(d => d.Id == Id);
+
+        isLoading = false;
+    }
+}

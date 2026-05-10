@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Confirmai.Services
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UiTextService T
+
+@if (isAuthenticated)
+{
+    <div class="alert alert-warning">
+        @T["App.NotAuthorized"]
+    </div>
+}
+
+@code {
+    private bool isAuthenticated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
+
+        if (isAuthenticated)
+        {
+            return;
+        }
+
+        AuthNavigationHelper.NavigateToLoginForCurrentUrl(NavigationManager, replace: true);
+    }
+}

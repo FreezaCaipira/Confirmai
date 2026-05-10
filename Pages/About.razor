@@ -1,0 +1,24 @@
+@page "/about"
+
+@inject NavigationManager Navigation
+@inject UiTextService T
+
+<PageTitle>@T["Common.Redirecting"]</PageTitle>
+
+<div class="entity-shell parchment-a">
+    <section class="entity-shell-grid" aria-label="Redirecionamento">
+        <article class="entity-shell-card entity-shell-main">
+            <p class="identity-muted">@T["Common.Redirecting"]</p>
+        </article>
+    </section>
+</div>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Navigation.NavigateTo("/servers", replace: true);
+        }
+    }
+}

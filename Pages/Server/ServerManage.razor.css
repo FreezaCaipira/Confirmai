@@ -1,0 +1,318 @@
+/* -- Unified card: override form-card's dark theme + max-width -- */
+.form-card.server-manage-main {
+    max-width: none;
+    margin: 0;
+    padding: 1rem 1.05rem;
+}
+
+/* -- Page header: logo + server name + nav buttons -- */
+.server-manage-page-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.3rem 0.1rem 0.65rem;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgba(143, 106, 61, 0.35);
+}
+
+.server-manage-logo {
+    width: 60px;
+    height: 60px;
+    flex: 0 0 60px;
+    border-radius: 6px;
+    object-fit: contain;
+    border: 1px solid rgba(111, 73, 37, 0.56);
+    background: #120b06;
+    padding: 0.18rem;
+}
+
+.server-manage-logo-fallback {
+    width: 60px;
+    height: 60px;
+    flex: 0 0 60px;
+    border-radius: 6px;
+    border: 1px solid rgba(111, 73, 37, 0.56);
+    background: linear-gradient(180deg, #5a3414 0%, #3f2410 100%);
+    color: #fce8b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: var(--font-display, Georgia, serif);
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.server-manage-header-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.server-manage-header-meta h2 {
+    margin: 0;
+    font-size: 1.12rem;
+    font-weight: 900;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #1e0e03 !important;
+    text-shadow: none !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.server-manage-header-meta p {
+    margin: 0.15rem 0 0;
+    color: #7a5530;
+    font-size: 0.82rem;
+}
+
+.server-manage-header-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.server-manage-header-actions .mk-btn {
+    min-height: 1.9rem;
+    border-radius: 7px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.server-manage-header-actions .mk-btn.mk-btn-muted {
+    border: 1px solid #7a4a1f;
+    background: linear-gradient(180deg, #f0ddb8 0%, #dfbf8c 100%);
+    color: #4b2b13;
+    box-shadow: inset 0 0 0 1px rgba(255, 231, 185, 0.46);
+}
+
+.server-manage-header-actions .mk-btn.mk-btn-muted:hover,
+.server-manage-header-actions .mk-btn.mk-btn-muted:focus-visible {
+    background: linear-gradient(180deg, #f4e3c2 0%, #e7c899 100%);
+    border-color: #8e5928;
+}
+
+/* -- Section dividers (rust bar, edge-to-edge inside the card) -- */
+.server-manage-section {
+    margin: 2rem -1.05rem 1rem;
+    padding: 0.3rem 0.56rem;
+    border-top: 1px solid rgba(143, 106, 61, 0.2);
+    border-bottom: 1px solid #8f4116;
+    background: linear-gradient(180deg, var(--rust-orange, #7a2f0e) 0%, var(--rust-dark, #57210d) 100%);
+    color: #ffe9be;
+    text-transform: uppercase;
+    font-family: var(--font-display, Georgia, serif);
+    font-weight: 600;
+    font-size: 1.02rem;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+
+/* -- Form field overrides for parchment background -- */
+.server-manage-main .form-group {
+    margin-bottom: 0.8rem;
+}
+
+.server-manage-main .form-group > label {
+    color: #5a3719;
+    font-size: 0.98rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.server-manage-main .identity-muted {
+    color: #3d2008;
+}
+
+.server-manage-main p {
+    color: #3d2008;
+}
+
+.server-manage-main .input,
+.server-manage-main input[type="text"],
+.server-manage-main input[type="url"],
+.server-manage-main input[type="email"],
+.server-manage-main select,
+.server-manage-main textarea {
+    min-height: 2.25rem;
+    font-size: 0.96rem;
+    line-height: 1.2;
+}
+
+.server-manage-main input[type="file"] {
+    min-height: 2.1rem;
+    font-size: 0.92rem;
+}
+
+.server-manage-main .checkbox-label {
+    font-size: 0.95rem;
+    color: #4f3116;
+}
+
+.server-manage-main .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.8rem;
+}
+
+.server-manage-main .form-actions .mk-btn,
+.server-manage-main .form-actions .cancel-btn,
+.server-manage-main .form-actions .save-btn,
+.server-manage-main .form-actions .danger {
+    min-height: 2.2rem;
+    font-size: 0.94rem;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+}
+
+/* -- Tables inside the unified card -- */
+.server-manage-main .product-table {
+    margin-top: 0.5rem;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.server-manage-main .product-table th {
+    font-size: 0.82rem;
+    padding: 0.5rem 0.8rem;
+    background: #4a2f0e;
+    color: #ffe9be;
+    text-align: left;
+    font-family: var(--font-display, Georgia, serif);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.server-manage-main .product-table td {
+    font-size: 0.92rem;
+    padding: 0.52rem 0.8rem;
+    border-bottom: none;
+    vertical-align: middle;
+    color: #2e1e08;
+}
+
+.server-manage-main .product-table tbody tr:nth-child(odd) td {
+    background: #c8a87a;
+}
+
+.server-manage-main .product-table tbody tr:nth-child(even) td {
+    background: #a8895f;
+}
+
+.server-manage-main .product-table tbody tr:hover td {
+    background: #7a5535;
+    color: #ffe9be;
+}
+
+.server-manage-main .product-table tbody tr:hover td a {
+    color: #ffe9be;
+}
+
+.server-members-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.server-members-table {
+    min-width: 520px;
+}
+
+/* -- Audit log table -- */
+.server-audit-table-wrap {
+    overflow-x: auto;
+    margin-top: 0.5rem;
+}
+
+.server-audit-table {
+    font-size: 0.82rem;
+}
+
+.audit-ts {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.audit-detail {
+    max-width: 280px;
+    word-break: break-word;
+    font-size: 0.78rem;
+}
+
+.audit-row-fail td {
+    background: #b84828 !important;
+    color: #fff0e8 !important;
+}
+
+.audit-row-fail td a,
+.audit-row-fail td code {
+    color: #ffe9be !important;
+}
+
+.audit-limit-note {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #5a3719;
+}
+
+/* -- Active/Revoked badges -- */
+.badge-active {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 3px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: #133013;
+    color: #7de484;
+    border: 1px solid #2a6a2a;
+}
+
+.badge-revoked {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 3px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: #3a1208;
+    color: #f4a080;
+    border: 1px solid #7a2f0e;
+}
+
+/* -- API key contact tip card -- */
+.server-apikey-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+    background: #a8895f;
+    border-left: 3px solid #7a2f0e;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+    margin-top: 0.7rem;
+    color: #2e1e08;
+}
+
+/* -- Responsive -- */
+@media (max-width: 600px) {
+    .server-manage-page-header {
+        flex-wrap: wrap;
+    }
+
+    .server-manage-header-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

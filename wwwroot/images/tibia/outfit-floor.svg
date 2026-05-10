@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-label="Tibia stone texture background">
+  <defs>
+    <filter id="softStone" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" result="blur"/>
+      <feOffset dx="0.35" dy="0.45" result="off"/>
+      <feComposite in="off" in2="SourceAlpha" operator="out" result="shadow"/>
+      <feColorMatrix in="shadow" type="matrix" values="0 0 0 0 0.08 0 0 0 0 0.08 0 0 0 0 0.09 0 0 0 0.45 0"/>
+      <feBlend in="SourceGraphic"/>
+    </filter>
+
+    <radialGradient id="stoneA" cx="50%" cy="38%" r="72%">
+      <stop offset="0%" stop-color="#9ca1a7"/>
+      <stop offset="60%" stop-color="#80868d"/>
+      <stop offset="100%" stop-color="#666b72"/>
+    </radialGradient>
+    <radialGradient id="stoneB" cx="48%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#a1a6ac"/>
+      <stop offset="58%" stop-color="#848b92"/>
+      <stop offset="100%" stop-color="#6a7078"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="320" height="180" fill="#595f66"/>
+
+  <g filter="url(#softStone)">
+    <rect x="4" y="6" width="46" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="52" y="6" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="101" y="6" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="150" y="6" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="199" y="6" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="248" y="6" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+
+    <rect x="12" y="44" width="46" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="61" y="44" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="110" y="44" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="159" y="44" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="208" y="44" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="257" y="44" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+
+    <rect x="4" y="82" width="46" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="52" y="82" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="101" y="82" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="150" y="82" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="199" y="82" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="248" y="82" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+
+    <rect x="12" y="120" width="46" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="61" y="120" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="110" y="120" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="159" y="120" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+    <rect x="208" y="120" width="47" height="40" rx="11" fill="url(#stoneB)"/>
+    <rect x="257" y="120" width="47" height="40" rx="11" fill="url(#stoneA)"/>
+  </g>
+</svg>

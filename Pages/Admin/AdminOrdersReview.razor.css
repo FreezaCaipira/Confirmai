@@ -1,0 +1,526 @@
+﻿.modal-warning-icon {
+    color: #b05a00;
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.release-summary-card {
+    margin-bottom: 1rem;
+}
+
+.release-product-preview-wrapper {
+    margin-bottom: 0.75rem;
+}
+
+.release-product-preview-img {
+    max-width: 180px;
+    border-radius: 8px;
+}
+
+.label {
+    color: #7a4e1e;
+    font-weight: bold;
+    width: 7em;
+    min-width: 7em;
+    display: inline-block;
+}
+
+.payment-details-card {
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(180deg, #f7ebd2 0%, #ecd3aa 100%);
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 246, 225, 0.74), 0 2px 8px rgba(40, 22, 8, 0.14);
+    border: 1px solid #9b774a;
+    padding: 0.55rem 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    color: #3a1f05;
+}
+
+.payment-details-card .details-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.7em;
+    justify-content: space-between;
+}
+
+.payment-details-card .label {
+    color: #7a4e1e;
+    width: 7em;
+    min-width: 7em;
+    display: inline-block;
+    text-align: left;
+}
+
+.release-modal-question {
+    margin: 0 0 0.85rem;
+    text-align: center;
+}
+
+.release-modal-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+}
+
+.release-modal-layout .release-summary-card.payment-details-card {
+    margin-bottom: 0;
+    max-width: none;
+    min-width: 0;
+    height: auto;
+    flex: 1 1 0;
+    overflow: hidden;
+}
+
+.release-modal-layout .release-summary-card .details-row > span:last-child {
+    min-width: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.release-modal-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 0 0 160px;
+    min-width: 0;
+    width: 160px;
+}
+
+.release-modal-side .release-product-preview-wrapper {
+    margin-bottom: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.release-modal-side .release-product-preview-img {
+    width: min(220px, 100%);
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.release-evidence-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.release-evidence-row .evidence-card {
+    min-width: 0;
+    width: 100%;
+}
+
+@media (max-width: 1100px) {
+    .release-modal-layout {
+        flex-direction: column;
+    }
+
+    .release-modal-side {
+        width: auto;
+        max-width: none;
+        flex-shrink: 0;
+        align-self: center;
+    }
+
+    .release-evidence-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .modal-warning-icon {
+        font-size: 1.25em;
+    }
+
+    .release-summary-card {
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .release-product-preview-wrapper {
+        margin-bottom: 0.5rem;
+    }
+
+    .release-product-preview-img {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+    }
+
+    .release-evidence-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Extracted from theme layer --- */
+.filter-bar.admin-filter-card {
+    display: grid;
+    grid-template-columns: minmax(140px, 1.4fr) minmax(140px, 1.4fr) minmax(120px, 0.9fr) minmax(120px, 0.9fr) auto auto;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.filter-bar.admin-filter-card input,
+.filter-bar.admin-filter-card button {
+    min-height: 2.35rem;
+    height: 2.35rem;
+    box-sizing: border-box;
+}
+
+.filter-bar.admin-filter-card button {
+    background: linear-gradient(180deg, #d4a43a 0%, #a87c28 100%);
+    border: 1px solid #7f5c1c;
+    color: #2e1702;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    border-radius: 2px;
+    padding: 0.4rem 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 86px;
+    cursor: pointer;
+}
+
+.filter-bar.admin-filter-card button:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+.filter-bar.admin-filter-card button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.orders-review-restored-notice {
+    background: linear-gradient(180deg, var(--parchment) 0%, #dbb97e 100%);
+    border: 1px solid #9a7040;
+    color: #3a1f05;
+    border-radius: 4px;
+    padding: 0.5rem 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.orders-review-new-order-toast {
+    background: linear-gradient(180deg, #d4f5d4 0%, #9ecc9e 100%);
+    border-color: #4a7a4a;
+    color: #1a3d1a;
+}
+
+.orders-review-new-order-toast i {
+    margin-right: 0.35rem;
+}
+
+.orders-review-sort-summary {
+    color: #5a3310;
+    font-style: italic;
+    font-size: 0.88rem;
+    margin-bottom: 0.4rem;
+}
+
+.pagination button {
+    background: linear-gradient(180deg, #d4a43a 0%, #a87c28 100%);
+    border: 1px solid #7f5c1c;
+    color: #2e1702;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    border-radius: 2px;
+}
+
+.pagination button:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+.pagination button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    color: #5a3310;
+    font-weight: 600;
+}
+
+.order-status-badge {
+    margin: 0;
+    font-weight: 800;
+    font-size: 0.82rem;
+    padding: 0.3em 0.85em;
+}
+
+.order-status-badge.aguardandorevisaoadm {
+    background: linear-gradient(180deg, #d2bf4c 0%, #a58f2e 100%);
+    color: #261c06;
+    border: 1px solid #847224;
+}
+
+@media (max-width: 900px) {
+    .filter-bar.admin-filter-card {
+        grid-template-columns: 1fr 1fr auto auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .filter-bar.admin-filter-card {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+.admin-release-funds-modal.modal-card {
+    width: min(860px, 94vw);
+    max-width: min(860px, 94vw);
+    min-width: 0;
+    max-height: calc(100vh - 1rem);
+    padding: 0.95rem 1rem 0.85rem;
+    background: linear-gradient(180deg, #f2e0bf 0%, #ddbe8e 100%);
+    border: 1px solid var(--brown-border-light);
+    color: #3c250f;
+    box-shadow: inset 0 0 0 1px rgba(255, 245, 221, 0.6), 0 12px 28px rgba(22, 12, 4, 0.38);
+}
+
+.admin-release-funds-modal .modal-title {
+    margin: -0.95rem -1rem 0.65rem;
+    padding: 0.35rem 0.5rem;
+    background: linear-gradient(180deg, var(--rust-orange, #7a2f0e) 0%, var(--rust-dark, #57210d) 100%);
+    border-bottom: 1px solid #8f4116;
+    color: #ffe9be;
+    font-size: 1.02rem;
+    font-family: var(--font-display, Georgia, serif);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.admin-release-funds-modal .modal-title-icon {
+    color: #f5c66a;
+}
+
+.admin-release-funds-modal .release-modal-content {
+    gap: 0.45rem;
+    padding-right: 0;
+    color: #4a2d15;
+    overflow-y: auto;
+    max-height: calc(100vh - 190px);
+}
+
+.admin-release-funds-modal .release-modal-question {
+    margin-bottom: 0.45rem;
+    color: #5c3516;
+    font-weight: 700;
+}
+
+.admin-release-funds-modal .release-modal-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+}
+
+.admin-release-funds-modal .release-summary-card.payment-details-card {
+    background: linear-gradient(180deg, #f7ebd2 0%, #ecd3aa 100%);
+    border: 1px solid #9b774a;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 246, 225, 0.74), 0 1px 3px rgba(40, 22, 8, 0.14);
+    padding: 0.55rem 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    color: #3a1f05;
+}
+
+.admin-release-funds-modal .release-summary-card .details-row {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.4rem;
+    padding: 0.28rem 0.1rem;
+    border-bottom: 1px solid rgba(143, 106, 61, 0.3);
+    margin-bottom: 0;
+}
+
+.admin-release-funds-modal .release-summary-card .details-row:last-child {
+    border-bottom: none;
+}
+
+.admin-release-funds-modal .release-summary-card .details-row > span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.admin-release-funds-modal .release-summary-card .label {
+    color: #6f431d;
+}
+
+.admin-release-funds-modal .release-modal-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 0 0 160px;
+    min-width: 0;
+    width: 160px;
+}
+
+.admin-release-funds-modal .release-product-preview-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.4rem;
+    background: linear-gradient(168deg, #ebd2a5 0%, #dfbd88 56%, #d0a973 100%);
+    border: 1px solid #9b774a;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(255, 244, 214, 0.45), 0 2px 6px rgba(40, 22, 8, 0.12);
+}
+
+.admin-release-funds-modal .release-product-preview-img {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+    border: 2px solid #8c6a3f;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #f7ebd2 0%, #ecd3aa 100%);
+    padding: 0.3rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 245, 222, 0.5), 0 3px 8px rgba(40, 22, 8, 0.18);
+}
+
+.admin-release-funds-modal .release-evidence-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    align-items: start;
+    margin-top: 0.5rem;
+    gap: 0.45rem;
+    width: 100%;
+}
+
+.admin-release-funds-modal .evidence-card {
+    background: linear-gradient(168deg, #ebd2a5 0%, #dfbd88 56%, #d0a973 100%);
+    border: 1px solid #9a7446;
+    border-radius: 8px;
+    color: #3e250f;
+    padding: 0.55rem 0.65rem;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 96px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.22rem;
+    overflow: hidden;
+    font-size: 0.9rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 244, 214, 0.4), 0 2px 6px rgba(40, 22, 8, 0.1);
+}
+
+.admin-release-funds-modal .evidence-card .evidence-card-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #5a3314;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.2rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid rgba(143, 106, 61, 0.35);
+    width: 100%;
+}
+
+.admin-release-funds-modal .evidence-card .evidence-card-title i,
+.admin-release-funds-modal .evidence-card .evidence-card-title b {
+    color: inherit;
+}
+
+.admin-release-funds-modal .evidence-card .evidence-card-title b {
+    margin: 0;
+    font-weight: inherit;
+}
+
+.admin-release-funds-modal .evidence-card a {
+    color: #7b4518;
+    font-weight: 700;
+}
+
+.admin-release-funds-modal .evidence-card a i {
+    color: inherit;
+}
+
+.admin-release-funds-modal .modal-actions {
+    margin-top: 0.58rem;
+    padding-top: 0.5rem;
+    gap: 0.55rem;
+}
+
+@media (max-width: 900px) {
+    .admin-release-funds-modal {
+        width: min(96vw, 720px);
+        max-width: min(96vw, 720px);
+        max-height: 90vh;
+    }
+
+    .admin-release-funds-modal .release-modal-layout {
+        flex-direction: column;
+    }
+
+    .admin-release-funds-modal .release-modal-side {
+        width: auto;
+        max-width: none;
+        flex-shrink: 0;
+        align-self: center;
+    }
+
+    .admin-release-funds-modal .release-evidence-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Extracted from site.css: page-specific rules */
+.evidence-section {
+    display: flex;
+    gap: 1.5em;
+    margin-top: 1em;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.modal-title-with-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+}
+
+@media (max-width: 768px) {
+    .evidence-section {
+        gap: 0.8rem;
+    }
+}
+
+/* Extracted from site.css: order review responsive actions */
+@media (max-width: 700px) {
+    .order-review-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .order-review-actions .details-btn,
+    .order-review-actions .success-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}

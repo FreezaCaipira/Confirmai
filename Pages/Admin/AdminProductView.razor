@@ -1,0 +1,86 @@
+﻿@page "/admin/items/view/{Id:int}"
+@page "/admin/products/view/{Id:int}"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+
+@inject ProductService ProductService
+@inject UiTextService T
+
+<div class="entity-shell parchment-a admin-page">
+
+    <section class="entity-shell-grid" aria-label="@T["AdminProductView.Aria"]">
+        <article class="apv-card">
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
+            }
+            else if (product == null)
+            {
+                <p>@T["AdminProductView.NotFound"]</p>
+            }
+            else
+            {
+                <h2 class="apv-title">@product.Name</h2>
+
+                <dl class="apv-dl">
+                    <div class="apv-row">
+                        <dt>ID</dt>
+                        <dd>#@product.Id</dd>
+                    </div>
+                    <div class="apv-row">
+                        <dt>@T["AdminUsers.User"]</dt>
+                        <dd class="apv-mono">@product.UserId</dd>
+                    </div>
+                    <div class="apv-row">
+                        <dt>Categoria</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(product.Category) ? "Geral" : product.Category)</dd>
+                    </div>
+                    <div class="apv-row">
+                        <dt>@T["Common.Value"]</dt>
+                        <dd>@product.Price.ToString("C")</dd>
+                    </div>
+                    <div class="apv-row">
+                        <dt>Peso</dt>
+                        <dd>@product.Weight</dd>
+                    </div>
+                    <div class="apv-row">
+                        <dt>ATK / DEF / ARM</dt>
+                        <dd>@product.Attack / @product.Defense / @product.Armor</dd>
+                    </div>
+                    <div class="apv-row">
+                        <dt>Drop</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(product.DropSources) ? "Não informado" : product.DropSources)</dd>
+                    </div>
+                    <div class="apv-row">
+                        <dt>@T["Products.CreatedAt"]</dt>
+                        <dd>@product.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</dd>
+                    </div>
+                </dl>
+
+                <div class="apv-actions">
+                    <button class="apv-btn-back" @onclick='() => NavigationManager.NavigateTo("/admin/items")'>@T["Common.Back"]</button>
+                    <button class="apv-btn-edit" @onclick='() => NavigationManager.NavigateTo($"/admin/items/edit/{product.Id}")'>@T["Common.Edit"]</button>
+                </div>
+            }
+        </article>
+    </section>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Product? product;
+    private bool isLoading = true;
+
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        product = await ProductService.GetByIdAsync(Id);
+        isLoading = false;
+    }
+}
+

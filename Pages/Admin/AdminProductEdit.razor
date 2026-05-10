@@ -1,0 +1,252 @@
+﻿@page "/admin/items/edit/{Id:int}"
+@page "/admin/products/edit/{Id:int}"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Confirmai.Shared
+
+@inject ProductService ProductService
+@inject GatewayService GatewayService
+@inject LogService LogService
+@inject TibiaServerService TibiaServerService
+@inject UiTextService T
+
+<div class="entity-shell parchment-a admin-page">
+
+    <section class="entity-shell-grid" aria-label="@T["AdminProductEdit.Aria"]">
+        <article class="entity-shell-card entity-shell-main form-card">
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
+            }
+            else if (product == null)
+            {
+                <p>@T["AdminProductEdit.NotFound"]</p>
+            }
+            else
+            {
+                <EditForm Model="product" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="form-group">
+                        <label>@T["Common.Name"]</label>
+                        <InputText class="input" @bind-Value="product.Name" />
+                        <ValidationMessage For="@(() => product.Name)" class="validation-message" />
+                    </div>
+                    <div class="form-group">
+                        <label>@T["Common.Description"]</label>
+                        <InputTextArea class="input" @bind-Value="product.Description" />
+                        <ValidationMessage For="@(() => product.Description)" class="validation-message" />
+                    </div>
+                    <div class="form-group">
+                        <label>@T["AdminProductEdit.Price"]</label>
+                        <InputNumber class="input" @bind-Value="product.Price" />
+                        <ValidationMessage For="@(() => product.Price)" class="validation-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <InputSelect class="input" @bind-Value="product.Category">
+                            @foreach (var category in categoryOptions)
+                            {
+                                <option value="@category.Value">@category.Label</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => product.Category)" class="validation-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gateway de precificacao</label>
+                        <InputSelect class="input" @bind-Value="product.PricingGateway">
+                            @foreach (var gateway in pricingGatewayOptions)
+                            {
+                                <option value="@gateway.Name">@gateway.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => product.PricingGateway)" class="validation-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cor de fundo</label>
+                        <div class="accent-color-control">
+                            <input type="color" class="accent-color-input" @bind="accentColorInput" />
+                            <div class="accent-color-preview" style="--accent-preview:@accentColorInput;">
+                                <span class="accent-color-swatch" aria-hidden="true"></span>
+                                <div class="accent-color-meta">
+                                    <strong>Preview do card</strong>
+                                    <small>@accentColorInput.ToUpperInvariant()</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Peso</label>
+                        <InputNumber class="input" @bind-Value="product.Weight" />
+                        <ValidationMessage For="@(() => product.Weight)" class="validation-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Atributos (ATK / DEF / ARM)</label>
+                        <div class="product-attr-grid">
+                            <InputNumber class="input" @bind-Value="product.Attack" />
+                            <InputNumber class="input" @bind-Value="product.Defense" />
+                            <InputNumber class="input" @bind-Value="product.Armor" />
+                        </div>
+                        <div class="product-attr-labels">
+                            <span>ATK</span>
+                            <span>DEF</span>
+                            <span>ARM</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Drop (monstros)</label>
+                        <InputTextArea class="input" @bind-Value="product.DropSources" placeholder="Ex.: Dragon, Demon, Orshabaal" />
+                        <ValidationMessage For="@(() => product.DropSources)" class="validation-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Servidores</label>
+                        <div class="server-checkbox-list">
+                            @foreach (var server in availableServers)
+                            {
+                                <label class="server-checkbox-item">
+                                    <input type="checkbox"
+                                           checked="@selectedServerIds.Contains(server.Id)"
+                                           @onchange="e => ToggleServer(server.Id, (bool)(e.Value ?? false))" />
+                                    @server.Name
+                                    @if (!server.IsActive)
+                                    {
+                                        <span class="server-inactive-badge">(inativo)</span>
+                                    }
+                                </label>
+                            }
+                            @if (!availableServers.Any())
+                            {
+                                <small>Nenhum servidor cadastrado.</small>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/items")'>@T["Common.Cancel"]</button>
+                        <button class="save-btn" type="submit" disabled="@isSaving">@T["Common.Save"]</button>
+                    </div>
+                </EditForm>
+            }
+        </article>
+    </section>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Product? product;
+    private bool isLoading = true;
+    private bool isSaving = false;
+    private string accentColorInput = "#BF4B13";
+    private List<GatewayInfo> pricingGatewayOptions = new();
+    private List<TibiaServer> availableServers = new();
+    private HashSet<int> selectedServerIds = new();
+    private readonly List<CategoryOption> categoryOptions =
+    [
+        new("helmet", "Helmet"),
+        new("armor", "Armor"),
+        new("legs", "Legs"),
+        new("boots", "Boots"),
+        new("shield", "Shield"),
+        new("necklace", "Necklace"),
+        new("ring", "Ring"),
+        new("axe", "Axe"),
+        new("club", "Club"),
+        new("sword", "Sword"),
+        new("distance", "Distance"),
+        new("ammunition", "Ammunition"),
+        new("rune", "Rune"),
+        new("valuable", "Valuable"),
+        new("tool", "Tool")
+    ];
+    [CascadingParameter] public Toast? ToastRef { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        pricingGatewayOptions = await GatewayService.GetAllAsync();
+        availableServers = await TibiaServerService.GetAllAsync();
+        product = await ProductService.GetByIdAsync(Id);
+        if (product != null)
+        {
+            selectedServerIds = product.ProductServers?.Select(ps => ps.ServerId).ToHashSet() ?? new();
+            accentColorInput = string.IsNullOrWhiteSpace(product.AccentColor)
+                ? "#BF4B13"
+                : product.AccentColor!;
+            EnsurePricingGatewayDefault();
+        }
+        isLoading = false;
+    }
+
+    private void EnsurePricingGatewayDefault()
+    {
+        if (product == null || !pricingGatewayOptions.Any())
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(product.PricingGateway))
+        {
+            product.PricingGateway = pricingGatewayOptions
+                .Select(g => g.Name)
+                .FirstOrDefault(name => string.Equals(name, "Pix", StringComparison.OrdinalIgnoreCase))
+                ?? pricingGatewayOptions[0].Name;
+            return;
+        }
+
+        if (pricingGatewayOptions.Any(g => string.Equals(g.Name, product.PricingGateway, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        pricingGatewayOptions.Insert(0, new GatewayInfo
+        {
+            Name = product.PricingGateway,
+            Enabled = false
+        });
+    }
+
+    private async Task Save()
+    {
+        if (product == null)
+        {
+            ToastRef?.Show(T["AdminProductEdit.NotFound"], "error");
+            return;
+        }
+        
+        isSaving = true;
+        product.AccentColor = accentColorInput;
+        await ProductService.UpdateAsync(product, null, selectedServerIds);
+        isSaving = false;
+
+        await LogService.LogAsync(
+            string.Format(T["AdminProductEdit.LogEdited"], product.Id),
+            source: "Admin",
+            level: "Info"
+        );
+        ToastRef?.Show(T["AdminProductEdit.UpdatedToast"], "success");
+        NavigationManager.NavigateTo($"/admin/items/view/{product.Id}");
+    }
+
+    private void ToggleServer(int serverId, bool isChecked)
+    {
+        if (isChecked)
+            selectedServerIds.Add(serverId);
+        else
+            selectedServerIds.Remove(serverId);
+    }
+
+    private sealed record CategoryOption(string Value, string Label);
+}
+

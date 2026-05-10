@@ -1,0 +1,499 @@
+﻿/* ===== Integration page — scoped styles =====
+   ATENÇÃO: Scoped .razor.css só entra em vigor após restart do servidor.
+   Para titles (h3), o site.css global tem .oldsite-main-content .entity-shell-card h3
+   com especificidade (0,2,2). Usamos .integration-article .integration-step-title
+   que após scoping fica (0,3,0) e ganha.
+   ============================================ */
+
+/* --- Title bar (rust gradient, texto claro) --- */
+.integration-title-bar {
+    padding: 1.4rem 1.5rem 1.2rem;
+    background: linear-gradient(180deg, #7a2f0e 0%, #57210d 100%);
+    border-bottom: 2px solid #6a2810;
+    border-radius: 3px 3px 0 0;
+    margin-bottom: 0;
+}
+
+.page-title-bar-title {
+    margin: 0 0 0.25rem;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: #ffe9be;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    letter-spacing: 0.04em;
+}
+
+.page-title-bar-subtitle {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #d9b88a;
+}
+
+/* --- Article container --- */
+.integration-article {
+    padding: 1.4rem 1.6rem;
+    line-height: 1.65;
+    color: #2e1e08;
+}
+
+.integration-intro p {
+    font-size: 0.97rem;
+    margin-bottom: 0.8rem;
+    color: #2e1e08;
+}
+
+/* --- Badges --- */
+.integration-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+}
+
+.int-badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 3px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.int-badge-auth   { background: #3a2208; color: #fad97a; border: 1px solid #6a4010; }
+.int-badge-secure { background: #133013; color: #7de484; border: 1px solid #2a6a2a; }
+.int-badge-rate   { background: #220d3a; color: #c8a0f8; border: 1px solid #5a3a80; }
+
+/* --- Section titles h2 --- */
+.integration-section-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #7a2f0e;
+    text-shadow: none;
+    margin: 1.6rem 0 0.9rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid #b07048;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.integration-divider {
+    border: none;
+    border-top: 1px solid #c9a870;
+    margin: 1.6rem 0;
+}
+
+/* --- Step number circle --- */
+.integration-step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+    align-items: flex-start;
+}
+
+.integration-step-number {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #7a2f0e 0%, #57210d 100%);
+    color: #ffe9be;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.15rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.integration-step-body {
+    flex: 1;
+    min-width: 0;
+}
+
+/*
+ * ESPECIFICIDADE: site.css tem body .oldsite-main-content .entity-shell-card h3 = (0,2,2)
+ * Este seletor após scoping = .integration-article[b-x] .integration-step-title[b-x] = (0,3,0)
+ * (0,3,0) > (0,2,2) — ganha.
+ */
+.integration-article .integration-step-title {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-display);
+    font-size: 0.97rem;
+    font-weight: 800;
+    color: #7a2f0e;
+    text-shadow: none;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.integration-substeps {
+    margin: 0.5rem 0 0.75rem 1.2rem;
+    padding: 0;
+    font-size: 0.92rem;
+    color: #2e1e08;
+}
+
+.integration-substeps li {
+    margin-bottom: 0.3rem;
+    color: #2e1e08;
+}
+
+/* --- Tips --- */
+.integration-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+    background: #a8895f;
+    border-left: 3px solid #7a2f0e;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+    margin-top: 0.7rem;
+    color: #2e1e08;
+}
+
+.int-tip-danger {
+    border-left-width: 4px;
+}
+
+.int-tip-icon {
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+
+/* --- Download buttons --- */
+.integration-download-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin: 0.7rem 0;
+}
+
+.int-download-btn {
+    display: inline-block;
+    padding: 0.55rem 1.1rem;
+    background: linear-gradient(180deg, #7a2f0e 0%, #57210d 100%);
+    color: #ffe9be;
+    border: 1px solid #6a2810;
+    border-radius: 3px;
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: opacity 0.15s;
+    letter-spacing: 0.02em;
+}
+
+.int-download-btn:hover {
+    opacity: 0.85;
+    color: #ffe9be;
+    text-decoration: none;
+}
+
+/* --- Tab groups (CANARY / TFS 1.x)
+ *  Fundo: tom claro do marrom-ferrugem (#7a2f0e em 15% de opacidade sobre branco ≈ #f2e2da)
+ *  Texto: #7a2f0e (mesmo marrom da bolinha)
+ * --- */
+.integration-tab-group {
+    border: 1px solid #7a2f0e;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 0.7rem;
+}
+
+.integration-tab-label {
+    padding: 0.4rem 0.85rem;
+    background: #7a2f0e;
+    border-bottom: 1px solid #57210d;
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #ffe9be;
+    text-shadow: none;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.integration-tab-label strong {
+    color: #ffe9be;
+    font-weight: 800;
+}
+
+.integration-tab-content {
+    padding: 0.6rem 0.85rem;
+    background: #a8895f;
+    font-size: 0.9rem;
+    color: #2e1e08;
+}
+
+.integration-tab-content p {
+    margin: 0 0 0.4rem;
+    color: #2e1e08;
+}
+
+/* --- Code blocks --- */
+.integration-code {
+    background: #2b1d0e;
+    color: #efd6ac;
+    padding: 0.75rem 1rem;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    overflow-x: auto;
+    margin: 0.5rem 0;
+    line-height: 1.55;
+    border: 1px solid #5d3a10;
+}
+
+.integration-code code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+}
+
+.integration-curl-wrap {
+    position: relative;
+}
+
+.int-copy-btn {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 3px;
+    color: #efd6ac;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+}
+
+.int-copy-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* --- Endpoint table --- */
+.integration-endpoints-intro {
+    font-size: 0.92rem;
+    margin-bottom: 0.8rem;
+    color: #2e1e08;
+}
+
+.integration-table-wrap {
+    overflow-x: auto;
+}
+
+.integration-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.integration-table th {
+    padding: 0.5rem 0.8rem;
+    background: #4a2f0e;
+    color: #ffe9be;
+    text-align: left;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.integration-table td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: none;
+    vertical-align: middle;
+    color: #2e1e08;
+}
+
+.integration-table tbody tr:nth-child(odd) td {
+    background: #c8a87a;
+}
+
+.integration-table tbody tr:nth-child(even) td {
+    background: #a8895f;
+}
+
+.integration-table tr:last-child td {
+    border-bottom: none;
+}
+
+.integration-table tbody tr:hover td {
+    background: #7a5535;
+    color: #ffe9be;
+}
+
+.http-method {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: monospace;
+    letter-spacing: 0.05em;
+}
+
+.http-get  { background: #133013; color: #7de484; border: 1px solid #2a5a2a; }
+.http-post { background: #0e1e30; color: #7ab4d4; border: 1px solid #1a3a5a; }
+
+/* --- Alt-cards (sem HTTP)
+ *  Fundo: tom claro ferrugem
+ *  Título h4: #7a2f0e
+ * --- */
+.integration-alt-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 0.8rem 0;
+}
+
+.integration-alt-card {
+    padding: 0.85rem 1rem;
+    background: #c8a87a;
+    border: 1px solid #7a2f0e;
+    border-radius: 6px;
+}
+
+.integration-alt-card h4 {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #7a2f0e;
+    text-shadow: none;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.integration-alt-card p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: #2e1e08;
+}
+
+/* --- Security grid
+ *  Fundo: mesmo tom claro
+ *  Título strong: #7a2f0e
+ * --- */
+.integration-security-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+    margin-top: 0.6rem;
+}
+
+.integration-security-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.75rem;
+    background: #c8a87a;
+    border: 1px solid #7a2f0e;
+    border-radius: 6px;
+}
+
+.int-sec-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.integration-security-item strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #7a2f0e;
+    text-shadow: none;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.25rem;
+}
+
+.integration-security-item p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #2e1e08;
+}
+
+/* --- Help CTA box --- */
+.integration-help-box {
+    padding: 1.1rem 1.3rem;
+    background: linear-gradient(135deg, #4a2f0e 0%, #2b1d0e 100%);
+    border-radius: 4px;
+    color: #efd6ac;
+    margin-top: 0.5rem;
+}
+
+.integration-help-box h3 {
+    margin: 0 0 0.4rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: #f9c85a;
+}
+
+.integration-help-box p {
+    margin: 0 0 0.9rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #efd6ac;
+}
+
+.int-help-cta {
+    display: inline-block;
+    padding: 0.5rem 1.2rem;
+    background: var(--gold);
+    color: #2b1d0e;
+    border-radius: 3px;
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+}
+
+.int-help-cta:hover {
+    background: var(--gold-light);
+    color: #2b1d0e;
+    text-decoration: none;
+}
+
+/* --- ServerManage helpers --- */
+.int-docs-link {
+    font-size: 0.88rem;
+    color: var(--gold-amber);
+    text-decoration: underline;
+}
+
+.server-apikeys-table td,
+.server-apikeys-table th {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 680px) {
+    .integration-alt-cards,
+    .integration-security-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .integration-download-row {
+        flex-direction: column;
+    }
+
+    .int-download-btn {
+        text-align: center;
+    }
+}
+
+
+
+

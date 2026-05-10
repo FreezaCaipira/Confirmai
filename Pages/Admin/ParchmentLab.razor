@@ -1,0 +1,66 @@
+﻿@page "/admin/parchment-lab"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Microsoft.AspNetCore.Authorization
+
+<div class="entity-shell parchment-lab-page">
+
+    <section class="entity-shell-grid" aria-label="Comparativo de papiros">
+        <article class="entity-shell-card entity-shell-main">
+            <div class="parchment-grid">
+                <section class="parchment-sample parchment-sample-a">
+                    <h3>Variante A - Classico claro</h3>
+                    <p>Tom equilibrado com desgaste suave. Boa legibilidade para formularios e tabelas.</p>
+                    <ul>
+                        <li>Borda escurecida leve</li>
+                        <li>Textura de fibra discreta</li>
+                        <li>Contraste alto para texto</li>
+                    </ul>
+                </section>
+
+                <section class="parchment-sample parchment-sample-b">
+                    <h3>Variante B - Antigo quente</h3>
+                    <p>Mais amarelado e envelhecido, com aspecto de pergaminho antigo e cantos mais queimados.</p>
+                    <ul>
+                        <li>Vinheta lateral forte</li>
+                        <li>Cantos mais marcados</li>
+                        <li>Tom rustico medieval</li>
+                    </ul>
+                </section>
+
+                <section class="parchment-sample parchment-sample-c">
+                    <h3>Variante C - Meio termo escuro</h3>
+                    <p>Bege medio com leitura forte e desgaste mais definido ao redor da caixa.</p>
+                    <ul>
+                        <li>Borda interna de moldura</li>
+                        <li>Textura um pouco mais visivel</li>
+                        <li>Boa separacao do fundo</li>
+                    </ul>
+                </section>
+
+                <section class="parchment-sample parchment-sample-d">
+                    <h3>Variante D - Alaria inspirado</h3>
+                    <p>Puxa para o visual de quadro com relevo e sombras de borda mais dramaticas.</p>
+                    <ul>
+                        <li>Sombra de profundidade maior</li>
+                        <li>Borda dupla e ornamento</li>
+                        <li>Look de painel principal</li>
+                    </ul>
+                </section>
+            </div>
+
+            <div class="parchment-choice-hint">
+                Sugestao: me diga a variante (A, B, C ou D) e eu aplico em todas as telas principais.
+            </div>
+        </article>
+    </section>
+
+    <section class="entity-shell-footer">
+        <button class="back-btn" @onclick='() => Navigation.NavigateTo("/admin")'>Voltar</button>
+    </section>
+</div>
+
+@code {
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+}

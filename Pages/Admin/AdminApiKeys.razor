@@ -1,0 +1,221 @@
+﻿@page "/admin/api-keys"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Shared
+@using Confirmai.Models
+@using Confirmai.Services
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+
+@inject ServerApiKeyService ApiKeyService
+@inject TibiaServerService ServerService
+@inject LogService LogService
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject UiTextService T
+
+<div class="entity-shell parchment-a admin-page admin-apikeys-shell">
+
+    <section class="entity-shell-grid" aria-label="@T["AdminApiKeys.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <h1 class="page-section-title">@T["AdminApiKeys.Title"]</h1>
+            @if (isLoading)
+            {
+                <div class="loading-spinner">Carregando API keys...</div>
+            }
+            else
+            {
+                <div class="apikeys-actions">
+                    @if (servers.Any())
+                    {
+                        <button class="btn-gold" @onclick="ToggleCreateForm">@T["AdminApiKeys.CreateNew"]</button>
+                    }
+                    else
+                    {
+                        <p class="identity-muted">@T["AdminApiKeys.NoServers"]</p>
+                    }
+                </div>
+
+                @if (showCreateForm)
+                {
+                    <div class="apikeys-create-form">
+                        <div class="form-group">
+                            <label>@T["AdminApiKeys.Server"]</label>
+                            <select @bind="newKeyServerId" class="form-control">
+                                <option value="0">@T["AdminApiKeys.SelectServer"]</option>
+                                @foreach (var s in servers)
+                                {
+                                    <option value="@s.Id">@s.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>@T["AdminApiKeys.Label"]</label>
+                            <input type="text" @bind="newKeyLabel" class="form-control"
+                                   placeholder="@T["AdminApiKeys.LabelPlaceholder"]" maxlength="120" />
+                        </div>
+                        <button class="btn-gold" @onclick="CreateKey" disabled="@(newKeyServerId <= 0 || isCreating)">
+                            @T["AdminApiKeys.Generate"]
+                        </button>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(lastCreatedRawKey))
+                {
+                    <div class="apikeys-created-key">
+                        <p class="apikeys-copy-warning">⚠️ @T["AdminApiKeys.CopyWarning"]</p>
+                        <div class="apikeys-key-display">
+                            <code>@lastCreatedRawKey</code>
+                            <button class="btn-small" @onclick="CopyKeyToClipboard">📋</button>
+                        </div>
+                    </div>
+                }
+
+                @if (keys.Any())
+                {
+                    <table class="product-table apikeys-table">
+                        <thead>
+                            <tr>
+                                <th>@T["AdminApiKeys.Server"]</th>
+                                <th>@T["AdminApiKeys.Prefix"]</th>
+                                <th>@T["AdminApiKeys.Label"]</th>
+                                <th>@T["Common.Status"]</th>
+                                <th>@T["AdminApiKeys.LastUsed"]</th>
+                                <th>@T["Common.CreatedAt"]</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var key in keys)
+                            {
+                                <tr class="@(!key.IsActive ? "revoked-row" : "")">
+                                    <td>@key.ServerName</td>
+                                    <td><code>@key.KeyPrefix…</code></td>
+                                    <td>@(key.Label ?? "—")</td>
+                                    <td>
+                                        @if (key.IsActive)
+                                        {
+                                            <span class="badge-active">@T["AdminApiKeys.Active"]</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-revoked">@T["AdminApiKeys.Revoked"]</span>
+                                        }
+                                    </td>
+                                    <td>@(key.LastUsedAt?.ToString("dd/MM/yyyy HH:mm") ?? T["AdminApiKeys.Never"])</td>
+                                    <td>@key.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (key.IsActive)
+                                        {
+                                            <button class="btn-danger-small" @onclick="() => RevokeKey(key.Id)">
+                                                @T["AdminApiKeys.Revoke"]
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="identity-muted">@T["AdminApiKeys.NoKeys"]</p>
+                }
+            }
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["Common.Back"]</button>
+    </section>
+</div>
+
+@code {
+    private List<ServerApiKeyService.ApiKeyView> keys = new();
+    private List<TibiaServer> servers = new();
+    private bool isLoading = true;
+    private bool isCreating;
+    private bool showCreateForm;
+    private int newKeyServerId;
+    private string newKeyLabel = string.Empty;
+    private string? lastCreatedRawKey;
+
+    [CascadingParameter] public Toast ToastRef { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        keys = await ApiKeyService.GetAllKeysAsync();
+        servers = await ServerService.GetAllAsync();
+        isLoading = false;
+    }
+
+    private void ToggleCreateForm()
+    {
+        showCreateForm = !showCreateForm;
+        lastCreatedRawKey = null;
+        newKeyServerId = 0;
+        newKeyLabel = string.Empty;
+    }
+
+    private async Task CreateKey()
+    {
+        if (newKeyServerId <= 0) return;
+
+        isCreating = true;
+        var result = await ApiKeyService.CreateKeyAsync(newKeyServerId, newKeyLabel);
+        isCreating = false;
+
+        if (result.Success && result.RawKey != null)
+        {
+            lastCreatedRawKey = result.RawKey;
+            keys = await ApiKeyService.GetAllKeysAsync();
+
+            var serverName = servers.FirstOrDefault(s => s.Id == newKeyServerId)?.Name ?? newKeyServerId.ToString();
+            await LogService.LogAsync(
+                $"API key criada para servidor '{serverName}'",
+                source: "Admin",
+                level: "Info"
+            );
+
+            ToastRef?.Show(T["AdminApiKeys.CreateSuccess"], "success");
+            showCreateForm = false;
+        }
+        else
+        {
+            ToastRef?.Show(result.Message, "error");
+        }
+    }
+
+    private async Task RevokeKey(int keyId)
+    {
+        var confirm = await JS.InvokeAsync<bool>("confirm", T["AdminApiKeys.ConfirmRevoke"]);
+        if (!confirm) return;
+
+        var success = await ApiKeyService.RevokeKeyAsync(keyId);
+        if (success)
+        {
+            keys = await ApiKeyService.GetAllKeysAsync();
+            await LogService.LogAsync(
+                $"API key #{keyId} revogada",
+                source: "Admin",
+                level: "Warning"
+            );
+            ToastRef?.Show(T["AdminApiKeys.RevokeSuccess"], "success");
+        }
+        else
+        {
+            ToastRef?.Show(T["AdminApiKeys.RevokeError"], "error");
+        }
+    }
+
+    private async Task CopyKeyToClipboard()
+    {
+        if (!string.IsNullOrEmpty(lastCreatedRawKey))
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", lastCreatedRawKey);
+            ToastRef?.Show(T["AdminApiKeys.Copied"], "success");
+        }
+    }
+}

@@ -1,0 +1,329 @@
+﻿@page "/payments"
+
+@attribute [Authorize]
+
+@using Confirmai.Models
+@using Confirmai.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
+
+@inject AppDbContext Db
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+@inject LogService LogService
+@inject IJSRuntime JS
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
+@inject PaymentEventBus PaymentEventBus
+
+<div class="entity-shell parchment-a payments-history-shell">
+    <section class="entity-shell-grid" aria-label="@T["PaymentHistory.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <h1 class="page-section-title">@T["PaymentHistory.Title"]</h1>
+            <div class="filter-bar admin-filter-card payments-filter-card">
+                <input type="number" placeholder="@T["PaymentHistory.Filter.MinValue"]" @bind="filterMinAmount" min="0" />
+                <input type="number" placeholder="@T["PaymentHistory.Filter.MaxValue"]" @bind="filterMaxAmount" min="0" />
+                <select @bind="filterStatus">
+                    <option value="">@T["PaymentHistory.Filter.AllStatus"]</option>
+                    <option value="paid">@T["Common.Paid"]</option>
+                    <option value="pending">@T["Common.Pending"]</option>
+                </select>
+                <input type="text" placeholder="@T["PaymentHistory.Filter.Gateway"]" @bind="filterGateway" @bind:event="oninput" />
+                <input type="date" @bind="filterDate" />
+                <button @onclick="ApplyFilters">@T["Common.Filter"]</button>
+                <button @onclick="ClearFilters">@T["Common.Clear"]</button>
+            </div>
+
+            <div class="payments-tab-bar">
+                <button class="payments-tab-btn @(activeTab == "sent" ? "active" : "")" @onclick='() => SwitchTab("sent")'>
+                    <i class="fas fa-paper-plane"></i>
+                    <span class="payments-tab-label">@T["PaymentHistory.TabSent"]</span>
+                    @if (payments?.Count > 0)
+                    {
+                        <span class="payments-tab-count">@payments.Count</span>
+                    }
+                </button>
+                <button class="payments-tab-btn @(activeTab == "received" ? "active" : "")" @onclick='() => SwitchTab("received")'>
+                    <i class="fas fa-inbox"></i>
+                    <span class="payments-tab-label">@T["PaymentHistory.TabReceived"]</span>
+                    @if (receivedPayments?.Count > 0)
+                    {
+                        <span class="payments-tab-count">@receivedPayments.Count</span>
+                    }
+                </button>
+            </div>
+
+            <AdminDataState IsLoading="@(filteredPayments == null)" IsEmpty="@(filteredPayments != null && !filteredPayments.Any())" LoadingText="@T["Common.Loading"]" EmptyText="@T["PaymentHistory.Empty"]" EmptyIcon="fas fa-money-bill-wave" EmptyHint="@T["PaymentHistory.EmptyHint"]">
+                <div class="payments-table-wrap">
+                <table class="product-table payments-history-table">
+        <thead>
+            <tr>
+                <th>@T["Common.Date"]</th>
+                <th>@T["PaymentHistory.Product"]</th>
+                @if (activeTab == "received")
+                {
+                    <th>@T["PaymentHistory.Buyer"]</th>
+                }
+                <th>@T["Common.Value"]</th>
+                <th>@T["Common.Status"]</th>
+                <th>@T["Common.Gateway"]</th>
+                <th>@T["Common.Actions"]</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in filteredPayments?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<PaymentRecord>())
+        {
+            <tr>
+                <td data-label="@T["Common.Date"]">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                <td data-label="@T["PaymentHistory.Product"]">@GetProductDisplayName(p)</td>
+                @if (activeTab == "received")
+                {
+                    <td data-label="@T["PaymentHistory.Buyer"]">@(p.User?.UserName ?? "-")</td>
+                }
+                <td data-label="@T["Common.Value"]">@FormatPaymentAmount(p.Amount, p.Currency)</td>
+                <td data-label="@T["Common.Status"]">
+                    @if (p.IsPaid)
+                    {
+                        <span class="order-status-badge pago">@T["Common.Paid"]</span>
+                    }
+                    else
+                    {
+                        <span class="order-status-badge aguardandopagamento">@T["Common.Pending"]</span>
+                    }
+                </td>
+                <td data-label="@T["Common.Gateway"]">@p.PaymentMethod</td>
+                <td data-label="@T["Common.Actions"]">
+                    @if (activeTab == "sent")
+                    {
+                        @if (!p.IsPaid)
+                        {
+                            <button class="edit-btn action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")' title="@T["Common.View"]" aria-label="@T["Common.View"]">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="danger action-btn icon-only" @onclick='() => ConfirmCancelPayment(p.Id)' title="@T["Common.Cancel"]" aria-label="@T["Common.Cancel"]">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="details-btn action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")' title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <button class="details-btn action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")' title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+                </table>
+            </div>
+
+                <div class="pagination payments-history-pagination">
+                    <button type="button" @onclick="@(() => PrevPage())" disabled="@(!CanGoToPreviousPage)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                    <button type="button" @onclick="@(() => NextPage())" disabled="@(!CanGoToNextPage)">@T["Common.Next"]</button>
+                </div>
+            </AdminDataState>
+        </article>
+    </section>
+</div>
+
+@code {
+    private List<PaymentRecord>? payments;
+    private List<PaymentRecord>? receivedPayments;
+    private List<PaymentRecord>? filteredPayments;
+    private Dictionary<int, string> productNamesById = new();
+    private string activeTab = "sent";
+    private decimal? filterMinAmount;
+    private decimal? filterMaxAmount;
+    private string filterStatus = "";
+    private string filterGateway = "";
+    private DateTime? filterDate;
+    [CascadingParameter] public Toast? ToastRef { get; set; }
+    private string? currentUserId;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
+
+    private int pageSize = 10;
+    private int currentPage = 1;
+    private int totalPages => filteredPayments == null ? 1 : Math.Max(1, (int)Math.Ceiling((double)filteredPayments.Count / pageSize));
+
+    private bool CanGoToNextPage => currentPage < totalPages;
+    private bool CanGoToPreviousPage => currentPage > 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+                var quote = await BitcoinQuoteService.GetQuoteAsync();
+                btcUsdRate = quote?.btc_usd;
+                btcBrlRate = quote?.btc_brl;
+
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var userId = authState.User.FindFirst("sub")?.Value
+          ?? authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        payments = await Db.Payments
+                        .Include(p => p.Product)
+            .Where(p => p.UserId == userId)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+
+        receivedPayments = await Db.Payments
+            .Include(p => p.Product)
+            .Include(p => p.User)
+            .Where(p => p.SellerId == userId
+                || (p.SellerId == null && p.Product != null && p.Product.UserId == userId))
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+
+        var productIds = payments
+            .Select(p => p.ProductId)
+            .Distinct()
+            .ToList();
+
+        productNamesById = await Db.Products
+            .AsNoTracking()
+            .Where(p => productIds.Contains(p.Id))
+            .Select(p => new { p.Id, p.Name })
+            .ToDictionaryAsync(p => p.Id, p => p.Name ?? string.Empty);
+
+        ApplyFilters();
+
+        currentUserId = userId;
+        PaymentEventBus.OnPaymentConfirmed += OnPaymentConfirmed;
+    }
+
+    private void OnPaymentConfirmed(string userId, string paymentId)
+    {
+        if (userId != currentUserId) return;
+
+        var payment = payments?.FirstOrDefault(p => p.PaymentId == paymentId);
+        if (payment != null && !payment.IsPaid)
+        {
+            payment.IsPaid = true;
+            payment.PaidAt = DateTime.UtcNow;
+            InvokeAsync(() =>
+            {
+                StateHasChanged();
+                ToastRef?.Show(string.Format(T["PaymentHistory.ConfirmedToast"], paymentId), "success");
+            });
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        PaymentEventBus.OnPaymentConfirmed -= OnPaymentConfirmed;
+        return ValueTask.CompletedTask;
+    }
+
+    private void SwitchTab(string tab)
+    {
+        activeTab = tab;
+        ClearFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        currentPage = 1;
+        var source = activeTab == "received" ? receivedPayments : payments;
+        filteredPayments = source?
+            .Where(p =>
+                (!filterMinAmount.HasValue || p.Amount >= filterMinAmount.Value) &&
+                (!filterMaxAmount.HasValue || p.Amount <= filterMaxAmount.Value) &&
+                (string.IsNullOrWhiteSpace(filterStatus) ||
+                    (filterStatus == "paid" && p.IsPaid) ||
+                    (filterStatus == "pending" && !p.IsPaid)) &&
+                (string.IsNullOrWhiteSpace(filterGateway) || (p.PaymentMethod?.Contains(filterGateway, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (!filterDate.HasValue || p.CreatedAt.Date == filterDate.Value.Date)
+            )
+            .ToList();
+    }
+
+    private void ClearFilters()
+    {
+        filterMinAmount = null;
+        filterMaxAmount = null;
+        filterStatus = "";
+        filterGateway = "";
+        filterDate = null;
+        ApplyFilters();
+    }
+
+    private async Task CancelPayment(int paymentId)
+    {
+        var payment = await Db.Payments.FindAsync(paymentId);
+        if (payment != null && !payment.IsPaid)
+        {
+            Db.Payments.Remove(payment);
+            await Db.SaveChangesAsync();
+            payments?.Remove(payment);
+
+            await LogService.LogAsync(
+                $"Pagamento cancelado (ID: {paymentId}) para produto {payment.ProductId}.",
+                source: "Payment",
+                level: "Warning",
+                userId: payment.UserId
+            );
+
+            ApplyFilters();
+            ToastRef?.Show(T["PaymentHistory.CanceledToast"], "info");
+        }
+    }
+
+    private async Task ConfirmCancelPayment(int paymentId)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", T["PaymentHistory.ConfirmCancel"])) return;
+        await CancelPayment(paymentId);
+    }
+
+    private void NextPage()
+    {
+        if (CanGoToNextPage)
+            currentPage++;
+    }
+
+    private void PrevPage()
+    {
+        if (CanGoToPreviousPage)
+            currentPage--;
+    }
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    }
+
+    private string FormatPaymentAmount(decimal amount, string? currency)
+    {
+        return currency switch
+        {
+            "BRL" => $"R$ {amount:N2}",
+            "USD" => $"$ {amount:N2}",
+            _ => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency)
+        };
+    }
+
+    private string GetProductDisplayName(PaymentRecord payment)
+    {
+        if (payment.Product is { Name: { Length: > 0 } productName })
+        {
+            return productName;
+        }
+
+        if (productNamesById.TryGetValue(payment.ProductId, out var mappedName)
+            && !string.IsNullOrWhiteSpace(mappedName))
+        {
+            return mappedName;
+        }
+
+        return payment.ProductId.ToString();
+    }
+}
+
+

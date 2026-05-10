@@ -1,0 +1,53 @@
+﻿@page
+@model Confirmai.Areas.Identity.Pages.Account.RegisterModel
+@inject Confirmai.Services.UiTextService T
+@{
+    ViewData["Title"] = T["Identity.Register.Title"];
+}
+
+<a href="/servers" class="identity-home-link identity-home-link-login">
+    <span class="identity-home-arrow">&#8592;</span>
+    <span class="identity-home-text">Servidores</span>
+</a>
+
+<h2 class="identity-login-heading">@T["Identity.Register.Heading"]</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form method="post">
+    <div>
+        <label asp-for="Input.Email">@T["Identity.Common.Email"]</label>
+        <input asp-for="Input.Email" autocomplete="username" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="Input.Password">@T["Identity.Common.Password"]</label>
+        <input asp-for="Input.Password" autocomplete="new-password" />
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="Input.ConfirmPassword">@T["Identity.Common.ConfirmPassword"]</label>
+        <input asp-for="Input.ConfirmPassword" autocomplete="new-password" />
+        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="Input.PixKey">Chave PIX (opcional)</label>
+        <input asp-for="Input.PixKey" autocomplete="off" placeholder="CPF, e-mail, telefone, aleatoria..." />
+        <span asp-validation-for="Input.PixKey" class="text-danger"></span>
+    </div>
+    <button type="submit">@T["Nav.Register"]</button>
+</form>
+
+<div class="identity-actions">
+    <a asp-page="./Login">@T["Identity.Register.HaveAccount"]</a>
+    <a asp-page="./ResendEmailConfirmation">@T["Identity.Resend.Title"]</a>
+</div>
+
+<div class="identity-footer">
+    <span>&copy; 2025 Confirmai</span>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

@@ -1,0 +1,133 @@
+﻿.parchment-lab-page .entity-shell-main {
+    background: linear-gradient(166deg, #ebd2a5 0%, #ddb983 52%, #cfa36d 100%);
+}
+
+.parchment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.parchment-sample {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid #866338;
+    padding: 0.95rem 1rem;
+    min-height: 220px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.parchment-sample > * {
+    position: relative;
+    z-index: 1;
+}
+
+.parchment-sample h3 {
+    margin: 0;
+    color: #4b2f16;
+    font-family: "Times New Roman", Georgia, serif;
+}
+
+.parchment-sample p,
+.parchment-sample li {
+    color: #55361c;
+    line-height: 1.52;
+}
+
+.parchment-sample ul {
+    margin: 0.55rem 0 0;
+    padding-left: 1.15rem;
+}
+
+.parchment-sample::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+}
+
+.parchment-sample::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.22;
+    background:
+        repeating-linear-gradient(0deg, rgba(122, 86, 44, 0.12) 0 1px, rgba(122, 86, 44, 0) 1px 5px),
+        repeating-linear-gradient(90deg, rgba(146, 107, 63, 0.08) 0 1px, rgba(146, 107, 63, 0) 1px 7px);
+}
+
+.parchment-sample-a {
+    background: linear-gradient(168deg, #efdbb6 0%, #e4c792 58%, #d8b27b 100%);
+}
+
+.parchment-sample-a::before {
+    background:
+        radial-gradient(128% 72% at 50% -20%, rgba(86, 59, 29, 0.34) 0%, rgba(86, 59, 29, 0.06) 52%, rgba(86, 59, 29, 0) 64%),
+        radial-gradient(128% 72% at 50% 120%, rgba(86, 59, 29, 0.38) 0%, rgba(86, 59, 29, 0.1) 52%, rgba(86, 59, 29, 0) 64%),
+        radial-gradient(76% 138% at -18% 50%, rgba(95, 67, 36, 0.38) 0%, rgba(95, 67, 36, 0.12) 56%, rgba(95, 67, 36, 0) 67%),
+        radial-gradient(76% 138% at 118% 50%, rgba(95, 67, 36, 0.38) 0%, rgba(95, 67, 36, 0.12) 56%, rgba(95, 67, 36, 0) 67%);
+}
+
+.parchment-sample-b {
+    background: linear-gradient(166deg, #e6c994 0%, #d8b177 56%, #c69359 100%);
+}
+
+.parchment-sample-b::before {
+    background:
+        radial-gradient(56% 52% at 0% 0%, rgba(80, 50, 24, 0.34) 0%, rgba(80, 50, 24, 0) 70%),
+        radial-gradient(56% 52% at 100% 0%, rgba(80, 50, 24, 0.34) 0%, rgba(80, 50, 24, 0) 70%),
+        radial-gradient(56% 52% at 0% 100%, rgba(80, 50, 24, 0.36) 0%, rgba(80, 50, 24, 0) 72%),
+        radial-gradient(56% 52% at 100% 100%, rgba(80, 50, 24, 0.36) 0%, rgba(80, 50, 24, 0) 72%),
+        radial-gradient(124% 80% at 50% -18%, rgba(97, 65, 31, 0.42) 0%, rgba(97, 65, 31, 0) 63%),
+        radial-gradient(124% 80% at 50% 120%, rgba(97, 65, 31, 0.45) 0%, rgba(97, 65, 31, 0) 64%);
+}
+
+.parchment-sample-c {
+    background: linear-gradient(167deg, #e2c08a 0%, #d1a86f 52%, #bf8e57 100%);
+    border-color: #7f5a2f;
+}
+
+.parchment-sample-c::before {
+    background:
+        linear-gradient(180deg, rgba(255, 236, 196, 0.25) 0%, rgba(255, 236, 196, 0) 22%),
+        radial-gradient(130% 84% at 50% 120%, rgba(72, 45, 21, 0.42) 0%, rgba(72, 45, 21, 0.08) 52%, rgba(72, 45, 21, 0) 63%),
+        radial-gradient(80% 144% at -16% 50%, rgba(80, 51, 25, 0.4) 0%, rgba(80, 51, 25, 0.12) 58%, rgba(80, 51, 25, 0) 69%),
+        radial-gradient(80% 144% at 116% 50%, rgba(80, 51, 25, 0.4) 0%, rgba(80, 51, 25, 0.12) 58%, rgba(80, 51, 25, 0) 69%);
+}
+
+.parchment-sample-d {
+    background: linear-gradient(166deg, #edd6a9 0%, #ddb67c 54%, #cb9b61 100%);
+    border: 1px solid #7a552a;
+    box-shadow: inset 0 0 0 1px rgba(252, 229, 179, 0.36), 0 10px 22px rgba(0, 0, 0, 0.26);
+}
+
+.parchment-sample-d::before {
+    background:
+        radial-gradient(58% 54% at 0% 0%, rgba(73, 44, 21, 0.42) 0%, rgba(73, 44, 21, 0) 72%),
+        radial-gradient(58% 54% at 100% 0%, rgba(73, 44, 21, 0.42) 0%, rgba(73, 44, 21, 0) 72%),
+        radial-gradient(58% 54% at 0% 100%, rgba(73, 44, 21, 0.44) 0%, rgba(73, 44, 21, 0) 74%),
+        radial-gradient(58% 54% at 100% 100%, rgba(73, 44, 21, 0.44) 0%, rgba(73, 44, 21, 0) 74%),
+        linear-gradient(180deg, rgba(255, 235, 190, 0.24) 0%, rgba(255, 235, 190, 0) 23%);
+}
+
+.parchment-choice-hint {
+    margin-top: 0.8rem;
+    border: 1px dashed var(--brown-border);
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+    color: #51331a;
+    background: rgba(248, 233, 204, 0.62);
+    font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .parchment-grid {
+        grid-template-columns: 1fr;
+    }
+}

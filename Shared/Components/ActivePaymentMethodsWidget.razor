@@ -1,0 +1,78 @@
+﻿@using Confirmai.Services
+@inject GatewayService GatewayService
+@inject UiTextService T
+
+<section class="oldsite-widget">
+    <h3>@T["Widget.PaymentMethods.Title"]</h3>
+
+    @if (isLoading)
+    {
+        <div class="loading-spinner">@T["Widget.PaymentMethods.Loading"]</div>
+    }
+    else if (!methods.Any())
+    {
+        <p>@T["Widget.PaymentMethods.Empty"]</p>
+    }
+    else
+    {
+        <div class="oldsite-payment-methods">
+            @foreach (var method in methods)
+            {
+                <div class="oldsite-payment-chip" title="@method.Name">
+                    <img src="@method.IconPath" alt="" aria-hidden="true" />
+                    <span>@method.Name</span>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private bool isLoading = true;
+    private List<PaymentMethodView> methods = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var active = (await GatewayService.GetAllAsync())
+            .Where(g => g.Enabled)
+            .OrderBy(g => g.Name)
+            .Select(g => g.Name)
+            .ToList();
+
+        methods = active
+            .Select(MapMethod)
+            .ToList();
+
+        isLoading = false;
+    }
+
+    private static PaymentMethodView MapMethod(string gatewayName)
+    {
+        var normalized = (gatewayName ?? string.Empty).Trim();
+        var key = normalized.ToLowerInvariant();
+
+        if (key.Contains("btcpay"))
+        {
+            return new PaymentMethodView("BtcPay", "/images/payment-methods/btcpay.svg");
+        }
+
+        if (key.Contains("testnet"))
+        {
+            return new PaymentMethodView("Testnet", "/images/payment-methods/testnet.svg");
+        }
+
+        if (key.Contains("lightning"))
+        {
+            return new PaymentMethodView("Lightning", "/images/payment-methods/lightning.svg");
+        }
+
+        if (key.Contains("pix"))
+        {
+            return new PaymentMethodView("Pix", "/images/payment-methods/pix.svg");
+        }
+
+        return new PaymentMethodView(normalized, "/images/payment-methods/generic.svg");
+    }
+
+    private sealed record PaymentMethodView(string Name, string IconPath);
+}

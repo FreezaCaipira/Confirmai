@@ -1,0 +1,172 @@
+﻿@page "/admin/users/view/{UserId}"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using Confirmai.Data
+@using Confirmai.Models
+
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager NavigationManager
+@inject UiTextService T
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+@if (isLoading)
+{
+    <div class="loading-spinner">@T["Common.Loading"]</div>
+}
+else if (user == null)
+{
+    <div class="alert alert-info">@T["AdminUserView.NotFound"]</div>
+}
+else
+{
+    <EntityProfileShell
+        Kicker="@T["AdminUserView.Kicker"]"
+        Title="@DisplayName"
+        Subtitle="@T["AdminUserView.Subtitle"]">
+        <MainContent>
+            <div class="admin-profile-view-grid">
+                <section class="admin-profile-panel-card">
+                    <h3>@T["Profile.PublicInfo"]</h3>
+                    <dl class="admin-profile-info-list">
+                        <dt>@T["Profile.DisplayName"]</dt>
+                        <dd>@DisplayName</dd>
+
+                        <dt>@T["Profile.ProfileType"]</dt>
+                        <dd>@T["Profile.UserType"]</dd>
+
+                        <dt>@T["Profile.Presentation"]</dt>
+                        <dd>@T["Profile.PresentationText"]</dd>
+                    </dl>
+                </section>
+
+                <section class="admin-profile-panel-card">
+                    <h3>Outfit do personagem</h3>
+                    <div class="admin-outfit-studio" role="img" aria-label="Preview do outfit do personagem">
+                        <img class="admin-outfit-image" src="@OutfitImageUrl" alt="Outfit do personagem" loading="lazy" />
+                    </div>
+                </section>
+
+                <section class="admin-profile-panel-card">
+                    <h3>Contato</h3>
+                    <dl class="admin-profile-info-list">
+                        <dt>Instagram</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(user.InstagramHandle) ? T["AdminUserView.NotInformed"] : user.InstagramHandle)</dd>
+
+                        <dt>Discord</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(user.DiscordHandle) ? T["AdminUserView.NotInformed"] : user.DiscordHandle)</dd>
+
+                        <dt>PayPal</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(user.PaypalAddress) ? T["AdminUserView.NotInformed"] : user.PaypalAddress)</dd>
+
+                        <dt>Binance</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(user.BinanceAddress) ? T["AdminUserView.NotInformed"] : user.BinanceAddress)</dd>
+
+                        <dt>PIX</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(user.PixKey) ? T["AdminUserView.NotInformed"] : user.PixKey)</dd>
+
+                        <dt>X</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(user.XHandle) ? T["AdminUserView.NotInformed"] : user.XHandle)</dd>
+                    </dl>
+                </section>
+
+                <section class="admin-profile-panel-card">
+                    <h3>Market stats</h3>
+                    <div class="admin-user-stats-grid">
+                        <div class="admin-user-stat-card">
+                            <span class="admin-user-stat-label">Recomendacoes</span>
+                            <span class="admin-user-stat-value">@referencesCount</span>
+                        </div>
+                        <div class="admin-user-stat-card">
+                            <span class="admin-user-stat-label">Itens vendidos</span>
+                            <span class="admin-user-stat-value">@soldItemsCount</span>
+                        </div>
+                        <div class="admin-user-stat-card">
+                            <span class="admin-user-stat-label">Itens comprados</span>
+                            <span class="admin-user-stat-value">@boughtItemsCount</span>
+                        </div>
+                        <div class="admin-user-stat-card">
+                            <span class="admin-user-stat-label">Ofertas ativas</span>
+                            <span class="admin-user-stat-value">@activeOffersCount</span>
+                        </div>
+                    </div>
+                </section>
+
+                @if (showAdminExtensions)
+                {
+                    <section class="admin-profile-panel-card admin-user-extensions-card">
+                        <h3>@T["AdminUserView.AdminData"]</h3>
+                        <dl class="admin-profile-info-list">
+                            <dt>@T["AdminUsers.User"]</dt>
+                            <dd>@(user.UserName ?? T["AdminUserView.NotInformed"])</dd>
+
+                            <dt>@T["Common.Email"]</dt>
+                            <dd>@(user.Email ?? T["AdminUserView.NotInformed"])</dd>
+
+                            <dt>@T["Common.Status"]</dt>
+                            <dd>
+                                @if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.Now)
+                                {
+                                    <span class="entity-shell-chip warn">@T["AdminUsers.Blocked"]</span>
+                                }
+                                else
+                                {
+                                    <span class="entity-shell-chip ok">@T["AdminUsers.Active"]</span>
+                                }
+                            </dd>
+                        </dl>
+                    </section>
+                }
+            </div>
+        </MainContent>
+
+        <FooterContent>
+            <div class="action-row">
+                <button class="mk-btn mk-btn-muted" type="button" @onclick='() => NavigationManager.NavigateTo("/admin/users")'>@T["Common.Back"]</button>
+                <button class="mk-btn mk-btn-secondary" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/users/edit/{user.Id}")'>@T["Common.Edit"]</button>
+                <button class="mk-btn mk-btn-primary" type="button" @onclick='() => NavigationManager.NavigateTo($"/profile/{user.Id}?intent=message")'>Mensagens</button>
+            </div>
+        </FooterContent>
+    </EntityProfileShell>
+}
+
+@code {
+    [Parameter] public string UserId { get; set; } = "";
+    private ApplicationUser? user;
+    private bool isLoading = true;
+    private int soldItemsCount;
+    private int boughtItemsCount;
+    private int referencesCount;
+    private int activeOffersCount;
+    private bool showAdminExtensions;
+
+    private string OutfitImageUrl => "https://outfit-images.ots.me/outfit.php?id=128&addons=3&head=114&body=114&legs=114&feet=114&mount=0&direction=3";
+
+    private string DisplayName => user?.FullName?.Trim() is { Length: > 0 } name
+        ? name
+        : user?.UserName ?? T["Layout.UserFallback"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserManager.FindByIdAsync(UserId);
+
+        if (user != null)
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            soldItemsCount = await db.Orders.AsNoTracking().CountAsync(o => o.SellerId == user.Id && o.IsPaid);
+            boughtItemsCount = await db.Orders.AsNoTracking().CountAsync(o => o.BuyerId == user.Id && o.IsPaid);
+            referencesCount = await db.SellerRecommendations.AsNoTracking().CountAsync(r => r.SellerUserId == user.Id);
+            activeOffersCount = await db.ItemOffers.AsNoTracking().CountAsync(o => o.SellerUserId == user.Id && o.IsActive);
+
+            // Keep the same layout as public profile while there are no extra admin-only blocks.
+            showAdminExtensions = false;
+        }
+
+        isLoading = false;
+    }
+}
+
+

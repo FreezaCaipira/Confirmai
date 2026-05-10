@@ -1,0 +1,89 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using Confirmai.Data
+@using Confirmai.Services
+@inject IDbContextFactory<AppDbContext> DbContextFactory
+
+<section class="oldsite-widget">
+    <h3>panorama geral</h3>
+    <p>Servidores ativos: @summary.ActiveServers / @summary.TotalServers</p>
+    <p>Anuncios gerais: @summary.ActiveOffers</p>
+    <p>Pedidos pagos: @summary.PaidOrders</p>
+    <p>Volume pago: @summary.PaidVolumeBtc.ToString("0.#####") BTC</p>
+</section>
+
+<section class="oldsite-widget">
+    <h3>ranking de servidores</h3>
+    @if (!ranking.Any())
+    {
+        <p>Sem dados de vendas globais.</p>
+    }
+    else
+    {
+        <ol>
+            @foreach (var item in ranking)
+            {
+                <li>@item.ServerName (@item.PaidOrders)</li>
+            }
+        </ol>
+    }
+</section>
+
+@code {
+    [Parameter] public int ServerId { get; set; }
+
+    private TibiaServerService.GlobalServerSummary summary = new();
+    private List<TibiaServerService.GlobalServerRankingItem> ranking = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await RefreshAsync(ServerId);
+    }
+
+    private async Task RefreshAsync(int serverId)
+    {
+        await using var db = await DbContextFactory.CreateDbContextAsync();
+
+        var totalServers = await db.Servers.CountAsync();
+        var activeServers = await db.Servers.CountAsync(s => s.IsActive);
+        var activeOffers = await db.Products
+            .CountAsync(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"));
+
+        var paidOrdersQuery = db.Orders
+            .AsNoTracking()
+            .Where(o => o.IsPaid);
+
+        var paidOrders = await paidOrdersQuery.CountAsync();
+        var paidVolume = await paidOrdersQuery.SumAsync(o => (decimal?)o.Amount) ?? 0m;
+
+        summary = new TibiaServerService.GlobalServerSummary
+        {
+            TotalServers = totalServers,
+            ActiveServers = activeServers,
+            ActiveOffers = activeOffers,
+            PaidOrders = paidOrders,
+            PaidVolumeBtc = paidVolume
+        };
+
+        ranking = await db.Orders
+            .AsNoTracking()
+            .Where(o => o.IsPaid && o.ServerId.HasValue)
+            .Join(
+                db.Servers.AsNoTracking(),
+                o => o.ServerId!.Value,
+                s => s.Id,
+                (o, s) => new { Order = o, Server = s })
+            .GroupBy(x => new { x.Server.Id, x.Server.Name })
+            .Select(g => new TibiaServerService.GlobalServerRankingItem
+            {
+                ServerId = g.Key.Id,
+                ServerName = g.Key.Name,
+                PaidOrders = g.Count(),
+                PaidVolumeBtc = g.Sum(x => x.Order.Amount)
+            })
+            .OrderByDescending(x => x.PaidOrders)
+            .ThenByDescending(x => x.PaidVolumeBtc)
+            .ThenBy(x => x.ServerName)
+            .Take(5)
+            .ToListAsync();
+    }
+}

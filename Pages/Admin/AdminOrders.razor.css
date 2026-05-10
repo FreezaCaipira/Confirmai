@@ -1,0 +1,83 @@
+﻿.pagination .pagination-info,
+.pagination .pagination-info {
+    color: #4d2f16;
+    font-weight: 800;
+    text-shadow: none;
+}
+
+.pagination,
+.pagination {
+    margin-top: 0.9rem;
+}
+
+.text-muted,
+.text-muted {
+    color: #6c4522;
+}
+
+.order-status-badge,
+.order-status-badge {
+    margin: 0;
+    font-weight: 800;
+}
+
+.order-status-badge.aguardandopagamento,
+.order-status-badge.aguardandopagamento {
+    background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold-amber) 100%);
+    color: #2e1707;
+    border: 1px solid var(--brown-deep);
+}
+
+.order-status-badge.pago,
+.order-status-badge.pago {
+    background: linear-gradient(180deg, #5f9b4b 0%, #3f7330 100%);
+    color: #efffe8;
+    border: 1px solid #35642a;
+}
+
+.order-status-badge.entregue,
+.order-status-badge.entregue {
+    background: linear-gradient(180deg, #5f9b4b 0%, #3f7330 100%);
+    color: #efffe8;
+    border: 1px solid #35642a;
+}
+
+.order-status-badge.finalizado,
+.order-status-badge.finalizado {
+    background: linear-gradient(180deg, #8f6bd1 0%, #6f4dac 100%);
+    color: #f5eeff;
+    border: 1px solid #5e3f95;
+}
+
+.order-status-badge.aguardandoentrega,
+.order-status-badge.aguardandoentrega {
+    background: linear-gradient(180deg, #5a8db5 0%, #3d6e8f 100%);
+    color: #e8f4ff;
+    border: 1px solid #335e7a;
+}
+
+.order-status-badge.cancelado,
+.order-status-badge.cancelado,
+.order-status-badge.falha,
+.order-status-badge.falha,
+.order-status-badge.reembolsado,
+.order-status-badge.reembolsado {
+    background: linear-gradient(180deg, #a85040 0%, #7c3528 100%);
+    color: #ffe8e4;
+    border: 1px solid #6c2416;
+}
+
+.order-status-badge.disputa,
+.order-status-badge.disputa {
+    background: linear-gradient(180deg, #c48a3a 0%, #9a6a28 100%);
+    color: #fff5e0;
+    border: 1px solid #7a5520;
+}
+
+.order-status-badge.aguardandorevisaoadm,
+.order-status-badge.aguardandorevisaoadm {
+    background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold-amber) 100%);
+    color: #2e1707;
+    border: 1px solid var(--brown-deep);
+}
+

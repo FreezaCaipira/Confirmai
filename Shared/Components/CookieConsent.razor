@@ -1,0 +1,73 @@
+﻿@using Confirmai.Services
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@inject UiTextService T
+
+<div id="cookie-consent-banner" class="cookie-consent-banner is-hidden" role="region" aria-label="@L("Cookie.Banner.Aria", "Cookie consent")">
+    <div class="cookie-consent-content">
+        <div class="cookie-consent-text">
+            <h3>@L("Cookie.Banner.Title", "Cookie usage")</h3>
+            <p>@L("Cookie.Banner.Description", "We use essential cookies for core functionality and optional cookies for analytics. You can accept all or customize.")</p>
+        </div>
+        <div class="cookie-consent-actions">
+            <button type="button" class="cookie-btn cookie-btn-neutral" data-cookie-action="openPreferences">@L("Cookie.Banner.Customize", "Customize")</button>
+            <button type="button" class="cookie-btn cookie-btn-soft" data-cookie-action="rejectOptional">@L("Cookie.Banner.RejectOptional", "Reject optional")</button>
+            <button type="button" class="cookie-btn cookie-btn-primary" data-cookie-action="acceptAll">@L("Cookie.Banner.AcceptAll", "Accept all")</button>
+        </div>
+    </div>
+</div>
+
+<div id="cookie-consent-modal" class="cookie-consent-overlay is-hidden" role="dialog" aria-modal="true" aria-label="@L("Cookie.Modal.Aria", "Cookie preferences")">
+    <div class="cookie-consent-modal">
+        <h3>@L("Cookie.Modal.Title", "Cookie preferences")</h3>
+        <p>@L("Cookie.Modal.Description", "Choose which cookie categories you allow. Essential cookies are always active.")</p>
+
+        <div class="cookie-option disabled">
+            <label>
+                <input type="checkbox" checked disabled />
+                <span>@L("Cookie.Category.Necessary", "Essential cookies")</span>
+            </label>
+            <small>@L("Cookie.Category.NecessaryDesc", "Required for authentication, security, and core platform behavior.")</small>
+        </div>
+
+        <div class="cookie-option">
+            <label>
+                <input id="cookie-analytics-toggle" type="checkbox" />
+                <span>@L("Cookie.Category.Analytics", "Analytics cookies")</span>
+            </label>
+            <small>@L("Cookie.Category.AnalyticsDesc", "Help us understand platform usage to improve experience and performance.")</small>
+        </div>
+
+        <div class="cookie-consent-actions">
+            <button type="button" class="cookie-btn cookie-btn-neutral" data-cookie-action="closePreferences">@L("Common.Cancel", "Cancel")</button>
+            <button type="button" class="cookie-btn cookie-btn-primary" data-cookie-action="savePreferences">@L("Cookie.Modal.SavePreferences", "Save preferences")</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("ConfirmaiCookieConsent.init");
+        }
+        catch (JSException)
+        {
+            // Keep the circuit alive if client script failed to load.
+        }
+    }
+
+    private string L(string key, string fallback)
+    {
+        var value = T[key];
+        return string.Equals(value, key, StringComparison.Ordinal) ? fallback : value;
+    }
+}
+
+

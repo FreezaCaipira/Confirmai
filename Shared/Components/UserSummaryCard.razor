@@ -1,0 +1,70 @@
+﻿@using Confirmai.Models
+
+<div class="user-summary-card">
+    <div class="user-summary-avatar-wrap">
+        @if (!string.IsNullOrWhiteSpace(AvatarUrl))
+        {
+            <img class="user-summary-avatar" src="@AvatarUrl" alt="Avatar" />
+        }
+        else
+        {
+            <div class="user-summary-avatar user-summary-avatar-fallback">@GetInitial(User.UserName)</div>
+        }
+    </div>
+
+    <p><b>UsuÃ¡rio:</b> @DisplayText(User.UserName)</p>
+
+    @if (ShowUserId)
+    {
+        <p><b>ID:</b> @DisplayText(User.Id)</p>
+    }
+
+    <p><b>Email:</b> @DisplayText(User.Email)</p>
+    <p><b>Nome completo:</b> @DisplayText(User.FullName)</p>
+    <p><b>Data de nascimento:</b> @(User.BirthDate?.ToString("dd/MM/yyyy") ?? "NÃ£o informada")</p>
+
+    @if (ShowRoles)
+    {
+        <p><b>PermissÃµes:</b> @(RoleList.Count > 0 ? string.Join(", ", RoleList) : "user")</p>
+    }
+
+    @if (ShowStatus)
+    {
+        <p>
+            <b>Status:</b>
+            @if (User.LockoutEnd != null && User.LockoutEnd > DateTimeOffset.Now)
+            {
+                <span class="user-summary-status-blocked">Bloqueado</span>
+            }
+            else
+            {
+                <span class="user-summary-status-active">Ativo</span>
+            }
+        </p>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ApplicationUser User { get; set; } = default!;
+    [Parameter] public string? AvatarUrl { get; set; }
+    [Parameter] public IEnumerable<string>? Roles { get; set; }
+    [Parameter] public bool ShowRoles { get; set; } = true;
+    [Parameter] public bool ShowUserId { get; set; }
+    [Parameter] public bool ShowStatus { get; set; }
+
+    private List<string> RoleList => Roles?.Where(r => !string.IsNullOrWhiteSpace(r)).ToList() ?? new List<string>();
+
+    private static string DisplayText(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "NÃ£o informado" : value;
+    }
+
+    private static string GetInitial(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return "?";
+
+        return text.Trim()[0].ToString().ToUpperInvariant();
+    }
+}
+

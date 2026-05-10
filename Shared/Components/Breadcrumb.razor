@@ -1,0 +1,224 @@
+﻿@using Confirmai.Services
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+@inject UiTextService T
+
+@if (Segments.Count >= 2)
+{
+    <nav class="breadcrumb-nav">
+        @foreach (var (segment, index) in Segments.Select((s, i) => (s, i)))
+        {
+            if (index < Segments.Count - 1)
+            {
+                <a href="@BuildUrl(index)">@segment</a>
+                <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
+            }
+            else
+            {
+                <span class="breadcrumb-current">@segment</span>
+            }
+        }
+    </nav>
+}
+
+@code {
+    private List<string> Segments = new();
+    private List<string> OriginalSegments = new();
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        UpdateSegments();
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        UpdateSegments();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateSegments()
+    {
+        var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        var pathOnly = uri.Split('?', '#')[0];
+        var allSegments = pathOnly.Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .Where(s => !IsIdSegment(s))
+            .ToList();
+
+        OriginalSegments = allSegments;
+        Segments = allSegments.Select(s => MapSegment(s)).ToList();
+
+        // On payment page, show the previous step based on returnUrl (real origin page).
+        if (allSegments.Count >= 2
+            && string.Equals(allSegments[0], "marketplace", StringComparison.OrdinalIgnoreCase)
+            && string.Equals(allSegments[1], "buy", StringComparison.OrdinalIgnoreCase)
+            && Segments.Count >= 2)
+        {
+            var currentUri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            var query = QueryHelpers.ParseQuery(currentUri.Query);
+            if (query.TryGetValue("returnUrl", out var returnUrlValues))
+            {
+                var originLabel = TryBuildReturnUrlLabel(returnUrlValues.LastOrDefault());
+                if (!string.IsNullOrWhiteSpace(originLabel))
+                {
+                    Segments[0] = originLabel;
+                }
+            }
+        }
+
+        if (Segments.Count == 0)
+            Segments.Add(T["Breadcrumb.Home"]);
+    }
+
+    private bool IsIdSegment(string s)
+    {
+        return Guid.TryParse(s, out _) || long.TryParse(s, out _) || int.TryParse(s, out _);
+    }
+
+    private string MapSegment(string s)
+    {
+        var decoded = Uri.UnescapeDataString(s ?? string.Empty);
+
+        var mapped = decoded.ToLower() switch
+        {
+            "admin" => T["Breadcrumb.Admin"],
+            "users" => T["Breadcrumb.Users"],
+            "payments" => T["Breadcrumb.Payments"],
+            "logs" => T["Breadcrumb.Logs"],
+            "edit" => T["Breadcrumb.Edit"],
+            "view" => T["Breadcrumb.View"],
+            "buy" => T["Breadcrumb.Buy"],
+            "items" => T["Breadcrumb.Items"],
+            "products" => T["Breadcrumb.Products"],
+            "about" => T["Breadcrumb.About"],
+            "contact" => T["Breadcrumb.Contact"],
+            "dashboard" => T["Breadcrumb.Dashboard"],
+            "marketplace" => T["Breadcrumb.Marketplace"],
+            "orders" => T["Breadcrumb.Orders"],
+            "languages" => T["Breadcrumb.Languages"],
+            _ => decoded
+        };
+
+        return ToCamelCaseLabel(mapped);
+    }
+
+    private static string ToCamelCaseLabel(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return value;
+        }
+
+        var normalized = value
+            .Replace('-', ' ')
+            .Replace('_', ' ');
+
+        var words = normalized
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(word => word.Length == 1
+                ? word.ToUpperInvariant()
+                : char.ToUpper(word[0]) + word[1..].ToLowerInvariant());
+
+        return string.Join(' ', words);
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private string BuildUrl(int index)
+    {
+        if (index < 0) return "/";
+
+        var currentUri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var currentQuery = QueryHelpers.ParseQuery(currentUri.Query);
+
+        if (index < OriginalSegments.Count
+            && string.Equals(OriginalSegments[index], "items", StringComparison.OrdinalIgnoreCase)
+            && OriginalSegments.Count > 0
+            && string.Equals(OriginalSegments[0], "servers", StringComparison.OrdinalIgnoreCase))
+        {
+            var pathOnly = NavigationManager
+                .ToBaseRelativePath(NavigationManager.Uri)
+                .Split('?', '#')[0]
+                .Trim('/');
+
+            var rawSegments = pathOnly.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (rawSegments.Length >= 2 && int.TryParse(rawSegments[1], out var serverId))
+            {
+                return $"/servers/{serverId}";
+            }
+        }
+
+        var path = string.Join('/', OriginalSegments.Take(index + 1));
+        var target = "/" + path;
+
+        // For payment routes, prefer exact returnUrl (origin page) when available.
+        if (string.Equals(target, "/marketplace", StringComparison.OrdinalIgnoreCase)
+            && currentQuery.TryGetValue("returnUrl", out var returnUrlValues))
+        {
+            var normalizedReturnUrl = TryNormalizeLocalReturnUrl(returnUrlValues.LastOrDefault());
+            if (!string.IsNullOrEmpty(normalizedReturnUrl))
+            {
+                return normalizedReturnUrl;
+            }
+        }
+
+        // If no returnUrl is present, server context should go back to server marketplace.
+        if (string.Equals(target, "/marketplace", StringComparison.OrdinalIgnoreCase)
+            && currentQuery.TryGetValue("serverId", out var serverIdValues)
+            && int.TryParse(serverIdValues.LastOrDefault(), out var serverContextId)
+            && serverContextId > 0)
+        {
+            return $"/servers/{serverContextId}";
+        }
+
+        return target;
+    }
+
+    private static string? TryNormalizeLocalReturnUrl(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return null;
+        }
+
+        var decoded = Uri.UnescapeDataString(raw).Trim();
+        if (!decoded.StartsWith('/'))
+        {
+            return null;
+        }
+
+        if (decoded.StartsWith("//", StringComparison.Ordinal)
+            || decoded.Contains("://", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        return decoded;
+    }
+
+    private string? TryBuildReturnUrlLabel(string? rawReturnUrl)
+    {
+        var normalized = TryNormalizeLocalReturnUrl(rawReturnUrl);
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return null;
+        }
+
+        var pathOnly = normalized.Split('?', '#')[0];
+        var segments = pathOnly.Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .Where(s => !IsIdSegment(s))
+            .ToList();
+
+        if (segments.Count == 0)
+        {
+            return null;
+        }
+
+        // Use last non-id segment so item pages show item name (e.g., Bow).
+        return MapSegment(segments[^1]);
+    }
+}
+

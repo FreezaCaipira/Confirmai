@@ -1,0 +1,293 @@
+﻿body,
+html {
+    background:
+        radial-gradient(circle at 12% 10%, rgba(232, 194, 126, 0.14) 0%, rgba(232, 194, 126, 0) 36%),
+        radial-gradient(circle at 88% 14%, rgba(121, 92, 56, 0.15) 0%, rgba(121, 92, 56, 0) 34%),
+        linear-gradient(180deg, #1d1710 0%, #17120d 52%, #120d09 100%);
+    color: #efe8d7;
+    margin: 0;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 220px;
+    height: 100vh;
+    background:
+        linear-gradient(180deg, rgba(71, 53, 34, 0.96) 0%, rgba(50, 38, 26, 0.98) 100%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, rgba(0, 0, 0, 0) 1px 4px);
+    color: #f2e5ce;
+    padding: 14px 0;
+    border-right: 1px solid #8f6e43;
+    box-shadow: inset -1px 0 0 rgba(255, 226, 170, 0.16), 4px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.main {
+    margin-left: 220px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background:
+        radial-gradient(circle at 20% -20%, rgba(249, 217, 155, 0.18) 0%, rgba(249, 217, 155, 0) 55%),
+        linear-gradient(180deg, rgba(64, 47, 30, 0.96) 0%, rgba(48, 35, 23, 0.98) 100%);
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #907046;
+    position: relative;
+    box-shadow: inset 0 -1px 0 rgba(253, 226, 176, 0.14);
+}
+
+header::before {
+    content: "";
+    position: absolute;
+    left: 0.45rem;
+    right: 0.45rem;
+    top: 0.34rem;
+    bottom: 0.34rem;
+    border: 1px solid rgba(235, 200, 135, 0.2);
+    border-radius: 9px;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(57, 40, 24, 0.5);
+}
+
+.header-actions {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-actions > span:not(.currency-indicator) {
+    position: relative;
+    padding-left: 0.86rem;
+    color: #ecd9b5;
+}
+
+.header-actions > span:not(.currency-indicator)::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: 18px;
+    transform: translateY(-50%);
+    background: linear-gradient(180deg, rgba(237, 198, 130, 0) 0%, rgba(237, 198, 130, 0.88) 48%, rgba(237, 198, 130, 0) 100%);
+}
+
+.header-actions > span:not(.currency-indicator)::after {
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    transform: translate(-50%, -50%);
+    background: #d5a860;
+    box-shadow: 0 0 0 1px rgba(57, 37, 16, 0.6);
+}
+
+.currency-indicator {
+    background: linear-gradient(180deg, #4b3b28 0%, #3a2e20 100%);
+    color: #f2dfbb;
+    border: 1px solid #8d6b3f;
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.language-flags {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: linear-gradient(180deg, #243144 0%, #1a2637 100%);
+    border: 1px solid #526882;
+    border-radius: 999px;
+    padding: 0.12rem 0.35rem;
+}
+
+.language-flag {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    min-width: 1.8rem;
+    height: 1.45rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.language-flag:hover {
+    background: #2e415a;
+    border-color: #6c89ab;
+}
+
+.language-flag.active {
+    background: #3a516f;
+    border-color: #9db5d4;
+    transform: translateY(-1px);
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #f3d59b;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.btn-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem 1.35rem;
+    background:
+    radial-gradient(circle at 12% 8%, rgba(255, 238, 203, 0.06) 0%, rgba(255, 238, 203, 0) 45%),
+    linear-gradient(180deg, rgba(58, 43, 29, 0.22) 0%, rgba(33, 24, 17, 0.1) 100%);
+}
+
+.main-content.main-content-route-padded {
+    padding: 2rem 1rem;
+}
+
+footer {
+    background: linear-gradient(180deg, rgba(61, 46, 31, 0.98) 0%, rgba(45, 34, 24, 0.98) 100%);
+    color: #c7b89b;
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid #7a603a;
+}
+
+.logout-btn {
+    background: linear-gradient(180deg, #d6ad66 0%, #b68440 100%);
+    color: #2e1d0b;
+    border: none;
+    padding: 0.4rem 1.2rem;
+    border-radius: 7px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+    transition: background 0.2s, color 0.2s;
+    text-decoration: none;
+    margin-left: 0.5rem;
+    border: 1px solid #73522a;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(180deg, #e0bc7c 0%, #c28f4d 100%);
+    color: #2e1d0b;
+}
+
+.usd-unavailable-badge {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0.12rem 0.45rem;
+    border-radius: 999px;
+    background: #3f4e62;
+    color: #d8e2f0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    vertical-align: middle;
+    cursor: help;
+    letter-spacing: 0.1px;
+}
+
+.usd-estimate {
+    margin-left: 0.3rem;
+    color: #c6d9f6;
+}
+
+@media (max-width: 980px) {
+    .sidebar {
+        width: 180px;
+    }
+
+    .main {
+        margin-left: 180px;
+    }
+
+    .main-content {
+        padding: 1.2rem 1rem;
+    }
+
+    .main-content.main-content-route-padded {
+        padding: 1.1rem 0.85rem;
+    }
+
+    .header-actions {
+        position: static;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 0.6rem;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #7d623d;
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .header-actions {
+        gap: 0.5rem;
+    }
+
+    .logout-btn {
+        margin-left: 0;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.92rem;
+    }
+
+    .currency-indicator {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.5rem;
+    }
+
+    .language-flags {
+        padding: 0.1rem 0.25rem;
+    }
+
+    .language-flag {
+        min-width: 1.6rem;
+        height: 1.35rem;
+        font-size: 0.88rem;
+    }
+
+    .main-content {
+        padding: 0.8rem 0.65rem;
+    }
+
+    .main-content.main-content-route-padded {
+        padding: 0.75rem 0.55rem;
+    }
+}
