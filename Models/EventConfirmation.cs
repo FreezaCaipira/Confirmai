@@ -1,0 +1,28 @@
+using System.ComponentModel.DataAnnotations;
+using Confirmai.Enums;
+
+namespace Confirmai.Models
+{
+    public class EventConfirmation
+    {
+        public int Id { get; set; }
+
+        public int EventId { get; set; }
+        public Event Event { get; set; } = null!;
+
+        [StringLength(450)]
+        public string UserId { get; set; } = string.Empty;
+        public ApplicationUser User { get; set; } = null!;
+
+        // Futsal: define se o jogador confirmou como goleiro ou linha
+        public FutsalPosition? Position { get; set; }
+
+        public DateTime ConfirmedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    public enum FutsalPosition
+    {
+        Outfield = 0,
+        Goalkeeper = 1
+    }
+}

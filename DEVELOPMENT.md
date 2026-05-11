@@ -95,8 +95,94 @@ Toda lógica de negócio vive em `Services/`. Padrão:
 
 ## Estado Atual (Mai/2026)
 
-- 601 testes unitários/integração passando, 0 falhas
-- Coverlet configurado, CI rodando em GitHub Actions
-- Todos os audit hooks ativos: Identity, Products, Servers, ServerMembers, ApiKeys, ItemOffers, Payments, Orders (criados/liberados/entregues/disputados), AdminSettings
+- Fork do OtServ Market adaptado para Confirmai
+- Infraestrutura intacta: Identity, CSP, SignalR, EF Core, Serilog, OpenTelemetry, CI
+- CSS restructurado: site.css (global), componentes isolados via .razor.css
+- Cookie consent funcional (JS renomeado para privacy-prefs.js — ad blockers bloqueavam cookie-consent.js)
+
+---
+
+## Roadmap Confirmai
+
+### Fase 1 — Modelo de dados base (atual)
+
+**Objetivo**: substituir entidades do fork pelas entidades do domínio real.
+
+Mapeamento fork → Confirmai:
+
+| Fork | Ação | Confirmai |
+|---|---|---|
+| `TibiaServer` | Adaptar | `Group` (casa de poker / pelada de fut) |
+| `ServerMember` | Adaptar | `GroupMember` |
+| `ServerMemberRole` | Renomear valores | `GroupMemberRole` (Admin / Member) |
+| `Product` | Substituir | `Event` (torneio ou partida) |
+| `Order` | Substituir | `EventConfirmation` |
+| `PaymentStatus` | Manter | Reaproveitado quando pagamento entrar |
+| `PaymentOrder` | Arquivar | Substituído no futuro por Pix |
+| `BtcPay` | Remover | Fora do escopo atual |
+
+Novas entidades sem equivalente no fork:
+- `Sport` — Futsal | Poker | (futuramente Xadrez, etc.)
+- `WaitingList` — fila de espera quando Event está lotado
+
+Modelo `Event` tabela única com campos nullable por esporte:
+```
+Event
+  GroupId, SportId, StartsAt, Location
+  MaxPlayers, MaxGoalkeepers?          ← futsal
+  BuyIn?, Rebuy?, Addon?, BonusInfo?   ← poker
+```
+
+- [ ] Criar enum/tabela `Sport`
+- [ ] Criar `Group` a partir de `TibiaServer`
+- [ ] Criar `GroupMember` / `GroupMemberRole`
+- [ ] Criar `Event` (tabela única com campos nullable)
+- [ ] Criar `EventConfirmation` + índice único (UserId, EventId)
+- [ ] Criar `WaitingList`
+- [ ] Migration e seed de dados de teste
+
+---
+
+### Fase 2 — UI tela inicial e listagem
+
+**Objetivo**: tela de esportes e listagem de eventos funcionais.
+
+- [ ] Tela `/` — lista de esportes disponíveis (cards: Futsal, Poker)
+- [ ] Tela `/[sport]` — lista de grupos por esporte, filtro por cidade (default: Pouso Alegre MG ou última cidade do usuário)
+- [ ] Tela `/[sport]/[groupId]` — lista de eventos do grupo
+- [ ] Tela `/[sport]/[groupId]/[eventId]` — detalhe do evento com lista de confirmados
+- [ ] Botão "Confirmar presença" — redireciona para login se não autenticado
+- [ ] Detecção de conflito de horário ao confirmar
+
+---
+
+### Fase 3 — Admin de grupo
+
+**Objetivo**: admin do grupo cria e gerencia eventos.
+
+- [ ] Painel do admin de grupo
+- [ ] CRUD de eventos (com campos específicos por esporte)
+- [ ] Gerenciar lista de confirmados (remover, promover da fila)
+- [ ] Definir vagas por posição (goleiro/linha no futsal)
+
+---
+
+### Fase 4 — Admin do site
+
+**Objetivo**: admin global gerencia grupos e esportes.
+
+- [ ] Aprovar/rejeitar novos grupos
+- [ ] Gerenciar esportes disponíveis
+- [ ] Dashboard de uso (grupos ativos, confirmações por período)
+
+---
+
+### Fase 5 — Pagamento (standby)
+
+**Objetivo**: monetização via taxa por confirmação.
+
+- [ ] Integração Pix (R$ 1,00 por confirmação ou similar)
+- [ ] Reaproveitamento de `PaymentStatus` e infraestrutura SignalR existente
+- [ ] Relatório financeiro para admin do grupo
 - Inline styles estáticos eliminados de todas as páginas
 - Sem `@layer` em `site.css` (era bloco unclosed — removido)

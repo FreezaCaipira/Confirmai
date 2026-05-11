@@ -112,8 +112,6 @@
     }
 
     function init() {
-        resetConsentForDevelopment();
-
         const consent = loadConsent();
 
         if (consent === null) {
@@ -167,6 +165,7 @@
 
     function autoInit() {
         try {
+            resetConsentForDevelopment();
             api.init();
         } catch {
             // Ignore runtime errors to avoid breaking the page.

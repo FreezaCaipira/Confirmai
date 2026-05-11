@@ -1,9 +1,34 @@
-﻿@*
-    Root URL ("/") is redirected to "/servers" via a server-side endpoint
-    registered in Program.cs (app.MapGet("/", ...)). This component is no
-    longer routed and is kept only to avoid breaking imports/tests that may
-    still reference the file.
-*@
+﻿@page "/"
+@attribute [AllowAnonymous]
+@using Microsoft.AspNetCore.Authorization
 
-@code {
-}
+<PageTitle>Confirmai</PageTitle>
+
+<div class="sports-page">
+    <section class="sports-hero">
+        <h2 class="sports-hero-title">Escolha seu esporte</h2>
+        <p class="sports-hero-sub">Confirme presença nos eventos da sua cidade em segundos.</p>
+    </section>
+
+    <section class="sports-grid" aria-label="Esportes disponíveis">
+        <a href="/futsal" class="sport-card sport-card--futsal">
+            <div class="sport-card-icon" aria-hidden="true">⚽</div>
+            <div class="sport-card-body">
+                <h3 class="sport-card-name">Futsal</h3>
+                <p class="sport-card-desc">Peladas, campeonatos e escolinhas na quadra</p>
+            </div>
+            <span class="sport-card-cta">Ver partidas →</span>
+        </a>
+
+        <a href="/poker" class="sport-card sport-card--poker">
+            <div class="sport-card-icon" aria-hidden="true">🃏</div>
+            <div class="sport-card-body">
+                <h3 class="sport-card-name">Poker</h3>
+                <p class="sport-card-desc">Torneios, cash games e ligas semanais</p>
+            </div>
+            <span class="sport-card-cta">Ver torneios →</span>
+        </a>
+    </section>
+</div>
+
+@code { }

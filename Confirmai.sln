@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confirmai", "Confirmai.csproj", "{0B060536-24D6-77F4-51AD-3E991CD57E2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confirmai.Tests", "Confirmai.Tests\Confirmai.Tests.csproj", "{6887D42E-7437-45F4-942F-66BA74B4B33E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confirmai.Tests", "OtServMarket.Tests\Confirmai.Tests.csproj", "{6887D42E-7437-45F4-942F-66BA74B4B33E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

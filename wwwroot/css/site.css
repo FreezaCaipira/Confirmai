@@ -1,11 +1,25 @@
-﻿/* Layout fallback: garante estilo do MainLayout/NavMenu sem depender de CSS isolation */
-:root {
-    /* -- Shell (layout chrome) -- */
-    --shell-gold: #d6ad66;
-    --shell-gold-dark: #b68440;
-    --shell-text: #efe8d7;
-    --shell-brown: #6f5634;
+﻿/* ================================================================
+   CONFIRMAI — GLOBAL STYLESHEET
 
+   Sections:
+   · Design Tokens   (CSS custom properties)
+   · Base            (html, body)
+   · Layout Shell    (.main, .sidebar, responsive breakpoints)
+   · Animations & Utilities
+   · Table System
+   · Button System
+   · Entity Shell System
+   · Page Layouts
+
+   Convention:
+   - This file: design tokens, layout shell, truly global systems
+   - ComponentName.razor.css: styles scoped to a single component
+   ================================================================ */
+
+/* ================================================================
+   DESIGN TOKENS
+   ================================================================ */
+:root {
     /* -- Dark backgrounds (warm Tibia browns) -- */
     --bg-deepest: #2f1a09;
     --bg-deep: #2f1d0b;
@@ -13,7 +27,7 @@
     --bg-dark-mid: #4e2f16;
     --bg-dark-soft: #4b2c13;
 
-    /* -- Dark backgrounds (remnant cool tones - phase-out candidates) -- */
+    /* -- Legacy cool-tone backgrounds (used in payment/BTC components; phase out as those are redesigned) -- */
     --bg-night: #181818;
     --bg-night-cool: #181c22;
     --bg-slate: #23272b;
@@ -37,7 +51,6 @@
     --gold-amber: #bf7f26;
     --gold-light: #e0a33f;
     --gold-soft: #f6cf8a;
-    --gold-pale: #ffe082;
 
     /* -- Brown spectrum (text, labels, borders) -- */
     --brown-border: #8a6739;
@@ -76,6 +89,9 @@
     --font-accent: "MedievalSharp", Georgia, cursive;
 }
 
+/* ================================================================
+   BASE
+   ================================================================ */
 html,
 body {
     background:
@@ -100,6 +116,9 @@ body::before {
     z-index: 0;
 }
 
+/* ================================================================
+   LAYOUT SHELL
+   ================================================================ */
 .main {
     margin-left: 220px;
     min-height: 100vh;
@@ -463,26 +482,9 @@ body::before {
     border-top: 1px solid #7a603a;
 }
 
-.cookie-consent-banner {
-    position: fixed;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    z-index: 5000;
-    background: linear-gradient(120deg, rgba(22, 34, 52, 0.96) 0%, rgba(8, 15, 24, 0.96) 75%);
-    border: 1px solid #2e4b72;
-    border-radius: 14px;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
-}
-
-.cookie-consent-content {
-    padding: 1rem 1.05rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1.2rem;
-}
-
+/* ================================================================
+   ANIMATIONS & UTILITIES
+   ================================================================ */
 @keyframes shell-reveal {
     from {
         opacity: 0;
@@ -495,137 +497,10 @@ body::before {
     }
 }
 
-.cookie-consent-text h3 {
-    margin: 0 0 0.2rem;
-    font-size: 1.02rem;
-    color: #f3f7ff;
-}
-
-.cookie-consent-text p {
-    margin: 0;
-    color: #b8c7dd;
-    font-size: 0.9rem;
-}
-
-.cookie-consent-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
-
-.cookie-btn {
-    border: 1px solid #4a5f7d;
-    border-radius: 8px;
-    padding: 0.42rem 0.8rem;
-    font-size: 0.85rem;
-    font-weight: 700;
-    cursor: pointer;
-    color: #e8f2ff;
-    background: #1c2a3b;
-    transition: transform 0.12s ease, filter 0.12s ease, border-color 0.12s ease;
-}
-
-.cookie-btn:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.06);
-}
-
-.cookie-btn.cookie-btn-neutral {
-    background: #273649;
-    border-color: #4a5f7d;
-}
-
-.cookie-btn.cookie-btn-soft {
-    background: #3f3c2a;
-    border-color: #7b7040;
-    color: #fff4d4;
-}
-
-.cookie-btn.cookie-btn-primary {
-    background: #1f5f43;
-    border-color: #2f8f66;
-    color: #e8fff5;
-}
-
-.cookie-consent-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 5100;
-    background: rgba(0, 0, 0, 0.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-}
-
-.cookie-consent-modal {
-    width: min(560px, 100%);
-    background: linear-gradient(180deg, #171f2b 0%, #121925 100%);
-    border: 1px solid #35537b;
-    border-radius: 12px;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
-    padding: 1.05rem;
-}
-
-.cookie-consent-modal h3 {
-    margin: 0 0 0.45rem;
-    color: #eef4ff;
-}
-
-.cookie-consent-modal p {
-    margin: 0 0 0.8rem;
-    color: #b8c7dd;
-}
-
-.cookie-option {
-    border: 1px solid #334a69;
-    border-radius: 10px;
-    padding: 0.65rem 0.75rem;
-    margin-bottom: 0.6rem;
-    background: #121a26;
-}
-
-.cookie-option label {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    color: #e8f0ff;
-    font-weight: 700;
-}
-
-.cookie-option small {
-    display: block;
-    margin-top: 0.3rem;
-    color: #9eb2cf;
-}
-
-.cookie-option.disabled {
-    opacity: 0.85;
-}
-
 .is-hidden {
     display: none !important;
 }
 
-@media (max-width: 760px) {
-    .cookie-consent-content {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .cookie-consent-actions {
-        justify-content: stretch;
-    }
-
-    .cookie-btn {
-        flex: 1 1 auto;
-        text-align: center;
-    }
-}
-
-/* Utilities and dashboard primitives */
 .dark-mode {
     background-color: #000;
     color: #fff;
@@ -820,7 +695,9 @@ body::before {
     margin-right: 0.7rem;
 }
 
-/* Shared tables and row actions */
+/* ================================================================
+   TABLE SYSTEM
+   ================================================================ */
 .payments-table {
     width: 100%;
     background: var(--bg-slate);
@@ -841,13 +718,13 @@ body::before {
     font-size: 1.1rem;
 }
 
-/* ============================================================
-   BUTTON SYSTEM (April 2026)
+/* ================================================================
+   BUTTON SYSTEM
    Single source of truth for all action buttons. Legacy class
    names (.save-btn / .cancel-btn / .success-btn / .danger /
    .warning-btn / .details-btn / .edit-btn / .back-btn / .view-btn)
-   are kept as aliases of the new `.btn` + `.btn--variant` API so
-   existing markup keeps working while we migrate progressively.
+   are kept as aliases of .btn + .btn--variant so existing markup
+   keeps working while we migrate progressively.
    New code SHOULD use:
        <button class="btn btn--primary">Save</button>
        <button class="btn btn--success">Confirm</button>
@@ -856,7 +733,7 @@ body::before {
        <button class="btn btn--info">Edit</button>
        <button class="btn btn--gold">Details</button>
    Modifiers: .btn--sm, .btn--icon
-   ============================================================ */
+   ================================================================ */
 .btn,
 .save-btn,
 .cancel-btn,
@@ -2782,10 +2659,13 @@ body::before {
     padding: 1rem;
 }
 
+/* ================================================================
+   ENTITY SHELL SYSTEM
+   ================================================================ */
+
 /* Global entity-shell base: ensures parchment card look for ALL pages using entity-shell pattern */
 .entity-shell {
     --entity-bg: var(--bg-dark);
-    --entity-card: #e9d0a3;
     --entity-line: var(--brown-border-accent);
     --entity-accent: var(--gold-deep);
     --entity-ink: var(--parchment-warm);

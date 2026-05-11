@@ -27,6 +27,13 @@ namespace Confirmai.Data
         public DbSet<GameLoginToken> GameLoginTokens { get; set; }
         public DbSet<DeliveryAuditLog> DeliveryAuditLogs { get; set; }
 
+        // Confirmai domain
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<GroupMember> GroupMembers { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<EventConfirmation> EventConfirmations { get; set; }
+        public DbSet<WaitingList> WaitingLists { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -294,6 +301,64 @@ namespace Confirmai.Data
                 .WithMany()
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // Confirmai domain
+            modelBuilder.Entity<GroupMember>()
+                .HasIndex(gm => new { gm.GroupId, gm.UserId })
+                .IsUnique();
+
+            modelBuilder.Entity<GroupMember>()
+                .HasOne(gm => gm.Group)
+                .WithMany(g => g.Members)
+                .HasForeignKey(gm => gm.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GroupMember>()
+                .HasOne(gm => gm.User)
+                .WithMany()
+                .HasForeignKey(gm => gm.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.Group)
+                .WithMany(g => g.Events)
+                .HasForeignKey(e => e.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Event>()
+                .HasIndex(e => new { e.GroupId, e.StartsAt });
+
+            modelBuilder.Entity<EventConfirmation>()
+                .HasIndex(ec => new { ec.EventId, ec.UserId })
+                .IsUnique();
+
+            modelBuilder.Entity<EventConfirmation>()
+                .HasOne(ec => ec.Event)
+                .WithMany(e => e.Confirmations)
+                .HasForeignKey(ec => ec.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<EventConfirmation>()
+                .HasOne(ec => ec.User)
+                .WithMany()
+                .HasForeignKey(ec => ec.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WaitingList>()
+                .HasIndex(w => new { w.EventId, w.UserId })
+                .IsUnique();
+
+            modelBuilder.Entity<WaitingList>()
+                .HasOne(w => w.Event)
+                .WithMany(e => e.WaitingList)
+                .HasForeignKey(w => w.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WaitingList>()
+                .HasOne(w => w.User)
+                .WithMany()
+                .HasForeignKey(w => w.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

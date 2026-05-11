@@ -1,0 +1,151 @@
+/* ================================================================
+   CookieConsent component styles
+   Extracted from site.css — scoped to this component via Blazor
+   CSS isolation. .is-hidden stays in site.css (toggled by JS).
+   ================================================================ */
+
+.cookie-consent-banner {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 5000;
+    background: linear-gradient(120deg, rgba(22, 34, 52, 0.96) 0%, rgba(8, 15, 24, 0.96) 75%);
+    border: 1px solid #2e4b72;
+    border-radius: 14px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+}
+
+.cookie-consent-content {
+    padding: 1rem 1.05rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.2rem;
+}
+
+.cookie-consent-text h3 {
+    margin: 0 0 0.2rem;
+    font-size: 1.02rem;
+    color: #f3f7ff;
+}
+
+.cookie-consent-text p {
+    margin: 0;
+    color: #b8c7dd;
+    font-size: 0.9rem;
+}
+
+.cookie-consent-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.cookie-btn {
+    border: 1px solid #4a5f7d;
+    border-radius: 8px;
+    padding: 0.42rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #e8f2ff;
+    background: #1c2a3b;
+    transition: transform 0.12s ease, filter 0.12s ease, border-color 0.12s ease;
+}
+
+.cookie-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+}
+
+.cookie-btn.cookie-btn-neutral {
+    background: #273649;
+    border-color: #4a5f7d;
+}
+
+.cookie-btn.cookie-btn-soft {
+    background: #3f3c2a;
+    border-color: #7b7040;
+    color: #fff4d4;
+}
+
+.cookie-btn.cookie-btn-primary {
+    background: #1f5f43;
+    border-color: #2f8f66;
+    color: #e8fff5;
+}
+
+.cookie-consent-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5100;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.cookie-consent-modal {
+    width: min(560px, 100%);
+    background: linear-gradient(180deg, #171f2b 0%, #121925 100%);
+    border: 1px solid #35537b;
+    border-radius: 12px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
+    padding: 1.05rem;
+}
+
+.cookie-consent-modal h3 {
+    margin: 0 0 0.45rem;
+    color: #eef4ff;
+}
+
+.cookie-consent-modal p {
+    margin: 0 0 0.8rem;
+    color: #b8c7dd;
+}
+
+.cookie-option {
+    border: 1px solid #334a69;
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 0.6rem;
+    background: #121a26;
+}
+
+.cookie-option label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #e8f0ff;
+    font-weight: 700;
+}
+
+.cookie-option small {
+    display: block;
+    margin-top: 0.3rem;
+    color: #9eb2cf;
+}
+
+.cookie-option.disabled {
+    opacity: 0.85;
+}
+
+@media (max-width: 760px) {
+    .cookie-consent-content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cookie-consent-actions {
+        justify-content: stretch;
+    }
+
+    .cookie-btn {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+}
