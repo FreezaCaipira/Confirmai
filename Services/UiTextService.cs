@@ -1122,10 +1122,10 @@ public sealed class UiTextService
                 ["Layout.ActiveOffersSuffix"] = "oferta(s) ativa(s) em",
                 ["Layout.ActiveServersSuffix"] = "servidor(es)",
 
-                ["Layout.NewsTicker1"] = "Servidor online para trocas seguras no estilo Tibia classic.",
-                ["Layout.NewsTicker2"] = "Novas ofertas entram a cada minuto no market.",
-                ["Layout.NewsTicker3"] = "Confira vendedores recomendados antes de fechar negócio.",
-                ["Layout.NewsTicker4"] = "Use filtros por categoria para achar itens raros mais rápido.",
+                ["Layout.NewsTicker1"] = "Confirme presença em partidas de futsal e torneios de poker.",
+                ["Layout.NewsTicker2"] = "Chega de grupo de WhatsApp — confirme aqui em segundos.",
+                ["Layout.NewsTicker3"] = "Lista de espera automática quando o evento lotar.",
+                ["Layout.NewsTicker4"] = "Seus eventos, sua cidade. Tudo organizado em um lugar.",
 
                 ["Layout.TrendingTitle"] = "trending no market",
                 ["Layout.Trending1"] = "Equipamentos raros",
@@ -2253,10 +2253,10 @@ public sealed class UiTextService
                 ["Layout.ActiveOffersSuffix"] = "active offer(s) across",
                 ["Layout.ActiveServersSuffix"] = "server(s)",
 
-                ["Layout.NewsTicker1"] = "Server online for safe trades in classic Tibia style.",
-                ["Layout.NewsTicker2"] = "New offers arrive every minute on the market.",
-                ["Layout.NewsTicker3"] = "Check recommended sellers before closing a deal.",
-                ["Layout.NewsTicker4"] = "Use category filters to find rare items faster.",
+                ["Layout.NewsTicker1"] = "Confirm your presence at futsal matches and poker tournaments.",
+                ["Layout.NewsTicker2"] = "No more WhatsApp groups — confirm here in seconds.",
+                ["Layout.NewsTicker3"] = "Automatic waiting list when the event is full.",
+                ["Layout.NewsTicker4"] = "Your events, your city. All organized in one place.",
 
                 ["Layout.TrendingTitle"] = "trending on market",
                 ["Layout.Trending1"] = "Rare equipment",
@@ -3385,10 +3385,10 @@ public sealed class UiTextService
                 ["Layout.ActiveOffersSuffix"] = "oferta(s) activa(s) en",
                 ["Layout.ActiveServersSuffix"] = "servidor(es)",
 
-                ["Layout.NewsTicker1"] = "Servidor en línea para intercambios seguros al estilo Tibia classic.",
-                ["Layout.NewsTicker2"] = "Nuevas ofertas llegan cada minuto al mercado.",
-                ["Layout.NewsTicker3"] = "Revisa vendedores recomendados antes de cerrar un trato.",
-                ["Layout.NewsTicker4"] = "Usa filtros por categoría para encontrar ítems raros más rápido.",
+                ["Layout.NewsTicker1"] = "Confirma tu presencia en partidos de fútbol sala y torneos de poker.",
+                ["Layout.NewsTicker2"] = "Sin grupos de WhatsApp — confirma aquí en segundos.",
+                ["Layout.NewsTicker3"] = "Lista de espera automática cuando el evento se llene.",
+                ["Layout.NewsTicker4"] = "Tus eventos, tu ciudad. Todo organizado en un solo lugar.",
 
                 ["Layout.TrendingTitle"] = "tendencias en el market",
                 ["Layout.Trending1"] = "Equipamiento raro",

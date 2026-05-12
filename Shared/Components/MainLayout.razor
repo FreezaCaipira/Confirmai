@@ -30,13 +30,9 @@
             <header class="oldsite-header">
                 <a href="/" class="oldsite-logo-wrap" aria-label="Início">
                     <div class="oldsite-logo-art" aria-hidden="true"></div>
-                    <h1 class="oldsite-logo">Confirmai</h1>
+                    <h1 class="oldsite-logo">Confirma Aí!</h1>
                     <p class="oldsite-tagline">Confirme sua presença</p>
                 </a>
-                <div class="oldsite-playerline">
-                    <span class="oldsite-online-dot" aria-hidden="true"></span>
-                    <span>@globalActiveOffers @T["Layout.ActiveOffersSuffix"] @globalActiveServers @T["Layout.ActiveServersSuffix"]</span>
-                </div>
                 <nav class="oldsite-top-nav" aria-label="Main menu">
                     <a href="/">Início</a>
                     <AuthorizeView>
@@ -105,7 +101,7 @@
                 <div class="oldsite-center-column">
 
                     <div class="layout-news-ticker oldsite-news-ticker" role="status" aria-live="polite">
-                        <strong>News Ticker</strong>
+                        <strong>Novidades</strong>
                         <span class="oldsite-news-ticker-text">@CurrentNewsTickerMessage</span>
                         <span class="oldsite-news-ticker-dots" aria-hidden="true">
                             @for (var i = 0; i < newsTickerMessages.Length; i++)
@@ -125,13 +121,10 @@
                     <ActivePaymentMethodsWidget />
 
                     <section class="oldsite-widget">
-                        <h3>@T["Layout.TrendingTitle"]</h3>
+                        <h3>Esportes</h3>
                         <ol>
-                            <li>@T["Layout.Trending1"]</li>
-                            <li>@T["Layout.Trending2"]</li>
-                            <li>@T["Layout.Trending3"]</li>
-                            <li>@T["Layout.Trending4"]</li>
-                            <li>@T["Layout.Trending5"]</li>
+                            <li><a href="/futsal">Futsal</a></li>
+                            <li><a href="/poker">Poker</a></li>
                         </ol>
                     </section>
 

@@ -51,8 +51,8 @@
     border-radius: 14px;
     text-decoration: none;
     color: #f1f5f9;
-    background: #1e2433;
-    border: 1px solid #2d3448;
+    background: #141e2b;
+    border: 1px solid #162438;
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     position: relative;
     overflow: hidden;
@@ -73,7 +73,7 @@
 }
 
 .sport-card:focus-visible {
-    outline: 2px solid #60a5fa;
+    outline: 2px solid #2e6496;
     outline-offset: 2px;
 }
 

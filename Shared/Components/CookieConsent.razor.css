@@ -6,10 +6,12 @@
 
 .cookie-consent-banner {
     position: fixed;
-    left: 16px;
+    left: auto;
     right: 16px;
     bottom: 16px;
     z-index: 5000;
+    width: fit-content;
+    max-width: min(480px, calc(100vw - 32px));
     background: linear-gradient(120deg, rgba(22, 34, 52, 0.96) 0%, rgba(8, 15, 24, 0.96) 75%);
     border: 1px solid #2e4b72;
     border-radius: 14px;
@@ -17,11 +19,10 @@
 }
 
 .cookie-consent-content {
-    padding: 1rem 1.05rem;
+    padding: 0.85rem 1rem;
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1.2rem;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .cookie-consent-text h3 {

@@ -20,8 +20,8 @@ html {
         repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, rgba(0, 0, 0, 0) 1px 4px);
     color: #f2e5ce;
     padding: 14px 0;
-    border-right: 1px solid #8f6e43;
-    box-shadow: inset -1px 0 0 rgba(255, 226, 170, 0.16), 4px 0 20px rgba(0, 0, 0, 0.3);
+    border-right: 1px solid #1c2a3b;
+    box-shadow: inset -1px 0 0 rgba(26, 84, 120, 0.12), 4px 0 20px rgba(0, 0, 0, 0.3);
 }
 
 .main {
@@ -37,9 +37,9 @@ header {
         linear-gradient(180deg, rgba(64, 47, 30, 0.96) 0%, rgba(48, 35, 23, 0.98) 100%);
     padding: 1rem;
     text-align: center;
-    border-bottom: 1px solid #907046;
+    border-bottom: 1px solid #162438;
     position: relative;
-    box-shadow: inset 0 -1px 0 rgba(253, 226, 176, 0.14);
+    box-shadow: inset 0 -1px 0 rgba(26, 84, 120, 0.18);
 }
 
 header::before {
@@ -49,10 +49,10 @@ header::before {
     right: 0.45rem;
     top: 0.34rem;
     bottom: 0.34rem;
-    border: 1px solid rgba(235, 200, 135, 0.2);
+    border: 1px solid rgba(26, 84, 120, 0.55);
     border-radius: 9px;
     pointer-events: none;
-    box-shadow: inset 0 0 0 1px rgba(57, 40, 24, 0.5);
+    box-shadow: inset 0 0 0 1px rgba(9, 15, 24, 0.5);
 }
 
 .header-actions {
@@ -290,4 +290,38 @@ footer {
     .main-content.main-content-route-padded {
         padding: 0.75rem 0.55rem;
     }
+}
+
+/* ── Sidebar widget links (scoped to MainLayout — loads last, wins) ── */
+.oldsite-widget ol {
+    list-style: none;
+    padding: 0.35rem 0.7rem 0.5rem;
+    margin: 0;
+}
+
+.oldsite-widget ol li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-bottom: none;
+}
+
+.oldsite-widget ol li:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.oldsite-widget ol li a {
+    display: block;
+    padding: 0.38rem 0.55rem;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border-radius: 5px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.oldsite-widget ol li a:hover {
+    color: #c8dff0;
+    background: rgba(26, 84, 120, 0.12);
 }
