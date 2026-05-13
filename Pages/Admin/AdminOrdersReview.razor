@@ -102,24 +102,13 @@
                 <td data-label="@T["AdminOrders.Buyer"]">@order.Buyer?.UserName</td>
                 <td data-label="@T["AdminOrders.Product"]">
                     <div>@order.Product?.Name</div>
-                    @if (!string.IsNullOrWhiteSpace(order.Payment?.InGamePlayerName))
-                    {
-                        <div class="text-muted">@T["AdminOrdersReview.InGamePlayerName"]: @order.Payment.InGamePlayerName</div>
-                    }
                 </td>
                 <td data-label="@T["Common.Value"]">@FormatAmount(order)</td>
                 <td data-label="@T["Common.Status"]">
                     <span class="order-status-badge aguardandorevisaoadm">@T["AdminOrdersReview.StatusAwaiting"]</span>
                 </td>
                 <td data-label="Origem">
-                    @if (order.ServerId.HasValue)
-                    {
-                        <span class="badge-active" title="Entrega confirmada pelo servidor de jogo">Servidor</span>
-                    }
-                    else
-                    {
-                        <span class="badge-payment-info" title="Entrega confirmada por evidencia manual">Manual</span>
-                    }
+                    <span class="badge-payment-info" title="Entrega confirmada por evidencia manual">Manual</span>
                 </td>
                 <td data-label="@T["Common.Actions"]">
                     <div class="order-review-actions">
@@ -160,10 +149,6 @@
                         <div class="details-row"><span class="label">@T["AdminOrdersReview.Quantity"]:</span><span>1</span></div>
                         <div class="details-row"><span class="label">@T["AdminOrders.Buyer"]:</span><span><a class="evidence-link" href="@($"/profile/{selectedOrder.BuyerId}")">@selectedOrder.Buyer?.UserName</a></span></div>
                         <div class="details-row"><span class="label">@T["AdminOrders.Seller"]:</span><span><a class="evidence-link" href="@($"/profile/{selectedOrder.SellerId}")">@selectedOrder.Seller?.UserName</a></span></div>
-                        @if (!string.IsNullOrWhiteSpace(selectedOrder.Payment?.InGamePlayerName))
-                        {
-                            <div class="details-row"><span class="label">@T["AdminOrdersReview.InGamePlayerName"]:</span><span>@selectedOrder.Payment.InGamePlayerName</span></div>
-                        }
                         <div class="details-row"><span class="label">@T["AdminOrdersReview.GrossAmount"]:</span><span>@FormatAmount(selectedOrder)</span></div>
                         <div class="details-row"><span class="label">@T["AdminOrdersReview.OperationFee"]:</span><span>@(releaseBreakdown?.Percent.ToString("0.##") ?? "0")%</span></div>
                         <div class="details-row"><span class="label">@T["AdminOrdersReview.FeeAmount"]:</span><span>@FormatAmountByCurrency(releaseBreakdown?.FeeAmount ?? 0m, selectedOrder)</span></div>

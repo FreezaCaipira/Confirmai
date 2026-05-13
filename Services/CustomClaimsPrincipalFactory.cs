@@ -26,18 +26,6 @@ public class CustomClaimsPrincipalFactory(
     protected override async Task<ClaimsIdentity> GenerateClaimsAsync(ApplicationUser user)
     {
         var identity = await base.GenerateClaimsAsync(user);
-
-        await using var db = await _dbContextFactory.CreateDbContextAsync();
-
-        var isServerAdmin = await db.ServerMembers
-            .AsNoTracking()
-            .AnyAsync(m => m.UserId == user.Id && m.Role == ServerMemberRole.ServerAdmin);
-
-        if (isServerAdmin)
-        {
-            identity.AddClaim(new Claim("server_admin", "true"));
-        }
-
         return identity;
     }
 }

@@ -134,23 +134,6 @@
         var currentUri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var currentQuery = QueryHelpers.ParseQuery(currentUri.Query);
 
-        if (index < OriginalSegments.Count
-            && string.Equals(OriginalSegments[index], "items", StringComparison.OrdinalIgnoreCase)
-            && OriginalSegments.Count > 0
-            && string.Equals(OriginalSegments[0], "servers", StringComparison.OrdinalIgnoreCase))
-        {
-            var pathOnly = NavigationManager
-                .ToBaseRelativePath(NavigationManager.Uri)
-                .Split('?', '#')[0]
-                .Trim('/');
-
-            var rawSegments = pathOnly.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            if (rawSegments.Length >= 2 && int.TryParse(rawSegments[1], out var serverId))
-            {
-                return $"/servers/{serverId}";
-            }
-        }
-
         var path = string.Join('/', OriginalSegments.Take(index + 1));
         var target = "/" + path;
 
@@ -163,15 +146,6 @@
             {
                 return normalizedReturnUrl;
             }
-        }
-
-        // If no returnUrl is present, server context should go back to server marketplace.
-        if (string.Equals(target, "/marketplace", StringComparison.OrdinalIgnoreCase)
-            && currentQuery.TryGetValue("serverId", out var serverIdValues)
-            && int.TryParse(serverIdValues.LastOrDefault(), out var serverContextId)
-            && serverContextId > 0)
-        {
-            return $"/servers/{serverContextId}";
         }
 
         return target;

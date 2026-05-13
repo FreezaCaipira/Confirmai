@@ -98,7 +98,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
                     return LocalRedirect(returnUrl);
                 }
 
-                return LocalRedirect("/servers");
+                return LocalRedirect("/");
 
             }
             return Page();

@@ -77,20 +77,12 @@ else
                     <h3>Market stats</h3>
                     <div class="admin-user-stats-grid">
                         <div class="admin-user-stat-card">
-                            <span class="admin-user-stat-label">Recomendacoes</span>
-                            <span class="admin-user-stat-value">@referencesCount</span>
-                        </div>
-                        <div class="admin-user-stat-card">
                             <span class="admin-user-stat-label">Itens vendidos</span>
                             <span class="admin-user-stat-value">@soldItemsCount</span>
                         </div>
                         <div class="admin-user-stat-card">
                             <span class="admin-user-stat-label">Itens comprados</span>
                             <span class="admin-user-stat-value">@boughtItemsCount</span>
-                        </div>
-                        <div class="admin-user-stat-card">
-                            <span class="admin-user-stat-label">Ofertas ativas</span>
-                            <span class="admin-user-stat-value">@activeOffersCount</span>
                         </div>
                     </div>
                 </section>
@@ -139,8 +131,6 @@ else
     private bool isLoading = true;
     private int soldItemsCount;
     private int boughtItemsCount;
-    private int referencesCount;
-    private int activeOffersCount;
     private bool showAdminExtensions;
 
     private string OutfitImageUrl => "https://outfit-images.ots.me/outfit.php?id=128&addons=3&head=114&body=114&legs=114&feet=114&mount=0&direction=3";
@@ -158,8 +148,6 @@ else
             await using var db = await DbFactory.CreateDbContextAsync();
             soldItemsCount = await db.Orders.AsNoTracking().CountAsync(o => o.SellerId == user.Id && o.IsPaid);
             boughtItemsCount = await db.Orders.AsNoTracking().CountAsync(o => o.BuyerId == user.Id && o.IsPaid);
-            referencesCount = await db.SellerRecommendations.AsNoTracking().CountAsync(r => r.SellerUserId == user.Id);
-            activeOffersCount = await db.ItemOffers.AsNoTracking().CountAsync(o => o.SellerUserId == user.Id && o.IsActive);
 
             // Keep the same layout as public profile while there are no extra admin-only blocks.
             showAdminExtensions = false;

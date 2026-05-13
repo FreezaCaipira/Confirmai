@@ -12,8 +12,8 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
 @inject LogService LogService
-@inject TibiaServerService TibiaServerService
 @inject UiTextService T
+
 
 <PageTitle>@(Id == 0 ? T["ProductForm.NewTitle"] : T["ProductForm.EditTitle"])</PageTitle>
 
@@ -106,67 +106,6 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="pf-fieldset">
-                        <legend class="pf-legend">Atributos do item</legend>
-
-                        <div class="pf-row-3col">
-                            <div class="form-group">
-                                <label>Peso</label>
-                                <InputNumber @bind-Value="product.Weight" class="input" />
-                                <ValidationMessage For="@(() => product.Weight)" />
-                            </div>
-
-                            <div class="form-group">
-                                <label>ATK</label>
-                                <InputNumber @bind-Value="product.Attack" class="input" />
-                            </div>
-
-                            <div class="form-group">
-                                <label>DEF</label>
-                                <InputNumber @bind-Value="product.Defense" class="input" />
-                            </div>
-                        </div>
-
-                        <div class="pf-row-2col">
-                            <div class="form-group">
-                                <label>ARM</label>
-                                <InputNumber @bind-Value="product.Armor" class="input" />
-                            </div>
-
-                            <div class="form-group">
-                                <label>Drop (monstros)</label>
-                                <InputTextArea @bind-Value="product.DropSources" class="input" rows="2" placeholder="Ex.: Dragon, Demon, Orshabaal" />
-                                <ValidationMessage For="@(() => product.DropSources)" />
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <fieldset class="pf-fieldset">
-                        <legend class="pf-legend">Servidores</legend>
-
-                        <div class="form-group">
-                            <div class="pf-server-list">
-                                @foreach (var server in availableServers)
-                                {
-                                    <label class="pf-server-item">
-                                        <input type="checkbox"
-                                               checked="@selectedServerIds.Contains(server.Id)"
-                                               @onchange="e => ToggleServer(server.Id, (bool)(e.Value ?? false))" />
-                                        @server.Name
-                                        @if (!server.IsActive)
-                                        {
-                                            <span class="pf-inactive-badge">(inativo)</span>
-                                        }
-                                    </label>
-                                }
-                                @if (!availableServers.Any())
-                                {
-                                    <small class="pf-empty-hint">Nenhum servidor cadastrado.</small>
-                                }
-                            </div>
-                        </div>
-                    </fieldset>
-
                     <div class="pf-submit-row">
                         <button class="pf-cancel-btn" type="button" @onclick='() => Navigation.NavigateTo("/products")'>
                             @T["Common.Cancel"]
@@ -188,10 +127,7 @@
     [CascadingParameter] public Toast? ToastRef { get; set; }
     private bool isLoading = false;
     private string accentColorInput = "#BF4B13";
-    private int? preselectedServerId;
     private List<GatewayInfo> pricingGatewayOptions = new();
-    private List<TibiaServer> availableServers = new();
-    private HashSet<int> selectedServerIds = new();
     private readonly List<CategoryOption> categoryOptions =
     [
         new("helmet", "Helmet"),
@@ -214,7 +150,6 @@
     protected override async Task OnInitializedAsync()
     {
         pricingGatewayOptions = await GatewayService.GetAllAsync();
-        availableServers = await TibiaServerService.GetAllAsync();
 
         if (Id != 0)
         {
@@ -223,7 +158,6 @@
             if (existing != null)
             {
                 product = existing;
-                selectedServerIds = product.ProductServers?.Select(ps => ps.ServerId).ToHashSet() ?? new();
             }
 
             accentColorInput = string.IsNullOrWhiteSpace(product.AccentColor)
@@ -274,14 +208,6 @@
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
         var query = QueryHelpers.ParseQuery(uri.Query);
 
-        if (query.TryGetValue("serverId", out var serverIdValues)
-            && int.TryParse(serverIdValues.LastOrDefault(), out var parsedServerId)
-            && parsedServerId > 0)
-        {
-            preselectedServerId = parsedServerId;
-            selectedServerIds.Add(parsedServerId);
-        }
-
         if (query.TryGetValue("itemName", out var itemNameValues))
         {
             var itemName = itemNameValues.LastOrDefault()?.Trim();
@@ -321,13 +247,7 @@
             var user = authState.User;
             product.UserId = user.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value ?? "";
 
-            var serverIds = selectedServerIds.Count > 0
-                ? selectedServerIds.AsEnumerable()
-                : preselectedServerId.HasValue
-                    ? new[] { preselectedServerId.Value }.AsEnumerable()
-                    : null;
-
-            await ProductService.AddAsync(product, imageFile, serverIds);
+            await ProductService.AddAsync(product, imageFile);
             await LogService.LogAsync(
                 string.Format(T["ProductForm.LogCreated"], product.Name, product.Id),
                 source: "Product",
@@ -338,7 +258,7 @@
         }
         else
         {
-            await ProductService.UpdateAsync(product, imageFile, selectedServerIds);
+            await ProductService.UpdateAsync(product, imageFile);
             await LogService.LogAsync(
                 string.Format(T["ProductForm.LogUpdated"], product.Name, product.Id),
                 source: "Product",
@@ -350,21 +270,7 @@
 
         isLoading = false;
 
-        if (Id == 0 && preselectedServerId.HasValue)
-        {
-            Navigation.NavigateTo($"/servers/{preselectedServerId.Value}");
-            return;
-        }
-
         Navigation.NavigateTo("/products");
-    }
-
-    private void ToggleServer(int serverId, bool isChecked)
-    {
-        if (isChecked)
-            selectedServerIds.Add(serverId);
-        else
-            selectedServerIds.Remove(serverId);
     }
 
     private void OnInputFileChange(InputFileChangeEventArgs e)

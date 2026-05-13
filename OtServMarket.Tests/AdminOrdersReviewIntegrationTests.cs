@@ -348,44 +348,6 @@ public class AdminOrdersReviewIntegrationTests : IClassFixture<IntegrationTestWe
         Assert.DoesNotContain(reviewOrders, o => o.SellerId == "seller-dis-2");
     }
 
-    [Fact]
-    public async Task OrdersReview_ServerId_IsPreserved_ForServerDeliveredOrders()
-    {
-        // Orders confirmed by a game server should have ServerId set and status AguardandoRevisaoAdm
-        using var scope = _factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        const int serverId = 30001;
-        db.Servers.Add(new TibiaServer { Id = serverId, Name = "Delivery Server", IsActive = true });
-        db.Users.AddRange(
-            new ApplicationUser { Id = "buyer-srv-1", UserName = "buyer-srv-1", Email = "buyer-srv-1@test.local" },
-            new ApplicationUser { Id = "seller-srv-1", UserName = "seller-srv-1", Email = "seller-srv-1@test.local" });
-        var product = new Product { Name = "Wand of Vortex", Description = "d", Price = 0.01m, UserId = "seller-srv-1" };
-        db.Products.Add(product);
-        await db.SaveChangesAsync();
-
-        var order = new OrderModel
-        {
-            BuyerId = "buyer-srv-1",
-            SellerId = "seller-srv-1",
-            ProductId = product.Id,
-            ServerId = serverId,
-            Amount = 0.01m,
-            IsPaid = true,
-            IsDelivered = true,
-            DeliveryPendingApproval = true,
-            Status = PaymentStatus.AguardandoRevisaoAdm,
-            CreatedAt = DateTime.UtcNow
-        };
-        db.Orders.Add(order);
-        await db.SaveChangesAsync();
-
-        var loaded = await db.Orders.FirstAsync(o => o.Id == order.Id);
-        Assert.Equal(PaymentStatus.AguardandoRevisaoAdm, loaded.Status);
-        Assert.Equal(serverId, loaded.ServerId);
-        Assert.True(loaded.IsDelivered);
-        Assert.True(loaded.DeliveryPendingApproval);
-    }
 }
 
 

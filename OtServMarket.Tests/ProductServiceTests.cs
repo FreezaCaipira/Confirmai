@@ -121,26 +121,6 @@ public class ProductServiceTests
         Assert.Null(await service.GetByIdAsync(999));
     }
 
-    // ── AddAsync with serverIds ──────────────────────────────────────
-
-    [Fact]
-    public async Task AddAsync_LinksServers_WhenProvided()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
-
-        var s1 = new TibiaServer { Name = "S1", IsActive = true };
-        var s2 = new TibiaServer { Name = "S2", IsActive = true };
-        db.Servers.AddRange(s1, s2);
-        await db.SaveChangesAsync();
-
-        var product = new Product { Name = "Item", Description = "d", Price = 1m, UserId = "u1" };
-        await service.AddAsync(product, null, new[] { s1.Id, s2.Id });
-
-        var links = await db.ProductServers.Where(ps => ps.ProductId == product.Id).ToListAsync();
-        Assert.Equal(2, links.Count);
-    }
-
     [Fact]
     public async Task AddAsync_SetsRequiresDeliveryFalse()
     {
@@ -165,29 +145,7 @@ public class ProductServiceTests
         Assert.Equal("#FF00AA", product.AccentColor);
     }
 
-    // ── UpdateAsync with serverIds ───────────────────────────────────
-
-    [Fact]
-    public async Task UpdateAsync_ReplacesServerLinks()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
-
-        var s1 = new TibiaServer { Name = "S1", IsActive = true };
-        var s2 = new TibiaServer { Name = "S2", IsActive = true };
-        db.Servers.AddRange(s1, s2);
-        await db.SaveChangesAsync();
-
-        var product = new Product { Name = "Item", Description = "d", Price = 1m, UserId = "u1" };
-        await service.AddAsync(product, null, new[] { s1.Id });
-
-        product.Name = "Updated";
-        await service.UpdateAsync(product, null, new[] { s2.Id });
-
-        var links = await db.ProductServers.Where(ps => ps.ProductId == product.Id).Select(ps => ps.ServerId).ToListAsync();
-        Assert.Single(links);
-        Assert.Contains(s2.Id, links);
-    }
+    // ── UpdateAsync ──────────────────────────────────────────────────
 
     [Fact]
     public async Task UpdateAsync_DoesNothing_WhenProductNotFound()

@@ -7,7 +7,6 @@ using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Config;
 using Confirmai.Configuration;
-using Confirmai.Endpoints;
 using Confirmai.Hubs;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -109,12 +108,8 @@ builder.Services.AddScoped<AdminUsersFilterStateService>();
 builder.Services.AddScoped<AdminPaymentsFilterStateService>();
 builder.Services.AddScoped<AdminOrdersFilterStateService>();
 builder.Services.AddScoped<AdminProductsFilterStateService>();
-builder.Services.AddScoped<TibiaServerService>();
 builder.Services.AddScoped<AuthenticationStateProvider,
     RevalidatingIdentityAuthenticationStateProvider>();
-builder.Services.AddScoped<ServerRegistrationRequestService>();
-builder.Services.AddScoped<ServerApiKeyService>();
-builder.Services.AddHostedService<GameLoginTokenCleanupService>();
 builder.Services.AddHostedService<LogRetentionService>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
 builder.Services.AddScoped<AdminSecurityPolicyService>();
@@ -496,8 +491,6 @@ app.MapPost("/api/btcpay/webhook", async (HttpContext context, BtcPayWebhookServ
 {
     return await webhookService.HandleAsync(context);
 }).RequireRateLimiting("webhook");
-
-app.MapServerIntegrationApi();
 
 using (var scope = app.Services.CreateScope())
 {

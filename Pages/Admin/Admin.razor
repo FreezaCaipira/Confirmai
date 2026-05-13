@@ -14,7 +14,6 @@
 @inject LanguagePreferenceService LanguagePreferenceService
 @inject DashboardMetricsService DashboardMetricsService
 @inject AdminSettingsService AdminSettingsService
-@inject ServerRegistrationRequestService ServerRegistrationRequestService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 @inject UiTextService T
@@ -32,12 +31,10 @@
             <nav class="admin-nav">
                 <a href="/admin/users">@T["Admin.Nav.Users"]</a>
                 <a href="/admin/items">Itens</a>
-                <a href="/servers">Servidores</a>
                 <a href="/admin/payments">@T["Admin.Nav.Payments"]</a>
                 <a href="/admin/orders">@T["Admin.Nav.Orders"]</a>
                 <a href="/admin/gateways">@T["Admin.Nav.Gateways"]</a>
                 <a href="/admin/orders-review">@T["Admin.Nav.Review"]</a>
-                <a href="/admin/server-requests">Solicitacoes de servidores</a>
                 <a href="/admin/logs">@T["Admin.Nav.Logs"]</a>
                 <a href="/admin/security">@T["Admin.Nav.Security"]</a>
                 <a href="/admin/api-keys">API Keys</a>
@@ -63,17 +60,9 @@
                     <p class="admin-kpi-label">@T["AdminDashboard.KpiPaidVolume"]</p>
                     <p class="admin-kpi-value">@FormatBtc(paidSalesVolumeBtc)</p>
                 </a>
-                <a class="admin-kpi-card" href="/admin/orders-review" aria-label="@T["AdminDashboard.KpiPendingOrdersAria"]">
+                <a href="/admin/orders-review" aria-label="@T["AdminDashboard.KpiPendingOrdersAria"]">
                     <p class="admin-kpi-label">@T["AdminDashboard.KpiPendingOrders"]</p>
                     <p class="admin-kpi-value">@pendingOrdersCount</p>
-                </a>
-                <a class="admin-kpi-card" href="/servers" aria-label="Servidores cadastrados">
-                    <p class="admin-kpi-label">Servidores</p>
-                    <p class="admin-kpi-value">@serversCount</p>
-                </a>
-                <a class="admin-kpi-card" href="/admin/server-requests" aria-label="Solicitacoes pendentes de novos servidores">
-                    <p class="admin-kpi-label">Solicitacoes de servidores</p>
-                    <p class="admin-kpi-value">@pendingServerRequestsCount</p>
                 </a>
             </div>
 
@@ -155,8 +144,6 @@
     private int usersCount;
     private int paidSalesCount;
     private int pendingOrdersCount;
-    private int pendingServerRequestsCount;
-    private int serversCount;
     private decimal paidSalesVolumeBtc;
     private string selectedLanguage = LanguagePreferenceService.DefaultLanguage;
     private decimal operationFeePercent;
@@ -181,8 +168,6 @@
         paidSalesCount = snapshot.PaidSalesCount;
         paidSalesVolumeBtc = snapshot.PaidSalesVolumeBtc;
         pendingOrdersCount = snapshot.PendingOrdersCount;
-        serversCount = snapshot.ServersCount;
-        pendingServerRequestsCount = await ServerRegistrationRequestService.CountPendingAsync();
         quoteQueriesCount = snapshot.QuoteQueriesCount;
         operationFeePercent = await AdminSettingsService.GetOperationFeePercentForAdminAsync(currentUser);
         siteIntermediaryPixKey = await AdminSettingsService.GetSiteIntermediaryPixKeyForAdminAsync(currentUser) ?? string.Empty;

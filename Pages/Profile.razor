@@ -157,20 +157,12 @@ else
                     <h3 class="profile-section-title">Market stats</h3>
                     <div class="profile-stats-grid">
                         <div class="profile-stat-card">
-                            <span class="profile-stat-label">Recomendacoes</span>
-                            <span class="profile-stat-value">@recommendationsCount</span>
-                        </div>
-                        <div class="profile-stat-card">
                             <span class="profile-stat-label">Itens vendidos</span>
                             <span class="profile-stat-value">@soldItemsCount</span>
                         </div>
                         <div class="profile-stat-card">
                             <span class="profile-stat-label">Itens comprados</span>
                             <span class="profile-stat-value">@boughtItemsCount</span>
-                        </div>
-                        <div class="profile-stat-card">
-                            <span class="profile-stat-label">Ofertas ativas</span>
-                            <span class="profile-stat-value">@activeOffersCount</span>
                         </div>
                         <div class="profile-stat-card">
                             <span class="profile-stat-label">Membro desde</span>
@@ -236,10 +228,8 @@ else
     private bool isAuthenticated;
     private bool isOwnProfile;
     private string currentUserId = string.Empty;
-    private int recommendationsCount;
     private int soldItemsCount;
     private int boughtItemsCount;
-    private int activeOffersCount;
     private string messageBody = string.Empty;
     private string? messageFeedback;
     private bool isSendingMessage;
@@ -280,10 +270,6 @@ else
         {
             await using var db = await DbFactory.CreateDbContextAsync();
 
-            recommendationsCount = await db.SellerRecommendations
-                .AsNoTracking()
-                .CountAsync(r => r.SellerUserId == Id);
-
             soldItemsCount = await db.Orders
                 .AsNoTracking()
                 .CountAsync(o => o.SellerId == Id && o.IsPaid);
@@ -291,10 +277,6 @@ else
             boughtItemsCount = await db.Orders
                 .AsNoTracking()
                 .CountAsync(o => o.BuyerId == Id && o.IsPaid);
-
-            activeOffersCount = await db.ItemOffers
-                .AsNoTracking()
-                .CountAsync(o => o.SellerUserId == Id && o.IsActive);
 
             profileEditModel = new ProfileEditModel
             {

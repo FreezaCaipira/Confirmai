@@ -132,19 +132,15 @@ namespace Confirmai.Services
 
                 var order = new OrderModel
                 {
-                    ServerId = payment.ServerId,
                     BuyerId = string.IsNullOrEmpty(buyerId) ? null : buyerId,
                     SellerId = string.IsNullOrEmpty(sellerId) ? null : sellerId,
                     ProductId = payment.ProductId,
                     Amount = payment.Amount,
                     IsPaid = true,
                     PaymentId = payment.Id,
-                    DeliveryAgentId = payment.DeliveryAgentId,
                     EstimatedDeliveryDays = payment.EstimatedDeliveryDays,
                     UseSiteIntermediary = payment.UseSiteIntermediary,
-                    ItemOfferId = payment.ItemOfferId,
-                    Status = participantDeleted ? PaymentStatus.AguardandoRevisaoAdm
-                           : (payment.ServerId.HasValue ? PaymentStatus.AguardandoEntregaInGame : PaymentStatus.AguardandoEntrega),
+                    Status = participantDeleted ? PaymentStatus.AguardandoRevisaoAdm : PaymentStatus.AguardandoEntrega,
                     CreatedAt = DateTime.UtcNow
                 };
 

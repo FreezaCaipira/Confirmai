@@ -46,8 +46,6 @@ namespace Confirmai.Models
         [StringLength(9, ErrorMessage = "A cor deve ter ate 9 caracteres.")]
         public string? AccentColor { get; set; }
         public bool RequiresDelivery { get; set; } = false;
-
-        public ICollection<ProductServer> ProductServers { get; set; } = new List<ProductServer>();
     }
 }
 

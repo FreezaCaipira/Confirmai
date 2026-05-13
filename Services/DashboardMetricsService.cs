@@ -11,7 +11,6 @@ public class DashboardMetricsSnapshot
     public decimal PaidSalesVolumeBtc { get; set; }
     public int PendingOrdersCount { get; set; }
     public int QuoteQueriesCount { get; set; }
-    public int ServersCount { get; set; }
 }
 
 public class DashboardMetricsService
@@ -45,16 +44,13 @@ public class DashboardMetricsService
             log.Source == "CryptoQuote" ||
             log.Source == "BitcoinQuote");
 
-        var serversCount = await _db.Servers.CountAsync();
-
         return new DashboardMetricsSnapshot
         {
             UsersCount = usersCount,
             PaidSalesCount = paidSalesCount,
             PaidSalesVolumeBtc = paidSalesVolumeBtc,
             PendingOrdersCount = pendingOrdersCount,
-            QuoteQueriesCount = quoteQueriesCount,
-            ServersCount = serversCount
+            QuoteQueriesCount = quoteQueriesCount
         };
     }
 }

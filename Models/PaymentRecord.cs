@@ -23,8 +23,6 @@ namespace Confirmai.Models
 
         public bool UseSiteIntermediary { get; set; } = true;
 
-        public int? DeliveryAgentId { get; set; }
-        public DeliveryAgent? DeliveryAgent { get; set; }
         public int? EstimatedDeliveryDays { get; set; }
 
         public Product? Product { get; set; }
@@ -33,12 +31,6 @@ namespace Confirmai.Models
 
         public string? SellerId { get; set; }
         public ApplicationUser? Seller { get; set; }
-
-        [StringLength(120)]
-        public string? InGamePlayerName { get; set; }
-
-        public int? ItemOfferId { get; set; }
-        public ItemOffer? ItemOffer { get; set; }
 
         /// <summary>Currency of the offer: BRL, USD or BTC</summary>
         public string? Currency { get; set; }

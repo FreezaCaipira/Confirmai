@@ -28,45 +28,8 @@ public class ApiKeyAuthHandler : AuthenticationHandler<ApiKeyAuthOptions>
         _scopeFactory = scopeFactory;
     }
 
-    protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.TryGetValue(ApiKeyAuthDefaults.HeaderName, out var headerValue))
-        {
-            return AuthenticateResult.NoResult();
-        }
-
-        var rawKey = headerValue.ToString();
-        if (string.IsNullOrWhiteSpace(rawKey))
-        {
-            return AuthenticateResult.Fail("Empty API key.");
-        }
-
-        using var scope = _scopeFactory.CreateScope();
-        var apiKeyService = scope.ServiceProvider.GetRequiredService<ServerApiKeyService>();
-
-        var (key, server) = await apiKeyService.ValidateKeyAsync(rawKey);
-        if (key == null || server == null)
-        {
-            return AuthenticateResult.Fail("Invalid API key.");
-        }
-
-        if (!server.IsActive)
-        {
-            return AuthenticateResult.Fail("Server is inactive.");
-        }
-
-        var claims = new[]
-        {
-            new Claim("ServerId", server.Id.ToString()),
-            new Claim("ServerName", server.Name),
-            new Claim("ApiKeyId", key.Id.ToString()),
-            new Claim(ClaimTypes.AuthenticationMethod, ApiKeyAuthDefaults.AuthenticationScheme)
-        };
-
-        var identity = new ClaimsIdentity(claims, ApiKeyAuthDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
-        var ticket = new AuthenticationTicket(principal, ApiKeyAuthDefaults.AuthenticationScheme);
-
-        return AuthenticateResult.Success(ticket);
+        return Task.FromResult(AuthenticateResult.NoResult());
     }
 }

@@ -148,7 +148,7 @@ public class AuthenticationIntegrationTests : IClassFixture<IntegrationTestWebAp
         var response = await PostLoginFormAsync(client, identity, "Runtime123!", rememberMe: false);
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Equal("/servers", response.Headers.Location?.OriginalString);
+        Assert.Equal("/", response.Headers.Location?.OriginalString);
     }
 
     private static async Task SetRuntimeSecuritySettingAsync(AppDbContext db, string key, string value)

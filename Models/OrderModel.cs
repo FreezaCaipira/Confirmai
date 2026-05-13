@@ -9,8 +9,6 @@ public class OrderModel
 {
     public int Id { get; set; }
 
-    public int? ServerId { get; set; }
-    public TibiaServer? Server { get; set; }
 
     public string? BuyerId { get; set; }
     public ApplicationUser? Buyer { get; set; }
@@ -28,8 +26,6 @@ public class OrderModel
     public int? PaymentId { get; set; }
     public PaymentRecord? Payment { get; set; }
 
-    public int? DeliveryAgentId { get; set; }
-    public DeliveryAgent? DeliveryAgent { get; set; }
     public int? EstimatedDeliveryDays { get; set; }
     public bool UseSiteIntermediary { get; set; } = true;
 
@@ -41,9 +37,6 @@ public class OrderModel
     public bool FundsReleased { get; set; } = false;
 
     public bool DeliveryPendingApproval { get; set; } = false;
-
-    public int? ItemOfferId { get; set; }
-    public ItemOffer? ItemOffer { get; set; }
 
     public List<OrderMessage> Messages { get; set; } = new();
 

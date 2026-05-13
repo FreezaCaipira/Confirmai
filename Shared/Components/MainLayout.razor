@@ -31,7 +31,7 @@
                 <a href="/" class="oldsite-logo-wrap" aria-label="Início">
                     <div class="oldsite-logo-art" aria-hidden="true"></div>
                     <h1 class="oldsite-logo">Confirma Aí!</h1>
-                    <p class="oldsite-tagline">Confirme sua presença</p>
+                    <p class="oldsite-tagline">Bora jogar!?</p>
                 </a>
                 <nav class="oldsite-top-nav" aria-label="Main menu">
                     <a href="/">Início</a>
@@ -128,10 +128,7 @@
                         </ol>
                     </section>
 
-                    @if (TryGetServerDetailsId(out var serverDetailsId))
-                    {
-                        <ServerGlobalWidgets ServerId="@serverDetailsId" />
-                    }
+
                 </aside>
             </div>
 
@@ -147,7 +144,6 @@
     private string selectedLanguage = LanguagePreferenceService.DefaultLanguage;
     private int newsTickerIndex;
     private int globalActiveOffers;
-    private int globalActiveServers;
     private System.Threading.Timer? newsTickerTimer;
     private System.Threading.Timer? mailboxTimer;
     private string currentUserId = string.Empty;
@@ -190,7 +186,6 @@
         try
         {
             await using var db = await DbContextFactory.CreateDbContextAsync();
-            globalActiveServers = await db.Servers.AsNoTracking().CountAsync(s => s.IsActive);
             globalActiveOffers = await db.Products.AsNoTracking()
                 .CountAsync(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"));
             await InvokeAsync(StateHasChanged);
@@ -217,28 +212,7 @@
             || path.StartsWith("orders");
     }
 
-    private bool TryGetServerDetailsId(out int serverId)
-    {
-        serverId = 0;
 
-        var path = NavigationManager
-            .ToBaseRelativePath(NavigationManager.Uri)
-            .Split('?', '#')[0]
-            .Trim('/');
-
-        var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length != 2)
-        {
-            return false;
-        }
-
-        if (!string.Equals(parts[0], "servers", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        return int.TryParse(parts[1], out serverId);
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

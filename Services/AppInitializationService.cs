@@ -38,7 +38,7 @@ namespace Confirmai.Services
         public async Task SeedAsync()
         {
             await SeedRolesAndAdminAsync();
-            await SeedTestUsersAndServerMembersAsync();
+            await SeedTestUsersAsync();
             await SeedGatewaysAsync();
             await SeedAdminSettingsAsync();
             await CleanupLegacyForkDataAsync();
@@ -48,8 +48,7 @@ namespace Confirmai.Services
         private sealed record SeedUserSpec(
             string Email,
             string FullName,
-            bool IsSystemAdmin,
-            ServerMemberRole? ServerRole);
+            bool IsSystemAdmin);
 
         private async Task SeedRolesAndAdminAsync()
         {
@@ -144,7 +143,7 @@ namespace Confirmai.Services
             await _db.SaveChangesAsync();
         }
 
-        private async Task SeedTestUsersAndServerMembersAsync()
+        private async Task SeedTestUsersAsync()
         {
             var enabled = _configuration.GetValue<bool?>("SeedTestUsers:Enabled") ?? _environment.IsDevelopment();
             if (!enabled)
@@ -159,71 +158,16 @@ namespace Confirmai.Services
 
             var seedUsers = new[]
             {
-                new SeedUserSpec("admin.teste@otserv.local", "Admin Sistema Teste", true, ServerMemberRole.ServerAdmin),
-                new SeedUserSpec("adm.server@otserv.local", "Admin Servidor Teste", false, ServerMemberRole.ServerAdmin),
-                new SeedUserSpec("player1@otserv.local", "Player Teste 1", false, ServerMemberRole.User),
-                new SeedUserSpec("player2@otserv.local", "Player Teste 2", false, ServerMemberRole.User)
+                new SeedUserSpec("admin.teste@otserv.local", "Admin Sistema Teste", true),
+                new SeedUserSpec("adm.server@otserv.local", "Admin Servidor Teste", false),
+                new SeedUserSpec("player1@otserv.local", "Player Teste 1", false),
+                new SeedUserSpec("player2@otserv.local", "Player Teste 2", false)
             };
 
-            var createdUsers = new List<ApplicationUser>();
-
             foreach (var spec in seedUsers)
             {
-                var user = await EnsureSeedUserAsync(spec, defaultPassword);
-                if (user != null)
-                {
-                    createdUsers.Add(user);
-                }
+                await EnsureSeedUserAsync(spec, defaultPassword);
             }
-
-            if (!createdUsers.Any())
-            {
-                return;
-            }
-
-            var firstServer = await _db.Servers
-                .OrderByDescending(s => s.IsActive)
-                .ThenBy(s => s.Id)
-                .FirstOrDefaultAsync();
-
-            if (firstServer == null)
-            {
-                return;
-            }
-
-            foreach (var spec in seedUsers)
-            {
-                if (!spec.ServerRole.HasValue)
-                {
-                    continue;
-                }
-
-                var user = createdUsers.FirstOrDefault(u => string.Equals(u.Email, spec.Email, StringComparison.OrdinalIgnoreCase));
-                if (user == null)
-                {
-                    continue;
-                }
-
-                var existingMember = await _db.ServerMembers
-                    .FirstOrDefaultAsync(m => m.ServerId == firstServer.Id && m.UserId == user.Id);
-
-                if (existingMember == null)
-                {
-                    _db.ServerMembers.Add(new ServerMember
-                    {
-                        ServerId = firstServer.Id,
-                        UserId = user.Id,
-                        Role = spec.ServerRole.Value,
-                        CreatedAt = DateTime.UtcNow
-                    });
-                }
-                else if (existingMember.Role != spec.ServerRole.Value)
-                {
-                    existingMember.Role = spec.ServerRole.Value;
-                }
-            }
-
-            await _db.SaveChangesAsync();
         }
 
         private async Task EnsureFakeTestUserAccessAsync(string email, string password)

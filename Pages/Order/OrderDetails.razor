@@ -108,32 +108,11 @@ else
                         </button>
                     </span>
                 </div>
-                @if (!string.IsNullOrWhiteSpace(order.Payment.InGamePlayerName))
-                {
-                    <div class="intermediation-row">
-                        <span class="intermediation-label">@T["OrderDetails.InGamePlayerName"]</span>
-                        <span class="intermediation-value">@order.Payment.InGamePlayerName</span>
-                    </div>
-                }
-                @if (order.ServerId.HasValue && order.Status == PaymentStatus.AguardandoEntregaInGame && luaDeliveryEnabled)
-                {
-                    <div class="ingame-delivery-notice">
-                        <i class="fas fa-gamepad"></i>
-                        <span>A entrega deste item sera realizada automaticamente pelo servidor do jogo. Nenhuma acao manual e necessaria — o personagem <strong>@(order.Payment?.InGamePlayerName ?? "informado")</strong> recebera o item em breve.</span>
-                    </div>
-                }
                 @if (order.Status == PaymentStatus.AguardandoRevisaoAdm)
                 {
                     <div class="order-status-notice notice-awaiting-review">
                         <i class="fas fa-hourglass-half"></i>
-                        @if (order.ServerId.HasValue && luaDeliveryEnabled)
-                        {
-                            <span>O servidor de jogo confirmou a entrega. O time administrativo irá revisar as evidências e liberar os fundos para o vendedor em breve.</span>
-                        }
-                        else
-                        {
-                            <span>As evidências foram enviadas e o pedido está aguardando revisão administrativa. Os fundos serão liberados para o vendedor após a confirmação.</span>
-                        }
+                        <span>As evidências foram enviadas e o pedido está aguardando revisão administrativa. Os fundos serão liberados para o vendedor após a confirmação.</span>
                     </div>
                 }
                 @if (order.Status == PaymentStatus.Disputa)
@@ -169,7 +148,7 @@ else
                         </button>
                     }
 
-                    @if (isSeller && order.IsPaid && !order.FundsReleased && (order.ItemOfferId == null || !luaDeliveryEnabled))
+                    @if (isSeller && order.IsPaid && !order.FundsReleased)
                     {
                         <button class="intermediation-btn intermediation-btn-info action-send-proof" @onclick="()=>showSellerEvidenceModal=true">
                             <i class="fas fa-upload"></i> Enviar evidencia de envio
@@ -182,7 +161,7 @@ else
                             <i class="fas fa-check"></i> Confirmar recebimento
                         </button>
                     }
-                    @if (isBuyer && !order.FundsReleased && (order.ItemOfferId == null || !luaDeliveryEnabled))
+                    @if (isBuyer && !order.FundsReleased)
                     {
                         <button class="intermediation-btn intermediation-btn-info action-send-proof" @onclick="()=>showConfirmModal=true">
                             <i class="fas fa-upload"></i> @T["OrderDetails.SendReceiveEvidence"]
@@ -574,7 +553,6 @@ else
             .Include(o => o.Product)
             .Include(o => o.Buyer)
             .Include(o => o.Seller)
-            .Include(o => o.DeliveryAgent)
             .Include(o => o.Payment) 
             .FirstOrDefaultAsync(o => o.Id == Id);
 

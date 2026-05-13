@@ -4939,6 +4939,11 @@ body .oldsite-top-nav .oldsite-top-nav-logout {
     color: #94a3b8 !important;
 }
 
+body .oldsite-top-nav .oldsite-mailbox-glyph,
+body .oldsite-top-nav .oldsite-profile-glyph {
+    filter: brightness(0) saturate(100%) invert(55%) sepia(30%) saturate(500%) hue-rotate(170deg) brightness(95%) !important;
+}
+
 body .oldsite-top-nav .oldsite-top-nav-unread {
     background: #3b82f6 !important;
     border: none !important;

@@ -135,29 +135,6 @@
                             </select>
                         </div>
 
-                        @if (selectedServerId.HasValue)
-                        {
-                            @if (buyerHasLinkedChar)
-                            {
-                                <div class="tibia-pay-field">
-                                    <label class="tibia-pay-label" for="ingame-player-name">@T["PaymentBuy.InGamePlayerName"]</label>
-                                    <input
-                                        id="ingame-player-name"
-                                        class="tibia-pay-select"
-                                        type="text"
-                                        value="@inGamePlayerName"
-                                        disabled />
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="tibia-pay-no-char-warning">
-                                    <strong>⚠️ @T["PaymentBuy.NoLinkedChar"]</strong>
-                                    <p>@T["PaymentBuy.NoLinkedCharDetail"]</p>
-                                </div>
-                            }
-                        }
-
                         @if (!string.IsNullOrWhiteSpace(pixCurrencyNotice))
                         {
                             <div class="payment-inline-feedback payment-inline-feedback-warning" role="status" aria-live="polite">
@@ -172,33 +149,11 @@
                             </div>
                         }
 
-                        @if (!selectedServerId.HasValue || buyerHasLinkedChar)
-                        {
-                            @if (inventoryCountdownSecs > 0)
-                            {
-                                <div class="inv-countdown-block" role="status" aria-live="polite">
-                                    <div class="inv-countdown-icon"><i class="fas fa-shield-alt"></i></div>
-                                    <div class="inv-countdown-text">
-                                        <strong>Verificando disponibilidade do item...</strong><br />
-                                        <span>Aguardando confirmação do servidor do vendedor.</span>
-                                    </div>
-                                    <div class="inv-countdown-timer">@FormatCountdown(inventoryCountdownSecs)</div>
-                                </div>
-                                <div class="tibia-pay-action-wrap">
-                                    <button class="tibia-pay-btn tibia-pay-btn-disabled" disabled aria-label="Aguardando verificação">
-                                        <i class="fas fa-clock"></i> @FormatCountdown(inventoryCountdownSecs)
-                                    </button>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="tibia-pay-action-wrap">
-                                    <button class="tibia-pay-btn" @onclick="GenerateAddress" aria-label="@T["PaymentBuy.GenerateAddress"]">
-                                        @T["PaymentBuy.GenerateAddress"]
-                                    </button>
-                                </div>
-                            }
-                        }
+                        <div class="tibia-pay-action-wrap">
+                            <button class="tibia-pay-btn" @onclick="GenerateAddress" aria-label="@T["PaymentBuy.GenerateAddress"]">
+                                @T["PaymentBuy.GenerateAddress"]
+                            </button>
+                        </div>
                     </div>
                 }
                 else
@@ -302,23 +257,13 @@
     private string? feedbackMessage;
     private string feedbackType = "info";
     private string copyIcon = "fas fa-copy";
-    private int? selectedServerId;
     private bool UseSiteIntermediary = true;
     private int selectedPurchaseQuantity = 1;
     private int maxPurchaseQuantity = 1;
     private decimal? selectedOfferUnitPrice;
-    private int? selectedOfferId;
     private string offerCurrency = "BTC"; // BRL, USD or BTC
     private string? pixCurrencyNotice;
     private string? pixSellerKeyNotice;
-    private string inGamePlayerName = string.Empty;
-    private bool buyerHasLinkedChar = true; // true = has char; false = no char linked (blocks purchase)
-
-    // Inventory verification countdown
-    // Matches POLL_INTERVAL_MS in market_integration.lua (5 minutes = 300 seconds).
-    private const int PollIntervalSeconds = 300;
-    private int inventoryCountdownSecs = 0;
-    private System.Threading.Timer? _countdownTimer;
 
     private PaymentRecord? paymentRecord;
 
@@ -338,11 +283,6 @@
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var query = QueryHelpers.ParseQuery(uri.Query);
-        if (query.TryGetValue("serverId", out var queryServerId) && int.TryParse(queryServerId.LastOrDefault(), out var parsedServerId))
-        {
-            selectedServerId = parsedServerId;
-        }
-
         if (query.TryGetValue("qty", out var queryQty) && int.TryParse(queryQty.LastOrDefault(), out var parsedQty) && parsedQty > 0)
         {
             selectedPurchaseQuantity = parsedQty;
@@ -365,11 +305,6 @@
             var c = queryCurrency.LastOrDefault()?.ToUpperInvariant();
             if (c == "BRL" || c == "USD" || c == "BTC")
                 offerCurrency = c;
-        }
-
-        if (query.TryGetValue("offerId", out var queryOfferId) && int.TryParse(queryOfferId.LastOrDefault(), out var parsedOfferId))
-        {
-            selectedOfferId = parsedOfferId;
         }
 
         selectedPurchaseQuantity = Math.Clamp(selectedPurchaseQuantity, 1, Math.Max(1, maxPurchaseQuantity));
@@ -403,97 +338,7 @@
 
         await OnSelectedMethodChangedAsync(false);
 
-        // Load buyer's linked character for this server
-        if (selectedServerId.HasValue)
-        {
-            var authState = await AuthProvider.GetAuthenticationStateAsync();
-            var buyerUserId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrEmpty(buyerUserId))
-            {
-                var member = await Db.ServerMembers
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(m => m.ServerId == selectedServerId.Value && m.UserId == buyerUserId);
-                if (member != null && !string.IsNullOrWhiteSpace(member.InGamePlayerName))
-                {
-                    inGamePlayerName = member.InGamePlayerName;
-                    buyerHasLinkedChar = true;
-                }
-                else
-                {
-                    buyerHasLinkedChar = false;
-                }
-            }
-        }
-
         PaymentEventBus.OnPaymentConfirmed += OnPaymentConfirmed;
-
-        // Start inventory countdown: if the last verification is stale (or missing),
-        // show a countdown equal to the remaining time until the next poll cycle.
-        await InitInventoryCountdownAsync();
-    }
-
-    private async Task InitInventoryCountdownAsync()
-    {
-        // Countdown only applies when Lua delivery is active (polls send InventoryLastVerifiedAt).
-        // When disabled (V1 manual evidence mode), skip entirely so the button is never blocked.
-        if (!await AdminSettingsService.GetLuaDeliveryEnabledAsync()) return;
-
-        if (!selectedOfferId.HasValue) return;
-
-        var offer = await Db.ItemOffers
-            .AsNoTracking()
-            .FirstOrDefaultAsync(o => o.Id == selectedOfferId.Value);
-
-        if (offer?.InventoryLastVerifiedAt == null)
-        {
-            // Never verified — wait full poll interval.
-            inventoryCountdownSecs = PollIntervalSeconds;
-        }
-        else
-        {
-            var age = (int)(DateTime.UtcNow - offer.InventoryLastVerifiedAt.Value).TotalSeconds;
-            if (age >= PollIntervalSeconds)
-            {
-                // Stale: calculate remaining time in the current cycle so refreshing
-                // does not reset the countdown back to the full interval.
-                inventoryCountdownSecs = PollIntervalSeconds - (age % PollIntervalSeconds);
-            }
-            else
-            {
-                // Fresh — no wait.
-                inventoryCountdownSecs = 0;
-                return;
-            }
-        }
-
-        if (inventoryCountdownSecs > 0)
-            StartCountdownTimer();
-    }
-
-    private void StartCountdownTimer()
-    {
-        _countdownTimer?.Dispose();
-        _countdownTimer = new System.Threading.Timer(_ =>
-        {
-            if (inventoryCountdownSecs > 0)
-            {
-                inventoryCountdownSecs--;
-                InvokeAsync(StateHasChanged);
-            }
-
-            if (inventoryCountdownSecs <= 0)
-            {
-                _countdownTimer?.Dispose();
-                _countdownTimer = null;
-            }
-        }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
-    }
-
-    private static string FormatCountdown(int totalSeconds)
-    {
-        var m = totalSeconds / 60;
-        var s = totalSeconds % 60;
-        return $"{m}:{s:D2}";
     }
 
     private void OnPaymentConfirmed(string userId, string paymentId)
@@ -510,23 +355,11 @@
     public ValueTask DisposeAsync()
     {
         PaymentEventBus.OnPaymentConfirmed -= OnPaymentConfirmed;
-        _countdownTimer?.Dispose();
         return ValueTask.CompletedTask;
     }
 
     private async Task GenerateAddress()
     {
-        if (!EnsureInGamePlayerNameReady())
-        {
-            return;
-        }
-
-        if (inventoryCountdownSecs > 0)
-        {
-            NotifyUser("Aguarde a verificação de disponibilidade do item antes de gerar o pagamento.", "warning");
-            return;
-        }
-
         // Validate the seller's offer is still available before hitting the payment gateway.
         if (!await ValidateOfferBeforePaymentAsync())
         {
@@ -578,7 +411,6 @@
 
             paymentRecord = new PaymentRecord
             {
-                ServerId = selectedServerId,
                 ProductId = ProductId,
                 UserId = userId,
                 SellerId = sellerUser?.Id,
@@ -589,12 +421,9 @@
                 IsPaid = false,
                 CreatedAt = DateTime.UtcNow,
                 PaymentMethod = SelectedMethod,
-                InGamePlayerName = NormalizeInGamePlayerName(),
                 PrivateKey = privateKey,
                 UseSiteIntermediary = UseSiteIntermediary,
-                DeliveryAgentId = null,
                 EstimatedDeliveryDays = null,
-                ItemOfferId = selectedOfferId
             };
 
             Db.Payments.Add(paymentRecord);
@@ -753,10 +582,7 @@
         var currentRelativePath = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
 
         var profileUrl = $"/profile/{safeUserId}?returnUrl={Uri.EscapeDataString(currentRelativePath)}";
-        if (selectedServerId.HasValue)
-        {
-            profileUrl += $"&serverId={selectedServerId.Value}";
-        }
+        return profileUrl;
 
         return profileUrl;
     }
@@ -790,11 +616,6 @@
     {
         try
         {
-            if (!EnsureInGamePlayerNameReady())
-            {
-                return;
-            }
-
             isLoading = true;
             pixSellerKeyNotice = null;
 
@@ -817,7 +638,6 @@
 
             paymentRecord = new PaymentRecord
             {
-                ServerId = selectedServerId,
                 ProductId = ProductId,
                 UserId = userId,
                 SellerId = sellerUser?.Id,
@@ -828,12 +648,9 @@
                 IsPaid = false,
                 CreatedAt = DateTime.UtcNow,
                 PaymentMethod = SelectedMethod,
-                InGamePlayerName = NormalizeInGamePlayerName(),
                 PrivateKey = null,
                 UseSiteIntermediary = UseSiteIntermediary,
-                DeliveryAgentId = null,
                 EstimatedDeliveryDays = null,
-                ItemOfferId = selectedOfferId
             };
 
             Db.Payments.Add(paymentRecord);
@@ -902,110 +719,7 @@
         return sellerPixKey.Trim();
     }
 
-    /// <summary>
-    /// Validates the seller's offer against the live database before creating a payment.
-    /// Blocks the transaction if the offer is no longer available, has insufficient stock,
-    /// or the quantity is already fully covered by existing pending payments.
-    /// </summary>
-    private async Task<bool> ValidateOfferBeforePaymentAsync()
-    {
-        // No offer-based purchase — legacy direct-product flow, skip.
-        if (!selectedOfferId.HasValue)
-            return true;
-
-        var offer = await Db.ItemOffers
-            .AsNoTracking()
-            .FirstOrDefaultAsync(o => o.Id == selectedOfferId.Value);
-
-        if (offer is null || !offer.IsActive)
-        {
-            NotifyUser("Esta oferta não está mais disponível. Volte e escolha outra.", "error");
-            await LogService.LogAsync(
-                $"Pagamento bloqueado: oferta {selectedOfferId} inativa ou inexistente.",
-                source: "Payment", level: "Warning", userId: sellerUser?.Id);
-            return false;
-        }
-
-        if (offer.Quantity < selectedPurchaseQuantity)
-        {
-            NotifyUser(
-                $"Quantidade insuficiente. O vendedor tem {offer.Quantity} unidade(s) disponível(is).",
-                "error");
-            await LogService.LogAsync(
-                $"Pagamento bloqueado: oferta {selectedOfferId} tem qty={offer.Quantity}, solicitado={selectedPurchaseQuantity}.",
-                source: "Payment", level: "Warning", userId: sellerUser?.Id);
-            return false;
-        }
-
-        // Count how many units are already locked by pending (unpaid, non-ordered) payments
-        // for this offer in the last 2 hours, to prevent overselling.
-        var pendingCount = await Db.Payments
-            .CountAsync(p =>
-                p.ItemOfferId == selectedOfferId.Value
-                && !p.IsPaid
-                && p.OrderId == null
-                && p.CreatedAt >= DateTime.UtcNow.AddHours(-2));
-
-        if (pendingCount >= offer.Quantity)
-        {
-            NotifyUser("Todas as unidades desta oferta já têm pagamentos em andamento. Tente novamente em instantes.", "warning");
-            await LogService.LogAsync(
-                $"Pagamento bloqueado: oferta {selectedOfferId} com {pendingCount} pagamentos pendentes para qty={offer.Quantity}.",
-                source: "Payment", level: "Warning", userId: sellerUser?.Id);
-            return false;
-        }
-
-        // Warn if seller has a history of failed deliveries (risk signal, but don't block).
-        if (selectedServerId.HasValue)
-        {
-            var sellerMember = await Db.ServerMembers
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ServerId == selectedServerId.Value && m.UserId == offer.SellerUserId);
-
-            if (sellerMember is null)
-            {
-                NotifyUser("O vendedor não está mais registrado neste servidor.", "error");
-                await LogService.LogAsync(
-                    $"Pagamento bloqueado: vendedor {offer.SellerUserId} sem membro ativo no servidor {selectedServerId}.",
-                    source: "Payment", level: "Warning", userId: sellerUser?.Id);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private bool EnsureInGamePlayerNameReady()
-    {
-        if (!selectedServerId.HasValue)
-        {
-            return true;
-        }
-
-        if (!buyerHasLinkedChar)
-        {
-            NotifyUser(T["PaymentBuy.NoLinkedChar"], "warning");
-            return false;
-        }
-
-        if (!string.IsNullOrWhiteSpace(NormalizeInGamePlayerName()))
-        {
-            return true;
-        }
-
-        NotifyUser(T["PaymentBuy.InGamePlayerNameRequired"], "warning");
-        return false;
-    }
-
-    private string? NormalizeInGamePlayerName()
-    {
-        if (string.IsNullOrWhiteSpace(inGamePlayerName))
-        {
-            return null;
-        }
-
-        return inGamePlayerName.Trim();
-    }
+    private Task<bool> ValidateOfferBeforePaymentAsync() => Task.FromResult(true);
 
     private static string BuildPixPayload(string pixKey, decimal amount, string merchantName, string merchantCity, string txId)
     {

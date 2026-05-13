@@ -34,8 +34,6 @@ namespace Confirmai.Services
         {
             return await _context.Products
                 .Include(p => p.User)
-                .Include(p => p.ProductServers)
-                .ThenInclude(ps => ps.Server)
                 .Where(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"))
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
@@ -43,8 +41,6 @@ namespace Confirmai.Services
         
         public async Task<Product?> GetByIdAsync(int id) =>
             await _context.Products
-                .Include(p => p.ProductServers)
-                .ThenInclude(ps => ps.Server)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
         public async Task AddAsync(Product product, IBrowserFile? imageFile, IEnumerable<int>? serverIds = null)
@@ -56,12 +52,6 @@ namespace Confirmai.Services
             {
                 var imagePath = await SaveImageAsync(imageFile);
                 product.ImagePath = imagePath;
-            }
-
-            var uniqueServerIds = (serverIds ?? Enumerable.Empty<int>()).Distinct().ToList();
-            foreach (var serverId in uniqueServerIds)
-            {
-                product.ProductServers.Add(new ProductServer { ServerId = serverId });
             }
 
             _context.Products.Add(product);
@@ -76,14 +66,13 @@ namespace Confirmai.Services
                     $"Produto criado: '{product.Name}' (R$ {product.Price:0.##}).",
                     actorUserId: product.UserId,
                     source: AdminAuditSources.Products,
-                    metadata: new { product.Id, product.Name, product.Price, product.Category, ServerIds = uniqueServerIds });
+                    metadata: new { product.Id, product.Name, product.Price, product.Category });
             }
         }
 
         public async Task UpdateAsync(Product product, IBrowserFile? imageFile, IEnumerable<int>? serverIds = null)
         {
             var existing = await _context.Products
-                .Include(p => p.ProductServers)
                 .FirstOrDefaultAsync(p => p.Id == product.Id);
 
             if (existing == null)
@@ -111,16 +100,6 @@ namespace Confirmai.Services
                 existing.ImagePath = imagePath;
             }
 
-            if (serverIds != null)
-            {
-                existing.ProductServers.Clear();
-                var uniqueServerIds = serverIds.Distinct().ToList();
-                foreach (var serverId in uniqueServerIds)
-                {
-                    existing.ProductServers.Add(new ProductServer { ProductId = existing.Id, ServerId = serverId });
-                }
-            }
-
             await _context.SaveChangesAsync();
 
             if (_log != null)
@@ -139,7 +118,6 @@ namespace Confirmai.Services
         public async Task<ProductDeleteResult> DeleteAsync(int id)
         {
             var product = await _context.Products
-                .Include(p => p.ProductServers)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
@@ -266,8 +244,6 @@ namespace Confirmai.Services
 
         public async Task<List<Product>> GetAllExceptUserAsync(string userId) =>
             await _context.Products
-                .Include(p => p.ProductServers)
-                .ThenInclude(ps => ps.Server)
                 .Where(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"))
                 .Where(p => p.UserId != userId)
                 .OrderByDescending(p => p.CreatedAt)
@@ -275,8 +251,6 @@ namespace Confirmai.Services
 
         public async Task<List<Product>> GetByUserIdAsync(string userId) =>
             await _context.Products
-                .Include(p => p.ProductServers)
-                .ThenInclude(ps => ps.Server)
                 .Where(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"))
                 .Where(p => p.UserId == userId)
                 .OrderByDescending(p => p.CreatedAt)
