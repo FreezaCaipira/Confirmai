@@ -3,9 +3,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 2.5rem 1rem;
-    gap: 2rem;
+    justify-content: flex-start;
+    padding: 1.25rem 1rem 2.5rem;
+    gap: 1.5rem;
 }
 
 /* ── Hero ────────────────────────────────── */
@@ -177,4 +177,96 @@
     .sport-card {
         padding: 1.5rem 1.25rem 1.2rem;
     }
+
+    .city-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+        width: 100%;
+    }
+
+    .city-select,
+    .city-input {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+/* ── City Selector ───────────────────────── */
+.city-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #111927;
+    border: 1px solid #1c2a3b;
+    border-radius: 10px;
+    padding: 0.6rem 1.1rem;
+}
+
+.city-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+    cursor: default;
+}
+
+.city-pin {
+    color: #4e95b8;
+    flex-shrink: 0;
+}
+
+.city-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.city-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: #0d1825;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.55rem center;
+    background-size: 0.8rem;
+    color: #f1f5f9;
+    border: 1px solid #1c2a3b;
+    border-radius: 7px;
+    padding: 0.32rem 1.8rem 0.32rem 0.6rem;
+    font-size: 0.9rem;
+    min-width: 190px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.city-select:focus {
+    border-color: #4e95b8;
+}
+
+.city-input {
+    background: #0d1825;
+    color: #f1f5f9;
+    border: 1px solid #1c2a3b;
+    border-radius: 7px;
+    padding: 0.32rem 0.6rem;
+    font-size: 0.9rem;
+    min-width: 210px;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.city-input:focus {
+    border-color: #4e95b8;
+}
+
+.city-input::placeholder {
+    color: #374151;
 }

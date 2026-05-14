@@ -1,4 +1,4 @@
-<div class="entity-shell">
+<div class="entity-shell @CssClass">
     <section class="entity-shell-grid" aria-label="Dados principais">
         <article class="entity-shell-card entity-shell-main">
             @MainContent
@@ -27,4 +27,5 @@
     [Parameter, EditorRequired] public RenderFragment MainContent { get; set; } = default!;
     [Parameter] public RenderFragment? SideContent { get; set; }
     [Parameter] public RenderFragment? FooterContent { get; set; }
+    [Parameter] public string CssClass { get; set; } = string.Empty;
 }

@@ -1,19 +1,19 @@
-﻿/* Admin Languages (security-shell): contrast fixes for parchment surface */
+﻿/* Admin Security shell — dark navy theme */
 .admin-security-shell .entity-shell-subtitle,
 .admin-security-shell .security-header p,
 .admin-security-shell .security-label,
 .admin-security-shell .security-input-grid label,
 .admin-security-shell .security-baseline-group h5 {
-    color: #6a4726;
+    color: #64748b;
 }
 
 .admin-security-shell .security-header h3 {
-    color: #ffe9be;
-    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
+    color: #daeaf8;
+    background: linear-gradient(180deg, #0f2a3f 0%, #0a1f30 100%);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
-    border-bottom: 1px solid #7f5c35;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid #1c2a3b;
+    text-shadow: none;
     font-family: var(--font-display);
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -25,60 +25,60 @@
 .admin-security-shell .security-toggle,
 .admin-security-shell .security-input-grid input,
 .admin-security-shell .security-input-grid select {
-    color: #452810;
+    color: #daeaf8;
 }
 
 .admin-security-shell .security-panel {
-    background: linear-gradient(170deg, #f1ddb9 0%, #e3c897 100%);
-    border: 1px solid var(--brown-border);
+    background: #0d1825;
+    border: 1px solid #1c2a3b;
 }
 
 .admin-security-shell .security-baseline-row {
-    border-bottom: 1px dashed #9b7848;
+    border-bottom: 1px dashed #1c2a3b;
 }
 
 .admin-security-shell .security-baseline-group {
-    border-top: 1px solid #a78352;
+    border-top: 1px solid #1c2a3b;
 }
 
 .admin-security-shell .security-env-pill {
-    background: linear-gradient(180deg, #ddbb7c 0%, #c39352 100%);
-    border: 1px solid var(--brown-mid);
-    color: var(--bg-deep);
+    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
+    border: 1px solid #153d5a;
+    color: #daeaf8;
 }
 
 .admin-security-shell .security-boolean-badge.on {
-    color: #204a24;
-    background: #d1e5bc;
-    border-color: #7e9f60;
+    color: #4ade80;
+    background: #0e2a1a;
+    border-color: #1e5f3a;
 }
 
 .admin-security-shell .security-boolean-badge.off {
-    color: #6f2b1f;
-    background: #ebc2b3;
-    border-color: #aa6f62;
+    color: #f87171;
+    background: #2a0e0e;
+    border-color: #5f1e1e;
 }
 
 .admin-security-shell .security-toggle input[type="checkbox"] {
-    accent-color: var(--gold-deep);
+    accent-color: #4e95b8;
 }
 
-/* --- Extracted from theme layer --- */
+/* --- Structural styles --- */
 .entity-shell-subtitle,
 .security-header p,
 .security-label,
 .security-input-grid label,
 .security-baseline-group h5 {
-    color: #6a4726;
+    color: #64748b;
 }
 
 .security-header h3 {
-    color: #ffe9be;
-    background: linear-gradient(180deg, #5d4024 0%, #4a321c 100%);
+    color: #daeaf8;
+    background: linear-gradient(180deg, #0f2a3f 0%, #0a1f30 100%);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
-    border-bottom: 1px solid #7f5c35;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid #1c2a3b;
+    text-shadow: none;
     font-family: var(--font-display);
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -90,42 +90,42 @@
 .security-toggle,
 .security-input-grid input,
 .security-input-grid select {
-    color: #452810;
+    color: #daeaf8;
 }
 
 .security-panel {
-    background: linear-gradient(170deg, #f1ddb9 0%, #e3c897 100%);
-    border: 1px solid var(--brown-border);
+    background: #0d1825;
+    border: 1px solid #1c2a3b;
 }
 
 .security-baseline-row {
-    border-bottom: 1px dashed #9b7848;
+    border-bottom: 1px dashed #1c2a3b;
 }
 
 .security-baseline-group {
-    border-top: 1px solid #a78352;
+    border-top: 1px solid #1c2a3b;
 }
 
 .security-env-pill {
-    background: linear-gradient(180deg, #ddbb7c 0%, #c39352 100%);
-    border: 1px solid var(--brown-mid);
-    color: var(--bg-deep);
+    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
+    border: 1px solid #153d5a;
+    color: #daeaf8;
 }
 
 .security-boolean-badge.on {
-    color: #204a24;
-    background: #d1e5bc;
-    border-color: #7e9f60;
+    color: #4ade80;
+    background: #0e2a1a;
+    border-color: #1e5f3a;
 }
 
 .security-boolean-badge.off {
-    color: #6f2b1f;
-    background: #ebc2b3;
-    border-color: #aa6f62;
+    color: #f87171;
+    background: #2a0e0e;
+    border-color: #5f1e1e;
 }
 
 .security-toggle input[type="checkbox"] {
-    accent-color: var(--gold-deep);
+    accent-color: #4e95b8;
 }
 
 @media (max-width: 980px) {

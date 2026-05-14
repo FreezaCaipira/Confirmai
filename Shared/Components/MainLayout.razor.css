@@ -1,24 +1,11 @@
-﻿body,
-html {
-    background:
-        radial-gradient(circle at 12% 10%, rgba(232, 194, 126, 0.14) 0%, rgba(232, 194, 126, 0) 36%),
-        radial-gradient(circle at 88% 14%, rgba(121, 92, 56, 0.15) 0%, rgba(121, 92, 56, 0) 34%),
-        linear-gradient(180deg, #1d1710 0%, #17120d 52%, #120d09 100%);
-    color: #efe8d7;
-    margin: 0;
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-}
-
-.sidebar {
+﻿.sidebar {
     position: fixed;
     left: 0;
     top: 0;
     width: 220px;
     height: 100vh;
-    background:
-        linear-gradient(180deg, rgba(71, 53, 34, 0.96) 0%, rgba(50, 38, 26, 0.98) 100%),
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, rgba(0, 0, 0, 0) 1px 4px);
-    color: #f2e5ce;
+    background: linear-gradient(180deg, #0d1825 0%, #091520 100%);
+    color: #f1f5f9;
     padding: 14px 0;
     border-right: 1px solid #1c2a3b;
     box-shadow: inset -1px 0 0 rgba(26, 84, 120, 0.12), 4px 0 20px rgba(0, 0, 0, 0.3);
@@ -32,9 +19,7 @@ html {
 }
 
 header {
-    background:
-        radial-gradient(circle at 20% -20%, rgba(249, 217, 155, 0.18) 0%, rgba(249, 217, 155, 0) 55%),
-        linear-gradient(180deg, rgba(64, 47, 30, 0.96) 0%, rgba(48, 35, 23, 0.98) 100%);
+    background: linear-gradient(180deg, #111927 0%, #0d1825 100%);
     padding: 1rem;
     text-align: center;
     border-bottom: 1px solid #162438;
@@ -67,7 +52,7 @@ header::before {
 .header-actions > span:not(.currency-indicator) {
     position: relative;
     padding-left: 0.86rem;
-    color: #ecd9b5;
+    color: #b8d4ea;
 }
 
 .header-actions > span:not(.currency-indicator)::before {
@@ -78,7 +63,7 @@ header::before {
     width: 1px;
     height: 18px;
     transform: translateY(-50%);
-    background: linear-gradient(180deg, rgba(237, 198, 130, 0) 0%, rgba(237, 198, 130, 0.88) 48%, rgba(237, 198, 130, 0) 100%);
+    background: linear-gradient(180deg, rgba(78, 149, 184, 0) 0%, rgba(78, 149, 184, 0.5) 48%, rgba(78, 149, 184, 0) 100%);
 }
 
 .header-actions > span:not(.currency-indicator)::after {
@@ -90,14 +75,14 @@ header::before {
     height: 5px;
     border-radius: 999px;
     transform: translate(-50%, -50%);
-    background: #d5a860;
-    box-shadow: 0 0 0 1px rgba(57, 37, 16, 0.6);
+    background: #4e95b8;
+    box-shadow: 0 0 0 1px rgba(9, 15, 24, 0.6);
 }
 
 .currency-indicator {
-    background: linear-gradient(180deg, #4b3b28 0%, #3a2e20 100%);
-    color: #f2dfbb;
-    border: 1px solid #8d6b3f;
+    background: rgba(26, 84, 120, 0.18);
+    color: #b8d4ea;
+    border: 1px solid #1a5478;
     border-radius: 999px;
     padding: 0.2rem 0.7rem;
     font-size: 0.82rem;
@@ -143,12 +128,12 @@ header::before {
 .btn-link {
     background: none;
     border: none;
-    color: #f3d59b;
+    color: #94a3b8;
     cursor: pointer;
     font-size: 1rem;
     padding: 0.3rem 0.7rem;
     border-radius: 4px;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
 
 .btn-link:hover {
@@ -158,42 +143,54 @@ header::before {
 .main-content {
     flex: 1;
     padding: 2rem 1.35rem;
-    background:
-    radial-gradient(circle at 12% 8%, rgba(255, 238, 203, 0.06) 0%, rgba(255, 238, 203, 0) 45%),
-    linear-gradient(180deg, rgba(58, 43, 29, 0.22) 0%, rgba(33, 24, 17, 0.1) 100%);
+    background: #111927;
+    border: 1px solid #162438;
+    border-top: 2px solid #153d5a;
+    box-shadow: none;
+    position: relative;
+    transition: border-color 0.25s ease, border-top-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.main-content:hover {
+    border-color: #1a5478;
+    border-top-color: #2d6a8a;
+    box-shadow: 0 0 0 1px rgba(26, 84, 120, 0.2), 0 8px 32px rgba(26, 84, 120, 0.14);
+}
+
+.main-content::before {
+    display: none;
 }
 
 .main-content.main-content-route-padded {
     padding: 2rem 1rem;
 }
 
-footer {
-    background: linear-gradient(180deg, rgba(61, 46, 31, 0.98) 0%, rgba(45, 34, 24, 0.98) 100%);
-    color: #c7b89b;
+footer.oldsite-footer {
+    background: #0d1825;
+    color: #94a3b8;
     text-align: center;
     padding: 1rem;
-    border-top: 1px solid #7a603a;
+    border: none;
+    border-top: 1px solid #1e3347;
 }
 
 .logout-btn {
-    background: linear-gradient(180deg, #d6ad66 0%, #b68440 100%);
-    color: #2e1d0b;
-    border: none;
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid #1c2a3b;
     padding: 0.4rem 1.2rem;
     border-radius: 7px;
-    font-weight: bold;
-    font-size: 1rem;
+    font-weight: 600;
+    font-size: 0.92rem;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
-    transition: background 0.2s, color 0.2s;
     text-decoration: none;
     margin-left: 0.5rem;
-    border: 1px solid #73522a;
+    transition: border-color 0.15s ease, color 0.15s ease;
 }
 
 .logout-btn:hover {
-    background: linear-gradient(180deg, #e0bc7c 0%, #c28f4d 100%);
-    color: #2e1d0b;
+    color: #b8d4ea;
+    border-color: #4e95b8;
 }
 
 .usd-unavailable-badge {
@@ -246,7 +243,7 @@ footer {
         height: auto;
         position: static;
         padding: 0.4rem 0;
-        border-bottom: 1px solid #7d623d;
+        border-bottom: 1px solid #1c2a3b;
     }
 
     .main {

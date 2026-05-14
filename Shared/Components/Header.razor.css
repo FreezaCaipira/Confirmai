@@ -1,12 +1,12 @@
 ﻿.header {
     background: linear-gradient(180deg, rgba(21, 28, 40, 0.98) 0%, rgba(15, 22, 32, 0.98) 100%);
-    color: #f6e4bf;
+    color: #f1f5f9;
     padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #81653f;
-    box-shadow: inset 0 -1px 0 rgba(243, 212, 151, 0.08);
+    border-bottom: 1px solid #1c2a3b;
+    box-shadow: inset 0 -1px 0 rgba(26, 84, 120, 0.12);
 }
 
 .header-content {
@@ -20,15 +20,17 @@
 }
 
 .social-button {
-    color: var(--bg-deep);
+    color: #94a3b8;
     text-decoration: none;
     padding: 5px 10px;
-    border: 1px solid #73522a;
+    border: 1px solid #1c2a3b;
     border-radius: 7px;
-    background: linear-gradient(180deg, #d6ad66 0%, #b68440 100%);
-    transition: filter 0.2s;
+    background: rgba(26, 84, 120, 0.15);
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 .social-button:hover {
-    filter: brightness(1.05);
+    background: rgba(26, 84, 120, 0.28);
+    border-color: #4e95b8;
+    color: #b8d4ea;
 }

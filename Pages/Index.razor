@@ -1,17 +1,44 @@
 ﻿@page "/"
 @attribute [AllowAnonymous]
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<Data.AppDbContext> DbFactory
 
 <PageTitle>Confirmai</PageTitle>
 
 <div class="sports-page">
-    <section class="sports-hero">
-        <h2 class="sports-hero-title">Escolha seu esporte</h2>
-        <p class="sports-hero-sub">Confirme presença nos eventos da sua cidade em segundos.</p>
+    <section class="city-selector" aria-label="Filtro de cidade">
+        <label class="city-label" for="city-select">
+            <svg class="city-pin" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true">
+                <path d="M20 10c0 6-8 13-8 13s-8-7-8-13a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+            </svg>
+            Cidade
+        </label>
+        <div class="city-controls">
+            <select class="city-select" id="city-select" @bind="SelectedCityKey">
+                @foreach (var c in Cities)
+                {
+                    <option value="@c.Key">@c.Label</option>
+                }
+                <option value="__other__">Outra cidade...</option>
+            </select>
+            @if (SelectedCityKey == "__other__")
+            {
+                <input class="city-input"
+                       type="text"
+                       placeholder="Ex: Belo Horizonte - MG"
+                       maxlength="80"
+                       @bind="CustomCity"
+                       @bind:event="oninput" />
+            }
+        </div>
     </section>
 
     <section class="sports-grid" aria-label="Esportes disponíveis">
-        <a href="/futsal" class="sport-card sport-card--futsal">
+        <a href="@FutsalHref" class="sport-card sport-card--futsal">
             <div class="sport-card-icon" aria-hidden="true">⚽</div>
             <div class="sport-card-body">
                 <h3 class="sport-card-name">Futsal</h3>
@@ -20,7 +47,7 @@
             <span class="sport-card-cta">Ver partidas →</span>
         </a>
 
-        <a href="/poker" class="sport-card sport-card--poker">
+        <a href="@PokerHref" class="sport-card sport-card--poker">
             <div class="sport-card-icon" aria-hidden="true">🃏</div>
             <div class="sport-card-body">
                 <h3 class="sport-card-name">Poker</h3>
@@ -31,4 +58,51 @@
     </section>
 </div>
 
-@code { }
+@code {
+    private record CityOption(string Key, string Label, string City, string StateCode);
+
+    private List<CityOption> Cities = new();
+    private string SelectedCityKey = "Pouso Alegre|MG";
+    private string CustomCity = string.Empty;
+
+    private string FutsalHref => BuildHref("/futsal");
+    private string PokerHref  => BuildHref("/poker");
+
+    private string BuildHref(string basePath)
+    {
+        if (SelectedCityKey == "__other__")
+        {
+            var trimmed = CustomCity.Trim();
+            return string.IsNullOrEmpty(trimmed)
+                ? basePath
+                : $"{basePath}?cidade={Uri.EscapeDataString(trimmed)}";
+        }
+        var opt = Cities.FirstOrDefault(c => c.Key == SelectedCityKey);
+        return opt is null
+            ? basePath
+            : $"{basePath}?cidade={Uri.EscapeDataString(opt.City)}&estado={opt.StateCode}";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var rows = await db.Groups
+            .Where(g => g.IsActive)
+            .Select(g => new { g.City, g.StateCode })
+            .Distinct()
+            .OrderBy(c => c.City)
+            .ToListAsync();
+
+        Cities = rows
+            .Select(r => new CityOption(
+                $"{r.City}|{r.StateCode}",
+                $"{r.City} - {r.StateCode}",
+                r.City,
+                r.StateCode))
+            .ToList();
+
+        const string defaultKey = "Pouso Alegre|MG";
+        if (!Cities.Any(c => c.Key == defaultKey))
+            Cities.Insert(0, new CityOption(defaultKey, "Pouso Alegre - MG", "Pouso Alegre", "MG"));
+    }
+}
