@@ -34,9 +34,9 @@ public class UiTextServiceTests
         language.SetLanguage("es-ES");
         var sut = new UiTextService(language);
 
-        var value = sut["OrderDetails.NotFoundOrDenied"];
+        var value = sut["App.NotAuthorized"];
 
-        Assert.Equal("Transaccion no encontrada o acceso denegado.", value);
+        Assert.Equal("No tienes permiso para acceder a esta pagina.", value);
     }
 
     [Fact]

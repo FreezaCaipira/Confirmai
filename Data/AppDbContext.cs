@@ -12,8 +12,6 @@ namespace Confirmai.Data
         public DbSet<PaymentRecord> Payments { get; set; }
         public DbSet<AppLog> Logs { get; set; }
         public DbSet<GatewayInfo> Gateways { get; set; }
-        public DbSet<OrderModel> Orders { get; set; }
-        public DbSet<OrderMessage> OrderMessages { get; set; }
         public DbSet<AppSetting> AppSettings { get; set; }
         public DbSet<UserMailboxMessage> UserMailboxMessages { get; set; }
 
@@ -49,48 +47,12 @@ namespace Confirmai.Data
             modelBuilder.Entity<AppLog>()
                 .HasIndex(l => new { l.EntityType, l.EntityId });
 
-            modelBuilder.Entity<OrderMessage>()
-                .HasOne(m => m.User)
-                .WithMany()
-                .HasForeignKey(m => m.UserId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            modelBuilder.Entity<OrderModel>()
-                .HasOne(o => o.Buyer)
-                .WithMany()
-                .HasForeignKey(o => o.BuyerId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            modelBuilder.Entity<OrderModel>()
-                .HasOne(o => o.Seller)
-                .WithMany()
-                .HasForeignKey(o => o.SellerId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            modelBuilder.Entity<OrderModel>()
-                .HasOne(o => o.Product)
-                .WithMany()
-                .HasForeignKey(o => o.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<PaymentRecord>()
-                .HasOne(p => p.Order)
-                .WithOne(o => o.Payment)
-                .HasForeignKey<OrderModel>(o => o.PaymentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // S-4: Use PostgreSQL xmin as optimistic concurrency token
             modelBuilder.Entity<PaymentRecord>()
                 .Property<uint>("xmin")
                 .HasColumnType("xid")
                 .ValueGeneratedOnAddOrUpdate()
                 .IsConcurrencyToken();
-
-            // S-4: Unique constraint prevents duplicate orders from race conditions
-            modelBuilder.Entity<OrderModel>()
-                .HasIndex(o => o.PaymentId)
-                .IsUnique()
-                .HasFilter("\"PaymentId\" IS NOT NULL");
 
             modelBuilder.Entity<PaymentRecord>()
                 .HasOne(p => p.Seller)
@@ -131,9 +93,6 @@ namespace Confirmai.Data
 
             modelBuilder.Entity<PaymentRecord>()
                 .HasIndex(p => p.UserId);
-
-            modelBuilder.Entity<OrderModel>()
-                .HasIndex(o => o.Status);
 
             modelBuilder.Entity<Product>()
                 .HasIndex(p => p.UserId);

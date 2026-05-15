@@ -157,14 +157,6 @@ else
                     <h3 class="profile-section-title">Market stats</h3>
                     <div class="profile-stats-grid">
                         <div class="profile-stat-card">
-                            <span class="profile-stat-label">Itens vendidos</span>
-                            <span class="profile-stat-value">@soldItemsCount</span>
-                        </div>
-                        <div class="profile-stat-card">
-                            <span class="profile-stat-label">Itens comprados</span>
-                            <span class="profile-stat-value">@boughtItemsCount</span>
-                        </div>
-                        <div class="profile-stat-card">
                             <span class="profile-stat-label">Membro desde</span>
                             <span class="profile-stat-value">@(user.MemberSince.HasValue ? user.MemberSince.Value.ToString("MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : "—")</span>
                         </div>
@@ -228,8 +220,6 @@ else
     private bool isAuthenticated;
     private bool isOwnProfile;
     private string currentUserId = string.Empty;
-    private int soldItemsCount;
-    private int boughtItemsCount;
     private string messageBody = string.Empty;
     private string? messageFeedback;
     private bool isSendingMessage;
@@ -269,14 +259,6 @@ else
         if (user != null)
         {
             await using var db = await DbFactory.CreateDbContextAsync();
-
-            soldItemsCount = await db.Orders
-                .AsNoTracking()
-                .CountAsync(o => o.SellerId == Id && o.IsPaid);
-
-            boughtItemsCount = await db.Orders
-                .AsNoTracking()
-                .CountAsync(o => o.BuyerId == Id && o.IsPaid);
 
             profileEditModel = new ProfileEditModel
             {
@@ -493,7 +475,6 @@ else
             .Where(m =>
                 (m.SenderUserId == currentUserId && m.RecipientUserId == Id)
                 || (m.SenderUserId == Id && m.RecipientUserId == currentUserId))
-            .Where(m => m.Subject == null || !m.Subject.ToLower().StartsWith("pedido "))
             .OrderByDescending(m => m.CreatedAt)
             .Take(80)
             .Select(m => new ProfileChatMessageView

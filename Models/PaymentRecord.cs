@@ -21,13 +21,7 @@ namespace Confirmai.Models
 
         public string? PrivateKey { get; set; }
 
-        public bool UseSiteIntermediary { get; set; } = true;
-
-        public int? EstimatedDeliveryDays { get; set; }
-
         public Product? Product { get; set; }
-        public int? OrderId { get; set; }
-        public OrderModel? Order { get; set; }
 
         public string? SellerId { get; set; }
         public ApplicationUser? Seller { get; set; }

@@ -45,17 +45,7 @@ public static class AdminLogsFilterInference
             return AdminLogsAuditQuickFilter.SecurityPolicy;
         }
 
-        if (!string.Equals(source, AdminAuditSources.OrdersReview, StringComparison.Ordinal))
-        {
-            return AdminLogsAuditQuickFilter.All;
-        }
-
-        return level switch
-        {
-            var currentLevel when currentLevel == AdminAuditLevels.Success => AdminLogsAuditQuickFilter.ReleaseSuccess,
-            var currentLevel when currentLevel == AdminAuditLevels.Refused => AdminLogsAuditQuickFilter.ReleaseRefused,
-            _ => AdminLogsAuditQuickFilter.ReleaseOnly
-        };
+        return AdminLogsAuditQuickFilter.All;
     }
 }
 

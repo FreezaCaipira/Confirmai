@@ -1,6 +1,5 @@
 ﻿using Confirmai.Data;
 using Confirmai.Hubs;
-using Confirmai.Models;
 using Confirmai.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
@@ -206,20 +205,11 @@ public class BtcPayWebhookServiceTests
 
         var result = await service.HandleAsync(context);
         var persisted = await db.Payments.FirstAsync(p => p.Id == payment.Id);
-        var order = await db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
-        var conversationMessages = await db.OrderMessages
-            .Where(m => m.OrderId == order!.Id)
-            .ToListAsync();
 
         var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
         Assert.Equal(StatusCodes.Status200OK, statusResult.StatusCode);
         Assert.True(persisted.IsPaid);
         Assert.NotNull(persisted.PaidAt);
-        Assert.NotNull(order);
-        Assert.Equal(order!.Id, persisted.OrderId);
-        Assert.Single(conversationMessages);
-        Assert.Equal("admin", conversationMessages[0].UserRole);
-        Assert.Equal($"Conversa do pedido {order.Id} iniciada entre comprador e vendedor. Admin acompanha este chat.", conversationMessages[0].Text);
 
         clientProxy.Verify(
             p => p.SendCoreAsync(
@@ -227,92 +217,6 @@ public class BtcPayWebhookServiceTests
                 It.Is<object?[]>(args => args.Length == 1 && Equals(args[0], "inv-3")),
                 It.IsAny<CancellationToken>()),
             Times.Once);
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenPaymentAlreadyPaidAndOrderMissing_CreatesOrderAndLinksPayment()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var payment = TestDataFactory.SeedPayment(db, isPaid: true, amount: 0.00003m, method: "BTCPayServer", paymentId: "inv-4", address: "tb1qaddress", buyerId: "buyer-1");
-
-        var service = CreateService(db, webhookSecret: "expected");
-        var context = WebhookTestFactory.CreateContext(secret: "expected", invoiceId: "inv-4", eventType: "InvoiceSettled");
-
-        var result = await service.HandleAsync(context);
-        var persistedPayment = await db.Payments.FirstAsync(p => p.Id == payment.Id);
-        var order = await db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
-        var conversationMessages = await db.OrderMessages
-            .Where(m => m.OrderId == order!.Id)
-            .ToListAsync();
-
-        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
-        Assert.Equal(StatusCodes.Status200OK, statusResult.StatusCode);
-        Assert.NotNull(order);
-        Assert.Equal(order!.Id, persistedPayment.OrderId);
-        Assert.Single(conversationMessages);
-        Assert.Equal("admin", conversationMessages[0].UserRole);
-        Assert.Equal($"Conversa do pedido {order.Id} iniciada entre comprador e vendedor. Admin acompanha este chat.", conversationMessages[0].Text);
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenPaymentAlreadyPaidAndOrderExistsButLinkMissing_RepairsPaymentOrderLink()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var payment = TestDataFactory.SeedPayment(db, isPaid: true, amount: 0.00003m, method: "BTCPayServer", paymentId: "inv-5", address: "tb1qaddress", buyerId: "buyer-1");
-
-        var order = new OrderModel
-        {
-            BuyerId = payment.UserId ?? string.Empty,
-            SellerId = "seller-1",
-            ProductId = payment.ProductId,
-            Amount = payment.Amount,
-            IsPaid = true,
-            PaymentId = payment.Id,
-            Status = Confirmai.Enums.PaymentStatus.AguardandoEntrega,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        db.Orders.Add(order);
-        await db.SaveChangesAsync();
-
-        payment.OrderId = null;
-        db.Payments.Update(payment);
-        await db.SaveChangesAsync();
-
-        var service = CreateService(db, webhookSecret: "expected");
-        var context = WebhookTestFactory.CreateContext(secret: "expected", invoiceId: "inv-5", eventType: "InvoiceSettled");
-
-        var result = await service.HandleAsync(context);
-        var persistedPayment = await db.Payments.FirstAsync(p => p.Id == payment.Id);
-
-        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
-        Assert.Equal(StatusCodes.Status200OK, statusResult.StatusCode);
-        Assert.Equal(order.Id, persistedPayment.OrderId);
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenSameSettledPayloadIsReceivedTwice_KeepsSingleOrder()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var payment = TestDataFactory.SeedPayment(db, isPaid: false, amount: 0.00003m, method: "BTCPayServer", paymentId: "inv-6", address: "tb1qaddress", buyerId: "buyer-1");
-
-        var service = CreateService(db, webhookSecret: "expected");
-        var firstContext = WebhookTestFactory.CreateContext(secret: "expected", invoiceId: "inv-6", eventType: "InvoiceSettled");
-        var secondContext = WebhookTestFactory.CreateContext(secret: "expected", invoiceId: "inv-6", eventType: "InvoiceSettled");
-
-        await service.HandleAsync(firstContext);
-        await service.HandleAsync(secondContext);
-
-        var persistedPayment = await db.Payments.FirstAsync(p => p.Id == payment.Id);
-        var orders = await db.Orders.Where(o => o.PaymentId == payment.Id).ToListAsync();
-        var conversationMessages = await db.OrderMessages
-            .Where(m => m.OrderId == orders[0].Id)
-            .ToListAsync();
-
-        Assert.True(persistedPayment.IsPaid);
-        Assert.Single(orders);
-        Assert.Equal(orders[0].Id, persistedPayment.OrderId);
-        Assert.Single(conversationMessages);
     }
 
     [Fact]
@@ -377,9 +281,6 @@ public class BtcPayWebhookServiceTests
 
         var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
         Assert.Equal(StatusCodes.Status200OK, statusResult.StatusCode);
-
-        var orders = await db.Orders.Where(o => o.PaymentId != null).ToListAsync();
-        Assert.Single(orders);
     }
 
     [Fact]
@@ -401,75 +302,6 @@ public class BtcPayWebhookServiceTests
 
         var payment = await db.Payments.FirstAsync(p => p.PaymentId == "inv-replay-ok");
         Assert.True(payment.IsPaid, "Payment should be confirmed when timestamp is recent and deliveryId is new.");
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenParticipantDeleted_CreatesOrderInAguardandoRevisaoAdm()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        // SeedPayment uses buyerId="buyer-1" but product.UserId = sellerId; to simulate participantDeleted
-        // set buyerId to null after seeding (UserId on the payment record)
-        var payment = TestDataFactory.SeedPayment(db, isPaid: false, amount: 0.00003m, method: "BTCPayServer",
-            paymentId: "inv-participant-deleted", address: "tb1qpd",
-            buyerId: "buyer-pd", sellerId: "seller-pd");
-        payment.UserId = null;
-        await db.SaveChangesAsync();
-
-        var service = CreateService(db, webhookSecret: "expected");
-        var context = WebhookTestFactory.CreateContext(secret: "expected", invoiceId: "inv-participant-deleted", eventType: "InvoiceSettled");
-
-        var result = await service.HandleAsync(context);
-        var order = await db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
-
-        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
-        Assert.Equal(StatusCodes.Status200OK, statusResult.StatusCode);
-        Assert.NotNull(order);
-        Assert.Equal(Confirmai.Enums.PaymentStatus.AguardandoRevisaoAdm, order!.Status);
-        Assert.Null(order.BuyerId);
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenParticipantDeleted_FiresOnOrderEnteredReviewEvent()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var payment = TestDataFactory.SeedPayment(db, isPaid: false, amount: 0.00003m, method: "BTCPayServer",
-            paymentId: "inv-pd-event", address: "tb1qpdevent",
-            buyerId: "buyer-pde", sellerId: "seller-pde");
-        payment.UserId = null;
-        await db.SaveChangesAsync();
-
-        var eventBus = new PaymentEventBus();
-        int? firedOrderId = null;
-        eventBus.OnOrderEnteredReview += id => firedOrderId = id;
-
-        var service = CreateService(db, webhookSecret: "expected", eventBus: eventBus);
-        var context = WebhookTestFactory.CreateContext(secret: "expected", invoiceId: "inv-pd-event", eventType: "InvoiceSettled");
-
-        await service.HandleAsync(context);
-
-        var order = await db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
-        Assert.NotNull(firedOrderId);
-        Assert.Equal(order!.Id, firedOrderId);
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenBothParticipantsPresent_DoesNotFireOnOrderEnteredReview()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var payment = TestDataFactory.SeedPayment(db, isPaid: false, amount: 0.00003m, method: "BTCPayServer",
-            paymentId: "inv-nopd-event", address: "tb1qnopdevent",
-            buyerId: "buyer-nopde", sellerId: "seller-nopde");
-
-        var eventBus = new PaymentEventBus();
-        var fired = false;
-        eventBus.OnOrderEnteredReview += _ => fired = true;
-
-        var service = CreateService(db, webhookSecret: "expected", eventBus: eventBus);
-        var context = WebhookTestFactory.CreateContext(secret: "expected", invoiceId: "inv-nopd-event", eventType: "InvoiceSettled");
-
-        await service.HandleAsync(context);
-
-        Assert.False(fired);
     }
 
     private static BtcPayWebhookService CreateService(

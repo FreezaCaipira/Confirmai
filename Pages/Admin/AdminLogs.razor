@@ -70,9 +70,6 @@
                 <span class="logs-filter-group-label">@T["AdminLogs.AuditView"]</span>
                 <div class="logs-chip-group">
                     <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.All)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.All)">@T["AdminLogs.All"] (@auditCountAll)</button>
-                    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseOnly)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseOnly)">@T["AdminLogs.ReleaseOnly"] (@auditCountReleaseOnly)</button>
-                    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseSuccess)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseSuccess)">@T["AdminLogs.ReleaseOk"] (@auditCountReleaseSuccess)</button>
-                    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseRefused)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseRefused)">@T["AdminLogs.ReleaseRefused"] (@auditCountReleaseRefused)</button>
                     <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.SecurityPolicy)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.SecurityPolicy)">@T["AdminLogs.SecurityPolicy"] (@auditCountSecurityPolicy)</button>
                 </div>
             </div>
@@ -198,9 +195,6 @@
     private List<AppLog> logs = new();
     private int totalLogs;
     private int auditCountAll;
-    private int auditCountReleaseOnly;
-    private int auditCountReleaseSuccess;
-    private int auditCountReleaseRefused;
     private int auditCountSecurityPolicy;
     private int pageSize = 10;
     private int currentPage = 1;
@@ -292,9 +286,6 @@
 
             totalLogs = data.TotalLogs;
             auditCountAll = data.AuditCounts.All;
-            auditCountReleaseOnly = data.AuditCounts.ReleaseOnly;
-            auditCountReleaseSuccess = data.AuditCounts.ReleaseSuccess;
-            auditCountReleaseRefused = data.AuditCounts.ReleaseRefused;
             auditCountSecurityPolicy = data.AuditCounts.SecurityPolicy;
             logs = data.Logs;
 
@@ -415,18 +406,6 @@
 
         switch (filter)
         {
-            case AdminLogsAuditQuickFilter.ReleaseOnly:
-                filterSource = AdminAuditSources.OrdersReview;
-                filterLevel = string.Empty;
-                break;
-            case AdminLogsAuditQuickFilter.ReleaseSuccess:
-                filterSource = AdminAuditSources.OrdersReview;
-                filterLevel = AdminAuditLevels.Success;
-                break;
-            case AdminLogsAuditQuickFilter.ReleaseRefused:
-                filterSource = AdminAuditSources.OrdersReview;
-                filterLevel = AdminAuditLevels.Refused;
-                break;
             case AdminLogsAuditQuickFilter.SecurityPolicy:
                 filterSource = AdminAuditSources.SecurityPolicy;
                 filterLevel = string.Empty;
@@ -698,9 +677,7 @@
     }
 
     private static string SourceBadgeClass(string source)
-        => string.Equals(source, AdminAuditSources.OrdersReview, StringComparison.Ordinal)
-            ? "log-source-badge admin-orders-review"
-            : "log-source-badge";
+        => "log-source-badge";
 
     public void Dispose()
     {

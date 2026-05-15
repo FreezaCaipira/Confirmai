@@ -44,7 +44,9 @@ public class AdminSecurityPolicyService
             .Where(s => s.Key == RequireConfirmedEmailKey || s.Key == LockoutMaxAttemptsKey || s.Key == LockoutMinutesKey)
             .ToDictionaryAsync(s => s.Key, s => s.Value);
 
-        var requireConfirmedEmail = ParseBool(settings, RequireConfirmedEmailKey, defaults.RequireConfirmedEmail);
+        var requireConfirmedEmail = _environment.IsDevelopment()
+            ? false
+            : ParseBool(settings, RequireConfirmedEmailKey, defaults.RequireConfirmedEmail);
         var lockoutMaxAttempts = ParseInt(settings, LockoutMaxAttemptsKey, defaults.LockoutMaxFailedAccessAttempts, MinLockoutMaxAttempts, MaxLockoutMaxAttempts);
         var lockoutMinutes = ParseInt(settings, LockoutMinutesKey, defaults.LockoutMinutes, MinLockoutMinutes, MaxLockoutMinutes);
 

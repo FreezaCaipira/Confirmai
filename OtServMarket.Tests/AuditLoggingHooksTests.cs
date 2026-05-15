@@ -102,40 +102,6 @@ public class AuditLoggingHooksTests
     }
 
     [Fact]
-    public async Task ProductService_DeleteAsync_WritesProductArchivedAudit_WhenRelatedOrdersExist()
-    {
-        await using var db = TestDataFactory.CreateDbContext();
-        var log = new LogService(db, NullLogger<LogService>.Instance);
-        var service = new ProductService(db, CreateEnvironment(), log);
-
-        var product = new Product
-        {
-            Name = "Has orders",
-            Description = "x",
-            Price = 0.01m,
-            UserId = "seller-4"
-        };
-        await service.AddAsync(product, imageFile: null);
-
-        db.Orders.Add(new OrderModel
-        {
-            ProductId = product.Id,
-            BuyerId = "buyer-1",
-            SellerId = "seller-4",
-            Amount = 0.01m
-        });
-        await db.SaveChangesAsync();
-
-        var result = await service.DeleteAsync(product.Id);
-
-        Assert.Equal(ProductService.ProductDeleteResult.ArchivedWithOrders, result);
-        var archivedAudit = await db.Logs
-            .SingleAsync(l => l.EventType == AuditEvents.ProductArchived);
-        Assert.Equal(product.Id.ToString(), archivedAudit.EntityId);
-        Assert.Equal("Warning", archivedAudit.Level);
-    }
-
-    [Fact]
     public async Task LogService_AuditAsync_DoesNotPersistMetadata_WhenMetadataIsNull()
     {
         await using var db = TestDataFactory.CreateDbContext();

@@ -43,7 +43,7 @@
                                 <span class="system-value">@(string.IsNullOrWhiteSpace(payment.PaymentMethod) ? "-" : payment.PaymentMethod)</span>
                             </div>
                             <div class="payment-receipt-row payment-id-row">
-                                <span class="label payment-id-label">@(T["OrderDetails.PaymentId"] == "OrderDetails.PaymentId" ? "ID do pagamento" : T["OrderDetails.PaymentId"]):</span>
+                                <span class="label payment-id-label">@T["PaymentDetails.PaymentId"]:</span>
                                 <span class="payment-address payment-address-inline">@(string.IsNullOrWhiteSpace(payment.PaymentId) ? "-" : payment.PaymentId)</span>
                             </div>
                             <div class="payment-receipt-row">
@@ -75,12 +75,6 @@
                             </div>
 
                             <div class="payment-reference-actions">
-                                @if (payment.Order != null)
-                                {
-                                    <a class="payment-link-btn" href="@($"/orders/{payment.Order.Id}")" title="@T["PaymentDetails.ViewOrder"]">
-                                        <span class="payment-link-text">@T["PaymentDetails.ViewOrder"]</span>
-                                    </a>
-                                }
                                 <a class="payment-btn payment-btn-success" href="@($"/payments/view/{payment.Id}")">
                                     <i class="fas fa-wave-square"></i> @T["PaymentView.Title"]
                                 </a>
@@ -112,7 +106,6 @@
         payment = await Db.Payments
             .Include(p => p.Product)
             .ThenInclude(product => product!.User)
-            .Include(p => p.Order)
             .FirstOrDefaultAsync(p => p.Id == PaymentId);
     }
 

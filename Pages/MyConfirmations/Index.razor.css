@@ -8,13 +8,13 @@
     font-size: 0.85rem;
     font-weight: 700;
     text-decoration: none;
-    background: #4a2b14;
-    color: #ffe6b6;
-    border: 1.5px solid #7a5c38;
+    background: #14532d;
+    color: #bbf7d0;
+    border: 1.5px solid #166534;
     transition: filter 0.15s;
 }
 
-.my-conf-browse-btn:hover { filter: brightness(1.1); }
+.my-conf-browse-btn:hover { filter: brightness(1.15); }
 
 .my-conf-browse-btn--poker {
     background: #3b0764;
@@ -28,15 +28,15 @@
 }
 
 .my-conf-section--past {
-    opacity: 0.75;
+    opacity: 0.65;
 }
 
 .my-conf-section-title {
-    font-size: 0.88rem;
-    font-weight: 800;
+    font-size: 0.8rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #5f3d1e;
+    letter-spacing: 0.06em;
+    color: #475569;
     margin: 0 0 0.6rem;
     display: flex;
     align-items: center;
@@ -56,13 +56,18 @@
     align-items: flex-start;
     gap: 0.7rem;
     padding: 0.7rem 0.85rem;
-    background: linear-gradient(180deg, var(--parchment-cream) 0%, var(--parchment-mid) 100%);
-    border: 1px solid var(--brown-border-light);
+    background: #0d1825;
+    border: 1px solid #162438;
     border-radius: 8px;
+    transition: border-color 0.15s;
+}
+
+.my-conf-card:hover {
+    border-color: #1a5478;
 }
 
 .my-conf-card--past {
-    opacity: 0.8;
+    opacity: 0.7;
 }
 
 /* ── Sport badge ─────────────────────────────────────────────── */
@@ -77,8 +82,8 @@
     font-size: 1rem;
 }
 
-.my-conf-sport--futsal { background: #dcfce7; }
-.my-conf-sport--poker  { background: #f3e8ff; }
+.my-conf-sport--futsal { background: #0a2018; border: 1px solid #14532d; }
+.my-conf-sport--poker  { background: #1a0a2e; border: 1px solid #3b0764; }
 
 /* ── Body ────────────────────────────────────────────────────── */
 .my-conf-body {
@@ -96,8 +101,8 @@
 
 .my-conf-name {
     font-size: 0.92rem;
-    color: #3d230f;
-    font-family: Georgia, "Times New Roman", serif;
+    color: #e2e8f0;
+    font-weight: 600;
 }
 
 .my-conf-pos {
@@ -105,8 +110,9 @@
     font-weight: 700;
     padding: 0.12rem 0.45rem;
     border-radius: 10px;
-    background: #fef3c7;
-    color: #92400e;
+    background: #0a2018;
+    color: #4ade80;
+    border: 1px solid #14532d;
 }
 
 .my-conf-cancelled {
@@ -114,14 +120,15 @@
     font-weight: 700;
     padding: 0.12rem 0.45rem;
     border-radius: 10px;
-    background: #fee2e2;
-    color: #991b1b;
+    background: #290f0f;
+    color: #f87171;
+    border: 1px solid #7f1d1d;
 }
 
 .my-conf-meta {
     margin: 0 0 0.12rem;
     font-size: 0.78rem;
-    color: #7a5c38;
+    color: #64748b;
 }
 
 /* ── Actions ─────────────────────────────────────────────────── */
@@ -137,29 +144,39 @@
     align-items: center;
     justify-content: center;
     padding: 0.3rem 0.65rem;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 0.76rem;
     font-weight: 700;
     text-decoration: none;
     cursor: pointer;
-    border: 1.5px solid transparent;
-    transition: filter 0.13s;
+    border: 1px solid transparent;
+    transition: border-color 0.14s, color 0.14s, background 0.14s;
     white-space: nowrap;
+    background: transparent;
+    font-family: inherit;
 }
 
-.my-conf-btn:hover:not(:disabled) { filter: brightness(1.08); }
-.my-conf-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.my-conf-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .my-conf-btn--view {
-    background: #4a2b14;
-    color: #ffe6b6;
-    border-color: #7a5c38;
+    background: #0d1825;
+    color: #4e95b8;
+    border-color: #1c2a3b;
+}
+
+.my-conf-btn--view:hover {
+    border-color: #4e95b8;
+    color: #82bdd8;
 }
 
 .my-conf-btn--cancel {
-    background: #fee2e2;
-    color: #991b1b;
-    border-color: #fca5a5;
+    background: transparent;
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+
+.my-conf-btn--cancel:hover:not(:disabled) {
+    background: #290f0f;
 }
 
 @media (max-width: 540px) {

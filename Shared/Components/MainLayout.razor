@@ -37,20 +37,17 @@
                     <a href="/">Início</a>
                     <AuthorizeView>
                         <Authorized>
+                            <a href="/minhas-confirmacoes">Jogos</a>
                             <a href="/payments">@T["Nav.Payments"]</a>
-                            <a href="/orders">@T["Nav.Orders"]</a>
-                            <a href="/meus-eventos">Meus Eventos</a>
-                            <a href="/minhas-confirmacoes">Minhas Confirmações</a>
+                            @if (isEventOrganizer)
+                            {
+                                <a href="/meus-eventos">Organizar</a>
+                            }
                             <AuthorizeView Policy="ServerAdmin">
                             <Authorized Context="gmContext">
                                 <a href="/docs/integration">@T["Nav.Integration"]</a>
                             </Authorized>
                         </AuthorizeView>
-                            <AuthorizeView Roles="venue_manager,admin">
-                                <Authorized Context="vmContext">
-                                    <a href="/venue-manager/venues">Quadras</a>
-                                </Authorized>
-                            </AuthorizeView>
                             <AuthorizeView Roles="admin">
                                 <Authorized Context="adminContext">
                                     <a href="/admin">Admin</a>
@@ -155,6 +152,7 @@
     private System.Threading.Timer? mailboxTimer;
     private string currentUserId = string.Empty;
     private int unreadMailboxCount;
+    private bool isEventOrganizer;
     private readonly SemaphoreSlim mailboxRefreshLock = new(1, 1);
     private bool isDisposed;
     private string[] newsTickerMessages = [];
@@ -215,8 +213,7 @@
         return string.IsNullOrEmpty(path)
             || path.StartsWith("servers")
             || path.StartsWith("marketplace")
-            || path.StartsWith("payments")
-            || path.StartsWith("orders");
+            || path.StartsWith("payments");
     }
 
 
@@ -337,10 +334,14 @@
             }
 
             currentUserId = userId;
+            var isAdmin = authState.User.IsInRole("admin");
             await using var db = await DbContextFactory.CreateDbContextAsync();
             unreadMailboxCount = await db.UserMailboxMessages
                 .AsNoTracking()
                 .CountAsync(m => m.RecipientUserId == currentUserId && !m.IsRead);
+            isEventOrganizer = isAdmin || await db.Events
+                .AsNoTracking()
+                .AnyAsync(e => e.CreatedByUserId == currentUserId);
 
             await InvokeAsync(StateHasChanged);
         }

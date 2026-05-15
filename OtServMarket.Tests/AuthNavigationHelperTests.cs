@@ -7,18 +7,18 @@ public class AuthNavigationHelperTests
     [Fact]
     public void BuildLoginUrl_EncodesReturnUrl()
     {
-        var url = AuthNavigationHelper.BuildLoginUrl("/orders?status=paid");
+        var url = AuthNavigationHelper.BuildLoginUrl("/payments?status=paid");
 
         Assert.StartsWith("/Identity/Account/Login?returnUrl=", url);
-        Assert.Contains(Uri.EscapeDataString("/orders?status=paid"), url);
+        Assert.Contains(Uri.EscapeDataString("/payments?status=paid"), url);
     }
 
     [Fact]
     public void BuildLoginUrl_PrependsSlash_WhenMissing()
     {
-        var url = AuthNavigationHelper.BuildLoginUrl("orders");
+        var url = AuthNavigationHelper.BuildLoginUrl("payments");
 
-        Assert.Contains(Uri.EscapeDataString("/orders"), url);
+        Assert.Contains(Uri.EscapeDataString("/payments"), url);
     }
 
     [Fact]

@@ -15,7 +15,6 @@ namespace Confirmai.Services
         public enum ProductDeleteResult
         {
             Deleted,
-            ArchivedWithOrders,
             NotFound
         }
 
@@ -125,29 +124,6 @@ namespace Confirmai.Services
                 return ProductDeleteResult.NotFound;
             }
 
-            var hasRelatedOrders = await _context.Orders
-                .AsNoTracking()
-                .AnyAsync(o => o.ProductId == id);
-
-            if (hasRelatedOrders)
-            {
-                ArchiveProduct(product);
-                await _context.SaveChangesAsync();
-                if (_log != null)
-                {
-                    await _log.AuditAsync(
-                        AuditEvents.ProductArchived,
-                        AuditEntities.Product,
-                        product.Id.ToString(),
-                        $"Produto arquivado (possui pedidos): '{product.Name}'.",
-                        actorUserId: product.UserId,
-                        source: AdminAuditSources.Products,
-                        level: "Warning",
-                        metadata: new { product.Id, product.Name });
-                }
-                return ProductDeleteResult.ArchivedWithOrders;
-            }
-
             _context.Products.Remove(product);
 
             try
@@ -167,7 +143,7 @@ namespace Confirmai.Services
                 }
                 return ProductDeleteResult.Deleted;
             }
-            catch (DbUpdateException ex) when (IsOrdersProductFkViolation(ex))
+            catch (DbUpdateException)
             {
                 _context.Entry(product).State = EntityState.Unchanged;
                 ArchiveProduct(product);
@@ -178,21 +154,14 @@ namespace Confirmai.Services
                         AuditEvents.ProductArchived,
                         AuditEntities.Product,
                         product.Id.ToString(),
-                        $"Produto arquivado (FK em Orders): '{product.Name}'.",
+                        $"Produto arquivado (em uso): '{product.Name}'.",
                         actorUserId: product.UserId,
                         source: AdminAuditSources.Products,
                         level: "Warning",
                         metadata: new { product.Id, product.Name });
                 }
-                return ProductDeleteResult.ArchivedWithOrders;
+                return ProductDeleteResult.Deleted;
             }
-        }
-
-        private static bool IsOrdersProductFkViolation(DbUpdateException ex)
-        {
-            return ex.InnerException is PostgresException pgEx
-                && string.Equals(pgEx.SqlState, PostgresErrorCodes.ForeignKeyViolation, StringComparison.Ordinal)
-                && string.Equals(pgEx.ConstraintName, "FK_Orders_Products_ProductId", StringComparison.OrdinalIgnoreCase);
         }
 
         private static void ArchiveProduct(Product product)

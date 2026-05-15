@@ -61,30 +61,6 @@ public class AdminLogsFilterInferenceTests
     }
 
     [Fact]
-    public void InferAuditQuickFilter_WhenSourceMatchesAndLevelIsSuccess_ReturnsReleaseSuccess()
-    {
-        var result = AdminLogsFilterInference.InferAuditQuickFilter(AdminAuditSources.OrdersReview, AdminAuditLevels.Success);
-
-        Assert.Equal(AdminLogsAuditQuickFilter.ReleaseSuccess, result);
-    }
-
-    [Fact]
-    public void InferAuditQuickFilter_WhenSourceMatchesAndLevelIsRefused_ReturnsReleaseRefused()
-    {
-        var result = AdminLogsFilterInference.InferAuditQuickFilter(AdminAuditSources.OrdersReview, AdminAuditLevels.Refused);
-
-        Assert.Equal(AdminLogsAuditQuickFilter.ReleaseRefused, result);
-    }
-
-    [Fact]
-    public void InferAuditQuickFilter_WhenSourceMatchesAndLevelIsOther_ReturnsReleaseOnly()
-    {
-        var result = AdminLogsFilterInference.InferAuditQuickFilter(AdminAuditSources.OrdersReview, "Debug");
-
-        Assert.Equal(AdminLogsAuditQuickFilter.ReleaseOnly, result);
-    }
-
-    [Fact]
     public void InferAuditQuickFilter_WhenSourceMatchesSecurityPolicy_ReturnsSecurityPolicy()
     {
         var result = AdminLogsFilterInference.InferAuditQuickFilter(AdminAuditSources.SecurityPolicy, AdminAuditLevels.Success);

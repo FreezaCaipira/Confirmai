@@ -171,28 +171,6 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public async Task DeleteAsync_ArchivesProduct_WhenOrdersExist()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
-
-        db.Users.Add(new ApplicationUser { Id = "u1", UserName = "u1" });
-        var product = new Product { Name = "Item", Description = "d", Price = 1m, UserId = "u1" };
-        db.Products.Add(product);
-        await db.SaveChangesAsync();
-
-        db.Orders.Add(new OrderModel { ProductId = product.Id, BuyerId = "u1", Amount = 1m });
-        await db.SaveChangesAsync();
-
-        var result = await service.DeleteAsync(product.Id);
-
-        Assert.Equal(ProductService.ProductDeleteResult.ArchivedWithOrders, result);
-        var archived = await db.Products.FindAsync(product.Id);
-        Assert.Equal("deleted-archived", archived!.Category);
-        Assert.StartsWith("[ARQUIVADO]", archived.Name);
-    }
-
-    [Fact]
     public async Task DeleteAsync_Deletes_WhenNoOrders()
     {
         using var db = TestDataFactory.CreateDbContext();

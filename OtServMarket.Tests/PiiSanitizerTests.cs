@@ -161,15 +161,15 @@ public class PiiSanitizerTests
             Microsoft.Extensions.Logging.Abstractions.NullLogger<LogService>.Instance);
 
         await service.AuditAsync(
-            eventType: AuditEvents.OrderCreated,
-            entityType: AuditEntities.Order,
+            eventType: AuditEvents.PaymentConfirmed,
+            entityType: AuditEntities.Payment,
             entityId: "42",
-            message: "Order created",
-            metadata: new { OrderId = 42, Amount = 0.05m });
+            message: "Payment confirmed",
+            metadata: new { PaymentId = 42, Amount = 0.05m });
 
         var saved = Assert.Single(db.Logs);
         Assert.NotNull(saved.MetadataJson);
-        Assert.Contains("\"OrderId\":42", saved.MetadataJson, StringComparison.Ordinal);
+        Assert.Contains("\"PaymentId\":42", saved.MetadataJson, StringComparison.Ordinal);
         Assert.Contains("\"Amount\":0.05", saved.MetadataJson, StringComparison.Ordinal);
     }
 }

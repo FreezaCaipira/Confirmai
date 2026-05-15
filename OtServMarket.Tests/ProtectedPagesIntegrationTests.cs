@@ -1,8 +1,4 @@
 ﻿using System.Net;
-using Confirmai.Data;
-using Confirmai.Enums;
-using Confirmai.Models;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Confirmai.Tests;
 
@@ -22,20 +18,6 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
         "Panel Administrativo"
     };
 
-    private static readonly string[] MyOrdersTitles =
-    {
-        "Meus Pedidos",
-        "My Orders",
-        "Mis Pedidos"
-    };
-
-    private static readonly string[] OrderNotFoundOrDeniedTexts =
-    {
-        "Transacao nao encontrada ou acesso negado.",
-        "Transaction not found or access denied.",
-        "Transaccion no encontrada o acceso denegado."
-    };
-
     private readonly IntegrationTestWebAppFactory _factory;
 
     public ProtectedPagesIntegrationTests(IntegrationTestWebAppFactory factory)
@@ -49,21 +31,6 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
         "Login",
         "Entrar"
     };
-
-    [Fact]
-    public async Task OrdersPage_ShowsNotAuthorized_WhenAnonymous()
-    {
-        var result = await GetPageAsync(_factory.CreateClient(), "/orders");
-        AssertOkAndContainsAny(result, LoginRedirectIndicators);
-    }
-
-    [Fact]
-    public async Task OrdersPage_RendersForAuthenticatedUser()
-    {
-        var client = CreateAuthenticatedClient(userId: "buyer-int", userName: "buyer");
-        var result = await GetPageAsync(client, "/orders");
-        AssertOkAndContainsAny(result, MyOrdersTitles);
-    }
 
     [Fact]
     public async Task AdminPage_ShowsNotAuthorized_ForNonAdminUser()
@@ -122,8 +89,6 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     [InlineData("/admin/products/view/1")]
     [InlineData("/admin/products/edit/1")]
     [InlineData("/admin/payments")]
-    [InlineData("/admin/orders")]
-    [InlineData("/admin/orders-review")]
     [InlineData("/admin/gateways")]
     [InlineData("/admin/venues")]
     [InlineData("/admin/venues/edit/0")]
@@ -155,36 +120,6 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     {
         var result = await GetPageAsync(_factory.CreateClient(), route);
         Assert.Equal(HttpStatusCode.OK, result.Response.StatusCode);
-    }
-
-    [Fact]
-    public async Task OrderDetails_ShowsAccessDenied_ForUnrelatedUser()
-    {
-        var orderId = await SeedOrderAsync(buyerId: "buyer-allowed", sellerId: "seller-allowed");
-
-        var client = CreateAuthenticatedClient(userId: "intruder-user", userName: "intruder", roles: "user");
-        var result = await GetPageAsync(client, $"/orders/{orderId}");
-        AssertOkAndContainsAny(result, OrderNotFoundOrDeniedTexts);
-    }
-
-    [Fact]
-    public async Task OrderDetails_ShowsNotAuthorized_WhenUserIdHeaderIsMissing()
-    {
-        var orderId = await SeedOrderAsync(buyerId: "buyer-allowed-2", sellerId: "seller-allowed-2");
-
-        var client = CreateHeaderClient(("X-Test-UserName", "missing-userid"));
-        var result = await GetPageAsync(client, $"/orders/{orderId}");
-        AssertOkAndContainsAny(result, LoginRedirectIndicators);
-    }
-
-    [Fact]
-    public async Task OrderDetails_ShowsNotAuthorized_WhenUserIdHeaderIsBlank()
-    {
-        var orderId = await SeedOrderAsync(buyerId: "buyer-allowed-3", sellerId: "seller-allowed-3");
-
-        var client = CreateHeaderClient(("X-Test-UserId", "   "), ("X-Test-UserName", "blank-userid"));
-        var result = await GetPageAsync(client, $"/orders/{orderId}");
-        AssertOkAndContainsAny(result, LoginRedirectIndicators);
     }
 
     private HttpClient CreateAuthenticatedClient(string userId, string userName, params string[] roles)
@@ -223,39 +158,6 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
             $"Expected one of [{string.Join(" | ", expectedTexts)}] in HTML response.");
     }
 
-    private async Task<int> SeedOrderAsync(string buyerId, string sellerId)
-    {
-        using var scope = _factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        var product = new Product
-        {
-            Name = "Produto restrito",
-            Description = "Produto para teste de autorização",
-            ShortDescription = "Resumo",
-            Price = 0.001m,
-            UserId = sellerId
-        };
-
-        db.Products.Add(product);
-        await db.SaveChangesAsync();
-
-        var order = new OrderModel
-        {
-            BuyerId = buyerId,
-            SellerId = sellerId,
-            ProductId = product.Id,
-            Amount = 0.001m,
-            IsPaid = true,
-            Status = PaymentStatus.Pago,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        db.Orders.Add(order);
-        await db.SaveChangesAsync();
-
-        return order.Id;
-    }
 }
 
 

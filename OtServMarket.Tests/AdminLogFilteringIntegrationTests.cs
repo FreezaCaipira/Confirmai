@@ -144,19 +144,19 @@ public class AdminLogFilteringIntegrationTests : IClassFixture<IntegrationTestWe
     {
         var marker = Guid.NewGuid().ToString("N");
         var expected = await SeedLogAsync(
-            source: AdminAuditSources.OrdersReview,
+            source: AdminAuditSources.SecurityPolicy,
             message: $"repasse confirmado token {marker}",
             level: AdminAuditLevels.Success,
             timestampUtc: new DateTime(2026, 3, 14, 12, 0, 0, DateTimeKind.Utc));
 
         _ = await SeedLogAsync(
-            source: AdminAuditSources.OrdersReview,
+            source: AdminAuditSources.SecurityPolicy,
             message: $"repasse confirmado token {marker}",
             level: AdminAuditLevels.Refused,
             timestampUtc: new DateTime(2026, 3, 14, 13, 0, 0, DateTimeKind.Utc));
 
         _ = await SeedLogAsync(
-            source: AdminAuditSources.OrdersReview,
+            source: AdminAuditSources.SecurityPolicy,
             message: $"repasse confirmado token {marker}",
             level: AdminAuditLevels.Success,
             timestampUtc: new DateTime(2026, 3, 1, 8, 0, 0, DateTimeKind.Utc));

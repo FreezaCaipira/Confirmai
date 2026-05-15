@@ -12,14 +12,14 @@ public class AdminLogsFilterStateServiceTests
         var js = new FakeLocalStorageJsRuntime();
         js.Set(AdminLogsStorageKeys.GlobalSearch, "term");
         js.Set(AdminLogsStorageKeys.UserFilter, "user-1");
-        js.Set(AdminLogsStorageKeys.SourceFilter, AdminAuditSources.OrdersReview);
+        js.Set(AdminLogsStorageKeys.SourceFilter, AdminAuditSources.SecurityPolicy);
         js.Set(AdminLogsStorageKeys.MessageFilter, "msg");
         js.Set(AdminLogsStorageKeys.LevelFilter, AdminAuditLevels.Success);
         js.Set(AdminLogsStorageKeys.StartDateFilter, new DateTime(2026, 3, 1).ToString("o", CultureInfo.InvariantCulture));
         js.Set(AdminLogsStorageKeys.EndDateFilter, new DateTime(2026, 3, 15).ToString("o", CultureInfo.InvariantCulture));
         js.Set(AdminLogsStorageKeys.Page, "3");
         js.Set(AdminLogsStorageKeys.QuickRangePreset, AdminLogsQuickRangePreset.Last30Days.ToString());
-        js.Set(AdminLogsStorageKeys.AuditQuickFilter, AdminLogsAuditQuickFilter.ReleaseSuccess.ToString());
+        js.Set(AdminLogsStorageKeys.AuditQuickFilter, AdminLogsAuditQuickFilter.SecurityPolicy.ToString());
         js.Set(AdminLogsStorageKeys.SortColumn, AdminLogSortColumn.Source.ToString());
         js.Set(AdminLogsStorageKeys.SortAscending, bool.TrueString);
 
@@ -29,13 +29,13 @@ public class AdminLogsFilterStateServiceTests
 
         Assert.Equal("term", state.GlobalSearch);
         Assert.Equal("user-1", state.UserId);
-        Assert.Equal(AdminAuditSources.OrdersReview, state.Source);
+        Assert.Equal(AdminAuditSources.SecurityPolicy, state.Source);
         Assert.Equal(AdminAuditLevels.Success, state.Level);
         Assert.Equal(new DateTime(2026, 3, 1), state.StartDate);
         Assert.Equal(new DateTime(2026, 3, 15), state.EndDate);
         Assert.Equal(3, state.Page);
         Assert.Equal(AdminLogsQuickRangePreset.Last30Days, state.QuickRangePreset);
-        Assert.Equal(AdminLogsAuditQuickFilter.ReleaseSuccess, state.AuditQuickFilter);
+        Assert.Equal(AdminLogsAuditQuickFilter.SecurityPolicy, state.AuditQuickFilter);
         Assert.Equal(AdminLogSortColumn.Source, state.SortColumn);
         Assert.True(state.SortAscending);
     }

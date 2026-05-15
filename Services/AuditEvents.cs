@@ -51,14 +51,6 @@ public static class AuditEvents
     public const string PaymentInvalid        = "payment.invalid";        // bad payload / signature
     public const string PaymentRefused        = "payment.refused";        // missing/expired/etc.
 
-    // ── Order ──
-    public const string OrderCreated         = "order.created";
-    public const string OrderStatusChanged   = "order.status.changed";
-    public const string OrderReleased        = "order.released";          // funds released to seller
-    public const string OrderRefunded        = "order.refunded";
-    public const string OrderDelivered       = "order.delivered";
-    public const string OrderDisputed        = "order.disputed";
-
     // ── Admin / Security ──
     public const string AdminSecurityPolicyChanged = "admin.security_policy.changed";
     public const string AdminSettingChanged        = "admin.setting.changed";
@@ -78,7 +70,6 @@ public static class AuditEntities
 {
     public const string User      = "User";
     public const string Product   = "Product";
-    public const string Order     = "Order";
     public const string Payment   = "Payment";
     public const string Server    = "Server";
     public const string ItemOffer = "ItemOffer";

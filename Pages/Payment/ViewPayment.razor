@@ -90,12 +90,11 @@
                         </div>
                         <div class="view-pay-card-body">
                             <div class="view-pay-row">
-                                <span class="view-pay-label">@(T["OrderDetails.PaymentId"] == "OrderDetails.PaymentId" ? "ID do pagamento" : T["OrderDetails.PaymentId"])</span>
+                                <span class="view-pay-label">@T["PaymentDetails.PaymentId"]</span>
                                 <span class="view-pay-value view-pay-value-id">@(string.IsNullOrWhiteSpace(payment.PaymentId) ? "-" : payment.PaymentId)</span>
                             </div>
                             @{
                                 var sellerUser = payment.Seller
-                                    ?? payment.Order?.Seller
                                     ?? payment.Product?.User;
                                 var sellerName = sellerUser?.UserName;
                             }
@@ -145,35 +144,6 @@
                                 </div>
                             }
 
-                            @if (payment.OrderId.HasValue)
-                            {
-                                <a class="view-pay-btn view-pay-btn-success view-pay-order-link" href="@($"/orders/{payment.OrderId.Value}")" title="@T["PaymentDetails.ViewOrder"]">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    <span>@T["PaymentDetails.ViewOrder"]</span>
-                                </a>
-                            }
-
-                            @if (IsPixPayment && !payment.IsPaid && isCurrentUserSeller)
-                            {
-                                <div class="view-pay-pix-confirm-wrap">
-                                    <p class="view-pay-pix-confirm-hint">
-                                        <i class="fas fa-info-circle"></i>
-                                        Ao confirmar o recebimento, o pedido sera criado automaticamente e o comprador sera notificado.
-                                    </p>
-                                    <button type="button" class="view-pay-btn-confirm-pix" @onclick="ConfirmPixReceiptAsync" disabled="@isConfirmingPix">
-                                        @if (isConfirmingPix)
-                                        {
-                                            <span class="oi oi-reload spinning" aria-hidden="true"></span>
-                                            <span>Confirmando...</span>
-                                        }
-                                        else
-                                        {
-                                            <i class="fas fa-check"></i>
-                                            <span>Confirmar recebimento do PIX</span>
-                                        }
-                                    </button>
-                                </div>
-                            }
                         </div>
                     </section>
                 </div>
@@ -200,9 +170,7 @@
     private string? feedbackMessage;
     private string feedbackType = "info";
     private bool isCheckingPayment;
-    private bool isConfirmingPix;
     private string currentUserId = "";
-    private bool isCurrentUserSeller;
 
     private bool IsPixPayment => string.Equals(payment?.PaymentMethod, "Pix", StringComparison.OrdinalIgnoreCase);
     private string AddressLabel => IsPixPayment ? T["PaymentBuy.PixCodeLabel"] : T["PaymentBuy.InvoiceAddress"];
@@ -226,8 +194,6 @@
             .Include(p => p.Seller)
             .Include(p => p.Product)
             .ThenInclude(prod => prod!.User)
-            .Include(p => p.Order)
-            .ThenInclude(o => o!.Seller)
             .FirstOrDefaultAsync(p => p.Id == PaymentId);
         isLoading = false;
 
@@ -235,8 +201,6 @@
         currentUserId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
         if (!string.IsNullOrEmpty(currentUserId) && payment != null)
         {
-            isCurrentUserSeller = currentUserId == payment.SellerId
-                || (string.IsNullOrEmpty(payment.SellerId) && currentUserId == payment.Product?.UserId);
         }
 
         var methods = PaymentFactory.GetAvailableMethods().ToList();
@@ -260,28 +224,6 @@
     {
         PaymentEventBus.OnPaymentConfirmed -= OnPaymentConfirmed;
         return ValueTask.CompletedTask;
-    }
-
-    private async Task ConfirmPixReceiptAsync()
-    {
-        if (payment == null || isConfirmingPix) return;
-        isConfirmingPix = true;
-        StateHasChanged();
-        var (success, error) = await PaymentConfirmationService.ConfirmPixReceiptAsync(payment.Id, currentUserId);
-        if (success)
-        {
-            payment.IsPaid = true;
-            payment.PaidAt = DateTime.UtcNow;
-            feedbackMessage = "Pagamento PIX confirmado! O pedido foi criado e o comprador foi notificado.";
-            feedbackType = "success";
-        }
-        else
-        {
-            feedbackMessage = error ?? "Erro ao confirmar pagamento PIX.";
-            feedbackType = "error";
-        }
-        isConfirmingPix = false;
-        StateHasChanged();
     }
 
     private async Task OnCheckPaymentClick()

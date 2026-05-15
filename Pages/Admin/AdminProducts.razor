@@ -176,24 +176,12 @@
             return;
         }
 
-        if (deleteResult == ProductService.ProductDeleteResult.ArchivedWithOrders)
-        {
-            await LogService.LogAsync(
-                $"Item arquivado por possuir pedidos vinculados (ID: {id})",
-                source: "Admin",
-                level: "Warning"
-            );
-            ToastRef?.Show("Item possui pedidos e foi arquivado ao inves de removido.", "warning");
-        }
-        else
-        {
-            await LogService.LogAsync(
-                string.Format(T["AdminProducts.LogDeleted"], id),
-                source: "Admin",
-                level: "Warning"
-            );
-            ToastRef?.Show(T["AdminProducts.DeletedToast"], "info");
-        }
+        await LogService.LogAsync(
+            string.Format(T["AdminProducts.LogDeleted"], id),
+            source: "Admin",
+            level: "Warning"
+        );
+        ToastRef?.Show(T["AdminProducts.DeletedToast"], "info");
 
         await LoadPageAsync();
     }

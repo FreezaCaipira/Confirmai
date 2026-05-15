@@ -11,7 +11,6 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
 @inject UiTextService T
-@inject IDbContextFactory<AppDbContext> DbFactory
 
 @if (isLoading)
 {
@@ -76,16 +75,6 @@ else
 
                 <section class="admin-profile-panel-card">
                     <h3>Market stats</h3>
-                    <div class="admin-user-stats-grid">
-                        <div class="admin-user-stat-card">
-                            <span class="admin-user-stat-label">Itens vendidos</span>
-                            <span class="admin-user-stat-value">@soldItemsCount</span>
-                        </div>
-                        <div class="admin-user-stat-card">
-                            <span class="admin-user-stat-label">Itens comprados</span>
-                            <span class="admin-user-stat-value">@boughtItemsCount</span>
-                        </div>
-                    </div>
                 </section>
 
                 <section class="admin-profile-panel-card">
@@ -149,8 +138,6 @@ else
     [Parameter] public string UserId { get; set; } = "";
     private ApplicationUser? user;
     private bool isLoading = true;
-    private int soldItemsCount;
-    private int boughtItemsCount;
     private bool showAdminExtensions;
     private bool isVenueManager;
     private bool roleToggleBusy;
@@ -168,9 +155,6 @@ else
 
         if (user != null)
         {
-            await using var db = await DbFactory.CreateDbContextAsync();
-            soldItemsCount = await db.Orders.AsNoTracking().CountAsync(o => o.SellerId == user.Id && o.IsPaid);
-            boughtItemsCount = await db.Orders.AsNoTracking().CountAsync(o => o.BuyerId == user.Id && o.IsPaid);
             isVenueManager = await UserManager.IsInRoleAsync(user, "venue_manager");
 
             showAdminExtensions = false;

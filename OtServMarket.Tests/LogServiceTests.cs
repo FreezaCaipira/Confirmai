@@ -58,22 +58,22 @@ public class LogServiceTests
         var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
 
         await service.AuditAsync(
-            eventType: AuditEvents.OrderCreated,
-            entityType: AuditEntities.Order,
+            eventType: AuditEvents.PaymentConfirmed,
+            entityType: AuditEntities.Payment,
             entityId: "123",
-            message: "Pedido 123 criado.",
+            message: "Payment 123 confirmed.",
             actorUserId: "buyer-7",
-            source: AdminAuditSources.Orders,
-            metadata: new { OrderId = 123, Amount = 0.05m, BuyerId = "buyer-7", SellerId = "seller-9" });
+            source: AdminAuditSources.Payments,
+            metadata: new { PaymentId = 123, Amount = 0.05m, BuyerId = "buyer-7", SellerId = "seller-9" });
 
         var saved = Assert.Single(db.Logs);
-        Assert.Equal(AuditEvents.OrderCreated, saved.EventType);
-        Assert.Equal(AuditEntities.Order, saved.EntityType);
+        Assert.Equal(AuditEvents.PaymentConfirmed, saved.EventType);
+        Assert.Equal(AuditEntities.Payment, saved.EntityType);
         Assert.Equal("123", saved.EntityId);
         Assert.Equal("buyer-7", saved.UserId);
-        Assert.Equal(AdminAuditSources.Orders, saved.Source);
+        Assert.Equal(AdminAuditSources.Payments, saved.Source);
         Assert.NotNull(saved.MetadataJson);
-        Assert.Contains("\"OrderId\":123", saved.MetadataJson);
+        Assert.Contains("\"PaymentId\":123", saved.MetadataJson);
         Assert.Contains("\"BuyerId\":\"buyer-7\"", saved.MetadataJson);
     }
 

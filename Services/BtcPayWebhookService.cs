@@ -3,9 +3,7 @@ using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 using Confirmai.Data;
-using Confirmai.Enums;
 using Confirmai.Hubs;
-using Confirmai.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
@@ -127,7 +125,6 @@ namespace Confirmai.Services
             if (payment.IsPaid)
             {
                 await _log.LogAsync($"Pagamento já está marcado como pago para invoiceId={invoiceId}", source: AdminAuditSources.Webhook, level: "Info");
-                await EnsureOrderAsync(payment, invoiceId);
                 return Results.Ok();
             }
 
@@ -154,12 +151,10 @@ namespace Confirmai.Services
                 metadata: new { PaymentId = payment.Id, InvoiceId = invoiceId, payment.Amount, payment.UserId, payment.ProductId, payment.ServerId });
 
             await _log.LogAsync(
-                $"Preparando para criar pedido: paymentId={payment.Id}, userId={payment.UserId}, productId={payment.ProductId}, productUserId={payment.Product?.UserId}",
+                $"Pagamento confirmado: paymentId={payment.Id}, userId={payment.UserId}, productId={payment.ProductId}",
                 source: AdminAuditSources.Webhook,
                 level: "Info"
             );
-
-            await EnsureOrderAsync(payment, invoiceId);
 
             if (!string.IsNullOrEmpty(payment.UserId))
             {
@@ -286,131 +281,6 @@ namespace Confirmai.Services
             {
                 if (kvp.Value < cutoff)
                     _processedDeliveries.TryRemove(kvp.Key, out _);
-            }
-        }
-
-        private async Task EnsureOrderAsync(PaymentRecord payment, string invoiceId)
-        {
-            var existingOrder = await _db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
-            if (existingOrder != null)
-            {
-                if (payment.OrderId != existingOrder.Id)
-                {
-                    payment.OrderId = existingOrder.Id;
-                    _db.Payments.Update(payment);
-                    await _db.SaveChangesAsync();
-                }
-                return;
-            }
-
-            try
-            {
-                var buyerId = payment.UserId;
-                var sellerId = payment.Product?.UserId;
-                var participantDeleted = string.IsNullOrEmpty(buyerId) || string.IsNullOrEmpty(sellerId);
-
-                var order = new OrderModel
-                {
-                    BuyerId = string.IsNullOrEmpty(buyerId) ? null : buyerId,
-                    SellerId = string.IsNullOrEmpty(sellerId) ? null : sellerId,
-                    ProductId = payment.ProductId,
-                    Amount = payment.Amount,
-                    IsPaid = true,
-                    PaymentId = payment.Id,
-                    EstimatedDeliveryDays = payment.EstimatedDeliveryDays,
-                    UseSiteIntermediary = payment.UseSiteIntermediary,
-                    Status = participantDeleted ? PaymentStatus.AguardandoRevisaoAdm : PaymentStatus.AguardandoEntrega,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _db.Orders.Add(order);
-                await _db.SaveChangesAsync();
-
-                var chatText = participantDeleted
-                    ? $"Pedido {order.Id} criado, mas um participante foi removido. Pedido bloqueado aguardando revisão administrativa."
-                    : $"Conversa do pedido {order.Id} iniciada entre comprador e vendedor. Admin acompanha este chat.";
-
-                _db.OrderMessages.Add(new OrderMessage
-                {
-                    OrderId = order.Id,
-                    UserId = null,
-                    UserRole = "admin",
-                    Text = chatText,
-                    CreatedAt = DateTime.UtcNow
-                });
-
-                await CreateInitialMailboxConversationAsync(order);
-
-                payment.OrderId = order.Id;
-                _db.Payments.Update(payment);
-                await _db.SaveChangesAsync();
-
-                await _log.AuditAsync(
-                    AuditEvents.OrderCreated,
-                    AuditEntities.Order,
-                    order.Id.ToString(),
-                    $"Pedido {order.Id} criado a partir do invoice {invoiceId}.",
-                    actorUserId: payment.UserId,
-                    source: AdminAuditSources.Orders,
-                    metadata: new { OrderId = order.Id, PaymentId = payment.Id, InvoiceId = invoiceId, order.BuyerId, order.SellerId, order.ProductId, order.Amount, order.Status, ParticipantDeleted = participantDeleted });
-
-                if (participantDeleted)
-                {
-                    _eventBus.NotifyOrderEnteredReview(order.Id);
-                }
-            }
-            catch (Exception ex)
-            {
-                await _log.LogAsync($"Erro ao criar pedido: {ex.Message}", source: AdminAuditSources.Webhook, level: "Error");
-            }
-        }
-
-        private async Task CreateInitialMailboxConversationAsync(OrderModel order)
-        {
-            var subject = $"Pedido {order.Id}";
-            var body = $"Conversa do pedido {order.Id} iniciada entre comprador e vendedor. Admin acompanha este chat.";
-
-            var adminRoleId = await _db.Roles
-                .Where(r => r.NormalizedName == "ADMIN")
-                .Select(r => r.Id)
-                .FirstOrDefaultAsync();
-
-            var adminUserIds = string.IsNullOrWhiteSpace(adminRoleId)
-                ? new List<string>()
-                : await _db.UserRoles
-                    .Where(ur => ur.RoleId == adminRoleId)
-                    .Select(ur => ur.UserId)
-                    .Distinct()
-                    .ToListAsync();
-
-            var primaryAdminId = adminUserIds.FirstOrDefault();
-            var senderId = !string.IsNullOrWhiteSpace(primaryAdminId) ? primaryAdminId : order.BuyerId;
-
-            if (string.IsNullOrWhiteSpace(senderId))
-                return;
-
-            var recipients = new HashSet<string>(StringComparer.Ordinal);
-            if (!string.IsNullOrWhiteSpace(order.BuyerId))
-                recipients.Add(order.BuyerId);
-            if (!string.IsNullOrWhiteSpace(order.SellerId))
-                recipients.Add(order.SellerId);
-            foreach (var adminId in adminUserIds)
-                recipients.Add(adminId);
-
-            recipients.Remove(senderId);
-
-            var now = DateTime.UtcNow;
-            foreach (var recipientId in recipients)
-            {
-                _db.UserMailboxMessages.Add(new UserMailboxMessage
-                {
-                    SenderUserId = senderId,
-                    RecipientUserId = recipientId,
-                    Subject = subject,
-                    Body = body,
-                    IsRead = false,
-                    CreatedAt = now
-                });
             }
         }
     }

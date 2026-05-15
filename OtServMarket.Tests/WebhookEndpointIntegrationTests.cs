@@ -240,9 +240,6 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
         Assert.NotNull(payment);
         Assert.True(payment!.IsPaid);
 
-        var orders = db.Orders.Where(order => order.PaymentId == payment.Id).ToList();
-        Assert.Single(orders);
-        Assert.Equal(orders[0].Id, payment.OrderId);
     }
 
     [Fact]
@@ -265,12 +262,10 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
         const string missingInvoiceId = "inv-http-missing";
 
         int paymentsBefore;
-        int ordersBefore;
         using (var preScope = _factory.Services.CreateScope())
         {
             var preDb = preScope.ServiceProvider.GetRequiredService<AppDbContext>();
             paymentsBefore = preDb.Payments.Count();
-            ordersBefore = preDb.Orders.Count();
         }
 
         var response = await SendWebhookJsonAsync(
@@ -282,7 +277,6 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Assert.Equal(paymentsBefore, db.Payments.Count());
-        Assert.Equal(ordersBefore, db.Orders.Count());
         Assert.DoesNotContain(db.Payments, p => p.PaymentId == missingInvoiceId);
     }
 
@@ -444,8 +438,6 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
         Assert.NotNull(payment);
         Assert.False(payment!.IsPaid);
         Assert.Null(payment.PaidAt);
-        Assert.Null(payment.OrderId);
-        Assert.DoesNotContain(db.Orders, order => order.PaymentId == payment.Id);
     }
 
     private void AssertPaymentSettledAndOrderCreated(string invoiceId)
@@ -457,11 +449,6 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
         Assert.NotNull(payment);
         Assert.True(payment!.IsPaid);
         Assert.NotNull(payment.PaidAt);
-
-        var order = db.Orders.FirstOrDefault(o => o.PaymentId == payment.Id);
-        Assert.NotNull(order);
-        Assert.Equal(PaymentStatus.AguardandoEntrega, order!.Status);
-        Assert.Equal(order.Id, payment.OrderId);
     }
 
     private async Task SeedPaymentAsync(string invoiceId)

@@ -1,7 +1,6 @@
-﻿using Confirmai.Data;
+using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Hubs;
-using Confirmai.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
 
@@ -59,7 +58,6 @@ namespace Confirmai.Services
             if (received < dbPayment.Amount)
                 return (false, false, received);
 
-            // S-4: Use optimistic concurrency to prevent race conditions
             try
             {
                 dbPayment.IsPaid = true;
@@ -83,109 +81,13 @@ namespace Confirmai.Services
                 userId: dbPayment.UserId
             );
 
+            if (!string.IsNullOrEmpty(dbPayment.UserId))
+            {
+                await _hubContext.Clients.User(dbPayment.UserId).SendAsync("PaymentConfirmed", dbPayment.PaymentId);
+                _eventBus.NotifyPaymentConfirmed(dbPayment.UserId, dbPayment.PaymentId ?? string.Empty);
+            }
+
             return (true, false, received);
-        }
-
-        /// <summary>
-        /// Called by the seller to manually confirm a PIX payment. Marks payment as paid and creates the order.
-        /// Returns (success, errorMessage).
-        /// </summary>
-        public async Task<(bool Success, string? Error)> ConfirmPixReceiptAsync(int paymentId, string sellerUserId)
-        {
-            var payment = await _db.Payments
-                .Include(p => p.Product)
-                .Include(p => p.Seller)
-                .FirstOrDefaultAsync(p => p.Id == paymentId);
-
-            if (payment == null)
-                return (false, "Pagamento não encontrado.");
-
-            if (payment.IsPaid)
-                return (false, "Este pagamento já foi confirmado.");
-
-            // Only the seller or product owner may confirm
-            var isAuthorized = string.Equals(payment.SellerId, sellerUserId, StringComparison.Ordinal)
-                || string.Equals(payment.Product?.UserId, sellerUserId, StringComparison.Ordinal);
-
-            if (!isAuthorized)
-                return (false, "Você não tem permissão para confirmar este pagamento.");
-
-            // S-4: Use optimistic concurrency to prevent race conditions
-            try
-            {
-                payment.IsPaid = true;
-                payment.PaidAt = DateTime.UtcNow;
-                await _db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return (false, "Este pagamento já foi confirmado por outra operação.");
-            }
-
-            // Create order
-            var existingOrder = await _db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
-            if (existingOrder == null)
-            {
-                var buyerId = payment.UserId;
-                var sellerId = payment.SellerId ?? payment.Product?.UserId;
-                var participantDeleted = string.IsNullOrEmpty(buyerId) || string.IsNullOrEmpty(sellerId);
-
-                var order = new OrderModel
-                {
-                    BuyerId = string.IsNullOrEmpty(buyerId) ? null : buyerId,
-                    SellerId = string.IsNullOrEmpty(sellerId) ? null : sellerId,
-                    ProductId = payment.ProductId,
-                    Amount = payment.Amount,
-                    IsPaid = true,
-                    PaymentId = payment.Id,
-                    EstimatedDeliveryDays = payment.EstimatedDeliveryDays,
-                    UseSiteIntermediary = payment.UseSiteIntermediary,
-                    Status = participantDeleted ? PaymentStatus.AguardandoRevisaoAdm : PaymentStatus.AguardandoEntrega,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _db.Orders.Add(order);
-                await _db.SaveChangesAsync();
-
-                var chatText = participantDeleted
-                    ? $"Pedido {order.Id} criado via PIX, mas um participante foi removido. Pedido bloqueado aguardando revisão administrativa."
-                    : $"Pagamento PIX confirmado pelo vendedor. Pedido {order.Id} iniciado.";
-
-                _db.OrderMessages.Add(new OrderMessage
-                {
-                    OrderId = order.Id,
-                    UserId = null,
-                    UserRole = "admin",
-                    Text = chatText,
-                    CreatedAt = DateTime.UtcNow
-                });
-
-                payment.OrderId = order.Id;
-                _db.Payments.Update(payment);
-                await _db.SaveChangesAsync();
-
-                if (participantDeleted)
-                {
-                    _eventBus.NotifyOrderEnteredReview(order.Id);
-                }
-            }
-
-            await _logService.LogAsync(
-                $"Pagamento PIX {paymentId} confirmado manualmente pelo vendedor {sellerUserId}.",
-                source: "Payment",
-                level: "Info",
-                userId: payment.UserId
-            );
-
-            // Notify buyer via SignalR + in-process event bus
-            if (!string.IsNullOrEmpty(payment.UserId))
-            {
-                await _hubContext.Clients.User(payment.UserId).SendAsync("PaymentConfirmed", payment.PaymentId);
-                _eventBus.NotifyPaymentConfirmed(payment.UserId, payment.PaymentId ?? string.Empty);
-            }
-
-            return (true, null);
         }
     }
 }
-

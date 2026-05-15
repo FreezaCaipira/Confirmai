@@ -8,7 +8,6 @@
 @using Confirmai.Services
 
 @attribute [Authorize(Roles = "admin")]
-@implements IDisposable
 
 @inject CurrencyPreferenceService CurrencyPreferenceService
 @inject LanguagePreferenceService LanguagePreferenceService
@@ -17,7 +16,6 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 @inject UiTextService T
-@inject PaymentEventBus PaymentEventBus
 
 <div class="entity-shell admin-page">
 
@@ -32,9 +30,7 @@
                 <a href="/admin/users">@T["Admin.Nav.Users"]</a>
                 <a href="/admin/items">Itens</a>
                 <a href="/admin/payments">@T["Admin.Nav.Payments"]</a>
-                <a href="/admin/orders">@T["Admin.Nav.Orders"]</a>
                 <a href="/admin/gateways">@T["Admin.Nav.Gateways"]</a>
-                <a href="/admin/orders-review">@T["Admin.Nav.Review"]</a>
                 <a href="/admin/logs">@T["Admin.Nav.Logs"]</a>
                 <a href="/admin/security">@T["Admin.Nav.Security"]</a>
                 <a href="/admin/api-keys">API Keys</a>
@@ -52,18 +48,6 @@
                 <a class="admin-kpi-card" href="/admin/users" aria-label="@T["AdminDashboard.KpiUsersAria"]">
                     <p class="admin-kpi-label">@T["AdminDashboard.KpiUsers"]</p>
                     <p class="admin-kpi-value">@usersCount</p>
-                </a>
-                <a class="admin-kpi-card" href="/admin/orders" aria-label="@T["AdminDashboard.KpiPaidSalesAria"]">
-                    <p class="admin-kpi-label">@T["AdminDashboard.KpiPaidSales"]</p>
-                    <p class="admin-kpi-value">@paidSalesCount</p>
-                </a>
-                <a class="admin-kpi-card" href="/admin/orders" aria-label="@T["AdminDashboard.KpiPaidVolumeAria"]">
-                    <p class="admin-kpi-label">@T["AdminDashboard.KpiPaidVolume"]</p>
-                    <p class="admin-kpi-value">@FormatBtc(paidSalesVolumeBtc)</p>
-                </a>
-                <a href="/admin/orders-review" aria-label="@T["AdminDashboard.KpiPendingOrdersAria"]">
-                    <p class="admin-kpi-label">@T["AdminDashboard.KpiPendingOrders"]</p>
-                    <p class="admin-kpi-value">@pendingOrdersCount</p>
                 </a>
             </div>
 
@@ -143,9 +127,6 @@
     private bool isLoading = true;
     private int quoteQueriesCount;
     private int usersCount;
-    private int paidSalesCount;
-    private int pendingOrdersCount;
-    private decimal paidSalesVolumeBtc;
     private string selectedLanguage = LanguagePreferenceService.DefaultLanguage;
     private decimal operationFeePercent;
     private string? operationFeeMessage;
@@ -166,36 +147,12 @@
         selectedFiat = CurrencyPreferenceService.SelectedFiatCurrency;
         var snapshot = await DashboardMetricsService.GetSnapshotAsync();
         usersCount = snapshot.UsersCount;
-        paidSalesCount = snapshot.PaidSalesCount;
-        paidSalesVolumeBtc = snapshot.PaidSalesVolumeBtc;
-        pendingOrdersCount = snapshot.PendingOrdersCount;
         quoteQueriesCount = snapshot.QuoteQueriesCount;
         operationFeePercent = await AdminSettingsService.GetOperationFeePercentForAdminAsync(currentUser);
         siteIntermediaryPixKey = await AdminSettingsService.GetSiteIntermediaryPixKeyForAdminAsync(currentUser) ?? string.Empty;
         selectedLanguage = LanguagePreferenceService.SelectedLanguage;
 
         isLoading = false;
-
-        PaymentEventBus.OnOrderEnteredReview += HandleOrderEnteredReview;
-    }
-
-    private void HandleOrderEnteredReview(int orderId)
-    {
-        _ = InvokeAsync(() =>
-        {
-            pendingOrdersCount++;
-            StateHasChanged();
-        });
-    }
-
-    public void Dispose()
-    {
-        PaymentEventBus.OnOrderEnteredReview -= HandleOrderEnteredReview;
-    }
-
-    private static string FormatBtc(decimal amount)
-    {
-        return amount.ToString("0.########", CultureInfo.InvariantCulture);
     }
 
     private async Task ApplyCurrencyPreferenceAsync()

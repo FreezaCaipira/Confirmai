@@ -20,14 +20,14 @@ public class FullFlowRecentFeaturesIntegrationTests : IClassFixture<IntegrationT
     };
 
     [Fact]
-    public async Task LanguageFlow_AnonymousOrdersPage_RendersEnglish_WhenCookieIsSetByRoute()
+    public async Task LanguageFlow_AnonymousPaymentsPage_RendersEnglish_WhenCookieIsSetByRoute()
     {
-        var cookieHeader = await SetLanguageAndExtractCookieAsync("en-US", "/orders");
+        var cookieHeader = await SetLanguageAndExtractCookieAsync("en-US", "/payments");
 
         using var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("Cookie", cookieHeader);
 
-        var response = await client.GetAsync("/orders");
+        var response = await client.GetAsync("/payments");
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -37,14 +37,14 @@ public class FullFlowRecentFeaturesIntegrationTests : IClassFixture<IntegrationT
     }
 
     [Fact]
-    public async Task LanguageFlow_AnonymousOrdersPage_RendersSpanish_WhenCookieIsSetByRoute()
+    public async Task LanguageFlow_AnonymousPaymentsPage_RendersSpanish_WhenCookieIsSetByRoute()
     {
-        var cookieHeader = await SetLanguageAndExtractCookieAsync("es-ES", "/orders");
+        var cookieHeader = await SetLanguageAndExtractCookieAsync("es-ES", "/payments");
 
         using var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("Cookie", cookieHeader);
 
-        var response = await client.GetAsync("/orders");
+        var response = await client.GetAsync("/payments");
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -54,14 +54,14 @@ public class FullFlowRecentFeaturesIntegrationTests : IClassFixture<IntegrationT
     }
 
     [Fact]
-    public async Task LanguageFlow_AnonymousOrdersPage_FallsBackToPortuguese_WhenLanguageIsInvalid()
+    public async Task LanguageFlow_AnonymousPaymentsPage_FallsBackToPortuguese_WhenLanguageIsInvalid()
     {
-        var cookieHeader = await SetLanguageAndExtractCookieAsync("fr-FR", "/orders");
+        var cookieHeader = await SetLanguageAndExtractCookieAsync("fr-FR", "/payments");
 
         using var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("Cookie", cookieHeader);
 
-        var response = await client.GetAsync("/orders");
+        var response = await client.GetAsync("/payments");
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -93,7 +93,7 @@ public class FullFlowRecentFeaturesIntegrationTests : IClassFixture<IntegrationT
         using var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("Cookie", "Confirmai.uiLanguage=fr-FR");
 
-        var response = await client.GetAsync("/orders");
+        var response = await client.GetAsync("/payments");
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -137,11 +137,11 @@ public class FullFlowRecentFeaturesIntegrationTests : IClassFixture<IntegrationT
     }
 
     [Fact]
-    public async Task LanguageFlow_QueryHintWithoutCookie_RendersEnglishOnOrders()
+    public async Task LanguageFlow_QueryHintWithoutCookie_RendersEnglishOnPayments()
     {
         using var client = _factory.CreateClient();
 
-        var response = await client.GetAsync("/orders?uiLang=en-US");
+        var response = await client.GetAsync("/payments?uiLang=en-US");
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -151,11 +151,11 @@ public class FullFlowRecentFeaturesIntegrationTests : IClassFixture<IntegrationT
     }
 
     [Fact]
-    public async Task LanguageFlow_QueryHintWithoutCookie_RendersSpanishOnOrders()
+    public async Task LanguageFlow_QueryHintWithoutCookie_RendersSpanishOnPayments()
     {
         using var client = _factory.CreateClient();
 
-        var response = await client.GetAsync("/orders?uiLang=es-ES");
+        var response = await client.GetAsync("/payments?uiLang=es-ES");
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

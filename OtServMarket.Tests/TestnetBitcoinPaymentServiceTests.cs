@@ -1,7 +1,5 @@
-﻿using System.Net;
-using Confirmai.Enums;
+using System.Net;
 using Confirmai.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Confirmai.Tests;
 
@@ -59,7 +57,7 @@ public class TestnetBitcoinPaymentServiceTests
     }
 
     [Fact]
-    public async Task CheckAndMarkPaymentAsync_MarksAsPaid_AndCreatesOrder()
+    public async Task CheckAndMarkPaymentAsync_MarksAsPaid()
     {
         using var db = TestDataFactory.CreateDbContext();
         var service = new TestnetBitcoinPaymentService(new StubHttpClientFactory(_ => HttpTestResponses.Json("{}")));
@@ -69,18 +67,15 @@ public class TestnetBitcoinPaymentServiceTests
 
         var result = await service.CheckAndMarkPaymentAsync(db, log, "pay-testnet-1");
 
-        var persistedPayment = await db.Payments.FirstAsync(p => p.Id == payment.Id);
-        var persistedOrder = await db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
+        var persistedPayment = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstAsync(db.Payments, p => p.Id == payment.Id);
 
         Assert.True(result);
         Assert.True(persistedPayment.IsPaid);
         Assert.NotNull(persistedPayment.PaidAt);
-        Assert.NotNull(persistedOrder);
-        Assert.Equal(PaymentStatus.AguardandoEntrega, persistedOrder!.Status);
     }
 
     [Fact]
-    public async Task CheckAndMarkPaymentAsync_WhenAlreadyPaid_CreatesMissingOrder()
+    public async Task CheckAndMarkPaymentAsync_WhenAlreadyPaid_ReturnsTrue()
     {
         using var db = TestDataFactory.CreateDbContext();
         var service = new TestnetBitcoinPaymentService(new StubHttpClientFactory(_ => HttpTestResponses.Json("{}")));
@@ -90,85 +85,7 @@ public class TestnetBitcoinPaymentServiceTests
 
         var result = await service.CheckAndMarkPaymentAsync(db, log, "pay-testnet-2");
 
-        var order = await db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
-
         Assert.True(result);
-        Assert.NotNull(order);
-        Assert.Equal(payment.UserId, order!.BuyerId);
-    }
-
-    [Fact]
-    public async Task CheckAndMarkPaymentAsync_WhenParticipantDeleted_CreatesOrderInAguardandoRevisaoAdm()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new TestnetBitcoinPaymentService(new StubHttpClientFactory(_ => HttpTestResponses.Json("{}")));
-        var log = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
-
-        // Trigger participantDeleted by leaving UserId (buyer) null on the payment
-        var payment = TestDataFactory.SeedPayment(db, isPaid: false, amount: 0.001m, method: "Testnet",
-            paymentId: "pay-testnet-participant-deleted", address: "tb1qparticipantdeleted",
-            buyerId: "buyer-participant-deleted", sellerId: "seller-participant-deleted");
-        payment.UserId = null;
-        await db.SaveChangesAsync();
-
-        var result = await service.CheckAndMarkPaymentAsync(db, log, "pay-testnet-participant-deleted");
-
-        var order = await db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
-
-        Assert.True(result);
-        Assert.NotNull(order);
-        Assert.Equal(Confirmai.Enums.PaymentStatus.AguardandoRevisaoAdm, order!.Status);
-        Assert.Null(order.BuyerId);
-    }
-
-    [Fact]
-    public async Task CheckAndMarkPaymentAsync_WhenParticipantDeleted_FiresOnOrderEnteredReviewEvent()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var eventBus = new Confirmai.Services.PaymentEventBus();
-        var service = new TestnetBitcoinPaymentService(
-            new StubHttpClientFactory(_ => HttpTestResponses.Json("{}")),
-            eventBus);
-        var log = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
-
-        int? firedOrderId = null;
-        eventBus.OnOrderEnteredReview += id => firedOrderId = id;
-
-        // Trigger participantDeleted by leaving UserId (buyer) null
-        var payment = TestDataFactory.SeedPayment(db, isPaid: false, amount: 0.001m, method: "Testnet",
-            paymentId: "pay-testnet-event", address: "tb1qeventtest",
-            buyerId: "buyer-event", sellerId: "seller-event");
-        payment.UserId = null;
-        await db.SaveChangesAsync();
-
-        await service.CheckAndMarkPaymentAsync(db, log, "pay-testnet-event");
-
-        var order = await db.Orders.FirstOrDefaultAsync(o => o.PaymentId == payment.Id);
-        Assert.NotNull(firedOrderId);
-        Assert.Equal(order!.Id, firedOrderId);
-    }
-
-    [Fact]
-    public async Task CheckAndMarkPaymentAsync_WhenBothParticipantsPresent_DoesNotFireOnOrderEnteredReview()
-    {
-        using var db = TestDataFactory.CreateDbContext();
-        var eventBus = new Confirmai.Services.PaymentEventBus();
-        var service = new TestnetBitcoinPaymentService(
-            new StubHttpClientFactory(_ => HttpTestResponses.Json("{}")),
-            eventBus);
-        var log = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
-
-        var fired = false;
-        eventBus.OnOrderEnteredReview += _ => fired = true;
-
-        var payment = TestDataFactory.SeedPayment(
-            db, isPaid: false, amount: 0.001m, method: "Testnet",
-            paymentId: "pay-testnet-noevent", address: "tb1qnoevent",
-            buyerId: "buyer-noevent", sellerId: "seller-noevent");
-
-        await service.CheckAndMarkPaymentAsync(db, log, "pay-testnet-noevent");
-
-        Assert.False(fired);
     }
 }
 

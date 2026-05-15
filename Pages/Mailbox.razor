@@ -140,16 +140,8 @@
 
                             <header class="mailbox-thread-head">
                                 <div class="mailbox-thread-title-block">
-                                    @if (contact.IsOrderConversation && contact.OrderId.HasValue)
-                                    {
-                                        <span class="mailbox-thread-title-kicker">@T["Mailbox.ThreadKickerOrder"]</span>
-                                        <a class="mailbox-thread-title-user" href="@($"/orders/{contact.OrderId.Value}")">@contact.ConversationTitle</a>
-                                    }
-                                    else
-                                    {
-                                        <span class="mailbox-thread-title-kicker">@T["Mailbox.ThreadKickerUser"]</span>
-                                        <a class="mailbox-thread-title-user" href="@($"/profile/{contact.ContactUserId}")">@contact.ContactName</a>
-                                    }
+                                    <span class="mailbox-thread-title-kicker">@T["Mailbox.ThreadKickerUser"]</span>
+                                    <a class="mailbox-thread-title-user" href="@($"/profile/{contact.ContactUserId}")">@contact.ContactName</a>
                                 </div>
                                 <span>@conversationMessages.Count @T["Mailbox.ThreadMessages"]</span>
                             </header>
@@ -318,11 +310,9 @@
             .Select(g =>
             {
                 var latest = g.OrderByDescending(x => x.CreatedAt).First();
-                var isOrderConversation = IsOrderConversationSubject(latest.Subject);
-                var normalizedSubject = NormalizeOrderSubject(latest.Subject);
                 var contactId = latest.SenderUserId == currentUserId ? latest.RecipientUserId : latest.SenderUserId;
                 var contactName = latest.SenderUserId == currentUserId ? latest.RecipientName : latest.SenderName;
-                var title = isOrderConversation ? latest.Subject.Trim() : (string.IsNullOrWhiteSpace(contactName) ? contactId : contactName);
+                var title = string.IsNullOrWhiteSpace(contactName) ? contactId : contactName;
 
                 return new ConversationContactView
                 {
@@ -330,9 +320,6 @@
                     ConversationTitle = title,
                     ContactUserId = contactId,
                     ContactName = string.IsNullOrWhiteSpace(contactName) ? contactId : contactName,
-                    IsOrderConversation = isOrderConversation,
-                    OrderSubjectNormalized = normalizedSubject,
-                    OrderId = TryParseOrderId(latest.Subject),
                     LastBody = latest.Body,
                     LastCreatedAt = latest.CreatedAt,
                     UnreadCount = g.Count(x => x.RecipientUserId == currentUserId && !x.IsRead),
@@ -412,43 +399,10 @@
         await LoadThreadForSelectedMessageAsync();
     }
 
-    private static bool IsOrderConversationSubject(string? subject)
-    {
-        return !string.IsNullOrWhiteSpace(subject)
-            && subject.Trim().StartsWith("Pedido ", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static string NormalizeOrderSubject(string? subject)
-    {
-        return (subject ?? string.Empty).Trim().ToLowerInvariant();
-    }
-
     private string BuildConversationKey(MailboxMessageView message)
     {
-        if (IsOrderConversationSubject(message.Subject))
-        {
-            return $"order:{NormalizeOrderSubject(message.Subject)}";
-        }
-
         var contactUserId = message.SenderUserId == currentUserId ? message.RecipientUserId : message.SenderUserId;
         return $"contact:{contactUserId}";
-    }
-
-    private static int? TryParseOrderId(string? subject)
-    {
-        if (!IsOrderConversationSubject(subject))
-        {
-            return null;
-        }
-
-        var raw = subject!.Trim();
-        var parts = raw.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (parts.Length < 2)
-        {
-            return null;
-        }
-
-        return int.TryParse(parts[1], out var orderId) ? orderId : null;
     }
 
     private string BuildSnippet(string body)
@@ -564,11 +518,6 @@
         composerRecipientUserId = selected.ContactUserId;
         composerInfoMessage = null;
 
-        if (selected.IsOrderConversation)
-        {
-            composerRecipientUserId = string.Empty;
-        }
-
         isThreadLoading = true;
         await using var db = await DbFactory.CreateDbContextAsync();
         var threadQuery = db.UserMailboxMessages
@@ -576,28 +525,17 @@
             .Include(m => m.SenderUser)
             .Where(m => m.RecipientUserId == currentUserId || m.SenderUserId == currentUserId);
 
-        if (selected.IsOrderConversation && !string.IsNullOrWhiteSpace(selected.OrderSubjectNormalized))
+        var contactId = selected.ContactUserId;
+        if (string.IsNullOrWhiteSpace(contactId))
         {
-            var normalizedSubject = selected.OrderSubjectNormalized;
-            threadQuery = threadQuery.Where(m => m.Subject != null && m.Subject.ToLower() == normalizedSubject);
+            conversationMessages.Clear();
+            isThreadLoading = false;
+            return;
         }
-        else
-        {
-            var contactId = selected.ContactUserId;
-            if (string.IsNullOrWhiteSpace(contactId))
-            {
-                conversationMessages.Clear();
-                isThreadLoading = false;
-                return;
-            }
 
-            threadQuery = threadQuery.Where(m =>
-                (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
-                || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
-
-            // Keep direct chat independent from order-linked threads.
-            threadQuery = threadQuery.Where(m => m.Subject == null || !m.Subject.ToLower().StartsWith("pedido "));
-        }
+        threadQuery = threadQuery.Where(m =>
+            (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
+            || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
 
         conversationMessages = await threadQuery
             .OrderBy(m => m.CreatedAt)
@@ -621,70 +559,6 @@
             return;
         }
 
-        if (selected.IsOrderConversation)
-        {
-            // One order-chat message can be mirrored to multiple recipients (seller/admins).
-            // Collapse identical mirrored copies in the mailbox thread.
-            conversationMessages = conversationMessages
-                .GroupBy(m => new
-                {
-                    m.SenderUserId,
-                    m.Body,
-                    Timestamp = new DateTime((m.CreatedAt.Ticks / TimeSpan.TicksPerSecond) * TimeSpan.TicksPerSecond, DateTimeKind.Utc)
-                })
-                .Select(g => g.OrderBy(x => x.Id).First())
-                .OrderBy(m => m.CreatedAt)
-                .ToList();
-
-            if (selected.OrderId.HasValue)
-            {
-                var order = await db.Orders
-                    .AsNoTracking()
-                    .Where(o => o.Id == selected.OrderId.Value)
-                    .Select(o => new { o.BuyerId, o.SellerId })
-                    .FirstOrDefaultAsync();
-
-                if (order != null)
-                {
-                    var adminRoleId = await db.Roles
-                        .AsNoTracking()
-                        .Where(r => r.NormalizedName == "ADMIN")
-                        .Select(r => r.Id)
-                        .FirstOrDefaultAsync();
-
-                    var adminUserIds = string.IsNullOrWhiteSpace(adminRoleId)
-                        ? new HashSet<string>(StringComparer.Ordinal)
-                        : (await db.UserRoles
-                            .AsNoTracking()
-                            .Where(ur => ur.RoleId == adminRoleId)
-                            .Select(ur => ur.UserId)
-                            .Distinct()
-                            .ToListAsync())
-                            .ToHashSet(StringComparer.Ordinal);
-
-                    foreach (var message in conversationMessages)
-                    {
-                        if (string.Equals(message.SenderUserId, order.BuyerId, StringComparison.Ordinal))
-                        {
-                            message.RoleClass = "buyer";
-                        }
-                        else if (!string.IsNullOrWhiteSpace(order.SellerId) && string.Equals(message.SenderUserId, order.SellerId, StringComparison.Ordinal))
-                        {
-                            message.RoleClass = "seller";
-                        }
-                        else if (adminUserIds.Contains(message.SenderUserId))
-                        {
-                            message.RoleClass = "admin";
-                        }
-                        else
-                        {
-                            message.RoleClass = "other";
-                        }
-                    }
-                }
-            }
-        }
-
         isThreadLoading = false;
         shouldAutoScrollThread = true;
     }
@@ -706,16 +580,7 @@
         IQueryable<UserMailboxMessage> unreadQuery = db.UserMailboxMessages
             .Where(m => m.RecipientUserId == currentUserId && !m.IsRead);
 
-        if (selected.IsOrderConversation && !string.IsNullOrWhiteSpace(selected.OrderSubjectNormalized))
-        {
-            var normalizedSubject = selected.OrderSubjectNormalized;
-            unreadQuery = unreadQuery.Where(m => m.Subject != null && m.Subject.ToLower() == normalizedSubject);
-        }
-        else
-        {
-            unreadQuery = unreadQuery.Where(m => m.SenderUserId == selected.ContactUserId);
-            unreadQuery = unreadQuery.Where(m => m.Subject == null || !m.Subject.ToLower().StartsWith("pedido "));
-        }
+        unreadQuery = unreadQuery.Where(m => m.SenderUserId == selected.ContactUserId);
 
         var unreadMessages = await unreadQuery.ToListAsync();
 
@@ -763,36 +628,24 @@
         isSendingReply = true;
 
         await using var db = await DbFactory.CreateDbContextAsync();
-        if (selected.IsOrderConversation)
+        if (string.IsNullOrWhiteSpace(composerRecipientUserId))
         {
-            var sent = await SendOrderConversationMessageAsync(db, selected, normalizedBody);
-            if (!sent)
-            {
-                isSendingReply = false;
-                return;
-            }
+            composerInfoMessage = "Selecione uma conversa antes de enviar.";
+            isSendingReply = false;
+            return;
         }
-        else
+
+        db.UserMailboxMessages.Add(new UserMailboxMessage
         {
-            if (string.IsNullOrWhiteSpace(composerRecipientUserId))
-            {
-                composerInfoMessage = "Selecione uma conversa antes de enviar.";
-                isSendingReply = false;
-                return;
-            }
+            SenderUserId = currentUserId,
+            RecipientUserId = composerRecipientUserId,
+            Subject = "Chat pelo perfil",
+            Body = normalizedBody,
+            IsRead = false,
+            CreatedAt = DateTime.UtcNow
+        });
 
-            db.UserMailboxMessages.Add(new UserMailboxMessage
-            {
-                SenderUserId = currentUserId,
-                RecipientUserId = composerRecipientUserId,
-                Subject = "Chat pelo perfil",
-                Body = normalizedBody,
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow
-            });
-
-            await db.SaveChangesAsync();
-        }
+        await db.SaveChangesAsync();
 
         composerBody = string.Empty;
         composerInfoMessage = "Mensagem enviada.";
@@ -824,19 +677,10 @@
         IQueryable<UserMailboxMessage> query = db.UserMailboxMessages
             .Where(m => m.RecipientUserId == currentUserId || m.SenderUserId == currentUserId);
 
-        if (selected.IsOrderConversation && !string.IsNullOrWhiteSpace(selected.OrderSubjectNormalized))
-        {
-            var normalizedSubject = selected.OrderSubjectNormalized;
-            query = query.Where(m => m.Subject != null && m.Subject.ToLower() == normalizedSubject);
-        }
-        else
-        {
-            var contactId = selected.ContactUserId;
-            query = query.Where(m =>
-                (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
-                || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
-            query = query.Where(m => m.Subject == null || !m.Subject.ToLower().StartsWith("pedido "));
-        }
+        var contactId = selected.ContactUserId;
+        query = query.Where(m =>
+            (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
+            || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
 
         var rows = await query.ToListAsync();
         if (rows.Count == 0)
@@ -885,94 +729,6 @@
         return (active, archived);
     }
 
-    private async Task<bool> SendOrderConversationMessageAsync(AppDbContext db, ConversationContactView selected, string body)
-    {
-        if (!selected.OrderId.HasValue)
-        {
-            composerInfoMessage = "Conversa de pedido invalida.";
-            return false;
-        }
-
-        var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == selected.OrderId.Value);
-        if (order == null)
-        {
-            composerInfoMessage = "Pedido nao encontrado para esta conversa.";
-            return false;
-        }
-
-        var adminRoleId = await db.Roles
-            .Where(r => r.NormalizedName == "ADMIN")
-            .Select(r => r.Id)
-            .FirstOrDefaultAsync();
-
-        var adminUserIds = string.IsNullOrWhiteSpace(adminRoleId)
-            ? new List<string>()
-            : await db.UserRoles
-                .Where(ur => ur.RoleId == adminRoleId)
-                .Select(ur => ur.UserId)
-                .Distinct()
-                .ToListAsync();
-
-        var isAdmin = adminUserIds.Contains(currentUserId, StringComparer.Ordinal);
-
-        var role = isAdmin
-            ? "admin"
-            : string.Equals(order.BuyerId, currentUserId, StringComparison.Ordinal)
-                ? "buyer"
-                : string.Equals(order.SellerId, currentUserId, StringComparison.Ordinal)
-                    ? "seller"
-                    : "other";
-
-        if (role == "other")
-        {
-            composerInfoMessage = "Voce nao participa deste pedido.";
-            return false;
-        }
-
-        var now = DateTime.UtcNow;
-        db.OrderMessages.Add(new OrderMessage
-        {
-            OrderId = order.Id,
-            UserId = currentUserId,
-            UserRole = role,
-            Text = body,
-            CreatedAt = now
-        });
-
-        var recipients = new HashSet<string>(StringComparer.Ordinal);
-        if (!string.IsNullOrWhiteSpace(order.BuyerId))
-            recipients.Add(order.BuyerId);
-
-        if (!string.IsNullOrWhiteSpace(order.SellerId))
-        {
-            recipients.Add(order.SellerId);
-        }
-
-        foreach (var adminId in adminUserIds)
-        {
-            recipients.Add(adminId);
-        }
-
-        recipients.Remove(currentUserId);
-
-        var subject = $"Pedido {order.Id}";
-        foreach (var recipientId in recipients)
-        {
-            db.UserMailboxMessages.Add(new UserMailboxMessage
-            {
-                SenderUserId = currentUserId,
-                RecipientUserId = recipientId,
-                Subject = subject,
-                Body = body,
-                IsRead = false,
-                CreatedAt = now
-            });
-        }
-
-        await db.SaveChangesAsync();
-        return true;
-    }
-
     private sealed class MailboxMessageView
     {
         public int Id { get; init; }
@@ -1006,9 +762,6 @@
         public string ConversationTitle { get; init; } = string.Empty;
         public string ContactUserId { get; init; } = string.Empty;
         public string ContactName { get; init; } = string.Empty;
-        public bool IsOrderConversation { get; init; }
-        public string OrderSubjectNormalized { get; init; } = string.Empty;
-        public int? OrderId { get; init; }
         public string LastBody { get; init; } = string.Empty;
         public DateTime LastCreatedAt { get; init; }
         public int UnreadCount { get; init; }

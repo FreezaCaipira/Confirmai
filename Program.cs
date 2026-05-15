@@ -1,4 +1,4 @@
-﻿using Confirmai;
+using Confirmai;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +42,7 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>(optional: true);
 
-// ── OpenTelemetry / Serilog OTLP ───────────────────────────────────────────
+// -- OpenTelemetry / Serilog OTLP -------------------------------------------
 // Read config early (before Host.UseSerilog) so the OTLP sink can be wired
 // into the bootstrap logger. When Endpoint is empty, OTLP is silently skipped.
 var otelSection = builder.Configuration.GetSection(OtelOptions.Section);
@@ -93,7 +93,6 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<GatewayService>();
 builder.Services.AddScoped<PaymentConfirmationService>();
-builder.Services.AddScoped<OrderAccessService>();
 builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<AbacatePayWebhookService>();
@@ -103,14 +102,12 @@ builder.Services.AddScoped<UiTextService>();
 builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<AdminSettingsService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();
-builder.Services.AddScoped<AdminOrderReleaseService>();
 builder.Services.AddScoped<EventNotificationService>();
 builder.Services.AddScoped<AdminLogsQueryService>();
 builder.Services.AddScoped<AdminLogsExportService>();
 builder.Services.AddScoped<AdminLogsFilterStateService>();
 builder.Services.AddScoped<AdminUsersFilterStateService>();
 builder.Services.AddScoped<AdminPaymentsFilterStateService>();
-builder.Services.AddScoped<AdminOrdersFilterStateService>();
 builder.Services.AddScoped<AdminProductsFilterStateService>();
 builder.Services.AddScoped<AuthenticationStateProvider,
     RevalidatingIdentityAuthenticationStateProvider>();
@@ -125,7 +122,7 @@ if (!builder.Environment.IsEnvironment("Testing") &&
     (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__")))
 {
     throw new InvalidOperationException(
-        "DefaultConnection não configurada. Defina em User Secrets com: dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" \"Host=localhost;Port=5432;Database=Confirmai;Username=freeza;Password=...\" --project .\\Confirmai.csproj"
+        "DefaultConnection n�o configurada. Defina em User Secrets com: dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" \"Host=localhost;Port=5432;Database=Confirmai;Username=freeza;Password=...\" --project .\\Confirmai.csproj"
     );
 }
 
@@ -229,7 +226,7 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>();
 
-// ── OpenTelemetry traces + metrics ───────────────────────────────────────────
+// -- OpenTelemetry traces + metrics -------------------------------------------
 // Only registered when an OTLP endpoint is configured; otherwise the app runs
 // normally with console/file logging only (no performance overhead).
 builder.Services.Configure<OtelOptions>(otelSection);
@@ -424,80 +421,6 @@ app.MapGet("/set-language/{languageCode}", (HttpContext context, string language
 
     return Results.LocalRedirect(target);
 });
-
-// ── Dev-only test seed endpoint ───────────────────────────────────────────────
-// Creates a settled PaymentRecord + OrderModel for E2E tests to assert against.
-// Only registered when running in Development environment — never exposed in prod.
-if (isDevelopment)
-{
-    app.MapPost("/api/test/seed-order", async (
-        HttpContext ctx,
-        AppDbContext db,
-        UserManager<ApplicationUser> userManager) =>
-    {
-        var statusStr = ctx.Request.Query["status"].FirstOrDefault() ?? "AguardandoEntrega";
-        if (!Enum.TryParse<PaymentStatus>(statusStr, ignoreCase: true, out var orderStatus))
-            orderStatus = PaymentStatus.AguardandoEntrega;
-
-        var adminUsers = await userManager.GetUsersInRoleAsync("admin");
-        var admin = adminUsers.FirstOrDefault();
-        if (admin is null)
-            return Results.Problem("No admin user found in database.");
-
-        var product = new Product
-        {
-            Name = "E2E Test Product " + Guid.NewGuid().ToString("N")[..8],
-            Description = "Produto criado automaticamente pelo endpoint de teste E2E.",
-            ShortDescription = "E2E test item",
-            Price = 0.001m,
-            UserId = admin.Id,
-            CreatedAt = DateTime.UtcNow
-        };
-        db.Products.Add(product);
-        await db.SaveChangesAsync();
-
-        var invoiceId = "e2e-" + Guid.NewGuid().ToString("N");
-        var payment = new PaymentRecord
-        {
-            ProductId = product.Id,
-            UserId = admin.Id,
-            Address = "tb1qe2e-test-address",
-            PaymentId = invoiceId,
-            PaymentMethod = "BTCPayServer",
-            Amount = 0.001m,
-            IsPaid = true,
-            PaidAt = DateTime.UtcNow,
-            CreatedAt = DateTime.UtcNow
-        };
-        db.Payments.Add(payment);
-        await db.SaveChangesAsync();
-
-        var order = new OrderModel
-        {
-            BuyerId = admin.Id,
-            SellerId = admin.Id,
-            ProductId = product.Id,
-            Amount = 0.001m,
-            IsPaid = true,
-            PaymentId = payment.Id,
-            Status = orderStatus,
-            CreatedAt = DateTime.UtcNow
-        };
-        db.Orders.Add(order);
-        await db.SaveChangesAsync();
-
-        payment.OrderId = order.Id;
-        await db.SaveChangesAsync();
-
-        return Results.Ok(new
-        {
-            orderId = order.Id,
-            productId = product.Id,
-            buyerEmail = admin.Email,
-            status = order.Status.ToString()
-        });
-    });
-}
 
 app.MapBlazorHub();
 app.MapRazorPages();

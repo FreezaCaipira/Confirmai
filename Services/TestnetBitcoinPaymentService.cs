@@ -1,11 +1,7 @@
 ﻿using NBitcoin;
-using System.Net.Http.Json;
 using System.Text.Json;
 using Confirmai.Data;
-using Confirmai.Models;
-using Confirmai.Enums;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 
 namespace Confirmai.Services
 {
@@ -112,128 +108,19 @@ namespace Confirmai.Services
             if (payment.IsPaid)
             {
                 await log.LogAsync($"[Testnet] Pagamento já está marcado como pago para paymentId={paymentId}", source: "Testnet", level: "Info");
-                // Garante que a order existe
-                if (!db.Orders.Any(o => o.PaymentId == payment.Id))
-                {
-                    await CreateOrderAsync(db, payment, log);
-                }
                 return true;
             }
 
-            // Aqui você pode adicionar lógica para checar na blockchain se quiser
             payment.IsPaid = true;
             payment.PaidAt = DateTime.UtcNow;
             await db.SaveChangesAsync();
 
             await log.LogAsync($"[Testnet] Pagamento marcado como pago para paymentId={paymentId}", source: "Testnet", level: "Info");
 
-            // Cria order se não existir
-            if (!db.Orders.Any(o => o.PaymentId == payment.Id))
-            {
-                await CreateOrderAsync(db, payment, log);
-            }
+            if (payment.UserId != null)
+                _eventBus?.NotifyPaymentConfirmed(payment.UserId, payment.PaymentId ?? paymentId);
 
             return true;
-        }
-
-        private async Task CreateOrderAsync(AppDbContext db, PaymentRecord payment, LogService log)
-        {
-            var buyerId = payment.UserId;
-            var sellerId = payment.Product?.UserId;
-            var participantDeleted = string.IsNullOrEmpty(buyerId) || string.IsNullOrEmpty(sellerId);
-
-            if (participantDeleted)
-            {
-                await log.LogAsync($"[Testnet] Participante removido ao criar pedido para paymentId={payment.Id}. Pedido criado em AguardandoRevisaoAdm.", source: "Testnet", level: "Warning");
-            }
-
-            var order = new OrderModel
-            {
-                BuyerId = string.IsNullOrEmpty(buyerId) ? null : buyerId,
-                SellerId = string.IsNullOrEmpty(sellerId) ? null : sellerId,
-                ProductId = payment.ProductId,
-                Amount = payment.Amount,
-                IsPaid = true,
-                PaymentId = payment.Id,
-                EstimatedDeliveryDays = payment.EstimatedDeliveryDays,
-                UseSiteIntermediary = payment.UseSiteIntermediary,
-                Status = participantDeleted ? PaymentStatus.AguardandoRevisaoAdm : PaymentStatus.AguardandoEntrega,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            db.Orders.Add(order);
-            await db.SaveChangesAsync();
-
-            if (participantDeleted)
-            {
-                _eventBus?.NotifyOrderEnteredReview(order.Id);
-            }
-
-            db.OrderMessages.Add(new OrderMessage
-            {
-                OrderId = order.Id,
-                UserId = null,
-                UserRole = "admin",
-                Text = $"Conversa do pedido {order.Id} iniciada entre comprador e vendedor. Admin acompanha este chat.",
-                CreatedAt = DateTime.UtcNow
-            });
-
-            await CreateInitialMailboxConversationAsync(db, order);
-
-            payment.OrderId = order.Id;
-            db.Payments.Update(payment);
-            await db.SaveChangesAsync();
-
-            await log.LogAsync($"[Testnet] Order criada para paymentId={payment.PaymentId}, orderId={order.Id}", source: "Testnet", level: "Info");
-        }
-
-        private static async Task CreateInitialMailboxConversationAsync(AppDbContext db, OrderModel order)
-        {
-            var subject = $"Pedido {order.Id}";
-            var body = $"Conversa do pedido {order.Id} iniciada entre comprador e vendedor. Admin acompanha este chat.";
-
-            var adminRoleId = await db.Roles
-                .Where(r => r.NormalizedName == "ADMIN")
-                .Select(r => r.Id)
-                .FirstOrDefaultAsync();
-
-            var adminUserIds = string.IsNullOrWhiteSpace(adminRoleId)
-                ? new List<string>()
-                : await db.UserRoles
-                    .Where(ur => ur.RoleId == adminRoleId)
-                    .Select(ur => ur.UserId)
-                    .Distinct()
-                    .ToListAsync();
-
-            var primaryAdminId = adminUserIds.FirstOrDefault();
-            var senderId = !string.IsNullOrWhiteSpace(primaryAdminId) ? primaryAdminId : order.BuyerId;
-
-            if (string.IsNullOrWhiteSpace(senderId))
-                return;
-
-            var recipients = new HashSet<string>(StringComparer.Ordinal);
-            if (!string.IsNullOrWhiteSpace(order.BuyerId))
-                recipients.Add(order.BuyerId);
-            if (!string.IsNullOrWhiteSpace(order.SellerId))
-                recipients.Add(order.SellerId);
-            foreach (var adminId in adminUserIds)
-                recipients.Add(adminId);
-
-            recipients.Remove(senderId);
-
-            var now = DateTime.UtcNow;
-            foreach (var recipientId in recipients)
-            {
-                db.UserMailboxMessages.Add(new UserMailboxMessage
-                {
-                    SenderUserId = senderId,
-                    RecipientUserId = recipientId,
-                    Subject = subject,
-                    Body = body,
-                    IsRead = false,
-                    CreatedAt = now
-                });
-            }
         }
     }
 }

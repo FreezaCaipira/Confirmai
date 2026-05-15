@@ -109,6 +109,8 @@ namespace Confirmai.Areas.Identity.Pages.Account
 
                     if (_environment.IsDevelopment())
                     {
+                        var confirmCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        await _userManager.ConfirmEmailAsync(user, confirmCode);
                         await _signInManager.SignInAsync(user, isPersistent: false);
                     }
                     return LocalRedirect("~/dashboard");

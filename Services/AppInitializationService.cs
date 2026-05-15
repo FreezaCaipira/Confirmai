@@ -352,39 +352,7 @@ namespace Confirmai.Services
 
             if (legacyProducts.Any())
             {
-                var legacyIds = legacyProducts.Select(p => p.Id).ToList();
-
-                var referencedLegacyIds = await _db.Orders
-                    .Where(o => legacyIds.Contains(o.ProductId))
-                    .Select(o => o.ProductId)
-                    .Distinct()
-                    .ToListAsync();
-
-                var deletableProducts = legacyProducts
-                    .Where(p => !referencedLegacyIds.Contains(p.Id))
-                    .ToList();
-
-                if (deletableProducts.Any())
-                {
-                    _db.Products.RemoveRange(deletableProducts);
-                }
-
-                var archivedProducts = legacyProducts
-                    .Where(p => referencedLegacyIds.Contains(p.Id))
-                    .ToList();
-
-                foreach (var archivedProduct in archivedProducts)
-                {
-                    if (!string.Equals(archivedProduct.Category, "legacy-archived", StringComparison.OrdinalIgnoreCase))
-                    {
-                        archivedProduct.Category = "legacy-archived";
-                    }
-
-                    if (!archivedProduct.Name.StartsWith("[ARCHIVED]", StringComparison.OrdinalIgnoreCase))
-                    {
-                        archivedProduct.Name = $"[ARCHIVED] Item legado #{archivedProduct.Id}";
-                    }
-                }
+                _db.Products.RemoveRange(legacyProducts);
             }
 
             if (cleanupFlag == null)

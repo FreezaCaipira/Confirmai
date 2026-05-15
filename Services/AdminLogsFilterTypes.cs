@@ -13,9 +13,6 @@ public enum AdminLogsQuickRangePreset
 public enum AdminLogsAuditQuickFilter
 {
     All,
-    ReleaseOnly,
-    ReleaseSuccess,
-    ReleaseRefused,
     SecurityPolicy
 }
 

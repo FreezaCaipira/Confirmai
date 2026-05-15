@@ -6,9 +6,6 @@ namespace Confirmai.Services;
 
 public sealed record AdminLogsAuditCounts(
     int All,
-    int ReleaseOnly,
-    int ReleaseSuccess,
-    int ReleaseRefused,
     int SecurityPolicy,
     int WebhookWarnings,
     int ServerIntegration);
@@ -59,9 +56,6 @@ public class AdminLogsQueryService
             .Select(g => new
             {
                 All = g.Count(),
-                ReleaseOnly = g.Count(log => log.Source == AdminAuditSources.OrdersReview),
-                ReleaseSuccess = g.Count(log => log.Source == AdminAuditSources.OrdersReview && log.Level == AdminAuditLevels.Success),
-                ReleaseRefused = g.Count(log => log.Source == AdminAuditSources.OrdersReview && log.Level == AdminAuditLevels.Refused),
                 SecurityPolicy = g.Count(log => log.Source == AdminAuditSources.SecurityPolicy),
                 WebhookWarnings = g.Count(log => log.Source == AdminAuditSources.Webhook && log.Level == "Warning"),
                 ServerIntegration = g.Count(log => log.Source == AdminAuditSources.ServerIntegration)
@@ -69,12 +63,9 @@ public class AdminLogsQueryService
             .FirstOrDefaultAsync();
 
         var counts = countsProjection is null
-            ? new AdminLogsAuditCounts(0, 0, 0, 0, 0, 0, 0)
+            ? new AdminLogsAuditCounts(0, 0, 0, 0)
             : new AdminLogsAuditCounts(
                 All: countsProjection.All,
-                ReleaseOnly: countsProjection.ReleaseOnly,
-                ReleaseSuccess: countsProjection.ReleaseSuccess,
-                ReleaseRefused: countsProjection.ReleaseRefused,
                 SecurityPolicy: countsProjection.SecurityPolicy,
                 WebhookWarnings: countsProjection.WebhookWarnings,
                 ServerIntegration: countsProjection.ServerIntegration);

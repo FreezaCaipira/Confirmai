@@ -3203,7 +3203,6 @@ body .oldsite-top-nav .oldsite-top-nav-user {
 
 body .oldsite-top-nav .oldsite-top-nav-profile-link {
     margin-left: 0;
-    border-left: 1px solid rgba(255, 201, 126, 0.2);
     padding: 0.25rem 0.5rem;
 }
 
@@ -4936,6 +4935,10 @@ body .oldsite-top-nav .oldsite-top-nav-logout {
     color: #94a3b8;
 }
 
+body .oldsite-top-nav .oldsite-top-nav-mailbox-icon {
+    border-right: 1px solid #1c2a3b;
+}
+
 body .oldsite-top-nav .oldsite-mailbox-glyph,
 body .oldsite-top-nav .oldsite-profile-glyph {
     filter: brightness(0) saturate(100%) invert(55%) sepia(30%) saturate(500%) hue-rotate(170deg) brightness(95%);
@@ -5133,6 +5136,100 @@ body .entity-shell.parchment-b .entity-shell-card {
     background: #111927;
     border: 1px solid #162438;
     box-shadow: none;
+}
+
+/* ── Page section title on dark cards ────────────────────────── */
+body .entity-shell-card .page-section-title,
+body .entity-shell .page-section-title {
+    color: #f1f5f9;
+    text-shadow: none;
+    text-align: left;
+}
+
+/* ── Outer entity-shell wrapper → dark theme ─────────────────── */
+body .main-content .entity-shell {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* ── Parchment-a filter bar → dark theme ─────────────────────── */
+body .entity-shell.parchment-a .filter-bar {
+    background: #0a1422;
+    border: 1px solid #1c2a3b;
+    box-shadow: none;
+}
+
+body .entity-shell.parchment-a .filter-bar input,
+body .entity-shell.parchment-a .filter-bar select,
+body .entity-shell.parchment-a .filter-bar input[type="date"] {
+    background: #111927;
+    border: 1px solid #1c2a3b;
+    color: #f1f5f9;
+    border-radius: 6px;
+}
+
+body .entity-shell.parchment-a .filter-bar input::placeholder {
+    color: #475569;
+}
+
+body .entity-shell.parchment-a .filter-bar button {
+    background: #0d1825;
+    border: 1px solid #1c2a3b;
+    color: #4e95b8;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+body .entity-shell.parchment-a .filter-bar button:hover {
+    border-color: #4e95b8;
+    color: #82bdd8;
+    background: rgba(78, 149, 184, 0.08);
+}
+
+/* ── Parchment-a table → dark theme ──────────────────────────── */
+body .entity-shell.parchment-a .product-table {
+    background: transparent;
+    border: 1px solid #162438;
+    border-radius: 8px;
+}
+
+body .entity-shell.parchment-a .product-table th {
+    background: #0a1928;
+    border-bottom: 1px solid #153d5a;
+    color: #4e95b8;
+    text-shadow: none;
+}
+
+body .entity-shell.parchment-a .product-table td {
+    background: transparent;
+    border-bottom: 1px solid #0f1f30;
+    color: #94a3b8;
+}
+
+body .entity-shell.parchment-a .product-table tr:nth-child(even) td {
+    background: #0b1928;
+}
+
+body .entity-shell.parchment-a .product-table tr:hover td {
+    background: rgba(26, 84, 120, 0.25);
+}
+
+/* ── Parchment-a status badges → dark theme ───────────────────── */
+body .entity-shell.parchment-a .order-status-badge.pago {
+    background: #0a2018;
+    color: #4ade80;
+    border: 1px solid #14532d;
+    text-shadow: none;
+}
+
+body .entity-shell.parchment-a .order-status-badge.aguardandopagamento {
+    background: #1c1508;
+    color: #fbbf24;
+    border: 1px solid #78350f;
+    text-shadow: none;
 }
 
 /* ── Widget blue accent ───────────────────────────────────────── */
@@ -5837,4 +5934,75 @@ body .oldsite-page {
 
 .entity-shell.admin-page .security-toggle input[type="checkbox"] {
     accent-color: #4e95b8;
+}
+
+/* ================================================================
+   CONFIRMAI CLEANUP — Remove remaining old-project remnants from
+   user-facing parchment-a pages (payments, etc.)
+   ================================================================ */
+
+/* ── Table row base: kill var(--bg-slate) = #23272b bleed ──────── */
+body .entity-shell.parchment-a .product-table tr,
+body .entity-shell.parchment-a .payments-table tr,
+body .entity-shell.parchment-a .log-table tr {
+    background: transparent;
+}
+
+/* ── Pagination buttons: replace orange Tibia gradient ──────────── */
+body .entity-shell.parchment-a .pagination button {
+    background: #0d1825;
+    border: 1px solid #1c2a3b;
+    border-radius: 6px;
+    box-shadow: none;
+    color: #4e95b8;
+    font-weight: 700;
+}
+
+body .entity-shell.parchment-a .pagination button:hover:not(:disabled) {
+    background: rgba(78, 149, 184, 0.08);
+    border-color: #4e95b8;
+    color: #82bdd8;
+    filter: none;
+}
+
+body .entity-shell.parchment-a .pagination button:disabled {
+    background: #0b1320;
+    border-color: #111f2e;
+    box-shadow: none;
+    color: #334155;
+    opacity: 0.6;
+}
+
+body .entity-shell.parchment-a .pagination .pagination-info,
+body .entity-shell.parchment-a .pagination-info {
+    color: #475569;
+    font-weight: 700;
+}
+
+/* ── Empty state: replace parchment/brown with dark theme ──────── */
+body .admin-empty-state {
+    background: #0b1928;
+    border: 1px dashed #1c2a3b;
+}
+
+body .admin-empty-state-icon {
+    color: #4e95b8;
+}
+
+body .admin-empty-state-text {
+    color: #e2e8f0;
+}
+
+body .admin-empty-state-hint {
+    color: #64748b;
+}
+
+/* ── entity-muted remnants: --brown-text (#6b4726) on dark bg ──── */
+body .entity-shell-card p,
+body .entity-shell-card li {
+    color: #94a3b8;
+}
+
+body .entity-shell-subtitle {
+    color: #64748b;
 }
