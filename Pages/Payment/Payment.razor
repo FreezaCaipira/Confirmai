@@ -10,6 +10,8 @@
 @using Microsoft.JSInterop
 @using System.Globalization
 @using System.Text
+@using Microsoft.Extensions.Options
+@using Confirmai.Configuration
 
 @inject BitcoinPaymentFactory PaymentFactory
 @inject AppDbContext Db
@@ -25,6 +27,7 @@
 @inject UiTextService T
 @inject IJSRuntime JS
 @inject PaymentEventBus PaymentEventBus
+@inject IOptions<AbacatePayOptions> AbacatePayOpts
 
 <div class="entity-shell payment-container parchment-b tibia-pay-shell">
 
@@ -181,9 +184,9 @@
                         else
                         {
                             <div class="tibia-pay-waiting-message" role="status" aria-live="polite">
-                                <span class="tibia-pay-waiting-title">@(IsPixCurrentPayment ? "Aguardando confirmacao manual do pagamento PIX." : T["PaymentBuy.Waiting"])</span>
+                                <span class="tibia-pay-waiting-title">@(IsPixCurrentPayment && !AbacatePayOpts.Value.IsEnabled ? "Aguardando confirmacao manual do pagamento PIX." : T["PaymentBuy.Waiting"])</span>
                             </div>
-                            @if (!IsPixCurrentPayment)
+                            @if (!IsPixCurrentPayment || AbacatePayOpts.Value.IsEnabled)
                             {
                                 <button type="button" class="tibia-pay-btn" @onclick="OnCheckPaymentClick" aria-label="@T["PaymentBuy.Check"]">
                                     @T["PaymentBuy.Check"]
@@ -462,7 +465,7 @@
 
     private async Task CheckPayment()
     {
-        if (IsPixCurrentPayment)
+        if (IsPixCurrentPayment && !AbacatePayOpts.Value.IsEnabled)
         {
             NotifyUser("A confirmacao automatica para PIX nao esta disponivel. Aguarde a validacao manual.", "info");
             return;
@@ -619,18 +622,29 @@
             isLoading = true;
             pixSellerKeyNotice = null;
 
-            var recipientPixKey = await ResolvePixRecipientKeyAsync();
-            if (string.IsNullOrWhiteSpace(recipientPixKey))
+            if (AbacatePayOpts.Value.IsEnabled)
             {
-                return;
+                // External Pix gateway: AbacatePay Transparent Checkout
+                var orderId = $"order-{ProductId}-{Guid.NewGuid():N}";
+                var pixService = PaymentFactory.GetService("Pix");
+                var (address, paymentId) = await pixService.GenerateAddressAsync(Amount, orderId);
+                Address = address;
+                PaymentId = paymentId;
+            }
+            else
+            {
+                // Fallback: static EMVCo Pix payload (requires manual seller confirmation)
+                var recipientPixKey = await ResolvePixRecipientKeyAsync();
+                if (string.IsNullOrWhiteSpace(recipientPixKey))
+                    return;
+
+                var merchantName = SanitizePixText(product?.User?.FullName ?? product?.User?.UserName ?? "OTSERV MARKET", 25);
+                var merchantCity = SanitizePixText("SAO PAULO", 15);
+                var txId = BuildPixTxId(ProductId);
+                Address = BuildPixPayload(recipientPixKey, Amount, merchantName, merchantCity, txId);
+                PaymentId = $"pix-{Guid.NewGuid():N}";
             }
 
-            var merchantName = SanitizePixText(product?.User?.FullName ?? product?.User?.UserName ?? "OTSERV MARKET", 25);
-            var merchantCity = SanitizePixText("SAO PAULO", 15);
-            var txId = BuildPixTxId(ProductId);
-
-            Address = BuildPixPayload(recipientPixKey, Amount, merchantName, merchantCity, txId);
-            PaymentId = $"pix-{Guid.NewGuid():N}";
             IsPaid = false;
 
             AuthenticationState? authState = await AuthProvider.GetAuthenticationStateAsync();
@@ -657,7 +671,7 @@
             await Db.SaveChangesAsync();
 
             await LogService.LogAsync(
-                $"QR PIX gerado para produto {ProductId} (intermediacao: {UseSiteIntermediary}).",
+                $"QR PIX gerado para produto {ProductId} via {(AbacatePayOpts.Value.IsEnabled ? "AbacatePay" : "payload estatico")}.",
                 source: "Payment",
                 level: "Info",
                 userId: userId

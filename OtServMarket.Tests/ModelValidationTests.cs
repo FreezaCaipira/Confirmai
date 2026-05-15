@@ -117,4 +117,91 @@ public class ModelValidationTests
 
         Assert.True(HasError(msg, nameof(UserMailboxMessage.Subject)));
     }
+
+    // ─── Venue ────────────────────────────────────────────────────────────────
+
+    private static Venue ValidVenue() => new()
+    {
+        Name      = "Arena do Zé",
+        Address   = "Rua das Flores, 123",
+        City      = "Pouso Alegre",
+        StateCode = "MG",
+    };
+
+    [Fact]
+    public void Venue_Valid_WhenAllRequiredFieldsPresent()
+    {
+        Assert.True(IsValid(ValidVenue()));
+    }
+
+    [Fact]
+    public void Venue_Invalid_WhenNameIsEmpty()
+    {
+        var v = ValidVenue();
+        v.Name = string.Empty;
+        Assert.True(HasError(v, nameof(Venue.Name)));
+    }
+
+    [Fact]
+    public void Venue_Invalid_WhenNameExceeds120Chars()
+    {
+        var v = ValidVenue();
+        v.Name = new string('a', 121);
+        Assert.True(HasError(v, nameof(Venue.Name)));
+    }
+
+    [Fact]
+    public void Venue_Invalid_WhenAddressIsEmpty()
+    {
+        var v = ValidVenue();
+        v.Address = string.Empty;
+        Assert.True(HasError(v, nameof(Venue.Address)));
+    }
+
+    [Fact]
+    public void Venue_Invalid_WhenCityIsEmpty()
+    {
+        var v = ValidVenue();
+        v.City = string.Empty;
+        Assert.True(HasError(v, nameof(Venue.City)));
+    }
+
+    [Fact]
+    public void Venue_Invalid_WhenStateCodeExceedsTwoChars()
+    {
+        var v = ValidVenue();
+        v.StateCode = "MGX";
+        Assert.True(HasError(v, nameof(Venue.StateCode)));
+    }
+
+    [Fact]
+    public void Venue_Valid_WhenStateCodeIsExactlyTwoChars()
+    {
+        var v = ValidVenue();
+        v.StateCode = "SP";
+        Assert.True(IsValid(v));
+    }
+
+    // ─── Event ────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Event_Invalid_WhenLocationIsEmpty()
+    {
+        var ev = new Event { Location = string.Empty, MaxPlayers = 10, GroupId = 1 };
+        Assert.True(HasError(ev, nameof(Event.Location)));
+    }
+
+    [Fact]
+    public void Event_Invalid_WhenLocationExceeds200Chars()
+    {
+        var ev = new Event { Location = new string('x', 201), MaxPlayers = 10, GroupId = 1 };
+        Assert.True(HasError(ev, nameof(Event.Location)));
+    }
+
+    [Fact]
+    public void Event_Valid_WhenLocationIsWithinLimit()
+    {
+        var ev = new Event { Location = "Rua A, 10 — Bairro", MaxPlayers = 10, GroupId = 1 };
+        Assert.False(HasError(ev, nameof(Event.Location)));
+    }
 }

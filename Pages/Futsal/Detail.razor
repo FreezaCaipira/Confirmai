@@ -1,0 +1,348 @@
+@page "/futsal/{Id:int}"
+
+@attribute [AllowAnonymous]
+
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject Confirmai.Services.EventNotificationService NotificationService
+
+<PageTitle>@(ev?.Group?.Name ?? "Partida") · Confirmai</PageTitle>
+
+@if (isLoading)
+{
+    <div class="detail-loading">Carregando…</div>
+}
+else if (ev is null)
+{
+    <div class="detail-not-found">
+        <h2>Partida não encontrada.</h2>
+        <a href="/futsal">← Voltar</a>
+    </div>
+}
+else
+{
+    var confirmedOut = ev.Confirmations.Count(c => c.Position != FutsalPosition.Goalkeeper);
+    var confirmedGk  = ev.Confirmations.Count(c => c.Position == FutsalPosition.Goalkeeper);
+    var maxOut       = ev.MaxGoalkeepers.HasValue ? ev.MaxPlayers - ev.MaxGoalkeepers.Value : ev.MaxPlayers;
+    var isFullOut    = maxOut > 0 && confirmedOut >= maxOut;
+    var isFullGk     = ev.MaxGoalkeepers > 0 && confirmedGk >= ev.MaxGoalkeepers;
+    var userConf     = currentUserId is not null ? ev.Confirmations.FirstOrDefault(c => c.UserId == currentUserId) : null;
+    var isAdmin      = IsGroupAdmin();
+
+    <div class="detail-page">
+        <div class="detail-card">
+            @* ── Cabeçalho ────────────────────────────────────────────── *@
+            <header class="detail-header detail-header--futsal">
+                <span class="detail-sport-badge">⚽ Futsal</span>
+                <h1 class="detail-title">@ev.Group.Name</h1>
+                @if (!string.IsNullOrWhiteSpace(ev.LocalName))
+                {
+                    <p class="detail-localname">@ev.LocalName</p>
+                }
+                <p class="detail-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    @(ev.Venue is not null ? ev.Venue.Name : ev.Location)
+                    @if (!string.IsNullOrWhiteSpace(ev.Group.City))
+                    {
+                        <span> · @ev.Group.City/@ev.Group.StateCode</span>
+                    }
+                </p>
+            </header>
+
+            @if (isAdmin)
+            {
+                <div class="detail-admin-bar">
+                    <a class="detail-admin-btn" href="/futsal/@ev.Id/edit">
+                        <i class="fas fa-pen"></i> Editar partida
+                    </a>
+                    @if (ev.IsActive)
+                    {
+                        @if (!showCancelConfirm)
+                        {
+                            <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                                    @onclick="() => showCancelConfirm = true">
+                                <i class="fas fa-ban"></i> Cancelar partida
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="cancel-confirm-block">
+                                <span>Tem certeza? Todos os confirmados serão avisados.</span>
+                                <button class="detail-admin-btn" type="button"
+                                        @onclick="() => showCancelConfirm = false">Não</button>
+                                <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                                        @onclick="CancelEvent">Sim, cancelar</button>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+
+            @if (!ev.IsActive)
+            {
+                <div class="cancelled-banner">
+                    <i class="fas fa-ban"></i> Esta partida foi cancelada.
+                </div>
+            }
+
+            @* ── Info chips ───────────────────────────────────────────── *@
+            <div class="detail-chips">
+                <span class="detail-chip">
+                    <i class="fas fa-calendar-alt"></i>
+                    @ev.StartsAt.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("pt-BR"))
+                </span>
+                <span class="detail-chip">
+                    <i class="fas fa-clock"></i>
+                    @ev.StartsAt.ToString("HH:mm")
+                    @if (ev.DurationMinutes.HasValue)
+                    {
+                        <span> · @(ev.DurationMinutes / 60)h@(ev.DurationMinutes % 60 != 0 ? $"{ev.DurationMinutes % 60}min" : "")</span>
+                    }
+                </span>
+                @if (ev.Price.HasValue)
+                {
+                    <span class="detail-chip detail-chip--price">
+                        <i class="fas fa-money-bill-wave"></i>
+                        R$ @ev.Price.Value.ToString("N2")
+                    </span>
+                }
+            </div>
+
+            @* ── Jogadores ────────────────────────────────────────────── *@
+            <section class="detail-section">
+                <h2 class="detail-section-title">Jogadores confirmados</h2>
+
+                @if (ev.MaxGoalkeepers > 0)
+                {
+                    <div class="players-group-header">
+                        <span class="players-label">Linha</span>
+                        <span class="players-count @(isFullOut ? "is-full" : "")">
+                            @confirmedOut / @maxOut
+                        </span>
+                    </div>
+                }
+
+                <ol class="players-list">
+                    @{
+                        var outFieldPlayers = ev.Confirmations
+                            .Where(c => c.Position != FutsalPosition.Goalkeeper)
+                            .OrderBy(c => c.ConfirmedAt)
+                            .ToList();
+                        int outFieldSlots = maxOut > 0 ? maxOut : outFieldPlayers.Count;
+                        int outIdx = 0;
+                        foreach (var c in outFieldPlayers)
+                        {
+                            outIdx++;
+                            bool isWaitlist = maxOut > 0 && outIdx > maxOut;
+                            <li class="player-item @(isWaitlist ? "player-item--waitlist" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                <span class="player-num">@outIdx</span>
+                                <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
+                                @if (isWaitlist) { <span class="player-tag">fila</span> }
+                                @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
+                            </li>
+                        }
+                        for (int i = outIdx + 1; i <= outFieldSlots; i++)
+                        {
+                            <li class="player-item player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
+                        }
+                    }
+                </ol>
+
+                @if (ev.MaxGoalkeepers > 0)
+                {
+                    <div class="players-group-header" style="margin-top:1rem">
+                        <span class="players-label">🥅 Goleiros</span>
+                        <span class="players-count @(isFullGk ? "is-full" : "")">
+                            @confirmedGk / @ev.MaxGoalkeepers
+                        </span>
+                    </div>
+                    <ol class="players-list">
+                        @{
+                            var gkPlayers = ev.Confirmations
+                                .Where(c => c.Position == FutsalPosition.Goalkeeper)
+                                .OrderBy(c => c.ConfirmedAt)
+                                .ToList();
+                            int gkIdx = 0;
+                            foreach (var c in gkPlayers)
+                            {
+                                gkIdx++;
+                                bool isWaitlist = gkIdx > ev.MaxGoalkeepers!.Value;
+                                <li class="player-item @(isWaitlist ? "player-item--waitlist" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                    <span class="player-num">@gkIdx</span>
+                                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Goleiro")</span>
+                                    @if (isWaitlist) { <span class="player-tag">fila</span> }
+                                    @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
+                                </li>
+                            }
+                            for (int i = gkIdx + 1; i <= ev.MaxGoalkeepers!.Value; i++)
+                            {
+                                <li class="player-item player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
+                            }
+                        }
+                    </ol>
+                }
+            </section>
+
+            @* ── Ação de confirmação ──────────────────────────────────── *@
+            <div class="detail-action">
+                @if (!ev.IsActive)
+                {
+                    <p class="cancelled-notice">Esta partida foi cancelada.</p>
+                }
+                else if (currentUserId is null)
+                {
+                    <a href="/Identity/Account/Login?ReturnUrl=@Uri.EscapeDataString(NavigationManager.Uri)"
+                       class="confirm-btn">
+                        Entrar para confirmar presença
+                    </a>
+                }
+                else if (userConf is not null)
+                {
+                    <div class="confirmed-block">
+                        <p class="confirmed-label">
+                            ✅ Você está confirmado como <strong>@(userConf.Position == FutsalPosition.Goalkeeper ? "goleiro" : "linha")</strong>.
+                        </p>
+                        <button class="cancel-confirm-btn" @onclick="CancelConfirmation">
+                            Cancelar confirmação
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    @if (ev.MaxGoalkeepers > 0)
+                    {
+                        <div class="position-choice">
+                            <p class="position-label">Confirmar como:</p>
+                            <div class="position-btns">
+                                <button class="confirm-btn @(chosenPos == FutsalPosition.Outfield ? "confirm-btn--active" : "")"
+                                        @onclick='() => chosenPos = FutsalPosition.Outfield'>
+                                    ⚽ Linha @(isFullOut ? "(fila)" : "")
+                                </button>
+                                <button class="confirm-btn confirm-btn--gk @(chosenPos == FutsalPosition.Goalkeeper ? "confirm-btn--active" : "")"
+                                        @onclick='() => chosenPos = FutsalPosition.Goalkeeper'>
+                                    🥅 Goleiro @(isFullGk ? "(fila)" : "")
+                                </button>
+                            </div>
+                            <button class="confirm-submit-btn" @onclick="ConfirmPresence">
+                                Confirmar presença
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <button class="confirm-btn confirm-btn--full-width" @onclick="ConfirmPresence">
+                            @(isFullOut ? "Entrar na fila" : "Confirmar presença") ✓
+                        </button>
+                    }
+                }
+
+                @if (!string.IsNullOrWhiteSpace(actionError))
+                {
+                    <p class="detail-error">@actionError</p>
+                }
+            </div>
+
+            <div class="detail-back">
+                <a href="/futsal">← Voltar à lista</a>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Event?      ev             = null;
+    private bool        isLoading         = true;
+    private string?     currentUserId     = null;
+    private FutsalPosition chosenPos      = FutsalPosition.Outfield;
+    private string      actionError       = string.Empty;
+    private bool        showCancelConfirm = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await LoadEvent();
+    }
+
+    private async Task LoadEvent()
+    {
+        isLoading = true;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        ev = await db.Events
+            .Include(e => e.Group)
+            .Include(e => e.Venue)
+            .Include(e => e.Confirmations)
+                .ThenInclude(c => c.User)
+            .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
+        isLoading = false;
+    }
+
+    private bool IsGroupAdmin()
+    {
+        if (currentUserId is null || ev is null) return false;
+        return ev.CreatedByUserId == currentUserId;
+    }
+
+    private async Task ConfirmPresence()
+    {
+        if (currentUserId is null || ev is null) return;
+        actionError = string.Empty;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        // Avoid double-confirm
+        var existing = await db.EventConfirmations
+            .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
+        if (existing is not null) { actionError = "Você já está confirmado."; return; }
+
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId        = Id,
+            UserId         = currentUserId,
+            Position       = ev.MaxGoalkeepers > 0 ? chosenPos : FutsalPosition.Outfield,
+            ConfirmedAt    = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
+        await LoadEvent();
+    }
+
+    private async Task CancelConfirmation()
+    {
+        if (currentUserId is null) return;
+        actionError = string.Empty;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var conf = await db.EventConfirmations
+            .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
+        if (conf is not null)
+        {
+            db.EventConfirmations.Remove(conf);
+            await db.SaveChangesAsync();
+        }
+        await LoadEvent();
+    }
+
+    private async Task CancelEvent()
+    {
+        if (currentUserId is null) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var dbEv = await db.Events.FirstOrDefaultAsync(e => e.Id == Id);
+        if (dbEv is null || dbEv.CreatedByUserId != currentUserId) return;
+        dbEv.IsActive = false;
+        await db.SaveChangesAsync();
+        showCancelConfirm = false;
+        await NotificationService.NotifyEventCancelledAsync(Id, currentUserId!);
+        await LoadEvent();
+    }
+}

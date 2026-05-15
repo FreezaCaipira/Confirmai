@@ -1,0 +1,492 @@
+@page "/poker/{Id:int}"
+
+@attribute [AllowAnonymous]
+
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject Confirmai.Services.EventNotificationService NotificationService
+
+<PageTitle>@(PageTitle()) · Confirmai</PageTitle>
+
+@if (isLoading)
+{
+    <div class="detail-loading">Carregando…</div>
+}
+else if (ev is null)
+{
+    <div class="detail-not-found">
+        <h2>Evento não encontrado.</h2>
+        <a href="/poker">← Voltar</a>
+    </div>
+}
+else
+{
+    var isHomeGame  = ev.PokerEventType == PokerEventType.HomeGame;
+    var isUnlocked  = !isHomeGame || homeGameUnlocked;
+    var userConf    = currentUserId is not null ? ev.Confirmations.FirstOrDefault(c => c.UserId == currentUserId) : null;
+    var isAdmin     = ev.CreatedByUserId == currentUserId;
+
+    <div class="detail-page">
+        <div class="detail-card">
+
+            @* ── Header ──────────────────────────────────────────────── *@
+            <header class="detail-header detail-header--poker">
+                <div class="detail-poker-badge-row">
+                    <span class="detail-sport-badge detail-sport-badge--poker">♠ Poker</span>
+                    <span class="poker-type-badge--detail @TypeBadgeClass(ev.PokerEventType)">
+                        @TypeLabel(ev.PokerEventType)
+                    </span>
+                </div>
+                <h1 class="detail-title">
+                    @if (isHomeGame && !isUnlocked)
+                    {
+                        <span>@ev.Group.Name</span>
+                    }
+                    else
+                    {
+                        @ev.Group.Name
+                    }
+                </h1>
+                @if (!string.IsNullOrWhiteSpace(ev.PokerHouseName) && isUnlocked)
+                {
+                    <p class="detail-poker-house">
+                        <i class="fas fa-building"></i> @ev.PokerHouseName
+                    </p>
+                }
+                @if (!string.IsNullOrWhiteSpace(ev.Location) && isUnlocked)
+                {
+                    <p class="detail-location">
+                        <i class="fas fa-map-marker-alt"></i> @ev.Location
+                    </p>
+                }
+                @if (!string.IsNullOrWhiteSpace(ev.Group.City) && isUnlocked)
+                {
+                    <p class="detail-location">
+                        <i class="fas fa-city"></i> @ev.Group.City/@ev.Group.StateCode
+                    </p>
+                }
+            </header>
+
+            @if (isAdmin)
+            {
+                <div class="detail-admin-bar">
+                    <a class="detail-admin-btn detail-admin-btn--poker" href="/poker/@ev.Id/edit">
+                        <i class="fas fa-pen"></i> Editar evento
+                    </a>
+                    @if (ev.IsActive)
+                    {
+                        @if (!showCancelConfirm)
+                        {
+                            <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                                    @onclick="() => showCancelConfirm = true">
+                                <i class="fas fa-ban"></i> Cancelar evento
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="cancel-confirm-block">
+                                <span>Tem certeza? Esta ação não pode ser desfeita.</span>
+                                <button class="detail-admin-btn" type="button"
+                                        @onclick="() => showCancelConfirm = false">Não</button>
+                                <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                                        @onclick="CancelEvent">Sim, cancelar</button>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+
+            @if (!ev.IsActive)
+            {
+                <div class="cancelled-banner">
+                    <i class="fas fa-ban"></i> Este evento foi cancelado.
+                </div>
+            }
+
+            @* ── Info chips (sempre visíveis) ─────────────────────────── *@
+            <div class="detail-chips">
+                <span class="detail-chip">
+                    <i class="fas fa-calendar-alt"></i>
+                    @ev.StartsAt.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("pt-BR"))
+                </span>
+                <span class="detail-chip">
+                    <i class="fas fa-clock"></i> @ev.StartsAt.ToString("HH:mm")
+                </span>
+                @if (ev.LateRegEndsAt.HasValue && isUnlocked)
+                {
+                    <span class="detail-chip detail-chip--latereg">
+                        <i class="fas fa-hourglass-half"></i>
+                        Late Reg até @ev.LateRegEndsAt.Value.ToString("HH:mm")
+                        (@ev.LateRegEndsAt.Value.ToString("dd/MM"))
+                    </span>
+                }
+            </div>
+
+            @* ── Home Game: lock screen ───────────────────────────────── *@
+            @if (isHomeGame && !isUnlocked)
+            {
+                <div class="homegame-lock-block">
+                    <div class="homegame-lock-icon"><i class="fas fa-lock"></i></div>
+                    <p class="homegame-lock-text">
+                        Os detalhes deste Home Game são privados.<br />
+                        Digite o código de acesso para ver mais informações.
+                    </p>
+                    <div class="homegame-code-row">
+                        <input type="text"
+                               class="homegame-code-input @(codeWrong ? "homegame-code-input--error" : "")"
+                               placeholder="XK7-492"
+                               maxlength="7"
+                               @bind="codeInput"
+                               @bind:event="oninput"
+                               @onkeydown="HandleCodeKeyDown" />
+                        <button class="homegame-enter-btn" @onclick="TryUnlock">Entrar</button>
+                    </div>
+                    @if (codeWrong)
+                    {
+                        <p class="homegame-code-error">Código incorreto. Verifique com o organizador.</p>
+                    }
+                </div>
+            }
+
+            @* ── Torneio: detalhes ────────────────────────────────────── *@
+            @if (isUnlocked && ev.PokerEventType == PokerEventType.Tournament)
+            {
+                <section class="detail-section">
+                    <h2 class="detail-section-title">Estrutura</h2>
+                    <div class="poker-details-grid">
+                        @if (ev.Modality.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Modalidade</span>
+                                <span class="poker-detail-value">@ModalityLabel(ev.Modality.Value)</span>
+                            </div>
+                        }
+                        @if (ev.StartingStack.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Fichas iniciais</span>
+                                <span class="poker-detail-value">@ev.StartingStack.Value.ToString("N0")</span>
+                            </div>
+                        }
+                        @if (ev.InitialBlindBB.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Blind inicial</span>
+                                <span class="poker-detail-value">@ev.InitialBlindBB.Value BB</span>
+                            </div>
+                        }
+                        @if (ev.MaxPlayers != 0)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Máx. jogadores</span>
+                                <span class="poker-detail-value">@ev.MaxPlayers</span>
+                            </div>
+                        }
+                    </div>
+                </section>
+
+                <section class="detail-section">
+                    <h2 class="detail-section-title">Preços</h2>
+                    <div class="poker-details-grid">
+                        @if (ev.BuyInAmount.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Buy-in</span>
+                                <span class="poker-detail-value poker-detail-value--price">R$ @ev.BuyInAmount.Value.ToString("N2")</span>
+                            </div>
+                        }
+                        @if (ev.GTD.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">GTD</span>
+                                <span class="poker-detail-value poker-detail-value--gtd">R$ @ev.GTD.Value.ToString("N2")</span>
+                            </div>
+                        }
+                        @if (ev.RebuyAmount.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Rebuy</span>
+                                <span class="poker-detail-value">R$ @ev.RebuyAmount.Value.ToString("N2")</span>
+                            </div>
+                        }
+                        @if (ev.RebuyDoubleAmount.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Rebuy duplo</span>
+                                <span class="poker-detail-value">R$ @ev.RebuyDoubleAmount.Value.ToString("N2")</span>
+                            </div>
+                        }
+                        @if (ev.AddonAmount.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Add-on</span>
+                                <span class="poker-detail-value">R$ @ev.AddonAmount.Value.ToString("N2")</span>
+                            </div>
+                        }
+                        @if (ev.AddonDoubleAmount.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Add-on duplo</span>
+                                <span class="poker-detail-value">R$ @ev.AddonDoubleAmount.Value.ToString("N2")</span>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            @* ── Cash Game: detalhes ──────────────────────────────────── *@
+            @if (isUnlocked && ev.PokerEventType == PokerEventType.CashGame)
+            {
+                <section class="detail-section">
+                    <h2 class="detail-section-title">Stacks</h2>
+                    <div class="poker-details-grid">
+                        @if (ev.Modality.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Modalidade</span>
+                                <span class="poker-detail-value">@ModalityLabel(ev.Modality.Value)</span>
+                            </div>
+                        }
+                        @if (ev.CashMinBuyIn.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Stack mínimo</span>
+                                <span class="poker-detail-value poker-detail-value--price">R$ @ev.CashMinBuyIn.Value.ToString("N2")</span>
+                            </div>
+                        }
+                        @if (ev.CashMaxBuyIn.HasValue)
+                        {
+                            <div class="poker-detail-item">
+                                <span class="poker-detail-label">Stack máximo</span>
+                                <span class="poker-detail-value poker-detail-value--price">R$ @ev.CashMaxBuyIn.Value.ToString("N2")</span>
+                            </div>
+                        }
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(ev.CashIncludes))
+                    {
+                        <div class="cash-includes-block">
+                            <span class="cash-includes-label"><i class="fas fa-gift"></i> Incluso:</span>
+                            <span class="cash-includes-value">@ev.CashIncludes</span>
+                        </div>
+                    }
+                </section>
+            }
+
+            @* ── Home Game unlocked: detalhes ─────────────────────────── *@
+            @if (isUnlocked && ev.PokerEventType == PokerEventType.HomeGame)
+            {
+                <div class="homegame-unlocked-notice">
+                    <i class="fas fa-unlock"></i>
+                    <span>Acesso concedido. Bem-vindo ao home game!</span>
+                </div>
+            }
+
+            @* ── Jogadores inscritos ──────────────────────────────────── *@
+            @if (isUnlocked && ev.Confirmations.Any())
+            {
+                <section class="detail-section">
+                    <h2 class="detail-section-title">
+                        Inscritos (@ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $" / {ev.MaxPlayers}" : ""))
+                    </h2>
+                    <ol class="players-list">
+                        @{
+                            int pIdx = 0;
+                            foreach (var c in ev.Confirmations.OrderBy(c => c.ConfirmedAt))
+                            {
+                                pIdx++;
+                                bool isWaitlist = ev.MaxPlayers > 0 && pIdx > ev.MaxPlayers;
+                                <li class="player-item @(isWaitlist ? "player-item--waitlist" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                    <span class="player-num">@pIdx</span>
+                                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
+                                    @if (isWaitlist) { <span class="player-tag">fila</span> }
+                                    @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
+                                </li>
+                            }
+                        }
+                    </ol>
+                </section>
+            }
+
+            @* ── Ação ─────────────────────────────────────────────────── *@
+            @if (isUnlocked)
+            {
+                <div class="detail-action">
+                    @if (!ev.IsActive)
+                    {
+                        <p class="cancelled-notice">Este evento foi cancelado.</p>
+                    }
+                    else if (currentUserId is null)
+                    {
+                        <a href="/Identity/Account/Login?ReturnUrl=@Uri.EscapeDataString(NavigationManager.Uri)"
+                           class="confirm-btn confirm-btn--poker">
+                            Entrar para participar
+                        </a>
+                    }
+                    else if (userConf is not null)
+                    {
+                        <div class="confirmed-block">
+                            <p class="confirmed-label confirmed-label--poker">✅ Você está inscrito neste evento.</p>
+                            <button class="cancel-confirm-btn" @onclick="CancelConfirmation">
+                                Cancelar inscrição
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        var isFull = ev.MaxPlayers > 0 && ev.Confirmations.Count >= ev.MaxPlayers;
+                        <button class="confirm-btn confirm-btn--poker confirm-btn--full-width" @onclick="ConfirmPresence">
+                            @(isFull ? "Entrar na fila" : "Confirmar presença") ✓
+                        </button>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(actionError))
+                    {
+                        <p class="detail-error">@actionError</p>
+                    }
+                </div>
+            }
+
+            <div class="detail-back">
+                <a href="/poker">← Voltar à lista</a>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Event?   ev                = null;
+    private bool     isLoading         = true;
+    private string?  currentUserId     = null;
+    private bool     homeGameUnlocked  = false;
+    private string   codeInput         = string.Empty;
+    private bool     codeWrong         = false;
+    private string   actionError       = string.Empty;
+    private bool     showCancelConfirm = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await LoadEvent();
+    }
+
+    private async Task LoadEvent()
+    {
+        isLoading = true;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        ev = await db.Events
+            .Include(e => e.Group)
+            .Include(e => e.Confirmations)
+                .ThenInclude(c => c.User)
+            .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Poker);
+        isLoading = false;
+    }
+
+    private void TryUnlock()
+    {
+        codeWrong = false;
+        if (ev?.HomeGameCode is null) return;
+        if (string.Equals(codeInput.Trim(), ev.HomeGameCode, StringComparison.OrdinalIgnoreCase))
+            homeGameUnlocked = true;
+        else
+            codeWrong = true;
+    }
+
+    private async Task HandleCodeKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") TryUnlock();
+        await Task.CompletedTask;
+    }
+
+    private async Task ConfirmPresence()
+    {
+        if (currentUserId is null || ev is null) return;
+        actionError = string.Empty;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var existing = await db.EventConfirmations
+            .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
+        if (existing is not null) { actionError = "Você já está inscrito."; return; }
+
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId     = Id,
+            UserId      = currentUserId,
+            ConfirmedAt = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
+        await LoadEvent();
+    }
+
+    private async Task CancelConfirmation()
+    {
+        if (currentUserId is null) return;
+        actionError = string.Empty;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var conf = await db.EventConfirmations
+            .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
+        if (conf is not null)
+        {
+            db.EventConfirmations.Remove(conf);
+            await db.SaveChangesAsync();
+        }
+        await LoadEvent();
+    }
+
+    private async Task CancelEvent()
+    {
+        if (currentUserId is null) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var dbEv = await db.Events.FirstOrDefaultAsync(e => e.Id == Id);
+        if (dbEv is null || dbEv.CreatedByUserId != currentUserId) return;
+        dbEv.IsActive = false;
+        await db.SaveChangesAsync();
+        showCancelConfirm = false;
+        await NotificationService.NotifyEventCancelledAsync(Id, currentUserId!);
+        await LoadEvent();
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private string PageTitle() => ev is null ? "Evento" : $"{ev.Group.Name} · {TypeLabel(ev.PokerEventType)}";
+
+    private static string TypeLabel(PokerEventType? t) => t switch
+    {
+        PokerEventType.Tournament => "Torneio",
+        PokerEventType.CashGame   => "Cash Game",
+        PokerEventType.HomeGame   => "Home Game",
+        _                         => "Poker"
+    };
+
+    private static string TypeBadgeClass(PokerEventType? t) => t switch
+    {
+        PokerEventType.Tournament => "poker-type-badge--tourney",
+        PokerEventType.CashGame   => "poker-type-badge--cash",
+        PokerEventType.HomeGame   => "poker-type-badge--home",
+        _                         => ""
+    };
+
+    private static string ModalityLabel(PokerModality m) => m switch
+    {
+        PokerModality.Vanilla      => "Vanilla (Texas NL)",
+        PokerModality.PKO          => "PKO",
+        PokerModality.Freezeout    => "Freezeout",
+        PokerModality.PLO4         => "PLO 4 cartas",
+        PokerModality.PLO5         => "PLO 5 cartas",
+        PokerModality.PLO6         => "PLO 6 cartas",
+        PokerModality.DealerChoice => "Dealer's Choice",
+        _                          => m.ToString()
+    };
+}

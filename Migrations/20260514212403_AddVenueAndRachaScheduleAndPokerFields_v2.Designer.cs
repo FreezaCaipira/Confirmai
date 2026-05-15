@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Confirmai.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260513152426_RemoveTibiaFields")]
-    partial class RemoveTibiaFields
+    [Migration("20260514212403_AddVenueAndRachaScheduleAndPokerFields_v2")]
+    partial class AddVenueAndRachaScheduleAndPokerFields_v2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -219,6 +219,12 @@ namespace Confirmai.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<decimal?>("AddonAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("AddonDoubleAmount")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("BonusInfo")
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
@@ -227,6 +233,19 @@ namespace Confirmai.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<decimal?>("BuyInAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("CashIncludes")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<decimal?>("CashMaxBuyIn")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("CashMinBuyIn")
+                        .HasColumnType("numeric");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -234,11 +253,31 @@ namespace Confirmai.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("character varying(450)");
 
+                    b.Property<int?>("DurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("GTD")
+                        .HasColumnType("numeric");
+
                     b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("HomeGameCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<int?>("InitialBlindBB")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LateRegEndsAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LocalName")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -251,17 +290,53 @@ namespace Confirmai.Migrations
                     b.Property<int>("MaxPlayers")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("Modality")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PokerEventType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PokerHouseName")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<int?>("RachaScheduleId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Rebuy")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<decimal?>("RebuyAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("RebuyDoubleAmount")
+                        .HasColumnType("numeric");
+
                     b.Property<int>("Sport")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("StartingStack")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StartsAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("VenueId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("HomeGameCode")
+                        .IsUnique()
+                        .HasFilter("\"HomeGameCode\" IS NOT NULL");
+
+                    b.HasIndex("RachaScheduleId");
+
+                    b.HasIndex("VenueId");
 
                     b.HasIndex("GroupId", "StartsAt");
 
@@ -545,6 +620,58 @@ namespace Confirmai.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("Confirmai.Models.RachaSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LocalName")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<int>("MaxPlayers")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<TimeOnly>("TimeOfDay")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<int>("VenueId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VenueId");
+
+                    b.HasIndex("GroupId", "DayOfWeek", "TimeOfDay");
+
+                    b.ToTable("RachaSchedules");
+                });
+
             modelBuilder.Entity("Confirmai.Models.UserMailboxMessage", b =>
                 {
                     b.Property<int>("Id")
@@ -614,6 +741,54 @@ namespace Confirmai.Migrations
                     b.HasIndex("SenderUserId", "CreatedAt");
 
                     b.ToTable("UserMailboxMessages");
+                });
+
+            modelBuilder.Entity("Confirmai.Models.Venue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("StateCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("City", "StateCode", "IsActive");
+
+                    b.ToTable("Venues");
                 });
 
             modelBuilder.Entity("Confirmai.Models.WaitingList", b =>
@@ -918,7 +1093,21 @@ namespace Confirmai.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Confirmai.Models.RachaSchedule", "RachaSchedule")
+                        .WithMany("GeneratedEvents")
+                        .HasForeignKey("RachaScheduleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Confirmai.Models.Venue", "Venue")
+                        .WithMany("Events")
+                        .HasForeignKey("VenueId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Group");
+
+                    b.Navigation("RachaSchedule");
+
+                    b.Navigation("Venue");
                 });
 
             modelBuilder.Entity("Confirmai.Models.EventConfirmation", b =>
@@ -993,6 +1182,25 @@ namespace Confirmai.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Confirmai.Models.RachaSchedule", b =>
+                {
+                    b.HasOne("Confirmai.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Confirmai.Models.Venue", "Venue")
+                        .WithMany("Schedules")
+                        .HasForeignKey("VenueId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Venue");
                 });
 
             modelBuilder.Entity("Confirmai.Models.UserMailboxMessage", b =>
@@ -1151,6 +1359,18 @@ namespace Confirmai.Migrations
             modelBuilder.Entity("Confirmai.Models.PaymentRecord", b =>
                 {
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Confirmai.Models.RachaSchedule", b =>
+                {
+                    b.Navigation("GeneratedEvents");
+                });
+
+            modelBuilder.Entity("Confirmai.Models.Venue", b =>
+                {
+                    b.Navigation("Events");
+
+                    b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("OrderModel", b =>

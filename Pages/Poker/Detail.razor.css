@@ -1,0 +1,200 @@
+/* Shared detail styles live in wwwroot/css/events.css */
+
+/* ── Header poker ────────────────────────── */
+.detail-header--poker .detail-sport-badge { color: #a78bfa; }
+
+.detail-poker-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.15rem;
+}
+
+.detail-sport-badge--poker { color: #a78bfa !important; }
+
+/* ── Tipo badge (no header) ──────────────── */
+.poker-type-badge--detail {
+    display: inline-block;
+    padding: 1px 10px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.poker-type-badge--tourney { background: #1e1034; color: #a78bfa; border: 1px solid #4c1d95; }
+.poker-type-badge--cash    { background: #14290f; color: #4ade80; border: 1px solid #14532d; }
+.poker-type-badge--home    { background: #1a1209; color: #fbbf24; border: 1px solid #78350f; }
+
+/* ── Casa de poker ───────────────────────── */
+.detail-poker-house {
+    font-size: 0.88rem;
+    color: #a78bfa;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* ── Late reg chip ───────────────────────── */
+.detail-chip--latereg {
+    border-color: #78350f;
+    color: #fbbf24;
+    background: #1a1209;
+}
+
+/* ── Home Game — lock screen ─────────────── */
+.homegame-lock-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem 1rem;
+    background: #0d1420;
+    border: 1px dashed #78350f;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.homegame-lock-icon {
+    font-size: 2.5rem;
+    color: #d97706;
+    opacity: 0.7;
+}
+
+.homegame-lock-text {
+    font-size: 0.88rem;
+    color: #78716c;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 340px;
+}
+
+.homegame-code-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.homegame-code-input {
+    width: 120px;
+    padding: 0.55rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid #44403c;
+    background: #1a1209;
+    color: #fbbf24;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.14s;
+}
+
+.homegame-code-input:focus   { border-color: #d97706; }
+.homegame-code-input--error  { border-color: #dc2626 !important; }
+
+.homegame-enter-btn {
+    padding: 0.55rem 1.1rem;
+    border-radius: 8px;
+    background: #d97706;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.88rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.14s;
+}
+
+.homegame-enter-btn:hover { background: #b45309; }
+
+.homegame-code-error {
+    font-size: 0.8rem;
+    color: #f87171;
+    margin: 0;
+}
+
+/* ── Home Game unlocked notice ───────────── */
+.homegame-unlocked-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.75rem 1rem;
+    background: #0a1e10;
+    border: 1px solid #14532d;
+    border-radius: 10px;
+    font-size: 0.87rem;
+    color: #4ade80;
+    font-weight: 600;
+}
+
+.homegame-unlocked-notice i { color: #4ade80; }
+
+/* ── Poker details grid ──────────────────── */
+.poker-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.6rem;
+}
+
+.poker-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    background: #0d1825;
+    border: 1px solid #162438;
+    border-radius: 10px;
+    padding: 0.65rem 0.85rem;
+}
+
+.poker-detail-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #475569;
+}
+
+.poker-detail-value {
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: #e2e8f0;
+}
+
+.poker-detail-value--price { color: #4ade80; }
+.poker-detail-value--gtd   { color: #fbbf24; font-size: 1.1rem; }
+
+/* ── Cash includes ───────────────────────── */
+.cash-includes-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    background: #0d1825;
+    border: 1px solid #162438;
+    border-radius: 10px;
+    margin-top: 0.5rem;
+}
+
+.cash-includes-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #a78bfa;
+    white-space: nowrap;
+}
+
+.cash-includes-value {
+    font-size: 0.87rem;
+    color: #94a3b8;
+}
+
+/* ── Confirm btn poker variant ───────────── */
+.confirm-btn--poker {
+    background: #7c3aed;
+    color: #fff;
+    border: none;
+}
+
+.confirm-btn--poker:hover { background: #6d28d9; }
+
+.confirmed-label--poker { color: #a78bfa; background: #1e1034; border-color: #4c1d95; }

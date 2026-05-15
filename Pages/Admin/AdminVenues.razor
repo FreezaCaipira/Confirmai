@@ -1,0 +1,194 @@
+﻿@page "/admin/venues"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Confirmai.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject LogService LogService
+
+<div class="entity-shell admin-page admin-venues-page">
+
+    <PageTitle>Quadras / Venues — Confirmai</PageTitle>
+
+    <section class="entity-shell-grid" aria-label="Gerenciamento de quadras">
+        <article class="entity-shell-card entity-shell-main">
+            <h1 class="page-section-title">Quadras &amp; Venues</h1>
+
+            <div class="filter-bar admin-filter-card">
+                <input type="text" placeholder="Filtrar por nome…"
+                       @bind="filterName" @bind:event="oninput" @bind:after="ApplyFilter" />
+                <select @bind="filterType" @bind:after="ApplyFilter">
+                    <option value="">Todos os tipos</option>
+                    @foreach (var t in Enum.GetValues<VenueType>())
+                    {
+                        <option value="@((int)t)">@VenueTypeLabel(t)</option>
+                    }
+                </select>
+                <select @bind="filterState" @bind:after="ApplyFilter">
+                    <option value="">Todos os estados</option>
+                    <option value="active">Ativas</option>
+                    <option value="inactive">Inativas</option>
+                </select>
+                <div class="filter-action-buttons">
+                    <button type="button" @onclick="ClearFilters">Limpar</button>
+                    <button type="button" class="success-btn" @onclick='() => NavigationManager.NavigateTo("/admin/venues/edit/0")'>
+                        <i class="fas fa-plus"></i> Nova Quadra
+                    </button>
+                </div>
+            </div>
+
+            <AdminDataState IsLoading="@isLoading"
+                            IsEmpty="@(!filtered.Any())"
+                            LoadingText="Carregando quadras…"
+                            EmptyText="Nenhuma quadra encontrada."
+                            EmptyIcon="fas fa-map-marker-alt"
+                            EmptyHint="Cadastre quadras para vinculá-las aos rachas.">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Cidade / UF</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in filtered.Skip((currentPage - 1) * PageSize).Take(PageSize))
+                        {
+                            <tr>
+                                <td data-label="Nome">@v.Name</td>
+                                <td data-label="Tipo">
+                                    <span class="venue-type-badge venue-type-@v.Type.ToString().ToLower()">
+                                        @VenueTypeLabel(v.Type)
+                                    </span>
+                                </td>
+                                <td data-label="Cidade / UF">@v.City — @v.StateCode</td>
+                                <td data-label="Status">
+                                    @if (v.IsActive)
+                                    {
+                                        <span class="order-status-badge pago">Ativa</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="order-status-badge cancelado">Inativa</span>
+                                    }
+                                </td>
+                                <td data-label="Ações">
+                                    <div class="admin-actions-row">
+                                        <button class="edit-btn action-btn icon-only"
+                                                @onclick='() => NavigationManager.NavigateTo($"/admin/venues/edit/{v.Id}")'
+                                                title="Editar" aria-label="Editar">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </button>
+                                        <button class="danger action-btn icon-only"
+                                                @onclick="() => ToggleActive(v)"
+                                                title="@(v.IsActive ? "Desativar" : "Ativar")"
+                                                aria-label="@(v.IsActive ? "Desativar" : "Ativar")">
+                                            <i class="fas @(v.IsActive ? "fa-ban" : "fa-check")"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button type="button" @onclick="PrevPage" disabled="@(currentPage <= 1)">Anterior</button>
+                    <span class="pagination-info">Página @currentPage de @TotalPages</span>
+                    <button type="button" @onclick="NextPage" disabled="@(currentPage >= TotalPages)">Próxima</button>
+                </div>
+            </AdminDataState>
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="Ações extras">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+    </section>
+
+</div>
+
+@code {
+    private const int PageSize = 20;
+
+    private List<Venue> all      = new();
+    private List<Venue> filtered = new();
+    private bool        isLoading = true;
+    private int         currentPage = 1;
+
+    private string  filterName  = string.Empty;
+    private string  filterType  = string.Empty;
+    private string  filterState = string.Empty;
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(filtered.Count / (double)PageSize));
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        all = await db.Venues
+            .OrderBy(v => v.StateCode)
+            .ThenBy(v => v.City)
+            .ThenBy(v => v.Name)
+            .ToListAsync();
+        ApplyFilter();
+        isLoading = false;
+    }
+
+    private void ApplyFilter()
+    {
+        var q = all.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(filterName))
+            q = q.Where(v => v.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)
+                           || v.City.Contains(filterName, StringComparison.OrdinalIgnoreCase));
+
+        if (!string.IsNullOrWhiteSpace(filterType) && int.TryParse(filterType, out var typeInt))
+            q = q.Where(v => (int)v.Type == typeInt);
+
+        if (filterState == "active")   q = q.Where(v => v.IsActive);
+        if (filterState == "inactive") q = q.Where(v => !v.IsActive);
+
+        filtered = q.ToList();
+        currentPage = 1;
+    }
+
+    private void ClearFilters()
+    {
+        filterName  = string.Empty;
+        filterType  = string.Empty;
+        filterState = string.Empty;
+        ApplyFilter();
+    }
+
+    private async Task ToggleActive(Venue venue)
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var entity = await db.Venues.FindAsync(venue.Id);
+        if (entity is null) return;
+        entity.IsActive = !entity.IsActive;
+        await db.SaveChangesAsync();
+        venue.IsActive = entity.IsActive;
+        var evtType = entity.IsActive ? "venue.activated" : "venue.deactivated";
+        var label   = entity.IsActive ? "ativada" : "desativada";
+        await LogService.AuditAsync(evtType, "Venue", entity.Id.ToString(),
+            $"Quadra {label}: {entity.Name}");
+    }
+
+    private void PrevPage() { if (currentPage > 1) currentPage--; }
+    private void NextPage() { if (currentPage < TotalPages) currentPage++; }
+
+    private static string VenueTypeLabel(VenueType t) => t switch
+    {
+        VenueType.Quadra  => "Quadra",
+        VenueType.Society => "Society",
+        VenueType.Campo   => "Campo",
+        _                 => t.ToString()
+    };
+}

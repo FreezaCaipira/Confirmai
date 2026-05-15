@@ -1,0 +1,529 @@
+@page "/poker/create"
+
+@attribute [Authorize]
+
+@using System.Security.Claims
+@using System.Security.Cryptography
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Criar Evento · Poker · Confirmai</PageTitle>
+
+<div class="create-event-page">
+    <div class="create-event-card">
+
+        @* ── Seleção de tipo ─────────────────────────────────────────────── *@
+        <div class="poker-type-selector">
+            <button class="poker-type-tab @(form.EventType == PokerEventType.Tournament ? "is-active is-active--tourney" : "")"
+                    type="button" @onclick='() => form.EventType = PokerEventType.Tournament'>
+                <i class="fas fa-trophy"></i> Torneio
+            </button>
+            <button class="poker-type-tab @(form.EventType == PokerEventType.CashGame ? "is-active is-active--cash" : "")"
+                    type="button" @onclick='() => form.EventType = PokerEventType.CashGame'>
+                <i class="fas fa-coins"></i> Cash Game
+            </button>
+            <button class="poker-type-tab @(form.EventType == PokerEventType.HomeGame ? "is-active is-active--home" : "")"
+                    type="button" @onclick='() => form.EventType = PokerEventType.HomeGame'>
+                <i class="fas fa-home"></i> Home Game
+            </button>
+        </div>
+
+        <h1 class="create-event-title">
+            @(form.EventType switch
+            {
+                PokerEventType.Tournament => "🏆 Novo Torneio",
+                PokerEventType.CashGame   => "💰 Novo Cash Game",
+                PokerEventType.HomeGame   => "🏠 Novo Home Game",
+                _                         => "Novo Evento"
+            })
+        </h1>
+
+        <EditForm Model="form" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="validation-summary" />
+
+            @* ── Identidade ──────────────────────────────────────────────── *@
+            <fieldset class="form-section">
+                <legend>Identidade</legend>
+
+                <div class="form-group">
+                    <label>Nome do evento <span class="required">*</span></label>
+                    <InputText class="input" @bind-Value="form.Name"
+                               placeholder='@(form.EventType == PokerEventType.Tournament
+                                    ? "Ex: \"Deep Stack Terça\", \"Sunday Main Event\""
+                                    : form.EventType == PokerEventType.CashGame
+                                        ? "Ex: \"Cash da Galera\", \"NL200 Semanal\""
+                                        : "Ex: \"Torneio do Bolão\", \"Reunião Mensal\"")' />
+                    <ValidationMessage For="@(() => form.Name)" class="validation-message" />
+                </div>
+
+                <div class="form-group">
+                    <label>@(form.EventType == PokerEventType.HomeGame ? "Sua casa / local" : "Casa de Poker") <span class="required">*</span></label>
+                    <InputText class="input" @bind-Value="form.PokerHouseName"
+                               placeholder='@(form.EventType == PokerEventType.HomeGame ? "Ex: \"Casa do João\"" : "Ex: \"Casino XYZ\", \"Club Poker SP\"")' />
+                    <ValidationMessage For="@(() => form.PokerHouseName)" class="validation-message" />
+                </div>
+
+                @if (form.EventType != PokerEventType.HomeGame)
+                {
+                    <div class="form-group">
+                        <label>Endereço</label>
+                        <InputText class="input" @bind-Value="form.Address"
+                                   placeholder="Rua, número, bairro — Cidade/UF" />
+                    </div>
+                }
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Cidade <span class="required">*</span></label>
+                        <InputText class="input" @bind-Value="form.City" placeholder="São Paulo" />
+                        <ValidationMessage For="@(() => form.City)" class="validation-message" />
+                    </div>
+                    <div class="form-group">
+                        <label>UF <span class="required">*</span></label>
+                        <InputText class="input" @bind-Value="form.StateCode" placeholder="SP" maxlength="2" />
+                        <ValidationMessage For="@(() => form.StateCode)" class="validation-message" />
+                    </div>
+                </div>
+            </fieldset>
+
+            @* ── Data e hora ─────────────────────────────────────────────── *@
+            <fieldset class="form-section">
+                <legend>Data &amp; Horário</legend>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Data <span class="required">*</span></label>
+                        <InputDate class="input" @bind-Value="form.Date" />
+                        <ValidationMessage For="@(() => form.Date)" class="validation-message" />
+                    </div>
+                        <div class="form-group">
+                        <label>Hora de início <span class="required">*</span></label>
+                        <input type="time" class="input"
+                               value="@form.Time.ToString("HH:mm")"
+                               @onchange="OnTimeChange" />
+                    </div>
+                </div>
+
+                @if (form.EventType == PokerEventType.Tournament)
+                {
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Late Registration — data</label>
+                            <InputDate class="input" @bind-Value="form.LateRegDate" />
+                        </div>
+                        <div class="form-group">
+                            <label>Late Registration — hora</label>
+                            <input type="time" class="input"
+                                   value="@(form.LateRegTime?.ToString(@"hh\:mm") ?? "")"
+                                   @onchange="e => { if (TimeOnly.TryParse(e.Value?.ToString(), out var t)) form.LateRegTime = t; }" />
+                            <small class="form-hint">Deixe em branco se não houver.</small>
+                        </div>
+                    </div>
+                }
+            </fieldset>
+
+            @* ── Modalidade ──────────────────────────────────────────────── *@
+            @if (form.EventType != PokerEventType.HomeGame)
+            {
+                <fieldset class="form-section">
+                    <legend>Modalidade</legend>
+
+                    <div class="modality-grid">
+                        @foreach (var m in AvailableModalities(form.EventType))
+                        {
+                            <label class="modality-chip @(form.Modality == m ? "modality-chip--on" : "")">
+                                <input type="radio" name="modality" value="@m"
+                                       checked="@(form.Modality == m)"
+                                       @onchange="() => form.Modality = m" />
+                                @ModalityLabel(m)
+                            </label>
+                        }
+                    </div>
+                </fieldset>
+            }
+
+            @* ── Torneio: preços e estrutura ─────────────────────────────── *@
+            @if (form.EventType == PokerEventType.Tournament)
+            {
+                <fieldset class="form-section">
+                    <legend>Estrutura do Torneio</legend>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Fichas iniciais <span class="required">*</span></label>
+                            <InputNumber class="input" @bind-Value="form.StartingStack" min="1000" step="500" />
+                            <ValidationMessage For="@(() => form.StartingStack)" class="validation-message" />
+                        </div>
+                        <div class="form-group">
+                            <label>Blind inicial (em BBs) <span class="required">*</span></label>
+                            <InputNumber class="input" @bind-Value="form.InitialBlindBB" min="1" />
+                            <small class="form-hint">Quantas fichas = 1 BB no nível inicial.</small>
+                            <ValidationMessage For="@(() => form.InitialBlindBB)" class="validation-message" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nº máximo de jogadores</label>
+                        <InputNumber class="input" @bind-Value="form.MaxPlayers" min="0" />
+                        <small class="form-hint">Use 0 para ilimitado.</small>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-section">
+                    <legend>Preços</legend>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Buy-in (R$) <span class="required">*</span></label>
+                            <div class="input-prefix-wrap">
+                                <span class="input-prefix">R$</span>
+                                <InputNumber class="input" @bind-Value="form.BuyInAmount" min="0" step="5" />
+                            </div>
+                            <ValidationMessage For="@(() => form.BuyInAmount)" class="validation-message" />
+                        </div>
+                        <div class="form-group">
+                            <label>GTD — Premiação garantida (R$)</label>
+                            <div class="input-prefix-wrap">
+                                <span class="input-prefix">R$</span>
+                                <InputNumber class="input" @bind-Value="form.GTD" min="0" step="100" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Rebuy (R$)</label>
+                            <div class="input-prefix-wrap">
+                                <span class="input-prefix">R$</span>
+                                <InputNumber class="input" @bind-Value="form.RebuyAmount" min="0" step="5" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Rebuy duplo (R$)</label>
+                            <div class="input-prefix-wrap">
+                                <span class="input-prefix">R$</span>
+                                <InputNumber class="input" @bind-Value="form.RebuyDoubleAmount" min="0" step="5" />
+                            </div>
+                            <small class="form-hint">Pode ser menor que rebuy×2.</small>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Add-on (R$)</label>
+                            <div class="input-prefix-wrap">
+                                <span class="input-prefix">R$</span>
+                                <InputNumber class="input" @bind-Value="form.AddonAmount" min="0" step="5" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Add-on duplo (R$)</label>
+                            <div class="input-prefix-wrap">
+                                <span class="input-prefix">R$</span>
+                                <InputNumber class="input" @bind-Value="form.AddonDoubleAmount" min="0" step="5" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            }
+
+            @* ── Cash Game: stacks ───────────────────────────────────────── *@
+            @if (form.EventType == PokerEventType.CashGame)
+            {
+                <fieldset class="form-section">
+                    <legend>Stacks</legend>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Stack mínimo (R$) <span class="required">*</span></label>
+                            <div class="input-prefix-wrap">
+                                <span class="input-prefix">R$</span>
+                                <InputNumber class="input" @bind-Value="form.CashMinBuyIn" min="0" step="50" />
+                            </div>
+                            <ValidationMessage For="@(() => form.CashMinBuyIn)" class="validation-message" />
+                        </div>
+                        <div class="form-group">
+                            <label>Stack máximo (R$) <span class="required">*</span></label>
+                            <div class="input-prefix-wrap">
+                                <span class="input-prefix">R$</span>
+                                <InputNumber class="input" @bind-Value="form.CashMaxBuyIn" min="0" step="50" />
+                            </div>
+                            <ValidationMessage For="@(() => form.CashMaxBuyIn)" class="validation-message" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>O que está incluso para os jogadores?</label>
+                        <InputText class="input" @bind-Value="form.CashIncludes"
+                                   placeholder='Ex: "janta, cerveja e refri", "snacks e água"' maxlength="300" />
+                        <small class="form-hint">Opcional — ex: janta inclusa, bebidas, etc.</small>
+                    </div>
+                </fieldset>
+            }
+
+            @* ── Home Game: aviso ────────────────────────────────────────── *@
+            @if (form.EventType == PokerEventType.HomeGame)
+            {
+                <div class="homegame-notice">
+                    <i class="fas fa-key"></i>
+                    <div>
+                        <strong>Código de acesso</strong>
+                        <p>Um código privado será gerado automaticamente ao criar o evento. Compartilhe com seus convidados — apenas quem tiver o código verá os detalhes do home game.</p>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(saveError))
+            {
+                <p class="validation-message" style="margin-top:.5rem">@saveError</p>
+            }
+
+            <div class="form-actions">
+                <button class="cancel-btn" type="button"
+                        @onclick='() => NavigationManager.NavigateTo("/poker")'>
+                    Cancelar
+                </button>
+                <button class="save-btn save-btn--poker" type="submit" disabled="@isSaving">
+                    @(isSaving ? "Criando…" : $"Criar {EventTypeLabel(form.EventType)}")
+                </button>
+            </div>
+
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    // ── Form model ──────────────────────────────────────────────────────────
+
+    private sealed class CreatePokerEventForm
+    {
+        public PokerEventType EventType { get; set; } = PokerEventType.Tournament;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe o nome do evento.")]
+        [System.ComponentModel.DataAnnotations.StringLength(120)]
+        public string Name { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe o nome da casa/local.")]
+        [System.ComponentModel.DataAnnotations.StringLength(120)]
+        public string PokerHouseName { get; set; } = string.Empty;
+
+        public string? Address { get; set; }
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe a cidade.")]
+        [System.ComponentModel.DataAnnotations.StringLength(120)]
+        public string City { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe a UF.")]
+        [System.ComponentModel.DataAnnotations.StringLength(2)]
+        public string StateCode { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe a data.")]
+        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+
+        public TimeOnly Time { get; set; } = new TimeOnly(19, 0);
+
+        // Late reg (torneio)
+        public DateOnly? LateRegDate { get; set; }
+        public TimeOnly? LateRegTime { get; set; }
+
+        // Modalidade
+        public PokerModality Modality { get; set; } = PokerModality.Vanilla;
+
+        // Torneio — estrutura
+        [System.ComponentModel.DataAnnotations.Range(1000, int.MaxValue, ErrorMessage = "Mínimo 1.000 fichas.")]
+        public int StartingStack { get; set; } = 20000;
+
+        [System.ComponentModel.DataAnnotations.Range(1, int.MaxValue, ErrorMessage = "Informe os BBs.")]
+        public int InitialBlindBB { get; set; } = 50;
+
+        public int MaxPlayers { get; set; } = 0;
+
+        // Torneio — preços
+        [System.ComponentModel.DataAnnotations.Range(0, 1000000, ErrorMessage = "Valor inválido.")]
+        public decimal BuyInAmount { get; set; } = 0;
+
+        public decimal? GTD              { get; set; }
+        public decimal? RebuyAmount      { get; set; }
+        public decimal? RebuyDoubleAmount{ get; set; }
+        public decimal? AddonAmount      { get; set; }
+        public decimal? AddonDoubleAmount{ get; set; }
+
+        // Cash Game
+        [System.ComponentModel.DataAnnotations.Range(0, 1000000, ErrorMessage = "Valor inválido.")]
+        public decimal CashMinBuyIn { get; set; } = 0;
+
+        [System.ComponentModel.DataAnnotations.Range(0, 1000000, ErrorMessage = "Valor inválido.")]
+        public decimal CashMaxBuyIn { get; set; } = 0;
+
+        public string? CashIncludes { get; set; }
+    }
+
+    // ── State ────────────────────────────────────────────────────────────────
+
+    private CreatePokerEventForm form      = new();
+    private bool                 isSaving  = false;
+    private string               saveError = string.Empty;
+
+    // ── Query param: ?tipo= ──────────────────────────────────────────────────
+
+    [SupplyParameterFromQuery(Name = "tipo")]
+    public string? TipoParam { get; set; }
+
+    protected override void OnInitialized()
+    {
+        form.EventType = TipoParam switch
+        {
+            "cashgame"  => PokerEventType.CashGame,
+            "homegame"  => PokerEventType.HomeGame,
+            _           => PokerEventType.Tournament,
+        };
+    }
+
+    // ── Save ─────────────────────────────────────────────────────────────────
+
+    private async Task Save()
+    {
+        isSaving  = true;
+        saveError = string.Empty;
+
+        try
+        {
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                saveError = "Você precisa estar autenticado.";
+                return;
+            }
+
+            var startsAt = DateTime.SpecifyKind(
+                form.Date.ToDateTime(form.Time),
+                DateTimeKind.Utc);
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+
+            // 1 — Group
+            var group = new Group
+            {
+                Name            = form.Name,
+                Sport           = Sport.Poker,
+                City            = form.City,
+                StateCode       = form.StateCode.ToUpperInvariant(),
+                IsActive        = true,
+                CreatedByUserId = userId,
+            };
+            db.Groups.Add(group);
+            await db.SaveChangesAsync();
+
+            // 2 — GroupMember (Admin)
+            db.GroupMembers.Add(new GroupMember
+            {
+                GroupId = group.Id,
+                UserId  = userId,
+                Role    = GroupMemberRole.Admin,
+            });
+
+            // 3 — Event
+            var ev = new Event
+            {
+                GroupId         = group.Id,
+                Sport           = Sport.Poker,
+                Location        = form.Address ?? string.Empty,
+                PokerHouseName  = form.PokerHouseName,
+                StartsAt        = startsAt,
+                MaxPlayers      = form.MaxPlayers,
+                PokerEventType  = form.EventType,
+                Modality        = form.EventType != PokerEventType.HomeGame ? form.Modality : null,
+                IsActive        = true,
+                CreatedByUserId = userId,
+            };
+
+            switch (form.EventType)
+            {
+                case PokerEventType.Tournament:
+                    ev.BuyInAmount         = form.BuyInAmount;
+                    ev.GTD                 = form.GTD;
+                    ev.RebuyAmount         = form.RebuyAmount;
+                    ev.RebuyDoubleAmount   = form.RebuyDoubleAmount;
+                    ev.AddonAmount         = form.AddonAmount;
+                    ev.AddonDoubleAmount   = form.AddonDoubleAmount;
+                    ev.StartingStack       = form.StartingStack;
+                    ev.InitialBlindBB      = form.InitialBlindBB;
+                    if (form.LateRegDate.HasValue && form.LateRegTime.HasValue)
+                        ev.LateRegEndsAt = DateTime.SpecifyKind(
+                            form.LateRegDate.Value.ToDateTime(form.LateRegTime.Value),
+                            DateTimeKind.Utc);
+                    break;
+
+                case PokerEventType.CashGame:
+                    ev.CashMinBuyIn = form.CashMinBuyIn;
+                    ev.CashMaxBuyIn = form.CashMaxBuyIn;
+                    ev.CashIncludes = form.CashIncludes;
+                    break;
+
+                case PokerEventType.HomeGame:
+                    ev.HomeGameCode = GenerateHomeGameCode();
+                    break;
+            }
+
+            db.Events.Add(ev);
+            await db.SaveChangesAsync();
+            NavigationManager.NavigateTo($"/poker/{ev.Id}");
+        }
+        catch (Exception ex)
+        {
+            saveError = $"Erro ao criar evento: {ex.Message}";
+            isSaving  = false;
+        }
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private void OnTimeChange(ChangeEventArgs e)
+        => form.Time = TimeOnly.TryParse(e.Value?.ToString(), out var t) ? t : new TimeOnly(19, 0);
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private static string GenerateHomeGameCode()
+    {
+        const string Letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        const string Digits  = "23456789";
+        var bytes = RandomNumberGenerator.GetBytes(6);
+        return $"{Letters[bytes[0] % Letters.Length]}{Letters[bytes[1] % Letters.Length]}{Digits[bytes[2] % Digits.Length]}-{Digits[bytes[3] % Digits.Length]}{Digits[bytes[4] % Digits.Length]}{Digits[bytes[5] % Digits.Length]}";
+    }
+
+    private static PokerModality[] AvailableModalities(PokerEventType type) =>
+        type == PokerEventType.CashGame
+            ? Enum.GetValues<PokerModality>()
+            : Enum.GetValues<PokerModality>().Where(m => m != PokerModality.DealerChoice).ToArray();
+
+    private static string ModalityLabel(PokerModality m) => m switch
+    {
+        PokerModality.Vanilla      => "Vanilla (Texas NL)",
+        PokerModality.PKO          => "PKO",
+        PokerModality.Freezeout    => "Freezeout",
+        PokerModality.PLO4         => "PLO 4 cartas",
+        PokerModality.PLO5         => "PLO 5 cartas",
+        PokerModality.PLO6         => "PLO 6 cartas",
+        PokerModality.DealerChoice => "Dealer's Choice",
+        _                          => m.ToString()
+    };
+
+    private static string EventTypeLabel(PokerEventType t) => t switch
+    {
+        PokerEventType.Tournament => "Torneio",
+        PokerEventType.CashGame   => "Cash Game",
+        PokerEventType.HomeGame   => "Home Game",
+        _                         => "Evento"
+    };
+}

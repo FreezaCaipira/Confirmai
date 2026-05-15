@@ -1,0 +1,128 @@
+@page "/venue-manager/venues"
+
+@attribute [Authorize(Roles = "venue_manager,admin")]
+
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Minhas Quadras — Confirmai</PageTitle>
+
+<div class="entity-shell admin-page">
+
+    <section class="entity-shell-grid" aria-label="Gerenciamento de quadras">
+        <article class="entity-shell-card entity-shell-main">
+            <div class="page-section-header">
+                <h1 class="page-section-title">Minhas Quadras</h1>
+                <button class="success-btn" type="button"
+                        @onclick='() => NavigationManager.NavigateTo("/venue-manager/venues/edit/0")'>
+                    <i class="fas fa-plus"></i> Nova Quadra
+                </button>
+            </div>
+
+            @if (isLoading)
+            {
+                <p class="listing-state">Carregando…</p>
+            }
+            else if (!venues.Any())
+            {
+                <div class="listing-state listing-empty">
+                    <p>Você ainda não cadastrou nenhuma quadra.</p>
+                    <p style="color:#888;font-size:.9rem">Use o botão "Nova Quadra" para começar.</p>
+                </div>
+            }
+            else
+            {
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Cidade / UF</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in venues)
+                        {
+                            <tr>
+                                <td data-label="Nome">@v.Name</td>
+                                <td data-label="Tipo">
+                                    <span class="venue-type-badge venue-type-@v.Type.ToString().ToLower()">
+                                        @VenueTypeLabel(v.Type)
+                                    </span>
+                                </td>
+                                <td data-label="Cidade / UF">@v.City — @v.StateCode</td>
+                                <td data-label="Status">
+                                    @if (v.IsActive)
+                                    {
+                                        <span class="entity-shell-chip ok">Ativa</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="entity-shell-chip warn">Inativa</span>
+                                    }
+                                </td>
+                                <td data-label="Ações">
+                                    <div class="admin-actions-row">
+                                        <button class="edit-btn action-btn icon-only"
+                                                @onclick='() => NavigationManager.NavigateTo($"/venue-manager/venues/edit/{v.Id}")'
+                                                title="Editar" aria-label="Editar">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </article>
+    </section>
+
+</div>
+
+@code {
+    private List<Venue> venues = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            isLoading = false;
+            return;
+        }
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        // Admins see all venues; venue_managers see only theirs
+        var isAdmin = auth.User.IsInRole("admin");
+        var query = db.Venues.AsNoTracking().AsQueryable();
+        if (!isAdmin)
+            query = query.Where(v => v.CreatedByUserId == userId);
+
+        venues = await query.OrderBy(v => v.Name).ToListAsync();
+        isLoading = false;
+    }
+
+    private static string VenueTypeLabel(VenueType t) => t switch
+    {
+        VenueType.Quadra  => "Quadra",
+        VenueType.Society => "Society",
+        VenueType.Campo   => "Campo",
+        _                 => t.ToString()
+    };
+}

@@ -1,0 +1,201 @@
+@page "/meus-eventos"
+
+@attribute [Authorize]
+
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using System.Globalization
+@using System.Security.Claims
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Meus Eventos — Confirmai</PageTitle>
+
+<div class="entity-shell">
+
+    <section class="entity-shell-grid" aria-label="Meus eventos criados">
+        <article class="entity-shell-card entity-shell-main">
+
+            <div class="my-events-header">
+                <h1 class="page-section-title">Meus Eventos</h1>
+                <div class="my-events-create-btns">
+                    <a href="/futsal/create" class="my-events-create-btn my-events-create-btn--futsal">
+                        <i class="fas fa-futbol"></i> Nova Partida
+                    </a>
+                    <a href="/poker/create?tipo=torneio" class="my-events-create-btn my-events-create-btn--poker">
+                        <i class="fas fa-trophy"></i> Novo Torneio
+                    </a>
+                </div>
+            </div>
+
+            @if (isLoading)
+            {
+                <p class="listing-state">Carregando seus eventos…</p>
+            }
+            else if (!events.Any())
+            {
+                <div class="listing-state listing-empty">
+                    <p>Você ainda não criou nenhum evento.</p>
+                    <p style="color:#888;font-size:.9rem">Use os botões acima para criar sua primeira partida ou torneio.</p>
+                </div>
+            }
+            else
+            {
+                <!-- Filtro de esporte -->
+                <div class="my-events-sport-tabs">
+                    <button class="my-events-tab @(sportFilter == null ? "my-events-tab--active" : "")"
+                            @onclick='() => sportFilter = null'>
+                        Todos (@events.Count)
+                    </button>
+                    @if (events.Any(e => e.Sport == Sport.Futsal))
+                    {
+                        <button class="my-events-tab my-events-tab--futsal @(sportFilter == Sport.Futsal ? "my-events-tab--active" : "")"
+                                @onclick='() => sportFilter = Sport.Futsal'>
+                            ⚽ Futsal (@events.Count(e => e.Sport == Sport.Futsal))
+                        </button>
+                    }
+                    @if (events.Any(e => e.Sport == Sport.Poker))
+                    {
+                        <button class="my-events-tab my-events-tab--poker @(sportFilter == Sport.Poker ? "my-events-tab--active" : "")"
+                                @onclick='() => sportFilter = Sport.Poker'>
+                            🃏 Poker (@events.Count(e => e.Sport == Sport.Poker))
+                        </button>
+                    }
+                </div>
+
+                <div class="my-events-list">
+                    @foreach (var ev in FilteredEvents)
+                    {
+                        var isFutsal = ev.Sport == Sport.Futsal;
+                        var isPast   = ev.StartsAt < DateTime.UtcNow;
+                        var detailUrl = isFutsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
+
+                        <div class="my-event-card @(!ev.IsActive ? "my-event-card--inactive" : isPast ? "my-event-card--past" : "")">
+                            <div class="my-event-sport-badge @(isFutsal ? "my-event-sport-badge--futsal" : "my-event-sport-badge--poker")">
+                                @(isFutsal ? "⚽" : "🃏")
+                            </div>
+
+                            <div class="my-event-body">
+                                <div class="my-event-name-row">
+                                    <strong class="my-event-name">@ev.Group.Name</strong>
+                                    @if (!ev.IsActive)
+                                    {
+                                        <span class="my-event-status my-event-status--cancelled">Cancelado</span>
+                                    }
+                                    else if (isPast)
+                                    {
+                                        <span class="my-event-status my-event-status--past">Encerrado</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="my-event-status my-event-status--active">Ativo</span>
+                                    }
+                                    @if (!isFutsal && ev.PokerEventType.HasValue)
+                                    {
+                                        <span class="my-event-type-badge my-event-type-badge--@ev.PokerEventType.ToString()!.ToLower()">
+                                            @PokerTypeLabel(ev.PokerEventType.Value)
+                                        </span>
+                                    }
+                                </div>
+                                <p class="my-event-meta">
+                                    📅 @ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy 'às' HH:mm", PtBr)
+                                    &nbsp;·&nbsp;
+                                    👥 @ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $"/{ev.MaxPlayers}" : "") confirmados
+                                </p>
+                                @if (!string.IsNullOrWhiteSpace(ev.Location))
+                                {
+                                    <p class="my-event-location">📍 @ev.Location</p>
+                                }
+                            </div>
+
+                            <div class="my-event-actions">
+                                <a href="@detailUrl" class="my-event-action-btn my-event-action-btn--view">
+                                    Ver detalhes
+                                </a>
+                                @if (ev.IsActive && !isPast)
+                                {
+                                    <button class="my-event-action-btn my-event-action-btn--cancel"
+                                            disabled="@(cancellingId == ev.Id)"
+                                            @onclick="() => CancelEvent(ev)">
+                                        @(cancellingId == ev.Id ? "…" : "Cancelar")
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+        </article>
+    </section>
+
+</div>
+
+@code {
+    private static readonly CultureInfo PtBr = new("pt-BR");
+
+    private List<Event> events = new();
+    private bool        isLoading   = true;
+    private Sport?      sportFilter = null;
+    private int?        cancellingId = null;
+
+    private IEnumerable<Event> FilteredEvents =>
+        sportFilter.HasValue
+            ? events.Where(e => e.Sport == sportFilter.Value)
+            : events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            isLoading = false;
+            return;
+        }
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        events = await db.Events
+            .Include(e => e.Group)
+            .Include(e => e.Confirmations)
+            .Where(e => e.CreatedByUserId == userId)
+            .OrderByDescending(e => e.StartsAt)
+            .ToListAsync();
+
+        isLoading = false;
+    }
+
+    private async Task CancelEvent(Event ev)
+    {
+        cancellingId = ev.Id;
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var entity = await db.Events.FindAsync(ev.Id);
+            if (entity is not null)
+            {
+                entity.IsActive = false;
+                await db.SaveChangesAsync();
+                ev.IsActive = false; // update local state
+            }
+        }
+        finally
+        {
+            cancellingId = null;
+        }
+    }
+
+    private static string PokerTypeLabel(PokerEventType t) => t switch
+    {
+        PokerEventType.CashGame  => "Cash Game",
+        PokerEventType.HomeGame  => "Home Game",
+        _                        => "Torneio",
+    };
+}

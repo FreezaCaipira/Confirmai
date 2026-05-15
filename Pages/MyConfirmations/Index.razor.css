@@ -1,0 +1,178 @@
+/* ── Browse buttons (empty state) ───────────────────────────── */
+.my-conf-browse-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    background: #4a2b14;
+    color: #ffe6b6;
+    border: 1.5px solid #7a5c38;
+    transition: filter 0.15s;
+}
+
+.my-conf-browse-btn:hover { filter: brightness(1.1); }
+
+.my-conf-browse-btn--poker {
+    background: #3b0764;
+    color: #e9d5ff;
+    border-color: #4c1d95;
+}
+
+/* ── Section heading ─────────────────────────────────────────── */
+.my-conf-section {
+    margin-bottom: 1.5rem;
+}
+
+.my-conf-section--past {
+    opacity: 0.75;
+}
+
+.my-conf-section-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #5f3d1e;
+    margin: 0 0 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* ── Confirmation list ───────────────────────────────────────── */
+.my-conf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+/* ── Confirmation card ───────────────────────────────────────── */
+.my-conf-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.7rem 0.85rem;
+    background: linear-gradient(180deg, var(--parchment-cream) 0%, var(--parchment-mid) 100%);
+    border: 1px solid var(--brown-border-light);
+    border-radius: 8px;
+}
+
+.my-conf-card--past {
+    opacity: 0.8;
+}
+
+/* ── Sport badge ─────────────────────────────────────────────── */
+.my-conf-sport {
+    flex-shrink: 0;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.my-conf-sport--futsal { background: #dcfce7; }
+.my-conf-sport--poker  { background: #f3e8ff; }
+
+/* ── Body ────────────────────────────────────────────────────── */
+.my-conf-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.my-conf-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.2rem;
+}
+
+.my-conf-name {
+    font-size: 0.92rem;
+    color: #3d230f;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.my-conf-pos {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: 10px;
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.my-conf-cancelled {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: 10px;
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.my-conf-meta {
+    margin: 0 0 0.12rem;
+    font-size: 0.78rem;
+    color: #7a5c38;
+}
+
+/* ── Actions ─────────────────────────────────────────────────── */
+.my-conf-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+
+.my-conf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem 0.65rem;
+    border-radius: 5px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: filter 0.13s;
+    white-space: nowrap;
+}
+
+.my-conf-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.my-conf-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.my-conf-btn--view {
+    background: #4a2b14;
+    color: #ffe6b6;
+    border-color: #7a5c38;
+}
+
+.my-conf-btn--cancel {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fca5a5;
+}
+
+@media (max-width: 540px) {
+    .my-conf-card {
+        flex-wrap: wrap;
+    }
+
+    .my-conf-actions {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .my-conf-btn {
+        flex: 1;
+    }
+}

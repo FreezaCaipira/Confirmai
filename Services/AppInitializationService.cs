@@ -52,7 +52,7 @@ namespace Confirmai.Services
 
         private async Task SeedRolesAndAdminAsync()
         {
-            string[] roles = new[] { "admin", "user" };
+            string[] roles = new[] { "admin", "user", "venue_manager" };
             foreach (var role in roles)
             {
                 if (!await _roleManager.RoleExistsAsync(role))

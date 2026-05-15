@@ -1,0 +1,161 @@
+/* ── Page wrapper ────────────────────────── */
+.listing-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 55vh;
+    padding: 1.25rem 1rem 2.5rem;
+}
+
+/* ── Actions row ────────────────────────── */
+.listing-page-actions {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.1rem;
+}
+
+/* ── Criar Partida button ────────────────── */
+.btn-create-event {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.38rem 0.95rem;
+    border-radius: 8px;
+    background: #1a5478;
+    color: #e2eef5;
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-decoration: none;
+    border: 1px solid #0f3352;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-create-event:hover {
+    background: #0f3352;
+    border-color: #0a2540;
+}
+
+/* ── Event card base ─────────────────────── */
+.event-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: #141e2b;
+    border: 1px solid #162438;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.event-card--futsal {
+    border-color: #14532d;
+}
+
+.event-card--futsal:hover {
+    border-color: #16a34a;
+    box-shadow: 0 8px 24px rgba(22, 163, 74, 0.12);
+}
+
+/* ── Time badge ──────────────────────────── */
+.event-time {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #4ade80;
+    letter-spacing: -0.02em;
+    min-width: 3.5rem;
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+/* ── Body ────────────────────────────────── */
+.event-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.2rem;
+    color: #f1f5f9;
+    font-family: inherit;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-location {
+    font-size: 0.8rem;
+    color: #4e6a80;
+    margin: 0 0 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.76rem;
+    color: #94a3b8;
+    background: #0d1825;
+    border: 1px solid #1c2a3b;
+    border-radius: 20px;
+    padding: 0.18rem 0.6rem;
+}
+
+.meta-chip--gk {
+    border-color: #1a3040;
+    color: #7ec8e3;
+}
+
+/* ── Action button ───────────────────────── */
+.event-action {
+    flex-shrink: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4ade80;
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid #14532d;
+    border-radius: 7px;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.event-action:hover {
+    background: rgba(74, 222, 128, 0.08);
+    border-color: #4ade80;
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 560px) {
+    .event-card {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .event-action {
+        width: 100%;
+        text-align: center;
+    }
+
+    .event-time {
+        min-width: auto;
+    }
+}

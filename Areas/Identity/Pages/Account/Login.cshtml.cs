@@ -35,6 +35,9 @@ namespace Confirmai.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; } = new();
 
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
+
         public class InputModel
         {
             [Required]
@@ -93,12 +96,12 @@ namespace Confirmai.Areas.Identity.Pages.Account
                     source: AdminAuditSources.Identity,
                     metadata: new { user.Id, user.UserName, Input.RememberMe });
 
-                if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-                {
-                    return LocalRedirect(returnUrl);
-                }
-
-                return LocalRedirect("/");
+                var target = !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
+                    ? returnUrl
+                    : !string.IsNullOrWhiteSpace(ReturnUrl) && Url.IsLocalUrl(ReturnUrl)
+                        ? ReturnUrl
+                        : "/";
+                return LocalRedirect(target);
 
             }
             return Page();

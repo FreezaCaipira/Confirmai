@@ -70,7 +70,7 @@ public class RecentFeaturesIntegrationTests : IClassFixture<IntegrationTestWebAp
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("cookie-consent-banner", html, StringComparison.Ordinal);
         Assert.Contains("cookie-consent-modal", html, StringComparison.Ordinal);
-        Assert.Contains("/js/cookie-consent.js", html, StringComparison.Ordinal);
+        Assert.Contains("/js/privacy-prefs.js", html, StringComparison.Ordinal);
     }
 }
 

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using OpenTelemetry.Resources;
@@ -85,6 +86,7 @@ builder.Services.AddSingleton<PaymentEventBus>();
 
 builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>();
 builder.Services.AddScoped<IBitcoinPaymentService, TestnetBitcoinPaymentService>();
+builder.Services.AddScoped<IBitcoinPaymentService, AbacatePayPixService>();
 builder.Services.AddScoped<BitcoinPaymentFactory>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<UserService>();
@@ -94,6 +96,7 @@ builder.Services.AddScoped<PaymentConfirmationService>();
 builder.Services.AddScoped<OrderAccessService>();
 builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
+builder.Services.AddScoped<AbacatePayWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
 builder.Services.AddScoped<LanguagePreferenceService>();
 builder.Services.AddScoped<UiTextService>();
@@ -101,6 +104,7 @@ builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<AdminSettingsService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();
 builder.Services.AddScoped<AdminOrderReleaseService>();
+builder.Services.AddScoped<EventNotificationService>();
 builder.Services.AddScoped<AdminLogsQueryService>();
 builder.Services.AddScoped<AdminLogsExportService>();
 builder.Services.AddScoped<AdminLogsFilterStateService>();
@@ -111,6 +115,7 @@ builder.Services.AddScoped<AdminProductsFilterStateService>();
 builder.Services.AddScoped<AuthenticationStateProvider,
     RevalidatingIdentityAuthenticationStateProvider>();
 builder.Services.AddHostedService<LogRetentionService>();
+builder.Services.AddHostedService<RachaSchedulerService>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
 builder.Services.AddScoped<AdminSecurityPolicyService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
@@ -179,6 +184,17 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 });
 
 builder.Services.Configure<BtcPayOptions>(builder.Configuration.GetSection("BtcPay"));
+builder.Services.Configure<AbacatePayOptions>(builder.Configuration.GetSection(AbacatePayOptions.Section));
+builder.Services.AddHttpClient("AbacatePay", (sp, client) =>
+{
+    var opts = sp.GetRequiredService<IOptions<AbacatePayOptions>>().Value;
+    client.BaseAddress = new Uri(string.IsNullOrWhiteSpace(opts.BaseUrl)
+        ? "https://api.abacatepay.com/v2"
+        : opts.BaseUrl);
+    if (!string.IsNullOrWhiteSpace(opts.ApiKey))
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", opts.ApiKey);
+});
 
 builder.Services.AddAuthentication()
     .AddScheme<ApiKeyAuthOptions, ApiKeyAuthHandler>(ApiKeyAuthDefaults.AuthenticationScheme, _ => { });
@@ -488,6 +504,11 @@ app.MapRazorPages();
 app.MapFallbackToPage("/_Host");
 
 app.MapPost("/api/btcpay/webhook", async (HttpContext context, BtcPayWebhookService webhookService) =>
+{
+    return await webhookService.HandleAsync(context);
+}).RequireRateLimiting("webhook");
+
+app.MapPost("/api/abacatepay/webhook", async (HttpContext context, AbacatePayWebhookService webhookService) =>
 {
     return await webhookService.HandleAsync(context);
 }).RequireRateLimiting("webhook");

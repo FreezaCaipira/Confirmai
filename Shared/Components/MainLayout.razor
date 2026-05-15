@@ -39,11 +39,18 @@
                         <Authorized>
                             <a href="/payments">@T["Nav.Payments"]</a>
                             <a href="/orders">@T["Nav.Orders"]</a>
+                            <a href="/meus-eventos">Meus Eventos</a>
+                            <a href="/minhas-confirmacoes">Minhas Confirmações</a>
                             <AuthorizeView Policy="ServerAdmin">
                             <Authorized Context="gmContext">
                                 <a href="/docs/integration">@T["Nav.Integration"]</a>
                             </Authorized>
                         </AuthorizeView>
+                            <AuthorizeView Roles="venue_manager,admin">
+                                <Authorized Context="vmContext">
+                                    <a href="/venue-manager/venues">Quadras</a>
+                                </Authorized>
+                            </AuthorizeView>
                             <AuthorizeView Roles="admin">
                                 <Authorized Context="adminContext">
                                     <a href="/admin">Admin</a>

@@ -23,6 +23,8 @@ namespace Confirmai.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<EventConfirmation> EventConfirmations { get; set; }
         public DbSet<WaitingList> WaitingLists { get; set; }
+        public DbSet<Venue> Venues { get; set; }
+        public DbSet<MatchSchedule> RachaSchedules { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -196,6 +198,46 @@ namespace Confirmai.Data
                 .WithMany()
                 .HasForeignKey(w => w.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Venue
+            modelBuilder.Entity<Venue>()
+                .HasIndex(v => new { v.City, v.StateCode, v.IsActive });
+
+            // RachaSchedule
+            modelBuilder.Entity<MatchSchedule>()
+                .HasOne(rs => rs.Group)
+                .WithMany()
+                .HasForeignKey(rs => rs.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MatchSchedule>()
+                .HasOne(rs => rs.Venue)
+                .WithMany(v => v.Schedules)
+                .HasForeignKey(rs => rs.VenueId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MatchSchedule>()
+                .HasIndex(rs => new { rs.GroupId, rs.DayOfWeek, rs.TimeOfDay });
+
+            // Event — Venue FK
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.Venue)
+                .WithMany(v => v.Events)
+                .HasForeignKey(e => e.VenueId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Event — RachaSchedule FK
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.RachaSchedule)
+                .WithMany(rs => rs.GeneratedEvents)
+                .HasForeignKey(e => e.RachaScheduleId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // HomeGameCode should be unique when not null
+            modelBuilder.Entity<Event>()
+                .HasIndex(e => e.HomeGameCode)
+                .IsUnique()
+                .HasFilter("\"HomeGameCode\" IS NOT NULL");
         }
     }
 }

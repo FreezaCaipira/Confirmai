@@ -1,0 +1,93 @@
+/* ── Reutiliza estilos do Create.razor.css do Futsal ── */
+/* As classes .create-event-page, .create-event-card, .form-section,
+   .form-group, .form-row-2, .input, .form-hint, .required,
+   .input-prefix-wrap, .input-prefix, .form-actions,
+   .save-btn, .cancel-btn, .validation-* são definidas em
+   Pages/Futsal/Create.razor.css e compartilhadas via bundle global. */
+
+/* ── Seletor de tipo ─────────────────────── */
+.poker-type-selector {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.poker-type-tab {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #1c2a3b;
+    background: #111927;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: background 0.14s, border-color 0.14s, color 0.14s;
+}
+
+.poker-type-tab.is-active--tourney { background: #1e1034; border-color: #7c3aed; color: #a78bfa; }
+.poker-type-tab.is-active--cash    { background: #14290f; border-color: #16a34a; color: #4ade80; }
+.poker-type-tab.is-active--home    { background: #1a1209; border-color: #d97706; color: #fbbf24; }
+
+/* ── Modalidade chips ────────────────────── */
+.modality-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+}
+
+.modality-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    background: #111927;
+    border: 1px solid #1c2a3b;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.13s, border-color 0.13s, color 0.13s;
+    user-select: none;
+}
+
+.modality-chip input[type=radio] { display: none; }
+
+.modality-chip--on {
+    background: #1e1034;
+    border-color: #7c3aed;
+    color: #a78bfa;
+}
+
+/* ── Home Game notice ────────────────────── */
+.homegame-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    background: #1a1209;
+    border: 1px solid #78350f;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1.25rem;
+    color: #fbbf24;
+}
+
+.homegame-notice i { font-size: 1.3rem; margin-top: 0.15rem; flex-shrink: 0; }
+.homegame-notice strong { display: block; font-size: 0.9rem; margin-bottom: 0.3rem; }
+.homegame-notice p { font-size: 0.82rem; color: #b45309; margin: 0; line-height: 1.5; }
+
+/* ── Save button poker variant ───────────── */
+.save-btn--poker {
+    background: #7c3aed;
+    border-color: #6d28d9;
+}
+
+.save-btn--poker:hover:not(:disabled) { background: #6d28d9; }

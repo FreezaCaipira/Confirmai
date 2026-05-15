@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Confirmai.Migrations
 {
     /// <inheritdoc />
-    public partial class RemoveTibiaFields : Migration
+    public partial class AddVenueAndRachaScheduleAndPokerFields : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -105,11 +105,354 @@ namespace Confirmai.Migrations
             migrationBuilder.DropColumn(
                 name: "ServerId",
                 table: "Orders");
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "AddonAmount",
+                table: "Events",
+                type: "numeric",
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "AddonDoubleAmount",
+                table: "Events",
+                type: "numeric",
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "BuyInAmount",
+                table: "Events",
+                type: "numeric",
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "CashIncludes",
+                table: "Events",
+                type: "character varying(300)",
+                maxLength: 300,
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "CashMaxBuyIn",
+                table: "Events",
+                type: "numeric",
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "CashMinBuyIn",
+                table: "Events",
+                type: "numeric",
+                nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "DurationMinutes",
+                table: "Events",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "GTD",
+                table: "Events",
+                type: "numeric",
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "HomeGameCode",
+                table: "Events",
+                type: "character varying(10)",
+                maxLength: 10,
+                nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "InitialBlindBB",
+                table: "Events",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "LateRegEndsAt",
+                table: "Events",
+                type: "timestamp with time zone",
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "LocalName",
+                table: "Events",
+                type: "character varying(60)",
+                maxLength: 60,
+                nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "Modality",
+                table: "Events",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "PokerEventType",
+                table: "Events",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "PokerHouseName",
+                table: "Events",
+                type: "character varying(120)",
+                maxLength: 120,
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "Price",
+                table: "Events",
+                type: "numeric",
+                nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "RachaScheduleId",
+                table: "Events",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "RebuyAmount",
+                table: "Events",
+                type: "numeric",
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "RebuyDoubleAmount",
+                table: "Events",
+                type: "numeric",
+                nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "StartingStack",
+                table: "Events",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "VenueId",
+                table: "Events",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.CreateTable(
+                name: "Venues",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Address = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    City = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    StateCode = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedByUserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Venues", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RachaSchedules",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    GroupId = table.Column<int>(type: "integer", nullable: false),
+                    VenueId = table.Column<int>(type: "integer", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "integer", nullable: false),
+                    TimeOfDay = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    DurationMinutes = table.Column<int>(type: "integer", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    MaxPlayers = table.Column<int>(type: "integer", nullable: false),
+                    LocalName = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedByUserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RachaSchedules", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RachaSchedules_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RachaSchedules_Venues_VenueId",
+                        column: x => x.VenueId,
+                        principalTable: "Venues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_HomeGameCode",
+                table: "Events",
+                column: "HomeGameCode",
+                unique: true,
+                filter: "\"HomeGameCode\" IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_RachaScheduleId",
+                table: "Events",
+                column: "RachaScheduleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_VenueId",
+                table: "Events",
+                column: "VenueId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RachaSchedules_GroupId_DayOfWeek_TimeOfDay",
+                table: "RachaSchedules",
+                columns: new[] { "GroupId", "DayOfWeek", "TimeOfDay" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RachaSchedules_VenueId",
+                table: "RachaSchedules",
+                column: "VenueId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Venues_City_StateCode_IsActive",
+                table: "Venues",
+                columns: new[] { "City", "StateCode", "IsActive" });
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Events_RachaSchedules_RachaScheduleId",
+                table: "Events",
+                column: "RachaScheduleId",
+                principalTable: "RachaSchedules",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.SetNull);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Events_Venues_VenueId",
+                table: "Events",
+                column: "VenueId",
+                principalTable: "Venues",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.SetNull);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Events_RachaSchedules_RachaScheduleId",
+                table: "Events");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Events_Venues_VenueId",
+                table: "Events");
+
+            migrationBuilder.DropTable(
+                name: "RachaSchedules");
+
+            migrationBuilder.DropTable(
+                name: "Venues");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Events_HomeGameCode",
+                table: "Events");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Events_RachaScheduleId",
+                table: "Events");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Events_VenueId",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "AddonAmount",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "AddonDoubleAmount",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "BuyInAmount",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "CashIncludes",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "CashMaxBuyIn",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "CashMinBuyIn",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "DurationMinutes",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "GTD",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "HomeGameCode",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "InitialBlindBB",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "LateRegEndsAt",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "LocalName",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "Modality",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "PokerEventType",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "PokerHouseName",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "Price",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "RachaScheduleId",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "RebuyAmount",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "RebuyDoubleAmount",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "StartingStack",
+                table: "Events");
+
+            migrationBuilder.DropColumn(
+                name: "VenueId",
+                table: "Events");
+
             migrationBuilder.AddColumn<int>(
                 name: "DeliveryAgentId",
                 table: "Payments",

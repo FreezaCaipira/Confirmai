@@ -200,10 +200,10 @@ public class FullFlowRecentFeaturesIntegrationTests : IClassFixture<IntegrationT
         Assert.Equal(HttpStatusCode.OK, hostResponse.StatusCode);
         Assert.Contains("cookie-consent-banner", hostHtml, StringComparison.Ordinal);
         Assert.Contains("cookie-consent-modal", hostHtml, StringComparison.Ordinal);
-        Assert.Contains("/js/cookie-consent.js", hostHtml, StringComparison.Ordinal);
+        Assert.Contains("/js/privacy-prefs.js", hostHtml, StringComparison.Ordinal);
         Assert.Contains("ConfirmaiIsDevelopment", hostHtml, StringComparison.Ordinal);
 
-        var scriptResponse = await client.GetAsync("/js/cookie-consent.js");
+        var scriptResponse = await client.GetAsync("/js/privacy-prefs.js");
         var script = await scriptResponse.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, scriptResponse.StatusCode);

@@ -1,0 +1,54 @@
+@page "/futsal"
+@attribute [AllowAnonymous]
+@using Microsoft.AspNetCore.Components.Authorization
+
+<PageTitle>Futsal · Confirmai</PageTitle>
+
+<div class="listing-page">
+    <div class="listing-page-actions">
+        <a href="/futsal/create" class="btn-create-event">
+            <i class="fas fa-plus"></i> Criar Partida
+        </a>
+    </div>
+    <EventListingShell Sport="Sport.Futsal" SportLabel="partidas" City="@City" StateCode="@Estado">
+        <EventCard Context="ev">
+            @{
+                var confirmedOut = ev.Confirmations.Count(c => c.Position != FutsalPosition.Goalkeeper);
+                var confirmedGk  = ev.Confirmations.Count(c => c.Position == FutsalPosition.Goalkeeper);
+                var totalOut     = ev.MaxGoalkeepers.HasValue
+                    ? ev.MaxPlayers - ev.MaxGoalkeepers.Value
+                    : ev.MaxPlayers;
+            }
+            <article class="event-card event-card--futsal">
+                <div class="event-time">@ev.StartsAt.ToString("HH:mm")</div>
+                <div class="event-body">
+                    <h3 class="event-name">@ev.Group.Name</h3>
+                    <p class="event-location">@ev.Location &middot; @ev.Group.City - @ev.Group.StateCode</p>
+                    <div class="event-meta">
+                        <span class="meta-chip">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                 aria-hidden="true">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                            @confirmedOut / @totalOut jogadores
+                        </span>
+                        @if (ev.MaxGoalkeepers > 0)
+                        {
+                            <span class="meta-chip meta-chip--gk">🥅 @confirmedGk / @ev.MaxGoalkeepers goleiros</span>
+                        }
+                    </div>
+                </div>
+                <a href="/futsal/@ev.Id" class="event-action">Confirmar →</a>
+            </article>
+        </EventCard>
+    </EventListingShell>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "cidade")] public string? City   { get; set; }
+    [SupplyParameterFromQuery(Name = "estado")] public string? Estado { get; set; }
+}

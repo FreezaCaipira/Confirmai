@@ -184,5 +184,64 @@ Event
 - [ ] Integração Pix (R$ 1,00 por confirmação ou similar)
 - [ ] Reaproveitamento de `PaymentStatus` e infraestrutura SignalR existente
 - [ ] Relatório financeiro para admin do grupo
+
+---
+
+### Fase 6 — Notificações WhatsApp (planejado)
+
+**Objetivo**: notificar participantes via WhatsApp além do mailbox interno e email, para avisos de cancelamento e mudança de data/hora.
+
+#### Pré-requisitos de modelo
+
+1. Adicionar campo `PhoneNumber` (formato E.164, ex: `+5535999990000`) em `ApplicationUser`
+2. Adicionar `WhatsAppOptIn bool` (consentimento explícito) em `ApplicationUser`
+3. Exibir opção de opt-in nas configurações de perfil do usuário
+
+#### Pré-requisitos de infraestrutura
+
+Criar abstração em `Services/`:
+
+```csharp
+// Services/IWhatsAppSender.cs
+public interface IWhatsAppSender
+{
+    Task SendTextAsync(string toE164, string text);
+}
+```
+
+Implementar com um dos providers abaixo (ordem de preferência):
+
+| Provider | Tipo | Observação |
+|---|---|---|
+| **Evolution API** | Self-hosted (Docker) | Gratuito; usa sessão QR Code via WhatsApp Web; mais simples para MVP |
+| **Z-API** | SaaS BR | Plano gratuito com limite; boa SDK REST |
+| **Twilio WhatsApp** | SaaS global | Requer aprovação de template no Meta; mais robusto para produção |
+
+Registrar em `Program.cs`:
+
+```csharp
+// exemplo com Evolution API
+builder.Services.AddHttpClient<IWhatsAppSender, EvolutionWhatsAppSender>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["WhatsApp:BaseUrl"]!);
+    client.DefaultRequestHeaders.Add("apikey", builder.Configuration["WhatsApp:ApiKey"]);
+});
+```
+
+#### Ponto de integração
+
+O envio já está estruturado em `Services/EventNotificationService.cs` no método privado `SendToParticipantsAsync`.
+Há um bloco `// TODO (WhatsApp)` comentado com o código exato a descomentar após a implementação do provider.
+
+#### Configuração (`appsettings.json`)
+
+```json
+"WhatsApp": {
+  "Provider": "EvolutionApi",  // ou "ZApi" | "Twilio"
+  "BaseUrl": "",               // ex: http://localhost:8080
+  "ApiKey": "",
+  "Instance": ""               // Evolution API: nome da instância conectada
+}
+```
 - Inline styles estáticos eliminados de todas as páginas
 - Sem `@layer` em `site.css` (era bloco unclosed — removido)

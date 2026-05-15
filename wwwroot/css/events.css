@@ -1,0 +1,516 @@
+/* ================================================================
+   EVENTS.CSS — Shared styles for event create/detail pages
+   (Futsal + Poker)
+
+   Loaded globally in _Host.cshtml.
+   Scoped CSS (.razor.css siblings) only contain component-
+   specific overrides on top of these base styles.
+   ================================================================ */
+
+/* ── Loading / not-found states ─────────────────────────────────── */
+.detail-loading,
+.detail-not-found {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: #64748b;
+}
+
+.detail-not-found h2 { color: #94a3b8; margin-bottom: 0.75rem; }
+.detail-not-found a  { color: #60a5fa; font-size: 0.9rem; }
+
+/* ── Detail page shell ───────────────────────────────────────────── */
+.detail-page {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 1rem 3rem;
+}
+
+.detail-card {
+    width: 100%;
+    max-width: 680px;
+    background: #141e2b;
+    border: 1px solid #162438;
+    border-radius: 16px;
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ── Detail header ───────────────────────────────────────────────── */
+.detail-header { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.detail-sport-badge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.detail-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #f1f5f9;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.detail-localname {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+    font-style: italic;
+}
+
+.detail-location {
+    font-size: 0.85rem;
+    color: #4e6a80;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* ── Info chips ──────────────────────────────────────────────────── */
+.detail-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detail-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: #94a3b8;
+    background: #0d1825;
+    border: 1px solid #1c2a3b;
+    border-radius: 20px;
+    padding: 0.3rem 0.75rem;
+}
+
+.detail-chip--price { border-color: #14532d; color: #4ade80; font-weight: 700; }
+
+/* ── Admin bar (edit button) ─────────────────────────────────────── */
+.detail-admin-bar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.detail-admin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    background: #0d1825;
+    border: 1px solid #1c2a3b;
+    border-radius: 8px;
+    padding: 0.35rem 0.85rem;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.detail-admin-btn:hover {
+    border-color: #3b82f6;
+    color: #60a5fa;
+}
+
+.detail-admin-btn--poker:hover {
+    border-color: #a855f7;
+    color: #c084fc;
+}
+
+.detail-admin-btn--danger {
+    border-color: #3d1a1a;
+    color: #f87171;
+}
+
+.detail-admin-btn--danger:hover {
+    border-color: #ef4444;
+    color: #fca5a5;
+}
+
+.cancel-confirm-block {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.cancel-confirm-block span {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+/* ── Cancelled banner ────────────────────────────────────────────── */
+.cancelled-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #1c0f0f;
+    border: 1px solid #7f1d1d;
+    border-radius: 8px;
+    color: #f87171;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+}
+
+.cancelled-notice {
+    color: #f87171;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+}
+
+/* ── Detail section ──────────────────────────────────────────────── */
+.detail-section { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.detail-section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #475569;
+    margin: 0;
+}
+
+/* ── Players group header ────────────────────────────────────────── */
+.players-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+}
+
+.players-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.players-count {
+    font-size: 0.82rem;
+    color: #4ade80;
+    font-weight: 700;
+    background: #14290f;
+    border: 1px solid #14532d;
+    border-radius: 12px;
+    padding: 0.1rem 0.6rem;
+}
+
+.players-count.is-full {
+    color: #f87171;
+    background: #290f0f;
+    border-color: #7f1d1d;
+}
+
+/* ── Players list ────────────────────────────────────────────────── */
+.players-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.player-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 8px;
+    background: #0d1825;
+    border: 1px solid #162438;
+}
+
+.player-item--me        { border-color: #22c55e; background: #0a1e10; }
+.player-item--waitlist  { opacity: 0.6; }
+.player-item--empty     { border-style: dashed; opacity: 0.35; }
+
+.player-num {
+    width: 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #334155;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.player-name        { flex: 1; font-size: 0.9rem; color: #cbd5e1; }
+.player-slot-empty  { flex: 1; color: #334155; }
+
+.player-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #f87171;
+    background: #290f0f;
+    border: 1px solid #7f1d1d;
+    border-radius: 8px;
+    padding: 1px 7px;
+}
+
+.player-tag--me {
+    color: #4ade80;
+    background: #0a1e10;
+    border-color: #14532d;
+}
+
+/* ── Confirm action area ─────────────────────────────────────────── */
+.detail-action { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.confirm-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.confirm-btn:hover       { background: #15803d; }
+.confirm-btn--full-width { width: 100%; }
+.confirm-btn--gk         { background: #0369a1; }
+.confirm-btn--gk:hover   { background: #0284c7; }
+.confirm-btn--active     { box-shadow: 0 0 0 2px #4ade80; }
+
+.position-choice { display: flex; flex-direction: column; gap: 0.65rem; }
+.position-label  { font-size: 0.82rem; color: #64748b; margin: 0; }
+.position-btns   { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.position-btns .confirm-btn { flex: 1; min-width: 140px; }
+
+.confirm-submit-btn {
+    padding: 0.7rem;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 800;
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.confirm-submit-btn:hover { background: #15803d; }
+
+.confirmed-block { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.confirmed-label {
+    font-size: 0.9rem;
+    color: #4ade80;
+    margin: 0;
+    background: #0a1e10;
+    border: 1px solid #14532d;
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+}
+
+.cancel-confirm-btn {
+    align-self: flex-start;
+    font-size: 0.8rem;
+    color: #f87171;
+    background: transparent;
+    border: 1px solid #7f1d1d;
+    border-radius: 7px;
+    padding: 0.35rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.13s;
+}
+
+.cancel-confirm-btn:hover { background: #290f0f; }
+
+.detail-error {
+    font-size: 0.82rem;
+    color: #f87171;
+    background: #290f0f;
+    border: 1px solid #7f1d1d;
+    border-radius: 7px;
+    padding: 0.5rem 0.75rem;
+    margin: 0;
+}
+
+.detail-back a {
+    font-size: 0.82rem;
+    color: #475569;
+    text-decoration: none;
+    transition: color 0.14s;
+}
+
+.detail-back a:hover { color: #94a3b8; }
+
+/* ── Create event page shell ─────────────────────────────────────── */
+.create-event-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem 1rem 4rem;
+    min-height: 60vh;
+}
+
+.create-event-card {
+    background: #0f1923;
+    border: 1px solid #1c2a3b;
+    border-radius: 16px;
+    padding: 2rem 2.25rem;
+    width: 100%;
+    max-width: 640px;
+}
+
+.create-event-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ── Fieldsets ───────────────────────────────────────────────────── */
+.form-section {
+    border: 1px solid #1c3a54;
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.form-section legend {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #72b8d6;
+    padding: 0 0.4rem;
+}
+
+/* ── Form rows ───────────────────────────────────────────────────── */
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* ── Form group ──────────────────────────────────────────────────── */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.9rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.form-group .input {
+    background: #111927;
+    border: 1px solid #1c2a3b;
+    border-radius: 8px;
+    color: #f1f5f9;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.92rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+
+.form-group .input:focus {
+    outline: none;
+    border-color: #4ade80;
+}
+
+.form-hint      { font-size: 0.78rem; color: #72b8d6; }
+.form-hint--warn { color: #f59e0b; font-size: 0.82rem; }
+.required       { color: #f87171; }
+
+/* ── Price input with R$ prefix ─────────────────────────────────── */
+.input-prefix-wrap {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid #1c2a3b;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111927;
+}
+
+.input-prefix {
+    background: #1c2a3b;
+    color: #64748b;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #1c2a3b;
+}
+
+.input-prefix-wrap .input { border: none; border-radius: 0; flex: 1; }
+
+/* ── Form actions ────────────────────────────────────────────────── */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.save-btn {
+    background: #16a34a;
+    color: #fff;
+    border: 1px solid #15803d;
+    border-radius: 8px;
+    padding: 0.55rem 1.4rem;
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.save-btn:hover:not(:disabled) { background: #15803d; }
+.save-btn:disabled             { opacity: 0.5; cursor: not-allowed; }
+
+.cancel-btn {
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #1c2a3b;
+    border-radius: 8px;
+    padding: 0.55rem 1.1rem;
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.cancel-btn:hover { border-color: #4e95b8; color: #4e95b8; }
+
+.validation-summary { color: #f87171; font-size: 0.85rem; margin-bottom: 1rem; }
+.validation-message { color: #f87171; font-size: 0.8rem; }
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+    .detail-card       { padding: 1.25rem 1rem; }
+    .detail-title      { font-size: 1.25rem; }
+    .position-btns .confirm-btn { min-width: 0; }
+    .create-event-card { padding: 1.5rem 1rem; }
+}
+
+@media (max-width: 480px) {
+    .form-row-2 { grid-template-columns: 1fr; }
+}

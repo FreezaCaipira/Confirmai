@@ -1,0 +1,116 @@
+@page "/poker"
+@attribute [AllowAnonymous]
+@using Confirmai.Enums
+@using Microsoft.AspNetCore.Components.Authorization
+
+<PageTitle>Poker · Confirmai</PageTitle>
+
+<div class="listing-page">
+    <AuthorizeView>
+        <Authorized>
+            <div class="create-poker-dropdown @(showTypeMenu ? "is-open" : "")">
+                <button class="btn-create-event btn-create-event--poker"
+                        @onclick="() => showTypeMenu = !showTypeMenu"
+                        @onfocusout="() => Task.Delay(150).ContinueWith(_ => { showTypeMenu = false; InvokeAsync(StateHasChanged); })">
+                    <i class="fas fa-plus"></i> Criar Evento <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                @if (showTypeMenu)
+                {
+                    <div class="create-poker-menu">
+                        <a class="create-poker-menu-item" href="/poker/create?tipo=torneio">
+                            <i class="fas fa-trophy"></i>
+                            <span>
+                                <strong>Torneio</strong>
+                                <small>Buy-in, rebuy, GTD, late reg…</small>
+                            </span>
+                        </a>
+                        <a class="create-poker-menu-item" href="/poker/create?tipo=cashgame">
+                            <i class="fas fa-coins"></i>
+                            <span>
+                                <strong>Cash Game</strong>
+                                <small>Stack mín/máx, modalidade, incluso…</small>
+                            </span>
+                        </a>
+                        <a class="create-poker-menu-item" href="/poker/create?tipo=homegame">
+                            <i class="fas fa-home"></i>
+                            <span>
+                                <strong>Home Game</strong>
+                                <small>Acesso por código privado</small>
+                            </span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </Authorized>
+    </AuthorizeView>
+
+    <EventListingShell Sport="Sport.Poker" SportLabel="torneios" City="@City" StateCode="@Estado">
+        <EventCard Context="ev">
+            @{
+                var typeLabel = ev.PokerEventType switch
+                {
+                    PokerEventType.CashGame  => ("cash",    "💰 Cash Game"),
+                    PokerEventType.HomeGame  => ("home",    "🏠 Home Game"),
+                    _                        => ("tourney", "🏆 Torneio"),
+                };
+                bool isHomeGame = ev.PokerEventType == PokerEventType.HomeGame;
+            }
+            <article class="event-card event-card--poker">
+                <div class="event-time">@ev.StartsAt.ToString("HH:mm")</div>
+                <div class="event-body">
+                    <div class="event-name-row">
+                        <h3 class="event-name">@ev.Group.Name</h3>
+                        <span class="poker-type-badge poker-type-badge--@typeLabel.Item1">@typeLabel.Item2</span>
+                    </div>
+                    @if (!isHomeGame)
+                    {
+                        <p class="event-location">
+                            @(ev.PokerHouseName ?? ev.Location) &middot; @ev.Group.City — @ev.Group.StateCode
+                        </p>
+                        <div class="event-meta">
+                            @if (ev.BuyInAmount.HasValue)
+                            {
+                                <span class="meta-chip">Buy-in: R$@ev.BuyInAmount.Value.ToString("N0")</span>
+                            }
+                            else if (!string.IsNullOrEmpty(ev.BuyIn))
+                            {
+                                <span class="meta-chip">Buy-in: @ev.BuyIn</span>
+                            }
+                            @if (ev.GTD.HasValue)
+                            {
+                                <span class="meta-chip meta-chip--gtd">GTD R$@ev.GTD.Value.ToString("N0")</span>
+                            }
+                            @if (ev.CashMinBuyIn.HasValue)
+                            {
+                                <span class="meta-chip">Stack: R$@ev.CashMinBuyIn.Value.ToString("N0") — R$@ev.CashMaxBuyIn.GetValueOrDefault().ToString("N0")</span>
+                            }
+                            @if (ev.LateRegEndsAt.HasValue && ev.LateRegEndsAt > DateTime.UtcNow)
+                            {
+                                <span class="meta-chip meta-chip--latereg">Late Reg até @ev.LateRegEndsAt.Value.ToLocalTime().ToString("HH:mm")</span>
+                            }
+                            @if (ev.MaxPlayers > 0)
+                            {
+                                <span class="meta-chip meta-chip--players">👥 @ev.Confirmations.Count / @ev.MaxPlayers</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="event-location event-location--locked">
+                            <i class="fas fa-lock"></i> Detalhes disponíveis com código de acesso
+                        </p>
+                        <p class="event-location">@ev.Group.City — @ev.Group.StateCode</p>
+                    }
+                </div>
+                <a href="/poker/@ev.Id" class="event-action">@(isHomeGame ? "Acessar →" : "Confirmar →")</a>
+            </article>
+        </EventCard>
+    </EventListingShell>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "cidade")] public string? City   { get; set; }
+    [SupplyParameterFromQuery(Name = "estado")] public string? Estado { get; set; }
+
+    private bool showTypeMenu = false;
+}

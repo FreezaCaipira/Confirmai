@@ -1,0 +1,62 @@
+/* Shared form/detail styles live in wwwroot/css/events.css */
+
+.create-event-title i { color: #4ade80; }
+
+/* ── Venue preview ───────────────────────── */
+.venue-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    color: #4e95b8;
+    background: #0d1e2e;
+    border: 1px solid #1c3048;
+    border-radius: 7px;
+    padding: 0.45rem 0.75rem;
+    margin-top: -0.25rem;
+}
+
+/* ── Weekday chips ───────────────────────── */
+.weekday-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+}
+
+.weekday-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    background: #111927;
+    border: 1px solid #1c2a3b;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.14s, border-color 0.14s, color 0.14s;
+    user-select: none;
+}
+
+.weekday-chip input[type=checkbox] { display: none; }
+
+.weekday-chip--on {
+    background: #14532d;
+    border-color: #16a34a;
+    color: #4ade80;
+}
+
+/* ── Switch toggle label ─────────────────── */
+.switch-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+/* form-actions, save-btn, cancel-btn, validation-* → events.css */

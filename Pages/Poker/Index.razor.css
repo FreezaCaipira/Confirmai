@@ -1,0 +1,363 @@
+/* ── Page wrapper ────────────────────────── */
+.listing-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 55vh;
+    padding: 1.25rem 1rem 2.5rem;
+}
+
+/* ── Criar Evento dropdown ───────────────── */
+.create-poker-dropdown {
+    position: relative;
+    align-self: flex-end;
+    margin-bottom: 0.25rem;
+}
+
+.btn-create-event {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+
+.btn-create-event--poker {
+    background: #6d28d9;
+    color: #fff;
+    border: 1px solid #5b21b6;
+}
+
+.btn-create-event--poker:hover,
+.create-poker-dropdown.is-open .btn-create-event--poker {
+    background: #5b21b6;
+    box-shadow: 0 4px 14px rgba(109, 40, 217, 0.3);
+}
+
+.dropdown-arrow {
+    font-size: 0.72rem;
+    transition: transform 0.15s;
+}
+
+.create-poker-dropdown.is-open .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.create-poker-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    background: #0f1923;
+    border: 1px solid #2d1a4a;
+    border-radius: 12px;
+    min-width: 220px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    z-index: 50;
+    overflow: hidden;
+}
+
+.create-poker-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: #e2e8f0;
+    transition: background 0.13s;
+}
+
+.create-poker-menu-item:hover { background: #1c2a3b; }
+
+.create-poker-menu-item i {
+    font-size: 1.1rem;
+    width: 1.5rem;
+    text-align: center;
+    color: #a78bfa;
+    flex-shrink: 0;
+}
+
+.create-poker-menu-item strong {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.create-poker-menu-item small {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* ── Event card base ─────────────────────── */
+.event-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: #141e2b;
+    border: 1px solid #162438;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.event-card--poker { border-color: #3b0764; }
+.event-card--poker:hover {
+    border-color: #7c3aed;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+}
+
+/* ── Time badge ──────────────────────────── */
+.event-time {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #a78bfa;
+    letter-spacing: -0.02em;
+    min-width: 3.5rem;
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+/* ── Body ────────────────────────────────── */
+.event-body { flex: 1; min-width: 0; }
+
+.event-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+    flex-wrap: wrap;
+}
+
+.event-name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-location {
+    font-size: 0.8rem;
+    color: #4e6a80;
+    margin: 0 0 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-location--locked {
+    color: #64748b;
+    font-style: italic;
+}
+
+.event-location--locked i { margin-right: 0.25rem; }
+
+.event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+/* ── Badges tipo poker ───────────────────── */
+.poker-type-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.poker-type-badge--tourney { background: #1e1034; color: #a78bfa; border: 1px solid #4c1d95; }
+.poker-type-badge--cash    { background: #14290f; color: #4ade80; border: 1px solid #14532d; }
+.poker-type-badge--home    { background: #1a1209; color: #fbbf24; border: 1px solid #78350f; }
+
+/* ── Meta chips ──────────────────────────── */
+.meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.76rem;
+    color: #94a3b8;
+    background: #0d1825;
+    border: 1px solid #1c2a3b;
+    border-radius: 20px;
+    padding: 0.18rem 0.6rem;
+}
+
+.meta-chip--players { border-color: #2d1a4a; color: #c4b5fd; }
+.meta-chip--gtd     { border-color: #14532d; color: #4ade80; font-weight: 700; }
+.meta-chip--latereg { border-color: #78350f; color: #fbbf24; }
+
+.event-bonus {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0.4rem 0 0;
+    font-style: italic;
+}
+
+/* ── Action button ───────────────────────── */
+.event-action {
+    flex-shrink: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #a78bfa;
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid #3b0764;
+    border-radius: 7px;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.event-action:hover {
+    background: rgba(167, 139, 250, 0.08);
+    border-color: #a78bfa;
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 560px) {
+    .event-card { flex-wrap: wrap; gap: 0.75rem; }
+    .event-action { width: 100%; text-align: center; }
+    .event-time { min-width: auto; }
+}
+
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: #141e2b;
+    border: 1px solid #162438;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.event-card--poker {
+    border-color: #3b0764;
+}
+
+.event-card--poker:hover {
+    border-color: #7c3aed;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+}
+
+/* ── Time badge ──────────────────────────── */
+.event-time {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #a78bfa;
+    letter-spacing: -0.02em;
+    min-width: 3.5rem;
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+/* ── Body ────────────────────────────────── */
+.event-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.2rem;
+    color: #f1f5f9;
+    font-family: inherit;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-location {
+    font-size: 0.8rem;
+    color: #4e6a80;
+    margin: 0 0 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.76rem;
+    color: #94a3b8;
+    background: #0d1825;
+    border: 1px solid #1c2a3b;
+    border-radius: 20px;
+    padding: 0.18rem 0.6rem;
+}
+
+.meta-chip--players {
+    border-color: #2d1a4a;
+    color: #c4b5fd;
+}
+
+.event-bonus {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0.4rem 0 0;
+    font-style: italic;
+}
+
+/* ── Action button ───────────────────────── */
+.event-action {
+    flex-shrink: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #a78bfa;
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid #3b0764;
+    border-radius: 7px;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.event-action:hover {
+    background: rgba(167, 139, 250, 0.08);
+    border-color: #a78bfa;
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 560px) {
+    .event-card {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .event-action {
+        width: 100%;
+        text-align: center;
+    }
+
+    .event-time {
+        min-width: auto;
+    }
+}

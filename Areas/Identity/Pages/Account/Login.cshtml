@@ -15,6 +15,7 @@
 <div asp-validation-summary="All" class="text-danger"></div>
 
 <form method="post">
+    <input type="hidden" asp-for="ReturnUrl" />
     <div>
         <label asp-for="Input.Email">@T["Identity.Common.Email"]</label>
         <input asp-for="Input.Email" autocomplete="username" />

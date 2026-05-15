@@ -1,0 +1,211 @@
+@page "/venue-manager/venues/edit/{Id:int}"
+
+@attribute [Authorize(Roles = "venue_manager,admin")]
+
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject LogService LogService
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>@(IsNew ? "Nova Quadra" : "Editar Quadra") — Confirmai</PageTitle>
+
+<div class="entity-shell admin-page">
+
+    <section class="entity-shell-grid" aria-label="@(IsNew ? "Nova quadra" : "Editar quadra")">
+        <article class="entity-shell-card entity-shell-main form-card">
+
+            <h1 class="page-section-title">@(IsNew ? "Nova Quadra" : "Editar Quadra")</h1>
+
+            @if (isLoading)
+            {
+                <div class="loading-spinner">Carregando…</div>
+            }
+            else if (accessDenied)
+            {
+                <div class="detail-error">
+                    <p>Você não tem permissão para editar esta quadra.</p>
+                    <button class="cancel-btn" type="button"
+                            @onclick='() => NavigationManager.NavigateTo("/venue-manager/venues")'>
+                        Voltar
+                    </button>
+                </div>
+            }
+            else
+            {
+                <EditForm Model="model" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="validation-summary" />
+
+                    <div class="form-group">
+                        <label>Nome <span class="required">*</span></label>
+                        <InputText class="input" @bind-Value="model.Name"
+                                   placeholder="Ex: Arena do Zé, Society Central…" />
+                        <ValidationMessage For="@(() => model.Name)" class="validation-message" />
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Tipo <span class="required">*</span></label>
+                            <InputSelect class="input" @bind-Value="model.Type">
+                                @foreach (var t in Enum.GetValues<VenueType>())
+                                {
+                                    <option value="@t">@VenueTypeLabel(t)</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label>UF <span class="required">*</span></label>
+                            <InputText class="input" @bind-Value="model.StateCode"
+                                       placeholder="SP" maxlength="2" style="text-transform:uppercase" />
+                            <ValidationMessage For="@(() => model.StateCode)" class="validation-message" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cidade <span class="required">*</span></label>
+                        <InputText class="input" @bind-Value="model.City"
+                                   placeholder="São Paulo" />
+                        <ValidationMessage For="@(() => model.City)" class="validation-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Endereço <span class="required">*</span></label>
+                        <InputText class="input" @bind-Value="model.Address"
+                                   placeholder="Rua das Flores, 123 — Bairro" />
+                        <ValidationMessage For="@(() => model.Address)" class="validation-message" />
+                    </div>
+
+                    @if (!IsNew)
+                    {
+                        <div class="form-group">
+                            <label class="switch-label">
+                                <InputCheckbox @bind-Value="model.IsActive" />
+                                Ativa
+                            </label>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(saveError))
+                    {
+                        <p class="validation-message">@saveError</p>
+                    }
+
+                    <div class="form-actions">
+                        <button class="cancel-btn" type="button"
+                                @onclick='() => NavigationManager.NavigateTo("/venue-manager/venues")'>
+                            Cancelar
+                        </button>
+                        <button class="save-btn" type="submit" disabled="@isSaving">
+                            @(isSaving ? "Salvando…" : "Salvar")
+                        </button>
+                    </div>
+                </EditForm>
+            }
+        </article>
+    </section>
+
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Venue  model      = new();
+    private bool   isLoading  = true;
+    private bool   isSaving   = false;
+    private bool   accessDenied = false;
+    private string saveError  = string.Empty;
+
+    private bool IsNew => Id == 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!IsNew)
+        {
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = auth.User.IsInRole("admin");
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var found = await db.Venues.FindAsync(Id);
+
+            if (found is null)
+            {
+                isLoading = false;
+                return;
+            }
+
+            // Venue managers can only edit their own venues
+            if (!isAdmin && found.CreatedByUserId != userId)
+            {
+                accessDenied = true;
+                isLoading    = false;
+                return;
+            }
+
+            model = found;
+        }
+
+        isLoading = false;
+    }
+
+    private async Task Save()
+    {
+        isSaving  = true;
+        saveError = string.Empty;
+
+        try
+        {
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = auth.User.IsInRole("admin");
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+
+            if (IsNew)
+            {
+                model.CreatedByUserId = userId;
+                model.CreatedAt       = DateTime.UtcNow;
+                db.Venues.Add(model);
+                await LogService.AuditAsync("venue.created", "Venue", null, $"Nova quadra criada: {model.Name}", userId);
+            }
+            else
+            {
+                // Re-check ownership before saving
+                var existing = await db.Venues.AsNoTracking().FirstOrDefaultAsync(v => v.Id == Id);
+                if (existing is not null && !isAdmin && existing.CreatedByUserId != userId)
+                {
+                    saveError = "Você não tem permissão para editar esta quadra.";
+                    isSaving  = false;
+                    return;
+                }
+
+                db.Venues.Update(model);
+                await LogService.AuditAsync("venue.updated", "Venue", model.Id.ToString(), $"Quadra editada: {model.Name}", userId);
+            }
+
+            await db.SaveChangesAsync();
+            NavigationManager.NavigateTo("/venue-manager/venues");
+        }
+        catch (Exception ex)
+        {
+            saveError = $"Erro ao salvar: {ex.Message}";
+            isSaving  = false;
+        }
+    }
+
+    private static string VenueTypeLabel(VenueType t) => t switch
+    {
+        VenueType.Quadra  => "Quadra",
+        VenueType.Society => "Society",
+        VenueType.Campo   => "Campo",
+        _                 => t.ToString()
+    };
+}

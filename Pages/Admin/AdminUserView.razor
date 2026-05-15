@@ -88,6 +88,25 @@ else
                     </div>
                 </section>
 
+                <section class="admin-profile-panel-card">
+                    <h3>Papéis &amp; Permissões</h3>
+                    <div class="role-toggle-row">
+                        <div class="role-toggle-info">
+                            <strong>Gerenciador de Quadras</strong>
+                            <small>Permite criar e editar quadras/venues no portal do gestor.</small>
+                        </div>
+                        <button class="role-toggle-btn @(isVenueManager ? "role-toggle-btn--active" : "")"
+                                disabled="@roleToggleBusy"
+                                @onclick="ToggleVenueManager">
+                            @(roleToggleBusy ? "…" : isVenueManager ? "Remover" : "Conceder")
+                        </button>
+                    </div>
+                    @if (!string.IsNullOrEmpty(roleToggleError))
+                    {
+                        <p class="validation-message" style="margin-top:.5rem">@roleToggleError</p>
+                    }
+                </section>
+
                 @if (showAdminExtensions)
                 {
                     <section class="admin-profile-panel-card admin-user-extensions-card">
@@ -133,6 +152,9 @@ else
     private int soldItemsCount;
     private int boughtItemsCount;
     private bool showAdminExtensions;
+    private bool isVenueManager;
+    private bool roleToggleBusy;
+    private string roleToggleError = string.Empty;
 
     private string OutfitImageUrl => "https://outfit-images.ots.me/outfit.php?id=128&addons=3&head=114&body=114&legs=114&feet=114&mount=0&direction=3";
 
@@ -149,13 +171,29 @@ else
             await using var db = await DbFactory.CreateDbContextAsync();
             soldItemsCount = await db.Orders.AsNoTracking().CountAsync(o => o.SellerId == user.Id && o.IsPaid);
             boughtItemsCount = await db.Orders.AsNoTracking().CountAsync(o => o.BuyerId == user.Id && o.IsPaid);
+            isVenueManager = await UserManager.IsInRoleAsync(user, "venue_manager");
 
-            // Keep the same layout as public profile while there are no extra admin-only blocks.
             showAdminExtensions = false;
         }
 
         isLoading = false;
     }
+
+    private async Task ToggleVenueManager()
+    {
+        if (user is null) return;
+        roleToggleBusy  = true;
+        roleToggleError = string.Empty;
+
+        IdentityResult result = isVenueManager
+            ? await UserManager.RemoveFromRoleAsync(user, "venue_manager")
+            : await UserManager.AddToRoleAsync(user, "venue_manager");
+
+        if (result.Succeeded)
+            isVenueManager = !isVenueManager;
+        else
+            roleToggleError = string.Join(" ", result.Errors.Select(e => e.Description));
+
+        roleToggleBusy = false;
+    }
 }
-
-

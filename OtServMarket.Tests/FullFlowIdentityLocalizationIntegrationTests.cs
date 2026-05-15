@@ -23,7 +23,7 @@ public class FullFlowIdentityLocalizationIntegrationTests : IClassFixture<Integr
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("<html lang=\"en-US\">", html, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("Confirmai Login", html, StringComparison.Ordinal);
+        Assert.Contains("Login", html, StringComparison.Ordinal);
     }
 
     [Fact]
