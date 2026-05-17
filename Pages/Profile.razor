@@ -2,13 +2,11 @@
 
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.EntityFrameworkCore
 @using System.Security.Claims
 @using System.Globalization
 @using System.ComponentModel.DataAnnotations
-@using Confirmai.Data
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IDbContextFactory<AppDbContext> DbFactory
@@ -17,122 +15,112 @@
 @inject UiTextService T
 @inject IWebHostEnvironment Env
 
+<PageTitle>@(loading ? "Perfil" : DisplayName) · Confirmai</PageTitle>
+
 @if (loading)
 {
-    <div class="loading-spinner">@T["Profile.Loading"]</div>
+    <div class="loading-spinner">Carregando...</div>
 }
 else if (user == null)
 {
-    <div class="alert alert-info">@T["Profile.NotFound"]</div>
+    <div class="detail-not-found">
+        <h2>Perfil não encontrado.</h2>
+        <a href="/">← Início</a>
+    </div>
 }
 else
 {
-    <EntityProfileShell
-        Kicker="@T["Profile.Kicker"]"
-        Title="@DisplayName"
-        Subtitle="@T["Profile.Subtitle"]">
-        <MainContent>
-            <div class="profile-view-grid">
-                <section class="profile-panel-card">
-                    <h3 class="profile-section-title">@T["Profile.PublicInfo"]</h3>
-                    <dl class="profile-info-list">
-                        <dt>@T["Profile.DisplayName"]</dt>
-                        <dd>@DisplayName</dd>
+    <div class="profile-page">
 
-                        <dt>@T["Profile.ProfileType"]</dt>
-                        <dd>@PublicProfileType</dd>
-
-                        <dt>@T["Profile.Presentation"]</dt>
-                        <dd>@PublicPresentation</dd>
-                    </dl>
-                </section>
-
-                <section class="profile-panel-card profile-outfit-card">
-                    <h3 class="profile-section-title">@DisplayName</h3>
-                    <div class="profile-outfit-studio" role="img" aria-label="Outfit do personagem @DisplayName">
-                        <div class="profile-outfit-preview-body">
-                            <img class="profile-outfit-image" src="@OutfitImageUrl" alt="Outfit do personagem" loading="lazy" />
-                        </div>
-                    </div>
-                </section>
-
-                <section class="profile-panel-card profile-contacts-card">
-                    <h3 class="profile-section-title">Contatos</h3>
-                    <dl class="profile-info-list">
-                        <dt>Instagram</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(user.InstagramHandle) ? T["AdminUserView.NotInformed"] : user.InstagramHandle)</dd>
-
-                        <dt>Discord</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(user.DiscordHandle) ? T["AdminUserView.NotInformed"] : user.DiscordHandle)</dd>
-
-                        <dt>PayPal</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(user.PaypalAddress) ? T["AdminUserView.NotInformed"] : user.PaypalAddress)</dd>
-
-                        <dt>Binance</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(user.BinanceAddress) ? T["AdminUserView.NotInformed"] : user.BinanceAddress)</dd>
-
-                        <dt>PIX</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(user.PixKey) ? T["AdminUserView.NotInformed"] : user.PixKey)</dd>
-
-                        <dt>X</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(user.XHandle) ? T["AdminUserView.NotInformed"] : user.XHandle)</dd>
-                    </dl>
-                </section>
-
-                @if (isOwnProfile)
+        @* ── Card geral ──────────────────────────────────────────────────── *@
+        <div class="profile-card">
+            <header class="profile-card-header">
+                @if (!string.IsNullOrWhiteSpace(user.AvatarPath))
                 {
-                    <section class="profile-panel-card profile-edit-card">
-                        <h3 class="profile-section-title">Editar minha conta</h3>
+                    <img class="profile-avatar-img" src="@user.AvatarPath" alt="Avatar de @DisplayName" />
+                }
+                else
+                {
+                    <div class="profile-avatar-initials" aria-hidden="true">@AvatarInitial</div>
+                }
+                <div class="profile-identity">
+                    <h1 class="profile-name">@DisplayName</h1>
+                    @if (user.MemberSince.HasValue)
+                    {
+                        <p class="profile-since">Membro desde @user.MemberSince.Value.ToString("MM/yyyy", CultureInfo.InvariantCulture)</p>
+                    }
+                </div>
+            </header>
 
-                        <EditForm Model="profileEditModel" OnValidSubmit="SaveOwnProfileAsync">
-                            <DataAnnotationsValidator />
-                            <ValidationSummary />
-
-                            <div class="profile-edit-form-grid">
-                                <div class="form-group">
-                                    <label>Instagram</label>
-                                    <InputText class="input" @bind-Value="profileEditModel.InstagramHandle" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Discord</label>
-                                    <InputText class="input" @bind-Value="profileEditModel.DiscordHandle" />
-                                </div>
-                                <div class="form-group">
-                                    <label>PayPal</label>
-                                    <InputText class="input" @bind-Value="profileEditModel.PaypalAddress" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Binance</label>
-                                    <InputText class="input" @bind-Value="profileEditModel.BinanceAddress" />
-                                </div>
-                                <div class="form-group">
-                                    <label>PIX</label>
-                                    <InputText class="input" @bind-Value="profileEditModel.PixKey" />
-                                </div>
-                                <div class="form-group">
-                                    <label>X</label>
-                                    <InputText class="input" @bind-Value="profileEditModel.XHandle" />
-                                </div>
-                            </div>
-
-                            @if (!string.IsNullOrWhiteSpace(profileSaveFeedback))
-                            {
-                                <div class="profile-mailbox-feedback" role="status">@profileSaveFeedback</div>
-                            }
-
-                            <div class="form-actions">
-                                <button class="mk-btn mk-btn-primary" type="submit" disabled="@isSavingProfile">
-                                    @(isSavingProfile ? "Salvando..." : "Salvar dados")
-                                </button>
-                            </div>
-                        </EditForm>
-                    </section>
-
-                    <section class="profile-panel-card profile-avatar-card">
-                        <h3 class="profile-section-title">Avatar</h3>
-                        <div class="profile-avatar-preview">
-                            <img class="profile-avatar-img" src="@OutfitImageUrl" alt="Seu avatar" />
+            @if (!string.IsNullOrWhiteSpace(user.InstagramHandle)
+                 || !string.IsNullOrWhiteSpace(user.DiscordHandle)
+                 || !string.IsNullOrWhiteSpace(user.PixKey))
+            {
+                <section class="profile-contacts-section">
+                    @if (!string.IsNullOrWhiteSpace(user.InstagramHandle))
+                    {
+                        <div class="profile-contact-row">
+                            <span class="profile-contact-label">Instagram</span>
+                            <span class="profile-contact-value">@user.InstagramHandle</span>
                         </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(user.DiscordHandle))
+                    {
+                        <div class="profile-contact-row">
+                            <span class="profile-contact-label">Discord</span>
+                            <span class="profile-contact-value">@user.DiscordHandle</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(user.PixKey))
+                    {
+                        <div class="profile-contact-row">
+                            <span class="profile-contact-label">PIX</span>
+                            <span class="profile-contact-value">@user.PixKey</span>
+                        </div>
+                    }
+                </section>
+            }
+
+            @if (isOwnProfile)
+            {
+                <details class="profile-edit-details">
+                    <summary class="profile-edit-summary">Editar perfil</summary>
+                    <EditForm Model="profileEditModel" OnValidSubmit="SaveOwnProfileAsync" class="profile-edit-form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="profile-edit-grid">
+                            <div class="form-group">
+                                <label>Instagram</label>
+                                <InputText class="input" @bind-Value="profileEditModel.InstagramHandle" />
+                            </div>
+                            <div class="form-group">
+                                <label>Discord</label>
+                                <InputText class="input" @bind-Value="profileEditModel.DiscordHandle" />
+                            </div>
+                            <div class="form-group">
+                                <label>PIX</label>
+                                <InputText class="input" @bind-Value="profileEditModel.PixKey" />
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(profileSaveFeedback))
+                        {
+                            <p class="profile-feedback" role="status">@profileSaveFeedback</p>
+                        }
+                        <div class="profile-edit-actions">
+                            <button class="mk-btn mk-btn-primary" type="submit" disabled="@isSavingProfile">
+                                @(isSavingProfile ? "Salvando..." : "Salvar")
+                            </button>
+                        </div>
+                    </EditForm>
+                </details>
+
+                <details class="profile-edit-details">
+                    <summary class="profile-edit-summary">Trocar avatar</summary>
+                    <div class="profile-avatar-edit">
+                        @if (!string.IsNullOrWhiteSpace(user.AvatarPath))
+                        {
+                            <img class="profile-avatar-preview" src="@user.AvatarPath" alt="Seu avatar" />
+                        }
                         <div class="profile-avatar-upload">
                             <InputFile id="avatar-input" OnChange="OnAvatarSelected" accept=".jpg,.jpeg,.png" class="profile-avatar-input" />
                             <label for="avatar-input" class="mk-btn">Escolher imagem</label>
@@ -140,77 +128,104 @@ else
                         </div>
                         @if (avatarFile != null)
                         {
-                            <div class="form-actions">
-                                <button class="mk-btn mk-btn-primary" type="button" @onclick="SaveAvatarAsync" disabled="@isSavingAvatar">
-                                    @(isSavingAvatar ? "Salvando..." : "Salvar avatar")
-                                </button>
-                            </div>
+                            <button class="mk-btn mk-btn-primary" type="button" @onclick="SaveAvatarAsync" disabled="@isSavingAvatar">
+                                @(isSavingAvatar ? "Salvando..." : "Salvar avatar")
+                            </button>
                         }
                         @if (!string.IsNullOrWhiteSpace(avatarFeedback))
                         {
-                            <div class="profile-mailbox-feedback" role="status">@avatarFeedback</div>
+                            <p class="profile-feedback" role="status">@avatarFeedback</p>
                         }
-                    </section>
-                }
-
-                <section class="profile-panel-card profile-stats-card">
-                    <h3 class="profile-section-title">Market stats</h3>
-                    <div class="profile-stats-grid">
-                        <div class="profile-stat-card">
-                            <span class="profile-stat-label">Membro desde</span>
-                            <span class="profile-stat-value">@(user.MemberSince.HasValue ? user.MemberSince.Value.ToString("MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : "—")</span>
-                        </div>
                     </div>
-                </section>
+                </details>
+            }
+        </div>
+
+        @* ── Card de esportes ─────────────────────────────────────────────── *@
+        <div class="profile-sport-card">
+            <div class="profile-sport-tabs" role="tablist">
+                <button class="profile-sport-tab @(activeSport == Sport.Futsal ? "active" : string.Empty)"
+                        role="tab" type="button" @onclick='() => SetSport(Sport.Futsal)'>
+                    ⚽ Futsal
+                </button>
+                <button class="profile-sport-tab @(activeSport == Sport.Poker ? "active" : string.Empty)"
+                        role="tab" type="button" @onclick='() => SetSport(Sport.Poker)'>
+                    🃏 Poker
+                </button>
             </div>
 
-            @if (!isOwnProfile && isAuthenticated)
+            @if (activeSport == Sport.Futsal)
             {
-                <section class="profile-mailbox-section">
-                    <div class="profile-mailbox-launch profile-panel-card">
-                        <p class="profile-mailbox-launch-hint">Enviar mensagem para este perfil</p>
-
-                        <div class="profile-mailbox-compose">
-                            @if (!string.IsNullOrWhiteSpace(messageFeedback))
-                            {
-                                <div class="profile-mailbox-feedback" role="status">@messageFeedback</div>
-                            }
-
-                            <div class="profile-chat-thread" aria-label="Historico do chat">
-                                @if (!chatMessages.Any())
-                                {
-                                    <div class="profile-chat-empty">Sem mensagens ainda. Envie a primeira mensagem.</div>
-                                }
-                                else
-                                {
-                                    @foreach (var chatMessage in chatMessages)
-                                    {
-                                        <article class="profile-chat-bubble @(chatMessage.IsIncoming ? "incoming" : "outgoing")">
-                                            <p>@chatMessage.Body</p>
-                                            <span class="profile-chat-meta">@chatMessage.CreatedAt.ToLocalTime().ToString("dd/MM HH:mm", CultureInfo.InvariantCulture)</span>
-                                        </article>
-                                    }
-                                }
-                            </div>
-
-                            <textarea id="profile-mailbox-body" class="mk-input profile-chat-textarea" rows="3" maxlength="4000" placeholder="Digite sua mensagem aqui..." @bind="messageBody"></textarea>
-
-                            <div class="profile-chat-actions">
-                                <button class="mk-btn profile-chat-send-btn" type="button" @onclick="SendMailboxMessageAsync" disabled="@isSendingMessage">
-                                    @(isSendingMessage ? "Enviando..." : "Enviar mensagem")
-                                </button>
-
-                                @if (chatMessages.Any())
-                                {
-                                    <button class="mk-btn profile-chat-refresh-btn" type="button" @onclick="RefreshChatAsync">Atualizar chat</button>
-                                }
-                            </div>
-                        </div>
+                <div class="profile-sport-stats" role="tabpanel">
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">@futsalTotal</span>
+                        <span class="profile-stat-label">Partidas</span>
                     </div>
-                </section>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">@futsalOutfieldTotal</span>
+                        <span class="profile-stat-label">Jogador de linha</span>
+                    </div>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">@futsalGoalkeeperTotal</span>
+                        <span class="profile-stat-label">Goleiro</span>
+                    </div>
+                </div>
             }
-        </MainContent>
-    </EntityProfileShell>
+            else if (activeSport == Sport.Poker)
+            {
+                <div class="profile-sport-stats" role="tabpanel">
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">@pokerTotal</span>
+                        <span class="profile-stat-label">Sessões</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* ── Chat (só para outros perfis autenticados) ───────────────────── *@
+        @if (!isOwnProfile && isAuthenticated)
+        {
+            <div class="profile-card profile-message-card">
+                <h3 class="profile-message-title">Mensagem</h3>
+                <div class="profile-chat-thread" aria-label="Histórico do chat">
+                    @if (!chatMessages.Any())
+                    {
+                        <div class="profile-chat-empty">Sem mensagens ainda.</div>
+                    }
+                    else
+                    {
+                        @foreach (var msg in chatMessages)
+                        {
+                            <article class="profile-chat-bubble @(msg.IsIncoming ? "incoming" : "outgoing")">
+                                <p>@msg.Body</p>
+                                <span class="profile-chat-meta">@msg.CreatedAt.ToLocalTime().ToString("dd/MM HH:mm", CultureInfo.InvariantCulture)</span>
+                            </article>
+                        }
+                    }
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(messageFeedback))
+                {
+                    <p class="profile-feedback" role="status">@messageFeedback</p>
+                }
+
+                <textarea class="mk-input profile-chat-textarea" rows="3" maxlength="4000"
+                          placeholder="Digite sua mensagem..." @bind="messageBody"></textarea>
+
+                <div class="profile-chat-actions">
+                    <button class="mk-btn mk-btn-primary" type="button"
+                            @onclick="SendMailboxMessageAsync" disabled="@isSendingMessage">
+                        @(isSendingMessage ? "Enviando..." : "Enviar")
+                    </button>
+                    @if (chatMessages.Any())
+                    {
+                        <button class="mk-btn" type="button" @onclick="RefreshChatAsync">Atualizar</button>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
 }
 
 @code {
@@ -225,23 +240,26 @@ else
     private bool isSendingMessage;
     private bool isSavingProfile;
     private string? profileSaveFeedback;
-    private bool showMailboxComposer;
     private IBrowserFile? avatarFile;
     private string? avatarFeedback;
     private bool isSavingAvatar;
     private List<ProfileChatMessageView> chatMessages = new();
     private ProfileEditModel profileEditModel = new();
 
+    // Sport stats
+    private Sport activeSport = Sport.Futsal;
+    private int futsalTotal;
+    private int futsalGoalkeeperTotal;
+    private int futsalOutfieldTotal;
+    private int pokerTotal;
+
     private string DisplayName => user?.FullName?.Trim() is { Length: > 0 } name
         ? name
-        : user?.UserName ?? T["Layout.UserFallback"];
+        : user?.UserName ?? "—";
 
-    private string PublicProfileType => T["Profile.UserType"];
-
-    private string PublicPresentation => T["Profile.PresentationText"];
-
-    // TODO: substituir head/body/legs/feet pelos params reais do personagem logado
-    private string OutfitImageUrl => user?.AvatarPath ?? "/images/tibia/char.png";
+    private string AvatarInitial => DisplayName.Length > 0
+        ? DisplayName[0].ToString().ToUpperInvariant()
+        : "?";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -253,71 +271,59 @@ else
             ?? string.Empty;
         isAuthenticated = !string.IsNullOrWhiteSpace(currentUserId);
         isOwnProfile = isAuthenticated && string.Equals(currentUserId, Id, StringComparison.Ordinal);
-        showMailboxComposer = isAuthenticated && !isOwnProfile;
 
         user = await UserManager.FindByIdAsync(Id);
         if (user != null)
         {
-            await using var db = await DbFactory.CreateDbContextAsync();
-
             profileEditModel = new ProfileEditModel
             {
                 InstagramHandle = user.InstagramHandle,
                 DiscordHandle = user.DiscordHandle,
-                PaypalAddress = user.PaypalAddress,
-                BinanceAddress = user.BinanceAddress,
                 PixKey = user.PixKey,
-                XHandle = user.XHandle
             };
 
             PrefillIntentMessage();
 
-            if (showMailboxComposer)
-            {
+            if (!isOwnProfile && isAuthenticated)
                 await LoadChatMessagesAsync();
-            }
+
+            await LoadSportStatsAsync();
         }
 
         loading = false;
     }
 
-    private void OpenMailbox()
+    private async Task LoadSportStatsAsync()
     {
-        NavigationManager.NavigateTo("/mailbox");
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var confirmations = await db.EventConfirmations
+            .AsNoTracking()
+            .Where(c => c.UserId == Id)
+            .Select(c => new { c.Event.Sport, c.Position })
+            .ToListAsync();
+
+        futsalTotal = confirmations.Count(c => c.Sport == Sport.Futsal);
+        futsalGoalkeeperTotal = confirmations.Count(c => c.Sport == Sport.Futsal && c.Position == FutsalPosition.Goalkeeper);
+        futsalOutfieldTotal = confirmations.Count(c => c.Sport == Sport.Futsal && c.Position != FutsalPosition.Goalkeeper);
+        pokerTotal = confirmations.Count(c => c.Sport == Sport.Poker);
     }
+
+    private void SetSport(Sport sport) => activeSport = sport;
 
     private void PrefillIntentMessage()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var query = QueryHelpers.ParseQuery(uri.Query);
-
-        if (!query.TryGetValue("intent", out var intent) || !string.Equals(intent.ToString(), "message", StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        showMailboxComposer = true;
+        // intent=message acknowledged — chat always shown for other profiles
+        _ = query.TryGetValue("intent", out _);
     }
 
     private async Task SendMailboxMessageAsync()
     {
-        if (!isAuthenticated || string.IsNullOrWhiteSpace(currentUserId) || user == null)
-        {
-            messageFeedback = "Voce precisa estar autenticado para enviar mensagens.";
-            return;
-        }
-
-        if (isOwnProfile)
-        {
-            messageFeedback = "Nao e possivel enviar mensagem para o proprio perfil.";
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(messageBody))
-        {
-            messageFeedback = "Escreva uma mensagem antes de enviar.";
-            return;
-        }
+        if (!isAuthenticated || string.IsNullOrWhiteSpace(currentUserId) || user == null) return;
+        if (isOwnProfile) { messageFeedback = "Não é possível enviar mensagem para o próprio perfil."; return; }
+        if (string.IsNullOrWhiteSpace(messageBody)) { messageFeedback = "Escreva uma mensagem antes de enviar."; return; }
 
         isSendingMessage = true;
         messageFeedback = null;
@@ -325,19 +331,15 @@ else
         try
         {
             await using var db = await DbFactory.CreateDbContextAsync();
-
-            var message = new UserMailboxMessage
+            db.UserMailboxMessages.Add(new UserMailboxMessage
             {
                 SenderUserId = currentUserId,
                 RecipientUserId = Id,
                 Subject = "Chat pelo perfil",
                 Body = messageBody.Trim(),
                 CreatedAt = DateTime.UtcNow
-            };
-
-            db.UserMailboxMessages.Add(message);
+            });
             await db.SaveChangesAsync();
-
             messageBody = string.Empty;
             messageFeedback = "Mensagem enviada.";
             await LoadChatMessagesAsync();
@@ -350,9 +352,9 @@ else
 
     private async Task SaveOwnProfileAsync()
     {
-        if (user == null || !isOwnProfile || string.IsNullOrWhiteSpace(currentUserId) || !string.Equals(user.Id, currentUserId, StringComparison.Ordinal))
+        if (user == null || !isOwnProfile || !string.Equals(user.Id, currentUserId, StringComparison.Ordinal))
         {
-            profileSaveFeedback = "Nao foi possivel salvar os dados do perfil.";
+            profileSaveFeedback = "Não foi possível salvar.";
             return;
         }
 
@@ -361,23 +363,15 @@ else
 
         user.InstagramHandle = NormalizeOptional(profileEditModel.InstagramHandle);
         user.DiscordHandle = NormalizeOptional(profileEditModel.DiscordHandle);
-        user.PaypalAddress = NormalizeOptional(profileEditModel.PaypalAddress);
-        user.BinanceAddress = NormalizeOptional(profileEditModel.BinanceAddress);
         user.PixKey = NormalizeOptional(profileEditModel.PixKey);
-        user.XHandle = NormalizeOptional(profileEditModel.XHandle);
 
         var result = await UserManager.UpdateAsync(user);
         isSavingProfile = false;
-
-        profileSaveFeedback = result.Succeeded
-            ? "Dados atualizados com sucesso."
-            : "Nao foi possivel salvar os dados.";
+        profileSaveFeedback = result.Succeeded ? "Dados atualizados." : "Erro ao salvar.";
     }
 
-    private static string? NormalizeOptional(string? value)
-    {
-        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-    }
+    private static string? NormalizeOptional(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     private void OnAvatarSelected(InputFileChangeEventArgs e)
     {
@@ -387,8 +381,7 @@ else
 
     private async Task SaveAvatarAsync()
     {
-        if (user == null || !isOwnProfile || avatarFile == null)
-            return;
+        if (user == null || !isOwnProfile || avatarFile == null) return;
 
         const long maxBytes = 2 * 1024 * 1024;
         var allowedTypes = new[] { "image/jpeg", "image/png" };
@@ -424,26 +417,16 @@ else
                 await readStream.CopyToAsync(stream);
             }
 
-            // Delete old avatar file if it was a local upload
             if (!string.IsNullOrWhiteSpace(user.AvatarPath) && user.AvatarPath.StartsWith("/uploads/"))
             {
                 var oldPath = Path.Combine(Env.WebRootPath, user.AvatarPath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
-                if (File.Exists(oldPath))
-                    File.Delete(oldPath);
+                if (File.Exists(oldPath)) File.Delete(oldPath);
             }
 
             user.AvatarPath = $"/uploads/avatars/{filename}";
             var result = await UserManager.UpdateAsync(user);
-
-            if (result.Succeeded)
-            {
-                avatarFeedback = "Avatar atualizado com sucesso.";
-                avatarFile = null;
-            }
-            else
-            {
-                avatarFeedback = "Erro ao salvar avatar.";
-            }
+            avatarFeedback = result.Succeeded ? "Avatar atualizado." : "Erro ao salvar avatar.";
+            if (result.Succeeded) avatarFile = null;
         }
         catch
         {
@@ -455,10 +438,7 @@ else
         }
     }
 
-    private async Task RefreshChatAsync()
-    {
-        await LoadChatMessagesAsync();
-    }
+    private async Task RefreshChatAsync() => await LoadChatMessagesAsync();
 
     private async Task LoadChatMessagesAsync()
     {
@@ -469,12 +449,10 @@ else
         }
 
         await using var db = await DbFactory.CreateDbContextAsync();
-
         var recent = await db.UserMailboxMessages
             .AsNoTracking()
-            .Where(m =>
-                (m.SenderUserId == currentUserId && m.RecipientUserId == Id)
-                || (m.SenderUserId == Id && m.RecipientUserId == currentUserId))
+            .Where(m => (m.SenderUserId == currentUserId && m.RecipientUserId == Id)
+                     || (m.SenderUserId == Id && m.RecipientUserId == currentUserId))
             .OrderByDescending(m => m.CreatedAt)
             .Take(80)
             .Select(m => new ProfileChatMessageView
@@ -497,23 +475,8 @@ else
 
     private sealed class ProfileEditModel
     {
-        [StringLength(120)]
-        public string? InstagramHandle { get; set; }
-
-        [StringLength(120)]
-        public string? DiscordHandle { get; set; }
-
-        [StringLength(160)]
-        public string? PaypalAddress { get; set; }
-
-        [StringLength(160)]
-        public string? BinanceAddress { get; set; }
-
-        [StringLength(160)]
-        public string? PixKey { get; set; }
-
-        [StringLength(120)]
-        public string? XHandle { get; set; }
+        [StringLength(120)] public string? InstagramHandle { get; set; }
+        [StringLength(120)] public string? DiscordHandle { get; set; }
+        [StringLength(160)] public string? PixKey { get; set; }
     }
-
 }

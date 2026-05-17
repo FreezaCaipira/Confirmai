@@ -1,7 +1,24 @@
-﻿.mailbox-page .entity-shell-main h3 {
+﻿/* ── Layout ─────────────────────────────────────────────────────────────── */
+
+.mailbox-page {
+    max-width: 980px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+}
+
+.mailbox-shell-card {
+    border: 1px solid #8c6030;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #f7ead0 0%, #e4cc9a 100%);
+    box-shadow: 0 2px 8px rgba(60, 30, 10, 0.1), inset 0 0 0 1px rgba(255, 245, 220, 0.6);
+    padding: 1rem 1.05rem;
+}
+
+.mailbox-shell-card h3 {
     margin-top: 0.7rem;
 }
 
+/* ── Header ──────────────────────────────────────────────────────────────── */
 .mailbox-page-header {
     margin: -1rem -1.05rem 0.72rem;
     padding: 0.38rem 0.62rem;

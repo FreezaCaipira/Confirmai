@@ -19,15 +19,14 @@
 
 <PageTitle>@T["Mailbox.PageTitle"]</PageTitle>
 
-<div class="entity-shell parchment-a mailbox-page">
-    <section class="entity-shell-grid" aria-label="@T["Mailbox.Aria"]">
-        <article class="entity-shell-card entity-shell-main">
-            @if (isLoading)
-            {
-                <div class="loading-spinner">@T["Mailbox.Loading"]</div>
-            }
-            else
-            {
+<div class="mailbox-page">
+    <div class="mailbox-shell-card" aria-label="@T["Mailbox.Aria"]">
+        @if (isLoading)
+        {
+            <div class="loading-spinner">@T["Mailbox.Loading"]</div>
+        }
+        else
+        {
                 <div class="mailbox-page-header">
                     <h3 class="mailbox-page-title">@T["Mailbox.Title"]</h3>
                     <button class="mk-btn mk-btn-secondary mailbox-profile-btn" type="button" @onclick='() => Navigation.NavigateTo($"/profile/{currentUserId}")'>@T["Mailbox.MyProfile"]</button>
@@ -191,8 +190,7 @@
                     </article>
                 </section>
             }
-        </article>
-    </section>
+    </div>
 </div>
 
 @code {
