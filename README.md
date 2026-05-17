@@ -147,48 +147,6 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE Confirmai TO freeza;"
 dotnet ef database update
 ```
 
-### Nota importante sobre paginação e componentização
-
-Decisão atual do projeto:
-- As paginações foram mantidas em código local das páginas (sem componente compartilhado de paginação) por estabilidade operacional.
-
-Evidências observadas no projeto:
-- Na tela `"/admin/logs"`, a versão componentizada da paginação apresentou cliques sem avanço de página em ambiente real.
-- Ao substituir por botões locais na própria página, o comportamento voltou ao normal imediatamente.
-- O comportamento foi percebido em histórico anterior do projeto e reproduzido novamente no ciclo atual.
-
-Registro cronológico recente (refatoração/auditoria):
-- Cenário inicial estável: .NET 9 + paginação local na tela de logs.
-- Tentativa de padronização com componente de paginação: regressão de clique sem avanço em logs.
-- Mitigação imediata: descomponentização da paginação em logs e posteriormente em todas as rotas paginadas.
-- Tentativa de atualização para .NET 10 para eliminar hipótese de bug de versão: compilou, mas o comportamento reportado em ambiente real não estabilizou.
-- Decisão operacional: rollback completo para .NET 9 (`global.json`, `TargetFramework` da aplicação e testes), preservando paginação local.
-- Estado validado após rollback: comportamento voltou a funcionar no fluxo reportado.
-
-Risco conhecido e lição aprendida:
-- Risco: regressão silenciosa de interatividade em paginações durante recomposição/upgrade.
-- Lição: preferir estabilidade observável em runtime real antes de consolidar abstrações compartilhadas.
-- Regra prática: abstração só permanece quando o comportamento final for equivalente em todas as rotas críticas.
-
-Escopo atual da decisão:
-- Páginas administrativas e de usuário com paginação usam implementação local.
-- O componente `Shared/Components/PaginationControls.razor` não é obrigatório para os fluxos atuais.
-- Ações críticas de filtros (`Filtrar`/`Limpar`) em páginas admin também usam botões locais (sem componente intermediário de ação) para reduzir risco de regressão de callback.
-
-Diretriz para futura recomposição:
-- Só reintroduzir paginação componentizada com teste manual obrigatório nas rotas: `/admin/logs`, `/admin/users`, `/admin/products`, `/admin/payments`, `/admin/orders`, `/admin/orders-review`, `/orders`, `/payments`, `/products`, `/marketplace`.
-- Registrar evidência do teste (data, versão .NET, navegador e resultado por rota) antes de consolidar a recomposição.
-- Em caso de regressão em qualquer rota, voltar para paginação local nessa rota.
-- Recomendação para PR de recomposição: incluir checklist de validação de clique, persistência de página atual e comportamento após filtro/ordenação.
-
-Referências para debate na comunidade:
-- Issue tracker ASP.NET Core: https://github.com/dotnet/aspnetcore/issues
-- Discussões ASP.NET Core: https://github.com/dotnet/aspnetcore/discussions
-- Docs de EventCallback: https://learn.microsoft.com/en-us/aspnet/core/blazor/components/event-handling
-- Docs de render modes/interatividade: https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes
-
----
-
 ## Testes E2E (Playwright)
 
 Além dos testes automatizados .NET (`Confirmai.Tests`), o projeto possui uma suíte de testes E2E de navegador na pasta [e2e](e2e) para validar interações reais de UI/JavaScript.
@@ -314,6 +272,37 @@ sudo -u postgres psql -c "CREATE DATABASE Confirmai OWNER <user>;"
 dotnet ef database update
 ```
 - Testes E2E (Playwright) para fluxos de compra, pedido e acesso admin
+
+---
+
+## Problemas Técnicos Resolvidos
+
+### `@onclick` em componentes compartilhados não funciona (cliques ignorados)
+
+**Sintoma:** Botões com `@onclick` dentro de componentes em `Shared/Components/` não respondem a cliques. O circuito Blazor trava na conexão inicial com o erro:
+```
+InvalidCharacterError: Failed to execute 'setAttribute' on 'Element': '@onclick' is not a valid attribute name.
+```
+Componentes dentro de `Pages/` com os mesmos handlers funcionam normalmente.
+
+**Causa raiz:** O projeto não tinha um `_Imports.razor` na raiz. Em Blazor, cada `_Imports.razor` aplica seus `@using` apenas para arquivos `.razor` na mesma pasta e subpastas. Sem o arquivo raiz, componentes em `Shared/Components/` compilavam sem `@using Microsoft.AspNetCore.Components.Web`. O compilador Razor, não conseguindo resolver os tipos de evento (`MouseEventArgs`, etc.), emitia `@onclick` como atributo HTML literal em vez de `EventCallback`. O circuito falhava ao tentar fazer `element.setAttribute('@onclick', ...)` — inválido no DOM — e morria silenciosamente na hidratação.
+
+**Fix:** Criar `_Imports.razor` na raiz do projeto com os imports padrão Blazor:
+```razor
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+```
+
+**Por que mover botões para a própria página "resolvia":** Páginas em `Pages/` recebiam o `Pages/_Imports.razor` → `@onclick` compilava corretamente. Parecia um bug de componentização, mas era ausência do arquivo raiz. A paginação componentizada (`PaginationControls.razor`) e qualquer `EventCallback` em componentes de `Shared/` vão funcionar após o fix.
+
+**Como diagnosticar em outros projetos:**
+1. Ver o HTML da página (`Ctrl+U` ou DevTools → Network): se os botões tiverem `@onclick="NomeDaFuncao"` como atributo literal, a causa é essa.
+2. DevTools → Console: erro `setAttribute` com `@onclick` confirma.
+3. Verificar se existe `_Imports.razor` na raiz do projeto (ao lado do `.csproj`).
 
 ---
 
