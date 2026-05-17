@@ -143,24 +143,24 @@
 }
 
 .profile-edit-form {
-    padding: 0.72rem 1.1rem 0.9rem;
+    padding: 1rem 1.1rem 1.1rem;
 }
 
 .profile-edit-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 0.52rem 0.72rem;
-    margin-bottom: 0.62rem;
+    gap: 0.9rem 1rem;
+    margin-bottom: 0;
 }
 
 .profile-edit-grid .form-group > label {
     display: block;
-    margin-bottom: 0.2rem;
-    font-size: 0.78rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--ci-text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
 }
 
 /* ::deep garante que o seletor alcança inputs renderizados por InputText (child component) */
@@ -193,9 +193,18 @@
 }
 
 .profile-edit-actions {
-    margin-top: 0.62rem;
+    margin-top: 0.75rem;
     display: flex;
     gap: 0.5rem;
+}
+
+/* ValidationSummary renderiza <ul> vazio que adiciona margem indesejada */
+.profile-edit-form ::deep .validation-errors {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8rem;
+    color: #f87171;
 }
 
 /* ── Botões no card de perfil ────────────────────────────────────────────── */

@@ -59,50 +59,6 @@ else
                 </p>
             </header>
 
-            @if (ev.LineupConfirmedAt is not null)
-            {
-                <div class="detail-admin-bar">
-                    <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
-                        <i class="fas fa-clipboard-list"></i> Ver Escalação
-                    </a>
-                </div>
-            }
-
-            @if (isAdmin)
-            {
-                <div class="detail-admin-bar">
-                    <a class="detail-admin-btn" href="/futsal/@ev.Id/edit">
-                        <i class="fas fa-pen"></i> Editar partida
-                    </a>
-                    @if (ev.IsActive)
-                    {
-                        @if (ev.LineupConfirmedAt is null)
-                        {
-                            <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
-                                <i class="fas fa-list-ol"></i> Montar Escalação
-                            </a>
-                        }
-                        @if (!showCancelConfirm)
-                        {
-                            <button class="detail-admin-btn detail-admin-btn--danger" type="button"
-                                    @onclick="() => showCancelConfirm = true">
-                                <i class="fas fa-ban"></i> Cancelar partida
-                            </button>
-                        }
-                        else
-                        {
-                            <div class="cancel-confirm-block">
-                                <span>Tem certeza? Todos os confirmados serão avisados.</span>
-                                <button class="detail-admin-btn" type="button"
-                                        @onclick="() => showCancelConfirm = false">Não</button>
-                                <button class="detail-admin-btn detail-admin-btn--danger" type="button"
-                                        @onclick="CancelEvent">Sim, cancelar</button>
-                            </div>
-                        }
-                    }
-                </div>
-            }
-
             @if (!ev.IsActive)
             {
                 <div class="cancelled-banner">
@@ -350,6 +306,50 @@ else
             <div class="detail-back">
                 <a href="/futsal">← Voltar à lista</a>
             </div>
+
+            @if (ev.LineupConfirmedAt is not null || isAdmin)
+            {
+                <div class="detail-admin-bar detail-admin-bar--footer">
+                    @if (ev.LineupConfirmedAt is not null)
+                    {
+                        <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
+                            <i class="fas fa-clipboard-list"></i> Ver Escalação
+                        </a>
+                    }
+                    @if (isAdmin)
+                    {
+                        <a class="detail-admin-btn" href="/futsal/@ev.Id/edit">
+                            <i class="fas fa-pen"></i> Editar partida
+                        </a>
+                        @if (ev.IsActive)
+                        {
+                            @if (ev.LineupConfirmedAt is null)
+                            {
+                                <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
+                                    <i class="fas fa-list-ol"></i> Montar Escalação
+                                </a>
+                            }
+                            @if (!showCancelConfirm)
+                            {
+                                <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                                        @onclick="() => showCancelConfirm = true">
+                                    <i class="fas fa-ban"></i> Cancelar partida
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="cancel-confirm-block">
+                                    <span>Tem certeza? Todos os confirmados serão avisados.</span>
+                                    <button class="detail-admin-btn" type="button"
+                                            @onclick="() => showCancelConfirm = false">Não</button>
+                                    <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                                            @onclick="CancelEvent">Sim, cancelar</button>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+            }
         </div>
     </div>
 }

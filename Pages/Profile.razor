@@ -85,33 +85,35 @@ else
             {
                 <details class="profile-edit-details">
                     <summary class="profile-edit-summary">Editar perfil</summary>
-                    <EditForm Model="profileEditModel" OnValidSubmit="SaveOwnProfileAsync" class="profile-edit-form">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary />
-                        <div class="profile-edit-grid">
-                            <div class="form-group">
-                                <label>Instagram</label>
-                                <InputText class="input" @bind-Value="profileEditModel.InstagramHandle" />
+                    <div class="profile-edit-form">
+                        <EditForm Model="profileEditModel" OnValidSubmit="SaveOwnProfileAsync">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+                            <div class="profile-edit-grid">
+                                <div class="form-group">
+                                    <label>Instagram</label>
+                                    <InputText class="input" @bind-Value="profileEditModel.InstagramHandle" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Discord</label>
+                                    <InputText class="input" @bind-Value="profileEditModel.DiscordHandle" />
+                                </div>
+                                <div class="form-group">
+                                    <label>PIX</label>
+                                    <InputText class="input" @bind-Value="profileEditModel.PixKey" />
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Discord</label>
-                                <InputText class="input" @bind-Value="profileEditModel.DiscordHandle" />
+                            @if (!string.IsNullOrWhiteSpace(profileSaveFeedback))
+                            {
+                                <p class="profile-feedback" role="status">@profileSaveFeedback</p>
+                            }
+                            <div class="profile-edit-actions">
+                                <button class="mk-btn mk-btn-primary" type="submit" disabled="@isSavingProfile">
+                                    @(isSavingProfile ? "Salvando..." : "Salvar")
+                                </button>
                             </div>
-                            <div class="form-group">
-                                <label>PIX</label>
-                                <InputText class="input" @bind-Value="profileEditModel.PixKey" />
-                            </div>
-                        </div>
-                        @if (!string.IsNullOrWhiteSpace(profileSaveFeedback))
-                        {
-                            <p class="profile-feedback" role="status">@profileSaveFeedback</p>
-                        }
-                        <div class="profile-edit-actions">
-                            <button class="mk-btn mk-btn-primary" type="submit" disabled="@isSavingProfile">
-                                @(isSavingProfile ? "Salvando..." : "Salvar")
-                            </button>
-                        </div>
-                    </EditForm>
+                        </EditForm>
+                    </div>
                 </details>
 
                 <details class="profile-edit-details">
