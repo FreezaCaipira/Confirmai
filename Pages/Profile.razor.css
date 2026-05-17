@@ -163,26 +163,83 @@
     letter-spacing: 0.03em;
 }
 
+/* ::deep garante que o seletor alcança inputs renderizados por InputText (child component) */
+.profile-edit-grid .form-group ::deep input,
 .profile-edit-grid .form-group .input {
     width: 100%;
     box-sizing: border-box;
     border: 1px solid var(--ci-border);
     border-radius: 4px;
-    padding: 0.34rem 0.5rem;
+    padding: 0.38rem 0.52rem;
     background: var(--ci-bg-input);
     color: var(--ci-text);
     font-size: 0.88rem;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.15s ease;
 }
 
+.profile-edit-grid .form-group ::deep input:focus,
 .profile-edit-grid .form-group .input:focus {
-    outline: 2px solid var(--ci-accent);
-    outline-offset: 1px;
+    outline: none;
+    border-color: var(--ci-accent);
+    box-shadow: 0 0 0 2px rgba(79, 156, 248, 0.22);
     background: var(--ci-bg-input);
 }
 
+.profile-edit-grid .form-group ::deep input::placeholder,
+.profile-edit-grid .form-group .input::placeholder {
+    color: var(--ci-text-subtle);
+    opacity: 1;
+}
+
 .profile-edit-actions {
-    margin-top: 0.5rem;
+    margin-top: 0.62rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ── Botões no card de perfil ────────────────────────────────────────────── */
+
+.profile-card .mk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0.34rem 0.9rem;
+    border: 1px solid var(--ci-border);
+    border-radius: 4px;
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.profile-card .mk-btn:hover:not(:disabled) {
+    background: rgba(79, 156, 248, 0.1);
+    border-color: var(--ci-border-dim);
+    color: var(--ci-text);
+}
+
+.profile-card .mk-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.profile-card .mk-btn-primary {
+    background: var(--ci-accent-mid);
+    border-color: var(--ci-border-dim);
+    color: var(--ci-text);
+}
+
+.profile-card .mk-btn-primary:hover:not(:disabled) {
+    background: var(--ci-accent);
+    border-color: var(--ci-accent);
+    color: #fff;
 }
 
 .profile-avatar-edit {
@@ -194,8 +251,8 @@
 }
 
 .profile-avatar-preview {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--ci-border-dim);
@@ -208,8 +265,10 @@
     gap: 0.46rem;
 }
 
-.profile-avatar-input {
-    display: none;
+/* Ocultar o input nativo do InputFile — uso inline style também como fallback */
+.profile-avatar-input,
+::deep .profile-avatar-input {
+    display: none !important;
 }
 
 .profile-avatar-hint {
