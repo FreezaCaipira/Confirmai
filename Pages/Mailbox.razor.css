@@ -24,9 +24,9 @@
     padding: 0.38rem 0.62rem;
     background: var(--ci-bg-card-deep);
     border-bottom: 1px solid var(--ci-border);
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     gap: 0.5rem;
 }
 
@@ -38,6 +38,13 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    grid-column: 2;
+    text-align: center;
+}
+
+.mailbox-page-header .mailbox-profile-btn {
+    grid-column: 3;
+    justify-self: end;
 }
 
 .mailbox-profile-btn {
