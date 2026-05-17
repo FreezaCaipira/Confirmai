@@ -7,10 +7,10 @@
 }
 
 .mailbox-shell-card {
-    border: 1px solid #8c6030;
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
-    background: linear-gradient(180deg, #f7ead0 0%, #e4cc9a 100%);
-    box-shadow: 0 2px 8px rgba(60, 30, 10, 0.1), inset 0 0 0 1px rgba(255, 245, 220, 0.6);
+    background: var(--ci-bg-card);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(79, 156, 248, 0.06);
     padding: 1rem 1.05rem;
 }
 
@@ -22,8 +22,8 @@
 .mailbox-page-header {
     margin: -1rem -1.05rem 0.72rem;
     padding: 0.38rem 0.62rem;
-    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
-    border-bottom: 1px solid var(--rust);
+    background: var(--ci-bg-card-deep);
+    border-bottom: 1px solid var(--ci-border);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -32,22 +32,21 @@
 
 .mailbox-page-title {
     margin: 0;
-    color: #ffe9be;
-    font-family: var(--font-display);
+    color: var(--ci-text);
+    font-family: var(--ci-font);
     font-size: 1.05rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .mailbox-profile-btn {
     min-height: 1.6rem;
     padding: 0.14rem 0.6rem;
-    border: 1px solid #8a6a3a;
+    border: 1px solid var(--ci-border);
     border-radius: 2px;
-    background: linear-gradient(180deg, rgba(255, 240, 200, 0.2) 0%, rgba(200, 160, 100, 0.2) 100%);
-    color: #ffe0b0;
+    background: rgba(79, 156, 248, 0.1);
+    color: var(--ci-text-blue);
     font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -56,7 +55,7 @@
 }
 
 .mailbox-profile-btn:hover {
-    background: rgba(255, 240, 200, 0.18);
+    background: rgba(79, 156, 248, 0.18);
 }
 
 .mailbox-toolbar {
@@ -73,10 +72,10 @@
     align-items: end;
     margin-bottom: 0.72rem;
     padding: 0.56rem;
-    border: 1px solid rgba(140, 100, 50, 0.4);
+    border: 1px solid var(--ci-border);
     border-radius: 4px;
-    background: #e4ccaa;
-    box-shadow: inset 0 1px 3px rgba(60, 35, 12, 0.12);
+    background: var(--ci-bg-card-deep);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 .mailbox-filter-field {
@@ -87,7 +86,7 @@
 .mailbox-filter-field label {
     font-size: 0.7rem;
     font-weight: 700;
-    color: #5f3d1e;
+    color: var(--ci-text-muted);
 }
 
 .mailbox-search {
@@ -99,7 +98,7 @@
     align-items: center;
     gap: 0.38rem;
     font-size: 0.73rem;
-    color: #4b2c15;
+    color: var(--ci-text);
     font-weight: 700;
 }
 
@@ -114,9 +113,9 @@
     min-height: 1.85rem;
     padding: 0.18rem 0.55rem;
     border-radius: 3px;
-    border: 1px solid #a08050;
-    background: #f0e0c2;
-    color: #4a2c14;
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-card);
+    color: var(--ci-text);
     font-size: 0.72rem;
     font-weight: 700;
 }
@@ -130,10 +129,10 @@
     width: 100%;
     box-sizing: border-box;
     min-height: 1.82rem;
-    border: 1px solid var(--brown-border-warm);
+    border: 1px solid var(--ci-border);
     border-radius: 4px;
-    background: #fff7e8;
-    color: #3e2410;
+    background: var(--ci-bg-input);
+    color: var(--ci-text);
     padding: 0.16rem 0.4rem;
     font-size: 0.76rem;
 }
@@ -159,8 +158,8 @@
 
 .mailbox-list-pane,
 .mailbox-thread-pane {
-    border: 1px solid rgba(143, 106, 61, 0.9);
-    background: linear-gradient(180deg, rgba(249, 237, 212, 0.86) 0%, rgba(235, 215, 179, 0.9) 100%);
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-card-deep);
     border-radius: 4px;
     padding: 0.5rem;
 }
@@ -173,9 +172,9 @@
 }
 
 .mailbox-folder-tab {
-    border: 1px solid var(--brown-border-light);
-    background: linear-gradient(180deg, #f2e5ca 0%, #e3d0ad 100%);
-    color: #4b2c15;
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-card);
+    color: var(--ci-text-muted);
     min-height: 1.9rem;
     font-size: 0.72rem;
     font-weight: 700;
@@ -187,13 +186,14 @@
 }
 
 .mailbox-folder-tab.active {
-    border-color: #9c4a18;
-    box-shadow: inset 0 0 0 1px rgba(191, 75, 19, 0.2);
-    background: linear-gradient(180deg, #f5ddb4 0%, #e8c28a 100%);
+    border-color: var(--ci-accent-mid);
+    background: rgba(79, 156, 248, 0.12);
+    color: var(--ci-accent);
 }
 
 .mailbox-folder-tab:hover:not(.active) {
-    background: #d0b88e;
+    background: rgba(79, 156, 248, 0.07);
+    color: var(--ci-text);
 }
 
 .mailbox-list.mailbox-list-compact {
@@ -206,18 +206,17 @@
 .mailbox-list-pane .mailbox-pagination {
     margin-top: 0.7rem;
     padding-top: 0.44rem;
-    border-top: 1px dashed rgba(143, 106, 61, 0.46);
+    border-top: 1px dashed var(--ci-border);
 }
 
 .mailbox-list-item {
-    border: 1px solid var(--brown-border-light);
-    background: linear-gradient(180deg, #f8edd6 0%, #ebd7b3 100%);
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-card);
     border-radius: 6px;
     padding: 0.56rem 0.58rem;
     text-align: left;
-    color: #4b2c15;
+    color: var(--ci-text);
     cursor: pointer;
-    box-shadow: 0 1px 0 rgba(255, 241, 214, 0.55);
     display: block;
     position: relative;
 }
@@ -237,7 +236,7 @@
 }
 
 .mailbox-list-item-main:focus-visible {
-    outline: 1px dashed #9d5f2a;
+    outline: 1px dashed var(--ci-accent);
     outline-offset: 2px;
 }
 
@@ -250,34 +249,34 @@
     font-size: 0.66rem;
     min-height: 1.65rem;
     padding: 0.18rem 0.46rem;
-    border-color: #8b4f1d;
-    background: linear-gradient(180deg, #f0ddbc 0%, #e4c697 100%);
-    color: #5a3216;
+    border-color: var(--ci-border);
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-muted);
     font-weight: 700;
 }
 
 .mailbox-list-item-mark-read:hover,
 .mailbox-list-item-mark-read:focus-visible {
-    border-color: #8f3f14;
-    background: linear-gradient(180deg, #f3e3c7 0%, #e9cfaa 100%);
+    background: rgba(79, 156, 248, 0.1);
+    color: var(--ci-text);
 }
 
 .mailbox-list-item.unread {
-    border-color: #8f4d16;
-    box-shadow: inset 0 0 0 1px rgba(191, 75, 19, 0.2);
+    border-color: var(--ci-accent-mid);
+    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.15);
 }
 
 .mailbox-list-item.sent {
-    background: linear-gradient(180deg, #efe4cd 0%, #e0cda7 100%);
+    background: var(--ci-bg-card-deep);
 }
 
 .mailbox-list-item.active {
-    border-color: #9c4a18;
-    box-shadow: inset 0 0 0 1px rgba(191, 75, 19, 0.24), 0 2px 6px rgba(66, 31, 11, 0.2);
+    border-color: var(--ci-accent-mid);
+    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.2), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .mailbox-list-item:not(.active):hover {
-    background: #fff6e4;
+    background: rgba(79, 156, 248, 0.06);
 }
 
 .mailbox-list-item-head {
@@ -302,9 +301,9 @@
     place-items: center;
     font-size: 0.58rem;
     font-weight: 800;
-    color: #fff0d2;
-    border: 1px solid #8f4d16;
-    background: linear-gradient(180deg, #bb5a20 0%, #8f3f12 100%);
+    color: var(--ci-text);
+    border: 1px solid var(--ci-border-dim);
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
     flex: 0 0 auto;
 }
 
@@ -318,9 +317,9 @@
     font-size: 0.6rem;
     line-height: 1;
     font-weight: 800;
-    color: #35180a;
-    border: 1px solid #9f6a20;
-    background: linear-gradient(180deg, #ffd57f 0%, #f3b94f 100%);
+    color: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-accent);
+    background: var(--ci-accent);
     flex: 0 0 auto;
 }
 
@@ -334,7 +333,7 @@
 
 .mailbox-list-item-head span {
     font-size: 0.65rem;
-    color: #6d4a28;
+    color: var(--ci-text-muted);
     white-space: nowrap;
 }
 
@@ -344,12 +343,12 @@
     right: 0.58rem;
     font-weight: 700;
     font-size: 0.64rem;
-    color: var(--brown-text-dark);
+    color: var(--ci-text-subtle);
 }
 
 .mailbox-list-item-peer {
     margin-top: 0.24rem;
-    color: var(--brown-text-dark);
+    color: var(--ci-text-muted);
     font-size: 0.7rem;
     font-weight: 700;
 }
@@ -362,24 +361,24 @@
 }
 
 .mailbox-chip {
-    border: 1px solid var(--brown-border-light);
+    border: 1px solid var(--ci-border);
     border-radius: 999px;
     padding: 0.08rem 0.34rem;
     font-size: 0.6rem;
     font-weight: 700;
-    color: #5b3b1f;
-    background: linear-gradient(180deg, #f6e8cb 0%, #e8d0a6 100%);
+    color: var(--ci-text-muted);
+    background: var(--ci-bg-card-deep);
 }
 
 .mailbox-chip-alert {
-    border-color: #8f4d16;
-    color: #6c2a0d;
-    background: linear-gradient(180deg, #f4d2b7 0%, #e6b083 100%);
+    border-color: var(--ci-accent-mid);
+    color: var(--ci-accent);
+    background: rgba(79, 156, 248, 0.1);
 }
 
 .mailbox-list-item-snippet {
     margin-top: 0.22rem;
-    color: #4f3118;
+    color: var(--ci-text-muted);
     font-size: 0.74rem;
     line-height: 1.35;
 }
@@ -389,7 +388,7 @@
     justify-content: space-between;
     align-items: baseline;
     gap: 0.45rem;
-    border-bottom: 1px dotted #b98f59;
+    border-bottom: 1px dotted var(--ci-border);
     padding-bottom: 0.24rem;
     margin-bottom: 0.34rem;
 }
@@ -397,7 +396,7 @@
 .mailbox-thread-head h3 {
     margin: 0;
     font-size: 0.88rem;
-    color: #4b2c15;
+    color: var(--ci-text);
 }
 
 .mailbox-thread-title-block {
@@ -409,30 +408,30 @@
     font-size: 0.66rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--brown-text-dark);
+    color: var(--ci-text-subtle);
     font-weight: 800;
 }
 
 .mailbox-thread-title-user {
     font-size: 0.92rem;
     font-weight: 800;
-    color: #4f257f;
+    color: var(--ci-accent);
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 
 .mailbox-thread-head span {
-    color: var(--brown-text-dark);
+    color: var(--ci-text-subtle);
     font-size: 0.69rem;
     white-space: nowrap;
 }
 
 .mailbox-thread-body {
-    border: 1px solid rgba(74, 101, 124, 0.68);
-    background: rgba(216, 226, 235, 0.9);
+    border: 1px solid var(--ci-border);
+    background: rgba(79, 156, 248, 0.05);
     border-radius: 4px;
     padding: 0.48rem;
-    color: #152a3a;
+    color: var(--ci-text);
     line-height: 1.35;
     font-size: 0.8rem;
     white-space: pre-wrap;
@@ -451,12 +450,12 @@
 }
 
 .mailbox-thread-bubble {
-    border: 1px solid #47607a;
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
     padding: 0.44rem;
     max-width: 78%;
     width: fit-content;
-    background: linear-gradient(180deg, #b7c7d6 0%, #9eaebe 100%);
+    background: var(--ci-bg-card-deep);
     display: grid;
     gap: 0.2rem;
 }
@@ -467,58 +466,58 @@
 
 .mailbox-thread-bubble.outgoing {
     justify-self: end;
-    border-color: #854a3f;
-    background: linear-gradient(180deg, #c69388 0%, #ab756b 100%);
+    border-color: var(--ci-accent-mid);
+    background: rgba(26, 90, 176, 0.3);
 }
 
 .mailbox-thread-bubble.outgoing .mailbox-thread-body {
-    background: rgba(225, 195, 188, 0.9);
-    border-color: rgba(138, 82, 72, 0.74);
+    background: rgba(79, 156, 248, 0.1);
+    border-color: var(--ci-accent-mid);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer {
-    border-color: rgba(63, 98, 131, 0.78);
-    background: linear-gradient(180deg, #a9c1d8 0%, #8ea8c2 100%);
+    border-color: var(--ci-border-dim);
+    background: rgba(26, 82, 152, 0.2);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer .mailbox-thread-body {
-    border-color: rgba(63, 98, 131, 0.8);
-    background: rgba(201, 216, 230, 0.94);
+    border-color: var(--ci-border-dim);
+    background: rgba(79, 156, 248, 0.07);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer .mailbox-thread-author,
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer .mailbox-thread-body {
-    color: #1f3f5d;
+    color: var(--ci-text-blue);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller {
-    border-color: rgba(127, 74, 68, 0.78);
-    background: linear-gradient(180deg, #b98a83 0%, #9f6f69 100%);
+    border-color: var(--ci-accent-mid);
+    background: rgba(26, 90, 176, 0.25);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller .mailbox-thread-body {
-    border-color: rgba(127, 74, 68, 0.82);
-    background: rgba(228, 205, 200, 0.93);
+    border-color: var(--ci-accent-mid);
+    background: rgba(79, 156, 248, 0.1);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller .mailbox-thread-author,
 .mailbox-thread-bubble.mailbox-thread-bubble-seller .mailbox-thread-body {
-    color: #552620;
+    color: var(--ci-text);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-admin {
-    border-color: rgba(110, 110, 110, 0.74);
-    background: linear-gradient(180deg, #c8c8c8 0%, #b1b1b1 100%);
+    border-color: var(--ci-border);
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-admin .mailbox-thread-body {
-    border-color: rgba(110, 110, 110, 0.78);
-    background: rgba(224, 224, 224, 0.92);
+    border-color: var(--ci-border);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-admin .mailbox-thread-author,
 .mailbox-thread-bubble.mailbox-thread-bubble-admin .mailbox-thread-body {
-    color: #383838;
+    color: var(--ci-text-muted);
 }
 
 .mailbox-thread-bubble-meta {
@@ -526,7 +525,7 @@
     justify-content: space-between;
     gap: 0.4rem;
     align-items: baseline;
-    border-bottom: 1px solid rgba(86, 111, 133, 0.28);
+    border-bottom: 1px solid rgba(79, 156, 248, 0.15);
     padding-bottom: 0.12rem;
 }
 
@@ -535,12 +534,12 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    color: #4a2b14;
+    color: var(--ci-text-muted);
 }
 
 .mailbox-thread-time {
     font-size: 0.62rem;
-    color: #694524;
+    color: var(--ci-text-subtle);
     white-space: nowrap;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
@@ -549,26 +548,26 @@
 .mailbox-composer {
     margin: 0.46rem -0.5rem -0.5rem;
     padding: 0.5rem;
-    border-top: 1px solid rgba(140, 100, 50, 0.4);
-    background: #e4ccaa;
+    border-top: 1px solid var(--ci-border);
+    background: var(--ci-bg-card-deep);
     border-radius: 0 0 3px 3px;
 }
 
 .mailbox-composer label {
-    color: #4b2c15;
+    color: var(--ci-text-muted);
     font-weight: 700;
 }
 
 .mailbox-composer h4 {
     margin: 0 0 0.3rem;
-    color: #4b2c15;
+    color: var(--ci-text);
     font-size: 0.78rem;
 }
 
 .mailbox-composer-info {
     margin: 0 0 0.34rem;
     font-size: 0.7rem;
-    color: var(--brown-text-dark);
+    color: var(--ci-text-subtle);
 }
 
 .mailbox-composer-grid {
@@ -586,29 +585,29 @@
 }
 
 .mailbox-thread-empty {
-    border: 1px dashed #b58a57;
+    border: 1px dashed var(--ci-border);
     border-radius: 4px;
     padding: 0.7rem;
-    color: var(--brown-text-dark);
+    color: var(--ci-text-subtle);
     font-size: 0.76rem;
     text-align: center;
-    background: rgba(253, 246, 228, 0.64);
+    background: rgba(79, 156, 248, 0.03);
 }
 
 .mailbox-card {
-    border: 1px solid var(--brown-border-light);
-    background: linear-gradient(180deg, #f8edd6 0%, #ebd7b3 100%);
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-card);
     border-radius: 4px;
     padding: 0.56rem;
 }
 
 .mailbox-card.unread {
-    border-color: #8f4d16;
-    box-shadow: inset 0 0 0 1px rgba(191, 75, 19, 0.22);
+    border-color: var(--ci-accent-mid);
+    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.15);
 }
 
 .mailbox-card.sent {
-    background: linear-gradient(180deg, #efe4cd 0%, #e0cda7 100%);
+    background: var(--ci-bg-card-deep);
 }
 
 .mailbox-card header {
@@ -621,22 +620,22 @@
 .mailbox-card header h4 {
     margin: 0;
     font-size: 0.84rem;
-    color: #4b2c15;
+    color: var(--ci-text);
 }
 
 .mailbox-card header span {
     font-size: 0.7rem;
-    color: #654425;
+    color: var(--ci-text-subtle);
 }
 
 .mailbox-card p {
     margin: 0.28rem 0;
-    color: #4d3119;
+    color: var(--ci-text-muted);
 }
 
 .mailbox-meta {
     font-size: 0.72rem;
-    color: #5f3d1e;
+    color: var(--ci-text-subtle);
 }
 
 .mailbox-actions {
@@ -651,9 +650,9 @@
 }
 
 .mailbox-actions .mk-btn.mk-btn-primary {
-    border-color: #8f3d13;
-    background: linear-gradient(180deg, #d96425 0%, #b94817 100%);
-    color: #fff4e2;
+    border-color: var(--ci-accent-mid);
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    color: var(--ci-text);
     font-weight: 800;
     letter-spacing: 0.02em;
 }
@@ -667,12 +666,12 @@
 }
 
 .mailbox-pagination span {
-    color: #5f3d1e;
+    color: var(--ci-text-subtle);
     font-size: 0.74rem;
 }
 
 .market-empty {
-    color: #5f3d1e;
+    color: var(--ci-text-subtle);
     font-size: 0.74rem;
 }
 

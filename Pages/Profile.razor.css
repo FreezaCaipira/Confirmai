@@ -11,10 +11,10 @@
 /* ── Card base ───────────────────────────────────────────────────────────── */
 
 .profile-card {
-    border: 1px solid #8c6030;
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
-    background: linear-gradient(180deg, #f7ead0 0%, #e8cd98 100%);
-    box-shadow: 0 2px 8px rgba(60, 30, 10, 0.1), inset 0 0 0 1px rgba(255, 245, 220, 0.6);
+    background: var(--ci-bg-card);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(79, 156, 248, 0.06);
     overflow: hidden;
 }
 
@@ -25,8 +25,8 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.1rem;
-    border-bottom: 1px solid rgba(140, 96, 48, 0.3);
-    background: linear-gradient(180deg, #f9edd8 0%, #efd6a8 100%);
+    border-bottom: 1px solid var(--ci-border);
+    background: var(--ci-bg-card-deep);
 }
 
 .profile-avatar-img {
@@ -34,7 +34,7 @@
     height: 72px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #a07040;
+    border: 2px solid var(--ci-border-dim);
     flex: 0 0 auto;
 }
 
@@ -42,14 +42,14 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: linear-gradient(180deg, #c47830 0%, #9a5820 100%);
-    border: 2px solid #8c5020;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 2px solid var(--ci-border-dim);
     display: grid;
     place-items: center;
-    font-family: var(--font-display);
+    font-family: var(--ci-font);
     font-size: 1.8rem;
     font-weight: 700;
-    color: #fff4e0;
+    color: var(--ci-text);
     flex: 0 0 auto;
 }
 
@@ -59,10 +59,10 @@
 
 .profile-name {
     margin: 0 0 0.18rem;
-    font-family: var(--font-display);
-    font-size: 1.35rem;
+    font-family: var(--ci-font);
+    font-size: 1.25rem;
     font-weight: 700;
-    color: #3a1f0b;
+    color: var(--ci-text);
     line-height: 1.2;
 }
 
@@ -70,7 +70,7 @@
     margin: 0;
     font-size: 0.78rem;
     font-weight: 700;
-    color: #7a5030;
+    color: var(--ci-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
@@ -81,7 +81,7 @@
     display: grid;
     gap: 0.28rem;
     padding: 0.72rem 1.1rem;
-    border-bottom: 1px solid rgba(140, 96, 48, 0.2);
+    border-bottom: 1px solid var(--ci-border);
 }
 
 .profile-contact-row {
@@ -93,7 +93,7 @@
 .profile-contact-label {
     font-size: 0.72rem;
     font-weight: 800;
-    color: #6a4020;
+    color: var(--ci-text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     min-width: 72px;
@@ -102,22 +102,22 @@
 
 .profile-contact-value {
     font-size: 0.88rem;
-    font-weight: 700;
-    color: #251207;
+    font-weight: 600;
+    color: var(--ci-text-blue);
     overflow-wrap: anywhere;
 }
 
 /* ── Edição ──────────────────────────────────────────────────────────────── */
 
 .profile-edit-details {
-    border-top: 1px solid rgba(140, 96, 48, 0.2);
+    border-top: 1px solid var(--ci-border);
 }
 
 .profile-edit-summary {
     padding: 0.56rem 1.1rem;
     font-size: 0.8rem;
     font-weight: 800;
-    color: #5a3010;
+    color: var(--ci-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     cursor: pointer;
@@ -139,7 +139,7 @@
 }
 
 .profile-edit-summary:hover {
-    background: rgba(140, 96, 48, 0.08);
+    background: rgba(79, 156, 248, 0.08);
 }
 
 .profile-edit-form {
@@ -158,7 +158,7 @@
     margin-bottom: 0.2rem;
     font-size: 0.78rem;
     font-weight: 700;
-    color: #4a2c14;
+    color: var(--ci-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
@@ -166,19 +166,19 @@
 .profile-edit-grid .form-group .input {
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #8a5830;
+    border: 1px solid var(--ci-border);
     border-radius: 4px;
     padding: 0.34rem 0.5rem;
-    background: linear-gradient(180deg, #fdf6e8 0%, #f5e8cf 100%);
-    color: #251207;
+    background: var(--ci-bg-input);
+    color: var(--ci-text);
     font-size: 0.88rem;
-    box-shadow: inset 0 1px 3px rgba(80, 50, 20, 0.12);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .profile-edit-grid .form-group .input:focus {
-    outline: 2px solid #c4872e;
+    outline: 2px solid var(--ci-accent);
     outline-offset: 1px;
-    background: #fffcf4;
+    background: var(--ci-bg-input);
 }
 
 .profile-edit-actions {
@@ -198,7 +198,7 @@
     height: 64px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #a07040;
+    border: 2px solid var(--ci-border-dim);
 }
 
 .profile-avatar-upload {
@@ -214,7 +214,7 @@
 
 .profile-avatar-hint {
     font-size: 0.72rem;
-    color: #6a4020;
+    color: var(--ci-text-subtle);
     font-weight: 600;
 }
 
@@ -222,27 +222,27 @@
     margin: 0.4rem 0 0;
     font-size: 0.82rem;
     font-weight: 700;
-    color: #5a2808;
+    color: var(--ci-text-blue);
     padding: 0.28rem 0.52rem;
     border-radius: 4px;
-    background: rgba(200, 150, 80, 0.18);
-    border: 1px solid rgba(160, 110, 50, 0.4);
+    background: rgba(79, 156, 248, 0.12);
+    border: 1px solid rgba(79, 156, 248, 0.3);
 }
 
 /* ── Card de esportes ────────────────────────────────────────────────────── */
 
 .profile-sport-card {
-    border: 1px solid #8c6030;
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
-    background: linear-gradient(180deg, #f4e8cc 0%, #e4ca94 100%);
-    box-shadow: 0 2px 8px rgba(60, 30, 10, 0.1), inset 0 0 0 1px rgba(255, 245, 220, 0.55);
+    background: var(--ci-bg-card);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(79, 156, 248, 0.06);
     overflow: hidden;
 }
 
 .profile-sport-tabs {
     display: flex;
-    border-bottom: 1px solid rgba(140, 96, 48, 0.4);
-    background: linear-gradient(180deg, #dfc48a 0%, #cba870 100%);
+    border-bottom: 1px solid var(--ci-border);
+    background: var(--ci-bg-card-deep);
 }
 
 .profile-sport-tab {
@@ -252,7 +252,7 @@
     padding: 0.62rem 1rem;
     font-size: 0.82rem;
     font-weight: 800;
-    color: #5a3010;
+    color: var(--ci-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     cursor: pointer;
@@ -261,14 +261,14 @@
 }
 
 .profile-sport-tab:hover:not(.active) {
-    background: rgba(255, 240, 200, 0.3);
-    color: #3a1a08;
+    background: rgba(79, 156, 248, 0.08);
+    color: var(--ci-text);
 }
 
 .profile-sport-tab.active {
-    color: #8c2800;
-    border-bottom-color: #8c2800;
-    background: rgba(255, 245, 215, 0.5);
+    color: var(--ci-accent);
+    border-bottom-color: var(--ci-accent);
+    background: rgba(79, 156, 248, 0.07);
 }
 
 .profile-sport-stats {
@@ -285,7 +285,7 @@
     gap: 0.18rem;
     text-align: center;
     padding: 0.56rem 0.72rem;
-    border-right: 1px dashed rgba(140, 96, 48, 0.35);
+    border-right: 1px dashed var(--ci-border);
 }
 
 .profile-stat-item:last-child {
@@ -293,17 +293,17 @@
 }
 
 .profile-stat-number {
-    font-family: var(--font-display);
+    font-family: var(--ci-font);
     font-size: 2rem;
     font-weight: 900;
-    color: #3a1f0b;
+    color: var(--ci-accent);
     line-height: 1;
 }
 
 .profile-stat-label {
     font-size: 0.7rem;
     font-weight: 800;
-    color: #7a5030;
+    color: var(--ci-text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
@@ -318,12 +318,12 @@
 
 .profile-message-title {
     margin: 0;
-    font-family: var(--font-display);
+    font-family: var(--ci-font);
     font-size: 0.92rem;
-    color: #3a1f0b;
+    color: var(--ci-text);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-bottom: 1px solid rgba(140, 96, 48, 0.3);
+    border-bottom: 1px solid var(--ci-border);
     padding-bottom: 0.4rem;
 }
 
@@ -340,19 +340,19 @@
     padding: 0.72rem;
     font-size: 0.78rem;
     font-weight: 700;
-    color: #7a5030;
-    border: 1px dashed rgba(140, 96, 48, 0.45);
+    color: var(--ci-text-subtle);
+    border: 1px dashed var(--ci-border);
     border-radius: 4px;
-    background: rgba(255, 248, 233, 0.7);
+    background: rgba(79, 156, 248, 0.04);
 }
 
 .profile-chat-bubble {
     width: fit-content;
     max-width: 78%;
-    border: 1px solid #47607a;
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
     padding: 0.44rem;
-    background: linear-gradient(180deg, #b7c7d6 0%, #9eaebe 100%);
+    background: var(--ci-bg-card-deep);
     display: grid;
     gap: 0.14rem;
 }
@@ -363,28 +363,28 @@
 
 .profile-chat-bubble.outgoing {
     justify-self: end;
-    border-color: #854a3f;
-    background: linear-gradient(180deg, #c69388 0%, #ab756b 100%);
+    border-color: var(--ci-accent-mid);
+    background: rgba(26, 90, 176, 0.3);
 }
 
 .profile-chat-bubble p {
     margin: 0;
     font-size: 0.83rem;
     line-height: 1.35;
-    color: #152a3a;
+    color: var(--ci-text);
     white-space: pre-wrap;
     word-break: break-word;
 }
 
 .profile-chat-bubble.outgoing p {
-    color: #2a0e08;
+    color: var(--ci-text-blue);
 }
 
 .profile-chat-meta {
     justify-self: end;
     font-size: 0.67rem;
     font-weight: 700;
-    color: rgba(40, 30, 20, 0.55);
+    color: var(--ci-text-subtle);
 }
 
 .profile-chat-textarea {
@@ -397,5 +397,3 @@
     gap: 0.5rem;
     flex-wrap: wrap;
 }
-
-
