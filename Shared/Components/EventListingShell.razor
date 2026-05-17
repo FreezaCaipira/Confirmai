@@ -45,6 +45,12 @@
     {
         <p class="listing-state">Carregando @SportLabel...</p>
     }
+    else if (LoadError is not null)
+    {
+        <div class="listing-state listing-empty">
+            <p style="color:#f87171">@LoadError</p>
+        </div>
+    }
     else if (!Events.Any())
     {
         <div class="listing-state listing-empty">
@@ -80,12 +86,14 @@
     private bool          ShowDatePicker = false;
     private bool          IsLoading      = true;
     private List<Event>   Events         = new();
+    private string?       LoadError      = null;
 
     protected override async Task OnInitializedAsync() => await LoadEvents();
 
     private async Task LoadEvents()
     {
         IsLoading = true;
+        LoadError = null;
         StateHasChanged();
         try
         {
@@ -121,9 +129,15 @@
                     .ToList();
             }
         }
+        catch (Exception ex)
+        {
+            LoadError = $"Erro ao carregar {SportLabel}: {ex.Message}";
+            Events    = new();
+        }
         finally
         {
             IsLoading = false;
+            StateHasChanged();
         }
     }
 
@@ -133,7 +147,10 @@
 
     private async Task OnDateInputChange(ChangeEventArgs e)
     {
-        if (DateOnly.TryParse(e.Value?.ToString(), out var d))
+        // Browser always sends dates as "yyyy-MM-dd" (ISO 8601) regardless of locale
+        if (DateOnly.TryParseExact(e.Value?.ToString(), "yyyy-MM-dd",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out var d))
             SelectedDate = d;
         ShowDatePicker = false;
         await LoadEvents();
