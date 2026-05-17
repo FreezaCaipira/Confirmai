@@ -673,6 +673,8 @@
 .market-empty {
     color: var(--ci-text-subtle);
     font-size: 0.74rem;
+    background: transparent;
+    border-color: var(--ci-border);
 }
 
 .mailbox-sent-title {

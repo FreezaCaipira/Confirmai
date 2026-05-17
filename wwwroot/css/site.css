@@ -4796,8 +4796,7 @@ body .oldsite-main-content {
 /* Global pagination palette: Tibia orange from right info cards */
 body .pagination button,
 body .my-orders-shell .my-orders-pagination button,
-body .admin-items-page .pagination button,
-body .mailbox-page .mailbox-pagination .mk-btn {
+body .admin-items-page .pagination button {
     border: 1px solid #8a3f14;
     border-radius: 3px;
     background: linear-gradient(180deg, var(--orange) 0%, #a34111 100%);
@@ -4808,19 +4807,41 @@ body .mailbox-page .mailbox-pagination .mk-btn {
 
 body .pagination button:hover:not(:disabled),
 body .my-orders-shell .my-orders-pagination button:hover:not(:disabled),
-body .admin-items-page .pagination button:hover:not(:disabled),
-body .mailbox-page .mailbox-pagination .mk-btn:hover:not(:disabled) {
+body .admin-items-page .pagination button:hover:not(:disabled) {
     filter: brightness(1.08);
 }
 
 body .pagination button:disabled,
 body .my-orders-shell .my-orders-pagination button:disabled,
-body .admin-items-page .pagination button:disabled,
-body .mailbox-page .mailbox-pagination .mk-btn:disabled {
+body .admin-items-page .pagination button:disabled {
     background: linear-gradient(180deg, #a85a2b 0%, #7f3f1d 100%);
     border-color: #6d3418;
     color: #e3c6a0;
     opacity: 0.85;
+}
+
+/* Mailbox pagination — dark navy theme */
+body .mailbox-page .mailbox-pagination .mk-btn {
+    border: 1px solid var(--ci-border);
+    border-radius: 3px;
+    background: var(--ci-bg-card);
+    color: var(--ci-text);
+    font-weight: 700;
+    box-shadow: none;
+}
+
+body .mailbox-page .mailbox-pagination .mk-btn:hover:not(:disabled) {
+    background: rgba(79, 156, 248, 0.1);
+    border-color: var(--ci-border-dim);
+    color: var(--ci-text);
+    filter: none;
+}
+
+body .mailbox-page .mailbox-pagination .mk-btn:disabled {
+    background: var(--ci-bg-card-deep);
+    border-color: var(--ci-border);
+    color: var(--ci-text-subtle);
+    opacity: 0.6;
 }
 
 
@@ -5025,24 +5046,31 @@ body .oldsite-footer {
 
 /* ── Breadcrumb ───────────────────────────────────────────────── */
 .breadcrumb-nav {
-    color: #475569;
+    color: #64748b;
+    font-family: inherit;
+    font-size: .8rem;
+    letter-spacing: 0;
 }
 
 .breadcrumb-nav a {
-    color: #6082a0;
+    color: #7dd3fc;
+    font-weight: 500;
 }
 
 .breadcrumb-nav a:hover {
-    color: #8aacc8;
-    background: rgba(255, 255, 255, 0.04);
+    color: #bae6fd;
+    background: rgba(125, 211, 252, 0.08);
 }
 
 .breadcrumb-current {
-    color: #475569;
+    color: #94a3b8;
+    font-weight: 500;
+    opacity: 1;
 }
 
 .breadcrumb-sep {
-    color: #334155;
+    color: #475569;
+    opacity: 1;
 }
 
 /* ── Sidebar widget links ─────────────────────────────────────── */
