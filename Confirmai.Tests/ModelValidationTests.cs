@@ -204,4 +204,50 @@ public class ModelValidationTests
         var ev = new Event { Location = "Rua A, 10 — Bairro", MaxPlayers = 10, GroupId = 1 };
         Assert.False(HasError(ev, nameof(Event.Location)));
     }
+
+    // ─── EventConfirmation (lineup fields) ────────────────────────────────────
+
+    private static EventConfirmation ValidConfirmation() => new()
+    {
+        EventId = 1,
+        UserId  = "user-1",
+    };
+
+    [Fact]
+    public void EventConfirmation_Valid_WhenTeamIdIsNull()
+    {
+        var c = ValidConfirmation();
+        c.TeamId = null;
+        Assert.True(IsValid(c));
+    }
+
+    [Fact]
+    public void EventConfirmation_Valid_WhenTeamIdIsZero_TeamA()
+    {
+        var c = ValidConfirmation();
+        c.TeamId = 0;
+        Assert.True(IsValid(c));
+    }
+
+    [Fact]
+    public void EventConfirmation_Valid_WhenTeamIdIsOne_TeamB()
+    {
+        var c = ValidConfirmation();
+        c.TeamId = 1;
+        Assert.True(IsValid(c));
+    }
+
+    [Fact]
+    public void Event_Valid_WhenLineupConfirmedAtIsNull()
+    {
+        var ev = new Event { Location = "Quadra", MaxPlayers = 10, GroupId = 1, LineupConfirmedAt = null };
+        Assert.False(HasError(ev, nameof(Event.LineupConfirmedAt)));
+    }
+
+    [Fact]
+    public void Event_Valid_WhenLineupConfirmedAtIsSet()
+    {
+        var ev = new Event { Location = "Quadra", MaxPlayers = 10, GroupId = 1, LineupConfirmedAt = DateTime.UtcNow };
+        Assert.False(HasError(ev, nameof(Event.LineupConfirmedAt)));
+    }
 }

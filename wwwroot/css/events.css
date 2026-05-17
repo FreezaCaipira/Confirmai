@@ -124,6 +124,16 @@
     color: #c084fc;
 }
 
+.detail-admin-btn--lineup {
+    border-color: #14532d;
+    color: #22c55e;
+}
+
+.detail-admin-btn--lineup:hover {
+    border-color: #22c55e;
+    color: #4ade80;
+}
+
 .detail-admin-btn--danger {
     border-color: #3d1a1a;
     color: #f87171;

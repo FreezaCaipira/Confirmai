@@ -17,6 +17,47 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
     private readonly string _databaseName = $"Confirmai-int-{Guid.NewGuid()}";
 
     /// <summary>
+    /// Seeds a minimal Futsal group + event. Returns the created event ID.
+    /// When <paramref name="lineupConfirmed"/> is true, sets LineupConfirmedAt
+    /// so the confirmed-lineup state is rendered.
+    /// </summary>
+    public async Task<int> SeedFutsalEventAsync(
+        bool lineupConfirmed = false,
+        string creatorId = "test-creator-1")
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        var group = new Confirmai.Models.Group
+        {
+            Name           = "Racha de Teste",
+            Sport          = Confirmai.Enums.Sport.Futsal,
+            City           = "Pouso Alegre",
+            StateCode      = "MG",
+            CreatedByUserId = creatorId
+        };
+        db.Groups.Add(group);
+        await db.SaveChangesAsync();
+
+        var ev = new Confirmai.Models.Event
+        {
+            GroupId         = group.Id,
+            Sport           = Confirmai.Enums.Sport.Futsal,
+            Location        = "Quadra de Teste",
+            StartsAt        = DateTime.UtcNow.AddDays(1),
+            MaxPlayers      = 12,
+            MaxGoalkeepers  = 2,
+            IsActive        = true,
+            CreatedByUserId = creatorId,
+            LineupConfirmedAt = lineupConfirmed ? DateTime.UtcNow : null
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+
+        return ev.Id;
+    }
+
+    /// <summary>
     /// Ensures the LuaDeliveryEnabled feature flag is set to "true" for tests
     /// that exercise the /api/v1/server/trades/* endpoints. Safe to call
     /// multiple times — it inserts the row only when missing.

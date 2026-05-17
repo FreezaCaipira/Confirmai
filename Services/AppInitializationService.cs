@@ -161,7 +161,21 @@ namespace Confirmai.Services
                 new SeedUserSpec("admin.teste@otserv.local", "Admin Sistema Teste", true),
                 new SeedUserSpec("adm.server@otserv.local", "Admin Servidor Teste", false),
                 new SeedUserSpec("player1@otserv.local", "Player Teste 1", false),
-                new SeedUserSpec("player2@otserv.local", "Player Teste 2", false)
+                new SeedUserSpec("player2@otserv.local", "Player Teste 2", false),
+                new SeedUserSpec("jogador01@teste.com", "Jogador Teste 01", false),
+                new SeedUserSpec("jogador02@teste.com", "Jogador Teste 02", false),
+                new SeedUserSpec("jogador03@teste.com", "Jogador Teste 03", false),
+                new SeedUserSpec("jogador04@teste.com", "Jogador Teste 04", false),
+                new SeedUserSpec("jogador05@teste.com", "Jogador Teste 05", false),
+                new SeedUserSpec("jogador06@teste.com", "Jogador Teste 06", false),
+                new SeedUserSpec("jogador07@teste.com", "Jogador Teste 07", false),
+                new SeedUserSpec("jogador08@teste.com", "Jogador Teste 08", false),
+                new SeedUserSpec("jogador09@teste.com", "Jogador Teste 09", false),
+                new SeedUserSpec("jogador10@teste.com", "Jogador Teste 10", false),
+                new SeedUserSpec("jogador11@teste.com", "Jogador Teste 11", false),
+                new SeedUserSpec("jogador12@teste.com", "Jogador Teste 12", false),
+                new SeedUserSpec("goleiro01@teste.com", "Goleiro Teste 01", false),
+                new SeedUserSpec("goleiro02@teste.com", "Goleiro Teste 02", false),
             };
 
             foreach (var spec in seedUsers)

@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY OtServMarket.csproj ./
+COPY Confirmai.csproj ./
 RUN dotnet restore
 
 COPY . ./
@@ -21,4 +21,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
-ENTRYPOINT ["dotnet", "OtServMarket.dll"]
+ENTRYPOINT ["dotnet", "Confirmai.dll"]

@@ -33,7 +33,7 @@ else
     var isHomeGame  = ev.PokerEventType == PokerEventType.HomeGame;
     var isUnlocked  = !isHomeGame || homeGameUnlocked;
     var userConf    = currentUserId is not null ? ev.Confirmations.FirstOrDefault(c => c.UserId == currentUserId) : null;
-    var isAdmin     = ev.CreatedByUserId == currentUserId;
+    var isAdmin     = EventAccess.IsCreator(ev, currentUserId);
 
     <div class="detail-page">
         <div class="detail-card">

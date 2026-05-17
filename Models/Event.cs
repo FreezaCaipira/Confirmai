@@ -111,6 +111,9 @@ namespace Confirmai.Models
         [StringLength(300)]
         public string? BonusInfo { get; set; }
 
+        /// <summary>Preenchido quando o admin confirma a escalação dos times</summary>
+        public DateTime? LineupConfirmedAt { get; set; }
+
         // ── Navegação ─────────────────────────────────────────────────────────
 
         public ICollection<EventConfirmation> Confirmations { get; set; } = new List<EventConfirmation>();

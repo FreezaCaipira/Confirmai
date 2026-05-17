@@ -17,6 +17,9 @@ namespace Confirmai.Models
         // Futsal: define se o jogador confirmou como goleiro ou linha
         public FutsalPosition? Position { get; set; }
 
+        /// <summary>Escalação: 0 = Time A, 1 = Time B, null = não escalado</summary>
+        public int? TeamId { get; set; }
+
         public DateTime ConfirmedAt { get; set; } = DateTime.UtcNow;
     }
 

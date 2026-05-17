@@ -59,6 +59,15 @@ else
                 </p>
             </header>
 
+            @if (ev.LineupConfirmedAt is not null)
+            {
+                <div class="detail-admin-bar">
+                    <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
+                        <i class="fas fa-clipboard-list"></i> Ver Escalação
+                    </a>
+                </div>
+            }
+
             @if (isAdmin)
             {
                 <div class="detail-admin-bar">
@@ -67,6 +76,12 @@ else
                     </a>
                     @if (ev.IsActive)
                     {
+                        @if (ev.LineupConfirmedAt is null)
+                        {
+                            <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
+                                <i class="fas fa-list-ol"></i> Montar Escalação
+                            </a>
+                        }
                         @if (!showCancelConfirm)
                         {
                             <button class="detail-admin-btn detail-admin-btn--danger" type="button"
@@ -369,11 +384,7 @@ else
         isLoading = false;
     }
 
-    private bool IsGroupAdmin()
-    {
-        if (currentUserId is null || ev is null) return false;
-        return ev.CreatedByUserId == currentUserId;
-    }
+    private bool IsGroupAdmin() => EventAccess.IsCreator(ev, currentUserId);
 
     private async Task ConfirmAs(FutsalPosition pos)
     {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# backup.sh — PostgreSQL backup script for OtServMarket
+# backup.sh — PostgreSQL backup script for Confirmai
 #
 # Usage:
 #   ./backup.sh
@@ -7,23 +7,23 @@
 # Environment variables (all optional — fall back to defaults):
 #   PGHOST        PostgreSQL host          (default: localhost)
 #   PGPORT        PostgreSQL port          (default: 5432)
-#   PGDATABASE    Database name            (default: otservmarket)
+#   PGDATABASE    Database name            (default: confirmai)
 #   PGUSER        PostgreSQL user          (default: postgres)
 #   PGPASSWORD    PostgreSQL password      (set via env or .pgpass — never hardcode)
-#   BACKUP_DIR    Destination directory    (default: /var/backups/otservmarket)
+#   BACKUP_DIR    Destination directory    (default: /var/backups/confirmai)
 #   RETAIN_DAYS   Days to keep backups     (default: 7)
 #
 # Recommended cron (daily at 02:00):
-#   0 2 * * * /opt/otservmarket/scripts/backup.sh >> /var/log/otservmarket-backup.log 2>&1
+#   0 2 * * * /opt/confirmai/scripts/backup.sh >> /var/log/confirmai-backup.log 2>&1
 
 set -euo pipefail
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 PGHOST="${PGHOST:-localhost}"
 PGPORT="${PGPORT:-5432}"
-PGDATABASE="${PGDATABASE:-otservmarket}"
+PGDATABASE="${PGDATABASE:-confirmai}"
 PGUSER="${PGUSER:-postgres}"
-BACKUP_DIR="${BACKUP_DIR:-/var/backups/otservmarket}"
+BACKUP_DIR="${BACKUP_DIR:-/var/backups/confirmai}"
 RETAIN_DAYS="${RETAIN_DAYS:-7}"
 
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"

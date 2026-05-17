@@ -24,27 +24,12 @@ using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
 using Serilog.Sinks.OpenTelemetry;
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
-    .Enrich.FromLogContext()
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
-    .WriteTo.File(
-        path: "logs/Confirmai-.log",
-        rollingInterval: RollingInterval.Day,
-        retainedFileCountLimit: 30,
-        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
-    .CreateLogger();
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>(optional: true);
 
 // -- OpenTelemetry / Serilog OTLP -------------------------------------------
-// Read config early (before Host.UseSerilog) so the OTLP sink can be wired
-// into the bootstrap logger. When Endpoint is empty, OTLP is silently skipped.
+// Config is read first so the OTLP sink can be included in the single logger.
+// When Endpoint is empty, OTLP is silently skipped.
 var otelSection = builder.Configuration.GetSection(OtelOptions.Section);
 var otelOptions = otelSection.Get<OtelOptions>() ?? new OtelOptions();
 
@@ -454,6 +439,89 @@ using (var scope = app.Services.CreateScope())
 // PaymentHub is a server-to-client notification channel; [Authorize] on the hub ensures only authenticated users connect
 app.MapHub<PaymentHub>("/paymentHub");
 app.MapHealthChecks("/health");
+
+// ── Dev-only seed endpoints (only registered in Development / Testing) ──────
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
+{
+    // POST /api/test/seed-event-confirmations?eventId=1
+    // Fills the event with all jogadorXX@teste.com + goleiroXX@teste.com seed
+    // users, respecting MaxPlayers and MaxGoalkeepers. Idempotent.
+    app.MapPost("/api/test/seed-event-confirmations", async (
+        int eventId,
+        AppDbContext db,
+        UserManager<ApplicationUser> userManager) =>
+    {
+        var ev = await db.Events
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == eventId);
+
+        if (ev is null)
+            return Results.NotFound(new { error = $"Evento {eventId} não encontrado." });
+
+        var maxOutfield = ev.MaxPlayers;
+        var maxGk = ev.MaxGoalkeepers ?? 0;
+
+        // Collect existing confirmations so we don't double-insert
+        var existing = await db.EventConfirmations
+            .Where(c => c.EventId == eventId)
+            .Select(c => new { c.UserId, c.Position })
+            .ToListAsync();
+
+        var existingOutfield = existing.Count(c => c.Position == Confirmai.Models.FutsalPosition.Outfield || c.Position == null);
+        var existingGk = existing.Count(c => c.Position == Confirmai.Models.FutsalPosition.Goalkeeper);
+        var existingUserIds = existing.Select(c => c.UserId).ToHashSet();
+
+        var added = new List<string>();
+
+        // Fill goalkeepers
+        for (int i = 1; i <= 10 && existingGk < maxGk; i++)
+        {
+            var email = $"goleiro{i:D2}@teste.com";
+            var user = await userManager.FindByEmailAsync(email);
+            if (user is null || existingUserIds.Contains(user.Id)) continue;
+            db.EventConfirmations.Add(new Confirmai.Models.EventConfirmation
+            {
+                EventId = eventId,
+                UserId = user.Id,
+                Position = Confirmai.Models.FutsalPosition.Goalkeeper,
+                ConfirmedAt = DateTime.UtcNow
+            });
+            existingGk++;
+            existingUserIds.Add(user.Id);
+            added.Add(email);
+        }
+
+        // Fill outfield
+        for (int i = 1; i <= 30 && existingOutfield < maxOutfield; i++)
+        {
+            var email = $"jogador{i:D2}@teste.com";
+            var user = await userManager.FindByEmailAsync(email);
+            if (user is null || existingUserIds.Contains(user.Id)) continue;
+            db.EventConfirmations.Add(new Confirmai.Models.EventConfirmation
+            {
+                EventId = eventId,
+                UserId = user.Id,
+                Position = Confirmai.Models.FutsalPosition.Outfield,
+                ConfirmedAt = DateTime.UtcNow
+            });
+            existingOutfield++;
+            existingUserIds.Add(user.Id);
+            added.Add(email);
+        }
+
+        await db.SaveChangesAsync();
+
+        return Results.Ok(new
+        {
+            eventId,
+            added = added.Count,
+            users = added,
+            totalOutfield = existingOutfield,
+            totalGoalkeepers = existingGk
+        });
+    });
+}
+
 app.Run();
 
 public partial class Program { }

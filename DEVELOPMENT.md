@@ -245,3 +245,46 @@ Há um bloco `// TODO (WhatsApp)` comentado com o código exato a descomentar ap
 ```
 - Inline styles estáticos eliminados de todas as páginas
 - Sem `@layer` em `site.css` (era bloco unclosed — removido)
+
+---
+
+### Fase 7 — Escalação de Times (em desenvolvimento)
+
+**Objetivo**: após o evento estar com vagas preenchidas, o admin monta a escalação dos dois times, randomiza os jogadores de linha, confirma e compartilha no WhatsApp.
+
+#### Modelo de dados
+
+- [ ] Adicionar `TeamId int?` em `EventConfirmation` (0 = Time A, 1 = Time B, null = não escalado)
+- [ ] Adicionar `LineupConfirmedAt DateTime?` em `Event`
+- [ ] Migration: `AddLineupFields`
+
+#### Página `/futsal/{Id}/escalacao`
+
+Nova página `Pages/Futsal/Escalacao.razor` + `Escalacao.razor.css`:
+
+- [ ] Guard: apenas admin do grupo (criador do evento) acessa; demais veem escalação somente leitura após confirmada
+- [ ] **Estado `draft`** (`LineupConfirmedAt == null`):
+  - GKs auto-atribuídos: GK1 → Time A, GK2 → Time B
+  - Jogadores de linha distribuídos aleatoriamente (`Random.Shuffle` in-memory)
+  - Botão `[🔀 Randomizar]` — novo shuffle sem salvar no banco
+  - Botão `[✅ Confirmar Escalação]` → modal de confirmação → salva `TeamId` em cada `EventConfirmation` + `LineupConfirmedAt` no `Event`
+  - Número ímpar de jogadores: jogador extra aparece como "reserva" no rodapé
+- [ ] **Estado `confirmed`** (`LineupConfirmedAt != null`):
+  - Exibe dois cards de time lado a lado (somente leitura)
+  - Texto formatado para compartilhamento
+  - Botão `[📋 Copiar texto]`
+  - Botão `[📲 Compartilhar no WhatsApp]` → `wa.me/?text=<escalação URL-encoded>` (sem API)
+  - Botão `[🔄 Resetar Escalação]` (admin only) → modal → zera `TeamId` e `LineupConfirmedAt`
+
+#### Integração em `Detail.razor`
+
+- [ ] Na admin bar: botão `[🎯 Montar Escalação]` quando `isAdmin && LineupConfirmedAt == null`
+- [ ] Para todos: link `[📋 Ver Escalação]` quando `LineupConfirmedAt != null`
+
+#### Regras de negócio
+
+- Randomização é livre (in-memory) antes de confirmar
+- Após confirmação, a escalação fica travada para todos lerem
+- Reset disponível apenas para o admin, com modal de aviso
+- WhatsApp: deep link `wa.me/?text=...` — sem custo, sem API, usuário envia manualmente no grupo
+- Número ímpar: jogador extra listado como "reserva" ao final da escalação
