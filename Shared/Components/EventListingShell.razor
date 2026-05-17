@@ -96,6 +96,7 @@
             var query = db.Events
                 .Include(e => e.Group)
                 .Include(e => e.Confirmations)
+                .Include(e => e.Venue)
                 .Where(e => e.IsActive
                     && e.Group.Sport == Sport
                     && e.StartsAt >= start

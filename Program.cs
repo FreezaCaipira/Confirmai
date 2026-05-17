@@ -107,8 +107,7 @@ builder.Services.AddScoped<AdminLogsQueryService>();
 builder.Services.AddScoped<AdminLogsExportService>();
 builder.Services.AddScoped<AdminLogsFilterStateService>();
 builder.Services.AddScoped<AdminUsersFilterStateService>();
-builder.Services.AddScoped<AdminPaymentsFilterStateService>();
-builder.Services.AddScoped<AdminProductsFilterStateService>();
+ builder.Services.AddScoped<AdminPaymentsFilterStateService>();
 builder.Services.AddScoped<AuthenticationStateProvider,
     RevalidatingIdentityAuthenticationStateProvider>();
 builder.Services.AddHostedService<LogRetentionService>();

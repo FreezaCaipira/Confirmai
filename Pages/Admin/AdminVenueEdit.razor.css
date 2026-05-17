@@ -1,0 +1,47 @@
+﻿.venue-admin-assigned {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    background: #0b1928;
+    border: 1px solid #1b3d6c;
+    border-radius: 8px;
+}
+
+.venue-admin-name {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+}
+
+.venue-admin-email {
+    display: block;
+    font-size: 0.78rem;
+    color: #6082a0;
+    margin-top: 0.1rem;
+}
+
+.venue-admin-search {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.venue-admin-search .input {
+    flex: 1;
+}
+
+.venue-admin-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    background: #091420;
+    border: 1px solid #1a5298;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}

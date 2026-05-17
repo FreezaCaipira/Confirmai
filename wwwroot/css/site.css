@@ -1,4 +1,4 @@
-/* ================================================================
+﻿/* ================================================================
    CONFIRMAI — GLOBAL STYLESHEET
 
    Sections:
@@ -93,16 +93,16 @@
     --ci-bg-card:      #111927;
     --ci-bg-card-deep: #0d1825;
     --ci-bg-input:     #07111d;
-    --ci-accent:       #4e95b8;
-    --ci-accent-mid:   #1a5478;
-    --ci-accent-dark:  #0f3352;
-    --ci-border:       #1c2a3b;
-    --ci-border-dim:   #153d5a;
+    --ci-accent:       #4f9cf8;
+    --ci-accent-mid:   #1a5ab0;
+    --ci-accent-dark:  #0d3270;
+    --ci-border:       #1b3d6c;
+    --ci-border-dim:   #1a5298;
     --ci-text:         #f1f5f9;
-    --ci-text-blue:    #daeaf8;
-    --ci-text-link:    #b8d4ea;
-    --ci-text-muted:   #94a3b8;
-    --ci-text-subtle:  #64748b;
+    --ci-text-blue:    #deeeff;
+    --ci-text-link:    #7ab6ff;
+    --ci-text-muted:   #8aacc8;
+    --ci-text-subtle:  #6082a0;
     --ci-font:         -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
@@ -340,15 +340,15 @@ body::before {
 }
 
 .sidebar nav ul li a {
-    color: #94a3b8;
+    color: #8aacc8;
     text-decoration: none;
     font-weight: 600;
     letter-spacing: 0.02em;
     padding: 0.56rem 0.78rem;
     border-radius: 8px;
     display: flex;
-    border: 1px solid rgba(26, 84, 120, 0.3);
-    background: rgba(26, 84, 120, 0.12);
+    border: 1px solid rgba(26, 90, 176, 0.3);
+    background: rgba(26, 90, 176, 0.12);
     text-transform: uppercase;
     font-size: 0.8rem;
     align-items: center;
@@ -359,24 +359,24 @@ body::before {
 .sidebar nav ul li a .oi {
     width: 1rem;
     text-align: center;
-    color: #4e95b8;
+    color: #4f9cf8;
     font-size: 0.8rem;
 }
 
 .sidebar nav ul li a.active {
-    color: #daeaf8;
-    border-color: #4e95b8;
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
+    color: #deeeff;
+    border-color: #4f9cf8;
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
 }
 
 .sidebar nav ul li a.active .oi {
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .sidebar nav ul li a:hover {
-    color: #b8d4ea;
-    background: rgba(26, 84, 120, 0.22);
-    border-color: rgba(78, 149, 184, 0.4);
+    color: #7ab6ff;
+    background: rgba(26, 90, 176, 0.22);
+    border-color: rgba(79, 156, 248, 0.4);
     transform: translateX(2px);
 }
 
@@ -4367,7 +4367,7 @@ body .oldsite-payment-chip:nth-child(even) {
 }
 
 body .oldsite-payment-chip:hover {
-    background: rgba(26, 84, 120, 0.12);
+    background: rgba(26, 90, 176, 0.12);
 }
 
 body .oldsite-payment-chip img {
@@ -4380,7 +4380,7 @@ body .oldsite-payment-chip img {
 }
 
 body .oldsite-payment-chip span {
-    color: #94a3b8 !important;
+    color: #8aacc8 !important;
     font-size: 0.82rem;
     font-weight: 500;
     line-height: 1.4;
@@ -4746,14 +4746,14 @@ body .oldsite-news-ticker .oldsite-news-ticker-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #1c2a3b;
+    background: #1b3d6c;
     border: 1px solid #243447;
     transition: background 0.3s, transform 0.3s;
 }
 
 body .oldsite-news-ticker .oldsite-news-ticker-dot.active {
-    background: #1a5478;
-    border-color: #153d5a;
+    background: #1a5ab0;
+    border-color: #1a5298;
     transform: scale(1.15);
 }
 
@@ -4854,7 +4854,7 @@ body .oldsite-logo-wrap {
     padding: 1.15rem 0 0.85rem;
     border: none;
     border-image: none;
-    border-bottom: 1px solid #1c2a3b;
+    border-bottom: 1px solid #1b3d6c;
     background: #141e2b;
     box-shadow: none;
 }
@@ -4871,7 +4871,7 @@ body .oldsite-logo {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: clamp(1.5rem, 3vw, 2.1rem);
     font-weight: 800;
-    background: linear-gradient(135deg, #e2f0fa 0%, #91c6e0 45%, #4e95b8 100%);
+    background: linear-gradient(135deg, #e2f0fa 0%, #91c6e0 45%, #4f9cf8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -4903,18 +4903,20 @@ body .oldsite-online-dot {
 /* ── Top nav ──────────────────────────────────────────────────── */
 body .oldsite-top-nav {
     background: #0e1b2b;
-    border: none;
+    border-top: 1px solid #1b3868;
+    border-right: 1px solid #1a5298;
+    border-bottom: 1px solid #1a5298;
+    border-left: 1px solid #1a5298;
     border-image: none;
-    border-top: 1px solid #162438;
     box-shadow: none;
 }
 
 body .oldsite-top-nav a {
-    color: #4e95b8;
+    color: #4f9cf8;
     font-size: 0.82rem;
     font-weight: 500;
     text-transform: none;
-    border-right: 1px solid #1c2a3b;
+    border-right: 1px solid #1b3d6c;
     letter-spacing: 0;
     text-shadow: none;
 }
@@ -4925,18 +4927,18 @@ body .oldsite-top-nav a:hover {
 }
 
 body .oldsite-top-nav .oldsite-top-nav-user {
-    color: #b8d4ea;
+    color: #7ab6ff;
     font-size: 0.8rem;
     border-right: none;
 }
 
 body .oldsite-top-nav .oldsite-top-nav-logout {
-    border-left: 1px solid #1c2a3b;
-    color: #94a3b8;
+    border-left: 1px solid #1b3d6c;
+    color: #8aacc8;
 }
 
 body .oldsite-top-nav .oldsite-top-nav-mailbox-icon {
-    border-right: 1px solid #1c2a3b;
+    border-right: 1px solid #1b3d6c;
 }
 
 body .oldsite-top-nav .oldsite-mailbox-glyph,
@@ -4952,23 +4954,23 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
 
 .nav-language-flags {
     background: linear-gradient(180deg, #0f1d2e 0%, #0a1520 100%);
-    border-left: 1px solid #153d5a;
-    border-right: 1px solid #153d5a;
+    border-left: 1px solid #1a5298;
+    border-right: 1px solid #1a5298;
 }
 
 /* ── News ticker ──────────────────────────────────────────────── */
 .layout-news-ticker {
     background: #111927;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 5px;
-    color: #94a3b8;
+    color: #8aacc8;
     box-shadow: none;
 }
 
 .layout-news-ticker strong {
     background: rgba(21, 61, 90, 0.18);
     border: 1px solid rgba(21, 61, 90, 0.32);
-    color: #4e95b8;
+    color: #4f9cf8;
     letter-spacing: 0.04em;
 }
 
@@ -4980,7 +4982,7 @@ body .oldsite-right-column {
 
 body .oldsite-widget {
     background: #111927;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-image: none;
     border-radius: 8px;
     box-shadow: none;
@@ -4994,8 +4996,8 @@ body .oldsite-widget::before {
 body .oldsite-widget h3 {
     background: #0a1928;
     border-bottom: 1px solid #122a3d;
-    border-left: 3px solid #153d5a;
-    color: #4e95b8;
+    border-left: 3px solid #1a5298;
+    color: #4f9cf8;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 0.68rem;
     font-weight: 700;
@@ -5008,7 +5010,7 @@ body .oldsite-widget h3 {
 body .oldsite-widget p,
 body .oldsite-widget small,
 body .oldsite-widget ol {
-    color: #94a3b8;
+    color: #8aacc8;
     padding: 0.4rem 0.7rem;
     font-size: 0.78rem;
 }
@@ -5017,7 +5019,7 @@ body .oldsite-widget ol {
 body .oldsite-footer {
     background: #090f18;
     border: none;
-    border-top: 1px solid #1c2a3b;
+    border-top: 1px solid #1b3d6c;
     color: #91c6e0;
 }
 
@@ -5027,11 +5029,11 @@ body .oldsite-footer {
 }
 
 .breadcrumb-nav a {
-    color: #64748b;
+    color: #6082a0;
 }
 
 .breadcrumb-nav a:hover {
-    color: #94a3b8;
+    color: #8aacc8;
     background: rgba(255, 255, 255, 0.04);
 }
 
@@ -5047,7 +5049,7 @@ body .oldsite-footer {
 /* Nuke ALL amber ol/li rules from the legacy Tibia blocks */
 body .oldsite-widget ol,
 body .oldsite-widget ol li {
-    color: #94a3b8;
+    color: #8aacc8;
     border-bottom: none;
     list-style: none;
     padding: 0;
@@ -5068,7 +5070,7 @@ body .oldsite-widget ol li:nth-child(even) {
 body .oldsite-widget ol li a {
     display: block;
     padding: 0.38rem 0.55rem;
-    color: #94a3b8;
+    color: #8aacc8;
     text-decoration: none;
     font-size: 0.82rem;
     font-weight: 500;
@@ -5077,7 +5079,7 @@ body .oldsite-widget ol li a {
 }
 
 body .oldsite-widget ol li a:hover {
-    background: rgba(26, 84, 120, 0.12);
+    background: rgba(26, 90, 176, 0.12);
     color: #c8dff0;
 }
 
@@ -5090,17 +5092,17 @@ body .oldsite-widget ol li a:hover {
 body .main-content,
 body .main-content.main-content-route-padded {
     background: #111927;
-    border: 1px solid #162438;
-    border-top: 2px solid #153d5a;
+    border: 1px solid #1b3868;
+    border-top: 2px solid #1a5298;
     box-shadow: none;
     position: relative;
     transition: border-color 0.25s ease, border-top-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 body .main-content:hover {
-    border-color: #1a5478;
+    border-color: #1a5ab0;
     border-top-color: #2d6a8a;
-    box-shadow: 0 0 0 1px rgba(26, 84, 120, 0.2), 0 8px 32px rgba(26, 84, 120, 0.14);
+    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.2), 0 8px 32px rgba(26, 90, 176, 0.14);
 }
 
 body .main-content::before {
@@ -5111,17 +5113,17 @@ body .main-content::before {
 body .oldsite-main-content .entity-shell-card,
 body .entity-shell-card {
     background: #111927;
-    border: 1px solid #162438;
-    border-top: 2px solid #153d5a;
+    border: 1px solid #1b3868;
+    border-top: 2px solid #1a5298;
     box-shadow: none;
     transition: border-color 0.25s ease, border-top-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 body .oldsite-main-content .entity-shell-card:hover,
 body .entity-shell-card:hover {
-    border-color: #1a5478;
+    border-color: #1a5ab0;
     border-top-color: #2d6a8a;
-    box-shadow: 0 0 0 1px rgba(26, 84, 120, 0.2), 0 8px 28px rgba(26, 84, 120, 0.14);
+    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.2), 0 8px 28px rgba(26, 90, 176, 0.14);
 }
 
 body .oldsite-main-content .entity-shell-card::before,
@@ -5134,7 +5136,7 @@ body .entity-shell-card::after {
 body .entity-shell.parchment-a .entity-shell-card,
 body .entity-shell.parchment-b .entity-shell-card {
     background: #111927;
-    border: 1px solid #162438;
+    border: 1px solid #1b3868;
     box-shadow: none;
 }
 
@@ -5156,7 +5158,7 @@ body .main-content .entity-shell {
 /* ── Parchment-a filter bar → dark theme ─────────────────────── */
 body .entity-shell.parchment-a .filter-bar {
     background: #0a1422;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     box-shadow: none;
 }
 
@@ -5164,7 +5166,7 @@ body .entity-shell.parchment-a .filter-bar input,
 body .entity-shell.parchment-a .filter-bar select,
 body .entity-shell.parchment-a .filter-bar input[type="date"] {
     background: #111927;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     color: #f1f5f9;
     border-radius: 6px;
 }
@@ -5175,8 +5177,8 @@ body .entity-shell.parchment-a .filter-bar input::placeholder {
 
 body .entity-shell.parchment-a .filter-bar button {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
-    color: #4e95b8;
+    border: 1px solid #1b3d6c;
+    color: #4f9cf8;
     border-radius: 6px;
     font-weight: 700;
     cursor: pointer;
@@ -5184,29 +5186,29 @@ body .entity-shell.parchment-a .filter-bar button {
 }
 
 body .entity-shell.parchment-a .filter-bar button:hover {
-    border-color: #4e95b8;
+    border-color: #4f9cf8;
     color: #82bdd8;
-    background: rgba(78, 149, 184, 0.08);
+    background: rgba(79, 156, 248, 0.08);
 }
 
 /* ── Parchment-a table → dark theme ──────────────────────────── */
 body .entity-shell.parchment-a .product-table {
     background: transparent;
-    border: 1px solid #162438;
+    border: 1px solid #1b3868;
     border-radius: 8px;
 }
 
 body .entity-shell.parchment-a .product-table th {
     background: #0a1928;
-    border-bottom: 1px solid #153d5a;
-    color: #4e95b8;
+    border-bottom: 1px solid #1a5298;
+    color: #4f9cf8;
     text-shadow: none;
 }
 
 body .entity-shell.parchment-a .product-table td {
     background: transparent;
     border-bottom: 1px solid #0f1f30;
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 body .entity-shell.parchment-a .product-table tr:nth-child(even) td {
@@ -5214,7 +5216,7 @@ body .entity-shell.parchment-a .product-table tr:nth-child(even) td {
 }
 
 body .entity-shell.parchment-a .product-table tr:hover td {
-    background: rgba(26, 84, 120, 0.25);
+    background: rgba(26, 90, 176, 0.25);
 }
 
 /* ── Parchment-a status badges → dark theme ───────────────────── */
@@ -5241,18 +5243,26 @@ body .oldsite-widget {
 body .nav-language-flags .language-flag-card.active {
     opacity: 1;
     border-radius: 3px;
-    box-shadow: 0 0 0 2px #1a5478, 0 0 8px rgba(26, 84, 120, 0.4);
+    box-shadow: 0 0 0 2px #1a5ab0, 0 0 8px rgba(26, 90, 176, 0.4);
+}
+
+/* Reset nav-link sizing for flag links (media query bleeds in) */
+body .oldsite-top-nav .nav-language-flags a {
+    flex: none;
+    min-width: unset;
+    min-height: unset;
+    padding: 0;
 }
 
 body .oldsite-widget:hover {
-    border-color: #1a5478;
-    box-shadow: 0 0 0 1px rgba(26, 84, 120, 0.18), 0 4px 16px rgba(26, 84, 120, 0.1);
+    border-color: #1a5ab0;
+    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.18), 0 4px 16px rgba(26, 90, 176, 0.1);
 }
 
 /* ── Header bottom line accent ───────────────────────────────── */
 body .oldsite-logo-wrap,
 body .oldsite-header {
-    border-bottom-color: #153d5a;
+    border-bottom-color: #1a5298;
 }
 
 body .oldsite-top-nav a:hover,
@@ -5263,7 +5273,7 @@ body .oldsite-top-nav a:focus {
 
 /* ── Ticker label accent ──────────────────────────────────────── */
 .layout-news-ticker strong {
-    color: #4e95b8;
+    color: #4f9cf8;
     background: rgba(21, 61, 90, 0.2);
     border-color: rgba(21, 61, 90, 0.35);
 }
@@ -5271,12 +5281,12 @@ body .oldsite-top-nav a:focus {
 /* ── Content headings — metallic navy tint ────────────────────── */
 body .oldsite-main-content h1,
 body .oldsite-main-content h2 {
-    color: #daeaf8;
+    color: #deeeff;
     text-shadow: none;
 }
 
 body .oldsite-main-content h3 {
-    color: #4e95b8;
+    color: #4f9cf8;
     text-shadow: none;
 }
 
@@ -5296,23 +5306,23 @@ body .oldsite-main-content h3 {
 
 /* Nuke all border-image sub-properties on the logo link */
 body .oldsite-logo-wrap {
-    border-top: none;
-    border-right: none;
-    border-left: none;
-    border-bottom: 1px solid #162438;
+    border-top: 1px solid #1a5298;
+    border-right: 1px solid #1a5298;
+    border-left: 1px solid #1a5298;
+    border-bottom: 1px solid #1b3868;
     border-image-source: none;
     border-image-slice: 0;
     border-image-width: 0;
     border-image-outset: 0;
     background-image: linear-gradient(180deg, #111d2e 0%, #0d1820 100%);
     background-color: #111d2e;
-    box-shadow: inset 0 -1px 0 #153d5a;
+    box-shadow: inset 0 -1px 0 #1a5298;
 }
 
 /* Force dark background on the header element itself */
 body .oldsite-header {
     background: linear-gradient(180deg, #111d2e 0%, #0d1820 100%);
-    border-bottom: 1px solid #162438;
+    border-bottom: none;
 }
 
 /* Outer page wrapper: no amber from padding gap */
@@ -5337,18 +5347,18 @@ body .oldsite-page {
 
 /* Page card */
 .entity-shell.admin-page .entity-shell-card {
-    border: 1px solid #1a5478;
-    border-top: 2px solid #4e95b8;
-    box-shadow: 0 0 0 1px rgba(26, 84, 120, 0.15);
+    border: 1px solid #1a5ab0;
+    border-top: 2px solid #4f9cf8;
+    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.15);
 }
 
 .entity-shell.admin-page .page-section-title {
-    color: #daeaf8;
+    color: #deeeff;
     text-shadow: none;
 }
 
 .entity-shell.admin-page .admin-welcome {
-    color: #64748b;
+    color: #6082a0;
     font-size: 0.9rem;
     font-weight: 400;
 }
@@ -5363,10 +5373,10 @@ body .oldsite-page {
 
 .entity-shell.admin-page .admin-nav a {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 6px;
     box-shadow: none;
-    color: #4e95b8;
+    color: #4f9cf8;
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0;
@@ -5396,8 +5406,8 @@ body .oldsite-page {
 .entity-shell.admin-page .admin-kpi-card,
 .entity-shell.admin-page .admin-kpi-grid > a {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
-    border-top: 2px solid #153d5a;
+    border: 1px solid #1b3d6c;
+    border-top: 2px solid #1a5298;
     border-radius: 8px;
     box-shadow: none;
     color: #f1f5f9;
@@ -5409,15 +5419,15 @@ body .oldsite-page {
 
 .entity-shell.admin-page .admin-kpi-card:hover,
 .entity-shell.admin-page .admin-kpi-grid > a:hover {
-    border-color: #1a5478;
+    border-color: #1a5ab0;
     border-top-color: #2d6a8a;
-    box-shadow: 0 0 0 1px rgba(26, 84, 120, 0.2);
+    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.2);
     filter: none;
     transform: none;
 }
 
 .entity-shell.admin-page .admin-kpi-label {
-    color: #64748b;
+    color: #6082a0;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -5436,10 +5446,10 @@ body .oldsite-page {
 /* Settings cards */
 .entity-shell.admin-page .admin-settings-card {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 8px;
     box-shadow: none;
-    color: #94a3b8;
+    color: #8aacc8;
     margin: 0.55rem 0;
     padding: 0.75rem 1rem;
 }
@@ -5447,11 +5457,11 @@ body .oldsite-page {
 .entity-shell.admin-page .admin-settings-card b,
 .entity-shell.admin-page .admin-settings-card strong,
 .entity-shell.admin-page .admin-settings-card label {
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .entity-shell.admin-page .admin-settings-card a {
-    color: #4e95b8;
+    color: #4f9cf8;
 }
 
 /* Inputs & selects */
@@ -5465,7 +5475,7 @@ body .oldsite-page {
 .entity-shell.admin-page input[type="search"],
 .entity-shell.admin-page input[type="password"] {
     background: #07111d;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 6px;
     color: #f1f5f9;
 }
@@ -5475,7 +5485,7 @@ body .oldsite-page {
 .entity-shell.admin-page select:focus,
 .entity-shell.admin-page input:focus {
     border-color: #2d6a8a;
-    box-shadow: 0 0 0 2px rgba(26, 84, 120, 0.25);
+    box-shadow: 0 0 0 2px rgba(26, 90, 176, 0.25);
     outline: none;
 }
 
@@ -5486,7 +5496,7 @@ body .oldsite-page {
 .entity-shell.admin-page .logs-quick-range-bar,
 .entity-shell.admin-page .logs-audit-filter-bar {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     box-shadow: none;
 }
 
@@ -5496,7 +5506,7 @@ body .oldsite-page {
 .entity-shell.admin-page .logs-main-filter-bar input,
 .entity-shell.admin-page .logs-main-filter-bar select {
     background: #07111d;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     color: #f1f5f9;
 }
 
@@ -5508,22 +5518,22 @@ body .oldsite-page {
 
 .entity-shell.admin-page .filter-bar button,
 .entity-shell.admin-page .filter-bar.admin-filter-card button {
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
-    border: 1px solid #153d5a;
-    color: #daeaf8;
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
+    border: 1px solid #1a5298;
+    color: #deeeff;
     font-weight: 600;
     box-shadow: none;
 }
 
 .entity-shell.admin-page .filter-bar button:hover,
 .entity-shell.admin-page .filter-bar.admin-filter-card button:hover {
-    background: linear-gradient(180deg, #2d6a8a 0%, #1a5478 100%);
+    background: linear-gradient(180deg, #2d6a8a 0%, #1a5ab0 100%);
 }
 
 .entity-shell.admin-page .filter-bar button:disabled,
 .entity-shell.admin-page .filter-bar.admin-filter-card button:disabled {
     background: #0d1825;
-    border-color: #162438;
+    border-color: #1b3868;
     color: #334155;
     cursor: not-allowed;
 }
@@ -5543,17 +5553,17 @@ body .oldsite-page {
 .entity-shell.admin-page .edit-btn,
 .entity-shell.admin-page .back-btn,
 .entity-shell.admin-page .view-btn {
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
-    border: 1px solid #153d5a;
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
+    border: 1px solid #1a5298;
     box-shadow: none;
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .entity-shell.admin-page .details-btn:hover,
 .entity-shell.admin-page .edit-btn:hover,
 .entity-shell.admin-page .back-btn:hover,
 .entity-shell.admin-page .view-btn:hover {
-    background: linear-gradient(180deg, #2d6a8a 0%, #1a5478 100%);
+    background: linear-gradient(180deg, #2d6a8a 0%, #1a5ab0 100%);
 }
 
 .entity-shell.admin-page .warning-btn {
@@ -5577,7 +5587,7 @@ body .oldsite-page {
 .entity-shell.admin-page .log-table,
 .entity-shell.admin-page .product-table {
     background: transparent;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 6px;
 }
 
@@ -5586,8 +5596,8 @@ body .oldsite-page {
 .entity-shell.admin-page .log-table th,
 .entity-shell.admin-page .product-table th {
     background: #0a1928;
-    border-bottom: 1px solid #153d5a;
-    color: #4e95b8;
+    border-bottom: 1px solid #1a5298;
+    color: #4f9cf8;
     text-shadow: none;
 }
 
@@ -5595,9 +5605,9 @@ body .oldsite-page {
 .entity-shell.admin-page .payments-table td,
 .entity-shell.admin-page .log-table td,
 .entity-shell.admin-page .product-table td {
-    background: rgba(26, 84, 120, 0.18);
+    background: rgba(26, 90, 176, 0.18);
     border-bottom: 1px solid #0f1f30;
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 .entity-shell.admin-page table tr:nth-child(even) td,
@@ -5611,52 +5621,52 @@ body .oldsite-page {
 .entity-shell.admin-page .payments-table tr:hover td,
 .entity-shell.admin-page .log-table tr:hover td,
 .entity-shell.admin-page .product-table tr:hover td {
-    background: rgba(26, 84, 120, 0.32);
+    background: rgba(26, 90, 176, 0.32);
     filter: none;
 }
 
 .entity-shell.admin-page table td a {
-    color: #4e95b8;
+    color: #4f9cf8;
 }
 
 .entity-shell.admin-page table td strong,
 .entity-shell.admin-page table td b {
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 /* Pagination */
 .entity-shell.admin-page .pagination button {
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
-    border: 1px solid #153d5a;
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
+    border: 1px solid #1a5298;
     box-shadow: none;
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .entity-shell.admin-page .pagination button:hover {
-    background: linear-gradient(180deg, #2d6a8a 0%, #1a5478 100%);
+    background: linear-gradient(180deg, #2d6a8a 0%, #1a5ab0 100%);
 }
 
 .entity-shell.admin-page .pagination button:disabled {
     background: #0d1825;
-    border-color: #162438;
+    border-color: #1b3868;
     color: #334155;
     opacity: 1;
 }
 
 .entity-shell.admin-page .pagination .pagination-info,
 .entity-shell.admin-page .pagination-info {
-    color: #64748b;
+    color: #6082a0;
     font-weight: 600;
     text-shadow: none;
 }
 
 /* Text helpers */
 .entity-shell.admin-page .text-muted {
-    color: #64748b;
+    color: #6082a0;
 }
 
 .entity-shell.admin-page .label {
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 .entity-shell.admin-page .operation-fee-message.ok {
@@ -5669,15 +5679,15 @@ body .oldsite-page {
 
 /* Logs */
 .entity-shell.admin-page .logs-filter-group-label {
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
     border: none;
-    color: #daeaf8;
+    color: #deeeff;
     text-shadow: none;
 }
 
 .entity-shell.admin-page .logs-total-count,
 .entity-shell.admin-page .orders-review-sort-summary {
-    color: #64748b;
+    color: #6082a0;
     text-shadow: none;
 }
 
@@ -5685,49 +5695,49 @@ body .oldsite-page {
 .entity-shell.admin-page .orders-review-restored-notice {
     background: #0d1825;
     border-left-color: #2d6a8a;
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 .entity-shell.admin-page .orders-review-restored-close {
-    color: #64748b;
+    color: #6082a0;
 }
 
 /* Entity shell footer */
 .entity-shell.admin-page .entity-shell-footer {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     box-shadow: none;
 }
 
 /* Payment details card (orders review modal) */
 .entity-shell.admin-page .payment-details-card {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     box-shadow: none;
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 .entity-shell.admin-page .payment-details-card .label {
-    border-right-color: #1c2a3b;
-    color: #4e95b8;
+    border-right-color: #1b3d6c;
+    color: #4f9cf8;
 }
 
 /* APV card (product/user view) */
 .entity-shell.admin-page .apv-card {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     box-shadow: none;
 }
 
 .entity-shell.admin-page .apv-title {
     background: #0a1928;
-    border-bottom: 1px solid #153d5a;
-    color: #4e95b8;
+    border-bottom: 1px solid #1a5298;
+    color: #4f9cf8;
     text-shadow: none;
 }
 
 .entity-shell.admin-page .apv-dl {
-    border-color: #1c2a3b;
+    border-color: #1b3d6c;
 }
 
 .entity-shell.admin-page .apv-row:nth-child(odd) {
@@ -5740,12 +5750,12 @@ body .oldsite-page {
 
 .entity-shell.admin-page .apv-row dt,
 .entity-shell.admin-page .apv-row dd {
-    border-right-color: #1c2a3b;
-    color: #94a3b8;
+    border-right-color: #1b3d6c;
+    color: #8aacc8;
 }
 
 .entity-shell.admin-page .apv-row dt {
-    color: #4e95b8;
+    color: #4f9cf8;
 }
 
 .entity-shell.admin-page .apv-mono {
@@ -5754,53 +5764,53 @@ body .oldsite-page {
 
 .entity-shell.admin-page .apv-btn-back {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
-    color: #94a3b8;
+    border: 1px solid #1b3d6c;
+    color: #8aacc8;
 }
 
 .entity-shell.admin-page .apv-btn-edit {
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
-    border: 1px solid #153d5a;
-    color: #daeaf8;
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
+    border: 1px solid #1a5298;
+    color: #deeeff;
 }
 
 /* Admin user view profile panels */
 .entity-shell.admin-page .admin-profile-panel-card {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     box-shadow: none;
 }
 
 .entity-shell.admin-page .admin-profile-panel-card h3 {
     background: #0a1928;
-    border-bottom: 1px solid #153d5a;
+    border-bottom: 1px solid #1a5298;
     border-radius: 7px 7px 0 0;
-    color: #4e95b8;
+    color: #4f9cf8;
     text-shadow: none;
 }
 
 .entity-shell.admin-page .admin-profile-info-list dt {
-    color: #4e95b8;
+    color: #4f9cf8;
 }
 
 .entity-shell.admin-page .admin-profile-info-list dd {
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .entity-shell.admin-page .admin-profile-governance-copy {
-    color: #64748b;
+    color: #6082a0;
 }
 
 .entity-shell.admin-page .admin-user-stats-grid .admin-kpi-card {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
-    border-top: 2px solid #153d5a;
+    border: 1px solid #1b3d6c;
+    border-top: 2px solid #1a5298;
     box-shadow: none;
 }
 
 /* Form pages */
 .entity-shell.admin-page .form-group label {
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 .entity-shell.admin-page .form-group .input,
@@ -5808,7 +5818,7 @@ body .oldsite-page {
 .entity-shell.admin-page .form-group textarea.input,
 .entity-shell.admin-page .form-group select.input {
     background: #07111d;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     color: #f1f5f9;
 }
 
@@ -5817,20 +5827,20 @@ body .oldsite-page {
 .entity-shell.admin-page .form-group textarea.input:focus,
 .entity-shell.admin-page .form-group select.input:focus {
     border-color: #2d6a8a;
-    box-shadow: 0 0 0 2px rgba(26, 84, 120, 0.25);
+    box-shadow: 0 0 0 2px rgba(26, 90, 176, 0.25);
     outline: none;
 }
 
 .entity-shell.admin-page .product-attr-labels {
-    color: #64748b;
+    color: #6082a0;
 }
 
 .entity-shell.admin-page .accent-color-meta strong {
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .entity-shell.admin-page .accent-color-meta small {
-    color: #64748b;
+    color: #6082a0;
 }
 
 .entity-shell.admin-page .save-btn {
@@ -5846,14 +5856,14 @@ body .oldsite-page {
 
 .entity-shell.admin-page .cancel-btn {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     box-shadow: none;
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 .entity-shell.admin-page .cancel-btn:hover {
     border-color: #2d6a8a;
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 /* Validation */
@@ -5884,56 +5894,56 @@ body .oldsite-page {
 
 .entity-shell.admin-page .security-panel {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     box-shadow: none;
 }
 
 .entity-shell.admin-page .security-header h3 {
     background: linear-gradient(180deg, #0f2a3f 0%, #0a1f30 100%);
-    border-bottom: 1px solid #1c2a3b;
-    color: #daeaf8;
+    border-bottom: 1px solid #1b3d6c;
+    color: #deeeff;
     text-shadow: none;
 }
 
 .entity-shell.admin-page .security-header p,
 .entity-shell.admin-page .security-label,
 .entity-shell.admin-page .security-baseline-group h5 {
-    color: #64748b;
+    color: #6082a0;
 }
 
 .entity-shell.admin-page .security-panel h4,
 .entity-shell.admin-page .security-value,
 .entity-shell.admin-page .security-toggle {
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .entity-shell.admin-page .security-input-grid label {
-    color: #64748b;
+    color: #6082a0;
 }
 
 .entity-shell.admin-page .security-input-grid input,
 .entity-shell.admin-page .security-input-grid select {
     background: #07111d;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     color: #f1f5f9;
 }
 
 .entity-shell.admin-page .security-baseline-row {
-    border-bottom: 1px dashed #1c2a3b;
+    border-bottom: 1px dashed #1b3d6c;
 }
 
 .entity-shell.admin-page .security-baseline-group {
-    border-top: 1px solid #1c2a3b;
+    border-top: 1px solid #1b3d6c;
 }
 
 .entity-shell.admin-page .security-env-pill {
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
-    border: 1px solid #153d5a;
-    color: #daeaf8;
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
+    border: 1px solid #1a5298;
+    color: #deeeff;
 }
 
 .entity-shell.admin-page .security-toggle input[type="checkbox"] {
-    accent-color: #4e95b8;
+    accent-color: #4f9cf8;
 }
 
 /* ================================================================
@@ -5951,16 +5961,16 @@ body .entity-shell.parchment-a .log-table tr {
 /* ── Pagination buttons: replace orange Tibia gradient ──────────── */
 body .entity-shell.parchment-a .pagination button {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 6px;
     box-shadow: none;
-    color: #4e95b8;
+    color: #4f9cf8;
     font-weight: 700;
 }
 
 body .entity-shell.parchment-a .pagination button:hover:not(:disabled) {
-    background: rgba(78, 149, 184, 0.08);
-    border-color: #4e95b8;
+    background: rgba(79, 156, 248, 0.08);
+    border-color: #4f9cf8;
     color: #82bdd8;
     filter: none;
 }
@@ -5982,11 +5992,11 @@ body .entity-shell.parchment-a .pagination-info {
 /* ── Empty state: replace parchment/brown with dark theme ──────── */
 body .admin-empty-state {
     background: #0b1928;
-    border: 1px dashed #1c2a3b;
+    border: 1px dashed #1b3d6c;
 }
 
 body .admin-empty-state-icon {
-    color: #4e95b8;
+    color: #4f9cf8;
 }
 
 body .admin-empty-state-text {
@@ -5994,15 +6004,74 @@ body .admin-empty-state-text {
 }
 
 body .admin-empty-state-hint {
-    color: #64748b;
+    color: #6082a0;
 }
 
 /* ── entity-muted remnants: --brown-text (#6b4726) on dark bg ──── */
 body .entity-shell-card p,
 body .entity-shell-card li {
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 body .entity-shell-subtitle {
-    color: #64748b;
+    color: #6082a0;
+}
+
+/* ── Google Maps Places Autocomplete dropdown ───────────────────── */
+.pac-container {
+    z-index: 9999 !important;
+    background: #0f1923;
+    border: 1px solid #1b3d6c;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    font-family: inherit;
+}
+.pac-item {
+    padding: 0.45rem 0.75rem;
+    border-top: 1px solid #1b3d6c;
+    color: #cbd5e1;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+.pac-item:hover, .pac-item-selected { background: #152436; }
+.pac-item-query { color: #e2e8f0; font-weight: 600; }
+.pac-matched { color: #4f9cf8; }
+.pac-icon { display: none; }
+
+/* ── Identity / Bootstrap form-control dark theme ───────────────── */
+.form-control {
+    background-color: #121f30;
+    color: #c8d8f0;
+    border: 1px solid #1b3d6c;
+    border-radius: 6px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.form-control:hover {
+    border-color: #1a5298;
+    background-color: #121f30;
+}
+.form-control:focus {
+    background-color: #121f30;
+    color: #deeeff;
+    border-color: #2d6ac4;
+    box-shadow: 0 0 0 3px rgba(26, 82, 152, 0.25);
+    outline: none;
+}
+.form-control::placeholder {
+    color: #4a6b8a;
+    opacity: 1;
+}
+
+/* Autofill do Chrome: impede fundo branco */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #121f30 inset !important;
+    -webkit-text-fill-color: #c8d8f0 !important;
+    caret-color: #c8d8f0;
+    border-color: #1b3d6c;
+    transition: background-color 5000s ease-in-out 0s;
 }

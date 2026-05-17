@@ -1,12 +1,15 @@
 @page "/admin/venues/edit/{Id:int}"
 
 @attribute [Authorize(Roles = "admin")]
+@implements IAsyncDisposable
 
 @using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Shared
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -15,6 +18,9 @@
 @inject NavigationManager NavigationManager
 @inject LogService LogService
 @inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IJSRuntime JS
+@inject IConfiguration Config
 
 <div class="entity-shell admin-page">
 
@@ -36,9 +42,11 @@
                     <ValidationSummary class="validation-summary" />
 
                     <div class="form-group">
-                        <label>Nome <span class="required">*</span></label>
-                        <InputText class="input" @bind-Value="model.Name"
-                                   placeholder="Ex: Arena do Zé, Society Central…" />
+                        <label>Nome da Quadra <span class="required">*</span></label>
+                        <InputText id="admin-venue-name-input" class="input" @bind-Value="model.Name"
+                                   placeholder="Ex: Arena do Zé, Society Central…"
+                                   autocomplete="off" />
+                        <small class="form-hint">Digite o nome para buscar no Google Maps e preencher os campos automaticamente.</small>
                         <ValidationMessage For="@(() => model.Name)" class="validation-message" />
                     </div>
 
@@ -68,9 +76,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Endereço <span class="required">*</span></label>
+                        <label>Endereço</label>
                         <InputText class="input" @bind-Value="model.Address"
-                                   placeholder="Rua das Flores, 123 — Bairro" />
+                                   placeholder="Preenchido automaticamente ao selecionar o local" />
                         <ValidationMessage For="@(() => model.Address)" class="validation-message" />
                     </div>
 
@@ -81,6 +89,51 @@
                                 <InputCheckbox @bind-Value="model.IsActive" />
                                 Ativa
                             </label>
+                        </div>
+
+                        <hr style="border-color:#1c2a3b;margin:1.25rem 0" />
+
+                        <div class="form-group">
+                            <label>Admin da Quadra</label>
+                            @if (venueAdmin is not null)
+                            {
+                                <div class="venue-admin-assigned">
+                                    <div>
+                                        <span class="venue-admin-name">@(venueAdmin.FullName ?? venueAdmin.UserName)</span>
+                                        <span class="venue-admin-email">@venueAdmin.Email</span>
+                                    </div>
+                                    <button type="button" class="danger-btn action-btn"
+                                            @onclick="RemoveVenueAdmin" disabled="@isAssigning">
+                                        <i class="fas fa-user-minus"></i> Remover
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="venue-admin-search">
+                                    <input class="input" placeholder="Buscar por e-mail…"
+                                           @bind="adminSearchEmail" @bind:event="oninput"
+                                           @onkeydown="@(e => { if (e.Key == "Enter") SearchUser(); })" />
+                                    <button type="button" class="edit-btn action-btn"
+                                            @onclick="SearchUser" disabled="@isAssigning">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                @if (searchedUser is not null)
+                                {
+                                    <div class="venue-admin-result">
+                                        <span>@(searchedUser.FullName ?? searchedUser.UserName) &mdash; @searchedUser.Email</span>
+                                        <button type="button" class="success-btn action-btn"
+                                                @onclick="AssignVenueAdmin" disabled="@isAssigning">
+                                            <i class="fas fa-user-plus"></i> Atribuir
+                                        </button>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(adminSearchError))
+                                {
+                                    <p class="validation-message">@adminSearchError</p>
+                                }
+                            }
                         </div>
                     }
 
@@ -112,10 +165,21 @@
 @code {
     [Parameter] public int Id { get; set; }
 
-    private Venue  model    = new();
-    private bool   isLoading = true;
-    private bool   isSaving  = false;
-    private string saveError = string.Empty;
+    private Venue            model           = new();
+    private bool             isLoading       = true;
+    private bool             isSaving        = false;
+    private string           saveError       = string.Empty;
+
+    // Places autocomplete
+    private DotNetObjectReference<AdminVenueEdit>? _objRef;
+    private bool _acInit = false;
+
+    // Venue admin assignment
+    private ApplicationUser? venueAdmin;
+    private ApplicationUser? searchedUser;
+    private string           adminSearchEmail = string.Empty;
+    private string           adminSearchError = string.Empty;
+    private bool             isAssigning      = false;
 
     private bool IsNew => Id == 0;
 
@@ -124,10 +188,118 @@
         if (!IsNew)
         {
             await using var db = await DbFactory.CreateDbContextAsync();
-            var found = await db.Venues.FindAsync(Id);
-            if (found is not null) model = found;
+            var found = await db.Venues
+                .Include(v => v.VenueAdmin)
+                .FirstOrDefaultAsync(v => v.Id == Id);
+            if (found is not null)
+            {
+                model      = found;
+                venueAdmin = found.VenueAdmin;
+            }
         }
         isLoading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_acInit && !isLoading)
+        {
+            _acInit = true;
+            var apiKey = Config["Google:MapsApiKey"];
+            if (!string.IsNullOrWhiteSpace(apiKey) && !apiKey.Contains("SET_VIA"))
+            {
+                _objRef ??= DotNetObjectReference.Create(this);
+                await JS.InvokeVoidAsync("venueAutocomplete.init", apiKey, _objRef, "admin-venue-name-input");
+            }
+        }
+    }
+
+    [JSInvokable]
+    public void PlaceSelected(string name, string street, string city, string state)
+    {
+        model.Name      = name;
+        model.Address   = street;
+        model.City      = city;
+        model.StateCode = state.Length > 2 ? state[..2] : state.ToUpperInvariant();
+        InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_objRef is not null)
+        {
+            try { await JS.InvokeVoidAsync("venueAutocomplete.dispose"); } catch { }
+            _objRef.Dispose();
+        }
+    }
+
+    private async Task SearchUser()
+    {
+        adminSearchError = string.Empty;
+        searchedUser     = null;
+        var email = adminSearchEmail.Trim();
+        if (string.IsNullOrWhiteSpace(email)) return;
+
+        var user = await UserManager.FindByEmailAsync(email);
+        if (user is null)
+            adminSearchError = "Nenhum usuário encontrado com esse e-mail.";
+        else
+            searchedUser = user;
+    }
+
+    private async Task AssignVenueAdmin()
+    {
+        if (searchedUser is null) return;
+        isAssigning = true;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var venue = await db.Venues.FindAsync(Id);
+        if (venue is null) { isAssigning = false; return; }
+
+        venue.VenueAdminUserId = searchedUser.Id;
+        await db.SaveChangesAsync();
+
+        // Ensure the user has the venue_manager role
+        if (!await UserManager.IsInRoleAsync(searchedUser, "venue_manager"))
+            await UserManager.AddToRoleAsync(searchedUser, "venue_manager");
+
+        var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await LogService.AuditAsync("venue.admin_assigned", "Venue", Id.ToString(),
+            $"Admin da quadra atribuído: {searchedUser.Email}", userId);
+
+        venueAdmin       = searchedUser;
+        searchedUser     = null;
+        adminSearchEmail = string.Empty;
+        isAssigning      = false;
+    }
+
+    private async Task RemoveVenueAdmin()
+    {
+        if (venueAdmin is null) return;
+        isAssigning = true;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var venue = await db.Venues.FindAsync(Id);
+        if (venue is null) { isAssigning = false; return; }
+
+        var removedUser = venueAdmin;
+        venue.VenueAdminUserId = null;
+        await db.SaveChangesAsync();
+
+        // Remove venue_manager role only if user has no other venues assigned
+        var hasOtherVenues = await db.Venues
+            .AnyAsync(v => v.VenueAdminUserId == removedUser.Id);
+        if (!hasOtherVenues)
+            await UserManager.RemoveFromRoleAsync(removedUser, "venue_manager");
+
+        var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await LogService.AuditAsync("venue.admin_removed", "Venue", Id.ToString(),
+            $"Admin da quadra removido: {removedUser.Email}", userId);
+
+        venueAdmin  = null;
+        isAssigning = false;
     }
 
     private async Task Save()

@@ -1,4 +1,4 @@
-/* ── Header ──────────────────────────────────────────────────── */
+﻿/* ── Header ──────────────────────────────────────────────────── */
 .my-events-header {
     display: flex;
     align-items: center;
@@ -57,9 +57,9 @@
 .my-events-tab {
     padding: 0.3rem 0.75rem;
     border-radius: 20px;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     background: transparent;
-    color: #64748b;
+    color: #6082a0;
     font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
@@ -69,13 +69,13 @@
 
 .my-events-tab:hover {
     border-color: #2d6a8a;
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 .my-events-tab--active {
     background: #0d1825;
-    color: #4e95b8;
-    border-color: #1a5478;
+    color: #4f9cf8;
+    border-color: #1a5ab0;
 }
 
 .my-events-tab--futsal.my-events-tab--active {
@@ -103,13 +103,13 @@
     gap: 0.75rem;
     padding: 0.75rem 0.9rem;
     background: #0d1825;
-    border: 1px solid #162438;
+    border: 1px solid #1b3868;
     border-radius: 8px;
     transition: border-color 0.15s, opacity 0.2s;
 }
 
 .my-event-card:hover {
-    border-color: #1a5478;
+    border-color: #1a5ab0;
 }
 
 .my-event-card--inactive {
@@ -177,8 +177,8 @@
 
 .my-event-status--past {
     background: #1a2535;
-    color: #64748b;
-    border: 1px solid #1c2a3b;
+    color: #6082a0;
+    border: 1px solid #1b3d6c;
 }
 
 .my-event-status--cancelled {
@@ -215,7 +215,7 @@
 .my-event-meta {
     margin: 0 0 0.18rem;
     font-size: 0.8rem;
-    color: #64748b;
+    color: #6082a0;
 }
 
 .my-event-location {
@@ -262,12 +262,12 @@
 
 .my-event-action-btn--view {
     background: #0d1825;
-    color: #4e95b8;
-    border-color: #1c2a3b;
+    color: #4f9cf8;
+    border-color: #1b3d6c;
 }
 
 .my-event-action-btn--view:hover {
-    border-color: #4e95b8;
+    border-color: #4f9cf8;
     color: #82bdd8;
 }
 

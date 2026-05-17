@@ -264,7 +264,7 @@
     border-radius: 3px;
     cursor: pointer;
     transition: filter 0.12s ease, transform 0.1s ease;
-    border: 1px solid rgba(26, 84, 120, 0.4);
+    border: 1px solid rgba(26, 90, 176, 0.4);
 }
 
 .entity-shell.admin-page .action-btn.icon-only i {
@@ -274,16 +274,16 @@
 }
 
 .entity-shell.admin-page .details-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
-    color: #daeaf8;
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
+    color: #deeeff;
 }
 
 .entity-shell.admin-page .details-btn.action-btn.icon-only i {
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .entity-shell.admin-page .edit-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, #2d6a8a 0%, #1a5478 100%);
+    background: linear-gradient(180deg, #2d6a8a 0%, #1a5ab0 100%);
     color: #e8f4ff;
 }
 

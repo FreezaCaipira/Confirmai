@@ -22,7 +22,6 @@
             <h1 class="page-section-title">@T["AdminPayments.Title"]</h1>
             <div class="filter-bar admin-filter-card">
                 <input type="text" placeholder="@T["AdminPayments.Filter.User"]" @bind="filterUserId" @bind:event="oninput" />
-                <input type="text" placeholder="@T["AdminPayments.Filter.Product"]" @bind="filterProductId" @bind:event="oninput" />
                 <input type="number" placeholder="@T["AdminPayments.Filter.Min"]" @bind="filterMinAmount" min="0" />
                 <input type="number" placeholder="@T["AdminPayments.Filter.Max"]" @bind="filterMaxAmount" min="0" />
                 <select @bind="filterStatus">
@@ -47,7 +46,6 @@
                 <table class="payments-table align-right">
                     <thead>
                         <tr>
-                            <th>@T["AdminPayments.Product"]</th>
                             <th>@T["AdminPayments.User"]</th>
                             <th>@T["Common.Gateway"]</th>
                             <th>@T["Common.Value"]</th>
@@ -60,18 +58,6 @@
                     @foreach (var p in pagedPayments)
                     {
                         <tr>
-                            <td data-label="@T["AdminPayments.Product"]">
-                                @if (p.Product != null)
-                                {
-                                    <a class="evidence-link" href="@($"/admin/items/view/{p.ProductId}")">
-                                        @p.Product.Name
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">ID: @p.ProductId</span>
-                                }
-                            </td>
                             <td data-label="@T["AdminPayments.User"]">
                                 @if (p.User != null)
                                 {
@@ -128,7 +114,6 @@
     private int totalCount;
 
     private string filterUserId = "";
-    private string filterProductId = "";
     private decimal? filterMinAmount;
     private decimal? filterMaxAmount;
     private string filterStatus = "";
@@ -175,8 +160,6 @@
 
         if (!string.IsNullOrWhiteSpace(filterUserId))
             query = query.Where(p => (p.User != null && p.User.UserName != null && p.User.UserName.Contains(filterUserId)) || (p.UserId != null && p.UserId.Contains(filterUserId)));
-        if (!string.IsNullOrWhiteSpace(filterProductId))
-            query = query.Where(p => (p.Product != null && p.Product.Name != null && p.Product.Name.Contains(filterProductId)) || p.ProductId.ToString().Contains(filterProductId));
         if (filterMinAmount.HasValue)
             query = query.Where(p => p.Amount >= filterMinAmount.Value);
         if (filterMaxAmount.HasValue)
@@ -191,7 +174,6 @@
 
         pagedPayments = await query
             .OrderByDescending(p => p.CreatedAt)
-            .Include(p => p.Product)
             .Include(p => p.User)
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
@@ -211,7 +193,6 @@
     private async Task ClearFilters()
     {
         filterUserId = "";
-        filterProductId = "";
         filterMinAmount = null;
         filterMaxAmount = null;
         filterStatus = "";
@@ -247,7 +228,6 @@
         var state = await AdminPaymentsFilterStateService.LoadAsync();
 
         filterUserId = state.UserId;
-        filterProductId = state.ProductId;
         filterMinAmount = state.MinAmount;
         filterMaxAmount = state.MaxAmount;
         filterStatus = state.Status;
@@ -256,7 +236,6 @@
 
         showRestoredFiltersNotice =
             !string.IsNullOrWhiteSpace(filterUserId)
-            || !string.IsNullOrWhiteSpace(filterProductId)
             || filterMinAmount.HasValue
             || filterMaxAmount.HasValue
             || !string.IsNullOrWhiteSpace(filterStatus)
@@ -269,7 +248,7 @@
         await AdminPaymentsFilterStateService.SaveAsync(new AdminPaymentsFilterState
         {
             UserId = filterUserId,
-            ProductId = filterProductId,
+            ProductId = string.Empty,
             MinAmount = filterMinAmount,
             MaxAmount = filterMaxAmount,
             Status = filterStatus,

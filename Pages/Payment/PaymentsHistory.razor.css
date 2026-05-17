@@ -19,9 +19,9 @@
     font-family: inherit;
     cursor: pointer;
     border-radius: 8px;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     background: #0d1825;
-    color: #64748b;
+    color: #6082a0;
     transition: border-color 0.15s, color 0.15s, background 0.15s;
     line-height: 1.2;
     text-align: left;
@@ -30,14 +30,14 @@
 
 .payments-tab-btn:hover:not(.active) {
     border-color: #2d6a8a;
-    color: #94a3b8;
-    background: rgba(26, 84, 120, 0.1);
+    color: #8aacc8;
+    background: rgba(26, 90, 176, 0.1);
 }
 
 .payments-tab-btn.active {
     background: #0a1928;
-    border-color: #1a5478;
-    color: #4e95b8;
+    border-color: #1a5ab0;
+    color: #4f9cf8;
     cursor: default;
 }
 
@@ -51,15 +51,15 @@
     border-radius: 999px;
     font-size: 0.75rem;
     font-weight: 900;
-    background: rgba(26, 84, 120, 0.25);
-    color: #64748b;
+    background: rgba(26, 90, 176, 0.25);
+    color: #6082a0;
     margin-left: 0.1rem;
     line-height: 1;
 }
 
 .payments-tab-btn.active .payments-tab-count {
-    background: rgba(78, 149, 184, 0.2);
-    color: #4e95b8;
+    background: rgba(79, 156, 248, 0.2);
+    color: #4f9cf8;
 }
 
 .payments-filter-card {
@@ -215,7 +215,7 @@
 }
 
 .payments-history-shell .payments-history-pagination .pagination-info {
-    color: #64748b;
+    color: #6082a0;
     font-weight: 800;
     text-shadow: none;
 }

@@ -82,19 +82,41 @@
                                     }
                                 </td>
                                 <td data-label="Ações">
-                                    <div class="admin-actions-row">
-                                        <button class="edit-btn action-btn icon-only"
-                                                @onclick='() => NavigationManager.NavigateTo($"/admin/venues/edit/{v.Id}")'
-                                                title="Editar" aria-label="Editar">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </button>
-                                        <button class="danger action-btn icon-only"
-                                                @onclick="() => ToggleActive(v)"
-                                                title="@(v.IsActive ? "Desativar" : "Ativar")"
-                                                aria-label="@(v.IsActive ? "Desativar" : "Ativar")">
-                                            <i class="fas @(v.IsActive ? "fa-ban" : "fa-check")"></i>
-                                        </button>
-                                    </div>
+                                    @if (confirmDeleteId == v.Id)
+                                    {
+                                        <div class="admin-actions-row" style="gap:0.4rem;align-items:center">
+                                            <span style="font-size:0.8rem;color:#f1f5f9;white-space:nowrap">Remover?</span>
+                                            <button class="danger-btn action-btn icon-only" title="Confirmar"
+                                                    @onclick='() => DeleteVenue(v.Id)'>
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="cancel-btn action-btn icon-only" title="Cancelar"
+                                                    @onclick='() => confirmDeleteId = null'>
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="admin-actions-row">
+                                            <button class="edit-btn action-btn icon-only"
+                                                    @onclick='() => NavigationManager.NavigateTo($"/admin/venues/edit/{v.Id}")'
+                                                    title="Editar" aria-label="Editar">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
+                                            <button class="danger action-btn icon-only"
+                                                    @onclick="() => ToggleActive(v)"
+                                                    title="@(v.IsActive ? "Desativar" : "Ativar")"
+                                                    aria-label="@(v.IsActive ? "Desativar" : "Ativar")">
+                                                <i class="fas @(v.IsActive ? "fa-ban" : "fa-check")"></i>
+                                            </button>
+                                            <button class="danger-btn action-btn icon-only"
+                                                    @onclick='() => { confirmDeleteId = v.Id; deleteError = string.Empty; }'
+                                                    title="Remover" aria-label="Remover">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -107,6 +129,11 @@
                     <button type="button" @onclick="NextPage" disabled="@(currentPage >= TotalPages)">Próxima</button>
                 </div>
             </AdminDataState>
+
+            @if (!string.IsNullOrWhiteSpace(deleteError))
+            {
+                <p class="validation-message" style="margin-top:0.75rem">@deleteError</p>
+            }
         </article>
     </section>
 
@@ -123,6 +150,8 @@
     private List<Venue> filtered = new();
     private bool        isLoading = true;
     private int         currentPage = 1;
+    private int?        confirmDeleteId;
+    private string      deleteError = string.Empty;
 
     private string  filterName  = string.Empty;
     private string  filterType  = string.Empty;
@@ -183,6 +212,32 @@
 
     private void PrevPage() { if (currentPage > 1) currentPage--; }
     private void NextPage() { if (currentPage < TotalPages) currentPage++; }
+
+    private async Task DeleteVenue(int id)
+    {
+        confirmDeleteId = null;
+        deleteError     = string.Empty;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var venue = await db.Venues
+            .Include(v => v.Events)
+            .FirstOrDefaultAsync(v => v.Id == id);
+
+        if (venue is null) return;
+
+        if (venue.Events.Count > 0)
+        {
+            deleteError = $"\"{venue.Name}\" possui {venue.Events.Count} evento(s) vinculado(s) e não pode ser removida.";
+            return;
+        }
+
+        db.Venues.Remove(venue);
+        await db.SaveChangesAsync();
+        await LogService.AuditAsync("venue.deleted", "Venue", id.ToString(), $"Quadra removida: {venue.Name}");
+
+        all.RemoveAll(v => v.Id == id);
+        ApplyFilter();
+    }
 
     private static string VenueTypeLabel(VenueType t) => t switch
     {

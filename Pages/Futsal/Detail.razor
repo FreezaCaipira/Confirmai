@@ -14,6 +14,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject Confirmai.Services.EventNotificationService NotificationService
+@inject IConfiguration Config
 
 <PageTitle>@(ev?.Group?.Name ?? "Partida") · Confirmai</PageTitle>
 
@@ -117,75 +118,183 @@ else
                 }
             </div>
 
+            @* ── Mapa da quadra ───────────────────────────────────────── *@
+            @{
+                // Prefer venue name + city for the map query — more reliable than raw address.
+                var mapAddr = ev.Venue is not null
+                    ? $"{ev.Venue.Name}, {ev.Venue.City}, {ev.Venue.StateCode}, Brasil"
+                    : ev.Location;
+
+                var mapsKey = Config["Google:MapsApiKey"];
+                var hasMapsKey = !string.IsNullOrWhiteSpace(mapsKey) && !mapsKey!.Contains("SET_VIA");
+            }
+            @if (!string.IsNullOrWhiteSpace(mapAddr))
+            {
+                var mapsSearchUrl = $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(mapAddr)}";
+                <section class="detail-section">
+                    <h2 class="detail-section-title">
+                        <i class="fas fa-map-marker-alt"></i> Localização
+                    </h2>
+                    @if (hasMapsKey)
+                    {
+                        <div class="detail-map-wrap">
+                            <iframe
+                                class="detail-map"
+                                src="@($"https://www.google.com/maps/embed/v1/place?key={mapsKey}&q={Uri.EscapeDataString(mapAddr)}&language=pt-BR")"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                allowfullscreen
+                                title="Localização da quadra">
+                            </iframe>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="detail-map-placeholder" href="@mapsSearchUrl" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <span class="detail-map-placeholder-name">@(ev.Venue?.Name ?? mapAddr)</span>
+                                @if (ev.Venue is not null)
+                                {
+                                    <span class="detail-map-placeholder-addr">@ev.Venue.Address · @ev.Venue.City/@ev.Venue.StateCode</span>
+                                }
+                            </div>
+                            <i class="fas fa-external-link-alt detail-map-placeholder-ext"></i>
+                        </a>
+                    }
+                    <a class="detail-map-link"
+                       href="@mapsSearchUrl"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        <i class="fas fa-external-link-alt"></i> Abrir no Google Maps
+                    </a>
+                </section>
+            }
+
             @* ── Jogadores ────────────────────────────────────────────── *@
             <section class="detail-section">
                 <h2 class="detail-section-title">Jogadores confirmados</h2>
 
-                @if (ev.MaxGoalkeepers > 0)
-                {
-                    <div class="players-group-header">
-                        <span class="players-label">Linha</span>
-                        <span class="players-count @(isFullOut ? "is-full" : "")">
-                            @confirmedOut / @maxOut
-                        </span>
-                    </div>
+                @{
+                    var outFieldPlayers = ev.Confirmations
+                        .Where(c => c.Position != FutsalPosition.Goalkeeper)
+                        .OrderBy(c => c.ConfirmedAt)
+                        .ToList();
+                    int outFieldSlots = maxOut > 0 ? maxOut : outFieldPlayers.Count;
+                    bool canConfirm = ev.IsActive && currentUserId is not null && userConf is null;
                 }
 
-                <ol class="players-list">
-                    @{
-                        var outFieldPlayers = ev.Confirmations
-                            .Where(c => c.Position != FutsalPosition.Goalkeeper)
-                            .OrderBy(c => c.ConfirmedAt)
-                            .ToList();
-                        int outFieldSlots = maxOut > 0 ? maxOut : outFieldPlayers.Count;
-                        int outIdx = 0;
-                        foreach (var c in outFieldPlayers)
-                        {
-                            outIdx++;
-                            bool isWaitlist = maxOut > 0 && outIdx > maxOut;
-                            <li class="player-item @(isWaitlist ? "player-item--waitlist" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
-                                <span class="player-num">@outIdx</span>
-                                <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
-                                @if (isWaitlist) { <span class="player-tag">fila</span> }
-                                @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
-                            </li>
-                        }
-                        for (int i = outIdx + 1; i <= outFieldSlots; i++)
-                        {
-                            <li class="player-item player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
-                        }
-                    }
-                </ol>
-
                 @if (ev.MaxGoalkeepers > 0)
                 {
-                    <div class="players-group-header" style="margin-top:1rem">
-                        <span class="players-label">🥅 Goleiros</span>
-                        <span class="players-count @(isFullGk ? "is-full" : "")">
-                            @confirmedGk / @ev.MaxGoalkeepers
-                        </span>
+                    <div class="players-group">
+                        <div class="players-group-header">
+                            <span class="players-label">⚽ Linha</span>
+                            <span class="players-count @(isFullOut ? "is-full" : "")">
+                                @confirmedOut / @maxOut
+                            </span>
+                        </div>
+                        <ol class="players-list">
+                            @{
+                                int outIdx = 0;
+                                foreach (var c in outFieldPlayers)
+                                {
+                                    outIdx++;
+                                    bool isWaitlist = maxOut > 0 && outIdx > maxOut;
+                                    <li class="player-item @(isWaitlist ? "player-item--waitlist" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                        <span class="player-num">@outIdx</span>
+                                        <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
+                                        @if (isWaitlist) { <span class="player-tag">fila</span> }
+                                        @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
+                                    </li>
+                                }
+                                for (int i = outIdx + 1; i <= outFieldSlots; i++)
+                                {
+                                    if (canConfirm)
+                                    {
+                                        <li class="player-item player-item--slot">
+                                            <span class="player-num">@i</span>
+                                            <button class="player-slot-btn" @onclick="() => ConfirmAs(FutsalPosition.Outfield)">+ confirmar</button>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="player-item player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
+                                    }
+                                }
+                            }
+                        </ol>
                     </div>
+
+                    <div class="players-group" style="margin-top:0.75rem">
+                        <div class="players-group-header">
+                            <span class="players-label">🥅 Goleiros</span>
+                            <span class="players-count @(isFullGk ? "is-full" : "")">
+                                @confirmedGk / @ev.MaxGoalkeepers
+                            </span>
+                        </div>
+                        <ol class="players-list">
+                            @{
+                                var gkPlayers = ev.Confirmations
+                                    .Where(c => c.Position == FutsalPosition.Goalkeeper)
+                                    .OrderBy(c => c.ConfirmedAt)
+                                    .ToList();
+                                int gkIdx = 0;
+                                foreach (var c in gkPlayers)
+                                {
+                                    gkIdx++;
+                                    bool isWaitlist = gkIdx > ev.MaxGoalkeepers!.Value;
+                                    <li class="player-item @(isWaitlist ? "player-item--waitlist" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                        <span class="player-num">@gkIdx</span>
+                                        <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Goleiro")</span>
+                                        @if (isWaitlist) { <span class="player-tag">fila</span> }
+                                        @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
+                                    </li>
+                                }
+                                for (int i = gkIdx + 1; i <= ev.MaxGoalkeepers!.Value; i++)
+                                {
+                                    if (canConfirm)
+                                    {
+                                        <li class="player-item player-item--slot">
+                                            <span class="player-num">@i</span>
+                                            <button class="player-slot-btn player-slot-btn--gk" @onclick="() => ConfirmAs(FutsalPosition.Goalkeeper)">+ confirmar</button>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="player-item player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
+                                    }
+                                }
+                            }
+                        </ol>
+                    </div>
+                }
+                else
+                {
                     <ol class="players-list">
                         @{
-                            var gkPlayers = ev.Confirmations
-                                .Where(c => c.Position == FutsalPosition.Goalkeeper)
-                                .OrderBy(c => c.ConfirmedAt)
-                                .ToList();
-                            int gkIdx = 0;
-                            foreach (var c in gkPlayers)
+                            int outIdx = 0;
+                            foreach (var c in outFieldPlayers)
                             {
-                                gkIdx++;
-                                bool isWaitlist = gkIdx > ev.MaxGoalkeepers!.Value;
-                                <li class="player-item @(isWaitlist ? "player-item--waitlist" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
-                                    <span class="player-num">@gkIdx</span>
-                                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Goleiro")</span>
-                                    @if (isWaitlist) { <span class="player-tag">fila</span> }
+                                outIdx++;
+                                <li class="player-item @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                    <span class="player-num">@outIdx</span>
+                                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
                                     @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
                                 </li>
                             }
-                            for (int i = gkIdx + 1; i <= ev.MaxGoalkeepers!.Value; i++)
+                            for (int i = outIdx + 1; i <= outFieldSlots; i++)
                             {
-                                <li class="player-item player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
+                                if (canConfirm)
+                                {
+                                    <li class="player-item player-item--slot">
+                                        <span class="player-num">@i</span>
+                                        <button class="player-slot-btn" @onclick="() => ConfirmAs(FutsalPosition.Outfield)">+ confirmar</button>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="player-item player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
+                                }
                             }
                         }
                     </ol>
@@ -215,34 +324,6 @@ else
                             Cancelar confirmação
                         </button>
                     </div>
-                }
-                else
-                {
-                    @if (ev.MaxGoalkeepers > 0)
-                    {
-                        <div class="position-choice">
-                            <p class="position-label">Confirmar como:</p>
-                            <div class="position-btns">
-                                <button class="confirm-btn @(chosenPos == FutsalPosition.Outfield ? "confirm-btn--active" : "")"
-                                        @onclick='() => chosenPos = FutsalPosition.Outfield'>
-                                    ⚽ Linha @(isFullOut ? "(fila)" : "")
-                                </button>
-                                <button class="confirm-btn confirm-btn--gk @(chosenPos == FutsalPosition.Goalkeeper ? "confirm-btn--active" : "")"
-                                        @onclick='() => chosenPos = FutsalPosition.Goalkeeper'>
-                                    🥅 Goleiro @(isFullGk ? "(fila)" : "")
-                                </button>
-                            </div>
-                            <button class="confirm-submit-btn" @onclick="ConfirmPresence">
-                                Confirmar presença
-                            </button>
-                        </div>
-                    }
-                    else
-                    {
-                        <button class="confirm-btn confirm-btn--full-width" @onclick="ConfirmPresence">
-                            @(isFullOut ? "Entrar na fila" : "Confirmar presença") ✓
-                        </button>
-                    }
                 }
 
                 @if (!string.IsNullOrWhiteSpace(actionError))
@@ -292,6 +373,12 @@ else
     {
         if (currentUserId is null || ev is null) return false;
         return ev.CreatedByUserId == currentUserId;
+    }
+
+    private async Task ConfirmAs(FutsalPosition pos)
+    {
+        chosenPos = pos;
+        await ConfirmPresence();
     }
 
     private async Task ConfirmPresence()

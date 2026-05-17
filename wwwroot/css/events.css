@@ -1,4 +1,4 @@
-/* ================================================================
+﻿/* ================================================================
    EVENTS.CSS — Shared styles for event create/detail pages
    (Futsal + Poker)
 
@@ -12,10 +12,10 @@
 .detail-not-found {
     text-align: center;
     padding: 4rem 1rem;
-    color: #64748b;
+    color: #6082a0;
 }
 
-.detail-not-found h2 { color: #94a3b8; margin-bottom: 0.75rem; }
+.detail-not-found h2 { color: #8aacc8; margin-bottom: 0.75rem; }
 .detail-not-found a  { color: #60a5fa; font-size: 0.9rem; }
 
 /* ── Detail page shell ───────────────────────────────────────────── */
@@ -28,8 +28,9 @@
 .detail-card {
     width: 100%;
     max-width: 680px;
-    background: #141e2b;
-    border: 1px solid #162438;
+    background: #0f1923;
+    border: 1px solid #1b3868;
+    border-top: 2px solid #1a5298;
     border-radius: 16px;
     padding: 1.75rem 1.5rem;
     display: flex;
@@ -57,14 +58,14 @@
 
 .detail-localname {
     font-size: 0.85rem;
-    color: #64748b;
+    color: #8aacc8;
     margin: 0;
     font-style: italic;
 }
 
 .detail-location {
     font-size: 0.85rem;
-    color: #4e6a80;
+    color: #7a9ab8;
     margin: 0;
     display: flex;
     align-items: center;
@@ -83,9 +84,9 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.82rem;
-    color: #94a3b8;
+    color: #8aacc8;
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 20px;
     padding: 0.3rem 0.75rem;
 }
@@ -104,9 +105,9 @@
     gap: 0.4rem;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #94a3b8;
+    color: #8aacc8;
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 8px;
     padding: 0.35rem 0.85rem;
     text-decoration: none;
@@ -142,7 +143,7 @@
 
 .cancel-confirm-block span {
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 /* ── Cancelled banner ────────────────────────────────────────────── */
@@ -171,12 +172,19 @@
 .detail-section { display: flex; flex-direction: column; gap: 0.5rem; }
 
 .detail-section-title {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #475569;
-    margin: 0;
+    letter-spacing: 0.06em;
+    color: #4f9cf8;
+    margin: 0 0 0.25rem;
+}
+
+/* ── Players group container ─────────────────────────────────────── */
+.players-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
 /* ── Players group header ────────────────────────────────────────── */
@@ -184,25 +192,30 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 0.35rem;
+    padding: 0.42rem 0.85rem;
+    background: #0a1928;
+    border: 1px solid #1a5298;
+    border-radius: 8px 8px 0 0;
+    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .players-label {
-    font-size: 0.8rem;
+    font-size: 0.73rem;
     font-weight: 700;
-    color: #64748b;
+    color: #4f9cf8;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
 }
 
 .players-count {
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     color: #4ade80;
     font-weight: 700;
-    background: #14290f;
+    background: #0a2018;
     border: 1px solid #14532d;
-    border-radius: 12px;
-    padding: 0.1rem 0.6rem;
+    border-radius: 10px;
+    padding: 0.08rem 0.55rem;
 }
 
 .players-count.is-full {
@@ -211,41 +224,89 @@
     border-color: #7f1d1d;
 }
 
-/* ── Players list ────────────────────────────────────────────────── */
+/* ── Players list ─────────────────────────────────────────────────── */
 .players-list {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0;
+    border: 1px solid #1b3d6c;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Connected to group header: square top corners, blue border */
+.players-group .players-list {
+    border-top: none;
+    border-color: #1a5298;
+    border-radius: 0 0 8px 8px;
 }
 
 .player-item {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    padding: 0.45rem 0.75rem;
-    border-radius: 8px;
+    padding: 0.48rem 0.85rem;
+    border-radius: 0;
     background: #0d1825;
-    border: 1px solid #162438;
+    border: none;
+    border-bottom: 1px solid #0f1f30;
 }
 
-.player-item--me        { border-color: #22c55e; background: #0a1e10; }
-.player-item--waitlist  { opacity: 0.6; }
-.player-item--empty     { border-style: dashed; opacity: 0.35; }
+.players-list .player-item:last-child { border-bottom: none; }
+
+/* zebra: even rows clearly darker */
+.players-list .player-item:nth-child(even) { background: #060d16; }
+
+.player-item--me {
+    background: #091a0f !important;
+    box-shadow: inset 3px 0 0 #22c55e;
+}
+
+.player-item--waitlist { opacity: 0.65; }
+/* empty decorative slots — no bg override so zebra applies */
+.player-item--empty    { opacity: 0.38; }
+/* clickable vacant slot */
+.player-item--slot {
+    background: #0b1b2d;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+.player-item--slot:hover { background: #0e2438; }
+.players-list .player-item--slot:nth-child(even) { background: #08131e; }
+.players-list .player-item--slot:nth-child(even):hover { background: #0d1e2e; }
 
 .player-num {
     width: 1.5rem;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #334155;
+    color: #7aaccc;
     text-align: right;
     flex-shrink: 0;
 }
 
-.player-name        { flex: 1; font-size: 0.9rem; color: #cbd5e1; }
-.player-slot-empty  { flex: 1; color: #334155; }
+.player-name        { flex: 1; font-size: 0.9rem; color: #e2e8f0; font-weight: 500; }
+.player-slot-empty  { flex: 1; color: #2e5575; font-size: 0.85rem; }
+
+/* inline slot confirm button */
+.player-slot-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #2d7a52;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: left;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.13s;
+    letter-spacing: 0.01em;
+}
+.player-slot-btn:hover   { color: #4ade80; }
+.player-slot-btn--gk     { color: #2d5a90; }
+.player-slot-btn--gk:hover { color: #60a5fa; }
 
 .player-tag {
     font-size: 0.7rem;
@@ -290,7 +351,7 @@
 .confirm-btn--active     { box-shadow: 0 0 0 2px #4ade80; }
 
 .position-choice { display: flex; flex-direction: column; gap: 0.65rem; }
-.position-label  { font-size: 0.82rem; color: #64748b; margin: 0; }
+.position-label  { font-size: 0.82rem; color: #6082a0; margin: 0; }
 .position-btns   { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .position-btns .confirm-btn { flex: 1; min-width: 140px; }
 
@@ -345,13 +406,25 @@
 }
 
 .detail-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     font-size: 0.82rem;
-    color: #475569;
+    font-weight: 500;
+    color: #7eb3d4;
+    background: #0d1825;
+    border: 1px solid #1b3d6c;
+    border-radius: 20px;
+    padding: 0.35rem 0.9rem;
     text-decoration: none;
-    transition: color 0.14s;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 
-.detail-back a:hover { color: #94a3b8; }
+.detail-back a:hover {
+    color: #deeeff;
+    border-color: #3b6ea8;
+    background: #111e30;
+}
 
 /* ── Create event page shell ─────────────────────────────────────── */
 .create-event-page {
@@ -364,7 +437,7 @@
 
 .create-event-card {
     background: #0f1923;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 16px;
     padding: 2rem 2.25rem;
     width: 100%;
@@ -416,12 +489,12 @@
 .form-group label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #94a3b8;
+    color: #8aacc8;
 }
 
 .form-group .input {
     background: #111927;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 8px;
     color: #f1f5f9;
     padding: 0.5rem 0.75rem;
@@ -444,21 +517,21 @@
 .input-prefix-wrap {
     display: flex;
     align-items: stretch;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 8px;
     overflow: hidden;
     background: #111927;
 }
 
 .input-prefix {
-    background: #1c2a3b;
-    color: #64748b;
+    background: #1b3d6c;
+    color: #6082a0;
     padding: 0.5rem 0.75rem;
     font-size: 0.88rem;
     font-weight: 700;
     display: flex;
     align-items: center;
-    border-right: 1px solid #1c2a3b;
+    border-right: 1px solid #1b3d6c;
 }
 
 .input-prefix-wrap .input { border: none; border-radius: 0; flex: 1; }
@@ -488,8 +561,8 @@
 
 .cancel-btn {
     background: transparent;
-    color: #64748b;
-    border: 1px solid #1c2a3b;
+    color: #6082a0;
+    border: 1px solid #1b3d6c;
     border-radius: 8px;
     padding: 0.55rem 1.1rem;
     font-weight: 600;
@@ -498,7 +571,7 @@
     transition: border-color 0.15s, color 0.15s;
 }
 
-.cancel-btn:hover { border-color: #4e95b8; color: #4e95b8; }
+.cancel-btn:hover { border-color: #4f9cf8; color: #4f9cf8; }
 
 .validation-summary { color: #f87171; font-size: 0.85rem; margin-bottom: 1rem; }
 .validation-message { color: #f87171; font-size: 0.8rem; }
@@ -514,3 +587,67 @@
 @media (max-width: 480px) {
     .form-row-2 { grid-template-columns: 1fr; }
 }
+
+/* ── Venue map embed ─────────────────────────────────────────────── */
+.detail-map-wrap {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #1b3d6c;
+    height: 230px;
+    background: #0a1422;
+}
+
+.detail-map {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+.detail-map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: #4f9cf8;
+    text-decoration: none;
+    margin-top: 0.4rem;
+    transition: color 0.14s;
+}
+
+.detail-map-link:hover {
+    color: #82bdd8;
+    text-decoration: underline;
+}
+
+/* Placeholder shown when no Maps API key is configured */
+.detail-map-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+    background: #0b1928;
+    border: 1px solid #1b3d6c;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.14s, background 0.14s;
+    cursor: pointer;
+}
+.detail-map-placeholder:hover { border-color: #4f9cf8; background: #0e2236; }
+.detail-map-placeholder > .fa-map-marker-alt {
+    font-size: 1.25rem;
+    color: #4f9cf8;
+    flex-shrink: 0;
+}
+.detail-map-placeholder > div { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; }
+.detail-map-placeholder-name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+.detail-map-placeholder-addr {
+    font-size: 0.78rem;
+    color: #6082a0;
+}
+.detail-map-placeholder-ext { font-size: 0.8rem; color: #4f9cf8; flex-shrink: 0; }

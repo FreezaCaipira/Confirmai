@@ -13,6 +13,7 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject LogService LogService
 
 <PageTitle>Minhas Quadras — Confirmai</PageTitle>
 
@@ -73,18 +74,45 @@
                                     }
                                 </td>
                                 <td data-label="Ações">
-                                    <div class="admin-actions-row">
-                                        <button class="edit-btn action-btn icon-only"
-                                                @onclick='() => NavigationManager.NavigateTo($"/venue-manager/venues/edit/{v.Id}")'
-                                                title="Editar" aria-label="Editar">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </button>
-                                    </div>
+                                    @if (confirmDeleteId == v.Id)
+                                    {
+                                        <div class="admin-actions-row" style="gap:0.4rem;align-items:center">
+                                            <span style="font-size:0.8rem;color:#f1f5f9;white-space:nowrap">Remover?</span>
+                                            <button class="danger-btn action-btn icon-only" title="Confirmar remoção"
+                                                    @onclick='() => DeleteVenue(v.Id)'>
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="cancel-btn action-btn icon-only" title="Cancelar"
+                                                    @onclick='() => confirmDeleteId = null'>
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="admin-actions-row">
+                                            <button class="edit-btn action-btn icon-only"
+                                                    @onclick='() => NavigationManager.NavigateTo($"/venue-manager/venues/edit/{v.Id}")'
+                                                    title="Editar" aria-label="Editar">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
+                                            <button class="danger-btn action-btn icon-only"
+                                                    @onclick='() => { confirmDeleteId = v.Id; deleteError = string.Empty; }'
+                                                    title="Remover" aria-label="Remover">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    }
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(deleteError))
+            {
+                <p class="validation-message" style="margin-top:0.75rem">@deleteError</p>
             }
         </article>
     </section>
@@ -93,7 +121,9 @@
 
 @code {
     private List<Venue> venues = new();
-    private bool isLoading = true;
+    private bool   isLoading     = true;
+    private int?   confirmDeleteId;
+    private string deleteError   = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -108,11 +138,11 @@
 
         await using var db = await DbFactory.CreateDbContextAsync();
 
-        // Admins see all venues; venue_managers see only theirs
+        // Admins see all venues; venue_managers see only their assigned venues
         var isAdmin = auth.User.IsInRole("admin");
         var query = db.Venues.AsNoTracking().AsQueryable();
         if (!isAdmin)
-            query = query.Where(v => v.CreatedByUserId == userId);
+            query = query.Where(v => v.VenueAdminUserId == userId);
 
         venues = await query.OrderBy(v => v.Name).ToListAsync();
         isLoading = false;
@@ -125,4 +155,40 @@
         VenueType.Campo   => "Campo",
         _                 => t.ToString()
     };
+
+    private async Task DeleteVenue(int id)
+    {
+        confirmDeleteId = null;
+        deleteError     = string.Empty;
+
+        var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var isAdmin = auth.User.IsInRole("admin");
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var venue = await db.Venues
+            .Include(v => v.Events)
+            .FirstOrDefaultAsync(v => v.Id == id);
+
+        if (venue is null) return;
+
+        if (!isAdmin && venue.VenueAdminUserId != userId)
+        {
+            deleteError = "Você não tem permissão para remover esta quadra.";
+            return;
+        }
+
+        if (venue.Events.Count > 0)
+        {
+            deleteError = $"\"{venue.Name}\" possui {venue.Events.Count} evento(s) vinculado(s) e não pode ser removida.";
+            return;
+        }
+
+        db.Venues.Remove(venue);
+        await db.SaveChangesAsync();
+        await LogService.AuditAsync("venue.deleted", "Venue", id.ToString(), $"Quadra removida: {venue.Name}", userId);
+
+        venues.RemoveAll(v => v.Id == id);
+    }
 }

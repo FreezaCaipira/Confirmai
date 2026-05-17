@@ -1,4 +1,4 @@
-/* ── Browse buttons (empty state) ───────────────────────────── */
+﻿/* ── Browse buttons (empty state) ───────────────────────────── */
 .my-conf-browse-btn {
     display: inline-flex;
     align-items: center;
@@ -57,13 +57,13 @@
     gap: 0.7rem;
     padding: 0.7rem 0.85rem;
     background: #0d1825;
-    border: 1px solid #162438;
+    border: 1px solid #1b3868;
     border-radius: 8px;
     transition: border-color 0.15s;
 }
 
 .my-conf-card:hover {
-    border-color: #1a5478;
+    border-color: #1a5ab0;
 }
 
 .my-conf-card--past {
@@ -128,7 +128,7 @@
 .my-conf-meta {
     margin: 0 0 0.12rem;
     font-size: 0.78rem;
-    color: #64748b;
+    color: #6082a0;
 }
 
 /* ── Actions ─────────────────────────────────────────────────── */
@@ -160,12 +160,12 @@
 
 .my-conf-btn--view {
     background: #0d1825;
-    color: #4e95b8;
-    border-color: #1c2a3b;
+    color: #4f9cf8;
+    border-color: #1b3d6c;
 }
 
 .my-conf-btn--view:hover {
-    border-color: #4e95b8;
+    border-color: #4f9cf8;
     color: #82bdd8;
 }
 

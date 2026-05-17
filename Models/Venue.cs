@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Confirmai.Enums;
 
 namespace Confirmai.Models
@@ -29,8 +30,16 @@ namespace Confirmai.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        /// <summary>Usuário que criou o registro (apenas auditoria).</summary>
         [StringLength(450)]
         public string? CreatedByUserId { get; set; }
+
+        /// <summary>Usuário responsável pela gestão desta quadra (opcional).</summary>
+        [StringLength(450)]
+        public string? VenueAdminUserId { get; set; }
+
+        [ForeignKey(nameof(VenueAdminUserId))]
+        public ApplicationUser? VenueAdmin { get; set; }
 
         public ICollection<Event> Events { get; set; } = new List<Event>();
         public ICollection<MatchSchedule> Schedules { get; set; } = new List<MatchSchedule>();

@@ -19,6 +19,8 @@
         <article class="entity-shell-card entity-shell-main">
             <h1 class="page-section-title">@T["AdminGateways.Title"]</h1>
             @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
             }
             else
             {

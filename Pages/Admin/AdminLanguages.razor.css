@@ -4,15 +4,15 @@
 .admin-security-shell .security-label,
 .admin-security-shell .security-input-grid label,
 .admin-security-shell .security-baseline-group h5 {
-    color: #64748b;
+    color: #6082a0;
 }
 
 .admin-security-shell .security-header h3 {
-    color: #daeaf8;
+    color: #deeeff;
     background: linear-gradient(180deg, #0f2a3f 0%, #0a1f30 100%);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
-    border-bottom: 1px solid #1c2a3b;
+    border-bottom: 1px solid #1b3d6c;
     text-shadow: none;
     font-family: var(--font-display);
     text-transform: uppercase;
@@ -25,26 +25,26 @@
 .admin-security-shell .security-toggle,
 .admin-security-shell .security-input-grid input,
 .admin-security-shell .security-input-grid select {
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .admin-security-shell .security-panel {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
 }
 
 .admin-security-shell .security-baseline-row {
-    border-bottom: 1px dashed #1c2a3b;
+    border-bottom: 1px dashed #1b3d6c;
 }
 
 .admin-security-shell .security-baseline-group {
-    border-top: 1px solid #1c2a3b;
+    border-top: 1px solid #1b3d6c;
 }
 
 .admin-security-shell .security-env-pill {
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
-    border: 1px solid #153d5a;
-    color: #daeaf8;
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
+    border: 1px solid #1a5298;
+    color: #deeeff;
 }
 
 .admin-security-shell .security-boolean-badge.on {
@@ -60,7 +60,7 @@
 }
 
 .admin-security-shell .security-toggle input[type="checkbox"] {
-    accent-color: #4e95b8;
+    accent-color: #4f9cf8;
 }
 
 /* --- Structural styles --- */
@@ -69,15 +69,15 @@
 .security-label,
 .security-input-grid label,
 .security-baseline-group h5 {
-    color: #64748b;
+    color: #6082a0;
 }
 
 .security-header h3 {
-    color: #daeaf8;
+    color: #deeeff;
     background: linear-gradient(180deg, #0f2a3f 0%, #0a1f30 100%);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
-    border-bottom: 1px solid #1c2a3b;
+    border-bottom: 1px solid #1b3d6c;
     text-shadow: none;
     font-family: var(--font-display);
     text-transform: uppercase;
@@ -90,26 +90,26 @@
 .security-toggle,
 .security-input-grid input,
 .security-input-grid select {
-    color: #daeaf8;
+    color: #deeeff;
 }
 
 .security-panel {
     background: #0d1825;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
 }
 
 .security-baseline-row {
-    border-bottom: 1px dashed #1c2a3b;
+    border-bottom: 1px dashed #1b3d6c;
 }
 
 .security-baseline-group {
-    border-top: 1px solid #1c2a3b;
+    border-top: 1px solid #1b3d6c;
 }
 
 .security-env-pill {
-    background: linear-gradient(180deg, #1a5478 0%, #0f3352 100%);
-    border: 1px solid #153d5a;
-    color: #daeaf8;
+    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
+    border: 1px solid #1a5298;
+    color: #deeeff;
 }
 
 .security-boolean-badge.on {
@@ -125,7 +125,7 @@
 }
 
 .security-toggle input[type="checkbox"] {
-    accent-color: #4e95b8;
+    accent-color: #4f9cf8;
 }
 
 @media (max-width: 980px) {

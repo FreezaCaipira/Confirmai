@@ -1,4 +1,4 @@
-/* ── Wrapper ─────────────────────────────── */
+﻿/* ── Wrapper ─────────────────────────────── */
 .event-listing {
     display: flex;
     flex-direction: column;
@@ -14,16 +14,16 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.82rem;
-    color: #64748b;
+    color: #6082a0;
 }
 
 .listing-pin {
-    color: #4e95b8;
+    color: #4f9cf8;
     flex-shrink: 0;
 }
 
 .listing-location-change {
-    color: #4e95b8;
+    color: #4f9cf8;
     text-decoration: none;
     font-weight: 600;
     margin-left: 0.15rem;
@@ -38,7 +38,7 @@
     display: flex;
     align-items: stretch;
     background: #111927;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 10px;
     overflow: hidden;
 }
@@ -46,7 +46,7 @@
 .date-nav {
     background: transparent;
     border: none;
-    color: #94a3b8;
+    color: #8aacc8;
     padding: 0.55rem 1.1rem;
     font-size: 1.4rem;
     line-height: 1;
@@ -64,8 +64,8 @@
 .date-display {
     background: transparent;
     border: none;
-    border-left: 1px solid #1c2a3b;
-    border-right: 1px solid #1c2a3b;
+    border-left: 1px solid #1b3d6c;
+    border-right: 1px solid #1b3d6c;
     color: #f1f5f9;
     padding: 0.55rem 1.5rem;
     font-size: 0.92rem;
@@ -85,8 +85,8 @@
     background: #0d1825;
     color: #f1f5f9;
     border: none;
-    border-left: 1px solid #1c2a3b;
-    border-right: 1px solid #1c2a3b;
+    border-left: 1px solid #1b3d6c;
+    border-right: 1px solid #1b3d6c;
     padding: 0.5rem 0.85rem;
     font-size: 0.9rem;
     outline: none;
@@ -96,7 +96,7 @@
 
 /* ── States ──────────────────────────────── */
 .listing-state {
-    color: #64748b;
+    color: #6082a0;
     font-size: 0.92rem;
     text-align: center;
     padding: 2.5rem 1rem;
@@ -112,9 +112,9 @@
 
 .btn-today {
     background: transparent;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     border-radius: 7px;
-    color: #94a3b8;
+    color: #8aacc8;
     padding: 0.35rem 1rem;
     font-size: 0.85rem;
     cursor: pointer;
@@ -122,8 +122,8 @@
 }
 
 .btn-today:hover {
-    border-color: #4e95b8;
-    color: #4e95b8;
+    border-color: #4f9cf8;
+    color: #4f9cf8;
 }
 
 /* ── Event list container ────────────────── */

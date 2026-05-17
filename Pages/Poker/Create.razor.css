@@ -1,4 +1,4 @@
-/* ── Reutiliza estilos do Create.razor.css do Futsal ── */
+﻿/* ── Reutiliza estilos do Create.razor.css do Futsal ── */
 /* As classes .create-event-page, .create-event-card, .form-section,
    .form-group, .form-row-2, .input, .form-hint, .required,
    .input-prefix-wrap, .input-prefix, .form-actions,
@@ -18,9 +18,9 @@
     min-width: 100px;
     padding: 0.55rem 0.75rem;
     border-radius: 8px;
-    border: 1px solid #1c2a3b;
+    border: 1px solid #1b3d6c;
     background: #111927;
-    color: #64748b;
+    color: #6082a0;
     font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
@@ -50,8 +50,8 @@
     padding: 0.35rem 0.85rem;
     border-radius: 20px;
     background: #111927;
-    border: 1px solid #1c2a3b;
-    color: #94a3b8;
+    border: 1px solid #1b3d6c;
+    color: #8aacc8;
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
