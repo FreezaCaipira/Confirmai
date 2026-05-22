@@ -218,9 +218,41 @@ else
                                         {
                                             @if (isAdmin)
                                             {
-                                                <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => AdminTogglePaid(c.Id)">
-                                                    <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
-                                                </button>
+                                                @if (confirmPayId == c.Id)
+                                                {
+                                                    <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
+                                                    <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => AdminTogglePaid(c.Id)">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button class="player-tag player-tag--admin-pay-no" type="button" @onclick="() => confirmPayId = null">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => confirmPayId = c.Id">
+                                                        <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
+                                                    </button>
+                                                }
+                                                @if (c.UserId != currentUserId)
+                                                {
+                                                    @if (confirmRemoveId == c.Id)
+                                                    {
+                                                        <span class="player-tag player-tag--remove-confirm">remover?</span>
+                                                        <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => AdminRemoveConfirmation(c.Id)">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        <button class="player-tag player-tag--admin-remove-no" type="button" @onclick="() => confirmRemoveId = null">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => confirmRemoveId = c.Id">
+                                                            <i class="fas fa-user-times"></i> remover
+                                                        </button>
+                                                    }
+                                                }
                                             }
                                             else
                                             {
@@ -273,7 +305,7 @@ else
                                 <button class="slot-ctrl-btn slot-ctrl-btn--remove"
                                         disabled="@(maxOut <= minInfo.MinOutfield || maxOut <= confirmedOut)"
                                         @onclick="AdminRemoveOutfieldSlot">
-                                    <i class="fas fa-minus"></i>
+                                    <i class="fas fa-minus"></i> Remover vaga de linha
                                 </button>
                                 <button class="add-slot-row" @onclick="AdminAddOutfieldSlot">
                                     <i class="fas fa-plus"></i> Adicionar vaga de linha
@@ -311,6 +343,25 @@ else
                                                 <i class="fas fa-user-times"></i> cancelar
                                             </button>
                                         }
+                                        @if (isAdmin && c.UserId != currentUserId)
+                                        {
+                                            @if (confirmRemoveId == c.Id)
+                                            {
+                                                <span class="player-tag player-tag--remove-confirm">remover?</span>
+                                                <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => AdminRemoveConfirmation(c.Id)">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="player-tag player-tag--admin-remove-no" type="button" @onclick="() => confirmRemoveId = null">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => confirmRemoveId = c.Id">
+                                                    <i class="fas fa-user-times"></i> remover
+                                                </button>
+                                            }
+                                        }
                                     </li>
                                 }
                                 for (int i = gkIdx + 1; i <= ev.MaxGoalkeepers!.Value; i++)
@@ -342,7 +393,7 @@ else
                                 <button class="slot-ctrl-btn slot-ctrl-btn--remove"
                                         disabled="@(ev.MaxGoalkeepers!.Value <= minInfo.MinGoalkeepers || ev.MaxGoalkeepers!.Value <= confirmedGk)"
                                         @onclick="AdminRemoveGoalkeeperSlot">
-                                    <i class="fas fa-minus"></i>
+                                    <i class="fas fa-minus"></i> Remover vaga de goleiro
                                 </button>
                                 <button class="add-slot-row add-slot-row--gk" @onclick="AdminAddGoalkeeperSlot">
                                     <i class="fas fa-plus"></i> Adicionar vaga de goleiro
@@ -368,9 +419,41 @@ else
                                     {
                                         @if (isAdmin)
                                         {
-                                            <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => AdminTogglePaid(c.Id)">
-                                                <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
-                                            </button>
+                                            @if (confirmPayId == c.Id)
+                                            {
+                                                <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
+                                                <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => AdminTogglePaid(c.Id)">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="player-tag player-tag--admin-pay-no" type="button" @onclick="() => confirmPayId = null">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => confirmPayId = c.Id">
+                                                    <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
+                                                </button>
+                                            }
+                                            @if (c.UserId != currentUserId)
+                                            {
+                                                @if (confirmRemoveId == c.Id)
+                                                {
+                                                    <span class="player-tag player-tag--remove-confirm">remover?</span>
+                                                    <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => AdminRemoveConfirmation(c.Id)">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button class="player-tag player-tag--admin-remove-no" type="button" @onclick="() => confirmRemoveId = null">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => confirmRemoveId = c.Id">
+                                                        <i class="fas fa-user-times"></i> remover
+                                                    </button>
+                                                }
+                                            }
                                         }
                                         else
                                         {
@@ -432,7 +515,7 @@ else
                             <button class="slot-ctrl-btn slot-ctrl-btn--remove"
                                     disabled="@(maxOut <= minInfo.MinOutfield || maxOut <= confirmedOut)"
                                     @onclick="AdminRemoveOutfieldSlot">
-                                <i class="fas fa-minus"></i>
+                                <i class="fas fa-minus"></i> Remover vaga
                             </button>
                             <button class="add-slot-row" @onclick="AdminAddOutfieldSlot">
                                 <i class="fas fa-plus"></i> Adicionar vaga
@@ -536,6 +619,8 @@ else
     private FutsalPosition chosenPos      = FutsalPosition.Outfield;
     private string      actionError       = string.Empty;
     private bool        isSystemAdmin     = false;
+    private int?        confirmRemoveId   = null;
+    private int?        confirmPayId      = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -617,6 +702,19 @@ else
         if (conf is null) return;
         conf.HasPaid = !conf.HasPaid;
         await db.SaveChangesAsync();
+        confirmPayId = null;
+        await LoadEvent();
+    }
+
+    private async Task AdminRemoveConfirmation(int confirmationId)
+    {
+        if (!IsGroupAdmin()) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var conf = await db.EventConfirmations.FindAsync(confirmationId);
+        if (conf is null) return;
+        db.EventConfirmations.Remove(conf);
+        await db.SaveChangesAsync();
+        confirmRemoveId = null;
         await LoadEvent();
     }
 
