@@ -1,3 +1,4 @@
+using Confirmai.Enums;
 using Confirmai.Models;
 
 namespace Confirmai.Shared.Helpers;
@@ -15,4 +16,16 @@ public static class EventAccess
         => ev is not null
            && !string.IsNullOrEmpty(userId)
            && ev.CreatedByUserId == userId;
+
+    /// <summary>
+    /// Returns true when <paramref name="userId"/> is the event creator
+    /// OR has <see cref="GroupMemberRole.Admin"/> in the event's group.
+    /// Requires <c>ev.Group.Members</c> to be loaded.
+    /// </summary>
+    public static bool IsAdmin(Event? ev, string? userId)
+    {
+        if (ev is null || string.IsNullOrEmpty(userId)) return false;
+        if (ev.CreatedByUserId == userId) return true;
+        return ev.Group?.Members.Any(m => m.UserId == userId && m.Role == GroupMemberRole.Admin) == true;
+    }
 }

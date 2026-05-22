@@ -1,0 +1,207 @@
+@page "/pagamento/evento/{ConfirmationId:int}"
+
+@attribute [Authorize]
+
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using System.Globalization
+@using System.Security.Claims
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>Pagamento — Confirmai</PageTitle>
+
+<div class="entity-shell">
+    <section class="entity-shell-grid" aria-label="Pagamento de partida">
+        <article class="entity-shell-card entity-shell-main">
+
+            @if (isLoading)
+            {
+                <p class="listing-state">Carregando…</p>
+            }
+            else if (conf is null)
+            {
+                <div class="evpay-not-found">
+                    <p>Confirmação não encontrada.</p>
+                    <a href="/" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+                </div>
+            }
+            else
+            {
+                var ev       = conf.Event;
+                var isFutsal = ev.Sport == Sport.Futsal;
+                var backUrl  = isFutsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
+                var ptBr     = new CultureInfo("pt-BR");
+
+                @* ── Cabeçalho ─────────────────────────────────────────── *@
+                <div class="evpay-header">
+                    <div class="evpay-header-top">
+                        <span class="evpay-sport-badge">@(isFutsal ? "⚽ Futsal" : "🃏 Poker")</span>
+                        <a href="@backUrl" class="detail-back-link">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                    <h1 class="evpay-title">@ev.Group.Name</h1>
+                    <p class="evpay-meta">
+                        <i class="fas fa-calendar-alt"></i>
+                        @ev.StartsAt.ToLocalTime().ToString("dddd, dd/MM/yyyy 'às' HH:mm", ptBr)
+                    </p>
+                    @if (!string.IsNullOrWhiteSpace(ev.Location))
+                    {
+                        <p class="evpay-meta"><i class="fas fa-map-marker-alt"></i> @ev.Location</p>
+                    }
+                </div>
+
+                @* ── Resumo do pagamento ────────────────────────────────── *@
+                <div class="evpay-summary-card">
+                    <div class="evpay-summary-row">
+                        <span class="evpay-summary-label">Jogador</span>
+                        <span class="evpay-summary-value">@(conf.User?.FullName ?? conf.User?.UserName ?? "—")</span>
+                    </div>
+                    <div class="evpay-summary-row">
+                        <span class="evpay-summary-label">Posição</span>
+                        <span class="evpay-summary-value">
+                            @(conf.Position == FutsalPosition.Goalkeeper ? "🥅 Goleiro" : "⚽ Linha")
+                        </span>
+                    </div>
+                    <div class="evpay-summary-divider"></div>
+                    <div class="evpay-summary-row evpay-summary-row--total">
+                        <span class="evpay-summary-label">Valor a pagar</span>
+                        <span class="evpay-summary-amount">R$ @ev.Price!.Value.ToString("N2", ptBr)</span>
+                    </div>
+                </div>
+
+                @* ── Status / Ação ──────────────────────────────────────── *@
+                @if (conf.HasPaid)
+                {
+                    <div class="evpay-status evpay-status--paid">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Pagamento confirmado</strong>
+                            <p>Sua participação está garantida. Boa partida!</p>
+                        </div>
+                    </div>
+                    <a href="@backUrl" class="evpay-action-btn evpay-action-btn--back">
+                        <i class="fas fa-arrow-left"></i> Voltar para a partida
+                    </a>
+                }
+                else
+                {
+                    @* ── Métodos de pagamento ─────────────────────────── *@
+                    <div class="evpay-methods">
+                        <h2 class="evpay-methods-title">Forma de pagamento</h2>
+                        <div class="evpay-method-list">
+                            <label class="evpay-method-option @(selectedMethod == "pix" ? "evpay-method-option--selected" : "")">
+                                <input type="radio" name="method" value="pix" @onchange='() => selectedMethod = "pix"' checked="@(selectedMethod == "pix")" />
+                                <span class="evpay-method-icon">💠</span>
+                                <span class="evpay-method-name">Pix</span>
+                                <span class="evpay-method-badge">Instantâneo</span>
+                            </label>
+                            <label class="evpay-method-option evpay-method-option--disabled" title="Em breve">
+                                <input type="radio" name="method" value="btcpay" disabled />
+                                <span class="evpay-method-icon">₿</span>
+                                <span class="evpay-method-name">BtcPay</span>
+                                <span class="evpay-method-badge evpay-method-badge--soon">Em breve</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(errorMsg))
+                    {
+                        <p class="evpay-error">@errorMsg</p>
+                    }
+
+                    @* ── Botão de confirmação (mock) ───────────────────── *@
+                    <button class="evpay-action-btn evpay-action-btn--pay"
+                            disabled="@isProcessing"
+                            @onclick="ProcessPayment">
+                        @if (isProcessing)
+                        {
+                            <span>Processando…</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-lock"></i>
+                            <span>Pagar R$ @ev.Price.Value.ToString("N2", ptBr)</span>
+                        }
+                    </button>
+                    <p class="evpay-disclaimer">
+                        <i class="fas fa-info-circle"></i>
+                        Integração com gateway de pagamento em implementação.
+                    </p>
+                }
+            }
+
+        </article>
+    </section>
+</div>
+
+@code {
+    [Parameter] public int ConfirmationId { get; set; }
+
+    private EventConfirmation? conf;
+    private bool   isLoading    = true;
+    private bool   isProcessing = false;
+    private string errorMsg     = string.Empty;
+    private string selectedMethod = "pix";
+    private string userId = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        userId   = auth.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        conf = await db.EventConfirmations
+            .Include(c => c.Event).ThenInclude(e => e.Group)
+            .Include(c => c.User)
+            .FirstOrDefaultAsync(c => c.Id == ConfirmationId && c.UserId == userId);
+
+        // Redirecionar se não tem preço ou é goleiro
+        if (conf is not null && (conf.Event.Price is null || conf.Position == FutsalPosition.Goalkeeper))
+        {
+            var backUrl = conf.Event.Sport == Sport.Futsal
+                ? $"/futsal/{conf.Event.Id}"
+                : $"/poker/{conf.Event.Id}";
+            NavigationManager.NavigateTo(backUrl);
+            return;
+        }
+
+        isLoading = false;
+    }
+
+    private async Task ProcessPayment()
+    {
+        if (conf is null) return;
+        isProcessing = true;
+        errorMsg     = string.Empty;
+
+        try
+        {
+            // TODO: integrar gateway (AbacatePay / BtcPay / Pix)
+            // Por enquanto, mock: marca como pago diretamente
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var entity = await db.EventConfirmations.FindAsync(conf.Id);
+            if (entity is null) { errorMsg = "Confirmação não encontrada."; return; }
+
+            entity.HasPaid = true;
+            await db.SaveChangesAsync();
+
+            conf.HasPaid = true; // atualiza local para mostrar status pago
+        }
+        catch
+        {
+            errorMsg = "Erro ao processar pagamento. Tente novamente.";
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+}

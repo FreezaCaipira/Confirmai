@@ -30,11 +30,6 @@
         <input asp-for="Input.ConfirmPassword" autocomplete="new-password" />
         <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
     </div>
-    <div>
-        <label asp-for="Input.PixKey">Chave PIX (opcional)</label>
-        <input asp-for="Input.PixKey" autocomplete="off" placeholder="CPF, e-mail, telefone, aleatoria..." />
-        <span asp-validation-for="Input.PixKey" class="text-danger"></span>
-    </div>
     <button type="submit">@T["Nav.Register"]</button>
 </form>
 

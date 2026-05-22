@@ -205,6 +205,11 @@
 .meta-chip--players { border-color: #2d1a4a; color: #c4b5fd; }
 .meta-chip--gtd     { border-color: #14532d; color: #4ade80; font-weight: 700; }
 .meta-chip--latereg { border-color: #78350f; color: #fbbf24; }
+.meta-chip--confirmed { background: rgba(22, 163, 74, 0.12); border-color: rgba(74, 222, 128, 0.35); color: #4ade80; font-weight: 700; }
+
+.event-card--confirmed {
+    box-shadow: 0 2px 10px rgba(22, 163, 74, 0.15), 0 0 0 1px rgba(74, 222, 128, 0.08);
+}
 
 .event-bonus {
     font-size: 0.8rem;

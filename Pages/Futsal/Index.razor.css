@@ -81,10 +81,18 @@
     min-width: 0;
 }
 
+.event-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.2rem;
+}
+
 .event-name {
+    margin: 0;
     font-size: 1rem;
     font-weight: 700;
-    margin: 0 0 0.2rem;
     color: #f1f5f9;
     font-family: inherit;
     text-shadow: none;
@@ -135,6 +143,19 @@
 .meta-chip--gk {
     border-color: #1a3040;
     color: #7ec8e3;
+}
+
+.meta-chip--confirmed {
+    background: rgba(22, 163, 74, 0.12);
+    border-color: rgba(74, 222, 128, 0.35);
+    color: #4ade80;
+    font-weight: 700;
+}
+
+/* ── Confirmed card highlight ────────────── */
+.event-card--confirmed {
+    border-left-color: #4ade80;
+    box-shadow: 0 2px 10px rgba(22, 163, 74, 0.15), 0 0 0 1px rgba(74, 222, 128, 0.08);
 }
 
 /* ── Action button ───────────────────────── */

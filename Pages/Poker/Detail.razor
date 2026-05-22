@@ -33,7 +33,7 @@ else
     var isHomeGame  = ev.PokerEventType == PokerEventType.HomeGame;
     var isUnlocked  = !isHomeGame || homeGameUnlocked;
     var userConf    = currentUserId is not null ? ev.Confirmations.FirstOrDefault(c => c.UserId == currentUserId) : null;
-    var isAdmin     = EventAccess.IsCreator(ev, currentUserId);
+    var isAdmin     = EventAccess.IsAdmin(ev, currentUserId);
 
     <div class="detail-page">
         <div class="detail-card">
@@ -387,8 +387,10 @@ else
         await using var db = await DbFactory.CreateDbContextAsync();
         ev = await db.Events
             .Include(e => e.Group)
+                .ThenInclude(g => g.Members)
             .Include(e => e.Confirmations)
                 .ThenInclude(c => c.User)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Poker);
         isLoading = false;
     }

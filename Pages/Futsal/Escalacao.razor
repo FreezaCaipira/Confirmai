@@ -40,17 +40,19 @@ else
     <div class="esc-page">
         <div class="esc-card">
             <header class="esc-header">
-                <a class="esc-back-link" href="/futsal/@ev.Id">← @ev.Group.Name</a>
-                <h1 class="esc-title">
-                    @if (ev.LineupConfirmedAt is null)
-                    {
-                        <span>Montar Escalação</span>
-                    }
-                    else
-                    {
-                        <span>Escalação</span>
-                    }
-                </h1>
+                <div class="esc-header-top">
+                    <h1 class="esc-title">
+                        @if (ev.LineupConfirmedAt is null)
+                        {
+                            <span>Montar Escalação</span>
+                        }
+                        else
+                        {
+                            <span>Escalação</span>
+                        }
+                    </h1>
+                    <a class="detail-back-link" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar à partida</a>
+                </div>
                 <p class="esc-date">
                     <i class="fas fa-calendar-alt"></i>
                     @ev.StartsAt.ToString("dd/MM/yyyy HH:mm")
@@ -233,8 +235,8 @@ else
                 }
 
                 <div class="esc-draft-actions">
-                    <button class="esc-btn esc-btn--secondary" @onclick="Randomize">
-                        <i class="fas fa-random"></i> Randomizar
+                    <button class="esc-btn esc-btn--shuffle" @onclick="Randomize">
+                        <i class="fas fa-dice fa-lg"></i> Embaralhar jogadores de linha
                     </button>
                     <button class="esc-btn esc-btn--primary" @onclick="() => showConfirmModal = true">
                         <i class="fas fa-check"></i> Confirmar escalação
@@ -294,10 +296,12 @@ else
         await using var db = await DbFactory.CreateDbContextAsync();
         ev = await db.Events
             .Include(e => e.Group)
+                .ThenInclude(g => g.Members)
             .Include(e => e.Confirmations)
                 .ThenInclude(c => c.User)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
-        isAdmin = EventAccess.IsCreator(ev, currentUserId);
+        isAdmin = EventAccess.IsAdmin(ev, currentUserId);
         isLoading = false;
     }
 
@@ -409,8 +413,47 @@ else
 
     private async Task ShareOnWhatsApp()
     {
-        var url = $"https://wa.me/?text={Uri.EscapeDataString(BuildShareText())}";
+        var url = $"https://wa.me/?text={Uri.EscapeDataString(BuildWhatsAppText())}";
         await JS.InvokeVoidAsync("open", url, "_blank", "noopener,noreferrer");
+    }
+
+    private string BuildWhatsAppText()
+    {
+        if (ev is null) return string.Empty;
+
+        var sb = new StringBuilder();
+        var teamAConfs   = ev.Confirmations.Where(c => c.TeamId == 0).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
+        var teamBConfs   = ev.Confirmations.Where(c => c.TeamId == 1).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
+        var reservaConfs = ev.Confirmations.Where(c => c.TeamId == null).OrderBy(c => c.ConfirmedAt).ToList();
+
+        sb.AppendLine($"*Escalação — {ev.Group.Name}*");
+        sb.AppendLine(ev.StartsAt.ToString("dd/MM/yyyy HH:mm"));
+        sb.AppendLine();
+
+        sb.AppendLine("*TIME A*");
+        foreach (var c in teamAConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
+            sb.AppendLine($"(Goleiro) {c.User.FullName ?? c.User.Email}");
+        int i = 1;
+        foreach (var c in teamAConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
+            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
+        sb.AppendLine();
+
+        sb.AppendLine("*TIME B*");
+        foreach (var c in teamBConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
+            sb.AppendLine($"(Goleiro) {c.User.FullName ?? c.User.Email}");
+        i = 1;
+        foreach (var c in teamBConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
+            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
+
+        if (reservaConfs.Any())
+        {
+            sb.AppendLine();
+            sb.AppendLine("*Reservas*");
+            foreach (var c in reservaConfs)
+                sb.AppendLine($"- {c.User.FullName ?? c.User.Email}");
+        }
+
+        return sb.ToString().TrimEnd();
     }
 
     private string BuildShareText()

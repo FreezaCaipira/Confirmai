@@ -1,0 +1,234 @@
+/* ── Not found ───────────────────────────────────────────────── */
+.evpay-not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    color: var(--ci-text-muted, #8aacc8);
+    text-align: center;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.evpay-header {
+    margin-bottom: 1.25rem;
+}
+
+.evpay-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+}
+
+.evpay-sport-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #22c55e;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 20px;
+    padding: 0.2rem 0.7rem;
+}
+
+.evpay-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--ci-text, #e2e8f0);
+    margin: 0 0 0.35rem;
+}
+
+.evpay-meta {
+    font-size: 0.83rem;
+    color: var(--ci-text-muted, #8aacc8);
+    margin: 0 0 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* ── Summary card ────────────────────────────────────────────── */
+.evpay-summary-card {
+    background: var(--ci-bg-card-deep, #0d1825);
+    border: 1px solid var(--ci-border, #1b3868);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1.25rem;
+}
+
+.evpay-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.35rem 0;
+    font-size: 0.88rem;
+}
+
+.evpay-summary-label {
+    color: var(--ci-text-muted, #8aacc8);
+}
+
+.evpay-summary-value {
+    color: var(--ci-text, #e2e8f0);
+    font-weight: 500;
+}
+
+.evpay-summary-divider {
+    height: 1px;
+    background: var(--ci-border, #1b3868);
+    margin: 0.4rem 0;
+}
+
+.evpay-summary-row--total {
+    padding-top: 0.5rem;
+}
+
+.evpay-summary-amount {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #4ade80;
+}
+
+/* ── Status pago ─────────────────────────────────────────────── */
+.evpay-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.evpay-status--paid {
+    background: rgba(22,163,74,0.1);
+    border: 1px solid rgba(74,222,128,0.25);
+    color: #4ade80;
+}
+
+.evpay-status--paid i { font-size: 1.4rem; margin-top: 0.1rem; }
+.evpay-status--paid strong { display: block; font-size: 0.95rem; margin-bottom: 0.2rem; }
+.evpay-status--paid p { margin: 0; font-size: 0.82rem; color: #86efac; }
+
+/* ── Métodos de pagamento ────────────────────────────────────── */
+.evpay-methods { margin-bottom: 1.1rem; }
+
+.evpay-methods-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ci-text-muted, #8aacc8);
+    margin: 0 0 0.6rem;
+}
+
+.evpay-method-list {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.evpay-method-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    border: 1.5px solid var(--ci-border, #1b3868);
+    border-radius: 10px;
+    background: var(--ci-bg-card-deep, #0d1825);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+}
+
+.evpay-method-option input[type="radio"] { display: none; }
+
+.evpay-method-option--selected {
+    border-color: #3b82f6;
+    background: rgba(59,130,246,0.08);
+}
+
+.evpay-method-option--disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.evpay-method-icon { font-size: 1.1rem; }
+
+.evpay-method-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ci-text, #e2e8f0);
+}
+
+.evpay-method-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 8px;
+    background: rgba(34,197,94,0.12);
+    color: #4ade80;
+    border: 1px solid rgba(74,222,128,0.25);
+}
+
+.evpay-method-badge--soon {
+    background: rgba(148,163,184,0.1);
+    color: #94a3b8;
+    border-color: rgba(148,163,184,0.2);
+}
+
+/* ── Botões de ação ──────────────────────────────────────────── */
+.evpay-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    text-decoration: none !important;
+    transition: filter 0.15s;
+    margin-bottom: 0.5rem;
+}
+
+.evpay-action-btn--pay {
+    background: #16a34a;
+    color: #fff;
+}
+.evpay-action-btn--pay:hover:not(:disabled) { filter: brightness(1.1); }
+.evpay-action-btn--pay:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.evpay-action-btn--back {
+    background: var(--ci-bg-card-deep, #0d1825);
+    color: var(--ci-text-muted, #8aacc8);
+    border: 1px solid var(--ci-border, #1b3868);
+}
+.evpay-action-btn--back:hover { filter: brightness(1.1); }
+
+/* ── Disclaimer ──────────────────────────────────────────────── */
+.evpay-disclaimer {
+    font-size: 0.75rem;
+    color: var(--ci-text-subtle, #4a6785);
+    text-align: center;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+/* ── Error ───────────────────────────────────────────────────── */
+.evpay-error {
+    font-size: 0.82rem;
+    color: #f87171;
+    background: #290f0f;
+    border: 1px solid #7f1d1d;
+    border-radius: 8px;
+    padding: 0.5rem 0.8rem;
+    margin-bottom: 0.75rem;
+}

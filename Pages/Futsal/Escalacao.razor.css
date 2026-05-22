@@ -32,15 +32,17 @@
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
 
-.esc-back-link {
-    display: inline-block;
-    font-size: .85rem;
-    color: var(--accent, #22c55e);
-    text-decoration: none;
-    margin-bottom: .5rem;
-    transition: opacity .15s;
+.esc-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: .25rem;
 }
-.esc-back-link:hover { opacity: .75; }
+
+.esc-header-top .esc-title {
+    margin: 0;
+}
 
 .esc-title {
     font-size: 1.6rem;
@@ -175,6 +177,13 @@
     margin-top: 1.25rem;
 }
 
+.esc-draft-actions .esc-btn {
+    padding: .75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    gap: .55rem;
+}
+
 /* ── Buttons ────────────────────────────────────────────────────────────── */
 
 .esc-btn {
@@ -201,6 +210,16 @@
 .esc-btn--secondary {
     background: rgba(255,255,255,.1);
     color: var(--text, #e5e7eb);
+}
+
+.esc-btn--shuffle {
+    background: rgba(139, 92, 246, .18);
+    border: 1px solid rgba(139, 92, 246, .35);
+    color: #c4b5fd;
+}
+.esc-btn--shuffle:not(:disabled):hover {
+    background: rgba(139, 92, 246, .28);
+    filter: none;
 }
 
 .esc-btn--whatsapp {

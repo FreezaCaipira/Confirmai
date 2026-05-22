@@ -21,6 +21,9 @@ namespace Confirmai.Models
         public int? TeamId { get; set; }
 
         public DateTime ConfirmedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>Linha players only. Set to true when payment is confirmed (gateway TBD).</summary>
+        public bool HasPaid { get; set; }
     }
 
     public enum FutsalPosition

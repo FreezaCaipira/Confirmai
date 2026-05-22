@@ -19,9 +19,12 @@
 
 <div class="create-event-page">
     <div class="create-event-card">
-        <h1 class="create-event-title">
-            <i class="fas fa-futbol"></i> Editar Partida
-        </h1>
+        <div class="create-event-card-top">
+            <h1 class="create-event-title">
+                <i class="fas fa-futbol"></i> Editar Partida
+            </h1>
+            <a href="/futsal/@Id" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+        </div>
 
         @if (isLoading)
         {
@@ -55,14 +58,16 @@
                     <div class="form-group">
                         <label>Nome da partida <span class="required">*</span></label>
                         <InputText class="input" @bind-Value="form.GroupName"
-                                   placeholder='Ex: "Rachão da Galera do Zé", "Pelada de Quinta"' />
+                                   placeholder='Ex: "Rachão da Galera do Zé", "Pelada de Quinta"'
+                                   autocomplete="off" />
                         <ValidationMessage For="@(() => form.GroupName)" class="validation-message" />
                     </div>
 
                     <div class="form-group">
                         <label>Como vocês chamam o jogo na sua região?</label>
                         <InputText class="input" @bind-Value="form.LocalName"
-                                   placeholder='racha, pelada, baba, rachão…' maxlength="60" />
+                                   placeholder='racha, pelada, baba, rachão…' maxlength="60"
+                                   autocomplete="off" />
                         <small class="form-hint">Opcional — aparece nos cards para identificar o estilo da região.</small>
                     </div>
                 </fieldset>
@@ -135,16 +140,20 @@
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Nº de jogadores <span class="required">*</span></label>
-                            <InputNumber class="input" @bind-Value="form.MaxPlayers" min="4" max="100" />
+                            <label>Jogadores de linha <span class="required">*</span></label>
+                            <InputNumber class="input" @bind-Value="form.MaxPlayers" min="1" max="100" />
                             <ValidationMessage For="@(() => form.MaxPlayers)" class="validation-message" />
                         </div>
                         <div class="form-group">
-                            <label>Nº de goleiros</label>
-                            <InputNumber class="input" @bind-Value="form.MaxGoalkeepers" min="0" max="10" />
-                            <small class="form-hint">Deixe 0 se não há vaga separada para goleiros.</small>
+                            <label>Goleiros</label>
+                            <InputNumber class="input" @bind-Value="form.MaxGoalkeepers" min="0" max="10" disabled="@form.RotateInGoal" />
                         </div>
                     </div>
+
+                    <label class="switch-label" style="margin-top:.5rem">
+                        <input type="checkbox" @bind="form.RotateInGoal" @bind:after="OnRotateInGoalChanged" />
+                        Revezar jogadores de linha no gol
+                    </label>
                 </fieldset>
 
                 @* ── Valor ───────────────────────────────────────────────────── *@
@@ -168,14 +177,35 @@
                 }
 
                 <div class="form-actions">
-                    <button class="cancel-btn" type="button"
-                            @onclick='() => NavigationManager.NavigateTo($"/futsal/{Id}")'>
-                        Cancelar
-                    </button>
+                    @if (ev?.IsActive == true)
+                    {
+                        @if (!showCancelConfirm)
+                        {
+                            <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                                    @onclick="() => showCancelConfirm = true">
+                                <i class="fas fa-ban"></i> Cancelar partida
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="cancel-confirm-block">
+                                <span>Tem certeza? Todos os confirmados serão avisados.</span>
+                                <button class="detail-admin-btn" type="button"
+                                        @onclick="() => showCancelConfirm = false">Não</button>
+                                <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                                        @onclick="CancelEvent">Sim, cancelar</button>
+                            </div>
+                        }
+                    }
                     <button class="save-btn" type="submit" disabled="@isSaving">
                         @(isSaving ? "Salvando…" : "Salvar alterações")
                     </button>
                 </div>
+
+                @if (!string.IsNullOrWhiteSpace(cancelError))
+                {
+                    <p class="validation-message">@cancelError</p>
+                }
 
             </EditForm>
         }
@@ -203,23 +233,32 @@
 
         public int DurationMinutes { get; set; } = 90;
 
-        [Range(4, 100, ErrorMessage = "Mínimo 4 jogadores.")]
-        public int MaxPlayers { get; set; } = 14;
+        [Range(1, 100, ErrorMessage = "Mínimo 1 jogador.")]
+        public int MaxPlayers { get; set; } = 10;
 
         public int MaxGoalkeepers { get; set; } = 0;
+
+        public bool RotateInGoal { get; set; } = false;
+
+        public int PlayersPerSide { get; set; } = 5;
 
         [Range(0, 10000, ErrorMessage = "Valor inválido.")]
         public decimal Price { get; set; } = 0;
     }
 
-    private EditMatchForm form        = new();
-    private List<Venue>   venues      = new();
+    private EditMatchForm form             = new();
+    private List<Venue>   venues           = new();
     private Venue?        selectedVenue;
-    private bool          isLoading   = true;
-    private bool          notFound    = false;
-    private bool          accessDenied = false;
-    private bool          isSaving    = false;
-    private string        saveError   = string.Empty;
+    private Event?        ev;
+    private string?       currentUserId;
+    private bool          isSystemAdmin    = false;
+    private bool          isLoading        = true;
+    private bool          notFound         = false;
+    private bool          accessDenied     = false;
+    private bool          isSaving         = false;
+    private string        saveError        = string.Empty;
+    private bool          showCancelConfirm = false;
+    private string        cancelError      = string.Empty;
 
     private static readonly (int Min, string Label)[] DurationOptions =
     [
@@ -236,10 +275,12 @@
     {
         var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        currentUserId = userId;
+        isSystemAdmin = auth.User.IsInRole("admin");
 
         await using var db = await DbFactory.CreateDbContextAsync();
 
-        var ev = await db.Events
+        ev = await db.Events
             .Include(e => e.Group)
             .Include(e => e.Venue)
             .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
@@ -251,7 +292,7 @@
             return;
         }
 
-        if (ev.CreatedByUserId != userId)
+        if (ev.CreatedByUserId != userId && !isSystemAdmin)
         {
             accessDenied = true;
             isLoading    = false;
@@ -275,11 +316,19 @@
             DurationMinutes = ev.DurationMinutes ?? 90,
             MaxPlayers      = ev.MaxPlayers,
             MaxGoalkeepers  = ev.MaxGoalkeepers ?? 0,
+            RotateInGoal    = (ev.MaxGoalkeepers ?? 0) == 0,
+            PlayersPerSide  = ev.PlayersPerSide ?? 5,
             Price           = ev.Price ?? 0,
         };
 
         selectedVenue = venues.FirstOrDefault(v => v.Id == form.VenueId);
         isLoading = false;
+    }
+
+    private void OnRotateInGoalChanged()
+    {
+        if (form.RotateInGoal) form.MaxGoalkeepers = 0;
+        else if (form.MaxGoalkeepers == 0) form.MaxGoalkeepers = 2;
     }
 
     private void OnVenueChanged()
@@ -304,7 +353,7 @@
                 .Include(e => e.Group)
                 .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
 
-            if (ev is null || ev.CreatedByUserId != userId)
+            if (ev is null || (ev.CreatedByUserId != userId && !auth.User.IsInRole("admin")))
             {
                 saveError = "Acesso negado.";
                 isSaving  = false;
@@ -324,6 +373,7 @@
             ev.DurationMinutes = form.DurationMinutes;
             ev.MaxPlayers     = form.MaxPlayers;
             ev.MaxGoalkeepers = form.MaxGoalkeepers > 0 ? form.MaxGoalkeepers : null;
+            ev.PlayersPerSide = form.PlayersPerSide;
             ev.Price          = form.Price;
 
             await db.SaveChangesAsync();
@@ -334,6 +384,28 @@
         {
             saveError = $"Erro ao salvar: {ex.Message}";
             isSaving  = false;
+        }
+    }
+
+    private async Task CancelEvent()
+    {
+        cancelError = string.Empty;
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var dbEv = await db.Events.FirstOrDefaultAsync(e => e.Id == Id);
+            if (dbEv is null) return;
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (dbEv.CreatedByUserId != userId && !auth.User.IsInRole("admin")) return;
+            dbEv.IsActive = false;
+            await db.SaveChangesAsync();
+            await NotificationService.NotifyEventCancelledAsync(Id, userId!);
+            NavigationManager.NavigateTo($"/futsal/{Id}");
+        }
+        catch (Exception ex)
+        {
+            cancelError = $"Erro ao cancelar: {ex.Message}";
         }
     }
 

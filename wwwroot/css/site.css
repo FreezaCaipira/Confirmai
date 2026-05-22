@@ -3094,6 +3094,7 @@ body .oldsite-top-nav a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.35rem;
     padding: 0.25rem 1rem;
     color: #ffe6b6;
     text-decoration: none;
@@ -6090,16 +6091,22 @@ body .entity-shell-subtitle {
     opacity: 1;
 }
 
-/* Autofill do Chrome: impede fundo branco */
+/* Autofill + histórico do Chrome: neutraliza fundo e cor */
 .form-control:-webkit-autofill,
 .form-control:-webkit-autofill:hover,
 .form-control:-webkit-autofill:focus,
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px #121f30 inset !important;
-    -webkit-text-fill-color: #c8d8f0 !important;
-    caret-color: #c8d8f0;
-    border-color: #1b3d6c;
+input:-webkit-autofill:focus,
+input:autofill,
+input:autofill:hover,
+input:autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #111927 inset !important;
+    box-shadow: 0 0 0 1000px #111927 inset !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
+    color: #f1f5f9 !important;
+    caret-color: #f1f5f9;
+    border-color: #1b3d6c !important;
+    outline: none !important;
     transition: background-color 5000s ease-in-out 0s;
 }

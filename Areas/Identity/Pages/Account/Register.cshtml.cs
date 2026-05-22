@@ -56,9 +56,6 @@ namespace Confirmai.Areas.Identity.Pages.Account
             [DataType(DataType.Password)]
             [Compare("Password", ErrorMessage = "Passwords do not match.")]
             public string ConfirmPassword { get; set; } = string.Empty;
-
-            [StringLength(160)]
-            public string? PixKey { get; set; }
         }
 
         public void OnGet() { }
@@ -71,7 +68,6 @@ namespace Confirmai.Areas.Identity.Pages.Account
                 {
                     UserName = Input.Email,
                     Email = Input.Email,
-                    PixKey = string.IsNullOrWhiteSpace(Input.PixKey) ? null : Input.PixKey.Trim(),
                     MemberSince = DateTime.UtcNow
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);

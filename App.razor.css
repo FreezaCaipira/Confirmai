@@ -1,42 +1,44 @@
 ﻿.not-found-card {
     margin: 3rem auto;
     max-width: 480px;
-    background: var(--bg-slate);
-    color: #fff;
+    background: var(--ci-bg-card);
+    color: #f1f5f9;
+    border: 1px solid #1c3a54;
     border-radius: 16px;
-    box-shadow: 0 2px 16px #000a;
+    box-shadow: 0 2px 24px #000a;
     padding: 2.5rem 2rem;
     text-align: center;
 }
 
 .not-found-icon {
     font-size: 3rem;
-    color: #ff5252;
+    color: #f87171;
 }
 
 .not-found-title {
     margin: 1rem 0 0.5rem 0;
-    color: var(--gold);
+    color: var(--ci-accent);
 }
 
 .not-found-description {
-    color: #ccc;
+    color: #94a3b8;
     margin-bottom: 2rem;
+    line-height: 1.6;
 }
 
 .not-found-home-link {
     display: inline-block;
-    background: var(--gold);
-    color: var(--bg-slate);
-    font-weight: bold;
-    padding: 0.7rem 2rem;
+    background: var(--ci-accent-mid);
+    color: #fff;
+    font-weight: 700;
+    padding: 0.65rem 1.8rem;
     border-radius: 8px;
     text-decoration: none;
-    font-size: 1.2rem;
-    box-shadow: 0 2px 8px #0004;
-    transition: background 0.2s;
+    font-size: 1rem;
+    border: 1px solid var(--ci-accent);
+    transition: background 0.15s;
 }
 
 .not-found-home-link:hover {
-    background: #ffe066;
+    background: var(--ci-accent-dark);
 }

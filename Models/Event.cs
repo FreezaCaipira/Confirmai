@@ -31,6 +31,9 @@ namespace Confirmai.Models
 
         public int? MaxGoalkeepers { get; set; }
 
+        /// <summary>Jogadores por lado (5 = futsal, 7 = society, 11 = campo). Define corte entre titulares e revezamento.</summary>
+        public int? PlayersPerSide { get; set; }
+
         /// <summary>Como o jogo é chamado na região (racha, pelada, baba…)</summary>
         [StringLength(60)]
         public string? LocalName { get; set; }
