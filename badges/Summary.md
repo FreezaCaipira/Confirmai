@@ -2,8 +2,8 @@
 
 |||
 |:---|:---|
-| Generated on: | 05/27/2026 - 08:22:55 |
-| Coverage date: | 05/27/2026 - 08:22:50 |
+| Generated on: | 05/27/2026 - 21:06:58 |
+| Coverage date: | 05/27/2026 - 21:06:53 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 259 |
@@ -12,12 +12,12 @@
 | Covered lines: | 7017 |
 | Uncovered lines: | 80155 |
 | Coverable lines: | 87172 |
-| Total lines: | 106286 |
+| Total lines: | 106288 |
 | **Branch coverage:** | 26.5% (1353 of 5102) |
 | Covered branches: | 1353 |
 | Total branches: | 5102 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 12_26499670433 |
+| Tag: | 13_26538714607 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **7017** | **80155** | **87172** | **110798** | **8%** | **1353** | **5102** | **26.5%** |
+| **Confirmai** | **7017** | **80155** | **87172** | **110800** | **8%** | **1353** | **5102** | **26.5%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -172,7 +172,7 @@
 | Confirmai.Pages.Error | 0 | 3 | 3 | 15 | 0% | 0 | 0 |  |
 | Confirmai.Pages.Futsal.Create | 69 | 122 | 191 | 511 | 36.1% | 17 | 86 | 19.7% |
 | Confirmai.Pages.Futsal.Detail | 103 | 274 | 377 | 1001 | 27.3% | 83 | 444 | 18.6% |
-| Confirmai.Pages.Futsal.Edit | 81 | 86 | 167 | 454 | 48.5% | 26 | 86 | 30.2% |
+| Confirmai.Pages.Futsal.Edit | 81 | 86 | 167 | 455 | 48.5% | 26 | 86 | 30.2% |
 | Confirmai.Pages.Futsal.Escalacao | 41 | 181 | 222 | 540 | 18.4% | 25 | 174 | 14.3% |
 | Confirmai.Pages.Futsal.Index | 6 | 3 | 9 | 84 | 66.6% | 0 | 4 | 0% |
 | Confirmai.Pages.Futsal.Schedule.Edit | 0 | 101 | 101 | 318 | 0% | 0 | 34 | 0% |
@@ -192,7 +192,7 @@
 | Confirmai.Pages.Payment.ViewPayment | 0 | 120 | 120 | 319 | 0% | 0 | 94 | 0% |
 | Confirmai.Pages.Poker.Create | 0 | 189 | 189 | 607 | 0% | 0 | 102 | 0% |
 | Confirmai.Pages.Poker.Detail | 0 | 171 | 171 | 506 | 0% | 0 | 176 | 0% |
-| Confirmai.Pages.Poker.Edit | 0 | 171 | 171 | 545 | 0% | 0 | 88 | 0% |
+| Confirmai.Pages.Poker.Edit | 0 | 171 | 171 | 546 | 0% | 0 | 88 | 0% |
 | Confirmai.Pages.Poker.Index | 0 | 10 | 10 | 131 | 0% | 0 | 8 | 0% |
 | Confirmai.Pages.Product.Marketplace | 6 | 3 | 9 | 23 | 66.6% | 3 | 6 | 50% |
 | Confirmai.Pages.Product.ProductForm | 0 | 114 | 114 | 283 | 0% | 0 | 54 | 0% |
