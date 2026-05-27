@@ -17,7 +17,7 @@ public class GroupInviteCodeGenerationTests
             Name = "Grupo sem codigo",
             Sport = Sport.Futsal,
             CreatedByUserId = "u1",
-            InviteCode = null,
+            InviteCode = string.Empty,
         };
 
         db.Groups.Add(group);
