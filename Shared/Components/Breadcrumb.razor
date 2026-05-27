@@ -72,7 +72,10 @@
 
     private bool IsIdSegment(string s)
     {
-        return Guid.TryParse(s, out _) || long.TryParse(s, out _) || int.TryParse(s, out _);
+        if (Guid.TryParse(s, out _) || long.TryParse(s, out _) || int.TryParse(s, out _))
+            return true;
+        // invite codes: 8-char hex strings generated from GUID
+        return s.Length == 8 && s.All(c => (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
     }
 
     private string MapSegment(string s)
@@ -86,6 +89,9 @@
             "payments" => T["Breadcrumb.Payments"],
             "logs" => T["Breadcrumb.Logs"],
             "escalacao" => "Escalação",
+            "convite"   => "Convite",
+            "grupos"    => "Grupos",
+            "grupo"     => "Grupo",
             "edit" => T["Breadcrumb.Edit"],
             "view" => T["Breadcrumb.View"],
             "buy" => T["Breadcrumb.Buy"],

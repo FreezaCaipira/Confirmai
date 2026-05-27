@@ -228,4 +228,111 @@ public class EventNotificationServiceTests
         Assert.Contains("Data anterior", msg.Body);
         Assert.Contains("Nova data", msg.Body);
     }
+
+    // ── NotifyNewRecurringEventAsync ──────────────────────────────────────────
+
+    /// <summary>Seeds a group + event + GroupMembers (non-creator) for recurring-event tests.</summary>
+    private static (Group group, Event ev) SeedRecurringEvent(
+        AppDbContext db,
+        string creatorId,
+        params string[] memberIds)
+    {
+        var group = new Group { Name = "Racha Recorrente", Sport = Sport.Futsal };
+        db.Groups.Add(group);
+        db.SaveChanges();
+
+        var ev = new Event
+        {
+            GroupId         = group.Id,
+            Sport           = Sport.Futsal,
+            Location        = "Arena",
+            StartsAt        = DateTime.UtcNow.AddDays(7),
+            MaxPlayers      = 10,
+            CreatedByUserId = creatorId,
+            IsActive        = true,
+        };
+        db.Events.Add(ev);
+
+        // Creator always added as group member
+        if (!db.Users.Any(u => u.Id == creatorId))
+            db.Users.Add(new ApplicationUser { Id = creatorId, UserName = creatorId, Email = $"{creatorId}@test.com" });
+
+        db.GroupMembers.Add(new GroupMember { GroupId = group.Id, UserId = creatorId, Role = GroupMemberRole.Admin });
+
+        foreach (var uid in memberIds)
+        {
+            if (!db.Users.Any(u => u.Id == uid))
+                db.Users.Add(new ApplicationUser { Id = uid, UserName = uid, Email = $"{uid}@test.com" });
+
+            db.GroupMembers.Add(new GroupMember { GroupId = group.Id, UserId = uid, Role = GroupMemberRole.Member });
+        }
+
+        db.SaveChanges();
+        return (group, ev);
+    }
+
+    [Fact]
+    public async Task NotifyNewRecurringEventAsync_SendsMailbox_ToGroupMembers()
+    {
+        var (db, svc, _) = Build();
+        SeedRecurringEvent(db, creatorId: "creator-1", "member-1", "member-2");
+        var ev = db.Events.First();
+
+        await svc.NotifyNewRecurringEventAsync(ev.Id);
+
+        var messages = db.UserMailboxMessages.ToList();
+        Assert.Equal(2, messages.Count);
+        Assert.All(messages, m => Assert.Contains("[Confirmai] Nova partida:", m.Subject));
+    }
+
+    [Fact]
+    public async Task NotifyNewRecurringEventAsync_ExcludesCreator_FromRecipients()
+    {
+        var (db, svc, _) = Build();
+        SeedRecurringEvent(db, creatorId: "creator-1", "member-1");
+        var ev = db.Events.First();
+
+        await svc.NotifyNewRecurringEventAsync(ev.Id);
+
+        var messages = db.UserMailboxMessages.ToList();
+        Assert.Single(messages);
+        Assert.Equal("member-1", messages[0].RecipientUserId);
+        Assert.DoesNotContain(messages, m => m.RecipientUserId == "creator-1");
+    }
+
+    [Fact]
+    public async Task NotifyNewRecurringEventAsync_DoesNothing_WhenEventNotFound()
+    {
+        var (db, svc, _) = Build();
+
+        await svc.NotifyNewRecurringEventAsync(999999);
+
+        Assert.Empty(db.UserMailboxMessages);
+    }
+
+    [Fact]
+    public async Task NotifyNewRecurringEventAsync_DoesNothing_WhenNoOtherGroupMembers()
+    {
+        var (db, svc, _) = Build();
+        SeedRecurringEvent(db, creatorId: "creator-only"); // no other members
+        var ev = db.Events.First();
+
+        await svc.NotifyNewRecurringEventAsync(ev.Id);
+
+        Assert.Empty(db.UserMailboxMessages);
+    }
+
+    [Fact]
+    public async Task NotifyNewRecurringEventAsync_MessageBody_ContainsEventDetails()
+    {
+        var (db, svc, _) = Build();
+        SeedRecurringEvent(db, creatorId: "creator-1", "member-1");
+        var ev = db.Events.First();
+
+        await svc.NotifyNewRecurringEventAsync(ev.Id);
+
+        var msg = db.UserMailboxMessages.First();
+        Assert.Contains("Racha Recorrente", msg.Body);
+        Assert.Contains("Confirmai", msg.Body);
+    }
 }

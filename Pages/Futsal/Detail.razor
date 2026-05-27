@@ -10,12 +10,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
 
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject Confirmai.Services.EventNotificationService NotificationService
 @inject IConfiguration Config
+@inject IJSRuntime JS
 
 <PageTitle>@(ev?.Group?.Name ?? "Partida") · Confirmai</PageTitle>
 
@@ -38,6 +40,8 @@ else
     var isFullOut    = maxOut > 0 && confirmedOut >= maxOut;
     var isFullGk     = ev.MaxGoalkeepers > 0 && confirmedGk >= ev.MaxGoalkeepers;
     var userConf     = currentUserId is not null ? ev.Confirmations.FirstOrDefault(c => c.UserId == currentUserId) : null;
+    var userOnWaitlist = userWaitlistEntry is not null;
+    var isMember     = currentUserId is not null && ev.Group.Members.Any(m => m.UserId == currentUserId);
     var isAdmin      = IsGroupAdmin();
     var canEdit      = EventAccess.IsCreator(ev, currentUserId) || isSystemAdmin;
 
@@ -69,6 +73,10 @@ else
                         Organizado por <a href="/profile/@creatorUser.Id" class="detail-organizer-link">@(creatorUser.FullName ?? creatorUser.UserName)</a>
                     </p>
                 }
+                <p class="detail-group-ref">
+                    <i class="fas fa-users"></i>
+                    Abrir grupo: <a class="detail-group-link" href="/grupo/@ev.GroupId">@ev.Group.Name</a>
+                </p>
             </header>
 
             @if (!ev.IsActive)
@@ -180,21 +188,21 @@ else
 
             @* ── Jogadores ────────────────────────────────────────────── *@
             <section class="detail-section">
-                <h2 class="detail-section-title">Jogadores confirmados</h2>
-
                 @{
                     var outFieldPlayers = ev.Confirmations
                         .Where(c => c.Position != FutsalPosition.Goalkeeper)
                         .OrderBy(c => c.ConfirmedAt)
                         .ToList();
                     int outFieldSlots = maxOut > 0 ? maxOut : outFieldPlayers.Count;
-                    bool canConfirm = ev.IsActive && currentUserId is not null && userConf is null;
+                    bool canConfirm = ev.IsActive && currentUserId is not null && userConf is null && !userOnWaitlist
+                                      && (!ev.Group.IsPrivate || isMember);
                     int baseOut = ev.PlayersPerSide.HasValue ? (ev.PlayersPerSide.Value - 1) * 2 : ev.MaxPlayers;
                 }
 
                 @if (ev.MaxGoalkeepers > 0)
                 {
-                    <div class="players-group">
+                    <div class="players-groups-stack">
+                    <div class="players-group players-group--line">
                         <div class="players-group-header">
                             <span class="players-label">⚽ Linha</span>
                             <span class="players-count @(isFullOut ? "is-full" : "")">
@@ -207,12 +215,10 @@ else
                                 foreach (var c in outFieldPlayers)
                                 {
                                     outIdx++;
-                                    bool isWaitlist = maxOut > 0 && outIdx > maxOut;
-                                    bool isRotation = !isWaitlist && outIdx > baseOut;
-                                    <li class="player-item @(isWaitlist ? "player-item--waitlist" : isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                    bool isRotation = outIdx > baseOut;
+                                    <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
                                         <span class="player-num">@outIdx</span>
                                         <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
-                                        @if (isWaitlist) { <span class="player-tag">fila</span> }
                                         @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
                                         @if (ev.Price.HasValue)
                                         {
@@ -269,9 +275,28 @@ else
                                         }
                                         @if (ev.IsActive && c.UserId == currentUserId)
                                         {
-                                            <button class="player-tag player-tag--cancel" type="button" @onclick="CancelConfirmation">
-                                                <i class="fas fa-user-times"></i> cancelar
-                                            </button>
+                                            @if (c.HasPaid)
+                                            {
+                                                <span class="player-tag player-tag--cancel-blocked">
+                                                    <i class="fas fa-lock"></i> pago — contate a quadra
+                                                </span>
+                                            }
+                                            else if (confirmCancel)
+                                            {
+                                                <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
+                                                <button class="player-tag player-tag--cancel-yes" type="button" @onclick="CancelConfirmation">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => confirmCancel = false">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="player-tag player-tag--cancel" type="button" @onclick="() => confirmCancel = true">
+                                                    <i class="fas fa-user-times"></i> cancelar
+                                                </button>
+                                            }
                                         }
                                     </li>
                                 }
@@ -314,7 +339,7 @@ else
                         }
                     </div>
 
-                    <div class="players-group" style="margin-top:3rem">
+                    <div class="players-group players-group--gk">
                         <div class="players-group-header">
                             <span class="players-label">🥅 Goleiros</span>
                             <span class="players-count @(isFullGk ? "is-full" : "")">
@@ -331,17 +356,34 @@ else
                                 foreach (var c in gkPlayers)
                                 {
                                     gkIdx++;
-                                    bool isWaitlist = gkIdx > ev.MaxGoalkeepers!.Value;
-                                    <li class="player-item @(isWaitlist ? "player-item--waitlist" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                    <li class="player-item @(c.UserId == currentUserId ? "player-item--me" : "")">
                                         <span class="player-num">@gkIdx</span>
                                         <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Goleiro")</span>
-                                        @if (isWaitlist) { <span class="player-tag">fila</span> }
                                         @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
                                         @if (ev.IsActive && c.UserId == currentUserId)
                                         {
-                                            <button class="player-tag player-tag--cancel" type="button" @onclick="CancelConfirmation">
-                                                <i class="fas fa-user-times"></i> cancelar
-                                            </button>
+                                            @if (c.HasPaid)
+                                            {
+                                                <span class="player-tag player-tag--cancel-blocked">
+                                                    <i class="fas fa-lock"></i> pago — contate a quadra
+                                                </span>
+                                            }
+                                            else if (confirmCancel)
+                                            {
+                                                <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
+                                                <button class="player-tag player-tag--cancel-yes" type="button" @onclick="CancelConfirmation">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => confirmCancel = false">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="player-tag player-tag--cancel" type="button" @onclick="() => confirmCancel = true">
+                                                    <i class="fas fa-user-times"></i> cancelar
+                                                </button>
+                                            }
                                         }
                                         @if (isAdmin && c.UserId != currentUserId)
                                         {
@@ -400,6 +442,7 @@ else
                                 </button>
                             </div>
                         }
+                    </div>
                     </div>
                 }
                 else
@@ -479,9 +522,28 @@ else
                                     }
                                     @if (ev.IsActive && c.UserId == currentUserId)
                                     {
-                                        <button class="player-tag player-tag--cancel" type="button" @onclick="CancelConfirmation">
-                                            <i class="fas fa-user-times"></i> cancelar
-                                        </button>
+                                        @if (c.HasPaid)
+                                        {
+                                            <span class="player-tag player-tag--cancel-blocked">
+                                                <i class="fas fa-lock"></i> pago — contate a quadra
+                                            </span>
+                                        }
+                                        else if (confirmCancel)
+                                        {
+                                            <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
+                                            <button class="player-tag player-tag--cancel-yes" type="button" @onclick="CancelConfirmation">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => confirmCancel = false">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="player-tag player-tag--cancel" type="button" @onclick="() => confirmCancel = true">
+                                                <i class="fas fa-user-times"></i> cancelar
+                                            </button>
+                                        }
                                     }
                                 </li>
                             }
@@ -524,6 +586,56 @@ else
                     }
                 }
             </section>
+
+            @* ── Lista de espera ─────────────────────────────────────────── *@
+            @if (ev.WaitingList.Count > 0)
+            {
+                <hr class="detail-divider">
+                <section class="detail-section">
+                    <h2 class="detail-section-title"><i class="fas fa-clock"></i> Lista de espera (@ev.WaitingList.Count)</h2>
+                    <ol class="players-list">
+                        @{ int wIdx = 0; }
+                        @foreach (var w in ev.WaitingList.OrderBy(w => w.Position).ThenBy(w => w.JoinedAt))
+                        {
+                            wIdx++;
+                            <li class="player-item @(w.UserId == currentUserId ? "player-item--me" : "")">
+                                <span class="player-num">@wIdx</span>
+                                <span class="player-name">@(w.User?.FullName ?? w.User?.UserName ?? "Jogador")</span>
+                                @if (w.DesiredPosition == FutsalPosition.Goalkeeper) { <span class="player-tag">goleiro</span> }
+                                @if (w.UserId == currentUserId)
+                                {
+                                    <span class="player-tag player-tag--me">você</span>
+                                    @if (ev.IsActive)
+                                    {
+                                        @if (confirmLeaveWaitlist)
+                                        {
+                                            <span class="player-tag player-tag--cancel-confirm">sair da fila?</span>
+                                            <button class="player-tag player-tag--cancel-yes" type="button" @onclick="LeaveWaitlist">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => confirmLeaveWaitlist = false">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="player-tag player-tag--cancel" type="button" @onclick="() => confirmLeaveWaitlist = true">
+                                                <i class="fas fa-user-times"></i> sair da fila
+                                            </button>
+                                        }
+                                    }
+                                }
+                                @if (isAdmin && ev.IsActive && w.UserId != currentUserId)
+                                {
+                                    <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => AdminRemoveFromWaitlist(w.Id)">
+                                        <i class="fas fa-user-times"></i> remover
+                                    </button>
+                                }
+                            </li>
+                        }
+                    </ol>
+                </section>
+            }
 
             @* ── Banner: confirmado + pagamento ─────────────────────────── *@
             @if (userConf is not null)
@@ -569,6 +681,16 @@ else
                 </div>
             }
 
+            @if (ev.Group.IsPrivate && !isMember && ev.IsActive && currentUserId is not null && userConf is null && !userOnWaitlist)
+            {
+                <div class="detail-action">
+                    <div class="private-group-notice">
+                        <i class="fas fa-lock"></i>
+                        <span>Este grupo é privado. Peça o link de convite ao organizador para participar.</span>
+                    </div>
+                </div>
+            }
+
             @if (ev.LineupConfirmedAt is not null || isAdmin)
             {
                 <div class="detail-admin-bar detail-admin-bar--footer">
@@ -605,6 +727,7 @@ else
                     }
                 </div>
             }
+
         </div>
     </div>
 }
@@ -619,8 +742,11 @@ else
     private FutsalPosition chosenPos      = FutsalPosition.Outfield;
     private string      actionError       = string.Empty;
     private bool        isSystemAdmin     = false;
-    private int?        confirmRemoveId   = null;
-    private int?        confirmPayId      = null;
+    private int?        confirmRemoveId      = null;
+    private int?        confirmPayId         = null;
+    private bool        confirmCancel        = false;
+    private WaitingList? userWaitlistEntry   = null;
+    private bool        confirmLeaveWaitlist = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -640,10 +766,15 @@ else
             .Include(e => e.Venue)
             .Include(e => e.Confirmations)
                 .ThenInclude(c => c.User)
+            .Include(e => e.WaitingList)
+                .ThenInclude(w => w.User)
             .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
         if (ev?.CreatedByUserId is not null)
             creatorUser = await db.Users.FindAsync(ev.CreatedByUserId) as ApplicationUser;
+        userWaitlistEntry = currentUserId is not null
+            ? ev?.WaitingList.FirstOrDefault(w => w.UserId == currentUserId)
+            : null;
         isLoading = false;
     }
 
@@ -667,13 +798,51 @@ else
             .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
         if (existing is not null) { actionError = "Você já está confirmado."; return; }
 
-        db.EventConfirmations.Add(new EventConfirmation
+        // Avoid duplicate waitlist entry
+        var existingWait = await db.WaitingLists
+            .FirstOrDefaultAsync(w => w.EventId == Id && w.UserId == currentUserId);
+        if (existingWait is not null) { actionError = "Você já está na lista de espera."; return; }
+
+        // Re-check slot availability at DB level (not stale UI state)
+        var eventEntity = await db.Events
+            .Include(e => e.Confirmations)
+            .FirstOrDefaultAsync(e => e.Id == Id);
+        if (eventEntity is null) return;
+
+        bool isGk       = chosenPos == FutsalPosition.Goalkeeper;
+        int  currentGk  = eventEntity.Confirmations.Count(c => c.Position == FutsalPosition.Goalkeeper);
+        int  currentOut = eventEntity.Confirmations.Count(c => c.Position != FutsalPosition.Goalkeeper);
+        int  maxOutfield = eventEntity.MaxGoalkeepers.HasValue
+            ? eventEntity.MaxPlayers - eventEntity.MaxGoalkeepers.Value
+            : eventEntity.MaxPlayers;
+
+        bool slotFull = isGk
+            ? (eventEntity.MaxGoalkeepers > 0 && currentGk >= eventEntity.MaxGoalkeepers.Value)
+            : (maxOutfield > 0 && currentOut >= maxOutfield);
+
+        if (slotFull)
         {
-            EventId        = Id,
-            UserId         = currentUserId,
-            Position       = ev.MaxGoalkeepers > 0 ? chosenPos : FutsalPosition.Outfield,
-            ConfirmedAt    = DateTime.UtcNow,
-        });
+            var wCount = await db.WaitingLists.CountAsync(w => w.EventId == Id);
+            db.WaitingLists.Add(new WaitingList
+            {
+                EventId         = Id,
+                UserId          = currentUserId,
+                Position        = wCount + 1,
+                DesiredPosition = eventEntity.MaxGoalkeepers > 0 ? chosenPos : null,
+                JoinedAt        = DateTime.UtcNow,
+            });
+        }
+        else
+        {
+            db.EventConfirmations.Add(new EventConfirmation
+            {
+                EventId     = Id,
+                UserId      = currentUserId,
+                Position    = eventEntity.MaxGoalkeepers > 0 ? chosenPos : FutsalPosition.Outfield,
+                ConfirmedAt = DateTime.UtcNow,
+            });
+        }
+
         await db.SaveChangesAsync();
         await LoadEvent();
     }
@@ -688,10 +857,52 @@ else
             .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
         if (conf is not null)
         {
+            var position = conf.Position ?? FutsalPosition.Outfield;
             db.EventConfirmations.Remove(conf);
             await db.SaveChangesAsync();
+            await PromoteFromWaitlistAsync(db, position);
         }
+        confirmCancel = false;
         await LoadEvent();
+    }
+
+    private async Task LeaveWaitlist()
+    {
+        if (currentUserId is null) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var entry = await db.WaitingLists
+            .FirstOrDefaultAsync(w => w.EventId == Id && w.UserId == currentUserId);
+        if (entry is not null)
+        {
+            db.WaitingLists.Remove(entry);
+            await db.SaveChangesAsync();
+        }
+        confirmLeaveWaitlist = false;
+        await LoadEvent();
+    }
+
+    /// <summary>Promove o primeiro da lista de espera para a posição liberada.</summary>
+    private async Task PromoteFromWaitlistAsync(AppDbContext db, FutsalPosition position)
+    {
+        var next = await db.WaitingLists
+            .Where(w => w.EventId == Id &&
+                        (w.DesiredPosition == null || w.DesiredPosition == position))
+            .OrderBy(w => w.Position)
+            .ThenBy(w => w.JoinedAt)
+            .FirstOrDefaultAsync();
+        if (next is null) return;
+
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId     = Id,
+            UserId      = next.UserId,
+            Position    = position,
+            ConfirmedAt = DateTime.UtcNow,
+        });
+        db.WaitingLists.Remove(next);
+        await db.SaveChangesAsync();
+
+        _ = Task.Run(() => NotificationService.NotifyWaitlistPromotedAsync(Id, next.UserId));
     }
 
     private async Task AdminTogglePaid(int confirmationId)
@@ -712,9 +923,24 @@ else
         await using var db = await DbFactory.CreateDbContextAsync();
         var conf = await db.EventConfirmations.FindAsync(confirmationId);
         if (conf is null) return;
+        var position = conf.Position ?? FutsalPosition.Outfield;
         db.EventConfirmations.Remove(conf);
         await db.SaveChangesAsync();
+        await PromoteFromWaitlistAsync(db, position);
         confirmRemoveId = null;
+        await LoadEvent();
+    }
+
+    private async Task AdminRemoveFromWaitlist(int waitlistId)
+    {
+        if (!IsGroupAdmin()) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var entry = await db.WaitingLists.FindAsync(waitlistId);
+        if (entry is not null)
+        {
+            db.WaitingLists.Remove(entry);
+            await db.SaveChangesAsync();
+        }
         await LoadEvent();
     }
 
@@ -726,6 +952,7 @@ else
         if (evt is null) return;
         evt.MaxPlayers += 1;
         await db.SaveChangesAsync();
+        await PromoteFromWaitlistAsync(db, FutsalPosition.Outfield);
         await LoadEvent();
     }
 
@@ -752,6 +979,7 @@ else
         if (evt is null) return;
         evt.MaxGoalkeepers = (evt.MaxGoalkeepers ?? 0) + 1;
         await db.SaveChangesAsync();
+        await PromoteFromWaitlistAsync(db, FutsalPosition.Goalkeeper);
         await LoadEvent();
     }
 
@@ -769,4 +997,5 @@ else
         await db.SaveChangesAsync();
         await LoadEvent();
     }
+
 }

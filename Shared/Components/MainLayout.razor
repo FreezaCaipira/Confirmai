@@ -37,12 +37,9 @@
                     <a href="/"><i class="fas fa-search" aria-hidden="true"></i> Pesquisar</a>
                     <AuthorizeView>
                         <Authorized>
+                            <a href="/grupos"><i class="fas fa-users" aria-hidden="true"></i> Grupos</a>
                             <a href="/minhas-confirmacoes"><i class="fas fa-calendar-check" aria-hidden="true"></i> Meus Jogos</a>
                             <a href="/payments"><i class="fas fa-wallet" aria-hidden="true"></i> @T["Nav.Payments"]</a>
-                            @if (isEventOrganizer)
-                            {
-                                <a href="/meus-eventos"><i class="fas fa-clipboard-list" aria-hidden="true"></i> Organizar</a>
-                            }
                             <AuthorizeView Policy="ServerAdmin">
                             <Authorized Context="gmContext">
                                 <a href="/docs/integration">@T["Nav.Integration"]</a>

@@ -1,0 +1,168 @@
+@page "/grupos/criar"
+
+@attribute [Authorize]
+
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager              NavigationManager
+@inject AuthenticationStateProvider   AuthStateProvider
+
+<PageTitle>Criar Grupo — Confirmai</PageTitle>
+
+<div class="create-event-page">
+    <div class="create-event-card">
+        <h1 class="create-event-title">
+            <i class="fas fa-users"></i> Novo Grupo
+        </h1>
+
+        <EditForm Model="form" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="validation-summary" />
+
+            <fieldset class="form-section">
+                <legend>Identidade do Grupo</legend>
+
+                <div class="form-group">
+                    <label>Esporte <span class="required">*</span></label>
+                    <InputSelect class="input" @bind-Value="form.Sport">
+                        <option value="@Sport.Futsal">Futsal / Futebol</option>
+                        <option value="@Sport.Poker">Poker</option>
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label>Nome do grupo <span class="required">*</span></label>
+                    <InputText class="input" @bind-Value="form.Name"
+                               placeholder='@(form.Sport == Sport.Poker ? "Ex: \"Sierra Poker Club\"" : "Ex: \"Rachão de Terça\"")'
+                               autocomplete="off" />
+                    <ValidationMessage For="@(() => form.Name)" class="validation-message" />
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>Localização</legend>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Cidade <span class="required">*</span></label>
+                        <InputText class="input" @bind-Value="form.City" placeholder="São Paulo" />
+                        <ValidationMessage For="@(() => form.City)" class="validation-message" />
+                    </div>
+                    <div class="form-group">
+                        <label>UF <span class="required">*</span></label>
+                        <InputSelect class="input" @bind-Value="form.StateCode">
+                            <option value="">— Selecione —</option>
+                            <option value="EX">EX — Estrangeiro</option>
+                            <option disabled>──────────────────</option>
+                            @foreach (var uf in BrazilianStates)
+                            {
+                                <option value="@uf">@uf</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => form.StateCode)" class="validation-message" />
+                    </div>
+                </div>
+            </fieldset>
+
+
+            @if (!string.IsNullOrWhiteSpace(saveError))
+            {
+                <p class="validation-message">@saveError</p>
+            }
+
+            <div class="form-actions">
+                <button class="cancel-btn" type="button"
+                        @onclick='() => NavigationManager.NavigateTo("/grupos")'>
+                    Cancelar
+                </button>
+                <button class="save-btn" type="submit" disabled="@isSaving">
+                    @(isSaving ? "Criando…" : "Criar Grupo")
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private sealed class CreateGroupForm
+    {
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe o nome do grupo.")]
+        [System.ComponentModel.DataAnnotations.StringLength(120, ErrorMessage = "Máximo 120 caracteres.")]
+        public string Name { get; set; } = string.Empty;
+
+        public Sport Sport { get; set; } = Sport.Futsal;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe a cidade.")]
+        public string City { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Selecione a UF.")]
+        public string StateCode { get; set; } = string.Empty;
+
+        public bool IsPrivate { get; set; } = true;
+    }
+
+    private CreateGroupForm form      = new();
+    private bool            isSaving  = false;
+    private string          saveError = string.Empty;
+
+    private static readonly string[] BrazilianStates =
+        ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
+         "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+
+    private async Task Save()
+    {
+        isSaving  = true;
+        saveError = string.Empty;
+
+        try
+        {
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                saveError = "Você precisa estar autenticado.";
+                isSaving  = false;
+                return;
+            }
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+
+            var group = new Group
+            {
+                Name            = form.Name.Trim(),
+                Sport           = form.Sport,
+                City            = form.City.Trim(),
+                StateCode       = form.StateCode.Trim().ToUpperInvariant(),
+                IsActive        = true,
+                IsPrivate       = true,
+                CreatedByUserId = userId,
+                InviteCode      = Guid.NewGuid().ToString("N")[..8].ToUpper(),
+            };
+            db.Groups.Add(group);
+            await db.SaveChangesAsync();
+
+            db.GroupMembers.Add(new GroupMember
+            {
+                GroupId = group.Id,
+                UserId  = userId,
+                Role    = GroupMemberRole.Admin,
+            });
+            await db.SaveChangesAsync();
+
+            NavigationManager.NavigateTo($"/grupo/{group.Id}");
+        }
+        catch (Exception ex)
+        {
+            saveError = $"Erro ao criar grupo: {ex.Message}";
+            isSaving  = false;
+        }
+    }
+}

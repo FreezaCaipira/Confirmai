@@ -14,11 +14,18 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject Confirmai.Services.EventCollisionService EventCollisionService
 
 <PageTitle>Criar Evento · Poker · Confirmai</PageTitle>
 
 <div class="create-event-page">
     <div class="create-event-card">
+        @if (preselectedGroup is not null)
+        {
+            <p class="form-hint" style="margin-bottom:.5rem">
+                <i class="fas fa-users"></i> Evento para o grupo <strong>@preselectedGroup.Name</strong>
+            </p>
+        }
 
         @* ── Seleção de tipo ─────────────────────────────────────────────── *@
         <div class="poker-type-selector">
@@ -89,7 +96,15 @@
                     </div>
                     <div class="form-group">
                         <label>UF <span class="required">*</span></label>
-                        <InputText class="input" @bind-Value="form.StateCode" placeholder="SP" maxlength="2" />
+                        <InputSelect class="input" @bind-Value="form.StateCode">
+                            <option value="">— Selecione —</option>
+                            <option value="EX">EX — Estrangeiro</option>
+                            <option disabled>──────────────────</option>
+                            @foreach (var uf in BrazilianStates)
+                            {
+                                <option value="@uf">@uf</option>
+                            }
+                        </InputSelect>
                         <ValidationMessage For="@(() => form.StateCode)" class="validation-message" />
                     </div>
                 </div>
@@ -281,15 +296,20 @@
                     </div>
                 </div>
             }
-
             @if (!string.IsNullOrWhiteSpace(saveError))
             {
-                <p class="validation-message" style="margin-top:.5rem">@saveError</p>
+                <p class="validation-message" style="margin-top:.5rem">
+                    @saveError
+                    @if (!string.IsNullOrWhiteSpace(collisionHref))
+                    {
+                        <a href="@collisionHref" style="margin-left:.45rem;color:#93c5fd">@Confirmai.Services.EventCollisionService.OpenExistingEventLinkText</a>
+                    }
+                </p>
             }
 
             <div class="form-actions">
                 <button class="cancel-btn" type="button"
-                        @onclick='() => NavigationManager.NavigateTo("/poker")'>
+                        @onclick='() => NavigationManager.NavigateTo(preselectedGroup is not null ? $"/grupo/{preselectedGroup.Id}" : "/grupos")'>
                     Cancelar
                 </button>
                 <button class="save-btn save-btn--poker" type="submit" disabled="@isSaving">
@@ -327,7 +347,7 @@
         public string StateCode { get; set; } = string.Empty;
 
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe a data.")]
-        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         public TimeOnly Time { get; set; } = new TimeOnly(19, 0);
 
@@ -365,20 +385,31 @@
         public decimal CashMaxBuyIn { get; set; } = 0;
 
         public string? CashIncludes { get; set; }
+        public bool IsPrivate { get; set; } = true;
     }
 
     // ── State ────────────────────────────────────────────────────────────────
 
-    private CreatePokerEventForm form      = new();
-    private bool                 isSaving  = false;
-    private string               saveError = string.Empty;
+    private CreatePokerEventForm form           = new();
+    private Group?               preselectedGroup;
+    private bool                 isSaving       = false;
+    private string               saveError      = string.Empty;
+    private string?              collisionHref;
 
-    // ── Query param: ?tipo= ──────────────────────────────────────────────────
+    private static readonly string[] BrazilianStates =
+        ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
+         "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+
+    // ── Query params ────────────────────────────────────────────────
 
     [SupplyParameterFromQuery(Name = "tipo")]
     public string? TipoParam { get; set; }
 
-    protected override void OnInitialized()
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int? GroupId { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
         form.EventType = TipoParam switch
         {
@@ -386,6 +417,33 @@
             "homegame"  => PokerEventType.HomeGame,
             _           => PokerEventType.Tournament,
         };
+
+        if (GroupId.HasValue)
+        {
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+            preselectedGroup = await db.Groups
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.Id == GroupId.Value
+                    && g.Members.Any(m => m.UserId == userId && m.Role == GroupMemberRole.Admin));
+
+            if (preselectedGroup is null)
+            {
+                NavigationManager.NavigateTo("/grupos");
+                return;
+            }
+
+            // pré-preencher campos do grupo para que a validação passe mesmo ocultos
+            form.Name      = preselectedGroup.Name;
+            form.City      = preselectedGroup.City;
+            form.StateCode = preselectedGroup.StateCode;
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/grupos");
+        }
     }
 
     // ── Save ─────────────────────────────────────────────────────────────────
@@ -394,6 +452,7 @@
     {
         isSaving  = true;
         saveError = string.Empty;
+        collisionHref = null;
 
         try
         {
@@ -412,26 +471,45 @@
 
             await using var db = await DbFactory.CreateDbContextAsync();
 
-            // 1 — Group
-            var group = new Group
+            Group group;
+            if (preselectedGroup is not null)
             {
-                Name            = form.Name,
-                Sport           = Sport.Poker,
-                City            = form.City,
-                StateCode       = form.StateCode.ToUpperInvariant(),
-                IsActive        = true,
-                CreatedByUserId = userId,
-            };
-            db.Groups.Add(group);
-            await db.SaveChangesAsync();
+                group = preselectedGroup;
+            }
+            else
+            {
+                // 1 — Group (legacy flow)
+                group = new Group
+                {
+                    Name            = form.Name,
+                    Sport           = Sport.Poker,
+                    City            = form.City,
+                    StateCode       = form.StateCode.ToUpperInvariant(),
+                    IsActive        = true,
+                    IsPrivate       = true,
+                    CreatedByUserId = userId,
+                    InviteCode      = Guid.NewGuid().ToString("N")[..8].ToUpper(),
+                };
+                db.Groups.Add(group);
+                await db.SaveChangesAsync();
 
-            // 2 — GroupMember (Admin)
-            db.GroupMembers.Add(new GroupMember
+                // 2 — GroupMember (Admin)
+                db.GroupMembers.Add(new GroupMember
+                {
+                    GroupId = group.Id,
+                    UserId  = userId,
+                    Role    = GroupMemberRole.Admin,
+                });
+            }
+
+            var collision = await EventCollisionService.FindGroupTimeCollisionAsync(group.Id, startsAt);
+            if (collision is not null)
             {
-                GroupId = group.Id,
-                UserId  = userId,
-                Role    = GroupMemberRole.Admin,
-            });
+                saveError = Confirmai.Services.EventCollisionService.BuildConflictMessage(collision.StartsAt);
+                collisionHref = $"/poker/{collision.EventId}";
+                isSaving  = false;
+                return;
+            }
 
             // 3 — Event
             var ev = new Event

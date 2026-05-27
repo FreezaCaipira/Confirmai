@@ -49,10 +49,12 @@ namespace Confirmai.Services
             }
         }
 
-        private async Task GenerateEventsAsync(CancellationToken ct)
+        internal async Task GenerateEventsAsync(CancellationToken ct)
         {
             await using var scope = _scopeFactory.CreateAsyncScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var db            = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var notifications = scope.ServiceProvider.GetRequiredService<EventNotificationService>();
+            var collisionService = scope.ServiceProvider.GetRequiredService<EventCollisionService>();
 
             var schedules = await db.RachaSchedules
                 .Where(rs => rs.IsActive)
@@ -63,58 +65,64 @@ namespace Confirmai.Services
             if (schedules.Count == 0) return;
 
             var windowEnd = DateTime.UtcNow.AddDays(WeeksAhead * 7);
-            var today = DateTime.UtcNow.Date;
-            int created = 0;
+            var today     = DateTime.UtcNow.Date;
+            var newEvents = new List<Event>();
 
             foreach (var schedule in schedules)
             {
-                // Próxima ocorrência desse dia da semana a partir de hoje
                 var occurrences = GetOccurrences(today, schedule.DayOfWeek, schedule.TimeOfDay, windowEnd);
 
                 foreach (var startsAt in occurrences)
                 {
-                    // Evita duplicatas: verifica se já existe evento gerado por este schedule nessa data
-                    bool exists = await db.Events.AnyAsync(
-                        e => e.RachaScheduleId == schedule.Id
-                          && e.StartsAt == startsAt,
-                        ct);
-
-                    if (exists) continue;
+                    // Evita colisões com qualquer partida do mesmo grupo no mesmo horário.
+                    if (await collisionService.HasGroupTimeCollisionAsync(schedule.GroupId, startsAt, null, ct))
+                        continue;
 
                     var ev = new Event
                     {
-                        GroupId          = schedule.GroupId,
-                        Sport            = Sport.Futsal,
-                        VenueId          = schedule.VenueId,
-                        Location         = schedule.Venue.Address,
-                        StartsAt         = startsAt,
-                        DurationMinutes  = schedule.DurationMinutes,
-                        Price            = schedule.Price,
-                        MaxPlayers       = schedule.MaxPlayers > 0 ? schedule.MaxPlayers : 20,
-                        LocalName        = schedule.LocalName,
-                        RachaScheduleId  = schedule.Id,
-                        CreatedByUserId  = schedule.CreatedByUserId,
-                        IsActive         = true,
+                        GroupId         = schedule.GroupId,
+                        Sport           = Sport.Futsal,
+                        VenueId         = schedule.VenueId,
+                        Location        = schedule.Venue.Address,
+                        StartsAt        = startsAt,
+                        DurationMinutes = schedule.DurationMinutes,
+                        Price           = schedule.Price,
+                        MaxPlayers      = schedule.MaxPlayers > 0 ? schedule.MaxPlayers : 20,
+                        MaxGoalkeepers  = schedule.MaxGoalkeepers,
+                        LocalName       = schedule.LocalName,
+                        RachaScheduleId = schedule.Id,
+                        CreatedByUserId = schedule.CreatedByUserId,
+                        IsActive        = true,
                     };
 
                     db.Events.Add(ev);
-                    created++;
+                    newEvents.Add(ev);
                 }
             }
 
-            if (created > 0)
+            if (newEvents.Count == 0) return;
+
+            await db.SaveChangesAsync(ct); // popula ev.Id em cada evento
+            _logger.LogInformation(
+                "RachaSchedulerService: {Count} evento(s) gerado(s) para a janela de {Weeks} semanas.",
+                newEvents.Count, WeeksAhead);
+
+            // Notifica membros do grupo sobre cada novo evento (best-effort)
+            foreach (var ev in newEvents)
             {
-                await db.SaveChangesAsync(ct);
-                _logger.LogInformation(
-                    "RachaSchedulerService: {Count} evento(s) gerado(s) para a janela de {Weeks} semanas.",
-                    created, WeeksAhead);
+                try { await notifications.NotifyNewRecurringEventAsync(ev.Id); }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex,
+                        "RachaSchedulerService: falha ao notificar evento {EventId}.", ev.Id);
+                }
             }
         }
 
         /// <summary>
         /// Retorna todas as ocorrências de um DayOfWeek/TimeOfDay entre hoje e windowEnd (UTC).
         /// </summary>
-        private static IEnumerable<DateTime> GetOccurrences(
+        internal static IEnumerable<DateTime> GetOccurrences(
             DateTime from, DayOfWeek dayOfWeek, TimeOnly timeOfDay, DateTime windowEnd)
         {
             // Avança até o próximo dia da semana correto

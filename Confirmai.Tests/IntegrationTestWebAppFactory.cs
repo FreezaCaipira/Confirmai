@@ -58,6 +58,37 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
     }
 
     /// <summary>
+    /// Seeds a Futsal group and adds the given user as Admin. Returns the group ID.
+    /// </summary>
+    public async Task<int> SeedGroupWithAdminAsync(string adminUserId, string groupName = "Grupo de Teste")
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        var group = new Confirmai.Models.Group
+        {
+            Name            = groupName,
+            Sport           = Confirmai.Enums.Sport.Futsal,
+            City            = "Pouso Alegre",
+            StateCode       = "MG",
+            CreatedByUserId = adminUserId,
+            InviteCode      = Guid.NewGuid().ToString("N")[..8].ToUpper(),
+        };
+        db.Groups.Add(group);
+        await db.SaveChangesAsync();
+
+        db.GroupMembers.Add(new Confirmai.Models.GroupMember
+        {
+            GroupId = group.Id,
+            UserId  = adminUserId,
+            Role    = Confirmai.Enums.GroupMemberRole.Admin,
+        });
+        await db.SaveChangesAsync();
+
+        return group.Id;
+    }
+
+    /// <summary>
     /// Ensures the LuaDeliveryEnabled feature flag is set to "true" for tests
     /// that exercise the /api/v1/server/trades/* endpoints. Safe to call
     /// multiple times — it inserts the row only when missing.

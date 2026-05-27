@@ -25,6 +25,14 @@ namespace Confirmai.Models
         [StringLength(200)]
         public string? WebsiteUrl { get; set; }
 
+        /// <summary>Código de convite único para novos membros entrarem no grupo via link.</summary>
+        [Required]
+        [StringLength(12)]
+        public string InviteCode { get; set; } = string.Empty;
+
+        /// <summary>Quando verdadeiro, somente membros do grupo podem confirmar presença nos eventos.</summary>
+        public bool IsPrivate { get; set; } = false;
+
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

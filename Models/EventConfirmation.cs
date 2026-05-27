@@ -24,6 +24,10 @@ namespace Confirmai.Models
 
         /// <summary>Linha players only. Set to true when payment is confirmed (gateway TBD).</summary>
         public bool HasPaid { get; set; }
+
+        /// <summary>EfiBank Pix charge txId linked to this confirmation (32-char hex). Set when charge is created.</summary>
+        [StringLength(35)]
+        public string? PixTxId { get; set; }
     }
 
     public enum FutsalPosition

@@ -133,7 +133,7 @@ else
                 <div class="esc-share-bar">
                     <button class="esc-btn esc-btn--secondary" @onclick="CopyToClipboard">
                         <i class="fas @(copied ? "fa-check" : "fa-copy")"></i>
-                        @(copied ? "Copiado!" : "Copiar texto")
+                        @(copied ? "Copiado!" : "Copiar escalação")
                     </button>
                     <button class="esc-btn esc-btn--whatsapp" @onclick="ShareOnWhatsApp">
                         <i class="fab fa-whatsapp"></i> Compartilhar no WhatsApp
@@ -179,6 +179,9 @@ else
                                 <li class="esc-player esc-player--gk">
                                     <span class="esc-player-icon">🥅</span>
                                     <span class="esc-player-name">@s.Name</span>
+                                    <button class="esc-move-btn" title="Mover para Time B" @onclick="() => MovePlayer(s, true)">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
                                 </li>
                             }
                             @{ int draftNumA = 1; }
@@ -187,6 +190,9 @@ else
                                 <li class="esc-player">
                                     <span class="esc-player-num">@(draftNumA++)</span>
                                     <span class="esc-player-name">@s.Name</span>
+                                    <button class="esc-move-btn" title="Mover para Time B" @onclick="() => MovePlayer(s, true)">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
                                 </li>
                             }
                         </ul>
@@ -198,6 +204,9 @@ else
                             @foreach (var s in teamB.Where(s => s.IsGoalkeeper))
                             {
                                 <li class="esc-player esc-player--gk">
+                                    <button class="esc-move-btn" title="Mover para Time A" @onclick="() => MovePlayer(s, false)">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
                                     <span class="esc-player-icon">🥅</span>
                                     <span class="esc-player-name">@s.Name</span>
                                 </li>
@@ -206,6 +215,9 @@ else
                             @foreach (var s in teamB.Where(s => !s.IsGoalkeeper))
                             {
                                 <li class="esc-player">
+                                    <button class="esc-move-btn" title="Mover para Time A" @onclick="() => MovePlayer(s, false)">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
                                     <span class="esc-player-num">@(draftNumB++)</span>
                                     <span class="esc-player-name">@s.Name</span>
                                 </li>
@@ -238,10 +250,14 @@ else
                     <button class="esc-btn esc-btn--shuffle" @onclick="Randomize">
                         <i class="fas fa-dice fa-lg"></i> Embaralhar jogadores de linha
                     </button>
-                    <button class="esc-btn esc-btn--primary" @onclick="() => showConfirmModal = true">
+                    <button class="esc-btn esc-btn--primary" @onclick="() => showConfirmModal = true" disabled="@(!TeamsAreBalanced)">
                         <i class="fas fa-check"></i> Confirmar escalação
                     </button>
                 </div>
+                @if (!TeamsAreBalanced)
+                {
+                    <p class="esc-balance-hint"><i class="fas fa-exclamation-triangle"></i> Times desiguais — iguale os jogadores de linha para confirmar.</p>
+                }
 
                 @if (showConfirmModal)
                 {
@@ -280,6 +296,9 @@ else
     private bool    isSaving         = false;
     private bool    copied           = false;
     private string? actionError;
+
+    private bool TeamsAreBalanced =>
+        Math.Abs(teamA.Count(s => !s.IsGoalkeeper) - teamB.Count(s => !s.IsGoalkeeper)) <= 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -340,6 +359,30 @@ else
             var last = teamA.Last(s => !s.IsGoalkeeper);
             teamA.Remove(last);
             reservas.Add(last);
+        }
+    }
+
+    private void MovePlayer(PlayerSlot slot, bool toTeamB)
+    {
+        if (toTeamB)
+        {
+            teamA.Remove(slot);
+            if (slot.IsGoalkeeper)
+            {
+                var existing = teamB.FirstOrDefault(s => s.IsGoalkeeper);
+                if (existing is not null) { teamB.Remove(existing); teamA.Add(existing); }
+            }
+            teamB.Add(slot);
+        }
+        else
+        {
+            teamB.Remove(slot);
+            if (slot.IsGoalkeeper)
+            {
+                var existing = teamA.FirstOrDefault(s => s.IsGoalkeeper);
+                if (existing is not null) { teamA.Remove(existing); teamB.Add(existing); }
+            }
+            teamA.Add(slot);
         }
     }
 

@@ -28,6 +28,9 @@ namespace Confirmai.Models
 
         public int MaxPlayers { get; set; } = 20;
 
+        /// <summary>Vagas para goleiros; null = sem reserva separada.</summary>
+        public int? MaxGoalkeepers { get; set; }
+
         /// <summary>Como o jogo é chamado na região (racha, pelada, baba…)</summary>
         [StringLength(60)]
         public string? LocalName { get; set; }

@@ -14,6 +14,7 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject EventNotificationService NotificationService
 
 <PageTitle>Meus Eventos — Confirmai</PageTitle>
 
@@ -24,19 +25,113 @@
 
             <div class="my-events-header">
                 <h1 class="page-section-title">Meus Eventos</h1>
-                <div class="my-events-create-btns">
-                    <a href="/futsal/create" class="my-events-create-btn my-events-create-btn--futsal">
-                        <i class="fas fa-futbol"></i> Nova Partida
-                    </a>
-                    <a href="/poker/create?tipo=torneio" class="my-events-create-btn my-events-create-btn--poker">
-                        <i class="fas fa-trophy"></i> Novo Torneio
-                    </a>
+                <div class="my-events-header-right">
+                    <div class="my-events-view-tabs">
+                        <button class="my-events-tab @(view == "events" ? "my-events-tab--active" : "")"
+                                @onclick='() => view = "events"'>
+                            Partidas (@events.Count)
+                        </button>
+                        <button class="my-events-tab @(view == "schedules" ? "my-events-tab--active" : "")"
+                                @onclick='() => view = "schedules"'>
+                            🔁 Recorrências (@schedules.Count)
+                        </button>
+                    </div>
+                    <div class="my-events-create-btns">
+                        <a href="/futsal/create" class="my-events-create-btn my-events-create-btn--futsal">
+                            <i class="fas fa-futbol"></i> Nova Partida
+                        </a>
+                        <a href="/poker/create?tipo=torneio" class="my-events-create-btn my-events-create-btn--poker">
+                            <i class="fas fa-trophy"></i> Novo Torneio
+                        </a>
+                    </div>
                 </div>
             </div>
 
             @if (isLoading)
             {
                 <p class="listing-state">Carregando seus eventos…</p>
+            }
+            else if (view == "schedules")
+            {
+                @* ── Recorrências ────────────────────────────────────────── *@
+                @if (!schedules.Any())
+                {
+                    <div class="listing-state listing-empty">
+                        <p>Nenhum agendamento recorrente.</p>
+                        <p style="color:#888;font-size:.9rem">Crie uma partida recorrente em <a href="/futsal/create">Nova Partida</a>.</p>
+                    </div>
+                }
+                else
+                {
+                    @* Filtro por cidade (Gap A) *@
+                    @if (ScheduleCities.Count > 1)
+                    {
+                        <div class="my-events-sport-tabs" style="margin-bottom:.75rem">
+                            <button class="my-events-tab @(scheduleCityFilter is null ? "my-events-tab--active" : "")"
+                                    @onclick="() => scheduleCityFilter = null">
+                                Todas
+                            </button>
+                            @foreach (var city in ScheduleCities)
+                            {
+                                <button class="my-events-tab @(scheduleCityFilter == city ? "my-events-tab--active" : "")"
+                                        @onclick="@(() => scheduleCityFilter = city)">
+                                    @city
+                                </button>
+                            }
+                        </div>
+                    }
+
+                    <div class="my-schedules-list">
+                        @foreach (var s in FilteredSchedules)
+                        {
+                            var futureCount = scheduleFutureCounts.GetValueOrDefault(s.Id, 0);
+                            <div class="my-schedule-card @(!s.IsActive ? "my-schedule-card--inactive" : "")">
+                                <div class="my-event-sport-badge my-event-sport-badge--futsal">⚽</div>
+
+                                <div class="my-event-body">
+                                    <div class="my-event-name-row">
+                                        <strong class="my-event-name">@s.Group.Name</strong>
+                                        <span class="my-event-status @(s.IsActive ? "my-event-status--active" : "my-event-status--cancelled")">
+                                            @(s.IsActive ? "Ativo" : "Pausado")
+                                        </span>
+                                    </div>
+                                    <p class="my-event-meta">
+                                        📅 @DayName(s.DayOfWeek) às @s.TimeOfDay.ToString("HH:mm")
+                                        &nbsp;·&nbsp;
+                                        👥 @s.MaxPlayers vagas@(s.MaxGoalkeepers.HasValue ? $" ({s.MaxGoalkeepers} GK)" : "")
+                                        &nbsp;·&nbsp;
+                                        R$ @s.Price.ToString("N2", PtBr)
+                                    </p>
+                                    @if (s.Venue is not null)
+                                    {
+                                        <p class="my-event-location">📍 @s.Venue.Name — @s.Venue.City</p>
+                                    }
+                                    @if (futureCount > 0)
+                                    {
+                                        <p class="my-schedule-future-count">🗓 @futureCount partida@(futureCount == 1 ? "" : "s") futuras geradas</p>
+                                    }
+                                    @if (scheduleNextEvents.TryGetValue(s.Id, out var nextEv))
+                                    {
+                                        <p class="my-schedule-next-event">
+                                            🔔 Próxima: @nextEv.StartsAt.ToLocalTime().ToString("ddd dd/MM HH:mm", PtBr)
+                                            &nbsp;·&nbsp; @nextEv.Confirmed/@s.MaxPlayers confirmados
+                                            &nbsp;<a href="/futsal/@nextEv.EventId">ver</a>
+                                        </p>
+                                    }
+                                </div>
+
+                                <div class="my-event-actions">
+                                    <a href="/futsal/schedule/@s.Id/edit" class="my-event-action-btn my-event-action-btn--view">Editar</a>
+                                    <button class="my-event-action-btn @(s.IsActive ? "my-event-action-btn--cancel" : "my-event-action-btn--view")"
+                                            disabled="@(togglingScheduleId == s.Id)"
+                                            @onclick="() => ToggleSchedule(s)">
+                                        @(togglingScheduleId == s.Id ? "…" : s.IsActive ? "Pausar" : "Retomar")
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
             }
             else if (!events.Any())
             {
@@ -140,10 +235,30 @@
 @code {
     private static readonly CultureInfo PtBr = new("pt-BR");
 
-    private List<Event> events = new();
-    private bool        isLoading   = true;
-    private Sport?      sportFilter = null;
-    private int?        cancellingId = null;
+    private List<Event>              events              = new();
+    private List<MatchSchedule>      schedules           = new();
+    private Dictionary<int, int>     scheduleFutureCounts = new();
+    private Dictionary<int, (int EventId, DateTime StartsAt, int Confirmed)> scheduleNextEvents = new();
+    private bool                     isLoading           = true;
+    private Sport?                   sportFilter         = null;
+    private string?                  scheduleCityFilter  = null;
+    private int?                     cancellingId        = null;
+    private int?                     togglingScheduleId  = null;
+    private string                   view                = "events";
+    private string                   currentUserId       = string.Empty;
+
+    private List<string> ScheduleCities =>
+        schedules
+            .Select(s => s.Venue?.City)
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(c => c)
+            .ToList()!;
+
+    private IEnumerable<MatchSchedule> FilteredSchedules =>
+        scheduleCityFilter is null
+            ? schedules
+            : schedules.Where(s => string.Equals(s.Venue?.City, scheduleCityFilter, StringComparison.OrdinalIgnoreCase));
 
     private IEnumerable<Event> FilteredEvents =>
         sportFilter.HasValue
@@ -161,13 +276,65 @@
             return;
         }
 
+        currentUserId = userId;
+
         await using var db = await DbFactory.CreateDbContextAsync();
-        events = await db.Events
+        var now = DateTime.UtcNow;
+        var raw = await db.Events
             .Include(e => e.Group)
             .Include(e => e.Confirmations)
             .Where(e => e.CreatedByUserId == userId)
-            .OrderByDescending(e => e.StartsAt)
             .ToListAsync();
+
+        events = raw
+            .OrderBy(e => e.StartsAt < now)                                             // upcoming first
+            .ThenBy(e => e.StartsAt < now ? long.MaxValue - e.StartsAt.Ticks            // past: more recent first
+                                          : e.StartsAt.Ticks)                           // upcoming: nearest first
+            .ToList();
+
+        schedules = await db.RachaSchedules
+            .Include(s => s.Group)
+            .Include(s => s.Venue)
+            .Where(s => s.CreatedByUserId == userId)
+            .OrderByDescending(s => s.IsActive)
+            .ThenBy(s => s.DayOfWeek)
+            .ThenBy(s => s.TimeOfDay)
+            .ToListAsync();
+
+        // Gap G: contar partidas futuras geradas por cada schedule
+        var scheduleIds = schedules.Select(s => s.Id).ToList();
+        if (scheduleIds.Count > 0)
+        {
+            scheduleFutureCounts = await db.Events
+                .Where(e => e.RachaScheduleId.HasValue
+                         && scheduleIds.Contains(e.RachaScheduleId!.Value)
+                         && e.StartsAt > now
+                         && e.IsActive)
+                .GroupBy(e => e.RachaScheduleId!.Value)
+                .Select(g => new { ScheduleId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.ScheduleId, x => x.Count);
+
+            // Next upcoming event + confirmation count per schedule
+            var nextRows = await db.Events
+                .Where(e => e.RachaScheduleId.HasValue
+                         && scheduleIds.Contains(e.RachaScheduleId!.Value)
+                         && e.StartsAt > now
+                         && e.IsActive)
+                .Select(e => new
+                {
+                    ScheduleId     = e.RachaScheduleId!.Value,
+                    e.Id,
+                    e.StartsAt,
+                    Confirmed      = e.Confirmations.Count,
+                })
+                .ToListAsync();
+
+            scheduleNextEvents = nextRows
+                .GroupBy(e => e.ScheduleId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => { var f = g.OrderBy(e => e.StartsAt).First(); return (f.Id, f.StartsAt, f.Confirmed); });
+        }
 
         isLoading = false;
     }
@@ -183,12 +350,35 @@
             {
                 entity.IsActive = false;
                 await db.SaveChangesAsync();
-                ev.IsActive = false; // update local state
+                ev.IsActive = false;
             }
+
+            if (!string.IsNullOrWhiteSpace(currentUserId))
+                await NotificationService.NotifyEventCancelledAsync(ev.Id, currentUserId);
         }
         finally
         {
             cancellingId = null;
+        }
+    }
+
+    private async Task ToggleSchedule(MatchSchedule s)
+    {
+        togglingScheduleId = s.Id;
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var entity = await db.RachaSchedules.FindAsync(s.Id);
+            if (entity is not null && entity.CreatedByUserId == currentUserId)
+            {
+                entity.IsActive = !entity.IsActive;
+                await db.SaveChangesAsync();
+                s.IsActive = entity.IsActive;
+            }
+        }
+        finally
+        {
+            togglingScheduleId = null;
         }
     }
 
@@ -197,5 +387,16 @@
         PokerEventType.CashGame  => "Cash Game",
         PokerEventType.HomeGame  => "Home Game",
         _                        => "Torneio",
+    };
+
+    private static string DayName(DayOfWeek d) => d switch
+    {
+        DayOfWeek.Monday    => "Segunda-feira",
+        DayOfWeek.Tuesday   => "Terça-feira",
+        DayOfWeek.Wednesday => "Quarta-feira",
+        DayOfWeek.Thursday  => "Quinta-feira",
+        DayOfWeek.Friday    => "Sexta-feira",
+        DayOfWeek.Saturday  => "Sábado",
+        _                   => "Domingo",
     };
 }

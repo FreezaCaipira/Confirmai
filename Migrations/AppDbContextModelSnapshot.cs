@@ -341,7 +341,8 @@ namespace Confirmai.Migrations
 
                     b.HasIndex("VenueId");
 
-                    b.HasIndex("GroupId", "StartsAt");
+                    b.HasIndex("GroupId", "StartsAt")
+                        .IsUnique();
 
                     b.ToTable("Events");
                 });
@@ -362,6 +363,10 @@ namespace Confirmai.Migrations
 
                     b.Property<bool>("HasPaid")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("PixTxId")
+                        .HasMaxLength(35)
+                        .HasColumnType("character varying(35)");
 
                     b.Property<int?>("Position")
                         .HasColumnType("integer");
@@ -417,7 +422,15 @@ namespace Confirmai.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("character varying(450)");
 
+                    b.Property<string>("InviteCode")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("character varying(12)");
+
                     b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPrivate")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LogoPath")
@@ -443,7 +456,48 @@ namespace Confirmai.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("InviteCode")
+                        .IsUnique();
+
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("Confirmai.Models.GroupJoinRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("RespondedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RespondedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("GroupId", "UserId", "Status");
+
+                    b.ToTable("GroupJoinRequests");
                 });
 
             modelBuilder.Entity("Confirmai.Models.GroupMember", b =>
@@ -508,6 +562,9 @@ namespace Confirmai.Migrations
                     b.Property<string>("LocalName")
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)");
+
+                    b.Property<int?>("MaxGoalkeepers")
+                        .HasColumnType("integer");
 
                     b.Property<int>("MaxPlayers")
                         .HasColumnType("integer");
@@ -805,6 +862,9 @@ namespace Confirmai.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("DesiredPosition")
+                        .HasColumnType("integer");
+
                     b.Property<int>("EventId")
                         .HasColumnType("integer");
 
@@ -1011,6 +1071,25 @@ namespace Confirmai.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Confirmai.Models.GroupJoinRequest", b =>
+                {
+                    b.HasOne("Confirmai.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Confirmai.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });

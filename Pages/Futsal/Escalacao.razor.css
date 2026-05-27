@@ -20,14 +20,28 @@
 .esc-page {
     max-width: 860px;
     margin: 2rem auto;
-    padding: 0 1rem;
+    padding: 0 1rem 2rem;
+    position: relative;
+}
+
+.esc-page::before {
+    content: "";
+    position: absolute;
+    inset: -0.6rem 0.8rem 0.6rem;
+    border-radius: 18px;
+    background: radial-gradient(circle at 50% 8%, rgba(59, 130, 246, 0.16), rgba(7, 20, 36, 0));
+    pointer-events: none;
 }
 
 .esc-card {
-    background: var(--card-bg, #1e2533);
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(180deg, #0a1828 0%, #071424 100%);
+    border: 1px solid #1b3d6c;
+    border-top: 2px solid #1a5298;
     border-radius: 16px;
     padding: 1.75rem 1.5rem;
-    box-shadow: 0 4px 24px rgba(0,0,0,.25);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(79, 156, 248, 0.14);
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
@@ -89,11 +103,18 @@
 .esc-team {
     border-radius: 12px;
     padding: 1rem;
-    background: var(--card-inner-bg, rgba(255,255,255,.04));
+    background: linear-gradient(180deg, #11243a 0%, #0b1b2d 100%);
+    border: 1px solid #255080;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(147, 197, 253, 0.16);
 }
 
-.esc-team--a { border-top: 3px solid #eab308; }
-.esc-team--b { border-top: 3px solid #3b82f6; }
+.esc-team--a { border-top: 3px solid #7dd3fc; }
+.esc-team--b { border-top: 3px solid #60a5fa; }
+
+.esc-team--a .esc-team-title,
+.esc-team--b .esc-team-title {
+    color: #dbeafe;
+}
 
 .esc-team-title {
     font-size: 1rem;
@@ -119,16 +140,17 @@
     font-size: .9rem;
     padding: .35rem .5rem;
     border-radius: 6px;
-    transition: background .15s;
+    background: rgba(8, 18, 30, 0.46);
+    transition: background .15s, border-color .15s;
 }
 
 .esc-player-list .esc-player:nth-child(even) {
-    background: rgba(255,255,255,.045);
+    background: rgba(255,255,255,.07);
 }
 
-.esc-player:hover { background: rgba(255,255,255,.09); }
+.esc-player:hover { background: rgba(96, 165, 250, 0.18); }
 
-.esc-player--gk { color: var(--accent, #22c55e); font-weight: 600; }
+.esc-player--gk { color: var(--ci-accent, #4f9cf8); font-weight: 600; }
 
 .esc-player-num {
     min-width: 1.4rem;
@@ -195,15 +217,15 @@
     font-size: .9rem;
     font-weight: 600;
     cursor: pointer;
-    border: none;
+    border: 1px solid transparent;
     text-decoration: none;
-    transition: opacity .15s, filter .15s;
+    transition: opacity .15s, filter .15s, border-color .15s, color .15s, background .15s;
 }
 .esc-btn:disabled { opacity: .55; cursor: not-allowed; }
 .esc-btn:not(:disabled):hover { filter: brightness(1.1); }
 
 .esc-btn--primary {
-    background: var(--accent, #22c55e);
+    background: #22c55e;
     color: #fff;
 }
 
@@ -213,12 +235,16 @@
 }
 
 .esc-btn--shuffle {
-    background: rgba(139, 92, 246, .18);
-    border: 1px solid rgba(139, 92, 246, .35);
-    color: #c4b5fd;
+    background: linear-gradient(180deg, #17365c 0%, #112a47 100%);
+    border-color: #3b82f6;
+    color: #dbeafe;
+    box-shadow: 0 8px 20px rgba(29, 78, 143, 0.28), inset 0 1px 0 rgba(191, 219, 254, 0.22);
 }
 .esc-btn--shuffle:not(:disabled):hover {
-    background: rgba(139, 92, 246, .28);
+    border-color: #60a5fa;
+    color: #ffffff;
+    background: linear-gradient(180deg, #1f4b7d 0%, #16355b 100%);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.34), inset 0 1px 0 rgba(219, 234, 254, 0.28);
     filter: none;
 }
 
@@ -257,6 +283,15 @@
     margin-top: .5rem;
 }
 
+.esc-balance-hint {
+    font-size: .82rem;
+    color: #fbbf24;
+    margin: .5rem 0 0;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+
 /* ── Modal ──────────────────────────────────────────────────────────────── */
 
 .esc-modal-overlay {
@@ -271,7 +306,7 @@
 }
 
 .esc-modal {
-    background: var(--card-bg, #1e2533);
+    background: var(--ci-bg-card, #111927);
     border-radius: 14px;
     padding: 1.5rem;
     max-width: 420px;
@@ -288,4 +323,24 @@
     display: flex;
     gap: .75rem;
     justify-content: flex-end;
+}
+
+/* ── Move player button ─────────────────────────────────────────────────── */
+
+.esc-move-btn {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px;
+    color: rgba(255,255,255,.38);
+    cursor: pointer;
+    font-size: .72rem;
+    padding: 2px 7px;
+    line-height: 1.4;
+    transition: border-color .15s, color .15s, background .15s;
+}
+.esc-move-btn:hover {
+    border-color: rgba(79,156,248,.55);
+    color: #4f9cf8;
+    background: rgba(79,156,248,.08);
 }

@@ -1,0 +1,512 @@
+@page "/grupo/{Id:int}"
+
+@attribute [AllowAnonymous]
+
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider    AuthStateProvider
+@inject NavigationManager              NavigationManager
+@inject IConfiguration                 Config
+@inject IJSRuntime                     JS
+
+<PageTitle>@(group?.Name ?? "Grupo") · Confirmai</PageTitle>
+
+@if (isLoading)
+{
+    <div class="detail-loading">Carregando…</div>
+}
+else if (group is null)
+{
+    <div class="detail-not-found">
+        <h2>Grupo não encontrado.</h2>
+        <a href="/">← Voltar</a>
+    </div>
+}
+else
+{
+    var isAdmin  = currentUserId is not null &&
+                   group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
+    var isMember  = currentUserId is not null &&
+                   group.Members.Any(m => m.UserId == currentUserId);
+    var baseUrl   = (Config["App:BaseUrl"]?.TrimEnd('/'))  ?? NavigationManager.BaseUri.TrimEnd('/');
+    var newEventHref = group.Sport == Sport.Futsal
+        ? $"/futsal/create?groupId={group.Id}"
+        : $"/poker/create?groupId={group.Id}";
+    var orderedMembers = group.Members
+        .OrderBy(m => m.Role == GroupMemberRole.Admin ? 0 : 1)
+        .ThenBy(m => m.CreatedAt)
+        .ToList();
+    var hasHiddenMembers = orderedMembers.Count > MembersPreviewLimit;
+    var visibleMembers = showAllMembers
+        ? orderedMembers
+        : orderedMembers.Take(MembersPreviewLimit);
+
+    <div class="detail-page">
+        <div class="detail-card">
+
+            @* ── Cabeçalho ─────────────────────────────────────────── *@
+            <header class="detail-header">
+                <div class="detail-header-top">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                    </span>
+                    <a href="/grupos" class="detail-back-link">
+                        <i class="fas fa-arrow-left"></i> Grupos
+                    </a>
+                </div>
+                <h1 class="detail-title">@group.Name</h1>
+                @if (!string.IsNullOrWhiteSpace(group.City))
+                {
+                    <p class="detail-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        @group.City/@group.StateCode
+                    </p>
+                }
+                @if (!group.IsActive)
+                {
+                    <div class="cancelled-banner"><i class="fas fa-ban"></i> Grupo inativo.</div>
+                }
+            </header>
+
+            @* ── Convite (somente admin) ────────────────────────────── *@
+            @if (isAdmin)
+            {
+                <div class="invite-block">
+                    @{ var inviteUrl = $"{baseUrl}/convite/{group.InviteCode}"; }
+                    <div class="invite-row">
+                        <span class="invite-label"><i class="fas fa-link"></i> Link de convite:</span>
+                        <code class="invite-code-display" id="invite-url-text">@inviteUrl</code>
+                        <button class="invite-copy-btn" type="button"
+                                @onclick="() => CopyInviteLink(inviteUrl)">
+                            <i class="fas fa-copy"></i> @(copiedInvite ? "Copiado!" : "Copiar")
+                        </button>
+                    </div>
+                    <hr class="invite-row-divider" />
+                    <div class="invite-row">
+                        <span class="invite-label"><i class="fas fa-key"></i> Código:</span>
+                        <code class="invite-code-display invite-code-only">@group.InviteCode</code>
+                        <button class="invite-copy-btn" type="button"
+                                @onclick="() => CopyCode(group.InviteCode!)">
+                            <i class="fas fa-copy"></i> @(copiedCode ? "Copiado!" : "Copiar")
+                        </button>
+                    </div>
+                    <button class="detail-admin-btn detail-admin-btn--invite invite-block-btn" type="button"
+                            @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
+                        <i class="fas fa-link"></i> Convidar
+                    </button>
+                </div>
+            }
+
+            <hr class="detail-divider">
+
+            @* ── Membros ────────────────────────────────────────────── *@
+            <section class="detail-section">
+                <h2 class="detail-section-title">
+                    <i class="fas fa-users"></i> Membros (@group.Members.Count)
+                </h2>
+                <ul class="players-list">
+                    @foreach (var m in visibleMembers)
+                    {
+                        <li class="player-item @(m.UserId == currentUserId ? "player-item--me" : "")">
+                            <span class="player-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
+                            @if (m.Role == GroupMemberRole.Admin) { <span class="player-tag player-tag--admin">admin</span> }
+                            @if (m.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
+                        </li>
+                    }
+                </ul>
+                @if (hasHiddenMembers)
+                {
+                    <button class="members-toggle-btn" type="button" @onclick="ToggleMembersView">
+                        <i class="fas @(showAllMembers ? "fa-chevron-up" : "fa-chevron-down")"></i>
+                        @(showAllMembers ? "Mostrar menos" : $"Ver todos ({orderedMembers.Count})")
+                    </button>
+                }
+            </section>
+
+            <hr class="detail-divider">
+
+            @* ── Partidas ───────────────────────────────────────────── *@
+            <section class="detail-section">
+                <h2 class="detail-section-title detail-events-title" style="margin-bottom:0">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Partidas</span>
+                    <span class="detail-events-year">@eventsYear</span>
+                </h2>
+                <div class="detail-events-tabs">
+                    <div class="detail-events-tabs-left">
+                        <button class="detail-events-tab @(!showPastEvents ? "active" : string.Empty)"
+                                type="button"
+                                @onclick="() => showPastEvents = false">
+                            <i class="fas fa-bolt"></i> Próximas (@upcomingEvents.Count)
+                        </button>
+                        <button class="detail-events-tab @(showPastEvents ? "active" : string.Empty)"
+                                type="button"
+                                @onclick="() => showPastEvents = true">
+                            <i class="fas fa-history"></i> Realizadas (@pastEvents.Count)
+                        </button>
+                    </div>
+                    @if (isAdmin)
+                    {
+                        <a href="@newEventHref" class="groups-create-btn detail-events-create-btn">
+                            <i class="fas fa-plus"></i> Nova partida
+                        </a>
+                    }
+                </div>
+                <table class="events-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Jogadores</th>
+                            <th>Status</th>
+                            <th class="events-access-col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (displayedEvents.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" class="et-empty">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    @(showPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida próxima.")
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            var nextUpcomingEventId = upcomingEvents.FirstOrDefault()?.Id;
+                            @foreach (var ev in displayedEvents)
+                            {
+                                var href   = group.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
+                                var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
+                                var isNextUpcoming = !showPastEvents && nextUpcomingEventId.HasValue && ev.Id == nextUpcomingEventId.Value;
+                                <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
+                                    <td>
+                                        <span class="et-date-wrap">
+                                            <span class="et-date">@ev.StartsAt.ToLocalTime().ToString("dd/MM")</span>
+                                            @if (isNextUpcoming)
+                                            {
+                                                <span class="event-next-badge">próxima</span>
+                                            }
+                                        </span>
+                                        <span class="et-time">@ev.StartsAt.ToLocalTime().ToString("HH:mm")</span>
+                                    </td>
+                                    <td>
+                                        <span class="et-players @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
+                                    </td>
+                                    <td>
+                                        @if (!ev.IsActive)
+                                        {
+                                            <span class="player-tag player-tag--cancel">cancelado</span>
+                                        }
+                                        else if (isFull)
+                                        {
+                                            <span class="player-tag player-tag--full">lotado</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="player-tag player-tag--open">aberto</span>
+                                        }
+                                    </td>
+                                    <td class="events-access-col">
+                                        <button class="event-access-btn"
+                                                type="button"
+                                                @onclick:stopPropagation="true"
+                                                @onclick="() => NavigationManager.NavigateTo(href)">
+                                            Acessar
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </section>
+
+            @* ── Solicitações de entrada (admin) ─────────────────────── *@
+            @if (isAdmin && pendingRequests.Count > 0)
+            {
+                <hr class="detail-divider">
+                <section class="detail-section">
+                    <h2 class="detail-section-title">
+                        <i class="fas fa-user-clock"></i> Solicitações pendentes (@pendingRequests.Count)
+                    </h2>
+                    <ul class="pending-requests-list">
+                        @foreach (var req in pendingRequests)
+                        {
+                            <li class="pending-request-item">
+                                <span class="pending-request-name">@(req.User?.FullName ?? req.User?.UserName ?? "Usuário")</span>
+                                <span class="pending-request-date">@req.RequestedAt.ToLocalTime().ToString("dd/MM HH:mm")</span>
+                                <div class="pending-request-actions">
+                                    <button class="btn-approve" type="button"
+                                            @onclick="() => ApproveRequest(req.Id)">
+                                        <i class="fas fa-check"></i> Aprovar
+                                    </button>
+                                    <button class="btn-reject" type="button"
+                                            @onclick="() => RejectRequest(req.Id)">
+                                        <i class="fas fa-times"></i> Rejeitar
+                                    </button>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @* ── Não membro: solicitar entrada ────────────────────────── *@
+            @if (currentUserId is not null && !isMember)
+            {
+                <hr class="detail-divider">
+                <div class="join-request-section">
+                    @if (userJoinRequest?.Status == JoinRequestStatus.Pending)
+                    {
+                        <p class="join-request-pending">
+                            <i class="fas fa-hourglass-half"></i>
+                            Solicitação enviada — aguardando aprovação do administrador.
+                        </p>
+                    }
+                    else if (userJoinRequest?.Status == JoinRequestStatus.Rejected)
+                    {
+                        <p class="join-request-pending" style="color:#f87171">
+                            <i class="fas fa-times-circle"></i>
+                            Sua solicitação foi recusada.
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="join-request-info">
+                            <i class="fas fa-info-circle"></i>
+                            Você não é membro deste grupo. Solicite entrada ou peça o código de convite ao organizador.
+                        </p>
+                        <button class="confirm-btn" type="button" @onclick="RequestToJoin"
+                                disabled="@requestingJoin">
+                            <i class="fas fa-user-plus"></i>
+                            @(requestingJoin ? "Enviando…" : "Solicitar entrada")
+                        </button>
+                    }
+                </div>
+            }
+
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Group?                    group            = null;
+    private List<Event>               recentEvents     = new();
+    private List<GroupJoinRequest>    pendingRequests  = new();
+    private GroupJoinRequest?         userJoinRequest  = null;
+    private bool                      isLoading        = true;
+    private string?                   currentUserId    = null;
+    private bool                      copiedInvite     = false;
+    private bool                      copiedCode       = false;
+    private bool                      requestingJoin   = false;
+    private string                    enteredCode      = string.Empty;
+    private string                    codeError        = string.Empty;
+    private bool                      showPastEvents   = false;
+    private bool                      showAllMembers   = false;
+    private const int                 MembersPreviewLimit = 8;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await LoadGroup();
+    }
+
+    private async Task LoadGroup()
+    {
+        isLoading = true;
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        group = await db.Groups
+            .Include(g => g.Members)
+                .ThenInclude(m => m.User)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(g => g.Id == Id);
+
+        if (group is not null)
+        {
+            showAllMembers = false;
+
+            recentEvents = await db.Events
+                .Where(e => e.GroupId == Id)
+                .Include(e => e.Confirmations)
+                .OrderByDescending(e => e.StartsAt)
+                .Take(200)
+                .ToListAsync();
+
+            var nowUtc = DateTime.UtcNow;
+            upcomingEvents = recentEvents
+                .Where(e => e.StartsAt >= nowUtc)
+                .OrderBy(e => e.StartsAt)
+                .ToList();
+
+            pastEvents = recentEvents
+                .Where(e => e.StartsAt < nowUtc)
+                .OrderByDescending(e => e.StartsAt)
+                .ToList();
+
+            if (!showPastEvents && upcomingEvents.Count == 0 && pastEvents.Count > 0)
+            {
+                showPastEvents = true;
+            }
+            else if (showPastEvents && pastEvents.Count == 0 && upcomingEvents.Count > 0)
+            {
+                showPastEvents = false;
+            }
+
+            pendingRequests = await db.GroupJoinRequests
+                .Where(r => r.GroupId == Id && r.Status == JoinRequestStatus.Pending)
+                .Include(r => r.User)
+                .OrderBy(r => r.RequestedAt)
+                .ToListAsync();
+
+            if (currentUserId is not null)
+            {
+                userJoinRequest = await db.GroupJoinRequests
+                    .Where(r => r.GroupId == Id && r.UserId == currentUserId)
+                    .OrderByDescending(r => r.RequestedAt)
+                    .FirstOrDefaultAsync();
+            }
+        }
+
+        isLoading = false;
+    }
+
+    private List<Event> upcomingEvents = new();
+    private List<Event> pastEvents = new();
+    private List<Event> displayedEvents => showPastEvents ? pastEvents : upcomingEvents;
+    private int eventsYear => displayedEvents.FirstOrDefault() is { } eventItem
+        ? eventItem.StartsAt.ToLocalTime().Year
+        : DateTime.Now.Year;
+
+    private async Task CopyInviteLink(string url)
+    {
+        try { await JS.InvokeVoidAsync("navigator.clipboard.writeText", url); }
+        catch { /* fallback: ignore if clipboard not available */ }
+        copiedInvite = true;
+        await Task.Delay(2000);
+        copiedInvite = false;
+        StateHasChanged();
+    }
+
+    private void ToggleMembersView() => showAllMembers = !showAllMembers;
+
+    private async Task CopyCode(string code)
+    {
+        try { await JS.InvokeVoidAsync("navigator.clipboard.writeText", code); }
+        catch { }
+        copiedCode = true;
+        await Task.Delay(2000);
+        copiedCode = false;
+        StateHasChanged();
+    }
+
+    private async Task ShareInviteOnWhatsApp(string url)
+    {
+        var shareUrl = $"https://wa.me/?text={Uri.EscapeDataString(url)}";
+        await JS.InvokeVoidAsync("open", shareUrl, "_blank", "noopener,noreferrer");
+    }
+
+    private async Task RequestToJoin()
+    {
+        if (currentUserId is null || group is null) return;
+        requestingJoin = true;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var already = await db.GroupJoinRequests
+            .AnyAsync(r => r.GroupId == group.Id && r.UserId == currentUserId
+                        && r.Status == JoinRequestStatus.Pending);
+        if (!already)
+        {
+            db.GroupJoinRequests.Add(new GroupJoinRequest
+            {
+                GroupId     = group.Id,
+                UserId      = currentUserId,
+                RequestedAt = DateTime.UtcNow,
+                Status      = JoinRequestStatus.Pending,
+            });
+            await db.SaveChangesAsync();
+        }
+        requestingJoin = false;
+        await LoadGroup();
+    }
+
+    private async Task JoinWithCode()
+    {
+        if (currentUserId is null || group is null) return;
+        codeError      = string.Empty;
+        var typed = enteredCode.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(group.InviteCode) ||
+            !string.Equals(typed, group.InviteCode, StringComparison.OrdinalIgnoreCase))
+        {
+            codeError       = "Código inválido. Verifique e tente novamente.";
+            return;
+        }
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var exists = await db.GroupMembers
+            .AnyAsync(m => m.GroupId == group.Id && m.UserId == currentUserId);
+        if (!exists)
+        {
+            db.GroupMembers.Add(new GroupMember
+            {
+                GroupId   = group.Id,
+                UserId    = currentUserId,
+                Role      = GroupMemberRole.Member,
+                CreatedAt = DateTime.UtcNow,
+            });
+            await db.SaveChangesAsync();
+        }
+
+        await LoadGroup();
+    }
+
+    private async Task ApproveRequest(int requestId)
+    {
+        if (currentUserId is null || group is null) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var req = await db.GroupJoinRequests.FindAsync(requestId);
+        if (req is null || req.Status != JoinRequestStatus.Pending) return;
+
+        var alreadyMember = await db.GroupMembers
+            .AnyAsync(m => m.GroupId == req.GroupId && m.UserId == req.UserId);
+        if (!alreadyMember)
+        {
+            db.GroupMembers.Add(new GroupMember
+            {
+                GroupId   = req.GroupId,
+                UserId    = req.UserId,
+                Role      = GroupMemberRole.Member,
+                CreatedAt = DateTime.UtcNow,
+            });
+        }
+        req.Status            = JoinRequestStatus.Approved;
+        req.RespondedAt       = DateTime.UtcNow;
+        req.RespondedByUserId = currentUserId;
+        await db.SaveChangesAsync();
+        await LoadGroup();
+    }
+
+    private async Task RejectRequest(int requestId)
+    {
+        if (currentUserId is null) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var req = await db.GroupJoinRequests.FindAsync(requestId);
+        if (req is null || req.Status != JoinRequestStatus.Pending) return;
+        req.Status            = JoinRequestStatus.Rejected;
+        req.RespondedAt       = DateTime.UtcNow;
+        req.RespondedByUserId = currentUserId;
+        await db.SaveChangesAsync();
+        await LoadGroup();
+    }
+}

@@ -1,0 +1,255 @@
+@page "/convite/{Code}"
+
+@attribute [AllowAnonymous]
+
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider    AuthStateProvider
+@inject NavigationManager              NavigationManager
+
+<PageTitle>@(group?.Name ?? "Convite") · Confirmai</PageTitle>
+
+@if (isLoading)
+{
+    <div class="detail-loading">Carregando…</div>
+}
+else if (group is null)
+{
+    <div class="detail-not-found">
+        <h2>Convite inválido ou expirado.</h2>
+        <a href="/">← Voltar ao início</a>
+    </div>
+}
+else
+{
+    <div class="detail-page">
+        <div class="detail-card">
+
+            <header class="detail-header">
+                <div class="detail-header-top">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                    </span>
+                    <a class="detail-back-link" href="/">
+                        <i class="fas fa-arrow-left"></i> Início
+                    </a>
+                </div>
+                <h1 class="detail-title">@group.Name</h1>
+                @if (!string.IsNullOrWhiteSpace(group.City))
+                {
+                    <p class="detail-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        @group.City/@group.StateCode
+                    </p>
+                }
+            </header>
+
+            @* ── Membros ────────────────────────────────────────── *@
+            @if (group.Members.Count > 0)
+            {
+                <section class="detail-section" style="margin-top: 1.5rem;">
+                    <h2 class="detail-section-title">
+                        <i class="fas fa-users"></i> Membros (@group.Members.Count)
+                    </h2>
+                    <ul class="players-list">
+                        @foreach (var m in group.Members
+                            .OrderBy(m => m.Role == GroupMemberRole.Admin ? 0 : 1)
+                            .ThenBy(m => m.CreatedAt))
+                        {
+                            <li class="player-item">
+                                <span class="player-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
+                                @if (m.Role == GroupMemberRole.Admin)
+                                {
+                                    <span class="player-tag player-tag--admin">admin</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @* ── Partidas ───────────────────────────────────────── *@
+            @if (recentEvents.Count > 0)
+            {
+                <section class="detail-section" style="margin-top: 1.5rem;">
+                    <h2 class="detail-section-title">
+                        <i class="fas fa-calendar-alt"></i> Partidas (@recentEvents.Count)
+                    </h2>
+                    <table class="events-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Jogadores</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ev in recentEvents)
+                            {
+                                var href   = group.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
+                                var date   = ev.StartsAt.ToLocalTime().ToString("dd/MM/yyyy");
+                                var time   = ev.StartsAt.ToLocalTime().ToString("HH:mm");
+                                var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
+                                <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
+                                    <td>
+                                        <span class="et-date">@date</span>
+                                        <span class="et-time">@time</span>
+                                    </td>
+                                    <td>
+                                        <span class="et-players @(isFull ? "et-players--full" : "")">@ev.Confirmations.Count / @ev.MaxPlayers</span>
+                                    </td>
+                                    <td>
+                                        @if (!ev.IsActive)
+                                        {
+                                            <span class="player-tag player-tag--cancel">cancelado</span>
+                                        }
+                                        else if (isFull)
+                                        {
+                                            <span class="player-tag player-tag--full">lotado</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="player-tag player-tag--open">aberto</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </section>
+            }
+
+            <div class="detail-action" style="margin-top: 1.5rem;">
+                @if (currentUserId is null)
+                {
+                    <a href="/Identity/Account/Login?ReturnUrl=@Uri.EscapeDataString(NavigationManager.Uri)"
+                       class="confirm-btn">
+                        <i class="fas fa-sign-in-alt"></i> Entrar para participar do grupo
+                    </a>
+                }
+                else if (alreadyMember)
+                {
+                    <div class="confirmed-inline-banner">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Você já é membro deste grupo.</span>
+                    </div>
+                    <a href="/grupo/@group.Id" class="confirm-btn" style="margin-top: 1rem;">
+                        Ver grupo
+                    </a>
+                }
+                else if (joined)
+                {
+                    <div class="confirmed-inline-banner">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Você entrou no grupo <strong>@group.Name</strong>!</span>
+                    </div>
+                    <a href="/grupo/@group.Id" class="confirm-btn" style="margin-top: 1rem;">
+                        Ver grupo
+                    </a>
+                }
+                else
+                {
+                    @if (!string.IsNullOrWhiteSpace(actionError))
+                    {
+                        <p class="detail-error">@actionError</p>
+                    }
+                    <button class="confirm-btn" type="button" @onclick="JoinGroup">
+                        <i class="fas fa-user-plus"></i> Entrar no grupo
+                    </button>
+                }
+            </div>
+
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string Code { get; set; } = string.Empty;
+
+    private Group?      group         = null;
+    private List<Event> recentEvents  = new();
+    private bool        isLoading     = true;
+    private string?     currentUserId = null;
+    private bool        alreadyMember = false;
+    private bool        joined        = false;
+    private string      actionError   = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await LoadGroup();
+    }
+
+    private async Task LoadGroup()
+    {
+        isLoading = true;
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        group = await db.Groups
+            .Include(g => g.Members)
+                .ThenInclude(m => m.User)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(g => g.InviteCode == Code && g.IsActive);
+
+        if (group is not null)
+        {
+            recentEvents = await db.Events
+                .Where(e => e.GroupId == group.Id)
+                .Include(e => e.Confirmations)
+                .OrderByDescending(e => e.StartsAt)
+                .Take(10)
+                .ToListAsync();
+
+            if (currentUserId is not null)
+            {
+                alreadyMember = await db.GroupMembers
+                    .AnyAsync(m => m.GroupId == group.Id && m.UserId == currentUserId);
+            }
+        }
+
+        isLoading = false;
+    }
+
+    private async Task JoinGroup()
+    {
+        if (currentUserId is null || group is null) return;
+        actionError = string.Empty;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        // Re-check membership to prevent duplicate insert on double-click
+        var exists = await db.GroupMembers
+            .AnyAsync(m => m.GroupId == group.Id && m.UserId == currentUserId);
+        if (exists)
+        {
+            alreadyMember = true;
+            return;
+        }
+
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId   = group.Id,
+            UserId    = currentUserId,
+            Role      = GroupMemberRole.Member,
+            CreatedAt = DateTime.UtcNow,
+        });
+
+        try
+        {
+            await db.SaveChangesAsync();
+            joined = true;
+        }
+        catch (Exception)
+        {
+            actionError = "Erro ao entrar no grupo. Tente novamente.";
+        }
+    }
+}

@@ -32,6 +32,7 @@ else
 {
     var isHomeGame  = ev.PokerEventType == PokerEventType.HomeGame;
     var isUnlocked  = !isHomeGame || homeGameUnlocked;
+    var isMember    = currentUserId is not null && ev.Group.Members.Any(m => m.UserId == currentUserId);
     var userConf    = currentUserId is not null ? ev.Confirmations.FirstOrDefault(c => c.UserId == currentUserId) : null;
     var isAdmin     = EventAccess.IsAdmin(ev, currentUserId);
 
@@ -56,6 +57,10 @@ else
                         @ev.Group.Name
                     }
                 </h1>
+                <p class="detail-group-ref">
+                    <i class="fas fa-users"></i>
+                    Abrir grupo: <a class="detail-group-link" href="/grupo/@ev.GroupId">@ev.Group.Name</a>
+                </p>
                 @if (!string.IsNullOrWhiteSpace(ev.PokerHouseName) && isUnlocked)
                 {
                     <p class="detail-poker-house">
@@ -338,6 +343,13 @@ else
                             <button class="cancel-confirm-btn" @onclick="CancelConfirmation">
                                 Cancelar inscrição
                             </button>
+                        </div>
+                    }
+                    else if (ev.Group.IsPrivate && !isMember)
+                    {
+                        <div class="private-group-notice">
+                            <i class="fas fa-lock"></i>
+                            <span>Este grupo é privado. Peça o link de convite ao organizador para participar.</span>
                         </div>
                     }
                     else

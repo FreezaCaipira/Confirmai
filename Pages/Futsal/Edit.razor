@@ -14,6 +14,7 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject Confirmai.Services.EventNotificationService NotificationService
+@inject Confirmai.Services.EventCollisionService EventCollisionService
 
 <PageTitle>Editar Partida · Futsal · Confirmai</PageTitle>
 
@@ -140,7 +141,7 @@
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Jogadores de linha <span class="required">*</span></label>
+                            <label>Vagas totais (linha + goleiros) <span class="required">*</span></label>
                             <InputNumber class="input" @bind-Value="form.MaxPlayers" min="1" max="100" />
                             <ValidationMessage For="@(() => form.MaxPlayers)" class="validation-message" />
                         </div>
@@ -173,7 +174,13 @@
 
                 @if (!string.IsNullOrWhiteSpace(saveError))
                 {
-                    <p class="validation-message">@saveError</p>
+                    <p class="validation-message">
+                        @saveError
+                        @if (!string.IsNullOrWhiteSpace(collisionHref))
+                        {
+                            <a href="@collisionHref" style="margin-left:.45rem;color:#93c5fd">@Confirmai.Services.EventCollisionService.OpenExistingEventLinkText</a>
+                        }
+                    </p>
                 }
 
                 <div class="form-actions">
@@ -251,12 +258,14 @@
     private Venue?        selectedVenue;
     private Event?        ev;
     private string?       currentUserId;
+    private string        subFormat        = "futsal";
     private bool          isSystemAdmin    = false;
     private bool          isLoading        = true;
     private bool          notFound         = false;
     private bool          accessDenied     = false;
     private bool          isSaving         = false;
     private string        saveError        = string.Empty;
+    private string?       collisionHref;
     private bool          showCancelConfirm = false;
     private string        cancelError      = string.Empty;
 
@@ -322,7 +331,14 @@
         };
 
         selectedVenue = venues.FirstOrDefault(v => v.Id == form.VenueId);
+        subFormat = form.PlayersPerSide switch { 7 => "society", 11 => "campo", _ => "futsal" };
         isLoading = false;
+    }
+
+    private void OnSubFormatChanged(ChangeEventArgs e)
+    {
+        subFormat = e.Value?.ToString() ?? "futsal";
+        form.PlayersPerSide = subFormat switch { "society" => 7, "campo" => 11, _ => 5 };
     }
 
     private void OnRotateInGoalChanged()
@@ -341,6 +357,7 @@
     {
         isSaving  = true;
         saveError = string.Empty;
+        collisionHref = null;
 
         try
         {
@@ -364,17 +381,35 @@
             if (venue is null) { saveError = "Quadra inválida."; isSaving = false; return; }
 
             var oldStartsAt = ev.StartsAt;
+            var newStartsAt = DateTime.SpecifyKind(form.Date.ToDateTime(form.Time), DateTimeKind.Utc);
+
+            var collision = await EventCollisionService.FindGroupTimeCollisionAsync(ev.GroupId, newStartsAt, ev.Id);
+            if (collision is not null)
+            {
+                saveError = Confirmai.Services.EventCollisionService.BuildConflictMessage(collision.StartsAt);
+                collisionHref = $"/futsal/{collision.EventId}";
+                isSaving  = false;
+                return;
+            }
 
             ev.Group.Name     = form.GroupName;
             ev.LocalName      = form.LocalName;
             ev.VenueId        = form.VenueId;
             ev.Location       = venue.Address;
-            ev.StartsAt       = DateTime.SpecifyKind(form.Date.ToDateTime(form.Time), DateTimeKind.Utc);
+            ev.StartsAt       = newStartsAt;
             ev.DurationMinutes = form.DurationMinutes;
             ev.MaxPlayers     = form.MaxPlayers;
             ev.MaxGoalkeepers = form.MaxGoalkeepers > 0 ? form.MaxGoalkeepers : null;
             ev.PlayersPerSide = form.PlayersPerSide;
             ev.Price          = form.Price;
+
+            // Propagate MaxGoalkeepers back to the parent recurring schedule
+            if (ev.RachaScheduleId.HasValue)
+            {
+                var schedule = await db.RachaSchedules.FindAsync(ev.RachaScheduleId.Value);
+                if (schedule is not null)
+                    schedule.MaxGoalkeepers = ev.MaxGoalkeepers;
+            }
 
             await db.SaveChangesAsync();
             await NotificationService.NotifyEventUpdatedAsync(Id, userId!, oldStartsAt);

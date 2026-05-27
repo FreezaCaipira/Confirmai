@@ -81,6 +81,8 @@ builder.Services.AddScoped<PaymentConfirmationService>();
 builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<AbacatePayWebhookService>();
+builder.Services.AddScoped<EfiBankPixService>();
+builder.Services.AddScoped<EfiBankWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
 builder.Services.AddScoped<LanguagePreferenceService>();
 builder.Services.AddScoped<UiTextService>();
@@ -93,6 +95,7 @@ builder.Services.AddScoped<AdminLogsExportService>();
 builder.Services.AddScoped<AdminLogsFilterStateService>();
 builder.Services.AddScoped<AdminUsersFilterStateService>();
  builder.Services.AddScoped<AdminPaymentsFilterStateService>();
+builder.Services.AddScoped<EventCollisionService>();
 builder.Services.AddScoped<AuthenticationStateProvider,
     RevalidatingIdentityAuthenticationStateProvider>();
 builder.Services.AddHostedService<LogRetentionService>();
@@ -166,6 +169,7 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 
 builder.Services.Configure<BtcPayOptions>(builder.Configuration.GetSection("BtcPay"));
 builder.Services.Configure<AbacatePayOptions>(builder.Configuration.GetSection(AbacatePayOptions.Section));
+builder.Services.Configure<EfiBankOptions>(builder.Configuration.GetSection(EfiBankOptions.Section));
 builder.Services.AddHttpClient("AbacatePay", (sp, client) =>
 {
     var opts = sp.GetRequiredService<IOptions<AbacatePayOptions>>().Value;
@@ -416,6 +420,11 @@ app.MapPost("/api/btcpay/webhook", async (HttpContext context, BtcPayWebhookServ
 }).RequireRateLimiting("webhook");
 
 app.MapPost("/api/abacatepay/webhook", async (HttpContext context, AbacatePayWebhookService webhookService) =>
+{
+    return await webhookService.HandleAsync(context);
+}).RequireRateLimiting("webhook");
+
+app.MapPost("/api/efibank/webhook", async (HttpContext context, EfiBankWebhookService webhookService) =>
 {
     return await webhookService.HandleAsync(context);
 }).RequireRateLimiting("webhook");

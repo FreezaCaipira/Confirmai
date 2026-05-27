@@ -14,6 +14,7 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject Confirmai.Services.EventNotificationService NotificationService
+@inject Confirmai.Services.EventCollisionService EventCollisionService
 
 <PageTitle>Editar Evento · Poker · Confirmai</PageTitle>
 
@@ -283,7 +284,13 @@
 
                 @if (!string.IsNullOrWhiteSpace(saveError))
                 {
-                    <p class="validation-message" style="margin-top:.5rem">@saveError</p>
+                    <p class="validation-message" style="margin-top:.5rem">
+                        @saveError
+                        @if (!string.IsNullOrWhiteSpace(collisionHref))
+                        {
+                            <a href="@collisionHref" style="margin-left:.45rem;color:#93c5fd">@Confirmai.Services.EventCollisionService.OpenExistingEventLinkText</a>
+                        }
+                    </p>
                 }
 
                 <div class="form-actions">
@@ -368,6 +375,7 @@
     private bool               accessDenied      = false;
     private bool               isSaving          = false;
     private string             saveError         = string.Empty;
+    private string?            collisionHref;
 
     protected override async Task OnInitializedAsync()
     {
@@ -439,6 +447,7 @@
     {
         isSaving  = true;
         saveError = string.Empty;
+        collisionHref = null;
 
         try
         {
@@ -465,7 +474,18 @@
             ev.Location      = eventType != PokerEventType.HomeGame ? (form.Address ?? string.Empty) : string.Empty;
 
             var oldStartsAt = ev.StartsAt;
-            ev.StartsAt     = DateTime.SpecifyKind(form.Date.ToDateTime(form.Time), DateTimeKind.Utc);
+            var newStartsAt = DateTime.SpecifyKind(form.Date.ToDateTime(form.Time), DateTimeKind.Utc);
+
+            var collision = await EventCollisionService.FindGroupTimeCollisionAsync(ev.GroupId, newStartsAt, ev.Id);
+            if (collision is not null)
+            {
+                saveError = Confirmai.Services.EventCollisionService.BuildConflictMessage(collision.StartsAt);
+                collisionHref = $"/poker/{collision.EventId}";
+                isSaving  = false;
+                return;
+            }
+
+            ev.StartsAt     = newStartsAt;
 
             switch (eventType)
             {

@@ -89,6 +89,62 @@ public class EventNotificationService
 
     // ── internos ─────────────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Notifica todos os membros do grupo (exceto o criador) quando o scheduler
+    /// gera automaticamente uma nova ocorrência de evento recorrente.
+    /// </summary>
+    public async Task NotifyNewRecurringEventAsync(int eventId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        var ev = await db.Events
+            .Include(e => e.Group)
+            .Include(e => e.Venue)
+            .FirstOrDefaultAsync(e => e.Id == eventId);
+
+        if (ev is null) return;
+
+        var members = await db.GroupMembers
+            .Include(m => m.User)
+            .Where(m => m.GroupId == ev.GroupId && m.UserId != ev.CreatedByUserId)
+            .ToListAsync();
+
+        if (members.Count == 0) return;
+
+        var startsStr = ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy 'às' HH:mm",
+            System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
+        var location  = ev.Venue?.Name ?? ev.Location;
+        var subject   = $"[Confirmai] Nova partida: {ev.Group.Name}";
+        var bodyText  = $"Olá!\n\n" +
+                        $"Uma nova ocorrência de \"{ev.Group.Name}\" foi agendada automaticamente.\n\n" +
+                        $"📅 {startsStr}\n" +
+                        $"📍 {location}\n\n" +
+                        $"Acesse o Confirmai para confirmar sua presença.\n\n" +
+                        $"Equipe Confirmai";
+        var bodyHtml  = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
+
+        foreach (var member in members)
+        {
+            db.UserMailboxMessages.Add(new UserMailboxMessage
+            {
+                SenderUserId    = ev.CreatedByUserId ?? string.Empty,
+                RecipientUserId = member.UserId,
+                Subject         = subject,
+                Body            = bodyText,
+                CreatedAt       = DateTime.UtcNow,
+            });
+        }
+
+        await db.SaveChangesAsync();
+
+        foreach (var member in members)
+        {
+            if (string.IsNullOrWhiteSpace(member.User?.Email)) continue;
+            try   { await _emailSender.SendEmailAsync(member.User.Email, subject, bodyHtml); }
+            catch { /* ignore */ }
+        }
+    }
+
     private async Task SendToParticipantsAsync(
         AppDbContext db, Event ev, string senderId, string subject, string bodyText)
     {
@@ -137,5 +193,46 @@ public class EventNotificationService
         //       catch { /* ignore */ }
         //   }
         // ────────────────────────────────────────────────────────────────────
+    }
+
+    /// <summary>
+    /// Notifica o usuário que foi promovido da lista de espera para a partida.
+    /// </summary>
+    public async Task NotifyWaitlistPromotedAsync(int eventId, string promotedUserId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        var ev = await db.Events
+            .Include(e => e.Group)
+            .FirstOrDefaultAsync(e => e.Id == eventId);
+
+        if (ev is null) return;
+
+        var user = await db.Users.FindAsync(promotedUserId) as ApplicationUser;
+        if (user is null) return;
+
+        var startsStr = ev.StartsAt.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm");
+        var subject   = $"[Confirmai] Vaga aberta: {ev.Group.Name}";
+        var bodyText  = $"Olá!\n\n" +
+                        $"Uma vaga abriu e você foi promovido da lista de espera para a partida " +
+                        $"\"{ev.Group.Name}\" em {startsStr}.\n\n" +
+                        $"Equipe Confirmai";
+
+        db.UserMailboxMessages.Add(new UserMailboxMessage
+        {
+            SenderUserId    = ev.CreatedByUserId ?? string.Empty,
+            RecipientUserId = promotedUserId,
+            Subject         = subject,
+            Body            = bodyText,
+            CreatedAt       = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
+
+        if (!string.IsNullOrWhiteSpace(user.Email))
+        {
+            var bodyHtml = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
+            try { await _emailSender.SendEmailAsync(user.Email, subject, bodyHtml); }
+            catch { /* ignore */ }
+        }
     }
 }

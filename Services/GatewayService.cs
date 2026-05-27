@@ -23,8 +23,9 @@ namespace Confirmai.Services
 
             var defaults = new[]
             {
-                new { Name = "Pix", Enabled = true },
-                new { Name = "Testnet", Enabled = true },
+                new { Name = "Pix",          Enabled = true  },
+                new { Name = "EfiBank",      Enabled = true  },
+                new { Name = "Testnet",      Enabled = true  },
                 new { Name = "BTCPayServer", Enabled = false },
             };
 

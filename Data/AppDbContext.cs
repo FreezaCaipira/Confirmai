@@ -18,11 +18,115 @@ namespace Confirmai.Data
         // Confirmai domain
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
+        public DbSet<GroupJoinRequest> GroupJoinRequests { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventConfirmation> EventConfirmations { get; set; }
         public DbSet<WaitingList> WaitingLists { get; set; }
         public DbSet<Venue> Venues { get; set; }
         public DbSet<MatchSchedule> RachaSchedules { get; set; }
+
+        public override int SaveChanges()
+        {
+            EnsureGroupInviteCodesAsync(CancellationToken.None).GetAwaiter().GetResult();
+            ValidateEventCollisionsAsync(CancellationToken.None).GetAwaiter().GetResult();
+            return base.SaveChanges();
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            EnsureGroupInviteCodesAsync(CancellationToken.None).GetAwaiter().GetResult();
+            ValidateEventCollisionsAsync(CancellationToken.None).GetAwaiter().GetResult();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            await EnsureGroupInviteCodesAsync(cancellationToken);
+            await ValidateEventCollisionsAsync(cancellationToken);
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            await EnsureGroupInviteCodesAsync(cancellationToken);
+            await ValidateEventCollisionsAsync(cancellationToken);
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private async Task EnsureGroupInviteCodesAsync(CancellationToken cancellationToken)
+        {
+            var groupsWithoutCode = ChangeTracker.Entries<Group>()
+                .Where(e => e.State == EntityState.Added && string.IsNullOrWhiteSpace(e.Entity.InviteCode))
+                .ToList();
+
+            if (groupsWithoutCode.Count == 0)
+                return;
+
+            foreach (var entry in groupsWithoutCode)
+            {
+                entry.Entity.InviteCode = await GenerateUniqueInviteCodeAsync(cancellationToken);
+            }
+        }
+
+        private async Task<string> GenerateUniqueInviteCodeAsync(CancellationToken cancellationToken)
+        {
+            const int maxAttempts = 20;
+
+            for (var i = 0; i < maxAttempts; i++)
+            {
+                var code = Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
+
+                var duplicateInTracker = ChangeTracker.Entries<Group>()
+                    .Where(e => e.State != EntityState.Deleted)
+                    .Any(e => string.Equals(e.Entity.InviteCode, code, StringComparison.OrdinalIgnoreCase));
+
+                if (duplicateInTracker)
+                    continue;
+
+                var duplicateInDb = await Groups.AnyAsync(g => g.InviteCode == code, cancellationToken);
+                if (!duplicateInDb)
+                    return code;
+            }
+
+            throw new InvalidOperationException("Não foi possível gerar um código de convite único para o grupo.");
+        }
+
+        private async Task ValidateEventCollisionsAsync(CancellationToken cancellationToken)
+        {
+            var candidates = ChangeTracker.Entries<Event>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified)
+                .Select(e => new
+                {
+                    Entry = e,
+                    EventId = e.Entity.Id,
+                    GroupId = e.Entity.GroupId,
+                    StartsAt = e.Entity.StartsAt,
+                })
+                .ToList();
+
+            if (candidates.Count == 0)
+                return;
+
+            // Prevent collisions among entities pending in this same unit of work.
+            var pendingCollision = candidates
+                .GroupBy(c => new { c.GroupId, c.StartsAt })
+                .Any(g => g.Count() > 1);
+
+            if (pendingCollision)
+                throw new InvalidOperationException("Já existe uma partida nesse grupo na mesma data e hora.");
+
+            foreach (var candidate in candidates)
+            {
+                var hasCollisionInDb = await Events.AnyAsync(
+                    e => e.GroupId == candidate.GroupId
+                      && e.StartsAt == candidate.StartsAt
+                      && (candidate.EventId <= 0 || e.Id != candidate.EventId),
+                    cancellationToken);
+
+                if (hasCollisionInDb)
+                    throw new InvalidOperationException("Já existe uma partida nesse grupo na mesma data e hora.");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -124,7 +228,8 @@ namespace Confirmai.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Event>()
-                .HasIndex(e => new { e.GroupId, e.StartsAt });
+                .HasIndex(e => new { e.GroupId, e.StartsAt })
+                .IsUnique();
 
             modelBuilder.Entity<EventConfirmation>()
                 .HasIndex(ec => new { ec.EventId, ec.UserId })
@@ -162,6 +267,11 @@ namespace Confirmai.Data
             modelBuilder.Entity<Venue>()
                 .HasIndex(v => new { v.City, v.StateCode, v.IsActive });
 
+            // Group InviteCode — always present and unique
+            modelBuilder.Entity<Group>()
+                .HasIndex(g => g.InviteCode)
+                .IsUnique();
+
             // RachaSchedule
             modelBuilder.Entity<MatchSchedule>()
                 .HasOne(rs => rs.Group)
@@ -197,6 +307,22 @@ namespace Confirmai.Data
                 .HasIndex(e => e.HomeGameCode)
                 .IsUnique()
                 .HasFilter("\"HomeGameCode\" IS NOT NULL");
+
+            // GroupJoinRequest
+            modelBuilder.Entity<GroupJoinRequest>()
+                .HasIndex(r => new { r.GroupId, r.UserId, r.Status });
+
+            modelBuilder.Entity<GroupJoinRequest>()
+                .HasOne(r => r.Group)
+                .WithMany()
+                .HasForeignKey(r => r.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GroupJoinRequest>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

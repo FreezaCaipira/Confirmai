@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Confirmai.Enums;
 
 namespace Confirmai.Models
 {
@@ -15,6 +16,9 @@ namespace Confirmai.Models
 
         // Posição na fila — menor número entra primeiro
         public int Position { get; set; }
+
+        /// <summary>Posição desejada no futsal (linha ou goleiro). Null = qualquer.</summary>
+        public FutsalPosition? DesiredPosition { get; set; }
 
         public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
     }

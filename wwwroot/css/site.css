@@ -5141,8 +5141,8 @@ body .main-content::before {
 /* ── Main content card (entity-shell-card) ────────────────────── */
 body .oldsite-main-content .entity-shell-card,
 body .entity-shell-card {
-    background: #111927;
-    border: 1px solid #1b3868;
+    background: #060e18;
+    border: 1px solid #1b3d6c;
     border-top: 2px solid #1a5298;
     box-shadow: none;
     transition: border-color 0.25s ease, border-top-color 0.25s ease, box-shadow 0.25s ease;

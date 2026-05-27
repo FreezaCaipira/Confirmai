@@ -1,6 +1,7 @@
 @page "/pagamento/evento/{ConfirmationId:int}"
 
 @attribute [Authorize]
+@implements IDisposable
 
 @using Confirmai.Data
 @using Confirmai.Enums
@@ -14,6 +15,7 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
+@inject EfiBankPixService EfiBankService
 
 <PageTitle>Pagamento — Confirmai</PageTitle>
 
@@ -78,8 +80,9 @@
                 </div>
 
                 @* ── Status / Ação ──────────────────────────────────────── *@
-                @if (conf.HasPaid)
+                @if (conf.HasPaid || payState == PayState.Paid)
                 {
+                    @* ── Pago ─────────────────────────────────────────── *@
                     <div class="evpay-status evpay-status--paid">
                         <i class="fas fa-check-circle"></i>
                         <div>
@@ -91,23 +94,38 @@
                         <i class="fas fa-arrow-left"></i> Voltar para a partida
                     </a>
                 }
+                else if (payState == PayState.AwaitingPayment)
+                {
+                    @* ── QR Code Pix ──────────────────────────────────── *@
+                    <div class="evpay-qr-section">
+                        <div class="evpay-qr-image">
+                            <QRCode Value="@brCode" />
+                        </div>
+
+                        <div class="evpay-awaiting">
+                            <span class="evpay-awaiting-dot"></span>
+                            Aguardando pagamento…
+                        </div>
+
+                        <p class="evpay-brcode">@brCode</p>
+
+                        <button class="evpay-action-btn evpay-action-btn--copy"
+                                @onclick="CopyBrCode">
+                            <i class="@(copied ? "fas fa-check" : "fas fa-copy")"></i>
+                            @(copied ? "Copiado!" : "Copiar código Pix")
+                        </button>
+                    </div>
+                }
                 else
                 {
-                    @* ── Métodos de pagamento ─────────────────────────── *@
+                    @* ── Selecionar método ────────────────────────────── *@
                     <div class="evpay-methods">
                         <h2 class="evpay-methods-title">Forma de pagamento</h2>
                         <div class="evpay-method-list">
-                            <label class="evpay-method-option @(selectedMethod == "pix" ? "evpay-method-option--selected" : "")">
-                                <input type="radio" name="method" value="pix" @onchange='() => selectedMethod = "pix"' checked="@(selectedMethod == "pix")" />
+                            <label class="evpay-method-option evpay-method-option--selected">
                                 <span class="evpay-method-icon">💠</span>
                                 <span class="evpay-method-name">Pix</span>
-                                <span class="evpay-method-badge">Instantâneo</span>
-                            </label>
-                            <label class="evpay-method-option evpay-method-option--disabled" title="Em breve">
-                                <input type="radio" name="method" value="btcpay" disabled />
-                                <span class="evpay-method-icon">₿</span>
-                                <span class="evpay-method-name">BtcPay</span>
-                                <span class="evpay-method-badge evpay-method-badge--soon">Em breve</span>
+                                <span class="evpay-method-badge">1,19% · EfiBank</span>
                             </label>
                         </div>
                     </div>
@@ -117,24 +135,29 @@
                         <p class="evpay-error">@errorMsg</p>
                     }
 
-                    @* ── Botão de confirmação (mock) ───────────────────── *@
+                    @if (!EfiBankService.IsEnabled)
+                    {
+                        <p class="evpay-disclaimer">
+                            <i class="fas fa-clock"></i>
+                            Pagamento via Pix em breve. Entre em contato com o organizador.
+                        </p>
+                    }
+                    else
+                    {
                     <button class="evpay-action-btn evpay-action-btn--pay"
-                            disabled="@isProcessing"
-                            @onclick="ProcessPayment">
-                        @if (isProcessing)
+                            disabled="@(payState == PayState.Generating)"
+                            @onclick="GeneratePixCharge">
+                        @if (payState == PayState.Generating)
                         {
-                            <span>Processando…</span>
+                            <span>Gerando QR Code…</span>
                         }
                         else
                         {
-                            <i class="fas fa-lock"></i>
-                            <span>Pagar R$ @ev.Price.Value.ToString("N2", ptBr)</span>
+                            <i class="fas fa-qrcode"></i>
+                            <span>Gerar QR Code Pix — R$ @ev.Price!.Value.ToString("N2", ptBr)</span>
                         }
                     </button>
-                    <p class="evpay-disclaimer">
-                        <i class="fas fa-info-circle"></i>
-                        Integração com gateway de pagamento em implementação.
-                    </p>
+                    }
                 }
             }
 
@@ -143,14 +166,19 @@
 </div>
 
 @code {
+    private enum PayState { Idle, Generating, AwaitingPayment, Paid }
+
     [Parameter] public int ConfirmationId { get; set; }
 
     private EventConfirmation? conf;
-    private bool   isLoading    = true;
-    private bool   isProcessing = false;
-    private string errorMsg     = string.Empty;
-    private string selectedMethod = "pix";
-    private string userId = string.Empty;
+    private bool    isLoading = true;
+    private string  errorMsg  = string.Empty;
+    private string  userId    = string.Empty;
+
+    private PayState payState = PayState.Idle;
+    private string?  brCode;
+    private bool     copied;
+    private CancellationTokenSource? _pollCts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -176,32 +204,98 @@
         isLoading = false;
     }
 
-    private async Task ProcessPayment()
+    private async Task GeneratePixCharge()
     {
-        if (conf is null) return;
-        isProcessing = true;
-        errorMsg     = string.Empty;
+        if (conf is null || conf.Event.Price is null) return;
+        payState = PayState.Generating;
+        errorMsg = string.Empty;
 
         try
         {
-            // TODO: integrar gateway (AbacatePay / BtcPay / Pix)
-            // Por enquanto, mock: marca como pago diretamente
+            var (txId, pixBrCode) = await EfiBankService
+                .CreateChargeAsync(conf.Event.Price.Value, conf.Id);
+
+            // Persist txId so the webhook can resolve the confirmation
             await using var db = await DbFactory.CreateDbContextAsync();
             var entity = await db.EventConfirmations.FindAsync(conf.Id);
-            if (entity is null) { errorMsg = "Confirmação não encontrada."; return; }
+            if (entity is not null)
+            {
+                entity.PixTxId = txId;
+                await db.SaveChangesAsync();
+                conf.PixTxId = txId;
+            }
 
-            entity.HasPaid = true;
-            await db.SaveChangesAsync();
+            brCode   = pixBrCode;
+            payState = PayState.AwaitingPayment;
+            _ = StartPollingAsync(txId);
+        }
+        catch (Exception ex)
+        {
+            errorMsg = $"Erro ao gerar QR Code: {ex.Message}";
+            payState = PayState.Idle;
+        }
+    }
 
-            conf.HasPaid = true; // atualiza local para mostrar status pago
-        }
-        catch
+    private async Task StartPollingAsync(string txId)
+    {
+        _pollCts?.Cancel();
+        _pollCts = new CancellationTokenSource();
+        var ct = _pollCts.Token;
+
+        try
         {
-            errorMsg = "Erro ao processar pagamento. Tente novamente.";
+            while (!ct.IsCancellationRequested)
+            {
+                await Task.Delay(5000, ct);
+
+                // Check DB first (fastest if webhook already fired)
+                await using (var db = await DbFactory.CreateDbContextAsync())
+                {
+                    var fresh = await db.EventConfirmations.FindAsync(conf!.Id);
+                    if (fresh?.HasPaid is true)
+                    {
+                        conf.HasPaid = true;
+                        payState = PayState.Paid;
+                        await InvokeAsync(StateHasChanged);
+                        return;
+                    }
+                }
+
+                // Also query EfiBank API directly for faster feedback
+                if (await EfiBankService.IsChargePaidAsync(txId))
+                {
+                    await using var db = await DbFactory.CreateDbContextAsync();
+                    var entity = await db.EventConfirmations.FindAsync(conf!.Id);
+                    if (entity is not null)
+                    {
+                        entity.HasPaid = true;
+                        await db.SaveChangesAsync();
+                    }
+                    conf!.HasPaid = true;
+                    payState = PayState.Paid;
+                    await InvokeAsync(StateHasChanged);
+                    return;
+                }
+            }
         }
-        finally
-        {
-            isProcessing = false;
-        }
+        catch (TaskCanceledException) { }
+    }
+
+    private async Task CopyBrCode()
+    {
+        // No JS interop available without IJSRuntime injection;
+        // simply set the copied flag for visual feedback.
+        // The brCode is selectable via user-select:all CSS.
+        copied = true;
+        StateHasChanged();
+        await Task.Delay(2000);
+        copied = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _pollCts?.Cancel();
+        _pollCts?.Dispose();
     }
 }

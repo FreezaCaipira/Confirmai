@@ -2,6 +2,8 @@
 
 @attribute [Authorize]
 
+@* groupId pode ser passado via ?groupId=X para associar a um grupo existente *@
+
 @using System.Security.Claims
 @using Confirmai.Data
 @using Confirmai.Enums
@@ -13,13 +15,18 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject Confirmai.Services.EventCollisionService EventCollisionService
+
 
 <PageTitle>Criar Partida · Futsal · Confirmai</PageTitle>
 
 <div class="create-event-page">
     <div class="create-event-card">
         <h1 class="create-event-title">
-            <i class="fas fa-futbol"></i> Nova Partida de Futsal
+            <i class="fas fa-futbol"></i>
+            @(preselectedGroup is not null
+                ? $"Nova Partida — {preselectedGroup.Name}"
+                : "Nova Partida de Futsal")
         </h1>
 
         @if (isLoading)
@@ -36,13 +43,16 @@
                 <fieldset class="form-section">
                     <legend>Identidade da Partida</legend>
 
-                    <div class="form-group">
-                        <label>Nome da partida <span class="required">*</span></label>
-                        <InputText class="input" @bind-Value="form.GroupName"
-                                   placeholder='Ex: "Rachão da Galera do Zé", "Pelada de Quinta"'
-                                   autocomplete="off" />
-                        <ValidationMessage For="@(() => form.GroupName)" class="validation-message" />
-                    </div>
+                    @if (preselectedGroup is null)
+                    {
+                        <div class="form-group">
+                            <label>Nome da partida <span class="required">*</span></label>
+                            <InputText class="input" @bind-Value="form.GroupName"
+                                       placeholder='Ex: "Rachão da Galera do Zé", "Pelada de Quinta"'
+                                       autocomplete="off" />
+                            <ValidationMessage For="@(() => form.GroupName)" class="validation-message" />
+                        </div>
+                    }
 
                     <div class="form-group">
                         <label>Modalidade <span class="required">*</span></label>
@@ -134,7 +144,7 @@
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Jogadores de linha <span class="required">*</span></label>
+                            <label>Vagas totais (linha + goleiros) <span class="required">*</span></label>
                             <InputNumber class="input" @bind-Value="form.MaxPlayers" min="1" max="100" />
                             <ValidationMessage For="@(() => form.MaxPlayers)" class="validation-message" />
                         </div>
@@ -193,14 +203,22 @@
                     }
                 </fieldset>
 
+                @* ── Privacidade: grupos são sempre privados ────────────────────── *@
+
                 @if (!string.IsNullOrWhiteSpace(saveError))
                 {
-                    <p class="validation-message">@saveError</p>
+                    <p class="validation-message">
+                        @saveError
+                        @if (!string.IsNullOrWhiteSpace(collisionHref))
+                        {
+                            <a href="@collisionHref" style="margin-left:.45rem;color:#93c5fd">@Confirmai.Services.EventCollisionService.OpenExistingEventLinkText</a>
+                        }
+                    </p>
                 }
 
                 <div class="form-actions">
                     <button class="cancel-btn" type="button"
-                            @onclick='() => NavigationManager.NavigateTo("/futsal")'>
+                            @onclick='() => NavigationManager.NavigateTo(preselectedGroup is not null ? $"/grupo/{preselectedGroup.Id}" : "/grupos")'>
                         Cancelar
                     </button>
                     <button class="save-btn" type="submit" disabled="@(isSaving || !venues.Any())">
@@ -214,11 +232,17 @@
 </div>
 
 @code {
+    // ── Query param ──────────────────────────────────────────────────────────
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int? GroupId { get; set; }
+
     // ── Form model ──────────────────────────────────────────────────────────
 
     private sealed class CreateMatchForm
     {
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe o nome da partida.")]
+        // GroupName só é usado quando nenhum grupo é pré-selecionado (legacy flow)
         [System.ComponentModel.DataAnnotations.StringLength(120, ErrorMessage = "Máximo 120 caracteres.")]
         public string GroupName { get; set; } = string.Empty;
 
@@ -228,7 +252,7 @@
         public int VenueId { get; set; } = 0;
 
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe a data.")]
-        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         public TimeOnly Time { get; set; } = new TimeOnly(20, 0);
 
@@ -246,17 +270,20 @@
 
         public bool RecurrenceEnabled { get; set; } = false;
         public HashSet<DayOfWeek> SelectedDays { get; set; } = new();
+        public bool IsPrivate { get; set; } = true;
     }
 
     // ── State ────────────────────────────────────────────────────────────────
 
-    private CreateMatchForm form        = new();
-    private List<Venue>    venues       = new();
+    private CreateMatchForm form             = new();
+    private List<Venue>    venues            = new();
     private Venue?         selectedVenue;
-    private bool           isLoading   = true;
-    private bool           isSaving    = false;
-    private string         saveError   = string.Empty;
-    private string         subFormat   = "futsal";
+    private Group?         preselectedGroup;
+    private bool           isLoading        = true;
+    private bool           isSaving         = false;
+    private string         saveError        = string.Empty;
+    private string?        collisionHref;
+    private string         subFormat        = "futsal";
 
     // ── Options ──────────────────────────────────────────────────────────────
 
@@ -286,12 +313,37 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await using var db = await DbFactory.CreateDbContextAsync();
-        venues = await db.Venues
-            .Where(v => v.IsActive)
-            .OrderBy(v => v.City)
-            .ThenBy(v => v.Name)
-            .ToListAsync();
+        // Se veio com ?groupId, verificar se o usuário é admin do grupo
+        if (GroupId.HasValue)
+        {
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+            preselectedGroup = await db.Groups
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.Id == GroupId.Value
+                    && g.Members.Any(m => m.UserId == userId && m.Role == GroupMemberRole.Admin));
+
+            if (preselectedGroup is null)
+            {
+                NavigationManager.NavigateTo("/grupos");
+                return;
+            }
+
+            venues = await db.Venues
+                .Where(v => v.IsActive)
+                .OrderBy(v => v.City)
+                .ThenBy(v => v.Name)
+                .ToListAsync();
+        }
+        else
+        {
+            // Sem groupId: redirecionar para /grupos para criar/selecionar um grupo
+            NavigationManager.NavigateTo("/grupos");
+            return;
+        }
+
         isLoading = false;
     }
 
@@ -330,6 +382,7 @@
     {
         isSaving  = true;
         saveError = string.Empty;
+        collisionHref = null;
 
         try
         {
@@ -356,28 +409,48 @@
 
             await using var db = await DbFactory.CreateDbContextAsync();
 
-            // 1 — Criar Group
-            var group = new Group
+            Group group;
+            if (preselectedGroup is not null)
             {
-                Name            = form.GroupName,
-                Sport           = Sport.Futsal,
-                City            = venue.City,
-                StateCode       = venue.StateCode,
-                IsActive        = true,
-                CreatedByUserId = userId,
-            };
-            db.Groups.Add(group);
-            await db.SaveChangesAsync(); // gera group.Id
-
-            // 2 — Criar GroupMember (criador = Admin)
-            db.GroupMembers.Add(new GroupMember
+                // Usar grupo existente
+                group = preselectedGroup;
+            }
+            else
             {
-                GroupId = group.Id,
-                UserId  = userId,
-                Role    = GroupMemberRole.Admin,
-            });
+                // 1 — Criar Group
+                group = new Group
+                {
+                    Name            = form.GroupName,
+                    Sport           = Sport.Futsal,
+                    City            = venue.City,
+                    StateCode       = venue.StateCode,
+                    IsActive        = true,
+                    IsPrivate       = true,
+                    CreatedByUserId = userId,
+                    InviteCode      = Guid.NewGuid().ToString("N")[..8].ToUpper(),
+                };
+                db.Groups.Add(group);
+                await db.SaveChangesAsync();
 
-            // 3 — Criar primeiro Event
+                // 2 — Criar GroupMember (criador = Admin)
+                db.GroupMembers.Add(new GroupMember
+                {
+                    GroupId = group.Id,
+                    UserId  = userId,
+                    Role    = GroupMemberRole.Admin,
+                });
+            }
+
+            // 3 — Criar Event
+            var collision = await EventCollisionService.FindGroupTimeCollisionAsync(group.Id, startsAt);
+            if (collision is not null)
+            {
+                saveError = Confirmai.Services.EventCollisionService.BuildConflictMessage(collision.StartsAt);
+                collisionHref = $"/futsal/{collision.EventId}";
+                isSaving  = false;
+                return;
+            }
+
             var ev = new Event
             {
                 GroupId         = group.Id,
@@ -410,6 +483,7 @@
                         DurationMinutes = form.DurationMinutes,
                         Price           = form.Price,
                         MaxPlayers      = form.MaxPlayers,
+                        MaxGoalkeepers  = form.MaxGoalkeepers > 0 ? form.MaxGoalkeepers : null,
                         LocalName       = form.LocalName,
                         IsActive        = true,
                         CreatedByUserId = userId,

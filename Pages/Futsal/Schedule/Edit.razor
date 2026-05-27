@@ -1,0 +1,318 @@
+@page "/futsal/schedule/{Id:int}/edit"
+
+@attribute [Authorize]
+
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Editar Recorrência · Confirmai</PageTitle>
+
+<div class="create-event-page">
+    <div class="create-event-card">
+        <div class="create-event-card-top">
+            <h1 class="create-event-title">
+                <i class="fas fa-sync-alt"></i> Editar Recorrência
+            </h1>
+            <a href="/meus-eventos" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-spinner">Carregando...</div>
+        }
+        else if (notFound)
+        {
+            <div class="detail-not-found">
+                <h2>Agendamento não encontrado.</h2>
+                <a href="/meus-eventos">← Voltar</a>
+            </div>
+        }
+        else if (accessDenied)
+        {
+            <div class="detail-not-found">
+                <h2>Acesso negado.</h2>
+                <p>Apenas o criador pode editar este agendamento.</p>
+                <a href="/meus-eventos">← Voltar</a>
+            </div>
+        }
+        else
+        {
+            <p class="form-hint" style="margin-bottom:1rem">
+                ⚠️ Alterações aqui <strong>não afetam</strong> partidas já geradas — apenas as próximas ocorrências.
+            </p>
+
+            <EditForm Model="form" OnValidSubmit="Save">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="validation-summary" />
+
+                @* ── Nome / Apelido ────────────────────────────────────────── *@
+                <fieldset class="form-section">
+                    <legend>Identificação</legend>
+
+                    <div class="form-group">
+                        <label>Como vocês chamam o jogo?</label>
+                        <InputText class="input" @bind-Value="form.LocalName"
+                                   placeholder='racha, pelada, baba, rachão…' maxlength="60"
+                                   autocomplete="off" />
+                        <small class="form-hint">Opcional — aparece nos cards para identificar o estilo da região.</small>
+                    </div>
+                </fieldset>
+
+                @* ── Dia / Hora / Duração ─────────────────────────────────── *@
+                <fieldset class="form-section">
+                    <legend>Horário</legend>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Dia da semana <span class="required">*</span></label>
+                            <InputSelect class="input" @bind-Value="form.DayOfWeek">
+                                @foreach (var (dow, label) in WeekdayOptions)
+                                {
+                                    <option value="@dow">@label</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label>Hora de início <span class="required">*</span></label>
+                            <input type="time" class="input"
+                                   value="@form.TimeOfDay.ToString("HH:mm")"
+                                   @onchange="OnTimeChange" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Duração <span class="required">*</span></label>
+                        <InputSelect class="input" @bind-Value="form.DurationMinutes">
+                            @foreach (var (min, label) in DurationOptions)
+                            {
+                                <option value="@min">@label</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </fieldset>
+
+                @* ── Local ────────────────────────────────────────────────── *@
+                <fieldset class="form-section">
+                    <legend>Local</legend>
+
+                    <div class="form-group">
+                        <label>Quadra / Society / Campo <span class="required">*</span></label>
+                        <InputSelect class="input" @bind-Value="form.VenueId">
+                            <option value="0">— selecione —</option>
+                            @foreach (var v in venues)
+                            {
+                                <option value="@v.Id">@v.Name — @v.City/@v.StateCode</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => form.VenueId)" class="validation-message" />
+                    </div>
+                </fieldset>
+
+                @* ── Vagas ────────────────────────────────────────────────── *@
+                <fieldset class="form-section">
+                    <legend>Vagas</legend>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Vagas totais (linha + goleiros) <span class="required">*</span></label>
+                            <InputNumber class="input" @bind-Value="form.MaxPlayers" min="1" max="100" />
+                            <ValidationMessage For="@(() => form.MaxPlayers)" class="validation-message" />
+                        </div>
+                        <div class="form-group">
+                            <label>Goleiros</label>
+                            <InputNumber class="input" @bind-Value="form.MaxGoalkeepers" min="0" max="10" />
+                            <small class="form-hint">0 = sem reserva de goleiro.</small>
+                        </div>
+                    </div>
+                </fieldset>
+
+                @* ── Valor ────────────────────────────────────────────────── *@
+                <fieldset class="form-section">
+                    <legend>Valor</legend>
+
+                    <div class="form-group">
+                        <label>Valor por jogador (R$) <span class="required">*</span></label>
+                        <div class="input-prefix-wrap">
+                            <span class="input-prefix">R$</span>
+                            <InputNumber class="input" @bind-Value="form.Price" min="0" step="0.50" />
+                        </div>
+                        <ValidationMessage For="@(() => form.Price)" class="validation-message" />
+                        <small class="form-hint">Use 0 para partidas sem cobrança.</small>
+                    </div>
+                </fieldset>
+
+                @if (!string.IsNullOrWhiteSpace(saveError))
+                {
+                    <p class="validation-message">@saveError</p>
+                }
+
+                <div class="form-actions">
+                    <button class="cancel-btn" type="button"
+                            @onclick='() => NavigationManager.NavigateTo("/meus-eventos")'>
+                        Cancelar
+                    </button>
+                    <button class="save-btn" type="submit" disabled="@isSaving">
+                        @(isSaving ? "Salvando…" : "Salvar Alterações")
+                    </button>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    // ── Form model ────────────────────────────────────────────────────────
+
+    private sealed class EditScheduleForm
+    {
+        public string? LocalName { get; set; }
+
+        [Required]
+        public DayOfWeek DayOfWeek { get; set; }
+
+        public TimeOnly TimeOfDay { get; set; }
+
+        public int DurationMinutes { get; set; } = 90;
+
+        [Range(1, int.MaxValue, ErrorMessage = "Selecione a quadra.")]
+        public int VenueId { get; set; }
+
+        [Range(1, 100, ErrorMessage = "Mínimo 1 jogador.")]
+        public int MaxPlayers { get; set; } = 10;
+
+        public int MaxGoalkeepers { get; set; } = 0;
+
+        [Range(0, 10000, ErrorMessage = "Valor inválido.")]
+        public decimal Price { get; set; }
+    }
+
+    // ── State ─────────────────────────────────────────────────────────────
+
+    private EditScheduleForm form        = new();
+    private List<Venue>      venues      = new();
+    private bool             isLoading   = true;
+    private bool             isSaving    = false;
+    private bool             notFound    = false;
+    private bool             accessDenied = false;
+    private string           saveError   = string.Empty;
+
+    // ── Options ───────────────────────────────────────────────────────────
+
+    private static readonly (int Min, string Label)[] DurationOptions =
+    [
+        (60,  "1h"),
+        (75,  "1h15min"),
+        (90,  "1h30min"),
+        (105, "1h45min"),
+        (120, "2h"),
+        (150, "2h30min"),
+        (180, "3h"),
+    ];
+
+    private static readonly (DayOfWeek Dow, string Label)[] WeekdayOptions =
+    [
+        (DayOfWeek.Monday,    "Segunda-feira"),
+        (DayOfWeek.Tuesday,   "Terça-feira"),
+        (DayOfWeek.Wednesday, "Quarta-feira"),
+        (DayOfWeek.Thursday,  "Quinta-feira"),
+        (DayOfWeek.Friday,    "Sexta-feira"),
+        (DayOfWeek.Saturday,  "Sábado"),
+        (DayOfWeek.Sunday,    "Domingo"),
+    ];
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var schedule = await db.RachaSchedules.FindAsync(Id);
+
+        if (schedule is null)
+        {
+            notFound  = true;
+            isLoading = false;
+            return;
+        }
+
+        if (schedule.CreatedByUserId != userId)
+        {
+            accessDenied = true;
+            isLoading    = false;
+            return;
+        }
+
+        form = new EditScheduleForm
+        {
+            LocalName       = schedule.LocalName,
+            DayOfWeek       = schedule.DayOfWeek,
+            TimeOfDay       = schedule.TimeOfDay,
+            DurationMinutes = schedule.DurationMinutes,
+            VenueId         = schedule.VenueId,
+            MaxPlayers      = schedule.MaxPlayers,
+            MaxGoalkeepers  = schedule.MaxGoalkeepers ?? 0,
+            Price           = schedule.Price,
+        };
+
+        venues = await db.Venues
+            .Where(v => v.IsActive)
+            .OrderBy(v => v.City)
+            .ThenBy(v => v.Name)
+            .ToListAsync();
+
+        isLoading = false;
+    }
+
+    private void OnTimeChange(ChangeEventArgs e)
+        => form.TimeOfDay = TimeOnly.TryParse(e.Value?.ToString(), out var t) ? t : new TimeOnly(20, 0);
+
+    private async Task Save()
+    {
+        isSaving  = true;
+        saveError = string.Empty;
+
+        try
+        {
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var schedule = await db.RachaSchedules.FindAsync(Id);
+
+            if (schedule is null)      { notFound = true; return; }
+            if (schedule.CreatedByUserId != userId) { accessDenied = true; return; }
+
+            schedule.LocalName       = form.LocalName;
+            schedule.DayOfWeek       = form.DayOfWeek;
+            schedule.TimeOfDay       = form.TimeOfDay;
+            schedule.DurationMinutes = form.DurationMinutes;
+            schedule.VenueId         = form.VenueId;
+            schedule.MaxPlayers      = form.MaxPlayers;
+            schedule.MaxGoalkeepers  = form.MaxGoalkeepers > 0 ? form.MaxGoalkeepers : null;
+            schedule.Price           = form.Price;
+
+            await db.SaveChangesAsync();
+            NavigationManager.NavigateTo("/meus-eventos");
+        }
+        catch (Exception ex)
+        {
+            saveError = $"Erro ao salvar: {ex.Message}";
+            isSaving  = false;
+        }
+    }
+}
