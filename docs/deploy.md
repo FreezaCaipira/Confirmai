@@ -77,9 +77,10 @@ services:
       Email__FromEmail: ${SMTP_FROM_EMAIL}
       Email__FromName: "Confirmai"
       Email__Enabled: "true"
-      # Opcional — OpenTelemetry
-      # OpenTelemetry__Endpoint: ${OTEL_ENDPOINT}
-      # OpenTelemetry__Headers: ${OTEL_HEADERS}
+      OpenTelemetry__Endpoint: ${OTEL_ENDPOINT:-http://otel-collector:4318}
+      OpenTelemetry__Headers: ${OTEL_HEADERS:-}
+      OpenTelemetry__ServiceName: ${OTEL_SERVICE_NAME:-Confirmai}
+      OpenTelemetry__Environment: ${OTEL_ENVIRONMENT:-production}
 
 volumes:
   pgdata:
@@ -115,6 +116,19 @@ SMTP_PORT=587
 SMTP_USERNAME=apikey
 SMTP_PASSWORD=SG.token_sendgrid_aqui
 SMTP_FROM_EMAIL=no-reply@suaempresa.com
+
+# EfiBank Pix
+EFIBANK_CLIENT_ID=seu_client_id_producao
+EFIBANK_CLIENT_SECRET=seu_client_secret_producao
+EFIBANK_CERT_FILE=/home/deploy/efibank-producao.p12
+EFIBANK_CERT_PASSWORD=
+EFIBANK_PIX_KEY=sua_chave_pix_cadastrada_na_efi
+EFIBANK_WEBHOOK_SECRET=segredo_min32chars_aleatorio
+# EFIBANK_WEBHOOK_CERT_SUBJECT=conta.efipay.com.br  # padrão, não precisa alterar
+
+# Opcional: sobrescrever destino OTLP se nao usar o collector interno do compose
+# OTEL_ENDPOINT=http://otel-collector:4318
+# OTEL_HEADERS=Authorization=Bearer seu_token
 ```
 
 > **Nunca versione `.env`** — adicione ao `.gitignore` e faça backup seguro (ex: gestor de segredos).
@@ -123,64 +137,55 @@ SMTP_FROM_EMAIL=no-reply@suaempresa.com
 
 ## 4. Configurar o nginx como reverse proxy
 
-Instale o nginx no servidor host e configure o virtual host em `/etc/nginx/sites-available/Confirmai`:
-
-```nginx
-server {
-    listen 80;
-    server_name Confirmai.suaempresa.com;
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name Confirmai.suaempresa.com;
-
-    ssl_certificate     /etc/letsencrypt/live/Confirmai.suaempresa.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/Confirmai.suaempresa.com/privkey.pem;
-
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-    ssl_prefer_server_ciphers off;
-
-    # Necessário para SignalR (WebSocket)
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection $connection_upgrade;
-
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-
-    # Upload de evidências (máx 10 MB)
-    client_max_body_size 10M;
-
-    location / {
-        proxy_pass http://127.0.0.1:8080;
-    }
-}
-
-map $http_upgrade $connection_upgrade {
-    default upgrade;
-    ''      close;
-}
-```
-
-Ative e recarregue:
+O arquivo de configuração nginx já está incluído no repositório em `ops/nginx/confirmai.conf`.
+Ele configura:
+- Redirecionamento HTTP → HTTPS
+- TLS (Let's Encrypt)
+- **mTLS opcional** para que o EfiBank possa enviar webhooks com certificado cliente
+- WebSocket (necessário para Blazor Server / SignalR)
+- Cabeçalhos de proxy corretos (`X-Forwarded-For`, `X-Forwarded-Proto`)
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/Confirmai /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+# Copie, edite o domínio e ative
+sudo cp ops/nginx/confirmai.conf /etc/nginx/sites-available/confirmai
+sudo sed -i 's/confirmai.suaempresa.com/SEU_DOMINIO_REAL/g' /etc/nginx/sites-available/confirmai
+sudo ln -s /etc/nginx/sites-available/confirmai /etc/nginx/sites-enabled/confirmai
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
 ### Certificado TLS com Let's Encrypt
 
 ```bash
 sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d Confirmai.suaempresa.com
+sudo certbot --nginx -d confirmai.suaempresa.com
 ```
+
+### mTLS EfiBank — validação de CA (recomendado em produção)
+
+Por padrão o `confirmai.conf` usa `ssl_verify_client optional_no_ca`, que aceita qualquer
+certificado cliente sem validar a cadeia de CA. O app valida apenas o Subject (`conta.efipay.com.br`).
+
+Para validação completa com o CA da Efí:
+
+```bash
+sudo mkdir -p /etc/nginx/certs
+# Produção
+sudo curl -o /etc/nginx/certs/efipay-ca.crt \
+     https://certificados.efipay.com.br/efipay.crt
+```
+
+Depois edite `/etc/nginx/sites-available/confirmai` e substitua:
+
+```nginx
+# DE:
+ssl_verify_client optional_no_ca;
+
+# PARA:
+ssl_verify_client    optional;
+ssl_client_certificate /etc/nginx/certs/efipay-ca.crt;
+```
+
+Recarregue: `sudo nginx -t && sudo systemctl reload nginx`
 
 ### Renovação automática do certificado (cron)
 
@@ -238,15 +243,38 @@ curl -f https://Confirmai.suaempresa.com/health
 ## 7. Configurar webhook no BTCPay Server
 
 1. Acesse seu BTCPay Server → Store → **Settings → Webhooks → Add Webhook**
-2. URL: `https://Confirmai.suaempresa.com/api/btcpay/webhook`
+2. URL: `https://confirmai.suaempresa.com/api/btcpay/webhook`
 3. Secret: mesmo valor de `BTCPAY_WEBHOOK_SECRET` no `.env`
 4. Eventos: `InvoiceSettled`, `InvoiceExpired`, `InvoiceInvalid`
 
 ---
 
-## 8. Primeiro login e configurações pós-boot
+## 8. Registrar webhook no EfiBank (Pix)
 
-1. Acesse `https://Confirmai.suaempresa.com` e faça login com as credenciais de `ADMIN_EMAIL` / `ADMIN_PASSWORD`
+O app registra o webhook automaticamente na inicialização quando `EfiBank:WebhookUrl` está configurado.
+Verifique nos logs do primeiro boot:
+
+```
+[INF] EfiBankPixService: Webhook registrado com sucesso para chave <PIX_KEY>
+```
+
+Se quiser registrar manualmente via API:
+
+```bash
+# Substitua <PIX_KEY> pela sua chave Pix e <ACCESS_TOKEN> pelo token OAuth2
+curl -X PUT https://pix.api.efipay.com.br/v2/webhook/<PIX_KEY> \
+  --cert efibank-producao.p12 \
+  --key efibank-producao.p12 \
+  -H 'Authorization: Bearer <ACCESS_TOKEN>' \
+  -H 'Content-Type: application/json' \
+  -d '{"webhookUrl": "https://confirmai.suaempresa.com/api/webhooks/efibank/pix?webhookSecret=SEU_WEBHOOK_SECRET"}'
+```
+
+---
+
+## 9. Primeiro login e configurações pós-boot
+
+1. Acesse `https://confirmai.suaempresa.com` e faça login com as credenciais de `ADMIN_EMAIL` / `ADMIN_PASSWORD`
 2. Troque a senha imediatamente via `/manage/change-password`
 3. Acesse `/admin` → configure a taxa de operação e a chave PIX intermediária
 4. Remova as variáveis `AdminSeed__*` do `.env` (ou defina-as como vazio) e reinicie:
@@ -257,7 +285,7 @@ docker compose up -d app
 
 ---
 
-## 9. Atualizando para uma nova versão
+## 10. Atualizando para uma nova versão
 
 ```bash
 git pull origin main
@@ -268,9 +296,28 @@ docker compose logs -f app
 
 As migrations novas são aplicadas automaticamente no boot.
 
+### Smoke pos-deploy (obrigatorio)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-postdeploy.ps1 -BaseUrl https://Confirmai.suaempresa.com
+```
+
+Se algum check falhar, nao prossiga com operacao normal: execute rollback imediato.
+
+### Rollback rapido
+
+```bash
+# Exemplo: voltar para imagem anterior ja publicada
+docker compose pull app
+docker compose up -d app
+
+# Validar saude apos rollback
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-postdeploy.ps1 -BaseUrl https://Confirmai.suaempresa.com
+```
+
 ---
 
-## 10. Backup e restore do banco
+## 11. Backup e restore do banco
 
 ### Backup manual
 
@@ -293,7 +340,7 @@ gunzip -c backup_YYYYMMDD_HHMMSS.sql.gz | docker compose exec -T db psql -U app 
 
 ---
 
-## 11. Escalar horizontalmente (opcional)
+## 12. Escalar horizontalmente (opcional)
 
 O Confirmai usa `PaymentEventBus` como event bus **in-process** (singleton Blazor Server). Para múltiplas réplicas, substitua o event bus por um broker externo (Redis Pub/Sub ou Azure Service Bus) e configure o `IDataProtection` com storage compartilhado.
 
@@ -301,8 +348,56 @@ Para a maioria dos casos de uso de OTServs, uma única réplica é suficiente.
 
 ---
 
+## 13. Alertas reais de pagamentos/reconciliação
+
+Os arquivos operacionais agora ficam em `ops/monitoring/` e podem ser usados diretamente com Docker Compose.
+
+### Subir a stack
+
+```bash
+docker compose up -d
+docker compose --profile monitoring up -d prometheus alertmanager grafana alert-webhook
+```
+
+### Validar a cadeia
+
+```bash
+docker compose --profile monitoring ps
+docker compose logs prometheus --tail=100
+docker compose logs alertmanager --tail=100
+docker compose logs alert-webhook --tail=100
+```
+
+Smoke consolidado:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-monitoring-alerts.ps1 -RequirePaymentRules -RequireCollectorMetrics
+```
+
+Verificações esperadas:
+
+1. `otel-collector` escutando OTLP em `4317/4318` e expondo métricas em `9464`.
+2. Prometheus com target `otel-collector:9464` saudável.
+3. Alertmanager carregando `ops/monitoring/alertmanager.yml` sem erro.
+4. Grafana saudável em `http://localhost:3000` com datasource `Prometheus` e dashboard provisionado.
+5. Webhook de validação recebendo notificações em `http://localhost:18080`.
+
+### Antes de produção externa
+
+1. Troque os receivers de validação em `ops/monitoring/alertmanager.yml` por Slack/PagerDuty/Teams.
+2. Revise os thresholds em `ops/monitoring/prometheus-payments-alerts.yml`.
+3. Mantenha o fallback LogQL ativo durante a janela inicial de rollout.
+
+---
+
 ## Referências
 
 - [Checklist de produção](production-checklist.md) — verificar antes de cada deploy
+- [Smoke pós-deploy](../scripts/smoke-postdeploy.ps1) — automação mínima de validação operacional
+- [Runbook de observabilidade](observability-payments-runbook.md) — triagem e resposta a incidentes de pagamento
+- [Regras de alertas](payments-alert-rules.md) — thresholds e escalonamento para monitoramento contínuo
+- [Templates de monitoramento](monitoring/README.md) — arquivos exemplo para Prometheus/Alertmanager
+- [Fallback LogQL](monitoring/logql-payments-alerts.example.md) — alerta por logs enquanto contadores de domínio não estiverem instrumentados
+- [Dashboard Grafana (exemplo)](monitoring/grafana-payments-dashboard.example.json) — visão operacional dos sinais de pagamento/reconciliação
 - [Dockerfile](../Dockerfile) — multi-stage build SDK → runtime
 - [README.md](../README.md) — visão geral do projeto

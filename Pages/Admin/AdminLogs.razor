@@ -71,6 +71,7 @@
                 <div class="logs-chip-group">
                     <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.All)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.All)">@T["AdminLogs.All"] (@auditCountAll)</button>
                     <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.SecurityPolicy)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.SecurityPolicy)">@T["AdminLogs.SecurityPolicy"] (@auditCountSecurityPolicy)</button>
+                    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.PaymentPanelStale)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.PaymentPanelStale)">@T["AdminLogs.PaymentPanelStale"] (@auditCountPaymentPanelStale)</button>
                 </div>
             </div>
 
@@ -196,6 +197,7 @@
     private int totalLogs;
     private int auditCountAll;
     private int auditCountSecurityPolicy;
+    private int auditCountPaymentPanelStale;
     private int pageSize = 10;
     private int currentPage = 1;
     private int totalPages => Math.Max(1, (int)Math.Ceiling((double)totalLogs / pageSize));
@@ -241,6 +243,7 @@
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        ApplyQueryOverridesToCurrentFilters();
         await LoadLogs();
         isLoading = false;
     }
@@ -287,6 +290,7 @@
             totalLogs = data.TotalLogs;
             auditCountAll = data.AuditCounts.All;
             auditCountSecurityPolicy = data.AuditCounts.SecurityPolicy;
+            auditCountPaymentPanelStale = data.AuditCounts.PaymentPanelStale;
             logs = data.Logs;
 
             if (currentPage != data.EffectivePage)
@@ -409,10 +413,17 @@
             case AdminLogsAuditQuickFilter.SecurityPolicy:
                 filterSource = AdminAuditSources.SecurityPolicy;
                 filterLevel = string.Empty;
+                filterEventType = string.Empty;
+                break;
+            case AdminLogsAuditQuickFilter.PaymentPanelStale:
+                filterSource = string.Empty;
+                filterLevel = string.Empty;
+                filterEventType = AuditEvents.PaymentReconciliationPanelStale;
                 break;
             default:
                 filterSource = string.Empty;
                 filterLevel = string.Empty;
+                filterEventType = string.Empty;
                 break;
         }
 
@@ -469,7 +480,7 @@
 
     private AdminLogsAuditQuickFilter InferAuditQuickFilter()
     {
-        return AdminLogsFilterInference.InferAuditQuickFilter(filterSource, filterLevel);
+        return AdminLogsFilterInference.InferAuditQuickFilter(filterSource, filterLevel, filterEventType);
     }
 
     private async Task NextPage()
@@ -592,37 +603,93 @@
 
     private async Task LoadFilterStateFromStorageAsync()
     {
-        var state = await AdminLogsFilterStateService.LoadAsync();
+        var storedState = await AdminLogsFilterStateService.LoadAsync();
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var queryOverrides = AdminLogsQueryOverridesParser.Parse(uri);
+        var effectiveState = AdminLogsFilterStateMerger.ApplyQueryOverrides(storedState, queryOverrides);
 
-        filterGlobalSearch = state.GlobalSearch;
-        filterUserId = state.UserId;
-        filterSource = state.Source;
-        filterMessage = state.Message;
-        filterLevel = state.Level;
-        filterStartDate = state.StartDate;
-        filterEndDate = state.EndDate;
-        filterEventType = state.EventType;
-        filterEntityType = state.EntityType;
+        filterGlobalSearch = effectiveState.GlobalSearch;
+        filterUserId = effectiveState.UserId;
+        filterSource = effectiveState.Source;
+        filterMessage = effectiveState.Message;
+        filterLevel = effectiveState.Level;
+        filterStartDate = effectiveState.StartDate;
+        filterEndDate = effectiveState.EndDate;
+        filterEventType = effectiveState.EventType;
+        filterEntityType = effectiveState.EntityType;
 
-        selectedQuickRangePreset = state.QuickRangePreset ?? InferQuickRangePresetFromDates();
-        selectedAuditQuickFilter = state.AuditQuickFilter ?? InferAuditQuickFilter();
+        selectedQuickRangePreset = effectiveState.QuickRangePreset ?? InferQuickRangePresetFromDates();
+        selectedAuditQuickFilter = effectiveState.AuditQuickFilter ?? InferAuditQuickFilter();
 
-        if (state.SortColumn.HasValue)
+        if (effectiveState.SortColumn.HasValue)
         {
-            currentSortColumn = state.SortColumn.Value;
+            currentSortColumn = effectiveState.SortColumn.Value;
         }
 
-        if (state.SortAscending.HasValue)
+        if (effectiveState.SortAscending.HasValue)
         {
-            sortAscending = state.SortAscending.Value;
+            sortAscending = effectiveState.SortAscending.Value;
         }
 
-        if (state.Page.HasValue)
+        if (effectiveState.Page.HasValue)
         {
-            currentPage = state.Page.Value;
+            currentPage = effectiveState.Page.Value;
         }
 
-        showRestoredFiltersNotice = AdminLogsFilterStateRules.ShouldShowRestoredNotice(state);
+        if (queryOverrides.HasAny)
+        {
+            selectedQuickRangePreset = InferQuickRangePresetFromDates();
+            selectedAuditQuickFilter = InferAuditQuickFilter();
+            currentPage = 1;
+            showRestoredFiltersNotice = false;
+            return;
+        }
+
+        showRestoredFiltersNotice = AdminLogsFilterStateRules.ShouldShowRestoredNotice(storedState);
+    }
+
+    private void ApplyQueryOverridesToCurrentFilters()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var queryOverrides = AdminLogsQueryOverridesParser.Parse(uri);
+
+        if (!queryOverrides.HasAny)
+        {
+            return;
+        }
+
+        var currentState = new AdminLogsFilterState
+        {
+            GlobalSearch = filterGlobalSearch,
+            UserId = filterUserId,
+            Source = filterSource,
+            Message = filterMessage,
+            Level = filterLevel,
+            StartDate = filterStartDate,
+            EndDate = filterEndDate,
+            EventType = filterEventType,
+            EntityType = filterEntityType,
+            Page = currentPage,
+            QuickRangePreset = selectedQuickRangePreset,
+            AuditQuickFilter = selectedAuditQuickFilter,
+            SortColumn = currentSortColumn,
+            SortAscending = sortAscending
+        };
+
+        var effectiveState = AdminLogsFilterStateMerger.ApplyQueryOverrides(currentState, queryOverrides);
+
+        filterGlobalSearch = effectiveState.GlobalSearch;
+        filterUserId = effectiveState.UserId;
+        filterSource = effectiveState.Source;
+        filterMessage = effectiveState.Message;
+        filterLevel = effectiveState.Level;
+        filterStartDate = effectiveState.StartDate;
+        filterEndDate = effectiveState.EndDate;
+        filterEventType = effectiveState.EventType;
+        filterEntityType = effectiveState.EntityType;
+        currentPage = effectiveState.Page ?? 1;
+        selectedQuickRangePreset = InferQuickRangePresetFromDates();
+        selectedAuditQuickFilter = InferAuditQuickFilter();
     }
 
     private async Task PersistFilterStateAsync()

@@ -27,6 +27,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
     ports:
       - "8080:8080"
     environment:
@@ -40,6 +42,16 @@ services:
       BtcPay__ApiKey: ${BTCPAY_API_KEY}
       BtcPay__WebhookSecret: ${BTCPAY_WEBHOOK_SECRET}
       BtcPay__WebhookUrl: "https://${DOMAIN}/api/btcpay/webhook"
+      # EfiBank Pix
+      EfiBank__ClientId: ${EFIBANK_CLIENT_ID}
+      EfiBank__ClientSecret: ${EFIBANK_CLIENT_SECRET}
+      EfiBank__CertificatePath: /run/secrets/efibank.p12
+      EfiBank__CertificatePassword: ${EFIBANK_CERT_PASSWORD:-}
+      EfiBank__PixKey: ${EFIBANK_PIX_KEY}
+      EfiBank__Sandbox: "false"
+      EfiBank__WebhookSecret: ${EFIBANK_WEBHOOK_SECRET}
+      EfiBank__WebhookUrl: "https://${DOMAIN}/api/webhooks/efibank/pix"
+      EfiBank__WebhookClientCertSubject: ${EFIBANK_WEBHOOK_CERT_SUBJECT:-conta.efipay.com.br}
       Email__Host: ${SMTP_HOST}
       Email__Port: ${SMTP_PORT}
       Email__UseSsl: "true"
@@ -48,9 +60,13 @@ services:
       Email__FromEmail: ${SMTP_FROM_EMAIL}
       Email__FromName: "Confirmai"
       Email__Enabled: "true"
-      # Opcional — OpenTelemetry
-      # OpenTelemetry__Endpoint: ${OTEL_ENDPOINT}
-      # OpenTelemetry__Headers: ${OTEL_HEADERS}
+      OpenTelemetry__Endpoint: ${OTEL_ENDPOINT:-http://otel-collector:4318}
+      OpenTelemetry__Headers: ${OTEL_HEADERS:-}
+      OpenTelemetry__ServiceName: ${OTEL_SERVICE_NAME:-Confirmai}
+      OpenTelemetry__Environment: ${OTEL_ENVIRONMENT:-production}
+    secrets:
+      - source: efibank_cert
+        target: /run/secrets/efibank.p12
     volumes:
       - uploads:/app/wwwroot/uploads
       - evidences:/app/wwwroot/evidences
@@ -61,7 +77,85 @@ services:
       start_period: 15s
       retries: 3
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.126.0
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./ops/monitoring/otel-collector.yml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4318:4318"
+      - "4317:4317"
+      - "9464:9464"
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    depends_on:
+      - otel-collector
+      - alertmanager
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./ops/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./ops/monitoring/prometheus-payments-alerts.yml:/etc/prometheus/rules/prometheus-payments-alerts.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    volumes:
+      - ./ops/monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+    ports:
+      - "9093:9093"
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./ops/monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./ops/monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./ops/monitoring/grafana-payments-dashboard.provisioned.json:/var/lib/grafana/dashboards/grafana-payments-dashboard.provisioned.json:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+
+  alert-webhook:
+    image: ealen/echo-server:0.9.2
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    environment:
+      PORT: 8080
+    ports:
+      - "18080:8080"
+
 volumes:
   pgdata:
   uploads:
   evidences:
+  prometheus-data:
+  alertmanager-data:
+  grafana-data:
+
+secrets:
+  # Certificado mTLS da EfiBank (.p12).
+  # Defina EFIBANK_CERT_FILE no .env apontando para o arquivo local do cert.
+  efibank_cert:
+    file: ${EFIBANK_CERT_FILE}

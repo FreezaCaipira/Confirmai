@@ -23,3 +23,11 @@ window.ConfirmaiGetCookie = (name) => {
     return null;
 };
 
+window.ConfirmaiIsDocumentVisible = () => {
+    if (typeof document === "undefined") {
+        return true;
+    }
+
+    return document.visibilityState !== "hidden";
+};
+

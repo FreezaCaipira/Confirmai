@@ -17,6 +17,7 @@ public sealed class AbacatePayPixService : IBitcoinPaymentService
     private readonly ILogger<AbacatePayPixService> _logger;
 
     public string Name => "Pix";
+    public bool IsEnabled => _options.IsEnabled;
 
     public AbacatePayPixService(
         IHttpClientFactory httpClientFactory,

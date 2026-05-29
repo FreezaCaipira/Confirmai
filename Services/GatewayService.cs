@@ -25,6 +25,7 @@ namespace Confirmai.Services
             {
                 new { Name = "Pix",          Enabled = true  },
                 new { Name = "EfiBank",      Enabled = true  },
+                new { Name = "Appmax",       Enabled = false },
                 new { Name = "Testnet",      Enabled = true  },
                 new { Name = "BTCPayServer", Enabled = false },
             };
@@ -61,6 +62,19 @@ namespace Confirmai.Services
             return await db.Gateways
                 .OrderBy(g => g.Name)
                 .ToListAsync();
+        }
+
+        public async Task<HashSet<string>> GetEnabledGatewayNamesAsync()
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var enabled = await db.Gateways
+                .AsNoTracking()
+                .Where(g => g.Enabled)
+                .Select(g => g.Name)
+                .ToListAsync();
+
+            return new HashSet<string>(enabled, System.StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task<bool> SetStatusAsync(string name, bool enabled)

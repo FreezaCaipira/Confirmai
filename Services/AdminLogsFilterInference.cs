@@ -38,11 +38,16 @@ public static class AdminLogsFilterInference
         return AdminLogsQuickRangePreset.Custom;
     }
 
-    public static AdminLogsAuditQuickFilter InferAuditQuickFilter(string? source, string? level)
+    public static AdminLogsAuditQuickFilter InferAuditQuickFilter(string? source, string? level, string? eventType = null)
     {
         if (string.Equals(source, AdminAuditSources.SecurityPolicy, StringComparison.Ordinal))
         {
             return AdminLogsAuditQuickFilter.SecurityPolicy;
+        }
+
+        if (string.Equals(eventType, AuditEvents.PaymentReconciliationPanelStale, StringComparison.Ordinal))
+        {
+            return AdminLogsAuditQuickFilter.PaymentPanelStale;
         }
 
         return AdminLogsAuditQuickFilter.All;

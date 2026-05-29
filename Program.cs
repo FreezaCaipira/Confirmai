@@ -27,6 +27,22 @@ using Serilog.Sinks.OpenTelemetry;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>(optional: true);
 
+// When EfiBank mTLS webhook validation is configured, tell Kestrel to request (not require)
+// client certificates so that the webhook handler can validate EfiBank's cert.
+// NOTE: in nginx/Caddy deployments, configure ssl_client_certificate + ssl_verify_client optional
+// and pass the cert via the X-SSL-Client-Cert header instead of relying on Kestrel.
+var efiBankCfg = builder.Configuration.GetSection(EfiBankOptions.Section).Get<EfiBankOptions>();
+if (!string.IsNullOrWhiteSpace(efiBankCfg?.WebhookClientCertSubject))
+{
+    builder.WebHost.ConfigureKestrel(kestrel =>
+    {
+        kestrel.ConfigureHttpsDefaults(https =>
+        {
+            https.ClientCertificateMode = Microsoft.AspNetCore.Server.Kestrel.Https.ClientCertificateMode.AllowCertificate;
+        });
+    });
+}
+
 // -- OpenTelemetry / Serilog OTLP -------------------------------------------
 // Config is read first so the OTLP sink can be included in the single logger.
 // When Endpoint is empty, OTLP is silently skipped.
@@ -68,20 +84,29 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<BitcoinQuoteService>();
 builder.Services.AddSingleton<CryptoQuoteService>();
 builder.Services.AddSingleton<PaymentEventBus>();
+builder.Services.AddSingleton<PaymentDomainMetrics>();
 
 builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>();
 builder.Services.AddScoped<IBitcoinPaymentService, TestnetBitcoinPaymentService>();
 builder.Services.AddScoped<IBitcoinPaymentService, AbacatePayPixService>();
+builder.Services.AddScoped<AbacatePayPixService>();
+builder.Services.AddScoped<IEventPaymentGateway, EfiBankEventPaymentGateway>();
+builder.Services.AddScoped<IEventPaymentGateway, AbacatePayEventPaymentGateway>();
+builder.Services.AddScoped<IEventPaymentGateway, AppmaxEventPaymentGateway>();
 builder.Services.AddScoped<BitcoinPaymentFactory>();
+builder.Services.AddScoped<EventPaymentGatewayFactory>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<GatewayService>();
 builder.Services.AddScoped<PaymentConfirmationService>();
+builder.Services.AddScoped<EventPaymentReconciliationService>();
+builder.Services.AddScoped<EventConfirmationPaymentStatusService>();
 builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<AbacatePayWebhookService>();
 builder.Services.AddScoped<EfiBankPixService>();
+builder.Services.AddScoped<AppmaxPixService>();
 builder.Services.AddScoped<EfiBankWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
 builder.Services.AddScoped<LanguagePreferenceService>();
@@ -100,6 +125,7 @@ builder.Services.AddScoped<AuthenticationStateProvider,
     RevalidatingIdentityAuthenticationStateProvider>();
 builder.Services.AddHostedService<LogRetentionService>();
 builder.Services.AddHostedService<RachaSchedulerService>();
+builder.Services.AddHostedService<EventPaymentReconciliationWorker>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
 builder.Services.AddScoped<AdminSecurityPolicyService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
@@ -170,6 +196,7 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 builder.Services.Configure<BtcPayOptions>(builder.Configuration.GetSection("BtcPay"));
 builder.Services.Configure<AbacatePayOptions>(builder.Configuration.GetSection(AbacatePayOptions.Section));
 builder.Services.Configure<EfiBankOptions>(builder.Configuration.GetSection(EfiBankOptions.Section));
+builder.Services.Configure<AppmaxOptions>(builder.Configuration.GetSection(AppmaxOptions.Section));
 builder.Services.AddHttpClient("AbacatePay", (sp, client) =>
 {
     var opts = sp.GetRequiredService<IOptions<AbacatePayOptions>>().Value;
@@ -179,6 +206,22 @@ builder.Services.AddHttpClient("AbacatePay", (sp, client) =>
     if (!string.IsNullOrWhiteSpace(opts.ApiKey))
         client.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", opts.ApiKey);
+});
+
+builder.Services.AddHttpClient("Appmax", (sp, client) =>
+{
+    var opts = sp.GetRequiredService<IOptions<AppmaxOptions>>().Value;
+    client.BaseAddress = new Uri(string.IsNullOrWhiteSpace(opts.BaseUrl)
+        ? "https://api.appmax.com.br"
+        : opts.BaseUrl);
+});
+
+builder.Services.AddHttpClient("AppmaxAuth", (sp, client) =>
+{
+    var opts = sp.GetRequiredService<IOptions<AppmaxOptions>>().Value;
+    client.BaseAddress = new Uri(string.IsNullOrWhiteSpace(opts.AuthBaseUrl)
+        ? "https://auth.appmax.com.br"
+        : opts.AuthBaseUrl);
 });
 
 builder.Services.AddAuthentication()
@@ -253,6 +296,7 @@ if (otelOptions.IsEnabled && Uri.IsWellFormedUriString(otelOptions.Endpoint, Uri
             .SetResourceBuilder(resourceBuilder)
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
+            .AddMeter(PaymentDomainMetrics.MeterName)
             .AddOtlpExporter(o =>
             {
                 o.Endpoint = new Uri(otelOptions.Endpoint);
@@ -288,6 +332,27 @@ builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = Comp
 builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
 
 var app = builder.Build();
+
+// Guard: EfiBank sandbox must never be enabled in Production.
+// Fail fast at startup so a misconfiguration does not silently route real payments to sandbox.
+if (!isDevelopment)
+{
+    var efiBankOpts = app.Services.GetRequiredService<IOptions<EfiBankOptions>>().Value;
+    if (efiBankOpts.Sandbox)
+        throw new InvalidOperationException(
+            "EfiBank:Sandbox=true está ativo em um ambiente não-Development. " +
+            "Defina EfiBank:Sandbox=false (ou remova a chave) antes de publicar em produção.");
+
+    // Guard: AbacatePay dev API key should not be used in Production.
+    var abacateOpts = app.Services.GetRequiredService<IOptions<AbacatePayOptions>>().Value;
+    if (abacateOpts.IsEnabled &&
+        abacateOpts.ApiKey!.StartsWith("abc_dev_", StringComparison.OrdinalIgnoreCase))
+    {
+        Log.Warning(
+            "AbacatePay: ApiKey começa com 'abc_dev_' em um ambiente não-Development. " +
+            "Substitua pela ApiKey de produção (abc_live_...) antes de processar pagamentos reais.");
+    }
+}
 
 // S-1: Error handler + HTTPS redirect + HSTS
 if (!isDevelopment)
@@ -443,6 +508,11 @@ using (var scope = app.Services.CreateScope())
 
     var initializer = scope.ServiceProvider.GetRequiredService<AppInitializationService>();
     await initializer.SeedAsync();
+
+    // Register EfiBank webhook URL so EfiBank knows where to POST Pix notifications.
+    // No-op when EfiBank:WebhookUrl is not configured or the service is disabled.
+    var efiBankPix = scope.ServiceProvider.GetRequiredService<EfiBankPixService>();
+    await efiBankPix.RegisterWebhookAsync();
 }
 
 // PaymentHub is a server-to-client notification channel; [Authorize] on the hub ensures only authenticated users connect

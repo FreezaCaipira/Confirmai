@@ -113,7 +113,7 @@
                                 <div class="venue-admin-search">
                                     <input class="input" placeholder="Buscar por e-mail…"
                                            @bind="adminSearchEmail" @bind:event="oninput"
-                                           @onkeydown="@(e => { if (e.Key == "Enter") SearchUser(); })" />
+                                           @onkeydown="HandleAdminSearchKeyDownAsync" />
                                     <button type="button" class="edit-btn action-btn"
                                             @onclick="SearchUser" disabled="@isAssigning">
                                         <i class="fas fa-search"></i>
@@ -245,6 +245,12 @@
             adminSearchError = "Nenhum usuário encontrado com esse e-mail.";
         else
             searchedUser = user;
+    }
+
+    private async Task HandleAdminSearchKeyDownAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await SearchUser();
     }
 
     private async Task AssignVenueAdmin()

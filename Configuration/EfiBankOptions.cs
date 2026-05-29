@@ -37,6 +37,21 @@ public class EfiBankOptions
     /// </summary>
     public string? WebhookSecret { get; set; }
 
+    /// <summary>
+    /// Expected substring of the TLS client-certificate Subject that EfiBank presents when
+    /// posting webhook notifications (mTLS server-side validation).
+    /// Example: "conta.efipay.com.br"
+    /// Leave empty to skip certificate validation (rely on WebhookSecret only).
+    /// </summary>
+    public string? WebhookClientCertSubject { get; set; }
+
+    /// <summary>
+    /// Public HTTPS URL that EfiBank will POST Pix notifications to.
+    /// Example: https://app.confirmai.com.br/api/efibank/webhook
+    /// Leave empty to skip automatic webhook registration at startup.
+    /// </summary>
+    public string? WebhookUrl { get; set; }
+
     /// <summary>API base URL, selected by <see cref="Sandbox"/> flag.</summary>
     public string BaseUrl => Sandbox
         ? "https://pix-h.api.efipay.com.br"

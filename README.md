@@ -192,35 +192,51 @@ npm test
 
 ## Roadmap e Progresso
 
-Veja o arquivo [roadmap.md](roadmap.md) para detalhes das fases e próximos passos.
+Veja os arquivos [roadmap.md](roadmap.md) e [DEVELOPMENT.md](DEVELOPMENT.md) para o plano detalhado.
 
-**Status rápido (Jul/2025):**
-- ✅ Suite de testes: **560 testes** unitários e de integração passando, 0 falhas (`Confirmai.Tests`) + suíte E2E Playwright completa incluindo fluxo ponta-a-ponta.
-- ✅ **E2E ponta-a-ponta** (`purchase-flow-full.spec.ts`): pagamento confirmado → pedido em /orders → admin libera → status Finalizado (8 testes determinísticos via endpoint dev-only `POST /api/test/seed-order`).
-- ✅ **Checklist de produção** documentado em [docs/production-checklist.md](docs/production-checklist.md): variáveis de ambiente, HTTPS, PostgreSQL, SMTP, OTLP, segurança e smoke test pós-deploy.
-- ✅ **Guia de deploy** em [docs/deploy.md](docs/deploy.md): Docker Compose, nginx, Let's Encrypt, backup/restore e atualização.
-- ✅ Fluxo de pagamento robustecido: Pix (gateway principal), Testnet e BTCPayServer (desabilitado). Confirmação Pix manual pelo vendedor.
-- ✅ Sistema multi-servidor OpenTibia completo: catálogo de itens, membros, GMs, ownership e API Keys por servidor.
-- ✅ Mailbox entre usuários (`/mailbox`) com anexos, arquivamento e conversas.
-- ✅ Catálogo de itens com ofertas por servidor (`/servers/{id}/catalog`, `/servers/{id}/items/{key}`).
-- ✅ Perfil expandido: handles de contato (Pix, Discord), recomendações de vendedores.
-- ✅ **Performance da home** (`/servers`): skeleton loading, `PersistentComponentState`, `IMemoryCache` (TTL 60s), consultas `AsNoTracking` sem `Include(Members)`, redirect `/` consolidado em `/servers` sem JS.
-- ✅ **Compressão HTTP** (Brotli + Gzip) habilitada para HTTPS, MIME types incluindo `text/css`, `application/javascript`, `application/json` e `image/svg+xml`.
-- ✅ **CSS preload + deferral de fontes** em `_Host.cshtml` (Google Fonts + Font Awesome carregados com `media="print"` e promovidos via JS após `load`).
-- ✅ **CSP endurecida**: nonce por requisição em `script-src`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`. Removido `X-XSS-Protection` legado e `'unsafe-inline'` de scripts.
-- ✅ **Sistema de botões unificado** em `site.css`: `.btn` + `.btn--primary/--success/--danger/--neutral/--info/--gold` + `.btn--sm/--icon`. Classes legadas mantidas como aliases.
-- ✅ **Auditoria estruturada de eventos**: `AppLog` extendido com `EventType`, `EntityType`, `EntityId`, `IpAddress`, `CorrelationId`, `MetadataJson` (jsonb) + índices. `LogService.AuditAsync(...)` cobre `user.registered/login.*`, `product.*`, `server.*`, `payment.confirmed`, `order.created/released`. Constantes em `Services/AuditEvents.cs`.
-- ✅ Agentes de entrega cadastrados e gerenciáveis pelo painel admin.
-- ✅ Filtros e ordenação persistentes em todas as telas administrativas, com testes dedicados.
-- ✅ Exportação de logs administrativos e gestão de idiomas no painel admin.
-- ✅ HSTS configurado para 365 dias com `includeSubDomains` em produção.
-- ✅ UX responsiva consolidada: card-stacking mobile em todas as telas admin e de pedidos.
-- ✅ **Exclusão segura de usuários (Fase 6)**: FKs com `SetNull`/`Cascade`; pedidos bloqueados quando participante deletado; roteamento automático para revisão admin; UI exibe "(deletado)"; moeda exibida corretamente em BRL/USD.
-- ✅ **Testes de audit logging** (`AuditLoggingHooksTests`): hooks de `ProductService`, `ServerRegistrationRequestService` e `LogService` cobertos (7 testes).
-- ✅ **Testes de cache da home** (`TibiaServerServiceCacheTests`): `IMemoryCache` em `GetAllAsync` e `GetAllServerCardStatsAsync` cobertos (3 testes).
-- ✅ **Testes de security headers** (`SecurityHeadersIntegrationTests`): CSP nonce único por request, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` (3 testes).
-- ✅ **9 testes `ServerIntegrationEndpoints` corrigidos**: falha era `503 ServiceUnavailable` por ausência do feature flag `LuaDeliveryEnabled`; `EnsureLuaDeliveryEnabledAsync()` adicionado em `IntegrationTestWebAppFactory`.
-- 🟡 Próxima frente: ampliar auditoria para `ItemOffer`/`ServerMember`/`AppSettings`/senhas; página admin de timeline por entidade; CI/CD GitHub Actions.
+**Status rápido (Mai/2026):**
+- ✅ Build e suíte principal estáveis: **421 testes** passando em `Confirmai.Tests`.
+- ✅ Fluxo de futebol robusto: criação/edição de partidas, confirmação por posição (linha/goleiro), fila de espera, conflitos de horário e gestão admin.
+- ✅ Escalação concluída: `/futsal/{id}/escalacao` com randomização, confirmação, reset e leitura pública após confirmação.
+- ✅ Fluxo de grupos privados evoluído: não-membros agora podem solicitar entrada diretamente nos detalhes de futsal/poker, com estado visível de solicitação pendente/rejeitada.
+- ✅ Operação de grupos melhorada para admins: `/grupos` prioriza comunidades com solicitações pendentes, exibe badge de contagem, chip de urgência e seção destacada de ação necessária.
+- ✅ Camada de segurança e observabilidade consolidada (CSP com nonce, headers, logs/audit estruturados).
+- ✅ Pagamentos por evento com multi-gateway e reconciliação operacional entregues:
+   - tela de pagamento por evento (`/pagamento/evento/{confirmationId}`) com seleção de gateway
+   - webhooks (AbacatePay/Efi) marcando confirmação paga com idempotência
+   - reconciliação automática (worker) + reconciliação manual por `chargeId/txId`
+   - painel operacional em `/admin/payments` com contadores, última varredura automática/manual, tendência 24h, visão por gateway, varredura imediata e atualização contínua (30s)
+   - alerta visual por limiar de tendência (+5 pendências em 24h), badge de severidade (`ok/atenção/crítico`) e histórico das últimas 5 varreduras automáticas
+   - mini gráfico de tendência no card de varreduras e limiares de severidade configuráveis no `/admin`
+   - resumo de saúde de reconciliação também no `/admin`, com timestamp de última atualização
+   - throttle de auto-refresh quando a aba está em background
+   - contador em tempo real de "sem atualizar há" no painel `/admin/payments`, com alerta visual de defasagem
+   - auditoria automática (`Warning`) quando o painel de reconciliação fica defasado continuamente por mais de 5 minutos
+   - filtro rápido em `/admin/logs` para incidentes `payment.reconciliation.panel.stale`
+   - link direto no card de reconciliação para abrir `/admin/logs` já filtrado por `payment.reconciliation.panel.stale` e período padrão de 7 dias
+   - parsing de querystring de logs consolidado em helper testado (`eventType/source/level/entityType/startDate/endDate`)
+   - merge de estado salvo + querystring com precedência explícita para querystring no carregamento inicial de `/admin/logs`
+   - builder dedicado para deep-link de staleness no `/admin/payments`, com testes determinísticos do range padrão
+   - cobertura adicional de testes para casos de precedência parcial (datas/eventType) e persistência do quick-filter `PaymentPanelStale`
+   - teste de integração HTTP garantindo que `/admin/payments` renderiza o deep-link de staleness com período padrão (7 dias)
+   - `/admin/logs` agora aplica overrides de querystring já no carregamento inicial (SSR), evitando primeira renderização com dados fora do filtro
+   - transições auditáveis de status por confirmação (`Pending/Paid/Failed/Refunded`) com operação administrativa controlada
+   - script de smoke pós-deploy (`scripts/smoke-postdeploy.ps1`) para validação operacional e suporte a rollback rápido
+- ✅ Hardening de release e observabilidade base documentados: checklist de produção, guia de deploy, runbook de incidentes, regras de alerta e templates de monitoramento.
+- 🟡 Foco atual: fechar automação operacional dos alertas e evoluir UX/admin dos fluxos de grupo e evento.
+
+**Próximos tópicos priorizados:**
+1. Operação contínua: transformar o runbook de pagamentos em alertas realmente implantados no ambiente e validar escalonamento fim a fim.
+2. Produto/admin: consolidar o fluxo de aprovação de solicitações em grupos privados com mais contexto visual e atalhos de triagem.
+3. Produto: indicadores de ocupação, inadimplência e conversão em pagamento, com UX responsiva e acessibilidade AA nas telas de evento.
+
+**Operação de produção:**
+1. Checklist de produção: [docs/production-checklist.md](docs/production-checklist.md)
+2. Guia de deploy: [docs/deploy.md](docs/deploy.md)
+3. Runbook de observabilidade (pagamentos/reconciliação): [docs/observability-payments-runbook.md](docs/observability-payments-runbook.md)
+4. Regras de alertas operacionais: [docs/payments-alert-rules.md](docs/payments-alert-rules.md)
+5. Templates Prometheus/Alertmanager: [docs/monitoring/README.md](docs/monitoring/README.md)
+6. Dashboard Grafana (exemplo): [docs/monitoring/grafana-payments-dashboard.example.json](docs/monitoring/grafana-payments-dashboard.example.json)
 
 ---
 

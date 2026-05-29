@@ -18,6 +18,15 @@ public sealed record AdminLogExportRow(
     string? EntityId = null,
     string? MetadataJson = null);
 
+public sealed record EventConfirmationReconciliationExportRow(
+    int ConfirmationId,
+    int EventId,
+    string UserId,
+    DateTime ConfirmedAt,
+    string PaymentStatus,
+    string? PixTxId,
+    string? PaymentGatewayName);
+
 public class AdminLogsExportService
 {
     public string BuildCsv(IEnumerable<AdminLogExportRow> rows)
@@ -231,6 +240,36 @@ public class AdminLogsExportService
         var safeId = NormalizeForFileName(entityId);
         var timestamp = (utcNow ?? DateTime.UtcNow).ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
         return $"audit-timeline-{safeType}-{safeId}-{timestamp}.{extension}";
+    }
+
+    /// <summary>
+    /// Builds a reconciliation snapshot CSV for event confirmations.
+    /// </summary>
+    public string BuildEventConfirmationReconciliationCsv(IEnumerable<EventConfirmationReconciliationExportRow> rows)
+    {
+        var csv = new StringBuilder();
+        csv.AppendLine("ConfirmationId,EventId,UserId,ConfirmedAtUtc,PaymentStatus,PixTxId,PaymentGateway");
+
+        foreach (var row in rows)
+        {
+            csv
+                .Append(EscapeCsv(row.ConfirmationId.ToString(CultureInfo.InvariantCulture))).Append(',')
+                .Append(EscapeCsv(row.EventId.ToString(CultureInfo.InvariantCulture))).Append(',')
+                .Append(EscapeCsv(row.UserId)).Append(',')
+                .Append(EscapeCsv(row.ConfirmedAt.ToString("O", CultureInfo.InvariantCulture))).Append(',')
+                .Append(EscapeCsv(row.PaymentStatus)).Append(',')
+                .Append(EscapeCsv(row.PixTxId)).Append(',')
+                .Append(EscapeCsv(row.PaymentGatewayName))
+                .AppendLine();
+        }
+
+        return csv.ToString();
+    }
+
+    public string BuildEventConfirmationReconciliationFileName(DateTime? utcNow = null)
+    {
+        var timestamp = (utcNow ?? DateTime.UtcNow).ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+        return $"event-confirmations-reconciliation-{timestamp}.csv";
     }
 }
 

@@ -7,6 +7,7 @@ namespace Confirmai.Services;
 public sealed record AdminLogsAuditCounts(
     int All,
     int SecurityPolicy,
+    int PaymentPanelStale,
     int WebhookWarnings,
     int ServerIntegration);
 
@@ -57,16 +58,18 @@ public class AdminLogsQueryService
             {
                 All = g.Count(),
                 SecurityPolicy = g.Count(log => log.Source == AdminAuditSources.SecurityPolicy),
+                PaymentPanelStale = g.Count(log => log.EventType == AuditEvents.PaymentReconciliationPanelStale),
                 WebhookWarnings = g.Count(log => log.Source == AdminAuditSources.Webhook && log.Level == "Warning"),
                 ServerIntegration = g.Count(log => log.Source == AdminAuditSources.ServerIntegration)
             })
             .FirstOrDefaultAsync();
 
         var counts = countsProjection is null
-            ? new AdminLogsAuditCounts(0, 0, 0, 0)
+            ? new AdminLogsAuditCounts(0, 0, 0, 0, 0)
             : new AdminLogsAuditCounts(
                 All: countsProjection.All,
                 SecurityPolicy: countsProjection.SecurityPolicy,
+                PaymentPanelStale: countsProjection.PaymentPanelStale,
                 WebhookWarnings: countsProjection.WebhookWarnings,
                 ServerIntegration: countsProjection.ServerIntegration);
 

@@ -69,12 +69,36 @@ ASPNETCORE_ENVIRONMENT=Production
 
 ---
 
-## 3. HTTPS e certificados
+## 3. HTTPS, nginx e mTLS EfiBank
 
-- [ ] Certificado TLS válido instalado (Let's Encrypt ou CA comercial)
-- [ ] Redirecionamento HTTP → HTTPS configurado no reverse proxy (nginx/Caddy/Traefik)
+- [ ] Certificado TLS válido instalado (Let's Encrypt via certbot)
+- [ ] nginx configurado com `ops/nginx/confirmai.conf` (ou equivalente)
+- [ ] Redirecionamento HTTP → HTTPS ativo no nginx
 - [ ] HSTS ativo: o app já configura `max-age=365d; includeSubDomains` em produção
-- [ ] Não exponha a porta 5000 diretamente — use o reverse proxy como terminador TLS
+- [ ] `ssl_verify_client optional_no_ca` configurado no nginx (necessário para receber webhooks EfiBank com mTLS)
+- [ ] Header `X-SSL-Client-Cert $ssl_client_escaped_cert` configurado no nginx → backend
+- [ ] (Opcional, mais seguro) CA da Efí baixado em `/etc/nginx/certs/efipay-ca.crt` e `ssl_verify_client optional` ativo
+- [ ] Não exponha a porta 8080 diretamente — o nginx é o único ponto de entrada externo
+
+### EfiBank Pix (produção)
+
+| Chave | Descrição |
+|---|---|
+| `EfiBank__ClientId` | Client ID de produção (painel Efí → API → Credenciais) |
+| `EfiBank__ClientSecret` | Client Secret de produção |
+| `EfiBank__CertificatePath` | Caminho do `.p12` de produção dentro do container: `/run/secrets/efibank.p12` |
+| `EfiBank__CertificatePassword` | Senha do `.p12` (vazio se não houver) |
+| `EfiBank__PixKey` | Chave Pix cadastrada na conta Efí (CPF, CNPJ, e-mail ou EVP) |
+| `EfiBank__Sandbox` | `false` em produção |
+| `EfiBank__WebhookSecret` | Segredo de query-string do webhook (mín. 32 chars aleatórios) |
+| `EfiBank__WebhookUrl` | `https://SEU_DOMINIO/api/webhooks/efibank/pix?webhookSecret=<WebhookSecret>` |
+| `EfiBank__WebhookClientCertSubject` | `conta.efipay.com.br` (padrão — não alterar) |
+| `EFIBANK_CERT_FILE` | (`.env`) caminho local do `.p12` no host para o Docker secret |
+
+- [ ] `EfiBank__Sandbox` = `false`
+- [ ] Certificado `.p12` de **produção** montado via Docker secret em `/run/secrets/efibank.p12`
+- [ ] Webhook registrado na Efí (automático no boot quando `WebhookUrl` está configurado — verificar log `Webhook registrado com sucesso`)
+- [ ] Guard de sandbox ativo: se `Sandbox=true` em produção, o app lança exceção e não sobe
 
 ---
 
@@ -103,15 +127,41 @@ ASPNETCORE_ENVIRONMENT=Production
 ## 6. Monitoramento e alertas
 
 - [ ] OTLP endpoint configurado e recebendo traces + métricas
+- [ ] `otel-collector` ativo no ambiente e expondo métricas OTLP convertidas em Prometheus (`ops/monitoring/otel-collector.yml`)
+- [ ] Prometheus carregando `ops/monitoring/prometheus-payments-alerts.yml` sem erros
+- [ ] Alertmanager carregando `ops/monitoring/alertmanager.yml` e entregando notificações ao receiver esperado
 - [ ] Alertas configurados para: `5xx` em taxa > 1%, latência P99 > 2s, disco > 80%
 - [ ] Logs de auditoria acessíveis em `/admin/logs` (apenas admins)
 - [ ] Timeline de entidades acessível em `/admin/audit/{entityType}/{entityId}`
+- [ ] Runbook de incidentes de pagamentos/reconciliação revisado e disponível para on-call (`docs/observability-payments-runbook.md`)
+- [ ] Regras de alerta de pagamentos/reconciliação implantadas e validadas (`docs/payments-alert-rules.md`, `ops/monitoring/prometheus-payments-alerts.yml`)
+- [ ] Templates operacionais de Prometheus/Alertmanager adaptados para o ambiente (`docs/monitoring/`, `ops/monitoring/`)
+- [ ] Fallback de alertas por logs (LogQL) ativo quando contadores de domínio ainda não estiverem disponíveis (`docs/monitoring/logql-payments-alerts.example.md`)
+- [ ] Dashboard Grafana de pagamentos importado e validado (`docs/monitoring/grafana-payments-dashboard.example.json`)
 
 ---
 
 ## 7. Smoke test pós-deploy
 
-Execute os seguintes passos manualmente após cada deploy:
+Execute o smoke automatizado apos cada deploy:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-postdeploy.ps1 -BaseUrl https://Confirmai.suaempresa.com
+```
+
+Quando o profile `monitoring` estiver habilitado no ambiente, execute tambem:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-monitoring-alerts.ps1 -RequirePaymentRules -RequireCollectorMetrics
+```
+
+Opcional (somente quando ja houver sessao admin autenticada no host de validacao):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-postdeploy.ps1 -BaseUrl https://Confirmai.suaempresa.com -StrictAdmin
+```
+
+Checklist manual complementar:
 
 1. [ ] Acesse `https://Confirmai.suaempresa.com/health` → deve retornar `200 OK`
 2. [ ] Faça login com a conta admin
@@ -126,10 +176,12 @@ Execute os seguintes passos manualmente após cada deploy:
 
 Se algo der errado após o deploy:
 
-1. Reverter imagem Docker para a versão anterior: `docker pull Confirmai:<versao-anterior>`
-2. Verificar se migrations foram destrutivas — se sim, restaurar backup antes do rollback
-3. Verificar logs de erro: `docker logs <container>` ou painel OTLP
-4. Contato de emergência: admin do servidor
+1. Congelar deploy atual e coletar evidencias (status do smoke, logs e ultima imagem ativa).
+2. Reverter imagem Docker para a versao anterior conhecida como estavel.
+3. Reiniciar apenas o servico `app` com a imagem anterior e validar `/health`.
+4. Reexecutar smoke pos-rollback (`scripts/smoke-postdeploy.ps1`).
+5. Se migration destrutiva tiver sido aplicada, restaurar backup e repetir smoke.
+6. Registrar incidente com horario, causa provavel e acao corretiva.
 
 ---
 
@@ -140,3 +192,6 @@ Se algo der errado após o deploy:
 - [appsettings.Production.json](appsettings.Production.json) — template de configuração
 - [Dockerfile](Dockerfile) — imagem de produção
 - `.github/workflows/ci.yml` — pipeline CI/CD
+- [Runbook de observabilidade](observability-payments-runbook.md) — triagem e resposta para pagamentos/reconciliação
+- [Regras de alertas](payments-alert-rules.md) — thresholds, severidade e escalonamento para pagamentos
+- [Templates de monitoramento](monitoring/README.md) — arquivos exemplo para Prometheus/Alertmanager

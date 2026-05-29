@@ -120,6 +120,8 @@ namespace Confirmai.Services
             var defaultGateways = new[]
             {
                 new { Name = "Pix", Enabled = true },
+                new { Name = "EfiBank", Enabled = true },
+                new { Name = "Appmax", Enabled = false },
                 new { Name = "Testnet", Enabled = true },
                 new { Name = "BTCPayServer", Enabled = false },
             };

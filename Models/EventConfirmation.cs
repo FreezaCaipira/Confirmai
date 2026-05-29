@@ -22,12 +22,29 @@ namespace Confirmai.Models
 
         public DateTime ConfirmedAt { get; set; } = DateTime.UtcNow;
 
-        /// <summary>Linha players only. Set to true when payment is confirmed (gateway TBD).</summary>
+        /// <summary>
+        /// Canonical payment status contract for event confirmations.
+        /// </summary>
+        public EventConfirmationPaymentStatus PaymentStatus { get; set; } = EventConfirmationPaymentStatus.Pending;
+
+        /// <summary>
+        /// Legacy compatibility flag. Prefer PaymentStatus for new code.
+        /// </summary>
         public bool HasPaid { get; set; }
 
         /// <summary>EfiBank Pix charge txId linked to this confirmation (32-char hex). Set when charge is created.</summary>
         [StringLength(35)]
         public string? PixTxId { get; set; }
+
+        /// <summary>Pix Copia e Cola (brcode) stored at charge creation so the payment page can reuse it without an extra API call.</summary>
+        public string? PixBrCode { get; set; }
+
+        /// <summary>Gateway used to create the charge (e.g. EfiBank, Pix).</summary>
+        [StringLength(50)]
+        public string? PaymentGatewayName { get; set; }
+
+        public bool IsPaymentPending => PaymentStatus == EventConfirmationPaymentStatus.Pending;
+        public bool IsPaymentPaid => PaymentStatus == EventConfirmationPaymentStatus.Paid;
     }
 
     public enum FutsalPosition

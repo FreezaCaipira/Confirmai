@@ -47,6 +47,11 @@ public static class AuditEvents
     public const string PaymentInvoiceCreated = "payment.invoice.created";
     public const string PaymentReceived       = "payment.received";       // webhook arrived
     public const string PaymentConfirmed      = "payment.confirmed";      // settled / IsPaid=true
+    public const string PaymentFailed         = "payment.failed";
+    public const string PaymentRefunded       = "payment.refunded";
+    public const string PaymentStatusChanged  = "payment.status.changed";
+    public const string PaymentReconciliationSweep = "payment.reconciliation.sweep";
+    public const string PaymentReconciliationPanelStale = "payment.reconciliation.panel.stale";
     public const string PaymentReplayed       = "payment.replayed";       // duplicate delivery rejected
     public const string PaymentInvalid        = "payment.invalid";        // bad payload / signature
     public const string PaymentRefused        = "payment.refused";        // missing/expired/etc.

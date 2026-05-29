@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Confirmai.Configuration;
 using Confirmai.Data;
+using Confirmai.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -116,6 +117,39 @@ public sealed class AbacatePayWebhookService
 
     private async Task MarkPaymentPaidAsync(string chargeId)
     {
+        var confirmation = await _db.EventConfirmations
+            .FirstOrDefaultAsync(c => c.PixTxId == chargeId);
+
+        if (confirmation is not null)
+        {
+            if (confirmation.PaymentStatus == EventConfirmationPaymentStatus.Paid)
+                return; // idempotent
+
+            if (confirmation.PaymentStatus == EventConfirmationPaymentStatus.Refunded)
+                return; // do not resurrect refunded confirmations
+
+            confirmation.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+            confirmation.HasPaid = true;
+            if (string.IsNullOrWhiteSpace(confirmation.PaymentGatewayName))
+                confirmation.PaymentGatewayName = "Pix";
+
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return;
+            }
+
+            _eventBus.NotifyPaymentConfirmed(confirmation.UserId, chargeId);
+
+            await _log.LogAsync(
+                $"AbacatePay: confirmação de evento paga via webhook. chargeId={chargeId}, confirmationId={confirmation.Id}",
+                source: "Webhook", level: "Info");
+            return;
+        }
+
         var payment = await _db.Payments
             .FirstOrDefaultAsync(p => p.PaymentId == chargeId);
 

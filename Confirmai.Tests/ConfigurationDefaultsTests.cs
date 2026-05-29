@@ -53,6 +53,29 @@ public class ConfigurationDefaultsTests
         Assert.Equal("http://localhost/webhook", options.WebhookUrlLocal);
         Assert.Equal("https://example.com/webhook", options.WebhookUrlProd);
     }
+
+    [Fact]
+    public void AppmaxOptions_IsEnabled_RequiresCheckoutFlagAndAuth()
+    {
+        var options = new AppmaxOptions
+        {
+            BaseUrl = "https://api.appmax.com.br",
+            AuthBaseUrl = "https://auth.appmax.com.br"
+        };
+
+        Assert.False(options.IsEnabled);
+
+        options.EnableEventCheckout = true;
+        Assert.False(options.IsEnabled);
+
+        options.ApiKey = "static-token";
+        Assert.True(options.IsEnabled);
+
+        options.ApiKey = null;
+        options.ClientId = "merchant-client-id";
+        options.ClientSecret = "merchant-client-secret";
+        Assert.True(options.IsEnabled);
+    }
 }
 
 

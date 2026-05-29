@@ -1,4 +1,5 @@
 ﻿using Confirmai.Models;
+using Confirmai.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,7 @@ namespace Confirmai.Data
         {
             EnsureGroupInviteCodesAsync(CancellationToken.None).GetAwaiter().GetResult();
             ValidateEventCollisionsAsync(CancellationToken.None).GetAwaiter().GetResult();
+            SynchronizeEventConfirmationPaymentState();
             return base.SaveChanges();
         }
 
@@ -36,6 +38,7 @@ namespace Confirmai.Data
         {
             EnsureGroupInviteCodesAsync(CancellationToken.None).GetAwaiter().GetResult();
             ValidateEventCollisionsAsync(CancellationToken.None).GetAwaiter().GetResult();
+            SynchronizeEventConfirmationPaymentState();
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
@@ -43,6 +46,7 @@ namespace Confirmai.Data
         {
             await EnsureGroupInviteCodesAsync(cancellationToken);
             await ValidateEventCollisionsAsync(cancellationToken);
+            SynchronizeEventConfirmationPaymentState();
             return await base.SaveChangesAsync(cancellationToken);
         }
 
@@ -50,7 +54,46 @@ namespace Confirmai.Data
         {
             await EnsureGroupInviteCodesAsync(cancellationToken);
             await ValidateEventCollisionsAsync(cancellationToken);
+            SynchronizeEventConfirmationPaymentState();
             return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void SynchronizeEventConfirmationPaymentState()
+        {
+            var entries = ChangeTracker.Entries<EventConfirmation>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified)
+                .ToList();
+
+            foreach (var entry in entries)
+            {
+                var hasPaidProperty = entry.Property(e => e.HasPaid);
+                var statusProperty = entry.Property(e => e.PaymentStatus);
+
+                if (entry.State == EntityState.Added)
+                {
+                    if (entry.Entity.HasPaid && entry.Entity.PaymentStatus == EventConfirmationPaymentStatus.Pending)
+                    {
+                        entry.Entity.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+                    }
+
+                    entry.Entity.HasPaid = entry.Entity.PaymentStatus == EventConfirmationPaymentStatus.Paid;
+                    continue;
+                }
+
+                var hasPaidChanged = hasPaidProperty.IsModified;
+                var statusChanged = statusProperty.IsModified;
+
+                if (hasPaidChanged && !statusChanged)
+                {
+                    entry.Entity.PaymentStatus = entry.Entity.HasPaid
+                        ? EventConfirmationPaymentStatus.Paid
+                        : EventConfirmationPaymentStatus.Pending;
+                }
+                else
+                {
+                    entry.Entity.HasPaid = entry.Entity.PaymentStatus == EventConfirmationPaymentStatus.Paid;
+                }
+            }
         }
 
         private async Task EnsureGroupInviteCodesAsync(CancellationToken cancellationToken)
@@ -234,6 +277,16 @@ namespace Confirmai.Data
             modelBuilder.Entity<EventConfirmation>()
                 .HasIndex(ec => new { ec.EventId, ec.UserId })
                 .IsUnique();
+
+            modelBuilder.Entity<EventConfirmation>()
+                .HasIndex(ec => ec.PixTxId)
+                .IsUnique()
+                .HasFilter("\"PixTxId\" IS NOT NULL");
+
+            modelBuilder.Entity<EventConfirmation>()
+                .Property(ec => ec.PaymentStatus)
+                .HasConversion<int>()
+                .HasDefaultValue(EventConfirmationPaymentStatus.Pending);
 
             modelBuilder.Entity<EventConfirmation>()
                 .HasOne(ec => ec.Event)

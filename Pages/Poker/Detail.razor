@@ -347,10 +347,36 @@ else
                     }
                     else if (ev.Group.IsPrivate && !isMember)
                     {
-                        <div class="private-group-notice">
-                            <i class="fas fa-lock"></i>
-                            <span>Este grupo é privado. Peça o link de convite ao organizador para participar.</span>
-                        </div>
+                        @if (userJoinRequest?.Status == JoinRequestStatus.Pending)
+                        {
+                            <div class="private-group-notice">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span>Solicitação enviada — aguardando aprovação do administrador do grupo.</span>
+                            </div>
+                        }
+                        else if (userJoinRequest?.Status == JoinRequestStatus.Rejected)
+                        {
+                            <div class="private-group-notice">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Sua solicitação de entrada foi recusada.</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="private-group-notice">
+                                <i class="fas fa-lock"></i>
+                                <span>Este grupo é privado. Solicite entrada para o administrador.</span>
+                            </div>
+                            <button class="confirm-btn confirm-btn--poker" type="button" @onclick="RequestToJoinAsync" disabled="@requestingJoin">
+                                <i class="fas fa-user-plus"></i>
+                                @(requestingJoin ? "Enviando..." : "Solicitar entrada")
+                            </button>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(joinRequestError))
+                        {
+                            <p class="detail-error">@joinRequestError</p>
+                        }
                     }
                     else
                     {
@@ -385,6 +411,9 @@ else
     private bool     codeWrong         = false;
     private string   actionError       = string.Empty;
     private bool     showCancelConfirm = false;
+    private GroupJoinRequest? userJoinRequest = null;
+    private bool     requestingJoin    = false;
+    private string   joinRequestError  = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -404,7 +433,57 @@ else
                 .ThenInclude(c => c.User)
             .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Poker);
+
+        userJoinRequest = null;
+        if (currentUserId is not null && ev is not null)
+        {
+            userJoinRequest = await db.GroupJoinRequests
+                .Where(r => r.GroupId == ev.GroupId && r.UserId == currentUserId)
+                .OrderByDescending(r => r.RequestedAt)
+                .FirstOrDefaultAsync();
+        }
+
         isLoading = false;
+    }
+
+    private async Task RequestToJoinAsync()
+    {
+        if (currentUserId is null || ev is null)
+            return;
+
+        requestingJoin = true;
+        joinRequestError = string.Empty;
+
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+
+            var alreadyPending = await db.GroupJoinRequests
+                .AnyAsync(r => r.GroupId == ev.GroupId && r.UserId == currentUserId && r.Status == JoinRequestStatus.Pending);
+
+            if (!alreadyPending)
+            {
+                db.GroupJoinRequests.Add(new GroupJoinRequest
+                {
+                    GroupId = ev.GroupId,
+                    UserId = currentUserId,
+                    RequestedAt = DateTime.UtcNow,
+                    Status = JoinRequestStatus.Pending,
+                });
+
+                await db.SaveChangesAsync();
+            }
+
+            await LoadEvent();
+        }
+        catch
+        {
+            joinRequestError = "Não foi possível enviar a solicitação agora. Tente novamente em instantes.";
+        }
+        finally
+        {
+            requestingJoin = false;
+        }
     }
 
     private void TryUnlock()

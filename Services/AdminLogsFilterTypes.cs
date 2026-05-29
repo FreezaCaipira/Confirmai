@@ -13,6 +13,7 @@ public enum AdminLogsQuickRangePreset
 public enum AdminLogsAuditQuickFilter
 {
     All,
-    SecurityPolicy
+    SecurityPolicy,
+    PaymentPanelStale
 }
 

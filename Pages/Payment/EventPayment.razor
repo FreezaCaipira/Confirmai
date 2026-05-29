@@ -15,13 +15,14 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
-@inject EfiBankPixService EfiBankService
+@inject EventPaymentGatewayFactory EventGatewayFactory
+@inject ILogger<EventPayment> _logger
 
 <PageTitle>Pagamento — Confirmai</PageTitle>
 
 <div class="entity-shell">
     <section class="entity-shell-grid" aria-label="Pagamento de partida">
-        <article class="entity-shell-card entity-shell-main">
+        <article class="entity-shell-card entity-shell-main evpay-main">
 
             @if (isLoading)
             {
@@ -80,7 +81,7 @@
                 </div>
 
                 @* ── Status / Ação ──────────────────────────────────────── *@
-                @if (conf.HasPaid || payState == PayState.Paid)
+                @if (conf.PaymentStatus == EventConfirmationPaymentStatus.Paid || payState == PayState.Paid)
                 {
                     @* ── Pago ─────────────────────────────────────────── *@
                     <div class="evpay-status evpay-status--paid">
@@ -107,7 +108,10 @@
                             Aguardando pagamento…
                         </div>
 
-                        <p class="evpay-brcode">@brCode</p>
+                        <div class="evpay-brcode-wrap">
+                            <span class="evpay-brcode-label">Pix Copia e Cola</span>
+                            <p class="evpay-brcode">@brCode</p>
+                        </div>
 
                         <button class="evpay-action-btn evpay-action-btn--copy"
                                 @onclick="CopyBrCode">
@@ -122,11 +126,30 @@
                     <div class="evpay-methods">
                         <h2 class="evpay-methods-title">Forma de pagamento</h2>
                         <div class="evpay-method-list">
-                            <label class="evpay-method-option evpay-method-option--selected">
-                                <span class="evpay-method-icon">💠</span>
-                                <span class="evpay-method-name">Pix</span>
-                                <span class="evpay-method-badge">1,19% · EfiBank</span>
-                            </label>
+                            @foreach (var gateway in availableGateways)
+                            {
+                                var isSelected = string.Equals(selectedGatewayName, gateway.Name, StringComparison.OrdinalIgnoreCase);
+                                <button type="button"
+                                        class="evpay-method-option @(isSelected ? "evpay-method-option--selected" : string.Empty)"
+                                        @onclick="() => SelectGateway(gateway.Name)">
+                                    <span class="evpay-method-icon">💠</span>
+                                    <span class="evpay-method-name">@gateway.DisplayName</span>
+                                    <span class="evpay-method-badge">@gateway.Name</span>
+                                </button>
+                            }
+
+                            @foreach (var gateway in GetComingSoonGateways())
+                            {
+                                <button type="button"
+                                        class="evpay-method-option evpay-method-option--disabled"
+                                        disabled
+                                        aria-disabled="true"
+                                        title="Integração em breve">
+                                    <span class="evpay-method-icon">🧾</span>
+                                    <span class="evpay-method-name">@gateway.DisplayName</span>
+                                    <span class="evpay-method-badge evpay-method-badge--soon">em breve</span>
+                                </button>
+                            }
                         </div>
                     </div>
 
@@ -135,11 +158,11 @@
                         <p class="evpay-error">@errorMsg</p>
                     }
 
-                    @if (!EfiBankService.IsEnabled)
+                    @if (!availableGateways.Any())
                     {
                         <p class="evpay-disclaimer">
                             <i class="fas fa-clock"></i>
-                            Pagamento via Pix em breve. Entre em contato com o organizador.
+                            Nenhum gateway de pagamento está disponível no momento.
                         </p>
                     }
                     else
@@ -154,7 +177,7 @@
                         else
                         {
                             <i class="fas fa-qrcode"></i>
-                            <span>Gerar QR Code Pix — R$ @ev.Price!.Value.ToString("N2", ptBr)</span>
+                            <span>Gerar QR Code (@GetSelectedGatewayDisplayName()) — R$ @ev.Price!.Value.ToString("N2", ptBr)</span>
                         }
                     </button>
                     }
@@ -174,6 +197,9 @@
     private bool    isLoading = true;
     private string  errorMsg  = string.Empty;
     private string  userId    = string.Empty;
+    private List<EventPaymentGatewayOption> availableGateways = new();
+    private readonly List<EventPaymentGatewayOption> comingSoonGateways = [];
+    private string selectedGatewayName = string.Empty;
 
     private PayState payState = PayState.Idle;
     private string?  brCode;
@@ -191,6 +217,9 @@
             .Include(c => c.User)
             .FirstOrDefaultAsync(c => c.Id == ConfirmationId && c.UserId == userId);
 
+        availableGateways = (await EventGatewayFactory.GetAvailableAsync()).ToList();
+        selectedGatewayName = availableGateways.FirstOrDefault()?.Name ?? string.Empty;
+
         // Redirecionar se não tem preço ou é goleiro
         if (conf is not null && (conf.Event.Price is null || conf.Position == FutsalPosition.Goalkeeper))
         {
@@ -199,6 +228,17 @@
                 : $"/poker/{conf.Event.Id}";
             NavigationManager.NavigateTo(backUrl);
             return;
+        }
+
+        // Reuse existing pending charge — avoids creating a duplicate in the gateway
+        if (conf is not null &&
+            conf.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
+            conf.PixTxId is not null &&
+            conf.PixBrCode is not null)
+        {
+            brCode   = conf.PixBrCode;
+            payState = PayState.AwaitingPayment;
+            _ = StartPollingAsync(conf.PixTxId, conf.PaymentGatewayName ?? string.Empty);
         }
 
         isLoading = false;
@@ -212,34 +252,50 @@
 
         try
         {
-            var (txId, pixBrCode) = await EfiBankService
-                .CreateChargeAsync(conf.Event.Price.Value, conf.Id);
+            var gateway = await EventGatewayFactory.GetGatewayAsync(selectedGatewayName);
+            if (gateway is null)
+            {
+                errorMsg = "Gateway indisponível ou desativado pelo administrador.";
+                payState = PayState.Idle;
+                return;
+            }
 
-            // Persist txId so the webhook can resolve the confirmation
+            var charge = await gateway.CreateChargeAsync(conf.Event.Price.Value, conf.Id);
+
+            // Persist txId + brCode so the page can reuse the charge if the user returns
             await using var db = await DbFactory.CreateDbContextAsync();
             var entity = await db.EventConfirmations.FindAsync(conf.Id);
             if (entity is not null)
             {
-                entity.PixTxId = txId;
+                entity.PixTxId             = charge.ChargeId;
+                entity.PixBrCode           = charge.BrCode;
+                entity.PaymentGatewayName  = gateway.Name;
+                entity.PaymentStatus       = EventConfirmationPaymentStatus.Pending;
+                entity.HasPaid             = false;
                 await db.SaveChangesAsync();
-                conf.PixTxId = txId;
+                conf.PixTxId            = charge.ChargeId;
+                conf.PixBrCode          = charge.BrCode;
+                conf.PaymentGatewayName = gateway.Name;
+                conf.PaymentStatus      = EventConfirmationPaymentStatus.Pending;
+                conf.HasPaid            = false;
             }
 
-            brCode   = pixBrCode;
+            brCode   = charge.BrCode;
             payState = PayState.AwaitingPayment;
-            _ = StartPollingAsync(txId);
+            _ = StartPollingAsync(charge.ChargeId, gateway.Name);
         }
         catch (Exception ex)
         {
-            errorMsg = $"Erro ao gerar QR Code: {ex.Message}";
+            _logger.LogError(ex, "EventPayment: falha ao gerar cobrança. ConfirmationId={Id}", conf?.Id);
+            errorMsg = "Não foi possível gerar o QR Code. Tente novamente em instantes.";
             payState = PayState.Idle;
         }
     }
 
-    private async Task StartPollingAsync(string txId)
+    private async Task StartPollingAsync(string chargeId, string gatewayName)
     {
         _pollCts?.Cancel();
-        _pollCts = new CancellationTokenSource();
+        _pollCts = new CancellationTokenSource(TimeSpan.FromMinutes(30));
         var ct = _pollCts.Token;
 
         try
@@ -252,8 +308,9 @@
                 await using (var db = await DbFactory.CreateDbContextAsync())
                 {
                     var fresh = await db.EventConfirmations.FindAsync(conf!.Id);
-                    if (fresh?.HasPaid is true)
+                    if (fresh?.PaymentStatus == EventConfirmationPaymentStatus.Paid)
                     {
+                        conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
                         conf.HasPaid = true;
                         payState = PayState.Paid;
                         await InvokeAsync(StateHasChanged);
@@ -262,15 +319,18 @@
                 }
 
                 // Also query EfiBank API directly for faster feedback
-                if (await EfiBankService.IsChargePaidAsync(txId))
+                var gateway = await EventGatewayFactory.GetGatewayAsync(gatewayName);
+                if (gateway is not null && await gateway.IsChargePaidAsync(chargeId))
                 {
                     await using var db = await DbFactory.CreateDbContextAsync();
                     var entity = await db.EventConfirmations.FindAsync(conf!.Id);
                     if (entity is not null)
                     {
+                        entity.PaymentStatus = EventConfirmationPaymentStatus.Paid;
                         entity.HasPaid = true;
                         await db.SaveChangesAsync();
                     }
+                    conf!.PaymentStatus = EventConfirmationPaymentStatus.Paid;
                     conf!.HasPaid = true;
                     payState = PayState.Paid;
                     await InvokeAsync(StateHasChanged);
@@ -291,6 +351,35 @@
         await Task.Delay(2000);
         copied = false;
         StateHasChanged();
+    }
+
+    private void SelectGateway(string gatewayName)
+    {
+        selectedGatewayName = gatewayName;
+    }
+
+    private string GetSelectedGatewayDisplayName()
+    {
+        return availableGateways
+            .FirstOrDefault(g => string.Equals(g.Name, selectedGatewayName, StringComparison.OrdinalIgnoreCase))
+            ?.DisplayName
+            ?? "Pix";
+    }
+
+    private IReadOnlyList<EventPaymentGatewayOption> GetComingSoonGateways()
+    {
+        if (availableGateways.Count == 0)
+        {
+            return comingSoonGateways;
+        }
+
+        var availableNames = availableGateways
+            .Select(g => g.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return comingSoonGateways
+            .Where(g => !availableNames.Contains(g.Name))
+            .ToList();
     }
 
     public void Dispose()

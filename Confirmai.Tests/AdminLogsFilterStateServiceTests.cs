@@ -161,6 +161,28 @@ public class AdminLogsFilterStateServiceTests
             Page = 3
         });
     }
+
+    [Fact]
+    public async Task SaveAndLoadAsync_PreservesPaymentPanelStaleAuditQuickFilter()
+    {
+        var js = new FakeLocalStorageJsRuntime();
+        var service = new AdminLogsFilterStateService(js);
+
+        await service.SaveAsync(new AdminLogsFilterState
+        {
+            GlobalSearch = "stale",
+            AuditQuickFilter = AdminLogsAuditQuickFilter.PaymentPanelStale,
+            QuickRangePreset = AdminLogsQuickRangePreset.Last7Days,
+            Page = 1
+        });
+
+        var loaded = await service.LoadAsync();
+
+        Assert.Equal("stale", loaded.GlobalSearch);
+        Assert.Equal(AdminLogsAuditQuickFilter.PaymentPanelStale, loaded.AuditQuickFilter);
+        Assert.Equal(AdminLogsQuickRangePreset.Last7Days, loaded.QuickRangePreset);
+        Assert.Equal(1, loaded.Page);
+    }
 }
 
 

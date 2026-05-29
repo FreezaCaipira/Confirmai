@@ -29,5 +29,22 @@ internal static class WebhookTestFactory
         context.Request.Body.Position = 0;
         return context;
     }
+
+    /// <summary>
+    /// Creates an <see cref="HttpContext"/> for EfiBank webhook tests.
+    /// EfiBank uses a query-string secret (<c>?webhookSecret=...</c>) instead of a header.
+    /// </summary>
+    public static DefaultHttpContext CreateEfiBankContext(string rawBody, string? secret = null)
+    {
+        var context = new DefaultHttpContext();
+
+        if (secret is not null)
+            context.Request.QueryString = new QueryString($"?webhookSecret={Uri.EscapeDataString(secret)}");
+
+        context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(rawBody));
+        context.Request.ContentLength = context.Request.Body.Length;
+        context.Request.Body.Position = 0;
+        return context;
+    }
 }
 

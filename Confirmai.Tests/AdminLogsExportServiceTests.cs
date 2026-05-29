@@ -137,6 +137,41 @@ public class AdminLogsExportServiceTests
         Assert.Contains("\"Source\": \"Webhook\"", json);
         Assert.Contains("\"userName\": \"john\"", json);
     }
+
+    [Fact]
+    public void BuildEventConfirmationReconciliationCsv_WhenRowsProvided_ReturnsExpectedColumns()
+    {
+        var service = new AdminLogsExportService();
+        var rows = new[]
+        {
+            new EventConfirmationReconciliationExportRow(
+                ConfirmationId: 15,
+                EventId: 99,
+                UserId: "user-abc",
+                ConfirmedAt: new DateTime(2026, 5, 28, 12, 0, 0, DateTimeKind.Utc),
+                PaymentStatus: "Paid",
+                PixTxId: "tx-123",
+                PaymentGatewayName: "EfiBank")
+        };
+
+        var csv = service.BuildEventConfirmationReconciliationCsv(rows);
+
+        Assert.Contains("ConfirmationId,EventId,UserId,ConfirmedAtUtc,PaymentStatus,PixTxId,PaymentGateway", csv);
+        Assert.Contains("\"15\"", csv);
+        Assert.Contains("\"Paid\"", csv);
+        Assert.Contains("\"tx-123\"", csv);
+    }
+
+    [Fact]
+    public void BuildEventConfirmationReconciliationFileName_ReturnsDeterministicName()
+    {
+        var service = new AdminLogsExportService();
+
+        var name = service.BuildEventConfirmationReconciliationFileName(
+            utcNow: new DateTime(2026, 5, 28, 16, 30, 45, DateTimeKind.Utc));
+
+        Assert.Equal("event-confirmations-reconciliation-20260528-163045.csv", name);
+    }
 }
 
 

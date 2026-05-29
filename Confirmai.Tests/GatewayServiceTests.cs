@@ -19,8 +19,8 @@ public class GatewayServiceTests
             var service = new GatewayService(factory);
             var gateways = await service.GetAllAsync();
 
-            // GetAllAsync auto-seeds defaults (BTCPayServer, Testnet, Pix, EfiBank) then merges
-            Assert.Equal(4, gateways.Count);
+            // GetAllAsync auto-seeds defaults (BTCPayServer, Testnet, Pix, EfiBank, Appmax) then merges
+            Assert.Equal(5, gateways.Count);
         }
     }
 

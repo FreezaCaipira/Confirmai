@@ -67,6 +67,14 @@ public class AdminLogsFilterInferenceTests
 
         Assert.Equal(AdminLogsAuditQuickFilter.SecurityPolicy, result);
     }
+
+    [Fact]
+    public void InferAuditQuickFilter_WhenEventTypeMatchesPaymentPanelStale_ReturnsPaymentPanelStale()
+    {
+        var result = AdminLogsFilterInference.InferAuditQuickFilter(null, AdminAuditLevels.Success, AuditEvents.PaymentReconciliationPanelStale);
+
+        Assert.Equal(AdminLogsAuditQuickFilter.PaymentPanelStale, result);
+    }
 }
 
 

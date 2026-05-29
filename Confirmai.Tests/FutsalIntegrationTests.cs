@@ -1,4 +1,8 @@
 using System.Net;
+using Confirmai.Data;
+using Confirmai.Enums;
+using Confirmai.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Confirmai.Tests;
 
@@ -123,6 +127,20 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         Assert.Contains("Futsal", content);
     }
 
+    [Fact]
+    public async Task FutsalDetail_PrivateGroup_ShowsJoinRequestButton_ForAuthenticatedNonMember()
+    {
+        var eventId = await SeedPrivateFutsalEventAsync(creatorId: "private-futsal-creator");
+        var client = AuthenticatedClient("private-futsal-viewer");
+
+        var response = await client.GetAsync($"/futsal/{eventId}");
+        var content = await ReadContentAsync(response);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Este grupo é privado. Solicite entrada para o administrador.", content, StringComparison.Ordinal);
+        Assert.Contains("Solicitar entrada", content, StringComparison.Ordinal);
+    }
+
     // ──────────────────────────────────────────────
     // Create page – /futsal/create
     // ──────────────────────────────────────────────
@@ -218,5 +236,50 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var content = await ReadContentAsync(response);
 
         Assert.Contains("não encontrada", content);
+    }
+
+    private async Task<int> SeedPrivateFutsalEventAsync(string creatorId)
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        var group = new Group
+        {
+            Name = "Racha Privado de Teste",
+            Sport = Sport.Futsal,
+            City = "Pouso Alegre",
+            StateCode = "MG",
+            CreatedByUserId = creatorId,
+            IsPrivate = true,
+            InviteCode = "PRIVATE01"
+        };
+
+        db.Groups.Add(group);
+        await db.SaveChangesAsync();
+
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = group.Id,
+            UserId = creatorId,
+            Role = GroupMemberRole.Admin,
+            CreatedAt = DateTime.UtcNow,
+        });
+
+        var ev = new Event
+        {
+            GroupId = group.Id,
+            Sport = Sport.Futsal,
+            Location = "Quadra Privada",
+            StartsAt = DateTime.UtcNow.AddDays(1),
+            MaxPlayers = 12,
+            MaxGoalkeepers = 2,
+            IsActive = true,
+            CreatedByUserId = creatorId,
+        };
+
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+
+        return ev.Id;
     }
 }

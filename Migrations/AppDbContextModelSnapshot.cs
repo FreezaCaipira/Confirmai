@@ -364,6 +364,18 @@ namespace Confirmai.Migrations
                     b.Property<bool>("HasPaid")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("PaymentGatewayName")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("PaymentStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("PixBrCode")
+                        .HasColumnType("text");
+
                     b.Property<string>("PixTxId")
                         .HasMaxLength(35)
                         .HasColumnType("character varying(35)");
@@ -380,6 +392,10 @@ namespace Confirmai.Migrations
                         .HasColumnType("character varying(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PixTxId")
+                        .IsUnique()
+                        .HasFilter("\"PixTxId\" IS NOT NULL");
 
                     b.HasIndex("UserId");
 

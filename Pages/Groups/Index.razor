@@ -59,7 +59,60 @@
         <section class="groups-block">
             <div class="groups-block-header">
                 <h2 class="groups-title"><i class="fas fa-layer-group"></i> Meus grupos</h2>
+                @if (canFilterPendingForAction)
+                {
+                    <label class="groups-filter-toggle" for="groups-pending-filter">
+                        <input id="groups-pending-filter"
+                               type="checkbox"
+                               checked="@showOnlyPendingForAction"
+                               @onchange="OnPendingFilterChanged" />
+                        <span>Mostrar somente com solicitações pendentes</span>
+                    </label>
+                }
             </div>
+
+            @{ var visibleGroups = GetVisibleGroups(); }
+            @{ var actionRequiredGroups = GetActionRequiredGroups(); }
+
+            @if (actionRequiredGroups.Count > 0 && !showOnlyPendingForAction)
+            {
+                <div class="groups-action-panel">
+                    <div class="groups-action-panel-header">
+                        <div>
+                            <h3 class="groups-action-title"><i class="fas fa-bell"></i> Grupos com pendências</h3>
+                            <p class="groups-action-sub">Solicitações aguardando sua aprovação aparecem primeiro aqui.</p>
+                        </div>
+                    </div>
+
+                    <div class="groups-grid groups-grid--action-required">
+                        @foreach (var g in actionRequiredGroups)
+                        {
+                            var pendingRequestsCount = GetPendingRequestsCount(g.Id);
+                            <a class="group-card group-card--action-required" href="/grupo/@g.Id">
+                                <div class="group-card-top">
+                                    <span class="group-card-sport">
+                                        @(g.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                                    </span>
+                                    <div class="group-card-badges">
+                                        <span class="player-tag player-tag--action-needed">Ação necessária</span>
+                                        <span class="player-tag player-tag--pending-requests">@pendingRequestsCount solicitação@(pendingRequestsCount == 1 ? string.Empty : "ões")</span>
+                                    </div>
+                                </div>
+                                <h2 class="group-card-name">@g.Name</h2>
+                                @if (!string.IsNullOrWhiteSpace(g.City))
+                                {
+                                    <p class="group-card-location">
+                                        <i class="fas fa-map-marker-alt"></i> @g.City/@g.StateCode
+                                    </p>
+                                }
+                                <div class="group-card-meta">
+                                    <span><i class="fas fa-users"></i> @g.Members.Count membro@(g.Members.Count != 1 ? "s" : "")</span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
 
             @if (groups.Count == 0)
             {
@@ -69,12 +122,21 @@
                     <p class="groups-empty-sub">Assim que entrar em um grupo, ele aparecerá aqui.</p>
                 </div>
             }
+            else if (visibleGroups.Count == 0)
+            {
+                <div class="groups-empty">
+                    <i class="fas fa-filter groups-empty-icon"></i>
+                    <p>Nenhum grupo com solicitações pendentes no momento.</p>
+                    <p class="groups-empty-sub">Desative o filtro para ver todos os seus grupos.</p>
+                </div>
+            }
             else
             {
                 <div class="groups-grid">
-                    @foreach (var g in groups)
+                    @foreach (var g in visibleGroups)
                     {
-                        var isAdmin = g.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
+                        var isAdmin = IsCurrentUserAdmin(g);
+                        var pendingRequestsCount = GetPendingRequestsCount(g.Id);
                         var nextEvent = g.Events
                             .Where(e => e.IsActive && e.StartsAt > DateTime.UtcNow)
                             .OrderBy(e => e.StartsAt)
@@ -88,6 +150,11 @@
                                     @if (isAdmin)
                                     {
                                         <span class="player-tag player-tag--admin">admin</span>
+                                        @if (pendingRequestsCount > 0)
+                                        {
+                                            <span class="player-tag player-tag--action-needed">Ação necessária</span>
+                                            <span class="player-tag player-tag--pending-requests">@pendingRequestsCount solicitação@(pendingRequestsCount == 1 ? string.Empty : "ões")</span>
+                                        }
                                     }
                                     @if (!g.IsActive)
                                     {
@@ -125,9 +192,20 @@
     private string?      currentUserId = null;
     private List<Group>  groups        = new();
     private bool         isLoading     = true;
+    private Dictionary<int, int> pendingJoinRequestsByGroup = new();
+    private bool canFilterPendingForAction;
+    private bool showOnlyPendingForAction;
 
     private string       joinCode      = string.Empty;
     private string       joinCodeError = string.Empty;
+
+    [SupplyParameterFromQuery(Name = "pendentes")]
+    public bool? PendingOnlyQuery { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        showOnlyPendingForAction = PendingOnlyQuery == true;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -151,7 +229,57 @@
             .AsSplitQuery()
             .ToListAsync();
 
+        var adminGroupIds = groups
+            .Where(IsCurrentUserAdmin)
+            .Select(g => g.Id)
+            .ToList();
+
+        canFilterPendingForAction = adminGroupIds.Count > 0;
+
+        pendingJoinRequestsByGroup = adminGroupIds.Count == 0
+            ? new Dictionary<int, int>()
+            : await db.GroupJoinRequests
+                .Where(r => adminGroupIds.Contains(r.GroupId) && r.Status == JoinRequestStatus.Pending)
+                .GroupBy(r => r.GroupId)
+                .Select(g => new { GroupId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.GroupId, x => x.Count);
+
+        groups = groups
+            .OrderByDescending(g => GetPendingRequestsCount(g.Id) > 0)
+            .ThenByDescending(IsCurrentUserAdmin)
+            .ThenBy(g => g.Name)
+            .ToList();
+
         isLoading = false;
+    }
+
+    private List<Group> GetVisibleGroups()
+    {
+        if (!showOnlyPendingForAction)
+        {
+            return groups;
+        }
+
+        return groups
+            .Where(g => IsCurrentUserAdmin(g) && GetPendingRequestsCount(g.Id) > 0)
+            .ToList();
+    }
+
+    private List<Group> GetActionRequiredGroups()
+        => groups.Where(g => IsCurrentUserAdmin(g) && GetPendingRequestsCount(g.Id) > 0).ToList();
+
+    private bool IsCurrentUserAdmin(Group group)
+        => currentUserId is not null && group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
+
+    private int GetPendingRequestsCount(int groupId)
+        => pendingJoinRequestsByGroup.TryGetValue(groupId, out var pendingCount) ? pendingCount : 0;
+
+    private void OnPendingFilterChanged(ChangeEventArgs args)
+    {
+        showOnlyPendingForAction = args.Value is bool isChecked && isChecked;
+        NavigationManager.NavigateTo(
+            NavigationManager.GetUriWithQueryParameter("pendentes", showOnlyPendingForAction ? true : null),
+            replace: true);
     }
 
     private void JoinWithCode()

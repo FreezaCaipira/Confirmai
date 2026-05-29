@@ -40,6 +40,7 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
         Assert.Equal(2, data.Logs.Count);
         Assert.Equal(4, data.AuditCounts.All);
         Assert.Equal(1, data.AuditCounts.SecurityPolicy);
+        Assert.Equal(0, data.AuditCounts.PaymentPanelStale);
 
         Assert.Contains($"user-a-{marker}", data.Logs[0].UserId);
         Assert.Contains($"user-b-{marker}", data.Logs[1].UserId);
@@ -138,6 +139,50 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
             log.Source == AdminAuditSources.SecurityPolicy &&
             log.UserId == $"admin-security-{marker}" &&
             log.Message.Contains("Security policy updated.", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task GetPageDataAsync_ReturnsPaymentPanelStaleAuditCountsAndRows()
+    {
+        var marker = Guid.NewGuid().ToString("N");
+
+        using (var seedScope = _factory.Services.CreateScope())
+        {
+            var db = seedScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Logs.Add(new AppLog
+            {
+                Source = AdminAuditSources.Payments,
+                Message = $"stale panel {marker}",
+                Level = "Warning",
+                EventType = AuditEvents.PaymentReconciliationPanelStale,
+                EntityType = AuditEntities.Payment,
+                Timestamp = new DateTime(2026, 3, 12, 9, 0, 0, DateTimeKind.Utc)
+            });
+            await db.SaveChangesAsync();
+        }
+
+        using var queryScope = _factory.Services.CreateScope();
+        var service = queryScope.ServiceProvider.GetRequiredService<AdminLogsQueryService>();
+
+        var data = await service.GetPageDataAsync(
+            primaryCriteria: new AdminLogFilterCriteria
+            {
+                GlobalTerm = marker,
+                EventType = AuditEvents.PaymentReconciliationPanelStale
+            },
+            auditCountsCriteria: new AdminLogFilterCriteria
+            {
+                GlobalTerm = marker
+            },
+            sortColumn: AdminLogSortColumn.Timestamp,
+            sortAscending: false,
+            requestedPage: 1,
+            pageSize: 10);
+
+        Assert.Equal(1, data.TotalLogs);
+        Assert.Equal(1, data.AuditCounts.PaymentPanelStale);
+        Assert.Single(data.Logs);
+        Assert.Equal(AuditEvents.PaymentReconciliationPanelStale, data.Logs[0].EventType);
     }
 
     private static ClaimsPrincipal CreateAdminPrincipal(string userId)

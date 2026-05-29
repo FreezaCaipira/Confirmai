@@ -95,196 +95,113 @@ Toda lógica de negócio vive em `Services/`. Padrão:
 
 ## Estado Atual (Mai/2026)
 
-- Fork do OtServ Market adaptado para Confirmai
-- Infraestrutura intacta: Identity, CSP, SignalR, EF Core, Serilog, OpenTelemetry, CI
-- CSS restructurado: site.css (global), componentes isolados via .razor.css
-- Cookie consent funcional (JS renomeado para privacy-prefs.js — ad blockers bloqueavam cookie-consent.js)
+- Base estável para futebol + poker, com foco operacional em eventos e confirmações.
+- Build limpo e suíte principal passando (421/421 testes).
+- Fluxo de futsal completo para operação diária: vagas por posição, fila, cancelamento, status de pagamento e escalação.
+- Fluxo de pagamentos por evento com multi-gateway e reconciliação operacional já entregue (webhook + worker + fallback manual).
+- Operação/admin de reconciliação com painel de saúde, histórico de varreduras, tendência 24h e limiares configuráveis via dashboard admin.
+- Fluxo de grupos privados evoluido: solicitação de entrada iniciada pelo usuário nas páginas de evento e triagem priorizada em `/grupos` para admins.
+- Hardening de release entregue com smoke pós-deploy, checklist de rollback, runbook operacional de incidentes e templates de monitoramento.
+- Infra consolidada: Identity, CSP nonce por request, headers de segurança, audit/log estruturado, CI.
 
 ---
 
-## Roadmap Confirmai
+## Roadmap Confirmai (Atualizado)
 
-### Fase 1 — Modelo de dados base (atual)
+### Frentes concluídas
 
-**Objetivo**: substituir entidades do fork pelas entidades do domínio real.
+- [x] Modelo de domínio (Group, GroupMember, Event, EventConfirmation, WaitingList)
+- [x] Fluxos principais de futsal e poker (criação/edição, confirmação, fila, cancelamento)
+- [x] Escalação de futsal (`/futsal/{id}/escalacao`) com randomização, confirmação e reset
+- [x] Hardening de segurança base (CSP, headers, políticas de autenticação)
+- [x] Auditoria estruturada e observabilidade operacional
 
-Mapeamento fork → Confirmai:
+### Frentes em andamento
 
-| Fork | Ação | Confirmai |
-|---|---|---|
-| `TibiaServer` | Adaptar | `Group` (casa de poker / pelada de fut) |
-| `ServerMember` | Adaptar | `GroupMember` |
-| `ServerMemberRole` | Renomear valores | `GroupMemberRole` (Admin / Member) |
-| `Product` | Substituir | `Event` (torneio ou partida) |
-| `Order` | Substituir | `EventConfirmation` |
-| `PaymentStatus` | Manter | Reaproveitado quando pagamento entrar |
-| `PaymentOrder` | Arquivar | Substituído no futuro por Pix |
-| `BtcPay` | Remover | Fora do escopo atual |
+- [x] Pagamentos do fluxo de futebol em modo produção (contrato final de estados + E2E ponta a ponta)
+- [x] Operação/admin de pagamentos (timeline por confirmação, exportação e métricas por gateway)
+- [x] CI/CD de release com smoke test e rollback explícito
+- [x] UX inicial de grupos privados para solicitação de entrada e priorização de pendências admin
+- [ ] Alertas operacionais automatizados a partir do runbook (webhook warning, staleness e anomalia de pendências)
 
-Novas entidades sem equivalente no fork:
-- `Sport` — Futsal | Poker | (futuramente Xadrez, etc.)
-- `WaitingList` — fila de espera quando Event está lotado
+### Backlog planejado
 
-Modelo `Event` tabela única com campos nullable por esporte:
-```
-Event
-  GroupId, SportId, StartsAt, Location
-  MaxPlayers, MaxGoalkeepers?          ← futsal
-  BuyIn?, Rebuy?, Addon?, BonusInfo?   ← poker
-```
-
-- [ ] Criar enum/tabela `Sport`
-- [ ] Criar `Group` a partir de `TibiaServer`
-- [ ] Criar `GroupMember` / `GroupMemberRole`
-- [ ] Criar `Event` (tabela única com campos nullable)
-- [ ] Criar `EventConfirmation` + índice único (UserId, EventId)
-- [ ] Criar `WaitingList`
-- [ ] Migration e seed de dados de teste
+- [ ] WhatsApp provider real (`IWhatsAppSender`) com opt-in e envio transacional
+- [ ] Fluxo admin de grupos privados com mais contexto de decisão e atalhos diretos de aprovação/rejeição
+- [ ] Dashboard consolidado por grupo (ocupação, no-show, receita, inadimplência)
+- [ ] Refinos de UX mobile e acessibilidade AA nas telas de evento
 
 ---
 
-### Fase 2 — UI tela inicial e listagem
+## TODO Priorizado (Próximas Implementações)
 
-**Objetivo**: tela de esportes e listagem de eventos funcionais.
+### P0 — Pagamentos (crítico)
 
-- [ ] Tela `/` — lista de esportes disponíveis (cards: Futsal, Poker)
-- [ ] Tela `/[sport]` — lista de grupos por esporte, filtro por cidade (default: Pouso Alegre MG ou última cidade do usuário)
-- [ ] Tela `/[sport]/[groupId]` — lista de eventos do grupo
-- [ ] Tela `/[sport]/[groupId]/[eventId]` — detalhe do evento com lista de confirmados
-- [ ] Botão "Confirmar presença" — redireciona para login se não autenticado
-- [ ] Detecção de conflito de horário ao confirmar
+- [x] Fechar contrato de pagamento para eventos de futebol:
+  - Status oficiais (`pending`, `paid`, `failed`, `refunded`)
+  - Regra de cancelamento por status
+  - Regra de idempotência de webhook
+- [x] Garantir vínculo forte entre `EventConfirmation` e cobrança (charge/tx id)
+- [x] Cobrir reconciliação:
+  - webhook confirma pagamento
+  - polling/manual check corrige divergências
+  - worker automático mantém paridade sem clique manual
+- [x] E2E de pagamento do futebol (`confirmar` → `pagar` → `webhook` → `hasPaid=true`)
 
----
+### P1 — Operação/Admin
 
-### Fase 3 — Admin de grupo
+- [x] Tela/admin de pagamentos por evento (filtro por status e período)
+- [x] Painel operacional de reconciliação em `/admin/payments` (pendências + varredura imediata)
+- [x] Timeline/audit por confirmação (tentativas, confirmações, falhas)
+- [x] Exportação CSV de pagamentos e conciliação
+- [x] Telemetria operacional por gateway (pendências, share, severidade)
 
-**Objetivo**: admin do grupo cria e gerencia eventos.
+### P2 — Produto
 
-- [ ] Painel do admin de grupo
-- [ ] CRUD de eventos (com campos específicos por esporte)
-- [ ] Gerenciar lista de confirmados (remover, promover da fila)
-- [ ] Definir vagas por posição (goleiro/linha no futsal)
+- [ ] WhatsApp transacional (cancelamento/alteração) com consentimento explícito
+- [ ] Melhorar operação de grupos privados para admins (triagem rápida, contexto e ações diretas)
+- [ ] Melhorias analíticas (KPI de ocupação e conversão em pagamento)
+- [ ] Ajustes de UX responsiva e acessibilidade AA nas telas de evento
 
----
+### P3 — Operação contínua
 
-### Fase 4 — Admin do site
-
-**Objetivo**: admin global gerencia grupos e esportes.
-
-- [ ] Aprovar/rejeitar novos grupos
-- [ ] Gerenciar esportes disponíveis
-- [ ] Dashboard de uso (grupos ativos, confirmações por período)
-
----
-
-### Fase 5 — Pagamento (standby)
-
-**Objetivo**: monetização via taxa por confirmação.
-
-- [ ] Integração Pix (R$ 1,00 por confirmação ou similar)
-- [ ] Reaproveitamento de `PaymentStatus` e infraestrutura SignalR existente
-- [ ] Relatório financeiro para admin do grupo
+- [ ] Converter runbook em alertas acionáveis no stack de monitoramento
+- [ ] Definir baseline por gateway (pending/stale/failed/refunded) com revisão semanal
+- [ ] Formalizar ritual pós-incidente com checklist de causa raiz e follow-up
 
 ---
 
-### Fase 6 — Notificações WhatsApp (planejado)
+## Plano de Ação (30 dias)
 
-**Objetivo**: notificar participantes via WhatsApp além do mailbox interno e email, para avisos de cancelamento e mudança de data/hora.
+### Sprint 1 — Fechamento do núcleo de pagamento
 
-#### Pré-requisitos de modelo
+1. Definir contrato final de estados e transições.
+2. Ajustar persistência e idempotência.
+3. Entregar testes unitários e integração do núcleo.
 
-1. Adicionar campo `PhoneNumber` (formato E.164, ex: `+5535999990000`) em `ApplicationUser`
-2. Adicionar `WhatsAppOptIn bool` (consentimento explícito) em `ApplicationUser`
-3. Exibir opção de opt-in nas configurações de perfil do usuário
+### Sprint 2 — Fluxo ponta a ponta e operação
 
-#### Pré-requisitos de infraestrutura
+1. Completar webhook + reconciliação automática/manual.
+2. Publicar tela admin operacional de pagamentos (entregue).
+3. Entregar cenário E2E de futebol com pagamento confirmado.
 
-Criar abstração em `Services/`:
+### Sprint 3 — Release readiness
 
-```csharp
-// Services/IWhatsAppSender.cs
-public interface IWhatsAppSender
-{
-    Task SendTextAsync(string toE164, string text);
-}
-```
+1. Checklist de produção (variáveis, webhook URL, rotação de segredos). (entregue)
+2. Smoke test de deploy com rollback documentado. (entregue)
+3. Monitoramento de eventos de pagamento e alertas básicos. (entregue base)
+4. Próximo passo: automatizar alertas do runbook em produção.
 
-Implementar com um dos providers abaixo (ordem de preferência):
+### Próximo ciclo sugerido
 
-| Provider | Tipo | Observação |
-|---|---|---|
-| **Evolution API** | Self-hosted (Docker) | Gratuito; usa sessão QR Code via WhatsApp Web; mais simples para MVP |
-| **Z-API** | SaaS BR | Plano gratuito com limite; boa SDK REST |
-| **Twilio WhatsApp** | SaaS global | Requer aprovação de template no Meta; mais robusto para produção |
+1. Implantar e validar alertas reais de pagamentos/reconciliação no ambiente.
+2. Continuar a superfície admin de grupos privados com triagem mais rápida.
+3. Iniciar métricas de ocupação/inadimplência por grupo e evento.
 
-Registrar em `Program.cs`:
+## Referências operacionais (produção)
 
-```csharp
-// exemplo com Evolution API
-builder.Services.AddHttpClient<IWhatsAppSender, EvolutionWhatsAppSender>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["WhatsApp:BaseUrl"]!);
-    client.DefaultRequestHeaders.Add("apikey", builder.Configuration["WhatsApp:ApiKey"]);
-});
-```
-
-#### Ponto de integração
-
-O envio já está estruturado em `Services/EventNotificationService.cs` no método privado `SendToParticipantsAsync`.
-Há um bloco `// TODO (WhatsApp)` comentado com o código exato a descomentar após a implementação do provider.
-
-#### Configuração (`appsettings.json`)
-
-```json
-"WhatsApp": {
-  "Provider": "EvolutionApi",  // ou "ZApi" | "Twilio"
-  "BaseUrl": "",               // ex: http://localhost:8080
-  "ApiKey": "",
-  "Instance": ""               // Evolution API: nome da instância conectada
-}
-```
-- Inline styles estáticos eliminados de todas as páginas
-- Sem `@layer` em `site.css` (era bloco unclosed — removido)
-
----
-
-### Fase 7 — Escalação de Times (em desenvolvimento)
-
-**Objetivo**: após o evento estar com vagas preenchidas, o admin monta a escalação dos dois times, randomiza os jogadores de linha, confirma e compartilha no WhatsApp.
-
-#### Modelo de dados
-
-- [ ] Adicionar `TeamId int?` em `EventConfirmation` (0 = Time A, 1 = Time B, null = não escalado)
-- [ ] Adicionar `LineupConfirmedAt DateTime?` em `Event`
-- [ ] Migration: `AddLineupFields`
-
-#### Página `/futsal/{Id}/escalacao`
-
-Nova página `Pages/Futsal/Escalacao.razor` + `Escalacao.razor.css`:
-
-- [ ] Guard: apenas admin do grupo (criador do evento) acessa; demais veem escalação somente leitura após confirmada
-- [ ] **Estado `draft`** (`LineupConfirmedAt == null`):
-  - GKs auto-atribuídos: GK1 → Time A, GK2 → Time B
-  - Jogadores de linha distribuídos aleatoriamente (`Random.Shuffle` in-memory)
-  - Botão `[🔀 Randomizar]` — novo shuffle sem salvar no banco
-  - Botão `[✅ Confirmar Escalação]` → modal de confirmação → salva `TeamId` em cada `EventConfirmation` + `LineupConfirmedAt` no `Event`
-  - Número ímpar de jogadores: jogador extra aparece como "reserva" no rodapé
-- [ ] **Estado `confirmed`** (`LineupConfirmedAt != null`):
-  - Exibe dois cards de time lado a lado (somente leitura)
-  - Texto formatado para compartilhamento
-  - Botão `[📋 Copiar texto]`
-  - Botão `[📲 Compartilhar no WhatsApp]` → `wa.me/?text=<escalação URL-encoded>` (sem API)
-  - Botão `[🔄 Resetar Escalação]` (admin only) → modal → zera `TeamId` e `LineupConfirmedAt`
-
-#### Integração em `Detail.razor`
-
-- [ ] Na admin bar: botão `[🎯 Montar Escalação]` quando `isAdmin && LineupConfirmedAt == null`
-- [ ] Para todos: link `[📋 Ver Escalação]` quando `LineupConfirmedAt != null`
-
-#### Regras de negócio
-
-- Randomização é livre (in-memory) antes de confirmar
-- Após confirmação, a escalação fica travada para todos lerem
-- Reset disponível apenas para o admin, com modal de aviso
-- WhatsApp: deep link `wa.me/?text=...` — sem custo, sem API, usuário envia manualmente no grupo
-- Número ímpar: jogador extra listado como "reserva" ao final da escalação
+- `docs/production-checklist.md`
+- `docs/deploy.md`
+- `docs/observability-payments-runbook.md`
+- `docs/payments-alert-rules.md`
+- `docs/monitoring/README.md`

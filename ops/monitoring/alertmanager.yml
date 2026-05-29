@@ -1,0 +1,45 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: ops-validation
+  group_by: ["alertname", "severity", "team", "component"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 2h
+  routes:
+    - matchers:
+        - team="payments"
+        - severity="p1"
+      receiver: payments-p1-validation
+      continue: false
+
+    - matchers:
+        - team="payments"
+        - severity="p2"
+      receiver: payments-p2-validation
+      continue: false
+
+receivers:
+  - name: ops-validation
+    webhook_configs:
+      - url: "http://alert-webhook:8080/alerts/ops-default"
+        send_resolved: true
+
+  - name: payments-p1-validation
+    webhook_configs:
+      - url: "http://alert-webhook:8080/alerts/payments-p1"
+        send_resolved: true
+
+  - name: payments-p2-validation
+    webhook_configs:
+      - url: "http://alert-webhook:8080/alerts/payments-p2"
+        send_resolved: true
+
+inhibit_rules:
+  - source_matchers:
+      - severity="p1"
+    target_matchers:
+      - severity="p2"
+      - team="payments"
+    equal: ["alertname", "team", "component"]

@@ -1,0 +1,50 @@
+# Example Alertmanager routing for Confirmai payment alerts.
+# Adapt receivers and secrets for your environment.
+
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: ops-default
+  group_by: ["alertname", "severity", "team", "component"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 2h
+  routes:
+    - matchers:
+        - team="payments"
+        - severity="p1"
+      receiver: payments-p1
+      continue: false
+
+    - matchers:
+        - team="payments"
+        - severity="p2"
+      receiver: payments-p2
+      continue: false
+
+receivers:
+  - name: ops-default
+    # Example placeholder
+    webhook_configs:
+      - url: "https://example.internal/webhook/ops-default"
+        send_resolved: true
+
+  - name: payments-p1
+    # Replace with your Slack / PagerDuty / Teams integration
+    webhook_configs:
+      - url: "https://example.internal/webhook/payments-p1"
+        send_resolved: true
+
+  - name: payments-p2
+    webhook_configs:
+      - url: "https://example.internal/webhook/payments-p2"
+        send_resolved: true
+
+inhibit_rules:
+  - source_matchers:
+      - severity="p1"
+    target_matchers:
+      - severity="p2"
+      - team="payments"
+    equal: ["alertname", "team", "component"]

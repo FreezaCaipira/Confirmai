@@ -11,7 +11,11 @@ public class AdminSettingsService
     public const string OperationFeePercentKey = "OperationFeePercent";
     public const string SiteIntermediaryPixKey = "SiteIntermediaryPixKey";
     public const string LuaDeliveryEnabledKey = "LuaDeliveryEnabled";
+    public const string ReconciliationWarningThresholdKey = "ReconciliationWarningThreshold";
+    public const string ReconciliationCriticalThresholdKey = "ReconciliationCriticalThreshold";
     public const decimal DefaultOperationFeePercent = 2.0m;
+    public const int DefaultReconciliationWarningThreshold = 5;
+    public const int DefaultReconciliationCriticalThreshold = 10;
 
     private readonly AppDbContext _db;
     private readonly LogService? _log;
@@ -221,6 +225,111 @@ public class AdminSettingsService
         EnsureAdmin(user);
         var actorUserId = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         return SetLuaDeliveryEnabledAsync(enabled, actorUserId);
+    }
+
+    public async Task<(int warningThreshold, int criticalThreshold)> GetReconciliationSeverityThresholdsAsync()
+    {
+        var settings = await _db.AppSettings
+            .AsNoTracking()
+            .Where(s => s.Key == ReconciliationWarningThresholdKey || s.Key == ReconciliationCriticalThresholdKey)
+            .ToListAsync();
+
+        var warningThreshold = DefaultReconciliationWarningThreshold;
+        var criticalThreshold = DefaultReconciliationCriticalThreshold;
+
+        var warningSetting = settings.FirstOrDefault(s => s.Key == ReconciliationWarningThresholdKey);
+        var criticalSetting = settings.FirstOrDefault(s => s.Key == ReconciliationCriticalThresholdKey);
+
+        if (warningSetting is not null && int.TryParse(warningSetting.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedWarning))
+        {
+            warningThreshold = Math.Clamp(parsedWarning, 1, 200);
+        }
+
+        if (criticalSetting is not null && int.TryParse(criticalSetting.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedCritical))
+        {
+            criticalThreshold = Math.Clamp(parsedCritical, 1, 200);
+        }
+
+        if (criticalThreshold < warningThreshold)
+        {
+            criticalThreshold = warningThreshold;
+        }
+
+        return (warningThreshold, criticalThreshold);
+    }
+
+    public Task<(int warningThreshold, int criticalThreshold)> GetReconciliationSeverityThresholdsForAdminAsync(ClaimsPrincipal? user)
+    {
+        EnsureAdmin(user);
+        return GetReconciliationSeverityThresholdsAsync();
+    }
+
+    public async Task<bool> SetReconciliationSeverityThresholdsAsync(int warningThreshold, int criticalThreshold, string? actorUserId = null)
+    {
+        if (warningThreshold < 1 || criticalThreshold < 1)
+        {
+            return false;
+        }
+
+        if (criticalThreshold < warningThreshold)
+        {
+            return false;
+        }
+
+        var normalizedWarning = warningThreshold.ToString(CultureInfo.InvariantCulture);
+        var normalizedCritical = criticalThreshold.ToString(CultureInfo.InvariantCulture);
+
+        var warningSetting = await _db.AppSettings.FindAsync(ReconciliationWarningThresholdKey);
+        if (warningSetting is null)
+        {
+            warningSetting = new AppSetting { Key = ReconciliationWarningThresholdKey, Value = normalizedWarning };
+            _db.AppSettings.Add(warningSetting);
+        }
+        else
+        {
+            warningSetting.Value = normalizedWarning;
+        }
+
+        var criticalSetting = await _db.AppSettings.FindAsync(ReconciliationCriticalThresholdKey);
+        if (criticalSetting is null)
+        {
+            criticalSetting = new AppSetting { Key = ReconciliationCriticalThresholdKey, Value = normalizedCritical };
+            _db.AppSettings.Add(criticalSetting);
+        }
+        else
+        {
+            criticalSetting.Value = normalizedCritical;
+        }
+
+        await _db.SaveChangesAsync();
+
+        if (_log is not null)
+        {
+            await _log.AuditAsync(
+                AuditEvents.AdminSettingChanged,
+                AuditEntities.Setting,
+                ReconciliationWarningThresholdKey,
+                $"Configuração alterada: {ReconciliationWarningThresholdKey} = {normalizedWarning}.",
+                actorUserId: actorUserId,
+                source: AdminAuditSources.AdminSettings);
+
+            await _log.AuditAsync(
+                AuditEvents.AdminSettingChanged,
+                AuditEntities.Setting,
+                ReconciliationCriticalThresholdKey,
+                $"Configuração alterada: {ReconciliationCriticalThresholdKey} = {normalizedCritical}.",
+                actorUserId: actorUserId,
+                source: AdminAuditSources.AdminSettings);
+        }
+
+        return true;
+    }
+
+    public Task<bool> SetReconciliationSeverityThresholdsForAdminAsync(ClaimsPrincipal? user, int warningThreshold, int criticalThreshold)
+    {
+        EnsureAdmin(user);
+        var actorUserId = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        return SetReconciliationSeverityThresholdsAsync(warningThreshold, criticalThreshold, actorUserId);
     }
 
     private static void EnsureAdmin(ClaimsPrincipal? user)

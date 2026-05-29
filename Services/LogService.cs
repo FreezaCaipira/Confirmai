@@ -17,12 +17,18 @@ namespace Confirmai.Services
         private readonly AppDbContext _db;
         private readonly ILogger<LogService> _logger;
         private readonly IHttpContextAccessor? _httpContextAccessor;
+        private readonly PaymentDomainMetrics? _paymentMetrics;
 
-        public LogService(AppDbContext db, ILogger<LogService> logger, IHttpContextAccessor? httpContextAccessor = null)
+        public LogService(
+            AppDbContext db,
+            ILogger<LogService> logger,
+            IHttpContextAccessor? httpContextAccessor = null,
+            PaymentDomainMetrics? paymentMetrics = null)
         {
             _db = db;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
+            _paymentMetrics = paymentMetrics;
         }
 
         public async Task LogAsync(string message, string source = "App", string level = "Info", string? userId = null, Exception? ex = null)
@@ -40,6 +46,8 @@ namespace Confirmai.Services
 
             _db.Logs.Add(log);
             await _db.SaveChangesAsync();
+
+            _paymentMetrics?.Track(log);
 
             EmitToLoggingPipeline(log, ex);
         }
@@ -79,6 +87,8 @@ namespace Confirmai.Services
 
             _db.Logs.Add(log);
             await _db.SaveChangesAsync();
+
+            _paymentMetrics?.Track(log);
 
             EmitToLoggingPipeline(log, ex);
         }

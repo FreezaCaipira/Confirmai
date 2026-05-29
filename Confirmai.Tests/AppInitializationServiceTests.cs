@@ -48,10 +48,12 @@ public class AppInitializationServiceTests
             .OrderBy(g => g.Name)
             .ToListAsync();
 
-        Assert.Equal(3, gateways.Count);
-        Assert.Equal("BTCPayServer", gateways[0].Name);
-        Assert.Equal("Pix", gateways[1].Name);
-        Assert.Equal("Testnet", gateways[2].Name);
+        Assert.Equal(5, gateways.Count);
+        Assert.Equal("Appmax",       gateways[0].Name);
+        Assert.Equal("BTCPayServer", gateways[1].Name);
+        Assert.Equal("EfiBank",      gateways[2].Name);
+        Assert.Equal("Pix",          gateways[3].Name);
+        Assert.Equal("Testnet",      gateways[4].Name);
     }
 
     [Fact]

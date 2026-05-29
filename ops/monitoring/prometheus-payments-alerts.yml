@@ -1,0 +1,63 @@
+groups:
+  - name: confirmai-payments
+    interval: 30s
+    rules:
+      - alert: ConfirmaiPaymentPanelStale
+        expr: sum(increase(confirmai_payment_reconciliation_panel_stale_total[10m])) >= 1
+        for: 2m
+        labels:
+          severity: p2
+          team: payments
+          component: reconciliation
+        annotations:
+          summary: "Painel de reconciliação defasado"
+          description: "Foi detectado pelo menos 1 evento payment.reconciliation.panel.stale na janela de 10 minutos."
+          runbook: "docs/observability-payments-runbook.md"
+
+      - alert: ConfirmaiPaymentFailedSpike
+        expr: sum(increase(confirmai_payment_failed_total[15m])) > 5
+        for: 5m
+        labels:
+          severity: p1
+          team: payments
+          component: gateway
+        annotations:
+          summary: "Pico de falhas de pagamento"
+          description: "payment.failed excedeu 5 eventos em 15 minutos."
+          runbook: "docs/observability-payments-runbook.md"
+
+      - alert: ConfirmaiPaymentRefundedSpike
+        expr: sum(increase(confirmai_payment_refunded_total[30m])) > 3
+        for: 5m
+        labels:
+          severity: p1
+          team: payments
+          component: refund
+        annotations:
+          summary: "Pico de reembolsos"
+          description: "payment.refunded excedeu 3 eventos em 30 minutos."
+          runbook: "docs/observability-payments-runbook.md"
+
+      - alert: ConfirmaiWebhookWarningSpike
+        expr: sum(increase(confirmai_webhook_warnings_total[15m])) > 10
+        for: 3m
+        labels:
+          severity: p1
+          team: payments
+          component: webhook
+        annotations:
+          summary: "Pico de warnings em webhook"
+          description: "Warnings de webhook excederam 10 eventos em 15 minutos."
+          runbook: "docs/observability-payments-runbook.md"
+
+      - alert: ConfirmaiReconciliationPendingGrowing
+        expr: sum(increase(confirmai_payment_reconciliation_pending_growth_events_total[30m])) >= 3
+        for: 5m
+        labels:
+          severity: p2
+          team: payments
+          component: reconciliation
+        annotations:
+          summary: "Pendências em reconciliação estão crescendo"
+          description: "A reconciliação registrou crescimento de pending em 3 ou mais varreduras nos últimos 30 minutos."
+          runbook: "docs/observability-payments-runbook.md"

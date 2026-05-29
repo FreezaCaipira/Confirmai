@@ -20,18 +20,34 @@ public sealed class EfiBankPixService
     private readonly EfiBankOptions _options;
     private readonly IMemoryCache _cache;
     private readonly ILogger<EfiBankPixService> _logger;
+    // Overrides the HttpMessageHandler factory — used only in tests.
+    private readonly Func<HttpMessageHandler>? _handlerFactory;
 
     public EfiBankPixService(
         IHttpClientFactory httpClientFactory,
         IOptions<EfiBankOptions> options,
         IMemoryCache cache,
         ILogger<EfiBankPixService> logger)
+        : this(httpClientFactory, options, cache, logger, handlerFactory: null) { }
+
+    /// <summary>Test-only constructor that injects a custom <see cref="HttpMessageHandler"/> factory.</summary>
+    internal EfiBankPixService(
+        IHttpClientFactory httpClientFactory,
+        IOptions<EfiBankOptions> options,
+        IMemoryCache cache,
+        ILogger<EfiBankPixService> logger,
+        Func<HttpMessageHandler>? handlerFactory)
     {
         _httpClientFactory = httpClientFactory;
         _options = options.Value;
         _cache = cache;
         _logger = logger;
+        _handlerFactory = handlerFactory;
     }
+
+    /// <summary>Returns 1.00 in sandbox (EfiBank auto-confirms only when amount ≤ R$ 10).</summary>
+    internal static decimal GetEffectiveAmount(decimal requested, bool sandbox) =>
+        sandbox ? 1.00m : requested;
 
     public bool IsEnabled => _options.IsEnabled;
 
@@ -49,6 +65,10 @@ public sealed class EfiBankPixService
         var token = await GetAccessTokenAsync();
 
         using var http = CreateHttpClient(token);
+
+        // Em sandbox, cobrar sempre R$ 1,00 para acionar a confirmação automática do EfiBank
+        // (cobranças > R$ 10,00 ficam ATIVAS para sempre em homologação).
+        amount = GetEffectiveAmount(amount, _options.Sandbox);
 
         var amountStr = amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
         var body = new
@@ -96,6 +116,55 @@ public sealed class EfiBankPixService
         }
     }
 
+    /// <summary>
+    /// Registers (or updates) the webhook URL with EfiBank for the configured Pix key.
+    /// EfiBank API: PUT /v2/webhook/{chave}  → 204 No Content on success.
+    /// Should be called once at application startup when <see cref="EfiBankOptions.WebhookUrl"/> is set.
+    /// </summary>
+    public async Task RegisterWebhookAsync(CancellationToken cancellationToken = default)
+    {
+        if (!_options.IsEnabled)
+        {
+            _logger.LogDebug("EfiBank: registro de webhook ignorado — serviço desabilitado.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_options.WebhookUrl))
+        {
+            _logger.LogDebug("EfiBank: EfiBank:WebhookUrl não configurado — registro ignorado.");
+            return;
+        }
+
+        try
+        {
+            var token = await GetAccessTokenAsync();
+            using var http = CreateHttpClient(token);
+
+            var encodedKey = Uri.EscapeDataString(_options.PixKey!);
+            var body = new { webhookUrl = _options.WebhookUrl };
+
+            var response = await http.PutAsJsonAsync($"/v2/webhook/{encodedKey}", body, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation(
+                    "EfiBank: webhook registrado com sucesso. URL={WebhookUrl}, PixKey={PixKey}",
+                    _options.WebhookUrl, _options.PixKey);
+            }
+            else
+            {
+                var detail = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogWarning(
+                    "EfiBank: falha ao registrar webhook. Status={Status}, Body={Body}",
+                    response.StatusCode, detail);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "EfiBank: erro ao registrar webhook.");
+        }
+    }
+
     // ── Private helpers ───────────────────────────────────────────────────────
 
     private async Task<string> GetAccessTokenAsync()
@@ -118,31 +187,65 @@ public sealed class EfiBankPixService
         };
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", credentials);
 
-        var response = await http.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+        try
+        {
+            var response = await http.SendAsync(request);
+            response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<EfiBankTokenResponse>();
-        token = result!.AccessToken;
+            var result = await response.Content.ReadFromJsonAsync<EfiBankTokenResponse>();
+            token = result!.AccessToken;
 
-        _cache.Set(cacheKey, token, TimeSpan.FromSeconds(result.ExpiresIn - 60));
-        return token;
+            _cache.Set(cacheKey, token, TimeSpan.FromSeconds(result.ExpiresIn - 60));
+            return token;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex,
+                "EfiBank: falha ao obter token OAuth. URL={Url}, InnerException={Inner}",
+                _options.BaseUrl + "/oauth/token", ex.InnerException?.Message);
+            throw;
+        }
     }
 
     /// <summary>Creates an HttpClient with the mTLS certificate loaded.</summary>
     private HttpClient CreateHttpClient(string? bearerToken)
+    {
+        var handler = _handlerFactory?.Invoke() ?? CreateProductionHandler();
+        return BuildHttpClient(handler, bearerToken);
+    }
+
+    private HttpMessageHandler CreateProductionHandler()
     {
         var handler = new HttpClientHandler();
 
         if (!string.IsNullOrWhiteSpace(_options.CertificatePath) &&
             File.Exists(_options.CertificatePath))
         {
-            var cert = string.IsNullOrWhiteSpace(_options.CertificatePassword)
-                ? X509CertificateLoader.LoadPkcs12FromFile(_options.CertificatePath, null)
-                : X509CertificateLoader.LoadPkcs12FromFile(_options.CertificatePath, _options.CertificatePassword);
+            // UserKeySet + PersistKeySet + Exportable: persists the private key in the current
+            // user's key store so Windows SChannel can access it during mTLS handshake.
+            // MachineKeySet would require admin rights and fails with SEC_E_UNKNOWN_CREDENTIALS.
+            var password = _options.CertificatePassword ?? string.Empty;
+            var cert = X509CertificateLoader.LoadPkcs12FromFile(
+                _options.CertificatePath,
+                password,
+                X509KeyStorageFlags.UserKeySet  |
+                X509KeyStorageFlags.PersistKeySet |
+                X509KeyStorageFlags.Exportable);
 
             handler.ClientCertificates.Add(cert);
+            _logger.LogDebug("EfiBank: certificado carregado — Subject={Subject}, HasPrivateKey={HasKey}",
+                cert.Subject, cert.HasPrivateKey);
+        }
+        else
+        {
+            _logger.LogWarning("EfiBank: certificado não encontrado em '{Path}'", _options.CertificatePath);
         }
 
+        return handler;
+    }
+
+    private HttpClient BuildHttpClient(HttpMessageHandler handler, string? bearerToken)
+    {
         var http = new HttpClient(handler, disposeHandler: true)
         {
             BaseAddress = new Uri(_options.BaseUrl),
