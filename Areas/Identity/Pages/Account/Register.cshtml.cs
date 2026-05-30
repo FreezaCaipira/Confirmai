@@ -97,10 +97,17 @@ namespace Confirmai.Areas.Identity.Pages.Account
 
                     if (callbackUrl != null)
                     {
-                        await _emailSender.SendEmailAsync(
-                            Input.Email,
-                            _t["Identity.Email.ConfirmSubject"],
-                            string.Format(_t["Identity.Email.ConfirmBody"], HtmlEncoder.Default.Encode(callbackUrl), _t["Identity.Email.ConfirmAction"]));
+                        try
+                        {
+                            await _emailSender.SendEmailAsync(
+                                Input.Email,
+                                _t["Identity.Email.ConfirmSubject"],
+                                string.Format(_t["Identity.Email.ConfirmBody"], HtmlEncoder.Default.Encode(callbackUrl), _t["Identity.Email.ConfirmAction"]));
+                        }
+                        catch (Exception ex)
+                        {
+                            await _log.LogAsync($"Falha ao enviar e-mail de confirmação para {Input.Email}: {ex.Message}", source: "Register", level: "Error");
+                        }
                     }
 
                     if (_environment.IsDevelopment())
@@ -108,8 +115,10 @@ namespace Confirmai.Areas.Identity.Pages.Account
                         var confirmCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                         await _userManager.ConfirmEmailAsync(user, confirmCode);
                         await _signInManager.SignInAsync(user, isPersistent: false);
+                        return LocalRedirect("/grupos");
                     }
-                    return LocalRedirect("~/dashboard");
+
+                    return RedirectToPage("RegisterConfirmation", new { email = Input.Email });
                 }
                 foreach (var error in result.Errors)
                 {
