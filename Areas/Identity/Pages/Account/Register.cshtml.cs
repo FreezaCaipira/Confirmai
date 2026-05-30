@@ -19,7 +19,6 @@ namespace Confirmai.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
-        private readonly IWebHostEnvironment _environment;
         private readonly UiTextService _t;
         private readonly LogService _log;
 
@@ -27,14 +26,12 @@ namespace Confirmai.Areas.Identity.Pages.Account
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
-            IWebHostEnvironment environment,
             UiTextService t,
             LogService log)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
-            _environment = environment;
             _t = t;
             _log = log;
         }
@@ -110,8 +107,10 @@ namespace Confirmai.Areas.Identity.Pages.Account
                         }
                     }
 
-                    if (_environment.IsDevelopment())
+                    if (!_signInManager.Options.SignIn.RequireConfirmedEmail)
                     {
+                        // Email confirmation not required (dev mode or Email:Enabled=false in prod).
+                        // Auto-confirm so the account shows as verified in the DB.
                         var confirmCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                         await _userManager.ConfirmEmailAsync(user, confirmCode);
                         await _signInManager.SignInAsync(user, isPersistent: false);
