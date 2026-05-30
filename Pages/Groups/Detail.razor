@@ -16,6 +16,8 @@
 @inject NavigationManager              NavigationManager
 @inject IConfiguration                 Config
 @inject IJSRuntime                     JS
+@inject EventNotificationService       NotificationService
+@inject LogService                     LogService
 
 <PageTitle>@(group?.Name ?? "Grupo") · Confirmai</PageTitle>
 
@@ -109,9 +111,17 @@ else
 
             @* ── Membros ────────────────────────────────────────────── *@
             <section class="detail-section">
-                <h2 class="detail-section-title">
-                    <i class="fas fa-users"></i> Membros (@group.Members.Count)
-                </h2>
+                <div class="detail-section-header">
+                    <h2 class="detail-section-title">
+                        <i class="fas fa-users"></i> Membros (@group.Members.Count)
+                    </h2>
+                    @if (isAdmin)
+                    {
+                        <button class="delinquency-btn" type="button" @onclick="OpenDelinquencyModal">
+                            <i class="fas fa-exclamation-circle"></i> Inadimplência
+                        </button>
+                    }
+                </div>
                 <ul class="players-list">
                     @foreach (var m in visibleMembers)
                     {
@@ -296,6 +306,156 @@ else
 
         </div>
     </div>
+
+    @* ── Modal de Inadimplência ─────────────────────────────────── *@
+    @if (showDelinquencyModal)
+    {
+        <div class="dlq-overlay" @onclick="CloseDelinquencyModal">
+            <div class="dlq-modal" @onclick:stopPropagation="true">
+                <div class="dlq-modal-header">
+                    <h2 class="dlq-modal-title"><i class="fas fa-exclamation-circle"></i> Inadimplência</h2>
+                    <button class="dlq-close-btn" type="button" @onclick="CloseDelinquencyModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="dlq-tabs">
+                    <button class="dlq-tab @(dlqTab == "delinquent" ? "dlq-tab--active" : "")" type="button"
+                            @onclick='() => dlqTab = "delinquent"'>
+                        <i class="fas fa-exclamation-triangle"></i> Pendentes
+                    </button>
+                    <button class="dlq-tab @(dlqTab == "history" ? "dlq-tab--active" : "")" type="button"
+                            @onclick='() => dlqTab = "history"'>
+                        <i class="fas fa-history"></i> Histórico
+                        @if (paymentHistory.Count > 0)
+                        {
+                            <span class="dlq-tab-count">@paymentHistory.Count</span>
+                        }
+                    </button>
+                </div>
+
+                @if (isLoadingDelinquency)
+                {
+                    <div class="dlq-loading"><i class="fas fa-spinner fa-spin"></i> Carregando…</div>
+                }
+                else if (dlqTab == "history")
+                {
+                    @if (paymentHistory.Count == 0)
+                    {
+                        <div class="dlq-empty">
+                            <i class="fas fa-history"></i>
+                            <span>Nenhum pagamento manual registrado ainda.</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="dlq-history-list">
+                            @foreach (var h in paymentHistory)
+                            {
+                                <li class="dlq-history-item">
+                                    <div class="dlq-history-user">@h.UserName</div>
+                                    <div class="dlq-history-meta">
+                                        <span class="dlq-history-date"><i class="fas fa-calendar-alt"></i> @h.EventDate.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                                        <span class="dlq-history-price">R$ @h.EventPrice.ToString("F2")</span>
+                                        <a class="dlq-entry-link" href="@h.EventHref" target="_blank" rel="noopener">Ver</a>
+                                    </div>
+                                    <div class="dlq-history-admin">
+                                        <i class="fas fa-user-shield"></i> Marcado por <strong>@h.AdminName</strong>
+                                        em @h.MarkedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                }
+                else if (delinquencyList.Count == 0)
+                {
+                    <div class="dlq-empty">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Nenhum jogador inadimplente. Tudo em dia!</span>
+                    </div>
+                }
+                else
+                {
+                    <ul class="dlq-user-list">
+                        @foreach (var d in delinquencyList)
+                        {
+                            bool isSelected = selectedDelinquencyUserId == d.UserId;
+                            <li class="dlq-user-item @(isSelected ? "dlq-user-item--selected" : "")"
+                                @onclick="() => SelectDelinquencyUser(d.UserId)">
+                                <span class="dlq-user-name">@d.UserName</span>
+                                <div class="dlq-user-meta">
+                                    <span class="dlq-badge dlq-badge--games">@d.Entries.Count jogo@(d.Entries.Count != 1 ? "s" : "")</span>
+                                    <span class="dlq-badge dlq-badge--amount">R$ @d.TotalAmount.ToString("F2")</span>
+                                </div>
+                                <div class="dlq-notify-actions" @onclick:stopPropagation="true">
+                                    @if (notifiedUserIds.Contains(d.UserId))
+                                    {
+                                        <span class="dlq-notified-badge"><i class="fas fa-check"></i> Notificado</span>
+                                    }
+                                    else if (notifyingUserId == d.UserId)
+                                    {
+                                        <span class="dlq-notifying"><i class="fas fa-spinner fa-spin"></i></span>
+                                    }
+                                    else
+                                    {
+                                        <button class="dlq-notify-btn dlq-notify-btn--email" type="button"
+                                                title="Enviar e-mail de cobrança"
+                                                @onclick="() => AdminNotifyDelinquency(d)">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="dlq-notify-btn dlq-notify-btn--whatsapp" type="button"
+                                                title="Cobrar via WhatsApp"
+                                                @onclick="() => OpenWhatsAppDelinquency(d)">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </button>
+                                    }
+                                </div>
+                                <i class="fas fa-chevron-@(isSelected ? "up" : "down") dlq-chevron"></i>
+                            </li>
+
+                            @if (isSelected)
+                            {
+                                <li class="dlq-detail-panel">
+                                    <div class="dlq-detail-summary">
+                                        <span><strong>@d.Entries.Count</strong> partida@(d.Entries.Count != 1 ? "s" : "") sem pagamento</span>
+                                        <span>Total: <strong>R$ @d.TotalAmount.ToString("F2")</strong></span>
+                                    </div>
+                                    <ul class="dlq-entries">
+                                        @foreach (var entry in d.Entries)
+                                        {
+                                            <li class="dlq-entry">
+                                                <div class="dlq-entry-info">
+                                                    <span class="dlq-entry-date">@entry.EventDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                                    <span class="dlq-entry-price">R$ @entry.EventPrice.ToString("F2")</span>
+                                                </div>
+                                                <div class="dlq-entry-actions">
+                                                    <a href="@entry.EventHref" class="dlq-entry-link" target="_blank">
+                                                        <i class="fas fa-external-link-alt"></i> Ver partida
+                                                    </a>
+                                                    @if (markingPaidId == entry.ConfirmationId)
+                                                    {
+                                                        <span class="dlq-marking"><i class="fas fa-spinner fa-spin"></i></span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="dlq-mark-paid-btn" type="button"
+                                                                @onclick="() => AdminMarkPaid(entry.ConfirmationId, d.UserId)">
+                                                            <i class="fas fa-check"></i> Marcar pago
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    }
 }
 
 @code {
@@ -508,5 +668,200 @@ else
         req.RespondedByUserId = currentUserId;
         await db.SaveChangesAsync();
         await LoadGroup();
+    }
+
+    // ── Inadimplência ────────────────────────────────────────────────
+
+    private record DelinquencyEntry(int ConfirmationId, int EventId, DateTime EventDate, decimal EventPrice, string EventHref);
+    private record UserDelinquency(string UserId, string UserName, List<DelinquencyEntry> Entries)
+    {
+        public decimal TotalAmount => Entries.Sum(e => e.EventPrice);
+    }
+
+    private record PaymentHistoryEntry(
+        string UserName,
+        DateTime EventDate,
+        decimal  EventPrice,
+        string   EventHref,
+        string   AdminName,
+        DateTime MarkedAt);
+
+    private bool                        showDelinquencyModal    = false;
+    private bool                        isLoadingDelinquency    = false;
+    private List<UserDelinquency>       delinquencyList         = new();
+    private List<PaymentHistoryEntry>   paymentHistory          = new();
+    private string                      dlqTab                  = "delinquent"; // "delinquent" | "history"
+    private string?                     selectedDelinquencyUserId = null;
+    private int?                        markingPaidId           = null;
+    private string?                     notifyingUserId         = null;
+    private HashSet<string>             notifiedUserIds         = new();
+
+    private async Task OpenDelinquencyModal()
+    {
+        showDelinquencyModal = true;
+        isLoadingDelinquency = true;
+        selectedDelinquencyUserId = null;
+        dlqTab = "delinquent";
+        notifyingUserId = null;
+        notifiedUserIds.Clear();
+        StateHasChanged();
+        await LoadDelinquencyData();
+        isLoadingDelinquency = false;
+        StateHasChanged();
+    }
+
+    private void CloseDelinquencyModal()
+    {
+        showDelinquencyModal = false;
+        selectedDelinquencyUserId = null;
+    }
+
+    private void SelectDelinquencyUser(string userId)
+    {
+        selectedDelinquencyUserId = selectedDelinquencyUserId == userId ? null : userId;
+    }
+
+    private async Task LoadDelinquencyData()
+    {
+        if (group is null) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var nowUtc = DateTime.UtcNow;
+        var memberIds = group.Members.Select(m => m.UserId).ToHashSet();
+
+        var unpaidConfirmations = await db.EventConfirmations
+            .Where(c =>
+                c.Event.GroupId == Id &&
+                c.Event.StartsAt < nowUtc &&
+                c.Event.Price != null &&
+                c.Event.Price > 0 &&
+                !c.HasPaid &&
+                c.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
+                c.Position != FutsalPosition.Goalkeeper &&   // goleiros nunca pagam
+                memberIds.Contains(c.UserId))
+            .Include(c => c.Event)
+            .Include(c => c.User)
+            .OrderBy(c => c.Event.StartsAt)
+            .ToListAsync();
+
+        var sport = group.Sport;
+        delinquencyList = unpaidConfirmations
+            .GroupBy(c => c.UserId)
+            .Select(g =>
+            {
+                var user     = g.First().User;
+                var userName = user?.FullName ?? user?.UserName ?? "Jogador";
+                var entries  = g.Select(c =>
+                {
+                    var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
+                    return new DelinquencyEntry(c.Id, c.EventId, c.Event.StartsAt, c.Event.Price!.Value, href);
+                }).ToList();
+                return new UserDelinquency(g.Key, userName, entries);
+            })
+            .OrderByDescending(d => d.TotalAmount)
+            .ToList();
+
+        // Histórico de pagamentos marcados manualmente pelo admin
+        var manualPaid = await db.EventConfirmations
+            .Where(c =>
+                c.Event.GroupId == Id &&
+                c.HasPaid &&
+                c.MarkedPaidByUserId != null &&
+                memberIds.Contains(c.UserId))
+            .Include(c => c.Event)
+            .Include(c => c.User)
+            .OrderByDescending(c => c.MarkedPaidAt)
+            .Take(50)
+            .ToListAsync();
+
+        var adminIds  = manualPaid.Select(c => c.MarkedPaidByUserId!).Distinct().ToList();
+        var adminUsers = await db.Users
+            .Where(u => adminIds.Contains(u.Id))
+            .Select(u => new { u.Id, Name = u.FullName ?? u.UserName ?? u.Email })
+            .ToListAsync();
+        var adminMap = adminUsers.ToDictionary(u => u.Id, u => u.Name ?? "Admin");
+
+        paymentHistory = manualPaid.Select(c =>
+        {
+            var href      = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
+            var userName  = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
+            var adminName = adminMap.TryGetValue(c.MarkedPaidByUserId!, out var n) ? n : "Admin";
+            return new PaymentHistoryEntry(userName, c.Event.StartsAt, c.Event.Price ?? 0, href, adminName, c.MarkedPaidAt!.Value);
+        }).ToList();
+    }
+
+    private async Task AdminMarkPaid(int confirmationId, string userId)
+    {
+        markingPaidId = confirmationId;
+        StateHasChanged();
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var conf = await db.EventConfirmations.FindAsync(confirmationId);
+        if (conf is not null && !conf.HasPaid && conf.PaymentGatewayName == null)
+        {
+            conf.PaymentStatus      = EventConfirmationPaymentStatus.Paid;
+            conf.HasPaid            = true;
+            conf.MarkedPaidByUserId = currentUserId;
+            conf.MarkedPaidAt       = DateTime.UtcNow;
+            await db.SaveChangesAsync();
+            await LogService.AuditAsync(
+                AuditEvents.EventConfirmationPaidManual,
+                AuditEntities.EventConfirmation,
+                confirmationId.ToString(),
+                $"Admin marcou confirmação #{confirmationId} do jogador {userId} como paga manualmente (grupo #{Id})",
+                currentUserId, "GroupAdmin");
+        }
+        markingPaidId = null;
+        await LoadDelinquencyData();
+        // keep the selected user open if they still have entries
+        if (!delinquencyList.Any(d => d.UserId == userId))
+            selectedDelinquencyUserId = null;
+        StateHasChanged();
+    }
+
+    private async Task AdminNotifyDelinquency(UserDelinquency d)
+    {
+        if (currentUserId is null || group is null) return;
+        notifyingUserId = d.UserId;
+        StateHasChanged();
+
+        var entries = d.Entries
+            .Select(e => (e.EventDate, e.EventPrice))
+            .ToList();
+
+        await NotificationService.NotifyDelinquencyAsync(
+            adminUserId:  currentUserId,
+            targetUserId: d.UserId,
+            groupName:    group.Name,
+            entries:      entries);
+
+        await LogService.AuditAsync(
+            AuditEvents.DelinquencyNotified,
+            AuditEntities.Group,
+            Id.ToString(),
+            $"Admin notificou jogador {d.UserId} ({d.UserName}) sobre {d.Entries.Count} partida(s) em aberto — R$ {d.TotalAmount:F2} (grupo #{Id})",
+            currentUserId, "GroupAdmin");
+
+        notifyingUserId = null;
+        notifiedUserIds.Add(d.UserId);
+        StateHasChanged();
+    }
+
+    private async Task OpenWhatsAppDelinquency(UserDelinquency d)
+    {
+        if (group is null) return;
+        var lines   = string.Join("%0A", d.Entries.Select(e =>
+            $"• {e.EventDate.ToLocalTime():dd/MM/yyyy} — R$ {e.EventPrice:F2}"));
+        var count   = d.Entries.Count;
+        var total   = d.TotalAmount.ToString("F2");
+        var plural  = count != 1 ? "s" : "";
+        var msg     = Uri.EscapeDataString(
+            $"Olá, {d.UserName}! 👋\n\n" +
+            $"Você tem {count} partida{plural} sem pagamento em \"{group.Name}\":\n\n" +
+            string.Join("\n", d.Entries.Select(e =>
+                $"• {e.EventDate.ToLocalTime():dd/MM/yyyy} — R$ {e.EventPrice:F2}")) +
+            $"\n\nTotal: R$ {total}\n\n" +
+            $"Quando puder, regularize no Confirmai 🙏");
+        var url = $"https://wa.me/?text={msg}";
+        await JS.InvokeVoidAsync("open", url, "_blank", "noopener,noreferrer");
     }
 }

@@ -1822,8 +1822,65 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 }
 
 .groups-block-header {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
     margin-bottom: 0.85rem;
+}
+
+.groups-filter-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid rgba(96, 165, 250, 0.35);
+    border-radius: 20px;
+    background: rgba(96, 165, 250, 0.07);
+    color: rgba(186, 214, 255, 0.85);
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: border-color 0.18s, background 0.18s, color 0.18s;
+    user-select: none;
+}
+
+.groups-filter-toggle:hover {
+    border-color: rgba(96, 165, 250, 0.65);
+    background: rgba(96, 165, 250, 0.13);
+    color: rgba(186, 214, 255, 1);
+}
+
+.groups-filter-toggle input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border: 1.5px solid rgba(96, 165, 250, 0.5);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.groups-filter-toggle input[type="checkbox"]:checked {
+    background: rgba(96, 165, 250, 0.85);
+    border-color: rgba(96, 165, 250, 0.85);
+}
+
+.groups-filter-toggle input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: -1px;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
 }
 
 .groups-action-panel {
@@ -1964,6 +2021,437 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: #4a90d9;
     margin-bottom: 1rem;
     display: block;
+}
+
+/* ── Inadimplência ──────────────────────────────────────────────── */
+.detail-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.delinquency-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #fbbf24;
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.35);
+    border-radius: 8px;
+    padding: 0.28rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.delinquency-btn:hover {
+    background: rgba(251,191,36,0.16);
+    border-color: rgba(251,191,36,0.65);
+    color: #fde68a;
+}
+
+/* Modal overlay */
+.dlq-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 300;
+    padding: 2rem 1rem 1rem;
+    overflow-y: auto;
+}
+
+.dlq-modal {
+    background: #060e18;
+    border: 1px solid #1b3d6c;
+    border-top: 2px solid rgba(251,191,36,0.55);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dlq-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.1rem 0.75rem;
+    border-bottom: 1px solid #1b3d6c;
+}
+
+.dlq-modal-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #fbbf24;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+}
+
+.dlq-close-btn {
+    background: none;
+    border: none;
+    color: #6082a0;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.dlq-close-btn:hover {
+    color: #f87171;
+    background: rgba(239,68,68,0.1);
+}
+
+.dlq-loading,
+.dlq-empty {
+    padding: 2rem 1.1rem;
+    color: #6082a0;
+    font-size: 0.88rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.dlq-empty i { color: #4ade80; font-size: 1.2rem; }
+
+/* User list */
+.dlq-user-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dlq-user-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 1.1rem;
+    border-bottom: 1px solid #0d1f35;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.dlq-user-item:hover {
+    background: #0b1929;
+}
+
+.dlq-user-item--selected {
+    background: rgba(251,191,36,0.06);
+    border-left: 3px solid rgba(251,191,36,0.55);
+}
+
+.dlq-user-name {
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.dlq-user-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.dlq-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 1px 7px;
+    border: 1px solid;
+}
+
+.dlq-badge--games {
+    color: #93c5fd;
+    background: rgba(96,165,250,0.1);
+    border-color: rgba(96,165,250,0.3);
+}
+
+.dlq-badge--amount {
+    color: #fbbf24;
+    background: rgba(251,191,36,0.08);
+    border-color: rgba(251,191,36,0.3);
+}
+
+.dlq-chevron {
+    color: #4f9cf8;
+    font-size: 0.72rem;
+    flex-shrink: 0;
+}
+
+/* Detail panel (expands below the selected user row) */
+.dlq-detail-panel {
+    list-style: none;
+    background: #0a1824;
+    border-bottom: 1px solid #1b3d6c;
+    padding: 0.75rem 1.1rem 0.9rem;
+}
+
+.dlq-detail-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: #7ea8ca;
+    margin-bottom: 0.65rem;
+}
+
+.dlq-detail-summary strong { color: #e2e8f0; }
+
+/* Entries (list of unpaid games) */
+.dlq-entries {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.dlq-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    background: #0d1825;
+    border: 1px solid #1b3d6c;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+}
+
+.dlq-entry-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.dlq-entry-date {
+    font-size: 0.82rem;
+    color: #deeeff;
+    font-weight: 600;
+}
+
+.dlq-entry-price {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fbbf24;
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: 6px;
+    padding: 1px 7px;
+}
+
+.dlq-entry-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.dlq-entry-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #60a5fa;
+    text-decoration: none;
+    transition: color 0.14s;
+}
+
+.dlq-entry-link:hover { color: #93c5fd; text-decoration: underline; }
+
+.dlq-mark-paid-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #4ade80;
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.35);
+    border-radius: 7px;
+    padding: 0.22rem 0.65rem;
+    cursor: pointer;
+    transition: background 0.14s, border-color 0.14s, color 0.14s;
+}
+
+.dlq-mark-paid-btn:hover {
+    background: rgba(74,222,128,0.16);
+    border-color: rgba(74,222,128,0.65);
+    color: #86efac;
+}
+
+.dlq-marking {
+    color: #4ade80;
+    font-size: 0.82rem;
+}
+
+/* ── Notificação por usuário ── */
+.dlq-notify-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+
+.dlq-notify-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.85rem;
+    height: 1.85rem;
+    border-radius: 7px;
+    border: 1px solid;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.14s, border-color 0.14s, color 0.14s;
+    background: transparent;
+}
+
+.dlq-notify-btn--email {
+    color: #60a5fa;
+    border-color: rgba(96,165,250,0.35);
+}
+.dlq-notify-btn--email:hover {
+    background: rgba(96,165,250,0.12);
+    border-color: rgba(96,165,250,0.65);
+}
+
+.dlq-notify-btn--whatsapp {
+    color: #4ade80;
+    border-color: rgba(74,222,128,0.35);
+}
+.dlq-notify-btn--whatsapp:hover {
+    background: rgba(74,222,128,0.12);
+    border-color: rgba(74,222,128,0.65);
+}
+
+.dlq-notified-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #34d399;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 8px;
+    padding: 1px 7px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.dlq-notifying {
+    color: #60a5fa;
+    font-size: 0.82rem;
+}
+
+/* ── Tabs ── */
+.dlq-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    margin-bottom: 0.75rem;
+    gap: 0.25rem;
+}
+
+.dlq-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    transition: color 0.14s, border-color 0.14s;
+}
+.dlq-tab:hover {
+    color: rgba(255,255,255,0.85);
+}
+.dlq-tab--active {
+    color: #fbbf24;
+    border-bottom-color: #fbbf24;
+}
+
+.dlq-tab-count {
+    background: rgba(251,191,36,0.18);
+    color: #fbbf24;
+    border-radius: 9px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 6px;
+}
+
+/* ── Histórico de pagamentos manuais ── */
+.dlq-history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dlq-history-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.dlq-history-user {
+    font-weight: 700;
+    color: #f1f5f9;
+    font-size: 0.9rem;
+}
+
+.dlq-history-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+}
+
+.dlq-history-date {
+    color: rgba(255,255,255,0.6);
+}
+
+.dlq-history-price {
+    color: #4ade80;
+    font-weight: 700;
+}
+
+.dlq-history-admin {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+}
+.dlq-history-admin strong {
+    color: rgba(255,255,255,0.7);
 }
 
 .groups-empty-sub {

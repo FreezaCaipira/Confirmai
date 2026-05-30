@@ -37,11 +37,17 @@ services:
       AdminSeed__Email: ${ADMIN_EMAIL}
       AdminSeed__Password: ${ADMIN_PASSWORD}
       AdminSeed__FullName: ${ADMIN_FULLNAME}
+      AdminSeed__SyncPassword: ${ADMIN_SYNC_PASSWORD:-false}
       BtcPay__Url: ${BTCPAY_URL}
       BtcPay__StoreId: ${BTCPAY_STORE_ID}
       BtcPay__ApiKey: ${BTCPAY_API_KEY}
       BtcPay__WebhookSecret: ${BTCPAY_WEBHOOK_SECRET}
       BtcPay__WebhookUrl: "https://${DOMAIN}/api/btcpay/webhook"
+      # AbacatePay
+      AbacatePay__ApiKey: ${ABACATEPAY_API_KEY:-}
+      AbacatePay__WebhookSecret: ${ABACATEPAY_WEBHOOK_SECRET:-}
+      # Google Maps
+      Google__MapsApiKey: ${GOOGLE_MAPS_API_KEY:-}
       # EfiBank Pix
       EfiBank__ClientId: ${EFIBANK_CLIENT_ID}
       EfiBank__ClientSecret: ${EFIBANK_CLIENT_SECRET}

@@ -13,6 +13,7 @@
 @using Microsoft.JSInterop
 
 @inject IDbContextFactory<AppDbContext> DbFactory
+@inject LogService                     LogService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject Confirmai.Services.EventNotificationService NotificationService
@@ -224,23 +225,33 @@ else
                                         {
                                             @if (isAdmin)
                                             {
-                                                @if (confirmPayId == c.Id)
+                                                bool canTogglePaid1 = !c.HasPaid || c.PaymentGatewayName == null;
+                                                @if (canTogglePaid1)
                                                 {
-                                                    <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
-                                                    <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => AdminTogglePaid(c.Id)">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="player-tag player-tag--admin-pay-no" type="button" @onclick="() => confirmPayId = null">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                    @if (confirmPayId == c.Id)
+                                                    {
+                                                        <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
+                                                        <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => AdminTogglePaid(c.Id)">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        <button class="player-tag player-tag--admin-pay-no" type="button" @onclick="() => confirmPayId = null">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => confirmPayId = c.Id">
+                                                            <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
+                                                        </button>
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => confirmPayId = c.Id">
-                                                        <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
-                                                    </button>
+                                                    <span class="player-tag player-tag--paid" title="Pago via gateway — não pode ser desfeito pelo admin">
+                                                        <i class="fas fa-check"></i> pago
+                                                    </span>
                                                 }
-                                                @if (c.UserId != currentUserId)
+                                                @if (c.UserId != currentUserId && c.PaymentGatewayName == null)
                                                 {
                                                     @if (confirmRemoveId == c.Id)
                                                     {
@@ -450,23 +461,33 @@ else
                                     {
                                         @if (isAdmin)
                                         {
-                                            @if (confirmPayId == c.Id)
+                                            bool canTogglePaid2 = !c.HasPaid || c.PaymentGatewayName == null;
+                                            @if (canTogglePaid2)
                                             {
-                                                <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
-                                                <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => AdminTogglePaid(c.Id)">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button class="player-tag player-tag--admin-pay-no" type="button" @onclick="() => confirmPayId = null">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
+                                                @if (confirmPayId == c.Id)
+                                                {
+                                                    <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
+                                                    <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => AdminTogglePaid(c.Id)">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button class="player-tag player-tag--admin-pay-no" type="button" @onclick="() => confirmPayId = null">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => confirmPayId = c.Id">
+                                                        <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
+                                                    </button>
+                                                }
                                             }
                                             else
                                             {
-                                                <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => confirmPayId = c.Id">
-                                                    <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
-                                                </button>
+                                                <span class="player-tag player-tag--paid" title="Pago via gateway — não pode ser desfeito pelo admin">
+                                                    <i class="fas fa-check"></i> pago
+                                                </span>
                                             }
-                                            @if (c.UserId != currentUserId)
+                                            @if (c.UserId != currentUserId && c.PaymentGatewayName == null)
                                             {
                                                 @if (confirmRemoveId == c.Id)
                                                 {
@@ -972,11 +993,28 @@ else
         await using var db = await DbFactory.CreateDbContextAsync();
         var conf = await db.EventConfirmations.FindAsync(confirmationId);
         if (conf is null) return;
+        // Prevent admin from unmarking a payment that was confirmed by a payment gateway
+        if (conf.HasPaid && conf.PaymentGatewayName != null) return;
         conf.PaymentStatus = conf.PaymentStatus == EventConfirmationPaymentStatus.Paid
             ? EventConfirmationPaymentStatus.Pending
             : EventConfirmationPaymentStatus.Paid;
         conf.HasPaid = conf.PaymentStatus == EventConfirmationPaymentStatus.Paid;
+        if (conf.HasPaid)
+        {
+            conf.MarkedPaidByUserId = currentUserId;
+            conf.MarkedPaidAt       = DateTime.UtcNow;
+        }
+        else
+        {
+            conf.MarkedPaidByUserId = null;
+            conf.MarkedPaidAt       = null;
+        }
         await db.SaveChangesAsync();
+        var auditEvent = conf.HasPaid ? AuditEvents.EventConfirmationPaidManual : AuditEvents.EventConfirmationUnpaidManual;
+        var auditMsg   = conf.HasPaid
+            ? $"Admin marcou confirmação #{confirmationId} como paga (evento #{ev?.Id})"
+            : $"Admin desconfirmou pagamento da confirmação #{confirmationId} (evento #{ev?.Id})";
+        await LogService.AuditAsync(auditEvent, AuditEntities.EventConfirmation, confirmationId.ToString(), auditMsg, currentUserId, "EventAdmin");
         confirmPayId = null;
         await LoadEvent();
     }
@@ -988,9 +1026,12 @@ else
         var conf = await db.EventConfirmations.FindAsync(confirmationId);
         if (conf is null) return;
         var position = conf.Position ?? FutsalPosition.Outfield;
+        var targetUserId = conf.UserId;
         db.EventConfirmations.Remove(conf);
         await db.SaveChangesAsync();
         await PromoteFromWaitlistAsync(db, position);
+        await LogService.AuditAsync(AuditEvents.EventConfirmationRemoved, AuditEntities.EventConfirmation, confirmationId.ToString(),
+            $"Admin removeu jogador {targetUserId} da confirmação #{confirmationId} (evento #{ev?.Id})", currentUserId, "EventAdmin");
         confirmRemoveId = null;
         await LoadEvent();
     }
@@ -1002,8 +1043,11 @@ else
         var entry = await db.WaitingLists.FindAsync(waitlistId);
         if (entry is not null)
         {
+            var wlUserId = entry.UserId;
             db.WaitingLists.Remove(entry);
             await db.SaveChangesAsync();
+            await LogService.AuditAsync(AuditEvents.EventWaitlistRemoved, AuditEntities.EventConfirmation, waitlistId.ToString(),
+                $"Admin removeu jogador {wlUserId} da lista de espera (evento #{ev?.Id})", currentUserId, "EventAdmin");
         }
         await LoadEvent();
     }

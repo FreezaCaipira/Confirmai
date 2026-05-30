@@ -13,6 +13,7 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager              NavigationManager
 @inject AuthenticationStateProvider   AuthStateProvider
+@inject LogService                     LogService
 
 <PageTitle>Criar Grupo — Confirmai</PageTitle>
 
@@ -156,6 +157,13 @@
                 Role    = GroupMemberRole.Admin,
             });
             await db.SaveChangesAsync();
+
+            await LogService.AuditAsync(
+                AuditEvents.GroupCreated,
+                AuditEntities.Group,
+                group.Id.ToString(),
+                $"Grupo criado: \"{group.Name}\" (sport: {group.Sport})",
+                userId, "GroupCreate");
 
             NavigationManager.NavigateTo($"/grupo/{group.Id}");
         }

@@ -235,4 +235,56 @@ public class EventNotificationService
             catch { /* ignore */ }
         }
     }
+
+    /// <summary>
+    /// Notifica um jogador sobre suas partidas não pagas em um grupo.
+    /// Salva mensagem no mailbox interno e envia e-mail best-effort.
+    /// Retorna o nome e e-mail do destinatário para uso no frontend (ex: link WhatsApp).
+    /// </summary>
+    public async Task<(string UserName, string? Email, string? Phone)> NotifyDelinquencyAsync(
+        string adminUserId,
+        string targetUserId,
+        string groupName,
+        IReadOnlyList<(DateTime Date, decimal Price)> entries)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        var user = await db.Users.FindAsync(targetUserId) as ApplicationUser;
+        if (user is null) return (string.Empty, null, null);
+
+        var userName = user.FullName ?? user.UserName ?? "Jogador";
+        var total    = entries.Sum(e => e.Price);
+
+        var lines = string.Join("\n", entries.Select(e =>
+            $"• {e.Date.ToLocalTime():dd/MM/yyyy 'às' HH:mm} — R$ {e.Price:F2}"));
+
+        var bodyText =
+            $"Olá, {userName}!\n\n" +
+            $"Identificamos que você possui {entries.Count} partida{(entries.Count != 1 ? "s" : "")} " +
+            $"sem pagamento em \"{groupName}\":\n\n" +
+            $"{lines}\n\n" +
+            $"Total em aberto: R$ {total:F2}\n\n" +
+            $"Por favor, regularize o quanto antes.\n\n" +
+            $"Equipe Confirmai";
+
+        db.UserMailboxMessages.Add(new UserMailboxMessage
+        {
+            SenderUserId    = adminUserId,
+            RecipientUserId = targetUserId,
+            Subject         = $"[Confirmai] Pagamentos pendentes — {groupName}",
+            Body            = bodyText,
+            CreatedAt       = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
+
+        if (!string.IsNullOrWhiteSpace(user.Email))
+        {
+            var subject  = $"[Confirmai] Pagamentos pendentes — {groupName}";
+            var bodyHtml = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
+            try { await _emailSender.SendEmailAsync(user.Email, subject, bodyHtml); }
+            catch { /* ignore */ }
+        }
+
+        return (userName, user.Email, user.PhoneNumber);
+    }
 }

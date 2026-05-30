@@ -16,6 +16,7 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject Confirmai.Services.EventCollisionService EventCollisionService
+@inject LogService LogService
 
 
 <PageTitle>Criar Partida · Futsal · Confirmai</PageTitle>
@@ -492,6 +493,12 @@
             }
 
             await db.SaveChangesAsync();
+            await LogService.AuditAsync(
+                AuditEvents.EventCreated,
+                AuditEntities.Event,
+                ev.Id.ToString(),
+                $"Partida criada: \"{ev.LocalName ?? ev.Group?.Name}\" em {ev.StartsAt:dd/MM/yyyy HH:mm} (grupo #{ev.GroupId})",
+                userId, "EventCreate");
             NavigationManager.NavigateTo($"/futsal/{ev.Id}");
         }
         catch (Exception ex)

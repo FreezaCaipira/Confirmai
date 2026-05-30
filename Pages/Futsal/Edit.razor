@@ -16,6 +16,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject Confirmai.Services.EventNotificationService NotificationService
 @inject Confirmai.Services.EventCollisionService EventCollisionService
+@inject LogService LogService
 
 <PageTitle>Editar Partida · Futsal · Confirmai</PageTitle>
 
@@ -414,6 +415,12 @@
 
             await db.SaveChangesAsync();
             await NotificationService.NotifyEventUpdatedAsync(Id, userId!, oldStartsAt);
+            await LogService.AuditAsync(
+                AuditEvents.EventUpdated,
+                AuditEntities.Event,
+                Id.ToString(),
+                $"Partida #{Id} editada (novo horário: {newStartsAt:dd/MM/yyyy HH:mm})",
+                userId, "EventEdit");
             NavigationManager.NavigateTo($"/futsal/{Id}");
         }
         catch (Exception ex)
@@ -437,6 +444,12 @@
             dbEv.IsActive = false;
             await db.SaveChangesAsync();
             await NotificationService.NotifyEventCancelledAsync(Id, userId!);
+            await LogService.AuditAsync(
+                AuditEvents.EventCancelled,
+                AuditEntities.Event,
+                Id.ToString(),
+                $"Partida #{Id} cancelada pelo admin/criador",
+                userId, "EventEdit");
             NavigationManager.NavigateTo($"/futsal/{Id}");
         }
         catch (Exception ex)

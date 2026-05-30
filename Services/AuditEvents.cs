@@ -61,6 +61,27 @@ public static class AuditEvents
     public const string AdminSettingChanged        = "admin.setting.changed";
     public const string AdminAuditViewed           = "admin.audit.viewed";
 
+    // ── Event (partida/sessão) ──
+    public const string EventCreated = "event.created";
+    public const string EventUpdated = "event.updated";
+    public const string EventCancelled = "event.cancelled";
+
+    // ── EventConfirmation (presença / pagamento) ──
+    public const string EventConfirmationAdded         = "event.confirmation.added";
+    public const string EventConfirmationRemoved       = "event.confirmation.removed";
+    public const string EventConfirmationPaidManual    = "event.confirmation.paid.manual";    // admin marcou pago manualmente
+    public const string EventConfirmationUnpaidManual  = "event.confirmation.unpaid.manual";  // admin desconfirmou pagamento manual
+    public const string EventWaitlistRemoved           = "event.waitlist.removed";
+
+    // ── Group ──
+    public const string GroupCreated       = "group.created";
+    public const string GroupUpdated       = "group.updated";
+    public const string GroupMemberAdded   = "group.member.added";
+    public const string GroupMemberRemoved = "group.member.removed";
+
+    // ── Delinquência ──
+    public const string DelinquencyNotified = "delinquency.notified";
+
     // ── Webhook / integration ──
     public const string WebhookReceived     = "webhook.received";
     public const string WebhookUnauthorized = "webhook.unauthorized";
@@ -73,12 +94,15 @@ public static class AuditEvents
 /// </summary>
 public static class AuditEntities
 {
-    public const string User      = "User";
-    public const string Product   = "Product";
-    public const string Payment   = "Payment";
-    public const string Server    = "Server";
-    public const string ItemOffer = "ItemOffer";
-    public const string Webhook   = "Webhook";
-    public const string ApiKey    = "ApiKey";
-    public const string Setting   = "Setting";
+    public const string User              = "User";
+    public const string Product           = "Product";
+    public const string Payment           = "Payment";
+    public const string Server            = "Server";
+    public const string ItemOffer         = "ItemOffer";
+    public const string Webhook           = "Webhook";
+    public const string ApiKey            = "ApiKey";
+    public const string Setting           = "Setting";
+    public const string Event             = "Event";
+    public const string Group             = "Group";
+    public const string EventConfirmation = "EventConfirmation";
 }

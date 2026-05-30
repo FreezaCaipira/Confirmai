@@ -43,6 +43,13 @@ namespace Confirmai.Models
         [StringLength(50)]
         public string? PaymentGatewayName { get; set; }
 
+        /// <summary>UserId of the admin who manually marked this confirmation as paid (null if paid via gateway).</summary>
+        [StringLength(450)]
+        public string? MarkedPaidByUserId { get; set; }
+
+        /// <summary>UTC timestamp when an admin manually marked this confirmation as paid.</summary>
+        public DateTime? MarkedPaidAt { get; set; }
+
         public bool IsPaymentPending => PaymentStatus == EventConfirmationPaymentStatus.Pending;
         public bool IsPaymentPaid => PaymentStatus == EventConfirmationPaymentStatus.Paid;
     }
