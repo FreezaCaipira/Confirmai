@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 05/30/2026 - 02:56:48 |
-| Coverage date: | 05/30/2026 - 02:56:43 |
+| Generated on: | 05/30/2026 - 03:21:38 |
+| Coverage date: | 05/30/2026 - 03:21:33 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 284 |
 | Files: | 321 |
-| **Line coverage:** | 8.6% (8298 of 95674) |
+| **Line coverage:** | 8.6% (8298 of 95677) |
 | Covered lines: | 8298 |
-| Uncovered lines: | 87376 |
-| Coverable lines: | 95674 |
-| Total lines: | 117157 |
+| Uncovered lines: | 87379 |
+| Coverable lines: | 95677 |
+| Total lines: | 117158 |
 | **Branch coverage:** | 29.6% (1773 of 5977) |
 | Covered branches: | 1773 |
 | Total branches: | 5977 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 18_26672543467 |
+| Tag: | 19_26673080267 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **8298** | **87376** | **95674** | **123203** | **8.6%** | **1773** | **5977** | **29.6%** |
+| **Confirmai** | **8298** | **87379** | **95677** | **123204** | **8.6%** | **1773** | **5977** | **29.6%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -52,7 +52,7 @@
 | Confirmai.Areas.Identity.Pages.Account.LoginModel | 84 | 2 | 86 | 165 | 97.6% | 21 | 26 | 80.7% |
 | Confirmai.Areas.Identity.Pages.Account.LogoutModel | 7 | 6 | 13 | 39 | 53.8% | 2 | 8 | 25% |
 | Confirmai.Areas.Identity.Pages.Account.RegisterConfirmationModel | 5 | 0 | 5 | 23 | 100% | 2 | 2 | 100% |
-| Confirmai.Areas.Identity.Pages.Account.RegisterModel | 19 | 41 | 60 | 123 | 31.6% | 0 | 10 | 0% |
+| Confirmai.Areas.Identity.Pages.Account.RegisterModel | 19 | 45 | 64 | 132 | 29.6% | 0 | 10 | 0% |
 | Confirmai.Areas.Identity.Pages.Account.ResendEmailConfirmationModel | 15 | 16 | 31 | 82 | 48.3% | 2 | 6 | 33.3% |
 | Confirmai.Areas.Identity.Pages.Account.ResetPasswordModel | 12 | 25 | 37 | 101 | 32.4% | 1 | 12 | 8.3% |
 | Confirmai.Config.BtcPayOptions | 2 | 0 | 2 | 9 | 100% | 0 | 0 |  |
@@ -173,7 +173,7 @@
 | Confirmai.Pages.Admin.AdminVenues | 0 | 88 | 88 | 249 | 0% | 0 | 52 | 0% |
 | Confirmai.Pages.Admin.ParchmentLab | 0 | 2 | 2 | 66 | 0% | 0 | 0 |  |
 | Confirmai.Pages.Contact | 1 | 4 | 5 | 25 | 20% | 0 | 2 | 0% |
-| Confirmai.Pages.Dashboard | 0 | 5 | 5 | 27 | 0% | 0 | 2 | 0% |
+| Confirmai.Pages.Dashboard | 0 | 4 | 4 | 19 | 0% | 0 | 2 | 0% |
 | Confirmai.Pages.Docs.Integration | 0 | 8 | 8 | 299 | 0% | 0 | 0 |  |
 | Confirmai.Pages.Error | 0 | 3 | 3 | 15 | 0% | 0 | 0 |  |
 | Confirmai.Pages.Futsal.Create | 69 | 128 | 197 | 518 | 35% | 17 | 90 | 18.8% |
