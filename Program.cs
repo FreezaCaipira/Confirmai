@@ -388,13 +388,13 @@ app.Use(async (context, next) =>
     headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
     headers["Content-Security-Policy"] =
         "default-src 'self'; " +
-        $"script-src 'self' 'nonce-{nonce}'; " +
+        $"script-src 'self' 'nonce-{nonce}' https://maps.googleapis.com https://maps.gstatic.com; " +
         // style-src keeps 'unsafe-inline' because Blazor injects inline error
         // styles and component styles cannot easily be nonced at this layer.
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
-        "img-src 'self' data: blob:; " +
-        "connect-src 'self' wss: ws:; " +
+        "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com; " +
+        "connect-src 'self' wss: ws: https://maps.googleapis.com; " +
         "frame-ancestors 'none'; " +
         "base-uri 'self'; " +
         "form-action 'self';";
