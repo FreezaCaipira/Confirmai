@@ -218,7 +218,11 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
+        {
+            // Finish the navigation progress bar now that Blazor has rendered the new page.
+            try { await JSRuntime.InvokeVoidAsync("navProgress.finish"); } catch { }
             return;
+        }
 
         try
         {

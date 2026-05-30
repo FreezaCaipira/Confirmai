@@ -43,7 +43,26 @@
 
     @if (IsLoading)
     {
-        <p class="listing-state">Carregando @SportLabel...</p>
+        <ul class="event-list" aria-label="Carregando @SportLabel" aria-busy="true">
+            @for (var i = 0; i < 3; i++)
+            {
+                <li>
+                    <div class="event-card-skel">
+                        <div class="skel skel--time"></div>
+                        <div class="skel-body">
+                            <div class="skel skel--title"></div>
+                            <div class="skel skel--venue"></div>
+                            <div class="skel skel--loc"></div>
+                            <div class="skel-chips">
+                                <div class="skel skel--chip"></div>
+                                <div class="skel skel--chip"></div>
+                            </div>
+                        </div>
+                        <div class="skel skel--action"></div>
+                    </div>
+                </li>
+            }
+        </ul>
     }
     else if (LoadError is not null)
     {

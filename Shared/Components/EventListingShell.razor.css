@@ -136,3 +136,38 @@
     flex-direction: column;
     gap: 0.75rem;
 }
+
+/* ── Skeleton loading cards ──────────────── */
+@keyframes skeleton-shimmer {
+    0%   { background-position: -600px 0; }
+    100% { background-position:  600px 0; }
+}
+
+.skel {
+    border-radius: 5px;
+    background: linear-gradient(90deg, #111927 25%, #1d2f44 50%, #111927 75%);
+    background-size: 600px 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.event-card-skel {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: #1a2740;
+    border: 1px solid #1e3a5f;
+    border-left: 3px solid #1b3d6c;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.skel--time   { width: 3.5rem;  height: 1.6rem; flex-shrink: 0; }
+.skel-body    { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+.skel--title  { height: 1rem;   width: 55%; }
+.skel--venue  { height: 0.75rem; width: 40%; }
+.skel--loc    { height: 0.7rem; width: 50%; }
+.skel-chips   { display: flex;  gap: 0.5rem; margin-top: 0.1rem; }
+.skel--chip   { height: 1.3rem; width: 5.5rem; border-radius: 20px; }
+.skel--action { width: 5.5rem;  height: 2rem; flex-shrink: 0; border-radius: 7px; }
