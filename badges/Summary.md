@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 05/30/2026 - 02:34:59 |
-| Coverage date: | 05/30/2026 - 02:34:54 |
+| Generated on: | 05/30/2026 - 02:42:55 |
+| Coverage date: | 05/30/2026 - 02:42:49 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
-| Classes: | 283 |
-| Files: | 319 |
-| **Line coverage:** | 8.7% (8298 of 94412) |
+| Classes: | 284 |
+| Files: | 321 |
+| **Line coverage:** | 8.6% (8298 of 95673) |
 | Covered lines: | 8298 |
-| Uncovered lines: | 86114 |
-| Coverable lines: | 94412 |
-| Total lines: | 115785 |
+| Uncovered lines: | 87375 |
+| Coverable lines: | 95673 |
+| Total lines: | 117133 |
 | **Branch coverage:** | 29.6% (1773 of 5973) |
 | Covered branches: | 1773 |
 | Total branches: | 5973 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 16_26672098881 |
+| Tag: | 17_26672267856 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **8298** | **86114** | **94412** | **121831** | **8.7%** | **1773** | **5973** | **29.6%** |
+| **Confirmai** | **8298** | **87375** | **95673** | **123179** | **8.6%** | **1773** | **5973** | **29.6%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -129,6 +129,7 @@
 | Confirmai.Migrations.FixOrderMessagesUserFkSetNull2 | 0 | 1463 | 1463 | 1556 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.FixPaymentsUserFkSetNullSync | 0 | 1464 | 1464 | 1557 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.FixPendingModelChanges | 0 | 1462 | 1462 | 1555 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.FixPlayersPerSideIdempotent | 0 | 1261 | 1261 | 1348 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.FixUserDeleteFkConstraints | 0 | 1598 | 1598 | 1715 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.ForceCrownHelmetCategoryHelmet | 0 | 13 | 13 | 31 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.InitialCreate | 0 | 933 | 933 | 1045 | 0% | 0 | 0 |  |
