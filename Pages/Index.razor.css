@@ -272,3 +272,264 @@
 .city-input::placeholder {
     color: #374151;
 }
+
+/* ── Sports tabs (Explorar / Meus Jogos) ─────────────────────── */
+.sports-tabs {
+    display: flex;
+    gap: 0.3rem;
+    background: #0d1825;
+    border: 1px solid #1b3868;
+    border-radius: 10px;
+    padding: 0.3rem;
+    width: 100%;
+    max-width: 820px;
+}
+
+.sports-tab {
+    flex: 1;
+    padding: 0.55rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: transparent;
+    color: rgba(96, 130, 160, 0.85);
+    font-size: 0.88rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    letter-spacing: 0.01em;
+}
+
+.sports-tab:hover:not(.sports-tab--active) {
+    background: rgba(79, 156, 248, 0.07);
+    color: #c9daea;
+}
+
+.sports-tab--active {
+    background: rgba(79, 156, 248, 0.12);
+    color: #4f9cf8;
+    border-color: #1b3d6c;
+}
+
+/* ── Meus Jogos container ────────────────────────────────────── */
+.my-conf-container {
+    width: 100%;
+    max-width: 820px;
+}
+
+/* ── Browse buttons (empty state) ───────────────────────────── */
+.my-conf-browse-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    background: #14532d;
+    color: #bbf7d0;
+    border: 1.5px solid #166534;
+    transition: filter 0.15s;
+}
+
+.my-conf-browse-btn:hover { filter: brightness(1.15); }
+
+.my-conf-browse-btn--poker {
+    background: #3b0764;
+    color: #e9d5ff;
+    border-color: #4c1d95;
+}
+
+/* ── History sub-tabs ────────────────────────────────────────── */
+.my-conf-history-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem;
+    margin-bottom: 0.75rem;
+}
+
+.my-conf-tab {
+    border: 1px solid var(--ci-border, #1b3868);
+    background: var(--ci-bg-card, #0d1825);
+    color: rgba(96, 130, 160, 0.85);
+    min-height: 2rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-family: inherit;
+    transition: color 0.15s, background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.my-conf-tab.active {
+    border-color: #1b3d6c;
+    background: rgba(79, 156, 248, 0.1);
+    color: #4f9cf8;
+}
+
+.my-conf-tab:hover:not(.active) {
+    background: rgba(79, 156, 248, 0.06);
+    color: #c9daea;
+}
+
+/* ── Section heading ─────────────────────────────────────────── */
+.my-conf-section { margin-bottom: 1.5rem; }
+.my-conf-section--past { opacity: 0.65; }
+
+.my-conf-section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ci-text-muted, #8aacc8);
+    margin: 0 0 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* ── Confirmation list & card ────────────────────────────────── */
+.my-conf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.my-conf-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.7rem 0.85rem;
+    background: #0d1825;
+    border: 1px solid #1b3868;
+    border-radius: 8px;
+    transition: border-color 0.15s;
+}
+
+.my-conf-card:hover { border-color: #1a5ab0; }
+.my-conf-card--past { opacity: 0.7; }
+.my-conf-card--cancelled { opacity: 0.6; border-color: #3d1515; }
+
+/* ── Sport badge ─────────────────────────────────────────────── */
+.my-conf-sport {
+    flex-shrink: 0;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.my-conf-sport--futsal { background: #0a2018; border: 1px solid #14532d; }
+.my-conf-sport--poker  { background: #1a0a2e; border: 1px solid #3b0764; }
+
+/* ── Body ────────────────────────────────────────────────────── */
+.my-conf-body { flex: 1; min-width: 0; }
+
+.my-conf-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.2rem;
+}
+
+.my-conf-name { font-size: 0.92rem; color: #e2e8f0; font-weight: 600; }
+
+.my-conf-pos {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: 10px;
+    background: #0a2018;
+    color: #4ade80;
+    border: 1px solid #14532d;
+}
+
+.my-conf-cancelled {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: 10px;
+    background: #290f0f;
+    color: #f87171;
+    border: 1px solid #7f1d1d;
+}
+
+.meta-chip--confirmed {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: 10px;
+    background: rgba(22, 163, 74, 0.12);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.35);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.my-conf-meta { margin: 0 0 0.12rem; font-size: 0.78rem; color: #6082a0; }
+
+/* ── Actions ─────────────────────────────────────────────────── */
+.my-conf-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex-shrink: 0;
+    justify-content: center;
+    align-self: center;
+}
+
+.my-conf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: border-color 0.14s, color 0.14s, background 0.14s;
+    white-space: nowrap;
+    background: transparent;
+    font-family: inherit;
+}
+
+.my-conf-btn--view {
+    background: #0d1825;
+    color: #4f9cf8;
+    border-color: #1b3d6c;
+    padding: 0.45rem 1rem;
+    font-size: 0.82rem;
+    gap: 0.4rem;
+    letter-spacing: 0.01em;
+}
+
+.my-conf-btn--view:hover {
+    background: #112240;
+    border-color: #4f9cf8;
+    color: #93c5fd;
+}
+
+@media (max-width: 540px) {
+    .my-conf-card { flex-wrap: wrap; }
+    .my-conf-actions { flex-direction: row; width: 100%; }
+    .my-conf-btn { flex: 1; }
+}
