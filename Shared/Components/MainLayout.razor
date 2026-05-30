@@ -34,10 +34,14 @@
                     <p class="oldsite-tagline">Bora jogar!?</p>
                 </a>
                 <nav class="oldsite-top-nav" aria-label="Main menu">
-                    <a href="/"><i class="fas fa-play-circle" aria-hidden="true"></i> Jogos</a>
                     <AuthorizeView>
                         <Authorized>
-                            <a href="/grupos"><i class="fas fa-users" aria-hidden="true"></i> Grupos</a>
+                            <a href="/"><i class="fas fa-users" aria-hidden="true"></i> Grupos</a>
+                        </Authorized>
+                    </AuthorizeView>
+                    <a href="/jogos"><i class="fas fa-play-circle" aria-hidden="true"></i> Jogos</a>
+                    <AuthorizeView>
+                        <Authorized>
                             <a href="/payments"><i class="fas fa-wallet" aria-hidden="true"></i> @T["Nav.Payments"]</a>
                             <AuthorizeView Policy="ServerAdmin">
                             <Authorized Context="gmContext">
