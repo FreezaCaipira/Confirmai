@@ -11,6 +11,7 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.JSInterop
 @using System.Security.Claims
+@using System.Net.Http.Json
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
 
@@ -18,6 +19,7 @@
 @inject NavigationManager NavigationManager
 @inject LogService LogService
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IHttpClientFactory HttpClientFactory
 @inject UserManager<ApplicationUser> UserManager
 @inject IJSRuntime JS
 @inject IConfiguration Config
@@ -62,8 +64,13 @@
                         </div>
                         <div class="form-group">
                             <label>UF <span class="required">*</span></label>
-                            <InputText class="input" @bind-Value="model.StateCode"
-                                       placeholder="SP" maxlength="2" style="text-transform:uppercase" />
+                            <InputSelect class="input" @bind-Value="model.StateCode" @bind-Value:after="LoadCitiesAsync">
+                                <option value="">Selecione…</option>
+                                @foreach (var uf in BrazilianStates)
+                                {
+                                    <option value="@uf">@uf</option>
+                                }
+                            </InputSelect>
                             <ValidationMessage For="@(() => model.StateCode)" class="validation-message" />
                         </div>
                     </div>
@@ -71,7 +78,13 @@
                     <div class="form-group">
                         <label>Cidade <span class="required">*</span></label>
                         <InputText class="input" @bind-Value="model.City"
-                                   placeholder="São Paulo" />
+                                   list="venue-cities-list" placeholder="São Paulo" autocomplete="off" />
+                        <datalist id="venue-cities-list">
+                            @foreach (var c in cityOptions)
+                            {
+                                <option value="@c" />
+                            }
+                        </datalist>
                         <ValidationMessage For="@(() => model.City)" class="validation-message" />
                     </div>
 
@@ -166,6 +179,26 @@
     private bool             isLoading       = true;
     private bool             isSaving        = false;
     private string           saveError       = string.Empty;
+    private List<string>     cityOptions     = new();
+
+    private static readonly string[] BrazilianStates =
+        ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
+         "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+
+    private async Task LoadCitiesAsync()
+    {
+        if (string.IsNullOrWhiteSpace(model.StateCode)) return;
+        try
+        {
+            var http   = HttpClientFactory.CreateClient();
+            var result = await http.GetFromJsonAsync<IbgeMunicipio[]>(
+                $"https://servicodados.ibge.gov.br/api/v1/localidades/estados/{model.StateCode}/municipios?orderBy=nome");
+            cityOptions = result?.Select(m => m.Nome).ToList() ?? new();
+        }
+        catch { cityOptions = new(); }
+    }
+
+    private record IbgeMunicipio(string Nome);
 
     // Places autocomplete
     private DotNetObjectReference<AdminVenueEdit>? _objRef;
@@ -194,6 +227,7 @@
                 venueAdmin = found.VenueAdmin;
             }
         }
+        await LoadCitiesAsync();
         isLoading = false;
     }
 
@@ -212,13 +246,14 @@
     }
 
     [JSInvokable]
-    public void PlaceSelected(string name, string street, string city, string state)
+    public async Task PlaceSelected(string name, string street, string city, string state)
     {
         model.Name      = name;
         model.Address   = street;
         model.City      = city;
         model.StateCode = state.Length > 2 ? state[..2] : state.ToUpperInvariant();
-        InvokeAsync(StateHasChanged);
+        await LoadCitiesAsync();
+        await InvokeAsync(StateHasChanged);
     }
 
     public async ValueTask DisposeAsync()
