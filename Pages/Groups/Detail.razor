@@ -61,7 +61,7 @@ else
                         @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
                     </span>
                     <a href="/grupos" class="detail-back-link">
-                        <i class="fas fa-arrow-left"></i> Grupos
+                        <i class="fas fa-arrow-left"></i> Início
                     </a>
                 </div>
                 <h1 class="detail-title">@group.Name</h1>
@@ -100,10 +100,16 @@ else
                             <i class="fas fa-copy"></i> @(copiedCode ? "Copiado!" : "Copiar")
                         </button>
                     </div>
-                    <button class="detail-admin-btn detail-admin-btn--invite invite-block-btn" type="button"
-                            @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
-                        <i class="fas fa-link"></i> Convidar
-                    </button>
+                    <hr class="invite-row-divider" />
+                    <div class="invite-block-actions">
+                        <button class="detail-admin-btn detail-admin-btn--invite invite-block-btn" type="button"
+                                @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
+                            <i class="fas fa-link"></i> Convidar
+                        </button>
+                        <a class="detail-admin-btn invite-block-btn invite-block-btn--settings" href="/grupo/@group.Id/configuracoes">
+                            <i class="fas fa-cog"></i> Configurações
+                        </a>
+                    </div>
                 </div>
             }
 
@@ -163,17 +169,25 @@ else
                             <i class="fas fa-history"></i> Realizadas (@pastEvents.Count)
                         </button>
                     </div>
-                    @if (isAdmin)
-                    {
-                        <a href="@newEventHref" class="groups-create-btn detail-events-create-btn">
-                            <i class="fas fa-plus"></i> Nova partida
-                        </a>
-                    }
+                    <div class="detail-events-tabs-right">
+                        @if (isMember && group.EnablePostMatchRanking)
+                        {
+                            <a class="detail-admin-btn detail-admin-btn--ranking" href="/grupo/@group.Id/ranking">
+                                <i class="fas fa-trophy"></i> Ranking
+                            </a>
+                        }
+                        @if (isAdmin)
+                        {
+                            <a href="@newEventHref" class="groups-create-btn detail-events-create-btn">
+                                <i class="fas fa-plus"></i> Nova partida
+                            </a>
+                        }
+                    </div>
                 </div>
                 <table class="events-table">
                     <thead>
                         <tr>
-                            <th>Data</th>
+                            <th class="et-th-data"><span class="et-num-ph"></span>Data</th>
                             <th>Jogadores</th>
                             <th>Status</th>
                             <th class="events-access-col"></th>
@@ -199,14 +213,19 @@ else
                                 var isNextUpcoming = !showPastEvents && nextUpcomingEventId.HasValue && ev.Id == nextUpcomingEventId.Value;
                                 <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
                                     <td>
-                                        <span class="et-date-wrap">
-                                            <span class="et-date">@ev.StartsAt.ToLocalTime().ToString("dd/MM")</span>
-                                            @if (isNextUpcoming)
-                                            {
-                                                <span class="event-next-badge">próxima</span>
-                                            }
-                                        </span>
-                                        <span class="et-time">@ev.StartsAt.ToLocalTime().ToString("HH:mm")</span>
+                                        <div class="et-cell">
+                                            <span class="et-num">#@(eventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
+                                            <div class="et-cell-info">
+                                                <span class="et-date-wrap">
+                                                    <span class="et-date">@ev.StartsAt.ToLocalTime().ToString("dd/MM")</span>
+                                                    @if (isNextUpcoming)
+                                                    {
+                                                        <span class="event-next-badge">pr&oacute;xima</span>
+                                                    }
+                                                </span>
+                                                <span class="et-time">@ev.StartsAt.ToLocalTime().ToString("HH:mm")</span>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>
                                         <span class="et-players @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
@@ -516,6 +535,11 @@ else
                 .OrderByDescending(e => e.StartsAt)
                 .ToList();
 
+            eventNumbers = recentEvents
+                .OrderBy(e => e.StartsAt)
+                .Select((e, i) => (e.Id, Num: i + 1))
+                .ToDictionary(x => x.Id, x => x.Num);
+
             if (!showPastEvents && upcomingEvents.Count == 0 && pastEvents.Count > 0)
             {
                 showPastEvents = true;
@@ -545,6 +569,7 @@ else
 
     private List<Event> upcomingEvents = new();
     private List<Event> pastEvents = new();
+    private Dictionary<int, int> eventNumbers = new();
     private List<Event> displayedEvents => showPastEvents ? pastEvents : upcomingEvents;
     private int eventsYear => displayedEvents.FirstOrDefault() is { } eventItem
         ? eventItem.StartsAt.ToLocalTime().Year
@@ -653,6 +678,17 @@ else
         req.Status            = JoinRequestStatus.Approved;
         req.RespondedAt       = DateTime.UtcNow;
         req.RespondedByUserId = currentUserId;
+
+        db.UserMailboxMessages.Add(new UserMailboxMessage
+        {
+            SenderUserId         = null,   // null = mensagem do sistema (Confirmai)
+            RecipientUserId      = req.UserId,
+            RecipientDisplayName = (await db.Users.FindAsync(req.UserId) as ApplicationUser)?.UserName,
+            Subject              = $"Você foi aprovado em \"{group!.Name}\"",
+            Body                 = $"Sua solicitação para entrar no grupo **{group!.Name}** foi aprovada! Você já pode acessar o grupo.",
+            CreatedAt            = DateTime.UtcNow,
+        });
+
         await db.SaveChangesAsync();
         await LoadGroup();
     }

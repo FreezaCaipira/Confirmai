@@ -1,0 +1,149 @@
+@page "/grupo/{Id:int}/configuracoes"
+
+@attribute [Authorize]
+
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider    AuthStateProvider
+@inject NavigationManager              NavigationManager
+
+<PageTitle>Configurações — @(group?.Name ?? "Grupo") · Confirmai</PageTitle>
+
+@if (isLoading)
+{
+    <div class="detail-loading">Carregando…</div>
+}
+else if (group is null || !isAdmin)
+{
+    <div class="detail-not-found">
+        <h2>Acesso não autorizado.</h2>
+        <a href="/">← Voltar</a>
+    </div>
+}
+else
+{
+    <div class="detail-page">
+        <div class="detail-card">
+
+            <header class="detail-header">
+                <div class="detail-header-top">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                    </span>
+                    <a href="/grupo/@group.Id" class="detail-back-link">
+                        <i class="fas fa-arrow-left"></i> @group.Name
+                    </a>
+                </div>
+                <h1 class="detail-title">Configurações do grupo</h1>
+            </header>
+
+            <section class="detail-section features-section">
+                <h2 class="detail-section-title">
+                    <i class="fas fa-sliders-h"></i> Funcionalidades
+                </h2>
+                <p class="features-section-sub">Ative ou desative funcionalidades opcionais para este grupo.</p>
+
+                <div class="features-list">
+
+                    @* ── Ranking pós-partida ─────────────────────────────── *@
+                    <div class="feature-card @(group.EnablePostMatchRanking ? "feature-card--on" : "")">
+                        <div class="feature-card-info">
+                            <span class="feature-card-icon"><i class="fas fa-trophy"></i></span>
+                            <div class="feature-card-text">
+                                <strong class="feature-card-title">Ranking pós-partida</strong>
+                                <p class="feature-card-desc">
+                                    Exibe um ranking de participações e desempenho dos membros,
+                                    com visões mensal e anual, na página do grupo.
+                                </p>
+                            </div>
+                        </div>
+                        <label class="feature-toggle" title="@(group.EnablePostMatchRanking ? "Desativar" : "Ativar")">
+                            <input type="checkbox"
+                                   checked="@group.EnablePostMatchRanking"
+                                   disabled="@isSaving"
+                                   @onchange="() => TogglePostMatchRanking()" />
+                            <span class="feature-toggle-track"></span>
+                        </label>
+                    </div>
+
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(saveMessage))
+                {
+                    <p class="features-save-msg @(saveError ? "features-save-msg--error" : "")">
+                        <i class="fas @(saveError ? "fa-times-circle" : "fa-check-circle")"></i>
+                        @saveMessage
+                    </p>
+                }
+            </section>
+
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Group?  group     = null;
+    private bool    isLoading = true;
+    private bool    isAdmin   = false;
+    private bool    isSaving  = false;
+    private string  saveMessage = string.Empty;
+    private bool    saveError   = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        var currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        group = await db.Groups
+            .Include(g => g.Members)
+            .FirstOrDefaultAsync(g => g.Id == Id);
+
+        isAdmin = currentUserId is not null && group is not null &&
+                  group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
+
+        isLoading = false;
+    }
+
+    private async Task TogglePostMatchRanking()
+    {
+        if (group is null) return;
+
+        isSaving    = true;
+        saveMessage = string.Empty;
+        saveError   = false;
+
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var dbGroup = await db.Groups.FindAsync(group.Id);
+            if (dbGroup is null) return;
+
+            dbGroup.EnablePostMatchRanking = !group.EnablePostMatchRanking;
+            await db.SaveChangesAsync();
+
+            group.EnablePostMatchRanking = dbGroup.EnablePostMatchRanking;
+            saveMessage = dbGroup.EnablePostMatchRanking
+                ? "Ranking pós-partida ativado."
+                : "Ranking pós-partida desativado.";
+        }
+        catch
+        {
+            saveMessage = "Erro ao salvar. Tente novamente.";
+            saveError   = true;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}

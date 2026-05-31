@@ -283,9 +283,15 @@
                 Subject = m.Subject ?? string.Empty,
                 Body = m.Body,
                 SenderUserId = m.SenderUserId,
-                SenderName = m.SenderUser == null ? "(deletado)" : (string.IsNullOrWhiteSpace(m.SenderUser.UserName) ? m.SenderUserId ?? "(deletado)" : m.SenderUser.UserName!),
+                SenderName = m.SenderUserId == null
+                    ? "Confirmai"
+                    : (m.SenderUser == null
+                        ? (m.SenderDisplayName ?? "(conta excluída)")
+                        : (string.IsNullOrWhiteSpace(m.SenderUser.UserName) ? m.SenderDisplayName ?? m.SenderUserId : m.SenderUser.UserName!)),
                 RecipientUserId = m.RecipientUserId,
-                RecipientName = m.RecipientUser == null ? "(deletado)" : (string.IsNullOrWhiteSpace(m.RecipientUser.UserName) ? m.RecipientUserId ?? "(deletado)" : m.RecipientUser.UserName!),
+                RecipientName = m.RecipientUser == null
+                    ? (m.RecipientDisplayName ?? "(conta excluída)")
+                    : (string.IsNullOrWhiteSpace(m.RecipientUser.UserName) ? m.RecipientDisplayName ?? m.RecipientUserId : m.RecipientUser.UserName!),
                 IsArchivedBySender = m.IsArchivedBySender,
                 IsArchivedByRecipient = m.IsArchivedByRecipient,
                 IsRead = m.IsRead,
@@ -308,7 +314,7 @@
             .Select(g =>
             {
                 var latest = g.OrderByDescending(x => x.CreatedAt).First();
-                var contactId = latest.SenderUserId == currentUserId ? latest.RecipientUserId : latest.SenderUserId;
+                var contactId = latest.SenderUserId == currentUserId ? latest.RecipientUserId : (latest.SenderUserId ?? "SYSTEM");
                 var contactName = latest.SenderUserId == currentUserId ? latest.RecipientName : latest.SenderName;
                 var title = string.IsNullOrWhiteSpace(contactName) ? contactId : contactName;
 
@@ -399,7 +405,7 @@
 
     private string BuildConversationKey(MailboxMessageView message)
     {
-        var contactUserId = message.SenderUserId == currentUserId ? message.RecipientUserId : message.SenderUserId;
+        var contactUserId = message.SenderUserId == currentUserId ? message.RecipientUserId : (message.SenderUserId ?? "SYSTEM");
         return $"contact:{contactUserId}";
     }
 
@@ -531,9 +537,18 @@
             return;
         }
 
-        threadQuery = threadQuery.Where(m =>
-            (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
-            || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
+        if (contactId == "SYSTEM")
+        {
+            // system messages have no real sender — no reply allowed
+            composerRecipientUserId = string.Empty;
+            threadQuery = threadQuery.Where(m => m.SenderUserId == null && m.RecipientUserId == currentUserId);
+        }
+        else
+        {
+            threadQuery = threadQuery.Where(m =>
+                (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
+                || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
+        }
 
         conversationMessages = await threadQuery
             .OrderBy(m => m.CreatedAt)
@@ -545,7 +560,11 @@
                 SenderUserId = m.SenderUserId,
                 AuthorName = m.SenderUserId == currentUserId
                     ? "Voce"
-                    : (m.SenderUser == null ? "(deletado)" : (string.IsNullOrWhiteSpace(m.SenderUser.UserName) ? m.SenderUserId ?? "(deletado)" : m.SenderUser.UserName!)),
+                    : (m.SenderUserId == null
+                        ? "Confirmai"
+                        : (m.SenderUser == null
+                            ? (m.SenderDisplayName ?? "(conta excluída)")
+                            : (string.IsNullOrWhiteSpace(m.SenderUser.UserName) ? m.SenderDisplayName ?? m.SenderUserId : m.SenderUser.UserName!))),
                 IsIncoming = m.SenderUserId != currentUserId,
                 IsRead = m.IsRead,
                 CreatedAt = m.CreatedAt
@@ -578,7 +597,10 @@
         IQueryable<UserMailboxMessage> unreadQuery = db.UserMailboxMessages
             .Where(m => m.RecipientUserId == currentUserId && !m.IsRead);
 
-        unreadQuery = unreadQuery.Where(m => m.SenderUserId == selected.ContactUserId);
+        if (selected.ContactUserId == "SYSTEM")
+            unreadQuery = unreadQuery.Where(m => m.SenderUserId == null);
+        else
+            unreadQuery = unreadQuery.Where(m => m.SenderUserId == selected.ContactUserId);
 
         var unreadMessages = await unreadQuery.ToListAsync();
 
@@ -633,10 +655,13 @@
             return;
         }
 
+        var senderUser = await db.Users.FindAsync(currentUserId) as ApplicationUser;
         db.UserMailboxMessages.Add(new UserMailboxMessage
         {
             SenderUserId = currentUserId,
+            SenderDisplayName = senderUser?.UserName,
             RecipientUserId = composerRecipientUserId,
+            RecipientDisplayName = selected.ContactName,
             Subject = "Chat pelo perfil",
             Body = normalizedBody,
             IsRead = false,
@@ -676,9 +701,12 @@
             .Where(m => m.RecipientUserId == currentUserId || m.SenderUserId == currentUserId);
 
         var contactId = selected.ContactUserId;
-        query = query.Where(m =>
-            (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
-            || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
+        if (contactId == "SYSTEM")
+            query = query.Where(m => m.SenderUserId == null && m.RecipientUserId == currentUserId);
+        else
+            query = query.Where(m =>
+                (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
+                || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
 
         var rows = await query.ToListAsync();
         if (rows.Count == 0)
@@ -732,7 +760,7 @@
         public int Id { get; init; }
         public string Subject { get; init; } = string.Empty;
         public string Body { get; init; } = string.Empty;
-        public string SenderUserId { get; init; } = string.Empty;
+        public string? SenderUserId { get; init; }
         public string SenderName { get; init; } = string.Empty;
         public string RecipientUserId { get; init; } = string.Empty;
         public string RecipientName { get; init; } = string.Empty;
@@ -746,7 +774,7 @@
     {
         public int Id { get; init; }
         public string Body { get; init; } = string.Empty;
-        public string SenderUserId { get; init; } = string.Empty;
+        public string? SenderUserId { get; init; }
         public string AuthorName { get; init; } = string.Empty;
         public string RoleClass { get; set; } = string.Empty;
         public bool IsIncoming { get; init; }

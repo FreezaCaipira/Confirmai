@@ -1,19 +1,82 @@
 .esc-loading,
-.esc-not-found,
-.esc-unavailable {
+.esc-not-found {
     text-align: center;
     padding: 3rem 1rem;
     color: var(--text-muted, #6b7280);
 }
 
-.esc-unavailable i {
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: .75rem;
-    color: var(--text-muted, #9ca3af);
+/* ── Gate (lock / not-member) ───────────────────────────────────────────── */
+
+.esc-card--gate {
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.esc-unavailable p { margin-bottom: 1rem; }
+.esc-gate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .85rem;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+}
+
+.esc-gate-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(51,76,120,.25);
+    border: 1px solid rgba(79,156,248,.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #475569;
+    margin-bottom: .25rem;
+}
+
+.esc-gate-icon--past {
+    background: rgba(79,156,248,.1);
+    border-color: rgba(79,156,248,.3);
+    color: #4f9cf8;
+}
+
+.esc-gate-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin: 0;
+}
+
+.esc-gate-msg {
+    font-size: .875rem;
+    color: #64748b;
+    max-width: 300px;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.esc-gate-back {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: .5rem;
+    padding: .45rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(79,156,248,.3);
+    color: #4f9cf8;
+    font-size: .85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color .15s, background .15s, color .15s;
+}
+.esc-gate-back:hover {
+    border-color: #4f9cf8;
+    background: rgba(79,156,248,.08);
+    color: #93c5fd;
+}
 
 /* ── Page shell ─────────────────────────────────────────────────────────── */
 
@@ -122,6 +185,29 @@
     margin: 0 0 .75rem;
 }
 
+/* Inline team-name editor (admin, pre-match) */
+.esc-team-name-input {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed rgba(255,255,255,.25);
+    border-radius: 0;
+    color: #dbeafe;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    padding: 0 0 .2rem;
+    margin: 0 0 .75rem;
+    outline: none;
+    transition: border-color .15s;
+}
+.esc-team-name-input:focus {
+    border-bottom-color: rgba(255,255,255,.6);
+}
+.esc-team-name-input--a { color: #fbbf24; }
+.esc-team-name-input--b { color: #93c5fd; }
+
 /* ── Player list ────────────────────────────────────────────────────────── */
 
 .esc-player-list {
@@ -151,6 +237,22 @@
 .esc-player:hover { background: rgba(96, 165, 250, 0.18); }
 
 .esc-player--gk { color: var(--ci-accent, #4f9cf8); font-weight: 600; }
+
+.esc-player--mvp {
+    background: linear-gradient(90deg, rgba(251,191,36,.18) 0%, rgba(8,18,30,.46) 70%) !important;
+    box-shadow: inset 3px 0 0 #fbbf24;
+}
+
+.esc-player-mvp-tag {
+    font-size: .72rem;
+    font-weight: 700;
+    color: #fbbf24;
+    background: rgba(251,191,36,.12);
+    border: 1px solid rgba(251,191,36,.35);
+    border-radius: 999px;
+    padding: .1rem .45rem;
+    white-space: nowrap;
+}
 
 .esc-player-num {
     min-width: 1.4rem;
@@ -343,4 +445,320 @@
     border-color: rgba(79,156,248,.55);
     color: #4f9cf8;
     background: rgba(79,156,248,.08);
+}
+
+/* ── Section title (score + vote headers) ───────────────────────────────── */
+
+.esc-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .75rem;
+    gap: .5rem;
+}
+
+.esc-section-header .esc-section-title {
+    margin-bottom: 0;
+}
+
+.esc-section-title {
+    font-size: .85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #4f9cf8;
+    margin: 0 0 .75rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+
+/* ── Score section ──────────────────────────────────────────────────────── */
+
+.esc-score-section {
+    margin-top: 1.5rem;
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    background: rgba(15,26,48,.55);
+    border: 1px solid rgba(51,76,120,.4);
+}
+
+.esc-score-display {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: .5rem;
+}
+
+.esc-score-team {
+    font-size: 1.05rem;
+    color: #94a3b8;
+    font-weight: 700;
+}
+
+.esc-score-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #e2e8f0;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.esc-score-sep {
+    font-size: 1.2rem;
+    color: #475569;
+    font-weight: 700;
+}
+
+.esc-score-winner {
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.15rem;
+    margin: .5rem 0 .7rem;
+}
+.esc-score-winner--a  { color: #fbbf24; }
+.esc-score-winner--b  { color: #60a5fa; }
+.esc-score-winner--draw { color: #94a3b8; }
+
+.esc-score-inputs {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: .6rem;
+}
+
+.esc-score-input {
+    width: 3.5rem;
+    padding: .4rem .5rem;
+    border-radius: 7px;
+    border: 1px solid rgba(79,156,248,.4);
+    background: rgba(10,22,40,.7);
+    color: #e2e8f0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+}
+.esc-score-input:focus {
+    border-color: #4f9cf8;
+}
+
+.esc-score-label {
+    font-size: .8rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.esc-score-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: .5rem;
+}
+
+.esc-score-registered-by {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    font-size: .78rem;
+    color: #475569;
+    margin: .4rem 0 0;
+    flex-wrap: wrap;
+}
+
+.esc-score-registered-by strong { color: #64748b; }
+
+.esc-score-registered-when {
+    color: #334155;
+}
+
+.esc-btn--sm {
+    padding: .3rem .75rem;
+    font-size: .82rem;
+}
+
+.esc-hint {
+    font-size: .82rem;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    margin: .25rem 0 0;
+}
+
+/* ── Vote section ───────────────────────────────────────────────────────── */
+
+.esc-vote-section {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    background: rgba(15,26,48,.55);
+    border: 1px solid rgba(51,76,120,.4);
+}
+
+.esc-vote-hint {
+    font-size: .85rem;
+    color: #94a3b8;
+    margin: 0 0 .6rem;
+}
+
+.esc-vote-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+}
+
+.esc-vote-item {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .55rem .75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(51,76,120,.3);
+    background: rgba(10,22,40,.45);
+    cursor: pointer;
+    font-size: .875rem;
+    color: #cbd5e1;
+    transition: border-color .15s, background .15s, color .15s, transform .1s;
+    user-select: none;
+    position: relative;
+}
+.esc-vote-item:hover:not(.esc-vote-item--me) {
+    border-color: rgba(251,191,36,.55);
+    background: rgba(251,191,36,.07);
+    color: #fde68a;
+    transform: translateX(2px);
+}
+.esc-vote-item:hover:not(.esc-vote-item--me)::after {
+    content: "⮞";
+    position: absolute;
+    right: .75rem;
+    color: rgba(251,191,36,.6);
+    font-size: .8rem;
+}
+.esc-vote-item--me {
+    opacity: 0.38;
+    cursor: default;
+}
+
+.esc-vote-team-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.esc-vote-team-dot--a { background: #fbbf24; }
+.esc-vote-team-dot--b { background: #60a5fa; }
+
+.esc-vote-name { flex: 1; }
+
+.esc-vote-counter {
+    font-size: .78rem;
+    color: #334155;
+    margin: .5rem 0 0;
+}
+
+.esc-vote-pending {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .65rem .85rem;
+    border-radius: 8px;
+    background: rgba(79,156,248,.07);
+    border: 1px solid rgba(79,156,248,.2);
+    color: #93c5fd;
+    font-size: .875rem;
+}
+.esc-vote-pending i { font-size: 1rem; flex-shrink: 0; }
+.esc-vote-pending p { margin: 0; flex: 1; }
+
+.esc-vote-change-btn {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid rgba(79,156,248,.3);
+    border-radius: 6px;
+    color: #60a5fa;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: .2rem .55rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    transition: border-color .15s, color .15s, background .15s;
+    white-space: nowrap;
+}
+.esc-vote-change-btn:hover {
+    border-color: #60a5fa;
+    color: #93c5fd;
+    background: rgba(79,156,248,.08);
+}
+
+/* current-pick highlight in the player list */
+.esc-vote-item--current {
+    border-color: rgba(79,156,248,.45) !important;
+    background: rgba(79,156,248,.07) !important;
+}
+
+.esc-vote-current-tag {
+    margin-left: auto;
+    color: #4f9cf8;
+    font-size: .8rem;
+    flex-shrink: 0;
+}
+
+.esc-vote-mine {
+    font-size: .82rem;
+    color: #4ade80;
+    margin: .5rem 0 0;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+}
+
+/* ── MVP Banner ─────────────────────────────────────────────────────────── */
+
+.esc-mvp-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .85rem 1rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(251,191,36,.08), rgba(10,22,40,.6));
+    border: 1px solid rgba(251,191,36,.35);
+    margin-bottom: .5rem;
+}
+
+.esc-mvp-trophy {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.esc-mvp-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: #fbbf24;
+    margin: 0;
+    font-weight: 700;
+}
+
+.esc-mvp-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fde68a;
+    margin: .1rem 0 .15rem;
+}
+
+.esc-mvp-votes {
+    font-size: .75rem;
+    color: #64748b;
+    margin: 0;
 }

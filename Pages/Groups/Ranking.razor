@@ -1,0 +1,262 @@
+@page "/grupo/{Id:int}/ranking"
+
+@attribute [Authorize]
+
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider    AuthStateProvider
+@inject NavigationManager              NavigationManager
+
+<PageTitle>Ranking — @(group?.Name ?? "Grupo") · Confirmai</PageTitle>
+
+@if (isLoading)
+{
+    <div class="detail-loading">Carregando…</div>
+}
+else if (group is null || !isMember)
+{
+    <div class="detail-not-found">
+        <h2>Acesso não autorizado.</h2>
+        <a href="/">← Voltar</a>
+    </div>
+}
+else if (!group.EnablePostMatchRanking)
+{
+    <div class="detail-not-found">
+        <h2>Funcionalidade não habilitada.</h2>
+        <a href="/grupo/@group.Id">← Voltar ao grupo</a>
+    </div>
+}
+else
+{
+    <div class="detail-page">
+        <div class="detail-card">
+
+            <header class="detail-header">
+                <div class="detail-header-top">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                    </span>
+                    <a href="/grupo/@group.Id" class="detail-back-link">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </div>
+                <h1 class="detail-title ranking-title"><i class="fas fa-trophy"></i> Ranking</h1>
+            </header>
+
+            @* ── Filtro ────────────────────────────────────────────────── *@
+            <div class="ranking-tabs">
+                <button class="ranking-tab @(viewMode == RankingView.Month ? "ranking-tab--active" : "")"
+                        type="button" @onclick="() => SetView(RankingView.Month)">
+                    <i class="fas fa-calendar-alt"></i> Mês atual
+                </button>
+                <button class="ranking-tab @(viewMode == RankingView.Year ? "ranking-tab--active" : "")"
+                        type="button" @onclick="() => SetView(RankingView.Year)">
+                    <i class="fas fa-calendar-check"></i> Ano @currentYear
+                </button>
+                <button class="ranking-tab @(viewMode == RankingView.AllTime ? "ranking-tab--active" : "")"
+                        type="button" @onclick="() => SetView(RankingView.AllTime)">
+                    <i class="fas fa-infinity"></i> Geral
+                </button>
+            </div>
+
+            @* ── Tabela ────────────────────────────────────────────────── *@
+            @if (rankingRows.Count == 0)
+            {
+                <div class="ranking-empty">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>Nenhuma partida encerrada no período.</p>
+                </div>
+            }
+            else
+            {
+                <div class="ranking-header">
+                    <span class="ranking-pos"></span>
+                    <span class="ranking-name ranking-col-label"><i class="fas fa-user"></i> Nome</span>
+                    <span class="ranking-col ranking-col--label ranking-col--label-games"><i class="fas fa-futbol"></i> Partidas</span>
+                    <span class="ranking-col ranking-col--label ranking-col--label-highlight"><i class="fas fa-star"></i> Destaques</span>
+                    <span class="ranking-col ranking-col--label ranking-col--label-wins"><i class="fas fa-trophy"></i> Vitórias</span>
+                </div>
+                <ol class="ranking-list">
+                    @{ int pos = 0; }
+                    @foreach (var row in rankingRows)
+                    {
+                        pos++;
+                        bool isMe = row.UserId == currentUserId;
+                        string medalClass = pos switch { 1 => "ranking-medal--gold", 2 => "ranking-medal--silver", 3 => "ranking-medal--bronze", _ => "" };
+                        <li class="ranking-row @(isMe ? "ranking-row--me" : "")">
+                            <span class="ranking-pos @medalClass">
+                                @if (pos <= 3)
+                                {
+                                    <i class="fas fa-medal"></i>
+                                }
+                                else
+                                {
+                                    @pos
+                                }
+                            </span>
+                            <span class="ranking-name">@row.UserName @if (isMe) { <span class="player-tag player-tag--me">você</span> }</span>
+                            <span class="ranking-col" title="Partidas">@row.GamesPlayed</span>
+                            <span class="ranking-col ranking-col--highlight" title="Destaques">@row.Highlights</span>
+                            <span class="ranking-col ranking-col--wins" title="Vitórias">@row.Wins</span>
+                        </li>
+                    }
+                </ol>
+            }
+
+            <p class="ranking-footnote">
+                <i class="fas fa-info-circle"></i>
+                Contabiliza apenas partidas com data já encerrada.
+            </p>
+
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private enum RankingView { Month, Year, AllTime }
+
+    private sealed class RankingRow
+    {
+        public string UserId      { get; init; } = string.Empty;
+        public string UserName    { get; init; } = string.Empty;
+        public int    GamesPlayed { get; init; }
+        public int    GamesPaid   { get; init; }
+        public int    Wins        { get; init; }
+        public int    Draws       { get; init; }
+        public int    Highlights  { get; init; }
+    }
+
+    private Group?          group        = null;
+    private bool            isLoading    = true;
+    private bool            isMember     = false;
+    private string?         currentUserId = null;
+    private RankingView     viewMode     = RankingView.Month;
+    private int             currentYear  = DateTime.Now.Year;
+    private List<RankingRow> rankingRows = new();
+
+    private List<(int EventId, DateTime StartsAt, string WinnerUserId)> allMvpWinners = new();
+
+    // All-time raw data, filtered client-side per view
+    private List<(string UserId, string UserName, DateTime StartsAt, bool HasPaid, int? TeamId, int? ScoreTeamA, int? ScoreTeamB)> allConfirmations = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        group = await db.Groups
+            .Include(g => g.Members)
+            .FirstOrDefaultAsync(g => g.Id == Id);
+
+        if (group is null) { isLoading = false; return; }
+
+        isMember = currentUserId is not null &&
+                   group.Members.Any(m => m.UserId == currentUserId);
+
+        if (!isMember || !group.EnablePostMatchRanking) { isLoading = false; return; }
+
+        // Load all past event confirmations for this group
+        var now = DateTime.UtcNow;
+        var raw = await db.EventConfirmations
+            .Where(c => c.Event.GroupId == Id
+                     && c.Event.IsActive
+                     && c.Event.StartsAt < now
+                     && c.User != null)
+            .Select(c => new
+            {
+                c.UserId,
+                UserName = c.User!.FullName ?? c.User.UserName ?? c.UserId,
+                c.Event.StartsAt,
+                c.HasPaid,
+                c.TeamId,
+                c.Event.ScoreTeamA,
+                c.Event.ScoreTeamB,
+            })
+            .ToListAsync();
+
+        allConfirmations = raw
+            .Select(x => (x.UserId, x.UserName, x.StartsAt, x.HasPaid, x.TeamId, x.ScoreTeamA, x.ScoreTeamB))
+            .ToList();
+
+        // Load MVP highlights per event
+        var votesRaw = await db.PostMatchVotes
+            .Where(v => v.Event.GroupId == Id && v.Event.IsActive && v.Event.StartsAt < now)
+            .Select(v => new { v.EventId, v.VotedForUserId, v.Event.StartsAt })
+            .ToListAsync();
+
+        allMvpWinners = votesRaw
+            .GroupBy(v => v.EventId)
+            .Select(g => (
+                EventId: g.Key,
+                StartsAt: g.First().StartsAt,
+                WinnerUserId: g.GroupBy(v => v.VotedForUserId)
+                               .OrderByDescending(vg => vg.Count())
+                               .First().Key
+            ))
+            .ToList();
+
+        BuildRanking();
+        isLoading = false;
+    }
+
+    private void SetView(RankingView mode)
+    {
+        viewMode = mode;
+        BuildRanking();
+    }
+
+    private void BuildRanking()
+    {
+        var now   = DateTime.UtcNow;
+        var query = allConfirmations.AsEnumerable();
+
+        if (viewMode == RankingView.Month)
+            query = query.Where(x => x.StartsAt.Year == now.Year && x.StartsAt.Month == now.Month);
+        else if (viewMode == RankingView.Year)
+            query = query.Where(x => x.StartsAt.Year == currentYear);
+
+        var mvpQuery = allMvpWinners.AsEnumerable();
+        if (viewMode == RankingView.Month)
+            mvpQuery = mvpQuery.Where(x => x.StartsAt.Year == now.Year && x.StartsAt.Month == now.Month);
+        else if (viewMode == RankingView.Year)
+            mvpQuery = mvpQuery.Where(x => x.StartsAt.Year == currentYear);
+
+        var highlightCounts = mvpQuery
+            .GroupBy(x => x.WinnerUserId)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        rankingRows = query
+            .GroupBy(x => x.UserId)
+            .Select(g => new RankingRow
+            {
+                UserId      = g.Key,
+                UserName    = g.First().UserName,
+                GamesPlayed = g.Count(),
+                GamesPaid   = g.Count(x => x.HasPaid),
+                Wins        = g.Count(x =>
+                    (x.TeamId == 0 && x.ScoreTeamA > x.ScoreTeamB) ||
+                    (x.TeamId == 1 && x.ScoreTeamB > x.ScoreTeamA)),
+                Draws       = g.Count(x =>
+                    (x.TeamId == 0 || x.TeamId == 1) &&
+                    x.ScoreTeamA.HasValue && x.ScoreTeamB.HasValue &&
+                    x.ScoreTeamA == x.ScoreTeamB),
+                Highlights  = highlightCounts.GetValueOrDefault(g.Key, 0),
+            })
+            .OrderByDescending(r => r.Wins)
+            .ThenByDescending(r => r.GamesPlayed)
+            .ThenByDescending(r => r.GamesPaid)
+            .ToList();
+    }
+}

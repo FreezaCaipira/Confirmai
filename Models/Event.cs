@@ -117,9 +117,33 @@ namespace Confirmai.Models
         /// <summary>Preenchido quando o admin confirma a escalação dos times</summary>
         public DateTime? LineupConfirmedAt { get; set; }
 
+        // ── Pós-partida ───────────────────────────────────────────────────────
+
+        /// <summary>Placar do Time A (🟡). Preenchido após a partida.</summary>
+        public int? ScoreTeamA { get; set; }
+
+        /// <summary>Placar do Time B (🔵). Preenchido após a partida.</summary>
+        public int? ScoreTeamB { get; set; }
+
+        /// <summary>UserId de quem registrou o placar.</summary>
+        [StringLength(450)]
+        public string? ScoreRegisteredByUserId { get; set; }
+
+        /// <summary>Quando o placar foi registrado.</summary>
+        public DateTime? ScoreRegisteredAt { get; set; }
+
+        /// <summary>Nome personalizado do Time A (padrão: "Time A").</summary>
+        [StringLength(50)]
+        public string? TeamAName { get; set; }
+
+        /// <summary>Nome personalizado do Time B (padrão: "Time B").</summary>
+        [StringLength(50)]
+        public string? TeamBName { get; set; }
+
         // ── Navegação ─────────────────────────────────────────────────────────
 
         public ICollection<EventConfirmation> Confirmations { get; set; } = new List<EventConfirmation>();
         public ICollection<WaitingList> WaitingList { get; set; } = new List<WaitingList>();
+        public ICollection<PostMatchVote> PostMatchVotes { get; set; } = new List<PostMatchVote>();
     }
 }

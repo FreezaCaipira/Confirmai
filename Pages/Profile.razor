@@ -333,10 +333,13 @@ else
         try
         {
             await using var db = await DbFactory.CreateDbContextAsync();
+            var senderUser = await UserManager.FindByIdAsync(currentUserId);
             db.UserMailboxMessages.Add(new UserMailboxMessage
             {
                 SenderUserId = currentUserId,
+                SenderDisplayName = senderUser?.UserName,
                 RecipientUserId = Id,
+                RecipientDisplayName = user.UserName,
                 Subject = "Chat pelo perfil",
                 Body = messageBody.Trim(),
                 CreatedAt = DateTime.UtcNow

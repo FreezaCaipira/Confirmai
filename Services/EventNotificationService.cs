@@ -111,6 +111,8 @@ public class EventNotificationService
 
         if (members.Count == 0) return;
 
+        var senderUser = await db.Users.FindAsync(ev.CreatedByUserId) as ApplicationUser;
+        var senderDisplayName = senderUser?.UserName;
         var startsStr = ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy 'às' HH:mm",
             System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
         var location  = ev.Venue?.Name ?? ev.Location;
@@ -127,11 +129,13 @@ public class EventNotificationService
         {
             db.UserMailboxMessages.Add(new UserMailboxMessage
             {
-                SenderUserId    = ev.CreatedByUserId ?? string.Empty,
-                RecipientUserId = member.UserId,
-                Subject         = subject,
-                Body            = bodyText,
-                CreatedAt       = DateTime.UtcNow,
+                SenderUserId      = ev.CreatedByUserId ?? string.Empty,
+                SenderDisplayName = senderDisplayName,
+                RecipientUserId   = member.UserId,
+                RecipientDisplayName = member.User?.UserName,
+                Subject           = subject,
+                Body              = bodyText,
+                CreatedAt         = DateTime.UtcNow,
             });
         }
 
@@ -155,15 +159,20 @@ public class EventNotificationService
 
         if (recipients.Count == 0) return;
 
+        var senderUser = await db.Users.FindAsync(senderId) as ApplicationUser;
+        var senderDisplayName = senderUser?.UserName;
+
         foreach (var user in recipients)
         {
             db.UserMailboxMessages.Add(new UserMailboxMessage
             {
-                SenderUserId    = senderId,
-                RecipientUserId = user.Id,
-                Subject         = subject,
-                Body            = bodyText,
-                CreatedAt       = DateTime.UtcNow,
+                SenderUserId         = senderId,
+                SenderDisplayName    = senderDisplayName,
+                RecipientUserId      = user.Id,
+                RecipientDisplayName = user.UserName,
+                Subject              = subject,
+                Body                 = bodyText,
+                CreatedAt            = DateTime.UtcNow,
             });
         }
 
@@ -220,11 +229,13 @@ public class EventNotificationService
 
         db.UserMailboxMessages.Add(new UserMailboxMessage
         {
-            SenderUserId    = ev.CreatedByUserId ?? string.Empty,
-            RecipientUserId = promotedUserId,
-            Subject         = subject,
-            Body            = bodyText,
-            CreatedAt       = DateTime.UtcNow,
+            SenderUserId         = ev.CreatedByUserId ?? string.Empty,
+            SenderDisplayName    = (await db.Users.FindAsync(ev.CreatedByUserId) as ApplicationUser)?.UserName,
+            RecipientUserId      = promotedUserId,
+            RecipientDisplayName = user.UserName,
+            Subject              = subject,
+            Body                 = bodyText,
+            CreatedAt            = DateTime.UtcNow,
         });
         await db.SaveChangesAsync();
 
@@ -269,11 +280,13 @@ public class EventNotificationService
 
         db.UserMailboxMessages.Add(new UserMailboxMessage
         {
-            SenderUserId    = adminUserId,
-            RecipientUserId = targetUserId,
-            Subject         = $"[Confirmai] Pagamentos pendentes — {groupName}",
-            Body            = bodyText,
-            CreatedAt       = DateTime.UtcNow,
+            SenderUserId         = adminUserId,
+            SenderDisplayName    = (await db.Users.FindAsync(adminUserId) as ApplicationUser)?.UserName,
+            RecipientUserId      = targetUserId,
+            RecipientDisplayName = user.UserName,
+            Subject              = $"[Confirmai] Pagamentos pendentes — {groupName}",
+            Body                 = bodyText,
+            CreatedAt            = DateTime.UtcNow,
         });
         await db.SaveChangesAsync();
 

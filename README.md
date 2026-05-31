@@ -223,12 +223,14 @@ Veja os arquivos [roadmap.md](roadmap.md) e [DEVELOPMENT.md](DEVELOPMENT.md) par
    - transições auditáveis de status por confirmação (`Pending/Paid/Failed/Refunded`) com operação administrativa controlada
    - script de smoke pós-deploy (`scripts/smoke-postdeploy.ps1`) para validação operacional e suporte a rollback rápido
 - ✅ Hardening de release e observabilidade base documentados: checklist de produção, guia de deploy, runbook de incidentes, regras de alerta e templates de monitoramento.
-- 🟡 Foco atual: fechar automação operacional dos alertas e evoluir UX/admin dos fluxos de grupo e evento.
+- ✅ UX/roteamento (30/05/2026): `/grupos` agora é a tela inicial; Explorar moveu para `/jogos`; navegação reordenada (Grupos → Jogos → Pagamentos); UF select + datalist de cidades IBGE no formulário admin de quadras e na tela Explorar; Google Maps integrado via JS/CSP (ativo quando `Google__MapsApiKey` configurado).
+- 🟡 Foco atual: validação de pagamentos Pix em produção, alertas operacionais reais e UX de grupos privados.
 
 **Próximos tópicos priorizados:**
-1. Operação contínua: transformar o runbook de pagamentos em alertas realmente implantados no ambiente e validar escalonamento fim a fim.
-2. Produto/admin: consolidar o fluxo de aprovação de solicitações em grupos privados com mais contexto visual e atalhos de triagem.
-3. Produto: indicadores de ocupação, inadimplência e conversão em pagamento, com UX responsiva e acessibilidade AA nas telas de evento.
+1. Pagamentos: testar fluxo Pix completo em produção (EfiBank) e ativar webhook AbacatePay.
+2. Operação contínua: implantar alertas reais no ambiente e validar escalonamento fim a fim.
+3. Produto/admin: consolidar fluxo de aprovação de grupos privados com contexto visual e atalhos de triagem.
+4. Produto: indicadores de ocupação, inadimplência e conversão em pagamento.
 
 **Operação de produção:**
 1. Checklist de produção: [docs/production-checklist.md](docs/production-checklist.md)

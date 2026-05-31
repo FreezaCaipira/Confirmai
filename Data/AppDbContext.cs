@@ -25,6 +25,7 @@ namespace Confirmai.Data
         public DbSet<WaitingList> WaitingLists { get; set; }
         public DbSet<Venue> Venues { get; set; }
         public DbSet<MatchSchedule> RachaSchedules { get; set; }
+        public DbSet<PostMatchVote> PostMatchVotes { get; set; }
 
         public override int SaveChanges()
         {
@@ -223,7 +224,8 @@ namespace Confirmai.Data
                 .HasOne(m => m.SenderUser)
                 .WithMany()
                 .HasForeignKey(m => m.SenderUserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<UserMailboxMessage>()
                 .HasOne(m => m.RecipientUser)
@@ -376,6 +378,29 @@ namespace Confirmai.Data
                 .WithMany()
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // PostMatchVote — one vote per voter per event
+            modelBuilder.Entity<PostMatchVote>()
+                .HasIndex(v => new { v.EventId, v.VoterUserId })
+                .IsUnique();
+
+            modelBuilder.Entity<PostMatchVote>()
+                .HasOne(v => v.Event)
+                .WithMany(e => e.PostMatchVotes)
+                .HasForeignKey(v => v.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PostMatchVote>()
+                .HasOne(v => v.Voter)
+                .WithMany()
+                .HasForeignKey(v => v.VoterUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PostMatchVote>()
+                .HasOne(v => v.VotedFor)
+                .WithMany()
+                .HasForeignKey(v => v.VotedForUserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

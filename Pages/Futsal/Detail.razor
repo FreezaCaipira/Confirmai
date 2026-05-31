@@ -45,6 +45,8 @@ else
     var isMember     = currentUserId is not null && ev.Group.Members.Any(m => m.UserId == currentUserId);
     var isAdmin      = IsGroupAdmin();
     var canEdit      = EventAccess.IsCreator(ev, currentUserId) || isSystemAdmin;
+    var eventEndsAt  = ev.StartsAt.AddMinutes(ev.DurationMinutes ?? 120);
+    var isPastEvent  = eventEndsAt < DateTime.UtcNow;
 
     <div class="detail-page">
         <div class="detail-card">
@@ -52,9 +54,9 @@ else
             <header class="detail-header detail-header--futsal">
                 <div class="detail-header-top">
                     <span class="detail-sport-badge">⚽ Futsal</span>
-                    <a href="/futsal" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+                    <a href="/grupo/@ev.GroupId" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar para o grupo</a>
                 </div>
-                <h1 class="detail-title">@ev.Group.Name</h1>
+                <h1 class="detail-title detail-title--with-num">@ev.Group.Name <span class="detail-event-num">#@eventNumber</span></h1>
                 @if (!string.IsNullOrWhiteSpace(ev.LocalName))
                 {
                     <p class="detail-localname">@ev.LocalName</p>
@@ -173,8 +175,13 @@ else
             }
             @if (minInfo.Total > 0)
             {
-                <div class="quorum-bar @(hasQuorum ? "quorum-bar--ok" : "quorum-bar--warn")">
-                    @if (hasQuorum)
+                <div class="quorum-bar @(isPastEvent ? "quorum-bar--past" : (hasQuorum ? "quorum-bar--ok" : "quorum-bar--warn"))">
+                    @if (isPastEvent)
+                    {
+                        <i class="fas fa-flag-checkered"></i>
+                        <span>Partida encerrada</span>
+                    }
+                    else if (hasQuorum)
                     {
                         <i class="fas fa-check-circle"></i>
                         <span>Quantidade mínima de jogadores atingida</span>
@@ -195,9 +202,14 @@ else
                         .OrderBy(c => c.ConfirmedAt)
                         .ToList();
                     int outFieldSlots = maxOut > 0 ? maxOut : outFieldPlayers.Count;
-                    bool canConfirm = ev.IsActive && currentUserId is not null && userConf is null && !userOnWaitlist
+                    bool canConfirm = ev.IsActive && !isPastEvent && currentUserId is not null && userConf is null && !userOnWaitlist
                                       && (!ev.Group.IsPrivate || isMember);
                     int baseOut = ev.PlayersPerSide.HasValue ? (ev.PlayersPerSide.Value - 1) * 2 : ev.MaxPlayers;
+                    var detailMvpGroup = detailMvpVotes.GroupBy(v => v.VotedForUserId).OrderByDescending(g => g.Count()).FirstOrDefault();
+                    var detailMvpUserId = detailMvpGroup?.Key;
+                    int detailTotalVoters = ev.Confirmations.Count(c => c.TeamId == 0 || c.TeamId == 1);
+                    bool detailMvpRevealed = isPastEvent && detailMvpUserId is not null
+                                             && detailMvpVotes.Count >= Math.Max(1, (int)Math.Ceiling(detailTotalVoters * 0.5));
                 }
 
                 @if (ev.MaxGoalkeepers > 0)
@@ -217,10 +229,11 @@ else
                                 {
                                     outIdx++;
                                     bool isRotation = outIdx > baseOut;
-                                    <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                    <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "") @(detailMvpRevealed && c.UserId == detailMvpUserId ? "player-item--mvp" : "")">
                                         <span class="player-num">@outIdx</span>
                                         <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
                                         @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
+                                        @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
                                         @if (ev.Price.HasValue)
                                         {
                                             @if (isAdmin)
@@ -251,7 +264,7 @@ else
                                                         <i class="fas fa-check"></i> pago
                                                     </span>
                                                 }
-                                                @if (c.UserId != currentUserId && c.PaymentGatewayName == null)
+                                                @if (!isPastEvent && c.UserId != currentUserId && c.PaymentGatewayName == null)
                                                 {
                                                     @if (confirmRemoveId == c.Id)
                                                     {
@@ -284,7 +297,7 @@ else
                                                 }
                                             }
                                         }
-                                        @if (ev.IsActive && c.UserId == currentUserId && !c.HasPaid)
+                                        @if (ev.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
                                         {
                                             @if (confirmCancel)
                                             {
@@ -329,7 +342,7 @@ else
                                 <i class="fas fa-clock"></i> Entrar na lista de espera de linha
                             </button>
                         }
-                        @if (isAdmin && ev.IsActive)
+                        @if (isAdmin && ev.IsActive && !isPastEvent)
                         {
                             <div class="slot-controls">
                                 <button class="slot-ctrl-btn slot-ctrl-btn--remove"
@@ -361,11 +374,12 @@ else
                                 foreach (var c in gkPlayers)
                                 {
                                     gkIdx++;
-                                    <li class="player-item @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                    <li class="player-item @(c.UserId == currentUserId ? "player-item--me" : "") @(detailMvpRevealed && c.UserId == detailMvpUserId ? "player-item--mvp" : "")">
                                         <span class="player-num">@gkIdx</span>
                                         <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Goleiro")</span>
                                         @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
-                                        @if (ev.IsActive && c.UserId == currentUserId && !c.HasPaid)
+                                        @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
+                                        @if (ev.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
                                         {
                                             @if (confirmCancel)
                                             {
@@ -384,7 +398,7 @@ else
                                                 </button>
                                             }
                                         }
-                                        @if (isAdmin && c.UserId != currentUserId)
+                                        @if (isAdmin && !isPastEvent && c.UserId != currentUserId)
                                         {
                                             @if (confirmRemoveId == c.Id)
                                             {
@@ -428,7 +442,7 @@ else
                                 <i class="fas fa-clock"></i> Entrar na lista de espera de goleiros
                             </button>
                         }
-                        @if (isAdmin && ev.IsActive)
+                        @if (isAdmin && ev.IsActive && !isPastEvent)
                         {
                             <div class="slot-controls">
                                 <button class="slot-ctrl-btn slot-ctrl-btn--remove"
@@ -453,10 +467,11 @@ else
                             {
                                 outIdx++;
                                 bool isRotation = outIdx > baseOut;
-                                <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
+                                <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "") @(detailMvpRevealed && c.UserId == detailMvpUserId ? "player-item--mvp" : "")">
                                     <span class="player-num">@outIdx</span>
                                     <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
                                     @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
+                                    @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
                                     @if (ev.Price.HasValue)
                                     {
                                         @if (isAdmin)
@@ -487,7 +502,7 @@ else
                                                     <i class="fas fa-check"></i> pago
                                                 </span>
                                             }
-                                            @if (c.UserId != currentUserId && c.PaymentGatewayName == null)
+                                            @if (!isPastEvent && c.UserId != currentUserId && c.PaymentGatewayName == null)
                                             {
                                                 @if (confirmRemoveId == c.Id)
                                                 {
@@ -529,7 +544,7 @@ else
                                             }
                                         }
                                     }
-                                    @if (ev.IsActive && c.UserId == currentUserId && !c.HasPaid)
+                                    @if (ev.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
                                     {
                                         @if (confirmCancel)
                                         {
@@ -574,7 +589,7 @@ else
                             <i class="fas fa-clock"></i> Entrar na lista de espera
                         </button>
                     }
-                    @if (isAdmin && ev.IsActive)
+                    @if (isAdmin && ev.IsActive && !isPastEvent)
                     {
                         <div class="slot-controls">
                             <button class="slot-ctrl-btn slot-ctrl-btn--remove"
@@ -608,7 +623,7 @@ else
                                 @if (w.UserId == currentUserId)
                                 {
                                     <span class="player-tag player-tag--me">você</span>
-                                    @if (ev.IsActive)
+                                    @if (ev.IsActive && !isPastEvent)
                                     {
                                         @if (confirmLeaveWaitlist)
                                         {
@@ -628,7 +643,7 @@ else
                                         }
                                     }
                                 }
-                                @if (isAdmin && ev.IsActive && w.UserId != currentUserId)
+                                @if (isAdmin && ev.IsActive && !isPastEvent && w.UserId != currentUserId)
                                 {
                                     <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => AdminRemoveFromWaitlist(w.Id)">
                                         <i class="fas fa-user-times"></i> remover
@@ -725,9 +740,18 @@ else
                 <div class="detail-admin-bar detail-admin-bar--footer">
                     @if (ev.LineupConfirmedAt is not null)
                     {
-                        <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
-                            <i class="fas fa-clipboard-list"></i> Ver Escalação
-                        </a>
+                        @if (isPastEvent)
+                        {
+                            <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
+                                <i class="fas fa-flag-checkered"></i> Pós-Partida
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
+                                <i class="fas fa-clipboard-list"></i> Ver Escalação
+                            </a>
+                        }
                     }
                     @if (isAdmin)
                     {
@@ -773,12 +797,14 @@ else
     private bool        isSystemAdmin     = false;
     private int?        confirmRemoveId      = null;
     private int?        confirmPayId         = null;
+    private int         eventNumber          = 0;
     private bool        confirmCancel        = false;
     private WaitingList? userWaitlistEntry   = null;
     private bool        confirmLeaveWaitlist = false;
     private GroupJoinRequest? userJoinRequest = null;
     private bool        requestingJoin      = false;
     private string      joinRequestError    = string.Empty;
+    private List<PostMatchVote> detailMvpVotes = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -816,6 +842,18 @@ else
                 .OrderByDescending(r => r.RequestedAt)
                 .FirstOrDefaultAsync();
         }
+
+        detailMvpVotes = new();
+        if (ev is not null && ev.Group.EnablePostMatchRanking)
+        {
+            var evEndsAt = ev.StartsAt.AddMinutes(ev.DurationMinutes ?? 120);
+            if (evEndsAt < DateTime.UtcNow)
+                detailMvpVotes = await db.PostMatchVotes.Where(v => v.EventId == ev.Id).ToListAsync();
+        }
+
+        if (ev is not null)
+            eventNumber = 1 + await db.Events
+                .CountAsync(e => e.GroupId == ev.GroupId && e.StartsAt < ev.StartsAt);
 
         isLoading = false;
     }

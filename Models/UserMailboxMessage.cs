@@ -6,13 +6,20 @@ public class UserMailboxMessage
 {
     public int Id { get; set; }
 
-    [Required]
-    public string SenderUserId { get; set; } = string.Empty;
+    public string? SenderUserId { get; set; }
     public ApplicationUser? SenderUser { get; set; }
+
+    /// <summary>Nome do remetente capturado no momento do envio (preservado mesmo após exclusão da conta).</summary>
+    [StringLength(100)]
+    public string? SenderDisplayName { get; set; }
 
     [Required]
     public string RecipientUserId { get; set; } = string.Empty;
     public ApplicationUser? RecipientUser { get; set; }
+
+    /// <summary>Nome do destinatário capturado no momento do envio (preservado mesmo após exclusão da conta).</summary>
+    [StringLength(100)]
+    public string? RecipientDisplayName { get; set; }
 
     [StringLength(180)]
     public string Subject { get; set; } = string.Empty;

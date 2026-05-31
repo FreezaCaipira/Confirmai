@@ -35,6 +35,11 @@ namespace Confirmai.Models
 
         public bool IsActive { get; set; } = true;
 
+        // ── Feature flags ────────────────────────────────────────────────────
+
+        /// <summary>Habilita o ranking pós-partida (mensal/anual) para o grupo.</summary>
+        public bool EnablePostMatchRanking { get; set; } = false;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [StringLength(450)]

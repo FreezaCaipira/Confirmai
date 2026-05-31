@@ -8,6 +8,8 @@
 - Regras de cancelamento/reembolso com transicoes auditaveis aplicadas ao ciclo de confirmacoes.
 - Ciclo operacional de pagamentos evoluido: multi-gateway, webhook + reconciliacao automatica/manual e paineis admin (`/admin/payments` e `/admin`) com ultimas varreduras, tendencia 24h, alerta por limiar, badge de severidade, mini grafico, limiares configuraveis, timestamp de atualizacao e auto-refresh com throttle em aba em background.
 - Hardening operacional documentado: checklist de producao, deploy, runbook de incidentes, regras de alertas e templates de monitoramento.
+- **UX/roteamento (30/05/2026):** Grupos virou a tela inicial (`/`); Explorar moveu para `/jogos`; nav reordenada (Grupos → Jogos → Pagamentos); UF select + cidade datalist IBGE no formulário de quadras (admin) e na tela Explorar; botão Voltar redundante removido do admin venue form; CSP atualizado para Google Maps (integração preparada, sem billing ativo).
+- **Pós-Partida (30/05/2026):** `Escalacao.razor` transforma em página pós-partida quando evento encerrado: placar editável (qualquer membro, com "registrado por"), votação de destaque (upsert, reveal ≥ 50%), banner MVP. `Ranking.razor` (novo) com tabs Mês/Ano/Histórico, vitórias por placar. Botão "Ranking" movido para a página do grupo (coluna de acesso na tabela de partidas). Botão "Voltar" no detalhe do evento redireciona ao grupo. 17 novos testes (`PostMatchVoteTests`, `RankingWinCalculationTests`).
 
 ## Prioridades
 
@@ -33,6 +35,13 @@
 - [ ] Completar UX operacional de grupos privados (atalhos de aprovacao/rejeicao, filtros e contexto para admins).
 - [ ] Indicadores de ocupacao, inadimplencia e conversao em pagamento.
 - [ ] Ajustes de UX responsiva e acessibilidade AA nas telas de evento.
+- [x] UF select + cidade datalist IBGE em formulario de quadras (admin) e Explorar.
+- [x] Grupos como tela inicial, nav reordenada.
+- [x] Google Maps Places autocomplete no formulário de quadras (código pronto; requer billing).
+- [x] Pós-Partida: placar editável, votação de destaque (MVP), reveal ≥ 50%, banner MVP.
+- [x] Ranking do grupo por vitórias (tabs Mês/Ano/Histórico).
+- [ ] Página de histórico de pagamentos do jogador (auto-serviço).
+- [ ] `VenueManager/VenueEdit.razor`: aplicar mesma melhoria de UF/IBGE do admin.
 
 ### P3 — Observabilidade em producao
 

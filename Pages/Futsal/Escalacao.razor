@@ -14,7 +14,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
-<PageTitle>Escalação · Confirmai</PageTitle>
+<PageTitle>@(isPastEvent ? "Pós-Partida" : "Escalação") · Confirmai</PageTitle>
 
 @if (isLoading)
 {
@@ -27,12 +27,30 @@ else if (ev is null)
         <a href="/futsal">← Voltar</a>
     </div>
 }
-else if (ev.LineupConfirmedAt is null && !isAdmin)
+else if (!isPastEvent && ev.LineupConfirmedAt is null && !isAdmin)
 {
-    <div class="esc-unavailable">
-        <i class="fas fa-lock"></i>
-        <p>A escalação ainda não foi montada pelo organizador.</p>
-        <a href="/futsal/@ev.Id">← Voltar à partida</a>
+    <div class="esc-page">
+        <div class="esc-card esc-card--gate">
+            <div class="esc-gate">
+                <div class="esc-gate-icon"><i class="fas fa-lock"></i></div>
+                <h2 class="esc-gate-title">Escalação não disponível</h2>
+                <p class="esc-gate-msg">A escalação ainda não foi montada pelo organizador.</p>
+                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar à partida</a>
+            </div>
+        </div>
+    </div>
+}
+else if (isPastEvent && !isMember && !isAdmin)
+{
+    <div class="esc-page">
+        <div class="esc-card esc-card--gate">
+            <div class="esc-gate">
+                <div class="esc-gate-icon esc-gate-icon--past"><i class="fas fa-flag-checkered"></i></div>
+                <h2 class="esc-gate-title">Pós-Partida</h2>
+                <p class="esc-gate-msg">Apenas membros do grupo podem ver o resumo e votar no destaque.</p>
+                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar à partida</a>
+            </div>
+        </div>
     </div>
 }
 else
@@ -42,7 +60,11 @@ else
             <header class="esc-header">
                 <div class="esc-header-top">
                     <h1 class="esc-title">
-                        @if (ev.LineupConfirmedAt is null)
+                        @if (isPastEvent)
+                        {
+                            <span><i class="fas fa-flag-checkered"></i> Pós-Partida</span>
+                        }
+                        else if (ev.LineupConfirmedAt is null)
                         {
                             <span>Montar Escalação</span>
                         }
@@ -65,50 +87,82 @@ else
                 var confA       = ev.Confirmations.Where(c => c.TeamId == 0).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
                 var confB       = ev.Confirmations.Where(c => c.TeamId == 1).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
                 var confReserva = ev.Confirmations.Where(c => c.TeamId == null).OrderBy(c => c.ConfirmedAt).ToList();
+                var mvpGroup    = allVotes.GroupBy(v => v.VotedForUserId).OrderByDescending(g => g.Count()).FirstOrDefault();
+                var mvpUserId   = mvpGroup?.Key;
+                int mvpTotalVoters = ev.Confirmations.Count(c => c.TeamId == 0 || c.TeamId == 1);
+                bool mvpRevealed   = isPastEvent && mvpUserId is not null
+                                     && allVotes.Count >= Math.Max(1, (int)Math.Ceiling(mvpTotalVoters * 0.5));
 
-                <div class="esc-confirmed-badge">
-                    <i class="fas fa-check-circle"></i>
-                    Escalação confirmada em @ev.LineupConfirmedAt.Value.ToLocalTime().ToString("dd/MM HH:mm")
-                </div>
+                @if (!isPastEvent)
+                {
+                    <div class="esc-confirmed-badge">
+                        <i class="fas fa-check-circle"></i>
+                        Escalação confirmada em @ev.LineupConfirmedAt.Value.ToLocalTime().ToString("dd/MM HH:mm")
+                    </div>
+                }
 
                 <div class="esc-teams">
                     <div class="esc-team esc-team--a">
-                        <h2 class="esc-team-title">🟡 Time A</h2>
+                        @if (!isPastEvent && isAdmin)
+                        {
+                            <input class="esc-team-name-input esc-team-name-input--a"
+                                   @bind="teamAName" @bind:event="oninput"
+                                   @onblur="SaveTeamNames"
+                                   maxlength="50" placeholder="Time A" />
+                        }
+                        else
+                        {
+                            <h2 class="esc-team-title">🟡 @teamAName @(isPastEvent && ev.ScoreTeamA > ev.ScoreTeamB ? "🏆" : "")</h2>
+                        }
                         <ul class="esc-player-list">
                             @foreach (var c in confA.Where(c => c.Position == FutsalPosition.Goalkeeper))
                             {
-                                <li class="esc-player esc-player--gk">
+                                <li class="esc-player esc-player--gk @(mvpRevealed && c.UserId == mvpUserId ? "esc-player--mvp" : "")">
                                     <span class="esc-player-icon">🥅</span>
                                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
+                                    @if (mvpRevealed && c.UserId == mvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
                                 </li>
                             }
                             @{ int numA = 1; }
                             @foreach (var c in confA.Where(c => c.Position != FutsalPosition.Goalkeeper))
                             {
-                                <li class="esc-player">
+                                <li class="esc-player @(mvpRevealed && c.UserId == mvpUserId ? "esc-player--mvp" : "")">
                                     <span class="esc-player-num">@(numA++)</span>
                                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
+                                    @if (mvpRevealed && c.UserId == mvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
                                 </li>
                             }
                         </ul>
                     </div>
 
                     <div class="esc-team esc-team--b">
-                        <h2 class="esc-team-title">🔵 Time B</h2>
+                        @if (!isPastEvent && isAdmin)
+                        {
+                            <input class="esc-team-name-input esc-team-name-input--b"
+                                   @bind="teamBName" @bind:event="oninput"
+                                   @onblur="SaveTeamNames"
+                                   maxlength="50" placeholder="Time B" />
+                        }
+                        else
+                        {
+                            <h2 class="esc-team-title">🔵 @teamBName @(isPastEvent && ev.ScoreTeamB > ev.ScoreTeamA ? "🏆" : "")</h2>
+                        }
                         <ul class="esc-player-list">
                             @foreach (var c in confB.Where(c => c.Position == FutsalPosition.Goalkeeper))
                             {
-                                <li class="esc-player esc-player--gk">
+                                <li class="esc-player esc-player--gk @(mvpRevealed && c.UserId == mvpUserId ? "esc-player--mvp" : "")">
                                     <span class="esc-player-icon">🥅</span>
                                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
+                                    @if (mvpRevealed && c.UserId == mvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
                                 </li>
                             }
                             @{ int numB = 1; }
                             @foreach (var c in confB.Where(c => c.Position != FutsalPosition.Goalkeeper))
                             {
-                                <li class="esc-player">
+                                <li class="esc-player @(mvpRevealed && c.UserId == mvpUserId ? "esc-player--mvp" : "")">
                                     <span class="esc-player-num">@(numB++)</span>
                                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
+                                    @if (mvpRevealed && c.UserId == mvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
                                 </li>
                             }
                         </ul>
@@ -130,6 +184,177 @@ else
                     </div>
                 }
 
+                @* ── Placar pós-partida ───────────────────────────────── *@
+                @if (isPastEvent)
+                {
+                    <div class="esc-score-section">
+                        <div class="esc-section-header">
+                            <h3 class="esc-section-title"><i class="fas fa-futbol"></i> Placar</h3>
+                            @if (ev.ScoreTeamA is not null && ev.ScoreTeamB is not null && !editingScore)
+                            {
+                                <button class="esc-btn esc-btn--danger-ghost esc-btn--sm" @onclick="() => editingScore = true">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            }
+                        </div>
+                        @if (ev.ScoreTeamA is not null && ev.ScoreTeamB is not null && !editingScore)
+                        {
+                            <div class="esc-score-display">
+                                <span class="esc-score-team">🟡 @teamAName</span>
+                                <span class="esc-score-value">@ev.ScoreTeamA</span>
+                                <span class="esc-score-sep">×</span>
+                                <span class="esc-score-value">@ev.ScoreTeamB</span>
+                                <span class="esc-score-team">@teamBName 🔵</span>
+                            </div>
+                            @if (ev.ScoreTeamA > ev.ScoreTeamB)
+                            {
+                                <p class="esc-score-winner esc-score-winner--a">🏆 @teamAName venceu!</p>
+                            }
+                            else if (ev.ScoreTeamB > ev.ScoreTeamA)
+                            {
+                                <p class="esc-score-winner esc-score-winner--b">🏆 @teamBName venceu!</p>
+                            }
+                            else
+                            {
+                                <p class="esc-score-winner esc-score-winner--draw">🤝 Empate</p>
+                            }
+                            @if (scoreRegisteredByName is not null)
+                            {
+                                <p class="esc-score-registered-by">
+                                    <i class="fas fa-user-check"></i> Registrado por <strong>@scoreRegisteredByName</strong>
+                                    @if (ev.ScoreRegisteredAt is not null)
+                                    {
+                                        <span class="esc-score-registered-when">em @ev.ScoreRegisteredAt.Value.ToLocalTime().ToString("dd/MM HH:mm")</span>
+                                    }
+                                </p>
+                            }
+                        }
+                        else if (isMember || isAdmin || editingScore)
+                        {
+                            <div class="esc-score-inputs" style="margin-top:.25rem">
+                                <label class="esc-score-label">🟡 @teamAName</label>
+                                <input class="esc-score-input" type="number" min="0" max="99"
+                                       @bind="scoreInputA" @bind:event="oninput" placeholder="0" />
+                                <span class="esc-score-sep">×</span>
+                                <input class="esc-score-input" type="number" min="0" max="99"
+                                       @bind="scoreInputB" @bind:event="oninput" placeholder="0" />
+                                <label class="esc-score-label">@teamBName 🔵</label>
+                            </div>
+                            @if (scoreError is not null)
+                            {
+                                <p class="esc-error">@scoreError</p>
+                            }
+                            <div class="esc-score-actions">
+                                <button class="esc-btn esc-btn--primary esc-btn--sm" @onclick="SaveScore" disabled="@isSaving">
+                                    <i class="fas fa-check"></i> @(isSaving ? "Salvando…" : "Confirmar placar")
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="esc-hint"><i class="fas fa-clock"></i> Placar ainda não registrado.</p>
+                        }
+                    </div>
+                }
+
+                @* ── Votação no destaque ──────────────────────────────── *@
+                @if (isPastEvent && ev.Group.EnablePostMatchRanking && (isMember || isAdmin))
+                {
+                    var votePlayers = ev.Confirmations
+                        .Where(c => c.TeamId == 0 || c.TeamId == 1)
+                        .OrderBy(c => c.TeamId).ThenBy(c => c.Position).ThenBy(c => c.ConfirmedAt)
+                        .ToList();
+                    int totalVoters = votePlayers.Count;
+                    int voteCount   = allVotes.Count;
+                    bool revealed   = voteCount >= Math.Max(1, (int)Math.Ceiling(totalVoters * 0.5));
+
+                    <div class="esc-vote-section">
+                        <div class="esc-section-header">
+                            <h3 class="esc-section-title"><i class="fas fa-star"></i> Destaque da Partida</h3>
+                            <span class="esc-vote-progress-pill">@voteCount/@totalVoters votos</span>
+                        </div>
+
+                        @if (revealed)
+                        {
+                            @* Show MVP result *@
+                            var mvp = allVotes
+                                .GroupBy(v => v.VotedForUserId)
+                                .OrderByDescending(g => g.Count())
+                                .FirstOrDefault();
+                            var mvpName = mvp is not null
+                                ? (votePlayers.FirstOrDefault(p => p.UserId == mvp.Key)?.User?.FullName
+                                   ?? votePlayers.FirstOrDefault(p => p.UserId == mvp.Key)?.User?.Email
+                                   ?? "—")
+                                : "—";
+
+                            <div class="esc-mvp-banner">
+                                <span class="esc-mvp-trophy">🏆</span>
+                                <div>
+                                    <p class="esc-mvp-label">Destaque</p>
+                                    <p class="esc-mvp-name">@mvpName</p>
+                                    <p class="esc-mvp-votes">@(mvp?.Count() ?? 0) votos · @voteCount/@totalVoters votaram</p>
+                                </div>
+                            </div>
+
+                            @* Still show your vote *@
+                            @if (myVote is not null)
+                            {
+                                var myVoteName = votePlayers.FirstOrDefault(p => p.UserId == myVote.VotedForUserId)?.User?.FullName
+                                                 ?? votePlayers.FirstOrDefault(p => p.UserId == myVote.VotedForUserId)?.User?.Email
+                                                 ?? "—";
+                                <p class="esc-vote-mine"><i class="fas fa-check-circle"></i> Seu voto: <strong>@myVoteName</strong></p>
+                            }
+                        }
+                        else if (myVote is not null && !isEditingVote)
+                        {
+                            @* Voted but not revealed yet – show pending + Trocar voto *@
+                            var myVoteName = votePlayers.FirstOrDefault(p => p.UserId == myVote.VotedForUserId)?.User?.FullName
+                                             ?? votePlayers.FirstOrDefault(p => p.UserId == myVote.VotedForUserId)?.User?.Email
+                                             ?? "—";
+                            <div class="esc-vote-pending">
+                                <i class="fas fa-check-circle"></i>
+                                <p>Seu voto: <strong>@myVoteName</strong> — aguardando mais votos…</p>
+                                <button class="esc-vote-change-btn" @onclick="() => isEditingVote = true">
+                                    <i class="fas fa-pen"></i> Trocar
+                                </button>
+                            </div>
+                        }
+                        else if (currentUserId is not null && votePlayers.Any(p => p.UserId == currentUserId))
+                        {
+                            @* Can vote (first time or editing) *@
+                            <p class="esc-vote-hint">@(isEditingVote ? "Escolha um novo destaque:" : "Toque em quem foi o craque da partida:")</p>
+                            <ul class="esc-vote-list">
+                                @foreach (var p in votePlayers)
+                                {
+                                    bool isMe     = p.UserId == currentUserId;
+                                    bool isMyPick = myVote?.VotedForUserId == p.UserId;
+                                    <li class="esc-vote-item @(isMe ? "esc-vote-item--me" : "") @(isMyPick ? "esc-vote-item--current" : "")"
+                                        @onclick="@(isMe ? null : () => CastVote(p.UserId))"
+                                        title="@(isMe ? "Você não pode votar em si mesmo" : $"Votar em {p.User?.FullName ?? p.User?.Email}")">
+                                        <span class="esc-vote-team-badge @(p.TeamId == 0 ? "esc-vote-team-badge--a" : "esc-vote-team-badge--b")">@(p.TeamId == 0 ? "A" : "B")</span>
+                                        <span class="esc-vote-name">@(p.User?.FullName ?? p.User?.Email)</span>
+                                        @if (isMe)     { <span class="player-tag player-tag--me">você</span> }
+                                        @if (isMyPick) { <span class="esc-vote-current-tag"><i class="fas fa-check"></i></span> }
+                                    </li>
+                                }
+                            </ul>
+                            @if (isEditingVote)
+                            {
+                                <button class="esc-btn esc-btn--secondary esc-btn--sm" style="margin-top:.5rem" @onclick="() => isEditingVote = false">
+                                    Cancelar
+                                </button>
+                            }
+                            @if (voteError is not null) { <p class="esc-error">@voteError</p> }
+                        }
+                        else
+                        {
+                            <p class="esc-hint"><i class="fas fa-info-circle"></i> Apenas jogadores escalados podem votar.</p>
+                        }
+                    </div>
+                }
+
+                @if (!isPastEvent)
+                {
                 <div class="esc-share-bar">
                     <button class="esc-btn esc-btn--secondary" @onclick="CopyToClipboard">
                         <i class="fas @(copied ? "fa-check" : "fa-copy")"></i>
@@ -139,8 +364,9 @@ else
                         <i class="fab fa-whatsapp"></i> Compartilhar no WhatsApp
                     </button>
                 </div>
+                }
 
-                @if (isAdmin)
+                @if (isAdmin && !isPastEvent)
                 {
                     @if (!showResetModal)
                     {
@@ -172,7 +398,17 @@ else
             {
                 <div class="esc-teams">
                     <div class="esc-team esc-team--a">
-                        <h2 class="esc-team-title">🟡 Time A</h2>
+                        @if (isAdmin)
+                        {
+                            <input class="esc-team-name-input esc-team-name-input--a"
+                                   @bind="teamAName" @bind:event="oninput"
+                                   @onblur="SaveTeamNames"
+                                   maxlength="50" placeholder="Time A" />
+                        }
+                        else
+                        {
+                            <h2 class="esc-team-title">🟡 @teamAName</h2>
+                        }
                         <ul class="esc-player-list">
                             @foreach (var s in teamA.Where(s => s.IsGoalkeeper))
                             {
@@ -199,7 +435,17 @@ else
                     </div>
 
                     <div class="esc-team esc-team--b">
-                        <h2 class="esc-team-title">🔵 Time B</h2>
+                        @if (isAdmin)
+                        {
+                            <input class="esc-team-name-input esc-team-name-input--b"
+                                   @bind="teamBName" @bind:event="oninput"
+                                   @onblur="SaveTeamNames"
+                                   maxlength="50" placeholder="Time B" />
+                        }
+                        else
+                        {
+                            <h2 class="esc-team-title">🔵 @teamBName</h2>
+                        }
                         <ul class="esc-player-list">
                             @foreach (var s in teamB.Where(s => s.IsGoalkeeper))
                             {
@@ -297,6 +543,21 @@ else
     private bool    copied           = false;
     private string? actionError;
 
+    // ── Post-match state ─────────────────────────────────────────────────────
+    private bool isPastEvent;
+    private bool isMember;
+    private List<PostMatchVote> allVotes = new();
+    private PostMatchVote?       myVote;
+    private int?   scoreInputA;
+    private int?   scoreInputB;
+    private bool   editingScore = false;
+    private string? scoreError;
+    private string? voteError;
+    private string? scoreRegisteredByName;
+    private bool   isEditingVote = false;
+    private string  teamAName     = "Time A";
+    private string  teamBName     = "Time B";
+
     private bool TeamsAreBalanced =>
         Math.Abs(teamA.Count(s => !s.IsGoalkeeper) - teamB.Count(s => !s.IsGoalkeeper)) <= 1;
 
@@ -321,7 +582,52 @@ else
             .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
         isAdmin = EventAccess.IsAdmin(ev, currentUserId);
+
+        if (ev is not null)
+        {
+            isPastEvent = ev.StartsAt.AddMinutes(ev.DurationMinutes ?? 120) < DateTime.UtcNow;
+            isMember    = currentUserId is not null &&
+                          ev.Group.Members.Any(m => m.UserId == currentUserId);
+
+            allVotes = await db.PostMatchVotes
+                .Where(v => v.EventId == Id)
+                .ToListAsync();
+            myVote = currentUserId is not null
+                ? allVotes.FirstOrDefault(v => v.VoterUserId == currentUserId)
+                : null;
+
+            scoreInputA = ev.ScoreTeamA;
+            scoreInputB = ev.ScoreTeamB;
+
+            if (ev.ScoreRegisteredByUserId is not null)
+            {
+                var registrant = await db.Users
+                    .Where(u => u.Id == ev.ScoreRegisteredByUserId)
+                    .Select(u => u.FullName ?? u.Email)
+                    .FirstOrDefaultAsync();
+                scoreRegisteredByName = registrant;
+            }
+
+            teamAName = ev.TeamAName ?? "Time A";
+            teamBName = ev.TeamBName ?? "Time B";
+        }
+
         isLoading = false;
+    }
+
+    private async Task SaveTeamNames()
+    {
+        if (ev is null) return;
+        var nameA = string.IsNullOrWhiteSpace(teamAName) ? "Time A" : teamAName.Trim();
+        var nameB = string.IsNullOrWhiteSpace(teamBName) ? "Time B" : teamBName.Trim();
+        teamAName = nameA;
+        teamBName = nameB;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var dbEv = await db.Events.FindAsync(Id);
+        if (dbEv is null) return;
+        dbEv.TeamAName = nameA == "Time A" ? null : nameA;
+        dbEv.TeamBName = nameB == "Time B" ? null : nameB;
+        await db.SaveChangesAsync();
     }
 
     private void Randomize()
@@ -418,6 +724,60 @@ else
         isSaving         = false;
         await LoadEvent();
     }
+
+    // ── Post-match methods ───────────────────────────────────────────────────
+
+    private async Task CastVote(string votedForUserId)
+    {
+        if (currentUserId is null || votedForUserId == currentUserId) return;
+        voteError = null;
+        isSaving  = true;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var existing = await db.PostMatchVotes
+            .FirstOrDefaultAsync(v => v.EventId == Id && v.VoterUserId == currentUserId);
+        if (existing is not null)
+        {
+            existing.VotedForUserId = votedForUserId;
+            existing.VotedAt        = DateTime.UtcNow;
+        }
+        else
+        {
+            db.PostMatchVotes.Add(new PostMatchVote
+            {
+                EventId        = Id,
+                VoterUserId    = currentUserId,
+                VotedForUserId = votedForUserId,
+            });
+        }
+        await db.SaveChangesAsync();
+        isEditingVote = false;
+        isSaving      = false;
+        await LoadEvent();
+    }
+
+    private async Task SaveScore()
+    {
+        if (scoreInputA is null || scoreInputB is null) return;
+        scoreError = null;
+        isSaving   = true;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var dbEv = await db.Events.FindAsync(Id);
+        if (dbEv is not null)
+        {
+            dbEv.ScoreTeamA              = scoreInputA;
+            dbEv.ScoreTeamB              = scoreInputB;
+            dbEv.ScoreRegisteredByUserId = currentUserId;
+            dbEv.ScoreRegisteredAt       = DateTime.UtcNow;
+            await db.SaveChangesAsync();
+        }
+        editingScore = false;
+        isSaving     = false;
+        await LoadEvent();
+    }
+
+    // ── Escalação methods ────────────────────────────────────────────────────
 
     private async Task ResetarEscalacao()
     {

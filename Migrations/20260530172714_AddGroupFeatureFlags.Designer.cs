@@ -3,6 +3,7 @@ using System;
 using Confirmai.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Confirmai.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260530172714_AddGroupFeatureFlags")]
+    partial class AddGroupFeatureFlags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -319,19 +322,6 @@ namespace Confirmai.Migrations
                     b.Property<decimal?>("RebuyDoubleAmount")
                         .HasColumnType("numeric");
 
-                    b.Property<DateTime?>("ScoreRegisteredAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ScoreRegisteredByUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)");
-
-                    b.Property<int?>("ScoreTeamA")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ScoreTeamB")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Sport")
                         .HasColumnType("integer");
 
@@ -340,14 +330,6 @@ namespace Confirmai.Migrations
 
                     b.Property<DateTime>("StartsAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("TeamAName")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("TeamBName")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
 
                     b.Property<int?>("VenueId")
                         .HasColumnType("integer");
@@ -701,42 +683,6 @@ namespace Confirmai.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("Confirmai.Models.PostMatchVote", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("VotedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("VotedForUserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)");
-
-                    b.Property<string>("VoterUserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VotedForUserId");
-
-                    b.HasIndex("VoterUserId");
-
-                    b.HasIndex("EventId", "VoterUserId")
-                        .IsUnique();
-
-                    b.ToTable("PostMatchVotes");
                 });
 
             modelBuilder.Entity("Confirmai.Models.Product", b =>
@@ -1247,33 +1193,6 @@ namespace Confirmai.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Confirmai.Models.PostMatchVote", b =>
-                {
-                    b.HasOne("Confirmai.Models.Event", "Event")
-                        .WithMany("PostMatchVotes")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Confirmai.Models.ApplicationUser", "VotedFor")
-                        .WithMany()
-                        .HasForeignKey("VotedForUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Confirmai.Models.ApplicationUser", "Voter")
-                        .WithMany()
-                        .HasForeignKey("VoterUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-
-                    b.Navigation("VotedFor");
-
-                    b.Navigation("Voter");
-                });
-
             modelBuilder.Entity("Confirmai.Models.Product", b =>
                 {
                     b.HasOne("Confirmai.Models.ApplicationUser", "User")
@@ -1385,8 +1304,6 @@ namespace Confirmai.Migrations
             modelBuilder.Entity("Confirmai.Models.Event", b =>
                 {
                     b.Navigation("Confirmations");
-
-                    b.Navigation("PostMatchVotes");
 
                     b.Navigation("WaitingList");
                 });
