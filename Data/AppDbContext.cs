@@ -327,6 +327,14 @@ namespace Confirmai.Data
                 .HasIndex(g => g.InviteCode)
                 .IsUnique();
 
+            // Group PixReceiverUser — SetNull when user is deleted
+            modelBuilder.Entity<Group>()
+                .HasOne(g => g.PixReceiverUser)
+                .WithMany()
+                .HasForeignKey(g => g.PixReceiverUserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // RachaSchedule
             modelBuilder.Entity<MatchSchedule>()
                 .HasOne(rs => rs.Group)

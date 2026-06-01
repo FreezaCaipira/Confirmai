@@ -7,6 +7,7 @@
 @using Microsoft.JSInterop
 
 @inject BitcoinPaymentFactory PaymentFactory
+@inject EventPaymentGatewayFactory EventGatewayFactory
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 @inject GatewayService GatewayService
@@ -29,11 +30,13 @@
                     <tr>
                         <th>@T["Common.Name"]</th>
                         <th class="status-col">@T["Common.Status"]</th>
+                        <th class="status-col">@T["AdminGateways.CredentialsHeader"]</th>
                     </tr>
                 </thead>
                 <tbody>
                 @foreach (var method in methods)
                 {
+                    var isConfigured = configuredGatewayNames.Contains(method.Name);
                     <tr>
                         <td>@method.Name</td>
                         <td class="gateway-status">
@@ -47,6 +50,16 @@
                             <span class="gateway-status-label @(method.Enabled ? "active" : "inactive")">
                                 @(method.Enabled ? T["AdminGateways.Active"] : T["AdminGateways.Inactive"])
                             </span>
+                        </td>
+                        <td class="gateway-status">
+                            @if (isConfigured)
+                            {
+                                <span class="gateway-status-label active">@T["AdminGateways.Configured"]</span>
+                            }
+                            else
+                            {
+                                <span class="gateway-status-label inactive" title="@T["AdminGateways.NotConfiguredHint"]">⚠ @T["AdminGateways.NotConfigured"]</span>
+                            }
                         </td>
                     </tr>
                 }
@@ -63,6 +76,7 @@
 
 @code {
     private List<GatewayInfo> methods = new();
+    private HashSet<string> configuredGatewayNames = new();
     private bool isLoading = true;
     [CascadingParameter] public Toast ToastRef { get; set; } = default!;
     
@@ -70,6 +84,7 @@
     {
         isLoading = true;
         methods = await GatewayService.GetAllAsync();
+        configuredGatewayNames = EventGatewayFactory.GetConfiguredNames();
         isLoading = false;
     }
 

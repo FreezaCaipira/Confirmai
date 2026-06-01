@@ -56,4 +56,12 @@ public sealed class EventPaymentGatewayFactory
     {
         return _gateways.Where(g => g.IsAvailable).ToList();
     }
+
+    public HashSet<string> GetConfiguredNames()
+    {
+        return _gateways
+            .Where(g => g.IsAvailable)
+            .Select(g => g.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
 }

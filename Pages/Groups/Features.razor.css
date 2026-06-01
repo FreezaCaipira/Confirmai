@@ -127,3 +127,159 @@
 .features-save-msg--error {
     color: #f87171;
 }
+
+/* ── Membros & Permissões ────────────────────────────────────────── */
+.feat-members-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.feat-member-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    background: rgba(15, 26, 48, 0.7);
+    border: 1px solid rgba(51, 76, 120, 0.4);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+}
+
+.feat-member-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.feat-member-name {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.feat-role-btn {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}
+
+.feat-role-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.feat-role-btn--promote {
+    background: rgba(96, 165, 250, 0.1);
+    border-color: rgba(96, 165, 250, 0.5);
+    color: #93c5fd;
+}
+
+.feat-role-btn--promote:not(:disabled):hover {
+    background: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.8);
+    color: #bfdbfe;
+}
+
+.feat-role-btn--demote {
+    background: rgba(248, 113, 113, 0.1);
+    border-color: rgba(248, 113, 113, 0.5);
+    color: #fca5a5;
+}
+
+.feat-role-btn--demote:not(:disabled):hover {
+    background: rgba(248, 113, 113, 0.2);
+    border-color: rgba(248, 113, 113, 0.8);
+    color: #fecaca;
+}
+
+/* ── Pix do Organizador ─────────────────────────────────────────── */
+.feat-pix-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.06);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+}
+
+.feat-pix-profile-link {
+    color: #60a5fa;
+    text-decoration: underline;
+    font-size: 0.85rem;
+}
+
+.feat-pix-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.feat-pix-label {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.feat-pix-select {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(15, 26, 48, 0.8);
+    border: 1px solid rgba(51, 76, 120, 0.6);
+    border-radius: 7px;
+    color: #e2e8f0;
+    font-size: 0.875rem;
+    padding: 0.45rem 0.7rem;
+}
+
+.feat-pix-select:disabled {
+    opacity: 0.5;
+}
+
+.feat-pix-save-btn {
+    background: rgba(74, 222, 128, 0.12);
+    border: 1px solid rgba(74, 222, 128, 0.45);
+    color: #86efac;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+}
+
+.feat-pix-save-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.feat-pix-save-btn:not(:disabled):hover {
+    background: rgba(74, 222, 128, 0.22);
+    border-color: rgba(74, 222, 128, 0.7);
+    color: #bbf7d0;
+}

@@ -70,11 +70,12 @@
                     var isAdmin = IsCurrentUserAdmin(g);
                     var pendingCount = GetPendingRequestsCount(g.Id);
                     var hasPending = isAdmin && pendingCount > 0;
+                    var needsPix = GroupNeedsPixSetup(g);
                     var nextEvent = g.Events
                         .Where(e => e.IsActive && e.StartsAt > DateTime.UtcNow)
                         .OrderBy(e => e.StartsAt)
                         .FirstOrDefault();
-                    <a class="group-card @(hasPending ? "group-card--action-required" : "")" href="/grupo/@g.Id">
+                    <a class="group-card @(hasPending || needsPix ? "group-card--action-required" : "")" href="/grupo/@g.Id">
                         <div class="group-card-top">
                             <span class="group-card-sport">
                                 @(g.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
@@ -86,6 +87,10 @@
                                     @if (hasPending)
                                     {
                                         <span class="player-tag player-tag--pending-requests">@pendingCount pendente@(pendingCount == 1 ? string.Empty : "s")</span>
+                                    }
+                                    @if (needsPix)
+                                    {
+                                        <span class="player-tag player-tag--pix-missing" title="Nenhum admin tem chave Pix cadastrada">⚠ Pix pendente</span>
                                     }
                                 }
                                 @if (!g.IsActive)
@@ -177,6 +182,7 @@
         groups = await db.Groups
             .Where(g => g.Members.Any(m => m.UserId == currentUserId))
             .Include(g => g.Members)
+                .ThenInclude(m => m.User)
             .Include(g => g.Events.Where(e => e.IsActive && e.StartsAt > DateTime.UtcNow))
             .OrderByDescending(g => g.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin))
             .ThenBy(g => g.Name)
@@ -210,6 +216,10 @@
 
     private int GetPendingRequestsCount(int groupId)
         => pendingJoinRequestsByGroup.TryGetValue(groupId, out var pendingCount) ? pendingCount : 0;
+
+    private bool GroupNeedsPixSetup(Group group)
+        => IsCurrentUserAdmin(group)
+        && !group.Members.Any(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey));
 
     private void JoinWithCode()
     {

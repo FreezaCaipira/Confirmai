@@ -6,6 +6,77 @@
     margin-right: auto;
 }
 
+/* ── Pix Direto do Organizador ───────────────────────────────── */
+.evpay-admin-pix {
+    margin-top: 1.5rem;
+    background: rgba(10, 36, 22, 0.55);
+    border: 1px solid rgba(74, 222, 128, 0.25);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+}
+
+.evpay-admin-pix-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #86efac;
+    margin-bottom: 0.5rem;
+}
+
+.evpay-admin-pix-hint {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin: 0 0 0.75rem;
+    line-height: 1.45;
+}
+
+.evpay-admin-pix-key {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.evpay-admin-pix-code {
+    flex: 1;
+    background: rgba(15, 26, 48, 0.7);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #d1fae5;
+    word-break: break-all;
+    user-select: all;
+}
+
+.evpay-admin-pix-copy {
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: #86efac;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}
+
+.evpay-admin-pix-copy:hover {
+    background: rgba(74, 222, 128, 0.2);
+    border-color: rgba(74, 222, 128, 0.65);
+    color: #bbf7d0;
+}
+
 .evpay-main {
     width: 100%;
     max-width: 100%;

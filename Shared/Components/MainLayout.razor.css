@@ -1,4 +1,36 @@
-﻿.sidebar {
+﻿/* ── Cycling nav icon (Jogos) ──────────────────────────────────────────── */
+.nav-icon-cycle {
+    display: inline-grid;
+    vertical-align: middle;
+}
+
+.nav-icon-cycle > * {
+    grid-area: 1 / 1;
+}
+
+.nav-icon--a {
+    animation: nav-icon-show-a 10s ease-in-out infinite;
+}
+
+.nav-icon--b {
+    animation: nav-icon-show-b 10s ease-in-out infinite;
+    line-height: 1;
+    font-style: normal;
+}
+
+@keyframes nav-icon-show-a {
+    0%, 45%  { opacity: 1; }
+    50%, 95% { opacity: 0; }
+    100%     { opacity: 1; }
+}
+
+@keyframes nav-icon-show-b {
+    0%, 45%  { opacity: 0; }
+    50%, 95% { opacity: 1; }
+    100%     { opacity: 0; }
+}
+
+.sidebar {
     position: fixed;
     left: 0;
     top: 0;

@@ -181,6 +181,30 @@
                         }
                     </button>
                     }
+
+                    @* ── Pix Direto do Organizador ─────────────────────── *@
+                    @{ var adminPixKey = GetGroupAdminPixKey(ev.Group); }
+                    @if (!string.IsNullOrWhiteSpace(adminPixKey))
+                    {
+                        <div class="evpay-admin-pix">
+                            <div class="evpay-admin-pix-header">
+                                <i class="fas fa-qrcode"></i>
+                                <span>Pix direto ao organizador</span>
+                            </div>
+                            <p class="evpay-admin-pix-hint">
+                                Copie a chave Pix abaixo e transfira R$ @ev.Price!.Value.ToString("N2", ptBr) diretamente.
+                                O organizador confirmará o recebimento.
+                            </p>
+                            <div class="evpay-admin-pix-key">
+                                <code class="evpay-admin-pix-code">@adminPixKey</code>
+                                <button type="button" class="evpay-admin-pix-copy"
+                                        @onclick="() => CopyAdminPixKey(adminPixKey)">
+                                    <i class="fas @(copiedAdminPix ? "fa-check" : "fa-copy")"></i>
+                                    @(copiedAdminPix ? "Copiado!" : "Copiar")
+                                </button>
+                            </div>
+                        </div>
+                    }
                 }
             }
 
@@ -204,6 +228,7 @@
     private PayState payState = PayState.Idle;
     private string?  brCode;
     private bool     copied;
+    private bool     copiedAdminPix;
     private CancellationTokenSource? _pollCts;
 
     protected override async Task OnInitializedAsync()
@@ -213,7 +238,7 @@
 
         await using var db = await DbFactory.CreateDbContextAsync();
         conf = await db.EventConfirmations
-            .Include(c => c.Event).ThenInclude(e => e.Group)
+            .Include(c => c.Event).ThenInclude(e => e.Group).ThenInclude(g => g.Members).ThenInclude(m => m.User)
             .Include(c => c.User)
             .FirstOrDefaultAsync(c => c.Id == ConfirmationId && c.UserId == userId);
 
@@ -364,6 +389,38 @@
             .FirstOrDefault(g => string.Equals(g.Name, selectedGatewayName, StringComparison.OrdinalIgnoreCase))
             ?.DisplayName
             ?? "Pix";
+    }
+
+    /// <summary>
+    /// Returns the Pix key of the group's designated payment receiver.
+    /// Falls back to the first admin that has a PixKey configured.
+    /// </summary>
+    private static string? GetGroupAdminPixKey(Group group)
+    {
+        // Prefer the explicitly chosen receiver
+        if (!string.IsNullOrWhiteSpace(group.PixReceiverUserId))
+        {
+            var chosen = group.Members
+                .FirstOrDefault(m => m.UserId == group.PixReceiverUserId);
+            if (!string.IsNullOrWhiteSpace(chosen?.User?.PixKey))
+                return chosen.User.PixKey;
+        }
+
+        // Fallback: first admin with a Pix key
+        return group.Members
+            .Where(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey))
+            .OrderBy(m => m.CreatedAt)
+            .Select(m => m.User!.PixKey)
+            .FirstOrDefault();
+    }
+
+    private async Task CopyAdminPixKey(string key)
+    {
+        copiedAdminPix = true;
+        StateHasChanged();
+        await Task.Delay(2000);
+        copiedAdminPix = false;
+        StateHasChanged();
     }
 
     private IReadOnlyList<EventPaymentGatewayOption> GetComingSoonGateways()

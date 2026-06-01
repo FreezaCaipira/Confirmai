@@ -45,6 +45,14 @@ namespace Confirmai.Models
         [StringLength(450)]
         public string? CreatedByUserId { get; set; }
 
+        /// <summary>
+        /// UserId do admin cujo PixKey será exibido como destino de pagamento dos eventos deste grupo.
+        /// Se nulo, usa o primeiro admin encontrado que tenha PixKey configurado.
+        /// </summary>
+        [StringLength(450)]
+        public string? PixReceiverUserId { get; set; }
+        public ApplicationUser? PixReceiverUser { get; set; }
+
         public ICollection<GroupMember> Members { get; set; } = new List<GroupMember>();
         public ICollection<Event> Events { get; set; } = new List<Event>();
     }

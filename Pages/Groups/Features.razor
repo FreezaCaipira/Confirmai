@@ -29,6 +29,9 @@ else if (group is null || !isAdmin)
 }
 else
 {
+    var adminMembers   = members.Where(m => m.Role == GroupMemberRole.Admin).ToList();
+    var pixAdmins      = adminMembers.Where(m => !string.IsNullOrWhiteSpace(m.User?.PixKey)).ToList();
+
     <div class="detail-page">
         <div class="detail-card">
 
@@ -44,6 +47,7 @@ else
                 <h1 class="detail-title">Configurações do grupo</h1>
             </header>
 
+            @* ── Funcionalidades ────────────────────────────────────── *@
             <section class="detail-section features-section">
                 <h2 class="detail-section-title">
                     <i class="fas fa-sliders-h"></i> Funcionalidades
@@ -51,8 +55,6 @@ else
                 <p class="features-section-sub">Ative ou desative funcionalidades opcionais para este grupo.</p>
 
                 <div class="features-list">
-
-                    @* ── Ranking pós-partida ─────────────────────────────── *@
                     <div class="feature-card @(group.EnablePostMatchRanking ? "feature-card--on" : "")">
                         <div class="feature-card-info">
                             <span class="feature-card-icon"><i class="fas fa-trophy"></i></span>
@@ -72,7 +74,6 @@ else
                             <span class="feature-toggle-track"></span>
                         </label>
                     </div>
-
                 </div>
 
                 @if (!string.IsNullOrWhiteSpace(saveMessage))
@@ -84,6 +85,114 @@ else
                 }
             </section>
 
+            <hr class="detail-divider">
+
+            @* ── Membros & Permissões ───────────────────────────────── *@
+            <section class="detail-section features-section">
+                <h2 class="detail-section-title">
+                    <i class="fas fa-user-shield"></i> Membros &amp; Permissões
+                </h2>
+                <p class="features-section-sub">Promova membros a admin ou remova permissões de admin.</p>
+
+                <ul class="feat-members-list">
+                    @foreach (var m in members.OrderBy(m => m.Role == GroupMemberRole.Admin ? 0 : 1).ThenBy(m => m.User?.FullName))
+                    {
+                        var isSelf   = m.UserId == currentUserId;
+                        var isAdminM = m.Role == GroupMemberRole.Admin;
+                        var onlyAdmin = isAdminM && adminMembers.Count == 1;
+                        <li class="feat-member-item">
+                            <div class="feat-member-info">
+                                <span class="feat-member-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
+                                @if (isAdminM) { <span class="player-tag player-tag--admin">admin</span> }
+                                @if (isSelf)   { <span class="player-tag player-tag--me">você</span> }
+                            </div>
+                            @if (!isSelf)
+                            {
+                                @if (isAdminM)
+                                {
+                                    <button class="feat-role-btn feat-role-btn--demote"
+                                            type="button"
+                                            disabled="@(isSavingRole || onlyAdmin)"
+                                            title="@(onlyAdmin ? "O grupo deve ter pelo menos um admin" : "Remover permissão de admin")"
+                                            @onclick="() => SetMemberRole(m.Id, GroupMemberRole.Member)">
+                                        <i class="fas fa-user-minus"></i> Remover admin
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="feat-role-btn feat-role-btn--promote"
+                                            type="button"
+                                            disabled="@isSavingRole"
+                                            title="Promover a admin"
+                                            @onclick="() => SetMemberRole(m.Id, GroupMemberRole.Admin)">
+                                        <i class="fas fa-user-shield"></i> Tornar admin
+                                    </button>
+                                }
+                            }
+                        </li>
+                    }
+                </ul>
+
+                @if (!string.IsNullOrWhiteSpace(roleMessage))
+                {
+                    <p class="features-save-msg @(roleError ? "features-save-msg--error" : "")">
+                        <i class="fas @(roleError ? "fa-times-circle" : "fa-check-circle")"></i>
+                        @roleMessage
+                    </p>
+                }
+            </section>
+
+            <hr class="detail-divider">
+
+            @* ── Pix do Organizador ─────────────────────────────────── *@
+            <section class="detail-section features-section">
+                <h2 class="detail-section-title">
+                    <i class="fas fa-qrcode"></i> Pix do Organizador
+                </h2>
+                <p class="features-section-sub">
+                    Selecione qual admin recebe os pagamentos das partidas.
+                    A chave Pix do admin selecionado será exibida aos jogadores na página de pagamento.
+                </p>
+
+                @if (pixAdmins.Count == 0)
+                {
+                    <div class="feat-pix-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Nenhum admin do grupo tem Chave Pix cadastrada no perfil.
+                        <a href="/perfil" class="feat-pix-profile-link">Configure a sua Chave Pix →</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="feat-pix-form">
+                        <label class="feat-pix-label" for="pix-receiver-select">Admin que recebe:</label>
+                        <select id="pix-receiver-select"
+                                class="feat-pix-select"
+                                @bind="selectedPixReceiverId"
+                                disabled="@isSavingPix">
+                            <option value="">— Automático (primeiro admin com Pix) —</option>
+                            @foreach (var a in pixAdmins)
+                            {
+                                <option value="@a.UserId">@(a.User?.FullName ?? a.User?.UserName) — @a.User?.PixKey</option>
+                            }
+                        </select>
+                        <button class="feat-pix-save-btn" type="button"
+                                disabled="@isSavingPix"
+                                @onclick="SavePixReceiver">
+                            <i class="fas fa-save"></i> @(isSavingPix ? "Salvando…" : "Salvar")
+                        </button>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(pixMessage))
+                {
+                    <p class="features-save-msg @(pixError ? "features-save-msg--error" : "")">
+                        <i class="fas @(pixError ? "fa-times-circle" : "fa-check-circle")"></i>
+                        @pixMessage
+                    </p>
+                }
+            </section>
+
         </div>
     </div>
 }
@@ -91,46 +200,65 @@ else
 @code {
     [Parameter] public int Id { get; set; }
 
-    private Group?  group     = null;
-    private bool    isLoading = true;
-    private bool    isAdmin   = false;
-    private bool    isSaving  = false;
+    private Group?               group         = null;
+    private List<GroupMember>    members       = new();
+    private string?              currentUserId = null;
+    private bool                 isLoading     = true;
+    private bool                 isAdmin       = false;
+
+    // Feature toggles
+    private bool    isSaving    = false;
     private string  saveMessage = string.Empty;
     private bool    saveError   = false;
+
+    // Role management
+    private bool    isSavingRole = false;
+    private string  roleMessage  = string.Empty;
+    private bool    roleError    = false;
+
+    // Pix receiver
+    private bool    isSavingPix        = false;
+    private string  pixMessage         = string.Empty;
+    private bool    pixError           = false;
+    private string  selectedPixReceiverId = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-        var currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
         await using var db = await DbFactory.CreateDbContextAsync();
         group = await db.Groups
-            .Include(g => g.Members)
+            .Include(g => g.Members).ThenInclude(m => m.User)
             .FirstOrDefaultAsync(g => g.Id == Id);
 
         isAdmin = currentUserId is not null && group is not null &&
                   group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
 
+        members = group?.Members.ToList() ?? new();
+        selectedPixReceiverId = group?.PixReceiverUserId ?? string.Empty;
         isLoading = false;
     }
 
     private async Task TogglePostMatchRanking()
     {
         if (group is null) return;
-
         isSaving    = true;
         saveMessage = string.Empty;
         saveError   = false;
-
         try
         {
             await using var db = await DbFactory.CreateDbContextAsync();
             var dbGroup = await db.Groups.FindAsync(group.Id);
             if (dbGroup is null) return;
-
             dbGroup.EnablePostMatchRanking = !group.EnablePostMatchRanking;
             await db.SaveChangesAsync();
-
             group.EnablePostMatchRanking = dbGroup.EnablePostMatchRanking;
             saveMessage = dbGroup.EnablePostMatchRanking
                 ? "Ranking pós-partida ativado."
@@ -141,9 +269,72 @@ else
             saveMessage = "Erro ao salvar. Tente novamente.";
             saveError   = true;
         }
-        finally
+        finally { isSaving = false; }
+    }
+
+    private async Task SetMemberRole(int memberId, GroupMemberRole newRole)
+    {
+        if (group is null) return;
+        isSavingRole = true;
+        roleMessage  = string.Empty;
+        roleError    = false;
+        try
         {
-            isSaving = false;
+            await using var db = await DbFactory.CreateDbContextAsync();
+
+            // Safety: cannot remove last admin
+            if (newRole == GroupMemberRole.Member)
+            {
+                var adminCount = await db.GroupMembers
+                    .CountAsync(m => m.GroupId == group.Id && m.Role == GroupMemberRole.Admin);
+                if (adminCount <= 1)
+                {
+                    roleMessage = "O grupo deve ter pelo menos um admin.";
+                    roleError   = true;
+                    return;
+                }
+            }
+
+            var dbMember = await db.GroupMembers.FindAsync(memberId);
+            if (dbMember is null || dbMember.GroupId != group.Id) return;
+            dbMember.Role = newRole;
+            await db.SaveChangesAsync();
+            roleMessage = newRole == GroupMemberRole.Admin
+                ? "Membro promovido a admin."
+                : "Permissão de admin removida.";
+            await LoadAsync();
         }
+        catch
+        {
+            roleMessage = "Erro ao salvar. Tente novamente.";
+            roleError   = true;
+        }
+        finally { isSavingRole = false; }
+    }
+
+    private async Task SavePixReceiver()
+    {
+        if (group is null) return;
+        isSavingPix = true;
+        pixMessage  = string.Empty;
+        pixError    = false;
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var dbGroup = await db.Groups.FindAsync(group.Id);
+            if (dbGroup is null) return;
+            dbGroup.PixReceiverUserId = string.IsNullOrEmpty(selectedPixReceiverId)
+                ? null
+                : selectedPixReceiverId;
+            await db.SaveChangesAsync();
+            group.PixReceiverUserId = dbGroup.PixReceiverUserId;
+            pixMessage = "Destino Pix salvo com sucesso.";
+        }
+        catch
+        {
+            pixMessage = "Erro ao salvar. Tente novamente.";
+            pixError   = true;
+        }
+        finally { isSavingPix = false; }
     }
 }

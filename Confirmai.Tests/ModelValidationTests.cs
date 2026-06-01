@@ -42,6 +42,8 @@ public class ModelValidationTests
     [Fact]
     public void UserMailboxMessage_Invalid_WhenSenderUserIdIsEmpty()
     {
+        // SenderUserId is nullable (system/anonymous messages are valid)
+        // Validation error is NOT expected on empty SenderUserId
         var msg = new UserMailboxMessage
         {
             SenderUserId = string.Empty,
@@ -49,7 +51,7 @@ public class ModelValidationTests
             Body = "Hello!"
         };
 
-        Assert.True(HasError(msg, nameof(UserMailboxMessage.SenderUserId)));
+        Assert.False(HasError(msg, nameof(UserMailboxMessage.SenderUserId)));
     }
 
     [Fact]

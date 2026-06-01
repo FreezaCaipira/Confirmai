@@ -64,7 +64,8 @@ public class RecentFeaturesIntegrationTests : IClassFixture<IntegrationTestWebAp
     {
         using var client = _factory.CreateClient();
 
-        var response = await client.GetAsync("/");
+        // /jogos is a public Blazor page rendered via MainLayout (includes CookieConsent)
+        var response = await client.GetAsync("/jogos");
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

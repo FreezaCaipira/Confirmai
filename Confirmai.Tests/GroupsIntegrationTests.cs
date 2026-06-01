@@ -44,8 +44,9 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Ação necessária", html, StringComparison.Ordinal);
-        Assert.Contains("1 solicitação", html, StringComparison.Ordinal);
+        // Badge shows "N pendente(s)" and card gets action-required class
+        Assert.Contains("group-card--action-required", html, StringComparison.Ordinal);
+        Assert.Contains("pendente", html, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -117,8 +118,9 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        // Both groups are visible (pendentes filter was removed; groups sort pending-first)
         Assert.Contains("Grupo Com Pendencias Query", html, StringComparison.Ordinal);
-        Assert.DoesNotContain("Grupo Sem Pendencias Query", html, StringComparison.Ordinal);
+        Assert.Contains("Grupo Sem Pendencias Query", html, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -150,6 +152,8 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Grupos com pendências", html, StringComparison.Ordinal);
+        // Admin with pending requests should see the action-required card class and pending badge
+        Assert.Contains("group-card--action-required", html, StringComparison.Ordinal);
+        Assert.Contains("player-tag--pending-requests", html, StringComparison.Ordinal);
     }
 }

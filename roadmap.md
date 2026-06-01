@@ -10,6 +10,7 @@
 - Hardening operacional documentado: checklist de producao, deploy, runbook de incidentes, regras de alertas e templates de monitoramento.
 - **UX/roteamento (30/05/2026):** Grupos virou a tela inicial (`/`); Explorar moveu para `/jogos`; nav reordenada (Grupos → Jogos → Pagamentos); UF select + cidade datalist IBGE no formulário de quadras (admin) e na tela Explorar; botão Voltar redundante removido do admin venue form; CSP atualizado para Google Maps (integração preparada, sem billing ativo).
 - **Pós-Partida (30/05/2026):** `Escalacao.razor` transforma em página pós-partida quando evento encerrado: placar editável (qualquer membro, com "registrado por"), votação de destaque (upsert, reveal ≥ 50%), banner MVP. `Ranking.razor` (novo) com tabs Mês/Ano/Histórico, vitórias por placar. Botão "Ranking" movido para a página do grupo (coluna de acesso na tabela de partidas). Botão "Voltar" no detalhe do evento redireciona ao grupo. 17 novos testes (`PostMatchVoteTests`, `RankingWinCalculationTests`).
+- **UX Polish (31/05/2026):** Ranking overhaul — colunas nome/partidas/destaques/vitórias, destaques calculados via `PostMatchVotes`, cor âmbar no título. Numeração sequencial de partidas por grupo (`#N`) na tabela de eventos e no título do detalhe da partida. Botão "Configurações" ao lado de "Convidar" (flex row). Card "Entrar em outro grupo" visual idêntico ao "Meus grupos". Navegação: `← Grupos` → `← Início`; ranking `← @group.Name` → `← Voltar`.
 
 ## Prioridades
 
@@ -40,6 +41,9 @@
 - [x] Google Maps Places autocomplete no formulário de quadras (código pronto; requer billing).
 - [x] Pós-Partida: placar editável, votação de destaque (MVP), reveal ≥ 50%, banner MVP.
 - [x] Ranking do grupo por vitórias (tabs Mês/Ano/Histórico).
+- [x] Ranking overhaul: colunas destaques/partidas/vitórias, destaques via PostMatchVotes, título âmbar.
+- [x] Numeração sequencial de partidas (#N) na tabela do grupo e no título da partida.
+- [x] Configurações ao lado de Convidar (flex row). Card `/grupos` visual unificado.
 - [ ] Página de histórico de pagamentos do jogador (auto-serviço).
 - [ ] `VenueManager/VenueEdit.razor`: aplicar mesma melhoria de UF/IBGE do admin.
 

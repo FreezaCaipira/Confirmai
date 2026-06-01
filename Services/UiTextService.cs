@@ -288,6 +288,10 @@ public sealed class UiTextService
                 ["AdminGateways.LogChanged"] = "Gateway '{0}' {1}",
                 ["AdminGateways.ToastChanged"] = "Gateway '{0}' {1}!",
                 ["AdminGateways.SaveError"] = "Gateway nao encontrado ou erro ao salvar.",
+                ["AdminGateways.CredentialsHeader"] = "Credenciais",
+                ["AdminGateways.Configured"] = "Configurado",
+                ["AdminGateways.NotConfigured"] = "Sem credenciais",
+                ["AdminGateways.NotConfiguredHint"] = "As variaveis de ambiente ou segredos para este gateway nao estao configurados. O gateway nao aparecera como opcao de pagamento mesmo que esteja ativo.",
 
                 ["AdminApiKeys.Title"] = "API Keys dos Servidores",
                 ["AdminApiKeys.Subtitle"] = "Gerencie chaves de API para integracao com game servers OpenTibia.",
@@ -1325,6 +1329,10 @@ public sealed class UiTextService
                 ["AdminGateways.LogChanged"] = "Gateway '{0}' {1}",
                 ["AdminGateways.ToastChanged"] = "Gateway '{0}' {1}!",
                 ["AdminGateways.SaveError"] = "Gateway not found or save error.",
+                ["AdminGateways.CredentialsHeader"] = "Credentials",
+                ["AdminGateways.Configured"] = "Configured",
+                ["AdminGateways.NotConfigured"] = "No credentials",
+                ["AdminGateways.NotConfiguredHint"] = "Environment variables or secrets for this gateway are not configured. The gateway will not appear as a payment option even if the toggle is on.",
 
                 ["AdminApiKeys.Title"] = "Server API Keys",
                 ["AdminApiKeys.Subtitle"] = "Manage API keys for OpenTibia game server integration.",
@@ -2362,6 +2370,10 @@ public sealed class UiTextService
                 ["AdminGateways.LogChanged"] = "Gateway '{0}' {1}",
                 ["AdminGateways.ToastChanged"] = "Gateway '{0}' {1}!",
                 ["AdminGateways.SaveError"] = "Gateway no encontrado o error al guardar.",
+                ["AdminGateways.CredentialsHeader"] = "Credenciales",
+                ["AdminGateways.Configured"] = "Configurado",
+                ["AdminGateways.NotConfigured"] = "Sin credenciales",
+                ["AdminGateways.NotConfiguredHint"] = "Las variables de entorno o secretos para este gateway no estan configurados. El gateway no aparecera como opcion de pago aunque el interruptor este activado.",
 
                 ["AdminApiKeys.Title"] = "API Keys de Servidores",
                 ["AdminApiKeys.Subtitle"] = "Gestione claves de API para integracion con game servers OpenTibia.",
