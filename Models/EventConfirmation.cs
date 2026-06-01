@@ -50,6 +50,16 @@ namespace Confirmai.Models
         /// <summary>UTC timestamp when an admin manually marked this confirmation as paid.</summary>
         public DateTime? MarkedPaidAt { get; set; }
 
+        /// <summary>Raw bytes of the Pix payment proof image uploaded by the payer.</summary>
+        public byte[]? PixProofImageData { get; set; }
+
+        /// <summary>MIME type of the proof image (e.g. "image/jpeg").</summary>
+        [StringLength(100)]
+        public string? PixProofContentType { get; set; }
+
+        /// <summary>UTC timestamp when the payer last uploaded a proof image.</summary>
+        public DateTime? PixProofUploadedAt { get; set; }
+
         public bool IsPaymentPending => PaymentStatus == EventConfirmationPaymentStatus.Pending;
         public bool IsPaymentPaid => PaymentStatus == EventConfirmationPaymentStatus.Paid;
     }

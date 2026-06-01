@@ -119,8 +119,10 @@ else
                     ? $"{ev.Venue.Name}, {ev.Venue.City}, {ev.Venue.StateCode}, Brasil"
                     : ev.Location;
 
-                var mapsKey = Config["Google:MapsApiKey"];
+                var mapsKey    = Config["Google:MapsApiKey"];
                 var hasMapsKey = !string.IsNullOrWhiteSpace(mapsKey) && !mapsKey!.Contains("SET_VIA");
+                var mapWrapId  = $"map-wrap-{ev.Id}";
+                var mapFbId    = $"map-fallback-{ev.Id}";
             }
             @if (!string.IsNullOrWhiteSpace(mapAddr))
             {
@@ -130,9 +132,24 @@ else
                     <h2 class="detail-section-title">
                         <i class="fas fa-map-marker-alt"></i> Localização
                     </h2>
+
+                    @* Placeholder — always rendered, visible by default *@
+                    <a id="@mapFbId" class="detail-map-placeholder" href="@mapsSearchUrl" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <span class="detail-map-placeholder-name">@(ev.Venue?.Name ?? mapAddr)</span>
+                            @if (ev.Venue is not null)
+                            {
+                                <span class="detail-map-placeholder-addr">@ev.Venue.Address · @ev.Venue.City/@ev.Venue.StateCode</span>
+                            }
+                        </div>
+                        <i class="fas fa-external-link-alt detail-map-placeholder-ext"></i>
+                    </a>
+
+                    @* Iframe — hidden initially; JS shows it only when Google responds *@
                     @if (hasMapsKey)
                     {
-                        <div class="detail-map-wrap">
+                        <div id="@mapWrapId" class="detail-map-wrap" style="display:none">
                             <iframe
                                 class="detail-map"
                                 src="@($"https://www.google.com/maps/embed/v1/place?key={mapsKey}&q={Uri.EscapeDataString(mapAddr)}&language=pt-BR")"
@@ -143,20 +160,7 @@ else
                             </iframe>
                         </div>
                     }
-                    else
-                    {
-                        <a class="detail-map-placeholder" href="@mapsSearchUrl" target="_blank" rel="noopener noreferrer">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div>
-                                <span class="detail-map-placeholder-name">@(ev.Venue?.Name ?? mapAddr)</span>
-                                @if (ev.Venue is not null)
-                                {
-                                    <span class="detail-map-placeholder-addr">@ev.Venue.Address · @ev.Venue.City/@ev.Venue.StateCode</span>
-                                }
-                            </div>
-                            <i class="fas fa-external-link-alt detail-map-placeholder-ext"></i>
-                        </a>
-                    }
+
                     <a class="detail-map-link"
                        href="@mapsSearchUrl"
                        target="_blank"
@@ -812,6 +816,17 @@ else
         currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
         isSystemAdmin = auth.User.IsInRole("admin");
         await LoadEvent();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || ev is null) return;
+        var mapsKey    = Config["Google:MapsApiKey"];
+        var hasMapsKey = !string.IsNullOrWhiteSpace(mapsKey) && !mapsKey!.Contains("SET_VIA");
+        if (!hasMapsKey) return;
+        var mapWrapId = $"map-wrap-{ev.Id}";
+        var mapFbId   = $"map-fallback-{ev.Id}";
+        await JS.InvokeVoidAsync("ConfirmaiSetupMapFallback", mapWrapId, mapFbId);
     }
 
     private async Task LoadEvent()

@@ -420,6 +420,12 @@ else
                                 <div class="dlq-user-meta">
                                     <span class="dlq-badge dlq-badge--games">@d.Entries.Count jogo@(d.Entries.Count != 1 ? "s" : "")</span>
                                     <span class="dlq-badge dlq-badge--amount">R$ @d.TotalAmount.ToString("F2")</span>
+                                    @if (d.Entries.Any(e => e.HasProof))
+                                    {
+                                        <span class="dlq-badge dlq-badge--proof" title="Jogador enviou comprovante">
+                                            <i class="fas fa-camera"></i> Comprovante
+                                        </span>
+                                    }
                                 </div>
                                 <div class="dlq-notify-actions" @onclick:stopPropagation="true">
                                     @if (notifiedUserIds.Contains(d.UserId))
@@ -466,6 +472,14 @@ else
                                                     <a href="@entry.EventHref" class="dlq-entry-link" target="_blank">
                                                         <i class="fas fa-external-link-alt"></i> Ver partida
                                                     </a>
+                                                    @if (entry.HasProof)
+                                                    {
+                                                        <button class="dlq-view-proof-btn" type="button"
+                                                                title="Ver comprovante enviado pelo jogador"
+                                                                @onclick="() => viewingProofConfirmationId = entry.ConfirmationId">
+                                                            <i class="fas fa-camera"></i> Comprovante
+                                                        </button>
+                                                    }
                                                     @if (markingPaidId == entry.ConfirmationId)
                                                     {
                                                         <span class="dlq-marking"><i class="fas fa-spinner fa-spin"></i></span>
@@ -486,6 +500,22 @@ else
                         }
                     </ul>
                 }
+            </div>
+        </div>
+    }
+
+    @* ── Lightbox de comprovante Pix ─────────────────────────── *@
+    @if (viewingProofConfirmationId.HasValue)
+    {
+        <div class="dlq-proof-overlay" @onclick="() => viewingProofConfirmationId = null">
+            <div class="dlq-proof-box" @onclick:stopPropagation="true">
+                <button class="dlq-proof-close" type="button" @onclick="() => viewingProofConfirmationId = null">
+                    <i class="fas fa-times"></i>
+                </button>
+                <p class="dlq-proof-label"><i class="fas fa-camera"></i> Comprovante de pagamento</p>
+                <img src="/api/pix-proof/@viewingProofConfirmationId"
+                     class="dlq-proof-img"
+                     alt="Comprovante Pix" />
             </div>
         </div>
     }
@@ -722,7 +752,7 @@ else
 
     // ── Inadimplência ────────────────────────────────────────────────
 
-    private record DelinquencyEntry(int ConfirmationId, int EventId, DateTime EventDate, decimal EventPrice, string EventHref);
+    private record DelinquencyEntry(int ConfirmationId, int EventId, DateTime EventDate, decimal EventPrice, string EventHref, bool HasProof);
     private record UserDelinquency(string UserId, string UserName, List<DelinquencyEntry> Entries)
     {
         public decimal TotalAmount => Entries.Sum(e => e.EventPrice);
@@ -745,6 +775,7 @@ else
     private int?                        markingPaidId           = null;
     private string?                     notifyingUserId         = null;
     private HashSet<string>             notifiedUserIds         = new();
+    private int?                        viewingProofConfirmationId = null;
 
     private async Task OpenDelinquencyModal()
     {
@@ -792,6 +823,16 @@ else
             .Include(c => c.Event)
             .Include(c => c.User)
             .OrderBy(c => c.Event.StartsAt)
+            .Select(c => new {
+                c.Id,
+                c.UserId,
+                c.EventId,
+                c.Event,
+                c.User,
+                c.PaymentGatewayName,
+                c.Position,
+                HasProof = c.PixProofUploadedAt != null,
+            })
             .ToListAsync();
 
         var sport = group.Sport;
@@ -804,7 +845,7 @@ else
                 var entries  = g.Select(c =>
                 {
                     var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
-                    return new DelinquencyEntry(c.Id, c.EventId, c.Event.StartsAt, c.Event.Price!.Value, href);
+                    return new DelinquencyEntry(c.Id, c.EventId, c.Event.StartsAt, c.Event.Price!.Value, href, c.HasProof);
                 }).ToList();
                 return new UserDelinquency(g.Key, userName, entries);
             })

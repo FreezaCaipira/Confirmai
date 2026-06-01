@@ -214,6 +214,54 @@
                             </p>
                         }
                     </div>
+
+                    @* ── Comprovante de pagamento ──────────────────────── *@
+                    <div class="evpay-proof">
+                        <div class="evpay-proof-header">
+                            <i class="fas fa-camera"></i>
+                            <span>Comprovante de pagamento</span>
+                        </div>
+                        @if (conf.PixProofUploadedAt.HasValue)
+                        {
+                            <div class="evpay-proof-sent">
+                                <i class="fas fa-check-circle evpay-proof-sent-icon"></i>
+                                <span>Comprovante enviado em @conf.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</span>
+                            </div>
+                            <img src="/api/pix-proof/@conf.Id" class="evpay-proof-thumb" alt="Comprovante Pix" />
+                            <label class="evpay-proof-btn evpay-proof-btn--update">
+                                @if (uploadingProof)
+                                {
+                                    <i class="fas fa-spinner fa-spin"></i> <span>Enviando…</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sync-alt"></i> <span>Atualizar comprovante</span>
+                                }
+                                <InputFile OnChange="UploadProof" accept="image/jpeg,image/png,image/webp" style="display:none" disabled="@uploadingProof" />
+                            </label>
+                        }
+                        else
+                        {
+                            <p class="evpay-proof-hint">
+                                Após fazer o Pix, envie o comprovante para o organizador confirmar seu pagamento.
+                            </p>
+                            <label class="evpay-proof-btn">
+                                @if (uploadingProof)
+                                {
+                                    <i class="fas fa-spinner fa-spin"></i> <span>Enviando…</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-upload"></i> <span>Enviar comprovante</span>
+                                }
+                                <InputFile OnChange="UploadProof" accept="image/jpeg,image/png,image/webp" style="display:none" disabled="@uploadingProof" />
+                            </label>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(proofError))
+                        {
+                            <p class="evpay-proof-error">@proofError</p>
+                        }
+                    </div>
                 }
             }
 
@@ -238,6 +286,8 @@
     private string?  brCode;
     private bool     copied;
     private bool     copiedAdminPix;
+    private bool     uploadingProof;
+    private string   proofError = string.Empty;
     private CancellationTokenSource? _pollCts;
 
     protected override async Task OnInitializedAsync()
@@ -430,6 +480,59 @@
         await Task.Delay(2000);
         copiedAdminPix = false;
         StateHasChanged();
+    }
+
+    private async Task UploadProof(InputFileChangeEventArgs e)
+    {
+        if (conf is null) return;
+        const long MaxBytes = 5 * 1024 * 1024; // 5 MB
+        var file = e.File;
+        if (file is null) return;
+
+        var allowed = new[] { "image/jpeg", "image/png", "image/webp" };
+        if (!allowed.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
+        {
+            proofError = "Apenas imagens JPG, PNG ou WebP são aceitas.";
+            return;
+        }
+
+        uploadingProof = true;
+        proofError     = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            using var ms = new MemoryStream();
+            await file.OpenReadStream(MaxBytes).CopyToAsync(ms);
+            var bytes = ms.ToArray();
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var entity = await db.EventConfirmations.FindAsync(conf.Id);
+            if (entity is not null)
+            {
+                entity.PixProofImageData   = bytes;
+                entity.PixProofContentType = file.ContentType;
+                entity.PixProofUploadedAt  = DateTime.UtcNow;
+                await db.SaveChangesAsync();
+                conf.PixProofImageData   = bytes;
+                conf.PixProofContentType = file.ContentType;
+                conf.PixProofUploadedAt  = entity.PixProofUploadedAt;
+            }
+        }
+        catch (IOException)
+        {
+            proofError = "Arquivo muito grande ou inválido. Máximo 5 MB.";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "UploadProof: falha ao salvar comprovante. ConfirmationId={Id}", conf.Id);
+            proofError = "Erro ao enviar o comprovante. Tente novamente.";
+        }
+        finally
+        {
+            uploadingProof = false;
+            StateHasChanged();
+        }
     }
 
     /// <summary>Generates a Pix static BR Code (EMVco) payload for direct transfer QR codes.</summary>

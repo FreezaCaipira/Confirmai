@@ -2588,6 +2588,99 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: rgba(255,255,255,0.7);
 }
 
+/* ── Proof badge on delinquency user row ───────────────────────── */
+.dlq-badge--proof {
+    color: #fde68a;
+    background: rgba(251,191,36,0.12);
+    border-color: rgba(251,191,36,0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* ── View-proof button inside entry row ────────────────────────── */
+.dlq-view-proof-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #fbbf24;
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.35);
+    border-radius: 7px;
+    padding: 0.22rem 0.65rem;
+    cursor: pointer;
+    transition: background 0.14s, border-color 0.14s, color 0.14s;
+}
+.dlq-view-proof-btn:hover {
+    background: rgba(251,191,36,0.16);
+    border-color: rgba(251,191,36,0.65);
+    color: #fde68a;
+}
+
+/* ── Proof lightbox overlay ─────────────────────────────────────── */
+.dlq-proof-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.82);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.dlq-proof-box {
+    position: relative;
+    background: #0d1e35;
+    border: 1px solid rgba(251,191,36,0.3);
+    border-radius: 14px;
+    padding: 1.1rem;
+    max-width: min(520px, 96vw);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.dlq-proof-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    transition: color 0.14s, background 0.14s;
+}
+.dlq-proof-close:hover { color: #e2e8f0; background: rgba(255,255,255,0.08); }
+
+.dlq-proof-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fbbf24;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding-right: 2rem; /* avoid overlap with close btn */
+}
+
+.dlq-proof-img {
+    width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.4);
+}
+
 .groups-empty-sub {
     font-size: 0.85rem;
     margin-top: 0.4rem;

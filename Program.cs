@@ -494,6 +494,36 @@ app.MapPost("/api/efibank/webhook", async (HttpContext context, EfiBankWebhookSe
     return await webhookService.HandleAsync(context);
 }).RequireRateLimiting("webhook");
 
+// Serve Pix payment proof images — only to the payer or a group admin
+app.MapGet("/api/pix-proof/{id:int}", async (
+    int id,
+    HttpContext ctx,
+    IDbContextFactory<AppDbContext> dbFactory,
+    UserManager<ApplicationUser> userManager) =>
+{
+    var user = await userManager.GetUserAsync(ctx.User);
+    if (user is null) return Results.Unauthorized();
+
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var conf = await db.EventConfirmations
+        .Include(c => c.Event)
+            .ThenInclude(e => e.Group)
+                .ThenInclude(g => g.Members)
+        .FirstOrDefaultAsync(c => c.Id == id);
+
+    if (conf is null || conf.PixProofImageData is null || conf.PixProofImageData.Length == 0)
+        return Results.NotFound();
+
+    bool isOwner = conf.UserId == user.Id;
+    bool isAdmin = conf.Event.Group.Members
+        .Any(m => m.UserId == user.Id && m.Role == GroupMemberRole.Admin);
+    if (!isOwner && !isAdmin)
+        return Results.Forbid();
+
+    var contentType = conf.PixProofContentType ?? "image/jpeg";
+    return Results.File(conf.PixProofImageData, contentType);
+}).RequireAuthorization();
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
