@@ -41,6 +41,31 @@
     flex-wrap: wrap;
 }
 
+.evpay-admin-pix-qr {
+    display: flex;
+    justify-content: center;
+    margin: 0.75rem 0;
+}
+
+.evpay-admin-pix-qr :global(.qr-code-image) {
+    width: 180px;
+    height: 180px;
+    border-radius: 8px;
+    border: 2px solid rgba(74, 222, 128, 0.3);
+    background: #fff;
+    padding: 6px;
+}
+
+.evpay-admin-pix-no-key {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.83rem;
+    color: #94a3b8;
+    margin: 0.25rem 0 0;
+    line-height: 1.5;
+}
+
 .evpay-admin-pix-code {
     flex: 1;
     background: rgba(15, 26, 48, 0.7);

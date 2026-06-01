@@ -183,17 +183,20 @@
                     }
 
                     @* ── Pix Direto do Organizador ─────────────────────── *@
-                    @if (!string.IsNullOrWhiteSpace(GetGroupAdminPixKey(ev.Group)))
-                    {
-                        <div class="evpay-admin-pix">
-                            <div class="evpay-admin-pix-header">
-                                <i class="fas fa-qrcode"></i>
-                                <span>Pix direto ao organizador</span>
-                            </div>
+                    <div class="evpay-admin-pix">
+                        <div class="evpay-admin-pix-header">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            <span>Pix direto ao organizador</span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(GetGroupAdminPixKey(ev.Group)))
+                        {
                             <p class="evpay-admin-pix-hint">
-                                Copie a chave Pix abaixo e transfira R$ @ev.Price!.Value.ToString("N2", ptBr) diretamente.
+                                Escaneie o QR Code ou copie a chave e transfira R$ @ev.Price!.Value.ToString("N2", ptBr) diretamente.
                                 O organizador confirmará o recebimento.
                             </p>
+                            <div class="evpay-admin-pix-qr">
+                                <QRCode Value="@BuildPixStaticPayload(GetGroupAdminPixKey(ev.Group)!, ev.Group.Name, ev.Group.City, ev.Price!.Value)" />
+                            </div>
                             <div class="evpay-admin-pix-key">
                                 <code class="evpay-admin-pix-code">@GetGroupAdminPixKey(ev.Group)</code>
                                 <button type="button" class="evpay-admin-pix-copy"
@@ -202,8 +205,15 @@
                                     @(copiedAdminPix ? "Copiado!" : "Copiar")
                                 </button>
                             </div>
-                        </div>
-                    }
+                        }
+                        else
+                        {
+                            <p class="evpay-admin-pix-no-key">
+                                <i class="fas fa-exclamation-circle"></i>
+                                O organizador ainda não cadastrou uma chave Pix. Entre em contato diretamente para combinar o pagamento.
+                            </p>
+                        }
+                    </div>
                 }
             }
 
@@ -420,6 +430,36 @@
         await Task.Delay(2000);
         copiedAdminPix = false;
         StateHasChanged();
+    }
+
+    /// <summary>Generates a Pix static BR Code (EMVco) payload for direct transfer QR codes.</summary>
+    private static string BuildPixStaticPayload(string pixKey, string groupName, string? city, decimal amount)
+    {
+        static string F(string tag, string v) => $"{tag}{v.Length:D2}{v}";
+
+        var name    = groupName.Length > 25 ? groupName[..25] : groupName;
+        var cityStr = string.IsNullOrWhiteSpace(city) ? "Brasil" : (city.Length > 15 ? city[..15] : city);
+        var amtStr  = amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+
+        var mai  = F("0014", "br.gov.bcb.pix") + F("01", pixKey);
+        var body = "000201"
+            + F("26", mai)
+            + "52040000"
+            + "5303986"
+            + F("54", amtStr)
+            + "5802BR"
+            + F("59", name)
+            + F("60", cityStr)
+            + "6304";
+
+        ushort crc = 0xFFFF;
+        foreach (char c in body)
+        {
+            crc ^= (ushort)(c << 8);
+            for (int i = 0; i < 8; i++)
+                crc = (crc & 0x8000) != 0 ? (ushort)((crc << 1) ^ 0x1021) : (ushort)(crc << 1);
+        }
+        return body + crc.ToString("X4");
     }
 
     private IReadOnlyList<EventPaymentGatewayOption> GetComingSoonGateways()
