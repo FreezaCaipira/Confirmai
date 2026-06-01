@@ -183,8 +183,7 @@
                     }
 
                     @* ── Pix Direto do Organizador ─────────────────────── *@
-                    @{ var adminPixKey = GetGroupAdminPixKey(ev.Group); }
-                    @if (!string.IsNullOrWhiteSpace(adminPixKey))
+                    @if (!string.IsNullOrWhiteSpace(GetGroupAdminPixKey(ev.Group)))
                     {
                         <div class="evpay-admin-pix">
                             <div class="evpay-admin-pix-header">
@@ -196,9 +195,9 @@
                                 O organizador confirmará o recebimento.
                             </p>
                             <div class="evpay-admin-pix-key">
-                                <code class="evpay-admin-pix-code">@adminPixKey</code>
+                                <code class="evpay-admin-pix-code">@GetGroupAdminPixKey(ev.Group)</code>
                                 <button type="button" class="evpay-admin-pix-copy"
-                                        @onclick="() => CopyAdminPixKey(adminPixKey)">
+                                        @onclick="() => CopyAdminPixKey(GetGroupAdminPixKey(ev.Group)!)">
                                     <i class="fas @(copiedAdminPix ? "fa-check" : "fa-copy")"></i>
                                     @(copiedAdminPix ? "Copiado!" : "Copiar")
                                 </button>
