@@ -920,6 +920,13 @@ else
             </div>
         </div>
     }
+    else if (selectedConfirmationForProofPreview is not null && !selectedConfirmationForProofPreview.PixProofUploadedAt.HasValue)
+    {
+        <!-- Debug: Modal state is set but PixProofUploadedAt is null -->
+        <div style="position: fixed; bottom: 20px; right: 20px; background: red; color: white; padding: 10px; z-index: 9999;">
+            DEBUG: selectedConfirmationForProofPreview set mas PixProofUploadedAt is null
+        </div>
+    }
 }
 
 @code {
