@@ -28,6 +28,7 @@
 @inject IJSRuntime JS
 @inject PaymentEventBus PaymentEventBus
 @inject IOptions<AbacatePayOptions> AbacatePayOpts
+@implements IAsyncDisposable
 
 <div class="entity-shell payment-container parchment-b tibia-pay-shell">
 
@@ -257,8 +258,9 @@
     private int maxPurchaseQuantity = 1;
     private decimal? selectedOfferUnitPrice;
     private string offerCurrency = "BTC"; // BRL, USD or BTC
-    private string? pixCurrencyNotice;
-    private string? pixSellerKeyNotice;
+    private string? pixCurrencyNotice;    
+    private CancellationTokenSource? _copyCts;
+    private Task? _copyTask;    private string? pixSellerKeyNotice;
 
     private PaymentRecord? paymentRecord;
 
@@ -347,10 +349,19 @@
         });
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         PaymentEventBus.OnPaymentConfirmed -= OnPaymentConfirmed;
-        return ValueTask.CompletedTask;
+        
+        _copyCts?.Cancel();
+        
+        if (_copyTask is not null)
+        {
+            try { await _copyTask; }
+            catch (OperationCanceledException) { }
+        }
+        
+        _copyCts?.Dispose();
     }
 
     private async Task GenerateAddress()
@@ -561,11 +572,26 @@
         if (!string.IsNullOrEmpty(Address))
         {
             await JS.InvokeVoidAsync("navigator.clipboard.writeText", Address);
-            copyIcon = "fas fa-check";
-            StateHasChanged();
-            await Task.Delay(1500);
-            copyIcon = "fas fa-copy";
-            StateHasChanged();
+            
+            _copyCts?.Cancel();
+            _copyCts = new CancellationTokenSource();
+            var ct = _copyCts.Token;
+
+            try
+            {
+                copyIcon = "fas fa-check";
+                StateHasChanged();
+                await Task.Delay(1500, ct);
+                if (!ct.IsCancellationRequested)
+                {
+                    copyIcon = "fas fa-copy";
+                    StateHasChanged();
+                }
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                copyIcon = "fas fa-copy";
+            }
         }
     }
 

@@ -3,6 +3,7 @@
 @using Confirmai.Enums
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@implements IAsyncDisposable
 
 <PageTitle>Poker · Confirmai</PageTitle>
 
@@ -12,7 +13,7 @@
             <div class="create-poker-dropdown @(showTypeMenu ? "is-open" : "")">
                 <button class="btn-create-event btn-create-event--poker"
                         @onclick="() => showTypeMenu = !showTypeMenu"
-                        @onfocusout="() => Task.Delay(150).ContinueWith(_ => { showTypeMenu = false; InvokeAsync(StateHasChanged); })">
+                        @onfocusout="HandleMenuFocusOut">
                     <i class="fas fa-plus"></i> Criar Evento <i class="fas fa-chevron-down dropdown-arrow"></i>
                 </button>
                 @if (showTypeMenu)
@@ -120,6 +121,9 @@
 
     private string? currentUserId;
     private bool showTypeMenu = false;
+    
+    private CancellationTokenSource? _menuFocusOutCts;
+    private Task? _menuFocusOutTask;
 
     [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
 
@@ -127,5 +131,36 @@
     {
         var auth = await AuthProvider.GetAuthenticationStateAsync();
         currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+
+    private async Task HandleMenuFocusOut()
+    {
+        _menuFocusOutCts?.Cancel();
+        _menuFocusOutCts = new CancellationTokenSource();
+        var ct = _menuFocusOutCts.Token;
+
+        try
+        {
+            await Task.Delay(150, ct);
+            if (!ct.IsCancellationRequested)
+            {
+                showTypeMenu = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _menuFocusOutCts?.Cancel();
+        
+        if (_menuFocusOutTask is not null)
+        {
+            try { await _menuFocusOutTask; }
+            catch (OperationCanceledException) { }
+        }
+        
+        _menuFocusOutCts?.Dispose();
     }
 }
