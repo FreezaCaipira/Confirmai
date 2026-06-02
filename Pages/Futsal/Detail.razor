@@ -309,7 +309,7 @@ else
                                                         }
                                                         else if (c.PixProofUploadedAt.HasValue)
                                                         {
-                                                            <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => selectedConfirmationForProofPreview = c" title="Comprovante enviado - clique para visualizar">
+                                                            <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => SetProofPreview(c)" title="Comprovante enviado - clique para visualizar">
                                                                 <i class="fas fa-image"></i> 📎 comprovante
                                                             </button>
                                                         }
@@ -359,7 +359,7 @@ else
                                                 {
                                                     @if (isAdmin)
                                                     {
-                                                        <button class="player-tag player-tag--proof-pending" @onclick="() => selectedConfirmationForProofPreview = c" title="Comprovante enviado - clique para visualizar">
+                                                        <button class="player-tag player-tag--proof-pending" @onclick="() => SetProofPreview(c)" title="Comprovante enviado - clique para visualizar">
                                                             <i class="fas fa-image"></i> 📎 comprovante
                                                         </button>
                                                     }
@@ -621,7 +621,7 @@ else
                                             {
                                                 @if (isAdmin)
                                                 {
-                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => selectedConfirmationForProofPreview = c" title="Comprovante enviado - clique para visualizar">
+                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => SetProofPreview(c)" title="Comprovante enviado - clique para visualizar">
                                                         <i class="fas fa-image"></i> 📎 comprovante
                                                     </button>
                                                 }
@@ -1293,6 +1293,12 @@ else
         selectedConfirmationForProofPreview = null;
         // Navigate to admin payments page where admin can manage all payments
         NavigationManager.NavigateTo("/admin/payments");
+    }
+
+    private void SetProofPreview(EventConfirmation confirmation)
+    {
+        // Properly capture confirmation from foreach closure
+        selectedConfirmationForProofPreview = confirmation;
     }
 
 }
