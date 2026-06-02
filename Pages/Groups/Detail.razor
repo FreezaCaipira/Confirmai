@@ -18,6 +18,7 @@
 @inject IJSRuntime                     JS
 @inject EventNotificationService       NotificationService
 @inject LogService                     LogService
+@inject UiTextService                  Ui
 
 <PageTitle>@(group?.Name ?? "Grupo") · Confirmai</PageTitle>
 
@@ -219,13 +220,13 @@ else
                                             <span class="et-num">#@(eventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
                                             <div class="et-cell-info">
                                                 <span class="et-date-wrap">
-                                                    <span class="et-date">@ev.StartsAt.ToLocalTime().ToString("dd/MM")</span>
+                                                    <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
                                                     @if (isNextUpcoming)
                                                     {
                                                         <span class="event-next-badge">pr&oacute;xima</span>
                                                     }
                                                 </span>
-                                                <span class="et-time">@ev.StartsAt.ToLocalTime().ToString("HH:mm")</span>
+                                                <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
                                             </div>
                                         </div>
                                     </td>
@@ -274,7 +275,7 @@ else
                         {
                             <li class="pending-request-item">
                                 <span class="pending-request-name">@(req.User?.FullName ?? req.User?.UserName ?? "Usuário")</span>
-                                <span class="pending-request-date">@req.RequestedAt.ToLocalTime().ToString("dd/MM HH:mm")</span>
+                                <span class="pending-request-date">@Ui.FormatDateTime(req.RequestedAt.ToLocalTime(), "DateTimeShortCompact")</span>
                                 <div class="pending-request-actions">
                                     <button class="btn-approve" type="button"
                                             @onclick="() => ApproveRequest(req.Id)">
@@ -401,13 +402,13 @@ else
                                 <li class="payment-history-item">
                                     <div class="payment-history-user">@h.UserName</div>
                                     <div class="payment-history-meta">
-                                        <span class="payment-history-date"><i class="fas fa-calendar-alt"></i> @h.EventDate.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                                        <span class="payment-history-date"><i class="fas fa-calendar-alt"></i> @Ui.FormatDateTime(h.EventDate.ToLocalTime(), "DateDefault")</span>
                                         <span class="payment-history-price">R$ @h.EventPrice.ToString("F2")</span>
                                         <a class="payment-entry-link" href="@h.EventHref" target="_blank" rel="noopener">Ver</a>
                                     </div>
                                     <div class="payment-history-admin">
                                         <i class="fas fa-user-shield"></i> Marcado por <strong>@h.AdminName</strong>
-                                        em @h.MarkedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                        em @Ui.FormatDateTime(h.MarkedAt.ToLocalTime(), "DateTimeDefault")
                                     </div>
                                 </li>
                             }
@@ -432,11 +433,11 @@ else
                                     <div class="payment-proof-header">
                                         <div class="payment-proof-user">
                                             <span class="payment-proof-name">@proof.UserName</span>
-                                            <span class="payment-proof-uploaded"><i class="fas fa-clock"></i> Enviado @proof.ProofUploadedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                            <span class="payment-proof-uploaded"><i class="fas fa-clock"></i> Enviado @Ui.FormatDateTime(proof.ProofUploadedAt.ToLocalTime(), "DateTimeDefault")</span>
                                         </div>
                                         <div class="payment-proof-meta">
                                             <span class="payment-proof-event">@proof.EventName</span>
-                                            <span class="payment-proof-date">@proof.EventDate.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                                            <span class="payment-proof-date">@Ui.FormatDateTime(proof.EventDate.ToLocalTime(), "DateDefault")</span>
                                             <span class="payment-proof-price">R$ @proof.EventPrice.ToString("F2")</span>
                                         </div>
                                     </div>
@@ -529,7 +530,7 @@ else
                                         {
                                             <li class="payment-entry">
                                                 <div class="payment-entry-info">
-                                                    <span class="payment-entry-date">@entry.EventDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                                    <span class="payment-entry-date">@Ui.FormatDateTime(entry.EventDate.ToLocalTime(), "DateTimeDefault")</span>
                                                     <span class="payment-entry-price">R$ @entry.EventPrice.ToString("F2")</span>
                                                 </div>
                                                 <div class="payment-entry-actions">

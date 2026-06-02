@@ -16,6 +16,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IHttpClientFactory HttpClientFactory
+@inject UiTextService Ui
 
 <PageTitle>@(activeTab == "meus-jogos" ? "Meus Jogos — Confirmai" : "Confirmai")</PageTitle>
 
@@ -154,7 +155,7 @@
                                                         <span class="my-conf-pos">@PokerTypeLabel(ev.PokerEventType)</span>
                                                     }
                                                 </div>
-                                                <p class="my-conf-meta">📅 @ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy 'às' HH:mm", PtBr)</p>
+                                                <p class="my-conf-meta">📅 @Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateTimeFullShort")</p>
                                                 <p class="my-conf-meta">📍 @ev.Location &nbsp;·&nbsp; 👥 @ev.Confirmations.Count confirmados</p>
                                             </div>
                                             <div class="my-conf-actions">
@@ -201,7 +202,7 @@
                                                                 <span class="my-conf-pos">@(c.Position == FutsalPosition.Goalkeeper ? "🥅 Goleiro" : "👟 Linha")</span>
                                                             }
                                                         </div>
-                                                        <p class="my-conf-meta">📅 @ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy 'às' HH:mm", PtBr)</p>
+                                                        <p class="my-conf-meta">📅 @Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateTimeFullShort")</p>
                                                     </div>
                                                     <div class="my-conf-actions">
                                                         <a href="@detailUrl" class="my-conf-btn my-conf-btn--view"><i class="fas fa-arrow-right"></i> Entrar</a>
@@ -240,7 +241,7 @@
                                                                 <span class="my-conf-pos">@(c.Position == FutsalPosition.Goalkeeper ? "🥅 Goleiro" : "👟 Linha")</span>
                                                             }
                                                         </div>
-                                                        <p class="my-conf-meta">📅 @ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy 'às' HH:mm", PtBr)</p>
+                                                        <p class="my-conf-meta">📅 @Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateTimeFullShort")</p>
                                                     </div>
                                                     <div class="my-conf-actions">
                                                         <a href="@detailUrl" class="my-conf-btn my-conf-btn--view"><i class="fas fa-arrow-right"></i> Entrar</a>

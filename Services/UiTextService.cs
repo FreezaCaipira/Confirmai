@@ -3160,7 +3160,7 @@ public sealed class UiTextService
     /// Formata uma data/hora de acordo com o idioma selecionado.
     /// </summary>
     /// <param name="dateTime">Data e hora a formatar.</param>
-    /// <param name="pattern">Padrão desejado: DateDefault, TimeDefault, DateTimeDefault, DateTimeFull.</param>
+    /// <param name="pattern">Padrão desejado: DateDefault, TimeDefault, DateTimeDefault, DateTimeFull, DateTimeShortCompact.</param>
     public string FormatDateTime(DateTime dateTime, string pattern = "DateTimeDefault")
     {
         var currentLanguage = _language.SelectedLanguage;
@@ -3175,11 +3175,23 @@ public sealed class UiTextService
                 _ => "dd/MM/yyyy" // pt-BR
             },
             "TimeDefault" => "HH:mm",
+            "DateTimeShortCompact" => currentLanguage switch // dd/MM HH:mm format
+            {
+                "en-US" => "MM/dd HH:mm",
+                "es-ES" => "dd/MM HH:mm",
+                _ => "dd/MM HH:mm" // pt-BR
+            },
             "DateTimeFull" => currentLanguage switch
             {
                 "en-US" => "dddd, MMMM d, yyyy HH:mm",
                 "es-ES" => "dddd, d 'de' MMMM 'de' yyyy HH:mm",
                 _ => "dddd, d 'de' MMMM 'de' yyyy HH:mm" // pt-BR
+            },
+            "DateTimeFullShort" => currentLanguage switch // ddd, dd/MM/yyyy 'às' HH:mm
+            {
+                "en-US" => "ddd, MM/dd/yyyy 'at' HH:mm",
+                "es-ES" => "ddd, dd/MM/yyyy 'a' HH:mm",
+                _ => "ddd, dd/MM/yyyy 'às' HH:mm" // pt-BR
             },
             _ => currentLanguage switch // DateTimeDefault (default)
             {
