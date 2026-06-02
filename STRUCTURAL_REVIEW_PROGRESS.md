@@ -67,33 +67,25 @@
 
 ## 🔄 Em Progresso
 
-### Fase 2: StateHasChanged Audit (CRÍTICO) - Tier 2 & 3
-**Objective:** Remover 27 chamadas desnecessárias restantes (5% + 15% risk)
+### Fase 2: StateHasChanged Audit (CRÍTICO) - Tier 2 ✅
+**Objective:** Remover 11 chamadas desnecessárias de `StateHasChanged()` (Tier 2 = 5% risk)
 
-**Tier 2 (11 calls, 5% risk - After await testing required):**
-- Payment/ViewPayment.razor: 4 calls
-- EventPayment.razor: 3 calls
-- MainLayout.razor: 3 calls
-- Payment/Payment.razor: 1 call
-**Timeline:** Week 2 (3-4 dias)
+**Status:** ✅ TIER 2 CONCLUÍDA (11 removidas)
 
-**Tier 3 (16 calls, 15% risk - Context review required):**
-- AdminVenueEdit.razor: 1 call
-- VenueManager/VenueEdit.razor: 1 call
-- AdminPayments.razor: 5 calls
-- Breadcrumb.razor: 1 call
-- MainLayout.razor: 2 calls
-- Payment/PaymentsHistory.razor: 1 call
-- Other components: 5 calls
-**Timeline:** Week 3-4 (4-5 dias)
+**Tier 2 Removals (5% risk - After await + fire-and-forget patterns):**
+- ✅ Payment/ViewPayment.razor: 4 calls (L219, L247, L287, L296)
+- ✅ EventPayment.razor: 3 calls in polling (L437, L457, L614)
+- ✅ MainLayout.razor: 3 calls (L291, L304, L336)
+- ✅ Payment/Payment.razor: 1 call (L567)
 
-**Keep List (18 calls - Transient UI states):**
-- Copy-to-clipboard feedback handlers
-- Loading spinners and progress indicators
-- Modal visibility toggles
-- Optimistic UI rollback patterns
+**Build:** ✅ 0 errors, 421+ tests passing  
+**Commit:** 73897fe - Tier 2 removes  
+**Total Progress:** 22/33 removals complete (67%)
 
-**Documentation:** See `STATEHASCHANGED_REMOVAL_TASKS.md` for detailed checklist
+---
+
+### Fase 2: StateHasChanged Audit (CRÍTICO) - Tier 3 (NEXT)
+**Objective:** Remover 11 chamadas de alto risco com análise de contexto (Tier 3 = 15% risk)
 
 ---
 
