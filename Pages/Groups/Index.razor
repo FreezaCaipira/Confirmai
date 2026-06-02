@@ -21,7 +21,28 @@
 
     @if (isLoading)
     {
-        <div class="detail-loading">Carregando…</div>
+        <div class="detail-loading">
+            <div class="detail-skeleton">
+                <div class="skeleton-section">
+                    <div class="skeleton-list">
+                        <div class="skeleton-list-item">
+                            <div class="skeleton-list-item-avatar"></div>
+                            <div class="skeleton-list-item-content">
+                                <div class="skeleton-line skeleton-line--md" style="max-width: 200px;"></div>
+                                <div class="skeleton-line skeleton-line--sm" style="max-width: 150px;"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-list-item">
+                            <div class="skeleton-list-item-avatar"></div>
+                            <div class="skeleton-list-item-content">
+                                <div class="skeleton-line skeleton-line--md" style="max-width: 200px;"></div>
+                                <div class="skeleton-line skeleton-line--sm" style="max-width: 150px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
     else if (groups.Count == 0)
     {

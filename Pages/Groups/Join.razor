@@ -18,7 +18,19 @@
 
 @if (isLoading)
 {
-    <div class="detail-loading">Carregando…</div>
+    <div class="detail-loading">
+        <div class="detail-skeleton">
+            <div class="skeleton-header">
+                <div class="skeleton-line skeleton-line--sm"></div>
+                <div class="skeleton-line skeleton-line--lg"></div>
+                <div class="skeleton-line skeleton-line--md"></div>
+            </div>
+            <div class="skeleton-chips">
+                <div class="skeleton-chip"></div>
+                <div class="skeleton-chip"></div>
+            </div>
+        </div>
+    </div>
 }
 else if (group is null)
 {
