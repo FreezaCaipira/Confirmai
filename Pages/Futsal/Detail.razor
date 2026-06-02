@@ -318,6 +318,9 @@ else
                                                             <button class="player-tag player-tag--admin-pay player-tag--pay-pending" @onclick="() => confirmPayId = c.Id" title="Sem comprovante - clique para marcar pago">
                                                                 <i class="fas fa-exclamation-triangle"></i> pendente
                                                             </button>
+                                                            <button class="player-tag player-tag--admin-pay player-tag--pay-btn" @onclick="() => confirmPayId = c.Id" type="button" title="Clique para marcar como pago">
+                                                                <i class="fas fa-check"></i> pagar
+                                                            </button>
                                                         }
                                                     }
                                                 }
@@ -637,6 +640,12 @@ else
                                                 <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-pending player-tag--pay-link">
                                                     <i class="fas fa-exclamation-triangle"></i> pendente
                                                 </a>
+                                                @if (isAdmin)
+                                                {
+                                                    <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-btn player-tag--pay-link">
+                                                        <i class="fas fa-check"></i> pagar
+                                                    </a>
+                                                }
                                             }
                                             else
                                             {
