@@ -10,6 +10,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
+@implements IAsyncDisposable
 
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider    AuthStateProvider
@@ -625,6 +626,11 @@ else
     private bool                      requestingJoin   = false;
     private string                    enteredCode      = string.Empty;
     private string                    codeError        = string.Empty;
+    
+    private CancellationTokenSource? _copyInviteCts;
+    private CancellationTokenSource? _copyCodeCts;
+    private Task? _copyInviteTask;
+    private Task? _copyCodeTask;
     private bool                      showPastEvents   = false;
     private bool                      showAllMembers   = false;
     private const int                 MembersPreviewLimit = 8;
@@ -713,10 +719,25 @@ else
     {
         try { await JS.InvokeVoidAsync("navigator.clipboard.writeText", url); }
         catch { /* fallback: ignore if clipboard not available */ }
-        copiedInvite = true;
-        await Task.Delay(2000);
-        copiedInvite = false;
-        StateHasChanged();
+        
+        _copyInviteCts?.Cancel();
+        _copyInviteCts = new CancellationTokenSource();
+        var ct = _copyInviteCts.Token;
+
+        try
+        {
+            copiedInvite = true;
+            await Task.Delay(2000, ct);
+            if (!ct.IsCancellationRequested)
+            {
+                copiedInvite = false;
+                StateHasChanged();
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            copiedInvite = false;
+        }
     }
 
     private void ToggleMembersView() => showAllMembers = !showAllMembers;
@@ -725,10 +746,25 @@ else
     {
         try { await JS.InvokeVoidAsync("navigator.clipboard.writeText", code); }
         catch { }
-        copiedCode = true;
-        await Task.Delay(2000);
-        copiedCode = false;
-        StateHasChanged();
+        
+        _copyCodeCts?.Cancel();
+        _copyCodeCts = new CancellationTokenSource();
+        var ct = _copyCodeCts.Token;
+
+        try
+        {
+            copiedCode = true;
+            await Task.Delay(2000, ct);
+            if (!ct.IsCancellationRequested)
+            {
+                copiedCode = false;
+                StateHasChanged();
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            copiedCode = false;
+        }
     }
 
     private async Task ShareInviteOnWhatsApp(string url)
@@ -1113,6 +1149,27 @@ else
             $"Quando puder, regularize no Confirmai 🙏");
         var url = $"https://wa.me/?text={msg}";
         await JS.InvokeVoidAsync("open", url, "_blank", "noopener,noreferrer");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _copyInviteCts?.Cancel();
+        _copyCodeCts?.Cancel();
+
+        if (_copyInviteTask is not null)
+        {
+            try { await _copyInviteTask; }
+            catch (OperationCanceledException) { }
+        }
+
+        if (_copyCodeTask is not null)
+        {
+            try { await _copyCodeTask; }
+            catch (OperationCanceledException) { }
+        }
+
+        _copyInviteCts?.Dispose();
+        _copyCodeCts?.Dispose();
     }
 }
 
