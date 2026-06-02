@@ -581,9 +581,27 @@ else
                                                 }
                                                 else
                                                 {
-                                                    <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => confirmPayId = c.Id">
-                                                        <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
-                                                    </button>
+                                                    @if (c.HasPaid)
+                                                    {
+                                                        <button class="player-tag player-tag--admin-pay player-tag--paid" @onclick="() => confirmPayId = c.Id">
+                                                            <i class="fas fa-check"></i> pago
+                                                        </button>
+                                                    }
+                                                    else if (c.PixProofUploadedAt.HasValue)
+                                                    {
+                                                        <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
+                                                            <i class="fas fa-image"></i> 📎 comprovante
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="player-tag player-tag--admin-pay player-tag--pay-pending" @onclick="() => confirmPayId = c.Id">
+                                                            <i class="fas fa-exclamation-triangle"></i> pendente
+                                                        </button>
+                                                        <button class="player-tag player-tag--admin-pay player-tag--pay-btn" @onclick="() => confirmPayId = c.Id" type="button">
+                                                            <i class="fas fa-check"></i> pagar
+                                                        </button>
+                                                    }
                                                 }
                                             }
                                             else
