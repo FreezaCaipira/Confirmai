@@ -364,20 +364,17 @@ else
                                                         <i class="fas fa-image"></i> 📎 comprovante
                                                     </a>
                                                 }
-                                                else if (c.UserId == currentUserId)
+                                                else
                                                 {
                                                     <span class="player-tag player-tag--pay-pending">
                                                         <i class="fas fa-exclamation-triangle"></i> pendente
                                                     </span>
-                                                    <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-btn player-tag--pay-link">
-                                                        <i class="fas fa-dollar-sign"></i> pagar
-                                                    </a>
-                                                }
-                                                else if (isAdmin)
-                                                {
-                                                    <span class="player-tag player-tag--pay-pending">
-                                                        <i class="fas fa-exclamation-triangle"></i> pendente
-                                                    </span>
+                                                    @if (c.UserId == currentUserId)
+                                                    {
+                                                        <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-btn player-tag--pay-link">
+                                                            <i class="fas fa-dollar-sign"></i> pagar
+                                                        </a>
+                                                    }
                                                 }
                                             }
                                         }
