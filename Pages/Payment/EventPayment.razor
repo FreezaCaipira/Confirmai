@@ -1,7 +1,7 @@
 @page "/pagamento/evento/{ConfirmationId:int}"
 
 @attribute [Authorize]
-@implements IDisposable
+@implements IAsyncDisposable
 
 @using Confirmai.Data
 @using Confirmai.Enums
@@ -307,7 +307,15 @@
     private bool     uploadingProof;
     private string   proofError = string.Empty;
     private string   proofSuccessMessage = string.Empty;
+    
     private CancellationTokenSource? _pollCts;
+    private CancellationTokenSource? _copyBrCodeCts;
+    private CancellationTokenSource? _copyAdminPixCts;
+    private CancellationTokenSource? _uploadProofCts;
+    
+    private Task? _copyBrCodeTask;
+    private Task? _copyAdminPixTask;
+    private Task? _uploadProofTask;
 
     protected override async Task OnInitializedAsync()
     {
@@ -459,11 +467,25 @@
         // No JS interop available without IJSRuntime injection;
         // simply set the copied flag for visual feedback.
         // The brCode is selectable via user-select:all CSS.
-        copied = true;
-        StateHasChanged();
-        await Task.Delay(2000);
-        copied = false;
-        StateHasChanged();
+        _copyBrCodeCts?.Cancel();
+        _copyBrCodeCts = new CancellationTokenSource();
+        var ct = _copyBrCodeCts.Token;
+
+        try
+        {
+            copied = true;
+            StateHasChanged();
+            await Task.Delay(2000, ct);
+            if (!ct.IsCancellationRequested)
+            {
+                copied = false;
+                StateHasChanged();
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            copied = false;
+        }
     }
 
     private void SelectGateway(string gatewayName)
@@ -504,11 +526,25 @@
 
     private async Task CopyAdminPixKey(string key)
     {
-        copiedAdminPix = true;
-        StateHasChanged();
-        await Task.Delay(2000);
-        copiedAdminPix = false;
-        StateHasChanged();
+        _copyAdminPixCts?.Cancel();
+        _copyAdminPixCts = new CancellationTokenSource();
+        var ct = _copyAdminPixCts.Token;
+
+        try
+        {
+            copiedAdminPix = true;
+            StateHasChanged();
+            await Task.Delay(2000, ct);
+            if (!ct.IsCancellationRequested)
+            {
+                copiedAdminPix = false;
+                StateHasChanged();
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            copiedAdminPix = false;
+        }
     }
 
     private async Task UploadProof(InputFileChangeEventArgs e)
@@ -538,11 +574,12 @@
                 conf.PixProofContentType = file.ContentType;
                 conf.PixProofUploadedAt = result.UploadedAt;
                 proofSuccessMessage = "Comprovante enviado com sucesso! O organizador será notificado.";
+                
                 // Auto-dismiss success message after 5 seconds
-                _ = Task.Delay(5000).ContinueWith(_ => {
-                    proofSuccessMessage = string.Empty;
-                    InvokeAsync(StateHasChanged);
-                });
+                _uploadProofCts?.Cancel();
+                _uploadProofCts = new CancellationTokenSource();
+                var ct = _uploadProofCts.Token;
+                _uploadProofTask = DismissProofSuccessAsync(ct);
             }
             else
             {
@@ -563,6 +600,21 @@
             uploadingProof = false;
             StateHasChanged();
         }
+    }
+
+    /// <summary>Generates a Pix static BR Code (EMVco) payload for direct transfer QR codes.</summary>
+    private async Task DismissProofSuccessAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(5000, ct);
+            if (!ct.IsCancellationRequested)
+            {
+                proofSuccessMessage = string.Empty;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
     }
 
     /// <summary>Generates a Pix static BR Code (EMVco) payload for direct transfer QR codes.</summary>
@@ -611,9 +663,37 @@
             .ToList();
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
+        // Cancel all running tasks
         _pollCts?.Cancel();
+        _copyBrCodeCts?.Cancel();
+        _copyAdminPixCts?.Cancel();
+        _uploadProofCts?.Cancel();
+
+        // Await running tasks to ensure cancellation is processed
+        if (_copyBrCodeTask is not null)
+        {
+            try { await _copyBrCodeTask; }
+            catch (OperationCanceledException) { }
+        }
+
+        if (_copyAdminPixTask is not null)
+        {
+            try { await _copyAdminPixTask; }
+            catch (OperationCanceledException) { }
+        }
+
+        if (_uploadProofTask is not null)
+        {
+            try { await _uploadProofTask; }
+            catch (OperationCanceledException) { }
+        }
+
+        // Dispose all CancellationTokenSource instances
         _pollCts?.Dispose();
+        _copyBrCodeCts?.Dispose();
+        _copyAdminPixCts?.Dispose();
+        _uploadProofCts?.Dispose();
     }
 }
