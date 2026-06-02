@@ -309,7 +309,7 @@ else
                                                         }
                                                         else if (c.PixProofUploadedAt.HasValue)
                                                         {
-                                                            <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => SetProofPreview(c)" title="Comprovante enviado - clique para visualizar">
+                                                            <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
                                                                 <i class="fas fa-image"></i> 📎 comprovante
                                                             </button>
                                                         }
@@ -359,7 +359,7 @@ else
                                                 {
                                                     @if (isAdmin)
                                                     {
-                                                        <button class="player-tag player-tag--proof-pending" @onclick="() => SetProofPreview(c)" title="Comprovante enviado - clique para visualizar">
+                                                        <button class="player-tag player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
                                                             <i class="fas fa-image"></i> 📎 comprovante
                                                         </button>
                                                     }
@@ -621,7 +621,7 @@ else
                                             {
                                                 @if (isAdmin)
                                                 {
-                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => SetProofPreview(c)" title="Comprovante enviado - clique para visualizar">
+                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
                                                         <i class="fas fa-image"></i> 📎 comprovante
                                                     </button>
                                                 }
@@ -885,48 +885,6 @@ else
 
         </div>
     </div>
-
-    @* Modal de preview do comprovante de pagamento *@
-    @if (selectedConfirmationForProofPreview is not null)
-    {
-        <div class="proof-modal-overlay" @onclick="() => selectedConfirmationForProofPreview = null">
-            <div class="proof-modal" @onclick:stopPropagation>
-                <div class="proof-modal-header">
-                    <h3>Comprovante de Pagamento</h3>
-                    <button class="proof-modal-close" @onclick="() => selectedConfirmationForProofPreview = null" type="button">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <div class="proof-modal-content">
-                    <div class="proof-info">
-                        <p><strong>Jogador:</strong> @(selectedConfirmationForProofPreview.User?.FullName ?? selectedConfirmationForProofPreview.User?.UserName ?? "Jogador")</p>
-                        <p><strong>Enviado em:</strong> @selectedConfirmationForProofPreview.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</p>
-                    </div>
-
-                    <div class="proof-image-container">
-                        <img src="/api/pix-proof/@selectedConfirmationForProofPreview.Id" alt="Comprovante Pix" class="proof-image" />
-                    </div>
-
-                    <div class="proof-modal-actions">
-                        <button class="btn btn--info" @onclick="() => NavigateToPaymentsModal()" type="button">
-                            <i class="fas fa-arrow-right"></i> Ir para modal de pagamentos
-                        </button>
-                        <button class="btn btn--neutral" @onclick="() => selectedConfirmationForProofPreview = null" type="button">
-                            Fechar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-    else if (selectedConfirmationForProofPreview is not null && !selectedConfirmationForProofPreview.PixProofUploadedAt.HasValue)
-    {
-        <!-- Debug: Modal state is set but PixProofUploadedAt is null -->
-        <div style="position: fixed; bottom: 20px; right: 20px; background: red; color: white; padding: 10px; z-index: 9999;">
-            DEBUG: selectedConfirmationForProofPreview set mas PixProofUploadedAt is null
-        </div>
-    }
 }
 
 @code {
@@ -949,7 +907,6 @@ else
     private bool        requestingJoin      = false;
     private string      joinRequestError    = string.Empty;
     private List<PostMatchVote> detailMvpVotes = new();
-    private EventConfirmation? selectedConfirmationForProofPreview = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -1297,16 +1254,8 @@ else
     private void NavigateToPaymentsModal()
     {
         if (ev is null) return;
-        selectedConfirmationForProofPreview = null;
         // Navigate to admin payments page where admin can manage all payments
         NavigationManager.NavigateTo("/admin/payments");
-    }
-
-    private void SetProofPreview(EventConfirmation confirmation)
-    {
-        // Properly capture confirmation from foreach closure
-        selectedConfirmationForProofPreview = confirmation;
-        StateHasChanged();
     }
 
 }
