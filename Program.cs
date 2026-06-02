@@ -130,6 +130,8 @@ builder.Services.AddHostedService<LogRetentionService>();
 builder.Services.AddHostedService<RachaSchedulerService>();
 builder.Services.AddHostedService<EventNotificationSchedulerService>();
 builder.Services.AddHostedService<EventPaymentReconciliationWorker>();
+builder.Services.AddHostedService<PendingWebhooksAlertService>();
+builder.Services.AddHostedService<CertificateHealthCheckService>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
 builder.Services.AddScoped<AdminSecurityPolicyService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
