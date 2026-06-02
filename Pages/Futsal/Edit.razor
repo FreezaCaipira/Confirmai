@@ -190,7 +190,7 @@
                     {
                         @if (!showCancelConfirm)
                         {
-                            <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                            <button class="save-btn edit-cancel-btn" type="button"
                                     @onclick="() => showCancelConfirm = true">
                                 <i class="fas fa-ban"></i> Cancelar partida
                             </button>
@@ -199,9 +199,9 @@
                         {
                             <div class="cancel-confirm-block">
                                 <span>Tem certeza? Todos os confirmados serão avisados.</span>
-                                <button class="detail-admin-btn" type="button"
+                                <button class="save-btn edit-cancel-no-btn" type="button"
                                         @onclick="() => showCancelConfirm = false">Não</button>
-                                <button class="detail-admin-btn detail-admin-btn--danger" type="button"
+                                <button class="save-btn edit-cancel-btn" type="button"
                                         @onclick="CancelEvent">Sim, cancelar</button>
                             </div>
                         }

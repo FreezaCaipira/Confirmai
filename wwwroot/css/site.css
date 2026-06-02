@@ -103,6 +103,8 @@
     --ci-text-link:    #7ab6ff;
     --ci-text-muted:   #8aacc8;
     --ci-text-subtle:  #6082a0;
+    --ci-text-info:    #8fc2f3;
+    --ci-text-info-strong: #b7dbff;
     --ci-font:         -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 

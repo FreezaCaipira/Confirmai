@@ -1,4 +1,4 @@
-﻿using Confirmai.Data;
+using Confirmai.Data;
 using Confirmai.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,7 +56,7 @@ internal static class TestDataFactory
         var product = new Product
         {
             Name = "Produto teste",
-            Description = "Descrição",
+            Description = "Descri��o",
             Price = amount,
             UserId = sellerId
         };
@@ -79,5 +79,34 @@ internal static class TestDataFactory
         db.SaveChanges();
         return payment;
     }
+
+    public static Group CreateGroup(string name)
+    {
+        return new Group { Name = name };
+    }
+
+    public static Event CreateEvent(Group group, string dateStr, decimal price)
+    {
+        return new Event
+        {
+            GroupId = group.Id,
+            Group = group,
+            StartsAt = DateTime.Parse(dateStr),
+            Price = price
+        };
+    }
+
+    public static EventConfirmation CreateEventConfirmation(Event evt, ApplicationUser user)
+    {
+        return new EventConfirmation
+        {
+            EventId = evt.Id,
+            Event = evt,
+            UserId = user.Id,
+            User = user,
+            ConfirmedAt = DateTime.UtcNow
+        };
+    }
 }
+
 

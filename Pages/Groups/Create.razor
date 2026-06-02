@@ -8,12 +8,16 @@
 @using Confirmai.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
 @using Microsoft.EntityFrameworkCore
 
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager              NavigationManager
 @inject AuthenticationStateProvider   AuthStateProvider
 @inject LogService                     LogService
+@inject IWebHostEnvironment            Env
+@inject IJSRuntime                     JS
 
 <PageTitle>Criar Grupo — Confirmai</PageTitle>
 
@@ -44,6 +48,36 @@
                                placeholder='@(form.Sport == Sport.Poker ? "Ex: \"Sierra Poker Club\"" : "Ex: \"Rachão de Terça\"")'
                                autocomplete="off" />
                     <ValidationMessage For="@(() => form.Name)" class="validation-message" />
+                </div>
+
+                <div class="form-group">
+                    <label>Logo/Imagem do grupo</label>
+                    <div class="upload-section">
+                        <div class="upload-preview">
+                            @if (!string.IsNullOrWhiteSpace(logoPreview))
+                            {
+                                <img src="@logoPreview" alt="Preview" class="upload-preview-img" />
+                            }
+                            else
+                            {
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <span>Nenhuma imagem selecionada</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="upload-controls">
+                            <button class="upload-btn" type="button" @onclick="TriggerFileInput">
+                                <i class="fas fa-upload"></i> Selecionar imagem
+                            </button>
+                            <InputFile id="logo-input" OnChange="OnLogoSelected" accept=".jpg,.jpeg,.png,.webp" style="display:none" />
+                            @if (!string.IsNullOrWhiteSpace(logoFeedback))
+                            {
+                                <p class="@(logoError ? "validation-message" : "upload-success")">@logoFeedback</p>
+                            }
+                            <p class="upload-hint">PNG, JPG ou WebP • Máximo 5 MB</p>
+                        </div>
+                    </div>
                 </div>
             </fieldset>
 
@@ -113,6 +147,11 @@
     private bool            isSaving  = false;
     private string          saveError = string.Empty;
 
+    private IBrowserFile?   logoFile = null;
+    private string?         logoPreview = null;
+    private string          logoFeedback = string.Empty;
+    private bool            logoError = false;
+
     private static readonly string[] BrazilianStates =
         ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
          "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
@@ -146,9 +185,36 @@
                 IsPrivate       = true,
                 CreatedByUserId = userId,
                 InviteCode      = Guid.NewGuid().ToString("N")[..8].ToUpper(),
+                LogoPath        = null,
             };
             db.Groups.Add(group);
             await db.SaveChangesAsync();
+
+            // Salvar logo se fornecida
+            if (logoFile is not null)
+            {
+                try
+                {
+                    var logosDir = Path.Combine(Env.WebRootPath, "uploads", "groups");
+                    Directory.CreateDirectory(logosDir);
+
+                    var ext = Path.GetExtension(logoFile.Name).ToLowerInvariant();
+                    var filename = $"{Guid.NewGuid()}{ext}";
+                    var fullPath = Path.Combine(logosDir, filename);
+
+                    await using var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
+                    await using var readStream = logoFile.OpenReadStream(5 * 1024 * 1024);
+                    await readStream.CopyToAsync(stream);
+
+                    group.LogoPath = $"/uploads/groups/{filename}";
+                    db.Groups.Update(group);
+                    await db.SaveChangesAsync();
+                }
+                catch
+                {
+                    // Se falhar ao salvar logo, continua sem ela
+                }
+            }
 
             db.GroupMembers.Add(new GroupMember
             {
@@ -171,6 +237,55 @@
         {
             saveError = $"Erro ao criar grupo: {ex.Message}";
             isSaving  = false;
+        }
+    }
+
+    private async Task TriggerFileInput()
+    {
+        await JS.InvokeVoidAsync("eval", "document.getElementById('logo-input').click()");
+    }
+
+    private async Task OnLogoSelected(InputFileChangeEventArgs e)
+    {
+        logoFile = e.File;
+        logoError = false;
+        logoFeedback = string.Empty;
+
+        const long maxBytes = 5 * 1024 * 1024;
+        var allowedTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+        var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+
+        var ext = Path.GetExtension(logoFile.Name).ToLowerInvariant();
+        if (!allowedExts.Contains(ext) || !allowedTypes.Contains(logoFile.ContentType))
+        {
+            logoError = true;
+            logoFeedback = "Formato inválido. Use PNG, JPG ou WebP.";
+            logoFile = null;
+            return;
+        }
+
+        if (logoFile.Size > maxBytes)
+        {
+            logoError = true;
+            logoFeedback = "Arquivo muito grande. Máximo 5 MB.";
+            logoFile = null;
+            return;
+        }
+
+        try
+        {
+            var buffer = new byte[logoFile.Size];
+            await using var stream = logoFile.OpenReadStream(maxBytes);
+            await stream.ReadExactlyAsync(buffer);
+            logoPreview = $"data:{logoFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
+            logoFeedback = "Imagem selecionada com sucesso!";
+            logoError = false;
+        }
+        catch
+        {
+            logoError = true;
+            logoFeedback = "Erro ao processar imagem.";
+            logoFile = null;
         }
     }
 }

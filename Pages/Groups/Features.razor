@@ -6,6 +6,7 @@
 @using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
+@using Confirmai.Services
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -13,6 +14,8 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider    AuthStateProvider
 @inject NavigationManager              NavigationManager
+@inject LogService                     LogService
+@inject EventPaymentGatewayFactory     EventGatewayFactory
 
 <PageTitle>Configurações — @(group?.Name ?? "Grupo") · Confirmai</PageTitle>
 
@@ -31,6 +34,7 @@ else
 {
     var adminMembers   = members.Where(m => m.Role == GroupMemberRole.Admin).ToList();
     var pixAdmins      = adminMembers.Where(m => !string.IsNullOrWhiteSpace(m.User?.PixKey)).ToList();
+    var canManageAdminRoles = isCreator;
 
     <div class="detail-page">
         <div class="detail-card">
@@ -74,6 +78,38 @@ else
                             <span class="feature-toggle-track"></span>
                         </label>
                     </div>
+
+                    <div class="feature-card @(group.EnablePaymentGateways ? "feature-card--on" : "")">
+                        <div class="feature-card-info">
+                            <span class="feature-card-icon"><i class="fas fa-credit-card"></i></span>
+                            <div class="feature-card-text">
+                                <strong class="feature-card-title">Gateways de pagamento</strong>
+                                <p class="feature-card-desc">
+                                    Quando ativado, a tela de pagamento mostra opções de gateway
+                                    (EfiBank, Abacate e futuras integrações) além do Pix direto do organizador.
+                                </p>
+                                @if (availableGatewayOptions.Count == 0)
+                                {
+                                    <p class="feat-gateway-note">
+                                        Nenhum gateway está disponível no momento. Habilite/configure em Admin &gt; Gateways.
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p class="feat-gateway-note">
+                                        Disponíveis agora: @string.Join(", ", availableGatewayOptions.Select(g => g.DisplayName))
+                                    </p>
+                                }
+                            </div>
+                        </div>
+                        <label class="feature-toggle" title="@(group.EnablePaymentGateways ? "Desativar" : "Ativar")">
+                            <input type="checkbox"
+                                   checked="@group.EnablePaymentGateways"
+                                   disabled="@isSaving"
+                                   @onchange="() => TogglePaymentGateways()" />
+                            <span class="feature-toggle-track"></span>
+                        </label>
+                    </div>
                 </div>
 
                 @if (!string.IsNullOrWhiteSpace(saveMessage))
@@ -93,6 +129,13 @@ else
                     <i class="fas fa-user-shield"></i> Membros &amp; Permissões
                 </h2>
                 <p class="features-section-sub">Promova membros a admin ou remova permissões de admin.</p>
+                @if (!canManageAdminRoles)
+                {
+                    <p class="feat-role-note">
+                        <i class="fas fa-lock"></i>
+                        Apenas o criador do grupo pode adicionar ou remover administradores.
+                    </p>
+                }
 
                 <ul class="feat-members-list">
                     @foreach (var m in members.OrderBy(m => m.Role == GroupMemberRole.Admin ? 0 : 1).ThenBy(m => m.User?.FullName))
@@ -100,13 +143,15 @@ else
                         var isSelf   = m.UserId == currentUserId;
                         var isAdminM = m.Role == GroupMemberRole.Admin;
                         var onlyAdmin = isAdminM && adminMembers.Count == 1;
+                        var isConfirmingPromote = confirmPromoteMemberId == m.Id;
                         <li class="feat-member-item">
                             <div class="feat-member-info">
                                 <span class="feat-member-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
                                 @if (isAdminM) { <span class="player-tag player-tag--admin">admin</span> }
+                                @if (m.UserId == group.CreatedByUserId) { <span class="player-tag">criador</span> }
                                 @if (isSelf)   { <span class="player-tag player-tag--me">você</span> }
                             </div>
-                            @if (!isSelf)
+                            @if (!isSelf && canManageAdminRoles)
                             {
                                 @if (isAdminM)
                                 {
@@ -120,13 +165,34 @@ else
                                 }
                                 else
                                 {
-                                    <button class="feat-role-btn feat-role-btn--promote"
-                                            type="button"
-                                            disabled="@isSavingRole"
-                                            title="Promover a admin"
-                                            @onclick="() => SetMemberRole(m.Id, GroupMemberRole.Admin)">
-                                        <i class="fas fa-user-shield"></i> Tornar admin
-                                    </button>
+                                    @if (isConfirmingPromote)
+                                    {
+                                        <div class="feat-role-confirm">
+                                            <span class="feat-role-confirm-text">tornar admin?</span>
+                                            <button class="feat-role-btn feat-role-btn--confirm-yes"
+                                                    type="button"
+                                                    disabled="@isSavingRole"
+                                                    @onclick="() => SetMemberRole(m.Id, GroupMemberRole.Admin)">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="feat-role-btn feat-role-btn--confirm-no"
+                                                    type="button"
+                                                    disabled="@isSavingRole"
+                                                    @onclick="() => confirmPromoteMemberId = null">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <button class="feat-role-btn feat-role-btn--promote"
+                                                type="button"
+                                                disabled="@isSavingRole"
+                                                title="Promover a admin"
+                                                @onclick="() => confirmPromoteMemberId = m.Id">
+                                            <i class="fas fa-user-shield"></i> Tornar admin
+                                        </button>
+                                    }
                                 }
                             }
                         </li>
@@ -202,9 +268,11 @@ else
 
     private Group?               group         = null;
     private List<GroupMember>    members       = new();
+    private List<EventPaymentGatewayOption> availableGatewayOptions = new();
     private string?              currentUserId = null;
     private bool                 isLoading     = true;
     private bool                 isAdmin       = false;
+    private bool                 isCreator     = false;
 
     // Feature toggles
     private bool    isSaving    = false;
@@ -215,6 +283,7 @@ else
     private bool    isSavingRole = false;
     private string  roleMessage  = string.Empty;
     private bool    roleError    = false;
+    private int?    confirmPromoteMemberId = null;
 
     // Pix receiver
     private bool    isSavingPix        = false;
@@ -240,9 +309,12 @@ else
 
         isAdmin = currentUserId is not null && group is not null &&
                   group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
+        isCreator = currentUserId is not null && group is not null && group.CreatedByUserId == currentUserId;
 
         members = group?.Members.ToList() ?? new();
+        availableGatewayOptions = (await EventGatewayFactory.GetAvailableAsync()).ToList();
         selectedPixReceiverId = group?.PixReceiverUserId ?? string.Empty;
+        confirmPromoteMemberId = null;
         isLoading = false;
     }
 
@@ -257,12 +329,75 @@ else
             await using var db = await DbFactory.CreateDbContextAsync();
             var dbGroup = await db.Groups.FindAsync(group.Id);
             if (dbGroup is null) return;
+            var previous = dbGroup.EnablePostMatchRanking;
             dbGroup.EnablePostMatchRanking = !group.EnablePostMatchRanking;
             await db.SaveChangesAsync();
             group.EnablePostMatchRanking = dbGroup.EnablePostMatchRanking;
+
+            await LogService.AuditAsync(
+                AuditEvents.GroupFeatureToggled,
+                AuditEntities.Group,
+                dbGroup.Id.ToString(),
+                $"Configuração do grupo alterada: ranking pós-partida {(dbGroup.EnablePostMatchRanking ? "ativado" : "desativado")}",
+                currentUserId,
+                source: "GroupFeatures",
+                metadata: new
+                {
+                    Feature = "EnablePostMatchRanking",
+                    Previous = previous,
+                    Current = dbGroup.EnablePostMatchRanking,
+                    ChangedByUserId = currentUserId,
+                    ChangedAtUtc = DateTime.UtcNow,
+                });
+
             saveMessage = dbGroup.EnablePostMatchRanking
                 ? "Ranking pós-partida ativado."
                 : "Ranking pós-partida desativado.";
+        }
+        catch
+        {
+            saveMessage = "Erro ao salvar. Tente novamente.";
+            saveError   = true;
+        }
+        finally { isSaving = false; }
+    }
+
+    private async Task TogglePaymentGateways()
+    {
+        if (group is null) return;
+        isSaving    = true;
+        saveMessage = string.Empty;
+        saveError   = false;
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var dbGroup = await db.Groups.FindAsync(group.Id);
+            if (dbGroup is null) return;
+
+            var previous = dbGroup.EnablePaymentGateways;
+            dbGroup.EnablePaymentGateways = !group.EnablePaymentGateways;
+            await db.SaveChangesAsync();
+            group.EnablePaymentGateways = dbGroup.EnablePaymentGateways;
+
+            await LogService.AuditAsync(
+                AuditEvents.GroupFeatureToggled,
+                AuditEntities.Group,
+                dbGroup.Id.ToString(),
+                $"Configuração do grupo alterada: gateways de pagamento {(dbGroup.EnablePaymentGateways ? "ativado" : "desativado")}",
+                currentUserId,
+                source: "GroupFeatures",
+                metadata: new
+                {
+                    Feature = "EnablePaymentGateways",
+                    Previous = previous,
+                    Current = dbGroup.EnablePaymentGateways,
+                    ChangedByUserId = currentUserId,
+                    ChangedAtUtc = DateTime.UtcNow,
+                });
+
+            saveMessage = dbGroup.EnablePaymentGateways
+                ? "Gateways de pagamento ativados para este grupo."
+                : "Gateways de pagamento desativados. Fluxo padrão com Pix direto mantido.";
         }
         catch
         {
@@ -282,6 +417,33 @@ else
         {
             await using var db = await DbFactory.CreateDbContextAsync();
 
+            var dbGroup = await db.Groups.FindAsync(group.Id);
+            if (dbGroup is null) return;
+
+            if (string.IsNullOrWhiteSpace(currentUserId) || dbGroup.CreatedByUserId != currentUserId)
+            {
+                roleMessage = "Somente o criador do grupo pode adicionar ou remover admins.";
+                roleError   = true;
+
+                await LogService.AuditAsync(
+                    AuditEvents.GroupMemberRoleChangeDenied,
+                    AuditEntities.Group,
+                    dbGroup.Id.ToString(),
+                    "Tentativa negada de alterar papel de membro (somente criador pode gerir admins).",
+                    currentUserId,
+                    source: "GroupFeatures",
+                    level: "Warning",
+                    metadata: new
+                    {
+                        GroupId = dbGroup.Id,
+                        MemberId = memberId,
+                        RequestedRole = newRole.ToString(),
+                        ActorUserId = currentUserId,
+                        OccurredAtUtc = DateTime.UtcNow,
+                    });
+                return;
+            }
+
             // Safety: cannot remove last admin
             if (newRole == GroupMemberRole.Member)
             {
@@ -297,11 +459,38 @@ else
 
             var dbMember = await db.GroupMembers.FindAsync(memberId);
             if (dbMember is null || dbMember.GroupId != group.Id) return;
+            var oldRole = dbMember.Role;
+            if (oldRole == newRole)
+            {
+                roleMessage = "Nenhuma alteração de permissão foi necessária.";
+                confirmPromoteMemberId = null;
+                return;
+            }
             dbMember.Role = newRole;
             await db.SaveChangesAsync();
+
+            await LogService.AuditAsync(
+                AuditEvents.GroupMemberRoleChanged,
+                AuditEntities.Group,
+                dbGroup.Id.ToString(),
+                $"Permissão de membro alterada no grupo: usuário {dbMember.UserId} de {oldRole} para {newRole}.",
+                currentUserId,
+                source: "GroupFeatures",
+                metadata: new
+                {
+                    GroupId = dbGroup.Id,
+                    GroupName = dbGroup.Name,
+                    TargetUserId = dbMember.UserId,
+                    PreviousRole = oldRole.ToString(),
+                    CurrentRole = newRole.ToString(),
+                    ChangedByUserId = currentUserId,
+                    ChangedAtUtc = DateTime.UtcNow,
+                });
+
             roleMessage = newRole == GroupMemberRole.Admin
                 ? "Membro promovido a admin."
                 : "Permissão de admin removida.";
+            confirmPromoteMemberId = null;
             await LoadAsync();
         }
         catch
@@ -309,7 +498,12 @@ else
             roleMessage = "Erro ao salvar. Tente novamente.";
             roleError   = true;
         }
-        finally { isSavingRole = false; }
+        finally
+        {
+            isSavingRole = false;
+            if (roleError)
+                confirmPromoteMemberId = null;
+        }
     }
 
     private async Task SavePixReceiver()
@@ -323,11 +517,66 @@ else
             await using var db = await DbFactory.CreateDbContextAsync();
             var dbGroup = await db.Groups.FindAsync(group.Id);
             if (dbGroup is null) return;
-            dbGroup.PixReceiverUserId = string.IsNullOrEmpty(selectedPixReceiverId)
+
+            var previousReceiverId = dbGroup.PixReceiverUserId;
+            var requestedReceiverId = string.IsNullOrEmpty(selectedPixReceiverId)
                 ? null
                 : selectedPixReceiverId;
+
+            if (!string.IsNullOrWhiteSpace(requestedReceiverId))
+            {
+                var isEligible = await db.GroupMembers
+                    .Include(m => m.User)
+                    .AnyAsync(m =>
+                        m.GroupId == group.Id &&
+                        m.UserId == requestedReceiverId &&
+                        m.Role == GroupMemberRole.Admin &&
+                        !string.IsNullOrWhiteSpace(m.User!.PixKey));
+                if (!isEligible)
+                {
+                    pixMessage = "Escolha inválida: selecione um admin com chave Pix cadastrada.";
+                    pixError = true;
+                    return;
+                }
+            }
+
+            dbGroup.PixReceiverUserId = requestedReceiverId;
             await db.SaveChangesAsync();
             group.PixReceiverUserId = dbGroup.PixReceiverUserId;
+
+            if (!string.Equals(previousReceiverId, dbGroup.PixReceiverUserId, StringComparison.Ordinal))
+            {
+                var ids = new[] { previousReceiverId, dbGroup.PixReceiverUserId }
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Distinct()
+                    .Cast<string>()
+                    .ToList();
+                var names = await db.Users
+                    .Where(u => ids.Contains(u.Id))
+                    .Select(u => new { u.Id, Name = u.FullName ?? u.UserName ?? u.Email ?? u.Id })
+                    .ToListAsync();
+                var nameMap = names.ToDictionary(x => x.Id, x => x.Name);
+
+                await LogService.AuditAsync(
+                    AuditEvents.GroupPixReceiverChanged,
+                    AuditEntities.Group,
+                    dbGroup.Id.ToString(),
+                    "Destino Pix do grupo alterado.",
+                    currentUserId,
+                    source: "GroupFeatures",
+                    metadata: new
+                    {
+                        GroupId = dbGroup.Id,
+                        GroupName = dbGroup.Name,
+                        PreviousReceiverUserId = previousReceiverId,
+                        PreviousReceiverName = previousReceiverId is not null && nameMap.TryGetValue(previousReceiverId, out var previousName) ? previousName : null,
+                        CurrentReceiverUserId = dbGroup.PixReceiverUserId,
+                        CurrentReceiverName = dbGroup.PixReceiverUserId is not null && nameMap.TryGetValue(dbGroup.PixReceiverUserId, out var currentName) ? currentName : null,
+                        ChangedByUserId = currentUserId,
+                        ChangedAtUtc = DateTime.UtcNow,
+                    });
+            }
+
             pixMessage = "Destino Pix salvo com sucesso.";
         }
         catch

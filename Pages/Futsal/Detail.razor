@@ -14,6 +14,7 @@
 
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject LogService                     LogService
+@inject AdminConfirmationService AdminConfirmationService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject Confirmai.Services.EventNotificationService NotificationService
@@ -1043,33 +1044,12 @@ else
     private async Task AdminTogglePaid(int confirmationId)
     {
         if (!IsGroupAdmin()) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var conf = await db.EventConfirmations.FindAsync(confirmationId);
-        if (conf is null) return;
-        // Prevent admin from unmarking a payment that was confirmed by a payment gateway
-        if (conf.HasPaid && conf.PaymentGatewayName != null) return;
-        conf.PaymentStatus = conf.PaymentStatus == EventConfirmationPaymentStatus.Paid
-            ? EventConfirmationPaymentStatus.Pending
-            : EventConfirmationPaymentStatus.Paid;
-        conf.HasPaid = conf.PaymentStatus == EventConfirmationPaymentStatus.Paid;
-        if (conf.HasPaid)
+        var result = await AdminConfirmationService.TogglePaidAsync(confirmationId, currentUserId);
+        if (result.Found && result.Updated)
         {
-            conf.MarkedPaidByUserId = currentUserId;
-            conf.MarkedPaidAt       = DateTime.UtcNow;
+            confirmPayId = null;
+            await LoadEvent();
         }
-        else
-        {
-            conf.MarkedPaidByUserId = null;
-            conf.MarkedPaidAt       = null;
-        }
-        await db.SaveChangesAsync();
-        var auditEvent = conf.HasPaid ? AuditEvents.EventConfirmationPaidManual : AuditEvents.EventConfirmationUnpaidManual;
-        var auditMsg   = conf.HasPaid
-            ? $"Admin marcou confirmação #{confirmationId} como paga (evento #{ev?.Id})"
-            : $"Admin desconfirmou pagamento da confirmação #{confirmationId} (evento #{ev?.Id})";
-        await LogService.AuditAsync(auditEvent, AuditEntities.EventConfirmation, confirmationId.ToString(), auditMsg, currentUserId, "EventAdmin");
-        confirmPayId = null;
-        await LoadEvent();
     }
 
     private async Task AdminRemoveConfirmation(int confirmationId)

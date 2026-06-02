@@ -102,6 +102,9 @@ builder.Services.AddScoped<GatewayService>();
 builder.Services.AddScoped<PaymentConfirmationService>();
 builder.Services.AddScoped<EventPaymentReconciliationService>();
 builder.Services.AddScoped<EventConfirmationPaymentStatusService>();
+builder.Services.AddScoped<AdminConfirmationService>();
+builder.Services.AddScoped<DelinquencyService>();
+builder.Services.AddScoped<PixProofUploadService>();
 builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<AbacatePayWebhookService>();
@@ -125,6 +128,7 @@ builder.Services.AddScoped<AuthenticationStateProvider,
     RevalidatingIdentityAuthenticationStateProvider>();
 builder.Services.AddHostedService<LogRetentionService>();
 builder.Services.AddHostedService<RachaSchedulerService>();
+builder.Services.AddHostedService<EventNotificationSchedulerService>();
 builder.Services.AddHostedService<EventPaymentReconciliationWorker>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
 builder.Services.AddScoped<AdminSecurityPolicyService>();

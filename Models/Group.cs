@@ -40,6 +40,14 @@ namespace Confirmai.Models
         /// <summary>Habilita o ranking pós-partida (mensal/anual) para o grupo.</summary>
         public bool EnablePostMatchRanking { get; set; } = false;
 
+        /// <summary>
+        /// Habilita gateways de pagamento de terceiros (EfiBank, Abacate etc.)
+        /// para os pagamentos das partidas do grupo.
+        /// Quando falso, o fluxo padrão é Pix direto do organizador com
+        /// confirmação manual e envio de comprovante.
+        /// </summary>
+        public bool EnablePaymentGateways { get; set; } = false;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [StringLength(450)]

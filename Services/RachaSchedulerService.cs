@@ -107,16 +107,8 @@ namespace Confirmai.Services
                 "RachaSchedulerService: {Count} evento(s) gerado(s) para a janela de {Weeks} semanas.",
                 newEvents.Count, WeeksAhead);
 
-            // Notifica membros do grupo sobre cada novo evento (best-effort)
-            foreach (var ev in newEvents)
-            {
-                try { await notifications.NotifyNewRecurringEventAsync(ev.Id); }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex,
-                        "RachaSchedulerService: falha ao notificar evento {EventId}.", ev.Id);
-                }
-            }
+            // Notificações de eventos recorrentes são enviadas diariamente às 8h da manhã
+            // via EventNotificationSchedulerService (veja EventNotificationSchedulerService.cs)
         }
 
         /// <summary>

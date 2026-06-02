@@ -75,47 +75,53 @@
                         .Where(e => e.IsActive && e.StartsAt > DateTime.UtcNow)
                         .OrderBy(e => e.StartsAt)
                         .FirstOrDefault();
-                    <a class="group-card @(hasPending || needsPix ? "group-card--action-required" : "")" href="/grupo/@g.Id">
-                        <div class="group-card-top">
-                            <span class="group-card-sport">
-                                @(g.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
-                            </span>
-                            <div class="group-card-badges">
-                                @if (isAdmin)
+                    var backgroundStyle = string.IsNullOrWhiteSpace(g.LogoPath)
+                        ? "background: linear-gradient(135deg, #1a3a52 0%, #0f2438 100%);"
+                        : $"background-image: url('{g.LogoPath}'); background-size: cover; background-position: center;";
+                    <a class="group-card @(hasPending || needsPix ? "group-card--action-required" : "")" href="/grupo/@g.Id" style="@backgroundStyle">
+                        <div class="group-card-overlay"></div>
+                        <div class="group-card-content">
+                            <div class="group-card-top">
+                                <span class="group-card-sport">
+                                    @(g.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                                </span>
+                                <div class="group-card-badges">
+                                    @if (isAdmin)
+                                    {
+                                        <span class="player-tag player-tag--admin">admin</span>
+                                        @if (hasPending)
+                                        {
+                                            <span class="player-tag player-tag--pending-requests">@pendingCount pendente@(pendingCount == 1 ? string.Empty : "s")</span>
+                                        }
+                                        @if (needsPix)
+                                        {
+                                            <span class="player-tag player-tag--pix-missing" title="Nenhum admin tem chave Pix cadastrada">⚠ Pix pendente</span>
+                                        }
+                                    }
+                                    @if (!g.IsActive)
+                                    {
+                                        <span class="player-tag">inativo</span>
+                                    }
+                                </div>
+                            </div>
+                            <h2 class="group-card-name">@g.Name</h2>
+                            @if (!string.IsNullOrWhiteSpace(g.City))
+                            {
+                                <p class="group-card-location">
+                                    <i class="fas fa-map-marker-alt"></i> @g.City/@g.StateCode
+                                </p>
+                            }
+                            <div class="group-card-meta">
+                                <span><i class="fas fa-users"></i> @g.Members.Count membro@(g.Members.Count != 1 ? "s" : "")</span>
+                                @if (nextEvent is not null)
                                 {
-                                    <span class="player-tag player-tag--admin">admin</span>
-                                    @if (hasPending)
-                                    {
-                                        <span class="player-tag player-tag--pending-requests">@pendingCount pendente@(pendingCount == 1 ? string.Empty : "s")</span>
-                                    }
-                                    @if (needsPix)
-                                    {
-                                        <span class="player-tag player-tag--pix-missing" title="Nenhum admin tem chave Pix cadastrada">⚠ Pix pendente</span>
-                                    }
+                                    <span><i class="fas fa-calendar-alt"></i> @nextEvent.StartsAt.ToLocalTime().ToString("dd/MM HH:mm")</span>
                                 }
-                                @if (!g.IsActive)
+                                else
                                 {
-                                    <span class="player-tag">inativo</span>
+                                    <span class="group-card-no-event"><i class="fas fa-calendar-times"></i> Sem partida agendada</span>
                                 }
                             </div>
-                        </div>
-                        <h2 class="group-card-name">@g.Name</h2>
-                        @if (!string.IsNullOrWhiteSpace(g.City))
-                        {
-                            <p class="group-card-location">
-                                <i class="fas fa-map-marker-alt"></i> @g.City/@g.StateCode
-                            </p>
-                        }
-                        <div class="group-card-meta">
-                            <span><i class="fas fa-users"></i> @g.Members.Count membro@(g.Members.Count != 1 ? "s" : "")</span>
-                            @if (nextEvent is not null)
-                            {
-                                <span><i class="fas fa-calendar-alt"></i> @nextEvent.StartsAt.ToLocalTime().ToString("dd/MM HH:mm")</span>
-                            }
-                            else
-                            {
-                                <span class="group-card-no-event"><i class="fas fa-calendar-times"></i> Sem partida agendada</span>
-                            }
                         </div>
                     </a>
                 }

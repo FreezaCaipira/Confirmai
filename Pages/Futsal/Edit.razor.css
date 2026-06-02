@@ -9,10 +9,28 @@
     margin: 0;
 }
 .form-actions {
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     padding-top: 1.25rem;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.edit-cancel-btn {
+    background: #b91c1c;
+    border-color: #991b1b;
+}
+
+.edit-cancel-btn:hover:not(:disabled) {
+    background: #991b1b;
+}
+
+.edit-cancel-no-btn {
+    background: #334155;
+    border-color: #475569;
+}
+
+.edit-cancel-no-btn:hover:not(:disabled) {
+    background: #475569;
 }
 /* ── Input focus override (neutralize browser defaults) ─────────── */
 input:focus,

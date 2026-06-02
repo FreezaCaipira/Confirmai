@@ -142,18 +142,19 @@
     align-items: center;
     gap: 0.5rem;
     padding: 2rem 1rem;
-    color: #475569;
+    color: var(--ci-text-info, #8fc2f3);
     font-size: 0.9rem;
 }
 
 .ranking-empty i {
     font-size: 2rem;
+    color: var(--ci-text-info-strong, #b7dbff);
 }
 
 .ranking-footnote {
     margin-top: 1rem;
     font-size: 0.78rem;
-    color: #64748b;
+    color: var(--ci-text-info, #8fc2f3);
     display: flex;
     align-items: center;
     gap: 0.35rem;

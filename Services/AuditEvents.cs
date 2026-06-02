@@ -78,6 +78,10 @@ public static class AuditEvents
     public const string GroupUpdated       = "group.updated";
     public const string GroupMemberAdded   = "group.member.added";
     public const string GroupMemberRemoved = "group.member.removed";
+    public const string GroupMemberRoleChanged = "group.member.role.changed";
+    public const string GroupMemberRoleChangeDenied = "group.member.role.change.denied";
+    public const string GroupFeatureToggled = "group.feature.toggled";
+    public const string GroupPixReceiverChanged = "group.pix.receiver.changed";
 
     // ── Delinquência ──
     public const string DelinquencyNotified = "delinquency.notified";
