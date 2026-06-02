@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.DataProtection;
 using Serilog;
 using Serilog.Events;
 using OpenTelemetry.Resources;
@@ -150,6 +151,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(defaultConnection), ServiceLifetime.Scoped);
+
+// Configure Data Protection to persist antiforgery tokens in PostgreSQL
+// This ensures tokens remain valid across container restarts in production
+builder.Services
+    .AddDataProtection()
+    .PersistKeysToDbContext<AppDbContext>();
 
 var isDevelopment = builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing");
 var securityPolicy = SecurityPolicyDefaults.Create(isDevelopment);

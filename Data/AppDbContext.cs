@@ -1,11 +1,12 @@
 ﻿using Confirmai.Models;
 using Confirmai.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Confirmai.Data
 {
-    public class AppDbContext : IdentityDbContext<ApplicationUser>
+    public class AppDbContext : IdentityDbContext<ApplicationUser>, IDataProtectionKeyContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -26,6 +27,9 @@ namespace Confirmai.Data
         public DbSet<Venue> Venues { get; set; }
         public DbSet<MatchSchedule> RachaSchedules { get; set; }
         public DbSet<PostMatchVote> PostMatchVotes { get; set; }
+
+        // Data Protection Keys (ASP.NET Core antiforgery token encryption)
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
         public override int SaveChanges()
         {
