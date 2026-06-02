@@ -358,22 +358,13 @@ else
                                                         <i class="fas fa-check"></i> pago
                                                     </span>
                                                 }
-                                                else if (c.PixProofUploadedAt.HasValue)
+                                                else if (c.PixProofUploadedAt.HasValue && (c.UserId == currentUserId || isAdmin))
                                                 {
-                                                    @if (isAdmin)
-                                                    {
-                                                        <button class="player-tag player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
-                                                            <i class="fas fa-image"></i> 📎 comprovante
-                                                        </button>
-                                                    }
-                                                    else
-                                                    {
-                                                        <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--proof-pending player-tag--pay-link" title="Comprovante enviado - clique para gerenciar">
-                                                            <i class="fas fa-image"></i> 📎 comprovante
-                                                        </a>
-                                                    }
+                                                    <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--proof-pending player-tag--pay-link" title="Comprovante enviado - clique para gerenciar">
+                                                        <i class="fas fa-image"></i> 📎 comprovante
+                                                    </a>
                                                 }
-                                                else
+                                                else if (c.UserId == currentUserId)
                                                 {
                                                     <span class="player-tag player-tag--pay-pending">
                                                         <i class="fas fa-exclamation-triangle"></i> pendente
@@ -635,7 +626,7 @@ else
                                                     <i class="fas fa-check"></i> pago
                                                 </span>
                                             }
-                                            else if (c.PixProofUploadedAt.HasValue)
+                                            else if (c.PixProofUploadedAt.HasValue && (c.UserId == currentUserId || isAdmin))
                                             {
                                                 @if (isAdmin)
                                                 {
