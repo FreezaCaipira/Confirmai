@@ -242,6 +242,54 @@ Veja os arquivos [roadmap.md](roadmap.md) e [DEVELOPMENT.md](DEVELOPMENT.md) par
 
 ---
 
+## 📋 Revisão Estrutural (Junho 2026)
+
+### Achados Principais
+
+Uma auditoria completa foi realizada em **estrutura CSS, organização Blazor, separação de responsabilidades e segurança**.
+
+#### 🔴 **Problemas Críticos Identificados**
+
+| Problema | Impacto | Status |
+|----------|---------|--------|
+| **StateHasChanged() desnecessário** | 101 chamadas (60% evitáveis) causam re-renders excessivos | 🔄 **EM PROGRESSO** |
+| **Memory leaks potenciais** | Apenas 3 páginas têm `IAsyncDisposable` | 🔄 **PRÓXIMO** |
+| **Componentes muito grandes** | AdminPayments (1.220 linhas), Groups/Detail (1.041 linhas) | 📋 Backlog |
+| **Serviços desorganizados** | 71+ serviços no nível raiz sem subpastas | 📋 Backlog |
+| **CSS duplicado** | Estilos de cards, borders, gradientes repetidos | 📋 Backlog |
+
+#### ✅ **Pontos Fortes Confirmados**
+
+| Aspecto | Qualidade |
+|---------|-----------|
+| **Segurança** | ⭐⭐⭐⭐⭐ CSRF tokens, XSS protection, rate limiting, mTLS |
+| **DI/Arquitetura** | ⭐⭐⭐⭐ Factories, Scoped/Singleton bem aplicados |
+| **Padrões CSS** | ⭐⭐⭐⭐ Design tokens, BEM, CSS scoped |
+| **Separação de responsabilidades** | ⭐⭐⭐ Serviços bem definidos |
+
+### Plano de Ação Priorizado
+
+**🔴 CRÍTICA (1-2 semanas):**
+1. ✅ Auditoria e análise completa — [PROJECT_ANALYSIS.md](PROJECT_ANALYSIS.md)
+2. 🔄 **Implementar `IAsyncDisposable` globalmente** (todas as páginas)
+3. 🔄 Auditoria e remoção de `StateHasChanged()` desnecessários
+
+**🟡 MÉDIA (1-2 meses):**
+4. Refatorar componentes gigantes (AdminPayments, Groups/Detail)
+5. Reorganizar 71+ serviços em subpastas temáticas (`Services/Admin/`, `Services/Payment/`, etc.)
+6. Consolidar CSS duplicado em utilities reutilizáveis
+
+**🟢 BAIXA (3-6 meses):**
+7. Virtual Scrolling para listas grandes
+8. Cobertura de testes → meta 80%+
+9. Documentação expandida (ADRs, guias Blazor)
+
+Para detalhes completos, veja:
+- [PROJECT_ANALYSIS.md](PROJECT_ANALYSIS.md) — análise estrutural completa (CSS, Blazor, Serviços, Segurança, Boas Práticas)
+- [DEVELOPMENT.md](DEVELOPMENT.md) — notas de desenvolvimento e decisões técnicas
+
+---
+
 ## Checklist de Deploy (Produção)
 
 ### Variáveis obrigatórias (via User Secrets ou variáveis de ambiente)
