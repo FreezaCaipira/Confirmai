@@ -887,7 +887,7 @@ else
     </div>
 
     @* Modal de preview do comprovante de pagamento *@
-    @if (selectedConfirmationForProofPreview is not null && selectedConfirmationForProofPreview.PixProofUploadedAt.HasValue)
+    @if (selectedConfirmationForProofPreview is not null)
     {
         <div class="proof-modal-overlay" @onclick="() => selectedConfirmationForProofPreview = null">
             <div class="proof-modal" @onclick:stopPropagation>
