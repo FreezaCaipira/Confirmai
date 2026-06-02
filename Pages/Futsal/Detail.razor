@@ -827,7 +827,22 @@ else
         if (!hasMapsKey) return;
         var mapWrapId = $"map-wrap-{ev.Id}";
         var mapFbId   = $"map-fallback-{ev.Id}";
-        await JS.InvokeVoidAsync("ConfirmaiSetupMapFallback", mapWrapId, mapFbId);
+        try
+        {
+            await JS.InvokeVoidAsync("ConfirmaiSetupMapFallback", mapWrapId, mapFbId);
+        }
+        catch (JSDisconnectedException)
+        {
+            // Blazor circuit was disconnected during render — safely ignore
+        }
+        catch (OperationCanceledException)
+        {
+            // User navigated away before render completed — safely ignore
+        }
+        catch (Exception)
+        {
+            // Function may not be available in certain prerender scenarios — safely ignore
+        }
     }
 
     private async Task LoadEvent()
