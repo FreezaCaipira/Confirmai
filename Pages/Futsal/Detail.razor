@@ -457,6 +457,9 @@ else
                                         <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Goleiro")</span>
                                         @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
                                         @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
+                                        <span class="player-tag player-tag--no-pay">
+                                            <i class="fas fa-check-circle"></i> não paga
+                                        </span>
                                         @if (ev.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
                                         {
                                             @if (confirmCancel)

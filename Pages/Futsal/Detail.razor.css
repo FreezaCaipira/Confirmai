@@ -51,6 +51,18 @@
     border-color: rgba(96, 165, 250, 0.7);
 }
 
+/* Goalkeeper "Não Paga" Badge */
+.player-tag--no-pay {
+    background-color: rgba(74, 222, 128, 0.15);
+    border: 1px solid rgba(74, 222, 128, 0.5);
+    color: rgba(74, 222, 128, 0.95);
+}
+
+.player-tag--no-pay:hover {
+    background-color: rgba(74, 222, 128, 0.25);
+    border-color: rgba(74, 222, 128, 0.7);
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
