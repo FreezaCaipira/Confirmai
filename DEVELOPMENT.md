@@ -80,6 +80,83 @@ Toda lógica de negócio vive em `Services/`. Padrão:
 - **OWASP**: parametrização via EF Core, `[ValidateAntiForgeryToken]` em forms, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`
 - **Dependências externas** (Google Fonts, Font Awesome): carregadas com `media="print"` + promoção via JS pós-load para não bloquear render e respeitar a CSP com nonce
 
+### Monitoramento e Alertas Operacionais
+
+#### Background Services (`IHostedService`)
+
+Dois serviços de monitoramento contínuo registrados em `Program.cs` (linhas 133-134):
+
+1. **`PendingWebhooksAlertService`** (`Services/PendingWebhooksAlertService.cs`)
+   - **Propósito**: Detectar pagamentos Pix pendentes há mais de 24 horas (stale webhooks)
+   - **Frequência**: Executa a cada **1 hora** após inicialização
+   - **Lógica**: Consulta `EventConfirmations` onde `HasPaid=false`, `PaymentStatus=Pending` e `ConfirmedAt` > 24h atrás
+   - **Alerta**: Log `WARNING` se encontrar **>5 confirmações pendentes**
+   - **Saída**: Estruturada em `ILogger<PendingWebhooksAlertService>` (Serilog)
+   - **Uso**: `dotnet run` ativa automaticamente; não há UI de configuração necessária
+
+2. **`CertificateHealthCheckService`** (`Services/CertificateHealthCheckService.cs`)
+   - **Propósito**: Monitorar expiração do certificado mTLS EfiBank
+   - **Frequência**: Verifica a cada **12 horas** após inicialização
+   - **Lógica**: Lê X509Certificate2 do caminho em `IConfiguration["EfiBank:ClientCertificatePath"]`
+   - **Alertas progressivos**:
+     - 🔴 `EXPIRADO` — ≤0 dias (crítico, immediate action)
+     - 🔴 `CRÍTICO` — ≤7 dias (critical, renew ASAP)
+     - 🟠 `URGENTE` — 7-14 dias (urgent, plan renewal)
+     - 🟡 `AVISO` — 14-30 dias (warning, schedule soon)
+   - **Saída**: Logs estruturados com data exata de expiração
+   - **Uso**: Não requer configuração; função automaticamente em produção
+
+#### Monitorando em Produção
+
+**Buscar alertas de webhooks pendentes**:
+```bash
+# Linux/Docker
+grep "ALERTA.*Pix pendentes\|PendingWebhooksAlertService" /var/log/confirmai/confirmai.log | tail -20
+
+# Windows (PowerShell)
+Get-Content -Path "C:\logs\confirmai.log" -Tail 100 | Select-String "ALERTA.*Pix"
+```
+
+**Buscar alertas de certificado**:
+```bash
+# Qualquer alerta de certificado (EXPIRADO, CRÍTICO, URGENTE, AVISO)
+grep "EXPIRADO\|CRÍTICO\|URGENTE\|AVISO" /var/log/confirmai/confirmai.log
+
+# Apenas logs do serviço
+grep "CertificateHealthCheckService" /var/log/confirmai/confirmai.log
+```
+
+#### Integração com Stack de Monitoramento
+
+**DataDog / New Relic / Splunk**:
+
+Alertas são estruturados com Serilog e incluem:
+- **ServiceName**: `PendingWebhooksAlertService` | `CertificateHealthCheckService`
+- **Level**: `Information` (check), `Warning` (threshold exceeded), `Error` (exception)
+- **Timestamp**: ISO 8601
+- **Structured fields**: `PendingCount`, `ExpiryDate`, `DaysRemaining`, etc.
+
+Exemplo de parser para DataDog:
+```yaml
+# datadog-agent.yaml
+logs:
+  - service: confirmai-api
+    source: dotnet
+    tags:
+      - env:prod
+      - app:payments
+    query: "source:confirmai service:(PendingWebhooksAlertService OR CertificateHealthCheckService)"
+```
+
+#### Troubleshooting
+
+| Problema | Diagnóstico | Solução |
+|----------|-------------|---------|
+| Serviço não inicia | Log `StartAsync` ausente | Verificar `Program.cs` registrou `AddHostedService<>` |
+| Webhook alert nunca acionado | Consultar `SELECT * FROM "EventConfirmations" WHERE "HasPaid"=false` | Dados de teste? Verificar filtro de 24h |
+| Certificado alert não aparece | Verificar caminho em `appsettings.json` `EfiBank:ClientCertificatePath` | Path errado? Arquivo inacessível? |
+| Log não aparece em produção | Verificar nível de log em `Serilog:MinimumLevel` | Elevar para `Information` se estiver em `Error` |
+
 ---
 
 ## Fazer um Fork
@@ -102,8 +179,7 @@ Toda lógica de negócio vive em `Services/`. Padrão:
 - Operação/admin de reconciliação com painel de saúde, histórico de varreduras, tendência 24h e limiares configuráveis via dashboard admin.
 - Fluxo de grupos privados evoluido: solicitação de entrada iniciada pelo usuário nas páginas de evento e triagem priorizada em `/grupos` para admins.
 - Hardening de release entregue com smoke pós-deploy, checklist de rollback, runbook operacional de incidentes e templates de monitoramento.
-- Infra consolidada: Identity, CSP nonce por request, headers de segurança, audit/log estruturado, CI.
-
+- Infra consolidada: Identity, CSP nonce por request, headers de segurança, audit/log estruturado, CI.- [x] Alertas operacionais de webhooks e certificados (IHostedService) — veja seção "Monitoramento e Alertas Operacionais".
 ---
 
 ## Roadmap Confirmai (Atualizado)
@@ -122,7 +198,7 @@ Toda lógica de negócio vive em `Services/`. Padrão:
 - [x] Operação/admin de pagamentos (timeline por confirmação, exportação e métricas por gateway)
 - [x] CI/CD de release com smoke test e rollback explícito
 - [x] UX inicial de grupos privados para solicitação de entrada e priorização de pendências admin
-- [ ] Alertas operacionais automatizados a partir do runbook (webhook warning, staleness e anomalia de pendências)
+- [x] Alertas operacionais automatizados a partir do runbook (webhook warning, staleness e anomalia de pendências)
 
 ### Backlog planejado
 
@@ -165,7 +241,7 @@ Toda lógica de negócio vive em `Services/`. Padrão:
 
 ### P3 — Operação contínua
 
-- [ ] Converter runbook em alertas acionáveis no stack de monitoramento
+- [x] Converter runbook em alertas acionáveis no stack de monitoramento (PendingWebhooksAlertService, CertificateHealthCheckService)
 - [ ] Definir baseline por gateway (pending/stale/failed/refunded) com revisão semanal
 - [ ] Formalizar ritual pós-incidente com checklist de causa raiz e follow-up
 
