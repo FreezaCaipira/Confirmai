@@ -19,49 +19,85 @@
 - Análise estrutural documentada
 - README atualizado com Revisão Estrutural
 
+### Fase 1: IAsyncDisposable (CRÍTICO) ✅
+**Objective:** Implementar `IAsyncDisposable` em todas as páginas para prevenir memory leaks
+
+**Status:** ✅ CONCLUÍDA
+
+**Implementação:**
+- ✅ Analisadas 40 páginas para uso de recursos assíncronos
+- ✅ Refatoradas 5 páginas críticas com CancellationTokenSource:
+  1. EventPayment.razor - 4x Task.Delay + polling loop
+  2. Futsal/Escalacao.razor - Copy handler
+  3. Groups/Detail.razor - 2x Copy handlers
+  4. Poker/Index.razor - Menu focusout handler
+  5. Payment/Payment.razor - Copy handler
+- ✅ Implementado padrão consistente em todos: CancellationTokenSource + DisposeAsync()
+- ✅ Build: 0 errors, 421+ testes passando
+- ✅ Documentação: `ASYNC_DISPOSABLE_ANALYSIS.md` com guia de implementação
+
+**Commits:**
+- c0efa1f - EventPayment.razor: IAsyncDisposable
+- f161175 - Escalacao, Groups/Detail: IAsyncDisposable
+- 494557b - Poker/Index, Payment/Payment: IAsyncDisposable
+
+### Fase 2: StateHasChanged Audit (CRÍTICO) - Tier 1 ✅
+**Objective:** Remover 22 chamadas desnecessárias de `StateHasChanged()` (Tier 1 = 0% risk)
+
+**Status:** ✅ TIER 1 CONCLUÍDA (11 removidas)
+
+**Tier 1 Removals (0% risk - Lifecycle hooks):**
+- ✅ AdminLogs.razor: 2 calls in OnAfterRenderAsync (L259, L264)
+- ✅ AdminUsers.razor: 2 calls after LoadUsers() (L160, L297)
+- ✅ Toast.razor: 2 calls in Show() and timer callback (L19, L27)
+- ✅ BtcQuoteCard.razor: 1 call in finally block (L75)
+- ✅ EventListingShell.razor: 2 calls in LoadEvents() (L116, L159)
+- ✅ AdminPayments.razor: 1 call in OnAfterRenderAsync (L548)
+- ✅ Poker/Index.razor: 1 call in menu handler (L148)
+
+**Build:** ✅ 0 errors, 421+ tests passing  
+**Commit:** 663dc5b - Tier 1 removes
+
 ---
 
 ## 🔄 Em Progresso
 
-### Fase 1: IAsyncDisposable (CRÍTICO)
-**Objetivo:** Implementar `IAsyncDisposable` em todas as páginas para prevenir memory leaks
+### Fase 2: StateHasChanged Audit (CRÍTICO) - Tier 2 & 3
+**Objective:** Remover 27 chamadas desnecessárias restantes (5% + 15% risk)
 
-**Status:** Iniciando...
+## 🔄 Em Progresso
 
-**Escopo:**
-- [ ] Páginas que usam `Task.Delay` loops (delinquency notifications, etc.)
-- [ ] Páginas com SignalR subscriptions
-- [ ] Páginas com timers ou polling
-- [ ] Análise de quais 3 páginas já têm implementação (como referência)
+### Fase 2: StateHasChanged Audit (CRÍTICO) - Tier 2 & 3
+**Objective:** Remover 27 chamadas desnecessárias restantes (5% + 15% risk)
 
-**Ferramentas:**
-```csharp
-public async ValueTask DisposeAsync()
-{
-    _cts?.Cancel();
-    _cts?.Dispose();
-    // Unsubscribe de eventos
-    // Liberar recursos
-}
-```
+**Tier 2 (11 calls, 5% risk - After await testing required):**
+- Payment/ViewPayment.razor: 4 calls
+- EventPayment.razor: 3 calls
+- MainLayout.razor: 3 calls
+- Payment/Payment.razor: 1 call
+**Timeline:** Week 2 (3-4 dias)
 
-**Referências:**
-- Blazor Docs: https://learn.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-9.0#handle-incomplete-async-operations-at-render-or-disposal
-- Current investigation: Páginas com `await Task.Delay(...)` sem cancelamento
+**Tier 3 (16 calls, 15% risk - Context review required):**
+- AdminVenueEdit.razor: 1 call
+- VenueManager/VenueEdit.razor: 1 call
+- AdminPayments.razor: 5 calls
+- Breadcrumb.razor: 1 call
+- MainLayout.razor: 2 calls
+- Payment/PaymentsHistory.razor: 1 call
+- Other components: 5 calls
+**Timeline:** Week 3-4 (4-5 dias)
+
+**Keep List (18 calls - Transient UI states):**
+- Copy-to-clipboard feedback handlers
+- Loading spinners and progress indicators
+- Modal visibility toggles
+- Optimistic UI rollback patterns
+
+**Documentation:** See `STATEHASCHANGED_REMOVAL_TASKS.md` for detailed checklist
 
 ---
 
 ## 📋 Backlog Priorizado
-
-### Fase 2: StateHasChanged Audit (CRÍTICO)
-**Objective:** Remover 60+ chamadas desnecessárias de `StateHasChanged()`  
-**Estimativa:** 1-2 semanas  
-**Impacto:** Reduz re-renders em toda a aplicação, melhora performance  
-
-**Padrões a buscar:**
-- `StateHasChanged()` após `await` sem mudança de estado
-- `StateHasChanged()` em MainLayout (afeta toda página)
-- `StateHasChanged()` em handlers de eventos Blazor (redundante)
 
 ### Fase 3: Refatorar Componentes Grandes (MÉDIA)
 **Escopo:**
