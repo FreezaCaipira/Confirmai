@@ -145,7 +145,6 @@
             if (!ct.IsCancellationRequested)
             {
                 showTypeMenu = false;
-                await InvokeAsync(StateHasChanged);
             }
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { }

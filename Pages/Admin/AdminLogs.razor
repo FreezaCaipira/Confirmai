@@ -256,12 +256,10 @@
         }
 
         isLoading = true;
-        StateHasChanged();
         await LoadFilterStateFromStorageAsync();
         filtersLoaded = true;
         await LoadLogs();
         isLoading = false;
-        StateHasChanged();
     }
 
     private async Task LoadLogs()

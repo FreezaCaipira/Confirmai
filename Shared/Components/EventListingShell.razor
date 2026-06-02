@@ -113,7 +113,6 @@
     {
         IsLoading = true;
         LoadError = null;
-        StateHasChanged();
         try
         {
             await using var db = await DbFactory.CreateDbContextAsync();
@@ -156,7 +155,6 @@
         finally
         {
             IsLoading = false;
-            StateHasChanged();
         }
     }
 

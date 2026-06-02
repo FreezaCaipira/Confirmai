@@ -157,7 +157,6 @@
         await LoadFilterStateFromStorageAsync();
         ApplyFilters(resetPage: false);
         filtersLoaded = true;
-        StateHasChanged();
     }
 
     private void ApplyFilters(bool resetPage = true)
@@ -294,7 +293,6 @@
         await LoadUsersFromDb();
         ApplyFilters(resetPage: false);
         isLoading = false;
-        StateHasChanged();
     }
 
     private async Task LoadUsersFromDb()

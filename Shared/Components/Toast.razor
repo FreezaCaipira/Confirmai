@@ -16,7 +16,6 @@
             _ => "toast-info"
         };
         visible = true;
-        StateHasChanged();
 
         timer?.Dispose();
         timer = new System.Timers.Timer(timeout);
@@ -24,7 +23,6 @@
         {
             visible = false;
             timer?.Dispose();
-            InvokeAsync(StateHasChanged);
         };
         timer.AutoReset = false;
         timer.Start();
