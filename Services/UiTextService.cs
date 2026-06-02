@@ -1,4 +1,6 @@
-﻿namespace Confirmai.Services;
+﻿using System.Globalization;
+
+namespace Confirmai.Services;
 
 public sealed class UiTextService
 {
@@ -3152,6 +3154,42 @@ public sealed class UiTextService
         }
 
         return key;
+    }
+
+    /// <summary>
+    /// Formata uma data/hora de acordo com o idioma selecionado.
+    /// </summary>
+    /// <param name="dateTime">Data e hora a formatar.</param>
+    /// <param name="pattern">Padrão desejado: DateDefault, TimeDefault, DateTimeDefault, DateTimeFull.</param>
+    public string FormatDateTime(DateTime dateTime, string pattern = "DateTimeDefault")
+    {
+        var currentLanguage = _language.SelectedLanguage;
+        var culture = CultureInfo.GetCultureInfo(currentLanguage);
+
+        var format = pattern switch
+        {
+            "DateDefault" => currentLanguage switch
+            {
+                "en-US" => "MM/dd/yyyy",
+                "es-ES" => "dd/MM/yyyy",
+                _ => "dd/MM/yyyy" // pt-BR
+            },
+            "TimeDefault" => "HH:mm",
+            "DateTimeFull" => currentLanguage switch
+            {
+                "en-US" => "dddd, MMMM d, yyyy HH:mm",
+                "es-ES" => "dddd, d 'de' MMMM 'de' yyyy HH:mm",
+                _ => "dddd, d 'de' MMMM 'de' yyyy HH:mm" // pt-BR
+            },
+            _ => currentLanguage switch // DateTimeDefault (default)
+            {
+                "en-US" => "MM/dd/yyyy HH:mm",
+                "es-ES" => "dd/MM/yyyy HH:mm",
+                _ => "dd/MM/yyyy HH:mm" // pt-BR
+            }
+        };
+
+        return dateTime.ToString(format, culture);
     }
 
     private static bool TryGet(string languageCode, string key, out string value)
