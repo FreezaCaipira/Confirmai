@@ -34,7 +34,6 @@
     private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
         UpdateSegments();
-        InvokeAsync(StateHasChanged);
     }
 
     private void UpdateSegments()

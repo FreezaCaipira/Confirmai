@@ -210,7 +210,6 @@
             payment.PaidAt = DateTime.UtcNow;
             InvokeAsync(() =>
             {
-                StateHasChanged();
                 ToastRef?.Show(string.Format(T["PaymentHistory.ConfirmedToast"], paymentId), "success");
             });
         }
