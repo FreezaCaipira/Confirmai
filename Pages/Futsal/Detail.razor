@@ -301,9 +301,24 @@ else
                                                     }
                                                     else
                                                     {
-                                                        <button class="player-tag player-tag--admin-pay @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")" @onclick="() => confirmPayId = c.Id">
-                                                            <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
-                                                        </button>
+                                                        @if (c.HasPaid)
+                                                        {
+                                                            <button class="player-tag player-tag--admin-pay player-tag--paid" @onclick="() => confirmPayId = c.Id" title="Pago - clique para desmarcar">
+                                                                <i class="fas fa-check"></i> pago
+                                                            </button>
+                                                        }
+                                                        else if (c.PixProofUploadedAt.HasValue)
+                                                        {
+                                                            <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => selectedConfirmationForProofPreview = c" title="Comprovante enviado - clique para visualizar">
+                                                                <i class="fas fa-image"></i> 📎 comprovante
+                                                            </button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button class="player-tag player-tag--admin-pay player-tag--pay-pending" @onclick="() => confirmPayId = c.Id" title="Sem comprovante - clique para marcar pago">
+                                                                <i class="fas fa-exclamation-triangle"></i> pendente
+                                                            </button>
+                                                        }
                                                     }
                                                 }
                                                 else
@@ -334,9 +349,33 @@ else
                                             }
                                             else
                                             {
-                                                <span class="player-tag @(c.HasPaid ? "player-tag--paid" : "player-tag--pay-pending")">
-                                                    <i class="fas @(c.HasPaid ? "fa-check" : "fa-exclamation-triangle")"></i> @(c.HasPaid ? "pago" : "pendente")
-                                                </span>
+                                                @if (c.HasPaid)
+                                                {
+                                                    <span class="player-tag player-tag--paid">
+                                                        <i class="fas fa-check"></i> pago
+                                                    </span>
+                                                }
+                                                else if (c.PixProofUploadedAt.HasValue)
+                                                {
+                                                    @if (isAdmin)
+                                                    {
+                                                        <button class="player-tag player-tag--proof-pending" @onclick="() => selectedConfirmationForProofPreview = c" title="Comprovante enviado - clique para visualizar">
+                                                            <i class="fas fa-image"></i> 📎 comprovante
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="player-tag player-tag--proof-pending">
+                                                            <i class="fas fa-image"></i> 📎 comprovante
+                                                        </span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="player-tag player-tag--pay-pending">
+                                                        <i class="fas fa-exclamation-triangle"></i> pendente
+                                                    </span>
+                                                }
                                                 @if (!c.HasPaid && c.UserId == currentUserId)
                                                 {
                                                     <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-link">
@@ -577,6 +616,21 @@ else
                                                 <span class="player-tag player-tag--paid">
                                                     <i class="fas fa-check"></i> pago
                                                 </span>
+                                            }
+                                            else if (c.PixProofUploadedAt.HasValue)
+                                            {
+                                                @if (isAdmin)
+                                                {
+                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => selectedConfirmationForProofPreview = c" title="Comprovante enviado - clique para visualizar">
+                                                        <i class="fas fa-image"></i> 📎 comprovante
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <span class="player-tag player-tag--proof-pending">
+                                                        <i class="fas fa-image"></i> 📎 comprovante
+                                                    </span>
+                                                }
                                             }
                                             else if (c.UserId == currentUserId)
                                             {
@@ -833,6 +887,41 @@ else
     </div>
 }
 
+@* Modal de preview do comprovante de pagamento *@
+@if (selectedConfirmationForProofPreview is not null && selectedConfirmationForProofPreview.PixProofUploadedAt.HasValue)
+{
+    <div class="proof-modal-overlay" @onclick="() => selectedConfirmationForProofPreview = null">
+        <div class="proof-modal" @onclick:stopPropagation>
+            <div class="proof-modal-header">
+                <h3>Comprovante de Pagamento</h3>
+                <button class="proof-modal-close" @onclick="() => selectedConfirmationForProofPreview = null" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="proof-modal-content">
+                <div class="proof-info">
+                    <p><strong>Jogador:</strong> @(selectedConfirmationForProofPreview.User?.FullName ?? selectedConfirmationForProofPreview.User?.UserName ?? "Jogador")</p>
+                    <p><strong>Enviado em:</strong> @selectedConfirmationForProofPreview.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</p>
+                </div>
+
+                <div class="proof-image-container">
+                    <img src="/api/pix-proof/@selectedConfirmationForProofPreview.Id" alt="Comprovante Pix" class="proof-image" />
+                </div>
+
+                <div class="proof-modal-actions">
+                    <button class="btn btn--info" @onclick="() => NavigateToPaymentsModal()" type="button">
+                        <i class="fas fa-arrow-right"></i> Ir para modal de pagamentos
+                    </button>
+                    <button class="btn btn--neutral" @onclick="() => selectedConfirmationForProofPreview = null" type="button">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter] public int Id { get; set; }
 
@@ -853,6 +942,7 @@ else
     private bool        requestingJoin      = false;
     private string      joinRequestError    = string.Empty;
     private List<PostMatchVote> detailMvpVotes = new();
+    private EventConfirmation? selectedConfirmationForProofPreview = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -1195,6 +1285,14 @@ else
         evt.MaxGoalkeepers = currentGk - 1;
         await db.SaveChangesAsync();
         await LoadEvent();
+    }
+
+    private void NavigateToPaymentsModal()
+    {
+        if (ev is null) return;
+        selectedConfirmationForProofPreview = null;
+        // Navigate to admin payments page where admin can manage all payments
+        NavigationManager.NavigateTo("/admin/payments");
     }
 
 }
