@@ -216,7 +216,6 @@
         InvokeAsync(async () =>
         {
             await CheckPayment();
-            StateHasChanged();
         });
     }
 
@@ -244,7 +243,6 @@
         }
 
         isCheckingPayment = true;
-        await InvokeAsync(StateHasChanged);
 
         try
         {
@@ -284,7 +282,6 @@
         finally
         {
             isCheckingPayment = false;
-            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -293,7 +290,6 @@
         feedbackMessage = message;
         feedbackType = type;
         ToastRef?.Show(message, type);
-        _ = InvokeAsync(StateHasChanged);
     }
 
     private MarkupString FormatBtcWithUsdMarkup(decimal amount)

@@ -288,7 +288,6 @@
     {
         selectedLanguage = LanguagePreferenceService.SelectedLanguage;
         newsTickerMessages = BuildNewsTickerMessages();
-        InvokeAsync(StateHasChanged);
     }
 
     private void RotateNewsTicker()
@@ -301,7 +300,6 @@
             }
 
             newsTickerIndex = (newsTickerIndex + 1) % newsTickerMessages.Length;
-            StateHasChanged();
         });
     }
 
@@ -333,7 +331,6 @@
             {
                 currentUserId = string.Empty;
                 unreadMailboxCount = 0;
-                await InvokeAsync(StateHasChanged);
                 return;
             }
 

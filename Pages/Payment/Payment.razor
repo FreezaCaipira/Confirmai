@@ -564,7 +564,6 @@
         feedbackMessage = message;
         feedbackType = type;
         ToastRef?.Show(message, type);
-        _ = InvokeAsync(StateHasChanged);
     }
 
     private async Task CopyAddress()
