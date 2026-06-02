@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Confirmai.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260602033632_AddPerformanceIndices")]
+    [Migration("20260602034649_AddPerformanceIndices")]
     partial class AddPerformanceIndices
     {
         /// <inheritdoc />

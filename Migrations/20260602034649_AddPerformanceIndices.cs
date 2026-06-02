@@ -34,11 +34,11 @@ namespace Confirmai.Migrations
                 table: "Events",
                 column: "GroupId");
 
-            // Índice em PaymentRecords.BuyerId - otimiza histórico de compras
+            // Índice em Payments.UserId - otimiza histórico de compras do usuário
             migrationBuilder.CreateIndex(
-                name: "idx_paymentrecords_buyerid",
-                table: "PaymentRecords",
-                column: "BuyerId");
+                name: "idx_payments_userid",
+                table: "Payments",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -62,8 +62,8 @@ namespace Confirmai.Migrations
                 table: "Events");
 
             migrationBuilder.DropIndex(
-                name: "idx_paymentrecords_buyerid",
-                table: "PaymentRecords");
+                name: "idx_payments_userid",
+                table: "Payments");
         }
     }
 }

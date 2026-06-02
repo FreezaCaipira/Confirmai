@@ -27,10 +27,9 @@ WHERE Activity LIKE '%webhook%'
 ORDER BY CreatedAt DESC;
 
 # 2. Verificar payment record status
-SELECT Id, Status, GatewayId, CreatedAt, ConfirmedAt 
-FROM PaymentRecords 
-WHERE GatewayId = 'pix' 
-  AND CreatedAt > NOW() - INTERVAL '1 hour'
+SELECT Id, IsPaid, CreatedAt, PaidAt 
+FROM Payments 
+WHERE CreatedAt > NOW() - INTERVAL '1 hour'
 ORDER BY CreatedAt DESC;
 
 # 3. Verificar se há logs de erro
@@ -52,7 +51,7 @@ ORDER BY CreatedAt DESC;
    - Registrar em audit log para análise posterior
 
 3. **Se webhook duplicado foi rejeitado:**
-   - Verificar `PaymentRecords.IdempotencyKey`
+   - Verificar `Payments.IdempotencyKey`
    - Retry com novo ID se necessário
 
 ---
@@ -96,22 +95,22 @@ foreach (var c in confs)
 
 ---
 
-### 3. Múltiplos Webhooks Simultâneos Causam Race Condition
+### Múltiplos Webhooks Simultâneos Causam Race Condition
 
 **Sintoma:** Mesmo pagamento aparece 2-3x em histórico de pagamentos
 
 **Root Cause:**
-- Falta de índice de idempotência em `PaymentRecords`
+- Falta de índice de idempotência em `Payments`
 - Múltiplas confirmações processadas em paralelo
 
 **Diagnóstico:**
 
 ```sql
 SELECT 
-  paymentrecord_id, 
+  id, 
   COUNT(*) as occurrences
-FROM PaymentRecords
-GROUP BY paymentrecord_id
+FROM Payments
+GROUP BY id
 HAVING COUNT(*) > 1;
 ```
 
@@ -119,8 +118,8 @@ HAVING COUNT(*) > 1;
 
 1. **Adicionar índice de idempotência:**
    ```sql
-   CREATE UNIQUE INDEX idx_paymentrecords_idempotencykey 
-     ON PaymentRecords(IdempotencyKey) 
+   CREATE UNIQUE INDEX idx_payments_idempotencykey 
+     ON Payments(IdempotencyKey) 
      WHERE IdempotencyKey IS NOT NULL;
    ```
 
@@ -128,11 +127,11 @@ HAVING COUNT(*) > 1;
    ```csharp
    using (var transaction = await db.Database.BeginTransactionAsync())
    {
-       var lockedRecord = await db.PaymentRecords
-           .FromSql($"SELECT * FROM PaymentRecords WHERE Id = {paymentId} FOR UPDATE")
+       var lockedRecord = await db.Payments
+           .FromSql($"SELECT * FROM Payments WHERE Id = {paymentId} FOR UPDATE")
            .FirstOrDefaultAsync();
        
-       lockedRecord.Status = PaymentStatus.Paid;
+       lockedRecord.IsPaid = true;
        await db.SaveChangesAsync();
        await transaction.CommitAsync();
    }
@@ -186,7 +185,7 @@ if ([DateTime]::Now -gt $cert.NotAfter) {
 public async Task ProcessPixConfirmationAsync(string idempotencyKey, PaymentData data)
 {
     // Verificar se já foi processado
-    var existing = await db.PaymentRecords
+    var existing = await db.Payments
         .FirstOrDefaultAsync(p => p.IdempotencyKey == idempotencyKey);
     
     if (existing != null)
@@ -197,7 +196,7 @@ public async Task ProcessPixConfirmationAsync(string idempotencyKey, PaymentData
     
     // Processa novo pagamento
     var record = new PaymentRecord { IdempotencyKey = idempotencyKey, ... };
-    db.PaymentRecords.Add(record);
+    db.Payments.Add(record);
     await db.SaveChangesAsync();
 }
 ```
@@ -213,8 +212,8 @@ Execute todo dia às 9 AM UTC:
 ```sql
 -- Pagamentos pendentes por >24h
 SELECT COUNT(*) as pending_24h
-FROM PaymentRecords
-WHERE Status = 'Pending'
+FROM Payments
+WHERE IsPaid = false
   AND CreatedAt < NOW() - INTERVAL '24 hours';
 
 -- Alertar se > 5 pagamentos pendentes
@@ -224,7 +223,7 @@ WHERE Status = 'Pending'
 ### Dashboard Metrics
 
 - `eventconfirmations_unpaid_count`: Confirmações sem pagamento
-- `paymentrecords_failed_count`: Pagamentos com falha
+- `payments_failed_count`: Pagamentos com falha
 - `webhook_latency_ms`: Tempo do webhook até mark-paid
 
 ---
@@ -235,15 +234,15 @@ WHERE Status = 'Pending'
 
 **Passo a passo:**
 
-1. Verificar `PaymentRecords.Status`:
+1. Verificar `Payments.IsPaid`:
    ```sql
-   SELECT * FROM PaymentRecords WHERE Id = {paymentId};
+   SELECT * FROM Payments WHERE Id = {paymentId};
    ```
 
-2. Se status = `Pending`, atualizar manualmente:
+2. Se payment status é "IsPaid = false" há >24h, atualizar manualmente:
    ```sql
-   UPDATE PaymentRecords 
-   SET Status = 'Paid', ConfirmedAt = NOW()
+   UPDATE Payments 
+   SET IsPaid = true, PaidAt = NOW()
    WHERE Id = {paymentId};
    ```
 
