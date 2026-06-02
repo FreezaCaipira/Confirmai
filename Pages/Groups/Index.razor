@@ -97,10 +97,24 @@
                         .OrderBy(e => e.StartsAt)
                         .FirstOrDefault();
                     var backgroundStyle = string.IsNullOrWhiteSpace(g.LogoPath)
-                        ? "background: linear-gradient(135deg, #1a3a52 0%, #0f2438 100%);"
+                        ? GetDefaultBackgroundStyle(g.Sport)
                         : $"background-image: url('{g.LogoPath}'); background-size: cover; background-position: center;";
-                    <a class="group-card @(hasPending || needsPix ? "group-card--action-required" : "")" href="/grupo/@g.Id" style="@backgroundStyle">
+                    var hasCustomLogo = !string.IsNullOrWhiteSpace(g.LogoPath);
+                    <a class="group-card @(hasPending || needsPix ? "group-card--action-required" : "") @(hasCustomLogo ? "" : "group-card--default-bg")" href="/grupo/@g.Id" style="@backgroundStyle">
                         <div class="group-card-overlay"></div>
+                        @if (!hasCustomLogo)
+                        {
+                            <div class="group-card-icon">
+                                @if (g.Sport == Sport.Futsal)
+                                {
+                                    <i class="fas fa-futbol"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-cards"></i>
+                                }
+                            </div>
+                        }
                         <div class="group-card-content">
                             <div class="group-card-top">
                                 <span class="group-card-sport">
@@ -257,5 +271,13 @@
             return;
         }
         NavigationManager.NavigateTo($"/convite/{code}");
+    }
+
+    private string GetDefaultBackgroundStyle(Sport sport)
+    {
+        return sport == Sport.Futsal
+            ? "background: linear-gradient(135deg, #1a472e 0%, #0f2619 100%);"  // Green for futsal
+            : "background: linear-gradient(135deg, #2d1a47 0%, #1a0f26 100%);"  // Purple for poker
+        ;
     }
 }
