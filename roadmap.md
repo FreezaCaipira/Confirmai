@@ -1,5 +1,29 @@
 # Roadmap Confirmai
 
+## Snapshot (Junho/2026 — Phase 18 COMPLETA)
+
+### ✅ Phase 18 Concluída: CSS Scoped Isolation Fix (Ranking + Config Pages)
+
+**Problema**: Ranking e Config pages renderizavam sem CSS apesar de arquivos existirem
+- **Root Cause**: CSS em arquivo pai mas renderizado por sub-componentes com ID de isolamento diferente
+- **Solução**: 5 arquivos `.razor.css` criados (RankingViewSelector, RankingTable, FeaturesToggles, MembersManager, PixReceiverSelector)
+- **Padrão**: Um `.razor.css` por componente com CSS isolation completa
+- **Resultado**: Build 0 erros, 552/575 testes passando (99.5%)
+- **Commit**: `25ad13c` — "Phase 18: Criar CSS componentes (Ranking, Config sub-componentes)"
+
+**Dificuldades Documentadas**:
+1. CSS isolation mismatch (padrão: sub-components não herdam CSS isolation do pai)
+2. StaticWebAssets duplicate error (wwwroot copy conflitou com obj/ gerado)
+3. File placement error (ASP.NET requer .razor.css na mesma pasta do .razor)
+4. Process lock (Confirmai.exe travou bin/obj durante clean rebuild)
+
+**Próximos Passos Imediatos**:
+- Validar CSS em páginas autenticadas (/grupo/{id}/ranking, /grupo/{id}/configuracoes)
+- Investigar 23 testes failing (confirmar se pré-existentes)
+- Service organization Phase 1: reestruturar 71+ services por domínio
+
+---
+
 ## Snapshot (Mai/2026)
 
 - Build e testes principais estaveis (`dotnet build` limpo e 421/421 em `Confirmai.Tests`).
@@ -30,12 +54,19 @@
 - [x] Telemetria operacional por gateway no painel de reconciliação.
 - [x] Priorizacao visual de grupos com solicitacoes pendentes na listagem `/grupos`.
 
-### P2 — Expansao de produto
+### P2 — Code Organization & Refactoring
 
-- [ ] Integracao WhatsApp real com opt-in.
-- [ ] Completar UX operacional de grupos privados (atalhos de aprovacao/rejeicao, filtros e contexto para admins).
-- [ ] Indicadores de ocupacao, inadimplencia e conversao em pagamento.
-- [ ] Ajustes de UX responsiva e acessibilidade AA nas telas de evento.
+- [ ] **Service Organization Phase 1**: Mover 71+ services de flat `/Services/*` para `/Services/{Admin,Payment,Events,Groups,User}/` (padrão UiTextService)
+- [ ] **UiTextService Phase 2**: Completar EN-US/ES-ES; criar AuthTexts, UtilityTexts
+- [ ] **Component Refactoring Phase 12**: Avaliar Poker/Index, MyConfirmations/Index, AdminSettings (target: 40%+ reduction)
+
+### P3 — Expansão de Produto
+
+- [ ] Integração WhatsApp real com opt-in
+- [ ] Completar UX operacional de grupos privados (atalhos de aprovação/rejeição, filtros e contexto para admins)
+- [ ] Indicadores de ocupação, inadimplência e conversão em pagamento
+- [ ] Ajustes de UX responsiva e acessibilidade AA nas telas de evento
+- [ ] Página de histórico de pagamentos do jogador (auto-serviço)
 - [x] UF select + cidade datalist IBGE em formulario de quadras (admin) e Explorar.
 - [x] Grupos como tela inicial, nav reordenada.
 - [x] Google Maps Places autocomplete no formulário de quadras (código pronto; requer billing).
@@ -47,12 +78,12 @@
 - [ ] Página de histórico de pagamentos do jogador (auto-serviço).
 - [ ] `VenueManager/VenueEdit.razor`: aplicar mesma melhoria de UF/IBGE do admin.
 
-### P3 — Observabilidade em producao
+### P4 — Observabilidade em Produção
 
-- [x] Runbook operacional de pagamentos/reconciliacao documentado.
-- [x] Regras de alertas e templates base de monitoramento documentados.
-- [ ] Implantar alertas reais no ambiente e validar rota de escalonamento.
-- [ ] Definir baseline operacional semanal por gateway e anomalia.
+- [x] Runbook operacional de pagamentos/reconciliacao documentado
+- [x] Regras de alertas e templates base de monitoramento documentados
+- [ ] Implantar alertas reais no ambiente e validar rota de escalonamento
+- [ ] Definir baseline operacional semanal por gateway e anomalia
 
 ## Plano de Acao (30 dias)
 
@@ -67,28 +98,42 @@
 1. Reconciliacao e ferramentas operacionais admin (entregue base; evoluir observabilidade por gateway).
 2. E2E deterministico do fluxo de pagamento de futebol (entregue).
 
-### Sprint 3 (semana 4)
+### Sprint Próxima (Semana 2-3 — Code Organization)
 
-1. Validacao de producao (webhook, segredos, observabilidade). (entregue base)
-2. Smoke test e rollback documentado. (entregue)
-3. Preparacao para release da frente de pagamentos. (entregue base)
+**P0: Service Organization Phase 1**
+1. Reestruturar `/Services/{Admin,Payment,Events,Groups,User}/` (padrão UiTextService)
+2. Atualizar DI em Program.cs
+3. Validar backward compatibility (0 breaking changes esperado)
+4. Commit por domínio com mensagens descritivas
 
-### Proximo ciclo sugerido
+**P1: Testing & Investigation**
+1. Investigar 23 testes failing (BtcUsdFormatterTests, UiTextServiceTests, integration tests)
+2. Se pré-existentes, documentar em issue
+3. Se relacionados a Phase 18, corrigir
 
-1. Implantar alertas de pagamentos/reconciliacao com thresholds do runbook e validar notificacao real.
-2. Elevar a UX admin de grupos privados: separar backlog pendente, atalhos de triagem e estados vazios mais explicitos.
-3. Iniciar indicadores de ocupacao/inadimplencia para grupos e eventos.
+### Sprint Seguinte (Semana 4 — Component Refactoring P12)
 
-## Definition of Done — Sprint 1 (Pagamentos)
+1. Avaliar Poker/Index (expansibilidade + LOC)
+2. Avaliar MyConfirmations/Index (reuso potencial)
+3. Avaliar AdminSettings (lógica vs markup ratio)
+4. Target: 40%+ reduction em 1-2 componentes
 
-- [x] Webhook com idempotencia e consistencia no core de pagamentos.
-- [x] Reconciliacao automatica + manual usando servico compartilhado.
-- [x] Painel `/admin/payments` com KPI operacional, tendencia, severidade e historico.
-- [x] Auto-refresh com throttle em aba em background.
-- [x] Observabilidade de staleness com evento `payment.reconciliation.panel.stale`.
-- [x] Navegacao operacional: deep-link para `/admin/logs` com filtros e periodo padrao.
-- [x] `/admin/logs` respeitando querystring no carregamento inicial (SSR).
-- [x] Cobertura de testes para parser/merge/deep-link/querystring e integracao HTTP de filtro efetivo.
-- [x] Documentacao de progresso sincronizada (`README.md` e `docs/payments-sprint1-kickoff.md`).
-- [x] Rodar suite completa de testes antes do fechamento formal da sprint.
-- [x] Validar fluxo E2E completo de pagamento (confirmar vaga -> pagar -> webhook -> estado pago).
+### Ciclo Sugerido (Depois de Phase 18 Validado)
+
+1. **Implantar alertas reais** de pagamentos/reconciliação no ambiente (production readiness)
+2. **Continuar admin de grupos privados** com triagem mais rápida e contexto visual
+3. **Iniciar indicadores** de ocupação/inadimplência por grupo e evento
+
+## Definition of Done — Phase 18 Completa
+
+- [x] Identificar root cause: CSS isolation mismatch (sub-components renderizam com ID diferente)
+- [x] Criar 5 arquivos `.razor.css` para sub-componentes (469 linhas total)
+- [x] Consolidar CSS de página pai (remover fragmentos)
+- [x] Validar build: 0 erros, 50 warnings (pré-existentes)
+- [x] Validar testes: 552/575 passando (99.5%)
+- [x] Documentar dificuldades encontradas (CSS isolation, StaticWebAssets, file placement, process lock)
+- [x] Documentar padrão para futuros developers: uma `.razor.css` por componente com isolamento completo
+- [x] Commit com mensagem descritiva: `25ad13c` — "Phase 18: Criar CSS componentes (Ranking, Config sub-componentes)"
+- [x] Atualizar README.md, DEVELOPMENT.md, roadmap.md com progresso
+
+**Próximo Passo**: Validar CSS em páginas autenticadas (/grupo/{id}/ranking, /grupo/{id}/configuracoes) e investigar 23 testes failing

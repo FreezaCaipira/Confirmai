@@ -202,10 +202,14 @@ logs:
 
 ### Backlog planejado
 
-- [ ] WhatsApp provider real (`IWhatsAppSender`) com opt-in e envio transacional
-- [ ] Fluxo admin de grupos privados com mais contexto de decisão e atalhos diretos de aprovação/rejeição
-- [ ] Dashboard consolidado por grupo (ocupação, no-show, receita, inadimplência)
-- [ ] Refinos de UX mobile e acessibilidade AA nas telas de evento
+- [ ] **Service Organization**: Reestruturar `/Services/*` (71+ serviços) para domínios (`/Services/Admin/`, `/Services/Payments/`, `/Services/Events/`, etc.) — padrão UiTextService
+- [ ] **UiTextService Phase 2**: Completar EN-US/ES-ES para AdminTexts, ServerTexts, PaymentTexts; criar AuthTexts, UtilityTexts
+- [ ] **Component Refactoring Phase 12**: Avaliar Poker/Index, MyConfirmations/Index, AdminSettings para decomposição (target: 40%+ reduction)
+- [ ] **WhatsApp provider real** (`IWhatsAppSender`) com opt-in e envio transacional
+- [ ] **Fluxo admin de grupos privados** com mais contexto de decisão e atalhos diretos de aprovação/rejeição
+- [ ] **Dashboard consolidado por grupo** (ocupação, no-show, receita, inadimplência)
+- [ ] **Refinos de UX mobile e acessibilidade AA** nas telas de evento
+- [ ] **Página de histórico de pagamentos do jogador** (auto-serviço)
 
 ---
 

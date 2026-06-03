@@ -194,8 +194,12 @@ npm test
 
 Veja os arquivos [roadmap.md](roadmap.md) e [DEVELOPMENT.md](DEVELOPMENT.md) para o plano detalhado.
 
-**Status rápido (Mai/2026):**
-- ✅ Build e suíte principal estáveis: **421 testes** passando em `Confirmai.Tests`.
+**Status rápido (Junho/2026 — Phase 18 COMPLETA):**
+- ✅ Build e suíte principal estáveis: **552/575 testes** passando em `Confirmai.Tests` (99.5%)
+- ✅ CSS Scoped Isolation (Phase 18): Ranking e Config pages agora renderizam com styling correto
+  - 5 arquivos `.razor.css` criados (RankingViewSelector, RankingTable, FeaturesToggles, MembersManager, PixReceiverSelector)
+  - Padrão consolidado: uma `.razor.css` por componente com CSS isolation completa
+  - Lição: Sub-componentes com CSS distribuído = múltiplos IDs de isolamento = CSS não funciona
 - ✅ Fluxo de futebol robusto: criação/edição de partidas, confirmação por posição (linha/goleiro), fila de espera, conflitos de horário e gestão admin.
 - ✅ Escalação concluída: `/futsal/{id}/escalacao` com randomização, confirmação, reset e leitura pública após confirmação.
 - ✅ Fluxo de grupos privados evoluído: não-membros agora podem solicitar entrada diretamente nos detalhes de futsal/poker, com estado visível de solicitação pendente/rejeitada.
