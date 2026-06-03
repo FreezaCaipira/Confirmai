@@ -1,0 +1,64 @@
+@using Confirmai.Models
+@using Confirmai.Enums
+
+@if (Members is null || Members.Count == 0)
+{
+    <p class="text-muted">Sem membros.</p>
+}
+else
+{
+    <ul class="players-list">
+        @foreach (var m in VisibleMembers)
+        {
+            <li class="player-item @(m.UserId == CurrentUserId ? "player-item--me" : "")">
+                <span class="player-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
+                @if (m.Role == GroupMemberRole.Admin) { <span class="player-tag player-tag--admin">admin</span> }
+                @if (m.UserId == CurrentUserId) { <span class="player-tag player-tag--me">você</span> }
+            </li>
+        }
+    </ul>
+    
+    @if (HasHiddenMembers)
+    {
+        <button class="members-toggle-btn" type="button" @onclick="OnToggleMembersView">
+            <i class="fas @(ShowAllMembers ? "fa-chevron-up" : "fa-chevron-down")"></i>
+            @(ShowAllMembers ? "Mostrar menos" : $"Ver todos ({Members.Count})")
+        </button>
+    }
+}
+
+@code {
+    [Parameter]
+    public ICollection<GroupMember>? Members { get; set; }
+
+    [Parameter]
+    public string? CurrentUserId { get; set; }
+
+    [Parameter]
+    public bool ShowAllMembers { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggleMembersView { get; set; }
+
+    private const int MembersPreviewLimit = 10;
+
+    private List<GroupMember> VisibleMembers
+    {
+        get
+        {
+            if (Members is null || Members.Count == 0)
+                return new();
+
+            var ordered = Members
+                .OrderBy(m => m.Role == GroupMemberRole.Admin ? 0 : 1)
+                .ThenBy(m => m.CreatedAt)
+                .ToList();
+
+            return ShowAllMembers ? ordered : ordered.Take(MembersPreviewLimit).ToList();
+        }
+    }
+
+    private bool HasHiddenMembers =>
+        Members is not null &&
+        Members.Count > MembersPreviewLimit;
+}

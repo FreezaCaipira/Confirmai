@@ -1,6 +1,12 @@
-﻿using Confirmai.Data;
+using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +34,7 @@ public class AppInitializationServiceTests
 
         await service.SeedAsync();
 
-        Assert.Contains(loggerProvider.Messages, m => m.Contains("Usuário admin seed criado"));
+        Assert.Contains(loggerProvider.Messages, m => m.Contains("Usu�rio admin seed criado"));
         Assert.Contains(loggerProvider.Messages, m => m.Contains("promovido a admin"));
     }
 

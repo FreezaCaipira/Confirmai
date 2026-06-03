@@ -1,10 +1,16 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Core;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Utility;
 
 namespace Confirmai.Tests;
 
@@ -150,7 +156,7 @@ public class AuditLoggingHooksTests
         return env.Object;
     }
 
-    // ── AdminSettingsService ───────────────────────────────────────
+    // -- AdminSettingsService ---------------------------------------
 
     [Fact]
     public async Task AdminSettingsService_SetOperationFeePercentAsync_WritesAdminSettingChangedAudit()

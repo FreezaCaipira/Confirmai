@@ -1,3 +1,4 @@
+using Confirmai.Services.Payment;
 namespace Confirmai.Services;
 
 public sealed record EventPaymentGatewayOption(string Name, string DisplayName);

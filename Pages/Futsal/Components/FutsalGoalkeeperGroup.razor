@@ -1,0 +1,147 @@
+@using Confirmai.Models
+@using Confirmai.Enums
+@using Confirmai.Shared.Helpers
+
+<div class="players-group players-group--gk">
+    <div class="players-group-header">
+        <span class="players-label">🥅 Goleiros</span>
+        <span class="players-count @(IsFullGk ? "is-full" : "")">
+            @ConfirmedGk / @Event?.MaxGoalkeepers
+        </span>
+    </div>
+    <ol class="players-list">
+        @{
+            int gkIdx = 0;
+            foreach (var c in GoalkeeperPlayers)
+            {
+                gkIdx++;
+                <li class="player-item @(c.UserId == CurrentUserId ? "player-item--me" : "") @(DetailMvpRevealed && c.UserId == DetailMvpUserId ? "player-item--mvp" : "")">
+                    <span class="player-num">@gkIdx</span>
+                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Goleiro")</span>
+                    @if (c.UserId == CurrentUserId) { <span class="player-tag player-tag--me">você</span> }
+                    @if (DetailMvpRevealed && c.UserId == DetailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
+                    <span class="player-tag player-tag--no-pay">
+                        <i class="fas fa-check-circle"></i> não paga
+                    </span>
+                    @if (Event!.IsActive && !IsPastEvent && c.UserId == CurrentUserId && !c.HasPaid)
+                    {
+                        @if (ConfirmCancel)
+                        {
+                            <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
+                            <button class="player-tag player-tag--cancel-yes" type="button" @onclick="HandleCancelConfirmation">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => HandleConfirmCancelChange(false)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="player-tag player-tag--cancel" type="button" @onclick="() => HandleConfirmCancelChange(true)">
+                                <i class="fas fa-user-times"></i> cancelar
+                            </button>
+                        }
+                    }
+                    @if (IsAdmin && !IsPastEvent && c.UserId != CurrentUserId)
+                    {
+                        @if (ConfirmRemoveId == c.Id)
+                        {
+                            <span class="player-tag player-tag--remove-confirm">remover?</span>
+                            <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => HandleAdminRemoveConfirmation(c.Id)">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="player-tag player-tag--admin-remove-no" type="button" @onclick="() => HandleConfirmRemoveIdChange(null)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => HandleConfirmRemoveIdChange(c.Id)">
+                                <i class="fas fa-user-times"></i> remover
+                            </button>
+                        }
+                    }
+                </li>
+            }
+            for (int i = gkIdx + 1; i <= Event!.MaxGoalkeepers!.Value; i++)
+            {
+                bool isFirstEmpty = i == gkIdx + 1;
+                if (CanConfirm && isFirstEmpty)
+                {
+                    <li class="player-item player-item--slot">
+                        <span class="player-num">@i</span>
+                        <button class="player-slot-btn player-slot-btn--gk" @onclick="() => HandleConfirmAs(FutsalPosition.Goalkeeper)"><i class="fas fa-plus"></i> Confirmar presença</button>
+                    </li>
+                }
+                else
+                {
+                    <li class="player-item player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
+                }
+            }
+        }
+    </ol>
+    @if (IsFullGk && CanConfirm)
+    {
+        <button class="waitlist-cta waitlist-cta--gk" @onclick="() => HandleConfirmAs(FutsalPosition.Goalkeeper)">
+            <i class="fas fa-clock"></i> Entrar na lista de espera de goleiros
+        </button>
+    }
+    @if (IsAdmin && Event!.IsActive && !IsPastEvent)
+    {
+        <div class="slot-controls">
+            <button class="slot-ctrl-btn slot-ctrl-btn--remove"
+                    disabled="@(Event!.MaxGoalkeepers!.Value <= MinInfo.MinGoalkeepers || Event!.MaxGoalkeepers!.Value <= ConfirmedGk)"
+                    @onclick="HandleAdminRemoveGoalkeeperSlot">
+                <i class="fas fa-minus"></i> Remover vaga de goleiro
+            </button>
+            <button class="add-slot-row add-slot-row--gk" @onclick="HandleAdminAddGoalkeeperSlot">
+                <i class="fas fa-plus"></i> Adicionar vaga de goleiro
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Event? Event { get; set; }
+    [Parameter] public string? CurrentUserId { get; set; }
+    [Parameter] public bool IsAdmin { get; set; }
+    [Parameter] public bool IsPastEvent { get; set; }
+    [Parameter] public bool CanConfirm { get; set; }
+    [Parameter] public List<EventConfirmation> GoalkeeperPlayers { get; set; } = new();
+    [Parameter] public int ConfirmedGk { get; set; }
+    [Parameter] public int? ConfirmRemoveId { get; set; }
+    [Parameter] public bool ConfirmCancel { get; set; }
+    [Parameter] public bool DetailMvpRevealed { get; set; }
+    [Parameter] public string? DetailMvpUserId { get; set; }
+    [Parameter] public (int MinOutfield, int MinGoalkeepers) MinInfo { get; set; }
+    [Parameter] public bool IsFullGk { get; set; }
+
+    [Parameter] public EventCallback OnConfirmAs { get; set; }
+    [Parameter] public EventCallback<int?> OnConfirmRemoveIdChange { get; set; }
+    [Parameter] public EventCallback<bool> OnConfirmCancelChange { get; set; }
+    [Parameter] public EventCallback OnCancelConfirmation { get; set; }
+    [Parameter] public EventCallback<int> OnAdminRemoveConfirmation { get; set; }
+    [Parameter] public EventCallback OnAdminAddGoalkeeperSlot { get; set; }
+    [Parameter] public EventCallback OnAdminRemoveGoalkeeperSlot { get; set; }
+
+    private async Task HandleConfirmAs(FutsalPosition pos)
+        => await OnConfirmAs.InvokeAsync();
+
+    private async Task HandleConfirmRemoveIdChange(int? value)
+        => await OnConfirmRemoveIdChange.InvokeAsync(value);
+
+    private async Task HandleConfirmCancelChange(bool value)
+        => await OnConfirmCancelChange.InvokeAsync(value);
+
+    private async Task HandleCancelConfirmation()
+        => await OnCancelConfirmation.InvokeAsync();
+
+    private async Task HandleAdminRemoveConfirmation(int confirmationId)
+        => await OnAdminRemoveConfirmation.InvokeAsync(confirmationId);
+
+    private async Task HandleAdminAddGoalkeeperSlot()
+        => await OnAdminAddGoalkeeperSlot.InvokeAsync();
+
+    private async Task HandleAdminRemoveGoalkeeperSlot()
+        => await OnAdminRemoveGoalkeeperSlot.InvokeAsync();
+}

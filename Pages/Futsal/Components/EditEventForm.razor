@@ -1,0 +1,254 @@
+@using System.ComponentModel.DataAnnotations
+@using Confirmai.Enums
+@using Confirmai.Models
+
+<EditForm Model="Form" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="validation-summary" />
+
+    @* ── Identidade da partida ───────────────────────────────────── *@
+    <fieldset class="form-section">
+        <legend>Identidade da Partida</legend>
+
+        <div class="form-group">
+            <label>Nome da partida <span class="required">*</span></label>
+            <InputText class="input" @bind-Value="Form.GroupName"
+                       placeholder='Ex: "Rachão da Galera do Zé", "Pelada de Quinta"'
+                       autocomplete="off" />
+            <ValidationMessage For="@(() => Form.GroupName)" class="validation-message" />
+        </div>
+
+        <div class="form-group">
+            <label>Como vocês chamam o jogo na sua região?</label>
+            <InputText class="input" @bind-Value="Form.LocalName"
+                       placeholder='racha, pelada, baba, rachão…' maxlength="60"
+                       autocomplete="off" />
+            <small class="form-hint">Opcional — aparece nos cards para identificar o estilo da região.</small>
+        </div>
+    </fieldset>
+
+    @* ── Quadra ──────────────────────────────────────────────────── *@
+    <fieldset class="form-section">
+        <legend>Local</legend>
+
+        <div class="form-group">
+            <label>Quadra / Society / Campo <span class="required">*</span></label>
+            @if (!Venues.Any())
+            {
+                <p class="form-hint form-hint--warn">
+                    Nenhuma quadra cadastrada ainda. Solicite ao administrador do sistema.
+                </p>
+            }
+            else
+            {
+                <InputSelect class="input" @bind-Value="Form.VenueId" @bind-Value:after="OnVenueChanged">
+                    <option value="0">— Selecione a quadra —</option>
+                    @foreach (var v in Venues)
+                    {
+                        <option value="@v.Id">@v.Name (@VenueTypeLabel(v.Type)) — @v.City/@v.StateCode</option>
+                    }
+                </InputSelect>
+            }
+        </div>
+
+        @if (SelectedVenue is not null)
+        {
+            <div class="venue-preview">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>@SelectedVenue.Address · @SelectedVenue.City — @SelectedVenue.StateCode</span>
+            </div>
+        }
+    </fieldset>
+
+    @* ── Data, hora e duração ────────────────────────────────────── *@
+    <fieldset class="form-section">
+        <legend>Data &amp; Horário</legend>
+
+        <div class="form-row-2">
+            <div class="form-group">
+                <label>Data <span class="required">*</span></label>
+                <InputDate class="input" @bind-Value="Form.Date" />
+                <ValidationMessage For="@(() => Form.Date)" class="validation-message" />
+            </div>
+            <div class="form-group">
+                <label>Hora de início <span class="required">*</span></label>
+                <input type="time" class="input"
+                       value="@Form.Time.ToString("HH:mm")"
+                       @onchange="OnTimeChange" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Duração <span class="required">*</span></label>
+            <InputSelect class="input" @bind-Value="Form.DurationMinutes">
+                @foreach (var (min, label) in DurationOptions)
+                {
+                    <option value="@min">@label</option>
+                }
+            </InputSelect>
+        </div>
+    </fieldset>
+
+    @* ── Vagas ───────────────────────────────────────────────────── *@
+    <fieldset class="form-section">
+        <legend>Vagas</legend>
+
+        <div class="form-row-2">
+            <div class="form-group">
+                <label>Vagas totais (linha + goleiros) <span class="required">*</span></label>
+                <InputNumber class="input" @bind-Value="Form.MaxPlayers" min="1" max="100" />
+                <ValidationMessage For="@(() => Form.MaxPlayers)" class="validation-message" />
+            </div>
+            <div class="form-group">
+                <label>Goleiros</label>
+                <InputNumber class="input" @bind-Value="Form.MaxGoalkeepers" min="0" max="10" disabled="@Form.RotateInGoal" />
+            </div>
+        </div>
+
+        <label class="switch-label" style="margin-top:.5rem">
+            <input type="checkbox" @bind="Form.RotateInGoal" @bind:after="OnRotateInGoalChanged" />
+            Revezar jogadores de linha no gol
+        </label>
+    </fieldset>
+
+    @* ── Valor ───────────────────────────────────────────────────── *@
+    <fieldset class="form-section">
+        <legend>Valor</legend>
+
+        <div class="form-group">
+            <label>Valor por jogador (R$) <span class="required">*</span></label>
+            <div class="input-prefix-wrap">
+                <span class="input-prefix">R$</span>
+                <InputNumber class="input" @bind-Value="Form.Price" min="0" step="0.50" />
+            </div>
+            <ValidationMessage For="@(() => Form.Price)" class="validation-message" />
+            <small class="form-hint">Use 0 para partidas sem cobrança.</small>
+        </div>
+    </fieldset>
+
+    @if (!string.IsNullOrWhiteSpace(SaveError))
+    {
+        <p class="validation-message">
+            @SaveError
+            @if (!string.IsNullOrWhiteSpace(CollisionHref))
+            {
+                <a href="@CollisionHref" style="margin-left:.45rem;color:#93c5fd">@Confirmai.Services.Events.EventCollisionService.OpenExistingEventLinkText</a>
+            }
+        </p>
+    }
+
+    <div class="form-actions">
+        @if (ShowCancelButton)
+        {
+            @if (!ShowCancelConfirm)
+            {
+                <button class="save-btn edit-cancel-btn" type="button"
+                        @onclick="() => OnShowCancelConfirm(true)">
+                    <i class="fas fa-ban"></i> Cancelar partida
+                </button>
+            }
+            else
+            {
+                <div class="cancel-confirm-block">
+                    <span>Tem certeza? Todos os confirmados serão avisados.</span>
+                    <button class="save-btn edit-cancel-no-btn" type="button"
+                            @onclick="() => OnShowCancelConfirm(false)">Não</button>
+                    <button class="save-btn edit-cancel-btn" type="button"
+                            @onclick="OnCancelConfirmed">Sim, cancelar</button>
+                </div>
+            }
+        }
+        <button class="save-btn" type="submit" disabled="@IsSaving">
+            @(IsSaving ? "Salvando…" : "Salvar alterações")
+        </button>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(CancelError))
+    {
+        <p class="validation-message">@CancelError</p>
+    }
+</EditForm>
+
+@code {
+    [Parameter]
+    public EditEventFormData Form { get; set; } = null!;
+
+    [Parameter]
+    public List<Venue> Venues { get; set; } = new();
+
+    [Parameter]
+    public Venue? SelectedVenue { get; set; }
+
+    [Parameter]
+    public bool IsSaving { get; set; }
+
+    [Parameter]
+    public bool ShowCancelButton { get; set; }
+
+    [Parameter]
+    public bool ShowCancelConfirm { get; set; }
+
+    [Parameter]
+    public string SaveError { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? CollisionHref { get; set; }
+
+    [Parameter]
+    public string CancelError { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnFormSubmit { get; set; }
+
+    [Parameter]
+    public EventCallback OnVenueSelected { get; set; }
+
+    [Parameter]
+    public EventCallback OnRotateToggled { get; set; }
+
+    [Parameter]
+    public EventCallback<ChangeEventArgs> OnTimeChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnCancelConfirmShowChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelConfirmedClicked { get; set; }
+
+    private static readonly (int Min, string Label)[] DurationOptions =
+    [
+        (60,  "1h"),
+        (75,  "1h15min"),
+        (90,  "1h30min"),
+        (105, "1h45min"),
+        (120, "2h"),
+        (150, "2h30min"),
+        (180, "3h"),
+    ];
+
+    private async Task OnValidSubmit()
+        => await OnFormSubmit.InvokeAsync();
+
+    private async Task OnVenueChanged()
+        => await OnVenueSelected.InvokeAsync();
+
+    private async Task OnRotateInGoalChanged()
+        => await OnRotateToggled.InvokeAsync();
+
+    private async Task OnTimeChange(ChangeEventArgs e)
+        => await OnTimeChanged.InvokeAsync(e);
+
+    private async Task OnShowCancelConfirm(bool show)
+        => await OnCancelConfirmShowChanged.InvokeAsync(show);
+
+    private async Task OnCancelConfirmed()
+        => await OnCancelConfirmedClicked.InvokeAsync();
+
+    private static string VenueTypeLabel(VenueType t) => t switch
+    {
+        VenueType.Quadra  => "Quadra",
+        VenueType.Society => "Society",
+        VenueType.Campo   => "Campo",
+        _                 => t.ToString()
+    };
+}

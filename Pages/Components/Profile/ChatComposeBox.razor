@@ -1,0 +1,54 @@
+@if (!string.IsNullOrWhiteSpace(Feedback))
+{
+    <p class="profile-feedback" role="status">@Feedback</p>
+}
+
+<textarea class="mk-input profile-chat-textarea" rows="3" maxlength="4000"
+          placeholder="Digite sua mensagem..." @bind="localMessageBody"></textarea>
+
+<div class="profile-chat-actions">
+    <button class="mk-btn mk-btn-primary" type="button"
+            @onclick="HandleSendMessage" disabled="@IsSending">
+        @(IsSending ? "Enviando..." : "Enviar")
+    </button>
+    @if (ShowRefreshButton)
+    {
+        <button class="mk-btn" type="button" @onclick="HandleRefreshChat">Atualizar</button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string MessageBody { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsSending { get; set; }
+
+    [Parameter]
+    public string? Feedback { get; set; }
+
+    [Parameter]
+    public bool ShowRefreshButton { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSendMessage { get; set; }
+
+    [Parameter]
+    public EventCallback OnRefreshChat { get; set; }
+
+    private string localMessageBody = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        localMessageBody = MessageBody;
+    }
+
+    private async Task HandleSendMessage()
+    {
+        await OnSendMessage.InvokeAsync(localMessageBody);
+        localMessageBody = string.Empty;
+    }
+
+    private async Task HandleRefreshChat()
+        => await OnRefreshChat.InvokeAsync();
+}

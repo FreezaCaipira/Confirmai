@@ -1,0 +1,19 @@
+@if (IsLoading)
+{
+    <div class="loading-spinner">Carregando...</div>
+}
+else if (UserNotFound)
+{
+    <div class="detail-not-found">
+        <h2>Perfil não encontrado.</h2>
+        <a href="/">← Início</a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public bool UserNotFound { get; set; }
+}

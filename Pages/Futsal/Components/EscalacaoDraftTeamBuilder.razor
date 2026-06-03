@@ -1,0 +1,126 @@
+@using Confirmai.Models
+@using Confirmai.Enums
+@using Confirmai.Pages.Futsal.Components
+
+<div class="esc-teams">
+    <div class="esc-team esc-team--a">
+        @if (IsAdmin)
+        {
+            <input class="esc-team-name-input esc-team-name-input--a"
+                   @bind="@TeamAName" @bind:event="oninput"
+                   @onblur="SaveTeamNamesCallback"
+                   maxlength="50" placeholder="Time A" />
+        }
+        else
+        {
+            <h2 class="esc-team-title">🟡 @TeamAName</h2>
+        }
+        <ul class="esc-player-list">
+            @foreach (var s in TeamA.Where(s => s.IsGoalkeeper))
+            {
+                <li class="esc-player esc-player--gk">
+                    <span class="esc-player-icon">🥅</span>
+                    <span class="esc-player-name">@s.Name</span>
+                    <button class="esc-move-btn" title="Mover para Time B" @onclick="() => HandleMovePlayer(s, true)">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </li>
+            }
+            @{ int draftNumA = 1; }
+            @foreach (var s in TeamA.Where(s => !s.IsGoalkeeper))
+            {
+                <li class="esc-player">
+                    <span class="esc-player-num">@(draftNumA++)</span>
+                    <span class="esc-player-name">@s.Name</span>
+                    <button class="esc-move-btn" title="Mover para Time B" @onclick="() => HandleMovePlayer(s, true)">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="esc-team esc-team--b">
+        @if (IsAdmin)
+        {
+            <input class="esc-team-name-input esc-team-name-input--b"
+                   @bind="@TeamBName" @bind:event="oninput"
+                   @onblur="SaveTeamNamesCallback"
+                   maxlength="50" placeholder="Time B" />
+        }
+        else
+        {
+            <h2 class="esc-team-title">🔵 @TeamBName</h2>
+        }
+        <ul class="esc-player-list">
+            @foreach (var s in TeamB.Where(s => s.IsGoalkeeper))
+            {
+                <li class="esc-player esc-player--gk">
+                    <button class="esc-move-btn" title="Mover para Time A" @onclick="() => HandleMovePlayer(s, false)">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="esc-player-icon">🥅</span>
+                    <span class="esc-player-name">@s.Name</span>
+                </li>
+            }
+            @{ int draftNumB = 1; }
+            @foreach (var s in TeamB.Where(s => !s.IsGoalkeeper))
+            {
+                <li class="esc-player">
+                    <button class="esc-move-btn" title="Mover para Time A" @onclick="() => HandleMovePlayer(s, false)">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="esc-player-num">@(draftNumB++)</span>
+                    <span class="esc-player-name">@s.Name</span>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@if (Reservas.Any())
+{
+    <div class="esc-reserva">
+        <h3 class="esc-reserva-title">🔄 Reserva</h3>
+        <ul class="esc-player-list">
+            @foreach (var s in Reservas)
+            {
+                <li class="esc-player">
+                    <span class="esc-player-name">@s.Name</span>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<PlayerSlot> TeamA { get; set; } = new();
+
+    [Parameter]
+    public List<PlayerSlot> TeamB { get; set; } = new();
+
+    [Parameter]
+    public List<PlayerSlot> Reservas { get; set; } = new();
+
+    [Parameter]
+    public string TeamAName { get; set; } = "Time A";
+
+    [Parameter]
+    public string TeamBName { get; set; } = "Time B";
+
+    [Parameter]
+    public bool IsAdmin { get; set; }
+
+    [Parameter]
+    public EventCallback OnSaveTeamNames { get; set; }
+
+    [Parameter]
+    public EventCallback<(PlayerSlot Slot, bool ToTeamB)> OnMovePlayer { get; set; }
+
+    private async Task SaveTeamNamesCallback()
+        => await OnSaveTeamNames.InvokeAsync();
+
+    private async Task HandleMovePlayer(PlayerSlot slot, bool toTeamB)
+        => await OnMovePlayer.InvokeAsync((slot, toTeamB));
+}

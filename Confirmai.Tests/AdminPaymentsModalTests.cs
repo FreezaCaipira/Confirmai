@@ -1,6 +1,12 @@
+using Confirmai.Services.Admin;
+using Confirmai.Services.Core;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Utility;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Confirmai.Tests;

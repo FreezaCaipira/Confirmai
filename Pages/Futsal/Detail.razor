@@ -7,6 +7,8 @@
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Shared.Helpers
+@using Confirmai.Shared.Components.Futsal
+@using Confirmai.Pages.Futsal.Components
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -17,7 +19,7 @@
 @inject AdminConfirmationService AdminConfirmationService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
-@inject Confirmai.Services.EventNotificationService NotificationService
+@inject Confirmai.Services.Events.EventNotificationService NotificationService
 @inject IConfiguration Config
 @inject IJSRuntime JS
 
@@ -95,36 +97,10 @@ else
     <div class="detail-page">
         <div class="detail-card">
             @* ── Cabeçalho ────────────────────────────────────────────── *@
-            <header class="detail-header detail-header--futsal">
-                <div class="detail-header-top">
-                    <span class="detail-sport-badge">⚽ Futsal</span>
-                    <a href="/grupo/@ev.GroupId" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar para o grupo</a>
-                </div>
-                <h1 class="detail-title detail-title--with-num">@ev.Group.Name <span class="detail-event-num">#@eventNumber</span></h1>
-                @if (!string.IsNullOrWhiteSpace(ev.LocalName))
-                {
-                    <p class="detail-localname">@ev.LocalName</p>
-                }
-                <p class="detail-location">
-                    <i class="fas fa-map-marker-alt"></i>
-                    @(ev.Venue is not null ? ev.Venue.Name : ev.Location)
-                    @if (!string.IsNullOrWhiteSpace(ev.Group.City))
-                    {
-                        <span> · @ev.Group.City/@ev.Group.StateCode</span>
-                    }
-                </p>
-                @if (creatorUser is not null)
-                {
-                    <p class="detail-organizer">
-                        <i class="fas fa-user"></i>
-                        Organizado por <a href="/profile/@creatorUser.Id" class="detail-organizer-link">@(creatorUser.FullName ?? creatorUser.UserName)</a>
-                    </p>
-                }
-                <p class="detail-group-ref">
-                    <i class="fas fa-users"></i>
-                    Abrir grupo: <a class="detail-group-link" href="/grupo/@ev.GroupId">@ev.Group.Name</a>
-                </p>
-            </header>
+            <DetailEventHeader
+                Event="@ev"
+                EventNumber="@eventNumber"
+                CreatorUser="@creatorUser" />
 
             @if (!ev.IsActive)
             {
@@ -134,85 +110,19 @@ else
             }
 
             @* ── Info chips ───────────────────────────────────────────── *@
-            <div class="detail-chips">
-                <span class="detail-chip">
-                    <i class="fas fa-calendar-alt"></i>
-                    @ev.StartsAt.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("pt-BR"))
-                </span>
-                <span class="detail-chip">
-                    <i class="fas fa-clock"></i>
-                    @ev.StartsAt.ToString("HH:mm")
-                    @if (ev.DurationMinutes.HasValue)
-                    {
-                        <span> · @(ev.DurationMinutes / 60)h@(ev.DurationMinutes % 60 != 0 ? $"{ev.DurationMinutes % 60}min" : "")</span>
-                    }
-                </span>
-                @if (ev.Price.HasValue)
-                {
-                    <span class="detail-chip detail-chip--price">
-                        <i class="fas fa-money-bill-wave"></i>
-                        R$ @ev.Price.Value.ToString("N2")
-                    </span>
-                }
-            </div>
+            <DetailChipsRow Event="@ev" />
 
             @* ── Mapa da quadra ───────────────────────────────────────── *@
             @{
-                // Prefer venue name + city for the map query — more reliable than raw address.
                 var mapAddr = ev.Venue is not null
                     ? $"{ev.Venue.Name}, {ev.Venue.City}, {ev.Venue.StateCode}, Brasil"
                     : ev.Location;
-
-                var mapsKey    = Config["Google:MapsApiKey"];
-                var hasMapsKey = !string.IsNullOrWhiteSpace(mapsKey) && !mapsKey!.Contains("SET_VIA");
-                var mapWrapId  = $"map-wrap-{ev.Id}";
-                var mapFbId    = $"map-fallback-{ev.Id}";
             }
             @if (!string.IsNullOrWhiteSpace(mapAddr))
             {
-                var mapsSearchUrl = $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(mapAddr)}";
-                <hr class="detail-divider">
-                <section class="detail-section">
-                    <h2 class="detail-section-title">
-                        <i class="fas fa-map-marker-alt"></i> Localização
-                    </h2>
-
-                    @* Placeholder — always rendered, visible by default *@
-                    <a id="@mapFbId" class="detail-map-placeholder" href="@mapsSearchUrl" target="_blank" rel="noopener noreferrer">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div>
-                            <span class="detail-map-placeholder-name">@(ev.Venue?.Name ?? mapAddr)</span>
-                            @if (ev.Venue is not null)
-                            {
-                                <span class="detail-map-placeholder-addr">@ev.Venue.Address · @ev.Venue.City/@ev.Venue.StateCode</span>
-                            }
-                        </div>
-                        <i class="fas fa-external-link-alt detail-map-placeholder-ext"></i>
-                    </a>
-
-                    @* Iframe — hidden initially; JS shows it only when Google responds *@
-                    @if (hasMapsKey)
-                    {
-                        <div id="@mapWrapId" class="detail-map-wrap" style="display:none">
-                            <iframe
-                                class="detail-map"
-                                src="@($"https://www.google.com/maps/embed/v1/place?key={mapsKey}&q={Uri.EscapeDataString(mapAddr)}&language=pt-BR")"
-                                loading="lazy"
-                                referrerpolicy="no-referrer-when-downgrade"
-                                allowfullscreen
-                                title="Localização da quadra">
-                            </iframe>
-                        </div>
-                    }
-
-                    <a class="detail-map-link"
-                       href="@mapsSearchUrl"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        <i class="fas fa-external-link-alt"></i> Abrir no Google Maps
-                    </a>
-                </section>
-                <hr class="detail-divider">
+                <DetailLocationSection
+                    Event="@ev"
+                    MapsApiKey="@(Config["Google:MapsApiKey"] ?? string.Empty)" />
             }
 
             @* ── Quórum ───────────────────────────────────────────────── *@
@@ -223,23 +133,11 @@ else
             }
             @if (minInfo.Total > 0)
             {
-                <div class="quorum-bar @(isPastEvent ? "quorum-bar--past" : (hasQuorum ? "quorum-bar--ok" : "quorum-bar--warn"))">
-                    @if (isPastEvent)
-                    {
-                        <i class="fas fa-flag-checkered"></i>
-                        <span>Partida encerrada</span>
-                    }
-                    else if (hasQuorum)
-                    {
-                        <i class="fas fa-check-circle"></i>
-                        <span>Quantidade mínima de jogadores atingida</span>
-                    }
-                    else
-                    {
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>Quantidade mínima de jogadores é: <strong>@minInfo.MinOutfield</strong> de linha + <strong>@minInfo.MinGoalkeepers</strong> goleiro@(minInfo.MinGoalkeepers == 1 ? string.Empty : "s")</span>
-                    }
-                </div>
+                <DetailQuorumBar
+                    HasQuorum="@hasQuorum"
+                    IsPastEvent="@isPastEvent"
+                    MinOutfield="@minInfo.MinOutfield"
+                    MinGoalkeepers="@minInfo.MinGoalkeepers" />
             }
 
             @* ── Jogadores ────────────────────────────────────────────── *@
@@ -247,6 +145,10 @@ else
                 @{
                     var outFieldPlayers = ev.Confirmations
                         .Where(c => c.Position != FutsalPosition.Goalkeeper)
+                        .OrderBy(c => c.ConfirmedAt)
+                        .ToList();
+                    var gkPlayers = ev.Confirmations
+                        .Where(c => c.Position == FutsalPosition.Goalkeeper)
                         .OrderBy(c => c.ConfirmedAt)
                         .ToList();
                     int outFieldSlots = maxOut > 0 ? maxOut : outFieldPlayers.Count;
@@ -258,288 +160,62 @@ else
                     int detailTotalVoters = ev.Confirmations.Count(c => c.TeamId == 0 || c.TeamId == 1);
                     bool detailMvpRevealed = isPastEvent && detailMvpUserId is not null
                                              && detailMvpVotes.Count >= Math.Max(1, (int)Math.Ceiling(detailTotalVoters * 0.5));
+                    var minInfoTuple = (minInfo.MinOutfield, minInfo.MinGoalkeepers);
                 }
 
                 @if (ev.MaxGoalkeepers > 0)
                 {
                     <div class="players-groups-stack">
-                    <div class="players-group players-group--line">
-                        <div class="players-group-header">
-                            <span class="players-label">⚽ Linha</span>
-                            <span class="players-count @(isFullOut ? "is-full" : "")">
-                                @confirmedOut / @maxOut
-                            </span>
-                        </div>
-                        <ol class="players-list">
-                            @{
-                                int outIdx = 0;
-                                foreach (var c in outFieldPlayers)
-                                {
-                                    outIdx++;
-                                    bool isRotation = outIdx > baseOut;
-                                    <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "") @(detailMvpRevealed && c.UserId == detailMvpUserId ? "player-item--mvp" : "")">
-                                        <span class="player-num">@outIdx</span>
-                                        <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
-                                        @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
-                                        @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
-                                        @if (ev.Price.HasValue)
-                                        {
-                                            @if (isAdmin)
-                                            {
-                                                bool canTogglePaid1 = !c.HasPaid || c.PaymentGatewayName == null;
-                                                @if (canTogglePaid1)
-                                                {
-                                                    @if (confirmPayId == c.Id)
-                                                    {
-                                                        <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
-                                                        <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => AdminTogglePaid(c.Id)">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                        <button class="player-tag player-tag--admin-pay-no" type="button" @onclick="() => confirmPayId = null">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    }
-                                                    else
-                                                    {
-                                                        @if (c.HasPaid)
-                                                        {
-                                                            <button class="player-tag player-tag--admin-pay player-tag--paid" @onclick="() => confirmPayId = c.Id" title="Pago - clique para desmarcar">
-                                                                <i class="fas fa-check"></i> pago
-                                                            </button>
-                                                        }
-                                                        else if (c.PixProofUploadedAt.HasValue)
-                                                        {
-                                                            <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
-                                                                <i class="fas fa-image"></i> 📎 comprovante
-                                                            </button>
-                                                        }
-                                                        else
-                                                        {
-                                                            <button class="player-tag player-tag--admin-pay player-tag--pay-pending" @onclick="() => confirmPayId = c.Id" title="Sem comprovante - clique para marcar pago">
-                                                                <i class="fas fa-exclamation-triangle"></i> pendente
-                                                            </button>
-                                                            <button class="player-tag player-tag--admin-pay player-tag--pay-btn" @onclick="() => confirmPayId = c.Id" type="button" title="Clique para marcar como pago">
-                                                                <i class="fas fa-check"></i> pagar
-                                                            </button>
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    <span class="player-tag player-tag--paid" title="Pago via gateway — não pode ser desfeito pelo admin">
-                                                        <i class="fas fa-check"></i> pago
-                                                    </span>
-                                                }
-                                                @if (!isPastEvent && c.UserId != currentUserId && c.PaymentGatewayName == null)
-                                                {
-                                                    @if (confirmRemoveId == c.Id)
-                                                    {
-                                                        <span class="player-tag player-tag--remove-confirm">remover?</span>
-                                                        <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => AdminRemoveConfirmation(c.Id)">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                        <button class="player-tag player-tag--admin-remove-no" type="button" @onclick="() => confirmRemoveId = null">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    }
-                                                    else
-                                                    {
-                                                        <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => confirmRemoveId = c.Id">
-                                                            <i class="fas fa-user-times"></i> remover
-                                                        </button>
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                @if (c.HasPaid)
-                                                {
-                                                    <span class="player-tag player-tag--paid">
-                                                        <i class="fas fa-check"></i> pago
-                                                    </span>
-                                                }
-                                                else if (c.PixProofUploadedAt.HasValue && (c.UserId == currentUserId || isAdmin))
-                                                {
-                                                    <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--proof-pending player-tag--pay-link" title="Comprovante enviado - clique para gerenciar">
-                                                        <i class="fas fa-image"></i> 📎 comprovante
-                                                    </a>
-                                                }
-                                                else
-                                                {
-                                                    <span class="player-tag player-tag--pay-pending">
-                                                        <i class="fas fa-exclamation-triangle"></i> pendente
-                                                    </span>
-                                                    @if (c.UserId == currentUserId)
-                                                    {
-                                                        <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-btn player-tag--pay-link">
-                                                            <i class="fas fa-dollar-sign"></i> pagar
-                                                        </a>
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        @if (ev.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
-                                        {
-                                            @if (confirmCancel)
-                                            {
-                                                <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
-                                                <button class="player-tag player-tag--cancel-yes" type="button" @onclick="CancelConfirmation">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => confirmCancel = false">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <button class="player-tag player-tag--cancel" type="button" @onclick="() => confirmCancel = true">
-                                                    <i class="fas fa-user-times"></i> cancelar
-                                                </button>
-                                            }
-                                        }
-                                    </li>
-                                }
-                                for (int i = outIdx + 1; i <= outFieldSlots; i++)
-                                {
-                                    bool slotIsRotation = i > baseOut;
-                                    bool isFirstEmpty = i == outIdx + 1;
-                                    if (canConfirm && isFirstEmpty)
-                                    {
-                                        <li class="player-item @(slotIsRotation ? "player-item--rotation" : "") player-item--slot">
-                                            <span class="player-num">@i</span>
-                                            <button class="player-slot-btn" @onclick="() => ConfirmAs(FutsalPosition.Outfield)"><i class="fas fa-plus"></i> Confirmar presença</button>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        <li class="player-item @(slotIsRotation ? "player-item--rotation" : "") player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
-                                    }
-                                }
-                            }
-                        </ol>
-                        @if (isFullOut && canConfirm)
-                        {
-                            <button class="waitlist-cta" @onclick="() => ConfirmAs(FutsalPosition.Outfield)">
-                                <i class="fas fa-clock"></i> Entrar na lista de espera de linha
-                            </button>
-                        }
-                        @if (isAdmin && ev.IsActive && !isPastEvent)
-                        {
-                            <div class="slot-controls">
-                                <button class="slot-ctrl-btn slot-ctrl-btn--remove"
-                                        disabled="@(maxOut <= minInfo.MinOutfield || maxOut <= confirmedOut)"
-                                        @onclick="AdminRemoveOutfieldSlot">
-                                    <i class="fas fa-minus"></i> Remover vaga de linha
-                                </button>
-                                <button class="add-slot-row" @onclick="AdminAddOutfieldSlot">
-                                    <i class="fas fa-plus"></i> Adicionar vaga de linha
-                                </button>
-                            </div>
-                        }
-                    </div>
+                        <FutsalOutfieldGroup 
+                            Event="@ev"
+                            CurrentUserId="@currentUserId"
+                            IsAdmin="@isAdmin"
+                            IsPastEvent="@isPastEvent"
+                            CanConfirm="@canConfirm"
+                            OutFieldPlayers="@outFieldPlayers"
+                            OutFieldSlots="@outFieldSlots"
+                            BaseOut="@baseOut"
+                            ConfirmedOut="@confirmedOut"
+                            MaxOut="@maxOut"
+                            IsFullOut="@isFullOut"
+                            ConfirmRemoveId="@confirmRemoveId"
+                            ConfirmPayId="@confirmPayId"
+                            ConfirmCancel="@confirmCancel"
+                            DetailMvpRevealed="@detailMvpRevealed"
+                            DetailMvpUserId="@detailMvpUserId"
+                            MinInfo="@minInfoTuple"
+                            OnConfirmAs="@ConfirmAsCallback"
+                            OnConfirmPayIdChange="@ConfirmPayIdChangedCallback"
+                            OnConfirmRemoveIdChange="@ConfirmRemoveIdChangedCallback"
+                            OnConfirmCancelChange="@ConfirmCancelChangedCallback"
+                            OnCancelConfirmation="@CancelConfirmationCallback"
+                            OnAdminTogglePaid="@AdminTogglePaidCallback"
+                            OnAdminRemoveConfirmation="@AdminRemoveConfirmationCallback"
+                            OnAdminAddOutfieldSlot="@AdminAddOutfieldSlotCallback"
+                            OnAdminRemoveOutfieldSlot="@AdminRemoveOutfieldSlotCallback"
+                            OnNavigateToPaymentsModal="@NavigateToPaymentsModalCallback" />
 
-                    <div class="players-group players-group--gk">
-                        <div class="players-group-header">
-                            <span class="players-label">🥅 Goleiros</span>
-                            <span class="players-count @(isFullGk ? "is-full" : "")">
-                                @confirmedGk / @ev.MaxGoalkeepers
-                            </span>
-                        </div>
-                        <ol class="players-list">
-                            @{
-                                var gkPlayers = ev.Confirmations
-                                    .Where(c => c.Position == FutsalPosition.Goalkeeper)
-                                    .OrderBy(c => c.ConfirmedAt)
-                                    .ToList();
-                                int gkIdx = 0;
-                                foreach (var c in gkPlayers)
-                                {
-                                    gkIdx++;
-                                    <li class="player-item @(c.UserId == currentUserId ? "player-item--me" : "") @(detailMvpRevealed && c.UserId == detailMvpUserId ? "player-item--mvp" : "")">
-                                        <span class="player-num">@gkIdx</span>
-                                        <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Goleiro")</span>
-                                        @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
-                                        @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
-                                        <span class="player-tag player-tag--no-pay">
-                                            <i class="fas fa-check-circle"></i> não paga
-                                        </span>
-                                        @if (ev.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
-                                        {
-                                            @if (confirmCancel)
-                                            {
-                                                <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
-                                                <button class="player-tag player-tag--cancel-yes" type="button" @onclick="CancelConfirmation">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => confirmCancel = false">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <button class="player-tag player-tag--cancel" type="button" @onclick="() => confirmCancel = true">
-                                                    <i class="fas fa-user-times"></i> cancelar
-                                                </button>
-                                            }
-                                        }
-                                        @if (isAdmin && !isPastEvent && c.UserId != currentUserId)
-                                        {
-                                            @if (confirmRemoveId == c.Id)
-                                            {
-                                                <span class="player-tag player-tag--remove-confirm">remover?</span>
-                                                <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => AdminRemoveConfirmation(c.Id)">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button class="player-tag player-tag--admin-remove-no" type="button" @onclick="() => confirmRemoveId = null">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => confirmRemoveId = c.Id">
-                                                    <i class="fas fa-user-times"></i> remover
-                                                </button>
-                                            }
-                                        }
-                                    </li>
-                                }
-                                for (int i = gkIdx + 1; i <= ev.MaxGoalkeepers!.Value; i++)
-                                {
-                                    bool isFirstEmpty = i == gkIdx + 1;
-                                    if (canConfirm && isFirstEmpty)
-                                    {
-                                        <li class="player-item player-item--slot">
-                                            <span class="player-num">@i</span>
-                                            <button class="player-slot-btn player-slot-btn--gk" @onclick="() => ConfirmAs(FutsalPosition.Goalkeeper)"><i class="fas fa-plus"></i> Confirmar presença</button>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        <li class="player-item player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
-                                    }
-                                }
-                            }
-                        </ol>
-                        @if (isFullGk && canConfirm)
-                        {
-                            <button class="waitlist-cta waitlist-cta--gk" @onclick="() => ConfirmAs(FutsalPosition.Goalkeeper)">
-                                <i class="fas fa-clock"></i> Entrar na lista de espera de goleiros
-                            </button>
-                        }
-                        @if (isAdmin && ev.IsActive && !isPastEvent)
-                        {
-                            <div class="slot-controls">
-                                <button class="slot-ctrl-btn slot-ctrl-btn--remove"
-                                        disabled="@(ev.MaxGoalkeepers!.Value <= minInfo.MinGoalkeepers || ev.MaxGoalkeepers!.Value <= confirmedGk)"
-                                        @onclick="AdminRemoveGoalkeeperSlot">
-                                    <i class="fas fa-minus"></i> Remover vaga de goleiro
-                                </button>
-                                <button class="add-slot-row add-slot-row--gk" @onclick="AdminAddGoalkeeperSlot">
-                                    <i class="fas fa-plus"></i> Adicionar vaga de goleiro
-                                </button>
-                            </div>
-                        }
-                    </div>
+                        <FutsalGoalkeeperGroup 
+                            Event="@ev"
+                            CurrentUserId="@currentUserId"
+                            IsAdmin="@isAdmin"
+                            IsPastEvent="@isPastEvent"
+                            CanConfirm="@canConfirm"
+                            GoalkeeperPlayers="@gkPlayers"
+                            ConfirmedGk="@confirmedGk"
+                            ConfirmRemoveId="@confirmRemoveId"
+                            ConfirmCancel="@confirmCancel"
+                            DetailMvpRevealed="@detailMvpRevealed"
+                            DetailMvpUserId="@detailMvpUserId"
+                            MinInfo="@minInfoTuple"
+                            IsFullGk="@isFullGk"
+                            OnConfirmAs="@ConfirmAsCallback"
+                            OnConfirmRemoveIdChange="@ConfirmRemoveIdChangedCallback"
+                            OnConfirmCancelChange="@ConfirmCancelChangedCallback"
+                            OnCancelConfirmation="@CancelConfirmationCallback"
+                            OnAdminRemoveConfirmation="@AdminRemoveConfirmationCallback"
+                            OnAdminAddGoalkeeperSlot="@AdminAddGoalkeeperSlotCallback"
+                            OnAdminRemoveGoalkeeperSlot="@AdminRemoveGoalkeeperSlotCallback" />
                     </div>
                 }
                 else
@@ -654,9 +330,18 @@ else
                                                 </a>
                                                 @if (isAdmin)
                                                 {
-                                                    <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-btn player-tag--pay-link">
-                                                        <i class="fas fa-check"></i> pagar
-                                                    </a>
+                                                    @if (currentUserId == ev?.Group?.PixReceiverUserId)
+                                                    {
+                                                        <span class="player-tag player-tag--receiver-badge">
+                                                            <i class="fas fa-wallet"></i> recebedor
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-btn player-tag--pay-link">
+                                                            <i class="fas fa-check"></i> pagar
+                                                        </a>
+                                                    }
                                                 }
                                             }
                                             else
@@ -729,54 +414,16 @@ else
             </section>
 
             @* ── Lista de espera ─────────────────────────────────────────── *@
-            @if (ev.WaitingList.Count > 0)
-            {
-                <hr class="detail-divider">
-                <section class="detail-section">
-                    <h2 class="detail-section-title"><i class="fas fa-clock"></i> Lista de espera (@ev.WaitingList.Count)</h2>
-                    <ol class="players-list">
-                        @{ int wIdx = 0; }
-                        @foreach (var w in ev.WaitingList.OrderBy(w => w.Position).ThenBy(w => w.JoinedAt))
-                        {
-                            wIdx++;
-                            <li class="player-item @(w.UserId == currentUserId ? "player-item--me" : "")">
-                                <span class="player-num">@wIdx</span>
-                                <span class="player-name">@(w.User?.FullName ?? w.User?.UserName ?? "Jogador")</span>
-                                @if (w.DesiredPosition == FutsalPosition.Goalkeeper) { <span class="player-tag">goleiro</span> }
-                                @if (w.UserId == currentUserId)
-                                {
-                                    <span class="player-tag player-tag--me">você</span>
-                                    @if (ev.IsActive && !isPastEvent)
-                                    {
-                                        @if (confirmLeaveWaitlist)
-                                        {
-                                            <span class="player-tag player-tag--cancel-confirm">sair da fila?</span>
-                                            <button class="player-tag player-tag--cancel-yes" type="button" @onclick="LeaveWaitlist">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => confirmLeaveWaitlist = false">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <button class="player-tag player-tag--cancel" type="button" @onclick="() => confirmLeaveWaitlist = true">
-                                                <i class="fas fa-user-times"></i> sair da fila
-                                            </button>
-                                        }
-                                    }
-                                }
-                                @if (isAdmin && ev.IsActive && !isPastEvent && w.UserId != currentUserId)
-                                {
-                                    <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => AdminRemoveFromWaitlist(w.Id)">
-                                        <i class="fas fa-user-times"></i> remover
-                                    </button>
-                                }
-                            </li>
-                        }
-                    </ol>
-                </section>
-            }
+            <FutsalWaitlist
+                Event="@ev"
+                CurrentUserId="@currentUserId"
+                IsAdmin="@isAdmin"
+                IsPastEvent="@isPastEvent"
+                ConfirmLeaveWaitlist="@confirmLeaveWaitlist"
+                OnStartLeaveWaitlist="@(() => confirmLeaveWaitlist = true)"
+                OnLeaveWaitlist="@LeaveWaitlist"
+                OnCancelLeaveWaitlist="@(() => confirmLeaveWaitlist = false)"
+                OnAdminRemoveWaitlist="@AdminRemoveFromWaitlist" />
 
             @* ── Banner: confirmado + pagamento ─────────────────────────── *@
             @if (userConf is not null)
@@ -860,48 +507,15 @@ else
 
             @if (ev.LineupConfirmedAt is not null || isAdmin)
             {
-                <div class="detail-admin-bar detail-admin-bar--footer">
-                    @if (ev.LineupConfirmedAt is not null)
-                    {
-                        @if (isPastEvent)
-                        {
-                            <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
-                                <i class="fas fa-flag-checkered"></i> Pós-Partida
-                            </a>
-                        }
-                        else
-                        {
-                            <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
-                                <i class="fas fa-clipboard-list"></i> Ver Escalação
-                            </a>
-                        }
-                    }
-                    @if (isAdmin)
-                    {
-                        @if (ev.IsActive && ev.LineupConfirmedAt is null)
-                        {
-                            @if (hasQuorum)
-                            {
-                                <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@ev.Id/escalacao">
-                                    <i class="fas fa-list-ol"></i> Montar Escalação
-                                </a>
-                            }
-                            else
-                            {
-                                <span class="detail-admin-btn detail-admin-btn--lineup detail-admin-btn--disabled"
-                                      title="Faltam @lacking jogador@(lacking == 1 ? string.Empty : "es") para atingir o mínimo necessário">
-                                    <i class="fas fa-lock"></i> Montar Escalação
-                                </span>
-                            }
-                        }
-                    }
-                    @if (canEdit)
-                    {
-                        <a class="detail-admin-btn" href="/futsal/@ev.Id/edit">
-                            <i class="fas fa-pen"></i> Editar partida
-                        </a>
-                    }
-                </div>
+                <DetailAdminPanel
+                    EventId="@ev.Id"
+                    LineupConfirmedAt="@ev.LineupConfirmedAt"
+                    IsPastEvent="@isPastEvent"
+                    IsAdmin="@isAdmin"
+                    IsActive="@ev.IsActive"
+                    HasQuorum="@hasQuorum"
+                    Lacking="@lacking"
+                    CanEdit="@canEdit" />
             }
 
         </div>
@@ -1278,5 +892,42 @@ else
         // Navigate to admin payments page where admin can manage all payments
         NavigationManager.NavigateTo("/admin/payments");
     }
+
+    // Callback wrappers for child components
+    private async Task ConfirmAsCallback()
+        => await ConfirmPresence();
+
+    private async Task ConfirmPayIdChangedCallback(int? value)
+        => confirmPayId = value;
+
+    private async Task ConfirmRemoveIdChangedCallback(int? value)
+        => confirmRemoveId = value;
+
+    private async Task ConfirmCancelChangedCallback(bool value)
+        => confirmCancel = value;
+
+    private async Task CancelConfirmationCallback()
+        => await CancelConfirmation();
+
+    private async Task AdminTogglePaidCallback(int confirmationId)
+        => await AdminTogglePaid(confirmationId);
+
+    private async Task AdminRemoveConfirmationCallback(int confirmationId)
+        => await AdminRemoveConfirmation(confirmationId);
+
+    private async Task AdminAddOutfieldSlotCallback()
+        => await AdminAddOutfieldSlot();
+
+    private async Task AdminRemoveOutfieldSlotCallback()
+        => await AdminRemoveOutfieldSlot();
+
+    private async Task AdminAddGoalkeeperSlotCallback()
+        => await AdminAddGoalkeeperSlot();
+
+    private async Task AdminRemoveGoalkeeperSlotCallback()
+        => await AdminRemoveGoalkeeperSlot();
+
+    private async Task NavigateToPaymentsModalCallback()
+        => NavigateToPaymentsModal();
 
 }

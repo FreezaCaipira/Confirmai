@@ -1,5 +1,11 @@
-﻿using Confirmai.Models;
+using Confirmai.Services.Admin;
+using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 
 namespace Confirmai.Tests;
 

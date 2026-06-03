@@ -1,0 +1,49 @@
+@using System.Globalization
+
+<div class="evpay-admin-pix">
+    <div class="evpay-admin-pix-header">
+        <i class="fas fa-hand-holding-usd"></i>
+        <span>Pix direto ao organizador</span>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(GroupAdminPixKey))
+    {
+        <p class="evpay-admin-pix-hint">
+            Escaneie o QR Code ou copie a chave e transfira R$ @Price.ToString("N2", PtBr) diretamente.
+            O organizador confirmará o recebimento.
+        </p>
+        <div class="evpay-admin-pix-qr">
+            <QRCode Value="@PixQrPayload" />
+        </div>
+        <div class="evpay-admin-pix-key">
+            <code class="evpay-admin-pix-code">@GroupAdminPixKey</code>
+            <button type="button" class="evpay-admin-pix-copy"
+                    @onclick="HandleCopyAdminPixKey">
+                <i class="fas @(CopiedAdminPix ? "fa-check" : "fa-copy")"></i>
+                @(CopiedAdminPix ? "Copiado!" : "Copiar")
+            </button>
+        </div>
+    }
+    else
+    {
+        <p class="evpay-admin-pix-no-key">
+            <i class="fas fa-exclamation-circle"></i>
+            O organizador ainda não cadastrou uma chave Pix. Entre em contato diretamente para combinar o pagamento.
+        </p>
+    }
+</div>
+
+@code {
+    [Parameter] public string? GroupAdminPixKey { get; set; }
+    [Parameter] public string? GroupName { get; set; }
+    [Parameter] public string? GroupCity { get; set; }
+    [Parameter] public decimal Price { get; set; }
+    [Parameter] public bool CopiedAdminPix { get; set; }
+    [Parameter] public string? PixQrPayload { get; set; }
+    
+    [Parameter] public EventCallback OnCopyAdminPixKey { get; set; }
+    
+    private CultureInfo PtBr { get; } = new CultureInfo("pt-BR");
+
+    private async Task HandleCopyAdminPixKey()
+        => await OnCopyAdminPixKey.InvokeAsync();
+}

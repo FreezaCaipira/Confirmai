@@ -1,4 +1,4 @@
-ï»¿using System.Net;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using Confirmai.Data;
@@ -112,8 +112,8 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
         const string invoiceId = "inv-http-utf8-too-large";
         await SeedPaymentAsync(invoiceId);
 
-        // 'â‚¬' is 3 bytes in UTF-8, so byte size can exceed the limit even with fewer characters.
-        var multibyteNote = new string('â‚¬', 120);
+        // '€' is 3 bytes in UTF-8, so byte size can exceed the limit even with fewer characters.
+        var multibyteNote = new string('€', 120);
         var payload = $"{{\"invoiceId\":\"{invoiceId}\",\"type\":\"InvoiceSettled\",\"note\":\"{multibyteNote}\"}}";
 
         using var content = new StringContent(payload, Encoding.UTF8, "application/json");
@@ -132,12 +132,12 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
 
         string? payloadAtLimit = null;
 
-        // Find a note with mixed UTF-8 widths (3-byte 'â‚¬' + 1-byte 'a') that lands exactly on the byte limit.
+        // Find a note with mixed UTF-8 widths (3-byte '€' + 1-byte 'a') that lands exactly on the byte limit.
         for (var euroCount = 0; euroCount <= maxBytes && payloadAtLimit is null; euroCount++)
         {
             for (var asciiCount = 0; asciiCount <= maxBytes; asciiCount++)
             {
-            var note = new string('â‚¬', euroCount) + new string('a', asciiCount);
+            var note = new string('€', euroCount) + new string('a', asciiCount);
                 var candidate = $"{{\"invoiceId\":\"{invoiceId}\",\"type\":\"InvoiceSettled\",\"note\":\"{note}\"}}";
                 var byteCount = Encoding.UTF8.GetByteCount(candidate);
 
@@ -170,7 +170,7 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
         const string invoiceId = "inv-http-utf8-unknown-length-too-large";
         await SeedPaymentAsync(invoiceId);
 
-        var multibyteNote = new string('â‚¬', 140);
+        var multibyteNote = new string('€', 140);
         var payload = $"{{\"invoiceId\":\"{invoiceId}\",\"type\":\"InvoiceSettled\",\"note\":\"{multibyteNote}\"}}";
 
         using var content = new UnknownLengthStringContent(payload);
@@ -458,8 +458,8 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
 
         var product = new Product
         {
-            Name = "Produto integraÃ§Ã£o",
-            Description = "Produto para teste de integraÃ§Ã£o",
+            Name = "Produto integração",
+            Description = "Produto para teste de integração",
             Price = 0.0001m,
             UserId = "seller-int-1"
         };

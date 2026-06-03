@@ -1,6 +1,13 @@
-﻿using Confirmai.Data;
+using Confirmai.Services.Crypto;
+using Confirmai.Services.Admin;
+using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -91,7 +98,7 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
     /// <summary>
     /// Ensures the LuaDeliveryEnabled feature flag is set to "true" for tests
     /// that exercise the /api/v1/server/trades/* endpoints. Safe to call
-    /// multiple times — it inserts the row only when missing.
+    /// multiple times � it inserts the row only when missing.
     /// </summary>
     public async Task EnsureLuaDeliveryEnabledAsync()
     {
@@ -193,5 +200,6 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
         });
     }
 }
+
 
 

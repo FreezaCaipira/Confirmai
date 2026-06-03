@@ -1,0 +1,27 @@
+@using Confirmai.Enums
+@using Confirmai.Models
+@using System.Globalization
+
+<div class="evpay-summary-card">
+    <div class="evpay-summary-row">
+        <span class="evpay-summary-label">Jogador</span>
+        <span class="evpay-summary-value">@(Confirmation?.User?.FullName ?? Confirmation?.User?.UserName ?? "—")</span>
+    </div>
+    <div class="evpay-summary-row">
+        <span class="evpay-summary-label">Posição</span>
+        <span class="evpay-summary-value">
+            @(Confirmation?.Position == FutsalPosition.Goalkeeper ? "🥅 Goleiro" : "⚽ Linha")
+        </span>
+    </div>
+    <div class="evpay-summary-divider"></div>
+    <div class="evpay-summary-row evpay-summary-row--total">
+        <span class="evpay-summary-label">Valor a pagar</span>
+        <span class="evpay-summary-amount">R$ @(Confirmation?.Event?.Price?.ToString("N2", PtBr) ?? "0,00")</span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventConfirmation? Confirmation { get; set; }
+    
+    private CultureInfo PtBr { get; } = new CultureInfo("pt-BR");
+}

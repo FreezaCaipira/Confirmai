@@ -6,6 +6,9 @@
 @using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
+@using Confirmai.Services
+@using Confirmai.Services.Admin
+@using Confirmai.Shared.Components.Groups
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -163,23 +166,11 @@ else
                         }
                     </div>
                 </div>
-                <ul class="players-list">
-                    @foreach (var m in visibleMembers)
-                    {
-                        <li class="player-item @(m.UserId == currentUserId ? "player-item--me" : "")">
-                            <span class="player-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
-                            @if (m.Role == GroupMemberRole.Admin) { <span class="player-tag player-tag--admin">admin</span> }
-                            @if (m.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
-                        </li>
-                    }
-                </ul>
-                @if (hasHiddenMembers)
-                {
-                    <button class="members-toggle-btn" type="button" @onclick="ToggleMembersView">
-                        <i class="fas @(showAllMembers ? "fa-chevron-up" : "fa-chevron-down")"></i>
-                        @(showAllMembers ? "Mostrar menos" : $"Ver todos ({orderedMembers.Count})")
-                    </button>
-                }
+                <GroupDetailMembers
+                    Members="@group.Members"
+                    CurrentUserId="@currentUserId"
+                    ShowAllMembers="@showAllMembers"
+                    OnToggleMembersView="@ToggleMembersView" />
             </section>
 
             <hr class="detail-divider">
@@ -370,240 +361,36 @@ else
     </div>
 
     @* ── Modal de Pagamentos ───────────────────────────────────── *@
-    @if (showPaymentsModal)
-    {
-        <div class="payment-overlay" @onclick="ClosePaymentsModal">
-            <div class="payment-modal" @onclick:stopPropagation="true">
-                <div class="payment-modal-header">
-                    <h2 class="payment-modal-title"><i class="fas fa-money-bill-wave"></i> Pagamentos</h2>
-                    <button class="payment-close-btn" type="button" @onclick="ClosePaymentsModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+    <GroupDetailPaymentsModal
+        IsOpen="@showPaymentsModal"
+        IsLoadingPayments="@isLoadingPayments"
+        PaymentTab="@paymentTab"
+        SelectedPaymentUserId="@selectedPaymentUserId"
+        DelinquencyList="@delinquencyList"
+        PaymentHistory="@paymentHistory"
+        PendingProofList="@pendingProofList"
+        MarkingPaidId="@markingPaidId"
+        NotifyingUserId="@notifyingUserId"
+        NotifiedUserIds="@notifiedUserIds"
+        ViewingProofConfirmationId="@viewingProofConfirmationId"
+        CurrentReceiverId="@group?.PixReceiverUserId"
+        CurrentUserId="@currentUserId"
+        OnClose="@ClosePaymentsModal"
+        OnTabChange="@HandleTabChange"
+        OnRefreshPayments="@RefreshPayments"
+        OnSelectPaymentUser="@SelectPaymentUser"
+        OnMarkPaid="@HandleMarkPaidAsync"
+        OnNotifyDelinquency="@HandleNotifyDelinquencyAsync"
+        OnOpenWhatsApp="@OpenWhatsAppDelinquency"
+        OnViewProof="@HandleViewProof" />
 
-                <div class="payment-tabs">
-                    <button class="payment-tab @(paymentTab == "delinquent" ? "payment-tab--active" : "")" type="button"
-                            @onclick='() => paymentTab = "delinquent"'>
-                        <i class="fas fa-exclamation-triangle"></i> Pendentes
-                    </button>
-                    <button class="payment-tab @(paymentTab == "proofs" ? "payment-tab--active" : "")" type="button"
-                            @onclick='() => paymentTab = "proofs"'>
-                        <i class="fas fa-file-upload"></i> Comprovantes
-                        @if (pendingProofList.Count > 0)
-                        {
-                            <span class="payment-tab-count">@pendingProofList.Count</span>
-                        }
-                    </button>
-                    <button class="payment-tab @(paymentTab == "history" ? "payment-tab--active" : "")" type="button"
-                            @onclick='() => paymentTab = "history"'>
-                        <i class="fas fa-history"></i> Histórico
-                        @if (paymentHistory.Count > 0)
-                        {
-                            <span class="payment-tab-count">@paymentHistory.Count</span>
-                        }
-                    </button>
-                    <button class="payment-refresh-btn" type="button" @onclick="RefreshPayments" title="Recarregar lista de delinquência">
-                        <i class="fas @(isLoadingPayments ? "fa-spinner fa-spin" : "fa-sync-alt")"></i> <span>Recarregar</span>
-                    </button>
-                </div>
-
-                @if (isLoadingPayments)
-                {
-                    <div class="payment-loading"><i class="fas fa-spinner fa-spin"></i> Carregando…</div>
-                }
-                else if (paymentTab == "history")
-                {
-                    @if (paymentHistory.Count == 0)
-                    {
-                        <div class="payment-empty">
-                            <i class="fas fa-history"></i>
-                            <span>Nenhum pagamento manual registrado ainda.</span>
-                        </div>
-                    }
-                    else
-                    {
-                        <ul class="payment-history-list">
-                            @foreach (var h in paymentHistory)
-                            {
-                                <li class="payment-history-item">
-                                    <div class="payment-history-user">@h.UserName</div>
-                                    <div class="payment-history-meta">
-                                        <span class="payment-history-date"><i class="fas fa-calendar-alt"></i> @Ui.FormatDateTime(h.EventDate.ToLocalTime(), "DateDefault")</span>
-                                        <span class="payment-history-price">R$ @h.EventPrice.ToString("F2")</span>
-                                        <a class="payment-entry-link" href="@h.EventHref" target="_blank" rel="noopener">Ver</a>
-                                    </div>
-                                    <div class="payment-history-admin">
-                                        <i class="fas fa-user-shield"></i> Marcado por <strong>@h.AdminName</strong>
-                                        em @Ui.FormatDateTime(h.MarkedAt.ToLocalTime(), "DateTimeDefault")
-                                    </div>
-                                </li>
-                            }
-                        </ul>
-                    }
-                }
-                else if (paymentTab == "proofs")
-                {
-                    @if (pendingProofList.Count == 0)
-                    {
-                        <div class="payment-empty">
-                            <i class="fas fa-file-upload"></i>
-                            <span>Nenhum comprovante pendente de confirmação.</span>
-                        </div>
-                    }
-                    else
-                    {
-                        <ul class="payment-proofs-list">
-                            @foreach (var proof in pendingProofList)
-                            {
-                                <li class="payment-proof-item">
-                                    <div class="payment-proof-header">
-                                        <div class="payment-proof-user">
-                                            <span class="payment-proof-name">@proof.UserName</span>
-                                            <span class="payment-proof-uploaded"><i class="fas fa-clock"></i> Enviado @Ui.FormatDateTime(proof.ProofUploadedAt.ToLocalTime(), "DateTimeDefault")</span>
-                                        </div>
-                                        <div class="payment-proof-meta">
-                                            <span class="payment-proof-event">@proof.EventName</span>
-                                            <span class="payment-proof-date">@Ui.FormatDateTime(proof.EventDate.ToLocalTime(), "DateDefault")</span>
-                                            <span class="payment-proof-price">R$ @proof.EventPrice.ToString("F2")</span>
-                                        </div>
-                                    </div>
-                                    <div class="payment-proof-actions">
-                                        <button class="payment-view-proof-btn" type="button"
-                                                @onclick="() => viewingProofConfirmationId = proof.ConfirmationId">
-                                            <i class="fas fa-camera"></i> Ver comprovante
-                                        </button>
-                                        <a href="@proof.EventHref" class="payment-entry-link" target="_blank">
-                                            <i class="fas fa-external-link-alt"></i> Ver partida
-                                        </a>
-                                        @if (markingPaidId == proof.ConfirmationId)
-                                        {
-                                            <span class="payment-marking"><i class="fas fa-spinner fa-spin"></i></span>
-                                        }
-                                        else
-                                        {
-                                            <button class="payment-mark-paid-btn" type="button"
-                                                    @onclick="() => ConfirmMarkPaid(proof.ConfirmationId, proof.UserId)">
-                                                <i class="fas fa-check"></i> Confirmar pagamento
-                                            </button>
-                                        }
-                                    </div>
-                                </li>
-                            }
-                        </ul>
-                    }
-                }
-                else if (delinquencyList.Count == 0)
-                {
-                    <div class="payment-empty">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Nenhum jogador inadimplente. Tudo em dia!</span>
-                    </div>
-                }
-                else
-                {
-                    <ul class="payment-user-list">
-                        @foreach (var d in delinquencyList)
-                        {
-                            bool isSelected = selectedPaymentUserId == d.UserId;
-                            <li class="payment-user-item @(isSelected ? "payment-user-item--selected" : "")"
-                                @onclick="() => SelectPaymentUser(d.UserId)">
-                                <span class="payment-user-name">@d.UserName</span>
-                                <div class="payment-user-meta">
-                                    <span class="payment-badge payment-badge--games">@d.Entries.Count jogo@(d.Entries.Count != 1 ? "s" : "")</span>
-                                    <span class="payment-badge payment-badge--amount">R$ @d.TotalAmount.ToString("F2")</span>
-                                    @if (d.Entries.Any(e => e.HasProof))
-                                    {
-                                        <span class="payment-badge payment-badge--proof" title="Jogador enviou comprovante">
-                                            <i class="fas fa-camera"></i> Comprovante
-                                        </span>
-                                    }
-                                </div>
-                                <div class="payment-notify-actions" @onclick:stopPropagation="true">
-                                    @if (notifiedUserIds.Contains(d.UserId))
-                                    {
-                                        <span class="payment-notified-badge"><i class="fas fa-check"></i> Notificado</span>
-                                    }
-                                    else if (notifyingUserId == d.UserId)
-                                    {
-                                        <span class="payment-notifying"><i class="fas fa-spinner fa-spin"></i></span>
-                                    }
-                                    else
-                                    {
-                                        <button class="payment-notify-btn payment-notify-btn--email" type="button"
-                                                title="Enviar e-mail de cobrança"
-                                                @onclick="() => ConfirmNotifyDelinquency(d)">
-                                            <i class="fas fa-envelope"></i>
-                                        </button>
-                                        <button class="payment-notify-btn payment-notify-btn--whatsapp" type="button"
-                                                title="Cobrar via WhatsApp"
-                                                @onclick="() => OpenWhatsAppDelinquency(d)">
-                                            <i class="fab fa-whatsapp"></i>
-                                        </button>
-                                    }
-                                </div>
-                                <i class="fas fa-chevron-@(isSelected ? "up" : "down") payment-chevron"></i>
-                            </li>
-
-                            @if (isSelected)
-                            {
-                                <li class="payment-detail-panel">
-                                    <div class="payment-detail-summary">
-                                        <span><strong>@d.Entries.Count</strong> partida@(d.Entries.Count != 1 ? "s" : "") sem pagamento</span>
-                                        <span>Total: <strong>R$ @d.TotalAmount.ToString("F2")</strong></span>
-                                    </div>
-                                    <ul class="payment-entries">
-                                        @foreach (var entry in d.Entries)
-                                        {
-                                            <li class="payment-entry">
-                                                <div class="payment-entry-info">
-                                                    <span class="payment-entry-date">@Ui.FormatDateTime(entry.EventDate.ToLocalTime(), "DateTimeDefault")</span>
-                                                    <span class="payment-entry-price">R$ @entry.EventPrice.ToString("F2")</span>
-                                                </div>
-                                                <div class="payment-entry-actions">
-                                                    <a href="@entry.EventHref" class="payment-entry-link" target="_blank">
-                                                        <i class="fas fa-external-link-alt"></i> Ver partida
-                                                    </a>
-                                                    @if (entry.HasProof)
-                                                    {
-                                                        <button class="payment-view-proof-btn" type="button"
-                                                                title="Ver comprovante enviado pelo jogador"
-                                                                @onclick="() => viewingProofConfirmationId = entry.ConfirmationId">
-                                                            <i class="fas fa-camera"></i> Comprovante
-                                                        </button>
-                                                    }
-                                                    @if (markingPaidId == entry.ConfirmationId)
-                                                    {
-                                                        <span class="payment-marking"><i class="fas fa-spinner fa-spin"></i></span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <button class="payment-mark-paid-btn" type="button"
-                                                                @onclick="() => ConfirmMarkPaid(entry.ConfirmationId, d.UserId)">
-                                                            <i class="fas fa-check"></i> Marcar pago
-                                                        </button>
-                                                    }
-                                                </div>
-                                            </li>
-                                        }
-                                    </ul>
-                                </li>
-                            }
-                        }
-                    </ul>
-                }
-            </div>
-        </div>
-    }
-
-    @* ── Lightbox de comprovante Pix ─────────────────────────── *@
     @if (viewingProofConfirmationId.HasValue)
     {
-        <div class="payment-proof-overlay" @onclick="() => viewingProofConfirmationId = null">
-            <div class="payment-proof-box" @onclick:stopPropagation="true">
-                <button class="payment-proof-close" type="button" @onclick="() => viewingProofConfirmationId = null">
+        <div class="payment-proof-viewer" @onclick="() => viewingProofConfirmationId = null">
+            <div class="payment-proof-viewer-content" @onclick:stopPropagation="true">
+                <button class="payment-proof-viewer-close" type="button" @onclick="() => viewingProofConfirmationId = null">
                     <i class="fas fa-times"></i>
                 </button>
-                <p class="payment-proof-label"><i class="fas fa-camera"></i> Comprovante de pagamento</p>
                 <img src="/api/pix-proof/@viewingProofConfirmationId"
                      class="payment-proof-img"
                      alt="Comprovante Pix" />
@@ -731,7 +518,6 @@ else
             if (!ct.IsCancellationRequested)
             {
                 copiedInvite = false;
-                StateHasChanged();
             }
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -758,7 +544,6 @@ else
             if (!ct.IsCancellationRequested)
             {
                 copiedCode = false;
-                StateHasChanged();
             }
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -878,31 +663,6 @@ else
 
     // ── Pagamentos ────────────────────────────────────────────────
 
-    private record DelinquencyEntry(int ConfirmationId, int EventId, DateTime EventDate, decimal EventPrice, string EventHref, bool HasProof);
-    private record UserDelinquency(string UserId, string UserName, List<DelinquencyEntry> Entries)
-    {
-        public decimal TotalAmount => Entries.Sum(e => e.EventPrice);
-    }
-
-    private record PendingProofEntry(
-        int ConfirmationId,
-        string UserId,
-        string UserName,
-        int EventId,
-        string EventName,
-        DateTime EventDate,
-        decimal EventPrice,
-        string EventHref,
-        DateTime ProofUploadedAt);
-
-    private record PaymentHistoryEntry(
-        string UserName,
-        DateTime EventDate,
-        decimal  EventPrice,
-        string   EventHref,
-        string   AdminName,
-        DateTime MarkedAt);
-
     private bool                        showPaymentsModal       = false;
     private bool                        isLoadingPayments       = false;
     private List<UserDelinquency>       delinquencyList         = new();
@@ -925,7 +685,6 @@ else
         isLoadingPayments = false;
         notifyingUserId = null;
         notifiedUserIds.Clear();
-        StateHasChanged();
     }
 
     private void ClosePaymentsModal()
@@ -939,13 +698,41 @@ else
         selectedPaymentUserId = selectedPaymentUserId == userId ? null : userId;
     }
 
+    private async Task HandleTabChange(string tab)
+    {
+        paymentTab = tab;
+        selectedPaymentUserId = null; // Reset selection when switching tabs
+    }
+
+    private async Task HandleMarkPaidAsync((int ConfirmationId, string UserId) args)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja confirmar este pagamento?");
+        if (confirmed)
+        {
+            await AdminMarkPaid(args.ConfirmationId, args.UserId);
+        }
+    }
+
+    private async Task HandleNotifyDelinquencyAsync(UserDelinquency delinquency)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Deseja notificar {delinquency.UserName} sobre os pagamentos em aberto? Uma mensagem será enviada por e-mail.");
+        if (confirmed)
+        {
+            await AdminNotifyDelinquency(delinquency);
+        }
+    }
+
+    private async Task HandleViewProof(int confirmationId)
+    {
+        viewingProofConfirmationId = confirmationId;
+    }
+
+
     private async Task RefreshPayments()
     {
         isLoadingPayments = true;
-        StateHasChanged();
         await LoadPaymentsData();
         isLoadingPayments = false;
-        StateHasChanged();
     }
 
     private async Task LoadPaymentsData()
@@ -1058,19 +845,11 @@ else
         }).ToList();
     }
 
-    private async Task ConfirmMarkPaid(int confirmationId, string userId)
-    {
-        var confirmed = await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja confirmar este pagamento?");
-        if (confirmed)
-        {
-            await AdminMarkPaid(confirmationId, userId);
-        }
-    }
+
 
     private async Task AdminMarkPaid(int confirmationId, string userId)
     {
         markingPaidId = confirmationId;
-        StateHasChanged();
         await using var db = await DbFactory.CreateDbContextAsync();
         var conf = await db.EventConfirmations.FindAsync(confirmationId);
         if (conf is not null && !conf.HasPaid && conf.PaymentGatewayName == null)
@@ -1092,23 +871,14 @@ else
         // keep the selected user open if they still have entries
         if (!delinquencyList.Any(d => d.UserId == userId))
             selectedPaymentUserId = null;
-        StateHasChanged();
     }
 
-    private async Task ConfirmNotifyDelinquency(UserDelinquency d)
-    {
-        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Deseja notificar {d.UserName} sobre os pagamentos em aberto? Uma mensagem será enviada por e-mail.");
-        if (confirmed)
-        {
-            await AdminNotifyDelinquency(d);
-        }
-    }
+
 
     private async Task AdminNotifyDelinquency(UserDelinquency d)
     {
         if (currentUserId is null || group is null) return;
         notifyingUserId = d.UserId;
-        StateHasChanged();
 
         var entries = d.Entries
             .Select(e => (e.EventDate, e.EventPrice))
@@ -1129,21 +899,20 @@ else
 
         notifyingUserId = null;
         notifiedUserIds.Add(d.UserId);
-        StateHasChanged();
     }
 
-    private async Task OpenWhatsAppDelinquency(UserDelinquency d)
+    private async Task OpenWhatsAppDelinquency(UserDelinquency delinquency)
     {
         if (group is null) return;
-        var lines   = string.Join("%0A", d.Entries.Select(e =>
+        var lines   = string.Join("%0A", delinquency.Entries.Select(e =>
             $"• {e.EventDate.ToLocalTime():dd/MM/yyyy} — R$ {e.EventPrice:F2}"));
-        var count   = d.Entries.Count;
-        var total   = d.TotalAmount.ToString("F2");
+        var count   = delinquency.Entries.Count;
+        var total   = delinquency.TotalAmount.ToString("F2");
         var plural  = count != 1 ? "s" : "";
         var msg     = Uri.EscapeDataString(
-            $"Olá, {d.UserName}! 👋\n\n" +
+            $"Olá, {delinquency.UserName}! 👋\n\n" +
             $"Você tem {count} partida{plural} sem pagamento em \"{group.Name}\":\n\n" +
-            string.Join("\n", d.Entries.Select(e =>
+            string.Join("\n", delinquency.Entries.Select(e =>
                 $"• {e.EventDate.ToLocalTime():dd/MM/yyyy} — R$ {e.EventPrice:F2}")) +
             $"\n\nTotal: R$ {total}\n\n" +
             $"Quando puder, regularize no Confirmai 🙏");

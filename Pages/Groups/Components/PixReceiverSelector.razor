@@ -1,0 +1,79 @@
+@using Confirmai.Models
+
+<section class="detail-section features-section">
+    <h2 class="detail-section-title">
+        <i class="fas fa-qrcode"></i> Pix do Organizador
+    </h2>
+    <p class="features-section-sub">
+        Selecione qual admin recebe os pagamentos das partidas.
+        A chave Pix do admin selecionado será exibida aos jogadores na página de pagamento.
+    </p>
+
+    @if (PixAdmins.Count == 0)
+    {
+        <div class="feat-pix-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            Nenhum admin do grupo tem Chave Pix cadastrada no perfil.
+            <a href="/perfil" class="feat-pix-profile-link">Configure a sua Chave Pix →</a>
+        </div>
+    }
+    else
+    {
+        <div class="feat-pix-form">
+            <label class="feat-pix-label" for="pix-receiver-select">Admin que recebe:</label>
+            <select id="pix-receiver-select"
+                    class="feat-pix-select"
+                    @bind="localSelectedId"
+                    disabled="@IsSaving">
+                <option value="">— Automático (primeiro admin com Pix) —</option>
+                @foreach (var a in PixAdmins)
+                {
+                    <option value="@a.UserId">@(a.User?.FullName ?? a.User?.UserName) — @a.User?.PixKey</option>
+                }
+            </select>
+            <button class="feat-pix-save-btn" type="button"
+                    disabled="@IsSaving"
+                    @onclick="HandleSavePixReceiver">
+                <i class="fas fa-save"></i> @(IsSaving ? "Salvando…" : "Salvar")
+            </button>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Message))
+    {
+        <p class="features-save-msg @(IsError ? "features-save-msg--error" : "")">
+            <i class="fas @(IsError ? "fa-times-circle" : "fa-check-circle")"></i>
+            @Message
+        </p>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public List<GroupMember> PixAdmins { get; set; } = new();
+
+    [Parameter]
+    public string SelectedPixReceiverId { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsSaving { get; set; }
+
+    [Parameter]
+    public string Message { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsError { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSavePixReceiver { get; set; }
+
+    private string localSelectedId = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        localSelectedId = SelectedPixReceiverId;
+    }
+
+    private async Task HandleSavePixReceiver()
+        => await OnSavePixReceiver.InvokeAsync(localSelectedId);
+}

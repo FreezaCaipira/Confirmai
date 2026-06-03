@@ -1,0 +1,33 @@
+@using Confirmai.Models
+
+<div class="quorum-bar @(IsPastEvent ? "quorum-bar--past" : (HasQuorum ? "quorum-bar--ok" : "quorum-bar--warn"))">
+    @if (IsPastEvent)
+    {
+        <i class="fas fa-flag-checkered"></i>
+        <span>Partida encerrada</span>
+    }
+    else if (HasQuorum)
+    {
+        <i class="fas fa-check-circle"></i>
+        <span>Quantidade mínima de jogadores atingida</span>
+    }
+    else
+    {
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Quantidade mínima de jogadores é: <strong>@MinOutfield</strong> de linha + <strong>@MinGoalkeepers</strong> goleiro@(MinGoalkeepers == 1 ? string.Empty : "s")</span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public bool HasQuorum { get; set; }
+
+    [Parameter]
+    public bool IsPastEvent { get; set; }
+
+    [Parameter]
+    public int MinOutfield { get; set; } = 6;
+
+    [Parameter]
+    public int MinGoalkeepers { get; set; } = 1;
+}

@@ -1,0 +1,115 @@
+@inject UiTextService T
+
+@if (Logs?.Count == 0)
+{
+    <p class="logs-empty-state">@T["AdminLogs.Empty"]</p>
+}
+else
+{
+    <table class="log-table">
+        <thead>
+            <tr>
+                <th>
+                    <button class="table-sort-btn" @onclick="@(e => OnSort.InvokeAsync("Timestamp"))">
+                        @T["AdminLogs.DateTime"] @SortIndicator("Timestamp")
+                    </button>
+                </th>
+                <th>
+                    <button class="table-sort-btn" @onclick="@(e => OnSort.InvokeAsync("Level"))">
+                        @T["AdminLogs.Level"] @SortIndicator("Level")
+                    </button>
+                </th>
+                <th>
+                    <button class="table-sort-btn" @onclick="@(e => OnSort.InvokeAsync("Source"))">
+                        @T["AdminLogs.Source"] @SortIndicator("Source")
+                    </button>
+                </th>
+                <th>
+                    <button class="table-sort-btn" @onclick="@(e => OnSort.InvokeAsync("User"))">
+                        @T["AdminLogs.User"] @SortIndicator("User")
+                    </button>
+                </th>
+                <th>@T["AdminLogs.Message"]</th>
+                <th>@T["AdminLogs.Exception"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in Logs ?? new())
+            {
+                <tr>
+                    <td data-label="@T["AdminLogs.DateTime"]">@log.Timestamp.ToLocalTime().ToString("dd MMM yyyy, HH:mm:ss")</td>
+                    <td data-label="@T["AdminLogs.Level"]">
+                        <span class="log-level-badge @GetLevelBadgeClass(log.Level)">@log.Level</span>
+                    </td>
+                    <td data-label="@T["AdminLogs.Source"]">
+                        <span class="@SourceBadgeClass(log.Source)">@log.Source</span>
+                    </td>
+                    <td data-label="@T["AdminLogs.User"]">
+                        @if (log.User != null)
+                        {
+                            <a class="evidence-link" href="@($"/admin/users/view/{log.User.Id}")">
+                                @log.User.UserName
+                            </a>
+                        }
+                        else if (!string.IsNullOrEmpty(log.UserId))
+                        {
+                            <span class="text-muted">@T["AdminLogs.IdPrefix"] @log.UserId</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </td>
+                    <td data-label="@T["AdminLogs.Message"]">
+                        @log.Message
+                        @if (!string.IsNullOrWhiteSpace(log.EntityType) && !string.IsNullOrWhiteSpace(log.EntityId))
+                        {
+                            <a class="history-btn logs-timeline-link" href="@($"/admin/audit/{log.EntityType}/{log.EntityId}")" title="@T["AdminAuditTimeline.ViewHistory"]">
+                                <i class="fas fa-history"></i>
+                            </a>
+                        }
+                    </td>
+                    <td data-label="@T["AdminLogs.Exception"]" class="logs-exception-cell">@log.Exception</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public List<AppLog>? Logs { get; set; }
+
+    [Parameter]
+    public string CurrentSortColumn { get; set; } = "Timestamp";
+
+    [Parameter]
+    public bool SortAscending { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSort { get; set; }
+
+    private string GetLevelBadgeClass(string? level)
+    {
+        var normalized = level?.Trim().ToLowerInvariant();
+        return normalized switch
+        {
+            "warning" => "log-level-warning",
+            "error" or "bug" or "critical" or "fatal" => "log-level-error",
+            _ => "log-level-info"
+        };
+    }
+
+    private string SortIndicator(string column)
+    {
+        if (CurrentSortColumn != column)
+        {
+            return "⇅";
+        }
+
+        return SortAscending ? "↑" : "↓";
+    }
+
+    private static string SourceBadgeClass(string source)
+        => "log-source-badge";
+}

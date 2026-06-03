@@ -1,6 +1,12 @@
+using Confirmai.Services.Payment;
+using Confirmai.Services.Core;
 using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Utility;
 using Microsoft.EntityFrameworkCore;
 
 namespace Confirmai.Tests;
@@ -74,7 +80,7 @@ public class PaymentConfirmationServiceTests
     private static PaymentConfirmationService CreateConfirmationService(AppDbContext db, IBitcoinPaymentService paymentService)
     {
         var factory = new BitcoinPaymentFactory(new[] { paymentService });
-        var logService = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
+        var logService = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
         var hubContext = SignalRTestFactory.CreateHubContext();
         var eventBus = new PaymentEventBus();
         return new PaymentConfirmationService(db, factory, logService, hubContext, eventBus);

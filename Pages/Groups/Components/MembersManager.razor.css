@@ -1,0 +1,137 @@
+/* ── Members list ────────────────────────────────────────────── */
+.feat-members-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.feat-member-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    background: rgba(15, 26, 48, 0.7);
+    border: 1px solid rgba(51, 76, 120, 0.4);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+}
+
+.feat-member-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.feat-member-name {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.feat-role-btn {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}
+
+.feat-role-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.feat-role-btn--promote {
+    background: rgba(96, 165, 250, 0.1);
+    border-color: rgba(96, 165, 250, 0.5);
+    color: #93c5fd;
+}
+
+.feat-role-btn--promote:not(:disabled):hover {
+    background: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.8);
+    color: #bfdbfe;
+}
+
+.feat-role-btn--demote {
+    background: rgba(248, 113, 113, 0.1);
+    border-color: rgba(248, 113, 113, 0.5);
+    color: #fca5a5;
+}
+
+.feat-role-btn--demote:not(:disabled):hover {
+    background: rgba(248, 113, 113, 0.2);
+    border-color: rgba(248, 113, 113, 0.8);
+    color: #fecaca;
+}
+
+.feat-role-confirm {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+}
+
+.feat-role-confirm-text {
+    font-size: 0.74rem;
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    white-space: nowrap;
+}
+
+.feat-role-btn--confirm-yes,
+.feat-role-btn--confirm-no {
+    min-width: 30px;
+    justify-content: center;
+    padding: 0.26rem 0.45rem;
+}
+
+.feat-role-btn--confirm-yes {
+    background: rgba(74, 222, 128, 0.1);
+    border-color: rgba(74, 222, 128, 0.55);
+    color: #86efac;
+}
+
+.feat-role-btn--confirm-yes:not(:disabled):hover {
+    background: rgba(74, 222, 128, 0.2);
+    border-color: rgba(74, 222, 128, 0.85);
+    color: #bbf7d0;
+}
+
+.feat-role-btn--confirm-no {
+    background: rgba(248, 113, 113, 0.1);
+    border-color: rgba(248, 113, 113, 0.55);
+    color: #fca5a5;
+}
+
+.feat-role-btn--confirm-no:not(:disabled):hover {
+    background: rgba(248, 113, 113, 0.2);
+    border-color: rgba(248, 113, 113, 0.85);
+    color: #fecaca;
+}
+
+.feat-role-note {
+    margin: -0.35rem 0 0.9rem;
+    font-size: 0.82rem;
+    color: var(--ci-text-info, #8fc2f3);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}

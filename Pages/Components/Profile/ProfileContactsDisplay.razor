@@ -1,0 +1,35 @@
+@using Confirmai.Models
+
+@if (User is not null && (!string.IsNullOrWhiteSpace(User.InstagramHandle)
+     || !string.IsNullOrWhiteSpace(User.DiscordHandle)
+     || !string.IsNullOrWhiteSpace(User.PixKey)))
+{
+    <section class="profile-contacts-section">
+        @if (!string.IsNullOrWhiteSpace(User.InstagramHandle))
+        {
+            <div class="profile-contact-row">
+                <span class="profile-contact-label">Instagram</span>
+                <span class="profile-contact-value">@User.InstagramHandle</span>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(User.DiscordHandle))
+        {
+            <div class="profile-contact-row">
+                <span class="profile-contact-label">Discord</span>
+                <span class="profile-contact-value">@User.DiscordHandle</span>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(User.PixKey))
+        {
+            <div class="profile-contact-row">
+                <span class="profile-contact-label">PIX</span>
+                <span class="profile-contact-value">@User.PixKey</span>
+            </div>
+        }
+    </section>
+}
+
+@code {
+    [Parameter]
+    public ApplicationUser? User { get; set; }
+}

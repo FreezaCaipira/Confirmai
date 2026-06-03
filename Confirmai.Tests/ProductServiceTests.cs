@@ -1,5 +1,11 @@
-﻿using Confirmai.Models;
+using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 using Confirmai.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +24,7 @@ public class ProductServiceTests
         await service.AddAsync(new Product
         {
             Name = "Produto 1",
-            Description = "Descrição",
+            Description = "Descri��o",
             Price = 0.001m,
             UserId = "seller-1"
         }, imageFile: null);
@@ -73,7 +79,7 @@ public class ProductServiceTests
         return env.Object;
     }
 
-    // ── GetAllAsync ──────────────────────────────────────────────────
+    // -- GetAllAsync --------------------------------------------------
 
     [Fact]
     public async Task GetAllAsync_ExcludesArchivedProducts()
@@ -95,7 +101,7 @@ public class ProductServiceTests
         Assert.Equal("Active", result[0].Name);
     }
 
-    // ── GetByIdAsync ─────────────────────────────────────────────────
+    // -- GetByIdAsync -------------------------------------------------
 
     [Fact]
     public async Task GetByIdAsync_ReturnsProduct_WhenExists()
@@ -145,7 +151,7 @@ public class ProductServiceTests
         Assert.Equal("#FF00AA", product.AccentColor);
     }
 
-    // ── UpdateAsync ──────────────────────────────────────────────────
+    // -- UpdateAsync --------------------------------------------------
 
     [Fact]
     public async Task UpdateAsync_DoesNothing_WhenProductNotFound()
@@ -159,7 +165,7 @@ public class ProductServiceTests
         Assert.Equal(0, await db.Products.CountAsync());
     }
 
-    // ── DeleteAsync ──────────────────────────────────────────────────
+    // -- DeleteAsync --------------------------------------------------
 
     [Fact]
     public async Task DeleteAsync_ReturnsNotFound_WhenMissing()
@@ -186,7 +192,7 @@ public class ProductServiceTests
         Assert.Null(await db.Products.FindAsync(product.Id));
     }
 
-    // ── GetProductsCountAsync ────────────────────────────────────────
+    // -- GetProductsCountAsync ----------------------------------------
 
     [Fact]
     public async Task GetProductsCountAsync_ExcludesArchived()
@@ -204,7 +210,7 @@ public class ProductServiceTests
         Assert.Equal(2, await service.GetProductsCountAsync());
     }
 
-    // ── GetByUserIdAsync ─────────────────────────────────────────────
+    // -- GetByUserIdAsync ---------------------------------------------
 
     [Fact]
     public async Task GetByUserIdAsync_ReturnsOnlyUserProducts()
@@ -242,7 +248,7 @@ public class ProductServiceTests
         Assert.Equal("Active", result[0].Name);
     }
 
-    // ── AccentColor normalization ────────────────────────────────────
+    // -- AccentColor normalization ------------------------------------
 
     [Theory]
     [InlineData(null, null)]

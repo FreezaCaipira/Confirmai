@@ -1,4 +1,4 @@
-﻿using Confirmai.Data;
+using Confirmai.Data;
 
 namespace Confirmai.Tests;
 

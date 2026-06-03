@@ -1,0 +1,100 @@
+@using Confirmai.Data
+@using Confirmai.Services
+
+<section class="detail-section features-section">
+    <h2 class="detail-section-title">
+        <i class="fas fa-sliders-h"></i> Funcionalidades
+    </h2>
+    <p class="features-section-sub">Ative ou desative funcionalidades opcionais para este grupo.</p>
+
+    <div class="features-list">
+        <div class="feature-card @(Group!.EnablePostMatchRanking ? "feature-card--on" : "")">
+            <div class="feature-card-info">
+                <span class="feature-card-icon"><i class="fas fa-trophy"></i></span>
+                <div class="feature-card-text">
+                    <strong class="feature-card-title">Ranking pós-partida</strong>
+                    <p class="feature-card-desc">
+                        Exibe um ranking de participações e desempenho dos membros,
+                        com visões mensal e anual, na página do grupo.
+                    </p>
+                </div>
+            </div>
+            <label class="feature-toggle" title="@(Group!.EnablePostMatchRanking ? "Desativar" : "Ativar")">
+                <input type="checkbox"
+                       checked="@Group!.EnablePostMatchRanking"
+                       disabled="@IsSaving"
+                       @onchange="() => HandleTogglePostMatchRanking()" />
+                <span class="feature-toggle-track"></span>
+            </label>
+        </div>
+
+        <div class="feature-card @(Group!.EnablePaymentGateways ? "feature-card--on" : "")">
+            <div class="feature-card-info">
+                <span class="feature-card-icon"><i class="fas fa-credit-card"></i></span>
+                <div class="feature-card-text">
+                    <strong class="feature-card-title">Gateways de pagamento</strong>
+                    <p class="feature-card-desc">
+                        Quando ativado, a tela de pagamento mostra opções de gateway
+                        (EfiBank, Abacate e futuras integrações) além do Pix direto do organizador.
+                    </p>
+                    @if (AvailableGatewayOptions.Count == 0)
+                    {
+                        <p class="feat-gateway-note">
+                            Nenhum gateway está disponível no momento. Habilite/configure em Admin &gt; Gateways.
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="feat-gateway-note">
+                            Disponíveis agora: @string.Join(", ", AvailableGatewayOptions.Select(g => g.DisplayName))
+                        </p>
+                    }
+                </div>
+            </div>
+            <label class="feature-toggle" title="@(Group!.EnablePaymentGateways ? "Desativar" : "Ativar")">
+                <input type="checkbox"
+                       checked="@Group!.EnablePaymentGateways"
+                       disabled="@IsSaving"
+                       @onchange="() => HandleTogglePaymentGateways()" />
+                <span class="feature-toggle-track"></span>
+            </label>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(SaveMessage))
+    {
+        <p class="features-save-msg @(SaveError ? "features-save-msg--error" : "")">
+            <i class="fas @(SaveError ? "fa-times-circle" : "fa-check-circle")"></i>
+            @SaveMessage
+        </p>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public Group? Group { get; set; }
+
+    [Parameter]
+    public bool IsSaving { get; set; }
+
+    [Parameter]
+    public string SaveMessage { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool SaveError { get; set; }
+
+    [Parameter]
+    public List<EventPaymentGatewayOption> AvailableGatewayOptions { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnTogglePostMatchRanking { get; set; }
+
+    [Parameter]
+    public EventCallback OnTogglePaymentGateways { get; set; }
+
+    private async Task HandleTogglePostMatchRanking()
+        => await OnTogglePostMatchRanking.InvokeAsync();
+
+    private async Task HandleTogglePaymentGateways()
+        => await OnTogglePaymentGateways.InvokeAsync();
+}

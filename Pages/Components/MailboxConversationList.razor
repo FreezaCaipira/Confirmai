@@ -1,0 +1,218 @@
+@using Confirmai.Data
+@using System.Globalization
+
+<aside class="mailbox-list-pane">
+    <div class="mailbox-folder-tabs" aria-label="Lista de conversas">
+        <button class="mailbox-folder-tab @(ShowArchived ? string.Empty : "active")" type="button" @onclick="@(() => HandleSwitchFolder(false))">@T["Mailbox.TabActive"] (@ActiveConversationTotal)</button>
+        <button class="mailbox-folder-tab @(ShowArchived ? "active" : string.Empty)" type="button" @onclick="@(() => HandleSwitchFolder(true))">@T["Mailbox.TabArchived"] (@ArchivedConversationTotal)</button>
+    </div>
+
+    @if (!Conversations.Any())
+    {
+        <p class="market-empty">@T["Mailbox.NoConversations"]</p>
+    }
+    else
+    {
+        <div class="mailbox-list mailbox-list-compact">
+            @foreach (var contact in Conversations)
+            {
+                var isSelected = string.Equals(SelectedConversationKey, contact.ConversationKey, StringComparison.Ordinal);
+                <div class="mailbox-list-item @(contact.HasUnread ? "unread" : string.Empty) @(isSelected ? "active" : string.Empty)">
+                    <button class="mailbox-list-item-main"
+                            type="button"
+                            @onclick="@(() => HandleSelectConversation(contact.ConversationKey))">
+                        <div class="mailbox-list-item-head">
+                            <div class="mailbox-list-item-contact">
+                                <span class="mailbox-avatar" aria-hidden="true">@BuildAvatarInitials(contact.ConversationTitle)</span>
+                                <strong>@contact.ConversationTitle</strong>
+                                @if (contact.UnreadCount > 0)
+                                {
+                                    <span class="mailbox-unread-count">@contact.UnreadCount</span>
+                                }
+                            </div>
+                            <span class="mailbox-list-item-time">@FormatRelativeTime(contact.LastCreatedAt)</span>
+                        </div>
+                        <div class="mailbox-list-item-peer">@T["Mailbox.ConversationInProgress"]</div>
+                        @if (contact.HasUnread)
+                        {
+                            <div class="mailbox-list-item-status">
+                                <span class="mailbox-chip mailbox-chip-alert">@contact.UnreadCount @T["Mailbox.Unread"]</span>
+                            </div>
+                        }
+                        <div class="mailbox-list-item-snippet">@BuildSnippet(contact.LastBody)</div>
+                    </button>
+
+                    @if (contact.HasUnread)
+                    {
+                        <button class="mk-btn mk-btn-secondary mailbox-list-item-mark-read"
+                                type="button"
+                                @onclick="@(() => HandleMarkAsRead(contact.ConversationKey))">
+                            @T["Mailbox.MarkAsRead"]
+                        </button>
+                    }
+
+                    <button class="mk-btn mk-btn-secondary mailbox-list-item-mark-read"
+                            type="button"
+                            @onclick="@(() => HandleArchive(contact.ConversationKey))">
+                        @(ShowArchived ? T["Mailbox.Unarchive"] : T["Mailbox.Archive"])
+                    </button>
+                </div>
+            }
+        </div>
+
+        <div class="mailbox-pagination">
+            <button class="mk-btn mk-btn-secondary" type="button" disabled="@(CurrentPage <= 1)" @onclick="HandlePreviousPage">@T["Mailbox.PrevPage"]</button>
+            <span>Página @CurrentPage de @TotalPages(ConversationTotal)</span>
+            <button class="mk-btn mk-btn-secondary" type="button" disabled="@(CurrentPage >= TotalPages(ConversationTotal))" @onclick="HandleNextPage">@T["Mailbox.NextPage"]</button>
+        </div>
+    }
+</aside>
+
+@inject UiTextService T
+
+@code {
+    [Parameter]
+    public List<ConversationContactView> Conversations { get; set; } = new();
+
+    [Parameter]
+    public string? SelectedConversationKey { get; set; }
+
+    [Parameter]
+    public int CurrentPage { get; set; } = 1;
+
+    [Parameter]
+    public int PageSize { get; set; } = 20;
+
+    [Parameter]
+    public int ConversationTotal { get; set; }
+
+    [Parameter]
+    public int ActiveConversationTotal { get; set; }
+
+    [Parameter]
+    public int ArchivedConversationTotal { get; set; }
+
+    [Parameter]
+    public bool ShowArchived { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSelectConversation { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnMarkAsRead { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnArchive { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnSwitchFolder { get; set; }
+
+    [Parameter]
+    public EventCallback OnPreviousPage { get; set; }
+
+    [Parameter]
+    public EventCallback OnNextPage { get; set; }
+
+    private async Task HandleSelectConversation(string conversationKey)
+    {
+        await OnSelectConversation.InvokeAsync(conversationKey);
+    }
+
+    private async Task HandleMarkAsRead(string conversationKey)
+    {
+        await OnMarkAsRead.InvokeAsync(conversationKey);
+    }
+
+    private async Task HandleArchive(string conversationKey)
+    {
+        await OnArchive.InvokeAsync(conversationKey);
+    }
+
+    private async Task HandleSwitchFolder(bool archived)
+    {
+        await OnSwitchFolder.InvokeAsync(archived);
+    }
+
+    private async Task HandlePreviousPage()
+    {
+        await OnPreviousPage.InvokeAsync();
+    }
+
+    private async Task HandleNextPage()
+    {
+        await OnNextPage.InvokeAsync();
+    }
+
+    private string BuildSnippet(string body)
+    {
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            return T["Mailbox.NoContent"];
+        }
+
+        var trimmed = body.Trim();
+        return trimmed.Length <= 96
+            ? trimmed
+            : $"{trimmed[..96]}...";
+    }
+
+    private string BuildAvatarInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "?";
+        }
+
+        var parts = name
+            .Trim()
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (parts.Length == 1)
+        {
+            return parts[0].Length >= 2
+                ? parts[0][..2].ToUpperInvariant()
+                : parts[0][..1].ToUpperInvariant();
+        }
+
+        return string.Concat(parts[0][0], parts[^1][0]).ToUpperInvariant();
+    }
+
+    private string FormatRelativeTime(DateTime utcDate)
+    {
+        var now = DateTime.UtcNow;
+        var delta = now - utcDate;
+        if (delta.TotalMinutes < 1)
+        {
+            return T["Mailbox.Now"];
+        }
+
+        if (delta.TotalMinutes < 60)
+        {
+            return $"{Math.Max(1, (int)Math.Floor(delta.TotalMinutes))}m";
+        }
+
+        var localDate = utcDate.ToLocalTime();
+        var today = DateTime.Now.Date;
+        if (localDate.Date == today)
+        {
+            return $"{localDate:HH:mm}";
+        }
+
+        if (localDate.Date == today.AddDays(-1))
+        {
+            return T["Mailbox.Yesterday"];
+        }
+
+        return localDate.ToString("dd/MM", CultureInfo.InvariantCulture);
+    }
+
+    private int TotalPages(int total)
+    {
+        if (total <= 0)
+        {
+            return 1;
+        }
+
+        return (int)Math.Ceiling(total / (double)PageSize);
+    }
+}

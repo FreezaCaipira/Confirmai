@@ -10,6 +10,7 @@
 @using System.Security.Claims
 @using Confirmai.Data
 @using Confirmai.Models
+@using Confirmai.Pages.Components
 
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider AuthStateProvider
@@ -32,162 +33,39 @@
                     <button class="mk-btn mk-btn-secondary mailbox-profile-btn" type="button" @onclick='() => Navigation.NavigateTo($"/profile/{currentUserId}")'>@T["Mailbox.MyProfile"]</button>
                 </div>
 
-                <section class="mailbox-filters" aria-label="Filtros da caixa postal">
-                    <div class="mailbox-filter-field">
-                        <label for="mailbox-search">@T["Mailbox.FilterSearch"]</label>
-                        <input id="mailbox-search" class="mailbox-search mk-input" @bind="searchTerm" @bind:event="oninput" />
-                    </div>
-
-                    <div class="mailbox-filter-field mailbox-filter-inline">
-                        <label for="mailbox-page-size">@T["Mailbox.FilterPageSize"]</label>
-                        <select id="mailbox-page-size" class="mk-input" @bind="pageSize">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-
-                    <div class="mailbox-filter-field mailbox-filter-inline">
-                        <label class="mailbox-check-label">
-                            <input type="checkbox" @bind="inboxUnreadOnly" />
-                            <span>@T["Mailbox.FilterUnreadOnly"]</span>
-                        </label>
-                    </div>
-
-                    <div class="mailbox-filter-actions">
-                        <button class="mk-btn mk-btn-primary" type="button" @onclick="ApplyFiltersAsync">@T["Mailbox.FilterApply"]</button>
-                        <button class="mk-btn mk-btn-secondary" type="button" @onclick="ResetFiltersAsync">@T["Mailbox.FilterClear"]</button>
-                    </div>
-                </section>
+                <MailboxFilters
+                    SearchTerm="@searchTerm"
+                    PageSize="@pageSize"
+                    InboxUnreadOnly="@inboxUnreadOnly"
+                    OnApplyFilters="@ApplyFiltersAsync"
+                    OnResetFilters="@ResetFiltersAsync" />
 
                 <section class="mailbox-workspace" aria-label="Workspace de mensagens">
-                    <aside class="mailbox-list-pane">
-                        <div class="mailbox-folder-tabs" aria-label="Lista de conversas">
-                            <button class="mailbox-folder-tab @(showArchivedConversations ? string.Empty : "active")" type="button" @onclick='() => SwitchConversationFolderAsync(false)'>@T["Mailbox.TabActive"] (@activeConversationTotal)</button>
-                            <button class="mailbox-folder-tab @(showArchivedConversations ? "active" : string.Empty)" type="button" @onclick='() => SwitchConversationFolderAsync(true)'>@T["Mailbox.TabArchived"] (@archivedConversationTotal)</button>
-                        </div>
+<MailboxConversationList
+                    Conversations="@conversationContacts"
+                    SelectedConversationKey="@selectedConversationKey"
+                    CurrentPage="@conversationPage"
+                    PageSize="@pageSize"
+                    ConversationTotal="@conversationTotal"
+                    ActiveConversationTotal="@activeConversationTotal"
+                    ArchivedConversationTotal="@archivedConversationTotal"
+                    ShowArchived="@showArchivedConversations"
+                    OnSelectConversation="@SelectConversationCallback"
+                    OnMarkAsRead="@MarkAsReadCallback"
+                    OnArchive="@ArchiveCallback"
+                    OnSwitchFolder="@SwitchFolderCallback"
+                    OnPreviousPage="@PreviousPageCallback"
+                    OnNextPage="@NextPageCallback" />
 
-                        @if (!conversationContacts.Any())
-                        {
-                            <p class="market-empty">@T["Mailbox.NoConversations"]</p>
-                        }
-                        else
-                        {
-                            <div class="mailbox-list mailbox-list-compact">
-                                @foreach (var contact in conversationContacts)
-                                {
-                                    var isSelected = string.Equals(SelectedContact?.ConversationKey, contact.ConversationKey, StringComparison.Ordinal);
-                                    <div class="mailbox-list-item @(contact.HasUnread ? "unread" : string.Empty) @(isSelected ? "active" : string.Empty)">
-                                        <button class="mailbox-list-item-main"
-                                                type="button"
-                                                @onclick='() => SelectConversationAsync(contact.ConversationKey)'>
-                                            <div class="mailbox-list-item-head">
-                                                <div class="mailbox-list-item-contact">
-                                                    <span class="mailbox-avatar" aria-hidden="true">@BuildAvatarInitials(contact.ConversationTitle)</span>
-                                                    <strong>@contact.ConversationTitle</strong>
-                                                    @if (contact.UnreadCount > 0)
-                                                    {
-                                                        <span class="mailbox-unread-count">@contact.UnreadCount</span>
-                                                    }
-                                                </div>
-                                                <span class="mailbox-list-item-time">@FormatRelativeTime(contact.LastCreatedAt)</span>
-                                            </div>
-                                            <div class="mailbox-list-item-peer">@T["Mailbox.ConversationInProgress"]</div>
-                                            @if (contact.HasUnread)
-                                            {
-                                                <div class="mailbox-list-item-status">
-                                                    <span class="mailbox-chip mailbox-chip-alert">@contact.UnreadCount @T["Mailbox.Unread"]</span>
-                                                </div>
-                                            }
-                                            <div class="mailbox-list-item-snippet">@BuildSnippet(contact.LastBody)</div>
-                                        </button>
-
-                                        @if (contact.HasUnread)
-                                        {
-                                            <button class="mk-btn mk-btn-secondary mailbox-list-item-mark-read"
-                                                    type="button"
-                                                    @onclick='() => MarkConversationAsReadAsync(contact.ConversationKey)'>
-                                                @T["Mailbox.MarkAsRead"]
-                                            </button>
-                                        }
-
-                                        <button class="mk-btn mk-btn-secondary mailbox-list-item-mark-read"
-                                                type="button"
-                                                @onclick='() => SetConversationArchivedAsync(contact.ConversationKey, !showArchivedConversations)'>
-                                            @(showArchivedConversations ? T["Mailbox.Unarchive"] : T["Mailbox.Archive"])
-                                        </button>
-                                    </div>
-                                }
-                            </div>
-
-                            <div class="mailbox-pagination">
-                                <button class="mk-btn mk-btn-secondary" type="button" disabled="@(conversationPage <= 1)" @onclick="PreviousConversationPageAsync">@T["Mailbox.PrevPage"]</button>
-                                <span>Página @conversationPage de @TotalPages(conversationTotal)</span>
-                                <button class="mk-btn mk-btn-secondary" type="button" disabled="@(conversationPage >= TotalPages(conversationTotal))" @onclick="NextConversationPageAsync">@T["Mailbox.NextPage"]</button>
-                            </div>
-                        }
-                    </aside>
-
-                    <article class="mailbox-thread-pane">
-                        @if (SelectedContact == null)
-                        {
-                            <div class="mailbox-thread-empty">@T["Mailbox.SelectConversation"]</div>
-                        }
-                        else
-                        {
-                            var contact = SelectedContact;
-
-                            <header class="mailbox-thread-head">
-                                <div class="mailbox-thread-title-block">
-                                    <span class="mailbox-thread-title-kicker">@T["Mailbox.ThreadKickerUser"]</span>
-                                    <a class="mailbox-thread-title-user" href="@($"/profile/{contact.ContactUserId}")">@contact.ContactName</a>
-                                </div>
-                                <span>@conversationMessages.Count @T["Mailbox.ThreadMessages"]</span>
-                            </header>
-
-                            <div class="mailbox-thread-stream" @ref="threadStreamRef">
-                                @if (isThreadLoading)
-                                {
-                                    <div class="mailbox-thread-empty">@T["Mailbox.ThreadLoading"]</div>
-                                }
-                                else if (!conversationMessages.Any())
-                                {
-                                    <div class="mailbox-thread-empty">@T["Mailbox.ThreadEmpty"]</div>
-                                }
-                                else
-                                {
-                                    @foreach (var threadMsg in conversationMessages)
-                                    {
-                                        <article class="mailbox-thread-bubble @(threadMsg.IsIncoming ? "incoming" : "outgoing") @(string.IsNullOrWhiteSpace(threadMsg.RoleClass) ? string.Empty : $"mailbox-thread-bubble-{threadMsg.RoleClass}")">
-                                            <header class="mailbox-thread-bubble-meta">
-                                                <strong class="mailbox-thread-author">@threadMsg.AuthorName</strong>
-                                                <time class="mailbox-thread-time" datetime="@threadMsg.CreatedAt.ToString("O", CultureInfo.InvariantCulture)">
-                                                    @threadMsg.CreatedAt.ToLocalTime().ToString("dd/MM HH:mm", CultureInfo.InvariantCulture)
-                                                </time>
-                                            </header>
-                                            <p class="mailbox-thread-body">@threadMsg.Body</p>
-                                        </article>
-                                    }
-                                }
-                            </div>
-
-                            <section class="mailbox-composer" aria-label="Enviar mensagem">
-                                @if (!string.IsNullOrWhiteSpace(composerInfoMessage))
-                                {
-                                    <p class="mailbox-composer-info">@composerInfoMessage</p>
-                                }
-
-                                <div class="mailbox-filter-field">
-                                    <label for="composer-body">@T["Mailbox.ComposerLabel"]</label>
-                                    <textarea id="composer-body" class="mk-input mailbox-composer-textarea" @bind="composerBody"></textarea>
-                                </div>
-                            </section>
-
-                            <div class="mailbox-actions">
-                                <button class="mk-btn mk-btn-primary" type="button" disabled="@isSendingReply" @onclick="SendQuickReplyAsync">@(isSendingReply ? T["Mailbox.Sending"] : T["Mailbox.Send"])</button>
-                            </div>
-                        }
-                    </article>
+                <MailboxThreadPane
+                    SelectedContact="@SelectedContact"
+                    ConversationMessages="@conversationMessages"
+                    ComposerBody="@composerBody"
+                    ComposerInfoMessage="@composerInfoMessage"
+                    IsThreadLoading="@isThreadLoading"
+                    IsSendingReply="@isSendingReply"
+                    ThreadStreamRef="@threadStreamRef"
+                    OnSendReply="@SendReplyCallback" />
                 </section>
             }
     </div>
@@ -755,6 +633,30 @@
         return (active, archived);
     }
 
+    private async Task SendReplyCallback(string body)
+    {
+        composerBody = body;
+        await SendQuickReplyAsync();
+    }
+
+    private async Task SelectConversationCallback(string conversationKey)
+        => await SelectConversationAsync(conversationKey);
+
+    private async Task MarkAsReadCallback(string conversationKey)
+        => await MarkConversationAsReadAsync(conversationKey);
+
+    private async Task ArchiveCallback(string conversationKey)
+        => await SetConversationArchivedAsync(conversationKey, !showArchivedConversations);
+
+    private async Task SwitchFolderCallback(bool showArchived)
+        => await SwitchConversationFolderAsync(showArchived);
+
+    private async Task PreviousPageCallback()
+        => await PreviousConversationPageAsync();
+
+    private async Task NextPageCallback()
+        => await NextConversationPageAsync();
+
     private sealed class MailboxMessageView
     {
         public int Id { get; init; }
@@ -768,29 +670,5 @@
         public bool IsArchivedByRecipient { get; init; }
         public bool IsRead { get; init; }
         public DateTime CreatedAt { get; init; }
-    }
-
-    private sealed class ConversationMessageView
-    {
-        public int Id { get; init; }
-        public string Body { get; init; } = string.Empty;
-        public string? SenderUserId { get; init; }
-        public string AuthorName { get; init; } = string.Empty;
-        public string RoleClass { get; set; } = string.Empty;
-        public bool IsIncoming { get; init; }
-        public bool IsRead { get; init; }
-        public DateTime CreatedAt { get; init; }
-    }
-
-    private sealed class ConversationContactView
-    {
-        public string ConversationKey { get; init; } = string.Empty;
-        public string ConversationTitle { get; init; } = string.Empty;
-        public string ContactUserId { get; init; } = string.Empty;
-        public string ContactName { get; init; } = string.Empty;
-        public string LastBody { get; init; } = string.Empty;
-        public DateTime LastCreatedAt { get; init; }
-        public int UnreadCount { get; init; }
-        public bool HasUnread { get; init; }
     }
 }

@@ -2,7 +2,7 @@
     Layout = null;
     var title = ViewData["Title"] ?? "Confirmai";
 }
-@inject Confirmai.Services.LanguagePreferenceService LanguagePreferenceService
+@inject Confirmai.Services.User.LanguagePreferenceService LanguagePreferenceService
 <!DOCTYPE html>
 <html lang="@LanguagePreferenceService.SelectedLanguage">
 <head>

@@ -1,0 +1,66 @@
+@using Confirmai.Models
+
+<div class="evpay-proof">
+    <div class="evpay-proof-header">
+        <i class="fas fa-camera"></i>
+        <span>Comprovante de pagamento</span>
+    </div>
+    @if (Confirmation?.PixProofUploadedAt.HasValue ?? false)
+    {
+        <div class="evpay-proof-sent">
+            <i class="fas fa-check-circle evpay-proof-sent-icon"></i>
+            <span>Comprovante enviado em @Confirmation.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</span>
+        </div>
+        <img src="/api/pix-proof/@Confirmation.Id" class="evpay-proof-thumb" alt="Comprovante Pix" />
+        <label class="evpay-proof-btn evpay-proof-btn--update">
+            @if (UploadingProof)
+            {
+                <i class="fas fa-spinner fa-spin"></i> <span>Enviando…</span>
+            }
+            else
+            {
+                <i class="fas fa-sync-alt"></i> <span>Atualizar comprovante</span>
+            }
+            <InputFile OnChange="HandleProofUpload" accept="image/jpeg,image/png,image/webp" style="display:none" disabled="@UploadingProof" />
+        </label>
+    }
+    else
+    {
+        <p class="evpay-proof-hint">
+            Após fazer o Pix, envie o comprovante para o organizador confirmar seu pagamento.
+        </p>
+        <label class="evpay-proof-btn">
+            @if (UploadingProof)
+            {
+                <i class="fas fa-spinner fa-spin"></i> <span>Enviando…</span>
+            }
+            else
+            {
+                <i class="fas fa-upload"></i> <span>Enviar comprovante</span>
+            }
+            <InputFile OnChange="HandleProofUpload" accept="image/jpeg,image/png,image/webp" style="display:none" disabled="@UploadingProof" />
+        </label>
+    }
+    @if (!string.IsNullOrWhiteSpace(ProofError))
+    {
+        <p class="evpay-proof-error">@ProofError</p>
+    }
+    @if (!string.IsNullOrWhiteSpace(ProofSuccessMessage))
+    {
+        <p class="evpay-proof-success" style="animation: fadeout 3s forwards; animation-delay: 2s;">
+            <i class="fas fa-check-circle"></i> @ProofSuccessMessage
+        </p>
+    }
+</div>
+
+@code {
+    [Parameter] public EventConfirmation? Confirmation { get; set; }
+    [Parameter] public bool UploadingProof { get; set; }
+    [Parameter] public string? ProofError { get; set; }
+    [Parameter] public string? ProofSuccessMessage { get; set; }
+    
+    [Parameter] public EventCallback<InputFileChangeEventArgs> OnProofUpload { get; set; }
+
+    private async Task HandleProofUpload(InputFileChangeEventArgs e)
+        => await OnProofUpload.InvokeAsync(e);
+}

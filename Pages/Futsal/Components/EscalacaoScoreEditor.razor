@@ -1,0 +1,124 @@
+<div class="esc-score-section">
+    <div class="esc-section-header">
+        <h3 class="esc-section-title"><i class="fas fa-futbol"></i> Placar</h3>
+        @if (ScoreTeamA is not null && ScoreTeamB is not null && !EditingScore)
+        {
+            <button class="esc-btn esc-btn--danger-ghost esc-btn--sm" @onclick="() => HandleEditingScore(true)">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+        }
+    </div>
+
+    @if (ScoreTeamA is not null && ScoreTeamB is not null && !EditingScore)
+    {
+        <div class="esc-score-display">
+            <span class="esc-score-team">🟡 @TeamAName</span>
+            <span class="esc-score-value">@ScoreTeamA</span>
+            <span class="esc-score-sep">×</span>
+            <span class="esc-score-value">@ScoreTeamB</span>
+            <span class="esc-score-team">@TeamBName 🔵</span>
+        </div>
+
+        @if (ScoreTeamA > ScoreTeamB)
+        {
+            <p class="esc-score-winner esc-score-winner--a">🏆 @TeamAName venceu!</p>
+        }
+        else if (ScoreTeamB > ScoreTeamA)
+        {
+            <p class="esc-score-winner esc-score-winner--b">🏆 @TeamBName venceu!</p>
+        }
+        else
+        {
+            <p class="esc-score-winner esc-score-winner--draw">🤝 Empate</p>
+        }
+
+        @if (ScoreRegisteredByName is not null)
+        {
+            <p class="esc-score-registered-by">
+                <i class="fas fa-user-check"></i> Registrado por <strong>@ScoreRegisteredByName</strong>
+                @if (ScoreRegisteredAt is not null)
+                {
+                    <span class="esc-score-registered-when">em @ScoreRegisteredAt.Value.ToLocalTime().ToString("dd/MM HH:mm")</span>
+                }
+            </p>
+        }
+    }
+    else if (IsMember || IsAdmin || EditingScore)
+    {
+        <div class="esc-score-inputs" style="margin-top:.25rem">
+            <label class="esc-score-label">🟡 @TeamAName</label>
+            <input class="esc-score-input" type="number" min="0" max="99"
+                   @bind="@ScoreInputA" @bind:event="oninput" placeholder="0" />
+            <span class="esc-score-sep">×</span>
+            <input class="esc-score-input" type="number" min="0" max="99"
+                   @bind="@ScoreInputB" @bind:event="oninput" placeholder="0" />
+            <label class="esc-score-label">@TeamBName 🔵</label>
+        </div>
+        @if (ScoreError is not null)
+        {
+            <p class="esc-error">@ScoreError</p>
+        }
+        <div class="esc-score-actions">
+            <button class="esc-btn esc-btn--primary esc-btn--sm" @onclick="HandleSaveScore" disabled="@IsSaving">
+                <i class="fas fa-check"></i> @(IsSaving ? "Salvando…" : "Confirmar placar")
+            </button>
+        </div>
+    }
+    else
+    {
+        <p class="esc-hint"><i class="fas fa-clock"></i> Placar ainda não registrado.</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int? ScoreTeamA { get; set; }
+
+    [Parameter]
+    public int? ScoreTeamB { get; set; }
+
+    [Parameter]
+    public int? ScoreInputA { get; set; }
+
+    [Parameter]
+    public int? ScoreInputB { get; set; }
+
+    [Parameter]
+    public bool EditingScore { get; set; }
+
+    [Parameter]
+    public string? ScoreError { get; set; }
+
+    [Parameter]
+    public string TeamAName { get; set; } = "Time A";
+
+    [Parameter]
+    public string TeamBName { get; set; } = "Time B";
+
+    [Parameter]
+    public bool IsMember { get; set; }
+
+    [Parameter]
+    public bool IsAdmin { get; set; }
+
+    [Parameter]
+    public bool IsSaving { get; set; }
+
+    [Parameter]
+    public string? ScoreRegisteredByName { get; set; }
+
+    [Parameter]
+    public DateTime? ScoreRegisteredAt { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnEditingScoreChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnSaveScore { get; set; }
+
+    private async Task HandleEditingScore(bool value)
+        => await OnEditingScoreChanged.InvokeAsync(value);
+
+    private async Task HandleSaveScore()
+        => await OnSaveScore.InvokeAsync();
+}

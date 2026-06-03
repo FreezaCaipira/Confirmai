@@ -1,13 +1,13 @@
-﻿@page
+@page
 @model Confirmai.Areas.Identity.Pages.Account.RegisterModel
-@inject Confirmai.Services.UiTextService T
+@inject Confirmai.Services.Core.UiTextService T
 @{
     ViewData["Title"] = T["Identity.Register.Title"];
 }
 
 <a href="/" class="identity-home-link identity-home-link-login">
     <span class="identity-home-arrow">&#8592;</span>
-    <span class="identity-home-text">Início</span>
+    <span class="identity-home-text">In�cio</span>
 </a>
 
 <h2 class="identity-login-heading">@T["Identity.Register.Heading"]</h2>

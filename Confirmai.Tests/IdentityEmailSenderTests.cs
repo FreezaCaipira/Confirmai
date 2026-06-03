@@ -1,5 +1,11 @@
-﻿using Confirmai.Configuration;
+using Confirmai.Configuration;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging.Abstractions;

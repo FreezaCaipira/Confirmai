@@ -51,6 +51,15 @@
     border-color: rgba(96, 165, 250, 0.7);
 }
 
+.player-tag--receiver-badge {
+    background-color: rgba(251, 191, 36, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    color: rgba(251, 191, 36, 0.95);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
 /* Goalkeeper "Não Paga" Badge */
 .player-tag--no-pay {
     background-color: rgba(74, 222, 128, 0.15);

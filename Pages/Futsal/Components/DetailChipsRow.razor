@@ -1,0 +1,28 @@
+@using Confirmai.Models
+
+<div class="detail-chips">
+    <span class="detail-chip">
+        <i class="fas fa-calendar-alt"></i>
+        @Event.StartsAt.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("pt-BR"))
+    </span>
+    <span class="detail-chip">
+        <i class="fas fa-clock"></i>
+        @Event.StartsAt.ToString("HH:mm")
+        @if (Event.DurationMinutes.HasValue)
+        {
+            <span> · @(Event.DurationMinutes / 60)h@(Event.DurationMinutes % 60 != 0 ? $"{Event.DurationMinutes % 60}min" : "")</span>
+        }
+    </span>
+    @if (Event.Price.HasValue)
+    {
+        <span class="detail-chip detail-chip--price">
+            <i class="fas fa-money-bill-wave"></i>
+            R$ @Event.Price.Value.ToString("N2")
+        </span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Event Event { get; set; } = null!;
+}

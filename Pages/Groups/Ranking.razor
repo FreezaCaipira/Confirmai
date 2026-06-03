@@ -6,6 +6,7 @@
 @using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
+@using Confirmai.Shared.Components.Groups
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -72,64 +73,15 @@ else
             </header>
 
             @* ── Filtro ────────────────────────────────────────────────── *@
-            <div class="ranking-tabs">
-                <button class="ranking-tab @(viewMode == RankingView.Month ? "ranking-tab--active" : "")"
-                        type="button" @onclick="() => SetView(RankingView.Month)">
-                    <i class="fas fa-calendar-alt"></i> Mês atual
-                </button>
-                <button class="ranking-tab @(viewMode == RankingView.Year ? "ranking-tab--active" : "")"
-                        type="button" @onclick="() => SetView(RankingView.Year)">
-                    <i class="fas fa-calendar-check"></i> Ano @currentYear
-                </button>
-                <button class="ranking-tab @(viewMode == RankingView.AllTime ? "ranking-tab--active" : "")"
-                        type="button" @onclick="() => SetView(RankingView.AllTime)">
-                    <i class="fas fa-infinity"></i> Geral
-                </button>
-            </div>
+            <RankingViewSelector
+                ViewMode="@viewMode.ToString()"
+                CurrentYear="@currentYear"
+                OnViewModeChanged="@HandleViewModeChanged" />
 
             @* ── Tabela ────────────────────────────────────────────────── *@
-            @if (rankingRows.Count == 0)
-            {
-                <div class="ranking-empty">
-                    <i class="fas fa-calendar-times"></i>
-                    <p>Nenhuma partida encerrada no período.</p>
-                </div>
-            }
-            else
-            {
-                <div class="ranking-header">
-                    <span class="ranking-pos"></span>
-                    <span class="ranking-name ranking-col-label"><i class="fas fa-user"></i> Nome</span>
-                    <span class="ranking-col ranking-col--label ranking-col--label-games"><i class="fas fa-futbol"></i> Partidas</span>
-                    <span class="ranking-col ranking-col--label ranking-col--label-highlight"><i class="fas fa-star"></i> Destaques</span>
-                    <span class="ranking-col ranking-col--label ranking-col--label-wins"><i class="fas fa-trophy"></i> Vitórias</span>
-                </div>
-                <ol class="ranking-list">
-                    @{ int pos = 0; }
-                    @foreach (var row in rankingRows)
-                    {
-                        pos++;
-                        bool isMe = row.UserId == currentUserId;
-                        string medalClass = pos switch { 1 => "ranking-medal--gold", 2 => "ranking-medal--silver", 3 => "ranking-medal--bronze", _ => "" };
-                        <li class="ranking-row @(isMe ? "ranking-row--me" : "")">
-                            <span class="ranking-pos @medalClass">
-                                @if (pos <= 3)
-                                {
-                                    <i class="fas fa-medal"></i>
-                                }
-                                else
-                                {
-                                    @pos
-                                }
-                            </span>
-                            <span class="ranking-name">@row.UserName @if (isMe) { <span class="player-tag player-tag--me">você</span> }</span>
-                            <span class="ranking-col" title="Partidas">@row.GamesPlayed</span>
-                            <span class="ranking-col ranking-col--highlight" title="Destaques">@row.Highlights</span>
-                            <span class="ranking-col ranking-col--wins" title="Vitórias">@row.Wins</span>
-                        </li>
-                    }
-                </ol>
-            }
+            <RankingTable
+                RankingRows="@rankingRowsDynamic"
+                CurrentUserId="@currentUserId" />
 
             <p class="ranking-footnote">
                 <i class="fas fa-info-circle"></i>
@@ -163,6 +115,8 @@ else
     private RankingView     viewMode     = RankingView.Month;
     private int             currentYear  = DateTime.Now.Year;
     private List<RankingRow> rankingRows = new();
+
+    private List<dynamic>? rankingRowsDynamic => rankingRows.Cast<dynamic>().ToList();
 
     private List<(int EventId, DateTime StartsAt, string WinnerUserId)> allMvpWinners = new();
 
@@ -235,6 +189,14 @@ else
     {
         viewMode = mode;
         BuildRanking();
+    }
+
+    private void HandleViewModeChanged(string modeString)
+    {
+        if (Enum.TryParse<RankingView>(modeString, out var mode))
+        {
+            SetView(mode);
+        }
     }
 
     private void BuildRanking()

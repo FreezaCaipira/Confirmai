@@ -1,0 +1,28 @@
+@using System.Globalization
+
+@if (!ChatMessages.Any())
+{
+    <div class="profile-chat-empty">Sem mensagens ainda.</div>
+}
+else
+{
+    @foreach (var msg in ChatMessages)
+    {
+        <article class="profile-chat-bubble @(msg.IsIncoming ? "incoming" : "outgoing")">
+            <p>@msg.Body</p>
+            <span class="profile-chat-meta">@msg.CreatedAt.ToLocalTime().ToString("dd/MM HH:mm", CultureInfo.InvariantCulture)</span>
+        </article>
+    }
+}
+
+@code {
+    [Parameter]
+    public List<ProfileChatMessageView> ChatMessages { get; set; } = new();
+
+    public sealed class ProfileChatMessageView
+    {
+        public string Body { get; init; } = string.Empty;
+        public bool IsIncoming { get; init; }
+        public DateTime CreatedAt { get; init; }
+    }
+}

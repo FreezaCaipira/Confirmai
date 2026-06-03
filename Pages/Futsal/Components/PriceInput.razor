@@ -1,0 +1,18 @@
+<fieldset class="form-section">
+    <legend>Valor</legend>
+
+    <div class="form-group">
+        <label>Valor por jogador (R$) <span class="required">*</span></label>
+        <div class="input-prefix-wrap">
+            <span class="input-prefix">R$</span>
+            <InputNumber class="input" @bind-Value="@Price" min="0" step="0.50" />
+        </div>
+        <ValidationMessage For="@(() => Price)" class="validation-message" />
+        <small class="form-hint">Use 0 para partidas sem cobrança.</small>
+    </div>
+</fieldset>
+
+@code {
+    [Parameter]
+    public decimal Price { get; set; }
+}

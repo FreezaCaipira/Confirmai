@@ -7,6 +7,7 @@
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Services
+@using Confirmai.Pages.Groups.Components
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -71,212 +72,42 @@ else
             </header>
 
             @* ── Funcionalidades ────────────────────────────────────── *@
-            <section class="detail-section features-section">
-                <h2 class="detail-section-title">
-                    <i class="fas fa-sliders-h"></i> Funcionalidades
-                </h2>
-                <p class="features-section-sub">Ative ou desative funcionalidades opcionais para este grupo.</p>
-
-                <div class="features-list">
-                    <div class="feature-card @(group.EnablePostMatchRanking ? "feature-card--on" : "")">
-                        <div class="feature-card-info">
-                            <span class="feature-card-icon"><i class="fas fa-trophy"></i></span>
-                            <div class="feature-card-text">
-                                <strong class="feature-card-title">Ranking pós-partida</strong>
-                                <p class="feature-card-desc">
-                                    Exibe um ranking de participações e desempenho dos membros,
-                                    com visões mensal e anual, na página do grupo.
-                                </p>
-                            </div>
-                        </div>
-                        <label class="feature-toggle" title="@(group.EnablePostMatchRanking ? "Desativar" : "Ativar")">
-                            <input type="checkbox"
-                                   checked="@group.EnablePostMatchRanking"
-                                   disabled="@isSaving"
-                                   @onchange="() => TogglePostMatchRanking()" />
-                            <span class="feature-toggle-track"></span>
-                        </label>
-                    </div>
-
-                    <div class="feature-card @(group.EnablePaymentGateways ? "feature-card--on" : "")">
-                        <div class="feature-card-info">
-                            <span class="feature-card-icon"><i class="fas fa-credit-card"></i></span>
-                            <div class="feature-card-text">
-                                <strong class="feature-card-title">Gateways de pagamento</strong>
-                                <p class="feature-card-desc">
-                                    Quando ativado, a tela de pagamento mostra opções de gateway
-                                    (EfiBank, Abacate e futuras integrações) além do Pix direto do organizador.
-                                </p>
-                                @if (availableGatewayOptions.Count == 0)
-                                {
-                                    <p class="feat-gateway-note">
-                                        Nenhum gateway está disponível no momento. Habilite/configure em Admin &gt; Gateways.
-                                    </p>
-                                }
-                                else
-                                {
-                                    <p class="feat-gateway-note">
-                                        Disponíveis agora: @string.Join(", ", availableGatewayOptions.Select(g => g.DisplayName))
-                                    </p>
-                                }
-                            </div>
-                        </div>
-                        <label class="feature-toggle" title="@(group.EnablePaymentGateways ? "Desativar" : "Ativar")">
-                            <input type="checkbox"
-                                   checked="@group.EnablePaymentGateways"
-                                   disabled="@isSaving"
-                                   @onchange="() => TogglePaymentGateways()" />
-                            <span class="feature-toggle-track"></span>
-                        </label>
-                    </div>
-                </div>
-
-                @if (!string.IsNullOrWhiteSpace(saveMessage))
-                {
-                    <p class="features-save-msg @(saveError ? "features-save-msg--error" : "")">
-                        <i class="fas @(saveError ? "fa-times-circle" : "fa-check-circle")"></i>
-                        @saveMessage
-                    </p>
-                }
-            </section>
+            <FeaturesToggles
+                Group="@group"
+                IsSaving="@isSaving"
+                SaveMessage="@saveMessage"
+                SaveError="@saveError"
+                AvailableGatewayOptions="@availableGatewayOptions"
+                OnTogglePostMatchRanking="@TogglePostMatchRankingCallback"
+                OnTogglePaymentGateways="@TogglePaymentGatewaysCallback" />
 
             <hr class="detail-divider">
 
             @* ── Membros & Permissões ───────────────────────────────── *@
-            <section class="detail-section features-section">
-                <h2 class="detail-section-title">
-                    <i class="fas fa-user-shield"></i> Membros &amp; Permissões
-                </h2>
-                <p class="features-section-sub">Promova membros a admin ou remova permissões de admin.</p>
-                @if (!canManageAdminRoles)
-                {
-                    <p class="feat-role-note">
-                        <i class="fas fa-lock"></i>
-                        Apenas o criador do grupo pode adicionar ou remover administradores.
-                    </p>
-                }
-
-                <ul class="feat-members-list">
-                    @foreach (var m in members.OrderBy(m => m.Role == GroupMemberRole.Admin ? 0 : 1).ThenBy(m => m.User?.FullName))
-                    {
-                        var isSelf   = m.UserId == currentUserId;
-                        var isAdminM = m.Role == GroupMemberRole.Admin;
-                        var onlyAdmin = isAdminM && adminMembers.Count == 1;
-                        var isConfirmingPromote = confirmPromoteMemberId == m.Id;
-                        <li class="feat-member-item">
-                            <div class="feat-member-info">
-                                <span class="feat-member-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
-                                @if (isAdminM) { <span class="player-tag player-tag--admin">admin</span> }
-                                @if (m.UserId == group.CreatedByUserId) { <span class="player-tag">criador</span> }
-                                @if (isSelf)   { <span class="player-tag player-tag--me">você</span> }
-                            </div>
-                            @if (!isSelf && canManageAdminRoles)
-                            {
-                                @if (isAdminM)
-                                {
-                                    <button class="feat-role-btn feat-role-btn--demote"
-                                            type="button"
-                                            disabled="@(isSavingRole || onlyAdmin)"
-                                            title="@(onlyAdmin ? "O grupo deve ter pelo menos um admin" : "Remover permissão de admin")"
-                                            @onclick="() => SetMemberRole(m.Id, GroupMemberRole.Member)">
-                                        <i class="fas fa-user-minus"></i> Remover admin
-                                    </button>
-                                }
-                                else
-                                {
-                                    @if (isConfirmingPromote)
-                                    {
-                                        <div class="feat-role-confirm">
-                                            <span class="feat-role-confirm-text">tornar admin?</span>
-                                            <button class="feat-role-btn feat-role-btn--confirm-yes"
-                                                    type="button"
-                                                    disabled="@isSavingRole"
-                                                    @onclick="() => SetMemberRole(m.Id, GroupMemberRole.Admin)">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button class="feat-role-btn feat-role-btn--confirm-no"
-                                                    type="button"
-                                                    disabled="@isSavingRole"
-                                                    @onclick="() => confirmPromoteMemberId = null">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <button class="feat-role-btn feat-role-btn--promote"
-                                                type="button"
-                                                disabled="@isSavingRole"
-                                                title="Promover a admin"
-                                                @onclick="() => confirmPromoteMemberId = m.Id">
-                                            <i class="fas fa-user-shield"></i> Tornar admin
-                                        </button>
-                                    }
-                                }
-                            }
-                        </li>
-                    }
-                </ul>
-
-                @if (!string.IsNullOrWhiteSpace(roleMessage))
-                {
-                    <p class="features-save-msg @(roleError ? "features-save-msg--error" : "")">
-                        <i class="fas @(roleError ? "fa-times-circle" : "fa-check-circle")"></i>
-                        @roleMessage
-                    </p>
-                }
-            </section>
+            <MembersManager
+                Members="@members"
+                CurrentUserId="@currentUserId"
+                CreatedByUserId="@(group?.CreatedByUserId ?? "")"
+                CanManageAdminRoles="@canManageAdminRoles"
+                AdminCount="@(members.Count(m => m.Role == GroupMemberRole.Admin))"
+                IsSavingRole="@isSavingRole"
+                RoleMessage="@roleMessage"
+                RoleError="@roleError"
+                ConfirmPromoteMemberId="@confirmPromoteMemberId"
+                OnSetMemberRole="@SetMemberRoleCallback"
+                OnInitiatePromote="@InitiatePromoteCallback"
+                OnCancelPromote="@CancelPromoteCallback" />
 
             <hr class="detail-divider">
 
             @* ── Pix do Organizador ─────────────────────────────────── *@
-            <section class="detail-section features-section">
-                <h2 class="detail-section-title">
-                    <i class="fas fa-qrcode"></i> Pix do Organizador
-                </h2>
-                <p class="features-section-sub">
-                    Selecione qual admin recebe os pagamentos das partidas.
-                    A chave Pix do admin selecionado será exibida aos jogadores na página de pagamento.
-                </p>
-
-                @if (pixAdmins.Count == 0)
-                {
-                    <div class="feat-pix-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Nenhum admin do grupo tem Chave Pix cadastrada no perfil.
-                        <a href="/perfil" class="feat-pix-profile-link">Configure a sua Chave Pix →</a>
-                    </div>
-                }
-                else
-                {
-                    <div class="feat-pix-form">
-                        <label class="feat-pix-label" for="pix-receiver-select">Admin que recebe:</label>
-                        <select id="pix-receiver-select"
-                                class="feat-pix-select"
-                                @bind="selectedPixReceiverId"
-                                disabled="@isSavingPix">
-                            <option value="">— Automático (primeiro admin com Pix) —</option>
-                            @foreach (var a in pixAdmins)
-                            {
-                                <option value="@a.UserId">@(a.User?.FullName ?? a.User?.UserName) — @a.User?.PixKey</option>
-                            }
-                        </select>
-                        <button class="feat-pix-save-btn" type="button"
-                                disabled="@isSavingPix"
-                                @onclick="SavePixReceiver">
-                            <i class="fas fa-save"></i> @(isSavingPix ? "Salvando…" : "Salvar")
-                        </button>
-                    </div>
-                }
-
-                @if (!string.IsNullOrWhiteSpace(pixMessage))
-                {
-                    <p class="features-save-msg @(pixError ? "features-save-msg--error" : "")">
-                        <i class="fas @(pixError ? "fa-times-circle" : "fa-check-circle")"></i>
-                        @pixMessage
-                    </p>
-                }
-            </section>
+            <PixReceiverSelector
+                PixAdmins="@pixAdmins"
+                SelectedPixReceiverId="@selectedPixReceiverId"
+                IsSaving="@isSavingPix"
+                Message="@pixMessage"
+                IsError="@pixError"
+                OnSavePixReceiver="@SavePixReceiverCallback" />
 
         </div>
     </div>
@@ -604,5 +435,27 @@ else
             pixError   = true;
         }
         finally { isSavingPix = false; }
+    }
+
+    // Callback wrappers for child components
+    private async Task TogglePostMatchRankingCallback()
+        => await TogglePostMatchRanking();
+
+    private async Task TogglePaymentGatewaysCallback()
+        => await TogglePaymentGateways();
+
+    private async Task SetMemberRoleCallback((int memberId, GroupMemberRole newRole) args)
+        => await SetMemberRole(args.memberId, args.newRole);
+
+    private async Task InitiatePromoteCallback(int memberId)
+        => confirmPromoteMemberId = memberId;
+
+    private async Task CancelPromoteCallback()
+        => confirmPromoteMemberId = null;
+
+    private async Task SavePixReceiverCallback(string selectedId)
+    {
+        selectedPixReceiverId = selectedId;
+        await SavePixReceiver();
     }
 }

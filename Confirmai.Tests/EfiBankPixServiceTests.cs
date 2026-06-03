@@ -1,7 +1,13 @@
+using Confirmai.Services.Payment;
 using System.Net;
 using System.Text;
 using Confirmai.Configuration;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;

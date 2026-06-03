@@ -14,8 +14,8 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
-@inject Confirmai.Services.EventNotificationService NotificationService
-@inject Confirmai.Services.EventCollisionService EventCollisionService
+@inject Confirmai.Services.Events.EventNotificationService NotificationService
+@inject Confirmai.Services.Events.EventCollisionService EventCollisionService
 
 <PageTitle>Editar Evento · Poker · Confirmai</PageTitle>
 
@@ -289,7 +289,7 @@
                         @saveError
                         @if (!string.IsNullOrWhiteSpace(collisionHref))
                         {
-                            <a href="@collisionHref" style="margin-left:.45rem;color:#93c5fd">@Confirmai.Services.EventCollisionService.OpenExistingEventLinkText</a>
+                            <a href="@collisionHref" style="margin-left:.45rem;color:#93c5fd">@Confirmai.Services.Events.EventCollisionService.OpenExistingEventLinkText</a>
                         }
                     </p>
                 }
@@ -480,7 +480,7 @@
             var collision = await EventCollisionService.FindGroupTimeCollisionAsync(ev.GroupId, newStartsAt, ev.Id);
             if (collision is not null)
             {
-                saveError = Confirmai.Services.EventCollisionService.BuildConflictMessage(collision.StartsAt);
+                saveError = Confirmai.Services.Events.EventCollisionService.BuildConflictMessage(collision.StartsAt);
                 collisionHref = $"/poker/{collision.EventId}";
                 isSaving  = false;
                 return;
@@ -544,3 +544,4 @@
         _                          => m.ToString()
     };
 }
+

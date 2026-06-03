@@ -1,0 +1,32 @@
+@code {
+    [Parameter]
+    public int CurrentPage { get; set; } = 1;
+
+    [Parameter]
+    public int TotalPages { get; set; } = 1;
+
+    [Parameter]
+    public EventCallback OnPrevPage { get; set; }
+
+    [Parameter]
+    public EventCallback OnNextPage { get; set; }
+
+    [Inject]
+    public UiTextService T { get; set; } = default!;
+
+    private async Task HandlePrevPage()
+    {
+        await OnPrevPage.InvokeAsync();
+    }
+
+    private async Task HandleNextPage()
+    {
+        await OnNextPage.InvokeAsync();
+    }
+}
+
+<div class="pagination">
+    <button type="button" @onclick="HandlePrevPage" disabled="@(CurrentPage <= 1)">@T["Common.Previous"]</button>
+    <span class="pagination-info">@T["Common.Page"] @CurrentPage @T["Common.Of"] @TotalPages</span>
+    <button type="button" @onclick="HandleNextPage" disabled="@(CurrentPage >= TotalPages)">@T["Common.Next"]</button>
+</div>

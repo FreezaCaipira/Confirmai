@@ -1,0 +1,57 @@
+<div class="esc-draft-actions">
+    <button class="esc-btn esc-btn--shuffle" @onclick="HandleRandomize">
+        <i class="fas fa-dice fa-lg"></i> Embaralhar jogadores de linha
+    </button>
+    <button class="esc-btn esc-btn--primary" @onclick="() => HandleShowConfirmModal(true)" disabled="@(!TeamsAreBalanced)">
+        <i class="fas fa-check"></i> Confirmar escalação
+    </button>
+</div>
+
+@if (!TeamsAreBalanced)
+{
+    <p class="esc-balance-hint"><i class="fas fa-exclamation-triangle"></i> Times desiguais — iguale os jogadores de linha para confirmar.</p>
+}
+
+@if (ShowConfirmModal)
+{
+    <div class="esc-modal-overlay">
+        <div class="esc-modal">
+            <p>Confirmar esta escalação? Os times ficarão visíveis para todos os confirmados.</p>
+            <div class="esc-modal-actions">
+                <button class="esc-btn esc-btn--secondary" @onclick="() => HandleShowConfirmModal(false)" disabled="@IsSaving">Cancelar</button>
+                <button class="esc-btn esc-btn--primary" @onclick="HandleConfirmar" disabled="@IsSaving">
+                    @(IsSaving ? "Salvando…" : "Sim, confirmar")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool TeamsAreBalanced { get; set; }
+
+    [Parameter]
+    public bool ShowConfirmModal { get; set; }
+
+    [Parameter]
+    public bool IsSaving { get; set; }
+
+    [Parameter]
+    public EventCallback OnRandomize { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnShowConfirmModalChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnConfirmEscalacao { get; set; }
+
+    private async Task HandleRandomize()
+        => await OnRandomize.InvokeAsync();
+
+    private async Task HandleShowConfirmModal(bool value)
+        => await OnShowConfirmModalChanged.InvokeAsync(value);
+
+    private async Task HandleConfirmar()
+        => await OnConfirmEscalacao.InvokeAsync();
+}

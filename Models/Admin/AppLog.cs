@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Confirmai.Services.Core;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Confirmai.Models

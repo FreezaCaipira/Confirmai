@@ -9,9 +9,10 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.JSInterop
 @using System.Globalization
-@using System.Text
+@using Confirmai.Pages.Payment
 @using Microsoft.Extensions.Options
 @using Confirmai.Configuration
+@using System.Text
 
 @inject BitcoinPaymentFactory PaymentFactory
 @inject AppDbContext Db
@@ -41,188 +42,38 @@
             else
             {
                 <div class="tibia-pay-grid">
-                    <section class="tibia-pay-card tibia-pay-card-product">
-                <div class="tibia-pay-card-head">
-                    <h2>Resumo da oferta</h2>
-                </div>
-                <div class="tibia-pay-card-body">
-                    <article class="tibia-pay-item-card">
-                        <div class="tibia-pay-item-subcard" role="group" aria-label="Resumo do item">
-                            <div class="tibia-pay-item-media">
-                                <div class="tibia-pay-product-image">
-                                    @if (!string.IsNullOrEmpty(product.ImagePath))
-                                    {
-                                        <img src="@product.ImagePath" alt="@T["Marketplace.ImageAlt"]" />
-                                    }
-                                </div>
-                            </div>
-                            <div class="tibia-pay-item-row">
-                                <span class="tibia-pay-label">Item</span>
-                                <span class="tibia-pay-value"><b>@product.Name</b></span>
-                            </div>
-                            <div class="tibia-pay-item-row">
-                                <span class="tibia-pay-label">Nome</span>
-                                <span class="tibia-pay-value">@product.Name</span>
-                            </div>
-                            <div class="tibia-pay-item-row">
-                                <span class="tibia-pay-label">Quantidade</span>
-                                <span class="tibia-pay-value"><b>@selectedPurchaseQuantity</b></span>
-                            </div>
-                            <div class="tibia-pay-item-row tibia-pay-item-row-price">
-                                <span class="tibia-pay-label">Valor unitario</span>
-                                <span class="tibia-pay-value tibia-pay-value-price">@FormatOfferPrice(GetUnitPriceAmount())</span>
-                            </div>
-                            <div class="tibia-pay-item-row tibia-pay-item-row-price tibia-pay-item-row-total">
-                                <span class="tibia-pay-label">Valor total</span>
-                                <span class="tibia-pay-value tibia-pay-value-price tibia-pay-value-total">@FormatOfferPrice(Amount)</span>
-                            </div>
-                        </div>
+                <PaymentProductSummary
+                    Product="@product"
+                    SellerUser="@sellerUser"
+                    SelectedQuantity="@selectedPurchaseQuantity"
+                    UnitPrice="@GetUnitPriceAmount()"
+                    TotalAmount="@Amount"
+                    Currency="@offerCurrency"
+                    BtcUsdRate="@btcUsdRate"
+                    BtcBrlRate="@btcBrlRate" />
 
-                        <div class="tibia-pay-seller-highlight">
-                            <div class="tibia-pay-seller-inline">
-                                <span class="tibia-pay-label">@T["Common.Seller"]:</span>
-                                <span class="tibia-pay-seller-link-wrap">
-                                    @if (sellerUser != null)
-                                    {
-                                        <a class="evidence-link" href="@BuildSellerProfileUrl(sellerUser.Id)">@sellerUser.UserName</a>
-                                    }
-                                </span>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-                    </section>
-
-                    <section class="tibia-pay-card tibia-pay-card-checkout">
-                <div class="tibia-pay-card-head">
-                    <h2>@T["PaymentBuy.GeneratePayment"]</h2>
-                </div>
-                <div class="tibia-pay-card-body">
-                @if (!ActiveGateways.Any())
-                {
-                    <div class="no-gateways">
-                        <b>@T["PaymentBuy.NoMethod"]</b>
-                        <div class="no-gateways-hint">
-                            @T["PaymentBuy.NoMethodHint"]
-                        </div>
-                    </div>
-                }
-                else if (string.IsNullOrEmpty(Address))
-                {
-                    <div class="tibia-pay-form-grid">
-                        <div class="tibia-pay-switch-block">
-                            <label class="tibia-pay-switch" for="use-intermediary">
-                                <input id="use-intermediary" type="checkbox" @bind="UseSiteIntermediary" @bind:after="OnUseSiteIntermediaryChangedAsync" />
-                                <span class="tibia-pay-switch-lever" aria-hidden="true"></span>
-                                <span class="tibia-pay-switch-text">
-                                    @(UseSiteIntermediary
-                                        ? "Com intermedio do ADM do site"
-                                        : "Sem intermedio do ADM do site")
-                                </span>
-                            </label>
-                        </div>
-                        @if (!UseSiteIntermediary)
-                        {
-                            <div class="tibia-pay-no-intermediary-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Sem intermediação, o pagamento vai diretamente ao vendedor. Só prossiga se você <strong>confia totalmente no vendedor</strong>. O site não poderá mediar disputas nesta transação.</span>
-                            </div>
-                        }
-
-                        <div class="tibia-pay-field">
-                            <label class="tibia-pay-label" for="payment-method">Forma de pagamento:</label>
-                            <select id="payment-method" class="tibia-pay-select" @bind="SelectedMethod" @bind:after="OnSelectedMethodChangedAsync" aria-label="@T["PaymentBuy.SelectGateway"]">
-                                @foreach (var gateway in ActiveGateways)
-                                {
-                                    <option value="@gateway.Name">@gateway.Name</option>
-                                }
-                            </select>
-                        </div>
-
-                        @if (!string.IsNullOrWhiteSpace(pixCurrencyNotice))
-                        {
-                            <div class="payment-inline-feedback payment-inline-feedback-warning" role="status" aria-live="polite">
-                                @pixCurrencyNotice
-                            </div>
-                        }
-
-                        @if (!string.IsNullOrWhiteSpace(pixSellerKeyNotice))
-                        {
-                            <div class="payment-inline-feedback payment-inline-feedback-warning" role="status" aria-live="polite">
-                                @pixSellerKeyNotice
-                            </div>
-                        }
-
-                        <div class="tibia-pay-action-wrap">
-                            <button class="tibia-pay-btn" @onclick="GenerateAddress" aria-label="@T["PaymentBuy.GenerateAddress"]">
-                                @T["PaymentBuy.GenerateAddress"]
-                            </button>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="tibia-pay-status-block">
-                        <div class="tibia-pay-label">@(IsPixCurrentPayment ? T["PaymentBuy.PixCodeLabel"] : T["PaymentBuy.InvoiceAddress"])</div>
-                        <div class="tibia-pay-address-wrap">
-                            <div class="tibia-pay-address">@Address</div>
-                            <button class="tibia-pay-copy-btn" @onclick="CopyAddress" title="Copiar" aria-label="Copiar codigo">
-                                <i class="@copyIcon"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="tibia-pay-qrcode">
-                        <QRCode Value="@QRCodeValue" />
-                    </div>
-
-                    <div class="tibia-pay-status-block tibia-pay-status-main">
-                        <div class="tibia-pay-label">@T["Common.Status"]</div>
-                        <div class="tibia-pay-status-row">
-                        @if (IsPaid)
-                        {
-                            <span class="tibia-pay-pill tibia-pay-pill-ok">@T["PaymentBuy.PaidReceived"]</span>
-                        }
-                        else
-                        {
-                            <div class="tibia-pay-waiting-message" role="status" aria-live="polite">
-                                <span class="tibia-pay-waiting-title">@(IsPixCurrentPayment && !AbacatePayOpts.Value.IsEnabled ? "Aguardando confirmacao manual do pagamento PIX." : T["PaymentBuy.Waiting"])</span>
-                            </div>
-                            @if (!IsPixCurrentPayment || AbacatePayOpts.Value.IsEnabled)
-                            {
-                                <button type="button" class="tibia-pay-btn" @onclick="OnCheckPaymentClick" aria-label="@T["PaymentBuy.Check"]">
-                                    @T["PaymentBuy.Check"]
-                                </button>
-                            }
-                        }
-                        </div>
-                    </div>
-
-                    @if (!string.IsNullOrWhiteSpace(feedbackMessage))
-                    {
-                        <div class="payment-inline-feedback payment-inline-feedback-@feedbackType" role="status" aria-live="polite">
-                            @feedbackMessage
-                        </div>
-                    }
-
-                    @if (SelectedMethod == "Testnet" && !string.IsNullOrEmpty(paymentRecord?.PrivateKey))
-                    {
-                        <div class="tibia-pay-private-key">
-                            <div class="tibia-pay-label">
-                                <i class="fas fa-key"></i>
-                                @T["PaymentBuy.PrivateKey"]
-                            </div>
-                            <div class="tibia-pay-private-key-value">
-                                <code>@paymentRecord.PrivateKey</code>
-                            </div>
-                            <div class="no-gateways-hint">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                @T["PaymentBuy.PrivateKeyWarning"]
-                            </div>
-                        </div>
-                    }
-                }
-                </div>
-                    </section>
+                <PaymentCheckoutPanel
+                    Address="@Address"
+                    IsPaid="@IsPaid"
+                    ActiveGateways="@ActiveGateways"
+                    SelectedMethod="@SelectedMethod"
+                    UseSiteIntermediary="@UseSiteIntermediary"
+                    QRCodeValue="@QRCodeValue"
+                    PixCurrencyNotice="@pixCurrencyNotice"
+                    PixSellerKeyNotice="@pixSellerKeyNotice"
+                    FeedbackMessage="@feedbackMessage"
+                    FeedbackType="@feedbackType"
+                    IsLoading="@isLoading"
+                    IsPixCurrentPayment="@IsPixCurrentPayment"
+                    CopyIcon="@copyIcon"
+                    AbacatePayIsEnabled="@AbacatePayOpts.Value.IsEnabled"
+                    ShowPrivateKey="@ShowPrivateKeyValue"
+                    PrivateKey="@paymentRecord?.PrivateKey"
+                    OnGeneratePayment="@GenerateAddressCallback"
+                    OnCheckPayment="@CheckPaymentCallback"
+                    OnMethodChanged="@MethodChangedCallback"
+                    OnIntermediaryChanged="@IntermediaryChangedCallback"
+                    OnCopyAddress="@CopyAddressCallback" />
                 </div>
             }
 
@@ -245,6 +96,7 @@
     public decimal Amount { get; set; } = 0.000001m;
     public bool IsPaid { get; set; } = false;
     public string SelectedMethod { get; set; } = "";
+    private bool ShowPrivateKeyValue => SelectedMethod == "Testnet";
     [CascadingParameter] public Toast? ToastRef { get; set; }
     private const decimal MinBtcAmount = 0.000003m;
     private bool isLoading = false;
@@ -345,7 +197,6 @@
         InvokeAsync(async () =>
         {
             await CheckPayment();
-            StateHasChanged();
         });
     }
 
@@ -363,6 +214,24 @@
         
         _copyCts?.Dispose();
     }
+
+    private async Task GenerateAddressCallback()
+        => await GenerateAddress();
+
+    private async Task CheckPaymentCallback()
+        => await OnCheckPaymentClick();
+
+    private async Task MethodChangedCallback(string method)
+    {
+        SelectedMethod = method;
+        await OnSelectedMethodChangedAsync(true);
+    }
+
+    private async Task IntermediaryChangedCallback()
+        => await OnUseSiteIntermediaryChangedAsync();
+
+    private async Task CopyAddressCallback()
+        => await CopyAddress();
 
     private async Task GenerateAddress()
     {
@@ -584,7 +453,6 @@
                 if (!ct.IsCancellationRequested)
                 {
                     copyIcon = "fas fa-copy";
-                    StateHasChanged();
                 }
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -651,10 +519,10 @@
                 if (string.IsNullOrWhiteSpace(recipientPixKey))
                     return;
 
-                var merchantName = SanitizePixText(product?.User?.FullName ?? product?.User?.UserName ?? "OTSERV MARKET", 25);
-                var merchantCity = SanitizePixText("SAO PAULO", 15);
-                var txId = BuildPixTxId(ProductId);
-                Address = BuildPixPayload(recipientPixKey, Amount, merchantName, merchantCity, txId);
+                var merchantName = PixPayloadBuilder.SanitizePixText(product?.User?.FullName ?? product?.User?.UserName ?? "OTSERV MARKET", 25);
+                var merchantCity = PixPayloadBuilder.SanitizePixText("SAO PAULO", 15);
+                var txId = PixPayloadBuilder.BuildPixTxId(ProductId);
+                Address = PixPayloadBuilder.BuildPixPayload(recipientPixKey, Amount, merchantName, merchantCity, txId);
                 PaymentId = $"pix-{Guid.NewGuid():N}";
             }
 
@@ -745,88 +613,7 @@
     }
 
     private Task<bool> ValidateOfferBeforePaymentAsync() => Task.FromResult(true);
-
-    private static string BuildPixPayload(string pixKey, decimal amount, string merchantName, string merchantCity, string txId)
-    {
-        var merchantAccountInfo =
-            Tlv("00", "br.gov.bcb.pix") +
-            Tlv("01", pixKey);
-
-        var additionalDataField = Tlv("05", txId);
-
-        var payload =
-            Tlv("00", "01") +
-            Tlv("01", "12") +
-            Tlv("26", merchantAccountInfo) +
-            Tlv("52", "0000") +
-            Tlv("53", "986") +
-            (amount > 0m ? Tlv("54", amount.ToString("0.00", CultureInfo.InvariantCulture)) : string.Empty) +
-            Tlv("58", "BR") +
-            Tlv("59", merchantName) +
-            Tlv("60", merchantCity) +
-            Tlv("62", additionalDataField) +
-            "6304";
-
-        var crc = ComputeCrc16(payload);
-        return payload + crc;
-    }
-
-    private static string BuildPixTxId(int productId)
-    {
-        var raw = $"OTS{productId}{DateTime.UtcNow:ddHHmmss}";
-        return raw.Length > 25 ? raw[..25] : raw;
-    }
-
-    private static string Tlv(string id, string value)
-    {
-        return $"{id}{value.Length:D2}{value}";
-    }
-
-    private static string ComputeCrc16(string payload)
-    {
-        ushort crc = 0xFFFF;
-        var bytes = Encoding.ASCII.GetBytes(payload);
-
-        foreach (var b in bytes)
-        {
-            crc ^= (ushort)(b << 8);
-
-            for (var i = 0; i < 8; i++)
-            {
-                crc = (crc & 0x8000) != 0
-                    ? (ushort)((crc << 1) ^ 0x1021)
-                    : (ushort)(crc << 1);
-            }
-        }
-
-        return crc.ToString("X4");
-    }
-
-    private static string SanitizePixText(string input, int maxLength)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-        {
-            return string.Empty;
-        }
-
-        var normalized = input.Normalize(NormalizationForm.FormD);
-        var noDiacritics = new string(normalized
-            .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-            .ToArray());
-
-        var asciiUpper = noDiacritics.ToUpperInvariant();
-        var allowed = new string(asciiUpper
-            .Where(c => char.IsLetterOrDigit(c) || c == ' ')
-            .ToArray());
-
-        var compact = string.Join(" ", allowed.Split(' ', StringSplitOptions.RemoveEmptyEntries));
-        if (compact.Length <= maxLength)
-        {
-            return compact;
-        }
-
-        return compact[..maxLength];
-    }
 }
+
 
 

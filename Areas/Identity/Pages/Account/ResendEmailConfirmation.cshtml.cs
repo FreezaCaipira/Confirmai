@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 using Confirmai.Models;
@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Core;
 
 namespace Confirmai.Areas.Identity.Pages.Account
 {

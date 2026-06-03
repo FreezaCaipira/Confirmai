@@ -1,0 +1,154 @@
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+
+<div class="esc-teams">
+    <div class="esc-team esc-team--a">
+        @if (!IsPastEvent && IsAdmin)
+        {
+            <input class="esc-team-name-input esc-team-name-input--a"
+                   @bind="TeamAName" @bind:event="oninput"
+                   @onblur="HandleSaveTeamNames"
+                   maxlength="50" placeholder="Time A" />
+        }
+        else
+        {
+            <h2 class="esc-team-title">🟡 @TeamAName @(IsPastEvent && Event.ScoreTeamA > Event.ScoreTeamB ? "🏆" : "")</h2>
+        }
+        <ul class="esc-player-list">
+            @foreach (var c in ConfirmationsA.Where(c => c.Position == FutsalPosition.Goalkeeper))
+            {
+                <li class="esc-player esc-player--gk @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
+                    <span class="esc-player-icon">🥅</span>
+                    <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
+                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
+                </li>
+            }
+            @{ int numA = 1; }
+            @foreach (var c in ConfirmationsA.Where(c => c.Position != FutsalPosition.Goalkeeper))
+            {
+                <li class="esc-player @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
+                    <span class="esc-player-num">@(numA++)</span>
+                    <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
+                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="esc-team esc-team--b">
+        @if (!IsPastEvent && IsAdmin)
+        {
+            <input class="esc-team-name-input esc-team-name-input--b"
+                   @bind="TeamBName" @bind:event="oninput"
+                   @onblur="HandleSaveTeamNames"
+                   maxlength="50" placeholder="Time B" />
+        }
+        else
+        {
+            <h2 class="esc-team-title">🔵 @TeamBName @(IsPastEvent && Event.ScoreTeamB > Event.ScoreTeamA ? "🏆" : "")</h2>
+        }
+        <ul class="esc-player-list">
+            @foreach (var c in ConfirmationsB.Where(c => c.Position == FutsalPosition.Goalkeeper))
+            {
+                <li class="esc-player esc-player--gk @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
+                    <span class="esc-player-icon">🥅</span>
+                    <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
+                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
+                </li>
+            }
+            @{ int numB = 1; }
+            @foreach (var c in ConfirmationsB.Where(c => c.Position != FutsalPosition.Goalkeeper))
+            {
+                <li class="esc-player @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
+                    <span class="esc-player-num">@(numB++)</span>
+                    <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
+                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@if (ConfirmationsReserva.Any())
+{
+    <div class="esc-reserva">
+        <h3 class="esc-reserva-title">🔄 Reserva</h3>
+        <ul class="esc-player-list">
+            @foreach (var c in ConfirmationsReserva)
+            {
+                <li class="esc-player">
+                    <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public required Event Event { get; set; }
+
+    [Parameter]
+    public required bool IsPastEvent { get; set; }
+
+    [Parameter]
+    public required bool IsAdmin { get; set; }
+
+    [Parameter]
+    public string TeamAName { get; set; } = "Time A";
+
+    [Parameter]
+    public string TeamBName { get; set; } = "Time B";
+
+    [Parameter]
+    public EventCallback<(string TeamA, string TeamB)> OnTeamNamesChanged { get; set; }
+
+    [Parameter]
+    public required List<PostMatchVote> AllVotes { get; set; }
+
+    public List<EventConfirmation> ConfirmationsA => Event.Confirmations
+        .Where(c => c.TeamId == 0)
+        .OrderBy(c => c.Position)
+        .ThenBy(c => c.ConfirmedAt)
+        .ToList();
+
+    public List<EventConfirmation> ConfirmationsB => Event.Confirmations
+        .Where(c => c.TeamId == 1)
+        .OrderBy(c => c.Position)
+        .ThenBy(c => c.ConfirmedAt)
+        .ToList();
+
+    public List<EventConfirmation> ConfirmationsReserva => Event.Confirmations
+        .Where(c => c.TeamId == null)
+        .OrderBy(c => c.ConfirmedAt)
+        .ToList();
+
+    public string? MvpUserId
+    {
+        get
+        {
+            var mvpGroup = AllVotes.GroupBy(v => v.VotedForUserId)
+                .OrderByDescending(g => g.Count())
+                .FirstOrDefault();
+            return mvpGroup?.Key;
+        }
+    }
+
+    public bool MvpRevealed
+    {
+        get
+        {
+            if (!IsPastEvent || MvpUserId is null)
+                return false;
+
+            int mvpTotalVoters = Event.Confirmations.Count(c => c.TeamId == 0 || c.TeamId == 1);
+            return AllVotes.Count >= Math.Max(1, (int)Math.Ceiling(mvpTotalVoters * 0.5));
+        }
+    }
+
+    private async Task HandleSaveTeamNames()
+    {
+        await OnTeamNamesChanged.InvokeAsync((TeamAName, TeamBName));
+    }
+}

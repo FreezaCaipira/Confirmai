@@ -1,15 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Confirmai.Models;
 
 namespace Confirmai.Tests;
 
 /// <summary>
 /// Verifies DataAnnotation constraints declared on domain models using the standard
-/// Validator API — the same path EF Core and ASP.NET model binding use.
+/// Validator API � the same path EF Core and ASP.NET model binding use.
 /// </summary>
 public class ModelValidationTests
 {
-    // ─── helpers ─────────────────────────────────────────────────────────────
+    // --- helpers -------------------------------------------------------------
 
     private static IList<ValidationResult> Validate(object model)
     {
@@ -24,7 +24,7 @@ public class ModelValidationTests
     private static bool HasError(object model, string memberName) =>
         Validate(model).Any(r => r.MemberNames.Contains(memberName));
 
-    // ─── UserMailboxMessage ───────────────────────────────────────────────────
+    // --- UserMailboxMessage ---------------------------------------------------
 
     [Fact]
     public void UserMailboxMessage_Valid_WhenRequiredFieldsPresent()
@@ -120,11 +120,11 @@ public class ModelValidationTests
         Assert.True(HasError(msg, nameof(UserMailboxMessage.Subject)));
     }
 
-    // ─── Venue ────────────────────────────────────────────────────────────────
+    // --- Venue ----------------------------------------------------------------
 
     private static Venue ValidVenue() => new()
     {
-        Name      = "Arena do Zé",
+        Name      = "Arena do Z�",
         Address   = "Rua das Flores, 123",
         City      = "Pouso Alegre",
         StateCode = "MG",
@@ -184,7 +184,7 @@ public class ModelValidationTests
         Assert.True(IsValid(v));
     }
 
-    // ─── Event ────────────────────────────────────────────────────────────────
+    // --- Event ----------------------------------------------------------------
 
     [Fact]
     public void Event_Invalid_WhenLocationIsEmpty()
@@ -203,11 +203,11 @@ public class ModelValidationTests
     [Fact]
     public void Event_Valid_WhenLocationIsWithinLimit()
     {
-        var ev = new Event { Location = "Rua A, 10 — Bairro", MaxPlayers = 10, GroupId = 1 };
+        var ev = new Event { Location = "Rua A, 10 � Bairro", MaxPlayers = 10, GroupId = 1 };
         Assert.False(HasError(ev, nameof(Event.Location)));
     }
 
-    // ─── EventConfirmation (lineup fields) ────────────────────────────────────
+    // --- EventConfirmation (lineup fields) ------------------------------------
 
     private static EventConfirmation ValidConfirmation() => new()
     {

@@ -100,7 +100,7 @@
                         ? GetDefaultBackgroundStyle(g.Sport)
                         : $"background-image: url('{g.LogoPath}'); background-size: cover; background-position: center;";
                     var hasCustomLogo = !string.IsNullOrWhiteSpace(g.LogoPath);
-                    <a class="group-card @(hasPending || needsPix ? "group-card--action-required" : "") @(hasCustomLogo ? "" : "group-card--default-bg")" href="/grupo/@g.Id" style="@backgroundStyle">
+                    <a class="group-card @(hasPending || needsPix ? "group-card--action-required" : "") @(hasCustomLogo ? "" : "group-card--default-bg")" href="/grupo/@g.Id" style="@backgroundStyle" data-test-is-admin="@isAdmin.ToString()"  data-test-pending-count="@pendingCount">
                         <div class="group-card-overlay"></div>
                         @if (!hasCustomLogo)
                         {
@@ -220,15 +220,35 @@
         isLoading = true;
         await using var db = await DbFactory.CreateDbContextAsync();
 
+        // First: get group IDs
+        var userGroupIds = await db.GroupMembers
+            .Where(m => m.UserId == currentUserId)
+            .Select(m => m.GroupId)
+            .Distinct()
+            .ToListAsync();
+
+        if (!userGroupIds.Any())
+        {
+            groups = new List<Group>();
+            isLoading = false;
+            return;
+        }
+
+        // Second: load groups by ID - separate Groups from Events first
         groups = await db.Groups
-            .Where(g => g.Members.Any(m => m.UserId == currentUserId))
-            .Include(g => g.Members)
-                .ThenInclude(m => m.User)
-            .Include(g => g.Events.Where(e => e.IsActive && e.StartsAt > DateTime.UtcNow))
+            .Where(g => userGroupIds.Contains(g.Id))
             .OrderByDescending(g => g.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin))
             .ThenBy(g => g.Name)
-            .AsSplitQuery()
             .ToListAsync();
+
+        // Third: explicitly load Members for each group
+        foreach (var group in groups)
+        {
+            // Force load Members
+            await db.Entry(group).Collection(g => g.Members).LoadAsync();
+            // Force load Events
+            await db.Entry(group).Collection(g => g.Events).LoadAsync();
+        }
 
         var adminGroupIds = groups
             .Where(IsCurrentUserAdmin)

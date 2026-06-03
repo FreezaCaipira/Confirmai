@@ -1,0 +1,107 @@
+@using Confirmai.Models
+
+<section class="tibia-pay-card tibia-pay-card-product">
+    <div class="tibia-pay-card-head">
+        <h2>Resumo da oferta</h2>
+    </div>
+    <div class="tibia-pay-card-body">
+        <article class="tibia-pay-item-card">
+            <div class="tibia-pay-item-subcard" role="group" aria-label="Resumo do item">
+                <div class="tibia-pay-item-media">
+                    <div class="tibia-pay-product-image">
+                        @if (Product != null && !string.IsNullOrEmpty(Product.ImagePath))
+                        {
+                            <img src="@Product.ImagePath" alt="Product image" />
+                        }
+                    </div>
+                </div>
+                @if (Product != null)
+                {
+                    <div class="tibia-pay-item-row">
+                        <span class="tibia-pay-label">Item</span>
+                        <span class="tibia-pay-value"><b>@Product.Name</b></span>
+                    </div>
+                    <div class="tibia-pay-item-row">
+                        <span class="tibia-pay-label">Nome</span>
+                        <span class="tibia-pay-value">@Product.Name</span>
+                    </div>
+                    <div class="tibia-pay-item-row">
+                        <span class="tibia-pay-label">Quantidade</span>
+                        <span class="tibia-pay-value"><b>@SelectedQuantity</b></span>
+                    </div>
+                    <div class="tibia-pay-item-row tibia-pay-item-row-price">
+                        <span class="tibia-pay-label">Valor unitario</span>
+                        <span class="tibia-pay-value tibia-pay-value-price">@FormatOfferPrice(GetUnitPriceAmount())</span>
+                    </div>
+                    <div class="tibia-pay-item-row tibia-pay-item-row-price tibia-pay-item-row-total">
+                        <span class="tibia-pay-label">Valor total</span>
+                        <span class="tibia-pay-value tibia-pay-value-price tibia-pay-value-total">@FormatOfferPrice(TotalAmount)</span>
+                    </div>
+                }
+            </div>
+
+            <div class="tibia-pay-seller-highlight">
+                <div class="tibia-pay-seller-inline">
+                    <span class="tibia-pay-label">Common.Seller:</span>
+                    <span class="tibia-pay-seller-link-wrap">
+                        @if (SellerUser != null)
+                        {
+                            <a class="evidence-link" href="@BuildSellerProfileUrl(SellerUser.Id)">@SellerUser.UserName</a>
+                        }
+                    </span>
+                </div>
+            </div>
+        </article>
+    </div>
+</section>
+
+@inject NavigationManager NavigationManager
+
+@code {
+    [Parameter]
+    public Product? Product { get; set; }
+
+    [Parameter]
+    public ApplicationUser? SellerUser { get; set; }
+
+    [Parameter]
+    public int SelectedQuantity { get; set; } = 1;
+
+    [Parameter]
+    public decimal UnitPrice { get; set; }
+
+    [Parameter]
+    public decimal TotalAmount { get; set; }
+
+    [Parameter]
+    public string Currency { get; set; } = "BTC";
+
+    [Parameter]
+    public decimal? BtcUsdRate { get; set; }
+
+    [Parameter]
+    public decimal? BtcBrlRate { get; set; }
+
+    private string FormatOfferPrice(decimal amount)
+    {
+        return Currency switch
+        {
+            "BRL" => $"R$ {amount:N2}",
+            "USD" => $"$ {amount:N2}",
+            _ => BtcUsdFormatter.Format(amount, BtcUsdRate, BtcBrlRate, "BRL")
+        };
+    }
+
+    private decimal GetUnitPriceAmount()
+    {
+        return UnitPrice > 0 ? UnitPrice : Product?.Price ?? 0m;
+    }
+
+    private string BuildSellerProfileUrl(string sellerUserId)
+    {
+        var safeUserId = Uri.EscapeDataString(sellerUserId ?? string.Empty);
+        var currentRelativePath = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        var profileUrl = $"/profile/{safeUserId}?returnUrl={Uri.EscapeDataString(currentRelativePath)}";
+        return profileUrl;
+    }
+}

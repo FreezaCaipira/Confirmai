@@ -1,0 +1,193 @@
+@using System.Collections.Generic
+
+<section class="admin-payments-summary-card" aria-label="Payment reconciliation dashboard">
+    <div class="admin-payments-summary-grid">
+        <div class="admin-payments-summary-item">
+            <span class="admin-payments-summary-label">Pending with chargeId</span>
+            <strong class="admin-payments-summary-value">@PendingWithChargeId</strong>
+        </div>
+        <div class="admin-payments-summary-item">
+            <span class="admin-payments-summary-label">Pending without chargeId</span>
+            <strong class="admin-payments-summary-value">@PendingWithoutChargeId</strong>
+        </div>
+        <div class="admin-payments-summary-item">
+            <span class="admin-payments-summary-label">Stale pending (+30 min)</span>
+            <strong class="admin-payments-summary-value">@StalePending</strong>
+        </div>
+        <div class="admin-payments-summary-item">
+            <span class="admin-payments-summary-label">Confirmations paid today</span>
+            <strong class="admin-payments-summary-value">@PaidToday</strong>
+        </div>
+    </div>
+    <div class="admin-payments-summary-actions">
+        <button type="button" class="details-btn" disabled="@IsRunningSweep" @onclick="OnRunSweep">
+            @(IsRunningSweep ? "Checking pending..." : "Revalidate pending now")
+        </button>
+        <button type="button" class="details-btn" disabled="@IsRefreshing" @onclick="OnRefreshSummary">
+            @(IsRefreshing ? "Updating..." : "Refresh dashboard")
+        </button>
+        <button type="button" class="details-btn" @onclick="OnExportCsv">
+            Export reconciliation CSV
+        </button>
+        <button type="button" class="details-btn" @onclick="OnOpenAdvancedTools">
+            Advanced tools
+        </button>
+        <label class="admin-payments-auto-refresh-toggle">
+            <input type="checkbox" @bind="AutoRefreshEnabled" />
+            Auto refresh (30s)
+        </label>
+        @if (IsAutoRefreshPaused)
+        {
+            <span class="admin-payments-auto-refresh-pill admin-payments-auto-refresh-pill--paused">Auto refresh paused (tab in background)</span>
+        }
+        <span class="admin-payments-summary-hint">Uses the same routine as automatic worker.</span>
+        <span class="admin-payments-severity-pill @SeverityClass">Severity: @SeverityLabel</span>
+    </div>
+    <div class="admin-payments-summary-meta">
+        <span>Last dashboard update: @LastRefreshLabel</span>
+        <span class="@LastRefreshAgeClass">
+            Not updated for: @LastRefreshAgeLabel
+            <span class="admin-payments-summary-age-hint" title="Alert when exceeding 2 auto-refresh cycles (60s)." aria-label="Staleness alert explanation">i</span>
+        </span>
+        <span>Last pause by background tab: @LastAutoRefreshPauseLabel</span>
+        <span>Last automatic sweep: @LastAutomaticSweepLabel</span>
+        @if (!string.IsNullOrWhiteSpace(LastAutomaticSweepDetails))
+        {
+            <span>Last sweep summary: @LastAutomaticSweepDetails</span>
+        }
+        <span>Last manual sweep: @LastManualSweepLabel</span>
+        @if (!string.IsNullOrWhiteSpace(LastManualSweepDetails))
+        {
+            <span>Last manual sweep summary: @LastManualSweepDetails</span>
+        }
+        <span class="admin-payments-trend @(IsPendingTrendWarning ? "admin-payments-trend--warning" : "")">24h trend (pending in sweep): @PendingTrend24hLabel</span>
+        <a class="admin-payments-summary-link" href="@StalenessLogsHref">View staleness incidents in log</a>
+        <span>Pending by gateway: @PendingByGatewayLabel</span>
+        <span>Paid by gateway (total): @PaidByGatewayLabel</span>
+    </div>
+
+    @if (GatewayTelemetry?.Count > 0)
+    {
+        <div class="admin-payments-gateway-telemetry">
+            <span class="admin-payments-gateway-telemetry-title">Gateway telemetry (reconciliation)</span>
+            <table class="admin-payments-gateway-telemetry-table">
+                <thead>
+                    <tr>
+                        <th>Gateway</th>
+                        <th>Pending</th>
+                        <th>Stale pending</th>
+                        <th>Paid (total)</th>
+                        <th>Pending share</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in GatewayTelemetry!)
+                    {
+                        <tr>
+                            <td>@item.Gateway</td>
+                            <td>@item.Pending</td>
+                            <td>@item.StalePending</td>
+                            <td>@item.PaidTotal</td>
+                            <td>@item.PendingShareLabel</td>
+                            <td>
+                                <span class="admin-payments-gateway-severity @item.SeverityClass">@item.SeverityLabel</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (SweepHistory?.Count > 0)
+    {
+        <div class="admin-payments-sweep-history">
+            <span class="admin-payments-sweep-history-title">Last 5 automatic sweeps</span>
+            <div class="admin-payments-sparkline" role="img" aria-label="Trend of pending items in recent sweeps">
+                @foreach (var point in SweepHistory!.AsEnumerable().Reverse())
+                {
+                    var pointHeight = GetPendingHeightPercent(point);
+                    <div class="admin-payments-sparkline-point" style="height:@($"{pointHeight}%")" title="@($"{point.TimestampLabel}: {point.StillPending} pending")"></div>
+                }
+            </div>
+            <ul>
+                @foreach (var item in SweepHistory!)
+                {
+                    <li>@item.TimestampLabel - Considered=@item.Considered, Updated=@item.Updated, Pending=@item.StillPending, Not found=@item.NotFound</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(SweepResultMessage))
+    {
+        <div class="orders-review-restored-notice admin-payments-reconcile-result @(SweepResultIsError ? "admin-payments-reconcile-result--error" : "admin-payments-reconcile-result--ok")">
+            <span>@SweepResultMessage</span>
+            <button type="button" class="orders-review-restored-close" @onclick="OnDismissSweepMessage" aria-label="Close">&times;—</button>
+        </div>
+    }
+</section>
+
+@code {
+    // Summary metrics
+    [Parameter] public int PendingWithChargeId { get; set; }
+    [Parameter] public int PendingWithoutChargeId { get; set; }
+    [Parameter] public int StalePending { get; set; }
+    [Parameter] public int PaidToday { get; set; }
+
+    // UI state
+    [Parameter] public bool IsRunningSweep { get; set; }
+    [Parameter] public bool IsRefreshing { get; set; }
+    [Parameter] public bool AutoRefreshEnabled { get; set; }
+    [Parameter] public bool IsAutoRefreshPaused { get; set; }
+
+    // Severity & trends
+    [Parameter] public string SeverityLabel { get; set; } = "OK";
+    [Parameter] public string SeverityClass { get; set; } = "admin-payments-severity-pill--ok";
+    [Parameter] public string PendingTrend24hLabel { get; set; }
+    [Parameter] public bool IsPendingTrendWarning { get; set; }
+    [Parameter] public string PendingByGatewayLabel { get; set; }
+    [Parameter] public string PaidByGatewayLabel { get; set; }
+
+    // Timestamps
+    [Parameter] public string LastRefreshLabel { get; set; } = "Not yet updated.";
+    [Parameter] public string LastRefreshAgeLabel { get; set; } = "n/d";
+    [Parameter] public string LastRefreshAgeClass { get; set; } = string.Empty;
+    [Parameter] public string LastAutoRefreshPauseLabel { get; set; } = "No pauses recorded.";
+    [Parameter] public string LastAutomaticSweepLabel { get; set; } = "No automatic sweep recorded.";
+    [Parameter] public string LastAutomaticSweepDetails { get; set; } = string.Empty;
+    [Parameter] public string LastManualSweepLabel { get; set; } = "No manual sweep recorded.";
+    [Parameter] public string LastManualSweepDetails { get; set; } = string.Empty;
+
+    // Collections (simplified for component interface)
+    [Parameter] public List<dynamic>? GatewayTelemetry { get; set; }
+    [Parameter] public List<dynamic>? SweepHistory { get; set; }
+
+    // Result messages
+    [Parameter] public string SweepResultMessage { get; set; } = string.Empty;
+    [Parameter] public bool SweepResultIsError { get; set; }
+    [Parameter] public string StalenessLogsHref { get; set; } = "/admin/logs";
+
+    // Callbacks
+    [Parameter] public EventCallback OnRunSweep { get; set; }
+    [Parameter] public EventCallback OnRefreshSummary { get; set; }
+    [Parameter] public EventCallback OnExportCsv { get; set; }
+    [Parameter] public EventCallback OnOpenAdvancedTools { get; set; }
+    [Parameter] public EventCallback OnDismissSweepMessage { get; set; }
+
+    private int GetPendingHeightPercent(dynamic item)
+    {
+        try
+        {
+            int stillPending = item.StillPending;
+            int max = 50;
+            var height = Math.Max(12m, ((decimal)stillPending / max) * 100m);
+            return (int)Math.Round(height, 0, MidpointRounding.AwayFromZero);
+        }
+        catch
+        {
+            return 25;
+        }
+    }
+}

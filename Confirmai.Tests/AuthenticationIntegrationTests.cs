@@ -1,8 +1,14 @@
-﻿using System.Net;
+using Confirmai.Services.Admin;
+using System.Net;
 using System.Text.RegularExpressions;
 using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

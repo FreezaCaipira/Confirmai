@@ -1,12 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Confirmai.Services.Core;
+using Microsoft.EntityFrameworkCore;
 using Confirmai.Data;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Utility;
 
 namespace Confirmai.Tests;
 
 public class PiiSanitizerTests
 {
-    // ─── MaskEmail (single value) ─────────────────────────────────────────────
+    // --- MaskEmail (single value) ---------------------------------------------
 
     [Theory]
     [InlineData("john@example.com",          "j***@example.com")]
@@ -30,7 +36,7 @@ public class PiiSanitizerTests
         Assert.Equal(input, result);
     }
 
-    // ─── MaskEmailsInJson ─────────────────────────────────────────────────────
+    // --- MaskEmailsInJson -----------------------------------------------------
 
     [Fact]
     public void MaskEmailsInJson_ReturnsNull_WhenInputIsNull()
@@ -120,7 +126,7 @@ public class PiiSanitizerTests
         Assert.Equal(json, result);
     }
 
-    // ─── Integration: LogService masks emails in AuditAsync metadata ──────────
+    // --- Integration: LogService masks emails in AuditAsync metadata ----------
 
     private static AppDbContext CreateDbContext()
     {

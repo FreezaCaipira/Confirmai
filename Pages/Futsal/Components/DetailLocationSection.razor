@@ -1,0 +1,76 @@
+@using Confirmai.Models
+@using Microsoft.Extensions.Configuration
+
+<hr class="detail-divider">
+<section class="detail-section">
+    <h2 class="detail-section-title">
+        <i class="fas fa-map-marker-alt"></i> Localização
+    </h2>
+
+    @* Placeholder — always rendered, visible by default *@
+    <a id="@MapFallbackId" class="detail-map-placeholder" href="@MapsSearchUrl" target="_blank" rel="noopener noreferrer">
+        <i class="fas fa-map-marker-alt"></i>
+        <div>
+            <span class="detail-map-placeholder-name">@(Event.Venue?.Name ?? MapAddress)</span>
+            @if (Event.Venue is not null)
+            {
+                <span class="detail-map-placeholder-addr">@Event.Venue.Address · @Event.Venue.City/@Event.Venue.StateCode</span>
+            }
+        </div>
+        <i class="fas fa-external-link-alt detail-map-placeholder-ext"></i>
+    </a>
+
+    @* Iframe — hidden initially; JS shows it only when Google responds *@
+    @if (HasMapsKey)
+    {
+        <div id="@MapWrapId" class="detail-map-wrap" style="display:none">
+            <iframe
+                class="detail-map"
+                src="@EmbedUrl"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+                title="Localização da quadra">
+            </iframe>
+        </div>
+    }
+
+    <a class="detail-map-link"
+       href="@MapsSearchUrl"
+       target="_blank"
+       rel="noopener noreferrer">
+        <i class="fas fa-external-link-alt"></i> Abrir no Google Maps
+    </a>
+</section>
+<hr class="detail-divider">
+
+@code {
+    [Parameter]
+    public Event Event { get; set; } = null!;
+
+    [Parameter]
+    public string MapsApiKey { get; set; } = string.Empty;
+
+    private bool HasMapsKey => !string.IsNullOrWhiteSpace(MapsApiKey) && !MapsApiKey.Contains("SET_VIA");
+
+    private string MapAddress
+    {
+        get => Event.Venue is not null
+            ? $"{Event.Venue.Name}, {Event.Venue.City}, {Event.Venue.StateCode}, Brasil"
+            : Event.Location;
+    }
+
+    private string MapsSearchUrl
+    {
+        get => $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(MapAddress)}";
+    }
+
+    private string EmbedUrl
+    {
+        get => $"https://www.google.com/maps/embed/v1/place?key={MapsApiKey}&q={Uri.EscapeDataString(MapAddress)}&language=pt-BR";
+    }
+
+    private string MapWrapId => $"map-wrap-{Event.Id}";
+
+    private string MapFallbackId => $"map-fallback-{Event.Id}";
+}

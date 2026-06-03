@@ -1,6 +1,12 @@
-﻿using Confirmai.Data;
+using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -22,9 +28,9 @@ public class LogRetentionServiceTests : IClassFixture<IntegrationTestWebAppFacto
         _factory = factory;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
     // IP anonymization
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
 
     [Fact]
     public async Task RunAsync_AnonymizesIpAddress_ForLogsOlderThan30Days()
@@ -138,7 +144,7 @@ public class LogRetentionServiceTests : IClassFixture<IntegrationTestWebAppFacto
             await db.SaveChangesAsync();
         }
 
-        // Should not throw — filtering on IpAddress != null skips this entry
+        // Should not throw � filtering on IpAddress != null skips this entry
         await RunRetentionAsync();
 
         using var verifyScope = _factory.Services.CreateScope();
@@ -147,9 +153,9 @@ public class LogRetentionServiceTests : IClassFixture<IntegrationTestWebAppFacto
         Assert.Null(log.IpAddress); // was already null
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
     // Purge of operational logs (> 90 days, non-financial)
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
 
     [Fact]
     public async Task RunAsync_PurgesNonFinancialOperationalLog_OlderThan90Days()
@@ -232,9 +238,9 @@ public class LogRetentionServiceTests : IClassFixture<IntegrationTestWebAppFacto
         Assert.True(exists);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
     // Financial log protection
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
 
     [Theory]
     [InlineData("payment.confirmed")]
@@ -296,9 +302,9 @@ public class LogRetentionServiceTests : IClassFixture<IntegrationTestWebAppFacto
         Assert.True(exists);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
     // Edge cases
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
 
     [Fact]
     public async Task RunAsync_AnonymizesIpAndPurgesOldOperational_InSameCycle()
@@ -358,9 +364,9 @@ public class LogRetentionServiceTests : IClassFixture<IntegrationTestWebAppFacto
         Assert.True(financial);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
     // Helpers
-    // ─────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
 
     /// <summary>
     /// Invokes the internal <c>RunAsync</c> logic of <see cref="LogRetentionService"/>

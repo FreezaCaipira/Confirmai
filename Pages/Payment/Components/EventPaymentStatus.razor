@@ -1,0 +1,14 @@
+<div class="evpay-status evpay-status--paid">
+    <i class="fas fa-check-circle"></i>
+    <div>
+        <strong>Pagamento confirmado</strong>
+        <p>Sua participação está garantida. Boa partida!</p>
+    </div>
+</div>
+<a href="@BackUrl" class="evpay-action-btn evpay-action-btn--back">
+    <i class="fas fa-arrow-left"></i> Voltar para a partida
+</a>
+
+@code {
+    [Parameter] public string? BackUrl { get; set; }
+}

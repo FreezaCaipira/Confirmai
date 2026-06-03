@@ -1,0 +1,33 @@
+@using System.Globalization
+
+<div class="evpay-qr-section">
+    <div class="evpay-qr-image">
+        <QRCode Value="@BrCode" />
+    </div>
+
+    <div class="evpay-awaiting">
+        <span class="evpay-awaiting-dot"></span>
+        Aguardando pagamento…
+    </div>
+
+    <div class="evpay-brcode-wrap">
+        <span class="evpay-brcode-label">Pix Copia e Cola</span>
+        <p class="evpay-brcode">@BrCode</p>
+    </div>
+
+    <button class="evpay-action-btn evpay-action-btn--copy"
+            @onclick="HandleCopyBrCode">
+        <i class="@(Copied ? "fas fa-check" : "fas fa-copy")"></i>
+        @(Copied ? "Copiado!" : "Copiar código Pix")
+    </button>
+</div>
+
+@code {
+    [Parameter] public string? BrCode { get; set; }
+    [Parameter] public bool Copied { get; set; }
+    
+    [Parameter] public EventCallback OnCopyBrCode { get; set; }
+
+    private async Task HandleCopyBrCode()
+        => await OnCopyBrCode.InvokeAsync();
+}

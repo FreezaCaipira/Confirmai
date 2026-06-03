@@ -1,0 +1,68 @@
+@inject UiTextService T
+
+<div class="filter-bar logs-quick-range-bar">
+    <span class="logs-filter-group-label">@T["AdminLogs.QuickRange"]</span>
+    <div class="logs-chip-group">
+        <button class="@GetQuickRangeButtonClass(SelectedQuickRangePreset, "Today")" @onclick="@(e => OnSetToday.InvokeAsync())">@T["AdminLogs.Today"]</button>
+        <button class="@GetQuickRangeButtonClass(SelectedQuickRangePreset, "Last7Days")" @onclick="@(e => OnSetLast7Days.InvokeAsync())">@T["AdminLogs.Last7Days"]</button>
+        <button class="@GetQuickRangeButtonClass(SelectedQuickRangePreset, "Last30Days")" @onclick="@(e => OnSetLast30Days.InvokeAsync())">@T["AdminLogs.Last30Days"]</button>
+        <button class="@GetQuickRangeButtonClass(SelectedQuickRangePreset, "CurrentMonth")" @onclick="@(e => OnSetCurrentMonth.InvokeAsync())">@T["AdminLogs.CurrentMonth"]</button>
+        <button class="@GetQuickRangeButtonClass(SelectedQuickRangePreset, "None")" @onclick="@(e => OnClearRange.InvokeAsync())">@T["AdminLogs.ClearRange"]</button>
+    </div>
+</div>
+
+<div class="filter-bar logs-audit-filter-bar">
+    <span class="logs-filter-group-label">@T["AdminLogs.AuditView"]</span>
+    <div class="logs-chip-group">
+        <button class="@GetAuditFilterButtonClass(SelectedAuditQuickFilter, "All")" @onclick="@(e => OnSetAuditAll.InvokeAsync())">@T["AdminLogs.All"] (@AuditCountAll)</button>
+        <button class="@GetAuditFilterButtonClass(SelectedAuditQuickFilter, "SecurityPolicy")" @onclick="@(e => OnSetAuditSecurityPolicy.InvokeAsync())">@T["AdminLogs.SecurityPolicy"] (@AuditCountSecurityPolicy)</button>
+        <button class="@GetAuditFilterButtonClass(SelectedAuditQuickFilter, "PaymentPanelStale")" @onclick="@(e => OnSetAuditPaymentPanelStale.InvokeAsync())">@T["AdminLogs.PaymentPanelStale"] (@AuditCountPaymentPanelStale)</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string SelectedQuickRangePreset { get; set; } = "None";
+
+    [Parameter]
+    public string SelectedAuditQuickFilter { get; set; } = "All";
+
+    [Parameter]
+    public int AuditCountAll { get; set; }
+
+    [Parameter]
+    public int AuditCountSecurityPolicy { get; set; }
+
+    [Parameter]
+    public int AuditCountPaymentPanelStale { get; set; }
+
+    [Parameter]
+    public EventCallback OnSetToday { get; set; }
+
+    [Parameter]
+    public EventCallback OnSetLast7Days { get; set; }
+
+    [Parameter]
+    public EventCallback OnSetLast30Days { get; set; }
+
+    [Parameter]
+    public EventCallback OnSetCurrentMonth { get; set; }
+
+    [Parameter]
+    public EventCallback OnClearRange { get; set; }
+
+    [Parameter]
+    public EventCallback OnSetAuditAll { get; set; }
+
+    [Parameter]
+    public EventCallback OnSetAuditSecurityPolicy { get; set; }
+
+    [Parameter]
+    public EventCallback OnSetAuditPaymentPanelStale { get; set; }
+
+    private string GetQuickRangeButtonClass(string currentPreset, string presetName)
+        => currentPreset == presetName ? "quick-range-btn active" : "quick-range-btn";
+
+    private string GetAuditFilterButtonClass(string currentFilter, string filterName)
+        => currentFilter == filterName ? "quick-range-btn active" : "quick-range-btn";
+}

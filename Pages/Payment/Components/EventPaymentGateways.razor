@@ -1,0 +1,93 @@
+@using Confirmai.Models
+@using System.Globalization
+
+@if (GroupGatewaysEnabled)
+{
+    <div class="evpay-methods">
+        <h2 class="evpay-methods-title">Forma de pagamento</h2>
+        <div class="evpay-method-list">
+            @foreach (var gateway in AvailableGateways)
+            {
+                var isSelected = string.Equals(SelectedGatewayName, gateway.Name, StringComparison.OrdinalIgnoreCase);
+                <button type="button"
+                        class="evpay-method-option @(isSelected ? "evpay-method-option--selected" : string.Empty)"
+                        @onclick="() => HandleSelectGateway(gateway.Name)">
+                    <span class="evpay-method-icon">💠</span>
+                    <span class="evpay-method-name">@gateway.DisplayName</span>
+                    <span class="evpay-method-badge">@gateway.Name</span>
+                </button>
+            }
+
+            @foreach (var gateway in ComingSoonGateways)
+            {
+                <button type="button"
+                        class="evpay-method-option evpay-method-option--disabled"
+                        disabled
+                        aria-disabled="true"
+                        title="Integração em breve">
+                    <span class="evpay-method-icon">🧾</span>
+                    <span class="evpay-method-name">@gateway.DisplayName</span>
+                    <span class="evpay-method-badge evpay-method-badge--soon">em breve</span>
+                </button>
+            }
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMsg))
+    {
+        <p class="evpay-error">@ErrorMsg</p>
+    }
+
+    @if (!AvailableGateways.Any())
+    {
+        <p class="evpay-disclaimer">
+            <i class="fas fa-clock"></i>
+            Nenhum gateway de pagamento está disponível no momento.
+        </p>
+    }
+    else
+    {
+        <button class="evpay-action-btn evpay-action-btn--pay"
+                disabled="@(IsGenerating)"
+                @onclick="HandleGenerateCharge">
+            @if (IsGenerating)
+            {
+                <span>Gerando QR Code…</span>
+            }
+            else
+            {
+                <i class="fas fa-qrcode"></i>
+                <span>Gerar QR Code (@SelectedGatewayDisplayName) — R$ @Price.ToString("N2", PtBr)</span>
+            }
+        </button>
+    }
+}
+else
+{
+    <p class="evpay-disclaimer">
+        <i class="fas fa-info-circle"></i>
+        Este grupo utiliza o fluxo padrão: Pix direto para o organizador com envio de comprovante.
+    </p>
+}
+
+@code {
+    [Parameter] public List<EventPaymentGatewayOption> AvailableGateways { get; set; } = new();
+    [Parameter] public IReadOnlyList<EventPaymentGatewayOption> ComingSoonGateways { get; set; } = new List<EventPaymentGatewayOption>();
+    [Parameter] public string? SelectedGatewayName { get; set; }
+    [Parameter] public bool GroupGatewaysEnabled { get; set; }
+    [Parameter] public bool IsGenerating { get; set; }
+    [Parameter] public string? ErrorMsg { get; set; }
+    [Parameter] public decimal Price { get; set; }
+    [Parameter] public string? SelectedGatewayDisplayName { get; set; }
+    
+    [Parameter] public EventCallback<string> OnSelectGateway { get; set; }
+    [Parameter] public EventCallback OnGenerateCharge { get; set; }
+    
+    private CultureInfo PtBr { get; } = new CultureInfo("pt-BR");
+
+    private async Task HandleSelectGateway(string gatewayName)
+        => await OnSelectGateway.InvokeAsync(gatewayName);
+
+    private async Task HandleGenerateCharge()
+        => await OnGenerateCharge.InvokeAsync();
+}

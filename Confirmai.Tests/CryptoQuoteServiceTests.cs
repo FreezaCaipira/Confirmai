@@ -1,6 +1,13 @@
-﻿using System.Net;
+using Confirmai.Services.Crypto;
+using System.Net;
 using Confirmai.Data;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -94,4 +101,5 @@ public class CryptoQuoteServiceTests
         Assert.Equal(0, db.Logs.Count(log => log.Source == "QuoteQuery"));
     }
 }
+
 

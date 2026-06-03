@@ -3,6 +3,7 @@
 @attribute [Authorize(Roles = "admin")]
 
 @using Confirmai.Shared
+@using Confirmai.Shared.Components.Admin
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Confirmai.Models
@@ -19,17 +20,12 @@
     <section class="entity-shell-grid" aria-label="@T["AdminUsers.Aria"]">
         <article class="entity-shell-card entity-shell-main">
             <h1 class="page-section-title">@T["AdminUsers.Title"]</h1>
-            <div class="filter-bar admin-filter-card">
-                <input type="text" placeholder="@T["AdminUsers.Filter.Email"]" @bind="filterEmail" @bind:event="oninput" />
-                <input type="text" placeholder="@T["AdminUsers.Filter.Role"]" @bind="filterRole" @bind:event="oninput" />
-                <select @bind="filterStatus">
-                    <option value="">@T["AdminUsers.Filter.All"]</option>
-                    <option value="active">@T["AdminUsers.Active"]</option>
-                    <option value="blocked">@T["AdminUsers.Blocked"]</option>
-                </select>
-                <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">@T["Common.Filter"]</button>
-                <button type="button" @onclick="@(async () => await ClearFilters())">@T["Common.Clear"]</button>
-            </div>
+            <AdminUsersFilterBar
+                FilterEmail="@filterEmail"
+                FilterRole="@filterRole"
+                FilterStatus="@filterStatus"
+                OnApplyFilters="@HandleApplyFilters"
+                OnClearFilters="@HandleClearFilters" />
 
             @if (showRestoredFiltersNotice)
             {
@@ -39,76 +35,23 @@
                 </div>
             }
 
-            <AdminDataState IsLoading="@isLoading" IsEmpty="@(filteredUsers == null || !filteredUsers.Any())" LoadingText="@T["AdminUsers.Loading"]" EmptyText="@T["AdminUsers.Empty"]" EmptyIcon="fas fa-users" EmptyHint="@T["AdminUsers.EmptyHint"]">
-                <table class="product-table">
-                    <thead>
-                        <tr>
-                            <th>@T["AdminUsers.User"]</th>
-                            <th>@T["AdminUsers.Email"]</th>
-                            <th>@T["AdminUsers.Role"]</th>
-                            <th>@T["AdminUsers.ActiveColumn"]</th>
-                            <th>@T["Common.Actions"]</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var u in filteredUsers?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<ApplicationUser>())
-                    {
-                        <tr>
-                            <td data-label="@T["AdminUsers.User"]">@u.UserName</td>
-                            <td data-label="@T["AdminUsers.Email"]">@u.Email</td>
-                            <td data-label="@T["AdminUsers.Role"]">@userRoles.GetValueOrDefault(u.Id, "-")</td>
+            <AdminUsersTable
+                Users="@filteredUsers"
+                UserRoles="@userRoles"
+                CurrentPage="@currentPage"
+                PageSize="@pageSize"
+                IsLoading="@isLoading"
+                OnViewUser="@ViewUser"
+                OnEditUser="@EditUser"
+                OnLockUser="@LockUser"
+                OnUnlockUser="@UnlockUser"
+                OnDeleteUser="@DeleteUser" />
 
-                            @* <td data-label="Data Cadastro">@u.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td> *@
-
-                            <td data-label="@T["AdminUsers.ActiveColumn"]">
-                                @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
-                                {
-                                    <span class="order-status-badge cancelado">@T["AdminUsers.Blocked"]</span>
-                                }
-                                else
-                                {
-                                    <span class="order-status-badge pago">@T["AdminUsers.Active"]</span>
-                                }
-                            </td>
-                            <td data-label="@T["Common.Actions"]">
-                                <div class="admin-actions-row">
-                                    <button class="details-btn action-btn icon-only" @onclick="() => ViewUser(u.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <a class="history-btn action-btn icon-only" href="@($"/admin/audit/User/{u.Id}")" title="@T["AdminAuditTimeline.ViewHistory"]" aria-label="@T["AdminAuditTimeline.ViewHistory"]">
-                                        <i class="fas fa-history"></i>
-                                    </a>
-                                    <button class="edit-btn action-btn icon-only" @onclick="() => EditUser(u.Id)" title="@T["Products.Edit"]" aria-label="@T["Products.Edit"]">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </button>
-                                    @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
-                                    {
-                                        <button class="success-btn action-btn icon-only" @onclick="() => UnlockUser(u.Id)" title="@T["AdminUsers.Unlock"]" aria-label="@T["AdminUsers.Unlock"]">
-                                            <i class="fas fa-unlock"></i>
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <button class="warning-btn action-btn icon-only" @onclick="() => LockUser(u.Id)" title="@T["AdminUsers.Lock"]" aria-label="@T["AdminUsers.Lock"]">
-                                            <i class="fas fa-lock"></i>
-                                        </button>
-                                    }
-                                    <button class="danger action-btn icon-only" @onclick="() => DeleteUser(u.Id)" title="@T["Products.Remove"]" aria-label="@T["Products.Remove"]">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-
-                <div class="pagination">
-                    <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
-                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
-                    <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
-                </div>
-            </AdminDataState>
+            <AdminUsersPagination
+                CurrentPage="@currentPage"
+                TotalPages="@totalPages"
+                OnPrevPage="@PrevPage"
+                OnNextPage="@NextPage" />
         </article>
     </section>
 
@@ -232,12 +175,12 @@
         }
     }
 
-    private void EditUser(string userId)
+    private async Task EditUser(string userId)
     {
         NavigationManager.NavigateTo($"/admin/users/edit/{userId}");
     }
 
-    private void ViewUser(string userId)
+    private async Task ViewUser(string userId)
     {
         NavigationManager.NavigateTo($"/admin/users/view/{userId}");
     }
@@ -364,6 +307,24 @@
     private void DismissRestoredNotice()
     {
         showRestoredFiltersNotice = false;
+    }
+
+    private async Task HandleApplyFilters((string Email, string Role, string Status) filters)
+    {
+        filterEmail = filters.Email;
+        filterRole = filters.Role;
+        filterStatus = filters.Status;
+        await ApplyFiltersAndPersist();
+    }
+
+    private async Task HandleClearFilters((string Email, string Role, string Status) filters)
+    {
+        filterEmail = "";
+        filterRole = "";
+        filterStatus = "";
+        showRestoredFiltersNotice = false;
+        ApplyFilters();
+        await PersistFilterStateAsync();
     }
 }
 

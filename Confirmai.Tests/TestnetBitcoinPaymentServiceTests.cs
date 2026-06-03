@@ -1,5 +1,11 @@
+using Confirmai.Services.Core;
 using System.Net;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Utility;
 
 namespace Confirmai.Tests;
 
@@ -61,7 +67,7 @@ public class TestnetBitcoinPaymentServiceTests
     {
         using var db = TestDataFactory.CreateDbContext();
         var service = new TestnetBitcoinPaymentService(new StubHttpClientFactory(_ => HttpTestResponses.Json("{}")));
-        var log = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
+        var log = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         var payment = TestDataFactory.SeedPayment(db, isPaid: false, amount: 0.00003m, method: "Testnet", paymentId: "pay-testnet-1", address: "tb1qaddress");
 
@@ -79,7 +85,7 @@ public class TestnetBitcoinPaymentServiceTests
     {
         using var db = TestDataFactory.CreateDbContext();
         var service = new TestnetBitcoinPaymentService(new StubHttpClientFactory(_ => HttpTestResponses.Json("{}")));
-        var log = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
+        var log = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         var payment = TestDataFactory.SeedPayment(db, isPaid: true, amount: 0.00003m, method: "Testnet", paymentId: "pay-testnet-2", address: "tb1qaddress");
 

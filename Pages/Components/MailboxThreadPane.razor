@@ -1,0 +1,95 @@
+@using System.Globalization
+
+<article class="mailbox-thread-pane">
+    @if (SelectedContact == null)
+    {
+        <div class="mailbox-thread-empty">@T["Mailbox.SelectConversation"]</div>
+    }
+    else
+    {
+        var contact = SelectedContact;
+
+        <header class="mailbox-thread-head">
+            <div class="mailbox-thread-title-block">
+                <span class="mailbox-thread-title-kicker">@T["Mailbox.ThreadKickerUser"]</span>
+                <a class="mailbox-thread-title-user" href="@($"/profile/{contact.ContactUserId}")">@contact.ContactName</a>
+            </div>
+            <span>@ConversationMessages.Count @T["Mailbox.ThreadMessages"]</span>
+        </header>
+
+        <div class="mailbox-thread-stream" @ref="ThreadStreamRef">
+            @if (IsThreadLoading)
+            {
+                <div class="mailbox-thread-empty">@T["Mailbox.ThreadLoading"]</div>
+            }
+            else if (!ConversationMessages.Any())
+            {
+                <div class="mailbox-thread-empty">@T["Mailbox.ThreadEmpty"]</div>
+            }
+            else
+            {
+                @foreach (var threadMsg in ConversationMessages)
+                {
+                    <article class="mailbox-thread-bubble @(threadMsg.IsIncoming ? "incoming" : "outgoing") @(string.IsNullOrWhiteSpace(threadMsg.RoleClass) ? string.Empty : $"mailbox-thread-bubble-{threadMsg.RoleClass}")">
+                        <header class="mailbox-thread-bubble-meta">
+                            <strong class="mailbox-thread-author">@threadMsg.AuthorName</strong>
+                            <time class="mailbox-thread-time" datetime="@threadMsg.CreatedAt.ToString("O", CultureInfo.InvariantCulture)">
+                                @threadMsg.CreatedAt.ToLocalTime().ToString("dd/MM HH:mm", CultureInfo.InvariantCulture)
+                            </time>
+                        </header>
+                        <p class="mailbox-thread-body">@threadMsg.Body</p>
+                    </article>
+                }
+            }
+        </div>
+
+        <section class="mailbox-composer" aria-label="Enviar mensagem">
+            @if (!string.IsNullOrWhiteSpace(ComposerInfoMessage))
+            {
+                <p class="mailbox-composer-info">@ComposerInfoMessage</p>
+            }
+
+            <div class="mailbox-filter-field">
+                <label for="composer-body">@T["Mailbox.ComposerLabel"]</label>
+                <textarea id="composer-body" class="mk-input mailbox-composer-textarea" @bind="ComposerBody"></textarea>
+            </div>
+        </section>
+
+        <div class="mailbox-actions">
+            <button class="mk-btn mk-btn-primary" type="button" disabled="@IsSendingReply" @onclick="HandleSendReply">@(IsSendingReply ? T["Mailbox.Sending"] : T["Mailbox.Send"])</button>
+        </div>
+    }
+</article>
+
+@inject UiTextService T
+
+@code {
+    [Parameter]
+    public ConversationContactView? SelectedContact { get; set; }
+
+    [Parameter]
+    public List<ConversationMessageView> ConversationMessages { get; set; } = new();
+
+    [Parameter]
+    public string ComposerBody { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? ComposerInfoMessage { get; set; }
+
+    [Parameter]
+    public bool IsThreadLoading { get; set; }
+
+    [Parameter]
+    public bool IsSendingReply { get; set; }
+
+    [Parameter]
+    public ElementReference ThreadStreamRef { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSendReply { get; set; }
+
+    private async Task HandleSendReply()
+    {
+        await OnSendReply.InvokeAsync(ComposerBody);
+    }
+}

@@ -1,8 +1,8 @@
-﻿@* @page "/users"
+@* @page "/users"
 
-@inject Confirmai.Services.UserService UserService
+@inject Confirmai.Services.User.UserService UserService
 
-<h3>UsuÃ¡rios</h3>
+<h3>Usuários</h3>
 
 <EditForm Model="@newUser" OnValidSubmit="AddUser">
     <InputText @bind-value="newUser.Username" placeholder="Username" />

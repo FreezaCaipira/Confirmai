@@ -1,0 +1,68 @@
+<div class="detail-admin-bar detail-admin-bar--footer">
+    @if (LineupConfirmedAt is not null)
+    {
+        @if (IsPastEvent)
+        {
+            <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@EventId/escalacao">
+                <i class="fas fa-flag-checkered"></i> Pós-Partida
+            </a>
+        }
+        else
+        {
+            <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@EventId/escalacao">
+                <i class="fas fa-clipboard-list"></i> Ver Escalação
+            </a>
+        }
+    }
+    @if (IsAdmin)
+    {
+        @if (IsActive && LineupConfirmedAt is null)
+        {
+            @if (HasQuorum)
+            {
+                <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@EventId/escalacao">
+                    <i class="fas fa-list-ol"></i> Montar Escalação
+                </a>
+            }
+            else
+            {
+                <span class="detail-admin-btn detail-admin-btn--lineup detail-admin-btn--disabled"
+                      title="Faltam @Lacking jogador@(Lacking == 1 ? string.Empty : "es") para atingir o mínimo necessário">
+                    <i class="fas fa-lock"></i> Montar Escalação
+                </span>
+            }
+        }
+    }
+    @if (CanEdit)
+    {
+        <a class="detail-admin-btn" href="/futsal/@EventId/edit">
+            <i class="fas fa-pen"></i> Editar partida
+        </a>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    [Parameter]
+    public DateTime? LineupConfirmedAt { get; set; }
+
+    [Parameter]
+    public bool IsPastEvent { get; set; }
+
+    [Parameter]
+    public bool IsAdmin { get; set; }
+
+    [Parameter]
+    public bool IsActive { get; set; }
+
+    [Parameter]
+    public bool HasQuorum { get; set; }
+
+    [Parameter]
+    public int Lacking { get; set; }
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+}

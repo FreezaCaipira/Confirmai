@@ -1,0 +1,51 @@
+@if (RankingRows?.Count == 0)
+{
+    <div class="ranking-empty">
+        <i class="fas fa-calendar-times"></i>
+        <p>Nenhuma partida encerrada no período.</p>
+    </div>
+}
+else
+{
+    <div class="ranking-header">
+        <span class="ranking-pos"></span>
+        <span class="ranking-name ranking-col-label"><i class="fas fa-user"></i> Nome</span>
+        <span class="ranking-col ranking-col--label ranking-col--label-games"><i class="fas fa-futbol"></i> Partidas</span>
+        <span class="ranking-col ranking-col--label ranking-col--label-highlight"><i class="fas fa-star"></i> Destaques</span>
+        <span class="ranking-col ranking-col--label ranking-col--label-wins"><i class="fas fa-trophy"></i> Vitórias</span>
+    </div>
+    <ol class="ranking-list">
+        @{ int pos = 0; }
+        @foreach (var row in RankingRows ?? new())
+        {
+            pos++;
+            bool isMe = row.UserId == CurrentUserId;
+            string medalClass = pos switch { 1 => "ranking-medal--gold", 2 => "ranking-medal--silver", 3 => "ranking-medal--bronze", _ => "" };
+            <li class="ranking-row @(isMe ? "ranking-row--me" : "")">
+                <span class="ranking-pos @medalClass">
+                    @if (pos <= 3)
+                    {
+                        <i class="fas fa-medal"></i>
+                    }
+                    else
+                    {
+                        @pos
+                    }
+                </span>
+                <span class="ranking-name">@row.UserName @if (isMe) { <span class="player-tag player-tag--me">você</span> }</span>
+                <span class="ranking-col" title="Partidas">@row.GamesPlayed</span>
+                <span class="ranking-col ranking-col--highlight" title="Destaques">@row.Highlights</span>
+                <span class="ranking-col ranking-col--wins" title="Vitórias">@row.Wins</span>
+            </li>
+        }
+    </ol>
+}
+
+@code {
+    [Parameter]
+    public List<dynamic>? RankingRows { get; set; }
+
+    [Parameter]
+    public string? CurrentUserId { get; set; }
+}
+

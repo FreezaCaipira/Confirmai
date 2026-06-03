@@ -1,0 +1,124 @@
+@inject UiTextService T
+
+<div class="filter-bar logs-main-filter-bar">
+    <input type="text" placeholder="@T["AdminLogs.Filter.Global"]" @bind="localFilterGlobalSearch" @bind:event="oninput" @onchange="OnGlobalSearchChanged" />
+    <input type="text" placeholder="@T["AdminLogs.Filter.User"]" @bind="localFilterUserId" @bind:event="oninput" />
+    <input type="text" placeholder="@T["AdminLogs.Filter.Source"]" @bind="localFilterSource" @bind:event="oninput" />
+    <input type="text" placeholder="@T["AdminLogs.Filter.Message"]" @bind="localFilterMessage" @bind:event="oninput" />
+    <select @bind="localFilterLevel">
+        <option value="">@T["AdminLogs.Filter.AllLevels"]</option>
+        <option value="Error">Error</option>
+        <option value="Warning">Warning</option>
+        <option value="Info">Info</option>
+    </select>
+    <input type="date" @bind="localFilterStartDate" />
+    <input type="date" @bind="localFilterEndDate" />
+    <input type="text" placeholder="@T["AdminLogs.Filter.EventType"]" @bind="localFilterEventType" @bind:event="oninput" />
+    <input type="text" placeholder="@T["AdminLogs.Filter.EntityType"]" @bind="localFilterEntityType" @bind:event="oninput" />
+
+    <div class="logs-main-actions">
+        <button type="button" @onclick="ApplyAsync">@T["Common.Filter"]</button>
+        <button type="button" @onclick="ClearAsync">@T["Common.Clear"]</button>
+        <button class="logs-export-btn" @onclick="ExportCsvAsync" disabled="@(HasInvalidDateRange || TotalLogs == 0)">@T["AdminLogs.ExportCsv"]</button>
+        <button class="logs-export-btn" @onclick="ExportJsonAsync" disabled="@(HasInvalidDateRange || TotalLogs == 0)">@T["AdminLogs.ExportJson"]</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string FilterGlobalSearch { get; set; } = "";
+
+    [Parameter]
+    public string FilterUserId { get; set; } = "";
+
+    [Parameter]
+    public string FilterSource { get; set; } = "";
+
+    [Parameter]
+    public string FilterMessage { get; set; } = "";
+
+    [Parameter]
+    public string FilterLevel { get; set; } = "";
+
+    [Parameter]
+    public DateTime? FilterStartDate { get; set; }
+
+    [Parameter]
+    public DateTime? FilterEndDate { get; set; }
+
+    [Parameter]
+    public string FilterEventType { get; set; } = "";
+
+    [Parameter]
+    public string FilterEntityType { get; set; } = "";
+
+    [Parameter]
+    public int TotalLogs { get; set; }
+
+    [Parameter]
+    public bool HasInvalidDateRange { get; set; }
+
+    [Parameter]
+    public EventCallback OnGlobalSearchInput { get; set; }
+
+    [Parameter]
+    public EventCallback OnApplyFilters { get; set; }
+
+    [Parameter]
+    public EventCallback OnClearFilters { get; set; }
+
+    [Parameter]
+    public EventCallback OnExportCsv { get; set; }
+
+    [Parameter]
+    public EventCallback OnExportJson { get; set; }
+
+    private string localFilterGlobalSearch = "";
+    private string localFilterUserId = "";
+    private string localFilterSource = "";
+    private string localFilterMessage = "";
+    private string localFilterLevel = "";
+    private DateTime? localFilterStartDate;
+    private DateTime? localFilterEndDate;
+    private string localFilterEventType = "";
+    private string localFilterEntityType = "";
+
+    protected override void OnParametersSet()
+    {
+        localFilterGlobalSearch = FilterGlobalSearch;
+        localFilterUserId = FilterUserId;
+        localFilterSource = FilterSource;
+        localFilterMessage = FilterMessage;
+        localFilterLevel = FilterLevel;
+        localFilterStartDate = FilterStartDate;
+        localFilterEndDate = FilterEndDate;
+        localFilterEventType = FilterEventType;
+        localFilterEntityType = FilterEntityType;
+    }
+
+    private async Task OnGlobalSearchChanged()
+    {
+        await OnGlobalSearchInput.InvokeAsync();
+    }
+
+    private async Task ApplyAsync()
+    {
+        await OnApplyFilters.InvokeAsync();
+    }
+
+    private async Task ClearAsync()
+    {
+        await OnClearFilters.InvokeAsync();
+    }
+
+    private async Task ExportCsvAsync()
+    {
+        await OnExportCsv.InvokeAsync();
+    }
+
+    private async Task ExportJsonAsync()
+    {
+        await OnExportJson.InvokeAsync();
+    }
+}
+

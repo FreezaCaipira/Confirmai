@@ -1,5 +1,11 @@
-﻿using Confirmai.Data;
+using Confirmai.Services.Core;
+using Confirmai.Data;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Utility;
 using Microsoft.EntityFrameworkCore;
 
 namespace Confirmai.Tests;
@@ -10,7 +16,7 @@ public class LogServiceTests
     public async Task LogAsync_PersistsLogEntry_WithProvidedValues()
     {
         await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
+        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         await service.LogAsync(
             message: "payment started",
@@ -30,7 +36,7 @@ public class LogServiceTests
     public async Task LogAsync_PersistsExceptionText_WhenExceptionIsProvided()
     {
         await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
+        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         var ex = new InvalidOperationException("boom");
 
@@ -55,7 +61,7 @@ public class LogServiceTests
     public async Task AuditAsync_PersistsStructuredAuditFields()
     {
         await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
+        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         await service.AuditAsync(
             eventType: AuditEvents.PaymentConfirmed,
@@ -81,7 +87,7 @@ public class LogServiceTests
     public async Task AuditAsync_KeepsLegacyFieldsBackwardCompatible()
     {
         await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
+        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         await service.AuditAsync(
             eventType: AuditEvents.UserLoginFailed,

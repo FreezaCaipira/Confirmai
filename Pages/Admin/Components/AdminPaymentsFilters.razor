@@ -1,0 +1,71 @@
+@using Confirmai.Services
+
+<div class="filter-bar admin-filter-card">
+    <input type="text" placeholder="User ID" @bind="filterUserId" @bind:event="oninput" />
+    <input type="number" placeholder="Min amount" @bind="filterMinAmount" min="0" />
+    <input type="number" placeholder="Max amount" @bind="filterMaxAmount" min="0" />
+    <select @bind="filterStatus">
+        <option value="">All statuses</option>
+        <option value="paid">Paid</option>
+        <option value="pending">Pending</option>
+    </select>
+    <input type="date" @bind="filterDate" />
+    <button type="button" @onclick="ApplyFilters">Filter</button>
+    <button type="button" @onclick="ClearFilters">Clear</button>
+</div>
+
+@if (ShowRestoredNotice)
+{
+    <div class="orders-review-restored-notice">
+        <span>Previous filters have been restored.</span>
+        <button type="button" class="orders-review-restored-close" @onclick="DismissNotice" aria-label="Close">&times;—</button>
+    </div>
+}
+
+@code {
+    private string filterUserId = "";
+    private decimal? filterMinAmount;
+    private decimal? filterMaxAmount;
+    private string filterStatus = "";
+    private DateTime? filterDate;
+
+    [Parameter] public string FilterUserId { get; set; } = "";
+    [Parameter] public decimal? FilterMinAmount { get; set; }
+    [Parameter] public decimal? FilterMaxAmount { get; set; }
+    [Parameter] public string FilterStatus { get; set; } = "";
+    [Parameter] public DateTime? FilterDate { get; set; }
+    [Parameter] public bool ShowRestoredNotice { get; set; }
+
+    [Parameter] public EventCallback<(string UserId, decimal? MinAmount, decimal? MaxAmount, string Status, DateTime? Date)> OnApplyFilters { get; set; }
+    [Parameter] public EventCallback OnClearFilters { get; set; }
+    [Parameter] public EventCallback OnDismissNotice { get; set; }
+
+    protected override void OnInitialized()
+    {
+        filterUserId = FilterUserId;
+        filterMinAmount = FilterMinAmount;
+        filterMaxAmount = FilterMaxAmount;
+        filterStatus = FilterStatus;
+        filterDate = FilterDate;
+    }
+
+    private async Task ApplyFilters()
+    {
+        await OnApplyFilters.InvokeAsync((filterUserId, filterMinAmount, filterMaxAmount, filterStatus, filterDate));
+    }
+
+    private async Task ClearFilters()
+    {
+        filterUserId = "";
+        filterMinAmount = null;
+        filterMaxAmount = null;
+        filterStatus = "";
+        filterDate = null;
+        await OnClearFilters.InvokeAsync();
+    }
+
+    private async Task DismissNotice()
+    {
+        await OnDismissNotice.InvokeAsync();
+    }
+}

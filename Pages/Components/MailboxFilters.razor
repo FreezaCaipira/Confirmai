@@ -1,0 +1,58 @@
+@using Confirmai.Data
+
+<section class="mailbox-filters" aria-label="Filtros da caixa postal">
+    <div class="mailbox-filter-field">
+        <label for="mailbox-search">@T["Mailbox.FilterSearch"]</label>
+        <input id="mailbox-search" class="mailbox-search mk-input" @bind="SearchTerm" @bind:event="oninput" />
+    </div>
+
+    <div class="mailbox-filter-field mailbox-filter-inline">
+        <label for="mailbox-page-size">@T["Mailbox.FilterPageSize"]</label>
+        <select id="mailbox-page-size" class="mk-input" @bind="PageSize">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+        </select>
+    </div>
+
+    <div class="mailbox-filter-field mailbox-filter-inline">
+        <label class="mailbox-check-label">
+            <input type="checkbox" @bind="InboxUnreadOnly" />
+            <span>@T["Mailbox.FilterUnreadOnly"]</span>
+        </label>
+    </div>
+
+    <div class="mailbox-filter-actions">
+        <button class="mk-btn mk-btn-primary" type="button" @onclick="HandleApplyFilters">@T["Mailbox.FilterApply"]</button>
+        <button class="mk-btn mk-btn-secondary" type="button" @onclick="HandleResetFilters">@T["Mailbox.FilterClear"]</button>
+    </div>
+</section>
+
+@inject UiTextService T
+
+@code {
+    [Parameter]
+    public string SearchTerm { get; set; } = string.Empty;
+
+    [Parameter]
+    public int PageSize { get; set; } = 20;
+
+    [Parameter]
+    public bool InboxUnreadOnly { get; set; }
+
+    [Parameter]
+    public EventCallback OnApplyFilters { get; set; }
+
+    [Parameter]
+    public EventCallback OnResetFilters { get; set; }
+
+    private async Task HandleApplyFilters()
+    {
+        await OnApplyFilters.InvokeAsync();
+    }
+
+    private async Task HandleResetFilters()
+    {
+        await OnResetFilters.InvokeAsync();
+    }
+}

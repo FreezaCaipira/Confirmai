@@ -1,0 +1,63 @@
+@using Confirmai.Enums
+@using Confirmai.Models
+
+<fieldset class="form-section">
+    <legend>Local</legend>
+
+    <div class="form-group">
+        <label>Quadra / Society / Campo <span class="required">*</span></label>
+        @if (!Venues.Any())
+        {
+            <p class="form-hint form-hint--warn">
+                Nenhuma quadra cadastrada ainda. Solicite ao administrador do sistema.
+            </p>
+        }
+        else
+        {
+            <InputSelect class="input" @bind-Value="@SelectedVenueId" @bind-Value:after="HandleVenueChanged">
+                <option value="0">— Selecione a quadra —</option>
+                @foreach (var v in Venues)
+                {
+                    <option value="@v.Id">@v.Name (@VenueTypeLabel(v.Type)) — @v.City/@v.StateCode</option>
+                }
+            </InputSelect>
+        }
+        @if (SelectedVenueId == 0)
+        {
+            <ValidationMessage For="@(() => SelectedVenueId)" class="validation-message" />
+        }
+    </div>
+
+    @if (SelectedVenue is not null)
+    {
+        <div class="venue-preview">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>@SelectedVenue.Address · @SelectedVenue.City — @SelectedVenue.StateCode</span>
+        </div>
+    }
+</fieldset>
+
+@code {
+    [Parameter]
+    public List<Venue> Venues { get; set; } = new();
+
+    [Parameter]
+    public int SelectedVenueId { get; set; }
+
+    [Parameter]
+    public Venue? SelectedVenue { get; set; }
+
+    [Parameter]
+    public EventCallback OnVenueChanged { get; set; }
+
+    private async Task HandleVenueChanged()
+        => await OnVenueChanged.InvokeAsync();
+
+    private static string VenueTypeLabel(VenueType t) => t switch
+    {
+        VenueType.Quadra  => "Quadra",
+        VenueType.Society => "Society",
+        VenueType.Campo   => "Campo",
+        _                 => t.ToString()
+    };
+}

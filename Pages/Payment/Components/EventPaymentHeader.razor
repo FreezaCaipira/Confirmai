@@ -1,0 +1,27 @@
+@using Confirmai.Enums
+@using Confirmai.Models
+@using System.Globalization
+
+<div class="evpay-header">
+    <div class="evpay-header-top">
+        <span class="evpay-sport-badge">@(IsFutsal ? "⚽ Futsal" : "🃏 Poker")</span>
+        <a href="@BackUrl" class="detail-back-link">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+    <h1 class="evpay-title">@Event.Group.Name</h1>
+    <p class="evpay-meta">
+        <i class="fas fa-calendar-alt"></i>
+        @Event.StartsAt.ToLocalTime().ToString("dddd, dd/MM/yyyy 'às' HH:mm", new CultureInfo("pt-BR"))
+    </p>
+    @if (!string.IsNullOrWhiteSpace(Event.Location))
+    {
+        <p class="evpay-meta"><i class="fas fa-map-marker-alt"></i> @Event.Location</p>
+    }
+</div>
+
+@code {
+    [Parameter] public Event? Event { get; set; }
+    [Parameter] public bool IsFutsal { get; set; }
+    [Parameter] public string? BackUrl { get; set; }
+}

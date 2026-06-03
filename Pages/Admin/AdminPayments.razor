@@ -32,309 +32,76 @@
         <article class="entity-shell-card entity-shell-main">
             <h1 class="page-section-title">@T["AdminPayments.Title"]</h1>
 
-            <section class="admin-payments-summary-card" aria-label="Painel de reconciliação de pagamentos">
-                <div class="admin-payments-summary-grid">
-                    <div class="admin-payments-summary-item">
-                        <span class="admin-payments-summary-label">Pendentes com chargeId</span>
-                        <strong class="admin-payments-summary-value">@reconciliationPendingWithChargeId</strong>
-                    </div>
-                    <div class="admin-payments-summary-item">
-                        <span class="admin-payments-summary-label">Pendentes sem chargeId</span>
-                        <strong class="admin-payments-summary-value">@reconciliationPendingWithoutChargeId</strong>
-                    </div>
-                    <div class="admin-payments-summary-item">
-                        <span class="admin-payments-summary-label">Pendentes antigos (+30 min)</span>
-                        <strong class="admin-payments-summary-value">@reconciliationStalePending</strong>
-                    </div>
-                    <div class="admin-payments-summary-item">
-                        <span class="admin-payments-summary-label">Confirmações pagas hoje</span>
-                        <strong class="admin-payments-summary-value">@reconciliationPaidToday</strong>
-                    </div>
-                </div>
-                <div class="admin-payments-summary-actions">
-                    <button type="button" class="details-btn" disabled="@isRunningSweep" @onclick="RunSweepNowAsync">
-                        @(isRunningSweep ? "Varrendo pendentes..." : "Revalidar pendentes agora")
-                    </button>
-                    <button type="button" class="details-btn" disabled="@isSummaryRefreshing" @onclick="RefreshSummaryNowAsync">
-                        @(isSummaryRefreshing ? "Atualizando painel..." : "Atualizar painel")
-                    </button>
-                    <button type="button" class="details-btn" @onclick="ExportReconciliationCsvAsync">
-                        Exportar reconciliação CSV
-                    </button>
-                    <button type="button" class="details-btn" @onclick="OpenAdvancedToolsModal">
-                        Ferramentas avançadas
-                    </button>
-                    <label class="admin-payments-auto-refresh-toggle">
-                        <input type="checkbox" @bind="isAutoRefreshEnabled" />
-                        Auto refresh (30s)
-                    </label>
-                    @if (isAutoRefreshPausedByVisibility)
-                    {
-                        <span class="admin-payments-auto-refresh-pill admin-payments-auto-refresh-pill--paused">Auto refresh pausado (aba em background)</span>
-                    }
-                    <span class="admin-payments-summary-hint">Usa a mesma rotina do worker automático.</span>
-                    <span class="admin-payments-severity-pill @reconciliationSeverityClass">Severidade: @reconciliationSeverityLabel</span>
-                </div>
-                <div class="admin-payments-summary-meta">
-                    <span>Última atualização do painel: @lastSummaryRefreshLabel</span>
-                    <span class="@lastSummaryAgeClass">
-                        Sem atualizar há: @lastSummaryAgeLabel
-                        <span class="admin-payments-summary-age-hint" title="Alerta de defasagem quando passar de 2 ciclos de auto refresh (60s)." aria-label="Explicação do alerta de defasagem">i</span>
-                    </span>
-                    <span>Última pausa por aba em background: @lastAutoRefreshPauseLabel</span>
-                    <span>Última varredura automática: @lastAutomaticSweepLabel</span>
-                    @if (!string.IsNullOrWhiteSpace(lastAutomaticSweepDetails))
-                    {
-                        <span>Resumo da última varredura: @lastAutomaticSweepDetails</span>
-                    }
-                    <span>Última varredura manual: @lastManualSweepLabel</span>
-                    @if (!string.IsNullOrWhiteSpace(lastManualSweepDetails))
-                    {
-                        <span>Resumo da última varredura manual: @lastManualSweepDetails</span>
-                    }
-                    <span class="admin-payments-trend @(isPendingTrendWarning ? "admin-payments-trend--warning" : "")">Tendência 24h (pendentes na varredura): @pendingTrend24hLabel</span>
-                    <a class="admin-payments-summary-link" href="@BuildStalenessLogsHref()">Ver incidentes de defasagem no log</a>
-                    <span>Pendentes por gateway: @pendingByGatewayLabel</span>
-                    <span>Pagas por gateway (total): @paidByGatewayLabel</span>
-                </div>
-                @if (gatewayTelemetry.Count > 0)
-                {
-                    <div class="admin-payments-gateway-telemetry">
-                        <span class="admin-payments-gateway-telemetry-title">Telemetria por gateway (reconciliação)</span>
-                        <table class="admin-payments-gateway-telemetry-table">
-                            <thead>
-                                <tr>
-                                    <th>Gateway</th>
-                                    <th>Pendentes</th>
-                                    <th>Pendentes antigos</th>
-                                    <th>Pagas (total)</th>
-                                    <th>Share pendente</th>
-                                    <th>Severidade</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in gatewayTelemetry)
-                                {
-                                    <tr>
-                                        <td>@item.Gateway</td>
-                                        <td>@item.Pending</td>
-                                        <td>@item.StalePending</td>
-                                        <td>@item.PaidTotal</td>
-                                        <td>@item.PendingShareLabel</td>
-                                        <td>
-                                            <span class="admin-payments-gateway-severity @item.SeverityClass">@item.SeverityLabel</span>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                @if (automaticSweepHistory.Count > 0)
-                {
-                    <div class="admin-payments-sweep-history">
-                        <span class="admin-payments-sweep-history-title">Últimas 5 varreduras automáticas</span>
-                        <div class="admin-payments-sparkline" role="img" aria-label="Tendência de pendências nas últimas varreduras automáticas">
-                            @foreach (var point in automaticSweepHistory.AsEnumerable().Reverse())
-                            {
-                                var pointHeight = GetPendingHeightPercent(point);
-                                <div class="admin-payments-sparkline-point" style="height:@($"{pointHeight}%")" title="@($"{point.TimestampLabel}: {point.StillPending} pendente(s)")"></div>
-                            }
-                        </div>
-                        <ul>
-                            @foreach (var item in automaticSweepHistory)
-                            {
-                                <li>@item.TimestampLabel - Considerados=@item.Considered, Atualizados=@item.Updated, Pendentes=@item.StillPending, Não encontrados=@item.NotFound</li>
-                            }
-                        </ul>
-                    </div>
-                }
-                @if (!string.IsNullOrWhiteSpace(sweepResultMessage))
-                {
-                    <div class="orders-review-restored-notice admin-payments-reconcile-result @(sweepResultIsError ? "admin-payments-reconcile-result--error" : "admin-payments-reconcile-result--ok")">
-                        <span>@sweepResultMessage</span>
-                        <button type="button" class="orders-review-restored-close" @onclick="DismissSweepMessage" aria-label="Fechar">&times;—</button>
-                    </div>
-                }
-            </section>
+            <AdminPaymentsSummaryPanel
+                PendingWithChargeId="@reconciliationPendingWithChargeId"
+                PendingWithoutChargeId="@reconciliationPendingWithoutChargeId"
+                StalePending="@reconciliationStalePending"
+                PaidToday="@reconciliationPaidToday"
+                IsRunningSweep="@isRunningSweep"
+                IsRefreshing="@isSummaryRefreshing"
+                AutoRefreshEnabled="@isAutoRefreshEnabled"
+                IsAutoRefreshPaused="@isAutoRefreshPausedByVisibility"
+                SeverityLabel="@reconciliationSeverityLabel"
+                SeverityClass="@reconciliationSeverityClass"
+                PendingTrend24hLabel="@pendingTrend24hLabel"
+                IsPendingTrendWarning="@isPendingTrendWarning"
+                PendingByGatewayLabel="@pendingByGatewayLabel"
+                PaidByGatewayLabel="@paidByGatewayLabel"
+                LastRefreshLabel="@lastSummaryRefreshLabel"
+                LastRefreshAgeLabel="@lastSummaryAgeLabel"
+                LastRefreshAgeClass="@lastSummaryAgeClass"
+                LastAutoRefreshPauseLabel="@lastAutoRefreshPauseLabel"
+                LastAutomaticSweepLabel="@lastAutomaticSweepLabel"
+                LastAutomaticSweepDetails="@lastAutomaticSweepDetails"
+                LastManualSweepLabel="@lastManualSweepLabel"
+                LastManualSweepDetails="@lastManualSweepDetails"
+                GatewayTelemetry="@gatewayTelemetry"
+                SweepHistory="@automaticSweepHistory"
+                SweepResultMessage="@sweepResultMessage"
+                SweepResultIsError="@sweepResultIsError"
+                StalenessLogsHref="@BuildStalenessLogsHref()"
+                OnRunSweep="@RunSweepNowAsync"
+                OnRefreshSummary="@RefreshSummaryNowAsync"
+                OnExportCsv="@ExportReconciliationCsvAsync"
+                OnOpenAdvancedTools="@OpenAdvancedToolsModal"
+                OnDismissSweepMessage="@DismissSweepMessage" />
 
-            <div class="admin-payments-modal-backdrop @(isAdvancedToolsModalOpen ? "admin-payments-modal-backdrop--open" : "")"
-                 @onclick="CloseAdvancedToolsModalAsync"
-                 aria-hidden="@(!isAdvancedToolsModalOpen)">
-                 <div class="admin-payments-modal"
-                     id="admin-payments-advanced-modal"
-                     role="dialog"
-                     aria-modal="true"
-                     aria-labelledby="admin-payments-tools-title"
-                     @onkeydown="HandleAdvancedToolsKeyDown"
-                     @onclick:stopPropagation="true">
-                    <div class="admin-payments-modal-header">
-                        <h2 id="admin-payments-tools-title">Ferramentas avançadas</h2>
-                        <button type="button" class="orders-review-restored-close" @onclick="CloseAdvancedToolsModalAsync" aria-label="Fechar">&times;—</button>
-                    </div>
+            <AdminPaymentsAdvancedToolsModal
+                IsOpen="@isAdvancedToolsModalOpen"
+                IsReconciling="@isReconciling"
+                IsStatusTransitioning="@isStatusTransitioning"
+                ReconcileResultMessage="@reconcileResultMessage"
+                ReconcileResultIsError="@reconcileResultIsError"
+                ReconcileResultConfirmationId="@reconcileResultConfirmationId"
+                StatusTransitionResultMessage="@statusTransitionResultMessage"
+                StatusTransitionResultIsError="@statusTransitionResultIsError"
+                StatusTransitionConfirmationId="@statusTransitionConfirmationId"
+                OnClose="@CloseAdvancedToolsModalAsync"
+                OnReconcileCharge="@ReconcileChargeAsync"
+                OnOpenConfirmationTimeline="@OpenConfirmationTimeline"
+                OnApplyStatusTransition="@ApplyStatusTransitionAsync" />
 
-                    <div class="admin-payments-tools-grid">
-                        <section class="admin-payments-tools-section" aria-label="Reconciliar cobrança">
-                            <h3>Reconciliação manual</h3>
-                            <p class="admin-payments-tools-description">Use para revalidar uma cobrança específica via chargeId/txId.</p>
+            <AdminPaymentsFilters
+                FilterUserId="@filterUserId"
+                FilterMinAmount="@filterMinAmount"
+                FilterMaxAmount="@filterMaxAmount"
+                FilterStatus="@filterStatus"
+                FilterDate="@filterDate"
+                ShowRestoredNotice="@showRestoredFiltersNotice"
+                OnApplyFilters="@HandleFiltersApplied"
+                OnClearFilters="@ClearFilters"
+                OnDismissNotice="@DismissRestoredNotice" />
 
-                            <div class="filter-bar admin-filter-card admin-payments-reconcile-bar admin-payments-reconcile-bar--modal">
-                                <div class="admin-payments-reconcile-input-wrap">
-                                    <label class="admin-payments-reconcile-label">Reconciliação manual por chargeId/txId</label>
-                                    <input type="text" placeholder="Ex.: 7E9B... ou charge_xxx" @bind="reconcileChargeId" @bind:event="oninput" />
-                                </div>
-                                <button type="button" disabled="@isReconciling" @onclick="ReconcileChargeAsync">
-                                    @(isReconciling ? "Revalidando..." : "Revalidar cobrança")
-                                </button>
-                            </div>
+            <AdminPaymentsTable
+                Payments="@pagedPayments"
+                CurrentPage="@currentPage"
+                TotalPages="@totalPages"
+                IsLoading="@isLoading"
+                FormatAmount="@FormatBtcWithUsd"
+                OnViewPayment="@ViewPayment"
+                OnNextPage="@NextPage"
+                OnPrevPage="@PrevPage" />
 
-                            @if (!string.IsNullOrWhiteSpace(reconcileResultMessage))
-                            {
-                                <div class="orders-review-restored-notice admin-payments-reconcile-result @(reconcileResultIsError ? "admin-payments-reconcile-result--error" : "admin-payments-reconcile-result--ok")">
-                                    <span>@reconcileResultMessage</span>
-                                    @if (reconcileResultConfirmationId.HasValue)
-                                    {
-                                        <a class="details-btn" href="@BuildConfirmationTimelineHref(reconcileResultConfirmationId.Value)">Abrir timeline da confirmação</a>
-                                    }
-                                    <button type="button" class="orders-review-restored-close" @onclick="DismissReconcileMessage" aria-label="Fechar">&times;—</button>
-                                </div>
-                            }
-                        </section>
-
-                        <section class="admin-payments-tools-section" aria-label="Abrir timeline da confirmação">
-                            <h3>Timeline por confirmação</h3>
-                            <p class="admin-payments-tools-description">Acesso direto ao histórico auditável de uma confirmação.</p>
-
-                            <div class="filter-bar admin-filter-card admin-payments-reconcile-bar admin-payments-reconcile-bar--modal">
-                                <div class="admin-payments-reconcile-input-wrap">
-                                    <label class="admin-payments-reconcile-label">Timeline por confirmação</label>
-                                    <input type="number" min="1" placeholder="Ex.: 123" @bind="timelineConfirmationId" />
-                                </div>
-                                <button type="button" @onclick="OpenConfirmationTimeline" disabled="@(timelineConfirmationId is null || timelineConfirmationId <= 0)">
-                                    Abrir timeline
-                                </button>
-                            </div>
-                        </section>
-
-                        <section class="admin-payments-tools-section" aria-label="Transição de status">
-                            <h3>Transição de status</h3>
-                            <p class="admin-payments-tools-description">Aplicar mudanças controladas de status (cancelamento/reembolso).</p>
-
-                            <div class="filter-bar admin-filter-card admin-payments-reconcile-bar admin-payments-reconcile-bar--modal">
-                                <div class="admin-payments-reconcile-input-wrap">
-                                    <label class="admin-payments-reconcile-label">Transição de status (cancelamento/reembolso)</label>
-                                    <input type="number" min="1" placeholder="ConfirmationId" @bind="statusTransitionConfirmationId" />
-                                </div>
-                                <select @bind="statusTransitionTarget">
-                                    <option value="">Status alvo</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Paid">Paid</option>
-                                    <option value="Failed">Failed</option>
-                                    <option value="Refunded">Refunded</option>
-                                </select>
-                                <input type="text" placeholder="Motivo (opcional)" @bind="statusTransitionReason" />
-                                <button type="button" @onclick="ApplyStatusTransitionAsync" disabled="@isStatusTransitioning">
-                                    @(isStatusTransitioning ? "Aplicando..." : "Aplicar status")
-                                </button>
-                            </div>
-
-                            @if (!string.IsNullOrWhiteSpace(statusTransitionResultMessage))
-                            {
-                                <div class="orders-review-restored-notice admin-payments-reconcile-result @(statusTransitionResultIsError ? "admin-payments-reconcile-result--error" : "admin-payments-reconcile-result--ok")">
-                                    <span>@statusTransitionResultMessage</span>
-                                    @if (statusTransitionConfirmationId.HasValue && statusTransitionConfirmationId.Value > 0)
-                                    {
-                                        <a class="details-btn" href="@BuildConfirmationTimelineHref(statusTransitionConfirmationId.Value)">Ver timeline</a>
-                                    }
-                                    <button type="button" class="orders-review-restored-close" @onclick="DismissStatusTransitionMessage" aria-label="Fechar">&times;—</button>
-                                </div>
-                            }
-                        </section>
-                    </div>
-                </div>
-            </div>
-
-            <div class="filter-bar admin-filter-card">
-                <input type="text" placeholder="@T["AdminPayments.Filter.User"]" @bind="filterUserId" @bind:event="oninput" />
-                <input type="number" placeholder="@T["AdminPayments.Filter.Min"]" @bind="filterMinAmount" min="0" />
-                <input type="number" placeholder="@T["AdminPayments.Filter.Max"]" @bind="filterMaxAmount" min="0" />
-                <select @bind="filterStatus">
-                    <option value="">@T["AdminPayments.Filter.AllStatuses"]</option>
-                    <option value="paid">@T["Common.Paid"]</option>
-                    <option value="pending">@T["Common.Pending"]</option>
-                </select>
-                <input type="date" @bind="filterDate" />
-                <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">@T["Common.Filter"]</button>
-                <button type="button" @onclick="@(async () => await ClearFilters())">@T["Common.Clear"]</button>
-            </div>
-
-            @if (showRestoredFiltersNotice)
-            {
-                <div class="orders-review-restored-notice">
-                    <span>@T["AdminPayments.RestoredFilters"]</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">&times;—</button>
-                </div>
-            }
-
-            <AdminDataState IsLoading="@isLoading" IsEmpty="@(!pagedPayments.Any())" LoadingText="@T["AdminPayments.Loading"]" EmptyText="@T["AdminPayments.Empty"]" EmptyIcon="fas fa-money-bill-wave" EmptyHint="@T["AdminPayments.EmptyHint"]">
-                <table class="payments-table align-right">
-                    <thead>
-                        <tr>
-                            <th>@T["AdminPayments.User"]</th>
-                            <th>@T["Common.Gateway"]</th>
-                            <th>@T["Common.Value"]</th>
-                            <th>@T["Common.Status"]</th>
-                            <th>@T["Common.Date"]</th>
-                            <th>@T["Common.Actions"]</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var p in pagedPayments)
-                    {
-                        <tr>
-                            <td data-label="@T["AdminPayments.User"]">
-                                @if (p.User != null)
-                                {
-                                    <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
-                                        @p.User.UserName
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">ID: @p.UserId</span>
-                                }
-                            </td>
-                            <td data-label="@T["Common.Gateway"]">@p.PaymentMethod</td>
-                            <td data-label="@T["Common.Value"]">@FormatBtcWithUsd(p.Amount)</td>
-                            <td data-label="@T["Common.Status"]">
-                                @if (p.IsPaid)
-                                {
-                                    <span class="order-status-badge pago">@T["Common.Paid"]</span>
-                                }
-                                else
-                                {
-                                    <span class="order-status-badge aguardandopagamento">@T["Common.Pending"]</span>
-                                }
-                            </td>
-                            <td data-label="@T["Common.Date"]">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
-                            <td data-label="@T["Common.Actions"]">
-                                <div class="admin-actions-row">
-                                    <button class="details-btn action-btn icon-only" @onclick="() => ViewPayment(p.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-
-                <div class="pagination">
-                    <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
-                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
-                    <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
-                </div>
-            </AdminDataState>
         </article>
     </section>
 
@@ -650,6 +417,16 @@
     private void DismissRestoredNotice()
     {
         showRestoredFiltersNotice = false;
+    }
+
+    private async Task HandleFiltersApplied((string UserId, decimal? MinAmount, decimal? MaxAmount, string Status, DateTime? Date) filters)
+    {
+        filterUserId = filters.UserId;
+        filterMinAmount = filters.MinAmount;
+        filterMaxAmount = filters.MaxAmount;
+        filterStatus = filters.Status;
+        filterDate = filters.Date;
+        await ApplyFiltersAndPersist();
     }
 
     private MarkupString FormatBtcWithUsd(decimal amount)

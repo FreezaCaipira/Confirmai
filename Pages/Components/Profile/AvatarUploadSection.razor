@@ -1,0 +1,53 @@
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<details class="profile-edit-details">
+    <summary class="profile-edit-summary">Trocar avatar</summary>
+    <div class="profile-avatar-edit">
+        @if (!string.IsNullOrWhiteSpace(CurrentAvatarPath))
+        {
+            <img class="profile-avatar-preview" src="@CurrentAvatarPath" alt="Seu avatar" />
+        }
+        <div class="profile-avatar-upload">
+            <InputFile id="avatar-input" OnChange="HandleAvatarSelected" accept=".jpg,.jpeg,.png" class="profile-avatar-input" style="display:none" />
+            <label for="avatar-input" class="mk-btn">Escolher imagem</label>
+            <span class="profile-avatar-hint">PNG ou JPG · máx. 2 MB</span>
+        </div>
+        @if (SelectedFile != null)
+        {
+            <button class="mk-btn mk-btn-primary" type="button" @onclick="HandleSaveAvatar" disabled="@IsSaving">
+                @(IsSaving ? "Salvando..." : "Salvar avatar")
+            </button>
+        }
+        @if (!string.IsNullOrWhiteSpace(Feedback))
+        {
+            <p class="profile-feedback" role="status">@Feedback</p>
+        }
+    </div>
+</details>
+
+@code {
+    [Parameter]
+    public string? CurrentAvatarPath { get; set; }
+
+    [Parameter]
+    public IBrowserFile? SelectedFile { get; set; }
+
+    [Parameter]
+    public bool IsSaving { get; set; }
+
+    [Parameter]
+    public string? Feedback { get; set; }
+
+    [Parameter]
+    public EventCallback<IBrowserFile> OnAvatarSelected { get; set; }
+
+    [Parameter]
+    public EventCallback OnSaveAvatar { get; set; }
+
+    private async Task HandleAvatarSelected(InputFileChangeEventArgs e)
+        => await OnAvatarSelected.InvokeAsync(e.File);
+
+    private async Task HandleSaveAvatar()
+        => await OnSaveAvatar.InvokeAsync();
+}

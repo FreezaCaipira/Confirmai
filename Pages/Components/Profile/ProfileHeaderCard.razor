@@ -1,0 +1,38 @@
+@using System.Globalization
+@using Confirmai.Models
+
+@if (User is not null)
+{
+    <div class="profile-card">
+        <header class="profile-card-header">
+            @if (!string.IsNullOrWhiteSpace(User.AvatarPath))
+            {
+                <img class="profile-avatar-img" src="@User.AvatarPath" alt="Avatar de @DisplayName" />
+            }
+            else
+            {
+                <div class="profile-avatar-initials" aria-hidden="true">@AvatarInitial</div>
+            }
+            <div class="profile-identity">
+                <h1 class="profile-name">@DisplayName</h1>
+                @if (User.MemberSince.HasValue)
+                {
+                    <p class="profile-since">Membro desde @User.MemberSince.Value.ToString("MM/yyyy", CultureInfo.InvariantCulture)</p>
+                }
+            </div>
+        </header>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public ApplicationUser? User { get; set; }
+
+    private string DisplayName => User?.FullName?.Trim() is { Length: > 0 } name
+        ? name
+        : User?.UserName ?? "—";
+
+    private string AvatarInitial => DisplayName.Length > 0
+        ? DisplayName[0].ToString().ToUpperInvariant()
+        : "?";
+}

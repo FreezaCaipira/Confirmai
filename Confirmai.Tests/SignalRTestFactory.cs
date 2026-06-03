@@ -1,4 +1,4 @@
-﻿using Confirmai.Hubs;
+using Confirmai.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
 

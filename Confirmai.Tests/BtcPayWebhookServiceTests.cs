@@ -1,6 +1,12 @@
-﻿using Confirmai.Data;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Core;
+using Confirmai.Data;
 using Confirmai.Hubs;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -329,7 +335,7 @@ public class BtcPayWebhookServiceTests
 
         var config = TestConfigurationFactory.Create(configEntries);
 
-        var logService = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance);
+        var logService = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         hubContext ??= SignalRTestFactory.CreateHubContext();
         eventBus ??= new PaymentEventBus();

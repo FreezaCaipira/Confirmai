@@ -1,0 +1,133 @@
+@using Confirmai.Models
+@using Confirmai.Enums
+
+<section class="detail-section features-section">
+    <h2 class="detail-section-title">
+        <i class="fas fa-user-shield"></i> Membros &amp; Permissões
+    </h2>
+    <p class="features-section-sub">Promova membros a admin ou remova permissões de admin.</p>
+    @if (!CanManageAdminRoles)
+    {
+        <p class="feat-role-note">
+            <i class="fas fa-lock"></i>
+            Apenas o criador do grupo pode adicionar ou remover administradores.
+        </p>
+    }
+
+    <ul class="feat-members-list">
+        @foreach (var m in Members.OrderBy(m => m.Role == GroupMemberRole.Admin ? 0 : 1).ThenBy(m => m.User?.FullName))
+        {
+            var isSelf   = m.UserId == CurrentUserId;
+            var isAdminM = m.Role == GroupMemberRole.Admin;
+            var onlyAdmin = isAdminM && AdminCount == 1;
+            var isConfirmingPromote = ConfirmPromoteMemberId == m.Id;
+            <li class="feat-member-item">
+                <div class="feat-member-info">
+                    <span class="feat-member-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
+                    @if (isAdminM) { <span class="player-tag player-tag--admin">admin</span> }
+                    @if (m.UserId == CreatedByUserId) { <span class="player-tag">criador</span> }
+                    @if (isSelf)   { <span class="player-tag player-tag--me">você</span> }
+                </div>
+                @if (!isSelf && CanManageAdminRoles)
+                {
+                    @if (isAdminM)
+                    {
+                        <button class="feat-role-btn feat-role-btn--demote"
+                                type="button"
+                                disabled="@(IsSavingRole || onlyAdmin)"
+                                title="@(onlyAdmin ? "O grupo deve ter pelo menos um admin" : "Remover permissão de admin")"
+                                @onclick="() => HandleSetMemberRole(m.Id, GroupMemberRole.Member)">
+                            <i class="fas fa-user-minus"></i> Remover admin
+                        </button>
+                    }
+                    else
+                    {
+                        @if (isConfirmingPromote)
+                        {
+                            <div class="feat-role-confirm">
+                                <span class="feat-role-confirm-text">tornar admin?</span>
+                                <button class="feat-role-btn feat-role-btn--confirm-yes"
+                                        type="button"
+                                        disabled="@IsSavingRole"
+                                        @onclick="() => HandleSetMemberRole(m.Id, GroupMemberRole.Admin)">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="feat-role-btn feat-role-btn--confirm-no"
+                                        type="button"
+                                        disabled="@IsSavingRole"
+                                        @onclick="() => HandleCancelPromote()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <button class="feat-role-btn feat-role-btn--promote"
+                                    type="button"
+                                    disabled="@IsSavingRole"
+                                    title="Promover a admin"
+                                    @onclick="() => HandleInitiatePromote(m.Id)">
+                                <i class="fas fa-user-shield"></i> Tornar admin
+                            </button>
+                        }
+                    }
+                }
+            </li>
+        }
+    </ul>
+
+    @if (!string.IsNullOrWhiteSpace(RoleMessage))
+    {
+        <p class="features-save-msg @(RoleError ? "features-save-msg--error" : "")">
+            <i class="fas @(RoleError ? "fa-times-circle" : "fa-check-circle")"></i>
+            @RoleMessage
+        </p>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public List<GroupMember> Members { get; set; } = new();
+
+    [Parameter]
+    public string CurrentUserId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string CreatedByUserId { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool CanManageAdminRoles { get; set; }
+
+    [Parameter]
+    public int AdminCount { get; set; }
+
+    [Parameter]
+    public bool IsSavingRole { get; set; }
+
+    [Parameter]
+    public string RoleMessage { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool RoleError { get; set; }
+
+    [Parameter]
+    public int? ConfirmPromoteMemberId { get; set; }
+
+    [Parameter]
+    public EventCallback<(int, GroupMemberRole)> OnSetMemberRole { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnInitiatePromote { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelPromote { get; set; }
+
+    private async Task HandleSetMemberRole(int memberId, GroupMemberRole newRole)
+        => await OnSetMemberRole.InvokeAsync((memberId, newRole));
+
+    private async Task HandleInitiatePromote(int memberId)
+        => await OnInitiatePromote.InvokeAsync(memberId);
+
+    private async Task HandleCancelPromote()
+        => await OnCancelPromote.InvokeAsync();
+}

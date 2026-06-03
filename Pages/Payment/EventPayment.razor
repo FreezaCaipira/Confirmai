@@ -6,6 +6,7 @@
 @using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
+@using Confirmai.Pages.Payment.Components
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -43,242 +44,54 @@
                 var backUrl  = isFutsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
                 var ptBr     = new CultureInfo("pt-BR");
 
-                @* ── Cabeçalho ─────────────────────────────────────────── *@
-                <div class="evpay-header">
-                    <div class="evpay-header-top">
-                        <span class="evpay-sport-badge">@(isFutsal ? "⚽ Futsal" : "🃏 Poker")</span>
-                        <a href="@backUrl" class="detail-back-link">
-                            <i class="fas fa-arrow-left"></i> Voltar
-                        </a>
-                    </div>
-                    <h1 class="evpay-title">@ev.Group.Name</h1>
-                    <p class="evpay-meta">
-                        <i class="fas fa-calendar-alt"></i>
-                        @ev.StartsAt.ToLocalTime().ToString("dddd, dd/MM/yyyy 'às' HH:mm", ptBr)
-                    </p>
-                    @if (!string.IsNullOrWhiteSpace(ev.Location))
-                    {
-                        <p class="evpay-meta"><i class="fas fa-map-marker-alt"></i> @ev.Location</p>
-                    }
-                </div>
+                <EventPaymentHeader 
+                    Event="@ev"
+                    IsFutsal="@isFutsal"
+                    BackUrl="@backUrl" />
 
-                @* ── Resumo do pagamento ────────────────────────────────── *@
-                <div class="evpay-summary-card">
-                    <div class="evpay-summary-row">
-                        <span class="evpay-summary-label">Jogador</span>
-                        <span class="evpay-summary-value">@(conf.User?.FullName ?? conf.User?.UserName ?? "—")</span>
-                    </div>
-                    <div class="evpay-summary-row">
-                        <span class="evpay-summary-label">Posição</span>
-                        <span class="evpay-summary-value">
-                            @(conf.Position == FutsalPosition.Goalkeeper ? "🥅 Goleiro" : "⚽ Linha")
-                        </span>
-                    </div>
-                    <div class="evpay-summary-divider"></div>
-                    <div class="evpay-summary-row evpay-summary-row--total">
-                        <span class="evpay-summary-label">Valor a pagar</span>
-                        <span class="evpay-summary-amount">R$ @ev.Price!.Value.ToString("N2", ptBr)</span>
-                    </div>
-                </div>
+                <EventPaymentSummary 
+                    Confirmation="@conf" />
 
-                @* ── Status / Ação ──────────────────────────────────────── *@
                 @if (conf.PaymentStatus == EventConfirmationPaymentStatus.Paid || payState == PayState.Paid)
                 {
-                    @* ── Pago ─────────────────────────────────────────── *@
-                    <div class="evpay-status evpay-status--paid">
-                        <i class="fas fa-check-circle"></i>
-                        <div>
-                            <strong>Pagamento confirmado</strong>
-                            <p>Sua participação está garantida. Boa partida!</p>
-                        </div>
-                    </div>
-                    <a href="@backUrl" class="evpay-action-btn evpay-action-btn--back">
-                        <i class="fas fa-arrow-left"></i> Voltar para a partida
-                    </a>
+                    <EventPaymentStatus BackUrl="@backUrl" />
                 }
                 else if (payState == PayState.AwaitingPayment)
                 {
-                    @* ── QR Code Pix ──────────────────────────────────── *@
-                    <div class="evpay-qr-section">
-                        <div class="evpay-qr-image">
-                            <QRCode Value="@brCode" />
-                        </div>
-
-                        <div class="evpay-awaiting">
-                            <span class="evpay-awaiting-dot"></span>
-                            Aguardando pagamento…
-                        </div>
-
-                        <div class="evpay-brcode-wrap">
-                            <span class="evpay-brcode-label">Pix Copia e Cola</span>
-                            <p class="evpay-brcode">@brCode</p>
-                        </div>
-
-                        <button class="evpay-action-btn evpay-action-btn--copy"
-                                @onclick="CopyBrCode">
-                            <i class="@(copied ? "fas fa-check" : "fas fa-copy")"></i>
-                            @(copied ? "Copiado!" : "Copiar código Pix")
-                        </button>
-                    </div>
+                    <EventPaymentQr 
+                        BrCode="@brCode"
+                        Copied="@copied"
+                        OnCopyBrCode="@CopyBrCodeCallback" />
                 }
                 else
                 {
-                    @if (groupGatewaysEnabled)
-                    {
-                        @* ── Selecionar método ────────────────────────────── *@
-                        <div class="evpay-methods">
-                            <h2 class="evpay-methods-title">Forma de pagamento</h2>
-                            <div class="evpay-method-list">
-                                @foreach (var gateway in availableGateways)
-                                {
-                                    var isSelected = string.Equals(selectedGatewayName, gateway.Name, StringComparison.OrdinalIgnoreCase);
-                                    <button type="button"
-                                            class="evpay-method-option @(isSelected ? "evpay-method-option--selected" : string.Empty)"
-                                            @onclick="() => SelectGateway(gateway.Name)">
-                                        <span class="evpay-method-icon">💠</span>
-                                        <span class="evpay-method-name">@gateway.DisplayName</span>
-                                        <span class="evpay-method-badge">@gateway.Name</span>
-                                    </button>
-                                }
+                    <EventPaymentGateways
+                        AvailableGateways="@availableGateways"
+                        ComingSoonGateways="@GetComingSoonGateways()"
+                        SelectedGatewayName="@selectedGatewayName"
+                        GroupGatewaysEnabled="@groupGatewaysEnabled"
+                        IsGenerating="@(payState == PayState.Generating)"
+                        ErrorMsg="@errorMsg"
+                        Price="@(ev.Price!.Value)"
+                        SelectedGatewayDisplayName="@GetSelectedGatewayDisplayName()"
+                        OnSelectGateway="@SelectGatewayCallback"
+                        OnGenerateCharge="@GeneratePixChargeCallback" />
 
-                                @foreach (var gateway in GetComingSoonGateways())
-                                {
-                                    <button type="button"
-                                            class="evpay-method-option evpay-method-option--disabled"
-                                            disabled
-                                            aria-disabled="true"
-                                            title="Integração em breve">
-                                        <span class="evpay-method-icon">🧾</span>
-                                        <span class="evpay-method-name">@gateway.DisplayName</span>
-                                        <span class="evpay-method-badge evpay-method-badge--soon">em breve</span>
-                                    </button>
-                                }
-                            </div>
-                        </div>
+                    <EventPaymentPixAdmin
+                        GroupAdminPixKey="@GetGroupAdminPixKey(ev.Group)"
+                        GroupName="@ev.Group.Name"
+                        GroupCity="@ev.Group.City"
+                        Price="@(ev.Price!.Value)"
+                        CopiedAdminPix="@copiedAdminPix"
+                        PixQrPayload="@BuildPixStaticPayload(GetGroupAdminPixKey(ev.Group)!, ev.Group.Name, ev.Group.City, ev.Price!.Value)"
+                        OnCopyAdminPixKey="@CopyAdminPixKeyCallback" />
 
-                        @if (!string.IsNullOrWhiteSpace(errorMsg))
-                        {
-                            <p class="evpay-error">@errorMsg</p>
-                        }
-
-                        @if (!availableGateways.Any())
-                        {
-                            <p class="evpay-disclaimer">
-                                <i class="fas fa-clock"></i>
-                                Nenhum gateway de pagamento está disponível no momento.
-                            </p>
-                        }
-                        else
-                        {
-                        <button class="evpay-action-btn evpay-action-btn--pay"
-                                disabled="@(payState == PayState.Generating)"
-                                @onclick="GeneratePixCharge">
-                            @if (payState == PayState.Generating)
-                            {
-                                <span>Gerando QR Code…</span>
-                            }
-                            else
-                            {
-                                <i class="fas fa-qrcode"></i>
-                                <span>Gerar QR Code (@GetSelectedGatewayDisplayName()) — R$ @ev.Price!.Value.ToString("N2", ptBr)</span>
-                            }
-                        </button>
-                        }
-                    }
-                    else
-                    {
-                        <p class="evpay-disclaimer">
-                            <i class="fas fa-info-circle"></i>
-                            Este grupo utiliza o fluxo padrão: Pix direto para o organizador com envio de comprovante.
-                        </p>
-                    }
-
-                    @* ── Pix Direto do Organizador ─────────────────────── *@
-                    <div class="evpay-admin-pix">
-                        <div class="evpay-admin-pix-header">
-                            <i class="fas fa-hand-holding-usd"></i>
-                            <span>Pix direto ao organizador</span>
-                        </div>
-                        @if (!string.IsNullOrWhiteSpace(GetGroupAdminPixKey(ev.Group)))
-                        {
-                            <p class="evpay-admin-pix-hint">
-                                Escaneie o QR Code ou copie a chave e transfira R$ @ev.Price!.Value.ToString("N2", ptBr) diretamente.
-                                O organizador confirmará o recebimento.
-                            </p>
-                            <div class="evpay-admin-pix-qr">
-                                <QRCode Value="@BuildPixStaticPayload(GetGroupAdminPixKey(ev.Group)!, ev.Group.Name, ev.Group.City, ev.Price!.Value)" />
-                            </div>
-                            <div class="evpay-admin-pix-key">
-                                <code class="evpay-admin-pix-code">@GetGroupAdminPixKey(ev.Group)</code>
-                                <button type="button" class="evpay-admin-pix-copy"
-                                        @onclick="() => CopyAdminPixKey(GetGroupAdminPixKey(ev.Group)!)">
-                                    <i class="fas @(copiedAdminPix ? "fa-check" : "fa-copy")"></i>
-                                    @(copiedAdminPix ? "Copiado!" : "Copiar")
-                                </button>
-                            </div>
-                        }
-                        else
-                        {
-                            <p class="evpay-admin-pix-no-key">
-                                <i class="fas fa-exclamation-circle"></i>
-                                O organizador ainda não cadastrou uma chave Pix. Entre em contato diretamente para combinar o pagamento.
-                            </p>
-                        }
-                    </div>
-
-                    @* ── Comprovante de pagamento ──────────────────────── *@
-                    <div class="evpay-proof">
-                        <div class="evpay-proof-header">
-                            <i class="fas fa-camera"></i>
-                            <span>Comprovante de pagamento</span>
-                        </div>
-                        @if (conf.PixProofUploadedAt.HasValue)
-                        {
-                            <div class="evpay-proof-sent">
-                                <i class="fas fa-check-circle evpay-proof-sent-icon"></i>
-                                <span>Comprovante enviado em @conf.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</span>
-                            </div>
-                            <img src="/api/pix-proof/@conf.Id" class="evpay-proof-thumb" alt="Comprovante Pix" />
-                            <label class="evpay-proof-btn evpay-proof-btn--update">
-                                @if (uploadingProof)
-                                {
-                                    <i class="fas fa-spinner fa-spin"></i> <span>Enviando…</span>
-                                }
-                                else
-                                {
-                                    <i class="fas fa-sync-alt"></i> <span>Atualizar comprovante</span>
-                                }
-                                <InputFile OnChange="UploadProof" accept="image/jpeg,image/png,image/webp" style="display:none" disabled="@uploadingProof" />
-                            </label>
-                        }
-                        else
-                        {
-                            <p class="evpay-proof-hint">
-                                Após fazer o Pix, envie o comprovante para o organizador confirmar seu pagamento.
-                            </p>
-                            <label class="evpay-proof-btn">
-                                @if (uploadingProof)
-                                {
-                                    <i class="fas fa-spinner fa-spin"></i> <span>Enviando…</span>
-                                }
-                                else
-                                {
-                                    <i class="fas fa-upload"></i> <span>Enviar comprovante</span>
-                                }
-                                <InputFile OnChange="UploadProof" accept="image/jpeg,image/png,image/webp" style="display:none" disabled="@uploadingProof" />
-                            </label>
-                        }
-                        @if (!string.IsNullOrWhiteSpace(proofError))
-                        {
-                            <p class="evpay-proof-error">@proofError</p>
-                        }
-                        @if (!string.IsNullOrWhiteSpace(proofSuccessMessage))
-                        {
-                            <p class="evpay-proof-success" style="animation: fadeout 3s forwards; animation-delay: 2s;">
-                                <i class="fas fa-check-circle"></i> @proofSuccessMessage
-                            </p>
-                        }
-                    </div>
+                    <EventPaymentProof
+                        Confirmation="@conf"
+                        UploadingProof="@uploadingProof"
+                        ProofError="@proofError"
+                        ProofSuccessMessage="@proofSuccessMessage"
+                        OnProofUpload="@UploadProofCallback" />
                 }
             }
 
@@ -477,7 +290,6 @@
             if (!ct.IsCancellationRequested)
             {
                 copied = false;
-                StateHasChanged();
             }
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -536,7 +348,6 @@
             if (!ct.IsCancellationRequested)
             {
                 copiedAdminPix = false;
-                StateHasChanged();
             }
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -596,7 +407,6 @@
         finally
         {
             uploadingProof = false;
-            StateHasChanged();
         }
     }
 
@@ -693,4 +503,25 @@
         _copyAdminPixCts?.Dispose();
         _uploadProofCts?.Dispose();
     }
+
+    // Callback wrappers for child components
+    private async Task CopyBrCodeCallback()
+        => await CopyBrCode();
+
+    private async Task SelectGatewayCallback(string gatewayName)
+        => SelectGateway(gatewayName);
+
+    private async Task GeneratePixChargeCallback()
+        => await GeneratePixCharge();
+
+    private async Task CopyAdminPixKeyCallback()
+    {
+        if (conf is null) return;
+        var key = GetGroupAdminPixKey(conf.Event.Group);
+        if (!string.IsNullOrWhiteSpace(key))
+            await CopyAdminPixKey(key);
+    }
+
+    private async Task UploadProofCallback(InputFileChangeEventArgs e)
+        => await UploadProof(e);
 }

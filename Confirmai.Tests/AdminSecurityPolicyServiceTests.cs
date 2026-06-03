@@ -1,7 +1,13 @@
-﻿using System.Security.Claims;
+using Confirmai.Services.Admin;
+using Confirmai.Services.Core;
+using System.Security.Claims;
 using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Utility;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -103,7 +109,7 @@ public class AdminSecurityPolicyServiceTests
         return new AdminSecurityPolicyService(
             db,
             CreateEnvironment(isDevelopment),
-            new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.LogService>.Instance));
+            new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance));
     }
 
     private static ClaimsPrincipal CreatePrincipal(string userId, params string[] roles)

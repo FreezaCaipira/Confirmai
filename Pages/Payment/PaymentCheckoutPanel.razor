@@ -1,0 +1,225 @@
+@using Confirmai.Shared
+@using Microsoft.AspNetCore.Components
+
+<section class="tibia-pay-card tibia-pay-card-checkout">
+    <div class="tibia-pay-card-head">
+        <h2>@T["PaymentBuy.GeneratePayment"]</h2>
+    </div>
+    <div class="tibia-pay-card-body">
+        @if (!ActiveGateways.Any())
+        {
+            <div class="no-gateways">
+                <b>@T["PaymentBuy.NoMethod"]</b>
+                <div class="no-gateways-hint">
+                    @T["PaymentBuy.NoMethodHint"]
+                </div>
+            </div>
+        }
+        else if (string.IsNullOrEmpty(Address))
+        {
+            <div class="tibia-pay-form-grid">
+                <div class="tibia-pay-switch-block">
+                    <label class="tibia-pay-switch" for="use-intermediary">
+                        <input id="use-intermediary" type="checkbox" @bind="UseSiteIntermediary" @bind:after="HandleIntermediaryChanged" />
+                        <span class="tibia-pay-switch-lever" aria-hidden="true"></span>
+                        <span class="tibia-pay-switch-text">
+                            @(UseSiteIntermediary
+                                ? "Com intermedio do ADM do site"
+                                : "Sem intermedio do ADM do site")
+                        </span>
+                    </label>
+                </div>
+                @if (!UseSiteIntermediary)
+                {
+                    <div class="tibia-pay-no-intermediary-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Sem intermediação, o pagamento vai diretamente ao vendedor. Só prossiga se você <strong>confia totalmente no vendedor</strong>. O site não poderá mediar disputas nesta transação.</span>
+                    </div>
+                }
+
+                <div class="tibia-pay-field">
+                    <label class="tibia-pay-label" for="payment-method">Forma de pagamento:</label>
+                    <select id="payment-method" class="tibia-pay-select" @bind="SelectedMethod" @bind:after="HandleMethodChanged" aria-label="@T["PaymentBuy.SelectGateway"]">
+                        @foreach (var gateway in ActiveGateways)
+                        {
+                            <option value="@gateway.Name">@gateway.Name</option>
+                        }
+                    </select>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(PixCurrencyNotice))
+                {
+                    <div class="payment-inline-feedback payment-inline-feedback-warning" role="status" aria-live="polite">
+                        @PixCurrencyNotice
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(PixSellerKeyNotice))
+                {
+                    <div class="payment-inline-feedback payment-inline-feedback-warning" role="status" aria-live="polite">
+                        @PixSellerKeyNotice
+                    </div>
+                }
+
+                <div class="tibia-pay-action-wrap">
+                    <button class="tibia-pay-btn" @onclick="HandleGeneratePayment" aria-label="@T["PaymentBuy.GenerateAddress"]">
+                        @T["PaymentBuy.GenerateAddress"]
+                    </button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="tibia-pay-status-block">
+                <div class="tibia-pay-label">@(IsPixCurrentPayment ? T["PaymentBuy.PixCodeLabel"] : T["PaymentBuy.InvoiceAddress"])</div>
+                <div class="tibia-pay-address-wrap">
+                    <div class="tibia-pay-address">@Address</div>
+                    <button class="tibia-pay-copy-btn" @onclick="HandleCopyAddress" title="Copiar" aria-label="Copiar codigo">
+                        <i class="@CopyIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="tibia-pay-qrcode">
+                <QRCode Value="@QRCodeValue" />
+            </div>
+
+            <div class="tibia-pay-status-block tibia-pay-status-main">
+                <div class="tibia-pay-label">@T["Common.Status"]</div>
+                <div class="tibia-pay-status-row">
+                    @if (IsPaid)
+                    {
+                        <span class="tibia-pay-pill tibia-pay-pill-ok">@T["PaymentBuy.PaidReceived"]</span>
+                    }
+                    else
+                    {
+                        <div class="tibia-pay-waiting-message" role="status" aria-live="polite">
+                            <span class="tibia-pay-waiting-title">@(IsPixCurrentPayment && !AbacatePayIsEnabled ? "Aguardando confirmacao manual do pagamento PIX." : T["PaymentBuy.Waiting"])</span>
+                        </div>
+                        @if (!IsPixCurrentPayment || AbacatePayIsEnabled)
+                        {
+                            <button type="button" class="tibia-pay-btn" @onclick="HandleCheckPayment" aria-label="@T["PaymentBuy.Check"]">
+                                @T["PaymentBuy.Check"]
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(FeedbackMessage))
+            {
+                <div class="payment-inline-feedback payment-inline-feedback-@FeedbackType" role="status" aria-live="polite">
+                    @FeedbackMessage
+                </div>
+            }
+
+            @if (ShowPrivateKey && !string.IsNullOrEmpty(PrivateKey))
+            {
+                <div class="tibia-pay-private-key">
+                    <div class="tibia-pay-label">
+                        <i class="fas fa-key"></i>
+                        @T["PaymentBuy.PrivateKey"]
+                    </div>
+                    <div class="tibia-pay-private-key-value">
+                        <code>@PrivateKey</code>
+                    </div>
+                    <div class="no-gateways-hint">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        @T["PaymentBuy.PrivateKeyWarning"]
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</section>
+
+@inject UiTextService T
+
+@code {
+    [Parameter]
+    public string Address { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsPaid { get; set; }
+
+    [Parameter]
+    public List<GatewayInfo> ActiveGateways { get; set; } = new();
+
+    [Parameter]
+    public string SelectedMethod { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool UseSiteIntermediary { get; set; } = true;
+
+    [Parameter]
+    public string QRCodeValue { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? PixCurrencyNotice { get; set; }
+
+    [Parameter]
+    public string? PixSellerKeyNotice { get; set; }
+
+    [Parameter]
+    public string? FeedbackMessage { get; set; }
+
+    [Parameter]
+    public string FeedbackType { get; set; } = "info";
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public bool IsPixCurrentPayment { get; set; }
+
+    [Parameter]
+    public string CopyIcon { get; set; } = "fas fa-copy";
+
+    [Parameter]
+    public bool AbacatePayIsEnabled { get; set; }
+
+    [Parameter]
+    public bool ShowPrivateKey { get; set; }
+
+    [Parameter]
+    public string? PrivateKey { get; set; }
+
+    [Parameter]
+    public EventCallback OnGeneratePayment { get; set; }
+
+    [Parameter]
+    public EventCallback OnCheckPayment { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnMethodChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnIntermediaryChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnCopyAddress { get; set; }
+
+    private async Task HandleGeneratePayment()
+    {
+        await OnGeneratePayment.InvokeAsync();
+    }
+
+    private async Task HandleCheckPayment()
+    {
+        await OnCheckPayment.InvokeAsync();
+    }
+
+    private async Task HandleMethodChanged()
+    {
+        await OnMethodChanged.InvokeAsync(SelectedMethod);
+    }
+
+    private async Task HandleIntermediaryChanged()
+    {
+        await OnIntermediaryChanged.InvokeAsync();
+    }
+
+    private async Task HandleCopyAddress()
+    {
+        await OnCopyAddress.InvokeAsync();
+    }
+}

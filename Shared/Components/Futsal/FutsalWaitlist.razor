@@ -1,0 +1,103 @@
+@using Confirmai.Enums
+@using Confirmai.Models
+
+@if (Event.WaitingList.Count > 0)
+{
+    <hr class="detail-divider">
+    <section class="detail-section">
+        <h2 class="detail-section-title"><i class="fas fa-clock"></i> Lista de espera (@Event.WaitingList.Count)</h2>
+        <ol class="players-list">
+            @{ int wIdx = 0; }
+            @foreach (var w in Event.WaitingList.OrderBy(w => w.Position).ThenBy(w => w.JoinedAt))
+            {
+                wIdx++;
+                <li class="player-item @(w.UserId == CurrentUserId ? "player-item--me" : "")">
+                    <span class="player-num">@wIdx</span>
+                    <span class="player-name">@(w.User?.FullName ?? w.User?.UserName ?? "Jogador")</span>
+                    @if (w.DesiredPosition == FutsalPosition.Goalkeeper) { <span class="player-tag">goleiro</span> }
+                    @if (w.UserId == CurrentUserId)
+                    {
+                        <span class="player-tag player-tag--me">você</span>
+                        @if (Event.IsActive && !IsPastEvent)
+                        {
+                            @if (ConfirmLeaveWaitlist)
+                            {
+                                <span class="player-tag player-tag--cancel-confirm">sair da fila?</span>
+                                <button class="player-tag player-tag--cancel-yes" type="button" @onclick="HandleLeaveWaitlist">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="player-tag player-tag--cancel-no" type="button" @onclick="HandleCancelLeaveWaitlist">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="player-tag player-tag--cancel" type="button" @onclick="HandleStartLeaveWaitlist">
+                                    <i class="fas fa-user-times"></i> sair da fila
+                                </button>
+                            }
+                        }
+                    }
+                    @if (IsAdmin && Event.IsActive && !IsPastEvent && w.UserId != CurrentUserId)
+                    {
+                        <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => HandleAdminRemoveWaitlist(w.Id)">
+                            <i class="fas fa-user-times"></i> remover
+                        </button>
+                    }
+                </li>
+            }
+        </ol>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public Event Event { get; set; } = default!;
+
+    [Parameter]
+    public string? CurrentUserId { get; set; }
+
+    [Parameter]
+    public bool IsAdmin { get; set; }
+
+    [Parameter]
+    public bool IsPastEvent { get; set; }
+
+    [Parameter]
+    public bool ConfirmLeaveWaitlist { get; set; }
+
+    [Parameter]
+    public EventCallback OnStartLeaveWaitlist { get; set; }
+
+    [Parameter]
+    public EventCallback OnLeaveWaitlist { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelLeaveWaitlist { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnAdminRemoveWaitlist { get; set; }
+
+    [Inject]
+    public UiTextService T { get; set; } = default!;
+
+    private async Task HandleStartLeaveWaitlist()
+    {
+        await OnStartLeaveWaitlist.InvokeAsync();
+    }
+
+    private async Task HandleLeaveWaitlist()
+    {
+        await OnLeaveWaitlist.InvokeAsync();
+    }
+
+    private async Task HandleCancelLeaveWaitlist()
+    {
+        await OnCancelLeaveWaitlist.InvokeAsync();
+    }
+
+    private async Task HandleAdminRemoveWaitlist(int waitlistId)
+    {
+        await OnAdminRemoveWaitlist.InvokeAsync(waitlistId);
+    }
+}

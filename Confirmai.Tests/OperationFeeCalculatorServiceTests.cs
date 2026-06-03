@@ -1,5 +1,11 @@
-﻿using Confirmai.Data;
+using Confirmai.Services.Admin;
+using Confirmai.Data;
 using Confirmai.Services;
+using Confirmai.Services.Payment;
+using Confirmai.Services.Events;
+using Confirmai.Services.User;
+using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 using Microsoft.EntityFrameworkCore;
 
 namespace Confirmai.Tests;

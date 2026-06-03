@@ -1,0 +1,64 @@
+@using Confirmai.Enums
+
+<div class="profile-sport-card">
+    <div class="profile-sport-tabs" role="tablist">
+        <button class="profile-sport-tab @(ActiveSport == Sport.Futsal ? "active" : string.Empty)"
+                role="tab" type="button" @onclick='() => HandleSetSport(Sport.Futsal)'>
+            ⚽ Futsal
+        </button>
+        <button class="profile-sport-tab @(ActiveSport == Sport.Poker ? "active" : string.Empty)"
+                role="tab" type="button" @onclick='() => HandleSetSport(Sport.Poker)'>
+            🃏 Poker
+        </button>
+    </div>
+
+    @if (ActiveSport == Sport.Futsal)
+    {
+        <div class="profile-sport-stats" role="tabpanel">
+            <div class="profile-stat-item">
+                <span class="profile-stat-number">@FutsalTotal</span>
+                <span class="profile-stat-label">Partidas</span>
+            </div>
+            <div class="profile-stat-item">
+                <span class="profile-stat-number">@FutsalOutfieldTotal</span>
+                <span class="profile-stat-label">Jogador de linha</span>
+            </div>
+            <div class="profile-stat-item">
+                <span class="profile-stat-number">@FutsalGoalkeeperTotal</span>
+                <span class="profile-stat-label">Goleiro</span>
+            </div>
+        </div>
+    }
+    else if (ActiveSport == Sport.Poker)
+    {
+        <div class="profile-sport-stats" role="tabpanel">
+            <div class="profile-stat-item">
+                <span class="profile-stat-number">@PokerTotal</span>
+                <span class="profile-stat-label">Sessões</span>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Sport ActiveSport { get; set; } = Sport.Futsal;
+
+    [Parameter]
+    public int FutsalTotal { get; set; }
+
+    [Parameter]
+    public int FutsalOutfieldTotal { get; set; }
+
+    [Parameter]
+    public int FutsalGoalkeeperTotal { get; set; }
+
+    [Parameter]
+    public int PokerTotal { get; set; }
+
+    [Parameter]
+    public EventCallback<Sport> OnSetSport { get; set; }
+
+    private async Task HandleSetSport(Sport sport)
+        => await OnSetSport.InvokeAsync(sport);
+}

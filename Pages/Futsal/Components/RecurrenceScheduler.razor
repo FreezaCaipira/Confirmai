@@ -1,0 +1,51 @@
+<fieldset class="form-section">
+    <legend>Periodicidade</legend>
+
+    <label class="switch-label">
+        <input type="checkbox" @bind="@RecurrenceEnabled" />
+        Esta partida se repete semanalmente
+    </label>
+
+    @if (RecurrenceEnabled)
+    {
+        <div class="form-group" style="margin-top:.9rem">
+            <label>Dias da semana</label>
+            <div class="weekday-grid">
+                @foreach (var (dow, label) in WeekdayOptions)
+                {
+                    <label class="weekday-chip @(SelectedDays.Contains(dow) ? "weekday-chip--on" : "")">
+                        <input type="checkbox"
+                               checked="@SelectedDays.Contains(dow)"
+                               @onchange="e => HandleToggleDay(dow, (bool)(e.Value ?? false))" />
+                        @label
+                    </label>
+                }
+            </div>
+        </div>
+    }
+</fieldset>
+
+@code {
+    [Parameter]
+    public bool RecurrenceEnabled { get; set; }
+
+    [Parameter]
+    public HashSet<DayOfWeek> SelectedDays { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<(DayOfWeek, bool)> OnToggleDay { get; set; }
+
+    private static readonly (DayOfWeek Dow, string Label)[] WeekdayOptions =
+    [
+        (DayOfWeek.Monday,    "Seg"),
+        (DayOfWeek.Tuesday,   "Ter"),
+        (DayOfWeek.Wednesday, "Qua"),
+        (DayOfWeek.Thursday,  "Qui"),
+        (DayOfWeek.Friday,    "Sex"),
+        (DayOfWeek.Saturday,  "Sáb"),
+        (DayOfWeek.Sunday,    "Dom"),
+    ];
+
+    private async Task HandleToggleDay(DayOfWeek dow, bool on)
+        => await OnToggleDay.InvokeAsync((dow, on));
+}

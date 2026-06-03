@@ -1,0 +1,58 @@
+@using Confirmai.Shared
+
+<div class="filter-bar admin-filter-card">
+    <input type="text" placeholder="@T["AdminUsers.Filter.Email"]" @bind="localFilterEmail" @bind:event="oninput" />
+    <input type="text" placeholder="@T["AdminUsers.Filter.Role"]" @bind="localFilterRole" @bind:event="oninput" />
+    <select @bind="localFilterStatus">
+        <option value="">@T["AdminUsers.Filter.All"]</option>
+        <option value="active">@T["AdminUsers.Active"]</option>
+        <option value="blocked">@T["AdminUsers.Blocked"]</option>
+    </select>
+    <button type="button" @onclick="ApplyAsync">@T["Common.Filter"]</button>
+    <button type="button" @onclick="ClearAsync">@T["Common.Clear"]</button>
+</div>
+
+@code {
+    [Parameter]
+    public string FilterEmail { get; set; } = "";
+
+    [Parameter]
+    public string FilterRole { get; set; } = "";
+
+    [Parameter]
+    public string FilterStatus { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<(string Email, string Role, string Status)> OnApplyFilters { get; set; }
+
+    [Parameter]
+    public EventCallback<(string Email, string Role, string Status)> OnClearFilters { get; set; }
+
+    [Inject]
+    public UiTextService T { get; set; } = default!;
+
+    private string localFilterEmail = "";
+    private string localFilterRole = "";
+    private string localFilterStatus = "";
+
+    protected override void OnParametersSet()
+    {
+        localFilterEmail = FilterEmail;
+        localFilterRole = FilterRole;
+        localFilterStatus = FilterStatus;
+    }
+
+    private async Task ApplyAsync()
+    {
+        await OnApplyFilters.InvokeAsync((localFilterEmail, localFilterRole, localFilterStatus));
+    }
+
+    private async Task ClearAsync()
+    {
+        localFilterEmail = "";
+        localFilterRole = "";
+        localFilterStatus = "";
+        await OnClearFilters.InvokeAsync(("", "", ""));
+    }
+}
+

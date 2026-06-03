@@ -1,0 +1,28 @@
+@if (CurrentYear > 0)
+{
+    <div class="ranking-tabs">
+        <button class="ranking-tab @(ViewMode == "Month" ? "ranking-tab--active" : "")"
+                type="button" @onclick="@(e => OnViewModeChanged.InvokeAsync("Month"))">
+            <i class="fas fa-calendar-alt"></i> Mês atual
+        </button>
+        <button class="ranking-tab @(ViewMode == "Year" ? "ranking-tab--active" : "")"
+                type="button" @onclick="@(e => OnViewModeChanged.InvokeAsync("Year"))">
+            <i class="fas fa-calendar-check"></i> Ano @CurrentYear
+        </button>
+        <button class="ranking-tab @(ViewMode == "AllTime" ? "ranking-tab--active" : "")"
+                type="button" @onclick="@(e => OnViewModeChanged.InvokeAsync("AllTime"))">
+            <i class="fas fa-infinity"></i> Geral
+        </button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string ViewMode { get; set; } = "Month";
+
+    [Parameter]
+    public int CurrentYear { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnViewModeChanged { get; set; }
+}

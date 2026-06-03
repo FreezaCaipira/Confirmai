@@ -1,0 +1,143 @@
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+
+@if (IsPastEvent && Event.Group.EnablePostMatchRanking && (IsMember || IsAdmin))
+{
+    var votePlayers = Event.Confirmations
+        .Where(c => c.TeamId == 0 || c.TeamId == 1)
+        .OrderBy(c => c.TeamId).ThenBy(c => c.Position).ThenBy(c => c.ConfirmedAt)
+        .ToList();
+    int totalVoters = votePlayers.Count;
+    int voteCount   = AllVotes.Count;
+    bool revealed   = voteCount >= Math.Max(1, (int)Math.Ceiling(totalVoters * 0.5));
+
+    <div class="esc-vote-section">
+        <div class="esc-section-header">
+            <h3 class="esc-section-title"><i class="fas fa-star"></i> Destaque da Partida</h3>
+            <span class="esc-vote-progress-pill">@voteCount/@totalVoters votos</span>
+        </div>
+
+        @if (revealed)
+        {
+            @* Show MVP result *@
+            var mvp = AllVotes
+                .GroupBy(v => v.VotedForUserId)
+                .OrderByDescending(g => g.Count())
+                .FirstOrDefault();
+            var mvpName = mvp is not null
+                ? (votePlayers.FirstOrDefault(p => p.UserId == mvp.Key)?.User?.FullName
+                   ?? votePlayers.FirstOrDefault(p => p.UserId == mvp.Key)?.User?.Email
+                   ?? "—")
+                : "—";
+
+            <div class="esc-mvp-banner">
+                <span class="esc-mvp-trophy">🏆</span>
+                <div>
+                    <p class="esc-mvp-label">Destaque</p>
+                    <p class="esc-mvp-name">@mvpName</p>
+                    <p class="esc-mvp-votes">@(mvp?.Count() ?? 0) votos · @voteCount/@totalVoters votaram</p>
+                </div>
+            </div>
+
+            @* Still show your vote *@
+            @if (MyVote is not null)
+            {
+                var myVoteName = votePlayers.FirstOrDefault(p => p.UserId == MyVote.VotedForUserId)?.User?.FullName
+                                 ?? votePlayers.FirstOrDefault(p => p.UserId == MyVote.VotedForUserId)?.User?.Email
+                                 ?? "—";
+                <p class="esc-vote-mine"><i class="fas fa-check-circle"></i> Seu voto: <strong>@myVoteName</strong></p>
+            }
+        }
+        else if (MyVote is not null && !IsEditingVote)
+        {
+            @* Voted but not revealed yet – show pending + Trocar voto *@
+            var myVoteName = votePlayers.FirstOrDefault(p => p.UserId == MyVote.VotedForUserId)?.User?.FullName
+                             ?? votePlayers.FirstOrDefault(p => p.UserId == MyVote.VotedForUserId)?.User?.Email
+                             ?? "—";
+            <div class="esc-vote-pending">
+                <i class="fas fa-check-circle"></i>
+                <p>Seu voto: <strong>@myVoteName</strong> — aguardando mais votos…</p>
+                <button class="esc-vote-change-btn" @onclick="@(() => HandleEditingVoteChanged(true))">
+                    <i class="fas fa-pen"></i> Trocar
+                </button>
+            </div>
+        }
+        else if (CurrentUserId is not null && votePlayers.Any(p => p.UserId == CurrentUserId))
+        {
+            @* Can vote (first time or editing) *@
+            <p class="esc-vote-hint">@(IsEditingVote ? "Escolha um novo destaque:" : "Toque em quem foi o craque da partida:")</p>
+            <ul class="esc-vote-list">
+                @foreach (var p in votePlayers)
+                {
+                    bool isMe     = p.UserId == CurrentUserId;
+                    bool isMyPick = MyVote?.VotedForUserId == p.UserId;
+                    <li class="esc-vote-item @(isMe ? "esc-vote-item--me" : "") @(isMyPick ? "esc-vote-item--current" : "")"
+                        @onclick="@(isMe ? null : () => HandleCastVote(p.UserId))"
+                        title="@(isMe ? "Você não pode votar em si mesmo" : $"Votar em {p.User?.FullName ?? p.User?.Email}")">
+                        <span class="esc-vote-team-badge @(p.TeamId == 0 ? "esc-vote-team-badge--a" : "esc-vote-team-badge--b")">@(p.TeamId == 0 ? "A" : "B")</span>
+                        <span class="esc-vote-name">@(p.User?.FullName ?? p.User?.Email)</span>
+                        @if (isMe)     { <span class="player-tag player-tag--me">você</span> }
+                        @if (isMyPick) { <span class="esc-vote-current-tag"><i class="fas fa-check"></i></span> }
+                    </li>
+                }
+            </ul>
+            @if (IsEditingVote)
+            {
+                <button class="esc-btn esc-btn--secondary esc-btn--sm" style="margin-top:.5rem" @onclick="@(() => HandleEditingVoteChanged(false))">
+                    Cancelar
+                </button>
+            }
+            @if (VoteError is not null) { <p class="esc-error">@VoteError</p> }
+        }
+        else
+        {
+            <p class="esc-hint"><i class="fas fa-info-circle"></i> Apenas jogadores escalados podem votar.</p>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public required Event Event { get; set; }
+
+    [Parameter]
+    public required bool IsPastEvent { get; set; }
+
+    [Parameter]
+    public required bool IsMember { get; set; }
+
+    [Parameter]
+    public required bool IsAdmin { get; set; }
+
+    [Parameter]
+    public string? CurrentUserId { get; set; }
+
+    [Parameter]
+    public required List<PostMatchVote> AllVotes { get; set; }
+
+    [Parameter]
+    public PostMatchVote? MyVote { get; set; }
+
+    [Parameter]
+    public bool IsEditingVote { get; set; }
+
+    [Parameter]
+    public string? VoteError { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCastVote { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnEditingVoteChanged { get; set; }
+
+    private async Task HandleCastVote(string votedForUserId)
+    {
+        await OnCastVote.InvokeAsync(votedForUserId);
+    }
+
+    private async Task HandleEditingVoteChanged(bool isEditing)
+    {
+        await OnEditingVoteChanged.InvokeAsync(isEditing);
+    }
+}
