@@ -70,7 +70,7 @@ Confirmai é um marketplace descentralizado focado em transações com Bitcoin, 
    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE Confirmai TO seuusuario;"
    ```
 
-3. **Configure o `appsettings.json`**
+3. **Configure o `appsettings.json`
    
    Ajuste a string de conexão se necessário e configure as chaves dos gateways Bitcoin desejados.
 
@@ -190,9 +190,20 @@ npm test
 
 ---
 
+## Documentação
+
+Para informações detalhadas sobre arquitetura, desenvolvimento, deployment e operação, consulte a documentação em [docs/](docs/):
+
+- [Arquitetura](docs/architecture/system-overview.md)
+- [Desenvolvimento](docs/development/getting-started.md)
+- [Deployment](docs/deployment/production-checklist.md)
+- [Operações](docs/operations/troubleshooting.md)
+
+---
+
 ## Roadmap e Progresso
 
-Veja os arquivos [roadmap.md](roadmap.md) e [DEVELOPMENT.md](DEVELOPMENT.md) para o plano detalhado.
+Veja os arquivos [roadmap.md](roadmap.md) e [PROGRESS.md](PROGRESS.md) para o plano detalhado.
 
 **Status rápido (Junho/2026 — Phase 18 COMPLETA):**
 - ✅ Build e suíte principal estáveis: **552/575 testes** passando em `Confirmai.Tests` (99.5%)
@@ -237,10 +248,10 @@ Veja os arquivos [roadmap.md](roadmap.md) e [DEVELOPMENT.md](DEVELOPMENT.md) par
 4. Produto: indicadores de ocupação, inadimplência e conversão em pagamento.
 
 **Operação de produção:**
-1. Checklist de produção: [docs/production-checklist.md](docs/production-checklist.md)
-2. Guia de deploy: [docs/deploy.md](docs/deploy.md)
-3. Runbook de observabilidade (pagamentos/reconciliação): [docs/observability-payments-runbook.md](docs/observability-payments-runbook.md)
-4. Regras de alertas operacionais: [docs/payments-alert-rules.md](docs/payments-alert-rules.md)
+1. Checklist de produção: [docs/deployment/production-checklist.md](docs/deployment/production-checklist.md)
+2. Guia de deploy: [docs/deployment/README.md](docs/deployment/README.md)
+3. Runbook de observabilidade (pagamentos/reconciliação): [docs/operations/observability-payments-runbook.md](docs/operations/observability-payments-runbook.md)
+4. Regras de alertas operacionais: [docs/operations/payments-alert-rules.md](docs/operations/payments-alert-rules.md)
 5. Templates Prometheus/Alertmanager: [docs/monitoring/README.md](docs/monitoring/README.md)
 6. Dashboard Grafana (exemplo): [docs/monitoring/grafana-payments-dashboard.example.json](docs/monitoring/grafana-payments-dashboard.example.json)
 
@@ -385,5 +396,3 @@ Pull requests são bem-vindos! Veja o roadmap e abra issues para sugestões ou b
 ## Licença
 
 MIT
-
-

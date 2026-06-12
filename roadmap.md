@@ -129,11 +129,22 @@
 - [x] Identificar root cause: CSS isolation mismatch (sub-components renderizam com ID diferente)
 - [x] Criar 5 arquivos `.razor.css` para sub-componentes (469 linhas total)
 - [x] Consolidar CSS de página pai (remover fragmentos)
-- [x] Validar build: 0 erros, 50 warnings (pré-existentes)
-- [x] Validar testes: 552/575 passando (99.5%)
+- [x] Validar build: 0 erros, 552/575 testes passando (99.5%)
 - [x] Documentar dificuldades encontradas (CSS isolation, StaticWebAssets, file placement, process lock)
 - [x] Documentar padrão para futuros developers: uma `.razor.css` por componente com isolamento completo
 - [x] Commit com mensagem descritiva: `25ad13c` — "Phase 18: Criar CSS componentes (Ranking, Config sub-componentes)"
 - [x] Atualizar README.md, DEVELOPMENT.md, roadmap.md com progresso
 
 **Próximo Passo**: Validar CSS em páginas autenticadas (/grupo/{id}/ranking, /grupo/{id}/configuracoes) e investigar 23 testes failing
+
+## Progress Tracking
+
+For detailed progress tracking, see [PROGRESS.md](PROGRESS.md).
+
+## Documentation
+
+For technical documentation, see the [docs/](docs/) directory:
+- [Architecture](docs/architecture/system-overview.md)
+- [Development](docs/development/getting-started.md)
+- [Deployment](docs/deployment/production-checklist.md)
+- [Operations](docs/operations/troubleshooting.md)
