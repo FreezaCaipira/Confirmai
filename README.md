@@ -1,4 +1,4 @@
-﻿# Confirmai - Marketplace Bitcoin
+# Confirmai - Marketplace Bitcoin
 
 [![CI](https://github.com/FreezaCaipira/Confirmai/actions/workflows/ci.yml/badge.svg)](https://github.com/FreezaCaipira/Confirmai/actions/workflows/ci.yml)
 [![Coverage](https://raw.githubusercontent.com/FreezaCaipira/Confirmai/badges/badges/coverage.svg)](https://github.com/FreezaCaipira/Confirmai/actions/workflows/ci.yml)
