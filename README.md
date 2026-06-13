@@ -352,9 +352,6 @@ sudo -u postgres psql -c "DROP DATABASE IF EXISTS Confirmai;"
 sudo -u postgres psql -c "CREATE DATABASE Confirmai OWNER <user>;"
 dotnet ef database update
 ```
-- Testes E2E (Playwright) para fluxos de compra, pedido e acesso admin
-
----
 
 ## Problemas Técnicos Resolvidos
 
