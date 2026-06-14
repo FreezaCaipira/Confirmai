@@ -30,6 +30,11 @@ public class ApiKeyAuthHandler : AuthenticationHandler<ApiKeyAuthOptions>
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        return Task.FromResult(AuthenticateResult.NoResult());
+        if (!Request.Headers.ContainsKey(ApiKeyAuthDefaults.HeaderName))
+            return Task.FromResult(AuthenticateResult.NoResult());
+
+        // Fail closed: reject any request presenting an API key header until
+        // the full validation logic against the ServerApiKeys table is wired up.
+        return Task.FromResult(AuthenticateResult.Fail("API key validation is not configured."));
     }
 }

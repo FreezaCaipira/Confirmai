@@ -48,7 +48,7 @@ namespace Confirmai.Services.Payment
             if (!IsValidWebhookSecret(expectedSecret, receivedSecret))
             {
                 await _log.LogAsync(
-                    $"Tentativa de acesso negada ao webhook. Header recebido: '{receivedSecret ?? "null"}'. IP: {context.Connection.RemoteIpAddress}",
+                    $"Tentativa de acesso negada ao webhook. IP: {context.Connection.RemoteIpAddress}",
                     source: AdminAuditSources.Webhook,
                     level: "Warning"
                 );
@@ -80,7 +80,7 @@ namespace Confirmai.Services.Payment
                 return Results.StatusCode(StatusCodes.Status413PayloadTooLarge);
             }
 
-            await _log.LogAsync($"Webhook chamado. Body recebido: {body}", source: AdminAuditSources.Webhook, level: "Info");
+            await _log.LogAsync("Webhook payload recebido (body omitido dos logs por seguranca).", source: AdminAuditSources.Webhook, level: "Info");
 
             if (!TryParseWebhookPayload(body, out var invoiceId, out var status, out var deliveryId, out var webhookTimestamp, out var logMessage, out var responseMessage))
             {
