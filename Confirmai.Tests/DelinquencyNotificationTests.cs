@@ -8,6 +8,7 @@ using Confirmai.Services.Core;
 using Confirmai.Services.Utility;
 using Confirmai.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Confirmai.Tests;
@@ -19,7 +20,7 @@ public class DelinquencyNotificationTests
     {
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
         var emailMock = new Mock<IEmailSender>();
-        var svc = new EventNotificationService(factory, emailMock.Object);
+        var svc = new EventNotificationService(factory, emailMock.Object, NullLogger<EventNotificationService>.Instance);
         return (db, svc, emailMock);
     }
 
@@ -114,7 +115,7 @@ public class DelinquencyNotificationTests
             .ThrowsAsync(new Exception("SMTP error"));
 
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
-        var svc = new EventNotificationService(factory, emailMock.Object);
+        var svc = new EventNotificationService(factory, emailMock.Object, NullLogger<EventNotificationService>.Instance);
 
         var admin = new ApplicationUser { Id = "admin-1", UserName = "admin", FullName = "Admin Silva" };
         var user = new ApplicationUser { Id = "user-1", UserName = "joao", FullName = "João Silva", Email = "joao@example.com" };

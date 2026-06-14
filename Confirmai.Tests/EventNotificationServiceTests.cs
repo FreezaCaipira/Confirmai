@@ -9,6 +9,7 @@ using Confirmai.Services.User;
 using Confirmai.Services.Core;
 using Confirmai.Services.Utility;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Confirmai.Tests;
@@ -22,7 +23,7 @@ public class EventNotificationServiceTests
     {
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
         var emailMock     = new Mock<IEmailSender>();
-        var svc           = new EventNotificationService(factory, emailMock.Object);
+        var svc           = new EventNotificationService(factory, emailMock.Object, NullLogger<EventNotificationService>.Instance);
         return (db, svc, emailMock);
     }
 

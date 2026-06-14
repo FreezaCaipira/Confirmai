@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using Confirmai.Data;
 using Confirmai.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Confirmai.Services.Crypto
 {
@@ -12,8 +13,9 @@ namespace Confirmai.Services.Crypto
         private readonly string? _coinGeckoApiKey;
         private readonly string _coinGeckoApiHeaderName;
         private readonly IServiceScopeFactory? _scopeFactory;
+        private readonly ILogger<BitcoinQuoteService> _logger;
 
-        public BitcoinQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceScopeFactory? scopeFactory = null)
+        public BitcoinQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceScopeFactory? scopeFactory = null, ILogger<BitcoinQuoteService>? logger = null)
         {
             _http = httpClientFactory.CreateClient();
             _http.DefaultRequestHeaders.UserAgent.ParseAdd("Confirmai/1.0 (+https://Confirmai.com)");
@@ -23,6 +25,7 @@ namespace Confirmai.Services.Crypto
             _coinGeckoApiKey = configuration["CoinGecko:ApiKey"];
             _coinGeckoApiHeaderName = configuration["CoinGecko:ApiHeaderName"] ?? "x-cg-demo-api-key";
             _scopeFactory = scopeFactory;
+            _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<BitcoinQuoteService>.Instance;
         }
 
         private BitcoinQuote? _cachedQuote;
@@ -61,9 +64,10 @@ namespace Confirmai.Services.Crypto
 
                 return _cachedQuote;
             }
-            catch
+            catch (Exception ex)
             {
-                return _cachedQuote; // Retorna �ltimo valor em caso de erro
+                _logger.LogWarning(ex, "Falha ao obter cotação Bitcoin do CoinGecko");
+                return _cachedQuote;
             }
         }
 
@@ -104,8 +108,9 @@ namespace Confirmai.Services.Crypto
 
                 await db.SaveChangesAsync();
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogDebug(ex, "Falha ao registrar consulta de cotação (não-crítico)");
             }
         }
     }
