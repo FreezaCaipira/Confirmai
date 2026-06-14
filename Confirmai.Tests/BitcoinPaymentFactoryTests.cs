@@ -41,15 +41,17 @@ public class BitcoinPaymentFactoryTests
     }
 
     [Fact]
+    [Fact]
     public void GetService_IsCaseSensitive()
     {
         var testnet = new FakeBitcoinService { Name = "Testnet" };
-        var factory = new BitcoinPaymentFactory(new[] { testnet });
+        var other = new FakeBitcoinService { Name = "Other" };
+        var factory = new BitcoinPaymentFactory(new[] { other, testnet });
 
-        // "testnet" != "Testnet" → falls back to first
+        // "testnet" != "Testnet" → falls back to first ("Other"), proving case-sensitive lookup
         var result = factory.GetService("testnet");
 
-        Assert.Same(testnet, result);
+        Assert.Same(other, result);
     }
 
     [Fact]
