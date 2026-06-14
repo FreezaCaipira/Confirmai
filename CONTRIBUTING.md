@@ -5,15 +5,15 @@
 ```
 Confirmai/
 ├── Areas/Identity/          # Razor Pages do ASP.NET Identity (login, registro, senha)
-├── Configuration/           # ApiKeyAuth, BtcPayOptions, EmailOptions, SecurityPolicyDefaults
+├── Configuration/           # ApiKeyAuth, BtcPayOptions, EfiBankOptions, EmailOptions, etc.
 ├── Data/                    # AppDbContext, AppDbContextFactory
-├── Enums/                   # PaymentStatus, ServerMemberRole, etc.
+├── Enums/                   # PaymentStatus, EventConfirmationPaymentStatus, GroupMemberRole, etc.
 ├── Hubs/                    # PaymentHub (SignalR — [Authorize])
 ├── Migrations/              # EF Core migrations históricas
 ├── Models/                  # Entidades do domínio
 ├── Pages/                   # Blazor Server pages organizadas por feature
 │   ├── Admin/               # Dashboard + componentes admin (AdminPayments, AdminLogs, etc.)
-│   ├── Futsal/              # Partidas + componentes (Detail, Escalacao, Schedule, etc.)
+│   ├── Futsal/              # Partidas + componentes (Detail, Escalação, Schedule, etc.)
 │   ├── Groups/              # Grupos + componentes (Detail, Ranking, Config, etc.)
 │   ├── Payment/             # Pagamentos + componentes (EventPayment, Checkout, etc.)
 │   ├── Poker/               # Torneios de poker
@@ -22,7 +22,7 @@ Confirmai/
 ├── Shared/Components/       # Componentes globais reutilizáveis (Layout, Toast, Breadcrumb, etc.)
 ├── Services/                # Lógica de negócio organizada por domínio
 │   ├── Admin/               # Logs, filtros, auditoria, segurança, delinquência
-│   ├── Core/                # LogService, UiTextService, Auth, certificados, inicialização
+│   ├── Core/                # LogService, UiTextService, AuditEvents, Auth, certificados
 │   ├── Crypto/              # Cotações BTC/USD/BRL
 │   ├── EventPayments/       # Gateways de pagamento por evento (AbacatePay, Appmax, EfiBank)
 │   ├── Events/              # Métricas, colisão de horários, notificações, scheduler
@@ -32,8 +32,8 @@ Confirmai/
 │   ├── User/                # Preferências, claims, perfil
 │   └── Utility/             # Email, PII, produtos, testnet
 ├── wwwroot/                 # Estáticos (CSS, JS, imagens, uploads)
-├── Confirmai.Tests/         # xUnit + Moq
-└── e2e/                     # Playwright (TypeScript)
+├── Confirmai.Tests/         # xUnit + Moq (575 testes)
+└── e2e/                     # Playwright E2E (TypeScript, 20 specs)
 ```
 
 ---
@@ -45,40 +45,199 @@ Confirmai/
 | Artefato | Padrão | Exemplo |
 |----------|--------|---------|
 | Páginas | PascalCase | `AdminPayments.razor` |
-| Componentes | PascalCase | `MainLayout.razor` |
+| Componentes | PascalCase, subpasta `Components/` | `AdminPaymentsTable.razor` |
 | Serviços | `{Domain}Service` | `PaymentConfirmationService` |
 | Interfaces | `I{ServiceName}` | `IBitcoinPaymentService` |
 | Models | PascalCase | `PaymentRecord`, `ApplicationUser` |
-| Enums | PascalCase | `Sport`, `PaymentStatus` |
+| Enums | PascalCase | `PaymentStatus`, `EventConfirmationPaymentStatus` |
 | CSS classes | kebab-case + BEM | `.entity-shell`, `.entity-shell__card` |
+| CSS vars | prefixo semântico | `--bg-deep`, `--parchment`, `--accent-gold` |
 
-### Services
+---
 
-- Construtores recebem dependências opcionais (`LogService? log = null`) para facilitar testes sem mocks
-- Audit via `LogService.AuditAsync(eventType, entityType, entityId, message, actorUserId, source)`
-- Constantes de audit em `AuditEvents` e `AuditEntities` — **nunca renomear** (são chaves de analytics)
-- Novos serviços devem ir na subpasta de domínio correspondente em `Services/`
+## Services
 
-### Pages (Blazor Server)
+### DI e Lifetimes
 
-- Cada página/componente tem seu `.razor.css` isolado — sem `!important`, sem inline styles estáticos
-- Inline styles **só** para valores dinâmicos em runtime (ex.: `style="@BuildAccentStyle(color)"`)
-- Injeção via `@inject`; acesso ao usuário via `AuthProvider` + `UserManager.GetUserId(user)`
-- Páginas com timers, polling ou `Task.Delay` devem implementar `IAsyncDisposable` com `CancellationTokenSource`
+```csharp
+// Singleton — estado global compartilhado entre circuitos
+builder.Services.AddSingleton<BitcoinQuoteService>();
+builder.Services.AddSingleton<PaymentEventBus>();
 
-### CSS
+// Scoped — um por circuito Blazor (padrão para a maioria)
+builder.Services.AddScoped<LogService>();
+builder.Services.AddScoped<PaymentConfirmationService>();
 
-- **`site.css`**: design tokens (`--ci-*`), layout, shells, tabelas, sistema de botões
-- **`events.css`**: estilos compartilhados Futsal + Poker
-- **`identity.css`**: páginas Identity
-- **`marketplace.css`**: vitrine de servidores
-- **`.razor.css` por componente**: escopo isolado via Blazor CSS isolation
-- Botões: `.btn` + `.btn--primary/--success/--danger/--neutral/--info/--gold`
-- Design tokens: ~45 CSS custom properties em `:root` (usar `--ci-*` para código novo)
+// HostedService — background workers
+builder.Services.AddHostedService<PendingWebhooksAlertService>();
+```
 
-### Testes
+**Regra**: novos serviços são `Scoped` por padrão. Só usar `Singleton` se o serviço precisa compartilhar estado entre circuitos (cotações, event bus). Nunca injetar `Scoped` em `Singleton`.
 
-#### Unitários (`Confirmai.Tests/`)
+### Padrões de Serviço
+
+- **Construtor com LogService opcional**: facilita testes sem mocks
+  ```csharp
+  public AdminSettingsService(AppDbContext db, LogService? log = null)
+  ```
+- **Audit**: `LogService.AuditAsync(eventType, entityType, entityId, message, actorUserId, source)`
+- **Constantes de audit**: `AuditEvents.*` e `AuditEntities.*` (72 event types) — **nunca renomear** (são chaves de analytics; só adicionar novos valores)
+- **Novos serviços**: criar na subpasta de domínio correspondente em `Services/`
+
+### Factory Pattern
+
+- `EventPaymentGatewayFactory` — resolve `IEventPaymentGateway` por nome do gateway
+- `BitcoinPaymentFactory` — resolve `IBitcoinPaymentService` por tipo (BTCPay, AbacatePay, Testnet)
+
+---
+
+## Pages (Blazor Server)
+
+### DbContext — sempre via Factory
+
+Blazor Server mantém circuitos longos. **Nunca injetar `AppDbContext` diretamente.** Usar `IDbContextFactory`:
+
+```razor
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+@code {
+    private async Task LoadData()
+    {
+        using var db = await DbFactory.CreateDbContextAsync();
+        // usar db aqui — descartado ao final do bloco
+    }
+}
+```
+
+### Autorização
+
+```razor
+@attribute [Authorize(Roles = "admin")]     // páginas admin
+@attribute [AllowAnonymous]                 // páginas públicas
+```
+
+Acesso ao usuário: `@inject AuthenticationStateProvider AuthStateProvider` → `AuthStateProvider.GetAuthenticationStateAsync()`.
+
+### PageTitle
+
+Toda página deve ter:
+```razor
+<PageTitle>Nome da Página · Confirmai</PageTitle>
+```
+
+### i18n — UiTextService
+
+```razor
+@inject UiTextService T
+
+<h1>@T["AdminPayments.Title"]</h1>
+```
+
+Strings em `Services/Core/UiTextService.cs`, organizadas por locale (`pt-BR`, `en-US`, `es-ES` parcial).
+
+### IAsyncDisposable
+
+Páginas com timers, polling, `Task.Delay` ou `CancellationTokenSource` devem implementar:
+
+```razor
+@implements IAsyncDisposable
+
+@code {
+    private CancellationTokenSource? _cts = new();
+
+    public async ValueTask DisposeAsync()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}
+```
+
+Atualmente implementado em: AdminPayments, AdminVenueEdit, Escalacao, Groups/Detail, EventPayment, Payment, Poker/Index, VenueManager/VenueEdit.
+
+### Decomposição de Componentes
+
+Páginas grandes extraem sub-componentes em `Components/`:
+
+```
+Pages/Admin/
+├── AdminPayments.razor              # página principal (1161 linhas)
+└── Components/
+    ├── AdminPaymentsTable.razor      # tabela de pagamentos
+    ├── AdminPaymentsFilters.razor    # barra de filtros
+    ├── AdminPaymentsSummaryPanel.razor # painel de resumo
+    └── AdminPaymentsAdvancedToolsModal.razor
+```
+
+Sub-componentes recebem dados via `[Parameter]` e comunicam eventos via `EventCallback`.
+
+---
+
+## CSS
+
+### Arquivos globais
+
+| Arquivo | Escopo |
+|---------|--------|
+| `site.css` | Design tokens, layout shell, tabelas, botões, entity shell |
+| `events.css` | Estilos compartilhados Futsal + Poker |
+| `identity.css` | Páginas Identity (login, registro) |
+| `marketplace.css` | Vitrine de servidores |
+
+### CSS Isolation (scoped)
+
+- Cada componente/página tem seu `.razor.css` isolado (56 arquivos)
+- **Proibido**: `!important`, inline styles estáticos
+- **Permitido**: inline styles para valores dinâmicos em runtime (`style="@BuildAccentStyle(color)"`)
+
+### Design Tokens
+
+68 CSS custom properties em `:root` de `site.css`. Principais famílias:
+
+```css
+/* Backgrounds (tema escuro/warm) */
+--bg-deepest, --bg-deep, --bg-dark, --bg-dark-mid
+
+/* Superfícies parchment */
+--parchment-dark, --parchment, --parchment-mid, --parchment-light
+
+/* Acentos */
+--accent-gold, --accent-copper, --accent-amber
+
+/* Texto */
+--text-primary, --text-muted, --text-on-dark
+```
+
+Para código novo, usar as variáveis existentes em vez de cores hardcoded.
+
+### Entity Shell System
+
+Layout padrão para páginas de dados. Usado em todas as páginas admin, grupos, integração:
+
+```html
+<div class="entity-shell admin-page">
+    <section class="entity-shell-grid">
+        <article class="entity-shell-card entity-shell-main">
+            <!-- conteúdo principal -->
+        </article>
+        <aside class="entity-shell-card entity-shell-side">
+            <!-- painel lateral -->
+        </aside>
+    </section>
+</div>
+```
+
+Variantes de tema: `parchment-a` (6 páginas), `parchment-b` (3 páginas).
+
+### Botões
+
+`.btn` + modificador: `.btn--primary`, `.btn--success`, `.btn--danger`, `.btn--neutral`, `.btn--info`, `.btn--gold`, `.btn--icon`, `.btn--sm`, `.btn--variant`.
+
+---
+
+## Testes
+
+### Unitários (`Confirmai.Tests/`)
 
 ```bash
 dotnet test Confirmai.Tests/Confirmai.Tests.csproj
@@ -90,7 +249,7 @@ dotnet test Confirmai.Tests/Confirmai.Tests.csproj
 - `IntegrationTestWebAppFactory` para testes HTTP (`WebApplicationFactory`)
 - Feature flags: `factory.EnsureLuaDeliveryEnabledAsync()` antes de testes que dependem de `LuaDeliveryEnabled`
 
-#### E2E (`e2e/`)
+### E2E (`e2e/`)
 
 ```bash
 cd e2e && npm install && npm run install:browsers && npm test
@@ -100,7 +259,7 @@ cd e2e && npm install && npm run install:browsers && npm test
 - Admin E2E requer `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`; testes são pulados quando ausentes
 - Seletor de checkbox: usar `role/id`, não `name` (conflito com hidden fallback do ASP.NET)
 
-#### CI
+### CI
 
 - `.github/workflows/ci.yml`: build + `dotnet test` com Coverlet (cobertura Cobertura XML → ReportGenerator → badge)
 
@@ -112,7 +271,9 @@ cd e2e && npm install && npm run install:browsers && npm test
 - **API Key**: `ApiKeyAuth` valida header `X-Api-Key` com HMAC; chaves com hash em `ServerApiKeys`
 - **Secrets**: nunca em `appsettings.json`; usar User Secrets (dev) ou variáveis de ambiente (prod)
 - **OWASP**: parametrização via EF Core, `[ValidateAntiForgeryToken]` em forms, headers de segurança
+- **Headers** (em `Program.cs`): `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`
 - **Fontes externas** (Google Fonts, Font Awesome): `media="print"` + promoção via JS pós-load (respeita CSP)
+- **Identity**: lockout após 5 tentativas, cookie com sliding expiration, políticas de senha diferenciadas por ambiente
 
 ---
 
@@ -120,14 +281,20 @@ cd e2e && npm install && npm run install:browsers && npm test
 
 ### Background Services (`IHostedService`)
 
-1. **`PendingWebhooksAlertService`** — Detecta pagamentos Pix pendentes > 24h. Executa a cada 1h. Log `WARNING` se > 5 pendências.
-2. **`CertificateHealthCheckService`** — Monitora expiração do certificado mTLS EfiBank. Executa a cada 12h. Alertas progressivos: Expirado (≤0d), Crítico (≤7d), Urgente (7-14d), Aviso (14-30d).
+| Serviço | Função | Intervalo |
+|---------|--------|-----------|
+| `LogRetentionService` | Purga logs antigos (IPs anonimizados 30d, não-financeiros 90d) | Diário |
+| `RachaSchedulerService` | Cria eventos recorrentes a partir de `MatchSchedule` | Periódico |
+| `EventNotificationSchedulerService` | Envia notificações de partidas próximas | Periódico |
+| `EventPaymentReconciliationWorker` | Varredura automática de pagamentos pendentes | Periódico |
+| `PendingWebhooksAlertService` | Detecta pagamentos Pix pendentes > 24h | 1h |
+| `CertificateHealthCheckService` | Monitora expiração do cert mTLS EfiBank | 12h |
 
 ### Stack de Monitoramento
 
 Templates versionados em `ops/monitoring/`:
 - `otel-collector.yml` — OTLP → Prometheus
-- `prometheus.yml` — Regras de alerta de pagamentos
+- `prometheus.yml` + `prometheus-payments-alerts.yml` — Regras de alerta
 - `alertmanager.yml` — Roteamento `p1`/`p2`
 - Grafana com datasource e dashboard pré-provisionados
 
@@ -140,10 +307,10 @@ docker compose --profile monitoring up -d prometheus alertmanager grafana
 ## Fazer um Fork
 
 1. **Banco**: renomear `AppDbContext`, ajustar migrations
-2. **Tema**: tokens em `:root` de `site.css`, logo em `wwwroot/images/`
-3. **Gateway**: implementar `IBitcoinPaymentService` e registrar em `BitcoinPaymentFactory`
+2. **Tema**: tokens em `:root` de `site.css` (68 vars), logo em `wwwroot/images/`
+3. **Gateway**: implementar `IEventPaymentGateway` e registrar em `EventPaymentGatewayFactory`; ou `IBitcoinPaymentService` e registrar em `BitcoinPaymentFactory`
 4. **i18n**: strings em `Services/Core/UiTextService.cs` — `Dictionary<string, string>` por locale
-5. **Auditoria**: usar `AuditEvents.*` para novos eventos; nunca reutilizar constantes existentes
+5. **Auditoria**: usar `AuditEvents.*` para novos eventos (72 existentes); nunca reutilizar constantes
 
 ---
 
