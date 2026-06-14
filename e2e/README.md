@@ -1,81 +1,46 @@
-﻿# Confirmai E2E (Playwright)
+# Confirmai E2E (Playwright)
 
-This folder contains browser end-to-end tests for real UI interaction scenarios that are not covered by server-side integration tests.
+Testes end-to-end com Playwright (TypeScript) para cenários de interação real no browser.
 
-## Coverage mapping and status
+## Status atual
 
-- Last local validation: 2025-07-10
-- Result: 10 passed, 0 failed, 2 skipped (full suite with admin env vars passes all)
-- Command: npx playwright test --reporter=line
+- Ultima validacao local: 2026-06-14
+- Arquivos de teste: 20
+- Comando: `npx playwright test --reporter=line`
 
-Current test files and covered scenarios:
+## Arquivos de teste
 
-- [tests/auth-guards.spec.ts](tests/auth-guards.spec.ts)
-	- Login page smoke (core fields)
-	- Register page smoke (core fields)
-	- Anonymous user blocked on admin route
-- [tests/admin-auth-flow.spec.ts](tests/admin-auth-flow.spec.ts)
-	- Seeded admin real login flow
-	- Access smoke for critical admin routes
-	- Note: this file contains scenarios that are skipped when admin env vars are missing
-- [tests/cookie-consent.spec.ts](tests/cookie-consent.spec.ts)
-	- Accept all
-	- Reject optional
-	- Customize + save
-	- Cancel without persistence
-	- localStorage/cookie persistence contracts
-- [tests/language-switch.spec.ts](tests/language-switch.spec.ts)
-	- Language switch through flag click
-	- Persistence after navigation
-	- Persistence after full refresh
-- [tests/order-details.spec.ts](tests/order-details.spec.ts)
-	- Auth guard (redirect unauthenticated, authenticated loads)
-	- Page structure (breadcrumb, stepper, chat, order-id, grid)
-	- AguardandoRevisaoAdm status (admin notice, release button, modal, cancel)
-	- Release flow (success message, stepper update, cross-page count)
-- [tests/admin-release-flow.spec.ts](tests/admin-release-flow.spec.ts)
-	- Admin orders page loads with filters
-	- Orders-review table structure and Origem badge
-	- Release modal opens, confirms, and removes order from queue
-	- Cancel modal without changing list
-- [tests/purchase-flow.spec.ts](tests/purchase-flow.spec.ts)
-	- Marketplace page loads
-	- Unauthenticated buy redirect
-	- My-orders page load
-	- Order details for order 1 (not-found is valid)
-	- Docs/integration page and Lua download links
-	- Offer form page access
-- [tests/purchase-flow-full.spec.ts](tests/purchase-flow-full.spec.ts) ← **full ponta-a-ponta**
-	- Pedido aparece em /orders após pagamento confirmado (seed via `POST /api/test/seed-order`)
-	- /orders mostra status AguardandoEntrega para o pedido confirmado
-	- Detalhes acessíveis em /orders/{id} após pagamento
-	- Badge de status AguardandoEntrega em detalhes do pedido
-	- Pedido AguardandoRevisaoAdm aparece em /admin/orders-review
-	- Admin libera pedido específico → sai da fila de revisão
-	- Após liberação, pedido mostra status Finalizado em /orders/{id}
-	- Stepper marca etapa final como concluída após liberação
+- [tests/smoke.spec.ts](tests/smoke.spec.ts) — Smoke test basico (app responde)
+- [tests/public-pages.spec.ts](tests/public-pages.spec.ts) — Paginas publicas carregam
+- [tests/routes-and-meta.spec.ts](tests/routes-and-meta.spec.ts) — Rotas e meta tags
+- [tests/auth-guards.spec.ts](tests/auth-guards.spec.ts) — Guards de autenticacao (login/register smoke, admin bloqueado)
+- [tests/auth-forms.spec.ts](tests/auth-forms.spec.ts) — Formularios de autenticacao
+- [tests/forgot-password.spec.ts](tests/forgot-password.spec.ts) — Fluxo de esqueci senha
+- [tests/admin-auth-flow.spec.ts](tests/admin-auth-flow.spec.ts) — Login admin real + rotas criticas (requer env vars)
+- [tests/admin-audit-logs.spec.ts](tests/admin-audit-logs.spec.ts) — Logs de auditoria admin
+- [tests/admin-release-flow.spec.ts](tests/admin-release-flow.spec.ts) — Fluxo de liberacao admin (filtros, modal, release)
+- [tests/admin-venues.spec.ts](tests/admin-venues.spec.ts) — Gestao de quadras admin
+- [tests/cookie-consent.spec.ts](tests/cookie-consent.spec.ts) — Consentimento de cookies (aceitar/customizar/persistencia)
+- [tests/language-switch.spec.ts](tests/language-switch.spec.ts) — Troca de idioma e persistencia
+- [tests/events-guards.spec.ts](tests/events-guards.spec.ts) — Guards de eventos
+- [tests/navigation.spec.ts](tests/navigation.spec.ts) — Navegacao geral
+- [tests/mailbox.spec.ts](tests/mailbox.spec.ts) — Caixa de mensagens
+- [tests/order-details.spec.ts](tests/order-details.spec.ts) — Detalhes de pedido (auth guard, estrutura, badges, release)
+- [tests/purchase-flow.spec.ts](tests/purchase-flow.spec.ts) — Fluxo de compra (marketplace, unauthenticated, my-orders)
+- [tests/purchase-flow-full.spec.ts](tests/purchase-flow-full.spec.ts) — Fluxo completo ponta-a-ponta (pagamento → pedido → admin libera → finalizado)
+- [tests/server-listing.spec.ts](tests/server-listing.spec.ts) — Listagem de servidores
+- [tests/server-manage.spec.ts](tests/server-manage.spec.ts) — Gestao de servidores
 
-Why some tests are skipped:
+## Testes que requerem env vars
 
-- The seeded-admin scenarios require E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD.
-- If these variables are not defined, Playwright marks those tests as skipped by design.
-- The purchase-flow-full.spec.ts suite also requires a server running in Development mode (for the `/api/test/seed-order` endpoint).
-
-## Covered scenarios
-
-- Cookie consent interactions (accept/customize/persistence)
-- Language switch by flag click and persistence on protected routes
-- Identity authentication pages smoke checks (login/register)
-- Anonymous access guard on admin routes
-- Seeded admin real login flow and critical admin route smoke
-- Order details page (auth guard, structure, status badges, release flow)
-- Admin orders-review table (structure, Origem badge, release modal, cancel modal)
-- **Full purchase flow ponta-a-ponta**: pagamento confirmado → pedido em /orders → admin libera → status Finalizado (`purchase-flow-full.spec.ts`)
+- Cenarios admin requerem `E2E_ADMIN_EMAIL` e `E2E_ADMIN_PASSWORD`
+- Se nao definidos, Playwright marca esses testes como skipped
+- `purchase-flow-full.spec.ts` requer servidor em modo Development (endpoint `/api/test/seed-order`)
 
 ## Prerequisites
 
-- Node.js 20+ and npm
-- Confirmai app running locally
+- Node.js 20+ e npm
+- Confirmai app rodando localmente
 
 ## Install
 
@@ -88,15 +53,15 @@ npm run install:browsers
 ## Run
 
 ```bash
-# Starts the app automatically via dotnet run and executes E2E
+# Inicia o app automaticamente via dotnet run e executa E2E
 npm test
 
-# Or set a custom URL
+# Ou defina URL customizada
 set E2E_BASE_URL=http://127.0.0.1:5001
 npm test
 ```
 
-Seeded admin flow (requires env vars):
+Admin flow (requer env vars):
 
 ```bash
 # Git Bash
@@ -110,14 +75,7 @@ $env:E2E_ADMIN_PASSWORD="your-password"
 npm test -- --grep "Seeded admin"
 ```
 
-Windows PowerShell alternative:
-
-```powershell
-$env:E2E_BASE_URL="http://127.0.0.1:5001"
-npm test
-```
-
-## If app is already running
+## Se app ja estiver rodando
 
 ```bash
 # Git Bash
@@ -133,26 +91,17 @@ $env:E2E_SKIP_WEBSERVER="1"; npm test
 npx playwright show-report
 ```
 
-## Run only specific tests
+## Rodar testes especificos
 
 ```bash
-# Run a single file
+# Arquivo unico
 npx playwright test tests/auth-guards.spec.ts
 
-# Run by test name (grep)
+# Por nome (grep)
 npx playwright test --grep "cookie consent"
 ```
 
-## Practical troubleshooting
+## Troubleshooting
 
-- If all tests fail with `ERR_CONNECTION_REFUSED`, run without `E2E_SKIP_WEBSERVER` or start the app manually first.
-- On localhost/dev, cookie-consent reset logic can run on reload; tests avoid asserting consent persistence exclusively through post-reload banner visibility.
-- If a single test flakes, rerun once with `npm test -- --grep "<test name>"` before changing app code.
-- Seeded-admin tests auto-skip when `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD` are not set.
-
-## Notes
-
-- These tests are intentionally separated from the .NET test project.
-- They validate browser/runtime behaviors such as JavaScript click handlers and localStorage/cookies.
-
-
+- Se todos os testes falham com `ERR_CONNECTION_REFUSED`, rode sem `E2E_SKIP_WEBSERVER` ou inicie o app manualmente antes.
+- Em localhost/dev, logica de reset de cookie-consent pode rodar no reload; testes evitam depender exclusivamente de visibilidade do banner pos-reload.

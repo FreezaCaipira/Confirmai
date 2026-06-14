@@ -1,35 +1,42 @@
-﻿# Confirmai.Tests - Mapeamento de Cobertura
+# Confirmai.Tests — Mapeamento de Cobertura
 
 Este diretório concentra testes unitários e de integração da aplicação.
 
 ## Status atual
 
-- Ultima validacao local: 2026-03-22
-- Resultado: 287 testes passando, 0 falhas
-- Comando: dotnet test .\Confirmai.Tests\Confirmai.Tests.csproj -v minimal
+- Ultima validacao local: 2026-06-14
+- Resultado: 551 passando, 24 falhando, 575 total
+- Comando: `dotnet test Confirmai.Tests/Confirmai.Tests.csproj -v minimal`
 
 ## Mapa por dominio
 
 ### Admin e seguranca
 
 - Convencoes/autorizacao: [AdminAuthorizationConventionsTests.cs](AdminAuthorizationConventionsTests.cs)
-- Filtros e estado (logs, users, products, payments, orders):
+- Filtros e estado (logs, users, payments):
   - [AdminLogsFilterStateServiceTests.cs](AdminLogsFilterStateServiceTests.cs)
+  - [AdminLogsFilterInferenceTests.cs](AdminLogsFilterInferenceTests.cs)
+  - [AdminLogsFilterStateMergerTests.cs](AdminLogsFilterStateMergerTests.cs)
+  - [AdminLogsFilterStateRulesTests.cs](AdminLogsFilterStateRulesTests.cs)
   - [AdminUsersFilterStateServiceTests.cs](AdminUsersFilterStateServiceTests.cs)
-  - [AdminProductsFilterStateServiceTests.cs](AdminProductsFilterStateServiceTests.cs)
   - [AdminPaymentsFilterStateServiceTests.cs](AdminPaymentsFilterStateServiceTests.cs)
-  - [AdminOrdersFilterStateServiceTests.cs](AdminOrdersFilterStateServiceTests.cs)
 - Query/export/log sorting:
   - [AdminLogsQueryServiceIntegrationTests.cs](AdminLogsQueryServiceIntegrationTests.cs)
+  - [AdminLogsQueryStringIntegrationTests.cs](AdminLogsQueryStringIntegrationTests.cs)
+  - [AdminLogsQueryOverridesParserTests.cs](AdminLogsQueryOverridesParserTests.cs)
   - [AdminLogsExportServiceTests.cs](AdminLogsExportServiceTests.cs)
   - [AdminLogSortingIntegrationTests.cs](AdminLogSortingIntegrationTests.cs)
   - [AdminLogFilteringIntegrationTests.cs](AdminLogFilteringIntegrationTests.cs)
+  - [AdminLogsDeepLinkBuilderTests.cs](AdminLogsDeepLinkBuilderTests.cs)
 - Politica de seguranca e configuracoes admin:
   - [AdminSecurityPolicyServiceTests.cs](AdminSecurityPolicyServiceTests.cs)
   - [AdminSettingsServiceTests.cs](AdminSettingsServiceTests.cs)
-- Fluxo de revisao/liberacao:
-  - [AdminOrdersReviewIntegrationTests.cs](AdminOrdersReviewIntegrationTests.cs)
-  - [AdminOrderReleaseServiceIntegrationTests.cs](AdminOrderReleaseServiceIntegrationTests.cs)
+- Admin payments:
+  - [AdminPaymentsDeepLinkIntegrationTests.cs](AdminPaymentsDeepLinkIntegrationTests.cs)
+  - [AdminPaymentsModalTests.cs](AdminPaymentsModalTests.cs)
+- Admin confirmacao e auditoria:
+  - [AdminConfirmationServiceTests.cs](AdminConfirmationServiceTests.cs)
+  - [AuditLoggingHooksTests.cs](AuditLoggingHooksTests.cs)
 
 ### Auth e Identity
 
@@ -38,25 +45,76 @@ Este diretório concentra testes unitários e de integração da aplicação.
   - [FullFlowAuthenticationIdentityScenariosIntegrationTests.cs](FullFlowAuthenticationIdentityScenariosIntegrationTests.cs)
 - Localizacao/idioma no fluxo de login:
   - [FullFlowIdentityLocalizationIntegrationTests.cs](FullFlowIdentityLocalizationIntegrationTests.cs)
+- Features recentes e fluxos completos:
+  - [FullFlowRecentFeaturesIntegrationTests.cs](FullFlowRecentFeaturesIntegrationTests.cs)
+  - [RecentFeaturesIntegrationTests.cs](RecentFeaturesIntegrationTests.cs)
 - Smoke de PageModels Identity:
   - [IdentityPageModelsIntegrationTests.cs](IdentityPageModelsIntegrationTests.cs)
 - Email sender/fallback:
   - [IdentityEmailSenderTests.cs](IdentityEmailSenderTests.cs)
+- Auth navigation:
+  - [AuthNavigationHelperTests.cs](AuthNavigationHelperTests.cs)
+- Security headers:
+  - [SecurityHeadersIntegrationTests.cs](SecurityHeadersIntegrationTests.cs)
 
-### Compras, pedidos e pagamentos
+### Pagamentos e webhooks
 
-- Fluxo de compra e protecao de acesso:
-  - [PurchaseFlowIntegrationTests.cs](PurchaseFlowIntegrationTests.cs)
-  - [ProtectedPagesIntegrationTests.cs](ProtectedPagesIntegrationTests.cs)
-  - [OrderAccessServiceTests.cs](OrderAccessServiceTests.cs)
-- Pagamentos e confirmacao:
+- Confirmacao e status:
   - [PaymentConfirmationServiceTests.cs](PaymentConfirmationServiceTests.cs)
+  - [EventConfirmationPaymentStatusServiceTests.cs](EventConfirmationPaymentStatusServiceTests.cs)
+  - [EventConfirmationPaymentWebhookFlowIntegrationTests.cs](EventConfirmationPaymentWebhookFlowIntegrationTests.cs)
+- BtcPay:
   - [BtcPayServerPaymentServiceTests.cs](BtcPayServerPaymentServiceTests.cs)
   - [BtcPayWebhookServiceTests.cs](BtcPayWebhookServiceTests.cs)
+- EfiBank:
+  - [EfiBankPixServiceTests.cs](EfiBankPixServiceTests.cs)
+  - [EfiBankWebhookServiceTests.cs](EfiBankWebhookServiceTests.cs)
+- AbacatePay:
+  - [AbacatePayWebhookServiceTests.cs](AbacatePayWebhookServiceTests.cs)
+- Gateway:
+  - [GatewayServiceTests.cs](GatewayServiceTests.cs)
+- Event bus e hub:
+  - [PaymentEventBusTests.cs](PaymentEventBusTests.cs)
+  - [PaymentHubTests.cs](PaymentHubTests.cs)
+- Webhook endpoints:
   - [WebhookEndpointIntegrationTests.cs](WebhookEndpointIntegrationTests.cs)
-- Regras de ordenacao/status:
-  - [OrderReviewSortingTests.cs](OrderReviewSortingTests.cs)
-  - [OrderStatusHelperTests.cs](OrderStatusHelperTests.cs)
+- Reconciliacao:
+  - [EventPaymentReconciliationServiceTests.cs](EventPaymentReconciliationServiceTests.cs)
+- Pix manual/proof:
+  - [PixManualPaymentFlowTests.cs](PixManualPaymentFlowTests.cs)
+  - [PixProofUploadTests.cs](PixProofUploadTests.cs)
+  - [PixProofAdminVisibilityTests.cs](PixProofAdminVisibilityTests.cs)
+- Bitcoin testnet:
+  - [TestnetBitcoinPaymentServiceTests.cs](TestnetBitcoinPaymentServiceTests.cs)
+- Protecao de acesso:
+  - [ProtectedPagesIntegrationTests.cs](ProtectedPagesIntegrationTests.cs)
+  - [PurchaseFlowIntegrationTests.cs](PurchaseFlowIntegrationTests.cs)
+
+### Eventos e Futsal
+
+- Colisao de horarios:
+  - [EventCollisionServiceTests.cs](EventCollisionServiceTests.cs)
+- Notificacoes:
+  - [EventNotificationServiceTests.cs](EventNotificationServiceTests.cs)
+- Futsal (integracao e escalacao):
+  - [FutsalIntegrationTests.cs](FutsalIntegrationTests.cs)
+  - [FutsalEscalacaoIntegrationTests.cs](FutsalEscalacaoIntegrationTests.cs)
+  - [FutsalRefactoringE2ETests.cs](FutsalRefactoringE2ETests.cs)
+- Agendamento:
+  - [RachaSchedulerServiceTests.cs](RachaSchedulerServiceTests.cs)
+  - [MatchScheduleTests.cs](MatchScheduleTests.cs)
+- Pos-partida:
+  - [PostMatchVoteTests.cs](PostMatchVoteTests.cs)
+  - [RankingWinCalculationTests.cs](RankingWinCalculationTests.cs)
+
+### Grupos
+
+- Integracao e convites:
+  - [GroupsIntegrationTests.cs](GroupsIntegrationTests.cs)
+  - [GroupInviteCodeGenerationTests.cs](GroupInviteCodeGenerationTests.cs)
+- Delinquencia:
+  - [DelinquencyServiceTests.cs](DelinquencyServiceTests.cs)
+  - [DelinquencyNotificationTests.cs](DelinquencyNotificationTests.cs)
 
 ### Produto, cotacao e dashboard
 
@@ -68,6 +126,9 @@ Este diretório concentra testes unitários e de integração da aplicação.
   - [BtcUsdFormatterTests.cs](BtcUsdFormatterTests.cs)
 - Dashboard:
   - [DashboardMetricsServiceTests.cs](DashboardMetricsServiceTests.cs)
+- Fee:
+  - [OperationFeeCalculatorServiceTests.cs](OperationFeeCalculatorServiceTests.cs)
+  - [OperationFeeFlowIntegrationTests.cs](OperationFeeFlowIntegrationTests.cs)
 
 ### Preferencias e UX
 
@@ -75,25 +136,32 @@ Este diretório concentra testes unitários e de integração da aplicação.
   - [LanguagePreferenceServiceTests.cs](LanguagePreferenceServiceTests.cs)
   - [CurrencyPreferenceServiceTests.cs](CurrencyPreferenceServiceTests.cs)
   - [UiTextServiceTests.cs](UiTextServiceTests.cs)
+  - [UiTextServiceRefactoringTests.cs](UiTextServiceRefactoringTests.cs)
 - Local storage/debounce/inicializacao:
   - [LocalStorageStateHelpersTests.cs](LocalStorageStateHelpersTests.cs)
   - [DebounceDispatcherTests.cs](DebounceDispatcherTests.cs)
   - [AppInitializationServiceTests.cs](AppInitializationServiceTests.cs)
+- User:
+  - [UserServiceTests.cs](UserServiceTests.cs)
+- Mailbox:
+  - [MailboxConversationArchiveServiceTests.cs](MailboxConversationArchiveServiceTests.cs)
 
 ### Infra e configuracao
 
 - Defaults de configuracao:
   - [ConfigurationDefaultsTests.cs](ConfigurationDefaultsTests.cs)
-- Logging e fee calculator:
+- Logging e retencao:
   - [LogServiceTests.cs](LogServiceTests.cs)
-  - [OperationFeeCalculatorServiceTests.cs](OperationFeeCalculatorServiceTests.cs)
+  - [LogRetentionServiceTests.cs](LogRetentionServiceTests.cs)
+- Validacao de modelos:
+  - [ModelValidationTests.cs](ModelValidationTests.cs)
+- PII:
+  - [PiiSanitizerTests.cs](PiiSanitizerTests.cs)
 - DbContext design-time guard:
   - [AppDbContextFactoryTests.cs](AppDbContextFactoryTests.cs)
 
 ## Observacoes de cobertura
 
-- O mapeamento acima cobre os cenarios levantados no levantamento desta sprint.
-- Nao representa cobertura percentual por linha (coverage tool), e sim cobertura funcional por comportamento/cenario.
-- Para cobertura percentual por linha, adicionar coleta com coverlet collector em pipeline.
-
-
+- 83 arquivos de teste cobrindo 575 cenarios.
+- CI gera cobertura percentual via Coverlet (Cobertura XML → ReportGenerator → badge).
+- Para cobertura local: `dotnet test --collect:"XPlat Code Coverage"`.

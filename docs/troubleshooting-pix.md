@@ -1,7 +1,7 @@
 # Pix Webhook Troubleshooting Runbook
 
-**Última atualização:** June 2, 2026  
-**Versão:** 1.0  
+**Última atualização:** Junho 2026  
+**Versão:** 1.1  
 **Escopo:** EfiBank Pix mTLS + BTCPay Pix integrations
 
 ---
@@ -19,24 +19,24 @@
 
 **Diagnóstico:**
 
-```powershell
-# 1. Verificar logs de webhook
-SELECT * FROM AdminLogs 
-WHERE Activity LIKE '%webhook%' 
-  AND CreatedAt > NOW() - INTERVAL '1 hour'
-ORDER BY CreatedAt DESC;
+```sql
+-- 1. Verificar logs de webhook
+SELECT * FROM "Logs"
+WHERE "EventType" LIKE '%webhook%'
+  AND "Timestamp" > NOW() - INTERVAL '1 hour'
+ORDER BY "Timestamp" DESC;
 
-# 2. Verificar payment record status
-SELECT Id, IsPaid, CreatedAt, PaidAt 
-FROM Payments 
-WHERE CreatedAt > NOW() - INTERVAL '1 hour'
-ORDER BY CreatedAt DESC;
+-- 2. Verificar payment record status
+SELECT "Id", "PaymentStatus", "CreatedAt", "PaidAt"
+FROM "Payments"
+WHERE "CreatedAt" > NOW() - INTERVAL '1 hour'
+ORDER BY "CreatedAt" DESC;
 
-# 3. Verificar se há logs de erro
-SELECT * FROM Logs 
-WHERE Level = 'Error' 
-  AND CreatedAt > NOW() - INTERVAL '1 hour'
-ORDER BY CreatedAt DESC;
+-- 3. Verificar se há logs de erro
+SELECT * FROM "Logs"
+WHERE "Level" = 'Error'
+  AND "Timestamp" > NOW() - INTERVAL '1 hour'
+ORDER BY "Timestamp" DESC;
 ```
 
 **Ações Corretivas:**
@@ -47,8 +47,8 @@ ORDER BY CreatedAt DESC;
    - Verificar certificate renewal (mTLS expira em 1 ano)
 
 2. **Se payment status é "Pending" há >24h:**
-   - Manual mark paid: `AdminMarkPaid()` em Pages/Groups/Detail.razor
-   - Registrar em audit log para análise posterior
+   - Reconciliação manual via `/admin/payments` (botão de reconciliação por `chargeId/txId`)
+   - Registrar em audit log via `LogService.AuditAsync()` para análise posterior
 
 3. **Se webhook duplicado foi rejeitado:**
    - Verificar `Payments.IdempotencyKey`
@@ -58,40 +58,29 @@ ORDER BY CreatedAt DESC;
 
 ### 2. Webhook Recebido Mas Não Atualiza EventConfirmation
 
-**Sintoma:** `AdminLogs` mostra webhook recebido, mas `EventConfirmation.HasPaid` = false
+**Sintoma:** Logs mostram webhook recebido, mas `EventConfirmation.PaymentStatus` continua `Pending`
 
 **Root Cause:**
 - EventConfirmation.Id mismatch (webhook referencia ID errado)
-- `EventConfirmationPaymentStatusService` erro em lógica de status
+- `EventConfirmationPaymentStatusService` erro em lógica de transição de status
 
 **Diagnóstico:**
 
-```csharp
-// No EventNotificationSchedulerService.cs
-var confs = db.EventConfirmations
-  .Where(c => c.Event.StartsAt.Date == DateTime.UtcNow.Date 
-           && c.RachaScheduleId.HasValue)
-  .ToList();
-
-// Verificar se HasPaid foi atualizado
-foreach (var c in confs)
-{
-  Console.WriteLine($"ConfId: {c.Id}, UserId: {c.UserId}, HasPaid: {c.HasPaid}");
-}
+```sql
+-- Verificar confirmações do dia com status de pagamento
+SELECT "Id", "UserId", "PaymentStatus", "PaymentGatewayName"
+FROM "EventConfirmations"
+WHERE "ConfirmedAt"::date = CURRENT_DATE
+ORDER BY "ConfirmedAt" DESC;
 ```
 
 **Ações Corretivas:**
 
-1. Verificar `EventConfirmationPaymentStatusService.ProcessPaymentConfirmation()`:
-   ```csharp
-   var confirmation = await db.EventConfirmations.FindAsync(confirmationId);
-   if (confirmation == null)
-       throw new InvalidOperationException($"Confirmation {confirmationId} not found");
-   ```
+1. Verificar `Services/Events/EventConfirmationPaymentStatusService.cs` para lógica de transição de status
 
-2. Forçar status sync via admin dashboard:
-   - Abrir modal de pagamentos em Pages/Groups/Detail.razor
-   - Clicar "Confirmar Pagamento" manualmente
+2. Forçar reconciliação via admin dashboard:
+   - Abrir `/admin/payments`
+   - Usar reconciliação manual por `chargeId` ou `txId`
 
 ---
 
@@ -106,11 +95,11 @@ foreach (var c in confs)
 **Diagnóstico:**
 
 ```sql
-SELECT 
-  id, 
+SELECT
+  "Id",
   COUNT(*) as occurrences
-FROM Payments
-GROUP BY id
+FROM "Payments"
+GROUP BY "Id"
 HAVING COUNT(*) > 1;
 ```
 
@@ -181,24 +170,15 @@ if ([DateTime]::Now -gt $cert.NotAfter) {
 **Implementação Segura:**
 
 ```csharp
-// Services/PaymentWebhookService.cs
-public async Task ProcessPixConfirmationAsync(string idempotencyKey, PaymentData data)
-{
-    // Verificar se já foi processado
-    var existing = await db.Payments
-        .FirstOrDefaultAsync(p => p.IdempotencyKey == idempotencyKey);
-    
-    if (existing != null)
-    {
-        _logger.LogInformation($"Webhook duplicate ignored: {idempotencyKey}");
-        return; // Idempotente - não processa novamente
-    }
-    
-    // Processa novo pagamento
-    var record = new PaymentRecord { IdempotencyKey = idempotencyKey, ... };
-    db.Payments.Add(record);
-    await db.SaveChangesAsync();
-}
+// Serviços de webhook por gateway:
+// Services/Payment/EfiBankWebhookService.cs
+// Services/Payment/BtcPayWebhookService.cs
+// Services/Payment/AbacatePayWebhookService.cs
+//
+// Cada um implementa idempotência internamente:
+// - Verifica se o webhook já foi processado antes de atualizar status
+// - Registra transições via LogService.AuditAsync()
+// - Usa PaymentEventBus para notificação em tempo real via SignalR
 ```
 
 ---
@@ -212,9 +192,9 @@ Execute todo dia às 9 AM UTC:
 ```sql
 -- Pagamentos pendentes por >24h
 SELECT COUNT(*) as pending_24h
-FROM Payments
-WHERE IsPaid = false
-  AND CreatedAt < NOW() - INTERVAL '24 hours';
+FROM "EventConfirmations"
+WHERE "PaymentStatus" = 0
+  AND "ConfirmedAt" < NOW() - INTERVAL '24 hours';
 
 -- Alertar se > 5 pagamentos pendentes
 -- (indica problema sistemático)
@@ -234,33 +214,28 @@ WHERE IsPaid = false
 
 **Passo a passo:**
 
-1. Verificar `Payments.IsPaid`:
+1. Verificar status do pagamento:
    ```sql
-   SELECT * FROM Payments WHERE Id = {paymentId};
+   SELECT * FROM "Payments" WHERE "Id" = {paymentId};
    ```
 
-2. Se payment status é "IsPaid = false" há >24h, atualizar manualmente:
+2. Se `PaymentStatus = 0` (Pending) há >24h, usar reconciliação manual via `/admin/payments`
+
+3. Verificar `EventConfirmation` associada:
    ```sql
-   UPDATE Payments 
-   SET IsPaid = true, PaidAt = NOW()
-   WHERE Id = {paymentId};
+   SELECT "Id", "PaymentStatus", "PaymentGatewayName"
+   FROM "EventConfirmations"
+   WHERE "Id" = {confirmationId};
    ```
 
-3. Reprocessar `EventConfirmation`:
+4. Registrar via auditoria:
    ```csharp
-   var confirmation = await db.EventConfirmations.FindAsync(confirmationId);
-   confirmation.HasPaid = true;
-   confirmation.PaymentStatus = EventConfirmationPaymentStatus.Paid;
-   await db.SaveChangesAsync();
-   ```
-
-4. Registrar em `AdminLogs`:
-   ```csharp
-   await logService.LogAdminActionAsync(
-       userId: adminId,
-       action: "ManualPaymentMarkPaid",
-       details: $"PaymentId: {paymentId}, ConfirmationId: {confirmationId}",
-       ipAddress: httpContext.Connection.RemoteIpAddress.ToString()
+   await logService.AuditAsync(
+       eventType: "admin.payment.status.transition",
+       entityType: "Payment",
+       entityId: confirmationId.ToString(),
+       message: "Reconciliação manual Pix",
+       actorUserId: adminId
    );
    ```
 
@@ -323,5 +298,7 @@ curl --cert /path/to/client.crt \
 
 - [EfiBank Pix Documentation](https://docs.efibank.com.br)
 - [BTCPay Webhook Docs](https://docs.btcpayserver.org/API/Greenfield/Green%20field%20-%20Webhooks)
-- `Services/EfiBankPixService.cs` — Lógica de integração Pix
-- `Services/AdminConfirmationService.cs` — Mark-paid logic
+- `Services/Payment/EfiBankPixService.cs` — Lógica de integração Pix
+- `Services/Payment/EfiBankWebhookService.cs` — Webhook handler EfiBank
+- `Services/Admin/AdminConfirmationService.cs` — Confirmação manual de pagamento
+- `Services/Payment/EventPaymentReconciliationService.cs` — Reconciliação automática/manual
