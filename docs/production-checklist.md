@@ -187,11 +187,11 @@ Se algo der errado após o deploy:
 
 ## Referências
 
-- [README.md](README.md) — setup local e visão geral
-- [roadmap.md](roadmap.md) — histórico de fases e features
-- [appsettings.Production.json](appsettings.Production.json) — template de configuração
-- [Dockerfile](Dockerfile) — imagem de produção
+- [README.md](../README.md) — setup local e visão geral
+- [ROADMAP.md](../ROADMAP.md) — progresso e próximos passos
+- [CONTRIBUTING.md](../CONTRIBUTING.md) — convenções e workflow
+- [appsettings.Production.json](../appsettings.Production.json) — template de configuração
+- [Dockerfile](../Dockerfile) — imagem de produção
 - `.github/workflows/ci.yml` — pipeline CI/CD
 - [Runbook de observabilidade](observability-payments-runbook.md) — triagem e resposta para pagamentos/reconciliação
-- [Regras de alertas](payments-alert-rules.md) — thresholds, severidade e escalonamento para pagamentos
 - [Templates de monitoramento](monitoring/README.md) — arquivos exemplo para Prometheus/Alertmanager
