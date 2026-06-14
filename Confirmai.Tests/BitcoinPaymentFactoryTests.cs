@@ -41,7 +41,6 @@ public class BitcoinPaymentFactoryTests
     }
 
     [Fact]
-    [Fact]
     public void GetService_IsCaseSensitive()
     {
         var testnet = new FakeBitcoinService { Name = "Testnet" };
