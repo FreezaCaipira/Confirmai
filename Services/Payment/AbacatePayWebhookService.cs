@@ -1,12 +1,11 @@
 using Confirmai.Services.Core;
+using Confirmai.Services.Payment.Shared;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Confirmai.Configuration;
 using Confirmai.Data;
-using Confirmai.Enums;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Confirmai.Services.Payment;
@@ -19,54 +18,34 @@ namespace Confirmai.Services.Payment;
 /// </summary>
 public sealed class AbacatePayWebhookService
 {
-    private const int MaxBodyBytes = 64 * 1024;
-
-    private readonly AppDbContext _db;
     private readonly LogService _log;
     private readonly AbacatePayOptions _options;
-    private readonly PaymentEventBus _eventBus;
+    private readonly WebhookPaymentMarker _paymentMarker;
 
     public AbacatePayWebhookService(
-        AppDbContext db,
         LogService log,
         IOptions<AbacatePayOptions> options,
-        PaymentEventBus eventBus)
+        WebhookPaymentMarker paymentMarker)
     {
-        _db = db;
         _log = log;
         _options = options.Value;
-        _eventBus = eventBus;
+        _paymentMarker = paymentMarker;
     }
 
     public async Task<IResult> HandleAsync(HttpContext context)
     {
         // ── Layer 1: query-string secret ───────────────────────────────────
-        if (!string.IsNullOrWhiteSpace(_options.WebhookSecret))
+        if (!WebhookSecretValidator.Validate(context, _options.WebhookSecret))
         {
-            var provided = context.Request.Query["webhookSecret"].ToString() ?? "";
-            var expected = _options.WebhookSecret;
-
-            var providedBytes = Encoding.UTF8.GetBytes(provided.PadRight(expected.Length));
-            var expectedBytes = Encoding.UTF8.GetBytes(expected);
-
-            if (provided.Length != expected.Length ||
-                !CryptographicOperations.FixedTimeEquals(providedBytes, expectedBytes))
-            {
-                await _log.LogAsync(
-                    $"AbacatePay webhook: webhookSecret inválido. IP={context.Connection.RemoteIpAddress}",
-                    source: "Webhook", level: "Warning");
-                return Results.Unauthorized();
-            }
+            await _log.LogAsync(
+                $"AbacatePay webhook: webhookSecret inválido. IP={context.Connection.RemoteIpAddress}",
+                source: "Webhook", level: "Warning");
+            return Results.Unauthorized();
         }
 
         // ── Read body (size-bounded) ────────────────────────────────────────
-        if (context.Request.ContentLength > MaxBodyBytes)
-            return Results.StatusCode(StatusCodes.Status413PayloadTooLarge);
-
-        using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
-        var body = await reader.ReadToEndAsync();
-
-        if (Encoding.UTF8.GetByteCount(body) > MaxBodyBytes)
+        var body = await WebhookBodyReader.ReadBodyAsync(context);
+        if (body is null)
             return Results.StatusCode(StatusCodes.Status413PayloadTooLarge);
 
         // ── Layer 2: HMAC-SHA256 signature ─────────────────────────────────
@@ -74,12 +53,7 @@ public sealed class AbacatePayWebhookService
         if (!string.IsNullOrWhiteSpace(signature))
         {
             var expected = ComputeHmacBase64(body);
-
-            var sigBytes = Encoding.UTF8.GetBytes(signature.PadRight(expected.Length));
-            var expBytes = Encoding.UTF8.GetBytes(expected);
-
-            if (signature.Length != expected.Length ||
-                !CryptographicOperations.FixedTimeEquals(sigBytes, expBytes))
+            if (!WebhookSecretValidator.FixedTimeCompare(signature, expected))
             {
                 await _log.LogAsync(
                     "AbacatePay webhook: assinatura HMAC inválida.",
@@ -110,79 +84,14 @@ public sealed class AbacatePayWebhookService
         if (payload?.Event == "transparent.completed" &&
             payload.Data?.Id is string chargeId)
         {
-            await MarkPaymentPaidAsync(chargeId);
+            var found = await _paymentMarker.MarkConfirmationPaidAsync(chargeId, "Pix", "AbacatePay");
+            if (!found)
+            {
+                await _paymentMarker.MarkMarketplacePaymentPaidAsync(chargeId, "AbacatePay");
+            }
         }
 
         return Results.Ok();
-    }
-
-    private async Task MarkPaymentPaidAsync(string chargeId)
-    {
-        var confirmation = await _db.EventConfirmations
-            .FirstOrDefaultAsync(c => c.PixTxId == chargeId);
-
-        if (confirmation is not null)
-        {
-            if (confirmation.PaymentStatus == EventConfirmationPaymentStatus.Paid)
-                return; // idempotent
-
-            if (confirmation.PaymentStatus == EventConfirmationPaymentStatus.Refunded)
-                return; // do not resurrect refunded confirmations
-
-            confirmation.PaymentStatus = EventConfirmationPaymentStatus.Paid;
-            confirmation.HasPaid = true;
-            if (string.IsNullOrWhiteSpace(confirmation.PaymentGatewayName))
-                confirmation.PaymentGatewayName = "Pix";
-
-            try
-            {
-                await _db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return;
-            }
-
-            _eventBus.NotifyPaymentConfirmed(confirmation.UserId, chargeId);
-
-            await _log.LogAsync(
-                $"AbacatePay: confirmação de evento paga via webhook. chargeId={chargeId}, confirmationId={confirmation.Id}",
-                source: "Webhook", level: "Info");
-            return;
-        }
-
-        var payment = await _db.Payments
-            .FirstOrDefaultAsync(p => p.PaymentId == chargeId);
-
-        if (payment is null)
-        {
-            await _log.LogAsync(
-                $"AbacatePay webhook: pagamento não encontrado para chargeId={chargeId}.",
-                source: "Webhook", level: "Warning");
-            return;
-        }
-
-        if (payment.IsPaid)
-            return; // idempotent
-
-        payment.IsPaid = true;
-        payment.PaidAt = DateTime.UtcNow;
-
-        try
-        {
-            await _db.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            // Another process already updated; treat as success
-            return;
-        }
-
-        _eventBus.NotifyPaymentConfirmed(payment.UserId ?? "", chargeId);
-
-        await _log.LogAsync(
-            $"AbacatePay: pagamento chargeId={chargeId} confirmado via webhook.",
-            source: "Webhook", level: "Info");
     }
 
     /// <summary>HMAC-SHA256 of the raw UTF-8 body, base64-encoded.</summary>

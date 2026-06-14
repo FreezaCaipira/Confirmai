@@ -1,4 +1,5 @@
 using Confirmai.Services.Payment;
+using Confirmai.Services.Payment.Shared;
 using Confirmai.Services.Core;
 using System.Security.Cryptography;
 using System.Text;
@@ -81,8 +82,9 @@ public class AbacatePayWebhookServiceTests
         });
 
         var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var paymentMarker = new WebhookPaymentMarker(db, logService, new PaymentEventBus());
 
-        return new AbacatePayWebhookService(db, logService, options, new PaymentEventBus());
+        return new AbacatePayWebhookService(logService, options, paymentMarker);
     }
 
     private static DefaultHttpContext CreateContext(string body, string webhookSecret)

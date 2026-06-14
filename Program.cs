@@ -114,6 +114,7 @@ builder.Services.AddScoped<AdminConfirmationService>();
 builder.Services.AddScoped<DelinquencyService>();
 builder.Services.AddScoped<PixProofUploadService>();
 builder.Services.AddScoped<AppInitializationService>();
+builder.Services.AddScoped<Confirmai.Services.Payment.Shared.WebhookPaymentMarker>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<AbacatePayWebhookService>();
 builder.Services.AddScoped<EfiBankPixService>();

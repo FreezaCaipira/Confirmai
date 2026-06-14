@@ -21,81 +21,61 @@ public sealed class AdminLogsFilterState
     public bool? SortAscending { get; init; }
 }
 
-public class AdminLogsFilterStateService
+public class AdminLogsFilterStateService : AdminFilterStateServiceBase<AdminLogsFilterState>
 {
-    private readonly IJSRuntime _js;
+    public AdminLogsFilterStateService(IJSRuntime js) : base(js) { }
 
-    public AdminLogsFilterStateService(IJSRuntime js)
+    protected override async Task<AdminLogsFilterState> LoadCoreAsync()
     {
-        _js = js;
+        var globalSearch = await LocalStorageStateHelpers.GetStringAsync(Js, AdminLogsStorageKeys.GlobalSearch);
+        var userId = await LocalStorageStateHelpers.GetStringAsync(Js, AdminLogsStorageKeys.UserFilter);
+        var source = await LocalStorageStateHelpers.GetStringAsync(Js, AdminLogsStorageKeys.SourceFilter);
+        var message = await LocalStorageStateHelpers.GetStringAsync(Js, AdminLogsStorageKeys.MessageFilter);
+        var level = await LocalStorageStateHelpers.GetStringAsync(Js, AdminLogsStorageKeys.LevelFilter);
+        var startDate = await LocalStorageStateHelpers.GetDateAsync(Js, AdminLogsStorageKeys.StartDateFilter);
+        var endDate = await LocalStorageStateHelpers.GetDateAsync(Js, AdminLogsStorageKeys.EndDateFilter);
+        var eventType = await LocalStorageStateHelpers.GetStringAsync(Js, AdminLogsStorageKeys.EventTypeFilter);
+        var entityType = await LocalStorageStateHelpers.GetStringAsync(Js, AdminLogsStorageKeys.EntityTypeFilter);
+        var page = await LocalStorageStateHelpers.GetPositiveIntAsync(Js, AdminLogsStorageKeys.Page);
+        var quickRangePreset = await LocalStorageStateHelpers.GetEnumAsync<AdminLogsQuickRangePreset>(Js, AdminLogsStorageKeys.QuickRangePreset);
+        var auditQuickFilter = await LocalStorageStateHelpers.GetEnumAsync<AdminLogsAuditQuickFilter>(Js, AdminLogsStorageKeys.AuditQuickFilter);
+        var sortColumn = await LocalStorageStateHelpers.GetEnumAsync<AdminLogSortColumn>(Js, AdminLogsStorageKeys.SortColumn);
+        var sortAscending = await LocalStorageStateHelpers.GetNullableBoolAsync(Js, AdminLogsStorageKeys.SortAscending);
+
+        return new AdminLogsFilterState
+        {
+            GlobalSearch = globalSearch,
+            UserId = userId,
+            Source = source,
+            Message = message,
+            Level = level,
+            StartDate = startDate,
+            EndDate = endDate,
+            EventType = eventType,
+            EntityType = entityType,
+            Page = page,
+            QuickRangePreset = quickRangePreset,
+            AuditQuickFilter = auditQuickFilter,
+            SortColumn = sortColumn,
+            SortAscending = sortAscending
+        };
     }
 
-    public async Task<AdminLogsFilterState> LoadAsync()
+    protected override async Task SaveCoreAsync(AdminLogsFilterState state)
     {
-        try
-        {
-            var globalSearch = await LocalStorageStateHelpers.GetStringAsync(_js, AdminLogsStorageKeys.GlobalSearch);
-            var userId = await LocalStorageStateHelpers.GetStringAsync(_js, AdminLogsStorageKeys.UserFilter);
-            var source = await LocalStorageStateHelpers.GetStringAsync(_js, AdminLogsStorageKeys.SourceFilter);
-            var message = await LocalStorageStateHelpers.GetStringAsync(_js, AdminLogsStorageKeys.MessageFilter);
-            var level = await LocalStorageStateHelpers.GetStringAsync(_js, AdminLogsStorageKeys.LevelFilter);
-            var startDate = await LocalStorageStateHelpers.GetDateAsync(_js, AdminLogsStorageKeys.StartDateFilter);
-            var endDate = await LocalStorageStateHelpers.GetDateAsync(_js, AdminLogsStorageKeys.EndDateFilter);
-            var eventType = await LocalStorageStateHelpers.GetStringAsync(_js, AdminLogsStorageKeys.EventTypeFilter);
-            var entityType = await LocalStorageStateHelpers.GetStringAsync(_js, AdminLogsStorageKeys.EntityTypeFilter);
-            var page = await LocalStorageStateHelpers.GetPositiveIntAsync(_js, AdminLogsStorageKeys.Page);
-            var quickRangePreset = await LocalStorageStateHelpers.GetEnumAsync<AdminLogsQuickRangePreset>(_js, AdminLogsStorageKeys.QuickRangePreset);
-            var auditQuickFilter = await LocalStorageStateHelpers.GetEnumAsync<AdminLogsAuditQuickFilter>(_js, AdminLogsStorageKeys.AuditQuickFilter);
-            var sortColumn = await LocalStorageStateHelpers.GetEnumAsync<AdminLogSortColumn>(_js, AdminLogsStorageKeys.SortColumn);
-            var sortAscending = await LocalStorageStateHelpers.GetNullableBoolAsync(_js, AdminLogsStorageKeys.SortAscending);
-
-            return new AdminLogsFilterState
-            {
-                GlobalSearch = globalSearch,
-                UserId = userId,
-                Source = source,
-                Message = message,
-                Level = level,
-                StartDate = startDate,
-                EndDate = endDate,
-                EventType = eventType,
-                EntityType = entityType,
-                Page = page,
-                QuickRangePreset = quickRangePreset,
-                AuditQuickFilter = auditQuickFilter,
-                SortColumn = sortColumn,
-                SortAscending = sortAscending
-            };
-        }
-        catch
-        {
-            return new AdminLogsFilterState();
-        }
-    }
-
-    public async Task SaveAsync(AdminLogsFilterState state)
-    {
-        try
-        {
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.GlobalSearch, state.GlobalSearch);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.UserFilter, state.UserId);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.SourceFilter, state.Source);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.MessageFilter, state.Message);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.LevelFilter, state.Level);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.EventTypeFilter, state.EventType);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.EntityTypeFilter, state.EntityType);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.QuickRangePreset, state.QuickRangePreset?.ToString() ?? string.Empty);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.AuditQuickFilter, state.AuditQuickFilter?.ToString() ?? string.Empty);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.SortColumn, state.SortColumn?.ToString() ?? string.Empty);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminLogsStorageKeys.SortAscending, state.SortAscending?.ToString() ?? string.Empty);
-            await LocalStorageStateHelpers.SetOrRemoveDateAsync(_js, AdminLogsStorageKeys.StartDateFilter, state.StartDate);
-            await LocalStorageStateHelpers.SetOrRemoveDateAsync(_js, AdminLogsStorageKeys.EndDateFilter, state.EndDate);
-            await LocalStorageStateHelpers.SetPageAsync(_js, AdminLogsStorageKeys.Page, state.Page);
-        }
-        catch
-        {
-            // No-op: ignore storage failures.
-        }
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.GlobalSearch, state.GlobalSearch);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.UserFilter, state.UserId);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.SourceFilter, state.Source);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.MessageFilter, state.Message);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.LevelFilter, state.Level);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.EventTypeFilter, state.EventType);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.EntityTypeFilter, state.EntityType);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.QuickRangePreset, state.QuickRangePreset?.ToString() ?? string.Empty);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.AuditQuickFilter, state.AuditQuickFilter?.ToString() ?? string.Empty);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.SortColumn, state.SortColumn?.ToString() ?? string.Empty);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminLogsStorageKeys.SortAscending, state.SortAscending?.ToString() ?? string.Empty);
+        await LocalStorageStateHelpers.SetOrRemoveDateAsync(Js, AdminLogsStorageKeys.StartDateFilter, state.StartDate);
+        await LocalStorageStateHelpers.SetOrRemoveDateAsync(Js, AdminLogsStorageKeys.EndDateFilter, state.EndDate);
+        await LocalStorageStateHelpers.SetPageAsync(Js, AdminLogsStorageKeys.Page, state.Page);
     }
 }
-
