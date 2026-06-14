@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Confirmai.Data;
 using Confirmai.Models;
 
@@ -18,8 +19,9 @@ namespace Confirmai.Services.Crypto
         private readonly string? _coinGeckoApiKey;
         private readonly string _coinGeckoApiHeaderName;
         private readonly IServiceScopeFactory? _scopeFactory;
+        private readonly ILogger<CryptoQuoteService> _logger;
 
-        public CryptoQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceScopeFactory? scopeFactory = null)
+        public CryptoQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceScopeFactory? scopeFactory = null, ILogger<CryptoQuoteService>? logger = null)
         {
             _http = httpClientFactory.CreateClient();
             _http.DefaultRequestHeaders.UserAgent.ParseAdd("Confirmai/1.0 (+https://Confirmai.com)");
@@ -29,6 +31,7 @@ namespace Confirmai.Services.Crypto
             _coinGeckoApiKey = configuration["CoinGecko:ApiKey"];
             _coinGeckoApiHeaderName = configuration["CoinGecko:ApiHeaderName"] ?? "x-cg-demo-api-key";
             _scopeFactory = scopeFactory;
+            _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<CryptoQuoteService>.Instance;
 
             _cache = new Dictionary<string, (CryptoQuote?, DateTime)>();
             _lastErrorLogAt = new Dictionary<string, DateTime>();
@@ -109,7 +112,7 @@ namespace Confirmai.Services.Crypto
                 return;
 
             _lastErrorLogAt[cryptoId] = DateTime.UtcNow;
-            Console.WriteLine($"Error loading quote from CoinGecko for '{cryptoId}': {ex.Message}");
+            _logger.LogWarning(ex, "Falha ao obter cotação do CoinGecko para '{CryptoId}'", cryptoId);
         }
 
         private CryptoQuote? GetCachedQuote(string cryptoId)
@@ -138,8 +141,9 @@ namespace Confirmai.Services.Crypto
 
                 await db.SaveChangesAsync();
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogDebug(ex, "Falha ao registrar consulta de cotação (não-crítico)");
             }
         }
     }

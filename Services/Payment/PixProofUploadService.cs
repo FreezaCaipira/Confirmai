@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Confirmai.Data;
 
 namespace Confirmai.Services.Payment;
@@ -9,12 +10,14 @@ namespace Confirmai.Services.Payment;
 public class PixProofUploadService
 {
     private readonly IDbContextFactory<AppDbContext> _factory;
+    private readonly ILogger<PixProofUploadService> _logger;
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
     private static readonly string[] AllowedMimeTypes = { "image/jpeg", "image/png", "image/webp" };
 
-    public PixProofUploadService(IDbContextFactory<AppDbContext> factory)
+    public PixProofUploadService(IDbContextFactory<AppDbContext> factory, ILogger<PixProofUploadService> logger)
     {
         _factory = factory;
+        _logger = logger;
     }
 
     /// <summary>
@@ -83,16 +86,18 @@ public class PixProofUploadService
                 UploadedAt = confirmation.PixProofUploadedAt
             };
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            _logger.LogWarning(ex, "Erro de I/O ao processar upload de comprovante Pix para confirmação {ConfirmationId}", confirmationId);
             return new PixProofUploadResult
             {
                 Success = false,
                 Message = "Erro ao processar arquivo. Tente novamente."
             };
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro inesperado ao processar upload de comprovante Pix para confirmação {ConfirmationId}", confirmationId);
             return new PixProofUploadResult
             {
                 Success = false,

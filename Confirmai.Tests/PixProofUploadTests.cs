@@ -8,6 +8,7 @@ using Confirmai.Services.User;
 using Confirmai.Services.Core;
 using Confirmai.Services.Utility;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Confirmai.Tests;
@@ -23,7 +24,7 @@ public class PixProofUploadTests
 
         var db = new AppDbContext(options);
         var factory = new TestInMemoryDbContextFactory(dbName);
-        var svc = new PixProofUploadService(factory);
+        var svc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
         return (db, svc, factory);
     }
 

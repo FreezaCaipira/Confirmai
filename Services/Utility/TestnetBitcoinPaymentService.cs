@@ -4,6 +4,7 @@ using NBitcoin;
 using System.Text.Json;
 using Confirmai.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Confirmai.Services.Utility
 {
@@ -12,11 +13,13 @@ namespace Confirmai.Services.Utility
         public string Name => "Testnet";
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly PaymentEventBus? _eventBus;
+        private readonly ILogger<TestnetBitcoinPaymentService> _logger;
 
-        public TestnetBitcoinPaymentService(IHttpClientFactory httpClientFactory, PaymentEventBus? eventBus = null)
+        public TestnetBitcoinPaymentService(IHttpClientFactory httpClientFactory, PaymentEventBus? eventBus = null, ILogger<TestnetBitcoinPaymentService>? logger = null)
         {
             _httpClientFactory = httpClientFactory;
             _eventBus = eventBus;
+            _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<TestnetBitcoinPaymentService>.Instance;
         }
 
         public Task<(string Address, string PaymentId, string PrivateKey)> GenerateAddressWithKeyAsync(decimal amount, string? orderId = null)
@@ -55,8 +58,9 @@ namespace Confirmai.Services.Utility
 
                 return await GetReceivedFromBlockstreamAsync(normalizedAddress);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogWarning(ex, "Testnet: falha ao consultar saldo do endere√ßo {Address}", normalizedAddress);
                 return 0m;
             }
         }
@@ -103,13 +107,13 @@ namespace Confirmai.Services.Utility
             var payment = db.Payments.Include(p => p.Product).FirstOrDefault(p => p.PaymentId == paymentId);
             if (payment == null)
             {
-                await log.LogAsync($"[Testnet] Pagamento n„o encontrado para paymentId={paymentId}", source: "Testnet", level: "Warning");
+                await log.LogAsync($"[Testnet] Pagamento n√£o encontrado para paymentId={paymentId}", source: "Testnet", level: "Warning");
                 return false;
             }
 
             if (payment.IsPaid)
             {
-                await log.LogAsync($"[Testnet] Pagamento j· est· marcado como pago para paymentId={paymentId}", source: "Testnet", level: "Info");
+                await log.LogAsync($"[Testnet] Pagamento j√° est√° marcado como pago para paymentId={paymentId}", source: "Testnet", level: "Info");
                 return true;
             }
 
