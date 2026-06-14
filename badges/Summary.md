@@ -2,33 +2,33 @@
 
 |||
 |:---|:---|
-| Generated on: | 05/30/2026 - 04:38:48 |
-| Coverage date: | 05/30/2026 - 04:38:43 |
+| Generated on: | 06/14/2026 - 12:10:01 |
+| Coverage date: | 06/14/2026 - 12:09:56 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
-| Classes: | 284 |
-| Files: | 321 |
-| **Line coverage:** | 8.6% (8310 of 95679) |
-| Covered lines: | 8310 |
-| Uncovered lines: | 87369 |
-| Coverable lines: | 95679 |
-| Total lines: | 117186 |
-| **Branch coverage:** | 29.7% (1783 of 5993) |
-| Covered branches: | 1783 |
-| Total branches: | 5993 |
+| Classes: | 388 |
+| Files: | 427 |
+| **Line coverage:** | 6.5% (7334 of 111692) |
+| Covered lines: | 7334 |
+| Uncovered lines: | 104358 |
+| Coverable lines: | 111692 |
+| Total lines: | 138870 |
+| **Branch coverage:** | 26.9% (1978 of 7353) |
+| Covered branches: | 1978 |
+| Total branches: | 7353 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 23_26674662670 |
+| Tag: | 86_27498349473 |
 
 # Risk Hotspots
 
 | **Assembly** | **Class** | **Method** | **Crap Score** | **Cyclomatic complexity** |
 |:---|:---|:---|---:|---:|
-| Confirmai | Confirmai.Pages.Groups.Detail | BuildRenderTree(...) | 22052 | 148 || Confirmai | Confirmai.Pages.Futsal.Detail | BuildRenderTree(...) | 18169 | 352 || Confirmai | Confirmai.Pages.Poker.Detail | BuildRenderTree(...) | 18090 | 134 || Confirmai | Confirmai.Pages.MyEvents.Index | BuildRenderTree(...) | 7140 | 84 || Confirmai | Confirmai.Pages.Payment.Payment | OnInitializedAsync() | 2550 | 50 || Confirmai | Confirmai.Pages.Profile | BuildRenderTree(...) | 2523 | 54 || Confirmai | Confirmai.Pages.Groups.Join | BuildRenderTree(...) | 1806 | 42 || Confirmai | Confirmai.Pages.Payment.EventPayment | BuildRenderTree(...) | 1806 | 42 || Confirmai | Confirmai.Pages.Payment.Payment | BuildRenderTree(...) | 1806 | 42 || Confirmai | Confirmai.Pages.Mailbox | BuildRenderTree(...) | 1640 | 40 || Confirmai | Confirmai.Pages.Payment.ViewPayment | BuildRenderTree(...) | 1640 | 40 || Confirmai | Confirmai.Services.AppmaxPixService | BuildCheckoutContextAsync() | 1056 | 32 || Confirmai | Confirmai.Pages.Futsal.Escalacao | BuildRenderTree(...) | 1004 | 64 || Confirmai | Confirmai.Pages.Futsal.Create | Save() | 812 | 28 || Confirmai | Confirmai.Pages.Futsal.Detail | ConfirmPresence() | 702 | 26 || Confirmai | Confirmai.Pages.Payment.EventPayment | OnInitializedAsync() | 702 | 26 || Confirmai | Confirmai.Pages.Profile | SaveAvatarAsync() | 702 | 26 || Confirmai | Confirmai.Pages.Futsal.Escalacao | BuildWhatsAppText() | 600 | 24 || Confirmai | Confirmai.Pages.Futsal.Escalacao | BuildShareText() | 600 | 24 || Confirmai | Confirmai.Pages.Payment.Payment | GeneratePixPaymentAsync() | 600 | 24 || Confirmai | Confirmai.Pages.Payment.PaymentDetails | BuildRenderTree(...) | 600 | 24 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminTogglePaid() | 506 | 22 || Confirmai | Confirmai.Pages.Product.ProductForm | ApplyCreateQueryDefaults() | 506 | 22 || Confirmai | Confirmai.Pages.Futsal.Escalacao | Randomize() | 420 | 20 || Confirmai | Confirmai.Pages.Poker.Create | Save() | 420 | 20 || Confirmai | Confirmai.Pages.Poker.Edit | Save() | 420 | 20 || Confirmai | Confirmai.Services.AppmaxPixService | GetBearerTokenAsync() | 420 | 20 || Confirmai | Confirmai.Shared.Components.UserSummaryCard | BuildRenderTree(...) | 420 | 20 || Confirmai | Confirmai.Pages.Futsal.Edit | Save() | 342 | 18 || Confirmai | Confirmai.Pages.Groups.Detail | LoadGroup() | 342 | 18 || Confirmai | Confirmai.Pages.Mailbox | SetConversationArchivedAsync() | 342 | 18 || Confirmai | Confirmai.Pages.Payment.EventPayment | StartPollingAsync() | 342 | 18 || Confirmai | Confirmai.Pages.Payment.Payment | GenerateAddress() | 342 | 18 || Confirmai | Confirmai.Services.AbacatePayPixService | GenerateAddressAsync() | 342 | 18 || Confirmai | Confirmai.Pages.Admin.AdminGateways | OnSwitchChanged() | 272 | 16 || Confirmai | Confirmai.Pages.Futsal.Escalacao | ConfirmarEscalacao() | 272 | 16 || Confirmai | Confirmai.Pages.Payment.ViewPayment | get_QRCodeValue() | 272 | 16 || Confirmai | Program | <Main>$() | 261 | 80 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminRemoveOutfieldSlot() | 210 | 14 || Confirmai | Confirmai.Pages.Payment.Payment | CheckPayment() | 210 | 14 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | BuildRenderTree(...) | 210 | 14 || Confirmai | Confirmai.Pages.Payment.ViewPayment | OnInitializedAsync() | 210 | 14 || Confirmai | Confirmai.Shared.Components.Breadcrumb | MapSegment(...) | 173 | 78 || Confirmai | Confirmai.Pages.Admin.AdminAuditTimeline | BuildRenderTree(...) | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminAuditTimeline | GetLevelBadgeClass(...) | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminLogs | LoadFilterStateFromStorageAsync() | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminUsers | DeleteUser() | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminUserView | get_DisplayName() | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminVenues | ApplyFilter() | 156 | 12 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminRemoveGoalkeeperSlot() | 156 | 12 || Confirmai | Confirmai.Pages.Groups.Detail | ApproveRequest() | 156 | 12 || Confirmai | Confirmai.Pages.Groups.Detail | JoinWithCode() | 156 | 12 || Confirmai | Confirmai.Pages.Payment.EventPayment | GeneratePixCharge() | 156 | 12 || Confirmai | Confirmai.Pages.Poker.Create | BuildRenderTree(...) | 156 | 12 || Confirmai | Confirmai.Pages.Profile | get_DisplayName() | 156 | 12 || Confirmai | Confirmai.Pages.Profile | SendMailboxMessageAsync() | 156 | 12 || Confirmai | Confirmai.Pages.VenueManager.VenueEdit | OnAfterRenderAsync() | 156 | 12 || Confirmai | Confirmai.Pages.VenueManager.Venues | BuildRenderTree(...) | 156 | 12 || Confirmai | Confirmai.Services.AdminSettingsService | SetReconciliationSeverityThresholdsAsync() | 156 | 12 || Confirmai | Confirmai.Services.AppmaxPixService | NormalizePhone(...) | 156 | 12 || Confirmai | Confirmai.Services.AppmaxPixService | TryGetInt64Path(...) | 156 | 12 || Confirmai | Confirmai.Services.EventNotificationService | NotifyDelinquencyAsync() | 156 | 12 || Confirmai | System.Text.RegularExpressions.Generated | TryMatchAtCurrentPosition(...) | 112 | 88 || Confirmai | System.Text.RegularExpressions.Generated.<RegexGenerator_g>FBE5D3F183809CBDAE41AF23BFC06E22EE1BD9C4D07898CEDDF9B7DCFD59724FE__EmailInJsonValueByKeyRegex_0 | TryMatchAtCurrentPosition(...) | 112 | 88 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ChangePasswordModel | OnPostAsync() | 110 | 10 || Confirmai | Confirmai.Areas.Identity.Pages.Account.RegisterModel | OnPostAsync() | 110 | 10 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ResetPasswordModel | OnPostAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminPayments | BuildSweepDetails(...) | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminPayments | ApplyStatusTransitionAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminPayments | LoadFilterStateFromStorageAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminUserEdit | Save() | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | OnAfterRenderAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Futsal.Escalacao | MovePlayer(...) | 110 | 10 || Confirmai | Confirmai.Pages.Groups.Detail | AdminMarkPaid() | 110 | 10 || Confirmai | Confirmai.Pages.Mailbox | LoadMessagesAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Mailbox | LoadThreadForSelectedMessageAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Mailbox | MarkConversationAsReadAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Mailbox | SendQuickReplyAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Payment.Payment | ResolvePixRecipientKeyAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | OnPaymentConfirmed(...) | 110 | 10 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | GetProductDisplayName(...) | 110 | 10 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | OnInitializedAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Poker.Create | OnInitializedAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Poker.Edit | BuildRenderTree(...) | 110 | 10 || Confirmai | Confirmai.Pages.Poker.Edit | OnInitializedAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Product.ProductForm | HandleValidSubmit() | 110 | 10 || Confirmai | Confirmai.Pages.VenueManager.VenueEdit | OnInitializedAsync() | 110 | 10 || Confirmai | Confirmai.Pages.VenueManager.VenueEdit | Save() | 110 | 10 || Confirmai | Confirmai.Pages.VenueManager.Venues | DeleteVenue() | 110 | 10 || Confirmai | Confirmai.Services.AbacatePayPixService | GetReceivedAmountAsync() | 110 | 10 || Confirmai | Confirmai.Services.AppmaxPixService | IsPaidOrderStatus(...) | 110 | 10 || Confirmai | Confirmai.Services.EventNotificationService | NotifyWaitlistPromotedAsync() | 110 | 10 || Confirmai | Confirmai.Services.PaymentDomainMetrics | TrackPendingGrowthFromSweepMetadata(...) | 110 | 10 || Confirmai | Confirmai.Services.ProductService | SaveImageAsync() | 110 | 10 || Confirmai | Confirmai.Shared.Components.Toast | Show(...) | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminPayments | BuildRenderTree(...) | 81 | 50 || Confirmai | Confirmai.Services.AbacatePayWebhookService | HandleAsync() | 80 | 34 || Confirmai | Confirmai.Pages.Admin.Admin | BuildPendingTrendLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminGateways | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminPayments | BuildPendingTrendLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminPayments | OnAfterRenderAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminPayments | ReconcileChargeAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminUsers | LoadFilterStateFromStorageAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminUsers | LockUser() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | AssignVenueAdmin() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | RemoveVenueAdmin() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminVenues | ToggleActive() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Create | OnSubFormatChanged(...) | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminAddGoalkeeperSlot() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminAddOutfieldSlot() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminRemoveConfirmation() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminRemoveFromWaitlist() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | RequestToJoinAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Edit | OnSubFormatChanged(...) | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Edit | CancelEvent() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Escalacao | ResetarEscalacao() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Schedule.Edit | Save() | 72 | 8 || Confirmai | Confirmai.Pages.Groups.Detail | RejectRequest() | 72 | 8 || Confirmai | Confirmai.Pages.Groups.Detail | RequestToJoin() | 72 | 8 || Confirmai | Confirmai.Pages.Groups.Join | JoinGroup() | 72 | 8 || Confirmai | Confirmai.Pages.Mailbox | FormatRelativeTime(...) | 72 | 8 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | CancelPayment() | 72 | 8 || Confirmai | Confirmai.Pages.Payment.ViewPayment | CheckPayment() | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Create | ModalityLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Detail | ModalityLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Detail | CancelEvent() | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Detail | ConfirmPresence() | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Detail | RequestToJoinAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Edit | ModalityLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Product.ProductForm | EnsurePricingGatewayDefault() | 72 | 8 || Confirmai | Confirmai.Pages.Profile | LoadChatMessagesAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Profile | SaveOwnProfileAsync() | 72 | 8 || Confirmai | Confirmai.Pages.VenueManager.VenueEdit | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Services.AppmaxPixService | TryGetStringPath(...) | 72 | 8 || Confirmai | Confirmai.Shared.Components.Breadcrumb | TryNormalizeLocalReturnUrl(...) | 72 | 8 || Confirmai | Confirmai.Shared.Components.BtcQuoteCard | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Shared.MainLayout | OnAfterRenderAsync() | 72 | 8 || Confirmai | Confirmai.Services.PaymentDomainMetrics | Track(...) | 60 | 14 || Confirmai | Confirmai.Pages.MyEvents.Index | DayName(...) | 56 | 7 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ForgotPasswordConfirmationModel | OnGet() | 53 | 8 || Confirmai | Confirmai.Pages.Admin.AdminPayments | RunSummaryRefreshLoopAsync() | 52 | 10 || Confirmai | Confirmai.Services.AppInitializationService | EnsureFakeTestUserAccessAsync() | 50 | 22 || Confirmai | Confirmai.Shared.Components.EventListingShell | BuildRenderTree(...) | 50 | 22 || Confirmai | Confirmai.Pages.Groups.Index | BuildRenderTree(...) | 47 | 44 || Confirmai | Confirmai.Services.AbacatePayWebhookService | MarkPaymentPaidAsync() | 47 | 14 || Confirmai | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ResetPassword | ExecuteAsync() | 42 | 6 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ForgotPasswordModel | OnPostAsync() | 42 | 6 || Confirmai | Confirmai.Configuration.OtelOptions | ParsedHeaders() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.Admin | GetSweepMetric(...) | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminLogs | ApplyFiltersCore() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminLogs | ExportCsvAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminLogs | ExportJsonAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminPayments | GetSweepMetric(...) | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminPayments | TryWriteStalenessIncidentAuditAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminUsers | ApplyFilters(...) | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminUsers | LoadUsersFromDb() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminUsers | UnlockUser() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminUserView | ToggleVenueManager() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminVenues | DeleteVenue() | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Detail | CancelConfirmation() | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Detail | LeaveWaitlist() | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Schedule.Edit | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Schedule.Edit | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Groups.Join | LoadGroup() | 42 | 6 || Confirmai | Confirmai.Pages.Index | PokerTypeLabel(...) | 42 | 6 || Confirmai | Confirmai.Pages.Index | SetTabAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Mailbox | BuildAvatarInitials(...) | 42 | 6 || Confirmai | Confirmai.Pages.Mailbox | EnsureConversationSelection() | 42 | 6 || Confirmai | Confirmai.Pages.Mailbox | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.MyEvents.Index | CancelEvent() | 42 | 6 || Confirmai | Confirmai.Pages.MyEvents.Index | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.MyEvents.Index | ToggleSchedule() | 42 | 6 || Confirmai | Confirmai.Pages.Payment.Payment | ComputeCrc16(...) | 42 | 6 || Confirmai | Confirmai.Pages.Payment.Payment | SanitizePixText(...) | 42 | 6 || Confirmai | Confirmai.Pages.Payment.Payment | OnSelectedMethodChangedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | TryUnlock() | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | TypeLabel(...) | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | TypeBadgeClass(...) | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | CancelConfirmation() | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | LoadEvent() | 42 | 6 || Confirmai | Confirmai.Pages.Product.ProductForm | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.VenueManager.Venues | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Services.AppmaxPixService | TryResolvePath(...) | 42 | 6 || Confirmai | Confirmai.Services.AppmaxPixService | IsChargePaidAsync() | 42 | 6 || Confirmai | Confirmai.Services.EfiBankPixService | CreateProductionHandler() | 42 | 6 || Confirmai | Confirmai.Services.AdminLogsFilterInference | InferQuickRangePreset(...) | 40 | 40 || Confirmai | Confirmai.Services.EfiBankPixService | RegisterWebhookAsync() | 40 | 8 || Confirmai | System.Text.RegularExpressions.Generated | TryMatchAtCurrentPosition(...) | 40 | 38 || Confirmai | System.Text.RegularExpressions.Generated.<RegexGenerator_g>FBE5D3F183809CBDAE41AF23BFC06E22EE1BD9C4D07898CEDDF9B7DCFD59724FE__BareEmailInJsonValueRegex_1 | TryMatchAtCurrentPosition(...) | 40 | 38 || Confirmai | Confirmai.Services.EfiBankWebhookService | HandleAsync() | 38 | 38 || Confirmai | Confirmai.Pages.Admin.AdminPayments | UpdateSeverity() | 34 | 14 || Confirmai | Confirmai.Services.AppInitializationService | SeedRolesAndAdminAsync() | 34 | 28 || Confirmai | Confirmai.Services.BtcPayWebhookService | HandleAsync() | 34 | 32 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ConfirmEmailModel | OnGetAsync() | 31 | 8 || Confirmai | Confirmai.Pages.Admin.AdminLogs | BuildActivePeriodSummary() | 31 | 8 || Confirmai | Confirmai.Services.EventPaymentReconciliationService | ReconcileByChargeIdAsync() | 31 | 18 || Confirmai | Confirmai.Pages.Admin.AdminLogs | BuildRenderTree(...) | 27 | 26 || Confirmai | Confirmai.Services.BtcPayWebhookService | TryParseWebhookPayload(...) | 26 | 26 || Confirmai | Confirmai.Services.PaymentConfirmationService | ConfirmAsync() | 24 | 24 || Confirmai | Confirmai.Pages.Admin.AdminLanguages | BuildRenderTree(...) | 22 | 22 || Confirmai | Confirmai.Areas.Identity.Pages.Account.LoginModel | OnPostAsync() | 20 | 20 || Confirmai | Confirmai.Pages.Admin.Admin | BuildRenderTree(...) | 21 | 20 || Confirmai | Confirmai.Pages.Admin.AdminPayments | LoadOperationalSummaryAsync() | 23 | 20 || Confirmai | Confirmai.Services.EventNotificationService | NotifyNewRecurringEventAsync() | 20 | 20 || Confirmai | Confirmai.Services.LogService | EnrichWithRequestContext(...) | 20 | 20 || Confirmai | Confirmai.Services.AdminLogFiltering | Apply(...) | 18 | 18 || Confirmai | Confirmai.Services.AdminLogsFilterStateRules | ShouldShowRestoredNotice(...) | 18 | 18 || Confirmai | Confirmai.Data.AppDbContext | SynchronizeEventConfirmationPaymentState() | 18 | 16 || Confirmai | Confirmai.Pages.Admin.AdminPayments | LoadPageAsync() | 19 | 16 || Confirmai | Confirmai.Services.AdminLogsFilterStateService | SaveAsync() | 16 | 16 || Confirmai | Confirmai.Services.EventConfirmationPaymentStatusService | TransitionStatusAsync() | 24 | 16 || Confirmai | Confirmai.Shared.Components.Breadcrumb | IsIdSegment(...) | 16 | 16 || Confirmai | Confirmai.Shared.MainLayout | LoadCurrentUserAndUnreadCountSafeAsync() | 16 | 16 |
+| Confirmai | Confirmai.Pages.Poker.Detail | BuildRenderTree(...) | 18090 | 134 || Confirmai | Confirmai.Pages.Groups.Detail | BuildRenderTree(...) | 11772 | 108 || Confirmai | Confirmai.Pages.Components.EscalacaoVoting | BuildRenderTree(...) | 10100 | 100 || Confirmai | Confirmai.Pages.Admin.Components.AdminPaymentsSummaryPanel | BuildRenderTree(...) | 7482 | 86 || Confirmai | Confirmai.Pages.MyEvents.Index | BuildRenderTree(...) | 7140 | 84 || Confirmai | Confirmai.Pages.Components.EscalacaoConfirmed | BuildRenderTree(...) | 4970 | 70 || Confirmai | Confirmai.Shared.Components.Groups.GroupDetailPaymentsModal | BuildRenderTree(...) | 4970 | 70 || Confirmai | Confirmai.Pages.Futsal.Detail | BuildRenderTree(...) | 4238 | 192 || Confirmai | Confirmai.Pages.Payment.Payment | OnInitializedAsync() | 2550 | 50 || Confirmai | Confirmai.Pages.Futsal.Components.FutsalOutfieldGroup | BuildRenderTree(...) | 2380 | 90 || Confirmai | Confirmai.Pages.Groups.Join | BuildRenderTree(...) | 1806 | 42 || Confirmai | Confirmai.Pages.Payment.ViewPayment | BuildRenderTree(...) | 1640 | 40 || Confirmai | Confirmai.Shared.Components.Groups.RankingTable | BuildRenderTree(...) | 1640 | 40 || Confirmai | Confirmai.Pages.Groups.Components.MembersManager | BuildRenderTree(...) | 1482 | 38 || Confirmai | Confirmai.Pages.Payment.PaymentCheckoutPanel | BuildRenderTree(...) | 1056 | 32 || Confirmai | Confirmai.Services.Payment.AppmaxPixService | BuildCheckoutContextAsync() | 1056 | 32 || Confirmai | Confirmai.Pages.Futsal.Components.EscalacaoScoreEditor | BuildRenderTree(...) | 930 | 30 || Confirmai | Confirmai.Pages.Payment.EventPayment | OnInitializedAsync() | 930 | 30 || Confirmai | Confirmai.Shared.Components.Futsal.FutsalWaitlist | BuildRenderTree(...) | 821 | 32 || Confirmai | Confirmai.Pages.Futsal.Create | Save() | 812 | 28 || Confirmai | Confirmai.Services.Payment.PaymentInitializationService | ParseQueryParameters(...) | 812 | 28 || Confirmai | Confirmai.Pages.Futsal.Detail | ConfirmPresence() | 702 | 26 || Confirmai | Confirmai.Pages.Groups.Ranking | BuildRanking() | 702 | 26 || Confirmai | Confirmai.Pages.Profile | SaveAvatarAsync() | 702 | 26 || Confirmai | Confirmai.Shared.Components.Groups.GroupDetailMembers | BuildRenderTree(...) | 702 | 26 || Confirmai | Confirmai.Pages.Futsal.Escalacao | BuildWhatsAppText() | 600 | 24 || Confirmai | Confirmai.Pages.Futsal.Escalacao | BuildShareText() | 600 | 24 || Confirmai | Confirmai.Pages.Groups.Features | SetMemberRole() | 600 | 24 || Confirmai | Confirmai.Pages.Payment.Components.EventPaymentSummary | BuildRenderTree(...) | 600 | 24 || Confirmai | Confirmai.Pages.Payment.Payment | GeneratePixPaymentAsync() | 600 | 24 || Confirmai | Confirmai.Pages.Payment.PaymentDetails | BuildRenderTree(...) | 600 | 24 || Confirmai | Confirmai.Pages.Admin.Components.AdminPaymentsAdvancedToolsModal | BuildRenderTree(...) | 506 | 22 || Confirmai | Confirmai.Pages.Groups.Features | SavePixReceiver() | 506 | 22 || Confirmai | Confirmai.Pages.Payment.EventPayment | DisposeAsync() | 506 | 22 || Confirmai | Confirmai.Pages.Product.ProductForm | ApplyCreateQueryDefaults() | 506 | 22 || Confirmai | Confirmai.Pages.Futsal.Components.FutsalGoalkeeperGroup | BuildRenderTree(...) | 443 | 60 || Confirmai | Confirmai.Pages.Components.MailboxConversationList | BuildRenderTree(...) | 420 | 20 || Confirmai | Confirmai.Pages.Futsal.Escalacao | Randomize() | 420 | 20 || Confirmai | Confirmai.Pages.Groups.Components.PixReceiverSelector | BuildRenderTree(...) | 420 | 20 || Confirmai | Confirmai.Pages.Mailbox | SetConversationArchivedAsync() | 420 | 20 || Confirmai | Confirmai.Pages.Poker.Create | Save() | 420 | 20 || Confirmai | Confirmai.Pages.Poker.Edit | Save() | 420 | 20 || Confirmai | Confirmai.Services.Payment.AppmaxPixService | GetBearerTokenAsync() | 420 | 20 || Confirmai | Confirmai.Shared.Components.UserSummaryCard | BuildRenderTree(...) | 420 | 20 || Confirmai | Confirmai.Pages.Futsal.Edit | Save() | 342 | 18 || Confirmai | Confirmai.Pages.Groups.Detail | LoadGroup() | 342 | 18 || Confirmai | Confirmai.Pages.Groups.Features | LoadAsync() | 342 | 18 || Confirmai | Confirmai.Pages.Payment.EventPayment | StartPollingAsync() | 342 | 18 || Confirmai | Confirmai.Pages.Payment.Payment | GenerateAddress() | 342 | 18 || Confirmai | Confirmai.Services.Payment.AbacatePayPixService | GenerateAddressAsync() | 342 | 18 || Confirmai | Program | <Main>$() | 315 | 84 || Confirmai | Confirmai.Pages.Admin.AdminGateways | OnSwitchChanged() | 272 | 16 || Confirmai | Confirmai.Pages.Components.MailboxThreadPane | BuildRenderTree(...) | 272 | 16 || Confirmai | Confirmai.Pages.Futsal.Components.EscalacaoDraftTeamBuilder | BuildRenderTree(...) | 272 | 16 || Confirmai | Confirmai.Pages.Futsal.Escalacao | ConfirmarEscalacao() | 272 | 16 || Confirmai | Confirmai.Pages.Groups.Components.FeaturesToggles | BuildRenderTree(...) | 272 | 16 || Confirmai | Confirmai.Pages.Payment.ViewPayment | get_QRCodeValue() | 272 | 16 || Confirmai | Confirmai.Services.Core.CertificateHealthCheckService | CheckEfiBankCertificateAsync() | 272 | 16 || Confirmai | Confirmai.Pages.Components.Profile.ProfileContactsDisplay | BuildRenderTree(...) | 210 | 14 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminRemoveOutfieldSlot() | 210 | 14 || Confirmai | Confirmai.Pages.Futsal.Escalacao | SaveTeamNames() | 210 | 14 || Confirmai | Confirmai.Pages.Groups.Create | Save() | 210 | 14 || Confirmai | Confirmai.Pages.Groups.Detail | ApproveRequest() | 210 | 14 || Confirmai | Confirmai.Pages.Groups.Features | BuildRenderTree(...) | 210 | 14 || Confirmai | Confirmai.Pages.Payment.Components.EventPaymentGateways | BuildRenderTree(...) | 210 | 14 || Confirmai | Confirmai.Pages.Payment.EventPayment | GeneratePixCharge() | 210 | 14 || Confirmai | Confirmai.Pages.Payment.Payment | CheckPayment() | 210 | 14 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | BuildRenderTree(...) | 210 | 14 || Confirmai | Confirmai.Pages.Payment.ViewPayment | OnInitializedAsync() | 210 | 14 || Confirmai | Confirmai.Pages.Profile | SendMailboxMessageAsync() | 210 | 14 || Confirmai | Confirmai.Services.Core.UiText.BaseTexts | GetText(...) | 210 | 14 || Confirmai | Confirmai.Shared.Components.Breadcrumb | MapSegment(...) | 173 | 78 || Confirmai | Confirmai.Pages.Admin.AdminAuditTimeline | BuildRenderTree(...) | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminAuditTimeline | GetLevelBadgeClass(...) | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminLogs | GetLevelBadgeClass(...) | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminLogs | LoadFilterStateFromStorageAsync() | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminUsers | DeleteUser() | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminUserView | get_DisplayName() | 156 | 12 || Confirmai | Confirmai.Pages.Admin.AdminVenues | ApplyFilter() | 156 | 12 || Confirmai | Confirmai.Pages.Components.Profile.ProfileHeaderCard | get_DisplayName() | 156 | 12 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminRemoveGoalkeeperSlot() | 156 | 12 || Confirmai | Confirmai.Pages.Groups.Detail | DisposeAsync() | 156 | 12 || Confirmai | Confirmai.Pages.Groups.Detail | JoinWithCode() | 156 | 12 || Confirmai | Confirmai.Pages.Mailbox | LoadThreadForSelectedMessageAsync() | 156 | 12 || Confirmai | Confirmai.Pages.Mailbox | MarkConversationAsReadAsync() | 156 | 12 || Confirmai | Confirmai.Pages.Mailbox | SendQuickReplyAsync() | 156 | 12 || Confirmai | Confirmai.Pages.Payment.Components.EventPaymentProof | BuildRenderTree(...) | 156 | 12 || Confirmai | Confirmai.Pages.Payment.EventPayment | BuildRenderTree(...) | 156 | 12 || Confirmai | Confirmai.Pages.Payment.EventPayment | GetGroupAdminPixKey(...) | 156 | 12 || Confirmai | Confirmai.Pages.Payment.EventPayment | BuildPixStaticPayload(...) | 156 | 12 || Confirmai | Confirmai.Pages.Poker.Create | BuildRenderTree(...) | 156 | 12 || Confirmai | Confirmai.Pages.Profile | get_DisplayName() | 156 | 12 || Confirmai | Confirmai.Pages.VenueManager.VenueEdit | OnAfterRenderAsync() | 156 | 12 || Confirmai | Confirmai.Pages.VenueManager.Venues | BuildRenderTree(...) | 156 | 12 || Confirmai | Confirmai.Services.Admin.AdminSettingsService | SetReconciliationSeverityThresholdsAsync() | 156 | 12 || Confirmai | Confirmai.Services.Events.EventNotificationService | NotifyWaitlistPromotedAsync() | 156 | 12 || Confirmai | Confirmai.Services.Payment.AppmaxPixService | NormalizePhone(...) | 156 | 12 || Confirmai | Confirmai.Services.Payment.AppmaxPixService | TryGetInt64Path(...) | 156 | 12 || Confirmai | System.Text.RegularExpressions.Generated | TryMatchAtCurrentPosition(...) | 112 | 88 || Confirmai | System.Text.RegularExpressions.Generated.<RegexGenerator_g>FBE5D3F183809CBDAE41AF23BFC06E22EE1BD9C4D07898CEDDF9B7DCFD59724FE__EmailInJsonValueByKeyRegex_0 | TryMatchAtCurrentPosition(...) | 112 | 88 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ChangePasswordModel | OnPostAsync() | 110 | 10 || Confirmai | Confirmai.Areas.Identity.Pages.Account.RegisterModel | OnPostAsync() | 110 | 10 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ResetPasswordModel | OnPostAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminGateways | BuildRenderTree(...) | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminPayments | BuildSweepDetails(...) | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminPayments | ApplyStatusTransitionAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminPayments | LoadFilterStateFromStorageAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminUserEdit | Save() | 110 | 10 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | OnAfterRenderAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Futsal.Escalacao | MovePlayer(...) | 110 | 10 || Confirmai | Confirmai.Pages.Groups.Detail | AdminMarkPaid() | 110 | 10 || Confirmai | Confirmai.Pages.Groups.Features | TogglePaymentGateways() | 110 | 10 || Confirmai | Confirmai.Pages.Groups.Features | TogglePostMatchRanking() | 110 | 10 || Confirmai | Confirmai.Pages.Groups.Ranking | BuildRenderTree(...) | 110 | 10 || Confirmai | Confirmai.Pages.Groups.Ranking | OnInitializedAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Mailbox | LoadMessagesAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Payment.Payment | ResolvePixRecipientKeyAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | OnPaymentConfirmed(...) | 110 | 10 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | GetProductDisplayName(...) | 110 | 10 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | OnInitializedAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Poker.Create | OnInitializedAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Poker.Edit | BuildRenderTree(...) | 110 | 10 || Confirmai | Confirmai.Pages.Poker.Edit | OnInitializedAsync() | 110 | 10 || Confirmai | Confirmai.Pages.Product.ProductForm | HandleValidSubmit() | 110 | 10 || Confirmai | Confirmai.Pages.VenueManager.VenueEdit | OnInitializedAsync() | 110 | 10 || Confirmai | Confirmai.Pages.VenueManager.VenueEdit | Save() | 110 | 10 || Confirmai | Confirmai.Pages.VenueManager.Venues | DeleteVenue() | 110 | 10 || Confirmai | Confirmai.Services.Payment.AbacatePayPixService | GetReceivedAmountAsync() | 110 | 10 || Confirmai | Confirmai.Services.Payment.AppmaxPixService | IsPaidOrderStatus(...) | 110 | 10 || Confirmai | Confirmai.Services.Utility.ProductService | SaveImageAsync() | 110 | 10 || Confirmai | Confirmai.Shared.Components.Toast | Show(...) | 110 | 10 || Confirmai | Confirmai.Services.Payment.AbacatePayWebhookService | HandleAsync() | 73 | 24 || Confirmai | Confirmai.Configuration.ApiKeyAuthHandler | HandleAuthenticateAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.Admin | BuildPendingTrendLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminPayments | BuildPendingTrendLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminPayments | OnAfterRenderAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminPayments | ReconcileChargeAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminUsers | LoadFilterStateFromStorageAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminUsers | LockUser() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | AssignVenueAdmin() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | RemoveVenueAdmin() | 72 | 8 || Confirmai | Confirmai.Pages.Admin.AdminVenues | ToggleActive() | 72 | 8 || Confirmai | Confirmai.Pages.Components.MailboxConversationList | FormatRelativeTime(...) | 72 | 8 || Confirmai | Confirmai.Pages.Components.Profile.AvatarUploadSection | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Pages.Components.Profile.ProfileSportStats | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Create | OnSubFormatChanged(...) | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminAddGoalkeeperSlot() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminAddOutfieldSlot() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminRemoveConfirmation() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminRemoveFromWaitlist() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | OnAfterRenderAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Detail | RequestToJoinAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Edit | CancelEvent() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Escalacao | CastVote() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Escalacao | ResetarEscalacao() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Escalacao | SaveScore() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Schedule.Edit | Save() | 72 | 8 || Confirmai | Confirmai.Pages.Groups.Create | OnLogoSelected() | 72 | 8 || Confirmai | Confirmai.Pages.Groups.Detail | RejectRequest() | 72 | 8 || Confirmai | Confirmai.Pages.Groups.Detail | RequestToJoin() | 72 | 8 || Confirmai | Confirmai.Pages.Groups.Join | JoinGroup() | 72 | 8 || Confirmai | Confirmai.Pages.Mailbox | FormatRelativeTime(...) | 72 | 8 || Confirmai | Confirmai.Pages.Payment.EventPayment | UploadProof() | 72 | 8 || Confirmai | Confirmai.Pages.Payment.PaymentProductSummary | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Pages.Payment.PaymentsHistory | CancelPayment() | 72 | 8 || Confirmai | Confirmai.Pages.Payment.ViewPayment | CheckPayment() | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Create | ModalityLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Detail | ModalityLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Detail | CancelEvent() | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Detail | ConfirmPresence() | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Detail | RequestToJoinAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Poker.Edit | ModalityLabel(...) | 72 | 8 || Confirmai | Confirmai.Pages.Product.ProductForm | EnsurePricingGatewayDefault() | 72 | 8 || Confirmai | Confirmai.Pages.Profile | LoadChatMessagesAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Profile | SaveOwnProfileAsync() | 72 | 8 || Confirmai | Confirmai.Pages.VenueManager.VenueEdit | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Services.Payment.AppmaxPixService | TryGetStringPath(...) | 72 | 8 || Confirmai | Confirmai.Services.Payment.PaymentInitializationService | ResolveSeller() | 72 | 8 || Confirmai | Confirmai.Shared.Components.AdminDataState | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Shared.Components.Breadcrumb | TryNormalizeLocalReturnUrl(...) | 72 | 8 || Confirmai | Confirmai.Shared.Components.BtcQuoteCard | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Shared.Components.Groups.RankingViewSelector | BuildRenderTree(...) | 72 | 8 || Confirmai | Confirmai.Shared.MainLayout | OnAfterRenderAsync() | 72 | 8 || Confirmai | Confirmai.Pages.Futsal.Escalacao | BuildRenderTree(...) | 57 | 38 || Confirmai | Confirmai.Pages.MyEvents.Index | DayName(...) | 56 | 7 || Confirmai | Confirmai.Pages.Profile | BuildRenderTree(...) | 55 | 12 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ForgotPasswordConfirmationModel | OnGet() | 53 | 8 || Confirmai | Confirmai.Pages.Admin.AdminPayments | RunSummaryRefreshLoopAsync() | 52 | 10 || Confirmai | Confirmai.Services.Core.AppInitializationService | EnsureFakeTestUserAccessAsync() | 50 | 22 || Confirmai | Confirmai.Shared.Components.EventListingShell | BuildRenderTree(...) | 50 | 22 || Confirmai | Confirmai.Pages.Groups.Index | BuildRenderTree(...) | 48 | 42 || Confirmai | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ResetPassword | ExecuteAsync() | 42 | 6 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ForgotPasswordModel | OnPostAsync() | 42 | 6 || Confirmai | Confirmai.Configuration.OtelOptions | ParsedHeaders() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.Admin | GetSweepMetric(...) | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminLogs | ApplyFiltersCore() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminLogs | ExportCsvAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminLogs | ExportJsonAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminPayments | GetSweepMetric(...) | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminPayments | TryWriteStalenessIncidentAuditAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminUsers | ApplyFilters(...) | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminUsers | LoadUsersFromDb() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminUsers | UnlockUser() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminUserView | ToggleVenueManager() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | LoadCitiesAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminVenueEdit | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.AdminVenues | DeleteVenue() | 42 | 6 || Confirmai | Confirmai.Pages.Admin.Components.AdminPaymentsAdvancedToolsModal | ApplyStatusTransition() | 42 | 6 || Confirmai | Confirmai.Pages.Components.EscalacaoConfirmed | get_MvpRevealed() | 42 | 6 || Confirmai | Confirmai.Pages.Components.MailboxConversationList | BuildAvatarInitials(...) | 42 | 6 || Confirmai | Confirmai.Pages.Components.Profile.ChatComposeBox | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Components.Profile.ProfileChatThread | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Components.Profile.ProfileHeaderCard | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Components.EscalacaoControls | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Detail | AdminTogglePaid() | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Detail | CancelConfirmation() | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Detail | LeaveWaitlist() | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Schedule.Edit | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Futsal.Schedule.Edit | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Groups.Join | LoadGroup() | 42 | 6 || Confirmai | Confirmai.Pages.Index | PokerTypeLabel(...) | 42 | 6 || Confirmai | Confirmai.Pages.Index | LoadOtherCitiesAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Index | SetTabAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Mailbox | BuildAvatarInitials(...) | 42 | 6 || Confirmai | Confirmai.Pages.Mailbox | EnsureConversationSelection() | 42 | 6 || Confirmai | Confirmai.Pages.Mailbox | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.MyEvents.Index | CancelEvent() | 42 | 6 || Confirmai | Confirmai.Pages.MyEvents.Index | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.MyEvents.Index | ToggleSchedule() | 42 | 6 || Confirmai | Confirmai.Pages.Payment.Components.EventPaymentPixAdmin | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Payment.Payment | BuildRenderTree(...) | 42 | 6 || Confirmai | Confirmai.Pages.Payment.Payment | CopyAddress() | 42 | 6 || Confirmai | Confirmai.Pages.Payment.Payment | DisposeAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Payment.Payment | OnSelectedMethodChangedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | TryUnlock() | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | TypeLabel(...) | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | TypeBadgeClass(...) | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | CancelConfirmation() | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Detail | LoadEvent() | 42 | 6 || Confirmai | Confirmai.Pages.Poker.Index | DisposeAsync() | 42 | 6 || Confirmai | Confirmai.Pages.Product.ProductForm | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Pages.VenueManager.Venues | OnInitializedAsync() | 42 | 6 || Confirmai | Confirmai.Services.Payment.AppmaxPixService | TryResolvePath(...) | 42 | 6 || Confirmai | Confirmai.Services.Payment.AppmaxPixService | IsChargePaidAsync() | 42 | 6 || Confirmai | Confirmai.Services.Payment.EfiBankPixService | CreateProductionHandler() | 42 | 6 || Confirmai | Confirmai.Services.Payment.PaymentInitializationService | SetupPaymentGatewaysAsync() | 42 | 6 || Confirmai | Confirmai.Services.Payment.Shared.WebhookPaymentMarker | MarkMarketplacePaymentPaidAsync() | 42 | 6 || Confirmai | Confirmai.Shared.Components.Groups.GroupDetailMembers | get_VisibleMembers() | 42 | 6 || Confirmai | Confirmai.Services.Admin.AdminLogsFilterInference | InferQuickRangePreset(...) | 40 | 40 || Confirmai | Confirmai.Services.Payment.EfiBankPixService | RegisterWebhookAsync() | 40 | 8 || Confirmai | System.Text.RegularExpressions.Generated | TryMatchAtCurrentPosition(...) | 40 | 38 || Confirmai | System.Text.RegularExpressions.Generated.<RegexGenerator_g>FBE5D3F183809CBDAE41AF23BFC06E22EE1BD9C4D07898CEDDF9B7DCFD59724FE__BareEmailInJsonValueRegex_1 | TryMatchAtCurrentPosition(...) | 40 | 38 || Confirmai | Confirmai.Pages.Admin.AdminPayments | UpdateSeverity() | 34 | 14 || Confirmai | Confirmai.Services.Core.AppInitializationService | SeedRolesAndAdminAsync() | 34 | 28 || Confirmai | Confirmai.Areas.Identity.Pages.Account.ConfirmEmailModel | OnGetAsync() | 31 | 8 || Confirmai | Confirmai.Pages.Admin.AdminLogs | BuildActivePeriodSummary() | 31 | 8 || Confirmai | Confirmai.Services.Payment.BtcPayWebhookService | HandleAsync() | 31 | 30 || Confirmai | Confirmai.Services.Payment.EventPaymentReconciliationService | ReconcileByChargeIdAsync() | 31 | 18 || Confirmai | Confirmai.Services.Payment.EfiBankWebhookService | HandleAsync() | 30 | 30 || Confirmai | Confirmai.Services.Payment.BtcPayWebhookService | TryParseWebhookPayload(...) | 26 | 26 || Confirmai | Confirmai.Services.Events.EventNotificationService | NotifyNewRecurringEventAsync() | 24 | 24 || Confirmai | Confirmai.Services.Payment.PaymentConfirmationService | ConfirmAsync() | 24 | 24 || Confirmai | Confirmai.Pages.Admin.AdminLanguages | BuildRenderTree(...) | 22 | 22 || Confirmai | Confirmai.Pages.Futsal.Detail | LoadEvent() | 22 | 22 || Confirmai | Confirmai.Areas.Identity.Pages.Account.LoginModel | OnPostAsync() | 20 | 20 || Confirmai | Confirmai.Pages.Admin.Admin | BuildRenderTree(...) | 21 | 20 || Confirmai | Confirmai.Pages.Admin.AdminPayments | LoadOperationalSummaryAsync() | 23 | 20 || Confirmai | Confirmai.Services.Core.LogService | EnrichWithRequestContext(...) | 20 | 20 || Confirmai | Confirmai.Services.Admin.AdminConfirmationService | TogglePaidAsync() | 18 | 18 || Confirmai | Confirmai.Services.Admin.AdminLogFiltering | Apply(...) | 18 | 18 || Confirmai | Confirmai.Services.Admin.AdminLogsFilterStateRules | ShouldShowRestoredNotice(...) | 18 | 18 || Confirmai | Confirmai.Services.Core.UiTextService | MergeDomain(...) | 18 | 18 || Confirmai | Confirmai.Data.AppDbContext | SynchronizeEventConfirmationPaymentState() | 18 | 16 || Confirmai | Confirmai.Pages.Admin.AdminPayments | LoadPageAsync() | 19 | 16 || Confirmai | Confirmai.Pages.Futsal.Components.DetailAdminPanel | BuildRenderTree(...) | 17 | 16 || Confirmai | Confirmai.Services.Admin.AdminLogsFilterStateService | SaveCoreAsync() | 16 | 16 || Confirmai | Confirmai.Services.Core.UiTextService | Get(...) | 16 | 16 || Confirmai | Confirmai.Services.Events.EventConfirmationPaymentStatusService | TransitionStatusAsync() | 24 | 16 || Confirmai | Confirmai.Shared.Components.Admin.AdminLogsTable | BuildRenderTree(...) | 17 | 16 || Confirmai | Confirmai.Shared.Components.Breadcrumb | IsIdSegment(...) | 16 | 16 || Confirmai | Confirmai.Shared.MainLayout | LoadCurrentUserAndUnreadCountSafeAsync() | 16 | 16 |
 # Coverage
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **8310** | **87369** | **95679** | **123232** | **8.6%** | **1783** | **5993** | **29.7%** |
+| **Confirmai** | **7334** | **104358** | **111692** | **146077** | **6.5%** | **1978** | **7353** | **26.9%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -45,40 +45,44 @@
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ResetPasswordConfirmation | 0 | 1 | 1 | 14 | 0% | 0 | 2 | 0% |
 | BlockstreamAddressInfo | 0 | 2 | 2 | 8 | 0% | 0 | 0 |  |
 | Confirmai.App | 4 | 0 | 4 | 34 | 100% | 0 | 0 |  |
-| Confirmai.Areas.Identity.Pages.Account.ChangePasswordModel | 0 | 35 | 35 | 98 | 0% | 0 | 12 | 0% |
-| Confirmai.Areas.Identity.Pages.Account.ConfirmEmailModel | 9 | 10 | 19 | 50 | 47.3% | 2 | 8 | 25% |
+| Confirmai.Areas.Identity.Pages.Account.ChangePasswordModel | 0 | 35 | 35 | 100 | 0% | 0 | 12 | 0% |
+| Confirmai.Areas.Identity.Pages.Account.ConfirmEmailModel | 9 | 10 | 19 | 52 | 47.3% | 2 | 8 | 25% |
 | Confirmai.Areas.Identity.Pages.Account.ForgotPasswordConfirmationModel | 6 | 18 | 24 | 52 | 25% | 1 | 8 | 12.5% |
-| Confirmai.Areas.Identity.Pages.Account.ForgotPasswordModel | 8 | 19 | 27 | 78 | 29.6% | 0 | 6 | 0% |
-| Confirmai.Areas.Identity.Pages.Account.LoginModel | 84 | 2 | 86 | 165 | 97.6% | 21 | 26 | 80.7% |
+| Confirmai.Areas.Identity.Pages.Account.ForgotPasswordModel | 8 | 19 | 27 | 80 | 29.6% | 0 | 6 | 0% |
+| Confirmai.Areas.Identity.Pages.Account.LoginModel | 84 | 2 | 86 | 167 | 97.6% | 21 | 26 | 80.7% |
 | Confirmai.Areas.Identity.Pages.Account.LogoutModel | 7 | 6 | 13 | 39 | 53.8% | 2 | 8 | 25% |
 | Confirmai.Areas.Identity.Pages.Account.RegisterConfirmationModel | 5 | 0 | 5 | 23 | 100% | 2 | 2 | 100% |
-| Confirmai.Areas.Identity.Pages.Account.RegisterModel | 17 | 45 | 62 | 131 | 27.4% | 0 | 10 | 0% |
-| Confirmai.Areas.Identity.Pages.Account.ResendEmailConfirmationModel | 15 | 16 | 31 | 82 | 48.3% | 2 | 6 | 33.3% |
-| Confirmai.Areas.Identity.Pages.Account.ResetPasswordModel | 12 | 25 | 37 | 101 | 32.4% | 1 | 12 | 8.3% |
+| Confirmai.Areas.Identity.Pages.Account.RegisterModel | 17 | 45 | 62 | 133 | 27.4% | 0 | 10 | 0% |
+| Confirmai.Areas.Identity.Pages.Account.ResendEmailConfirmationModel | 15 | 16 | 31 | 84 | 48.3% | 2 | 6 | 33.3% |
+| Confirmai.Areas.Identity.Pages.Account.ResetPasswordModel | 12 | 25 | 37 | 103 | 32.4% | 1 | 12 | 8.3% |
 | Confirmai.Config.BtcPayOptions | 2 | 0 | 2 | 9 | 100% | 0 | 0 |  |
 | Confirmai.Configuration.AbacatePayOptions | 4 | 1 | 5 | 32 | 80% | 0 | 0 |  |
-| Confirmai.Configuration.ApiKeyAuthHandler | 0 | 4 | 4 | 35 | 0% | 0 | 0 |  |
+| Confirmai.Configuration.ApiKeyAuthHandler | 0 | 42 | 42 | 99 | 0% | 0 | 12 | 0% |
 | Confirmai.Configuration.AppmaxOptions | 13 | 0 | 13 | 42 | 100% | 10 | 10 | 100% |
 | Confirmai.Configuration.EfiBankOptions | 17 | 0 | 17 | 66 | 100% | 8 | 8 | 100% |
 | Confirmai.Configuration.EmailOptions | 8 | 0 | 8 | 15 | 100% | 0 | 0 |  |
 | Confirmai.Configuration.OtelOptions | 6 | 7 | 13 | 78 | 46.1% | 0 | 6 | 0% |
 | Confirmai.Configuration.SecurityPolicyDefaults | 23 | 0 | 23 | 48 | 100% | 2 | 2 | 100% |
 | Confirmai.Configuration.SecurityPolicySnapshot | 11 | 0 | 11 | 48 | 100% | 0 | 0 |  |
-| Confirmai.Data.AppDbContext | 233 | 6 | 239 | 382 | 97.4% | 27 | 34 | 79.4% |
+| Confirmai.Data.AppDbContext | 261 | 6 | 267 | 422 | 97.7% | 27 | 34 | 79.4% |
 | Confirmai.Data.AppDbContextFactory | 20 | 3 | 23 | 45 | 86.9% | 5 | 6 | 83.3% |
 | Confirmai.Migrations.AddAppSettings | 0 | 616 | 616 | 689 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddAuditFieldsToAppLog | 0 | 1550 | 1550 | 1657 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddBuyerIntermediaryChoice | 0 | 1177 | 1177 | 1264 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddConfirmaiDomain | 0 | 1932 | 1932 | 2051 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddConfirmationHasPaid | 0 | 1165 | 1165 | 1247 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AddDataProtectionKeysTable | 0 | 1413 | 1413 | 1502 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddDeliveryAgentsAndAssignment | 0 | 747 | 747 | 839 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddDeliveryAuditLog | 0 | 1538 | 1538 | 1635 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddEventConfirmationPaymentGatewayName | 0 | 1262 | 1262 | 1348 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddEventConfirmationPaymentStatusContract | 0 | 1263 | 1263 | 1348 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddGameLoginToken | 0 | 1452 | 1452 | 1546 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AddGroupFeatureFlags | 0 | 1277 | 1277 | 1361 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddGroupInviteCodeAndWaitlistPosition | 0 | 1203 | 1203 | 1289 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddGroupIsPrivate | 0 | 1189 | 1189 | 1271 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddGroupJoinRequest | 0 | 1274 | 1274 | 1362 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AddGroupPaymentGatewaysToggle | 0 | 1389 | 1389 | 1476 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AddGroupPixReceiver | 0 | 1393 | 1393 | 1484 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddHelmetCategoryToCrownHelmet | 0 | 14 | 14 | 32 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddInGamePlayerNameToPayments | 0 | 11 | 11 | 30 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddInventoryVerificationToOffers | 0 | 1462 | 1462 | 1556 | 0% | 0 | 0 |  |
@@ -98,13 +102,17 @@
 | Confirmai.Migrations.AddPaymentRecordSellerIdFix | 0 | 1238 | 1238 | 1327 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddPaymentSellerFK | 0 | 1234 | 1234 | 1321 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddPerformanceIndexes | 0 | 1261 | 1261 | 1352 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AddPerformanceIndices | 0 | 1415 | 1415 | 1516 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddPixBrCodeToEventConfirmation | 0 | 1260 | 1260 | 1344 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AddPixProofToEventConfirmation | 0 | 1402 | 1402 | 1494 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddPixTxIdToEventConfirmation | 0 | 1172 | 1172 | 1254 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddPlayerInventorySnapshot | 0 | 1393 | 1393 | 1485 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddPlayersPerSideToEvent | 0 | 10 | 10 | 28 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AddPostMatchVoting | 0 | 1401 | 1401 | 1496 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddProductAccentColor | 0 | 940 | 940 | 1019 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddProductPricingGateway | 0 | 1208 | 1208 | 1293 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddProductRequiresDelivery | 0 | 675 | 675 | 749 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AddScoreRegisteredBy | 0 | 1361 | 1361 | 1450 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddSellerRecommendations | 0 | 1044 | 1044 | 1130 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddServerApiKeys | 0 | 1331 | 1331 | 1423 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddServerLogoPath | 0 | 774 | 774 | 849 | 0% | 0 | 0 |  |
@@ -112,6 +120,7 @@
 | Confirmai.Migrations.AddServerMembersAndSalesTracking | 0 | 901 | 901 | 990 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddServerOwnershipAndPrimaryGm | 0 | 763 | 763 | 840 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddServerRegistrationRequests | 0 | 995 | 995 | 1082 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AddTeamNamesToEvent | 0 | 1370 | 1370 | 1458 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddTibiaServersAndProductServerMap | 0 | 784 | 784 | 864 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddUserAvatarAndMemberSince | 0 | 1500 | 1500 | 1594 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddUserContactHandles | 0 | 1224 | 1224 | 1317 | 0% | 0 | 0 |  |
@@ -120,7 +129,7 @@
 | Confirmai.Migrations.AddVenueAdminUser | 0 | 1172 | 1172 | 1258 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddVenueAndRachaScheduleAndPokerFields | 0 | 2116 | 2116 | 2333 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddVenueAndRachaScheduleAndPokerFields_v2 | 0 | 1316 | 1316 | 1405 | 0% | 0 | 0 |  |
-| Confirmai.Migrations.AppDbContextModelSnapshot | 0 | 1257 | 1257 | 1320 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AppDbContextModelSnapshot | 0 | 1396 | 1396 | 1463 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.DropInventorySnapshotsAndOfferInventoryFields | 0 | 1440 | 1440 | 1533 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.EnforceUniqueGroupStartsAt | 0 | 1266 | 1266 | 1354 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.FixItemOfferCascadeBlocker | 0 | 1485 | 1485 | 1582 | 0% | 0 | 0 |  |
@@ -137,179 +146,274 @@
 | Confirmai.Migrations.RemoveInventorySnapshots | 0 | 1504 | 1504 | 1606 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.RemoveOrdersFeature | 0 | 1276 | 1276 | 1374 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.RequireInviteCodeForGroups | 0 | 87 | 87 | 111 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.StoreMailboxDisplayNames | 0 | 1283 | 1283 | 1369 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.SyncModelSnapshot | 0 | 1447 | 1447 | 1540 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.SystemMailboxSender | 0 | 1293 | 1293 | 1381 | 0% | 0 | 0 |  |
 | Confirmai.Models.Admin.EditUserModel | 0 | 6 | 6 | 32 | 0% | 0 | 0 |  |
 | Confirmai.Models.ApplicationUser | 1 | 9 | 10 | 37 | 10% | 0 | 0 |  |
-| Confirmai.Models.AppLog | 14 | 0 | 14 | 54 | 100% | 0 | 0 |  |
+| Confirmai.Models.AppLog | 14 | 0 | 14 | 55 | 100% | 0 | 0 |  |
 | Confirmai.Models.AppSetting | 2 | 0 | 2 | 15 | 100% | 0 | 0 |  |
 | Confirmai.Models.BitcoinData | 2 | 0 | 2 | 9 | 100% | 0 | 0 |  |
 | Confirmai.Models.BitcoinQuote | 2 | 0 | 2 | 9 | 100% | 0 | 0 |  |
 | Confirmai.Models.CoinGeckoPrice | 2 | 0 | 2 | 10 | 100% | 0 | 0 |  |
 | Confirmai.Models.CoinGeckoResponse | 1 | 0 | 1 | 8 | 100% | 0 | 0 |  |
 | Confirmai.Models.CryptoQuote | 4 | 0 | 4 | 12 | 100% | 0 | 0 |  |
-| Confirmai.Models.Event | 28 | 14 | 42 | 125 | 66.6% | 0 | 0 |  |
-| Confirmai.Models.EventConfirmation | 11 | 6 | 17 | 62 | 64.7% | 0 | 0 |  |
+| Confirmai.Models.Event | 35 | 14 | 49 | 149 | 71.4% | 0 | 0 |  |
+| Confirmai.Models.EventConfirmation | 17 | 3 | 20 | 72 | 85% | 0 | 0 |  |
 | Confirmai.Models.GatewayInfo | 2 | 0 | 2 | 12 | 100% | 0 | 0 |  |
-| Confirmai.Models.Group | 12 | 2 | 14 | 46 | 85.7% | 0 | 0 |  |
+| Confirmai.Models.Group | 14 | 4 | 18 | 67 | 77.7% | 0 | 0 |  |
 | Confirmai.Models.GroupJoinRequest | 4 | 5 | 9 | 26 | 44.4% | 0 | 0 |  |
 | Confirmai.Models.GroupMember | 5 | 2 | 7 | 21 | 71.4% | 0 | 0 |  |
 | Confirmai.Models.MatchSchedule | 15 | 1 | 16 | 47 | 93.7% | 0 | 0 |  |
 | Confirmai.Models.PaymentRecord | 11 | 6 | 17 | 33 | 64.7% | 0 | 0 |  |
+| Confirmai.Models.PostMatchVote | 4 | 4 | 8 | 25 | 50% | 0 | 0 |  |
 | Confirmai.Models.Product | 16 | 2 | 18 | 51 | 88.8% | 0 | 0 |  |
-| Confirmai.Models.UserMailboxMessage | 12 | 6 | 18 | 45 | 66.6% | 0 | 0 |  |
+| Confirmai.Models.ServerApiKey | 0 | 9 | 9 | 29 | 0% | 0 | 0 |  |
+| Confirmai.Models.UserMailboxMessage | 14 | 6 | 20 | 52 | 70% | 0 | 0 |  |
 | Confirmai.Models.Venue | 12 | 1 | 13 | 47 | 92.3% | 0 | 0 |  |
 | Confirmai.Models.WaitingList | 0 | 8 | 8 | 25 | 0% | 0 | 0 |  |
 | Confirmai.Pages.About | 1 | 4 | 5 | 24 | 20% | 0 | 2 | 0% |
 | Confirmai.Pages.Admin.Admin | 73 | 104 | 177 | 410 | 41.2% | 13 | 56 | 23.2% |
 | Confirmai.Pages.Admin.AdminAuditTimeline | 0 | 55 | 55 | 152 | 0% | 0 | 32 | 0% |
-| Confirmai.Pages.Admin.AdminGateways | 0 | 38 | 38 | 112 | 0% | 0 | 24 | 0% |
+| Confirmai.Pages.Admin.AdminGateways | 0 | 45 | 45 | 127 | 0% | 0 | 26 | 0% |
 | Confirmai.Pages.Admin.AdminLanguages | 36 | 22 | 58 | 176 | 62% | 10 | 24 | 41.6% |
-| Confirmai.Pages.Admin.AdminLogs | 157 | 223 | 380 | 759 | 41.3% | 35 | 126 | 27.7% |
-| Confirmai.Pages.Admin.AdminPayments | 267 | 418 | 685 | 1390 | 38.9% | 74 | 248 | 29.8% |
+| Confirmai.Pages.Admin.AdminLogs | 115 | 235 | 350 | 695 | 32.8% | 17 | 112 | 15.1% |
+| Confirmai.Pages.Admin.AdminPayments | 223 | 393 | 616 | 1161 | 36.2% | 55 | 192 | 28.6% |
 | Confirmai.Pages.Admin.AdminUserEdit | 0 | 46 | 46 | 131 | 0% | 0 | 16 | 0% |
-| Confirmai.Pages.Admin.AdminUsers | 0 | 179 | 179 | 371 | 0% | 0 | 78 | 0% |
+| Confirmai.Pages.Admin.AdminUsers | 0 | 163 | 163 | 330 | 0% | 0 | 58 | 0% |
 | Confirmai.Pages.Admin.AdminUserView | 0 | 57 | 57 | 183 | 0% | 0 | 56 | 0% |
-| Confirmai.Pages.Admin.AdminVenueEdit | 0 | 129 | 129 | 353 | 0% | 0 | 76 | 0% |
+| Confirmai.Pages.Admin.AdminVenueEdit | 0 | 146 | 146 | 385 | 0% | 0 | 82 | 0% |
 | Confirmai.Pages.Admin.AdminVenues | 0 | 88 | 88 | 249 | 0% | 0 | 52 | 0% |
+| Confirmai.Pages.Admin.Components.AdminPaymentsAdvancedToolsModal | 0 | 41 | 41 | 165 | 0% | 0 | 34 | 0% |
+| Confirmai.Pages.Admin.Components.AdminPaymentsFilters | 0 | 29 | 29 | 71 | 0% | 0 | 2 | 0% |
+| Confirmai.Pages.Admin.Components.AdminPaymentsSummaryPanel | 0 | 74 | 74 | 193 | 0% | 0 | 90 | 0% |
+| Confirmai.Pages.Admin.Components.AdminPaymentsTable | 0 | 19 | 19 | 74 | 0% | 0 | 56 | 0% |
 | Confirmai.Pages.Admin.ParchmentLab | 0 | 2 | 2 | 66 | 0% | 0 | 0 |  |
+| Confirmai.Pages.Components.ConversationContactView | 0 | 8 | 8 | 25 | 0% | 0 | 0 |  |
+| Confirmai.Pages.Components.ConversationMessageView | 0 | 8 | 8 | 25 | 0% | 0 | 0 |  |
+| Confirmai.Pages.Components.EscalacaoConfirmed | 0 | 54 | 54 | 154 | 0% | 0 | 78 | 0% |
+| Confirmai.Pages.Components.EscalacaoVoting | 0 | 60 | 60 | 143 | 0% | 0 | 100 | 0% |
+| Confirmai.Pages.Components.MailboxConversationList | 0 | 82 | 82 | 218 | 0% | 0 | 40 | 0% |
+| Confirmai.Pages.Components.MailboxFilters | 0 | 14 | 14 | 58 | 0% | 0 | 0 |  |
+| Confirmai.Pages.Components.MailboxThreadPane | 0 | 31 | 31 | 95 | 0% | 0 | 16 | 0% |
+| Confirmai.Pages.Components.Profile.AvatarUploadSection | 0 | 13 | 13 | 53 | 0% | 0 | 8 | 0% |
+| Confirmai.Pages.Components.Profile.ChatComposeBox | 0 | 17 | 17 | 54 | 0% | 0 | 6 | 0% |
+| Confirmai.Pages.Components.Profile.ProfileChatThread | 0 | 8 | 8 | 28 | 0% | 0 | 6 | 0% |
+| Confirmai.Pages.Components.Profile.ProfileContactsDisplay | 0 | 10 | 10 | 35 | 0% | 0 | 14 | 0% |
+| Confirmai.Pages.Components.Profile.ProfileEditForm | 0 | 11 | 11 | 59 | 0% | 0 | 4 | 0% |
+| Confirmai.Pages.Components.Profile.ProfileHeaderCard | 0 | 13 | 13 | 38 | 0% | 0 | 20 | 0% |
+| Confirmai.Pages.Components.Profile.ProfileLoadingStates | 4 | 0 | 4 | 19 | 100% | 3 | 4 | 75% |
+| Confirmai.Pages.Components.Profile.ProfileSportStats | 0 | 15 | 15 | 64 | 0% | 0 | 8 | 0% |
 | Confirmai.Pages.Contact | 1 | 4 | 5 | 25 | 20% | 0 | 2 | 0% |
 | Confirmai.Pages.Dashboard | 0 | 4 | 4 | 19 | 0% | 0 | 2 | 0% |
 | Confirmai.Pages.Docs.Integration | 0 | 8 | 8 | 299 | 0% | 0 | 0 |  |
 | Confirmai.Pages.Error | 0 | 3 | 3 | 15 | 0% | 0 | 0 |  |
-| Confirmai.Pages.Futsal.Create | 69 | 128 | 197 | 518 | 35% | 17 | 90 | 18.8% |
-| Confirmai.Pages.Futsal.Detail | 114 | 320 | 434 | 1109 | 26.2% | 107 | 500 | 21.4% |
-| Confirmai.Pages.Futsal.Edit | 81 | 98 | 179 | 468 | 45.2% | 26 | 86 | 30.2% |
-| Confirmai.Pages.Futsal.Escalacao | 41 | 181 | 222 | 540 | 18.4% | 25 | 174 | 14.3% |
+| Confirmai.Pages.Futsal.Components.DateTimeSelector | 16 | 3 | 19 | 58 | 84.2% | 2 | 6 | 33.3% |
+| Confirmai.Pages.Futsal.Components.DetailAdminPanel | 13 | 1 | 14 | 68 | 92.8% | 11 | 16 | 68.7% |
+| Confirmai.Pages.Futsal.Components.DetailChipsRow | 5 | 2 | 7 | 28 | 71.4% | 2 | 12 | 16.6% |
+| Confirmai.Pages.Futsal.Components.DetailEventHeader | 10 | 2 | 12 | 43 | 83.3% | 5 | 10 | 50% |
+| Confirmai.Pages.Futsal.Components.DetailLocationSection | 11 | 3 | 14 | 76 | 78.5% | 7 | 12 | 58.3% |
+| Confirmai.Pages.Futsal.Components.DetailQuorumBar | 7 | 0 | 7 | 33 | 100% | 5 | 10 | 50% |
+| Confirmai.Pages.Futsal.Components.EditEventForm | 34 | 22 | 56 | 254 | 60.7% | 10 | 24 | 41.6% |
+| Confirmai.Pages.Futsal.Components.EditEventFormData | 11 | 0 | 11 | 39 | 100% | 0 | 0 |  |
+| Confirmai.Pages.Futsal.Components.EscalacaoControls | 0 | 14 | 14 | 57 | 0% | 0 | 6 | 0% |
+| Confirmai.Pages.Futsal.Components.EscalacaoDraftTeamBuilder | 0 | 33 | 33 | 126 | 0% | 0 | 16 | 0% |
+| Confirmai.Pages.Futsal.Components.EscalacaoScoreEditor | 0 | 38 | 38 | 124 | 0% | 0 | 30 | 0% |
+| Confirmai.Pages.Futsal.Components.EscalacaoShare | 4 | 2 | 6 | 26 | 66.6% | 2 | 4 | 50% |
+| Confirmai.Pages.Futsal.Components.FutsalGoalkeeperGroup | 30 | 23 | 53 | 147 | 56.6% | 16 | 60 | 26.6% |
+| Confirmai.Pages.Futsal.Components.FutsalMatchIdentity | 6 | 3 | 9 | 58 | 66.6% | 1 | 6 | 16.6% |
+| Confirmai.Pages.Futsal.Components.FutsalOutfieldGroup | 38 | 43 | 81 | 239 | 46.9% | 17 | 90 | 18.8% |
+| Confirmai.Pages.Futsal.Components.PlayerSlot | 0 | 1 | 1 | 7 | 0% | 0 | 0 |  |
+| Confirmai.Pages.Futsal.Components.PriceInput | 1 | 0 | 1 | 18 | 100% | 0 | 0 |  |
+| Confirmai.Pages.Futsal.Components.RecurrenceScheduler | 4 | 14 | 18 | 51 | 22.2% | 1 | 8 | 12.5% |
+| Confirmai.Pages.Futsal.Components.SlotsAndGoalkeeperConfig | 4 | 1 | 5 | 37 | 80% | 0 | 0 |  |
+| Confirmai.Pages.Futsal.Components.VenueSelector | 7 | 11 | 18 | 63 | 38.8% | 4 | 12 | 33.3% |
+| Confirmai.Pages.Futsal.Create | 43 | 153 | 196 | 417 | 21.9% | 10 | 74 | 13.5% |
+| Confirmai.Pages.Futsal.Detail | 89 | 275 | 364 | 933 | 24.4% | 88 | 342 | 25.7% |
+| Confirmai.Pages.Futsal.Edit | 50 | 84 | 134 | 332 | 37.3% | 14 | 50 | 28% |
+| Confirmai.Pages.Futsal.Escalacao | 56 | 234 | 290 | 660 | 19.3% | 41 | 202 | 20.2% |
 | Confirmai.Pages.Futsal.Index | 6 | 3 | 9 | 84 | 66.6% | 0 | 4 | 0% |
 | Confirmai.Pages.Futsal.Schedule.Edit | 0 | 101 | 101 | 318 | 0% | 0 | 34 | 0% |
-| Confirmai.Pages.Groups.Create | 0 | 58 | 58 | 176 | 0% | 0 | 12 | 0% |
-| Confirmai.Pages.Groups.Detail | 0 | 398 | 398 | 867 | 0% | 0 | 258 | 0% |
-| Confirmai.Pages.Groups.Index | 78 | 15 | 93 | 295 | 83.8% | 39 | 62 | 62.9% |
-| Confirmai.Pages.Groups.Join | 0 | 82 | 82 | 255 | 0% | 0 | 60 | 0% |
-| Confirmai.Pages.Index | 40 | 86 | 126 | 382 | 31.7% | 17 | 122 | 13.9% |
-| Confirmai.Pages.Mailbox | 0 | 396 | 396 | 768 | 0% | 0 | 184 | 0% |
+| Confirmai.Pages.Groups.Components.FeaturesToggles | 0 | 15 | 15 | 100 | 0% | 0 | 16 | 0% |
+| Confirmai.Pages.Groups.Components.MembersManager | 0 | 34 | 34 | 133 | 0% | 0 | 38 | 0% |
+| Confirmai.Pages.Groups.Components.PixReceiverSelector | 0 | 16 | 16 | 79 | 0% | 0 | 20 | 0% |
+| Confirmai.Pages.Groups.Create | 0 | 109 | 109 | 291 | 0% | 0 | 36 | 0% |
+| Confirmai.Pages.Groups.Detail | 0 | 431 | 431 | 947 | 0% | 0 | 260 | 0% |
+| Confirmai.Pages.Groups.Features | 0 | 249 | 249 | 461 | 0% | 0 | 104 | 0% |
+| Confirmai.Pages.Groups.Index | 81 | 11 | 92 | 303 | 88% | 42 | 66 | 63.6% |
+| Confirmai.Pages.Groups.Join | 0 | 82 | 82 | 267 | 0% | 0 | 60 | 0% |
+| Confirmai.Pages.Groups.Ranking | 0 | 99 | 99 | 244 | 0% | 0 | 52 | 0% |
+| Confirmai.Pages.Index | 42 | 102 | 144 | 424 | 29.1% | 17 | 130 | 13% |
+| Confirmai.Pages.Mailbox | 0 | 359 | 359 | 674 | 0% | 0 | 164 | 0% |
 | Confirmai.Pages.MyConfirmations.Index | 0 | 2 | 2 | 9 | 0% | 0 | 0 |  |
 | Confirmai.Pages.MyEvents.Index | 0 | 163 | 163 | 402 | 0% | 0 | 121 | 0% |
-| Confirmai.Pages.Pages__Host | 2 | 0 | 2 | 223 | 100% | 5 | 6 | 83.3% |
-| Confirmai.Pages.Payment.EventPayment | 0 | 147 | 147 | 390 | 0% | 0 | 108 | 0% |
-| Confirmai.Pages.Payment.Payment | 0 | 369 | 369 | 807 | 0% | 0 | 198 | 0% |
+| Confirmai.Pages.Pages__Host | 2 | 0 | 2 | 224 | 100% | 5 | 6 | 83.3% |
+| Confirmai.Pages.Payment.Components.EventPaymentGateways | 0 | 26 | 26 | 93 | 0% | 0 | 14 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentHeader | 0 | 8 | 8 | 27 | 0% | 0 | 4 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentPixAdmin | 0 | 13 | 13 | 49 | 0% | 0 | 6 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentProof | 0 | 14 | 14 | 66 | 0% | 0 | 12 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentQr | 0 | 6 | 6 | 33 | 0% | 0 | 4 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentStatus | 0 | 1 | 1 | 14 | 0% | 0 | 0 |  |
+| Confirmai.Pages.Payment.Components.EventPaymentSummary | 0 | 5 | 5 | 27 | 0% | 0 | 24 | 0% |
+| Confirmai.Pages.Payment.EventPayment | 0 | 241 | 241 | 527 | 0% | 0 | 148 | 0% |
+| Confirmai.Pages.Payment.Payment | 0 | 307 | 307 | 619 | 0% | 0 | 156 | 0% |
+| Confirmai.Pages.Payment.PaymentCheckoutPanel | 0 | 61 | 61 | 225 | 0% | 0 | 32 | 0% |
 | Confirmai.Pages.Payment.PaymentDetails | 0 | 38 | 38 | 119 | 0% | 0 | 32 | 0% |
-| Confirmai.Pages.Payment.PaymentsHistory | 0 | 155 | 155 | 329 | 0% | 0 | 88 | 0% |
-| Confirmai.Pages.Payment.ViewPayment | 0 | 120 | 120 | 319 | 0% | 0 | 94 | 0% |
-| Confirmai.Pages.Poker.Create | 0 | 189 | 189 | 607 | 0% | 0 | 102 | 0% |
-| Confirmai.Pages.Poker.Detail | 0 | 206 | 206 | 585 | 0% | 0 | 200 | 0% |
-| Confirmai.Pages.Poker.Edit | 0 | 171 | 171 | 546 | 0% | 0 | 88 | 0% |
-| Confirmai.Pages.Poker.Index | 0 | 10 | 10 | 131 | 0% | 0 | 8 | 0% |
+| Confirmai.Pages.Payment.PaymentProductSummary | 0 | 28 | 28 | 107 | 0% | 0 | 18 | 0% |
+| Confirmai.Pages.Payment.PaymentsHistory | 0 | 154 | 154 | 328 | 0% | 0 | 88 | 0% |
+| Confirmai.Pages.Payment.PixPayloadBuilder | 44 | 0 | 44 | 113 | 100% | 15 | 16 | 93.7% |
+| Confirmai.Pages.Payment.ViewPayment | 0 | 117 | 117 | 315 | 0% | 0 | 94 | 0% |
+| Confirmai.Pages.Poker.Create | 0 | 189 | 189 | 608 | 0% | 0 | 102 | 0% |
+| Confirmai.Pages.Poker.Detail | 0 | 206 | 206 | 628 | 0% | 0 | 200 | 0% |
+| Confirmai.Pages.Poker.Edit | 0 | 171 | 171 | 547 | 0% | 0 | 88 | 0% |
+| Confirmai.Pages.Poker.Index | 0 | 24 | 24 | 165 | 0% | 0 | 18 | 0% |
 | Confirmai.Pages.Product.Marketplace | 6 | 3 | 9 | 23 | 66.6% | 3 | 6 | 50% |
 | Confirmai.Pages.Product.ProductForm | 0 | 114 | 114 | 283 | 0% | 0 | 54 | 0% |
 | Confirmai.Pages.Product.Products | 0 | 3 | 3 | 23 | 0% | 0 | 2 | 0% |
-| Confirmai.Pages.Profile | 20 | 168 | 188 | 484 | 10.6% | 8 | 144 | 5.5% |
+| Confirmai.Pages.Profile | 19 | 133 | 152 | 342 | 12.5% | 9 | 100 | 9% |
 | Confirmai.Pages.VenueManager.VenueEdit | 0 | 84 | 84 | 253 | 0% | 0 | 58 | 0% |
 | Confirmai.Pages.VenueManager.Venues | 0 | 59 | 59 | 194 | 0% | 0 | 30 | 0% |
 | Confirmai.RevalidatingIdentityAuthenticationStateProvider | 5 | 19 | 24 | 70 | 20.8% | 0 | 4 | 0% |
 | Confirmai.SerilogExtensions | 1 | 16 | 17 | 42 | 5.8% | 1 | 4 | 25% |
-| Confirmai.Services.AbacatePayCheckResult | 0 | 4 | 4 | 135 | 0% | 0 | 0 |  |
-| Confirmai.Services.AbacatePayEnvelope<T> | 0 | 4 | 4 | 135 | 0% | 0 | 0 |  |
-| Confirmai.Services.AbacatePayEventPaymentGateway | 3 | 8 | 11 | 25 | 27.2% | 0 | 0 |  |
-| Confirmai.Services.AbacatePayPixService | 8 | 51 | 59 | 135 | 13.5% | 0 | 28 | 0% |
-| Confirmai.Services.AbacatePayTransparent | 0 | 7 | 7 | 135 | 0% | 0 | 0 |  |
-| Confirmai.Services.AbacatePayWebhookData | 3 | 1 | 4 | 207 | 75% | 0 | 0 |  |
-| Confirmai.Services.AbacatePayWebhookPayload | 3 | 1 | 4 | 207 | 75% | 0 | 0 |  |
-| Confirmai.Services.AbacatePayWebhookService | 61 | 37 | 98 | 207 | 62.2% | 28 | 48 | 58.3% |
-| Confirmai.Services.AdminLogExportRow | 12 | 0 | 12 | 275 | 100% | 0 | 0 |  |
-| Confirmai.Services.AdminLogFilterCriteria | 9 | 0 | 9 | 78 | 100% | 0 | 0 |  |
-| Confirmai.Services.AdminLogFiltering | 24 | 1 | 25 | 78 | 96% | 17 | 18 | 94.4% |
-| Confirmai.Services.AdminLogsAuditCounts | 5 | 1 | 6 | 96 | 83.3% | 0 | 0 |  |
-| Confirmai.Services.AdminLogsDeepLinkBuilder | 3 | 0 | 3 | 14 | 100% | 0 | 0 |  |
-| Confirmai.Services.AdminLogsExportService | 97 | 33 | 130 | 275 | 74.6% | 27 | 42 | 64.2% |
-| Confirmai.Services.AdminLogsFilterInference | 20 | 1 | 21 | 56 | 95.2% | 33 | 44 | 75% |
-| Confirmai.Services.AdminLogsFilterState | 14 | 0 | 14 | 100 | 100% | 0 | 0 |  |
-| Confirmai.Services.AdminLogsFilterStateMerger | 19 | 0 | 19 | 30 | 100% | 14 | 14 | 100% |
-| Confirmai.Services.AdminLogsFilterStateRules | 10 | 0 | 10 | 19 | 100% | 18 | 18 | 100% |
-| Confirmai.Services.AdminLogsFilterStateService | 55 | 0 | 55 | 100 | 100% | 16 | 16 | 100% |
-| Confirmai.Services.AdminLogSorting | 25 | 15 | 40 | 60 | 62.5% | 8 | 13 | 61.5% |
-| Confirmai.Services.AdminLogsPageData | 5 | 0 | 5 | 96 | 100% | 0 | 0 |  |
-| Confirmai.Services.AdminLogsQueryOverrides | 13 | 0 | 13 | 70 | 100% | 10 | 10 | 100% |
-| Confirmai.Services.AdminLogsQueryOverridesParser | 19 | 1 | 20 | 70 | 95% | 8 | 10 | 80% |
-| Confirmai.Services.AdminLogsQueryService | 45 | 0 | 45 | 96 | 100% | 5 | 6 | 83.3% |
-| Confirmai.Services.AdminPaymentsFilterState | 7 | 0 | 7 | 72 | 100% | 0 | 0 |  |
-| Confirmai.Services.AdminPaymentsFilterStateService | 34 | 0 | 34 | 72 | 100% | 0 | 0 |  |
-| Confirmai.Services.AdminSecurityPolicyService | 67 | 2 | 69 | 156 | 97.1% | 22 | 32 | 68.7% |
-| Confirmai.Services.AdminSettingsService | 104 | 69 | 173 | 344 | 60.1% | 37 | 88 | 42% |
-| Confirmai.Services.AdminUsersFilterState | 5 | 0 | 5 | 64 | 100% | 0 | 0 |  |
-| Confirmai.Services.AdminUsersFilterStateService | 28 | 0 | 28 | 64 | 100% | 0 | 0 |  |
-| Confirmai.Services.AppInitializationService | 200 | 40 | 240 | 418 | 83.3% | 69 | 98 | 70.4% |
-| Confirmai.Services.AppmaxEventPaymentGateway | 3 | 7 | 10 | 26 | 30% | 0 | 0 |  |
-| Confirmai.Services.AppmaxPixService | 14 | 255 | 269 | 438 | 5.2% | 0 | 122 | 0% |
-| Confirmai.Services.AuthNavigationHelper | 10 | 2 | 12 | 32 | 83.3% | 5 | 6 | 83.3% |
-| Confirmai.Services.BitcoinPaymentFactory | 5 | 1 | 6 | 24 | 83.3% | 1 | 2 | 50% |
-| Confirmai.Services.BitcoinQuoteService | 38 | 18 | 56 | 113 | 67.8% | 12 | 18 | 66.6% |
-| Confirmai.Services.BtcPayServerPaymentService | 41 | 1 | 42 | 83 | 97.6% | 13 | 18 | 72.2% |
-| Confirmai.Services.BtcPayWebhookService | 137 | 15 | 152 | 288 | 90.1% | 68 | 78 | 87.1% |
-| Confirmai.Services.CryptoQuoteService | 46 | 27 | 73 | 148 | 63% | 16 | 28 | 57.1% |
-| Confirmai.Services.CurrencyPreferenceService | 7 | 0 | 7 | 20 | 100% | 2 | 2 | 100% |
-| Confirmai.Services.CustomClaimsPrincipalFactory | 5 | 0 | 5 | 31 | 100% | 0 | 0 |  |
-| Confirmai.Services.DashboardMetricsService | 15 | 0 | 15 | 39 | 100% | 0 | 0 |  |
-| Confirmai.Services.DashboardMetricsSnapshot | 2 | 0 | 2 | 39 | 100% | 0 | 0 |  |
-| Confirmai.Services.DebounceDispatcher | 20 | 2 | 22 | 51 | 90.9% | 4 | 4 | 100% |
-| Confirmai.Services.EfiBankCobResponse | 3 | 1 | 4 | 276 | 75% | 0 | 0 |  |
-| Confirmai.Services.EfiBankEventPaymentGateway | 3 | 7 | 10 | 24 | 30% | 0 | 0 |  |
-| Confirmai.Services.EfiBankPixService | 79 | 47 | 126 | 276 | 62.6% | 22 | 44 | 50% |
-| Confirmai.Services.EfiBankPixWebhookEntry | 3 | 1 | 4 | 192 | 75% | 0 | 0 |  |
-| Confirmai.Services.EfiBankTokenResponse | 3 | 0 | 3 | 276 | 100% | 0 | 0 |  |
-| Confirmai.Services.EfiBankWebhookPayload | 2 | 0 | 2 | 192 | 100% | 0 | 0 |  |
-| Confirmai.Services.EfiBankWebhookService | 78 | 9 | 87 | 192 | 89.6% | 40 | 48 | 83.3% |
-| Confirmai.Services.EventCollisionService | 22 | 2 | 24 | 60 | 91.6% | 2 | 2 | 100% |
-| Confirmai.Services.EventConfirmationPaymentStatusService | 61 | 25 | 86 | 134 | 70.9% | 15 | 25 | 60% |
-| Confirmai.Services.EventConfirmationPaymentTransitionResult | 6 | 1 | 7 | 134 | 85.7% | 0 | 0 |  |
-| Confirmai.Services.EventConfirmationReconciliationExportRow | 8 | 0 | 8 | 275 | 100% | 0 | 0 |  |
-| Confirmai.Services.EventNotificationService | 101 | 59 | 160 | 290 | 63.1% | 39 | 66 | 59% |
+| Confirmai.Services.AbacatePayEventPaymentGateway | 3 | 8 | 11 | 26 | 27.2% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminConfirmationService | 94 | 0 | 94 | 171 | 100% | 27 | 28 | 96.4% |
+| Confirmai.Services.Admin.AdminFilterStateServiceBase<T> | 12 | 0 | 12 | 58 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminLogExportRow | 12 | 0 | 12 | 275 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminLogFilterCriteria | 9 | 0 | 9 | 78 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminLogFiltering | 24 | 1 | 25 | 78 | 96% | 17 | 18 | 94.4% |
+| Confirmai.Services.Admin.AdminLogsAuditCounts | 5 | 1 | 6 | 98 | 83.3% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminLogsDeepLinkBuilder | 3 | 0 | 3 | 15 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminLogsExportService | 97 | 33 | 130 | 275 | 74.6% | 27 | 42 | 64.2% |
+| Confirmai.Services.Admin.AdminLogsFilterInference | 20 | 1 | 21 | 58 | 95.2% | 33 | 44 | 75% |
+| Confirmai.Services.Admin.AdminLogsFilterState | 14 | 0 | 14 | 81 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminLogsFilterStateMerger | 19 | 0 | 19 | 30 | 100% | 14 | 14 | 100% |
+| Confirmai.Services.Admin.AdminLogsFilterStateRules | 10 | 0 | 10 | 19 | 100% | 18 | 18 | 100% |
+| Confirmai.Services.Admin.AdminLogsFilterStateService | 48 | 0 | 48 | 81 | 100% | 16 | 16 | 100% |
+| Confirmai.Services.Admin.AdminLogSorting | 25 | 15 | 40 | 60 | 62.5% | 8 | 13 | 61.5% |
+| Confirmai.Services.Admin.AdminLogsPageData | 5 | 0 | 5 | 98 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminLogsQueryOverrides | 13 | 0 | 13 | 70 | 100% | 10 | 10 | 100% |
+| Confirmai.Services.Admin.AdminLogsQueryOverridesParser | 19 | 1 | 20 | 70 | 95% | 8 | 10 | 80% |
+| Confirmai.Services.Admin.AdminLogsQueryService | 45 | 0 | 45 | 98 | 100% | 5 | 6 | 83.3% |
+| Confirmai.Services.Admin.AdminPaymentsFilterState | 7 | 0 | 7 | 53 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminPaymentsFilterStateService | 27 | 0 | 27 | 53 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminRemoveConfirmationResult | 3 | 0 | 3 | 171 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminSecurityPolicyService | 67 | 2 | 69 | 158 | 97.1% | 22 | 32 | 68.7% |
+| Confirmai.Services.Admin.AdminSettingsService | 104 | 69 | 173 | 346 | 60.1% | 37 | 88 | 42% |
+| Confirmai.Services.Admin.AdminTogglePaidResult | 4 | 0 | 4 | 171 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminUsersFilterState | 5 | 0 | 5 | 45 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.AdminUsersFilterStateService | 21 | 0 | 21 | 45 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.DelinquencyEntry | 5 | 2 | 7 | 167 | 71.4% | 0 | 0 |  |
+| Confirmai.Services.Admin.DelinquencyService | 88 | 0 | 88 | 167 | 100% | 15 | 28 | 53.5% |
+| Confirmai.Services.Admin.EventConfirmationReconciliationExportRow | 8 | 0 | 8 | 275 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.PaymentHistoryEntry | 4 | 3 | 7 | 167 | 57.1% | 0 | 0 |  |
+| Confirmai.Services.Admin.PendingProofEntry | 0 | 10 | 10 | 167 | 0% | 0 | 0 |  |
+| Confirmai.Services.Admin.RuntimeSecurityPolicy | 4 | 0 | 4 | 158 | 100% | 0 | 0 |  |
+| Confirmai.Services.Admin.UserDelinquency | 5 | 0 | 5 | 167 | 100% | 0 | 0 |  |
+| Confirmai.Services.AppmaxEventPaymentGateway | 3 | 7 | 10 | 27 | 30% | 0 | 0 |  |
+| Confirmai.Services.BitcoinPaymentFactory | 6 | 0 | 6 | 24 | 100% | 2 | 2 | 100% |
+| Confirmai.Services.Core.AppInitializationService | 200 | 40 | 240 | 420 | 83.3% | 69 | 98 | 70.4% |
+| Confirmai.Services.Core.AuthNavigationHelper | 10 | 2 | 12 | 32 | 83.3% | 6 | 6 | 100% |
+| Confirmai.Services.Core.CertificateHealthCheckService | 16 | 46 | 62 | 121 | 25.8% | 1 | 18 | 5.5% |
+| Confirmai.Services.Core.DebounceDispatcher | 20 | 2 | 22 | 51 | 90.9% | 4 | 4 | 100% |
+| Confirmai.Services.Core.LogRetentionService | 29 | 11 | 40 | 89 | 72.5% | 6 | 8 | 75% |
+| Confirmai.Services.Core.LogService | 72 | 3 | 75 | 158 | 96% | 30 | 36 | 83.3% |
+| Confirmai.Services.Core.OperationFeeBreakdown | 1 | 0 | 1 | 25 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.OperationFeeCalculatorService | 8 | 0 | 8 | 25 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.UiText.AdminTexts | 359 | 0 | 359 | 378 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.UiText.AuthTexts | 204 | 0 | 204 | 219 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.UiText.BaseTexts | 0 | 14 | 14 | 61 | 0% | 0 | 16 | 0% |
+| Confirmai.Services.Core.UiText.CoreTexts | 126 | 0 | 126 | 145 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.UiText.PaymentTexts | 155 | 0 | 155 | 175 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.UiText.ServerTexts | 131 | 0 | 131 | 151 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.UiText.UtilityTexts | 483 | 0 | 483 | 498 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.UiTextService | 74 | 13 | 87 | 306 | 85% | 54 | 70 | 77.1% |
+| Confirmai.Services.Crypto.BitcoinQuoteService | 38 | 18 | 56 | 114 | 67.8% | 12 | 18 | 66.6% |
+| Confirmai.Services.Crypto.CryptoQuoteService | 46 | 27 | 73 | 149 | 63% | 16 | 28 | 57.1% |
+| Confirmai.Services.EfiBankEventPaymentGateway | 3 | 7 | 10 | 25 | 30% | 0 | 0 |  |
 | Confirmai.Services.EventPaymentChargeResult | 0 | 1 | 1 | 13 | 0% | 0 | 0 |  |
-| Confirmai.Services.EventPaymentGatewayFactory | 9 | 19 | 28 | 59 | 32.1% | 1 | 10 | 10% |
-| Confirmai.Services.EventPaymentGatewayOption | 0 | 1 | 1 | 59 | 0% | 0 | 0 |  |
-| Confirmai.Services.EventPaymentReconcileResult | 7 | 0 | 7 | 289 | 100% | 0 | 0 |  |
-| Confirmai.Services.EventPaymentReconciliationService | 136 | 44 | 180 | 289 | 75.5% | 33 | 48 | 68.7% |
-| Confirmai.Services.EventPaymentReconciliationSweepResult | 5 | 1 | 6 | 289 | 83.3% | 0 | 0 |  |
-| Confirmai.Services.EventPaymentReconciliationWorker | 9 | 21 | 30 | 65 | 30% | 1 | 6 | 16.6% |
-| Confirmai.Services.GatewayService | 39 | 8 | 47 | 92 | 82.9% | 12 | 14 | 85.7% |
-| Confirmai.Services.IdentityEmailSender | 48 | 18 | 66 | 108 | 72.7% | 8 | 14 | 57.1% |
-| Confirmai.Services.LanguagePreferenceService | 23 | 0 | 23 | 46 | 100% | 8 | 8 | 100% |
-| Confirmai.Services.LocalStorageStateHelpers | 34 | 0 | 34 | 74 | 100% | 23 | 26 | 88.4% |
-| Confirmai.Services.LogRetentionService | 29 | 11 | 40 | 88 | 72.5% | 6 | 8 | 75% |
-| Confirmai.Services.LogService | 72 | 3 | 75 | 154 | 96% | 30 | 36 | 83.3% |
-| Confirmai.Services.MailboxConversationArchiveService | 14 | 0 | 14 | 32 | 100% | 8 | 8 | 100% |
-| Confirmai.Services.OperationFeeBreakdown | 1 | 0 | 1 | 24 | 100% | 0 | 0 |  |
-| Confirmai.Services.OperationFeeCalculatorService | 8 | 0 | 8 | 24 | 100% | 0 | 0 |  |
-| Confirmai.Services.PaymentConfirmationService | 45 | 3 | 48 | 93 | 93.7% | 19 | 24 | 79.1% |
-| Confirmai.Services.PaymentDomainMetrics | 17 | 23 | 40 | 99 | 42.5% | 10 | 24 | 41.6% |
-| Confirmai.Services.PaymentEventBus | 2 | 0 | 2 | 11 | 100% | 2 | 2 | 100% |
-| Confirmai.Services.PiiSanitizer | 13 | 2 | 15 | 156 | 86.6% | 6 | 6 | 100% |
-| Confirmai.Services.ProductService | 99 | 45 | 144 | 255 | 68.7% | 20 | 36 | 55.5% |
-| Confirmai.Services.RachaSchedulerService | 61 | 14 | 75 | 143 | 81.3% | 15 | 18 | 83.3% |
-| Confirmai.Services.RuntimeSecurityPolicy | 4 | 0 | 4 | 156 | 100% | 0 | 0 |  |
-| Confirmai.Services.TestnetBitcoinPaymentService | 48 | 17 | 65 | 127 | 73.8% | 14 | 22 | 63.6% |
-| Confirmai.Services.UiTextService | 3129 | 2 | 3131 | 3164 | 99.9% | 8 | 10 | 80% |
-| Confirmai.Services.UserService | 10 | 0 | 10 | 32 | 100% | 2 | 2 | 100% |
+| Confirmai.Services.EventPaymentGatewayFactory | 32 | 0 | 32 | 68 | 100% | 10 | 10 | 100% |
+| Confirmai.Services.EventPaymentGatewayOption | 1 | 0 | 1 | 68 | 100% | 0 | 0 |  |
+| Confirmai.Services.Events.DashboardMetricsService | 15 | 0 | 15 | 39 | 100% | 0 | 0 |  |
+| Confirmai.Services.Events.DashboardMetricsSnapshot | 2 | 0 | 2 | 39 | 100% | 0 | 0 |  |
+| Confirmai.Services.Events.EventCollisionService | 22 | 2 | 24 | 60 | 91.6% | 2 | 2 | 100% |
+| Confirmai.Services.Events.EventConfirmationPaymentStatusService | 61 | 25 | 86 | 136 | 70.9% | 15 | 25 | 60% |
+| Confirmai.Services.Events.EventConfirmationPaymentTransitionResult | 6 | 1 | 7 | 136 | 85.7% | 0 | 0 |  |
+| Confirmai.Services.Events.EventNotificationSchedulerService | 7 | 48 | 55 | 131 | 12.7% | 0 | 10 | 0% |
+| Confirmai.Services.Events.EventNotificationService | 142 | 30 | 172 | 303 | 82.5% | 54 | 76 | 71% |
+| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 136 | 85.2% | 13 | 16 | 81.2% |
+| Confirmai.Services.Payment.AbacatePayCheckResult | 0 | 4 | 4 | 135 | 0% | 0 | 0 |  |
+| Confirmai.Services.Payment.AbacatePayEnvelope<T> | 0 | 4 | 4 | 135 | 0% | 0 | 0 |  |
+| Confirmai.Services.Payment.AbacatePayPixService | 8 | 51 | 59 | 135 | 13.5% | 0 | 28 | 0% |
+| Confirmai.Services.Payment.AbacatePayTransparent | 0 | 7 | 7 | 135 | 0% | 0 | 0 |  |
+| Confirmai.Services.Payment.AbacatePayWebhookData | 3 | 1 | 4 | 117 | 75% | 0 | 0 |  |
+| Confirmai.Services.Payment.AbacatePayWebhookPayload | 3 | 1 | 4 | 117 | 75% | 0 | 0 |  |
+| Confirmai.Services.Payment.AbacatePayWebhookService | 31 | 15 | 46 | 117 | 67.3% | 15 | 24 | 62.5% |
+| Confirmai.Services.Payment.AppmaxPixService | 14 | 255 | 269 | 438 | 5.2% | 0 | 122 | 0% |
+| Confirmai.Services.Payment.BtcPayServerPaymentService | 41 | 1 | 42 | 84 | 97.6% | 13 | 18 | 72.2% |
+| Confirmai.Services.Payment.BtcPayWebhookService | 138 | 15 | 153 | 356 | 90.1% | 66 | 76 | 86.8% |
+| Confirmai.Services.Payment.EfiBankCobResponse | 3 | 1 | 4 | 276 | 75% | 0 | 0 |  |
+| Confirmai.Services.Payment.EfiBankPixService | 79 | 47 | 126 | 276 | 62.6% | 22 | 44 | 50% |
+| Confirmai.Services.Payment.EfiBankPixWebhookEntry | 3 | 1 | 4 | 127 | 75% | 0 | 0 |  |
+| Confirmai.Services.Payment.EfiBankTokenResponse | 3 | 0 | 3 | 276 | 100% | 0 | 0 |  |
+| Confirmai.Services.Payment.EfiBankWebhookPayload | 2 | 0 | 2 | 127 | 100% | 0 | 0 |  |
+| Confirmai.Services.Payment.EfiBankWebhookService | 46 | 6 | 52 | 127 | 88.4% | 26 | 32 | 81.2% |
+| Confirmai.Services.Payment.EventPaymentReconcileResult | 7 | 0 | 7 | 292 | 100% | 0 | 0 |  |
+| Confirmai.Services.Payment.EventPaymentReconciliationService | 136 | 44 | 180 | 292 | 75.5% | 33 | 48 | 68.7% |
+| Confirmai.Services.Payment.EventPaymentReconciliationSweepResult | 5 | 1 | 6 | 292 | 83.3% | 0 | 0 |  |
+| Confirmai.Services.Payment.EventPaymentReconciliationWorker | 9 | 21 | 30 | 66 | 30% | 1 | 6 | 16.6% |
+| Confirmai.Services.Payment.GatewayService | 47 | 0 | 47 | 93 | 100% | 14 | 14 | 100% |
+| Confirmai.Services.Payment.LimitedStream | 12 | 22 | 34 | 356 | 35.2% | 1 | 6 | 16.6% |
+| Confirmai.Services.Payment.PaymentConfirmationService | 45 | 3 | 48 | 96 | 93.7% | 19 | 24 | 79.1% |
+| Confirmai.Services.Payment.PaymentDomainMetrics | 40 | 0 | 40 | 101 | 100% | 24 | 24 | 100% |
+| Confirmai.Services.Payment.PaymentEventBus | 2 | 0 | 2 | 11 | 100% | 2 | 2 | 100% |
+| Confirmai.Services.Payment.PaymentInitializationService | 0 | 42 | 42 | 114 | 0% | 0 | 40 | 0% |
+| Confirmai.Services.Payment.PendingWebhooksAlertService | 16 | 26 | 42 | 90 | 38% | 1 | 6 | 16.6% |
+| Confirmai.Services.Payment.PixProofUploadResult | 3 | 0 | 3 | 113 | 100% | 0 | 0 |  |
+| Confirmai.Services.Payment.PixProofUploadService | 42 | 13 | 55 | 113 | 76.3% | 14 | 14 | 100% |
+| Confirmai.Services.Payment.Shared.WebhookBodyReader | 7 | 1 | 8 | 30 | 87.5% | 3 | 4 | 75% |
+| Confirmai.Services.Payment.Shared.WebhookPaymentMarker | 28 | 22 | 50 | 115 | 56% | 8 | 14 | 57.1% |
+| Confirmai.Services.Payment.Shared.WebhookSecretValidator | 9 | 0 | 9 | 37 | 100% | 5 | 6 | 83.3% |
+| Confirmai.Services.User.CurrencyPreferenceService | 7 | 0 | 7 | 20 | 100% | 2 | 2 | 100% |
+| Confirmai.Services.User.CustomClaimsPrincipalFactory | 5 | 0 | 5 | 31 | 100% | 0 | 0 |  |
+| Confirmai.Services.User.LanguagePreferenceService | 23 | 0 | 23 | 47 | 100% | 8 | 8 | 100% |
+| Confirmai.Services.User.UserService | 10 | 0 | 10 | 33 | 100% | 2 | 2 | 100% |
+| Confirmai.Services.Utility.IdentityEmailSender | 48 | 18 | 66 | 109 | 72.7% | 8 | 14 | 57.1% |
+| Confirmai.Services.Utility.LocalStorageStateHelpers | 34 | 0 | 34 | 74 | 100% | 23 | 26 | 88.4% |
+| Confirmai.Services.Utility.MailboxConversationArchiveService | 14 | 0 | 14 | 32 | 100% | 8 | 8 | 100% |
+| Confirmai.Services.Utility.PiiSanitizer | 13 | 2 | 15 | 157 | 86.6% | 6 | 6 | 100% |
+| Confirmai.Services.Utility.ProductService | 99 | 45 | 144 | 258 | 68.7% | 20 | 36 | 55.5% |
+| Confirmai.Services.Utility.TestnetBitcoinPaymentService | 48 | 17 | 65 | 130 | 73.8% | 14 | 22 | 63.6% |
 | Confirmai.Shared.Components.ActivePaymentMethodsWidget | 27 | 4 | 31 | 78 | 87% | 11 | 16 | 68.7% |
-| Confirmai.Shared.Components.AdminDataState | 15 | 2 | 17 | 34 | 88.2% | 6 | 8 | 75% |
-| Confirmai.Shared.Components.Breadcrumb | 63 | 40 | 103 | 204 | 61.1% | 101 | 138 | 73.1% |
-| Confirmai.Shared.Components.BtcQuoteCard | 0 | 22 | 22 | 79 | 0% | 0 | 8 | 0% |
+| Confirmai.Shared.Components.Admin.AdminLogsFilterBar | 38 | 10 | 48 | 124 | 79.1% | 2 | 4 | 50% |
+| Confirmai.Shared.Components.Admin.AdminLogsQuickFilters | 25 | 0 | 25 | 68 | 100% | 3 | 4 | 75% |
+| Confirmai.Shared.Components.Admin.AdminLogsTable | 29 | 9 | 38 | 115 | 76.3% | 15 | 32 | 46.8% |
+| Confirmai.Shared.Components.Admin.AdminUsersFilterBar | 0 | 25 | 25 | 58 | 0% | 0 | 0 |  |
+| Confirmai.Shared.Components.Admin.AdminUsersPagination | 0 | 12 | 12 | 32 | 0% | 0 | 0 |  |
+| Confirmai.Shared.Components.Admin.AdminUsersTable | 0 | 40 | 40 | 127 | 0% | 0 | 18 | 0% |
+| Confirmai.Shared.Components.AdminDataState | 0 | 17 | 17 | 34 | 0% | 0 | 8 | 0% |
+| Confirmai.Shared.Components.Breadcrumb | 63 | 39 | 102 | 203 | 61.7% | 101 | 138 | 73.1% |
+| Confirmai.Shared.Components.BtcQuoteCard | 0 | 21 | 21 | 78 | 0% | 0 | 8 | 0% |
 | Confirmai.Shared.Components.CookieConsent | 15 | 7 | 22 | 73 | 68.1% | 1 | 4 | 25% |
 | Confirmai.Shared.Components.EntityProfileShell | 0 | 12 | 12 | 31 | 0% | 0 | 4 | 0% |
-| Confirmai.Shared.Components.EventListingShell | 43 | 33 | 76 | 187 | 56.5% | 14 | 46 | 30.4% |
+| Confirmai.Shared.Components.EventListingShell | 41 | 33 | 74 | 185 | 55.4% | 14 | 46 | 30.4% |
 | Confirmai.Shared.Components.FilterActionButtons | 0 | 6 | 6 | 10 | 0% | 0 | 0 |  |
+| Confirmai.Shared.Components.Futsal.FutsalWaitlist | 11 | 20 | 31 | 103 | 35.4% | 1 | 32 | 3.1% |
+| Confirmai.Shared.Components.Groups.GroupDetailMembers | 0 | 20 | 20 | 64 | 0% | 0 | 34 | 0% |
+| Confirmai.Shared.Components.Groups.GroupDetailPaymentsModal | 0 | 85 | 85 | 325 | 0% | 0 | 70 | 0% |
+| Confirmai.Shared.Components.Groups.RankingTable | 0 | 14 | 14 | 51 | 0% | 0 | 40 | 0% |
+| Confirmai.Shared.Components.Groups.RankingViewSelector | 0 | 8 | 8 | 28 | 0% | 0 | 8 | 0% |
 | Confirmai.Shared.Components.Header | 0 | 3 | 3 | 23 | 0% | 0 | 0 |  |
 | Confirmai.Shared.Components.PaginationControls | 0 | 13 | 13 | 24 | 0% | 0 | 4 | 0% |
 | Confirmai.Shared.Components.QRCode | 0 | 8 | 8 | 21 | 0% | 0 | 2 | 0% |
 | Confirmai.Shared.Components.StatCard | 0 | 4 | 4 | 9 | 0% | 0 | 0 |  |
-| Confirmai.Shared.Components.Toast | 1 | 23 | 24 | 39 | 4.1% | 1 | 12 | 8.3% |
+| Confirmai.Shared.Components.Toast | 1 | 21 | 22 | 37 | 4.5% | 1 | 12 | 8.3% |
 | Confirmai.Shared.Components.UserSummaryCard | 0 | 23 | 23 | 70 | 0% | 0 | 28 | 0% |
 | Confirmai.Shared.Helpers.BtcUsdFormatter | 19 | 0 | 19 | 49 | 100% | 17 | 20 | 85% |
-| Confirmai.Shared.Helpers.EventAccess | 6 | 0 | 6 | 31 | 100% | 11 | 14 | 78.5% |
+| Confirmai.Shared.Helpers.EventAccess | 6 | 0 | 6 | 31 | 100% | 12 | 14 | 85.7% |
 | Confirmai.Shared.Helpers.EventMinimums | 22 | 0 | 22 | 49 | 100% | 3 | 6 | 50% |
-| Confirmai.Shared.MainLayout | 108 | 35 | 143 | 369 | 75.5% | 48 | 70 | 68.5% |
+| Confirmai.Shared.MainLayout | 105 | 35 | 140 | 370 | 75% | 48 | 70 | 68.5% |
 | Confirmai.Shared.RouteNotAuthorized | 8 | 0 | 8 | 30 | 100% | 5 | 6 | 83.3% |
-| Program | 331 | 145 | 476 | 607 | 69.5% | 35 | 80 | 43.7% |
+| Program | 353 | 166 | 519 | 670 | 68% | 36 | 84 | 42.8% |
 | System.Text.RegularExpressions.Generated | 258 | 32 | 290 | 816 | 88.9% | 121 | 150 | 80.6% |
 | System.Text.RegularExpressions.Generated.<RegexGenerator_g>FBE5D3F183809CBDAE41AF23BFC06E22EE1BD9C4D07898CEDDF9B7DCFD59724FE__BareEmailInJsonValueRegex_1 | 98 | 9 | 107 | 789 | 91.5% | 41 | 50 | 82% |
 | System.Text.RegularExpressions.Generated.<RegexGenerator_g>FBE5D3F183809CBDAE41AF23BFC06E22EE1BD9C4D07898CEDDF9B7DCFD59724FE__EmailInJsonValueByKeyRegex_0 | 154 | 23 | 177 | 522 | 87% | 80 | 100 | 80% |
