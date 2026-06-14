@@ -67,13 +67,16 @@ namespace Confirmai.Services.Payment
                 return Results.StatusCode(StatusCodes.Status413PayloadTooLarge);
             }
 
-            using var reader = new StreamReader(context.Request.Body);
+            // Size-bounded streaming read: prevents memory exhaustion when
+            // Content-Length is missing or spoofed by reading at most maxWebhookBodyBytes + 1 bytes.
+            var limitedStream = new LimitedStream(context.Request.Body, maxWebhookBodyBytes + 1);
+            using var reader = new StreamReader(limitedStream, Encoding.UTF8);
             var body = await reader.ReadToEndAsync();
 
             if (Encoding.UTF8.GetByteCount(body) > maxWebhookBodyBytes)
             {
                 await _log.LogAsync(
-                    $"Payload do webhook excede limite permitido após leitura do corpo. Limite: {maxWebhookBodyBytes} bytes.",
+                    $"Payload do webhook excede limite permitido. Limite: {maxWebhookBodyBytes} bytes.",
                     source: AdminAuditSources.Webhook,
                     level: "Warning"
                 );
@@ -286,6 +289,68 @@ namespace Confirmai.Services.Payment
             }
         }
     }
+    /// <summary>
+    /// Read-only stream wrapper that caps the number of bytes read from an inner stream.
+    /// Used to prevent unbounded memory allocation when Content-Length is absent or spoofed.
+    /// </summary>
+    internal sealed class LimitedStream : Stream
+    {
+        private readonly Stream _inner;
+        private readonly long _maxBytes;
+        private long _bytesRead;
+
+        public LimitedStream(Stream inner, long maxBytes)
+        {
+            _inner = inner;
+            _maxBytes = maxBytes;
+        }
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position
+        {
+            get => _bytesRead;
+            set => throw new NotSupportedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            var remaining = _maxBytes - _bytesRead;
+            if (remaining <= 0) return 0;
+            var toRead = (int)Math.Min(count, remaining);
+            var read = _inner.Read(buffer, offset, toRead);
+            _bytesRead += read;
+            return read;
+        }
+
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            var remaining = _maxBytes - _bytesRead;
+            if (remaining <= 0) return 0;
+            var toRead = (int)Math.Min(count, remaining);
+            var read = await _inner.ReadAsync(buffer, offset, toRead, cancellationToken);
+            _bytesRead += read;
+            return read;
+        }
+
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            var remaining = _maxBytes - _bytesRead;
+            if (remaining <= 0) return 0;
+            var toRead = (int)Math.Min(buffer.Length, remaining);
+            var read = await _inner.ReadAsync(buffer[..toRead], cancellationToken);
+            _bytesRead += read;
+            return read;
+        }
+
+        public override void Flush() { }
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+    }
+
 }
 
 
