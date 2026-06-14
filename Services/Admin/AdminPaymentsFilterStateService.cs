@@ -14,60 +14,40 @@ public sealed class AdminPaymentsFilterState
     public int? Page { get; init; }
 }
 
-public class AdminPaymentsFilterStateService
+public class AdminPaymentsFilterStateService : AdminFilterStateServiceBase<AdminPaymentsFilterState>
 {
-    private readonly IJSRuntime _js;
+    public AdminPaymentsFilterStateService(IJSRuntime js) : base(js) { }
 
-    public AdminPaymentsFilterStateService(IJSRuntime js)
+    protected override async Task<AdminPaymentsFilterState> LoadCoreAsync()
     {
-        _js = js;
+        var userId = await LocalStorageStateHelpers.GetStringAsync(Js, AdminPaymentsStorageKeys.UserFilter);
+        var productId = await LocalStorageStateHelpers.GetStringAsync(Js, AdminPaymentsStorageKeys.ProductFilter);
+        var status = await LocalStorageStateHelpers.GetStringAsync(Js, AdminPaymentsStorageKeys.StatusFilter);
+        var minAmount = await LocalStorageStateHelpers.GetDecimalAsync(Js, AdminPaymentsStorageKeys.MinAmountFilter);
+        var maxAmount = await LocalStorageStateHelpers.GetDecimalAsync(Js, AdminPaymentsStorageKeys.MaxAmountFilter);
+        var date = await LocalStorageStateHelpers.GetDateAsync(Js, AdminPaymentsStorageKeys.DateFilter);
+        var page = await LocalStorageStateHelpers.GetPositiveIntAsync(Js, AdminPaymentsStorageKeys.Page);
+
+        return new AdminPaymentsFilterState
+        {
+            UserId = userId,
+            ProductId = productId,
+            MinAmount = minAmount,
+            MaxAmount = maxAmount,
+            Status = status,
+            Date = date,
+            Page = page
+        };
     }
 
-    public async Task<AdminPaymentsFilterState> LoadAsync()
+    protected override async Task SaveCoreAsync(AdminPaymentsFilterState state)
     {
-        try
-        {
-            var userId = await LocalStorageStateHelpers.GetStringAsync(_js, AdminPaymentsStorageKeys.UserFilter);
-            var productId = await LocalStorageStateHelpers.GetStringAsync(_js, AdminPaymentsStorageKeys.ProductFilter);
-            var status = await LocalStorageStateHelpers.GetStringAsync(_js, AdminPaymentsStorageKeys.StatusFilter);
-            var minAmount = await LocalStorageStateHelpers.GetDecimalAsync(_js, AdminPaymentsStorageKeys.MinAmountFilter);
-            var maxAmount = await LocalStorageStateHelpers.GetDecimalAsync(_js, AdminPaymentsStorageKeys.MaxAmountFilter);
-            var date = await LocalStorageStateHelpers.GetDateAsync(_js, AdminPaymentsStorageKeys.DateFilter);
-            var page = await LocalStorageStateHelpers.GetPositiveIntAsync(_js, AdminPaymentsStorageKeys.Page);
-
-            return new AdminPaymentsFilterState
-            {
-                UserId = userId,
-                ProductId = productId,
-                MinAmount = minAmount,
-                MaxAmount = maxAmount,
-                Status = status,
-                Date = date,
-                Page = page
-            };
-        }
-        catch
-        {
-            return new AdminPaymentsFilterState();
-        }
-    }
-
-    public async Task SaveAsync(AdminPaymentsFilterState state)
-    {
-        try
-        {
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminPaymentsStorageKeys.UserFilter, state.UserId);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminPaymentsStorageKeys.ProductFilter, state.ProductId);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminPaymentsStorageKeys.StatusFilter, state.Status);
-            await LocalStorageStateHelpers.SetOrRemoveDecimalAsync(_js, AdminPaymentsStorageKeys.MinAmountFilter, state.MinAmount);
-            await LocalStorageStateHelpers.SetOrRemoveDecimalAsync(_js, AdminPaymentsStorageKeys.MaxAmountFilter, state.MaxAmount);
-            await LocalStorageStateHelpers.SetOrRemoveDateAsync(_js, AdminPaymentsStorageKeys.DateFilter, state.Date);
-            await LocalStorageStateHelpers.SetPageAsync(_js, AdminPaymentsStorageKeys.Page, state.Page);
-        }
-        catch
-        {
-            // No-op: ignore storage failures.
-        }
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminPaymentsStorageKeys.UserFilter, state.UserId);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminPaymentsStorageKeys.ProductFilter, state.ProductId);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminPaymentsStorageKeys.StatusFilter, state.Status);
+        await LocalStorageStateHelpers.SetOrRemoveDecimalAsync(Js, AdminPaymentsStorageKeys.MinAmountFilter, state.MinAmount);
+        await LocalStorageStateHelpers.SetOrRemoveDecimalAsync(Js, AdminPaymentsStorageKeys.MaxAmountFilter, state.MaxAmount);
+        await LocalStorageStateHelpers.SetOrRemoveDateAsync(Js, AdminPaymentsStorageKeys.DateFilter, state.Date);
+        await LocalStorageStateHelpers.SetPageAsync(Js, AdminPaymentsStorageKeys.Page, state.Page);
     }
 }
-

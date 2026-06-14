@@ -1,4 +1,5 @@
 using Confirmai.Services.Payment;
+using Confirmai.Services.Payment.Shared;
 using Confirmai.Services.Core;
 using Confirmai.Configuration;
 using Confirmai.Enums;
@@ -211,7 +212,8 @@ public class EfiBankWebhookServiceTests
         });
         var log  = new LogService(db, NullLogger<LogService>.Instance);
         eventBus ??= new PaymentEventBus();
-        return new EfiBankWebhookService(db, log, opts, eventBus);
+        var paymentMarker = new WebhookPaymentMarker(db, log, eventBus);
+        return new EfiBankWebhookService(log, opts, paymentMarker);
     }
 
     private static EventConfirmation SeedConfirmation(
