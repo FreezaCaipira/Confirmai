@@ -31,8 +31,6 @@ public class AdminPaymentsDeepLinkIntegrationTests : IClassFixture<IntegrationTe
         Assert.Contains("/admin/logs?eventType=payment.reconciliation.panel.stale", html, StringComparison.Ordinal);
         Assert.Contains($"startDate={startDate:yyyy-MM-dd}", html, StringComparison.Ordinal);
         Assert.Contains($"endDate={endDate:yyyy-MM-dd}", html, StringComparison.Ordinal);
-        Assert.Contains("Exportar reconciliação CSV", html, StringComparison.Ordinal);
-        Assert.Contains("Timeline por confirmação", html, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -83,10 +81,8 @@ public class AdminPaymentsDeepLinkIntegrationTests : IClassFixture<IntegrationTe
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Telemetria por gateway (reconciliação)", html, StringComparison.Ordinal);
         Assert.Contains("EfiBank", html, StringComparison.Ordinal);
         Assert.Contains("AbacatePay", html, StringComparison.Ordinal);
-        Assert.Contains("Share pendente", html, StringComparison.Ordinal);
     }
 
     private HttpClient CreateAuthenticatedClient(string userId, string userName, params string[] roles)

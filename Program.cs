@@ -31,6 +31,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
 using Serilog.Sinks.OpenTelemetry;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>(optional: true);
@@ -380,6 +381,17 @@ if (!isDevelopment)
     app.UseExceptionHandler("/error");
     app.UseHsts();
 }
+
+// S-8: Forward headers from reverse proxy (nginx / Caddy) so the app sees
+// real client IPs and the original scheme. Must come before HTTPS redirect.
+if (!isDevelopment)
+{
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
+}
+
 if (!isDevelopment)
 {
     app.UseHttpsRedirection();

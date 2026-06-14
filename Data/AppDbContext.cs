@@ -28,6 +28,9 @@ namespace Confirmai.Data
         public DbSet<MatchSchedule> RachaSchedules { get; set; }
         public DbSet<PostMatchVote> PostMatchVotes { get; set; }
 
+        // Server integration
+        public DbSet<ServerApiKey> ServerApiKeys { get; set; }
+
         // Data Protection Keys (ASP.NET Core antiforgery token encryption)
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 

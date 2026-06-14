@@ -10,7 +10,7 @@ public class BtcUsdFormatterTests
         var formatted = BtcUsdFormatter.Format(0.001m, null);
 
         Assert.Contains("0.001 BTC", formatted);
-        Assert.Contains("USD indisponÌvel no momento", formatted);
+        Assert.Contains("USD indispon√≠vel no momento", formatted);
     }
 
     [Fact]
@@ -29,8 +29,8 @@ public class BtcUsdFormatterTests
 
         Assert.Contains("0.001 BTC", markup);
         Assert.Contains("usd-unavailable-badge", markup);
-        Assert.Contains("?? USD indisponÌvel no momento", markup);
-        Assert.Contains("title=\"N„o foi possÌvel carregar a cotaÁ„o USD agora. Tente novamente em instantes.\"", markup);
+        Assert.Contains("‚ö†Ô∏è USD indispon√≠vel no momento", markup);
+        Assert.Contains("title=\"N√£o foi poss√≠vel carregar a cota√ß√£o USD agora. Tente novamente em instantes.\"", markup);
     }
 
     [Fact]

@@ -58,6 +58,20 @@ internal static class CoreTexts
 
         // Breadcrumb
         ["Breadcrumb.Home"] = "Inicio",
+        ["Breadcrumb.Admin"] = "Admin",
+        ["Breadcrumb.Users"] = "Usuarios",
+        ["Breadcrumb.Payments"] = "Pagamentos",
+        ["Breadcrumb.Logs"] = "Logs",
+        ["Breadcrumb.Edit"] = "Editar",
+        ["Breadcrumb.View"] = "Visualizar",
+        ["Breadcrumb.Buy"] = "Comprar",
+        ["Breadcrumb.Items"] = "Itens",
+        ["Breadcrumb.Products"] = "Produtos",
+        ["Breadcrumb.About"] = "Sobre",
+        ["Breadcrumb.Contact"] = "Contato",
+        ["Breadcrumb.Dashboard"] = "Dashboard",
+        ["Breadcrumb.Marketplace"] = "Marketplace",
+        ["Breadcrumb.Languages"] = "Idiomas",
         
         // Error
         ["Error.Title"] = "Erro",
@@ -65,24 +79,57 @@ internal static class CoreTexts
         ["Error.NotFound"] = "Pagina nao encontrada",
         ["Error.AccessDenied"] = "Acesso negado",
         ["Error.InternalServer"] = "Erro interno do servidor",
+
+        // App-level
+        ["App.NotAuthorized"] = "Voce nao tem permissao para acessar esta pagina.",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
-        // Stubs - extend with English translations following same pattern as PtBr
         ["Nav.Dashboard"] = "Dashboard",
         ["Nav.Marketplace"] = "Marketplace",
         ["Layout.Hello"] = "Hello",
         ["Common.Loading"] = "Loading...",
+        ["App.NotAuthorized"] = "You are not authorized to access this page.",
+        ["Breadcrumb.Home"] = "Home",
+        ["Breadcrumb.Admin"] = "Admin",
+        ["Breadcrumb.Users"] = "Users",
+        ["Breadcrumb.Payments"] = "Payments",
+        ["Breadcrumb.Logs"] = "Logs",
+        ["Breadcrumb.Edit"] = "Edit",
+        ["Breadcrumb.View"] = "View",
+        ["Breadcrumb.Buy"] = "Buy",
+        ["Breadcrumb.Items"] = "Items",
+        ["Breadcrumb.Products"] = "Products",
+        ["Breadcrumb.About"] = "About",
+        ["Breadcrumb.Contact"] = "Contact",
+        ["Breadcrumb.Dashboard"] = "Dashboard",
+        ["Breadcrumb.Marketplace"] = "Marketplace",
+        ["Breadcrumb.Languages"] = "Languages",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
-        // Stubs - extend with Spanish translations following same pattern as PtBr
         ["Nav.Dashboard"] = "Panel",
         ["Common.Loading"] = "Cargando...",
+        ["App.NotAuthorized"] = "No tienes permiso para acceder a esta pagina.",
+        ["Breadcrumb.Home"] = "Inicio",
+        ["Breadcrumb.Admin"] = "Admin",
+        ["Breadcrumb.Users"] = "Usuarios",
+        ["Breadcrumb.Payments"] = "Pagos",
+        ["Breadcrumb.Logs"] = "Registros",
+        ["Breadcrumb.Edit"] = "Editar",
+        ["Breadcrumb.View"] = "Ver",
+        ["Breadcrumb.Buy"] = "Comprar",
+        ["Breadcrumb.Items"] = "Articulos",
+        ["Breadcrumb.Products"] = "Productos",
+        ["Breadcrumb.About"] = "Acerca de",
+        ["Breadcrumb.Contact"] = "Contacto",
+        ["Breadcrumb.Dashboard"] = "Panel",
+        ["Breadcrumb.Marketplace"] = "Mercado",
+        ["Breadcrumb.Languages"] = "Idiomas",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>
