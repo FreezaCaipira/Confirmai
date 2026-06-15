@@ -1,5 +1,7 @@
+using Confirmai.Services.Interfaces;
 using Confirmai.Services.Payment;
-namespace Confirmai.Services;
+
+namespace Confirmai.Services.EventPayments;
 
 public sealed class AppmaxEventPaymentGateway : IEventPaymentGateway
 {

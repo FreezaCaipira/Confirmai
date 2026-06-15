@@ -1,4 +1,5 @@
-using Confirmai.Services;
+using Confirmai.Services.Factories;
+using Confirmai.Services.Interfaces;
 
 namespace Confirmai.Tests;
 

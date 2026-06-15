@@ -1,5 +1,6 @@
 using Confirmai.Models;
-using Confirmai.Services;
+using Confirmai.Services.Factories;
+using Confirmai.Services.Interfaces;
 using Confirmai.Services.Payment;
 
 namespace Confirmai.Tests;

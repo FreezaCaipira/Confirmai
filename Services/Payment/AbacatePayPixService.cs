@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Confirmai.Configuration;
+using Confirmai.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace Confirmai.Services.Payment;
