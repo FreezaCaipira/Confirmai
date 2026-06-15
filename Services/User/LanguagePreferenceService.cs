@@ -43,5 +43,3 @@ public sealed class LanguagePreferenceService
         Changed?.Invoke();
     }
 }
-
-

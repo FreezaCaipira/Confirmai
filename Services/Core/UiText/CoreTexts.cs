@@ -56,6 +56,9 @@ internal static class CoreTexts
         ["Common.Optional"] = "Opcional",
         ["Common.Required"] = "Obrigatorio",
 
+        // App
+        ["App.NotAuthorized"] = "Voce nao tem permissao para acessar esta pagina.",
+
         // Breadcrumb
         ["Breadcrumb.Home"] = "Inicio",
         ["Breadcrumb.Admin"] = "Admin",
@@ -72,26 +75,25 @@ internal static class CoreTexts
         ["Breadcrumb.Dashboard"] = "Dashboard",
         ["Breadcrumb.Marketplace"] = "Marketplace",
         ["Breadcrumb.Languages"] = "Idiomas",
-        
+
         // Error
         ["Error.Title"] = "Erro",
         ["Error.Message"] = "Algo deu errado",
         ["Error.NotFound"] = "Pagina nao encontrada",
         ["Error.AccessDenied"] = "Acesso negado",
         ["Error.InternalServer"] = "Erro interno do servidor",
-
-        // App-level
-        ["App.NotAuthorized"] = "Voce nao tem permissao para acessar esta pagina.",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        ["App.NotAuthorized"] = "You are not authorized to access this page.",
+
         ["Nav.Dashboard"] = "Dashboard",
         ["Nav.Marketplace"] = "Marketplace",
         ["Layout.Hello"] = "Hello",
         ["Common.Loading"] = "Loading...",
-        ["App.NotAuthorized"] = "You are not authorized to access this page.",
+
         ["Breadcrumb.Home"] = "Home",
         ["Breadcrumb.Admin"] = "Admin",
         ["Breadcrumb.Users"] = "Users",
@@ -112,9 +114,12 @@ internal static class CoreTexts
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        ["App.NotAuthorized"] = "No tienes permiso para acceder a esta pagina.",
+
         ["Nav.Dashboard"] = "Panel",
         ["Common.Loading"] = "Cargando...",
-        ["App.NotAuthorized"] = "No tienes permiso para acceder a esta pagina.",
+
+        // Breadcrumb
         ["Breadcrumb.Home"] = "Inicio",
         ["Breadcrumb.Admin"] = "Admin",
         ["Breadcrumb.Users"] = "Usuarios",

@@ -1,4 +1,4 @@
-﻿namespace Confirmai.Configuration
+namespace Confirmai.Configuration
 {
     public class EmailOptions
     {
@@ -12,4 +12,3 @@
         public string FromName { get; set; } = "Confirmai";
     }
 }
-
