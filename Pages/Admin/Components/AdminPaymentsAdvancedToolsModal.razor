@@ -11,22 +11,22 @@
          @onkeydown="HandleKeyDown"
          @onclick:stopPropagation="true">
         <div class="admin-payments-modal-header">
-            <h2 id="admin-payments-tools-title">Advanced tools</h2>
+            <h2 id="admin-payments-tools-title">Ferramentas avançadas</h2>
             <button type="button" class="orders-review-restored-close" @onclick="OnClose" aria-label="Close">&times;—</button>
         </div>
 
         <div class="admin-payments-tools-grid">
-            <section class="admin-payments-tools-section" aria-label="Manual reconciliation">
-                <h3>Manual reconciliation</h3>
-                <p class="admin-payments-tools-description">Use to revalidate a specific charge via chargeId/txId.</p>
+            <section class="admin-payments-tools-section" aria-label="Reconciliação manual">
+                <h3>Reconciliação manual</h3>
+                <p class="admin-payments-tools-description">Use para revalidar um cobrança específica via chargeId/txId.</p>
 
                 <div class="filter-bar admin-filter-card admin-payments-reconcile-bar admin-payments-reconcile-bar--modal">
                     <div class="admin-payments-reconcile-input-wrap">
-                        <label class="admin-payments-reconcile-label">Reconciliation by chargeId/txId</label>
+                        <label class="admin-payments-reconcile-label">Reconciliação por chargeId/txId</label>
                         <input type="text" placeholder="Ex.: 7E9B... or charge_xxx" @bind="reconcileChargeId" @bind:event="oninput" />
                     </div>
                     <button type="button" disabled="@IsReconciling" @onclick="ReconcileCharge">
-                        @(IsReconciling ? "Revalidating..." : "Revalidate charge")
+                        @(IsReconciling ? "Revalidando..." : "Revalidar cobrança")
                     </button>
                 </div>
 
@@ -36,47 +36,47 @@
                         <span>@ReconcileResultMessage</span>
                         @if (ReconcileResultConfirmationId.HasValue)
                         {
-                            <a class="details-btn" href="@BuildConfirmationTimelineHref(ReconcileResultConfirmationId.Value)">Open confirmation timeline</a>
+                            <a class="details-btn" href="@BuildConfirmationTimelineHref(ReconcileResultConfirmationId.Value)">Abrir timeline da confirmação</a>
                         }
                         <button type="button" class="orders-review-restored-close" @onclick="DismissReconcileMessage" aria-label="Close">&times;—</button>
                     </div>
                 }
             </section>
 
-            <section class="admin-payments-tools-section" aria-label="Confirmation timeline">
-                <h3>Timeline by confirmation</h3>
-                <p class="admin-payments-tools-description">Direct access to auditable history of a confirmation.</p>
+            <section class="admin-payments-tools-section" aria-label="Timeline por confirmação">
+                <h3>Timeline por confirmação</h3>
+                <p class="admin-payments-tools-description">Acesso direto ao histórico auditável de uma confirmação.</p>
 
                 <div class="filter-bar admin-filter-card admin-payments-reconcile-bar admin-payments-reconcile-bar--modal">
                     <div class="admin-payments-reconcile-input-wrap">
-                        <label class="admin-payments-reconcile-label">Timeline by confirmation</label>
+                        <label class="admin-payments-reconcile-label">Timeline por confirmação</label>
                         <input type="number" min="1" placeholder="Ex.: 123" @bind="timelineConfirmationId" />
                     </div>
                     <button type="button" @onclick="OpenConfirmationTimeline" disabled="@(timelineConfirmationId is null || timelineConfirmationId <= 0)">
-                        Open timeline
+                        Abrir timeline
                     </button>
                 </div>
             </section>
 
-            <section class="admin-payments-tools-section" aria-label="Status transition">
-                <h3>Status transition</h3>
-                <p class="admin-payments-tools-description">Apply controlled status changes (cancellation/refund).</p>
+            <section class="admin-payments-tools-section" aria-label="Transição de status">
+                <h3>Transição de status</h3>
+                <p class="admin-payments-tools-description">Aplique mudanças controladas de status (cancelamento/reembolso).</p>
 
                 <div class="filter-bar admin-filter-card admin-payments-reconcile-bar admin-payments-reconcile-bar--modal">
                     <div class="admin-payments-reconcile-input-wrap">
-                        <label class="admin-payments-reconcile-label">Status transition (cancellation/refund)</label>
-                        <input type="number" min="1" placeholder="ConfirmationId" @bind="statusTransitionConfirmationId" />
+                        <label class="admin-payments-reconcile-label">Transição de status (cancelamento/reembolso)</label>
+                        <input type="number" min="1" placeholder="ConfirmationId" @bind="StatusTransitionConfirmationId" />
                     </div>
                     <select @bind="statusTransitionTarget">
-                        <option value="">Target status</option>
+                        <option value="">Status alvo</option>
                         <option value="Pending">Pending</option>
                         <option value="Paid">Paid</option>
                         <option value="Failed">Failed</option>
                         <option value="Refunded">Refunded</option>
                     </select>
-                    <input type="text" placeholder="Reason (optional)" @bind="statusTransitionReason" />
+                    <input type="text" placeholder="Motivo (opcional)" @bind="statusTransitionReason" />
                     <button type="button" @onclick="ApplyStatusTransition" disabled="@IsStatusTransitioning">
-                        @(IsStatusTransitioning ? "Applying..." : "Apply status")
+                        @(IsStatusTransitioning ? "Aplicando..." : "Aplicar status")
                     </button>
                 </div>
 
@@ -84,9 +84,9 @@
                 {
                     <div class="orders-review-restored-notice admin-payments-reconcile-result @(StatusTransitionResultIsError ? "admin-payments-reconcile-result--error" : "admin-payments-reconcile-result--ok")">
                         <span>@StatusTransitionResultMessage</span>
-                        @if (statusTransitionConfirmationId.HasValue && statusTransitionConfirmationId.Value > 0)
+                        @if (StatusTransitionConfirmationId.HasValue && StatusTransitionConfirmationId.Value > 0)
                         {
-                            <a class="details-btn" href="@BuildConfirmationTimelineHref(statusTransitionConfirmationId.Value)">View timeline</a>
+                            <a class="details-btn" href="@BuildConfirmationTimelineHref(StatusTransitionConfirmationId.Value)">Ver timeline</a>
                         }
                         <button type="button" class="orders-review-restored-close" @onclick="DismissStatusTransitionMessage" aria-label="Close">&times;—</button>
                     </div>
@@ -99,7 +99,6 @@
 @code {
     private string reconcileChargeId = string.Empty;
     private int? timelineConfirmationId;
-    private int? statusTransitionConfirmationId;
     private string statusTransitionTarget = string.Empty;
     private string statusTransitionReason = string.Empty;
 
@@ -111,6 +110,7 @@
     [Parameter] public int? ReconcileResultConfirmationId { get; set; }
     [Parameter] public string StatusTransitionResultMessage { get; set; } = string.Empty;
     [Parameter] public bool StatusTransitionResultIsError { get; set; }
+    [Parameter] public int? StatusTransitionConfirmationId { get; set; }
 
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback<string> OnReconcileCharge { get; set; }
@@ -134,9 +134,9 @@
 
     private async Task ApplyStatusTransition()
     {
-        if (statusTransitionConfirmationId.HasValue && statusTransitionConfirmationId.Value > 0 && !string.IsNullOrWhiteSpace(statusTransitionTarget))
+        if (StatusTransitionConfirmationId.HasValue && StatusTransitionConfirmationId.Value > 0 && !string.IsNullOrWhiteSpace(statusTransitionTarget))
         {
-            await OnApplyStatusTransition.InvokeAsync((statusTransitionConfirmationId.Value, statusTransitionTarget, statusTransitionReason));
+            await OnApplyStatusTransition.InvokeAsync((StatusTransitionConfirmationId.Value, statusTransitionTarget, statusTransitionReason));
         }
     }
 

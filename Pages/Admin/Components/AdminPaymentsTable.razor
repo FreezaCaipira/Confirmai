@@ -1,4 +1,6 @@
 @using Confirmai.Data
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Components
 
 <AdminDataState IsLoading="@IsLoading" IsEmpty="@(!(PaymentsToDisplay?.Any() ?? false))" LoadingText="Loading payments..." EmptyText="No payments found" EmptyIcon="fas fa-money-bill-wave" EmptyHint="No payments match your current filters.">
     <table class="payments-table align-right">
@@ -61,14 +63,14 @@
 </AdminDataState>
 
 @code {
-    [Parameter] public List<dynamic>? Payments { get; set; }
+    [Parameter] public List<PaymentRecord>? Payments { get; set; }
     [Parameter] public int CurrentPage { get; set; }
     [Parameter] public int TotalPages { get; set; }
     [Parameter] public bool IsLoading { get; set; }
-    [Parameter] public Func<decimal, string>? FormatAmount { get; set; }
+    [Parameter] public Func<decimal, MarkupString>? FormatAmount { get; set; }
     [Parameter] public EventCallback<int> OnViewPayment { get; set; }
     [Parameter] public EventCallback OnNextPage { get; set; }
     [Parameter] public EventCallback OnPrevPage { get; set; }
 
-    private List<dynamic> PaymentsToDisplay => Payments ?? new();
+    private List<PaymentRecord> PaymentsToDisplay => Payments ?? new();
 }

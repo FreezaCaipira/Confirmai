@@ -14,6 +14,7 @@ public class AdminAuthorizationConventionsTests
 
         var razorFiles = Directory
             .GetFiles(adminPagesPath, "*.razor", SearchOption.TopDirectoryOnly)
+            .Where(path => !Path.GetFileName(path).Equals("_Imports.razor", StringComparison.OrdinalIgnoreCase))
             .OrderBy(path => path)
             .ToArray();
 

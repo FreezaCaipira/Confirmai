@@ -73,7 +73,7 @@ public class FullFlowIdentityLocalizationIntegrationTests : IClassFixture<Integr
         var postHtml = await postResponse.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-        Assert.Contains("Login invalido.", postHtml, StringComparison.Ordinal);
+        Assert.Contains("Inicio de sesion invalido.", postHtml, StringComparison.Ordinal);
     }
 
     private async Task<HttpClient> CreateClientWithLanguageAsync(string languageCode)

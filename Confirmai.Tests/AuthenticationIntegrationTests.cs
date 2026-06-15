@@ -122,7 +122,7 @@ public class AuthenticationIntegrationTests : IClassFixture<IntegrationTestWebAp
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
 
-        Assert.Contains("confirme seu e-mail", content, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("confirme seu email", content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
