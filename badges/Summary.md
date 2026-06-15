@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 06/15/2026 - 16:04:08 |
-| Coverage date: | 06/15/2026 - 16:04:02 |
+| Generated on: | 06/15/2026 - 16:28:45 |
+| Coverage date: | 06/15/2026 - 16:28:40 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
-| Classes: | 388 |
-| Files: | 427 |
-| **Line coverage:** | 6.6% (7477 of 111708) |
-| Covered lines: | 7477 |
-| Uncovered lines: | 104231 |
-| Coverable lines: | 111708 |
-| Total lines: | 138889 |
-| **Branch coverage:** | 27.7% (2013 of 7253) |
-| Covered branches: | 2013 |
+| Classes: | 389 |
+| Files: | 429 |
+| **Line coverage:** | 6.6% (7476 of 113209) |
+| Covered lines: | 7476 |
+| Uncovered lines: | 105733 |
+| Coverable lines: | 113209 |
+| Total lines: | 140482 |
+| **Branch coverage:** | 27.7% (2012 of 7253) |
+| Covered branches: | 2012 |
 | Total branches: | 7253 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 90_27559205224 |
+| Tag: | 92_27560657542 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **7477** | **104231** | **111708** | **146101** | **6.6%** | **2013** | **7253** | **27.7%** |
+| **Confirmai** | **7476** | **105733** | **113209** | **147694** | **6.6%** | **2012** | **7253** | **27.7%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -129,7 +129,7 @@
 | Confirmai.Migrations.AddVenueAdminUser | 0 | 1172 | 1172 | 1258 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddVenueAndRachaScheduleAndPokerFields | 0 | 2116 | 2116 | 2333 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.AddVenueAndRachaScheduleAndPokerFields_v2 | 0 | 1316 | 1316 | 1405 | 0% | 0 | 0 |  |
-| Confirmai.Migrations.AppDbContextModelSnapshot | 0 | 1396 | 1396 | 1463 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.AppDbContextModelSnapshot | 0 | 1437 | 1437 | 1505 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.DropInventorySnapshotsAndOfferInventoryFields | 0 | 1440 | 1440 | 1533 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.EnforceUniqueGroupStartsAt | 0 | 1266 | 1266 | 1354 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.FixItemOfferCascadeBlocker | 0 | 1485 | 1485 | 1582 | 0% | 0 | 0 |  |
@@ -143,6 +143,7 @@
 | Confirmai.Migrations.ForceCrownHelmetCategoryHelmet | 0 | 13 | 13 | 31 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.InitialCreate | 0 | 933 | 933 | 1045 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.PaymentOrderOneToOne | 0 | 549 | 549 | 622 | 0% | 0 | 0 |  |
+| Confirmai.Migrations.PendingModelSync | 0 | 1460 | 1460 | 1551 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.RemoveInventorySnapshots | 0 | 1504 | 1504 | 1606 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.RemoveOrdersFeature | 0 | 1276 | 1276 | 1374 | 0% | 0 | 0 |  |
 | Confirmai.Migrations.RequireInviteCodeForGroups | 0 | 87 | 87 | 111 | 0% | 0 | 0 |  |
@@ -326,7 +327,7 @@
 | Confirmai.Services.Core.UiText.PaymentTexts | 155 | 0 | 155 | 175 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.ServerTexts | 131 | 0 | 131 | 151 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.UtilityTexts | 483 | 0 | 483 | 498 | 100% | 0 | 0 |  |
-| Confirmai.Services.Core.UiTextService | 75 | 12 | 87 | 306 | 86.2% | 55 | 70 | 78.5% |
+| Confirmai.Services.Core.UiTextService | 74 | 13 | 87 | 306 | 85% | 54 | 70 | 77.1% |
 | Confirmai.Services.Crypto.BitcoinQuoteService | 40 | 19 | 59 | 119 | 67.7% | 14 | 20 | 70% |
 | Confirmai.Services.Crypto.CryptoQuoteService | 47 | 28 | 75 | 153 | 62.6% | 18 | 30 | 60% |
 | Confirmai.Services.EfiBankEventPaymentGateway | 3 | 7 | 10 | 25 | 30% | 0 | 0 |  |
