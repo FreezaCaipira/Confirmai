@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 06/15/2026 - 16:28:45 |
-| Coverage date: | 06/15/2026 - 16:28:40 |
+| Generated on: | 06/15/2026 - 17:32:36 |
+| Coverage date: | 06/15/2026 - 17:32:31 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 389 |
 | Files: | 429 |
-| **Line coverage:** | 6.6% (7476 of 113209) |
-| Covered lines: | 7476 |
-| Uncovered lines: | 105733 |
+| **Line coverage:** | 6.6% (7477 of 113209) |
+| Covered lines: | 7477 |
+| Uncovered lines: | 105732 |
 | Coverable lines: | 113209 |
-| Total lines: | 140482 |
-| **Branch coverage:** | 27.7% (2012 of 7253) |
-| Covered branches: | 2012 |
+| Total lines: | 140449 |
+| **Branch coverage:** | 27.7% (2013 of 7253) |
+| Covered branches: | 2013 |
 | Total branches: | 7253 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 92_27560657542 |
+| Tag: | 94_27564269208 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **7476** | **105733** | **113209** | **147694** | **6.6%** | **2012** | **7253** | **27.7%** |
+| **Confirmai** | **7477** | **105732** | **113209** | **147667** | **6.6%** | **2013** | **7253** | **27.7%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -276,7 +276,6 @@
 | Confirmai.Pages.VenueManager.Venues | 0 | 59 | 59 | 194 | 0% | 0 | 30 | 0% |
 | Confirmai.RevalidatingIdentityAuthenticationStateProvider | 5 | 19 | 24 | 70 | 20.8% | 0 | 4 | 0% |
 | Confirmai.SerilogExtensions | 1 | 16 | 17 | 42 | 5.8% | 1 | 4 | 25% |
-| Confirmai.Services.AbacatePayEventPaymentGateway | 3 | 8 | 11 | 26 | 27.2% | 0 | 0 |  |
 | Confirmai.Services.Admin.AdminConfirmationService | 94 | 0 | 94 | 171 | 100% | 27 | 28 | 96.4% |
 | Confirmai.Services.Admin.AdminFilterStateServiceBase<T> | 12 | 0 | 12 | 58 | 100% | 0 | 0 |  |
 | Confirmai.Services.Admin.AdminLogExportRow | 12 | 0 | 12 | 275 | 100% | 0 | 0 |  |
@@ -310,14 +309,12 @@
 | Confirmai.Services.Admin.PendingProofEntry | 0 | 10 | 10 | 167 | 0% | 0 | 0 |  |
 | Confirmai.Services.Admin.RuntimeSecurityPolicy | 4 | 0 | 4 | 158 | 100% | 0 | 0 |  |
 | Confirmai.Services.Admin.UserDelinquency | 5 | 0 | 5 | 167 | 100% | 0 | 0 |  |
-| Confirmai.Services.AppmaxEventPaymentGateway | 3 | 7 | 10 | 27 | 30% | 0 | 0 |  |
-| Confirmai.Services.BitcoinPaymentFactory | 6 | 0 | 6 | 24 | 100% | 2 | 2 | 100% |
-| Confirmai.Services.Core.AppInitializationService | 200 | 40 | 240 | 420 | 83.3% | 69 | 98 | 70.4% |
+| Confirmai.Services.Core.AppInitializationService | 200 | 40 | 240 | 417 | 83.3% | 69 | 98 | 70.4% |
 | Confirmai.Services.Core.AuthNavigationHelper | 10 | 2 | 12 | 32 | 83.3% | 6 | 6 | 100% |
 | Confirmai.Services.Core.CertificateHealthCheckService | 16 | 46 | 62 | 121 | 25.8% | 1 | 18 | 5.5% |
 | Confirmai.Services.Core.DebounceDispatcher | 20 | 2 | 22 | 51 | 90.9% | 4 | 4 | 100% |
-| Confirmai.Services.Core.LogRetentionService | 29 | 11 | 40 | 89 | 72.5% | 6 | 8 | 75% |
-| Confirmai.Services.Core.LogService | 72 | 3 | 75 | 158 | 96% | 30 | 36 | 83.3% |
+| Confirmai.Services.Core.LogRetentionService | 29 | 11 | 40 | 87 | 72.5% | 6 | 8 | 75% |
+| Confirmai.Services.Core.LogService | 72 | 3 | 75 | 155 | 96% | 30 | 36 | 83.3% |
 | Confirmai.Services.Core.OperationFeeBreakdown | 1 | 0 | 1 | 25 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.OperationFeeCalculatorService | 8 | 0 | 8 | 25 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.AdminTexts | 359 | 0 | 359 | 378 | 100% | 0 | 0 |  |
@@ -327,44 +324,47 @@
 | Confirmai.Services.Core.UiText.PaymentTexts | 155 | 0 | 155 | 175 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.ServerTexts | 131 | 0 | 131 | 151 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.UtilityTexts | 483 | 0 | 483 | 498 | 100% | 0 | 0 |  |
-| Confirmai.Services.Core.UiTextService | 74 | 13 | 87 | 306 | 85% | 54 | 70 | 77.1% |
-| Confirmai.Services.Crypto.BitcoinQuoteService | 40 | 19 | 59 | 119 | 67.7% | 14 | 20 | 70% |
-| Confirmai.Services.Crypto.CryptoQuoteService | 47 | 28 | 75 | 153 | 62.6% | 18 | 30 | 60% |
-| Confirmai.Services.EfiBankEventPaymentGateway | 3 | 7 | 10 | 25 | 30% | 0 | 0 |  |
-| Confirmai.Services.EventPaymentChargeResult | 0 | 1 | 1 | 13 | 0% | 0 | 0 |  |
-| Confirmai.Services.EventPaymentGatewayFactory | 32 | 0 | 32 | 68 | 100% | 10 | 10 | 100% |
-| Confirmai.Services.EventPaymentGatewayOption | 1 | 0 | 1 | 68 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.UiTextService | 75 | 12 | 87 | 306 | 86.2% | 55 | 70 | 78.5% |
+| Confirmai.Services.Crypto.BitcoinQuoteService | 40 | 19 | 59 | 116 | 67.7% | 14 | 20 | 70% |
+| Confirmai.Services.Crypto.CryptoQuoteService | 47 | 28 | 75 | 149 | 62.6% | 18 | 30 | 60% |
+| Confirmai.Services.EventPayments.AbacatePayEventPaymentGateway | 3 | 8 | 11 | 28 | 27.2% | 0 | 0 |  |
+| Confirmai.Services.EventPayments.AppmaxEventPaymentGateway | 3 | 7 | 10 | 29 | 30% | 0 | 0 |  |
+| Confirmai.Services.EventPayments.EfiBankEventPaymentGateway | 3 | 7 | 10 | 27 | 30% | 0 | 0 |  |
 | Confirmai.Services.Events.DashboardMetricsService | 15 | 0 | 15 | 39 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.DashboardMetricsSnapshot | 2 | 0 | 2 | 39 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.EventCollisionService | 22 | 2 | 24 | 60 | 91.6% | 2 | 2 | 100% |
 | Confirmai.Services.Events.EventConfirmationPaymentStatusService | 61 | 25 | 86 | 136 | 70.9% | 15 | 25 | 60% |
 | Confirmai.Services.Events.EventConfirmationPaymentTransitionResult | 6 | 1 | 7 | 136 | 85.7% | 0 | 0 |  |
-| Confirmai.Services.Events.EventNotificationSchedulerService | 7 | 48 | 55 | 131 | 12.7% | 0 | 10 | 0% |
+| Confirmai.Services.Events.EventNotificationSchedulerService | 7 | 48 | 55 | 129 | 12.7% | 0 | 10 | 0% |
 | Confirmai.Services.Events.EventNotificationService | 146 | 30 | 176 | 307 | 82.9% | 54 | 76 | 71% |
-| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 136 | 85.2% | 13 | 16 | 81.2% |
-| Confirmai.Services.Payment.AbacatePayCheckResult | 0 | 4 | 4 | 135 | 0% | 0 | 0 |  |
-| Confirmai.Services.Payment.AbacatePayEnvelope<T> | 0 | 4 | 4 | 135 | 0% | 0 | 0 |  |
-| Confirmai.Services.Payment.AbacatePayPixService | 8 | 51 | 59 | 135 | 13.5% | 0 | 28 | 0% |
-| Confirmai.Services.Payment.AbacatePayTransparent | 0 | 7 | 7 | 135 | 0% | 0 | 0 |  |
+| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
+| Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
+| Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
+| Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
+| Confirmai.Services.Interfaces.EventPaymentChargeResult | 0 | 1 | 1 | 13 | 0% | 0 | 0 |  |
+| Confirmai.Services.Payment.AbacatePayCheckResult | 0 | 4 | 4 | 136 | 0% | 0 | 0 |  |
+| Confirmai.Services.Payment.AbacatePayEnvelope<T> | 0 | 4 | 4 | 136 | 0% | 0 | 0 |  |
+| Confirmai.Services.Payment.AbacatePayPixService | 8 | 51 | 59 | 136 | 13.5% | 0 | 28 | 0% |
+| Confirmai.Services.Payment.AbacatePayTransparent | 0 | 7 | 7 | 136 | 0% | 0 | 0 |  |
 | Confirmai.Services.Payment.AbacatePayWebhookData | 3 | 1 | 4 | 117 | 75% | 0 | 0 |  |
 | Confirmai.Services.Payment.AbacatePayWebhookPayload | 3 | 1 | 4 | 117 | 75% | 0 | 0 |  |
 | Confirmai.Services.Payment.AbacatePayWebhookService | 31 | 15 | 46 | 117 | 67.3% | 15 | 24 | 62.5% |
 | Confirmai.Services.Payment.AppmaxPixService | 14 | 255 | 269 | 438 | 5.2% | 0 | 122 | 0% |
-| Confirmai.Services.Payment.BtcPayServerPaymentService | 41 | 1 | 42 | 84 | 97.6% | 13 | 18 | 72.2% |
-| Confirmai.Services.Payment.BtcPayWebhookService | 138 | 15 | 153 | 356 | 90.1% | 66 | 76 | 86.8% |
+| Confirmai.Services.Payment.BtcPayServerPaymentService | 41 | 1 | 42 | 82 | 97.6% | 13 | 18 | 72.2% |
+| Confirmai.Services.Payment.BtcPayWebhookService | 138 | 15 | 153 | 353 | 90.1% | 66 | 76 | 86.8% |
 | Confirmai.Services.Payment.EfiBankCobResponse | 3 | 1 | 4 | 276 | 75% | 0 | 0 |  |
 | Confirmai.Services.Payment.EfiBankPixService | 79 | 47 | 126 | 276 | 62.6% | 22 | 44 | 50% |
 | Confirmai.Services.Payment.EfiBankPixWebhookEntry | 3 | 1 | 4 | 127 | 75% | 0 | 0 |  |
 | Confirmai.Services.Payment.EfiBankTokenResponse | 3 | 0 | 3 | 276 | 100% | 0 | 0 |  |
 | Confirmai.Services.Payment.EfiBankWebhookPayload | 2 | 0 | 2 | 127 | 100% | 0 | 0 |  |
 | Confirmai.Services.Payment.EfiBankWebhookService | 46 | 6 | 52 | 127 | 88.4% | 26 | 32 | 81.2% |
-| Confirmai.Services.Payment.EventPaymentReconcileResult | 7 | 0 | 7 | 292 | 100% | 0 | 0 |  |
-| Confirmai.Services.Payment.EventPaymentReconciliationService | 136 | 44 | 180 | 292 | 75.5% | 33 | 48 | 68.7% |
-| Confirmai.Services.Payment.EventPaymentReconciliationSweepResult | 5 | 1 | 6 | 292 | 83.3% | 0 | 0 |  |
+| Confirmai.Services.Payment.EventPaymentReconcileResult | 7 | 0 | 7 | 294 | 100% | 0 | 0 |  |
+| Confirmai.Services.Payment.EventPaymentReconciliationService | 136 | 44 | 180 | 294 | 75.5% | 33 | 48 | 68.7% |
+| Confirmai.Services.Payment.EventPaymentReconciliationSweepResult | 5 | 1 | 6 | 294 | 83.3% | 0 | 0 |  |
 | Confirmai.Services.Payment.EventPaymentReconciliationWorker | 9 | 21 | 30 | 66 | 30% | 1 | 6 | 16.6% |
-| Confirmai.Services.Payment.GatewayService | 47 | 0 | 47 | 93 | 100% | 14 | 14 | 100% |
-| Confirmai.Services.Payment.LimitedStream | 12 | 22 | 34 | 356 | 35.2% | 1 | 6 | 16.6% |
-| Confirmai.Services.Payment.PaymentConfirmationService | 45 | 3 | 48 | 96 | 93.7% | 19 | 24 | 79.1% |
+| Confirmai.Services.Payment.GatewayService | 47 | 0 | 47 | 86 | 100% | 14 | 14 | 100% |
+| Confirmai.Services.Payment.LimitedStream | 12 | 22 | 34 | 353 | 35.2% | 1 | 6 | 16.6% |
+| Confirmai.Services.Payment.PaymentConfirmationService | 45 | 3 | 48 | 95 | 93.7% | 19 | 24 | 79.1% |
 | Confirmai.Services.Payment.PaymentDomainMetrics | 40 | 0 | 40 | 101 | 100% | 24 | 24 | 100% |
 | Confirmai.Services.Payment.PaymentEventBus | 2 | 0 | 2 | 11 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Payment.PaymentInitializationService | 0 | 42 | 42 | 114 | 0% | 0 | 40 | 0% |
@@ -377,13 +377,13 @@
 | Confirmai.Services.User.CurrencyPreferenceService | 7 | 0 | 7 | 20 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.User.CustomClaimsPrincipalFactory | 5 | 0 | 5 | 31 | 100% | 0 | 0 |  |
 | Confirmai.Services.User.LanguagePreferenceService | 23 | 0 | 23 | 45 | 100% | 8 | 8 | 100% |
-| Confirmai.Services.User.UserService | 10 | 0 | 10 | 33 | 100% | 2 | 2 | 100% |
-| Confirmai.Services.Utility.IdentityEmailSender | 48 | 18 | 66 | 109 | 72.7% | 8 | 14 | 57.1% |
+| Confirmai.Services.User.UserService | 10 | 0 | 10 | 30 | 100% | 2 | 2 | 100% |
+| Confirmai.Services.Utility.IdentityEmailSender | 48 | 18 | 66 | 105 | 72.7% | 8 | 14 | 57.1% |
 | Confirmai.Services.Utility.LocalStorageStateHelpers | 34 | 0 | 34 | 74 | 100% | 23 | 26 | 88.4% |
 | Confirmai.Services.Utility.MailboxConversationArchiveService | 14 | 0 | 14 | 32 | 100% | 8 | 8 | 100% |
 | Confirmai.Services.Utility.PiiSanitizer | 13 | 2 | 15 | 157 | 86.6% | 6 | 6 | 100% |
-| Confirmai.Services.Utility.ProductService | 99 | 45 | 144 | 258 | 68.7% | 20 | 36 | 55.5% |
-| Confirmai.Services.Utility.TestnetBitcoinPaymentService | 49 | 18 | 67 | 134 | 73.1% | 16 | 24 | 66.6% |
+| Confirmai.Services.Utility.ProductService | 99 | 45 | 144 | 255 | 68.7% | 20 | 36 | 55.5% |
+| Confirmai.Services.Utility.TestnetBitcoinPaymentService | 49 | 18 | 67 | 132 | 73.1% | 16 | 24 | 66.6% |
 | Confirmai.Shared.Components.ActivePaymentMethodsWidget | 27 | 4 | 31 | 78 | 87% | 11 | 16 | 68.7% |
 | Confirmai.Shared.Components.Admin.AdminLogsFilterBar | 38 | 10 | 48 | 124 | 79.1% | 2 | 4 | 50% |
 | Confirmai.Shared.Components.Admin.AdminLogsQuickFilters | 25 | 0 | 25 | 68 | 100% | 3 | 4 | 75% |
@@ -414,7 +414,7 @@
 | Confirmai.Shared.Helpers.EventMinimums | 22 | 0 | 22 | 49 | 100% | 3 | 6 | 50% |
 | Confirmai.Shared.MainLayout | 105 | 35 | 140 | 370 | 75% | 48 | 70 | 68.5% |
 | Confirmai.Shared.RouteNotAuthorized | 8 | 0 | 8 | 30 | 100% | 5 | 6 | 83.3% |
-| Program | 353 | 166 | 519 | 670 | 68% | 36 | 84 | 42.8% |
+| Program | 353 | 166 | 519 | 673 | 68% | 36 | 84 | 42.8% |
 | System.Text.RegularExpressions.Generated | 258 | 32 | 290 | 816 | 88.9% | 121 | 150 | 80.6% |
 | System.Text.RegularExpressions.Generated.<RegexGenerator_g>FBE5D3F183809CBDAE41AF23BFC06E22EE1BD9C4D07898CEDDF9B7DCFD59724FE__BareEmailInJsonValueRegex_1 | 98 | 9 | 107 | 789 | 91.5% | 41 | 50 | 82% |
 | System.Text.RegularExpressions.Generated.<RegexGenerator_g>FBE5D3F183809CBDAE41AF23BFC06E22EE1BD9C4D07898CEDDF9B7DCFD59724FE__EmailInJsonValueByKeyRegex_0 | 154 | 23 | 177 | 522 | 87% | 80 | 100 | 80% |
