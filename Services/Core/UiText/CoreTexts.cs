@@ -118,6 +118,23 @@ internal static class CoreTexts
 
         ["Nav.Dashboard"] = "Panel",
         ["Common.Loading"] = "Cargando...",
+
+        // Breadcrumb
+        ["Breadcrumb.Home"] = "Inicio",
+        ["Breadcrumb.Admin"] = "Admin",
+        ["Breadcrumb.Users"] = "Usuarios",
+        ["Breadcrumb.Payments"] = "Pagos",
+        ["Breadcrumb.Logs"] = "Registros",
+        ["Breadcrumb.Edit"] = "Editar",
+        ["Breadcrumb.View"] = "Ver",
+        ["Breadcrumb.Buy"] = "Comprar",
+        ["Breadcrumb.Items"] = "Articulos",
+        ["Breadcrumb.Products"] = "Productos",
+        ["Breadcrumb.About"] = "Acerca de",
+        ["Breadcrumb.Contact"] = "Contacto",
+        ["Breadcrumb.Dashboard"] = "Panel",
+        ["Breadcrumb.Marketplace"] = "Mercado",
+        ["Breadcrumb.Languages"] = "Idiomas",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

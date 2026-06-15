@@ -12,54 +12,34 @@ public sealed class AdminUsersFilterState
     public int? Page { get; init; }
 }
 
-public class AdminUsersFilterStateService
+public class AdminUsersFilterStateService : AdminFilterStateServiceBase<AdminUsersFilterState>
 {
-    private readonly IJSRuntime _js;
+    public AdminUsersFilterStateService(IJSRuntime js) : base(js) { }
 
-    public AdminUsersFilterStateService(IJSRuntime js)
+    protected override async Task<AdminUsersFilterState> LoadCoreAsync()
     {
-        _js = js;
+        var userName = await LocalStorageStateHelpers.GetStringAsync(Js, AdminUsersStorageKeys.UserNameFilter);
+        var email = await LocalStorageStateHelpers.GetStringAsync(Js, AdminUsersStorageKeys.EmailFilter);
+        var role = await LocalStorageStateHelpers.GetStringAsync(Js, AdminUsersStorageKeys.RoleFilter);
+        var status = await LocalStorageStateHelpers.GetStringAsync(Js, AdminUsersStorageKeys.StatusFilter);
+        var page = await LocalStorageStateHelpers.GetPositiveIntAsync(Js, AdminUsersStorageKeys.Page);
+
+        return new AdminUsersFilterState
+        {
+            UserName = userName,
+            Email = email,
+            Role = role,
+            Status = status,
+            Page = page
+        };
     }
 
-    public async Task<AdminUsersFilterState> LoadAsync()
+    protected override async Task SaveCoreAsync(AdminUsersFilterState state)
     {
-        try
-        {
-            var userName = await LocalStorageStateHelpers.GetStringAsync(_js, AdminUsersStorageKeys.UserNameFilter);
-            var email = await LocalStorageStateHelpers.GetStringAsync(_js, AdminUsersStorageKeys.EmailFilter);
-            var role = await LocalStorageStateHelpers.GetStringAsync(_js, AdminUsersStorageKeys.RoleFilter);
-            var status = await LocalStorageStateHelpers.GetStringAsync(_js, AdminUsersStorageKeys.StatusFilter);
-            var page = await LocalStorageStateHelpers.GetPositiveIntAsync(_js, AdminUsersStorageKeys.Page);
-
-            return new AdminUsersFilterState
-            {
-                UserName = userName,
-                Email = email,
-                Role = role,
-                Status = status,
-                Page = page
-            };
-        }
-        catch
-        {
-            return new AdminUsersFilterState();
-        }
-    }
-
-    public async Task SaveAsync(AdminUsersFilterState state)
-    {
-        try
-        {
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminUsersStorageKeys.UserNameFilter, state.UserName);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminUsersStorageKeys.EmailFilter, state.Email);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminUsersStorageKeys.RoleFilter, state.Role);
-            await LocalStorageStateHelpers.SetStringAsync(_js, AdminUsersStorageKeys.StatusFilter, state.Status);
-            await LocalStorageStateHelpers.SetPageAsync(_js, AdminUsersStorageKeys.Page, state.Page);
-        }
-        catch
-        {
-            // No-op: ignore storage failures.
-        }
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminUsersStorageKeys.UserNameFilter, state.UserName);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminUsersStorageKeys.EmailFilter, state.Email);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminUsersStorageKeys.RoleFilter, state.Role);
+        await LocalStorageStateHelpers.SetStringAsync(Js, AdminUsersStorageKeys.StatusFilter, state.Status);
+        await LocalStorageStateHelpers.SetPageAsync(Js, AdminUsersStorageKeys.Page, state.Page);
     }
 }
-
