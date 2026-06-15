@@ -1,36 +1,37 @@
 @using System.Collections.Generic
+@using Confirmai.Pages.Admin
 
-<section class="admin-payments-summary-card" aria-label="Payment reconciliation dashboard">
+<section class="admin-payments-summary-card" aria-label="Painel de reconciliação de pagamentos">
     <div class="admin-payments-summary-grid">
         <div class="admin-payments-summary-item">
-            <span class="admin-payments-summary-label">Pending with chargeId</span>
+            <span class="admin-payments-summary-label">Pendente com chargeId</span>
             <strong class="admin-payments-summary-value">@PendingWithChargeId</strong>
         </div>
         <div class="admin-payments-summary-item">
-            <span class="admin-payments-summary-label">Pending without chargeId</span>
+            <span class="admin-payments-summary-label">Pendente sem chargeId</span>
             <strong class="admin-payments-summary-value">@PendingWithoutChargeId</strong>
         </div>
         <div class="admin-payments-summary-item">
-            <span class="admin-payments-summary-label">Stale pending (+30 min)</span>
+            <span class="admin-payments-summary-label">Pendente obsoleto (+30 min)</span>
             <strong class="admin-payments-summary-value">@StalePending</strong>
         </div>
         <div class="admin-payments-summary-item">
-            <span class="admin-payments-summary-label">Confirmations paid today</span>
+            <span class="admin-payments-summary-label">Confirmações pagas hoje</span>
             <strong class="admin-payments-summary-value">@PaidToday</strong>
         </div>
     </div>
     <div class="admin-payments-summary-actions">
         <button type="button" class="details-btn" disabled="@IsRunningSweep" @onclick="OnRunSweep">
-            @(IsRunningSweep ? "Checking pending..." : "Revalidate pending now")
+            @(IsRunningSweep ? "Verificando pendentes..." : "Revalidar pendentes agora")
         </button>
         <button type="button" class="details-btn" disabled="@IsRefreshing" @onclick="OnRefreshSummary">
-            @(IsRefreshing ? "Updating..." : "Refresh dashboard")
+            @(IsRefreshing ? "Atualizando..." : "Atualizar dashboard")
         </button>
         <button type="button" class="details-btn" @onclick="OnExportCsv">
-            Export reconciliation CSV
+            Exportar reconciliação CSV
         </button>
         <button type="button" class="details-btn" @onclick="OnOpenAdvancedTools">
-            Advanced tools
+            Ferramentas avançadas
         </button>
         <label class="admin-payments-auto-refresh-toggle">
             <input type="checkbox" @bind="AutoRefreshEnabled" />
@@ -38,47 +39,47 @@
         </label>
         @if (IsAutoRefreshPaused)
         {
-            <span class="admin-payments-auto-refresh-pill admin-payments-auto-refresh-pill--paused">Auto refresh paused (tab in background)</span>
+            <span class="admin-payments-auto-refresh-pill admin-payments-auto-refresh-pill--paused">Auto refresh pausado (aba em segundo plano)</span>
         }
-        <span class="admin-payments-summary-hint">Uses the same routine as automatic worker.</span>
+        <span class="admin-payments-summary-hint">Usa a mesma rotina do worker automático.</span>
         <span class="admin-payments-severity-pill @SeverityClass">Severity: @SeverityLabel</span>
     </div>
     <div class="admin-payments-summary-meta">
-        <span>Last dashboard update: @LastRefreshLabel</span>
+        <span>Última atualização do dashboard: @LastRefreshLabel</span>
         <span class="@LastRefreshAgeClass">
-            Not updated for: @LastRefreshAgeLabel
-            <span class="admin-payments-summary-age-hint" title="Alert when exceeding 2 auto-refresh cycles (60s)." aria-label="Staleness alert explanation">i</span>
+            Sem atualização há: @LastRefreshAgeLabel
+            <span class="admin-payments-summary-age-hint" title="Alerta quando excede 2 ciclos de auto-refresh (60s)." aria-label="Explicação do alerta de obsolescência">i</span>
         </span>
-        <span>Last pause by background tab: @LastAutoRefreshPauseLabel</span>
-        <span>Last automatic sweep: @LastAutomaticSweepLabel</span>
+        <span>Última pausa por aba em segundo plano: @LastAutoRefreshPauseLabel</span>
+        <span>Último sweep automático: @LastAutomaticSweepLabel</span>
         @if (!string.IsNullOrWhiteSpace(LastAutomaticSweepDetails))
         {
-            <span>Last sweep summary: @LastAutomaticSweepDetails</span>
+            <span>Resumo do último sweep: @LastAutomaticSweepDetails</span>
         }
-        <span>Last manual sweep: @LastManualSweepLabel</span>
+        <span>Último sweep manual: @LastManualSweepLabel</span>
         @if (!string.IsNullOrWhiteSpace(LastManualSweepDetails))
         {
-            <span>Last manual sweep summary: @LastManualSweepDetails</span>
+            <span>Resumo do último sweep manual: @LastManualSweepDetails</span>
         }
-        <span class="admin-payments-trend @(IsPendingTrendWarning ? "admin-payments-trend--warning" : "")">24h trend (pending in sweep): @PendingTrend24hLabel</span>
-        <a class="admin-payments-summary-link" href="@StalenessLogsHref">View staleness incidents in log</a>
-        <span>Pending by gateway: @PendingByGatewayLabel</span>
-        <span>Paid by gateway (total): @PaidByGatewayLabel</span>
+        <span class="admin-payments-trend @(IsPendingTrendWarning ? "admin-payments-trend--warning" : "")">Tendência 24h (pendentes no sweep): @PendingTrend24hLabel</span>
+        <a class="admin-payments-summary-link" href="@StalenessLogsHref">Ver incidentes de obsolescência no log</a>
+        <span>Pendentes por gateway: @PendingByGatewayLabel</span>
+        <span>Pagos por gateway (total): @PaidByGatewayLabel</span>
     </div>
 
     @if (GatewayTelemetry?.Count > 0)
     {
         <div class="admin-payments-gateway-telemetry">
-            <span class="admin-payments-gateway-telemetry-title">Gateway telemetry (reconciliation)</span>
+            <span class="admin-payments-gateway-telemetry-title">Telemetria por gateway (reconciliação)</span>
             <table class="admin-payments-gateway-telemetry-table">
                 <thead>
                     <tr>
                         <th>Gateway</th>
-                        <th>Pending</th>
-                        <th>Stale pending</th>
-                        <th>Paid (total)</th>
-                        <th>Pending share</th>
-                        <th>Severity</th>
+                        <th>Pendente</th>
+                        <th>Pendente obsoleto</th>
+                        <th>Pago (total)</th>
+                        <th>Share pendente</th>
+                        <th>Severidade</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,8 +104,8 @@
     @if (SweepHistory?.Count > 0)
     {
         <div class="admin-payments-sweep-history">
-            <span class="admin-payments-sweep-history-title">Last 5 automatic sweeps</span>
-            <div class="admin-payments-sparkline" role="img" aria-label="Trend of pending items in recent sweeps">
+            <span class="admin-payments-sweep-history-title">Últimos 5 sweeps automáticos</span>
+            <div class="admin-payments-sparkline" role="img" aria-label="Tendência de itens pendentes nos sweeps recentes">
                 @foreach (var point in SweepHistory!.AsEnumerable().Reverse())
                 {
                     var pointHeight = GetPendingHeightPercent(point);
@@ -151,18 +152,18 @@
     [Parameter] public string PaidByGatewayLabel { get; set; }
 
     // Timestamps
-    [Parameter] public string LastRefreshLabel { get; set; } = "Not yet updated.";
+    [Parameter] public string LastRefreshLabel { get; set; } = "Ainda não atualizado.";
     [Parameter] public string LastRefreshAgeLabel { get; set; } = "n/d";
     [Parameter] public string LastRefreshAgeClass { get; set; } = string.Empty;
-    [Parameter] public string LastAutoRefreshPauseLabel { get; set; } = "No pauses recorded.";
-    [Parameter] public string LastAutomaticSweepLabel { get; set; } = "No automatic sweep recorded.";
+    [Parameter] public string LastAutoRefreshPauseLabel { get; set; } = "Nenhuma pausa registrada.";
+    [Parameter] public string LastAutomaticSweepLabel { get; set; } = "Nenhum sweep automático registrado.";
     [Parameter] public string LastAutomaticSweepDetails { get; set; } = string.Empty;
-    [Parameter] public string LastManualSweepLabel { get; set; } = "No manual sweep recorded.";
+    [Parameter] public string LastManualSweepLabel { get; set; } = "Nenhum sweep manual registrado.";
     [Parameter] public string LastManualSweepDetails { get; set; } = string.Empty;
 
     // Collections (simplified for component interface)
-    [Parameter] public List<dynamic>? GatewayTelemetry { get; set; }
-    [Parameter] public List<dynamic>? SweepHistory { get; set; }
+    [Parameter] public List<AdminPayments.GatewayTelemetryItem>? GatewayTelemetry { get; set; }
+    [Parameter] public List<AdminPayments.SweepHistoryItem>? SweepHistory { get; set; }
 
     // Result messages
     [Parameter] public string SweepResultMessage { get; set; } = string.Empty;
@@ -176,18 +177,10 @@
     [Parameter] public EventCallback OnOpenAdvancedTools { get; set; }
     [Parameter] public EventCallback OnDismissSweepMessage { get; set; }
 
-    private int GetPendingHeightPercent(dynamic item)
+    private int GetPendingHeightPercent(AdminPayments.SweepHistoryItem item)
     {
-        try
-        {
-            int stillPending = item.StillPending;
-            int max = 50;
-            var height = Math.Max(12m, ((decimal)stillPending / max) * 100m);
-            return (int)Math.Round(height, 0, MidpointRounding.AwayFromZero);
-        }
-        catch
-        {
-            return 25;
-        }
+        int max = 50;
+        var height = Math.Max(12m, ((decimal)item.StillPending / max) * 100m);
+        return (int)Math.Round(height, 0, MidpointRounding.AwayFromZero);
     }
 }

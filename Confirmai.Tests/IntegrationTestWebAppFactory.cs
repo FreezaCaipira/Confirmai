@@ -98,7 +98,7 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
     /// <summary>
     /// Ensures the LuaDeliveryEnabled feature flag is set to "true" for tests
     /// that exercise the /api/v1/server/trades/* endpoints. Safe to call
-    /// multiple times — it inserts the row only when missing.
+    /// multiple times ï¿½ it inserts the row only when missing.
     /// </summary>
     public async Task EnsureLuaDeliveryEnabledAsync()
     {
@@ -165,6 +165,10 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
                 services.Remove(dbContextDescriptor);
 
             services.AddDbContext<AppDbContext>(options =>
+                options.UseInMemoryDatabase(_databaseName));
+
+            services.RemoveAll<IDbContextFactory<AppDbContext>>();
+            services.AddDbContextFactory<AppDbContext>(options =>
                 options.UseInMemoryDatabase(_databaseName));
 
             services.RemoveAll<BitcoinQuoteService>();

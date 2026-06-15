@@ -828,14 +828,14 @@
         return Math.Round(height, 2, MidpointRounding.AwayFromZero);
     }
 
-    private sealed record SweepHistoryItem(
+    public sealed record SweepHistoryItem(
         string TimestampLabel,
         int Considered,
         int Updated,
         int StillPending,
         int NotFound);
 
-    private sealed record GatewayTelemetryItem(
+    public sealed record GatewayTelemetryItem(
         string Gateway,
         int Pending,
         int StalePending,
