@@ -34,7 +34,7 @@ public class AppInitializationServiceTests
 
         await service.SeedAsync();
 
-        Assert.Contains(loggerProvider.Messages, m => m.Contains("Usuário admin seed criado"));
+        Assert.Contains(loggerProvider.Messages, m => m.Contains("UsuÃ¡rio admin seed criado"));
         Assert.Contains(loggerProvider.Messages, m => m.Contains("promovido a admin"));
     }
 

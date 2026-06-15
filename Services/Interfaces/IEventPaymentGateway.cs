@@ -1,4 +1,4 @@
-namespace Confirmai.Services;
+namespace Confirmai.Services.Interfaces;
 
 public sealed record EventPaymentChargeResult(string ChargeId, string BrCode);
 

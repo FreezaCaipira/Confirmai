@@ -5,105 +5,101 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 
-namespace Confirmai.Services.Utility
+namespace Confirmai.Services.Utility;
+
+public class IdentityEmailSender : IEmailSender
 {
-    public class IdentityEmailSender : IEmailSender
+    private readonly ILogger<IdentityEmailSender> _logger;
+    private readonly EmailOptions _options;
+    private readonly IWebHostEnvironment _environment;
+
+    public IdentityEmailSender(
+        ILogger<IdentityEmailSender> logger,
+        IOptions<EmailOptions> options,
+        IWebHostEnvironment environment)
     {
-        private readonly ILogger<IdentityEmailSender> _logger;
-        private readonly EmailOptions _options;
-        private readonly IWebHostEnvironment _environment;
+        _logger = logger;
+        _options = options.Value;
+        _environment = environment;
+    }
 
-        public IdentityEmailSender(
-            ILogger<IdentityEmailSender> logger,
-            IOptions<EmailOptions> options,
-            IWebHostEnvironment environment)
+    public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+    {
+        if (!IsSmtpEnabled())
         {
-            _logger = logger;
-            _options = options.Value;
-            _environment = environment;
+            await PersistFallbackEmailAsync(email, subject, htmlMessage);
+            _logger.LogInformation("Identity email (fallback log) -> To: {Email} | Subject: {Subject} | Body: {Body}", email, subject, htmlMessage);
+            return;
         }
 
-        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+        using var message = new MailMessage
         {
-            if (!IsSmtpEnabled())
-            {
-                await PersistFallbackEmailAsync(email, subject, htmlMessage);
-                _logger.LogInformation("Identity email (fallback log) -> To: {Email} | Subject: {Subject} | Body: {Body}", email, subject, htmlMessage);
-                return;
-            }
+            From = new MailAddress(_options.FromEmail, _options.FromName),
+            Subject = subject,
+            Body = htmlMessage,
+            IsBodyHtml = true
+        };
+        message.To.Add(email);
 
-            using var message = new MailMessage
-            {
-                From = new MailAddress(_options.FromEmail, _options.FromName),
-                Subject = subject,
-                Body = htmlMessage,
-                IsBodyHtml = true
-            };
-            message.To.Add(email);
+        using var client = new SmtpClient(_options.Host, _options.Port)
+        {
+            EnableSsl = _options.UseSsl,
+            Credentials = new NetworkCredential(_options.Username, _options.Password)
+        };
 
-            using var client = new SmtpClient(_options.Host, _options.Port)
-            {
-                EnableSsl = _options.UseSsl,
-                Credentials = new NetworkCredential(_options.Username, _options.Password)
-            };
+        await client.SendMailAsync(message);
+        _logger.LogInformation("Identity email sent via SMTP to {Email}.", email);
+    }
 
-            await client.SendMailAsync(message);
-            _logger.LogInformation("Identity email sent via SMTP to {Email}.", email);
+    private bool IsSmtpEnabled()
+    {
+        return _options.Enabled
+            && !string.IsNullOrWhiteSpace(_options.Host)
+            && !string.IsNullOrWhiteSpace(_options.FromEmail)
+            && !string.IsNullOrWhiteSpace(_options.Username)
+            && !string.IsNullOrWhiteSpace(_options.Password)
+            && _options.Port > 0;
+    }
+
+    private async Task PersistFallbackEmailAsync(string email, string subject, string htmlMessage)
+    {
+        try
+        {
+            var root = string.IsNullOrWhiteSpace(_environment.WebRootPath)
+                ? AppContext.BaseDirectory
+                : _environment.WebRootPath;
+
+            var fallbackDirectory = Path.Combine(root, "uploads", "dev-emails");
+            Directory.CreateDirectory(fallbackDirectory);
+
+            var fileName = $"{DateTime.UtcNow:yyyyMMdd_HHmmss}_{Guid.NewGuid():N}.html";
+            var filePath = Path.Combine(fallbackDirectory, fileName);
+            var textFilePath = Path.Combine(fallbackDirectory, Path.GetFileNameWithoutExtension(fileName) + ".txt");
+
+            var body = new StringBuilder();
+            body.AppendLine("<html><body style='font-family:Segoe UI,Arial,sans-serif'>");
+            body.AppendLine("<h2>Identity fallback email</h2>");
+            body.AppendLine($"<p><b>To:</b> {WebUtility.HtmlEncode(email)}</p>");
+            body.AppendLine($"<p><b>Subject:</b> {WebUtility.HtmlEncode(subject)}</p>");
+            body.AppendLine($"<p><b>Generated (UTC):</b> {DateTime.UtcNow:O}</p>");
+            body.AppendLine("<hr />");
+            body.AppendLine(htmlMessage);
+            body.AppendLine("</body></html>");
+
+            await File.WriteAllTextAsync(filePath, body.ToString(), Encoding.UTF8);
+            var textBody = new StringBuilder();
+            textBody.AppendLine("Identity fallback email");
+            textBody.AppendLine($"To: {email}");
+            textBody.AppendLine($"Subject: {subject}");
+            textBody.AppendLine($"Generated (UTC): {DateTime.UtcNow:O}");
+            textBody.AppendLine("----------------------------------------");
+            textBody.AppendLine(htmlMessage);
+            await File.WriteAllTextAsync(textFilePath, textBody.ToString(), Encoding.UTF8);
+            _logger.LogInformation("Identity fallback email persisted at {FallbackPath}", filePath);
         }
-
-        private bool IsSmtpEnabled()
+        catch (Exception ex)
         {
-            return _options.Enabled
-                && !string.IsNullOrWhiteSpace(_options.Host)
-                && !string.IsNullOrWhiteSpace(_options.FromEmail)
-                && !string.IsNullOrWhiteSpace(_options.Username)
-                && !string.IsNullOrWhiteSpace(_options.Password)
-                && _options.Port > 0;
-        }
-
-        private async Task PersistFallbackEmailAsync(string email, string subject, string htmlMessage)
-        {
-            try
-            {
-                var root = string.IsNullOrWhiteSpace(_environment.WebRootPath)
-                    ? AppContext.BaseDirectory
-                    : _environment.WebRootPath;
-
-                var fallbackDirectory = Path.Combine(root, "uploads", "dev-emails");
-                Directory.CreateDirectory(fallbackDirectory);
-
-                var fileName = $"{DateTime.UtcNow:yyyyMMdd_HHmmss}_{Guid.NewGuid():N}.html";
-                var filePath = Path.Combine(fallbackDirectory, fileName);
-                var textFilePath = Path.Combine(fallbackDirectory, Path.GetFileNameWithoutExtension(fileName) + ".txt");
-
-                var body = new StringBuilder();
-                body.AppendLine("<html><body style='font-family:Segoe UI,Arial,sans-serif'>");
-                body.AppendLine("<h2>Identity fallback email</h2>");
-                body.AppendLine($"<p><b>To:</b> {WebUtility.HtmlEncode(email)}</p>");
-                body.AppendLine($"<p><b>Subject:</b> {WebUtility.HtmlEncode(subject)}</p>");
-                body.AppendLine($"<p><b>Generated (UTC):</b> {DateTime.UtcNow:O}</p>");
-                body.AppendLine("<hr />");
-                body.AppendLine(htmlMessage);
-                body.AppendLine("</body></html>");
-
-                await File.WriteAllTextAsync(filePath, body.ToString(), Encoding.UTF8);
-                var textBody = new StringBuilder();
-                textBody.AppendLine("Identity fallback email");
-                textBody.AppendLine($"To: {email}");
-                textBody.AppendLine($"Subject: {subject}");
-                textBody.AppendLine($"Generated (UTC): {DateTime.UtcNow:O}");
-                textBody.AppendLine("----------------------------------------");
-                textBody.AppendLine(htmlMessage);
-                await File.WriteAllTextAsync(textFilePath, textBody.ToString(), Encoding.UTF8);
-                _logger.LogInformation("Identity fallback email persisted at {FallbackPath}", filePath);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to persist fallback identity email.");
-            }
+            _logger.LogWarning(ex, "Failed to persist fallback identity email.");
         }
     }
 }
-
-
-
