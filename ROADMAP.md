@@ -9,7 +9,7 @@
 | Páginas Blazor | ~97 |
 | Componentes compartilhados | 28 |
 | Serviços | 78 (organizados em 10 domínios) |
-| Testes (xUnit) | 551 passando / 24 falhando / 575 total |
+| Testes (xUnit) | 641 passando / 0 falhando / 641 total |
 | CSS scoped | 56 arquivos |
 | CSS globais | 4 arquivos |
 | StateHasChanged() | 13 chamadas em 7 arquivos |
@@ -65,6 +65,10 @@
 - [x] IAsyncDisposable implementado em 8 páginas críticas
 - [x] CSS Scoped Isolation corrigido (Phase 18): sub-componentes com `.razor.css` próprio
 - [x] CI com build + test + coverage (Coverlet → badge)
+- [x] Documentação consolidada: 22 .md → 3 centrais (README, ROADMAP, CONTRIBUTING) + docs operacionais
+- [x] 24 testes corrigidos (encoding UTF-8, chaves UiText, wiring de componentes, assertions)
+- [x] AdminPayments sub-componentes com _Imports.razor e parâmetros tipados
+- [x] IDbContextFactory registrado no test factory para cobertura completa
 
 ### UX
 - [x] Grupos como tela inicial (`/`), Explorar em `/jogos`
@@ -89,9 +93,16 @@
 - [ ] Testar fluxo Pix completo em produção (EfiBank)
 - [ ] Ativar webhook AbacatePay em produção
 - [ ] Implantar alertas reais e validar escalonamento fim a fim
-- [ ] Investigar 24 testes falhando (BtcUsdFormatter, integration tests, protected pages)
+- [x] ~~Investigar 24 testes falhando~~ → Corrigido (PR #7)
 
-### P1 — UX de Grupos Privados
+### P1 — Decomposição de Componentes Grandes
+- [ ] `Groups/Detail.razor` (947 linhas) — extrair sub-componentes
+- [ ] `Futsal/Detail.razor` (933 linhas) — extrair sub-componentes
+- [ ] `AdminLogs.razor` (695 linhas) — decompor
+- [ ] `Mailbox.razor` (674 linhas) — já tem Components/, mas página raiz grande
+- [ ] `Poker/Detail.razor` (628 linhas) — decompor
+
+### P2 — UX de Grupos Privados
 - [ ] Atalhos de aprovação/rejeição direta para admins
 - [ ] Filtros e contexto visual para decisões de triagem
 - [ ] `VenueManager/VenueEdit.razor`: aplicar melhoria UF/IBGE do admin
@@ -107,8 +118,9 @@
 - [ ] Ajustes de UX responsiva e acessibilidade AA
 
 ### P3 — Qualidade de Código
-- [ ] Refatorar componentes grandes: AdminPayments, Groups/Detail
+- [ ] Eliminar ~20+ inline styles estáticos (Groups/Join, Groups/Index, Groups/Detail, Index)
 - [ ] UiTextService Phase 2: completar EN-US/ES-ES, criar AuthTexts restantes
+- [ ] Expandir cobertura scoped CSS (42 de 97 páginas têm `.razor.css`, faltam 55)
 - [ ] Consolidar CSS duplicado em utility classes / design tokens adicionais
 - [ ] Aumentar cobertura de testes → meta 80%+
 
