@@ -335,7 +335,8 @@ public class BtcPayWebhookServiceTests
 
         var config = TestConfigurationFactory.Create(configEntries);
 
-        var logService = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"btcpay-webhook-{Guid.NewGuid()}");
+        var logService = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         hubContext ??= SignalRTestFactory.CreateHubContext();
         eventBus ??= new PaymentEventBus();

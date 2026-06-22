@@ -81,7 +81,8 @@ public class AbacatePayWebhookServiceTests
             WebhookSecret = webhookSecret
         });
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"abacate-webhook-{Guid.NewGuid()}");
+        var logService = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var paymentMarker = new WebhookPaymentMarker(db, logService, new PaymentEventBus());
 
         return new AbacatePayWebhookService(logService, options, paymentMarker);

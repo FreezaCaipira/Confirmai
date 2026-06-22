@@ -128,20 +128,18 @@ public class PiiSanitizerTests
 
     // --- Integration: LogService masks emails in AuditAsync metadata ----------
 
-    private static AppDbContext CreateDbContext()
+    private static IDbContextFactory<AppDbContext> CreateDbContextFactory()
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase($"pii-test-{Guid.NewGuid()}")
-            .Options;
-        return new AppDbContext(options);
+        return TestDbContextFactory.CreateInMemoryFactory($"pii-test-{Guid.NewGuid()}");
     }
 
     [Fact]
     public async Task LogService_AuditAsync_MasksEmailInMetadataJson()
     {
-        await using var db = CreateDbContext();
+        var dbFactory = CreateDbContextFactory();
+        await using var db = dbFactory.CreateDbContext();
         var service = new LogService(
-            db,
+            dbFactory,
             Microsoft.Extensions.Logging.Abstractions.NullLogger<LogService>.Instance);
 
         await service.AuditAsync(
@@ -161,9 +159,10 @@ public class PiiSanitizerTests
     [Fact]
     public async Task LogService_AuditAsync_MetadataWithoutEmail_IsUnchanged()
     {
-        await using var db = CreateDbContext();
+        var dbFactory = CreateDbContextFactory();
+        await using var db = dbFactory.CreateDbContext();
         var service = new LogService(
-            db,
+            dbFactory,
             Microsoft.Extensions.Logging.Abstractions.NullLogger<LogService>.Instance);
 
         await service.AuditAsync(

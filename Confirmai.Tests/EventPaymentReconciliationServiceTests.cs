@@ -34,7 +34,8 @@ public class EventPaymentReconciliationServiceTests
 
         var gateway = new FakeEventPaymentGateway("FakeGateway", paidChargeId: "charge-1");
         var gatewayFactory = new EventPaymentGatewayFactory(new[] { gateway }, new GatewayService(factory));
-        var service = new EventPaymentReconciliationService(factory, gatewayFactory, new LogService(db, NullLogger<LogService>.Instance));
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"reconciliation-{Guid.NewGuid()}");
+        var service = new EventPaymentReconciliationService(factory, gatewayFactory, new LogService(dbFactory, NullLogger<LogService>.Instance));
 
         var result = await service.ReconcileByChargeIdAsync("charge-1", actorUserId: "admin-1");
 
@@ -68,7 +69,8 @@ public class EventPaymentReconciliationServiceTests
 
         var gateway = new FakeEventPaymentGateway("FakeGateway", paidChargeId: null);
         var gatewayFactory = new EventPaymentGatewayFactory(new[] { gateway }, new GatewayService(factory));
-        var service = new EventPaymentReconciliationService(factory, gatewayFactory, new LogService(db, NullLogger<LogService>.Instance));
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"reconciliation-{Guid.NewGuid()}");
+        var service = new EventPaymentReconciliationService(factory, gatewayFactory, new LogService(dbFactory, NullLogger<LogService>.Instance));
 
         var result = await service.ReconcileByChargeIdAsync("charge-2", actorUserId: "admin-1");
 
@@ -109,7 +111,8 @@ public class EventPaymentReconciliationServiceTests
 
         var gateway = new FakeEventPaymentGateway("FakeGateway", paidChargeId: "charge-1");
         var gatewayFactory = new EventPaymentGatewayFactory(new[] { gateway }, new GatewayService(factory));
-        var service = new EventPaymentReconciliationService(factory, gatewayFactory, new LogService(db, NullLogger<LogService>.Instance));
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"reconciliation-{Guid.NewGuid()}");
+        var service = new EventPaymentReconciliationService(factory, gatewayFactory, new LogService(dbFactory, NullLogger<LogService>.Instance));
 
         var result = await service.ReconcilePendingConfirmationsAsync();
 
@@ -146,7 +149,8 @@ public class EventPaymentReconciliationServiceTests
 
         var gateway = new FakeEventPaymentGateway("FakeGateway", paidChargeId: "charge-refunded");
         var gatewayFactory = new EventPaymentGatewayFactory(new[] { gateway }, new GatewayService(factory));
-        var service = new EventPaymentReconciliationService(factory, gatewayFactory, new LogService(db, NullLogger<LogService>.Instance));
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"reconciliation-{Guid.NewGuid()}");
+        var service = new EventPaymentReconciliationService(factory, gatewayFactory, new LogService(dbFactory, NullLogger<LogService>.Instance));
 
         var result = await service.ReconcileByChargeIdAsync("charge-refunded", actorUserId: "admin-1");
 
@@ -225,7 +229,8 @@ public class EventPaymentReconciliationServiceTests
     {
         var gateway     = new FakeEventPaymentGateway("FakeGateway", paidChargeId: null);
         var gwFactory   = new EventPaymentGatewayFactory(new[] { gateway }, new GatewayService(factory));
-        var log         = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory   = TestDbContextFactory.CreateInMemoryFactory($"reconciliation-{Guid.NewGuid()}");
+        var log         = new LogService(dbFactory, NullLogger<LogService>.Instance);
         return new EventPaymentReconciliationService(factory, gwFactory, log);
     }
 

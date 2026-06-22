@@ -20,7 +20,7 @@ public class AdminSecurityPolicyServiceTests
     public async Task GetRuntimePolicyAsync_ReturnsEnvironmentDefaults_WhenSettingsDoNotExist()
     {
         await using var db = CreateDbContext();
-        var service = CreateService(db, isDevelopment: false);
+        var (service, _) = CreateService(db, isDevelopment: false);
 
         var policy = await service.GetRuntimePolicyAsync();
 
@@ -39,7 +39,7 @@ public class AdminSecurityPolicyServiceTests
             new AppSetting { Key = AdminSecurityPolicyService.LockoutMinutesKey, Value = "25" });
         await db.SaveChangesAsync();
 
-        var service = CreateService(db, isDevelopment: false);
+        var (service, _) = CreateService(db, isDevelopment: false);
         var policy = await service.GetRuntimePolicyAsync();
 
         Assert.False(policy.RequireConfirmedEmail);
@@ -51,7 +51,7 @@ public class AdminSecurityPolicyServiceTests
     public async Task SetRuntimePolicyForAdminAsync_Throws_WhenUserIsNotAdmin()
     {
         await using var db = CreateDbContext();
-        var service = CreateService(db, isDevelopment: false);
+        var (service, _) = CreateService(db, isDevelopment: false);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
             service.SetRuntimePolicyForAdminAsync(CreatePrincipal("u-1", "user"), new RuntimeSecurityPolicy(false, 3, 15)));
@@ -64,7 +64,7 @@ public class AdminSecurityPolicyServiceTests
         // Seed RequireConfirmedEmail = true so the audit log shows True -> False
         db.AppSettings.Add(new AppSetting { Key = AdminSecurityPolicyService.RequireConfirmedEmailKey, Value = "true" });
         await db.SaveChangesAsync();
-        var service = CreateService(db, isDevelopment: false);
+        var (service, dbFactory) = CreateService(db, isDevelopment: false);
 
         var saved = await service.SetRuntimePolicyForAdminAsync(CreatePrincipal("a-1", "admin"), new RuntimeSecurityPolicy(false, 2, 30));
         var policy = await service.GetRuntimePolicyAsync();
@@ -74,7 +74,8 @@ public class AdminSecurityPolicyServiceTests
         Assert.Equal(2, policy.LockoutMaxFailedAccessAttempts);
         Assert.Equal(30, policy.LockoutMinutes);
 
-        var auditLog = await db.Logs
+        await using var logDb = dbFactory.CreateDbContext();
+        var auditLog = await logDb.Logs
             .OrderByDescending(x => x.Id)
             .FirstOrDefaultAsync();
 
@@ -104,12 +105,14 @@ public class AdminSecurityPolicyServiceTests
         return env.Object;
     }
 
-    private static AdminSecurityPolicyService CreateService(AppDbContext db, bool isDevelopment)
+    private static (AdminSecurityPolicyService service, IDbContextFactory<AppDbContext> dbFactory) CreateService(AppDbContext db, bool isDevelopment)
     {
-        return new AdminSecurityPolicyService(
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"admin-security-{Guid.NewGuid()}");
+        var service = new AdminSecurityPolicyService(
             db,
             CreateEnvironment(isDevelopment),
-            new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance));
+            new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance));
+        return (service, dbFactory);
     }
 
     private static ClaimsPrincipal CreatePrincipal(string userId, params string[] roles)

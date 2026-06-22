@@ -132,7 +132,8 @@ public class AdminPaymentsModalTests
         await db.SaveChangesAsync();
         var confirmationId = conf.Id;
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"admin-payments-{Guid.NewGuid()}");
+        var logService = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var adminService = new AdminConfirmationService(factory, logService);
         var adminId = "admin-user";
 

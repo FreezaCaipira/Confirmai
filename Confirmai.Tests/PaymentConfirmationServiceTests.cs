@@ -81,7 +81,8 @@ public class PaymentConfirmationServiceTests
     private static PaymentConfirmationService CreateConfirmationService(AppDbContext db, IBitcoinPaymentService paymentService)
     {
         var factory = new BitcoinPaymentFactory(new[] { paymentService });
-        var logService = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"payment-confirmation-{Guid.NewGuid()}");
+        var logService = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
         var hubContext = SignalRTestFactory.CreateHubContext();
         var eventBus = new PaymentEventBus();
         return new PaymentConfirmationService(db, factory, logService, hubContext, eventBus);

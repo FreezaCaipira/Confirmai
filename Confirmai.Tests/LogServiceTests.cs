@@ -15,8 +15,8 @@ public class LogServiceTests
     [Fact]
     public async Task LogAsync_PersistsLogEntry_WithProvidedValues()
     {
-        await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = CreateDbContextFactory();
+        var service = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         await service.LogAsync(
             message: "payment started",
@@ -24,6 +24,7 @@ public class LogServiceTests
             level: "Warning",
             userId: "user-42");
 
+        await using var db = dbFactory.CreateDbContext();
         var saved = Assert.Single(db.Logs);
         Assert.Equal("payment started", saved.Message);
         Assert.Equal("Payment", saved.Source);
@@ -35,33 +36,30 @@ public class LogServiceTests
     [Fact]
     public async Task LogAsync_PersistsExceptionText_WhenExceptionIsProvided()
     {
-        await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = CreateDbContextFactory();
+        var service = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         var ex = new InvalidOperationException("boom");
 
         await service.LogAsync(message: "failed", ex: ex);
 
+        await using var db = dbFactory.CreateDbContext();
         var saved = Assert.Single(db.Logs);
         Assert.NotNull(saved.Exception);
         Assert.Contains("InvalidOperationException", saved.Exception, StringComparison.Ordinal);
         Assert.Contains("boom", saved.Exception, StringComparison.Ordinal);
     }
 
-    private static AppDbContext CreateDbContext()
+    private static IDbContextFactory<AppDbContext> CreateDbContextFactory()
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase($"log-service-tests-{Guid.NewGuid()}")
-            .Options;
-
-        return new AppDbContext(options);
+        return TestDbContextFactory.CreateInMemoryFactory($"log-service-tests-{Guid.NewGuid()}");
     }
 
     [Fact]
     public async Task AuditAsync_PersistsStructuredAuditFields()
     {
-        await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = CreateDbContextFactory();
+        var service = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         await service.AuditAsync(
             eventType: AuditEvents.PaymentConfirmed,
@@ -72,6 +70,7 @@ public class LogServiceTests
             source: AdminAuditSources.Payments,
             metadata: new { PaymentId = 123, Amount = 0.05m, BuyerId = "buyer-7", SellerId = "seller-9" });
 
+        await using var db = dbFactory.CreateDbContext();
         var saved = Assert.Single(db.Logs);
         Assert.Equal(AuditEvents.PaymentConfirmed, saved.EventType);
         Assert.Equal(AuditEntities.Payment, saved.EntityType);
@@ -86,8 +85,8 @@ public class LogServiceTests
     [Fact]
     public async Task AuditAsync_KeepsLegacyFieldsBackwardCompatible()
     {
-        await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = CreateDbContextFactory();
+        var service = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         await service.AuditAsync(
             eventType: AuditEvents.UserLoginFailed,
@@ -96,11 +95,11 @@ public class LogServiceTests
             message: "Bad password",
             level: "Warning");
 
+        await using var db = dbFactory.CreateDbContext();
         var saved = Assert.Single(db.Logs);
         Assert.Equal("Warning", saved.Level);
         Assert.Null(saved.MetadataJson); // no metadata supplied
         Assert.Null(saved.IpAddress);     // no HttpContext in this unit test
     }
 }
-
 

@@ -28,7 +28,8 @@ public class EventConfirmationPaymentStatusServiceTests
         });
         await db.SaveChangesAsync();
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = factory;
+        var logService = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var service = new EventConfirmationPaymentStatusService(factory, logService);
 
         var result = await service.TransitionStatusAsync(1, EventConfirmationPaymentStatus.Refunded, "admin-1", "cliente solicitou estorno");
@@ -62,7 +63,8 @@ public class EventConfirmationPaymentStatusServiceTests
         });
         await db.SaveChangesAsync();
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = factory;
+        var logService = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var service = new EventConfirmationPaymentStatusService(factory, logService);
 
         var result = await service.TransitionStatusAsync(1, EventConfirmationPaymentStatus.Refunded, "admin-1", "sem pagamento");
@@ -89,7 +91,8 @@ public class EventConfirmationPaymentStatusServiceTests
         });
         await db.SaveChangesAsync();
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = factory;
+        var logService = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var service = new EventConfirmationPaymentStatusService(factory, logService);
 
         var result = await service.TransitionStatusAsync(1, EventConfirmationPaymentStatus.Pending, "admin-1", "tentativa de retentativa");

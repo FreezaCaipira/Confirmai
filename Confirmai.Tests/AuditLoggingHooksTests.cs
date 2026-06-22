@@ -26,8 +26,9 @@ public class AuditLoggingHooksTests
     [Fact]
     public async Task ProductService_AddAsync_WritesProductCreatedAudit()
     {
-        await using var db = TestDataFactory.CreateDbContext();
-        var log = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"audit-hooks-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var log = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var service = new ProductService(db, CreateEnvironment(), log);
 
         var product = new Product
@@ -53,8 +54,9 @@ public class AuditLoggingHooksTests
     [Fact]
     public async Task ProductService_UpdateAsync_WritesProductUpdatedAudit()
     {
-        await using var db = TestDataFactory.CreateDbContext();
-        var log = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"audit-hooks-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var log = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var service = new ProductService(db, CreateEnvironment(), log);
 
         var product = new Product
@@ -82,8 +84,9 @@ public class AuditLoggingHooksTests
     [Fact]
     public async Task ProductService_DeleteAsync_WritesProductDeletedAudit_WhenNoOrders()
     {
-        await using var db = TestDataFactory.CreateDbContext();
-        var log = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"audit-hooks-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var log = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var service = new ProductService(db, CreateEnvironment(), log);
 
         var product = new Product
@@ -110,8 +113,9 @@ public class AuditLoggingHooksTests
     [Fact]
     public async Task LogService_AuditAsync_DoesNotPersistMetadata_WhenMetadataIsNull()
     {
-        await using var db = TestDataFactory.CreateDbContext();
-        var log = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"audit-hooks-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var log = new LogService(dbFactory, NullLogger<LogService>.Instance);
 
         await log.AuditAsync(
             AuditEvents.UserLockedOut,
@@ -132,8 +136,9 @@ public class AuditLoggingHooksTests
     [Fact]
     public async Task LogService_AuditAsync_PersistsExceptionDetails_WhenProvided()
     {
-        await using var db = TestDataFactory.CreateDbContext();
-        var log = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"audit-hooks-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var log = new LogService(dbFactory, NullLogger<LogService>.Instance);
 
         await log.AuditAsync(
             AuditEvents.PaymentInvalid,
@@ -161,8 +166,9 @@ public class AuditLoggingHooksTests
     [Fact]
     public async Task AdminSettingsService_SetOperationFeePercentAsync_WritesAdminSettingChangedAudit()
     {
-        await using var db = TestDataFactory.CreateDbContext();
-        var log = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"audit-hooks-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var log = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var service = new AdminSettingsService(db, log);
 
         var result = await service.SetOperationFeePercentAsync(3.5m, actorUserId: "admin-1");
@@ -178,8 +184,9 @@ public class AuditLoggingHooksTests
     [Fact]
     public async Task AdminSettingsService_SetSiteIntermediaryPixKeyAsync_WritesAdminSettingChangedAudit()
     {
-        await using var db = TestDataFactory.CreateDbContext();
-        var log = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"audit-hooks-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var log = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var service = new AdminSettingsService(db, log);
 
         var result = await service.SetSiteIntermediaryPixKeyAsync("pix@example.com", actorUserId: "admin-2");
@@ -194,8 +201,9 @@ public class AuditLoggingHooksTests
     [Fact]
     public async Task AdminSettingsService_SetLuaDeliveryEnabledAsync_WritesAdminSettingChangedAudit()
     {
-        await using var db = TestDataFactory.CreateDbContext();
-        var log = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"audit-hooks-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var log = new LogService(dbFactory, NullLogger<LogService>.Instance);
         var service = new AdminSettingsService(db, log);
 
         await service.SetLuaDeliveryEnabledAsync(true, actorUserId: "admin-3");

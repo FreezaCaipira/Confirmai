@@ -66,8 +66,9 @@ public class TestnetBitcoinPaymentServiceTests
     public async Task CheckAndMarkPaymentAsync_MarksAsPaid()
     {
         using var db = TestDataFactory.CreateDbContext();
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"testnet-bitcoin-{Guid.NewGuid()}");
         var service = new TestnetBitcoinPaymentService(new StubHttpClientFactory(_ => HttpTestResponses.Json("{}")));
-        var log = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var log = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         var payment = TestDataFactory.SeedPayment(db, isPaid: false, amount: 0.00003m, method: "Testnet", paymentId: "pay-testnet-1", address: "tb1qaddress");
 
@@ -84,8 +85,9 @@ public class TestnetBitcoinPaymentServiceTests
     public async Task CheckAndMarkPaymentAsync_WhenAlreadyPaid_ReturnsTrue()
     {
         using var db = TestDataFactory.CreateDbContext();
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"testnet-bitcoin-{Guid.NewGuid()}");
         var service = new TestnetBitcoinPaymentService(new StubHttpClientFactory(_ => HttpTestResponses.Json("{}")));
-        var log = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var log = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         var payment = TestDataFactory.SeedPayment(db, isPaid: true, amount: 0.00003m, method: "Testnet", paymentId: "pay-testnet-2", address: "tb1qaddress");
 
