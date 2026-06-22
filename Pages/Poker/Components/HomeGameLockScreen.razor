@@ -1,0 +1,34 @@
+<div class="homegame-lock-block">
+    <div class="homegame-lock-icon"><i class="fas fa-lock"></i></div>
+    <p class="homegame-lock-text">
+        Os detalhes deste Home Game são privados.<br />
+        Digite o código de acesso para ver mais informações.
+    </p>
+    <div class="homegame-code-row">
+        <input type="text"
+               class="homegame-code-input @(CodeWrong ? "homegame-code-input--error" : "")"
+               placeholder="XK7-492"
+               maxlength="7"
+               value="@CodeInput"
+               @oninput="HandleCodeInput"
+               @onkeydown="OnCodeKeyDown" />
+        <button class="homegame-enter-btn" @onclick="OnTryUnlock">Entrar</button>
+    </div>
+    @if (CodeWrong)
+    {
+        <p class="homegame-code-error">Código incorreto. Verifique com o organizador.</p>
+    }
+</div>
+
+@code {
+    [Parameter] public string CodeInput { get; set; } = string.Empty;
+    [Parameter] public bool CodeWrong { get; set; }
+    [Parameter] public EventCallback<string> OnCodeInputChange { get; set; }
+    [Parameter] public EventCallback<KeyboardEventArgs> OnCodeKeyDown { get; set; }
+    [Parameter] public EventCallback OnTryUnlock { get; set; }
+
+    private void HandleCodeInput(ChangeEventArgs e)
+    {
+        OnCodeInputChange.InvokeAsync(e.Value?.ToString() ?? string.Empty);
+    }
+}

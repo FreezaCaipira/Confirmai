@@ -182,27 +182,12 @@ else
             @* ── Home Game: lock screen ───────────────────────────────── *@
             @if (isHomeGame && !isUnlocked)
             {
-                <div class="homegame-lock-block">
-                    <div class="homegame-lock-icon"><i class="fas fa-lock"></i></div>
-                    <p class="homegame-lock-text">
-                        Os detalhes deste Home Game são privados.<br />
-                        Digite o código de acesso para ver mais informações.
-                    </p>
-                    <div class="homegame-code-row">
-                        <input type="text"
-                               class="homegame-code-input @(codeWrong ? "homegame-code-input--error" : "")"
-                               placeholder="XK7-492"
-                               maxlength="7"
-                               @bind="codeInput"
-                               @bind:event="oninput"
-                               @onkeydown="HandleCodeKeyDown" />
-                        <button class="homegame-enter-btn" @onclick="TryUnlock">Entrar</button>
-                    </div>
-                    @if (codeWrong)
-                    {
-                        <p class="homegame-code-error">Código incorreto. Verifique com o organizador.</p>
-                    }
-                </div>
+                <HomeGameLockScreen
+                    CodeInput="@codeInput"
+                    CodeWrong="@codeWrong"
+                    OnCodeInputChange="HandleCodeInputChange"
+                    OnCodeKeyDown="HandleCodeKeyDown"
+                    OnTryUnlock="TryUnlock" />
             }
 
             @* ── Torneio: detalhes ────────────────────────────────────── *@
@@ -537,6 +522,11 @@ else
             homeGameUnlocked = true;
         else
             codeWrong = true;
+    }
+
+    private void HandleCodeInputChange(string value)
+    {
+        codeInput = value;
     }
 
     private async Task HandleCodeKeyDown(KeyboardEventArgs e)

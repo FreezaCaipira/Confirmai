@@ -1,0 +1,74 @@
+.homegame-lock-block {
+    background: var(--bg-deep);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.homegame-lock-icon {
+    font-size: 2.5rem;
+    color: var(--accent-gold);
+    margin-bottom: 1rem;
+}
+
+.homegame-lock-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+.homegame-code-row {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.homegame-code-input {
+    background: var(--parchment);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    width: 140px;
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.homegame-code-input:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+}
+
+.homegame-code-input--error {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.homegame-enter-btn {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.homegame-enter-btn:hover {
+    opacity: 0.9;
+}
+
+.homegame-code-error {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin: 0;
+}
