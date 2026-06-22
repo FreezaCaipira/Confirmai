@@ -14,7 +14,7 @@ public class PendingWebhooksAlertService : IHostedService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<PendingWebhooksAlertService> _logger;
-    private Timer _timer;
+    private Timer _timer = default!;
     private const int AlertThreshold = 5; // Alertar se > 5 pagamentos pendentes
 
     public PendingWebhooksAlertService(

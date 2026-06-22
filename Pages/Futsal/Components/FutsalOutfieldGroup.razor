@@ -21,7 +21,7 @@
                     <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
                     @if (c.UserId == CurrentUserId) { <span class="player-tag player-tag--me">você</span> }
                     @if (DetailMvpRevealed && c.UserId == DetailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
-                    @if (Event.Price.HasValue)
+                    @if (Event!.Price.HasValue)
                     {
                         @if (IsAdmin)
                         {
@@ -162,7 +162,7 @@
             <i class="fas fa-clock"></i> Entrar na lista de espera de linha
         </button>
     }
-    @if (IsAdmin && Event.IsActive && !IsPastEvent)
+    @if (IsAdmin && Event!.IsActive && !IsPastEvent)
     {
         <div class="slot-controls">
             <button class="slot-ctrl-btn slot-ctrl-btn--remove"

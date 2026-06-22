@@ -73,7 +73,7 @@
                     bool isMe     = p.UserId == CurrentUserId;
                     bool isMyPick = MyVote?.VotedForUserId == p.UserId;
                     <li class="esc-vote-item @(isMe ? "esc-vote-item--me" : "") @(isMyPick ? "esc-vote-item--current" : "")"
-                        @onclick="@(isMe ? null : () => HandleCastVote(p.UserId))"
+                        @onclick="@(isMe ? null! : () => HandleCastVote(p.UserId!))"
                         title="@(isMe ? "Você não pode votar em si mesmo" : $"Votar em {p.User?.FullName ?? p.User?.Email}")">
                         <span class="esc-vote-team-badge @(p.TeamId == 0 ? "esc-vote-team-badge--a" : "esc-vote-team-badge--b")">@(p.TeamId == 0 ? "A" : "B")</span>
                         <span class="esc-vote-name">@(p.User?.FullName ?? p.User?.Email)</span>

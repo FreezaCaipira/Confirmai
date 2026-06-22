@@ -175,14 +175,16 @@
         }
     }
 
-    private async Task EditUser(string userId)
+    private Task EditUser(string userId)
     {
         NavigationManager.NavigateTo($"/admin/users/edit/{userId}");
+        return Task.CompletedTask;
     }
 
-    private async Task ViewUser(string userId)
+    private Task ViewUser(string userId)
     {
         NavigationManager.NavigateTo($"/admin/users/view/{userId}");
+        return Task.CompletedTask;
     }
 
     private async Task DeleteUser(string userId)

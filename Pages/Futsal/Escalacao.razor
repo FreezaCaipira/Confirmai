@@ -222,7 +222,7 @@ else
     private string? actionError;
     
     private CancellationTokenSource? _copyCts;
-    private Task? _copyTask;
+    private Task? _copyTask = null;
 
     // ── Post-match state ─────────────────────────────────────────────────────
     private bool isPastEvent;
@@ -256,8 +256,8 @@ else
     private async Task SaveTeamNamesCallback()
         => await SaveTeamNames();
 
-    private async Task MovePlayerCallback((PlayerSlot Slot, bool ToTeamB) args)
-        => MovePlayer(args.Slot, args.ToTeamB);
+    private Task MovePlayerCallback((PlayerSlot Slot, bool ToTeamB) args)
+    { MovePlayer(args.Slot, args.ToTeamB); return Task.CompletedTask; }
 
     private async Task RandomizeCallback()
     {

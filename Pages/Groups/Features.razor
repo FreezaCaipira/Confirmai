@@ -447,11 +447,11 @@ else
     private async Task SetMemberRoleCallback((int memberId, GroupMemberRole newRole) args)
         => await SetMemberRole(args.memberId, args.newRole);
 
-    private async Task InitiatePromoteCallback(int memberId)
-        => confirmPromoteMemberId = memberId;
+    private Task InitiatePromoteCallback(int memberId)
+    { confirmPromoteMemberId = memberId; return Task.CompletedTask; }
 
-    private async Task CancelPromoteCallback()
-        => confirmPromoteMemberId = null;
+    private Task CancelPromoteCallback()
+    { confirmPromoteMemberId = null; return Task.CompletedTask; }
 
     private async Task SavePixReceiverCallback(string selectedId)
     {

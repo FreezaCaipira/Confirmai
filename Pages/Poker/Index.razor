@@ -123,7 +123,7 @@
     private bool showTypeMenu = false;
     
     private CancellationTokenSource? _menuFocusOutCts;
-    private Task? _menuFocusOutTask;
+    private Task? _menuFocusOutTask = null;
 
     [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
 

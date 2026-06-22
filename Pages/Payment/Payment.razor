@@ -112,7 +112,8 @@
     private string offerCurrency = "BTC"; // BRL, USD or BTC
     private string? pixCurrencyNotice;    
     private CancellationTokenSource? _copyCts;
-    private Task? _copyTask;    private string? pixSellerKeyNotice;
+    private Task? _copyTask = null;
+    private string? pixSellerKeyNotice;
 
     private PaymentRecord? paymentRecord;
 

@@ -228,10 +228,11 @@
     private static string? NormalizeOptional(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
-    private async Task OnAvatarSelected(IBrowserFile file)
+    private Task OnAvatarSelected(IBrowserFile file)
     {
         avatarFile = file;
         avatarFeedback = null;
+        return Task.CompletedTask;
     }
 
     private async Task SaveAvatarAsync()
@@ -331,8 +332,8 @@
     private async Task SaveAvatarCallback()
         => await SaveAvatarAsync();
 
-    private async Task SetSportCallback(Sport sport)
-        => SetSport(sport);
+    private Task SetSportCallback(Sport sport)
+    { SetSport(sport); return Task.CompletedTask; }
 
     private async Task SendMailboxMessageCallback(string body)
         => await SendMailboxMessageAsync(body);

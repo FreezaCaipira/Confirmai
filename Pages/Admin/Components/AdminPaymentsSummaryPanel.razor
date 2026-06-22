@@ -146,10 +146,10 @@
     // Severity & trends
     [Parameter] public string SeverityLabel { get; set; } = "OK";
     [Parameter] public string SeverityClass { get; set; } = "admin-payments-severity-pill--ok";
-    [Parameter] public string PendingTrend24hLabel { get; set; }
+    [Parameter] public string PendingTrend24hLabel { get; set; } = string.Empty;
     [Parameter] public bool IsPendingTrendWarning { get; set; }
-    [Parameter] public string PendingByGatewayLabel { get; set; }
-    [Parameter] public string PaidByGatewayLabel { get; set; }
+    [Parameter] public string PendingByGatewayLabel { get; set; } = string.Empty;
+    [Parameter] public string PaidByGatewayLabel { get; set; } = string.Empty;
 
     // Timestamps
     [Parameter] public string LastRefreshLabel { get; set; } = "Ainda não atualizado.";
