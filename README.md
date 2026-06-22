@@ -5,6 +5,16 @@
 
 Plataforma SaaS para organização de esportes amadores (Futsal) e eventos sociais (Poker). Gerencia agendamento de partidas, confirmação de jogadores, pagamentos automatizados via Pix/Bitcoin e operação administrativa de grupos.
 
+## Status Atual
+
+| Métrica | Valor |
+|---------|-------|
+| Testes | 641/641 passando |
+| Build | 0 erros, 8 warnings preexistentes |
+| Idiomas | PT-BR, EN-US, ES-ES (691 chaves traduzidas) |
+| CSS Scoped | 110+ arquivos `.razor.css` |
+| Services | 78 serviços organizados por domínio |
+
 ## Funcionalidades
 
 - **Grupos e eventos** — Criação de comunidades, agendamento recorrente de partidas, confirmação por posição (linha/goleiro), fila de espera e promoção automática
@@ -101,6 +111,7 @@ Confirmai/
 
 | Documento | Descrição |
 |-----------|-----------|
+| [WORK_PLAN.md](WORK_PLAN.md) | Ordem de trabalho atual (Qualidade → UX → Operação → Produção) |
 | [ROADMAP.md](ROADMAP.md) | Progresso, prioridades e próximos passos |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Convenções, patterns e guia para contribuidores |
 | [docs/deploy.md](docs/deploy.md) | Guia completo de deploy com Docker |
