@@ -1,0 +1,202 @@
+<ol class="players-list">
+    @{
+        int outIdx = 0;
+        foreach (var c in OutFieldPlayers)
+        {
+            outIdx++;
+            bool isRotation = outIdx > BaseOut;
+            <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == CurrentUserId ? "player-item--me" : "") @(DetailMvpRevealed && c.UserId == DetailMvpUserId ? "player-item--mvp" : "")">
+                <span class="player-num">@outIdx</span>
+                <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
+                @if (c.UserId == CurrentUserId) { <span class="player-tag player-tag--me">você</span> }
+                @if (DetailMvpRevealed && c.UserId == DetailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
+                @if (Event.Price.HasValue)
+                {
+                    @if (IsAdmin)
+                    {
+                        bool canTogglePaid2 = !c.HasPaid || c.PaymentGatewayName == null;
+                        @if (canTogglePaid2)
+                        {
+                            @if (ConfirmPayId == c.Id)
+                            {
+                                <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
+                                <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => OnAdminTogglePaid.InvokeAsync(c.Id)">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="player-tag player-tag--admin-pay-no" type="button" @onclick="() => OnConfirmPayIdChange.InvokeAsync(null)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                @if (c.HasPaid)
+                                {
+                                    <button class="player-tag player-tag--admin-pay player-tag--paid" @onclick="() => OnConfirmPayIdChange.InvokeAsync(c.Id)">
+                                        <i class="fas fa-check"></i> pago
+                                    </button>
+                                }
+                                else if (c.PixProofUploadedAt.HasValue)
+                                {
+                                    <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="OnNavigateToPaymentsModal" title="Comprovante enviado - clique para gerenciar">
+                                        <i class="fas fa-image"></i> 📎 comprovante
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="player-tag player-tag--admin-pay player-tag--pay-pending" @onclick="() => OnConfirmPayIdChange.InvokeAsync(c.Id)">
+                                        <i class="fas fa-exclamation-triangle"></i> pendente
+                                    </button>
+                                    <button class="player-tag player-tag--admin-pay player-tag--pay-btn" @onclick="() => OnConfirmPayIdChange.InvokeAsync(c.Id)" type="button">
+                                        <i class="fas fa-check"></i> pagar
+                                    </button>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <span class="player-tag player-tag--paid" title="Pago via gateway — não pode ser desfeito pelo admin">
+                                <i class="fas fa-check"></i> pago
+                            </span>
+                        }
+                        @if (!IsPastEvent && c.UserId != CurrentUserId && c.PaymentGatewayName == null)
+                        {
+                            @if (ConfirmRemoveId == c.Id)
+                            {
+                                <span class="player-tag player-tag--remove-confirm">remover?</span>
+                                <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => OnAdminRemoveConfirmation.InvokeAsync(c.Id)">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="player-tag player-tag--admin-remove-no" type="button" @onclick="() => OnConfirmRemoveIdChange.InvokeAsync(null)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => OnConfirmRemoveIdChange.InvokeAsync(c.Id)">
+                                    <i class="fas fa-user-times"></i> remover
+                                </button>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        @if (c.HasPaid)
+                        {
+                            <span class="player-tag player-tag--paid">
+                                <i class="fas fa-check"></i> pago
+                            </span>
+                        }
+                        else if (c.PixProofUploadedAt.HasValue && (c.UserId == CurrentUserId || IsAdmin))
+                        {
+                            @if (IsAdmin)
+                            {
+                                <button class="player-tag player-tag--proof-pending" @onclick="OnNavigateToPaymentsModal" title="Comprovante enviado - clique para gerenciar">
+                                    <i class="fas fa-image"></i> 📎 comprovante
+                                </button>
+                            }
+                            else
+                            {
+                                <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--proof-pending player-tag--pay-link" title="Comprovante enviado - clique para gerenciar">
+                                    <i class="fas fa-image"></i> 📎 comprovante
+                                </a>
+                            }
+                        }
+                        else if (c.UserId == CurrentUserId)
+                        {
+                            <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-pending player-tag--pay-link">
+                                <i class="fas fa-exclamation-triangle"></i> pendente
+                            </a>
+                            @if (IsAdmin)
+                            {
+                                @if (CurrentUserId == Event?.Group?.PixReceiverUserId)
+                                {
+                                    <span class="player-tag player-tag--receiver-badge">
+                                        <i class="fas fa-wallet"></i> recebedor
+                                    </span>
+                                }
+                                else
+                                {
+                                    <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-btn player-tag--pay-link">
+                                        <i class="fas fa-check"></i> pagar
+                                    </a>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <span class="player-tag player-tag--pay-pending">
+                                <i class="fas fa-exclamation-triangle"></i> pendente
+                            </span>
+                        }
+                    }
+                }
+                @if (Event!.IsActive && !IsPastEvent && c.UserId == CurrentUserId && !c.HasPaid)
+                {
+                    @if (ConfirmCancel)
+                    {
+                        <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
+                        <button class="player-tag player-tag--cancel-yes" type="button" @onclick="OnCancelConfirmation">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => OnConfirmCancelChange.InvokeAsync(false)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="player-tag player-tag--cancel" type="button" @onclick="() => OnConfirmCancelChange.InvokeAsync(true)">
+                            <i class="fas fa-user-times"></i> cancelar
+                        </button>
+                    }
+                }
+            </li>
+        }
+        for (int i = outIdx + 1; i <= OutFieldSlots; i++)
+        {
+            bool slotIsRotation = i > BaseOut;
+            bool isFirstEmpty = i == outIdx + 1;
+            if (CanConfirm && isFirstEmpty)
+            {
+                <li class="player-item @(slotIsRotation ? "player-item--rotation" : "") player-item--slot">
+                    <span class="player-num">@i</span>
+                    <button class="player-slot-btn" @onclick="() => OnConfirmAs.InvokeAsync(FutsalPosition.Outfield)"><i class="fas fa-plus"></i> Confirmar presença</button>
+                </li>
+            }
+            else
+            {
+                <li class="player-item @(slotIsRotation ? "player-item--rotation" : "") player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
+            }
+        }
+    }
+    @if (IsFullOut && CanConfirm)
+    {
+        <button class="waitlist-cta" @onclick="() => OnConfirmAs.InvokeAsync(FutsalPosition.Outfield)">
+            <i class="fas fa-clock"></i> Entrar na lista de espera
+        </button>
+    }
+</ol>
+
+@code {
+    [Parameter] public List<EventConfirmation> OutFieldPlayers { get; set; } = new();
+    [Parameter] public Event? Event { get; set; }
+    [Parameter] public string? CurrentUserId { get; set; }
+    [Parameter] public bool IsAdmin { get; set; }
+    [Parameter] public bool IsPastEvent { get; set; }
+    [Parameter] public bool CanConfirm { get; set; }
+    [Parameter] public int OutFieldSlots { get; set; }
+    [Parameter] public int BaseOut { get; set; }
+    [Parameter] public bool IsFullOut { get; set; }
+    [Parameter] public int? ConfirmPayId { get; set; }
+    [Parameter] public int? ConfirmRemoveId { get; set; }
+    [Parameter] public bool ConfirmCancel { get; set; }
+    [Parameter] public bool DetailMvpRevealed { get; set; }
+    [Parameter] public string? DetailMvpUserId { get; set; }
+    [Parameter] public EventCallback<int> OnAdminTogglePaid { get; set; }
+    [Parameter] public EventCallback<int?> OnConfirmPayIdChange { get; set; }
+    [Parameter] public EventCallback<int?> OnConfirmRemoveIdChange { get; set; }
+    [Parameter] public EventCallback<bool> OnConfirmCancelChange { get; set; }
+    [Parameter] public EventCallback OnCancelConfirmation { get; set; }
+    [Parameter] public EventCallback<int> OnAdminRemoveConfirmation { get; set; }
+    [Parameter] public EventCallback OnNavigateToPaymentsModal { get; set; }
+    [Parameter] public EventCallback<FutsalPosition> OnConfirmAs { get; set; }
+}

@@ -1,0 +1,243 @@
+.players-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.player-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.25rem;
+    background: var(--bg-deep);
+}
+
+.player-item--me {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.player-item--mvp {
+    background: rgba(251, 191, 36, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.player-item--rotation {
+    opacity: 0.7;
+}
+
+.player-item--slot {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px dashed rgba(16, 185, 129, 0.4);
+}
+
+.player-item--empty {
+    opacity: 0.4;
+}
+
+.player-num {
+    font-weight: 700;
+    color: var(--accent-gold);
+    min-width: 24px;
+    text-align: center;
+}
+
+.player-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.player-slot-empty {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.player-slot-btn {
+    flex: 1;
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.player-slot-btn:hover {
+    opacity: 0.9;
+}
+
+.player-tag {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.player-tag--me {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.player-tag--mvp {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.player-tag--paid {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.player-tag--pay-pending {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.player-tag--proof-pending {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.player-tag--pay-link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.player-tag--pay-link:hover {
+    text-decoration: underline;
+}
+
+.player-tag--pay-btn {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    cursor: pointer;
+    border: none;
+}
+
+.player-tag--pay-btn:hover {
+    opacity: 0.9;
+}
+
+.player-tag--admin-pay {
+    cursor: pointer;
+    border: none;
+}
+
+.player-tag--admin-pay:hover {
+    opacity: 0.8;
+}
+
+.player-tag--admin-pay-yes {
+    background: #10b981;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.player-tag--admin-pay-no {
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.player-tag--pay-confirm {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.player-tag--receiver-badge {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.player-tag--admin-remove {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    cursor: pointer;
+    border: none;
+}
+
+.player-tag--admin-remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.player-tag--remove-confirm {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.player-tag--admin-remove-yes {
+    background: #10b981;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.player-tag--admin-remove-no {
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.player-tag--cancel {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    cursor: pointer;
+    border: none;
+}
+
+.player-tag--cancel:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.player-tag--cancel-confirm {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.player-tag--cancel-yes {
+    background: #10b981;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.player-tag--cancel-no {
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.waitlist-cta {
+    width: 100%;
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.waitlist-cta:hover {
+    opacity: 0.9;
+}

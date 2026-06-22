@@ -220,196 +220,43 @@ else
                 }
                 else
                 {
-                    <ol class="players-list">
-                        @{
-                            int outIdx = 0;
-                            foreach (var c in outFieldPlayers)
-                            {
-                                outIdx++;
-                                bool isRotation = outIdx > baseOut;
-                                <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "") @(detailMvpRevealed && c.UserId == detailMvpUserId ? "player-item--mvp" : "")">
-                                    <span class="player-num">@outIdx</span>
-                                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
-                                    @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
-                                    @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
-                                    @if (ev.Price.HasValue)
-                                    {
-                                        @if (isAdmin)
-                                        {
-                                            bool canTogglePaid2 = !c.HasPaid || c.PaymentGatewayName == null;
-                                            @if (canTogglePaid2)
-                                            {
-                                                @if (confirmPayId == c.Id)
-                                                {
-                                                    <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
-                                                    <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => AdminTogglePaid(c.Id)">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="player-tag player-tag--admin-pay-no" type="button" @onclick="() => confirmPayId = null">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                }
-                                                else
-                                                {
-                                                    @if (c.HasPaid)
-                                                    {
-                                                        <button class="player-tag player-tag--admin-pay player-tag--paid" @onclick="() => confirmPayId = c.Id">
-                                                            <i class="fas fa-check"></i> pago
-                                                        </button>
-                                                    }
-                                                    else if (c.PixProofUploadedAt.HasValue)
-                                                    {
-                                                        <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
-                                                            <i class="fas fa-image"></i> 📎 comprovante
-                                                        </button>
-                                                    }
-                                                    else
-                                                    {
-                                                        <button class="player-tag player-tag--admin-pay player-tag--pay-pending" @onclick="() => confirmPayId = c.Id">
-                                                            <i class="fas fa-exclamation-triangle"></i> pendente
-                                                        </button>
-                                                        <button class="player-tag player-tag--admin-pay player-tag--pay-btn" @onclick="() => confirmPayId = c.Id" type="button">
-                                                            <i class="fas fa-check"></i> pagar
-                                                        </button>
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <span class="player-tag player-tag--paid" title="Pago via gateway — não pode ser desfeito pelo admin">
-                                                    <i class="fas fa-check"></i> pago
-                                                </span>
-                                            }
-                                            @if (!isPastEvent && c.UserId != currentUserId && c.PaymentGatewayName == null)
-                                            {
-                                                @if (confirmRemoveId == c.Id)
-                                                {
-                                                    <span class="player-tag player-tag--remove-confirm">remover?</span>
-                                                    <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => AdminRemoveConfirmation(c.Id)">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="player-tag player-tag--admin-remove-no" type="button" @onclick="() => confirmRemoveId = null">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                }
-                                                else
-                                                {
-                                                    <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => confirmRemoveId = c.Id">
-                                                        <i class="fas fa-user-times"></i> remover
-                                                    </button>
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            @if (c.HasPaid)
-                                            {
-                                                <span class="player-tag player-tag--paid">
-                                                    <i class="fas fa-check"></i> pago
-                                                </span>
-                                            }
-                                            else if (c.PixProofUploadedAt.HasValue && (c.UserId == currentUserId || isAdmin))
-                                            {
-                                                @if (isAdmin)
-                                                {
-                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
-                                                        <i class="fas fa-image"></i> 📎 comprovante
-                                                    </button>
-                                                }
-                                                else
-                                                {
-                                                    <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--proof-pending player-tag--pay-link" title="Comprovante enviado - clique para gerenciar">
-                                                        <i class="fas fa-image"></i> 📎 comprovante
-                                                    </a>
-                                                }
-                                            }
-                                            else if (c.UserId == currentUserId)
-                                            {
-                                                <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-pending player-tag--pay-link">
-                                                    <i class="fas fa-exclamation-triangle"></i> pendente
-                                                </a>
-                                                @if (isAdmin)
-                                                {
-                                                    @if (currentUserId == ev?.Group?.PixReceiverUserId)
-                                                    {
-                                                        <span class="player-tag player-tag--receiver-badge">
-                                                            <i class="fas fa-wallet"></i> recebedor
-                                                        </span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-btn player-tag--pay-link">
-                                                            <i class="fas fa-check"></i> pagar
-                                                        </a>
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <span class="player-tag player-tag--pay-pending">
-                                                    <i class="fas fa-exclamation-triangle"></i> pendente
-                                                </span>
-                                            }
-                                        }
-                                    }
-                                    @if (ev!.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
-                                    {
-                                        @if (confirmCancel)
-                                        {
-                                            <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
-                                            <button class="player-tag player-tag--cancel-yes" type="button" @onclick="CancelConfirmation">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button class="player-tag player-tag--cancel-no" type="button" @onclick="() => confirmCancel = false">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <button class="player-tag player-tag--cancel" type="button" @onclick="() => confirmCancel = true">
-                                                <i class="fas fa-user-times"></i> cancelar
-                                            </button>
-                                        }
-                                    }
-                                </li>
-                            }
-                            for (int i = outIdx + 1; i <= outFieldSlots; i++)
-                            {
-                                bool slotIsRotation = i > baseOut;
-                                bool isFirstEmpty = i == outIdx + 1;
-                                if (canConfirm && isFirstEmpty)
-                                {
-                                    <li class="player-item @(slotIsRotation ? "player-item--rotation" : "") player-item--slot">
-                                        <span class="player-num">@i</span>
-                                        <button class="player-slot-btn" @onclick="() => ConfirmAs(FutsalPosition.Outfield)"><i class="fas fa-plus"></i> Confirmar presença</button>
-                                    </li>
-                                }
-                                else
-                                {
-                                    <li class="player-item @(slotIsRotation ? "player-item--rotation" : "") player-item--empty"><span class="player-num">@i</span><span class="player-slot-empty">–</span></li>
-                                }
-                            }
-                        }
-                    </ol>
-                    @if (isFullOut && canConfirm)
-                    {
-                        <button class="waitlist-cta" @onclick="() => ConfirmAs(FutsalPosition.Outfield)">
-                            <i class="fas fa-clock"></i> Entrar na lista de espera
+                    <PlayersListSection
+                        OutFieldPlayers="@outFieldPlayers"
+                        Event="@ev"
+                        CurrentUserId="@currentUserId"
+                        IsAdmin="@isAdmin"
+                        IsPastEvent="@isPastEvent"
+                        CanConfirm="@canConfirm"
+                        OutFieldSlots="@outFieldSlots"
+                        BaseOut="@baseOut"
+                        IsFullOut="@isFullOut"
+                        ConfirmPayId="@confirmPayId"
+                        ConfirmRemoveId="@confirmRemoveId"
+                        ConfirmCancel="@confirmCancel"
+                        DetailMvpRevealed="@detailMvpRevealed"
+                        DetailMvpUserId="@detailMvpUserId"
+                        OnAdminTogglePaid="AdminTogglePaid"
+                        OnConfirmPayIdChange="value => confirmPayId = value"
+                        OnConfirmRemoveIdChange="value => confirmRemoveId = value"
+                        OnConfirmCancelChange="value => confirmCancel = value"
+                        OnCancelConfirmation="CancelConfirmation"
+                        OnAdminRemoveConfirmation="AdminRemoveConfirmation"
+                        OnNavigateToPaymentsModal="NavigateToPaymentsModal"
+                        OnConfirmAs="ConfirmAs" />
+                }
+
+                @if (isAdmin && ev.IsActive && !isPastEvent)
+                {
+                    <div class="slot-controls">
+                        <button class="slot-ctrl-btn slot-ctrl-btn--remove"
+                                disabled="@(maxOut <= minInfo.MinOutfield || maxOut <= confirmedOut)"
+                                @onclick="AdminRemoveOutfieldSlot">
+                            <i class="fas fa-minus"></i> Remover vaga
                         </button>
-                    }
-                    @if (isAdmin && ev.IsActive && !isPastEvent)
-                    {
-                        <div class="slot-controls">
-                            <button class="slot-ctrl-btn slot-ctrl-btn--remove"
-                                    disabled="@(maxOut <= minInfo.MinOutfield || maxOut <= confirmedOut)"
-                                    @onclick="AdminRemoveOutfieldSlot">
-                                <i class="fas fa-minus"></i> Remover vaga
-                            </button>
-                            <button class="add-slot-row" @onclick="AdminAddOutfieldSlot">
-                                <i class="fas fa-plus"></i> Adicionar vaga
-                            </button>
-                        </div>
-                    }
+                        <button class="add-slot-row" @onclick="AdminAddOutfieldSlot">
+                            <i class="fas fa-plus"></i> Adicionar vaga
+                        </button>
+                    </div>
                 }
             </section>
 
