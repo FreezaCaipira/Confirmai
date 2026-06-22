@@ -300,34 +300,10 @@ else
             @if (currentUserId is not null && !isMember)
             {
                 <hr class="detail-divider">
-                <div class="join-request-section">
-                    @if (userJoinRequest?.Status == JoinRequestStatus.Pending)
-                    {
-                        <p class="join-request-pending">
-                            <i class="fas fa-hourglass-half"></i>
-                            Solicitação enviada — aguardando aprovação do administrador.
-                        </p>
-                    }
-                    else if (userJoinRequest?.Status == JoinRequestStatus.Rejected)
-                    {
-                        <p class="join-request-pending join-request-pending--rejected">
-                            <i class="fas fa-times-circle"></i>
-                            Sua solicitação foi recusada.
-                        </p>
-                    }
-                    else
-                    {
-                        <p class="join-request-info">
-                            <i class="fas fa-info-circle"></i>
-                            Você não é membro deste grupo. Solicite entrada ou peça o código de convite ao organizador.
-                        </p>
-                        <button class="confirm-btn" type="button" @onclick="RequestToJoin"
-                                disabled="@requestingJoin">
-                            <i class="fas fa-user-plus"></i>
-                            @(requestingJoin ? "Enviando…" : "Solicitar entrada")
-                        </button>
-                    }
-                </div>
+                <JoinRequestSection
+                    UserJoinRequest="@userJoinRequest"
+                    RequestingJoin="@requestingJoin"
+                    OnRequestToJoin="RequestToJoin" />
             }
 
         </div>
