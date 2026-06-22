@@ -352,7 +352,7 @@ else
                                             }
                                         }
                                     }
-                                    @if (ev.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
+                                    @if (ev!.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
                                     {
                                         @if (confirmCancel)
                                         {
@@ -791,7 +791,7 @@ else
     private async Task AdminTogglePaid(int confirmationId)
     {
         if (!IsGroupAdmin()) return;
-        var result = await AdminConfirmationService.TogglePaidAsync(confirmationId, currentUserId);
+        var result = await AdminConfirmationService.TogglePaidAsync(confirmationId, currentUserId!);
         if (result.Found && result.Updated)
         {
             confirmPayId = null;
@@ -897,14 +897,14 @@ else
     private async Task ConfirmAsCallback()
         => await ConfirmPresence();
 
-    private async Task ConfirmPayIdChangedCallback(int? value)
-        => confirmPayId = value;
+    private Task ConfirmPayIdChangedCallback(int? value)
+    { confirmPayId = value; return Task.CompletedTask; }
 
-    private async Task ConfirmRemoveIdChangedCallback(int? value)
-        => confirmRemoveId = value;
+    private Task ConfirmRemoveIdChangedCallback(int? value)
+    { confirmRemoveId = value; return Task.CompletedTask; }
 
-    private async Task ConfirmCancelChangedCallback(bool value)
-        => confirmCancel = value;
+    private Task ConfirmCancelChangedCallback(bool value)
+    { confirmCancel = value; return Task.CompletedTask; }
 
     private async Task CancelConfirmationCallback()
         => await CancelConfirmation();
@@ -927,7 +927,7 @@ else
     private async Task AdminRemoveGoalkeeperSlotCallback()
         => await AdminRemoveGoalkeeperSlot();
 
-    private async Task NavigateToPaymentsModalCallback()
-        => NavigateToPaymentsModal();
+    private Task NavigateToPaymentsModalCallback()
+    { NavigateToPaymentsModal(); return Task.CompletedTask; }
 
 }

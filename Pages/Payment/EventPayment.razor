@@ -126,8 +126,8 @@
     private CancellationTokenSource? _copyAdminPixCts;
     private CancellationTokenSource? _uploadProofCts;
     
-    private Task? _copyBrCodeTask;
-    private Task? _copyAdminPixTask;
+    private Task? _copyBrCodeTask = null;
+    private Task? _copyAdminPixTask = null;
     private Task? _uploadProofTask;
 
     protected override async Task OnInitializedAsync()
@@ -508,8 +508,8 @@
     private async Task CopyBrCodeCallback()
         => await CopyBrCode();
 
-    private async Task SelectGatewayCallback(string gatewayName)
-        => SelectGateway(gatewayName);
+    private Task SelectGatewayCallback(string gatewayName)
+    { SelectGateway(gatewayName); return Task.CompletedTask; }
 
     private async Task GeneratePixChargeCallback()
         => await GeneratePixCharge();

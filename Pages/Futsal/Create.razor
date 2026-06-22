@@ -255,7 +255,7 @@
         => form.Time = TimeOnly.TryParse(e.Value?.ToString(), out var t) ? t : new TimeOnly(19, 0);
 
     // Callback wrappers for child components
-    private async Task SubFormatChangedCallback(string newFormat)
+    private Task SubFormatChangedCallback(string newFormat)
     {
         subFormat = newFormat;
         (form.MaxPlayers, form.MaxGoalkeepers) = subFormat switch
@@ -264,19 +264,20 @@
             "campo"   => (24, 2),
             _         => (10, 2),   // futsal
         };
+        return Task.CompletedTask;
     }
 
-    private async Task VenueChangedCallback()
-        => OnVenueChanged();
+    private Task VenueChangedCallback()
+    { OnVenueChanged(); return Task.CompletedTask; }
 
-    private async Task TimeChangeCallback(TimeOnly newTime)
-        => form.Time = newTime;
+    private Task TimeChangeCallback(TimeOnly newTime)
+    { form.Time = newTime; return Task.CompletedTask; }
 
-    private async Task RotateInGoalChangedCallback()
-        => OnRotateInGoalChanged();
+    private Task RotateInGoalChangedCallback()
+    { OnRotateInGoalChanged(); return Task.CompletedTask; }
 
-    private async Task ToggleDayCallback((DayOfWeek dow, bool on) args)
-        => ToggleDay(args.dow, args.on);
+    private Task ToggleDayCallback((DayOfWeek dow, bool on) args)
+    { ToggleDay(args.dow, args.on); return Task.CompletedTask; }
 
     private async Task Save()
     {

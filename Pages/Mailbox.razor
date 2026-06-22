@@ -92,7 +92,7 @@
     private string composerBody = string.Empty;
     private string composerRecipientUserId = string.Empty;
     private string? composerInfoMessage;
-    private ElementReference threadStreamRef;
+    private ElementReference threadStreamRef = default;
 
     private ConversationContactView? SelectedContact => conversationContacts
         .FirstOrDefault(c => string.Equals(c.ConversationKey, selectedConversationKey, StringComparison.Ordinal));

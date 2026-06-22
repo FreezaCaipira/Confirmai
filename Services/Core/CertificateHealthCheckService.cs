@@ -14,7 +14,7 @@ public class CertificateHealthCheckService : IHostedService
 {
     private readonly IConfiguration _config;
     private readonly ILogger<CertificateHealthCheckService> _logger;
-    private Timer _timer;
+    private Timer _timer = default!;
 
     public CertificateHealthCheckService(
         IConfiguration config,
@@ -59,13 +59,13 @@ public class CertificateHealthCheckService : IHostedService
         }
     }
 
-    private async Task CheckEfiBankCertificateAsync()
+    private Task CheckEfiBankCertificateAsync()
     {
         var certPath = _config["EfiBank:ClientCertificatePath"];
         if (string.IsNullOrEmpty(certPath))
         {
             _logger.LogWarning("EfiBank:ClientCertificatePath não configurado");
-            return;
+            return Task.CompletedTask;
         }
 
         try
@@ -73,7 +73,7 @@ public class CertificateHealthCheckService : IHostedService
             if (!File.Exists(certPath))
             {
                 _logger.LogError("❌ Certificado EfiBank não encontrado em {Path}", certPath);
-                return;
+                return Task.CompletedTask;
             }
 
             var password = _config["EfiBank:CertificatePassword"];
@@ -117,5 +117,6 @@ public class CertificateHealthCheckService : IHostedService
         {
             _logger.LogError(ex, "❌ Erro ao verificar certificado EfiBank");
         }
+        return Task.CompletedTask;
     }
 }

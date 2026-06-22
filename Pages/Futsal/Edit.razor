@@ -94,7 +94,7 @@
     {
         var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        currentUserId = userId;
+        currentUserId = userId ?? string.Empty;
         isSystemAdmin = auth.User.IsInRole("admin");
 
         await using var db = await DbFactory.CreateDbContextAsync();
