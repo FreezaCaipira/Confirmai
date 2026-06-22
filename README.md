@@ -23,7 +23,7 @@ Plataforma SaaS para organização de esportes amadores (Futsal) e eventos socia
 | Real-time | SignalR (PaymentHub) |
 | Pagamentos | BTCPayServer, AbacatePay, EfiBank, Appmax |
 | Monitoramento | Serilog, OpenTelemetry, Prometheus/Grafana |
-| Testes | xUnit + Moq (551/575 passando), Playwright E2E |
+| Testes | xUnit + Moq (641/641 passando), Playwright E2E |
 | CI | GitHub Actions (build + test + coverage) |
 
 ## Como rodar
@@ -92,8 +92,8 @@ Confirmai/
 ├── Data/                     # AppDbContext + Factory
 ├── Configuration/            # Options (BtcPay, Email, Security)
 ├── Hubs/                     # PaymentHub (SignalR)
-├── wwwroot/css/              # 4 CSS globais + 56 scoped (.razor.css)
-├── Confirmai.Tests/          # xUnit (575 testes)
+├── wwwroot/css/              # 4 CSS globais + 110+ scoped (.razor.css)
+├── Confirmai.Tests/          # xUnit (641 testes)
 └── e2e/                      # Playwright E2E (TypeScript)
 ```
 

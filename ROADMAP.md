@@ -10,10 +10,11 @@
 | Componentes compartilhados | 28 |
 | Serviços | 78 (organizados em 10 domínios) |
 | Testes (xUnit) | 641 passando / 0 falhando / 641 total |
-| CSS scoped | 56 arquivos |
+| CSS scoped | 110+ arquivos (todos os .razor têm .razor.css) |
 | CSS globais | 4 arquivos |
 | StateHasChanged() | 13 chamadas em 7 arquivos |
 | IAsyncDisposable | 8 páginas implementam |
+| Warnings build | 0 CS1998, 0 CS0649, 0 CS86xx |
 
 ---
 
@@ -64,6 +65,11 @@
 - [x] StateHasChanged() reduzido de 101 → 13 chamadas
 - [x] IAsyncDisposable implementado em 8 páginas críticas
 - [x] CSS Scoped Isolation corrigido (Phase 18): sub-componentes com `.razor.css` próprio
+- [x] L1: Eliminar ~20 inline styles estáticos (Groups/Join, Groups/Index, Groups/Detail, Index, Poker/Edit)
+- [x] L2: Criar `.razor.css` para todas as páginas (110+ arquivos, incluindo 1 priority >400L)
+- [x] L3: Corrigir 40 warnings CS1998 (async sem await) → remover async, retornar Task.CompletedTask
+- [x] L4: Corrigir 18 warnings CS0649 (campos nunca atribuídos) → = null / = default
+- [x] L5: Corrigir warnings CS8618/CS8602/CS8604/CS8601 (nullability) → default!, null!, null-coalescing
 - [x] CI com build + test + coverage (Coverlet → badge)
 - [x] Documentação consolidada: 22 .md → 3 centrais (README, ROADMAP, CONTRIBUTING) + docs operacionais
 - [x] 24 testes corrigidos (encoding UTF-8, chaves UiText, wiring de componentes, assertions)
