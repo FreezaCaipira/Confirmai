@@ -528,6 +528,14 @@
     color: #93c5fd;
 }
 
+/* ── Empty state browse buttons ─────────────────────────────── */
+.browse-buttons-row {
+    margin-top: .75rem;
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
 @media (max-width: 540px) {
     .my-conf-card { flex-wrap: wrap; }
     .my-conf-actions { flex-direction: row; width: 100%; }

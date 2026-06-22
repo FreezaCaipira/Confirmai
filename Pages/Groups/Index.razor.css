@@ -1,0 +1,12 @@
+.skeleton-w-200 {
+    max-width: 200px;
+}
+
+.skeleton-w-150 {
+    max-width: 150px;
+}
+
+.detail-divider--groups {
+    max-width: 860px;
+    margin: 0 auto 1.25rem;
+}

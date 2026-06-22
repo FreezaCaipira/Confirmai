@@ -1,1 +1,17 @@
 /* Styles moved to shared CSS */
+
+.skeleton-w-200 {
+    max-width: 200px;
+}
+
+.skeleton-w-150 {
+    max-width: 150px;
+}
+
+.detail-events-title--no-mb {
+    margin-bottom: 0;
+}
+
+.join-request-pending--rejected {
+    color: #f87171;
+}
