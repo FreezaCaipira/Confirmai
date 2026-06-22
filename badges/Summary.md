@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 06/15/2026 - 17:32:36 |
-| Coverage date: | 06/15/2026 - 17:32:31 |
+| Generated on: | 06/22/2026 - 10:20:00 |
+| Coverage date: | 06/22/2026 - 10:19:54 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 389 |
 | Files: | 429 |
-| **Line coverage:** | 6.6% (7477 of 113209) |
-| Covered lines: | 7477 |
-| Uncovered lines: | 105732 |
-| Coverable lines: | 113209 |
-| Total lines: | 140449 |
-| **Branch coverage:** | 27.7% (2013 of 7253) |
+| **Line coverage:** | 6.6% (7476 of 113210) |
+| Covered lines: | 7476 |
+| Uncovered lines: | 105734 |
+| Coverable lines: | 113210 |
+| Total lines: | 140455 |
+| **Branch coverage:** | 27.7% (2013 of 7255) |
 | Covered branches: | 2013 |
-| Total branches: | 7253 |
+| Total branches: | 7255 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 94_27564269208 |
+| Tag: | 96_27945721307 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **7477** | **105732** | **113209** | **147667** | **6.6%** | **2013** | **7253** | **27.7%** |
+| **Confirmai** | **7476** | **105734** | **113210** | **147673** | **6.6%** | **2013** | **7255** | **27.7%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -181,7 +181,7 @@
 | Confirmai.Pages.Admin.AdminLogs | 115 | 235 | 350 | 695 | 32.8% | 17 | 112 | 15.1% |
 | Confirmai.Pages.Admin.AdminPayments | 229 | 387 | 616 | 1161 | 37.1% | 55 | 192 | 28.6% |
 | Confirmai.Pages.Admin.AdminUserEdit | 0 | 46 | 46 | 131 | 0% | 0 | 16 | 0% |
-| Confirmai.Pages.Admin.AdminUsers | 0 | 163 | 163 | 330 | 0% | 0 | 58 | 0% |
+| Confirmai.Pages.Admin.AdminUsers | 0 | 163 | 163 | 332 | 0% | 0 | 58 | 0% |
 | Confirmai.Pages.Admin.AdminUserView | 0 | 57 | 57 | 183 | 0% | 0 | 56 | 0% |
 | Confirmai.Pages.Admin.AdminVenueEdit | 0 | 146 | 146 | 385 | 0% | 0 | 82 | 0% |
 | Confirmai.Pages.Admin.AdminVenues | 0 | 88 | 88 | 249 | 0% | 0 | 52 | 0% |
@@ -229,9 +229,9 @@
 | Confirmai.Pages.Futsal.Components.RecurrenceScheduler | 4 | 14 | 18 | 51 | 22.2% | 1 | 8 | 12.5% |
 | Confirmai.Pages.Futsal.Components.SlotsAndGoalkeeperConfig | 4 | 1 | 5 | 37 | 80% | 0 | 0 |  |
 | Confirmai.Pages.Futsal.Components.VenueSelector | 7 | 11 | 18 | 63 | 38.8% | 4 | 12 | 33.3% |
-| Confirmai.Pages.Futsal.Create | 43 | 153 | 196 | 417 | 21.9% | 10 | 74 | 13.5% |
+| Confirmai.Pages.Futsal.Create | 43 | 153 | 196 | 418 | 21.9% | 10 | 74 | 13.5% |
 | Confirmai.Pages.Futsal.Detail | 89 | 275 | 364 | 933 | 24.4% | 88 | 342 | 25.7% |
-| Confirmai.Pages.Futsal.Edit | 50 | 84 | 134 | 332 | 37.3% | 14 | 50 | 28% |
+| Confirmai.Pages.Futsal.Edit | 50 | 84 | 134 | 332 | 37.3% | 15 | 52 | 28.8% |
 | Confirmai.Pages.Futsal.Escalacao | 56 | 234 | 290 | 660 | 19.3% | 41 | 202 | 20.2% |
 | Confirmai.Pages.Futsal.Index | 6 | 3 | 9 | 84 | 66.6% | 0 | 4 | 0% |
 | Confirmai.Pages.Futsal.Schedule.Edit | 0 | 101 | 101 | 318 | 0% | 0 | 34 | 0% |
@@ -257,7 +257,7 @@
 | Confirmai.Pages.Payment.Components.EventPaymentStatus | 0 | 1 | 1 | 14 | 0% | 0 | 0 |  |
 | Confirmai.Pages.Payment.Components.EventPaymentSummary | 0 | 5 | 5 | 27 | 0% | 0 | 24 | 0% |
 | Confirmai.Pages.Payment.EventPayment | 0 | 241 | 241 | 527 | 0% | 0 | 148 | 0% |
-| Confirmai.Pages.Payment.Payment | 0 | 307 | 307 | 619 | 0% | 0 | 156 | 0% |
+| Confirmai.Pages.Payment.Payment | 0 | 307 | 307 | 620 | 0% | 0 | 156 | 0% |
 | Confirmai.Pages.Payment.PaymentCheckoutPanel | 0 | 61 | 61 | 225 | 0% | 0 | 32 | 0% |
 | Confirmai.Pages.Payment.PaymentDetails | 0 | 38 | 38 | 119 | 0% | 0 | 32 | 0% |
 | Confirmai.Pages.Payment.PaymentProductSummary | 0 | 28 | 28 | 107 | 0% | 0 | 18 | 0% |
@@ -271,7 +271,7 @@
 | Confirmai.Pages.Product.Marketplace | 6 | 3 | 9 | 23 | 66.6% | 3 | 6 | 50% |
 | Confirmai.Pages.Product.ProductForm | 0 | 114 | 114 | 283 | 0% | 0 | 54 | 0% |
 | Confirmai.Pages.Product.Products | 0 | 3 | 3 | 23 | 0% | 0 | 2 | 0% |
-| Confirmai.Pages.Profile | 19 | 133 | 152 | 342 | 12.5% | 9 | 100 | 9% |
+| Confirmai.Pages.Profile | 19 | 133 | 152 | 343 | 12.5% | 9 | 100 | 9% |
 | Confirmai.Pages.VenueManager.VenueEdit | 0 | 84 | 84 | 253 | 0% | 0 | 58 | 0% |
 | Confirmai.Pages.VenueManager.Venues | 0 | 59 | 59 | 194 | 0% | 0 | 30 | 0% |
 | Confirmai.RevalidatingIdentityAuthenticationStateProvider | 5 | 19 | 24 | 70 | 20.8% | 0 | 4 | 0% |
@@ -311,7 +311,7 @@
 | Confirmai.Services.Admin.UserDelinquency | 5 | 0 | 5 | 167 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.AppInitializationService | 200 | 40 | 240 | 417 | 83.3% | 69 | 98 | 70.4% |
 | Confirmai.Services.Core.AuthNavigationHelper | 10 | 2 | 12 | 32 | 83.3% | 6 | 6 | 100% |
-| Confirmai.Services.Core.CertificateHealthCheckService | 16 | 46 | 62 | 121 | 25.8% | 1 | 18 | 5.5% |
+| Confirmai.Services.Core.CertificateHealthCheckService | 16 | 47 | 63 | 122 | 25.3% | 1 | 18 | 5.5% |
 | Confirmai.Services.Core.DebounceDispatcher | 20 | 2 | 22 | 51 | 90.9% | 4 | 4 | 100% |
 | Confirmai.Services.Core.LogRetentionService | 29 | 11 | 40 | 87 | 72.5% | 6 | 8 | 75% |
 | Confirmai.Services.Core.LogService | 72 | 3 | 75 | 155 | 96% | 30 | 36 | 83.3% |
@@ -324,7 +324,7 @@
 | Confirmai.Services.Core.UiText.PaymentTexts | 155 | 0 | 155 | 175 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.ServerTexts | 131 | 0 | 131 | 151 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.UtilityTexts | 483 | 0 | 483 | 498 | 100% | 0 | 0 |  |
-| Confirmai.Services.Core.UiTextService | 75 | 12 | 87 | 306 | 86.2% | 55 | 70 | 78.5% |
+| Confirmai.Services.Core.UiTextService | 74 | 13 | 87 | 306 | 85% | 54 | 70 | 77.1% |
 | Confirmai.Services.Crypto.BitcoinQuoteService | 40 | 19 | 59 | 116 | 67.7% | 14 | 20 | 70% |
 | Confirmai.Services.Crypto.CryptoQuoteService | 47 | 28 | 75 | 149 | 62.6% | 18 | 30 | 60% |
 | Confirmai.Services.EventPayments.AbacatePayEventPaymentGateway | 3 | 8 | 11 | 28 | 27.2% | 0 | 0 |  |
