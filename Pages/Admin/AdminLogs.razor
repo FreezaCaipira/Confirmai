@@ -42,13 +42,18 @@
                 OnExportCsv="@ExportCsvAsync"
                 OnExportJson="@ExportJsonAsync" />
 
-            @if (!string.IsNullOrWhiteSpace(exportNotice))
-            {
-                <div class="orders-review-restored-notice" role="status">
-                    <span>@exportNotice</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissExportNotice" aria-label="@T["AdminCommon.CloseNotice"]">&times;—</button>
-                </div>
-            }
+            <AdminLogsNotices
+                ExportNotice="@exportNotice"
+                HasInvalidDateRange="@HasInvalidDateRange"
+                InvalidDateRangeMessage="@T["AdminLogs.InvalidDateRange"]"
+                ShowRestoredFiltersNotice="@showRestoredFiltersNotice"
+                RestoredFiltersMessage="@T["AdminLogs.RestoredFilters"]"
+                HasDateRangeFilter="@HasDateRangeFilter"
+                AppliedPeriodMessage="@T["AdminLogs.AppliedPeriod"]"
+                ActivePeriodSummary="@ActivePeriodSummary"
+                CloseNoticeLabel="@T["AdminCommon.CloseNotice"]"
+                OnDismissExportNotice="DismissExportNotice"
+                OnDismissRestoredNotice="DismissRestoredNotice" />
 
             <AdminLogsQuickFilters
                 SelectedQuickRangePreset="@selectedQuickRangePreset.ToString()"
@@ -64,26 +69,6 @@
                 OnSetAuditAll="@(() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.All))"
                 OnSetAuditSecurityPolicy="@(() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.SecurityPolicy))"
                 OnSetAuditPaymentPanelStale="@(() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.PaymentPanelStale))" />
-
-            @if (HasInvalidDateRange)
-            {
-                <div class="orders-review-restored-notice">
-                    <span>@T["AdminLogs.InvalidDateRange"]</span>
-                </div>
-            }
-
-            @if (showRestoredFiltersNotice)
-            {
-                <div class="orders-review-restored-notice">
-                    <span>@T["AdminLogs.RestoredFilters"]</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">&times;—</button>
-                </div>
-            }
-
-            @if (HasDateRangeFilter)
-            {
-                <div class="orders-review-sort-summary">@T["AdminLogs.AppliedPeriod"] @ActivePeriodSummary</div>
-            }
 
             <p class="logs-total-count">
                 <b>@T["AdminLogs.Total"]</b> @totalLogs

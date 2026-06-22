@@ -1,0 +1,41 @@
+@if (!string.IsNullOrWhiteSpace(ExportNotice))
+{
+    <div class="orders-review-restored-notice" role="status">
+        <span>@ExportNotice</span>
+        <button type="button" class="orders-review-restored-close" @onclick="OnDismissExportNotice" aria-label="@CloseNoticeLabel">&times;—</button>
+    </div>
+}
+
+@if (HasInvalidDateRange)
+{
+    <div class="orders-review-restored-notice">
+        <span>@InvalidDateRangeMessage</span>
+    </div>
+}
+
+@if (ShowRestoredFiltersNotice)
+{
+    <div class="orders-review-restored-notice">
+        <span>@RestoredFiltersMessage</span>
+        <button type="button" class="orders-review-restored-close" @onclick="OnDismissRestoredNotice" aria-label="@CloseNoticeLabel">&times;—</button>
+    </div>
+}
+
+@if (HasDateRangeFilter)
+{
+    <div class="orders-review-sort-summary">@AppliedPeriodMessage @ActivePeriodSummary</div>
+}
+
+@code {
+    [Parameter] public string? ExportNotice { get; set; }
+    [Parameter] public bool HasInvalidDateRange { get; set; }
+    [Parameter] public string InvalidDateRangeMessage { get; set; } = string.Empty;
+    [Parameter] public bool ShowRestoredFiltersNotice { get; set; }
+    [Parameter] public string RestoredFiltersMessage { get; set; } = string.Empty;
+    [Parameter] public bool HasDateRangeFilter { get; set; }
+    [Parameter] public string AppliedPeriodMessage { get; set; } = string.Empty;
+    [Parameter] public string ActivePeriodSummary { get; set; } = string.Empty;
+    [Parameter] public string CloseNoticeLabel { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnDismissExportNotice { get; set; }
+    [Parameter] public EventCallback OnDismissRestoredNotice { get; set; }
+}
