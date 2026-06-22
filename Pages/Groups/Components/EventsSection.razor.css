@@ -1,0 +1,212 @@
+.detail-events-title--no-mb {
+    margin-bottom: 0;
+}
+
+.detail-events-year {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: normal;
+    margin-left: 0.5rem;
+}
+
+.detail-events-tabs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detail-events-tabs-left {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.detail-events-tab {
+    background: var(--bg-deep);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s;
+}
+
+.detail-events-tab.active {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    border-color: var(--accent-gold);
+}
+
+.detail-events-tab:hover:not(.active) {
+    background: var(--bg-deep);
+    border-color: var(--accent-gold);
+}
+
+.detail-events-tabs-right {
+    display: flex;
+}
+
+.detail-events-create-btn {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+}
+
+.detail-events-create-btn:hover {
+    opacity: 0.9;
+}
+
+.events-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.events-table thead th {
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.et-th-data {
+    width: 40%;
+}
+
+.events-access-col {
+    width: 80px;
+    text-align: right;
+}
+
+.events-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.events-table tbody tr:hover {
+    background: var(--bg-deep);
+}
+
+.events-table tbody td {
+    padding: 0.75rem;
+}
+
+.et-empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem;
+}
+
+.et-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.et-num {
+    font-weight: 700;
+    color: var(--accent-gold);
+    font-size: 0.875rem;
+}
+
+.et-num-ph {
+    display: inline-block;
+    width: 24px;
+}
+
+.et-cell-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.et-date-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.et-date {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.event-next-badge {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    font-size: 0.75rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.et-time {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.et-players {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.et-players--full {
+    color: #10b981;
+}
+
+.et-players--empty {
+    color: var(--text-secondary);
+}
+
+.player-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.player-tag--cancel {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.player-tag--full {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.player-tag--open {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.event-access-btn {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.event-access-btn:hover {
+    opacity: 0.9;
+}

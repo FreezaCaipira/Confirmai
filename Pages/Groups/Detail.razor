@@ -156,108 +156,21 @@ else
             <hr class="detail-divider">
 
             @* ── Partidas ───────────────────────────────────────────── *@
-            <section class="detail-section">
-                <h2 class="detail-section-title detail-events-title detail-events-title--no-mb">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Partidas</span>
-                    <span class="detail-events-year">@eventsYear</span>
-                </h2>
-                <div class="detail-events-tabs">
-                    <div class="detail-events-tabs-left">
-                        <button class="detail-events-tab @(!showPastEvents ? "active" : string.Empty)"
-                                type="button"
-                                @onclick="() => showPastEvents = false">
-                            <i class="fas fa-bolt"></i> Próximas (@upcomingEvents.Count)
-                        </button>
-                        <button class="detail-events-tab @(showPastEvents ? "active" : string.Empty)"
-                                type="button"
-                                @onclick="() => showPastEvents = true">
-                            <i class="fas fa-history"></i> Realizadas (@pastEvents.Count)
-                        </button>
-                    </div>
-                    <div class="detail-events-tabs-right">
-                        @if (isAdmin)
-                        {
-                            <a href="@newEventHref" class="groups-create-btn detail-events-create-btn">
-                                <i class="fas fa-plus"></i> Nova partida
-                            </a>
-                        }
-                    </div>
-                </div>
-                <table class="events-table">
-                    <thead>
-                        <tr>
-                            <th class="et-th-data"><span class="et-num-ph"></span>Data</th>
-                            <th>Jogadores</th>
-                            <th>Status</th>
-                            <th class="events-access-col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (displayedEvents.Count == 0)
-                        {
-                            <tr>
-                                <td colspan="4" class="et-empty">
-                                    <i class="fas fa-calendar-plus"></i>
-                                    @(showPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida próxima.")
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            var nextUpcomingEventId = upcomingEvents.FirstOrDefault()?.Id;
-                            @foreach (var ev in displayedEvents)
-                            {
-                                var href   = group.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
-                                var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
-                                var isNextUpcoming = !showPastEvents && nextUpcomingEventId.HasValue && ev.Id == nextUpcomingEventId.Value;
-                                <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
-                                    <td>
-                                        <div class="et-cell">
-                                            <span class="et-num">#@(eventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
-                                            <div class="et-cell-info">
-                                                <span class="et-date-wrap">
-                                                    <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
-                                                    @if (isNextUpcoming)
-                                                    {
-                                                        <span class="event-next-badge">pr&oacute;xima</span>
-                                                    }
-                                                </span>
-                                                <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="et-players @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
-                                    </td>
-                                    <td>
-                                        @if (!ev.IsActive)
-                                        {
-                                            <span class="player-tag player-tag--cancel">cancelado</span>
-                                        }
-                                        else if (isFull)
-                                        {
-                                            <span class="player-tag player-tag--full">lotado</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="player-tag player-tag--open">aberto</span>
-                                        }
-                                    </td>
-                                    <td class="events-access-col">
-                                        <button class="event-access-btn"
-                                                type="button"
-                                                @onclick:stopPropagation="true"
-                                                @onclick="() => NavigationManager.NavigateTo(href)">
-                                            Acessar
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </section>
+            <EventsSection
+                DisplayedEvents="@displayedEvents"
+                UpcomingEvents="@upcomingEvents"
+                EventNumbers="@eventNumbers"
+                ShowPastEvents="@showPastEvents"
+                UpcomingCount="@upcomingEvents.Count"
+                PastCount="@pastEvents.Count"
+                EventsYear="@eventsYear"
+                Sport="@group.Sport"
+                IsAdmin="@isAdmin"
+                NewEventHref="@newEventHref"
+                OnTogglePastEvents="TogglePastEvents"
+                OnNavigate="NavigateToEvent"
+                FormatDate="FormatEventDate"
+                FormatTime="FormatEventTime" />
 
             @* ── Solicitações de entrada (admin) ─────────────────────── *@
             @if (isAdmin && pendingRequests.Count > 0)
@@ -479,6 +392,14 @@ else
     {
         return Ui.FormatDateTime(req.RequestedAt.ToLocalTime(), "DateTimeShortCompact");
     }
+
+    private void TogglePastEvents(bool value) => showPastEvents = value;
+
+    private void NavigateToEvent(string href) => NavigationManager.NavigateTo(href);
+
+    private string FormatEventDate(DateTime dt) => Ui.FormatDateTime(dt, "DateDefault");
+
+    private string FormatEventTime(DateTime dt) => Ui.FormatDateTime(dt, "TimeDefault");
 
     private async Task RequestToJoin()
     {

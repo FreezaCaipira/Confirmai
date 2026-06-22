@@ -1,0 +1,119 @@
+<section class="detail-section">
+    <h2 class="detail-section-title detail-events-title detail-events-title--no-mb">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Partidas</span>
+        <span class="detail-events-year">@EventsYear</span>
+    </h2>
+    <div class="detail-events-tabs">
+        <div class="detail-events-tabs-left">
+            <button class="detail-events-tab @(!ShowPastEvents ? "active" : string.Empty)"
+                    type="button"
+                    @onclick="() => OnTogglePastEvents.InvokeAsync(false)">
+                <i class="fas fa-bolt"></i> Próximas (@UpcomingCount)
+            </button>
+            <button class="detail-events-tab @(ShowPastEvents ? "active" : string.Empty)"
+                    type="button"
+                    @onclick="() => OnTogglePastEvents.InvokeAsync(true)">
+                <i class="fas fa-history"></i> Realizadas (@PastCount)
+            </button>
+        </div>
+        <div class="detail-events-tabs-right">
+            @if (IsAdmin)
+            {
+                <a href="@NewEventHref" class="groups-create-btn detail-events-create-btn">
+                    <i class="fas fa-plus"></i> Nova partida
+                </a>
+            }
+        </div>
+    </div>
+    <table class="events-table">
+        <thead>
+            <tr>
+                <th class="et-th-data"><span class="et-num-ph"></span>Data</th>
+                <th>Jogadores</th>
+                <th>Status</th>
+                <th class="events-access-col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (DisplayedEvents.Count == 0)
+            {
+                <tr>
+                    <td colspan="4" class="et-empty">
+                        <i class="fas fa-calendar-plus"></i>
+                        @(ShowPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida próxima.")
+                    </td>
+                </tr>
+            }
+            else
+            {
+                var nextUpcomingEventId = UpcomingEvents.FirstOrDefault()?.Id;
+                @foreach (var ev in DisplayedEvents)
+                {
+                    var href = Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
+                    var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
+                    var isNextUpcoming = !ShowPastEvents && nextUpcomingEventId.HasValue && ev.Id == nextUpcomingEventId.Value;
+                    <tr class="events-table-row" @onclick="() => OnNavigate.InvokeAsync(href)">
+                        <td>
+                            <div class="et-cell">
+                                <span class="et-num">#@(EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
+                                <div class="et-cell-info">
+                                    <span class="et-date-wrap">
+                                        <span class="et-date">@FormatDate(ev.StartsAt.ToLocalTime())</span>
+                                        @if (isNextUpcoming)
+                                        {
+                                            <span class="event-next-badge">pr&oacute;xima</span>
+                                        }
+                                    </span>
+                                    <span class="et-time">@FormatTime(ev.StartsAt.ToLocalTime())</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="et-players @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
+                        </td>
+                        <td>
+                            @if (!ev.IsActive)
+                            {
+                                <span class="player-tag player-tag--cancel">cancelado</span>
+                            }
+                            else if (isFull)
+                            {
+                                <span class="player-tag player-tag--full">lotado</span>
+                            }
+                            else
+                            {
+                                <span class="player-tag player-tag--open">aberto</span>
+                            }
+                        </td>
+                        <td class="events-access-col">
+                            <button class="event-access-btn"
+                                    type="button"
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => OnNavigate.InvokeAsync(href)">
+                                Acessar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</section>
+
+@code {
+    [Parameter] public List<Event> DisplayedEvents { get; set; } = new();
+    [Parameter] public List<Event> UpcomingEvents { get; set; } = new();
+    [Parameter] public Dictionary<int, int> EventNumbers { get; set; } = new();
+    [Parameter] public bool ShowPastEvents { get; set; }
+    [Parameter] public int UpcomingCount { get; set; }
+    [Parameter] public int PastCount { get; set; }
+    [Parameter] public int EventsYear { get; set; }
+    [Parameter] public Sport Sport { get; set; }
+    [Parameter] public bool IsAdmin { get; set; }
+    [Parameter] public string NewEventHref { get; set; } = string.Empty;
+    [Parameter] public EventCallback<bool> OnTogglePastEvents { get; set; }
+    [Parameter] public EventCallback<string> OnNavigate { get; set; }
+    [Parameter] public Func<DateTime, string> FormatDate { get; set; } = dt => dt.ToString("dd/MM/yyyy");
+    [Parameter] public Func<DateTime, string> FormatTime { get; set; } = dt => dt.ToString("HH:mm");
+}
