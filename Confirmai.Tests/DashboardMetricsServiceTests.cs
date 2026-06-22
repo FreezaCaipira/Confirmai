@@ -14,7 +14,7 @@ public class DashboardMetricsServiceTests
     [Fact]
     public async Task GetSnapshotAsync_ReturnsAggregatedMetrics()
     {
-        using var db = TestDataFactory.CreateDbContext();
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
 
         db.Users.AddRange(
             new ApplicationUser { Id = "u1", UserName = "user1", Email = "user1@test.local" },
@@ -27,7 +27,7 @@ public class DashboardMetricsServiceTests
 
         await db.SaveChangesAsync();
 
-        var service = new DashboardMetricsService(db);
+        var service = new DashboardMetricsService(factory);
         var snapshot = await service.GetSnapshotAsync();
 
         Assert.IsType<DashboardMetricsSnapshot>(snapshot);

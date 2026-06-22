@@ -43,7 +43,7 @@ public class PixManualPaymentFlowTests
         var factory = new TestInMemoryDbContextFactory(dbName);
         var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
         
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var confirmSvc = new AdminConfirmationService(factory, logService);
         
         return (db, uploadSvc, confirmSvc, factory);

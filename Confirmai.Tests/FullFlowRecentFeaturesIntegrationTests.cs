@@ -16,7 +16,9 @@ public class FullFlowRecentFeaturesIntegrationTests : IClassFixture<IntegrationT
     {
         "Identity/Account/Login",
         "Login",
-        "Entrar"
+        "Entrar",
+        "Inicio de sesion",
+        "Iniciar sesion"
     };
 
     [Fact]

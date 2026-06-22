@@ -20,32 +20,37 @@ public class ProductService
         NotFound
     }
 
-    private readonly AppDbContext _context;
+    private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly IWebHostEnvironment _env;
     private readonly LogService? _log;
 
-    public ProductService(AppDbContext context, IWebHostEnvironment env, LogService? log = null)
+    public ProductService(IDbContextFactory<AppDbContext> dbFactory, IWebHostEnvironment env, LogService? log = null)
     {
-        _context = context;
+        _dbFactory = dbFactory;
         _env = env;
         _log = log;
     }
 
     public async Task<List<Product>> GetAllAsync()
     {
-        return await _context.Products
+        await using var context = _dbFactory.CreateDbContext();
+        return await context.Products
             .Include(p => p.User)
             .Where(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"))
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
     }
     
-    public async Task<Product?> GetByIdAsync(int id) =>
-        await _context.Products
+    public async Task<Product?> GetByIdAsync(int id)
+    {
+        await using var context = _dbFactory.CreateDbContext();
+        return await context.Products
             .FirstOrDefaultAsync(p => p.Id == id);
+    }
 
     public async Task AddAsync(Product product, IBrowserFile? imageFile, IEnumerable<int>? serverIds = null)
     {
+        await using var context = _dbFactory.CreateDbContext();
         product.RequiresDelivery = false;
         product.AccentColor = NormalizeAccentColor(product.AccentColor);
 
@@ -55,8 +60,8 @@ public class ProductService
             product.ImagePath = imagePath;
         }
 
-        _context.Products.Add(product);
-        await _context.SaveChangesAsync();
+        context.Products.Add(product);
+        await context.SaveChangesAsync();
 
         if (_log != null)
         {
@@ -73,7 +78,8 @@ public class ProductService
 
     public async Task UpdateAsync(Product product, IBrowserFile? imageFile, IEnumerable<int>? serverIds = null)
     {
-        var existing = await _context.Products
+        await using var context = _dbFactory.CreateDbContext();
+        var existing = await context.Products
             .FirstOrDefaultAsync(p => p.Id == product.Id);
 
         if (existing == null)
@@ -101,7 +107,7 @@ public class ProductService
             existing.ImagePath = imagePath;
         }
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         if (_log != null)
         {
@@ -118,7 +124,8 @@ public class ProductService
 
     public async Task<ProductDeleteResult> DeleteAsync(int id)
     {
-        var product = await _context.Products
+        await using var context = _dbFactory.CreateDbContext();
+        var product = await context.Products
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
@@ -126,11 +133,11 @@ public class ProductService
             return ProductDeleteResult.NotFound;
         }
 
-        _context.Products.Remove(product);
+        context.Products.Remove(product);
 
         try
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             if (_log != null)
             {
                 await _log.AuditAsync(
@@ -147,9 +154,9 @@ public class ProductService
         }
         catch (DbUpdateException)
         {
-            _context.Entry(product).State = EntityState.Unchanged;
+            context.Entry(product).State = EntityState.Unchanged;
             ArchiveProduct(product);
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             if (_log != null)
             {
                 await _log.AuditAsync(
@@ -208,24 +215,31 @@ public class ProductService
 
     public async Task<int> GetProductsCountAsync()
     {
-        return await _context.Products
+        await using var context = _dbFactory.CreateDbContext();
+        return await context.Products
             .Where(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"))
             .CountAsync();
     }
 
-    public async Task<List<Product>> GetAllExceptUserAsync(string userId) =>
-        await _context.Products
+    public async Task<List<Product>> GetAllExceptUserAsync(string userId)
+    {
+        await using var context = _dbFactory.CreateDbContext();
+        return await context.Products
             .Where(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"))
             .Where(p => p.UserId != userId)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
+    }
 
-    public async Task<List<Product>> GetByUserIdAsync(string userId) =>
-        await _context.Products
+    public async Task<List<Product>> GetByUserIdAsync(string userId)
+    {
+        await using var context = _dbFactory.CreateDbContext();
+        return await context.Products
             .Where(p => p.Category == null || (p.Category.ToLower() != "legacy-archived" && p.Category.ToLower() != "deleted-archived"))
             .Where(p => p.UserId == userId)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
+    }
 
     private static string? NormalizeAccentColor(string? color)
     {

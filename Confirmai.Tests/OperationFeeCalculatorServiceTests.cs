@@ -15,8 +15,8 @@ public class OperationFeeCalculatorServiceTests
     [Fact]
     public async Task CalculateBreakdownAsync_UsesDefaultPercent_WhenSettingIsMissing()
     {
-        await using var db = CreateDbContext();
-        var settingsService = new AdminSettingsService(db);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"operation-fee-{Guid.NewGuid()}");
+        var settingsService = new AdminSettingsService(dbFactory);
         var service = new OperationFeeCalculatorService(settingsService);
 
         const decimal grossAmount = 0.005m;
@@ -36,8 +36,8 @@ public class OperationFeeCalculatorServiceTests
     [Fact]
     public async Task CalculateBreakdownAsync_UsesPersistedPercent_AndRoundsFeeToEightDecimals()
     {
-        await using var db = CreateDbContext();
-        var settingsService = new AdminSettingsService(db);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"operation-fee-{Guid.NewGuid()}");
+        var settingsService = new AdminSettingsService(dbFactory);
         var service = new OperationFeeCalculatorService(settingsService);
 
         var saved = await settingsService.SetOperationFeePercentAsync(3.257m);
@@ -52,15 +52,6 @@ public class OperationFeeCalculatorServiceTests
         Assert.Equal(3.26m, breakdown.Percent);
         Assert.Equal(expectedFee, breakdown.FeeAmount);
         Assert.Equal(grossAmount - expectedFee, breakdown.NetAmount);
-    }
-
-    private static AppDbContext CreateDbContext()
-    {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase($"operation-fee-calculator-tests-{Guid.NewGuid()}")
-            .Options;
-
-        return new AppDbContext(options);
     }
 }
 

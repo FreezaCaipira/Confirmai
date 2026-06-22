@@ -19,18 +19,19 @@ public class AdminSettingsService
     public const int DefaultReconciliationWarningThreshold = 5;
     public const int DefaultReconciliationCriticalThreshold = 10;
 
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly LogService? _log;
 
-    public AdminSettingsService(AppDbContext db, LogService? log = null)
+    public AdminSettingsService(IDbContextFactory<AppDbContext> dbFactory, LogService? log = null)
     {
-        _db = db;
+        _dbFactory = dbFactory;
         _log = log;
     }
 
     public async Task<decimal> GetOperationFeePercentAsync()
     {
-        var setting = await _db.AppSettings
+        await using var db = _dbFactory.CreateDbContext();
+        var setting = await db.AppSettings
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Key == OperationFeePercentKey);
 
@@ -63,7 +64,8 @@ public class AdminSettingsService
         var normalized = Math.Round(operationFeePercent, 2, MidpointRounding.AwayFromZero)
             .ToString("0.##", CultureInfo.InvariantCulture);
 
-        var setting = await _db.AppSettings.FindAsync(OperationFeePercentKey);
+        await using var db = _dbFactory.CreateDbContext();
+        var setting = await db.AppSettings.FindAsync(OperationFeePercentKey);
 
         if (setting is null)
         {
@@ -72,14 +74,14 @@ public class AdminSettingsService
                 Key = OperationFeePercentKey,
                 Value = normalized
             };
-            _db.AppSettings.Add(setting);
+            db.AppSettings.Add(setting);
         }
         else
         {
             setting.Value = normalized;
         }
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         if (_log != null)
             await _log.AuditAsync(
@@ -102,7 +104,8 @@ public class AdminSettingsService
 
     public async Task<string?> GetSiteIntermediaryPixKeyAsync()
     {
-        var setting = await _db.AppSettings
+        await using var db = _dbFactory.CreateDbContext();
+        var setting = await db.AppSettings
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Key == SiteIntermediaryPixKey);
 
@@ -119,14 +122,15 @@ public class AdminSettingsService
     public async Task<bool> SetSiteIntermediaryPixKeyAsync(string? pixKey, string? actorUserId = null)
     {
         var normalized = pixKey?.Trim();
-        var setting = await _db.AppSettings.FindAsync(SiteIntermediaryPixKey);
+        await using var db = _dbFactory.CreateDbContext();
+        var setting = await db.AppSettings.FindAsync(SiteIntermediaryPixKey);
 
         if (string.IsNullOrWhiteSpace(normalized))
         {
             if (setting is not null)
             {
-                _db.AppSettings.Remove(setting);
-                await _db.SaveChangesAsync();
+                db.AppSettings.Remove(setting);
+                await db.SaveChangesAsync();
 
                 if (_log != null)
                     await _log.AuditAsync(
@@ -153,14 +157,14 @@ public class AdminSettingsService
                 Key = SiteIntermediaryPixKey,
                 Value = normalized
             };
-            _db.AppSettings.Add(setting);
+            db.AppSettings.Add(setting);
         }
         else
         {
             setting.Value = normalized;
         }
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         if (_log != null)
             await _log.AuditAsync(
@@ -183,7 +187,8 @@ public class AdminSettingsService
 
     public async Task<bool> GetLuaDeliveryEnabledAsync()
     {
-        var setting = await _db.AppSettings
+        await using var db = _dbFactory.CreateDbContext();
+        var setting = await db.AppSettings
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Key == LuaDeliveryEnabledKey);
 
@@ -198,19 +203,20 @@ public class AdminSettingsService
 
     public async Task SetLuaDeliveryEnabledAsync(bool enabled, string? actorUserId = null)
     {
-        var setting = await _db.AppSettings.FindAsync(LuaDeliveryEnabledKey);
+        await using var db = _dbFactory.CreateDbContext();
+        var setting = await db.AppSettings.FindAsync(LuaDeliveryEnabledKey);
         var value = enabled ? "true" : "false";
 
         if (setting is null)
         {
-            _db.AppSettings.Add(new AppSetting { Key = LuaDeliveryEnabledKey, Value = value });
+            db.AppSettings.Add(new AppSetting { Key = LuaDeliveryEnabledKey, Value = value });
         }
         else
         {
             setting.Value = value;
         }
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         if (_log != null)
             await _log.AuditAsync(
@@ -231,7 +237,8 @@ public class AdminSettingsService
 
     public async Task<(int warningThreshold, int criticalThreshold)> GetReconciliationSeverityThresholdsAsync()
     {
-        var settings = await _db.AppSettings
+        await using var db = _dbFactory.CreateDbContext();
+        var settings = await db.AppSettings
             .AsNoTracking()
             .Where(s => s.Key == ReconciliationWarningThresholdKey || s.Key == ReconciliationCriticalThresholdKey)
             .ToListAsync();
@@ -281,29 +288,30 @@ public class AdminSettingsService
         var normalizedWarning = warningThreshold.ToString(CultureInfo.InvariantCulture);
         var normalizedCritical = criticalThreshold.ToString(CultureInfo.InvariantCulture);
 
-        var warningSetting = await _db.AppSettings.FindAsync(ReconciliationWarningThresholdKey);
+        await using var db = _dbFactory.CreateDbContext();
+        var warningSetting = await db.AppSettings.FindAsync(ReconciliationWarningThresholdKey);
         if (warningSetting is null)
         {
             warningSetting = new AppSetting { Key = ReconciliationWarningThresholdKey, Value = normalizedWarning };
-            _db.AppSettings.Add(warningSetting);
+            db.AppSettings.Add(warningSetting);
         }
         else
         {
             warningSetting.Value = normalizedWarning;
         }
 
-        var criticalSetting = await _db.AppSettings.FindAsync(ReconciliationCriticalThresholdKey);
+        var criticalSetting = await db.AppSettings.FindAsync(ReconciliationCriticalThresholdKey);
         if (criticalSetting is null)
         {
             criticalSetting = new AppSetting { Key = ReconciliationCriticalThresholdKey, Value = normalizedCritical };
-            _db.AppSettings.Add(criticalSetting);
+            db.AppSettings.Add(criticalSetting);
         }
         else
         {
             criticalSetting.Value = normalizedCritical;
         }
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         if (_log is not null)
         {

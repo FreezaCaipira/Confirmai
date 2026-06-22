@@ -30,7 +30,7 @@ public class AdminConfirmationServiceTests
         await db.SaveChangesAsync();
         var confirmationId = conf.Id;
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var service = new AdminConfirmationService(factory, logService);
 
         // Act
@@ -71,7 +71,7 @@ public class AdminConfirmationServiceTests
         await db.SaveChangesAsync();
         var confirmationId = conf.Id;
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var service = new AdminConfirmationService(factory, logService);
 
         // Act
@@ -112,7 +112,7 @@ public class AdminConfirmationServiceTests
         await db.SaveChangesAsync();
         var confirmationId = conf.Id;
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var service = new AdminConfirmationService(factory, logService);
 
         // Act
@@ -149,7 +149,7 @@ public class AdminConfirmationServiceTests
         await db.SaveChangesAsync();
         var confirmationId = conf.Id;
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var service = new AdminConfirmationService(factory, logService);
 
         // Act
@@ -228,7 +228,7 @@ public class AdminConfirmationServiceTests
         await db.SaveChangesAsync();
         var confirmationId = conf.Id;
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var service = new AdminConfirmationService(factory, logService);
 
         // Act
@@ -323,7 +323,7 @@ public class AdminConfirmationServiceTests
         db.EventConfirmations.Add(conf2);
         await db.SaveChangesAsync();
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var service = new AdminConfirmationService(factory, logService);
 
         // Act
@@ -357,7 +357,7 @@ public class AdminConfirmationServiceTests
         await db.SaveChangesAsync();
         var confirmationId = conf.Id;
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var service = new AdminConfirmationService(factory, logService);
 
         // Act

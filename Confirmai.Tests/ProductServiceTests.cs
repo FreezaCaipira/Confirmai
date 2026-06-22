@@ -1,4 +1,4 @@
-using Confirmai.Models;
+ï»¿using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Payment;
@@ -18,13 +18,13 @@ public class ProductServiceTests
     [Fact]
     public async Task AddAsync_PersistsProduct_WhenImageIsNull()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         await service.AddAsync(new Product
         {
             Name = "Produto 1",
-            Description = "Descrição",
+            Description = "Descriï¿½ï¿½o",
             Price = 0.001m,
             UserId = "seller-1"
         }, imageFile: null);
@@ -35,8 +35,8 @@ public class ProductServiceTests
     [Fact]
     public async Task UpdateAndDeleteAsync_WorkAsExpected()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         var product = new Product
         {
@@ -60,8 +60,8 @@ public class ProductServiceTests
     [Fact]
     public async Task GetAllExceptUserAsync_FiltersByUser()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         await service.AddAsync(new Product { Name = "A", Description = "D", Price = 0.1m, UserId = "u1" }, null);
         await service.AddAsync(new Product { Name = "B", Description = "D", Price = 0.2m, UserId = "u2" }, null);
@@ -84,8 +84,8 @@ public class ProductServiceTests
     [Fact]
     public async Task GetAllAsync_ExcludesArchivedProducts()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         db.Users.Add(new ApplicationUser { Id = "u1", UserName = "u1" });
         db.Products.AddRange(
@@ -106,8 +106,8 @@ public class ProductServiceTests
     [Fact]
     public async Task GetByIdAsync_ReturnsProduct_WhenExists()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         var product = new Product { Name = "Test", Description = "d", Price = 1m, UserId = "u1" };
         db.Products.Add(product);
@@ -121,8 +121,8 @@ public class ProductServiceTests
     [Fact]
     public async Task GetByIdAsync_ReturnsNull_WhenNotFound()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         Assert.Null(await service.GetByIdAsync(999));
     }
@@ -130,8 +130,8 @@ public class ProductServiceTests
     [Fact]
     public async Task AddAsync_SetsRequiresDeliveryFalse()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         var product = new Product { Name = "Item", Description = "d", Price = 1m, UserId = "u1", RequiresDelivery = true };
         await service.AddAsync(product, null);
@@ -142,8 +142,8 @@ public class ProductServiceTests
     [Fact]
     public async Task AddAsync_NormalizesAccentColor()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         var product = new Product { Name = "Item", Description = "d", Price = 1m, UserId = "u1", AccentColor = "  ff00aa  " };
         await service.AddAsync(product, null);
@@ -156,8 +156,8 @@ public class ProductServiceTests
     [Fact]
     public async Task UpdateAsync_DoesNothing_WhenProductNotFound()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         var ghost = new Product { Id = 999, Name = "Ghost", Description = "d", Price = 1m, UserId = "u1" };
         await service.UpdateAsync(ghost, null);
@@ -170,8 +170,8 @@ public class ProductServiceTests
     [Fact]
     public async Task DeleteAsync_ReturnsNotFound_WhenMissing()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         Assert.Equal(ProductService.ProductDeleteResult.NotFound, await service.DeleteAsync(999));
     }
@@ -179,8 +179,8 @@ public class ProductServiceTests
     [Fact]
     public async Task DeleteAsync_Deletes_WhenNoOrders()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         var product = new Product { Name = "Item", Description = "d", Price = 1m, UserId = "u1" };
         db.Products.Add(product);
@@ -189,7 +189,8 @@ public class ProductServiceTests
         var result = await service.DeleteAsync(product.Id);
 
         Assert.Equal(ProductService.ProductDeleteResult.Deleted, result);
-        Assert.Null(await db.Products.FindAsync(product.Id));
+        await using var verifyDb = factory.CreateDbContext();
+        Assert.Null(await verifyDb.Products.FindAsync(product.Id));
     }
 
     // -- GetProductsCountAsync ----------------------------------------
@@ -197,8 +198,8 @@ public class ProductServiceTests
     [Fact]
     public async Task GetProductsCountAsync_ExcludesArchived()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         db.Products.AddRange(
             new Product { Name = "A", Description = "d", Price = 1m, UserId = "u1" },
@@ -215,8 +216,8 @@ public class ProductServiceTests
     [Fact]
     public async Task GetByUserIdAsync_ReturnsOnlyUserProducts()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         db.Products.AddRange(
             new Product { Name = "Mine", Description = "d", Price = 1m, UserId = "u1" },
@@ -233,8 +234,8 @@ public class ProductServiceTests
     [Fact]
     public async Task GetByUserIdAsync_ExcludesArchived()
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         db.Products.AddRange(
             new Product { Name = "Active", Description = "d", Price = 1m, UserId = "u1" },
@@ -260,8 +261,8 @@ public class ProductServiceTests
     [InlineData("12345", null)]
     public async Task AccentColor_IsNormalizedOnAdd(string? input, string? expected)
     {
-        using var db = TestDataFactory.CreateDbContext();
-        var service = new ProductService(db, CreateEnvironment());
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
 
         var product = new Product { Name = "P", Description = "d", Price = 1m, UserId = "u1", AccentColor = input };
         await service.AddAsync(product, null);
@@ -269,3 +270,4 @@ public class ProductServiceTests
         Assert.Equal(expected, product.AccentColor);
     }
 }
+

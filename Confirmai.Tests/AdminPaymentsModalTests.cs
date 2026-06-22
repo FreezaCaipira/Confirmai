@@ -132,7 +132,7 @@ public class AdminPaymentsModalTests
         await db.SaveChangesAsync();
         var confirmationId = conf.Id;
 
-        var logService = new LogService(db, NullLogger<LogService>.Instance);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var adminService = new AdminConfirmationService(factory, logService);
         var adminId = "admin-user";
 

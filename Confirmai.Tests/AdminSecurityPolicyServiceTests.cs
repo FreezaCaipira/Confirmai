@@ -19,8 +19,9 @@ public class AdminSecurityPolicyServiceTests
     [Fact]
     public async Task GetRuntimePolicyAsync_ReturnsEnvironmentDefaults_WhenSettingsDoNotExist()
     {
-        await using var db = CreateDbContext();
-        var service = CreateService(db, isDevelopment: false);
+        var factory = TestDbContextFactory.CreateInMemoryFactory($"admin-security-policy-{Guid.NewGuid()}");
+        await using var db = factory.CreateDbContext();
+        var service = CreateService(db, factory, isDevelopment: false);
 
         var policy = await service.GetRuntimePolicyAsync();
 
@@ -32,14 +33,15 @@ public class AdminSecurityPolicyServiceTests
     [Fact]
     public async Task GetRuntimePolicyAsync_UsesPersistedValues_WhenSettingsExist()
     {
-        await using var db = CreateDbContext();
+        var factory = TestDbContextFactory.CreateInMemoryFactory($"admin-security-policy-{Guid.NewGuid()}");
+        await using var db = factory.CreateDbContext();
         db.AppSettings.AddRange(
             new AppSetting { Key = AdminSecurityPolicyService.RequireConfirmedEmailKey, Value = "false" },
             new AppSetting { Key = AdminSecurityPolicyService.LockoutMaxAttemptsKey, Value = "3" },
             new AppSetting { Key = AdminSecurityPolicyService.LockoutMinutesKey, Value = "25" });
         await db.SaveChangesAsync();
 
-        var service = CreateService(db, isDevelopment: false);
+        var service = CreateService(db, factory, isDevelopment: false);
         var policy = await service.GetRuntimePolicyAsync();
 
         Assert.False(policy.RequireConfirmedEmail);
@@ -50,8 +52,9 @@ public class AdminSecurityPolicyServiceTests
     [Fact]
     public async Task SetRuntimePolicyForAdminAsync_Throws_WhenUserIsNotAdmin()
     {
-        await using var db = CreateDbContext();
-        var service = CreateService(db, isDevelopment: false);
+        var factory = TestDbContextFactory.CreateInMemoryFactory($"admin-security-policy-{Guid.NewGuid()}");
+        await using var db = factory.CreateDbContext();
+        var service = CreateService(db, factory, isDevelopment: false);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
             service.SetRuntimePolicyForAdminAsync(CreatePrincipal("u-1", "user"), new RuntimeSecurityPolicy(false, 3, 15)));
@@ -60,11 +63,12 @@ public class AdminSecurityPolicyServiceTests
     [Fact]
     public async Task SetRuntimePolicyForAdminAsync_PersistsValues_WhenUserIsAdmin()
     {
-        await using var db = CreateDbContext();
+        var factory = TestDbContextFactory.CreateInMemoryFactory($"admin-security-policy-{Guid.NewGuid()}");
+        await using var db = factory.CreateDbContext();
         // Seed RequireConfirmedEmail = true so the audit log shows True -> False
         db.AppSettings.Add(new AppSetting { Key = AdminSecurityPolicyService.RequireConfirmedEmailKey, Value = "true" });
         await db.SaveChangesAsync();
-        var service = CreateService(db, isDevelopment: false);
+        var service = CreateService(db, factory, isDevelopment: false);
 
         var saved = await service.SetRuntimePolicyForAdminAsync(CreatePrincipal("a-1", "admin"), new RuntimeSecurityPolicy(false, 2, 30));
         var policy = await service.GetRuntimePolicyAsync();
@@ -88,15 +92,6 @@ public class AdminSecurityPolicyServiceTests
         Assert.Contains("LockoutMinutes: 15 -> 30", auditLog.Message);
     }
 
-    private static AppDbContext CreateDbContext()
-    {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase($"admin-security-policy-tests-{Guid.NewGuid()}")
-            .Options;
-
-        return new AppDbContext(options);
-    }
-
     private static IWebHostEnvironment CreateEnvironment(bool isDevelopment)
     {
         var env = new Mock<IWebHostEnvironment>();
@@ -104,12 +99,12 @@ public class AdminSecurityPolicyServiceTests
         return env.Object;
     }
 
-    private static AdminSecurityPolicyService CreateService(AppDbContext db, bool isDevelopment)
+    private static AdminSecurityPolicyService CreateService(AppDbContext db, IDbContextFactory<AppDbContext> factory, bool isDevelopment)
     {
         return new AdminSecurityPolicyService(
-            db,
+            factory,
             CreateEnvironment(isDevelopment),
-            new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance));
+            new LogService(factory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance));
     }
 
     private static ClaimsPrincipal CreatePrincipal(string userId, params string[] roles)
