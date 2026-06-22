@@ -1,0 +1,68 @@
+.invite-block {
+    background: var(--bg-deep);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.invite-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.invite-label {
+    font-weight: 600;
+    color: var(--accent-gold);
+    white-space: nowrap;
+}
+
+.invite-code-display {
+    background: var(--parchment);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.invite-code-only {
+    max-width: 150px;
+}
+
+.invite-copy-btn {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.invite-copy-btn:hover {
+    opacity: 0.9;
+}
+
+.invite-row-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 0.75rem 0;
+}
+
+.invite-block-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.invite-block-btn {
+    flex: 1;
+    text-align: center;
+}
