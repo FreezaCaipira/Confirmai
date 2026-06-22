@@ -1,0 +1,10 @@
+<div class="mailbox-page-header">
+    <h3 class="mailbox-page-title">@Title</h3>
+    <button class="mk-btn mk-btn-secondary mailbox-profile-btn" type="button" @onclick="OnProfileClick">@ProfileButtonText</button>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string ProfileButtonText { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnProfileClick { get; set; }
+}
