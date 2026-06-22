@@ -316,16 +316,9 @@ else
 
     @if (viewingProofConfirmationId.HasValue)
     {
-        <div class="payment-proof-viewer" @onclick="() => viewingProofConfirmationId = null">
-            <div class="payment-proof-viewer-content" @onclick:stopPropagation="true">
-                <button class="payment-proof-viewer-close" type="button" @onclick="() => viewingProofConfirmationId = null">
-                    <i class="fas fa-times"></i>
-                </button>
-                <img src="/api/pix-proof/@viewingProofConfirmationId"
-                     class="payment-proof-img"
-                     alt="Comprovante Pix" />
-            </div>
-        </div>
+        <PaymentProofViewer
+            ProofImageUrl="@($"/api/pix-proof/{viewingProofConfirmationId}")"
+            OnClose="() => viewingProofConfirmationId = null" />
     }
 }
 

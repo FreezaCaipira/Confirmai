@@ -1,0 +1,15 @@
+<div class="payment-proof-viewer" @onclick="OnClose">
+    <div class="payment-proof-viewer-content" @onclick:stopPropagation="true">
+        <button class="payment-proof-viewer-close" type="button" @onclick="OnClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <img src="@ProofImageUrl"
+             class="payment-proof-img"
+             alt="Comprovante Pix" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public string ProofImageUrl { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnClose { get; set; }
+}
