@@ -66,7 +66,7 @@ else
             @* ── Membros ────────────────────────────────────────── *@
             @if (group.Members.Count > 0)
             {
-                <section class="detail-section" style="margin-top: 1.5rem;">
+                <section class="detail-section detail-section--spaced">
                     <h2 class="detail-section-title">
                         <i class="fas fa-users"></i> Membros (@group.Members.Count)
                     </h2>
@@ -90,7 +90,7 @@ else
             @* ── Partidas ───────────────────────────────────────── *@
             @if (recentEvents.Count > 0)
             {
-                <section class="detail-section" style="margin-top: 1.5rem;">
+                <section class="detail-section detail-section--spaced">
                     <h2 class="detail-section-title">
                         <i class="fas fa-calendar-alt"></i> Partidas (@recentEvents.Count)
                     </h2>
@@ -138,7 +138,7 @@ else
                 </section>
             }
 
-            <div class="detail-action" style="margin-top: 1.5rem;">
+            <div class="detail-action">
                 @if (currentUserId is null)
                 {
                     <a href="/Identity/Account/Login?ReturnUrl=@Uri.EscapeDataString(NavigationManager.Uri)"
@@ -152,7 +152,7 @@ else
                         <i class="fas fa-check-circle"></i>
                         <span>Você já é membro deste grupo.</span>
                     </div>
-                    <a href="/grupo/@group.Id" class="confirm-btn" style="margin-top: 1rem;">
+                    <a href="/grupo/@group.Id" class="confirm-btn confirm-btn--mt">
                         Ver grupo
                     </a>
                 }
@@ -162,7 +162,7 @@ else
                         <i class="fas fa-check-circle"></i>
                         <span>Você entrou no grupo <strong>@group.Name</strong>!</span>
                     </div>
-                    <a href="/grupo/@group.Id" class="confirm-btn" style="margin-top: 1rem;">
+                    <a href="/grupo/@group.Id" class="confirm-btn confirm-btn--mt">
                         Ver grupo
                     </a>
                 }

@@ -46,8 +46,8 @@
                     <div class="skeleton-list-item">
                         <div class="skeleton-list-item-avatar"></div>
                         <div class="skeleton-list-item-content">
-                            <div class="skeleton-line skeleton-line--md" style="max-width: 200px;"></div>
-                            <div class="skeleton-line skeleton-line--sm" style="max-width: 150px;"></div>
+                            <div class="skeleton-line skeleton-line--md skeleton-w-200"></div>
+                            <div class="skeleton-line skeleton-line--sm skeleton-w-150"></div>
                         </div>
                     </div>
                 </div>
@@ -177,7 +177,7 @@ else
 
             @* ── Partidas ───────────────────────────────────────────── *@
             <section class="detail-section">
-                <h2 class="detail-section-title detail-events-title" style="margin-bottom:0">
+                <h2 class="detail-section-title detail-events-title detail-events-title--no-mb">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Partidas</span>
                     <span class="detail-events-year">@eventsYear</span>
@@ -337,7 +337,7 @@ else
                     }
                     else if (userJoinRequest?.Status == JoinRequestStatus.Rejected)
                     {
-                        <p class="join-request-pending" style="color:#f87171">
+                        <p class="join-request-pending join-request-pending--rejected">
                             <i class="fas fa-times-circle"></i>
                             Sua solicitação foi recusada.
                         </p>
@@ -416,8 +416,8 @@ else
     
     private CancellationTokenSource? _copyInviteCts;
     private CancellationTokenSource? _copyCodeCts;
-    private Task? _copyInviteTask;
-    private Task? _copyCodeTask;
+    private Task? _copyInviteTask = null;
+    private Task? _copyCodeTask = null;
     private bool                      showPastEvents   = false;
     private bool                      showAllMembers   = false;
     private const int                 MembersPreviewLimit = 8;
@@ -698,10 +698,11 @@ else
         selectedPaymentUserId = selectedPaymentUserId == userId ? null : userId;
     }
 
-    private async Task HandleTabChange(string tab)
+    private Task HandleTabChange(string tab)
     {
         paymentTab = tab;
         selectedPaymentUserId = null; // Reset selection when switching tabs
+        return Task.CompletedTask;
     }
 
     private async Task HandleMarkPaidAsync((int ConfirmationId, string UserId) args)
@@ -722,9 +723,10 @@ else
         }
     }
 
-    private async Task HandleViewProof(int confirmationId)
+    private Task HandleViewProof(int confirmationId)
     {
         viewingProofConfirmationId = confirmationId;
+        return Task.CompletedTask;
     }
 
 
@@ -838,7 +840,7 @@ else
                 userName,
                 c.EventId,
                 eventName,
-                c.Event.StartsAt,
+                c.Event!.StartsAt,
                 c.Event.Price ?? 0,
                 href,
                 c.PixProofUploadedAt!.Value);
