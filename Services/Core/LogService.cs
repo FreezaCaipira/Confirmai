@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Confirmai.Data;
 using Confirmai.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Confirmai.Services.Core;
 
@@ -17,18 +18,18 @@ public class LogService
         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
     };
 
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly ILogger<LogService> _logger;
     private readonly IHttpContextAccessor? _httpContextAccessor;
     private readonly PaymentDomainMetrics? _paymentMetrics;
 
     public LogService(
-        AppDbContext db,
+        IDbContextFactory<AppDbContext> dbFactory,
         ILogger<LogService> logger,
         IHttpContextAccessor? httpContextAccessor = null,
         PaymentDomainMetrics? paymentMetrics = null)
     {
-        _db = db;
+        _dbFactory = dbFactory;
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;
         _paymentMetrics = paymentMetrics;
@@ -47,8 +48,9 @@ public class LogService
 
         EnrichWithRequestContext(log);
 
-        _db.Logs.Add(log);
-        await _db.SaveChangesAsync();
+        await using var db = _dbFactory.CreateDbContext();
+        db.Logs.Add(log);
+        await db.SaveChangesAsync();
 
         _paymentMetrics?.Track(log);
 
@@ -88,8 +90,9 @@ public class LogService
 
         EnrichWithRequestContext(log);
 
-        _db.Logs.Add(log);
-        await _db.SaveChangesAsync();
+        await using var db = _dbFactory.CreateDbContext();
+        db.Logs.Add(log);
+        await db.SaveChangesAsync();
 
         _paymentMetrics?.Track(log);
 

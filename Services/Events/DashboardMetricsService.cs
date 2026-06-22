@@ -12,18 +12,19 @@ public class DashboardMetricsSnapshot
 
 public class DashboardMetricsService
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _dbFactory;
 
-    public DashboardMetricsService(AppDbContext db)
+    public DashboardMetricsService(IDbContextFactory<AppDbContext> dbFactory)
     {
-        _db = db;
+        _dbFactory = dbFactory;
     }
 
     public async Task<DashboardMetricsSnapshot> GetSnapshotAsync()
     {
-        var usersCount = await _db.Users.CountAsync();
+        await using var db = _dbFactory.CreateDbContext();
+        var usersCount = await db.Users.CountAsync();
 
-        var quoteQueriesCount = await _db.Logs.CountAsync(log =>
+        var quoteQueriesCount = await db.Logs.CountAsync(log =>
             log.Source == "QuoteQuery" ||
             log.Source == "Quote" ||
             log.Source == "CryptoQuote" ||

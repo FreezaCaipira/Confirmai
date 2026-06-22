@@ -192,18 +192,18 @@ dotnet test
 
 ### Fase 2 — Cloud (Devin na próxima cota)
 ```
-[ ] C1. Decompor Groups/Detail.razor (947L)
-[ ] C1. Decompor Futsal/Detail.razor (933L)
-[ ] C1. Decompor AdminLogs.razor (695L)
-[ ] C1. Decompor Mailbox.razor (674L)
-[ ] C1. Decompor Poker/Detail.razor (628L)
-[ ] C2. Migrar LogService → IDbContextFactory
-[ ] C2. Migrar AdminSettingsService → IDbContextFactory
-[ ] C2. Migrar ProductService → IDbContextFactory
-[ ] C2. Migrar PaymentConfirmationService → IDbContextFactory
-[ ] C2. Migrar AdminSecurityPolicyService → IDbContextFactory
-[ ] C2. Migrar DashboardMetricsService → IDbContextFactory
-[ ] C3. UiTextService Phase 2 (EN-US/ES-ES)
+[x] C1. Decompor Groups/Detail.razor (947L)
+[x] C1. Decompor Futsal/Detail.razor (933L)
+[x] C1. Decompor AdminLogs.razor (695L)
+[x] C1. Decompor Mailbox.razor (674L)
+[x] C1. Decompor Poker/Detail.razor (628L)
+[x] C2. Migrar LogService → IDbContextFactory
+[x] C2. Migrar AdminSettingsService → IDbContextFactory
+[x] C2. Migrar ProductService → IDbContextFactory
+[x] C2. Migrar PaymentConfirmationService → IDbContextFactory
+[x] C2. Migrar AdminSecurityPolicyService → IDbContextFactory
+[x] C2. Migrar DashboardMetricsService → IDbContextFactory
+[x] C3. UiTextService Phase 2 (EN-US/ES-ES)
 [ ] C4. Atualizar docs
 ```
 

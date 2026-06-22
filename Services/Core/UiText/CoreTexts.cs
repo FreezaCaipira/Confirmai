@@ -87,13 +87,57 @@ internal static class CoreTexts
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
-        ["App.NotAuthorized"] = "You are not authorized to access this page.",
-
+        // Navigation
         ["Nav.Dashboard"] = "Dashboard",
         ["Nav.Marketplace"] = "Marketplace",
-        ["Layout.Hello"] = "Hello",
-        ["Common.Loading"] = "Loading...",
+        ["Nav.MyProducts"] = "My Products",
+        ["Nav.InvoiceHistory"] = "Invoice History",
+        ["Nav.Login"] = "Login",
+        ["Nav.Register"] = "Register",
+        ["Nav.Admin"] = "Admin",
+        ["Nav.AdminLanguages"] = "Languages",
+        ["Nav.About"] = "About",
+        ["Nav.Contact"] = "Contact",
 
+        // Layout
+        ["Layout.HeaderQuoteTitle"] = "Active currency for quote display",
+        ["Layout.HeaderQuote"] = "Quote",
+        ["Layout.Language"] = "Language",
+        ["Layout.LanguagePtBr"] = "Portuguese (Brazil)",
+        ["Layout.LanguageEnUs"] = "English (United States)",
+        ["Layout.LanguageEsEs"] = "Spanish",
+        ["Layout.Hello"] = "Hello",
+        ["Layout.UserFallback"] = "User",
+        ["Layout.Logout"] = "Logout",
+        ["Layout.WelcomeVisitor"] = "Welcome, visitor!",
+
+        // Common
+        ["Common.Loading"] = "Loading...",
+        ["Common.Error"] = "Error",
+        ["Common.Success"] = "Success",
+        ["Common.Confirm"] = "Confirm",
+        ["Common.Cancel"] = "Cancel",
+        ["Common.Delete"] = "Delete",
+        ["Common.Edit"] = "Edit",
+        ["Common.Save"] = "Save",
+        ["Common.Close"] = "Close",
+        ["Common.Back"] = "Back",
+        ["Common.Next"] = "Next",
+        ["Common.Previous"] = "Previous",
+        ["Common.Search"] = "Search",
+        ["Common.Filter"] = "Filter",
+        ["Common.Clear"] = "Clear",
+        ["Common.Export"] = "Export",
+        ["Common.Import"] = "Import",
+        ["Common.NotFound"] = "Not found",
+        ["Common.NoData"] = "No data",
+        ["Common.Optional"] = "Optional",
+        ["Common.Required"] = "Required",
+
+        // App
+        ["App.NotAuthorized"] = "You are not authorized to access this page.",
+
+        // Breadcrumb
         ["Breadcrumb.Home"] = "Home",
         ["Breadcrumb.Admin"] = "Admin",
         ["Breadcrumb.Users"] = "Users",
@@ -109,15 +153,67 @@ internal static class CoreTexts
         ["Breadcrumb.Dashboard"] = "Dashboard",
         ["Breadcrumb.Marketplace"] = "Marketplace",
         ["Breadcrumb.Languages"] = "Languages",
+
+        // Error
+        ["Error.Title"] = "Error",
+        ["Error.Message"] = "Something went wrong",
+        ["Error.NotFound"] = "Page not found",
+        ["Error.AccessDenied"] = "Access denied",
+        ["Error.InternalServer"] = "Internal server error",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
-        ["App.NotAuthorized"] = "No tienes permiso para acceder a esta pagina.",
-
+        // Navigation
         ["Nav.Dashboard"] = "Panel",
+        ["Nav.Marketplace"] = "Mercado",
+        ["Nav.MyProducts"] = "Mis Productos",
+        ["Nav.InvoiceHistory"] = "Historial de facturas",
+        ["Nav.Login"] = "Iniciar sesion",
+        ["Nav.Register"] = "Registrarse",
+        ["Nav.Admin"] = "Admin",
+        ["Nav.AdminLanguages"] = "Idiomas",
+        ["Nav.About"] = "Acerca de",
+        ["Nav.Contact"] = "Contacto",
+
+        // Layout
+        ["Layout.HeaderQuoteTitle"] = "Moneda activa para mostrar cotizacion",
+        ["Layout.HeaderQuote"] = "Cotizacion",
+        ["Layout.Language"] = "Idioma",
+        ["Layout.LanguagePtBr"] = "Portugues (Brasil)",
+        ["Layout.LanguageEnUs"] = "Ingles (Estados Unidos)",
+        ["Layout.LanguageEsEs"] = "Espanol",
+        ["Layout.Hello"] = "Hola",
+        ["Layout.UserFallback"] = "Usuario",
+        ["Layout.Logout"] = "Cerrar sesion",
+        ["Layout.WelcomeVisitor"] = "Bienvenido, visitante!",
+
+        // Common
         ["Common.Loading"] = "Cargando...",
+        ["Common.Error"] = "Error",
+        ["Common.Success"] = "Exito",
+        ["Common.Confirm"] = "Confirmar",
+        ["Common.Cancel"] = "Cancelar",
+        ["Common.Delete"] = "Eliminar",
+        ["Common.Edit"] = "Editar",
+        ["Common.Save"] = "Guardar",
+        ["Common.Close"] = "Cerrar",
+        ["Common.Back"] = "Atras",
+        ["Common.Next"] = "Siguiente",
+        ["Common.Previous"] = "Anterior",
+        ["Common.Search"] = "Buscar",
+        ["Common.Filter"] = "Filtro",
+        ["Common.Clear"] = "Limpiar",
+        ["Common.Export"] = "Exportar",
+        ["Common.Import"] = "Importar",
+        ["Common.NotFound"] = "No encontrado",
+        ["Common.NoData"] = "Sin datos",
+        ["Common.Optional"] = "Opcional",
+        ["Common.Required"] = "Obligatorio",
+
+        // App
+        ["App.NotAuthorized"] = "No tienes permiso para acceder a esta pagina.",
 
         // Breadcrumb
         ["Breadcrumb.Home"] = "Inicio",
@@ -135,6 +231,13 @@ internal static class CoreTexts
         ["Breadcrumb.Dashboard"] = "Panel",
         ["Breadcrumb.Marketplace"] = "Mercado",
         ["Breadcrumb.Languages"] = "Idiomas",
+
+        // Error
+        ["Error.Title"] = "Error",
+        ["Error.Message"] = "Algo salio mal",
+        ["Error.NotFound"] = "Pagina no encontrada",
+        ["Error.AccessDenied"] = "Acceso denegado",
+        ["Error.InternalServer"] = "Error interno del servidor",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

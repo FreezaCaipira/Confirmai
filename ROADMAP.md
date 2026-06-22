@@ -61,7 +61,7 @@
 
 ### Qualidade de Código
 - [x] Services reorganizados por domínio (`Admin/`, `Core/`, `Payment/`, `Events/`, etc.)
-- [x] UiTextService com i18n (PT-BR, EN-US, ES-ES parcial)
+- [x] UiTextService com i18n (PT-BR, EN-US, ES-ES completo - 691 chaves traduzidas)
 - [x] StateHasChanged() reduzido de 101 → 13 chamadas
 - [x] IAsyncDisposable implementado em 8 páginas críticas
 - [x] CSS Scoped Isolation corrigido (Phase 18): sub-componentes com `.razor.css` próprio
@@ -75,6 +75,7 @@
 - [x] 24 testes corrigidos (encoding UTF-8, chaves UiText, wiring de componentes, assertions)
 - [x] AdminPayments sub-componentes com _Imports.razor e parâmetros tipados
 - [x] IDbContextFactory registrado no test factory para cobertura completa
+- [x] Migrar 6 services de AppDbContext → IDbContextFactory (LogService, AdminSettingsService, ProductService, PaymentConfirmationService, AdminSecurityPolicyService, DashboardMetricsService)
 
 ### UX
 - [x] Grupos como tela inicial (`/`), Explorar em `/jogos`
@@ -102,11 +103,11 @@
 - [x] ~~Investigar 24 testes falhando~~ → Corrigido (PR #7)
 
 ### P1 — Decomposição de Componentes Grandes
-- [ ] `Groups/Detail.razor` (947 linhas) — extrair sub-componentes
-- [ ] `Futsal/Detail.razor` (933 linhas) — extrair sub-componentes
-- [ ] `AdminLogs.razor` (695 linhas) — decompor
-- [ ] `Mailbox.razor` (674 linhas) — já tem Components/, mas página raiz grande
-- [ ] `Poker/Detail.razor` (628 linhas) — decompor
+- [x] `Groups/Detail.razor` (947 linhas) — extrair sub-componentes
+- [x] `Futsal/Detail.razor` (933 linhas) — extrair sub-componentes
+- [x] `AdminLogs.razor` (695 linhas) — decompor
+- [x] `Mailbox.razor` (674 linhas) — já tem Components/, mas página raiz grande
+- [x] `Poker/Detail.razor` (628 linhas) — decompor
 
 ### P2 — UX de Grupos Privados
 - [ ] Atalhos de aprovação/rejeição direta para admins
@@ -124,8 +125,6 @@
 - [ ] Ajustes de UX responsiva e acessibilidade AA
 
 ### P3 — Qualidade de Código
-- [ ] Eliminar ~20+ inline styles estáticos (Groups/Join, Groups/Index, Groups/Detail, Index)
-- [ ] UiTextService Phase 2: completar EN-US/ES-ES, criar AuthTexts restantes
 - [ ] Expandir cobertura scoped CSS (42 de 97 páginas têm `.razor.css`, faltam 55)
 - [ ] Consolidar CSS duplicado em utility classes / design tokens adicionais
 - [ ] Aumentar cobertura de testes → meta 80%+

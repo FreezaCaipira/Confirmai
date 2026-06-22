@@ -210,7 +210,8 @@ public class EfiBankWebhookServiceTests
             WebhookSecret           = webhookSecret,
             WebhookClientCertSubject = webhookClientCertSubject,
         });
-        var log  = new LogService(db, NullLogger<LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"efibank-webhook-{Guid.NewGuid()}");
+        var log  = new LogService(dbFactory, NullLogger<LogService>.Instance);
         eventBus ??= new PaymentEventBus();
         var paymentMarker = new WebhookPaymentMarker(db, log, eventBus);
         return new EfiBankWebhookService(log, opts, paymentMarker);

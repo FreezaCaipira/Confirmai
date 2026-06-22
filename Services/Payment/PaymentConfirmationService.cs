@@ -11,20 +11,20 @@ namespace Confirmai.Services.Payment;
 
 public class PaymentConfirmationService
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly BitcoinPaymentFactory _paymentFactory;
     private readonly LogService _logService;
     private readonly IHubContext<PaymentHub> _hubContext;
     private readonly PaymentEventBus _eventBus;
 
     public PaymentConfirmationService(
-        AppDbContext db,
+        IDbContextFactory<AppDbContext> dbFactory,
         BitcoinPaymentFactory paymentFactory,
         LogService logService,
         IHubContext<PaymentHub> hubContext,
         PaymentEventBus eventBus)
     {
-        _db = db;
+        _dbFactory = dbFactory;
         _paymentFactory = paymentFactory;
         _logService = logService;
         _hubContext = hubContext;
@@ -33,7 +33,8 @@ public class PaymentConfirmationService
 
     public async Task<(bool Confirmed, bool AlreadyPaid, decimal ReceivedAmount)> ConfirmAsync(PaymentRecord payment)
     {
-        var dbPayment = await _db.Payments
+        await using var db = _dbFactory.CreateDbContext();
+        var dbPayment = await db.Payments
             .Include(p => p.Product)
             .FirstOrDefaultAsync(p => p.Id == payment.Id);
 
@@ -47,7 +48,7 @@ public class PaymentConfirmationService
         {
             if (service is TestnetBitcoinPaymentService testnetPaidService && !string.IsNullOrEmpty(dbPayment.PaymentId))
             {
-                await testnetPaidService.CheckAndMarkPaymentAsync(_db, _logService, dbPayment.PaymentId);
+                await testnetPaidService.CheckAndMarkPaymentAsync(db, _logService, dbPayment.PaymentId);
             }
 
             return (true, true, dbPayment.Amount);
@@ -65,7 +66,7 @@ public class PaymentConfirmationService
         {
             dbPayment.IsPaid = true;
             dbPayment.PaidAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
+            await db.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -74,7 +75,7 @@ public class PaymentConfirmationService
 
         if (service is TestnetBitcoinPaymentService testnetService && !string.IsNullOrEmpty(dbPayment.PaymentId))
         {
-            await testnetService.CheckAndMarkPaymentAsync(_db, _logService, dbPayment.PaymentId);
+            await testnetService.CheckAndMarkPaymentAsync(db, _logService, dbPayment.PaymentId);
         }
 
         await _logService.LogAsync(

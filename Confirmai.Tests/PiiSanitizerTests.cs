@@ -139,9 +139,10 @@ public class PiiSanitizerTests
     [Fact]
     public async Task LogService_AuditAsync_MasksEmailInMetadataJson()
     {
-        await using var db = CreateDbContext();
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"pii-sanitizer-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
         var service = new LogService(
-            db,
+            dbFactory,
             Microsoft.Extensions.Logging.Abstractions.NullLogger<LogService>.Instance);
 
         await service.AuditAsync(
@@ -161,9 +162,10 @@ public class PiiSanitizerTests
     [Fact]
     public async Task LogService_AuditAsync_MetadataWithoutEmail_IsUnchanged()
     {
-        await using var db = CreateDbContext();
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"pii-sanitizer-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
         var service = new LogService(
-            db,
+            dbFactory,
             Microsoft.Extensions.Logging.Abstractions.NullLogger<LogService>.Instance);
 
         await service.AuditAsync(

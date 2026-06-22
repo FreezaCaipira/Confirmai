@@ -15,8 +15,9 @@ public class LogServiceTests
     [Fact]
     public async Task LogAsync_PersistsLogEntry_WithProvidedValues()
     {
-        await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"log-service-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var service = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         await service.LogAsync(
             message: "payment started",
@@ -35,8 +36,9 @@ public class LogServiceTests
     [Fact]
     public async Task LogAsync_PersistsExceptionText_WhenExceptionIsProvided()
     {
-        await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"log-service-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var service = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         var ex = new InvalidOperationException("boom");
 
@@ -48,20 +50,12 @@ public class LogServiceTests
         Assert.Contains("boom", saved.Exception, StringComparison.Ordinal);
     }
 
-    private static AppDbContext CreateDbContext()
-    {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase($"log-service-tests-{Guid.NewGuid()}")
-            .Options;
-
-        return new AppDbContext(options);
-    }
-
     [Fact]
     public async Task AuditAsync_PersistsStructuredAuditFields()
     {
-        await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"log-service-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var service = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         await service.AuditAsync(
             eventType: AuditEvents.PaymentConfirmed,
@@ -86,8 +80,9 @@ public class LogServiceTests
     [Fact]
     public async Task AuditAsync_KeepsLegacyFieldsBackwardCompatible()
     {
-        await using var db = CreateDbContext();
-        var service = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var dbFactory = TestDbContextFactory.CreateInMemoryFactory($"log-service-{Guid.NewGuid()}");
+        await using var db = dbFactory.CreateDbContext();
+        var service = new LogService(dbFactory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
 
         await service.AuditAsync(
             eventType: AuditEvents.UserLoginFailed,

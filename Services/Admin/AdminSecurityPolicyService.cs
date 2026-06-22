@@ -27,21 +27,22 @@ public class AdminSecurityPolicyService
     private const int MinLockoutMinutes = 1;
     private const int MaxLockoutMinutes = 1440;
 
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly IWebHostEnvironment _environment;
     private readonly LogService _logService;
 
-    public AdminSecurityPolicyService(AppDbContext db, IWebHostEnvironment environment, LogService logService)
+    public AdminSecurityPolicyService(IDbContextFactory<AppDbContext> dbFactory, IWebHostEnvironment environment, LogService logService)
     {
-        _db = db;
+        _dbFactory = dbFactory;
         _environment = environment;
         _logService = logService;
     }
 
     public async Task<RuntimeSecurityPolicy> GetRuntimePolicyAsync()
     {
+        await using var db = _dbFactory.CreateDbContext();
         var defaults = SecurityPolicyDefaults.Create(_environment.IsDevelopment());
-        var settings = await _db.AppSettings
+        var settings = await db.AppSettings
             .AsNoTracking()
             .Where(s => s.Key == RequireConfirmedEmailKey || s.Key == LockoutMaxAttemptsKey || s.Key == LockoutMinutesKey)
             .ToDictionaryAsync(s => s.Key, s => s.Value);
@@ -76,11 +77,12 @@ public class AdminSecurityPolicyService
             return false;
         }
 
-        await UpsertAsync(RequireConfirmedEmailKey, policy.RequireConfirmedEmail ? "true" : "false");
-        await UpsertAsync(LockoutMaxAttemptsKey, policy.LockoutMaxFailedAccessAttempts.ToString(CultureInfo.InvariantCulture));
-        await UpsertAsync(LockoutMinutesKey, policy.LockoutMinutes.ToString(CultureInfo.InvariantCulture));
+        await using var db = _dbFactory.CreateDbContext();
+        await UpsertAsync(db, RequireConfirmedEmailKey, policy.RequireConfirmedEmail ? "true" : "false");
+        await UpsertAsync(db, LockoutMaxAttemptsKey, policy.LockoutMaxFailedAccessAttempts.ToString(CultureInfo.InvariantCulture));
+        await UpsertAsync(db, LockoutMinutesKey, policy.LockoutMinutes.ToString(CultureInfo.InvariantCulture));
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         var adminUserId = user?.FindFirstValue(ClaimTypes.NameIdentifier);
         await _logService.LogAsync(
@@ -114,12 +116,12 @@ public class AdminSecurityPolicyService
         return builder.ToString();
     }
 
-    private async Task UpsertAsync(string key, string value)
+    private async Task UpsertAsync(AppDbContext db, string key, string value)
     {
-        var setting = await _db.AppSettings.FindAsync(key);
+        var setting = await db.AppSettings.FindAsync(key);
         if (setting is null)
         {
-            _db.AppSettings.Add(new AppSetting { Key = key, Value = value });
+            db.AppSettings.Add(new AppSetting { Key = key, Value = value });
             return;
         }
 

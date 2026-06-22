@@ -17,7 +17,7 @@ public class PaymentConfirmationServiceTests
     [Fact]
     public async Task ConfirmAsync_Returns_NotConfirmed_WhenPaymentDoesNotExist()
     {
-        using var db = TestDataFactory.CreateDbContext();
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
         var payment = new PaymentRecord
         {
             Address = "no-exist",
@@ -28,7 +28,7 @@ public class PaymentConfirmationServiceTests
 
         var httpFactory = new StubHttpClientFactory(_ => HttpTestResponses.Json("{\"total_received\":0}"));
         var testnetService = new TestnetBitcoinPaymentService(httpFactory);
-        var service = CreateConfirmationService(db, testnetService);
+        var service = CreateConfirmationService(factory, testnetService);
 
         var result = await service.ConfirmAsync(payment);
 
@@ -39,7 +39,7 @@ public class PaymentConfirmationServiceTests
     [Fact]
     public async Task ConfirmAsync_ConfirmsPayment_WhenBlockchainReturnsEnoughFunds()
     {
-        using var db = TestDataFactory.CreateDbContext();
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
         var payment = TestDataFactory.SeedPayment(db, isPaid: false, amount: 0.00003m, method: "Testnet", paymentId: "testnet-1");
 
         var httpFactory = new StubHttpClientFactory(request =>
@@ -51,10 +51,11 @@ public class PaymentConfirmationServiceTests
         });
 
         var testnetService = new TestnetBitcoinPaymentService(httpFactory);
-        var service = CreateConfirmationService(db, testnetService);
+        var service = CreateConfirmationService(factory, testnetService);
 
         var result = await service.ConfirmAsync(payment);
-        var persistedPayment = await db.Payments.FirstAsync(p => p.Id == payment.Id);
+        await using var verifyDb = factory.CreateDbContext();
+        var persistedPayment = await verifyDb.Payments.FirstAsync(p => p.Id == payment.Id);
 
         Assert.True(result.Confirmed);
         Assert.False(result.AlreadyPaid);
@@ -65,12 +66,12 @@ public class PaymentConfirmationServiceTests
     [Fact]
     public async Task ConfirmAsync_WhenAlreadyPaidInTestnet_ReturnsAlreadyPaid()
     {
-        using var db = TestDataFactory.CreateDbContext();
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
         var payment = TestDataFactory.SeedPayment(db, isPaid: true, amount: 0.00003m, method: "Testnet", paymentId: "testnet-3");
 
         var httpFactory = new StubHttpClientFactory(_ => HttpTestResponses.Json("{}"));
         var testnetService = new TestnetBitcoinPaymentService(httpFactory);
-        var service = CreateConfirmationService(db, testnetService);
+        var service = CreateConfirmationService(factory, testnetService);
 
         var result = await service.ConfirmAsync(payment);
 
@@ -78,12 +79,12 @@ public class PaymentConfirmationServiceTests
         Assert.True(result.AlreadyPaid);
     }
 
-    private static PaymentConfirmationService CreateConfirmationService(AppDbContext db, IBitcoinPaymentService paymentService)
+    private static PaymentConfirmationService CreateConfirmationService(IDbContextFactory<AppDbContext> factory, IBitcoinPaymentService paymentService)
     {
-        var factory = new BitcoinPaymentFactory(new[] { paymentService });
-        var logService = new LogService(db, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+        var paymentFactory = new BitcoinPaymentFactory(new[] { paymentService });
+        var logService = new LogService(factory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
         var hubContext = SignalRTestFactory.CreateHubContext();
         var eventBus = new PaymentEventBus();
-        return new PaymentConfirmationService(db, factory, logService, hubContext, eventBus);
+        return new PaymentConfirmationService(factory, paymentFactory, logService, hubContext, eventBus);
     }
 }
