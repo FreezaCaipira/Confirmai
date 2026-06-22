@@ -293,14 +293,7 @@ else
             @if (isAdmin && group is not null && !group.Members.Any(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey)))
             {
                 <hr class="detail-divider">
-                <div class="detail-pix-notice">
-                    <span class="detail-pix-notice-icon"><i class="fas fa-exclamation-triangle"></i></span>
-                    <div class="detail-pix-notice-body">
-                        <strong>Pix do organizador não configurado</strong>
-                        <p>Nenhum administrador do grupo possui chave Pix cadastrada. Os participantes não terão opção de pagamento manual por Pix.</p>
-                        <a href="/grupo/@group.Id/configuracoes" class="detail-pix-notice-link">Configurar agora →</a>
-                    </div>
-                </div>
+                <PixNotice SettingsHref="@($"/grupo/{group.Id}/configuracoes")" />
             }
 
             @* ── Não membro: solicitar entrada ────────────────────────── *@
