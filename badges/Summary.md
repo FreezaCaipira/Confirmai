@@ -2,8 +2,8 @@
 
 |||
 |:---|:---|
-| Generated on: | 06/22/2026 - 10:20:00 |
-| Coverage date: | 06/22/2026 - 10:19:54 |
+| Generated on: | 06/22/2026 - 10:22:44 |
+| Coverage date: | 06/22/2026 - 10:22:38 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 389 |
@@ -12,12 +12,12 @@
 | Covered lines: | 7476 |
 | Uncovered lines: | 105734 |
 | Coverable lines: | 113210 |
-| Total lines: | 140455 |
+| Total lines: | 140457 |
 | **Branch coverage:** | 27.7% (2013 of 7255) |
 | Covered branches: | 2013 |
 | Total branches: | 7255 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 96_27945721307 |
+| Tag: | 98_27945855008 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **7476** | **105734** | **113210** | **147673** | **6.6%** | **2013** | **7255** | **27.7%** |
+| **Confirmai** | **7476** | **105734** | **113210** | **147675** | **6.6%** | **2013** | **7255** | **27.7%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -239,7 +239,7 @@
 | Confirmai.Pages.Groups.Components.MembersManager | 0 | 34 | 34 | 133 | 0% | 0 | 38 | 0% |
 | Confirmai.Pages.Groups.Components.PixReceiverSelector | 0 | 16 | 16 | 79 | 0% | 0 | 20 | 0% |
 | Confirmai.Pages.Groups.Create | 0 | 109 | 109 | 291 | 0% | 0 | 36 | 0% |
-| Confirmai.Pages.Groups.Detail | 0 | 431 | 431 | 947 | 0% | 0 | 260 | 0% |
+| Confirmai.Pages.Groups.Detail | 0 | 431 | 431 | 949 | 0% | 0 | 260 | 0% |
 | Confirmai.Pages.Groups.Features | 0 | 249 | 249 | 461 | 0% | 0 | 104 | 0% |
 | Confirmai.Pages.Groups.Index | 81 | 11 | 92 | 303 | 88% | 42 | 66 | 63.6% |
 | Confirmai.Pages.Groups.Join | 0 | 82 | 82 | 267 | 0% | 0 | 60 | 0% |
