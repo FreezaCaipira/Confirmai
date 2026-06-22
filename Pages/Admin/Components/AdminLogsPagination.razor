@@ -1,0 +1,22 @@
+<p class="logs-total-count">
+    <b>@TotalLabel</b> @TotalLogs
+</p>
+
+<div class="pagination">
+    <button type="button" @onclick="async () => await OnPrevPage.InvokeAsync()" disabled="@(CurrentPage <= 1)">@PreviousLabel</button>
+    <span class="pagination-info">@PageLabel @CurrentPage @OfLabel @TotalPages</span>
+    <button type="button" @onclick="async () => await OnNextPage.InvokeAsync()" disabled="@(CurrentPage >= TotalPages)">@NextLabel</button>
+</div>
+
+@code {
+    [Parameter] public int TotalLogs { get; set; }
+    [Parameter] public int CurrentPage { get; set; }
+    [Parameter] public int TotalPages { get; set; }
+    [Parameter] public string TotalLabel { get; set; } = "Total";
+    [Parameter] public string PreviousLabel { get; set; } = "Anterior";
+    [Parameter] public string NextLabel { get; set; } = "Próximo";
+    [Parameter] public string PageLabel { get; set; } = "Página";
+    [Parameter] public string OfLabel { get; set; } = "de";
+    [Parameter] public EventCallback OnPrevPage { get; set; }
+    [Parameter] public EventCallback OnNextPage { get; set; }
+}

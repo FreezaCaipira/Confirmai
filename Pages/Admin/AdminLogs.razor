@@ -70,9 +70,17 @@
                 OnSetAuditSecurityPolicy="@(() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.SecurityPolicy))"
                 OnSetAuditPaymentPanelStale="@(() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.PaymentPanelStale))" />
 
-            <p class="logs-total-count">
-                <b>@T["AdminLogs.Total"]</b> @totalLogs
-            </p>
+            <AdminLogsPagination
+                TotalLogs="@totalLogs"
+                CurrentPage="@currentPage"
+                TotalPages="@totalPages"
+                TotalLabel="@T["AdminLogs.Total"]"
+                PreviousLabel="@T["Common.Previous"]"
+                NextLabel="@T["Common.Next"]"
+                PageLabel="@T["Common.Page"]"
+                OfLabel="@T["Common.Of"]"
+                OnPrevPage="PrevPage"
+                OnNextPage="NextPage" />
 
             @if (isLoading)
             {
@@ -86,12 +94,6 @@
                     SortAscending="@sortAscending"
                     OnSort="@HandleSortAsync" />
             }
-
-            <div class="pagination">
-                <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
-                <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
-                <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
-            </div>
         </article>
     </section>
 

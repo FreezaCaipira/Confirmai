@@ -1,0 +1,45 @@
+.logs-total-count {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.logs-total-count b {
+    color: var(--text-primary);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem 0;
+}
+
+.pagination button {
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    border-color: var(--accent-gold);
+}
+
+.pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
