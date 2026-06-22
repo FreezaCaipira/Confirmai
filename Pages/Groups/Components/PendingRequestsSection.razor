@@ -1,0 +1,33 @@
+<section class="detail-section">
+    <h2 class="detail-section-title">
+        <i class="fas fa-user-clock"></i> Solicitações pendentes (@Requests.Count)
+    </h2>
+    <ul class="pending-requests-list">
+        @foreach (var req in Requests)
+        {
+            <li class="pending-request-item">
+                <span class="pending-request-name">@(req.User?.FullName ?? req.User?.UserName ?? "Usuário")</span>
+                <span class="pending-request-date">@FormattedDate</span>
+                <div class="pending-request-actions">
+                    <button class="btn-approve" type="button"
+                            @onclick="() => OnApprove.InvokeAsync(req.Id)">
+                        <i class="fas fa-check"></i> Aprovar
+                    </button>
+                    <button class="btn-reject" type="button"
+                            @onclick="() => OnReject.InvokeAsync(req.Id)">
+                        <i class="fas fa-times"></i> Rejeitar
+                    </button>
+                </div>
+            </li>
+        }
+    </ul>
+</section>
+
+@code {
+    [Parameter] public List<GroupJoinRequest> Requests { get; set; } = new();
+    [Parameter] public EventCallback<int> OnApprove { get; set; }
+    [Parameter] public EventCallback<int> OnReject { get; set; }
+    [Parameter] public Func<GroupJoinRequest, string> FormatDate { get; set; } = req => req.RequestedAt.ToString();
+
+    private string FormattedDate(GroupJoinRequest req) => FormatDate(req);
+}

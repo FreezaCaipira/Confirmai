@@ -263,30 +263,11 @@ else
             @if (isAdmin && pendingRequests.Count > 0)
             {
                 <hr class="detail-divider">
-                <section class="detail-section">
-                    <h2 class="detail-section-title">
-                        <i class="fas fa-user-clock"></i> Solicitações pendentes (@pendingRequests.Count)
-                    </h2>
-                    <ul class="pending-requests-list">
-                        @foreach (var req in pendingRequests)
-                        {
-                            <li class="pending-request-item">
-                                <span class="pending-request-name">@(req.User?.FullName ?? req.User?.UserName ?? "Usuário")</span>
-                                <span class="pending-request-date">@Ui.FormatDateTime(req.RequestedAt.ToLocalTime(), "DateTimeShortCompact")</span>
-                                <div class="pending-request-actions">
-                                    <button class="btn-approve" type="button"
-                                            @onclick="() => ApproveRequest(req.Id)">
-                                        <i class="fas fa-check"></i> Aprovar
-                                    </button>
-                                    <button class="btn-reject" type="button"
-                                            @onclick="() => RejectRequest(req.Id)">
-                                        <i class="fas fa-times"></i> Rejeitar
-                                    </button>
-                                </div>
-                            </li>
-                        }
-                    </ul>
-                </section>
+                <PendingRequestsSection
+                    Requests="@pendingRequests"
+                    OnApprove="ApproveRequest"
+                    OnReject="RejectRequest"
+                    FormatDate="FormatPendingRequestDate" />
             }
 
             @* ── Aviso: nenhum admin tem Pix (apenas para admins) ─────── *@
@@ -499,6 +480,11 @@ else
     {
         var shareUrl = $"https://wa.me/?text={Uri.EscapeDataString(url)}";
         await JS.InvokeVoidAsync("open", shareUrl, "_blank", "noopener,noreferrer");
+    }
+
+    private string FormatPendingRequestDate(GroupJoinRequest req)
+    {
+        return Ui.FormatDateTime(req.RequestedAt.ToLocalTime(), "DateTimeShortCompact");
     }
 
     private async Task RequestToJoin()
