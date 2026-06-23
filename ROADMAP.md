@@ -83,6 +83,7 @@
 - [x] Caixa de mensagens (`/mailbox`) com anexos e arquivamento
 - [x] Tema escuro, layout responsivo
 - [x] Cookie consent com personalização
+- [x] UX de Grupos Privados: filtros, contexto visual, bulk actions para aprovação/rejeição
 
 ### Infraestrutura
 - [x] Deploy guide com Docker + nginx + TLS
@@ -109,10 +110,6 @@
 - [x] `Mailbox.razor` (674 linhas) — já tem Components/, mas página raiz grande
 - [x] `Poker/Detail.razor` (628 linhas) — decompor
 
-### P2 — UX de Grupos Privados
-- [ ] Atalhos de aprovação/rejeição direta para admins
-- [ ] Filtros e contexto visual para decisões de triagem
-- [ ] `VenueManager/VenueEdit.razor`: aplicar melhoria UF/IBGE do admin
 
 ---
 
