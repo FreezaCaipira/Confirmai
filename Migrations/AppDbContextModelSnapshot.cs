@@ -188,6 +188,13 @@ namespace Confirmai.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<string>("WhatsAppNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<bool>("WhatsAppOptIn")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("XHandle")
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)");

@@ -1,0 +1,80 @@
+@namespace Confirmai.Shared.Components.Groups
+
+@using Confirmai.Services.Groups
+
+@inject GroupMetricsService MetricsService
+
+<div class="group-metrics">
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon metric-icon--members">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">@Metrics.TotalMembers</div>
+                <div class="metric-label">Membros</div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon metric-icon--events">
+                <i class="fas fa-calendar"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">@Metrics.TotalEvents</div>
+                <div class="metric-label">Eventos</div>
+                <div class="metric-sub">@Metrics.UpcomingEvents próximos</div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon metric-icon--attendance">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">@Metrics.AverageAttendanceRate%</div>
+                <div class="metric-label">Taxa de Presença</div>
+                <div class="metric-sub @(Metrics.AverageAttendanceRate >= 70 ? "metric-sub--good" : "metric-sub--warning")">
+                    @(Metrics.AverageAttendanceRate >= 70 ? "Boa" : "Atenção")
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon metric-icon--payments">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">@Metrics.PaymentCompletionRate%</div>
+                <div class="metric-label">Pagamentos</div>
+                <div class="metric-sub">@Metrics.PaidConfirmations/@Metrics.TotalConfirmations</div>
+            </div>
+        </div>
+
+        @if (Metrics.PendingJoinRequests > 0)
+        {
+            <div class="metric-card metric-card--alert">
+                <div class="metric-icon metric-icon--pending">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value">@Metrics.PendingJoinRequests</div>
+                    <div class="metric-label">Solicitações Pendentes</div>
+                    <div class="metric-sub metric-sub--alert">Ação necessária</div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int GroupId { get; set; }
+
+    private GroupMetricsSnapshot Metrics { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Metrics = await MetricsService.GetSnapshotAsync(GroupId);
+    }
+}
