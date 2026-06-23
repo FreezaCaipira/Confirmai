@@ -19,9 +19,15 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
 - **Benefício**: Isolamento de estilos, manutenção mais fácil
 
 ### 1.2 Consolidar CSS duplicado
-- **Status**: ⏭️ Pulado (CSS já bem organizado com scoped isolation, baixo ROI)
+- **Status**: ✅ Completo
 - **Prioridade**: Baixa
-- **Nota**: Reavaliar se necessário no futuro
+- **Ações realizadas**:
+  - Criado `.content-hero` em `site.css` para hero pseudo-elements compartilhados
+  - Criado `.parchment-card` e `.parchment-card-light` em `site.css` para gradientes de parchment
+  - Removidas duplicações de `order-status-badge` em AdminUsers.razor.css e AdminVenues.razor.css
+  - Mantidos overrides específicos em PaymentsHistory.razor.css e ViewPayment.razor.css
+  - Limpos About.razor.css e Contact.razor.css (páginas de redirect)
+- **Benefício**: Redução de duplicação, manutenção centralizada
 
 ### 1.3 Aumentar cobertura de testes (Checkpoints)
 - **Status**: ✅ Completo (serviços críticos cobertos)

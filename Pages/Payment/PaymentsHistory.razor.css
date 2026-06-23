@@ -184,9 +184,9 @@
 
 .payments-history-shell .payments-history-table .order-status-badge {
     margin: 0;
-    font-weight: 800;
 }
 
+/* Custom theme overrides for payments history */
 .payments-history-shell .payments-history-table .order-status-badge.aguardandopagamento {
     background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold-amber) 100%);
     color: #2e1707;
