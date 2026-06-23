@@ -84,6 +84,7 @@
 - [x] Tema escuro, layout responsivo
 - [x] Cookie consent com personalização
 - [x] Histórico de pagamentos com exportação CSV/HTML
+- [x] Acessibilidade WCAG AA: skip link, foco aprimorado, high contrast, reduced motion
 
 ### Infraestrutura
 - [x] Deploy guide com Docker + nginx + TLS
