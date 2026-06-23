@@ -52,18 +52,29 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
 ## Fase 2: UX em Geral (Experiência do Usuário) 🔄
 
 **Objetivo**: Melhorar usabilidade e acessibilidade para todos os usuários.
-**Status**: 🔄 Em Andamento (próximo passo)
+**Status**: 🔄 Em Andamento (2/5 completo)
 
 ### 2.1 UX de Grupos Privados
-- **Status**: Em Andamento (ROADMAP.md)
+- **Status**: ✅ Completo
 - **Prioridade**: Média
-- **Ação**: Atalhos de aprovação/rejeição direta, filtros e contexto visual, VenueEdit com UF/IBGE
-- **Benefício**: Reduzir atrito em workflows comuns
+- **Ações realizadas**:
+  - VenueManager/VenueEdit: aplicado seletor UF com lista de estados + API IBGE para cidades
+  - Groups/Detail: adicionado filtro de ordenação (mais recentes/mais antigas/nome A-Z)
+  - Groups/Detail: adicionado contexto visual (tempo de espera, indicador de urgência >48h, email)
+  - Groups/Detail: adicionado bulk actions (seleção múltipla, aprovar/rejeitar todos)
+  - Groups/Detail: adicionado checkbox de seleção com feedback visual
+- **Benefício**: Reduzir atrito em workflows comuns, melhorar triagem de solicitações
 
 ### 2.2 Página de histórico de pagamentos do jogador
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Média
-- **Ação**: Auto-serviço para consulta, filtros por data/status/valor, exportação PDF/CSV
+- **Ações realizadas**:
+  - Página PaymentsHistory.razor já existia em `/payments` com filtros implementados
+  - Adicionado botões de exportação CSV e HTML/PDF
+  - ExportToCsv: gera CSV com dados filtrados (data, produto, valor, status, gateway)
+  - ExportToPdf: gera tabela HTML com estilização para conversão em PDF
+  - Utiliza função JS existente ConfirmaiDownloadFile para downloads
+  - Atualizado layout de filtros para acomodar botões de exportação
 - **Benefício**: Reduzir suporte, transparência para usuário
 
 ### 2.3 Ajustes de UX responsiva e acessibilidade AA

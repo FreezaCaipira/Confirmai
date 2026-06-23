@@ -83,6 +83,7 @@
 - [x] Caixa de mensagens (`/mailbox`) com anexos e arquivamento
 - [x] Tema escuro, layout responsivo
 - [x] Cookie consent com personalização
+- [x] Histórico de pagamentos com exportação CSV/HTML
 
 ### Infraestrutura
 - [x] Deploy guide com Docker + nginx + TLS
