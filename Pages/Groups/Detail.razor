@@ -284,22 +284,68 @@ else
             {
                 <hr class="detail-divider">
                 <section class="detail-section">
-                    <h2 class="detail-section-title">
-                        <i class="fas fa-user-clock"></i> Solicitações pendentes (@pendingRequests.Count)
-                    </h2>
+                    <div class="detail-section-header">
+                        <h2 class="detail-section-title">
+                            <i class="fas fa-user-clock"></i> Solicitações pendentes (@pendingRequests.Count)
+                        </h2>
+                        <div class="detail-section-filters">
+                            <select class="input input--sm" @bind="requestSortOrder" style="width: auto;">
+                                <option value="newest">Mais recentes</option>
+                                <option value="oldest">Mais antigas</option>
+                                <option value="name">Nome A-Z</option>
+                            </select>
+                            @if (selectedRequestIds.Count > 0)
+                            {
+                                <div class="bulk-actions">
+                                    <span class="bulk-count">@selectedRequestIds.Count selecionado@(selectedRequestIds.Count == 1 ? "" : "s")</span>
+                                    <button class="btn-approve btn-approve--sm" type="button"
+                                            @onclick="ApproveSelected"
+                                            disabled="@isBulkProcessing">
+                                        <i class="fas fa-check"></i> Aprovar todos
+                                    </button>
+                                    <button class="btn-reject btn-reject--sm" type="button"
+                                            @onclick="RejectSelected"
+                                            disabled="@isBulkProcessing">
+                                        <i class="fas fa-times"></i> Rejeitar todos
+                                    </button>
+                                    <button class="btn-cancel btn-cancel--sm" type="button"
+                                            @onclick="ClearSelection"
+                                            disabled="@isBulkProcessing">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
                     <ul class="pending-requests-list">
-                        @foreach (var req in pendingRequests)
+                        @foreach (var req in sortedPendingRequests)
                         {
-                            <li class="pending-request-item">
-                                <span class="pending-request-name">@(req.User?.FullName ?? req.User?.UserName ?? "Usuário")</span>
-                                <span class="pending-request-date">@Ui.FormatDateTime(req.RequestedAt.ToLocalTime(), "DateTimeShortCompact")</span>
+                            var waitTime = DateTime.UtcNow - req.RequestedAt;
+                            var waitHours = (int)waitTime.TotalHours;
+                            var waitLabel = waitHours < 1 ? "agora mesmo" : waitHours < 24 ? $"{waitHours}h atrás" : $"{(int)waitTime.TotalDays}d atrás";
+                            var isUrgent = waitTime.TotalHours > 48;
+
+                            <li class="pending-request-item @(isUrgent ? "pending-request-item--urgent" : "") @(selectedRequestIds.Contains(req.Id) ? "pending-request-item--selected" : "")">
+                                <div class="pending-request-checkbox">
+                                    <input type="checkbox" id="req-@req.Id" @bind="selectedRequestIds" value="@req.Id" />
+                                </div>
+                                <div class="pending-request-info">
+                                    <span class="pending-request-name">@(req.User?.FullName ?? req.User?.UserName ?? "Usuário")</span>
+                                    <span class="pending-request-email">@req.User?.Email</span>
+                                    <div class="pending-request-meta">
+                                        <span class="pending-request-date">@Ui.FormatDateTime(req.RequestedAt.ToLocalTime(), "DateTimeShortCompact")</span>
+                                        <span class="pending-request-wait @(isUrgent ? "pending-request-wait--urgent" : "")">@waitLabel</span>
+                                    </div>
+                                </div>
                                 <div class="pending-request-actions">
                                     <button class="btn-approve" type="button"
-                                            @onclick="() => ApproveRequest(req.Id)">
+                                            @onclick="() => ApproveRequest(req.Id)"
+                                            title="Aprovar solicitação">
                                         <i class="fas fa-check"></i> Aprovar
                                     </button>
                                     <button class="btn-reject" type="button"
-                                            @onclick="() => RejectRequest(req.Id)">
+                                            @onclick="() => RejectRequest(req.Id)"
+                                            title="Rejeitar solicitação">
                                         <i class="fas fa-times"></i> Rejeitar
                                     </button>
                                 </div>
@@ -413,7 +459,18 @@ else
     private bool                      requestingJoin   = false;
     private string                    enteredCode      = string.Empty;
     private string                    codeError        = string.Empty;
-    
+    private string                    requestSortOrder = "newest";
+    private HashSet<int>              selectedRequestIds = new();
+    private bool                      isBulkProcessing = false;
+
+    private IEnumerable<GroupJoinRequest> sortedPendingRequests => requestSortOrder switch
+    {
+        "newest" => pendingRequests.OrderByDescending(r => r.RequestedAt),
+        "oldest" => pendingRequests.OrderBy(r => r.RequestedAt),
+        "name" => pendingRequests.OrderBy(r => r.User?.FullName ?? r.User?.UserName ?? ""),
+        _ => pendingRequests
+    };
+
     private CancellationTokenSource? _copyInviteCts;
     private CancellationTokenSource? _copyCodeCts;
     private Task? _copyInviteTask = null;
@@ -659,6 +716,93 @@ else
         req.RespondedByUserId = currentUserId;
         await db.SaveChangesAsync();
         await LoadGroup();
+    }
+
+    private async Task ApproveSelected()
+    {
+        if (currentUserId is null || group is null || selectedRequestIds.Count == 0) return;
+        isBulkProcessing = true;
+
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var requests = await db.GroupJoinRequests
+                .Where(r => selectedRequestIds.Contains(r.Id) && r.Status == JoinRequestStatus.Pending)
+                .Include(r => r.User)
+                .ToListAsync();
+
+            foreach (var req in requests)
+            {
+                var alreadyMember = await db.GroupMembers
+                    .AnyAsync(m => m.GroupId == req.GroupId && m.UserId == req.UserId);
+                if (!alreadyMember)
+                {
+                    db.GroupMembers.Add(new GroupMember
+                    {
+                        GroupId   = req.GroupId,
+                        UserId    = req.UserId,
+                        Role      = GroupMemberRole.Member,
+                        CreatedAt = DateTime.UtcNow,
+                    });
+                }
+
+                req.Status            = JoinRequestStatus.Approved;
+                req.RespondedAt       = DateTime.UtcNow;
+                req.RespondedByUserId = currentUserId;
+
+                db.UserMailboxMessages.Add(new UserMailboxMessage
+                {
+                    SenderUserId         = null,
+                    RecipientUserId      = req.UserId,
+                    RecipientDisplayName = req.User?.UserName,
+                    Subject              = $"Você foi aprovado em \"{group.Name}\"",
+                    Body                 = $"Sua solicitação para entrar no grupo **{group.Name}** foi aprovada! Você já pode acessar o grupo.",
+                    CreatedAt            = DateTime.UtcNow,
+                });
+            }
+
+            await db.SaveChangesAsync();
+            selectedRequestIds.Clear();
+            await LoadGroup();
+        }
+        finally
+        {
+            isBulkProcessing = false;
+        }
+    }
+
+    private async Task RejectSelected()
+    {
+        if (currentUserId is null || selectedRequestIds.Count == 0) return;
+        isBulkProcessing = true;
+
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var requests = await db.GroupJoinRequests
+                .Where(r => selectedRequestIds.Contains(r.Id) && r.Status == JoinRequestStatus.Pending)
+                .ToListAsync();
+
+            foreach (var req in requests)
+            {
+                req.Status            = JoinRequestStatus.Rejected;
+                req.RespondedAt       = DateTime.UtcNow;
+                req.RespondedByUserId = currentUserId;
+            }
+
+            await db.SaveChangesAsync();
+            selectedRequestIds.Clear();
+            await LoadGroup();
+        }
+        finally
+        {
+            isBulkProcessing = false;
+        }
+    }
+
+    private void ClearSelection()
+    {
+        selectedRequestIds.Clear();
     }
 
     // ── Pagamentos ────────────────────────────────────────────────
