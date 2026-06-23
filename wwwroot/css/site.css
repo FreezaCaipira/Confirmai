@@ -838,8 +838,61 @@ body::before {
 .back-btn:focus-visible,
 .view-btn:focus-visible,
 .history-btn:focus-visible {
-    outline: 2px solid var(--gold);
+    outline: 3px solid var(--gold);
     outline-offset: 2px;
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--gold);
+    color: #000;
+    padding: 8px 16px;
+    z-index: 10000;
+    text-decoration: none;
+    font-weight: 600;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Enhanced focus styles for all interactive elements */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn,
+    .save-btn,
+    .cancel-btn,
+    .success-btn,
+    .danger,
+    .warning-btn,
+    .details-btn,
+    .edit-btn {
+        border: 2px solid #fff;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 /* --- Color variants ---
@@ -3256,15 +3309,7 @@ body .oldsite-left-column .oldsite-side-link {
     border: 2px solid #8c3d13;
     border-image: linear-gradient(to bottom, #c07838, #7a3e18 30%, #5a2810 60%, #8a4a20) 1;
     border-radius: 2px;
-    background: linear-gradient(180deg, #b44713 0%, #8e330f 100%);
-    color: #f9e6c8;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 0.98rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-transform: lowercase;
-}
-
+    background:
         /* Corner ornaments — top-left */
         linear-gradient(90deg, #b8862d 0 14px, transparent 14px) 4px 4px / calc(100% - 8px) 1px no-repeat,
         linear-gradient(180deg, #b8862d 0 14px, transparent 14px) 4px 4px / 1px calc(100% - 8px) no-repeat,
@@ -3279,7 +3324,14 @@ body .oldsite-left-column .oldsite-side-link {
         linear-gradient(0deg, #b8862d 0 14px, transparent 14px) calc(100% - 5px) 4px / 1px calc(100% - 8px) no-repeat,
         /* Parchment grain texture (preserved from base) */
         repeating-linear-gradient(0deg, rgba(120, 86, 49, 0.14) 0 1px, rgba(120, 86, 49, 0) 1px 5px),
-        repeating-linear-gradient(90deg, rgba(146, 107, 63, 0.08) 0 1px, rgba(146, 107, 63, 0) 1px 7px);
+        repeating-linear-gradient(90deg, rgba(146, 107, 63, 0.08) 0 1px, rgba(146, 107, 63, 0) 1px 7px),
+        linear-gradient(180deg, #b44713 0%, #8e330f 100%);
+    color: #f9e6c8;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: lowercase;
     opacity: 0.6;
 }
 
