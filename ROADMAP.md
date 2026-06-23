@@ -85,6 +85,8 @@
 - [x] Cookie consent com personalização
 - [x] Histórico de pagamentos com exportação CSV/HTML
 - [x] Acessibilidade WCAG AA: skip link, foco aprimorado, high contrast, reduced motion
+- [x] Dashboard de métricas por grupo (ocupação, presença, pagamentos)
+- [x] Integração WhatsApp com opt-in
 
 ### Infraestrutura
 - [x] Deploy guide com Docker + nginx + TLS

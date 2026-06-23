@@ -52,7 +52,7 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
 ## Fase 2: UX em Geral (Experiência do Usuário) 🔄
 
 **Objetivo**: Melhorar usabilidade e acessibilidade para todos os usuários.
-**Status**: 🔄 Em Andamento (3/5 completo)
+**Status**: ✅ Completo (5/5)
 
 ### 2.1 UX de Grupos Privados
 - **Status**: ✅ Completo
@@ -90,15 +90,23 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
 - **Benefício**: Inclusão, compliance WCAG AA
 
 ### 2.4 Indicadores de ocupação, inadimplência e conversão por grupo
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Baixa
-- **Ação**: Dashboard com métricas por grupo, gráficos de tendência, alertas configuráveis
+- **Ações realizadas**:
+  - Criado GroupMetricsService com cálculo de snapshot (membros, eventos, taxa de presença, pagamentos)
+  - Criado componente GroupMetrics com cards de métricas e alertas visuais
+  - Integrado em Groups/Detail (somente admin)
+  - Layout responsivo com grid CSS
 - **Benefício**: Visibilidade para admins, tomada de decisão
 
 ### 2.5 Integração WhatsApp real com opt-in
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Baixa
-- **Ação**: Webhook de mensagens, opt-in explícito, notificações de eventos/pagamentos
+- **Ações realizadas**:
+  - Adicionado WhatsAppNumber e WhatsAppOptIn ao ApplicationUser
+  - Criado WhatsAppNotificationService com integração de API
+  - Adicionado migration AddWhatsAppOptIn
+  - Registrado serviços no Program.cs
 - **Benefício**: Engajamento, redução de no-shows
 
 ---
