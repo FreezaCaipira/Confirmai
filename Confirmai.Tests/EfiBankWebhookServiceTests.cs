@@ -242,4 +242,49 @@ public class EfiBankWebhookServiceTests
     private static int StatusOf(IResult result) =>
         Assert.IsAssignableFrom<IStatusCodeHttpResult>(result).StatusCode
         ?? StatusCodes.Status200OK;
+
+    [Fact]
+    public void TryGetCertFromHeader_ReturnsNull_WhenHeaderIsMissing()
+    {
+        var context = new DefaultHttpContext();
+        context.Request.Headers.Remove("X-SSL-Client-Cert");
+
+        var method = typeof(EfiBankWebhookService)
+            .GetMethod("TryGetCertFromHeader", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            ?? throw new InvalidOperationException("TryGetCertFromHeader method not found.");
+
+        var result = method.Invoke(null, [context]);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void TryGetCertFromHeader_ReturnsNull_WhenHeaderIsEmpty()
+    {
+        var context = new DefaultHttpContext();
+        context.Request.Headers["X-SSL-Client-Cert"] = "";
+
+        var method = typeof(EfiBankWebhookService)
+            .GetMethod("TryGetCertFromHeader", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            ?? throw new InvalidOperationException("TryGetCertFromHeader method not found.");
+
+        var result = method.Invoke(null, [context]);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void TryGetCertFromHeader_ReturnsNull_WhenHeaderIsInvalid()
+    {
+        var context = new DefaultHttpContext();
+        context.Request.Headers["X-SSL-Client-Cert"] = "invalid-cert-data";
+
+        var method = typeof(EfiBankWebhookService)
+            .GetMethod("TryGetCertFromHeader", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            ?? throw new InvalidOperationException("TryGetCertFromHeader method not found.");
+
+        var result = method.Invoke(null, [context]);
+
+        Assert.Null(result);
+    }
 }

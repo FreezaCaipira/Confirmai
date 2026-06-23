@@ -7,6 +7,7 @@ using Confirmai.Services.User;
 using Confirmai.Services.Core;
 using Confirmai.Services.Utility;
 using Confirmai.Data;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -268,6 +269,54 @@ public class ProductServiceTests
         await service.AddAsync(product, null);
 
         Assert.Equal(expected, product.AccentColor);
+    }
+
+    [Fact]
+    public async Task AddAsync_SavesImage_WhenImageFileIsProvided()
+    {
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
+
+        var imageFile = CreateMockBrowserFile("test.jpg", "image/jpeg", new byte[] { 0xFF, 0xD8, 0xFF });
+        var product = new Product { Name = "P", Description = "d", Price = 1m, UserId = "u1" };
+
+        await service.AddAsync(product, imageFile);
+
+        Assert.NotNull(product.ImagePath);
+        Assert.StartsWith("/uploads/", product.ImagePath);
+    }
+
+    [Fact]
+    public async Task AddAsync_Throws_WhenImageExtensionIsInvalid()
+    {
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
+
+        var imageFile = CreateMockBrowserFile("test.txt", "text/plain", new byte[] { 0x74, 0x65, 0x73, 0x74 });
+        var product = new Product { Name = "P", Description = "d", Price = 1m, UserId = "u1" };
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.AddAsync(product, imageFile));
+    }
+
+    [Fact]
+    public async Task AddAsync_Throws_WhenImageContentTypeIsInvalid()
+    {
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var service = new ProductService(factory, CreateEnvironment());
+
+        var imageFile = CreateMockBrowserFile("test.jpg", "text/plain", new byte[] { 0x74, 0x65, 0x73, 0x74 });
+        var product = new Product { Name = "P", Description = "d", Price = 1m, UserId = "u1" };
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.AddAsync(product, imageFile));
+    }
+
+    private static IBrowserFile CreateMockBrowserFile(string name, string contentType, byte[] content)
+    {
+        var mock = new Moq.Mock<IBrowserFile>();
+        mock.SetupGet(x => x.Name).Returns(name);
+        mock.SetupGet(x => x.ContentType).Returns(contentType);
+        mock.Setup(x => x.OpenReadStream(It.IsAny<long>(), It.IsAny<CancellationToken>())).Returns(new MemoryStream(content));
+        return mock.Object;
     }
 }
 

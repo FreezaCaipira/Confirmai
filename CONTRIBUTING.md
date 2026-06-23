@@ -32,7 +32,7 @@ Confirmai/
 │   ├── User/                # Preferências, claims, perfil
 │   └── Utility/             # Email, PII, produtos, testnet
 ├── wwwroot/                 # Estáticos (CSS, JS, imagens, uploads)
-├── Confirmai.Tests/         # xUnit + Moq (575 testes)
+├── Confirmai.Tests/         # xUnit + Moq (641 testes)
 └── e2e/                     # Playwright E2E (TypeScript, 20 specs)
 ```
 
@@ -78,7 +78,7 @@ builder.Services.AddHostedService<PendingWebhooksAlertService>();
 
 - **Construtor com LogService opcional**: facilita testes sem mocks
   ```csharp
-  public AdminSettingsService(AppDbContext db, LogService? log = null)
+  public AdminSettingsService(IDbContextFactory<AppDbContext> dbFactory, LogService? log = null)
   ```
 - **Audit**: `LogService.AuditAsync(eventType, entityType, entityId, message, actorUserId, source)`
 - **Constantes de audit**: `AuditEvents.*` e `AuditEntities.*` (72 event types) — **nunca renomear** (são chaves de analytics; só adicionar novos valores)
@@ -133,7 +133,7 @@ Toda página deve ter:
 <h1>@T["AdminPayments.Title"]</h1>
 ```
 
-Strings em `Services/Core/UiTextService.cs`, organizadas por locale (`pt-BR`, `en-US`, `es-ES` parcial).
+Strings em `Services/Core/UiText/` (6 arquivos de domínio), organizadas por locale (`pt-BR`, `en-US`, `es-ES` completo - 691 chaves traduzidas).
 
 ### IAsyncDisposable
 
