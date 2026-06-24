@@ -1,84 +1,83 @@
 @using Confirmai.Models
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Web.Virtualization
 
-<AdminDataState IsLoading="@IsLoading" IsEmpty="@(Users == null || !Users.Any())" LoadingText="@T["AdminUsers.Loading"]" EmptyText="@T["AdminUsers.Empty"]" EmptyIcon="fas fa-users" EmptyHint="@T["AdminUsers.EmptyHint"]">
-    <table class="product-table">
-        <thead>
-            <tr>
-                <th>@T["AdminUsers.User"]</th>
-                <th>@T["AdminUsers.Email"]</th>
-                <th>@T["AdminUsers.Role"]</th>
-                <th>@T["AdminUsers.ActiveColumn"]</th>
-                <th>@T["Common.Actions"]</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var u in DisplayedUsers)
-        {
-            <tr>
-                <td data-label="@T["AdminUsers.User"]">@u.UserName</td>
-                <td data-label="@T["AdminUsers.Email"]">@u.Email</td>
-                <td data-label="@T["AdminUsers.Role"]">@UserRoles.GetValueOrDefault(u.Id, "-")</td>
+@if (TotalItems == 0)
+{
+    <AdminDataState IsLoading="false" IsEmpty="true" LoadingText="@T["AdminUsers.Loading"]" EmptyText="@T["AdminUsers.Empty"]" EmptyIcon="fas fa-users" EmptyHint="@T["AdminUsers.EmptyHint"]">
+    </AdminDataState>
+}
+else
+{
+    <div class="users-table-container">
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>@T["AdminUsers.User"]</th>
+                    <th>@T["AdminUsers.Email"]</th>
+                    <th>@T["AdminUsers.Role"]</th>
+                    <th>@T["AdminUsers.ActiveColumn"]</th>
+                    <th>@T["Common.Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                <Virtualize Context="u" ItemsProvider="LoadUsersAsync" OverscanCount="10">
+                    <tr>
+                        <td data-label="@T["AdminUsers.User"]">@u.UserName</td>
+                        <td data-label="@T["AdminUsers.Email"]">@u.Email</td>
+                        <td data-label="@T["AdminUsers.Role"]">@UserRoles.GetValueOrDefault(u.Id, "-")</td>
 
-                <td data-label="@T["AdminUsers.ActiveColumn"]">
-                    @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
-                    {
-                        <span class="order-status-badge cancelado">@T["AdminUsers.Blocked"]</span>
-                    }
-                    else
-                    {
-                        <span class="order-status-badge pago">@T["AdminUsers.Active"]</span>
-                    }
-                </td>
-                <td data-label="@T["Common.Actions"]">
-                    <div class="admin-actions-row">
-                        <button class="details-btn action-btn icon-only" @onclick="() => ViewUserHandler(u.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <a class="history-btn action-btn icon-only" href="@($"/admin/audit/User/{u.Id}")" title="@T["AdminAuditTimeline.ViewHistory"]" aria-label="@T["AdminAuditTimeline.ViewHistory"]">
-                            <i class="fas fa-history"></i>
-                        </a>
-                        <button class="edit-btn action-btn icon-only" @onclick="() => EditUserHandler(u.Id)" title="@T["Products.Edit"]" aria-label="@T["Products.Edit"]">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                        @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
-                        {
-                            <button class="success-btn action-btn icon-only" @onclick="() => UnlockUserHandler(u.Id)" title="@T["AdminUsers.Unlock"]" aria-label="@T["AdminUsers.Unlock"]">
-                                <i class="fas fa-unlock"></i>
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="warning-btn action-btn icon-only" @onclick="() => LockUserHandler(u.Id)" title="@T["AdminUsers.Lock"]" aria-label="@T["AdminUsers.Lock"]">
-                                <i class="fas fa-lock"></i>
-                            </button>
-                        }
-                        <button class="danger action-btn icon-only" @onclick="() => DeleteUserHandler(u.Id)" title="@T["Products.Remove"]" aria-label="@T["Products.Remove"]">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-</AdminDataState>
+                        <td data-label="@T["AdminUsers.ActiveColumn"]">
+                            @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
+                            {
+                                <span class="order-status-badge cancelado">@T["AdminUsers.Blocked"]</span>
+                            }
+                            else
+                            {
+                                <span class="order-status-badge pago">@T["AdminUsers.Active"]</span>
+                            }
+                        </td>
+                        <td data-label="@T["Common.Actions"]">
+                            <div class="admin-actions-row">
+                                <button class="details-btn action-btn icon-only" @onclick="() => ViewUserHandler(u.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <a class="history-btn action-btn icon-only" href="@($"/admin/audit/User/{u.Id}")" title="@T["AdminAuditTimeline.ViewHistory"]" aria-label="@T["AdminAuditTimeline.ViewHistory"]">
+                                    <i class="fas fa-history"></i>
+                                </a>
+                                <button class="edit-btn action-btn icon-only" @onclick="() => EditUserHandler(u.Id)" title="@T["Products.Edit"]" aria-label="@T["Products.Edit"]">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                                @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
+                                {
+                                    <button class="success-btn action-btn icon-only" @onclick="() => UnlockUserHandler(u.Id)" title="@T["AdminUsers.Unlock"]" aria-label="@T["AdminUsers.Unlock"]">
+                                        <i class="fas fa-unlock"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="warning-btn action-btn icon-only" @onclick="() => LockUserHandler(u.Id)" title="@T["AdminUsers.Lock"]" aria-label="@T["AdminUsers.Lock"]">
+                                        <i class="fas fa-lock"></i>
+                                    </button>
+                                }
+                                <button class="danger action-btn icon-only" @onclick="() => DeleteUserHandler(u.Id)" title="@T["Products.Remove"]" aria-label="@T["Products.Remove"]">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </Virtualize>
+            </tbody>
+        </table>
+    </div>
+}
 
 @code {
     [Parameter]
-    public List<ApplicationUser>? Users { get; set; }
+    public int TotalItems { get; set; }
 
     [Parameter]
     public Dictionary<string, string> UserRoles { get; set; } = new();
-
-    [Parameter]
-    public int CurrentPage { get; set; } = 1;
-
-    [Parameter]
-    public int PageSize { get; set; } = 10;
-
-    [Parameter]
-    public bool IsLoading { get; set; }
 
     [Parameter]
     public EventCallback<string> OnViewUser { get; set; }
@@ -95,10 +94,11 @@
     [Parameter]
     public EventCallback<string> OnDeleteUser { get; set; }
 
+    [Parameter]
+    public ItemsProviderDelegate<ApplicationUser> LoadUsersAsync { get; set; } = default!;
+
     [Inject]
     public UiTextService T { get; set; } = default!;
-
-    private IEnumerable<ApplicationUser> DisplayedUsers => Users?.Skip((CurrentPage - 1) * PageSize).Take(PageSize) ?? Enumerable.Empty<ApplicationUser>();
 
     private async Task ViewUserHandler(string userId)
     {

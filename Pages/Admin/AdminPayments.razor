@@ -13,6 +13,7 @@
 @using Confirmai.Data
 @using Confirmai.Services
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
 
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject BitcoinQuoteService BitcoinQuoteService
@@ -93,14 +94,10 @@
                 OnDismissNotice="@DismissRestoredNotice" />
 
             <AdminPaymentsTable
-                Payments="@pagedPayments"
-                CurrentPage="@currentPage"
-                TotalPages="@totalPages"
-                IsLoading="@isLoading"
+                TotalItems="@totalCount"
                 FormatAmount="@FormatBtcWithUsd"
                 OnViewPayment="@ViewPayment"
-                OnNextPage="@NextPage"
-                OnPrevPage="@PrevPage" />
+                LoadPaymentsAsync="@LoadVirtualizedPaymentsAsync" />
 
         </article>
     </section>
@@ -111,8 +108,8 @@
 </div>
 
 @code {
-    private List<PaymentRecord> pagedPayments = new();
     private int totalCount;
+    private const int VirtualizePageSize = 50;
 
     private string filterUserId = "";
     private decimal? filterMinAmount;
@@ -120,7 +117,6 @@
     private string filterStatus = "";
     private DateTime? filterDate;
 
-    private bool isLoading = true;
     private bool filtersLoaded;
     private bool showRestoredFiltersNotice;
     private decimal? btcUsdRate;
@@ -162,9 +158,6 @@
     private int pendingTrendWarningThreshold = AdminSettingsService.DefaultReconciliationWarningThreshold;
     private int pendingTrendCriticalThreshold = AdminSettingsService.DefaultReconciliationCriticalThreshold;
 
-    private int pageSize = 10;
-    private int currentPage = 1;
-    private int totalPages => Math.Max(1, (int)Math.Ceiling((double)totalCount / pageSize));
     private string reconcileChargeId = string.Empty;
     private bool isReconciling;
     private bool isRunningSweep;
@@ -189,15 +182,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        isLoading = true;
         var quote = await BitcoinQuoteService.GetQuoteAsync();
         btcUsdRate = quote?.btc_usd;
         btcBrlRate = quote?.btc_brl;
         await RefreshOperationalPanelAsync(includePaymentsTable: false);
-        await LoadPageAsync();
+        await LoadPaymentsCountAsync();
         StartSummaryRefreshLoop();
         StartSummaryAgeLoop();
-        isLoading = false;
     }
 
     private void StartSummaryRefreshLoop()
@@ -305,11 +296,11 @@
         if (!firstRender || filtersLoaded) return;
 
         await LoadFilterStateFromStorageAsync();
-        await LoadPageAsync();
+        await LoadPaymentsCountAsync();
         filtersLoaded = true;
     }
 
-    private async Task LoadPageAsync()
+    private async Task LoadPaymentsCountAsync()
     {
         await using var db = await DbFactory.CreateDbContextAsync();
 
@@ -327,23 +318,46 @@
             query = query.Where(p => p.CreatedAt.Date == filterDate.Value.Date);
 
         totalCount = await query.CountAsync();
-        if (currentPage > totalPages) currentPage = totalPages;
+    }
 
-        pagedPayments = await query
+    private async ValueTask<ItemsProviderResult<PaymentRecord>> LoadVirtualizedPaymentsAsync(ItemsProviderRequest request)
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var startIndex = request.StartIndex;
+        var count = request.Count;
+
+        var query = db.Payments.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filterUserId))
+            query = query.Where(p => (p.User != null && p.User.UserName != null && p.User.UserName.Contains(filterUserId)) || (p.UserId != null && p.UserId.Contains(filterUserId)));
+        if (filterMinAmount.HasValue)
+            query = query.Where(p => p.Amount >= filterMinAmount.Value);
+        if (filterMaxAmount.HasValue)
+            query = query.Where(p => p.Amount <= filterMaxAmount.Value);
+        if (!string.IsNullOrWhiteSpace(filterStatus))
+            query = filterStatus == "paid" ? query.Where(p => p.IsPaid) : query.Where(p => !p.IsPaid);
+        if (filterDate.HasValue)
+            query = query.Where(p => p.CreatedAt.Date == filterDate.Value.Date);
+
+        var totalCount = await query.CountAsync();
+
+        var payments = await query
             .OrderByDescending(p => p.CreatedAt)
             .Include(p => p.User)
-            .Skip((currentPage - 1) * pageSize)
-            .Take(pageSize)
+            .Skip(startIndex)
+            .Take(count)
             .ToListAsync();
+
+        return new ItemsProviderResult<PaymentRecord>(payments, totalCount);
     }
 
     private void ViewPayment(int id) => NavigationManager.NavigateTo($"/payments/view/{id}");
 
     private async Task ApplyFiltersAndPersist()
     {
-        currentPage = 1;
         showRestoredFiltersNotice = false;
-        await LoadPageAsync();
+        await LoadPaymentsCountAsync();
         await PersistFilterStateAsync();
     }
 
@@ -354,30 +368,9 @@
         filterMaxAmount = null;
         filterStatus = "";
         filterDate = null;
-        currentPage = 1;
         showRestoredFiltersNotice = false;
-        await LoadPageAsync();
+        await LoadPaymentsCountAsync();
         await PersistFilterStateAsync();
-    }
-
-    private async Task NextPage()
-    {
-        if (currentPage < totalPages)
-        {
-            currentPage++;
-            await LoadPageAsync();
-            await PersistFilterStateAsync();
-        }
-    }
-
-    private async Task PrevPage()
-    {
-        if (currentPage > 1)
-        {
-            currentPage--;
-            await LoadPageAsync();
-            await PersistFilterStateAsync();
-        }
     }
 
     private async Task LoadFilterStateFromStorageAsync()
@@ -389,15 +382,13 @@
         filterMaxAmount = state.MaxAmount;
         filterStatus = state.Status;
         filterDate = state.Date;
-        currentPage = state.Page ?? 1;
 
         showRestoredFiltersNotice =
             !string.IsNullOrWhiteSpace(filterUserId)
             || filterMinAmount.HasValue
             || filterMaxAmount.HasValue
             || !string.IsNullOrWhiteSpace(filterStatus)
-            || filterDate.HasValue
-            || currentPage > 1;
+            || filterDate.HasValue;
     }
 
     private async Task PersistFilterStateAsync()
@@ -409,8 +400,7 @@
             MinAmount = filterMinAmount,
             MaxAmount = filterMaxAmount,
             Status = filterStatus,
-            Date = filterDate,
-            Page = currentPage
+            Date = filterDate
         });
     }
 
@@ -464,7 +454,7 @@
             }
 
             await LoadOperationalSummaryAsync();
-            await LoadPageAsync();
+            await LoadPaymentsCountAsync();
         }
         catch (Exception ex)
         {
@@ -686,7 +676,7 @@
             await LoadOperationalSummaryAsync();
 
             if (includePaymentsTable)
-                await LoadPageAsync();
+                await LoadPaymentsCountAsync();
 
             lastSummaryRefreshAt = DateTime.UtcNow;
             lastSummaryRefreshLabel = lastSummaryRefreshAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
@@ -971,7 +961,7 @@
                 : $"Varredura concluída: {result.Updated} atualizada(s), {result.StillPending} pendente(s), {result.NotFound} não encontrada(s).";
 
             await LoadOperationalSummaryAsync();
-            await LoadPageAsync();
+            await LoadPaymentsCountAsync();
         }
         catch (Exception ex)
         {
@@ -1063,7 +1053,7 @@
             }
 
             await LoadOperationalSummaryAsync();
-            await LoadPageAsync();
+            await LoadPaymentsCountAsync();
         }
         catch (Exception ex)
         {

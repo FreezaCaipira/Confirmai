@@ -7,6 +7,7 @@
 @using Confirmai.Services
 @using Confirmai.Shared.Components.Admin
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
 @using System.Globalization
@@ -89,24 +90,12 @@
                 <b>@T["AdminLogs.Total"]</b> @totalLogs
             </p>
 
-            @if (isLoading)
-            {
-                <div class="loading-spinner">Carregando logs...</div>
-            }
-            else
-            {
-                <AdminLogsTable
-                    Logs="@logs"
-                    CurrentSortColumn="@currentSortColumn.ToString()"
-                    SortAscending="@sortAscending"
-                    OnSort="@HandleSortAsync" />
-            }
-
-            <div class="pagination">
-                <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
-                <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
-                <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
-            </div>
+            <AdminLogsTable
+                TotalItems="@totalLogs"
+                CurrentSortColumn="@currentSortColumn.ToString()"
+                SortAscending="@sortAscending"
+                OnSort="@HandleSortAsync"
+                LoadLogsAsync="@LoadVirtualizedLogsAsync" />
         </article>
     </section>
 
@@ -121,13 +110,10 @@
     private int auditCountAll;
     private int auditCountSecurityPolicy;
     private int auditCountPaymentPanelStale;
-    private int pageSize = 10;
-    private int currentPage = 1;
-    private int totalPages => Math.Max(1, (int)Math.Ceiling((double)totalLogs / pageSize));
+    private const int VirtualizePageSize = 50;
     private const int ExportMaxRows = 10000;
     private bool filtersLoaded;
     private bool showRestoredFiltersNotice;
-    private bool isLoading = true;
     private string? exportNotice;
     private readonly SemaphoreSlim loadLogsLock = new(1, 1);
     private bool isDisposed;
@@ -152,23 +138,10 @@
     private bool HasDateRangeFilter => filterStartDate.HasValue || filterEndDate.HasValue;
     private string ActivePeriodSummary => BuildActivePeriodSummary();
 
-    private static string GetLevelBadgeClass(string? level)
-    {
-        var normalized = level?.Trim().ToLowerInvariant();
-        return normalized switch
-        {
-            "warning" => "log-level-warning",
-            "error" or "bug" or "critical" or "fatal" => "log-level-error",
-            _ => "log-level-info"
-        };
-    }
-
     protected override async Task OnInitializedAsync()
     {
-        isLoading = true;
         ApplyQueryOverridesToCurrentFilters();
-        await LoadLogs();
-        isLoading = false;
+        await LoadCountsAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -178,14 +151,12 @@
             return;
         }
 
-        isLoading = true;
         await LoadFilterStateFromStorageAsync();
         filtersLoaded = true;
-        await LoadLogs();
-        isLoading = false;
+        await LoadCountsAsync();
     }
 
-    private async Task LoadLogs()
+    private async Task LoadCountsAsync()
     {
         await loadLogsLock.WaitAsync();
         try
@@ -200,8 +171,8 @@
                 auditCountsCriteria: BuildAuditCountsFilterCriteria(),
                 sortColumn: currentSortColumn,
                 sortAscending: sortAscending,
-                requestedPage: currentPage,
-                pageSize: pageSize);
+                requestedPage: 1,
+                pageSize: 1);
 
             if (isDisposed)
             {
@@ -212,13 +183,45 @@
             auditCountAll = data.AuditCounts.All;
             auditCountSecurityPolicy = data.AuditCounts.SecurityPolicy;
             auditCountPaymentPanelStale = data.AuditCounts.PaymentPanelStale;
-            logs = data.Logs;
+        }
+        finally
+        {
+            loadLogsLock.Release();
+        }
+    }
 
-            if (currentPage != data.EffectivePage)
+    private async ValueTask<ItemsProviderResult<AppLog>> LoadVirtualizedLogsAsync(ItemsProviderRequest request)
+    {
+        await loadLogsLock.WaitAsync();
+        try
+        {
+            if (isDisposed)
             {
-                currentPage = data.EffectivePage;
-                await PersistFilterStateAsync();
+                return new ItemsProviderResult<AppLog>(new List<AppLog>(), 0);
             }
+
+            var startIndex = request.StartIndex;
+            var count = request.Count;
+
+            var data = await AdminLogsQueryService.GetPageDataAsync(
+                primaryCriteria: BuildPrimaryFilterCriteria(),
+                auditCountsCriteria: null,
+                sortColumn: currentSortColumn,
+                sortAscending: sortAscending,
+                requestedPage: (startIndex / VirtualizePageSize) + 1,
+                pageSize: VirtualizePageSize);
+
+            if (isDisposed)
+            {
+                return new ItemsProviderResult<AppLog>(new List<AppLog>(), 0);
+            }
+
+            var logs = data.Logs ?? new List<AppLog>();
+            var offsetInPage = startIndex % VirtualizePageSize;
+            var itemsToReturn = Math.Min(count, logs.Count - offsetInPage);
+            var slicedLogs = logs.Skip(offsetInPage).Take(itemsToReturn).ToList();
+
+            return new ItemsProviderResult<AppLog>(slicedLogs, data.TotalLogs);
         }
         finally
         {
@@ -274,10 +277,9 @@
             SyncSelectedAuditQuickFilter();
         }
 
-        currentPage = 1;
         showRestoredFiltersNotice = false;
         await PersistFilterStateAsync();
-        await LoadLogs();
+        await LoadCountsAsync();
     }
 
     private async Task OnGlobalSearchInput(ChangeEventArgs args)
@@ -370,9 +372,7 @@
             sortAscending = true;
         }
 
-        currentPage = 1;
         await PersistFilterStateAsync();
-        await LoadLogs();
     }
 
     private string SortIndicator(AdminLogSortColumn column)
@@ -417,30 +417,6 @@
     private AdminLogsAuditQuickFilter InferAuditQuickFilter()
     {
         return AdminLogsFilterInference.InferAuditQuickFilter(filterSource, filterLevel, filterEventType);
-    }
-
-    private async Task NextPage()
-    {
-        if (currentPage >= totalPages)
-        {
-            return;
-        }
-
-        currentPage++;
-        await PersistFilterStateAsync();
-        await LoadLogs();
-    }
-
-    private async Task PrevPage()
-    {
-        if (currentPage <= 1)
-        {
-            return;
-        }
-
-        currentPage--;
-        await PersistFilterStateAsync();
-        await LoadLogs();
     }
 
     private async Task ClearFilters()
@@ -567,16 +543,10 @@
             sortAscending = effectiveState.SortAscending.Value;
         }
 
-        if (effectiveState.Page.HasValue)
-        {
-            currentPage = effectiveState.Page.Value;
-        }
-
         if (queryOverrides.HasAny)
         {
             selectedQuickRangePreset = InferQuickRangePresetFromDates();
             selectedAuditQuickFilter = InferAuditQuickFilter();
-            currentPage = 1;
             showRestoredFiltersNotice = false;
             return;
         }
@@ -605,7 +575,6 @@
             EndDate = filterEndDate,
             EventType = filterEventType,
             EntityType = filterEntityType,
-            Page = currentPage,
             QuickRangePreset = selectedQuickRangePreset,
             AuditQuickFilter = selectedAuditQuickFilter,
             SortColumn = currentSortColumn,
@@ -623,7 +592,6 @@
         filterEndDate = effectiveState.EndDate;
         filterEventType = effectiveState.EventType;
         filterEntityType = effectiveState.EntityType;
-        currentPage = effectiveState.Page ?? 1;
         selectedQuickRangePreset = InferQuickRangePresetFromDates();
         selectedAuditQuickFilter = InferAuditQuickFilter();
     }
@@ -641,7 +609,6 @@
             EndDate = filterEndDate,
             EventType = filterEventType,
             EntityType = filterEntityType,
-            Page = currentPage,
             QuickRangePreset = selectedQuickRangePreset,
             AuditQuickFilter = selectedAuditQuickFilter,
             SortColumn = currentSortColumn,

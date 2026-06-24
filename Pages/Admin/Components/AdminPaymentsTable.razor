@@ -1,76 +1,72 @@
 @using Confirmai.Data
 @using Confirmai.Models
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web.Virtualization
 
-<AdminDataState IsLoading="@IsLoading" IsEmpty="@(!(PaymentsToDisplay?.Any() ?? false))" LoadingText="Loading payments..." EmptyText="No payments found" EmptyIcon="fas fa-money-bill-wave" EmptyHint="No payments match your current filters.">
-    <table class="payments-table align-right">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Gateway</th>
-                <th>Value</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var p in PaymentsToDisplay!)
-        {
-            <tr>
-                <td data-label="User">
-                    @if (p.User != null)
-                    {
-                        <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
-                            @p.User.UserName
-                        </a>
-                    }
-                    else
-                    {
-                        <span class="text-muted">ID: @p.UserId</span>
-                    }
-                </td>
-                <td data-label="Gateway">@p.PaymentMethod</td>
-                <td data-label="Value">@FormatAmount?.Invoke(p.Amount)</td>
-                <td data-label="Status">
-                    @if (p.IsPaid)
-                    {
-                        <span class="order-status-badge pago">Paid</span>
-                    }
-                    else
-                    {
-                        <span class="order-status-badge aguardandopagamento">Pending</span>
-                    }
-                </td>
-                <td data-label="Date">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
-                <td data-label="Actions">
-                    <div class="admin-actions-row">
-                        <button class="details-btn action-btn icon-only" @onclick="() => OnViewPayment.InvokeAsync(p.Id)" title="Details" aria-label="Details">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-
-    <div class="pagination">
-        <button type="button" @onclick="OnPrevPage" disabled="@(CurrentPage <= 1)">Previous</button>
-        <span class="pagination-info">Page @CurrentPage of @TotalPages</span>
-        <button type="button" @onclick="OnNextPage" disabled="@(CurrentPage >= TotalPages)">Next</button>
+@if (TotalItems == 0)
+{
+    <AdminDataState IsLoading="false" IsEmpty="true" LoadingText="Loading payments..." EmptyText="No payments found" EmptyIcon="fas fa-money-bill-wave" EmptyHint="No payments match your current filters.">
+    </AdminDataState>
+}
+else
+{
+    <div class="payments-table-container">
+        <table class="payments-table align-right">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Gateway</th>
+                    <th>Value</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <Virtualize Context="p" ItemsProvider="LoadPaymentsAsync" OverscanCount="10">
+                    <tr>
+                        <td data-label="User">
+                            @if (p.User != null)
+                            {
+                                <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
+                                    @p.User.UserName
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">ID: @p.UserId</span>
+                            }
+                        </td>
+                        <td data-label="Gateway">@p.PaymentMethod</td>
+                        <td data-label="Value">@FormatAmount?.Invoke(p.Amount)</td>
+                        <td data-label="Status">
+                            @if (p.IsPaid)
+                            {
+                                <span class="order-status-badge pago">Paid</span>
+                            }
+                            else
+                            {
+                                <span class="order-status-badge aguardandopagamento">Pending</span>
+                            }
+                        </td>
+                        <td data-label="Date">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                        <td data-label="Actions">
+                            <div class="admin-actions-row">
+                                <button class="details-btn action-btn icon-only" @onclick="() => OnViewPayment.InvokeAsync(p.Id)" title="Details" aria-label="Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </Virtualize>
+            </tbody>
+        </table>
     </div>
-</AdminDataState>
+}
 
 @code {
-    [Parameter] public List<PaymentRecord>? Payments { get; set; }
-    [Parameter] public int CurrentPage { get; set; }
-    [Parameter] public int TotalPages { get; set; }
-    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public int TotalItems { get; set; }
     [Parameter] public Func<decimal, MarkupString>? FormatAmount { get; set; }
     [Parameter] public EventCallback<int> OnViewPayment { get; set; }
-    [Parameter] public EventCallback OnNextPage { get; set; }
-    [Parameter] public EventCallback OnPrevPage { get; set; }
-
-    private List<PaymentRecord> PaymentsToDisplay => Payments ?? new();
+    [Parameter] public ItemsProviderDelegate<PaymentRecord> LoadPaymentsAsync { get; set; } = default!;
 }

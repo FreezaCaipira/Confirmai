@@ -1,0 +1,7 @@
+.payments-table-container {
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid #7f5c1c;
+    border-radius: 4px;
+    background: var(--parchment);
+}
