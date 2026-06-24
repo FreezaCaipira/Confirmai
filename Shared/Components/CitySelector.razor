@@ -1,5 +1,7 @@
 @using Confirmai.Shared
+@using Microsoft.JSInterop
 @inject UiTextService Ui
+@inject IJSRuntime JS
 
 <div class="city-selector" aria-label="Filtro de cidade">
     <label class="city-label" for="city-select">
@@ -19,6 +21,12 @@
             }
             <option value="@OtherCityKey">@Ui["Index.OtherCity"]</option>
         </select>
+        <button class="city-geo-btn" type="button" @onclick="GetUserLocation" title="Usar minha localização" aria-label="Usar minha localização">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="3 11 22 2 13 21 11 13 3 11" />
+            </svg>
+        </button>
         @if (SelectedCityKey == OtherCityKey)
         {
             <select class="city-select" value="@OtherStateCode" @onchange="OnOtherStateCodeChanged" @onchange:after="OnOtherStateChanged">
@@ -103,4 +111,56 @@
         if (CustomCityChanged.HasDelegate)
             await CustomCityChanged.InvokeAsync(e.Value?.ToString());
     }
+
+    private async Task GetUserLocation()
+    {
+        try
+        {
+            var coords = await JS.InvokeAsync<GeolocationResult>("navigator.geolocation.getCurrentPosition");
+            if (coords != null)
+            {
+                // Reverse geocoding using OpenStreetMap Nominatim API
+                var http = new HttpClient();
+                var result = await http.GetFromJsonAsync<NominatimResult>(
+                    $"https://nominatim.openstreetmap.org/reverse?format=json&lat={coords.Latitude}&lon={coords.Longitude}&zoom=10");
+
+                if (result != null && !string.IsNullOrEmpty(result.Address.City))
+                {
+                    var city = result.Address.City;
+                    var stateCode = result.Address.StateCode ?? string.Empty;
+
+                    // Check if this city exists in our list
+                    var existingCity = Cities.FirstOrDefault(c =>
+                        c.City.Equals(city, StringComparison.OrdinalIgnoreCase) &&
+                        c.StateCode.Equals(stateCode, StringComparison.OrdinalIgnoreCase));
+
+                    if (existingCity != null)
+                    {
+                        if (SelectedCityKeyChanged.HasDelegate)
+                            await SelectedCityKeyChanged.InvokeAsync(existingCity.Key);
+                    }
+                    else
+                    {
+                        // Set as "Other city"
+                        if (SelectedCityKeyChanged.HasDelegate)
+                            await SelectedCityKeyChanged.InvokeAsync(OtherCityKey);
+
+                        if (OtherStateCodeChanged.HasDelegate)
+                            await OtherStateCodeChanged.InvokeAsync(stateCode);
+
+                        if (CustomCityChanged.HasDelegate)
+                            await CustomCityChanged.InvokeAsync(city);
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Silently fail - geolocation may be denied or unavailable
+        }
+    }
+
+    private record GeolocationResult(double Latitude, double Longitude);
+    private record NominatimResult(NominatimAddress Address);
+    private record NominatimAddress(string? City, string? StateCode);
 }
