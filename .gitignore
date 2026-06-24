@@ -33,4 +33,5 @@ e2e/test-results/
 # Test coverage outputs (generated at CI time, not for versioning)
 coverage/
 coverage-test/
+TestResults/
 .aider*
