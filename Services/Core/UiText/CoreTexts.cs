@@ -98,6 +98,7 @@ internal static class CoreTexts
         ["Nav.AdminLanguages"] = "Languages",
         ["Nav.About"] = "About",
         ["Nav.Contact"] = "Contact",
+        ["Nav.Payments"] = "Payments",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Active currency for quote display",
@@ -110,6 +111,7 @@ internal static class CoreTexts
         ["Layout.UserFallback"] = "User",
         ["Layout.Logout"] = "Logout",
         ["Layout.WelcomeVisitor"] = "Welcome, visitor!",
+        ["Layout.NewsTicker1"] = "Confirmai News",
 
         // Common
         ["Common.Loading"] = "Loading...",
@@ -176,6 +178,7 @@ internal static class CoreTexts
         ["Nav.AdminLanguages"] = "Idiomas",
         ["Nav.About"] = "Acerca de",
         ["Nav.Contact"] = "Contacto",
+        ["Nav.Payments"] = "Pagos",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Moneda activa para mostrar cotizacion",
@@ -188,6 +191,7 @@ internal static class CoreTexts
         ["Layout.UserFallback"] = "Usuario",
         ["Layout.Logout"] = "Cerrar sesion",
         ["Layout.WelcomeVisitor"] = "Bienvenido, visitante!",
+        ["Layout.NewsTicker1"] = "Noticias de Confirmai",
 
         // Common
         ["Common.Loading"] = "Cargando...",
