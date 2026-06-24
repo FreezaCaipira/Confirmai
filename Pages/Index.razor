@@ -9,6 +9,7 @@
 @using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
+@using Confirmai.Shared
 @using Microsoft.JSInterop
 
 @inject IDbContextFactory<AppDbContext> DbFactory
@@ -20,7 +21,8 @@
 
 <PageTitle>@(activeTab == TabMyGames ? $"{Ui["Index.TabMyGames"]} — Confirmai" : "Confirmai")</PageTitle>
 
-<div class="sports-page">
+<CascadingValue Value="CurrentCityContext">
+    <div class="sports-page">
 
     <div class="sports-tabs" role="tablist" aria-label="Jogos">
         <button class="sports-tab @(activeTab == TabExplore ? "sports-tab--active" : string.Empty)"
@@ -267,7 +269,8 @@
             </NotAuthorized>
         </AuthorizeView>
     }
-</div>
+    </div>
+</CascadingValue>
 
 @code {
     private static readonly CultureInfo PtBr = new("pt-BR");
@@ -296,6 +299,22 @@
 
     private string FutsalHref => BuildHref("/futsal");
     private string PokerHref  => BuildHref("/poker");
+
+    // ── City Context for CascadingValue ───────────────────────────────
+    private CityContext CurrentCityContext
+    {
+        get
+        {
+            if (SelectedCityKey == OtherCityKey)
+            {
+                var trimmed = CustomCity.Trim();
+                if (string.IsNullOrEmpty(trimmed)) return new CityContext(null, null);
+                return new CityContext(trimmed, otherStateCode);
+            }
+            var opt = Cities.FirstOrDefault(c => c.Key == SelectedCityKey);
+            return opt is null ? new CityContext(null, null) : new CityContext(opt.City, opt.StateCode);
+        }
+    }
 
     private string BuildHref(string basePath)
     {
