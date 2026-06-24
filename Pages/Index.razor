@@ -18,28 +18,28 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject UiTextService Ui
 
-<PageTitle>@(activeTab == "meus-jogos" ? $"{Ui["Index.TabMyGames"]} — Confirmai" : "Confirmai")</PageTitle>
+<PageTitle>@(activeTab == TabMyGames ? $"{Ui["Index.TabMyGames"]} — Confirmai" : "Confirmai")</PageTitle>
 
 <div class="sports-page">
 
     <div class="sports-tabs" role="tablist" aria-label="Jogos">
-        <button class="sports-tab @(activeTab == "explorar" ? "sports-tab--active" : string.Empty)"
-                type="button" role="tab" aria-selected="@(activeTab == "explorar")"
-                @onclick='() => SetTabAsync("explorar")'>
+        <button class="sports-tab @(activeTab == TabExplore ? "sports-tab--active" : string.Empty)"
+                type="button" role="tab" aria-selected="@(activeTab == TabExplore)"
+                @onclick='() => SetTabAsync(TabExplore)'>
             🔍 @Ui["Index.TabExplore"]
         </button>
         <AuthorizeView>
             <Authorized>
-                <button class="sports-tab @(activeTab == "meus-jogos" ? "sports-tab--active" : string.Empty)"
-                        type="button" role="tab" aria-selected="@(activeTab == "meus-jogos")"
-                        @onclick='() => SetTabAsync("meus-jogos")'>
+                <button class="sports-tab @(activeTab == TabMyGames ? "sports-tab--active" : string.Empty)"
+                        type="button" role="tab" aria-selected="@(activeTab == TabMyGames)"
+                        @onclick='() => SetTabAsync(TabMyGames)'>
                     📅 @Ui["Index.TabMyGames"]
                 </button>
             </Authorized>
         </AuthorizeView>
     </div>
 
-    @if (activeTab == "explorar")
+    @if (activeTab == TabExplore)
     {
         <section class="city-selector" aria-label="Filtro de cidade">
             <label class="city-label" for="city-select">
@@ -57,9 +57,9 @@
                     {
                         <option value="@c.Key">@c.Label</option>
                     }
-                    <option value="__other__">@Ui["Index.OtherCity"]</option>
+                    <option value="@OtherCityKey">@Ui["Index.OtherCity"]</option>
                 </select>
-                @if (SelectedCityKey == "__other__")
+                @if (SelectedCityKey == OtherCityKey)
                 {
                     <select class="city-select" @bind="otherStateCode" @bind:after="LoadOtherCitiesAsync">
                         <option value="">UF…</option>
@@ -272,18 +272,26 @@
 @code {
     private static readonly CultureInfo PtBr = new("pt-BR");
 
+    // ── Constants ─────────────────────────────────────────────────
+    private const string DefaultCityKey = "Pouso Alegre|MG";
+    private const string DefaultCityName = "Pouso Alegre";
+    private const string DefaultStateCode = "MG";
+    private const string OtherCityKey = "__other__";
+    private const string TabExplore = "explorar";
+    private const string TabMyGames = "meus-jogos";
+
     // ── Tab ────────────────────────────────────────────────────────
     [Parameter]
     [SupplyParameterFromQuery(Name = "tab")]
     public string? Tab { get; set; }
 
-    private string activeTab = "explorar";
+    private string activeTab = TabExplore;
 
     // ── Explorar state ─────────────────────────────────────────────
     private record CityOption(string Key, string Label, string City, string StateCode);
 
     private List<CityOption> Cities = new();
-    private string SelectedCityKey = "Pouso Alegre|MG";
+    private string SelectedCityKey = DefaultCityKey;
     private string CustomCity = string.Empty;
 
     private string FutsalHref => BuildHref("/futsal");
@@ -291,7 +299,7 @@
 
     private string BuildHref(string basePath)
     {
-        if (SelectedCityKey == "__other__")
+        if (SelectedCityKey == OtherCityKey)
         {
             var trimmed = CustomCity.Trim();
             if (string.IsNullOrEmpty(trimmed)) return basePath;
@@ -342,10 +350,10 @@
         // Sync tab with URL (handles back/forward navigation and redirects from /minhas-confirmacoes).
         // userId may be empty here on first call (before OnInitializedAsync), so data loading
         // is deferred to OnInitializedAsync in that case.
-        var newTab = Tab == "meus-jogos" ? "meus-jogos" : "explorar";
+        var newTab = Tab == TabMyGames ? TabMyGames : TabExplore;
         activeTab = newTab;
 
-        if (newTab == "meus-jogos" && !confLoaded && !string.IsNullOrWhiteSpace(userId))
+        if (newTab == TabMyGames && !confLoaded && !string.IsNullOrWhiteSpace(userId))
             return LoadConfirmationsAsync();
 
         return Task.CompletedTask;
@@ -370,24 +378,23 @@
                 r.StateCode))
             .ToList();
 
-        const string defaultKey = "Pouso Alegre|MG";
-        if (!Cities.Any(c => c.Key == defaultKey))
-            Cities.Insert(0, new CityOption(defaultKey, "Pouso Alegre - MG", "Pouso Alegre", "MG"));
+        if (!Cities.Any(c => c.Key == DefaultCityKey))
+            Cities.Insert(0, new CityOption(DefaultCityKey, $"{DefaultCityName} - {DefaultStateCode}", DefaultCityName, DefaultStateCode));
 
         // Resolve auth (unavailable during OnParametersSetAsync on first load)
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
         userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
         // OnParametersSetAsync ran before us with empty userId; load now if still needed
-        if (activeTab == "meus-jogos" && !confLoaded)
+        if (activeTab == TabMyGames && !confLoaded)
             await LoadConfirmationsAsync();
     }
 
     private async Task SetTabAsync(string tab)
     {
         activeTab = tab;
-        NavigationManager.NavigateTo(tab == "meus-jogos" ? "/jogos?tab=meus-jogos" : "/jogos", replace: true);
-        if (tab == "meus-jogos" && !confLoaded)
+        NavigationManager.NavigateTo(tab == TabMyGames ? "/jogos?tab=meus-jogos" : "/jogos", replace: true);
+        if (tab == TabMyGames && !confLoaded)
             await LoadConfirmationsAsync();
     }
 
