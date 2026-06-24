@@ -24,6 +24,7 @@
     color: var(--text-primary);
     font-size: 0.875rem;
     min-width: 150px;
+    flex: 1;
 }
 
 .my-conf-filter:focus {
@@ -35,6 +36,55 @@
 /* ── Skeleton container ───────────────────── */
 .skeleton-container {
     padding: 1rem;
+}
+
+/* ── Mobile responsiveness ─────────────────── */
+@media (max-width: 768px) {
+    .sports-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .my-conf-filters {
+        flex-direction: column;
+    }
+
+    .my-conf-filter {
+        min-width: 100%;
+    }
+
+    .my-conf-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .my-conf-actions {
+        width: 100%;
+        margin-top: 0.75rem;
+    }
+
+    .my-conf-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .city-selector {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .city-controls {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .city-select,
+    .city-input {
+        width: 100%;
+    }
+
+    .city-geo-btn {
+        width: 100%;
+    }
 }
 
 /* ── Hero ────────────────────────────────── */
