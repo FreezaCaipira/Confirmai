@@ -205,7 +205,7 @@
 
             var data = await AdminLogsQueryService.GetPageDataAsync(
                 primaryCriteria: BuildPrimaryFilterCriteria(),
-                auditCountsCriteria: null,
+                auditCountsCriteria: default!,
                 sortColumn: currentSortColumn,
                 sortAscending: sortAscending,
                 requestedPage: (startIndex / VirtualizePageSize) + 1,
