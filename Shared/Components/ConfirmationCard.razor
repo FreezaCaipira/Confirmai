@@ -2,7 +2,7 @@
 @using Confirmai.Models
 @inject UiTextService Ui
 
-<div class="my-conf-card @CardClass">
+<div class="my-conf-card @CardClass @UrgentClass">
     <div class="my-conf-sport @SportClass">
         @Icon
     </div>
@@ -66,6 +66,10 @@
     private string Icon => Confirmation.Event.Sport == Sport.Futsal ? "⚽" : "🃏";
     private string SportClass => Confirmation.Event.Sport == Sport.Futsal ? "my-conf-sport--futsal" : "my-conf-sport--poker";
     private string CardClass => IsPast ? "my-conf-card--past" : (IsCancelled ? "my-conf-card--cancelled" : string.Empty);
+    private string UrgentClass => IsUrgent ? "my-conf-card--urgent" : string.Empty;
+
+    private bool IsUrgent => !IsPast && !IsCancelled &&
+        (Confirmation.Event.StartsAt - DateTime.UtcNow).TotalHours <= 24;
 
     private string DetailUrl => Confirmation.Event.Sport == Sport.Futsal
         ? $"/futsal/{Confirmation.Event.Id}"
