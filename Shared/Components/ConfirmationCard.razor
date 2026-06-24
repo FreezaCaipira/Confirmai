@@ -1,0 +1,76 @@
+@using Confirmai.Enums
+@using Confirmai.Models
+@inject UiTextService Ui
+
+<div class="my-conf-card @CardClass">
+    <div class="my-conf-sport @SportClass">
+        @Icon
+    </div>
+    <div class="my-conf-body">
+        <div class="my-conf-name-row">
+            <strong class="my-conf-name">@Confirmation.Event.Group.Name</strong>
+            @if (IsConfirmed)
+            {
+                <span class="meta-chip meta-chip--confirmed"><i class="fas fa-check"></i> @Ui["Index.Confirmed"]</span>
+            }
+            @if (IsCancelled)
+            {
+                <span class="my-conf-cancelled"><i class="fas fa-ban"></i> @Ui["Index.Cancelled"]</span>
+            }
+            @if (ShowPosition && Confirmation.Position.HasValue)
+            {
+                <span class="my-conf-pos">@PositionLabel</span>
+            }
+            @if (ShowPokerType && Confirmation.Event.PokerEventType.HasValue)
+            {
+                <span class="my-conf-pos">@PokerTypeLabel(Confirmation.Event.PokerEventType)</span>
+            }
+        </div>
+        <p class="my-conf-meta">📅 @Ui.FormatDateTime(Confirmation.Event.StartsAt.ToLocalTime(), "DateTimeFullShort")</p>
+        @if (!IsPast)
+        {
+            <p class="my-conf-meta">📍 @Confirmation.Event.Location &nbsp;·&nbsp; 👥 @Confirmation.Event.Confirmations.Count @Ui["Index.ConfirmedCount"]</p>
+        }
+    </div>
+    <div class="my-conf-actions">
+        <a href="@DetailUrl" class="my-conf-btn my-conf-btn--view"><i class="fas fa-arrow-right"></i> @Ui["Index.Enter"]</a>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventConfirmation Confirmation { get; set; } = default!;
+
+    [Parameter]
+    public bool IsPast { get; set; }
+
+    [Parameter]
+    public bool IsCancelled { get; set; }
+
+    [Parameter]
+    public bool ShowPosition { get; set; } = true;
+
+    [Parameter]
+    public bool ShowPokerType { get; set; } = true;
+
+    private bool IsConfirmed => !IsCancelled;
+
+    private string Icon => Confirmation.Event.Sport == Sport.Futsal ? "⚽" : "🃏";
+    private string SportClass => Confirmation.Event.Sport == Sport.Futsal ? "my-conf-sport--futsal" : "my-conf-sport--poker";
+    private string CardClass => IsPast ? "my-conf-card--past" : (IsCancelled ? "my-conf-card--cancelled" : string.Empty);
+
+    private string DetailUrl => Confirmation.Event.Sport == Sport.Futsal
+        ? $"/futsal/{Confirmation.Event.Id}"
+        : $"/poker/{Confirmation.Event.Id}";
+
+    private string PositionLabel => Confirmation.Position == FutsalPosition.Goalkeeper
+        ? $"🥅 {Ui["Index.Goalkeeper"]}"
+        : $"👟 {Ui["Index.Line"]}";
+
+    private string PokerTypeLabel(PokerEventType? type) => type switch
+    {
+        PokerEventType.CashGame => "💰 Cash",
+        PokerEventType.HomeGame => "� Home",
+        _ => "🏆 Torneio",
+    };
+}
