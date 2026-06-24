@@ -310,8 +310,13 @@
             var result = await http.GetFromJsonAsync<IbgeMunicipio[]>(
                 $"https://servicodados.ibge.gov.br/api/v1/localidades/estados/{otherStateCode}/municipios?orderBy=nome");
             otherCityOptions = result?.ToList() ?? new();
+            Console.WriteLine($"Loaded {otherCityOptions.Count} cities for state {otherStateCode}");
         }
-        catch { otherCityOptions = new(); }
+        catch
+        {
+            Console.WriteLine($"Error loading cities for state {otherStateCode}");
+            otherCityOptions = new();
+        }
     }
 
     private async Task LoadMatchCountsAsync(AppDbContext db)

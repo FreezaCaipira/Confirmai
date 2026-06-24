@@ -38,9 +38,16 @@
             </select>
             <select class="city-select" value="@CustomCity" @onchange="OnCustomCityChanged">
                 <option value="">Cidade…</option>
-                @foreach (var opt in OtherCityOptions)
+                @if (OtherCityOptions.Count > 0)
                 {
-                    <option value="@opt.Nome">@opt.Nome</option>
+                    @foreach (var opt in OtherCityOptions)
+                    {
+                        <option value="@opt.Nome">@opt.Nome</option>
+                    }
+                }
+                else
+                {
+                    <option disabled>Selecione um estado primeiro</option>
                 }
             </select>
         }
