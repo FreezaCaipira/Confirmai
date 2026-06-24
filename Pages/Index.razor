@@ -56,8 +56,8 @@
             OnOtherCityChange="LoadOtherCitiesAsync" />
 
         <section class="sports-grid" aria-label="Esportes disponíveis">
-            <SportCard Sport="Sport.Futsal" Href="@FutsalHref" Description="@Ui["Index.FutsalCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" />
-            <SportCard Sport="Sport.Poker" Href="@PokerHref" Description="@Ui["Index.PokerCardDesc"]" CtaText="@Ui["Index.ViewTournaments"]" />
+            <SportCard Sport="Sport.Futsal" Href="@FutsalHref" Description="@Ui["Index.FutsalCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@futsalMatchCount" />
+            <SportCard Sport="Sport.Poker" Href="@PokerHref" Description="@Ui["Index.PokerCardDesc"]" CtaText="@Ui["Index.ViewTournaments"]" MatchCount="@pokerMatchCount" />
         </section>
     }
     else
@@ -171,11 +171,33 @@
     private List<CityOption> Cities = new();
     private string SelectedCityKey = DefaultCityKey;
     private string CustomCity = string.Empty;
+    private int? futsalMatchCount = null;
+    private int? pokerMatchCount = null;
 
     // Callbacks for two-way binding with CitySelector
-    private void SelectedCityKeyChanged(string value) => SelectedCityKey = value;
-    private void otherStateCodeChanged(string value) => otherStateCode = value;
-    private void CustomCityChanged(string value) => CustomCity = value;
+    private async Task SelectedCityKeyChanged(string value)
+    {
+        SelectedCityKey = value;
+        await UpdateMatchCountsAsync();
+    }
+
+    private async Task otherStateCodeChanged(string value)
+    {
+        otherStateCode = value;
+        await UpdateMatchCountsAsync();
+    }
+
+    private async Task CustomCityChanged(string value)
+    {
+        CustomCity = value;
+        await UpdateMatchCountsAsync();
+    }
+
+    private async Task UpdateMatchCountsAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        await LoadMatchCountsAsync(db);
+    }
 
     // Empty state actions
     private List<EmptyStateAction> EmptyStateActions => new()
@@ -245,6 +267,40 @@
         catch { otherCityOptions = new(); }
     }
 
+    private async Task LoadMatchCountsAsync(AppDbContext db)
+    {
+        var (city, stateCode) = GetSelectedCityAndState();
+        if (string.IsNullOrEmpty(city) || string.IsNullOrEmpty(stateCode))
+        {
+            futsalMatchCount = null;
+            pokerMatchCount = null;
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        futsalMatchCount = await db.Events
+            .Where(e => e.Sport == Sport.Futsal && e.IsActive && e.StartsAt >= now)
+            .Where(e => e.Group.City == city && e.Group.StateCode == stateCode)
+            .CountAsync();
+
+        pokerMatchCount = await db.Events
+            .Where(e => e.Sport == Sport.Poker && e.IsActive && e.StartsAt >= now)
+            .Where(e => e.Group.City == city && e.Group.StateCode == stateCode)
+            .CountAsync();
+    }
+
+    private (string? City, string? StateCode) GetSelectedCityAndState()
+    {
+        if (SelectedCityKey == OtherCityKey)
+        {
+            var trimmed = CustomCity.Trim();
+            if (string.IsNullOrEmpty(trimmed)) return (null, null);
+            return (trimmed, otherStateCode);
+        }
+        var opt = Cities.FirstOrDefault(c => c.Key == SelectedCityKey);
+        return opt is null ? (null, null) : (opt.City, opt.StateCode);
+    }
+
     protected override Task OnParametersSetAsync()
     {
         // Sync tab with URL (handles back/forward navigation and redirects from /minhas-confirmacoes).
@@ -280,6 +336,9 @@
 
         if (!Cities.Any(c => c.Key == DefaultCityKey))
             Cities.Insert(0, new CityOption(DefaultCityKey, $"{DefaultCityName} - {DefaultStateCode}", DefaultCityName, DefaultStateCode));
+
+        // Load match counts for selected city
+        await LoadMatchCountsAsync(db);
 
         // Resolve auth (unavailable during OnParametersSetAsync on first load)
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();

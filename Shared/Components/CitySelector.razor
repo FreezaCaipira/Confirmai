@@ -12,7 +12,7 @@
         @Ui["Index.CityLabel"]
     </label>
     <div class="city-controls">
-        <select class="city-select" id="city-select" @bind="SelectedCityKey">
+        <select class="city-select" id="city-select" value="@SelectedCityKey" @onchange="OnSelectedCityKeyChanged">
             @foreach (var c in Cities)
             {
                 <option value="@c.Key">@c.Label</option>
@@ -21,7 +21,7 @@
         </select>
         @if (SelectedCityKey == OtherCityKey)
         {
-            <select class="city-select" @bind="OtherStateCode" @bind:after="OnOtherStateChanged">
+            <select class="city-select" value="@OtherStateCode" @onchange="OnOtherStateCodeChanged" @onchange:after="OnOtherStateChanged">
                 <option value="">UF…</option>
                 @foreach (var uf in BrazilianStates)
                 {
@@ -31,7 +31,8 @@
             <input class="city-input"
                    type="text"
                    list="other-city-list"
-                   @bind="CustomCity"
+                   value="@CustomCity"
+                   @oninput="OnCustomCityChanged"
                    placeholder="@Ui["Index.OtherCity"]" />
             <datalist id="other-city-list">
                 @foreach (var opt in OtherCityOptions)
@@ -83,5 +84,23 @@
     private async Task OnOtherStateChanged()
     {
         await OnOtherCityChange.InvokeAsync();
+    }
+
+    private async Task OnSelectedCityKeyChanged(ChangeEventArgs e)
+    {
+        if (SelectedCityKeyChanged.HasDelegate)
+            await SelectedCityKeyChanged.InvokeAsync(e.Value?.ToString());
+    }
+
+    private async Task OnOtherStateCodeChanged(ChangeEventArgs e)
+    {
+        if (OtherStateCodeChanged.HasDelegate)
+            await OtherStateCodeChanged.InvokeAsync(e.Value?.ToString());
+    }
+
+    private async Task OnCustomCityChanged(ChangeEventArgs e)
+    {
+        if (CustomCityChanged.HasDelegate)
+            await CustomCityChanged.InvokeAsync(e.Value?.ToString());
     }
 }

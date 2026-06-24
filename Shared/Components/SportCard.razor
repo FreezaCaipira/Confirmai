@@ -6,6 +6,10 @@
     <div class="sport-card-body">
         <h3 class="sport-card-name">@Name</h3>
         <p class="sport-card-desc">@Description</p>
+        @if (MatchCount.HasValue && MatchCount.Value > 0)
+        {
+            <p class="sport-card-count">@MatchCount.Value @(MatchCount.Value == 1 ? "partida disponível" : "partidas disponíveis")</p>
+        }
     </div>
     <span class="sport-card-cta">@CtaText</span>
 </a>
@@ -22,6 +26,9 @@
 
     [Parameter]
     public string? CtaText { get; set; }
+
+    [Parameter]
+    public int? MatchCount { get; set; }
 
     private string Icon => Sport == Sport.Futsal ? "⚽" : "🃏";
     private string Name => Sport == Sport.Futsal ? "Futsal" : "Poker";
