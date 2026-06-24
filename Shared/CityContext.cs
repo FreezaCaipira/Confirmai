@@ -12,3 +12,13 @@ public record CityContext(string? City, string? StateCode)
     /// </summary>
     public bool HasCity => !string.IsNullOrEmpty(City) && !string.IsNullOrEmpty(StateCode);
 }
+
+/// <summary>
+/// Opção de cidade para o seletor de cidades.
+/// </summary>
+public record CityOption(string Key, string Label, string City, string StateCode);
+
+/// <summary>
+/// Município IBGE para autocomplete de cidades.
+/// </summary>
+public record IbgeMunicipio(string Nome);

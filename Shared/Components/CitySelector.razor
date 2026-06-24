@@ -1,0 +1,87 @@
+@using Confirmai.Shared
+@inject UiTextService Ui
+
+<div class="city-selector" aria-label="Filtro de cidade">
+    <label class="city-label" for="city-select">
+        <svg class="city-pin" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+            <path d="M20 10c0 6-8 13-8 13s-8-7-8-13a8 8 0 0 1 16 0Z" />
+            <circle cx="12" cy="10" r="3" />
+        </svg>
+        @Ui["Index.CityLabel"]
+    </label>
+    <div class="city-controls">
+        <select class="city-select" id="city-select" @bind="SelectedCityKey">
+            @foreach (var c in Cities)
+            {
+                <option value="@c.Key">@c.Label</option>
+            }
+            <option value="@OtherCityKey">@Ui["Index.OtherCity"]</option>
+        </select>
+        @if (SelectedCityKey == OtherCityKey)
+        {
+            <select class="city-select" @bind="OtherStateCode" @bind:after="OnOtherStateChanged">
+                <option value="">UF…</option>
+                @foreach (var uf in BrazilianStates)
+                {
+                    <option value="@uf">@uf</option>
+                }
+            </select>
+            <input class="city-input"
+                   type="text"
+                   list="other-city-list"
+                   @bind="CustomCity"
+                   placeholder="@Ui["Index.OtherCity"]" />
+            <datalist id="other-city-list">
+                @foreach (var opt in OtherCityOptions)
+                {
+                    <option value="@opt.Nome" />
+                }
+            </datalist>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string SelectedCityKey { get; set; } = "Pouso Alegre|MG";
+
+    [Parameter]
+    public EventCallback<string> SelectedCityKeyChanged { get; set; }
+
+    [Parameter]
+    public string OtherStateCode { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> OtherStateCodeChanged { get; set; }
+
+    [Parameter]
+    public string CustomCity { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> CustomCityChanged { get; set; }
+
+    [Parameter]
+    public List<CityOption> Cities { get; set; } = new();
+
+    [Parameter]
+    public List<IbgeMunicipio> OtherCityOptions { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnOtherCityChange { get; set; }
+
+    private const string OtherCityKey = "__other__";
+
+    private static readonly string[] BrazilianStates = new[]
+    {
+        "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
+        "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
+        "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+    };
+
+    private async Task OnOtherStateChanged()
+    {
+        await OnOtherCityChange.InvokeAsync();
+    }
+}
