@@ -11,9 +11,9 @@
 /* ── Card base ───────────────────────────────────────────────────────────── */
 
 .profile-card {
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--ci-border, #1b3d6c);
     border-radius: 8px;
-    background: var(--ci-bg-card);
+    background: var(--ci-bg-card, #111927);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(79, 156, 248, 0.06);
     overflow: hidden;
 }
@@ -28,12 +28,12 @@
 
 .profile-message-title {
     margin: 0;
-    font-family: var(--ci-font);
+    font-family: var(--ci-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
     font-size: 0.92rem;
-    color: var(--ci-text);
+    color: var(--ci-text, #f1f5f9);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-bottom: 1px solid var(--ci-border);
+    border-bottom: 1px solid var(--ci-border, #1b3d6c);
     padding-bottom: 0.4rem;
 }
 

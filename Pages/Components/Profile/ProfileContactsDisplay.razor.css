@@ -2,7 +2,7 @@
     display: grid;
     gap: 0.28rem;
     padding: 0.72rem 1.1rem;
-    border-bottom: 1px solid var(--ci-border);
+    border-bottom: 1px solid var(--ci-border, #1b3d6c);
 }
 
 .profile-contact-row {
@@ -14,7 +14,7 @@
 .profile-contact-label {
     font-size: 0.72rem;
     font-weight: 800;
-    color: var(--ci-text-subtle);
+    color: var(--ci-text-subtle, #6082a0);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     min-width: 72px;
@@ -24,6 +24,6 @@
 .profile-contact-value {
     font-size: 0.88rem;
     font-weight: 600;
-    color: var(--ci-text-blue);
+    color: var(--ci-text-blue, #deeeff);
     overflow-wrap: anywhere;
 }

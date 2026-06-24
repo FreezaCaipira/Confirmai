@@ -1,7 +1,7 @@
 .profile-card {
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--ci-border, #1b3d6c);
     border-radius: 8px;
-    background: var(--ci-bg-card);
+    background: var(--ci-bg-card, #111927);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(79, 156, 248, 0.06);
     overflow: hidden;
 }
@@ -11,8 +11,8 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.1rem;
-    border-bottom: 1px solid var(--ci-border);
-    background: var(--ci-bg-card-deep);
+    border-bottom: 1px solid var(--ci-border, #1b3d6c);
+    background: var(--ci-bg-card-deep, #0d1825);
 }
 
 .profile-avatar-img {
@@ -20,7 +20,7 @@
     height: 72px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--ci-border-dim);
+    border: 2px solid var(--ci-border-dim, #1a5298);
     flex: 0 0 auto;
 }
 
@@ -28,14 +28,14 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: 2px solid var(--ci-border-dim);
+    background: linear-gradient(180deg, var(--ci-accent-mid, #1a5ab0) 0%, var(--ci-accent-dark, #0d3270) 100%);
+    border: 2px solid var(--ci-border-dim, #1a5298);
     display: grid;
     place-items: center;
     font-family: var(--ci-font);
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--ci-text);
+    color: var(--ci-text, #f1f5f9);
     flex: 0 0 auto;
 }
 
@@ -48,7 +48,7 @@
     font-family: var(--ci-font);
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--ci-text);
+    color: var(--ci-text, #f1f5f9);
     line-height: 1.2;
 }
 
@@ -56,7 +56,7 @@
     margin: 0;
     font-size: 0.78rem;
     font-weight: 700;
-    color: var(--ci-text-muted);
+    color: var(--ci-text-muted, #8aacc8);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
