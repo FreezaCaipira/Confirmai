@@ -9,9 +9,9 @@ Plataforma SaaS para organização de esportes amadores (Futsal) e eventos socia
 
 | Métrica | Valor |
 |---------|-------|
-| Testes | 641/641 passando |
-| Build | 0 erros, 8 warnings preexistentes |
-| Idiomas | PT-BR, EN-US, ES-ES (691 chaves traduzidas) |
+| Testes | 1,911/1,911 passando |
+| Build | 0 erros, 47 warnings preexistentes |
+| Idiomas | PT-BR, EN-US, ES-ES (697+ chaves traduzidas) |
 | CSS Scoped | 110+ arquivos `.razor.css` |
 | Services | 78 serviços organizados por domínio |
 
@@ -33,7 +33,7 @@ Plataforma SaaS para organização de esportes amadores (Futsal) e eventos socia
 | Real-time | SignalR (PaymentHub) |
 | Pagamentos | BTCPayServer, AbacatePay, EfiBank, Appmax |
 | Monitoramento | Serilog, OpenTelemetry, Prometheus/Grafana |
-| Testes | xUnit + Moq (641/641 passando), Playwright E2E |
+| Testes | xUnit + Moq (1,911/1,911 passando), Playwright E2E |
 | CI | GitHub Actions (build + test + coverage) |
 
 ## Como rodar
@@ -103,7 +103,7 @@ Confirmai/
 ├── Configuration/            # Options (BtcPay, Email, Security)
 ├── Hubs/                     # PaymentHub (SignalR)
 ├── wwwroot/css/              # 4 CSS globais + 110+ scoped (.razor.css)
-├── Confirmai.Tests/          # xUnit (641 testes)
+├── Confirmai.Tests/          # xUnit (1,911 testes)
 └── e2e/                      # Playwright E2E (TypeScript)
 ```
 
