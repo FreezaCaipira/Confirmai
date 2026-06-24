@@ -527,6 +527,7 @@ public class ProgramConfigurationTests
                         ["ConnectionStrings:DefaultConnection"] = "Host=localhost;Port=5432;Database=Confirmai_tests;Username=test;Password=test",
                         ["EfiBank:ClientId"] = "test-client-id",
                         ["EfiBank:ClientSecret"] = "test-client-secret",
+                        ["EfiBank:CertificatePath"] = "",
                         ["EfiBank:PixKey"] = "test-pix-key",
                         ["EfiBank:Sandbox"] = "false"
                     };
