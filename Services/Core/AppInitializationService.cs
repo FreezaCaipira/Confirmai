@@ -65,8 +65,15 @@ public class AppInitializationService
         var adminFullName = _configuration["AdminSeed:FullName"] ?? "Administrator";
         var syncAdminPassword = _configuration.GetValue<bool?>("AdminSeed:SyncPassword") ?? _environment.IsDevelopment();
 
+        // Skip admin seed if password is not configured (placeholder)
+        if (string.IsNullOrWhiteSpace(adminPassword) || adminPassword.Contains("__SET_VIA_USER_SECRETS__"))
+        {
+            _logger.LogInformation("Pulando criação de usuário admin seed: senha não configurada");
+            return;
+        }
+
         var adminUser = await _userManager.FindByEmailAsync(adminEmail);
-        if (adminUser == null && !string.IsNullOrWhiteSpace(adminPassword))
+        if (adminUser == null)
         {
             adminUser = new ApplicationUser
             {
