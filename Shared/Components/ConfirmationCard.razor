@@ -30,6 +30,14 @@
         @if (!IsPast)
         {
             <p class="my-conf-meta">📍 @Confirmation.Event.Location &nbsp;·&nbsp; 👥 @Confirmation.Event.Confirmations.Count @Ui["Index.ConfirmedCount"]</p>
+            @if (Confirmation.Event.Price.HasValue && Confirmation.Event.Price.Value > 0)
+            {
+                <p class="my-conf-meta my-conf-price">💰 R$ @Confirmation.Event.Price.Value.ToString("F2")</p>
+            }
+            @if (Confirmation.PaymentStatus != EventConfirmationPaymentStatus.Pending)
+            {
+                <p class="my-conf-meta my-conf-status" style="color: @PaymentStatusColor">@PaymentStatusLabel</p>
+            }
         }
     </div>
     <div class="my-conf-actions">
@@ -70,7 +78,25 @@
     private string PokerTypeLabel(PokerEventType? type) => type switch
     {
         PokerEventType.CashGame => "💰 Cash",
-        PokerEventType.HomeGame => "� Home",
+        PokerEventType.HomeGame => "🏠 Home",
         _ => "🏆 Torneio",
+    };
+
+    private string PaymentStatusLabel => Confirmation.PaymentStatus switch
+    {
+        EventConfirmationPaymentStatus.Paid => "✅ Pago",
+        EventConfirmationPaymentStatus.Failed => "❌ Falhou",
+        EventConfirmationPaymentStatus.Refunded => "↩️ Reembolsado",
+        EventConfirmationPaymentStatus.Expired => "⏰ Expirado",
+        _ => string.Empty
+    };
+
+    private string PaymentStatusColor => Confirmation.PaymentStatus switch
+    {
+        EventConfirmationPaymentStatus.Paid => "#4ade80",
+        EventConfirmationPaymentStatus.Failed => "#ef4444",
+        EventConfirmationPaymentStatus.Refunded => "#fbbf24",
+        EventConfirmationPaymentStatus.Expired => "#f97316",
+        _ => "var(--text-muted)"
     };
 }

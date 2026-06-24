@@ -99,6 +99,15 @@
     margin: 0.25rem 0;
 }
 
+.my-conf-price {
+    color: #4ade80;
+    font-weight: 500;
+}
+
+.my-conf-status {
+    font-weight: 500;
+}
+
 .my-conf-actions {
     flex-shrink: 0;
 }
