@@ -303,4 +303,17 @@ public sealed class UiTextService
 
         return (ptBrCount, enUsCount, esEsCount, ptBrCount + enUsCount + esEsCount);
     }
+
+    /// <summary>
+    /// **Testing/Development method** - Clear the static cache to force re-initialization.
+    /// Useful during development when text dictionaries are modified and need to be reloaded.
+    /// Thread-safe.
+    /// </summary>
+    public static void ClearCache()
+    {
+        lock (InitLock)
+        {
+            _textByLanguageCache = null;
+        }
+    }
 }
