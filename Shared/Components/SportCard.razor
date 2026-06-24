@@ -1,0 +1,29 @@
+@using Confirmai.Enums
+@inject UiTextService Ui
+
+<a href="@Href" class="sport-card sport-card--@SportClass">
+    <div class="sport-card-icon" aria-hidden="true">@Icon</div>
+    <div class="sport-card-body">
+        <h3 class="sport-card-name">@Name</h3>
+        <p class="sport-card-desc">@Description</p>
+    </div>
+    <span class="sport-card-cta">@CtaText</span>
+</a>
+
+@code {
+    [Parameter]
+    public Sport Sport { get; set; }
+
+    [Parameter]
+    public string Href { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    [Parameter]
+    public string? CtaText { get; set; }
+
+    private string Icon => Sport == Sport.Futsal ? "⚽" : "🃏";
+    private string Name => Sport == Sport.Futsal ? "Futsal" : "Poker";
+    private string SportClass => Sport == Sport.Futsal ? "futsal" : "poker";
+}

@@ -56,22 +56,8 @@
             OnOtherCityChange="LoadOtherCitiesAsync" />
 
         <section class="sports-grid" aria-label="Esportes disponíveis">
-            <a href="@FutsalHref" class="sport-card sport-card--futsal">
-                <div class="sport-card-icon" aria-hidden="true">⚽</div>
-                <div class="sport-card-body">
-                    <h3 class="sport-card-name">Futsal</h3>
-                    <p class="sport-card-desc">@Ui["Index.FutsalCardDesc"]</p>
-                </div>
-                <span class="sport-card-cta">@Ui["Index.ViewMatches"]</span>
-            </a>
-            <a href="@PokerHref" class="sport-card sport-card--poker">
-                <div class="sport-card-icon" aria-hidden="true">🃏</div>
-                <div class="sport-card-body">
-                    <h3 class="sport-card-name">Poker</h3>
-                    <p class="sport-card-desc">@Ui["Index.PokerCardDesc"]</p>
-                </div>
-                <span class="sport-card-cta">@Ui["Index.ViewTournaments"]</span>
-            </a>
+            <SportCard Sport="Sport.Futsal" Href="@FutsalHref" Description="@Ui["Index.FutsalCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" />
+            <SportCard Sport="Sport.Poker" Href="@PokerHref" Description="@Ui["Index.PokerCardDesc"]" CtaText="@Ui["Index.ViewTournaments"]" />
         </section>
     }
     else
