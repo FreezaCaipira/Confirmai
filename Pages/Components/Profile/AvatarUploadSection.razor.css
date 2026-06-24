@@ -1,5 +1,6 @@
 .profile-edit-details {
     border-top: 1px solid var(--ci-border);
+    margin-bottom: 0.5rem;
 }
 
 .profile-edit-summary {
