@@ -92,14 +92,12 @@
 
                         @if (past.Any() || cancelled.Any())
                         {
-                            <div class="my-conf-history-tabs">
-                                <button class="my-conf-tab @(!showCancelled ? "active" : string.Empty)" type="button" @onclick="() => showCancelled = false">
-                                    <i class="fas fa-history"></i> @Ui["Index.Previous"] (@past.Count)
-                                </button>
-                                <button class="my-conf-tab @(showCancelled ? "active" : string.Empty)" type="button" @onclick="() => showCancelled = true">
-                                    <i class="fas fa-ban"></i> @Ui["Index.Cancelled"] (@cancelled.Count)
-                                </button>
-                            </div>
+                            <MyGamesTabs
+                                ShowCancelled="@showCancelled"
+                                PreviousCount="@past.Count"
+                                CancelledCount="@cancelled.Count"
+                                OnPreviousClick="() => showCancelled = false"
+                                OnCancelledClick="() => showCancelled = true" />
 
                             @if (!showCancelled)
                             {

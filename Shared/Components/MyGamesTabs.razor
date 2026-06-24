@@ -1,0 +1,27 @@
+@inject UiTextService Ui
+
+<div class="my-conf-history-tabs">
+    <button class="my-conf-tab @(!ShowCancelled ? "active" : string.Empty)" type="button" @onclick="OnPreviousClick">
+        <i class="fas fa-history"></i> @Ui["Index.Previous"] (@PreviousCount)
+    </button>
+    <button class="my-conf-tab @(ShowCancelled ? "active" : string.Empty)" type="button" @onclick="OnCancelledClick">
+        <i class="fas fa-ban"></i> @Ui["Index.Cancelled"] (@CancelledCount)
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public bool ShowCancelled { get; set; }
+
+    [Parameter]
+    public int PreviousCount { get; set; }
+
+    [Parameter]
+    public int CancelledCount { get; set; }
+
+    [Parameter]
+    public EventCallback OnPreviousClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelledClick { get; set; }
+}
