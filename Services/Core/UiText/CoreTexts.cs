@@ -20,6 +20,10 @@ internal static class CoreTexts
         ["Nav.AdminLanguages"] = "Idiomas",
         ["Nav.About"] = "Sobre",
         ["Nav.Contact"] = "Contato",
+        ["Nav.Payments"] = "Pagamentos",
+        ["Nav.Integration"] = "Integracao",
+        ["Nav.Mailbox"] = "Caixa de Entrada",
+        ["Nav.Profile"] = "Perfil",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Moeda ativa para exibicao de cotacao",
@@ -32,6 +36,10 @@ internal static class CoreTexts
         ["Layout.UserFallback"] = "Usuario",
         ["Layout.Logout"] = "Sair",
         ["Layout.WelcomeVisitor"] = "Bem-vindo, visitante!",
+        ["Layout.NewsTicker1"] = "Novidades do Confirmai",
+        ["Layout.NewsTicker2"] = "Confirme sua presença nos jogos",
+        ["Layout.NewsTicker3"] = "Novos recursos disponiveis",
+        ["Layout.NewsTicker4"] = "Participe da comunidade",
 
         // Common
         ["Common.Loading"] = "Carregando...",
@@ -112,6 +120,9 @@ internal static class CoreTexts
         ["Layout.Logout"] = "Logout",
         ["Layout.WelcomeVisitor"] = "Welcome, visitor!",
         ["Layout.NewsTicker1"] = "Confirmai News",
+        ["Layout.NewsTicker2"] = "Confirm your presence in games",
+        ["Layout.NewsTicker3"] = "New features available",
+        ["Layout.NewsTicker4"] = "Join the community",
 
         // Common
         ["Common.Loading"] = "Loading...",
@@ -179,6 +190,9 @@ internal static class CoreTexts
         ["Nav.About"] = "Acerca de",
         ["Nav.Contact"] = "Contacto",
         ["Nav.Payments"] = "Pagos",
+        ["Nav.Integration"] = "Integracion",
+        ["Nav.Mailbox"] = "Bandeja de entrada",
+        ["Nav.Profile"] = "Perfil",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Moneda activa para mostrar cotizacion",
@@ -192,6 +206,9 @@ internal static class CoreTexts
         ["Layout.Logout"] = "Cerrar sesion",
         ["Layout.WelcomeVisitor"] = "Bienvenido, visitante!",
         ["Layout.NewsTicker1"] = "Noticias de Confirmai",
+        ["Layout.NewsTicker2"] = "Confirma tu presencia en los juegos",
+        ["Layout.NewsTicker3"] = "Nuevas caracteristicas disponibles",
+        ["Layout.NewsTicker4"] = "Unete a la comunidad",
 
         // Common
         ["Common.Loading"] = "Cargando...",
