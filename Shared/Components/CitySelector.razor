@@ -36,18 +36,13 @@
                     <option value="@uf">@uf</option>
                 }
             </select>
-            <input class="city-input"
-                   type="text"
-                   list="other-city-list"
-                   value="@CustomCity"
-                   @oninput="OnCustomCityChanged"
-                   placeholder="@Ui["Index.OtherCity"]" />
-            <datalist id="other-city-list">
+            <select class="city-select" value="@CustomCity" @onchange="OnCustomCityChanged">
+                <option value="">Cidade…</option>
                 @foreach (var opt in OtherCityOptions)
                 {
-                    <option value="@opt.Nome" />
+                    <option value="@opt.Nome">@opt.Nome</option>
                 }
-            </datalist>
+            </select>
         }
     </div>
 </div>
