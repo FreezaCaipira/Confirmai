@@ -32,6 +32,11 @@
     box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
 }
 
+/* ── Skeleton container ───────────────────── */
+.skeleton-container {
+    padding: 1rem;
+}
+
 /* ── Hero ────────────────────────────────── */
 .sports-hero {
     text-align: center;

@@ -67,7 +67,11 @@
                 <div class="my-conf-container">
                     @if (confLoading)
                     {
-                        <p class="listing-state">@Ui["Index.LoadingConfirmations"]</p>
+                        <div class="skeleton-container">
+                            <Skeleton Class="skeleton--card" />
+                            <Skeleton Class="skeleton--card" />
+                            <Skeleton Class="skeleton--card" />
+                        </div>
                     }
                     else if (!upcoming.Any() && !past.Any() && !cancelled.Any())
                     {
