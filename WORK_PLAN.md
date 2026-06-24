@@ -116,21 +116,41 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
 **Objetivo**: Melhorar observabilidade, eficiência e resposta a incidentes.
 
 ### 3.1 Virtual scrolling para listas grandes
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Baixa
-- **Ação**: Implementar em AdminLogs, AdminUsers, AdminPayments
+- **Ações realizadas**:
+  - Implementado virtual scrolling com Microsoft.AspNetCore.Components.Web.Virtualization
+  - AdminLogs: ItemsProviderDelegate com page size 50
+  - AdminUsers: ItemsProviderDelegate com page size 50
+  - AdminPayments: ItemsProviderDelegate com page size 50
+  - Removidos controles de paginação (gerenciados pela virtualização)
+  - Adicionados containers com max-height 600px e scroll
 - **Benefício**: Performance em listas com 1000+ itens
 
 ### 3.2 Definir baseline operacional semanal por gateway
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Baixa
-- **Ação**: Métricas de volume/latência/taxa de erro, alertas automatizados
+- **Ações realizadas**:
+  - Criado documento `docs/monitoring/gateway-baseline.md`
+  - Definidos baselines para EfiBank, AbacatePay, Appmax, BtcPay
+  - Métricas de volume, latência, erro e sucesso por gateway
+  - Thresholds de alerta P1/P2/P3
+  - Processo de revisão semanal com template de relatório
+  - Fontes de dados e processo de ajuste de thresholds
 - **Benefício**: Detecção proativa de problemas
 
 ### 3.3 Formalizar ritual pós-incidente com checklist de causa raiz
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Baixa
-- **Ação**: Template de post-mortem, checklist de análise, ações de follow-up
+- **Ações realizadas**:
+  - Criado documento `docs/monitoring/postmortem-checklist.md`
+  - Checklist completo de preparação pré-reunião
+  - Agenda estruturada com análise de 5 Whys
+  - Categorias de causa raiz (código, configuração, infraestrutura, processo, humano)
+  - Template de post-mortem com timeline, análise e action items
+  - Diretrizes de cultura sem culpa (blameless)
+  - Processo de follow-up (1 semana, 1 mês, 3 meses)
+  - Métricas de incidentes e action items para tracking
 - **Benefício**: Aprendizado contínuo, prevenção de recorrência
 
 ---
