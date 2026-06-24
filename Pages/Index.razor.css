@@ -8,6 +8,30 @@
     gap: 1.5rem;
 }
 
+/* ── Meus Jogos Filters ───────────────────── */
+.my-conf-filters {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.my-conf-filter {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    min-width: 150px;
+}
+
+.my-conf-filter:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
 /* ── Hero ────────────────────────────────── */
 .sports-hero {
     text-align: center;

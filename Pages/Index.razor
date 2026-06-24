@@ -75,6 +75,19 @@
                     }
                     else
                     {
+                        <div class="my-conf-filters">
+                            <select class="my-conf-filter" @bind="filterSport">
+                                <option value="">Todos os esportes</option>
+                                <option value="Futsal">⚽ Futsal</option>
+                                <option value="Poker">🃏 Poker</option>
+                            </select>
+                            <select class="my-conf-filter" @bind="filterPeriod">
+                                <option value="all">Todos os períodos</option>
+                                <option value="7days">Últimos 7 dias</option>
+                                <option value="30days">Últimos 30 dias</option>
+                            </select>
+                        </div>
+
                         @if (upcoming.Any())
                         {
                             <div class="my-conf-section">
@@ -242,13 +255,43 @@
     }
 
     // ── Meus Jogos state ───────────────────────────────────────────
-    private List<EventConfirmation> upcoming  = new();
-    private List<EventConfirmation> past      = new();
-    private List<EventConfirmation> cancelled = new();
+    private List<EventConfirmation> allUpcoming  = new();
+    private List<EventConfirmation> allPast      = new();
+    private List<EventConfirmation> allCancelled = new();
     private bool confLoaded    = false;
     private bool confLoading   = false;
     private bool showCancelled = false;
     private string userId      = string.Empty;
+
+    // ── Meus Jogos filters ────────────────────────────────────────
+    private Sport? filterSport = null;
+    private string filterPeriod = "all"; // all, 7days, 30days
+
+    // ── Filtered lists ───────────────────────────────────────────
+    private List<EventConfirmation> upcoming => FilterConfirmations(allUpcoming);
+    private List<EventConfirmation> past => FilterConfirmations(allPast);
+    private List<EventConfirmation> cancelled => FilterConfirmations(allCancelled);
+
+    private List<EventConfirmation> FilterConfirmations(List<EventConfirmation> list)
+    {
+        var filtered = list;
+
+        // Filter by sport
+        if (filterSport.HasValue)
+        {
+            filtered = filtered.Where(c => c.Event.Sport == filterSport.Value).ToList();
+        }
+
+        // Filter by period
+        if (filterPeriod != "all")
+        {
+            var days = filterPeriod == "7days" ? 7 : 30;
+            var cutoff = DateTime.UtcNow.AddDays(-days);
+            filtered = filtered.Where(c => c.Event.StartsAt >= cutoff).ToList();
+        }
+
+        return filtered;
+    }
 
     // ── Outra cidade ───────────────────────────────────────────────
     private string       otherStateCode  = string.Empty;
@@ -372,10 +415,10 @@
             .OrderBy(c => c.Event.StartsAt)
             .ToListAsync();
 
-        upcoming  = confs.Where(c => c.Event.StartsAt >= now && c.Event.IsActive).ToList();
-        past      = confs.Where(c => c.Event.StartsAt <  now && c.Event.IsActive)
+        allUpcoming  = confs.Where(c => c.Event.StartsAt >= now && c.Event.IsActive).ToList();
+        allPast      = confs.Where(c => c.Event.StartsAt <  now && c.Event.IsActive)
                          .OrderByDescending(c => c.Event.StartsAt).ToList();
-        cancelled = confs.Where(c => !c.Event.IsActive)
+        allCancelled = confs.Where(c => !c.Event.IsActive)
                          .OrderByDescending(c => c.Event.StartsAt).ToList();
         confLoading = false;
         confLoaded  = true;
