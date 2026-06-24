@@ -20,7 +20,7 @@
     flex-wrap: wrap;
 }
 
-.profile-card .mk-btn {
+.mk-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -39,24 +39,24 @@
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.profile-card .mk-btn:hover:not(:disabled) {
+.mk-btn:hover:not(:disabled) {
     background: rgba(79, 156, 248, 0.1);
     border-color: var(--ci-border-dim);
     color: var(--ci-text);
 }
 
-.profile-card .mk-btn:disabled {
+.mk-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.profile-card .mk-btn-primary {
+.mk-btn-primary {
     background: var(--ci-accent-mid);
     border-color: var(--ci-border-dim);
     color: var(--ci-text);
 }
 
-.profile-card .mk-btn-primary:hover:not(:disabled) {
+.mk-btn-primary:hover:not(:disabled) {
     background: var(--ci-accent);
     border-color: var(--ci-accent);
     color: #fff;
