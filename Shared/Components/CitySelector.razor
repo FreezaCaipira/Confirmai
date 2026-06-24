@@ -29,14 +29,14 @@
         </button>
         @if (SelectedCityKey == OtherCityKey)
         {
-            <select class="city-select" value="@OtherStateCode" @onchange="OnOtherStateCodeChanged" @onchange:after="OnOtherStateChanged">
+            <select class="city-select" @bind="OtherStateCode" @bind:after="OnOtherStateChanged">
                 <option value="">UF…</option>
                 @foreach (var uf in BrazilianStates)
                 {
                     <option value="@uf">@uf</option>
                 }
             </select>
-            <select class="city-select" value="@CustomCity" @onchange="OnCustomCityChanged">
+            <select class="city-select" @bind="CustomCity">
                 <option value="">Cidade…</option>
                 @if (OtherCityOptions.Count > 0)
                 {
@@ -100,18 +100,6 @@
     {
         if (SelectedCityKeyChanged.HasDelegate)
             await SelectedCityKeyChanged.InvokeAsync(e.Value?.ToString());
-    }
-
-    private async Task OnOtherStateCodeChanged(ChangeEventArgs e)
-    {
-        if (OtherStateCodeChanged.HasDelegate)
-            await OtherStateCodeChanged.InvokeAsync(e.Value?.ToString());
-    }
-
-    private async Task OnCustomCityChanged(ChangeEventArgs e)
-    {
-        if (CustomCityChanged.HasDelegate)
-            await CustomCityChanged.InvokeAsync(e.Value?.ToString());
     }
 
     private async Task GetUserLocation()
