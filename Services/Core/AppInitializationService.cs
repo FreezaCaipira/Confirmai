@@ -66,7 +66,9 @@ public class AppInitializationService
         var syncAdminPassword = _configuration.GetValue<bool?>("AdminSeed:SyncPassword") ?? _environment.IsDevelopment();
 
         // Skip admin seed if password is not configured (placeholder)
-        if (string.IsNullOrWhiteSpace(adminPassword) || adminPassword.Contains("__SET_VIA_USER_SECRETS__"))
+        if (string.IsNullOrWhiteSpace(adminPassword) ||
+            adminPassword.Contains("__SET_VIA_USER_SECRETS__") ||
+            adminPassword.Contains("__SET_VIA_USER_SECRETS_OR_ENV__"))
         {
             _logger.LogInformation("Pulando criação de usuário admin seed: senha não configurada");
             return;
