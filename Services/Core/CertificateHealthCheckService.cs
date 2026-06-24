@@ -3,6 +3,7 @@ using Confirmai.Data;
 using Confirmai.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 
 namespace Confirmai.Services.Core;
 
@@ -77,7 +78,7 @@ public class CertificateHealthCheckService : IHostedService
             }
 
             var password = _config["EfiBank:CertificatePassword"];
-            var cert = new X509Certificate2(certPath, password ?? string.Empty);
+            var cert = X509CertificateLoader.LoadPkcs12FromFile(certPath, password ?? string.Empty);
 
             var now = DateTime.Now;
             var expiryDate = cert.NotAfter;
