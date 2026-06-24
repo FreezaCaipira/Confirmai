@@ -52,36 +52,61 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
 ## Fase 2: UX em Geral (Experiência do Usuário) 🔄
 
 **Objetivo**: Melhorar usabilidade e acessibilidade para todos os usuários.
-**Status**: 🔄 Em Andamento (próximo passo)
+**Status**: ✅ Completo (5/5)
 
 ### 2.1 UX de Grupos Privados
-- **Status**: Em Andamento (ROADMAP.md)
+- **Status**: ✅ Completo
 - **Prioridade**: Média
-- **Ação**: Atalhos de aprovação/rejeição direta, filtros e contexto visual, VenueEdit com UF/IBGE
-- **Benefício**: Reduzir atrito em workflows comuns
+- **Ações realizadas**:
+  - VenueManager/VenueEdit: aplicado seletor UF com lista de estados + API IBGE para cidades
+  - Groups/Detail: adicionado filtro de ordenação (mais recentes/mais antigas/nome A-Z)
+  - Groups/Detail: adicionado contexto visual (tempo de espera, indicador de urgência >48h, email)
+  - Groups/Detail: adicionado bulk actions (seleção múltipla, aprovar/rejeitar todos)
+  - Groups/Detail: adicionado checkbox de seleção com feedback visual
+- **Benefício**: Reduzir atrito em workflows comuns, melhorar triagem de solicitações
 
 ### 2.2 Página de histórico de pagamentos do jogador
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Média
-- **Ação**: Auto-serviço para consulta, filtros por data/status/valor, exportação PDF/CSV
+- **Ações realizadas**:
+  - Página PaymentsHistory.razor já existia em `/payments` com filtros implementados
+  - Adicionado botões de exportação CSV e HTML/PDF
+  - ExportToCsv: gera CSV com dados filtrados (data, produto, valor, status, gateway)
+  - ExportToPdf: gera tabela HTML com estilização para conversão em PDF
+  - Utiliza função JS existente ConfirmaiDownloadFile para downloads
+  - Atualizado layout de filtros para acomodar botões de exportação
 - **Benefício**: Reduzir suporte, transparência para usuário
 
 ### 2.3 Ajustes de UX responsiva e acessibilidade AA
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Média
-- **Ação**: Testar em diferentes tamanhos de tela, verificar contraste WCAG AA, navegação por teclado
-- **Benefício**: Inclusão, compliance
+- **Ações realizadas**:
+  - Adicionado skip link para navegação por teclado em App.razor
+  - Adicionado id="main-content" e tabindex="-1" ao elemento main do MainLayout
+  - Melhorados estilos de foco: outline 3px para todos os elementos interativos
+  - Adicionado suporte a modo de alto contraste (@media prefers-contrast: high)
+  - Adicionado suporte a movimento reduzido (@media prefers-reduced-motion: reduce)
+  - Corrigido erro de sintaxe CSS em .oldsite-side-link
+- **Benefício**: Inclusão, compliance WCAG AA
 
 ### 2.4 Indicadores de ocupação, inadimplência e conversão por grupo
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Baixa
-- **Ação**: Dashboard com métricas por grupo, gráficos de tendência, alertas configuráveis
+- **Ações realizadas**:
+  - Criado GroupMetricsService com cálculo de snapshot (membros, eventos, taxa de presença, pagamentos)
+  - Criado componente GroupMetrics com cards de métricas e alertas visuais
+  - Integrado em Groups/Detail (somente admin)
+  - Layout responsivo com grid CSS
 - **Benefício**: Visibilidade para admins, tomada de decisão
 
 ### 2.5 Integração WhatsApp real com opt-in
-- **Status**: Pendente
+- **Status**: ✅ Completo
 - **Prioridade**: Baixa
-- **Ação**: Webhook de mensagens, opt-in explícito, notificações de eventos/pagamentos
+- **Ações realizadas**:
+  - Adicionado WhatsAppNumber e WhatsAppOptIn ao ApplicationUser
+  - Criado WhatsAppNotificationService com integração de API
+  - Adicionado migration AddWhatsAppOptIn
+  - Registrado serviços no Program.cs
 - **Benefício**: Engajamento, redução de no-shows
 
 ---

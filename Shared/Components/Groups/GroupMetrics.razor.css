@@ -1,0 +1,120 @@
+.group-metrics {
+    margin: 1.5rem 0;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.metric-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(26, 90, 176, 0.1);
+    border: 1px solid #2d6a8a;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+
+.metric-card:hover {
+    background: rgba(26, 90, 176, 0.15);
+    border-color: #4f9cf8;
+}
+
+.metric-card--alert {
+    background: rgba(191, 64, 64, 0.15);
+    border-color: #b71c1c;
+}
+
+.metric-card--alert:hover {
+    background: rgba(191, 64, 64, 0.2);
+    border-color: #c62828;
+}
+
+.metric-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.metric-icon--members {
+    background: rgba(79, 156, 248, 0.2);
+    color: #4f9cf8;
+}
+
+.metric-icon--events {
+    background: rgba(156, 39, 176, 0.2);
+    color: #9c27b0;
+}
+
+.metric-icon--attendance {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+}
+
+.metric-icon--payments {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.metric-icon--pending {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+}
+
+.metric-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #8aacc8;
+    line-height: 1.2;
+}
+
+.metric-label {
+    font-size: 0.85rem;
+    color: #6082a0;
+    margin-top: 0.25rem;
+}
+
+.metric-sub {
+    font-size: 0.75rem;
+    color: #4e6a82;
+    margin-top: 0.15rem;
+}
+
+.metric-sub--good {
+    color: #4ade80;
+}
+
+.metric-sub--warning {
+    color: #fbbf24;
+}
+
+.metric-sub--alert {
+    color: #f87171;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}

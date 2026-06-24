@@ -34,6 +34,14 @@
                 <input type="date" @bind="filterDate" />
                 <button @onclick="ApplyFilters">@T["Common.Filter"]</button>
                 <button @onclick="ClearFilters">@T["Common.Clear"]</button>
+                <div class="export-actions">
+                    <button class="export-btn" @onclick="ExportToCsv" title="Exportar CSV">
+                        <i class="fas fa-file-csv"></i> CSV
+                    </button>
+                    <button class="export-btn" @onclick="ExportToPdf" title="Exportar PDF">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                </div>
             </div>
 
             <div class="payments-tab-bar">
@@ -321,8 +329,91 @@
             return mappedName;
         }
 
-        return payment.ProductId.ToString();
+        return T["PaymentHistory.UnknownProduct"];
+    }
+
+    private async Task ExportToCsv()
+    {
+        if (filteredPayments == null || !filteredPayments.Any()) return;
+
+        var csv = new System.Text.StringBuilder();
+        csv.AppendLine("Data,Produto,Valor,Status,Gateway");
+
+        foreach (var p in filteredPayments)
+        {
+            var status = p.IsPaid ? T["Common.Paid"] : T["Common.Pending"];
+            var product = GetProductDisplayName(p);
+            var amount = FormatPaymentAmount(p.Amount, p.Currency);
+            var date = p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+            var gateway = p.PaymentMethod ?? "-";
+
+            csv.AppendLine($"\"{date}\",\"{product}\",\"{amount}\",\"{status}\",\"{gateway}\"");
+        }
+
+        var fileName = $"pagamentos_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, csv.ToString(), "text/csv");
+    }
+
+    private async Task ExportToPdf()
+    {
+        if (filteredPayments == null || !filteredPayments.Any()) return;
+
+        var html = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <style>
+        body {{ font-family: Arial, sans-serif; padding: 20px; }}
+        h1 {{ color: #333; }}
+        table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+        th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+        th {{ background-color: #f4f4f4; }}
+        .paid {{ color: green; font-weight: bold; }}
+        .pending {{ color: orange; font-weight: bold; }}
+    </style>
+</head>
+<body>
+    <h1>Histórico de Pagamentos</h1>
+    <p>Gerado em: {DateTime.Now:dd/MM/yyyy HH:mm}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Produto</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Gateway</th>
+            </tr>
+        </thead>
+        <tbody>";
+
+        foreach (var p in filteredPayments)
+        {
+            var status = p.IsPaid ? T["Common.Paid"] : T["Common.Pending"];
+            var statusClass = p.IsPaid ? "paid" : "pending";
+            var product = GetProductDisplayName(p);
+            var amount = FormatPaymentAmount(p.Amount, p.Currency);
+            var date = p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+            var gateway = p.PaymentMethod ?? "-";
+
+            html += $@"
+            <tr>
+                <td>{date}</td>
+                <td>{product}</td>
+                <td>{amount}</td>
+                <td class='{statusClass}'>{status}</td>
+                <td>{gateway}</td>
+            </tr>";
+        }
+
+        html += @"
+        </tbody>
+    </table>
+</body>
+</html>";
+
+        var fileName = $"pagamentos_{DateTime.Now:yyyyMMdd_HHmmss}.html";
+        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, html, "text/html");
     }
 }
-
-

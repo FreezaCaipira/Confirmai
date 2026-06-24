@@ -26,6 +26,13 @@ namespace Confirmai.Models
         [StringLength(120)]
         public string? XHandle { get; set; }
 
+        /// <summary>WhatsApp number with country code (e.g. +5511999999999)</summary>
+        [StringLength(20)]
+        public string? WhatsAppNumber { get; set; }
+
+        /// <summary>Whether user has opted in to receive WhatsApp notifications</summary>
+        public bool WhatsAppOptIn { get; set; } = false;
+
         /// <summary>Relative path to uploaded avatar, e.g. /uploads/avatars/{guid}.png</summary>
         [StringLength(260)]
         public string? AvatarPath { get; set; }
