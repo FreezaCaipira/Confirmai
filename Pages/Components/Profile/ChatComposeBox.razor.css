@@ -1,0 +1,63 @@
+.profile-feedback {
+    margin: 0.4rem 0 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ci-text-blue);
+    padding: 0.28rem 0.52rem;
+    border-radius: 4px;
+    background: rgba(79, 156, 248, 0.12);
+    border: 1px solid rgba(79, 156, 248, 0.3);
+}
+
+.profile-chat-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.profile-chat-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.profile-card .mk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0.34rem 0.9rem;
+    border: 1px solid var(--ci-border);
+    border-radius: 4px;
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.profile-card .mk-btn:hover:not(:disabled) {
+    background: rgba(79, 156, 248, 0.1);
+    border-color: var(--ci-border-dim);
+    color: var(--ci-text);
+}
+
+.profile-card .mk-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.profile-card .mk-btn-primary {
+    background: var(--ci-accent-mid);
+    border-color: var(--ci-border-dim);
+    color: var(--ci-text);
+}
+
+.profile-card .mk-btn-primary:hover:not(:disabled) {
+    background: var(--ci-accent);
+    border-color: var(--ci-accent);
+    color: #fff;
+}

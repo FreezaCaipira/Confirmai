@@ -1,0 +1,51 @@
+.profile-chat-empty {
+    text-align: center;
+    padding: 0.72rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ci-text-subtle);
+    border: 1px dashed var(--ci-border);
+    border-radius: 4px;
+    background: rgba(79, 156, 248, 0.04);
+}
+
+.profile-chat-bubble {
+    width: fit-content;
+    max-width: 78%;
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    padding: 0.44rem;
+    background: var(--ci-bg-card-deep);
+    display: grid;
+    gap: 0.14rem;
+}
+
+.profile-chat-bubble.incoming {
+    justify-self: start;
+}
+
+.profile-chat-bubble.outgoing {
+    justify-self: end;
+    border-color: var(--ci-accent-mid);
+    background: rgba(26, 90, 176, 0.3);
+}
+
+.profile-chat-bubble p {
+    margin: 0;
+    font-size: 0.83rem;
+    line-height: 1.35;
+    color: var(--ci-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.profile-chat-bubble.outgoing p {
+    color: var(--ci-text-blue);
+}
+
+.profile-chat-meta {
+    justify-self: end;
+    font-size: 0.67rem;
+    font-weight: 700;
+    color: var(--ci-text-subtle);
+}
