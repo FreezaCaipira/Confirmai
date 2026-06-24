@@ -22,3 +22,8 @@ public record CityOption(string Key, string Label, string City, string StateCode
 /// Município IBGE para autocomplete de cidades.
 /// </summary>
 public record IbgeMunicipio(string Nome);
+
+/// <summary>
+/// Ação para o estado vazio (botões de navegação).
+/// </summary>
+public record EmptyStateAction(string Icon, string Text, string Href, string? CssClass = null);

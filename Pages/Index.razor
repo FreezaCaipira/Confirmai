@@ -71,13 +71,7 @@
                     }
                     else if (!upcoming.Any() && !past.Any() && !cancelled.Any())
                     {
-                        <div class="listing-state listing-empty">
-                            <p>@Ui["Index.NoConfirmations"]</p>
-                            <div class="browse-buttons-row">
-                                <a href="/futsal" class="my-conf-browse-btn">⚽ @Ui["Index.ViewFutsal"]</a>
-                                <a href="/poker"  class="my-conf-browse-btn my-conf-browse-btn--poker">🃏 @Ui["Index.ViewPoker"]</a>
-                            </div>
-                        </div>
+                        <EmptyState Message="@Ui["Index.NoConfirmations"]" Actions="EmptyStateActions" />
                     }
                     else
                     {
@@ -252,6 +246,13 @@
     private void SelectedCityKeyChanged(string value) => SelectedCityKey = value;
     private void otherStateCodeChanged(string value) => otherStateCode = value;
     private void CustomCityChanged(string value) => CustomCity = value;
+
+    // Empty state actions
+    private List<EmptyStateAction> EmptyStateActions => new()
+    {
+        new EmptyStateAction("⚽", Ui["Index.ViewFutsal"], "/futsal"),
+        new EmptyStateAction("🃏", Ui["Index.ViewPoker"], "/poker", "my-conf-browse-btn--poker")
+    };
 
     private string FutsalHref => BuildHref("/futsal");
     private string PokerHref  => BuildHref("/poker");

@@ -1,0 +1,23 @@
+@using Confirmai.Shared
+@inject UiTextService Ui
+
+<div class="listing-state listing-empty">
+    <p>@Message</p>
+    @if (Actions != null && Actions.Any())
+    {
+        <div class="browse-buttons-row">
+            @foreach (var action in Actions)
+            {
+                <a href="@action.Href" class="my-conf-browse-btn @action.CssClass">@action.Icon @action.Text</a>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Message { get; set; } = string.Empty;
+
+    [Parameter]
+    public List<EmptyStateAction>? Actions { get; set; }
+}
