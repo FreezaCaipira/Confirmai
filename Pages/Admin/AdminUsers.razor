@@ -114,7 +114,7 @@
         {
             var userIdsWithRole = await db.UserRoles
                 .Join(db.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
-                .Where(x => x.Name.Contains(filterRole, StringComparison.OrdinalIgnoreCase))
+                .Where(x => x.Name != null && x.Name.Contains(filterRole, StringComparison.OrdinalIgnoreCase))
                 .Select(x => x.UserId)
                 .ToListAsync();
             query = query.Where(u => userIdsWithRole.Contains(u.Id));
