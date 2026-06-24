@@ -1,6 +1,6 @@
 .mailbox-thread-pane {
-    border: 1px solid var(--ci-border);
-    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border, #1b3d6c);
+    background: var(--ci-bg-card-deep, #0d1825);
     border-radius: 4px;
     padding: 0.5rem;
 }
@@ -10,7 +10,7 @@
     justify-content: space-between;
     align-items: baseline;
     gap: 0.45rem;
-    border-bottom: 1px dotted var(--ci-border);
+    border-bottom: 1px dotted var(--ci-border, #1b3d6c);
     padding-bottom: 0.24rem;
     margin-bottom: 0.34rem;
 }
@@ -30,7 +30,7 @@
     font-size: 0.66rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--ci-text-subtle);
+    color: var(--ci-text-subtle, #6082a0);
     font-weight: 800;
 }
 
@@ -43,13 +43,13 @@
 }
 
 .mailbox-thread-head span {
-    color: var(--ci-text-subtle);
+    color: var(--ci-text-subtle, #6082a0);
     font-size: 0.69rem;
     white-space: nowrap;
 }
 
 .mailbox-thread-body {
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--ci-border, #1b3d6c);
     background: rgba(79, 156, 248, 0.05);
     border-radius: 4px;
     padding: 0.48rem;
@@ -72,7 +72,7 @@
 }
 
 .mailbox-thread-bubble {
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--ci-border, #1b3d6c);
     border-radius: 8px;
     padding: 0.44rem;
     max-width: 78%;
@@ -88,13 +88,13 @@
 
 .mailbox-thread-bubble.outgoing {
     justify-self: end;
-    border-color: var(--ci-accent-mid);
+    border-color: var(--ci-accent-mid, #1a5ab0);
     background: rgba(26, 90, 176, 0.3);
 }
 
 .mailbox-thread-bubble.outgoing .mailbox-thread-body {
     background: rgba(79, 156, 248, 0.1);
-    border-color: var(--ci-accent-mid);
+    border-color: var(--ci-accent-mid, #1a5ab0);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer {
@@ -109,16 +109,16 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer .mailbox-thread-author,
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer .mailbox-thread-body {
-    color: var(--ci-text-blue);
+    color: var(--ci-text-blue, #deeeff);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller {
-    border-color: var(--ci-accent-mid);
+    border-color: var(--ci-accent-mid, #1a5ab0);
     background: rgba(26, 90, 176, 0.25);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller .mailbox-thread-body {
-    border-color: var(--ci-accent-mid);
+    border-color: var(--ci-accent-mid, #1a5ab0);
     background: rgba(79, 156, 248, 0.1);
 }
 
@@ -139,7 +139,7 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-admin .mailbox-thread-author,
 .mailbox-thread-bubble.mailbox-thread-bubble-admin .mailbox-thread-body {
-    color: var(--ci-text-muted);
+    color: var(--ci-text-muted, #8aacc8);
 }
 
 .mailbox-thread-bubble-meta {
@@ -156,12 +156,12 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    color: var(--ci-text-muted);
+    color: var(--ci-text-muted, #8aacc8);
 }
 
 .mailbox-thread-time {
     font-size: 0.62rem;
-    color: var(--ci-text-subtle);
+    color: var(--ci-text-subtle, #6082a0);
     white-space: nowrap;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
@@ -170,13 +170,13 @@
 .mailbox-composer {
     margin: 0.46rem -0.5rem -0.5rem;
     padding: 0.5rem;
-    border-top: 1px solid var(--ci-border);
+    border-top: 1px solid var(--ci-border, #1b3d6c);
     background: var(--ci-bg-card-deep);
     border-radius: 0 0 3px 3px;
 }
 
 .mailbox-composer label {
-    color: var(--ci-text-muted);
+    color: var(--ci-text-muted, #8aacc8);
     font-weight: 700;
 }
 
@@ -189,7 +189,7 @@
 .mailbox-composer-info {
     margin: 0 0 0.34rem;
     font-size: 0.7rem;
-    color: var(--ci-text-subtle);
+    color: var(--ci-text-subtle, #6082a0);
 }
 
 .mailbox-composer-grid {
@@ -210,7 +210,7 @@
     border: 1px dashed var(--ci-border);
     border-radius: 4px;
     padding: 0.7rem;
-    color: var(--ci-text-subtle);
+    color: var(--ci-text-subtle, #6082a0);
     font-size: 0.76rem;
     text-align: center;
     background: rgba(79, 156, 248, 0.03);
@@ -228,8 +228,8 @@
 }
 
 .mailbox-actions .mk-btn.mk-btn-primary {
-    border-color: var(--ci-accent-mid);
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border-color: var(--ci-accent-mid, #1a5ab0);
+    background: linear-gradient(180deg, var(--ci-accent-mid, #1a5ab0) 0%, var(--ci-accent-dark, #0d3270) 100%);
     color: var(--ci-text);
     font-weight: 800;
     letter-spacing: 0.02em;
@@ -241,9 +241,9 @@
     width: 100%;
     box-sizing: border-box;
     min-height: 1.82rem;
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--ci-border, #1b3d6c);
     border-radius: 4px;
-    background: var(--ci-bg-input);
+    background: var(--ci-bg-input, #07111d);
     color: var(--ci-text);
     padding: 0.16rem 0.4rem;
     font-size: 0.76rem;
