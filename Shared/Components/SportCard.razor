@@ -4,14 +4,16 @@
 <a href="@Href" class="sport-card sport-card--@SportClass">
     <div class="sport-card-icon" aria-hidden="true">@Icon</div>
     <div class="sport-card-body">
-        <h3 class="sport-card-name">@Name</h3>
+        <div class="sport-card-header">
+            <h3 class="sport-card-name">@Name</h3>
+            <span class="sport-card-cta">@CtaText</span>
+        </div>
         <p class="sport-card-desc">@Description</p>
         @if (MatchCount.HasValue && MatchCount.Value > 0)
         {
             <p class="sport-card-count">@MatchCount.Value @(MatchCount.Value == 1 ? "partida disponível" : "partidas disponíveis")</p>
         }
     </div>
-    <span class="sport-card-cta">@CtaText</span>
 </a>
 
 @code {

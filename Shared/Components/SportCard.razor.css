@@ -87,10 +87,18 @@
     flex: 1;
 }
 
+.sport-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+}
+
 .sport-card-name {
     font-size: 1.45rem;
     font-weight: 700;
-    margin: 0 0 0.35rem;
+    margin: 0;
     font-family: inherit;
     text-shadow: none;
     text-transform: none;
@@ -115,5 +123,5 @@
     font-size: 0.85rem;
     font-weight: 600;
     letter-spacing: 0.02em;
-    margin-top: 0.25rem;
+    white-space: nowrap;
 }
