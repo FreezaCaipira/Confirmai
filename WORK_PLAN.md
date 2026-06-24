@@ -1,6 +1,6 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 23/06/2026 | Base: `main`
+> Atualizado em 24/06/2026 | Base: `main`
 > 1,911/1,911 testes passando | 0 erros de build | 0 warnings CS1998/CS0649/CS86xx
 
 Este documento define a ordem de trabalho atual para melhorias de qualidade, UX e operação antes da validação em produção.
@@ -156,19 +156,90 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
 
 ---
 
-## Fase 4: Validação em Produção
+## Fase 5: Melhorias na Tela Inicial (Index/Jogos) 📋
+
+**Objetivo**: Melhorar UX, performance e manutenibilidade da página inicial de jogos.
+**Status**: ⏳ Pendente
+
+### 5.1 UX/UI - Explorar
+- **Status**: ⏳ Pendente
+- **Prioridade**: Média
+- **Ações planejadas**:
+  - Cards de esporte com imagens/ícones mais elaborados em vez de apenas emojis
+  - Adicionar contador de partidas disponíveis em cada esporte (ex: "12 partidas esta semana")
+  - Simplificar o fluxo de "Outra cidade" - atualmente requer selecionar UF e depois digitar cidade
+  - Adicionar geolocalização automática para sugerir cidade do usuário
+  - Empty state mais elaborado quando não há partidas na cidade selecionada
+- **Benefício**: Melhor primeira impressão, redução de atrito na descoberta
+
+### 5.2 UX/UI - Meus Jogos
+- **Status**: ⏳ Pendente
+- **Prioridade**: Média
+- **Ações planejadas**:
+  - Adicionar filtros por esporte (Futsal/Poker) e período
+  - Mostrar status do evento (confirmado, aguardando confirmação, vagas restantes)
+  - Cards mais informativos com preço, tipo de torneio, etc.
+  - Animação de transição entre abas
+  - Botão de "Redefinir filtros" quando há filtros ativos
+  - Destaque visual para eventos urgentes (ex: começando em < 24h)
+- **Benefício**: Usabilidade, engajamento, redução de no-shows
+
+### 5.3 UX/UI - Geral
+- **Status**: ⏳ Pendente
+- **Prioridade**: Baixa
+- **Ações planejadas**:
+  - News ticker com animação mais suave e carrossel automático
+  - Indicador de loading mais elaborado (skeleton screens)
+  - Responsividade melhorada para mobile
+  - Acessibilidade: melhor contraste, foco visível em elementos interativos
+- **Benefício**: Inclusão, experiência polida
+
+### 5.4 Refatoração - Componentização
+- **Status**: ⏳ Pendente
+- **Prioridade**: Média
+- **Ações planejadas**:
+  - Extrair `CitySelector` como componente reutilizável
+  - Extrair `SportCard` como componente
+  - Extrair `ConfirmationCard` como componente
+  - Extrair `MyGamesTabs` como componente
+  - Criar `EmptyState` component reutilizável
+- **Benefício**: Reutilização, manutenibilidade, testabilidade
+
+### 5.5 Refatoração - Services
+- **Status**: ⏳ Pendente
+- **Prioridade**: Baixa
+- **Ações planejadas**:
+  - Mover lógica de busca de cidades IBGE para `CityService`
+  - Mover lógica de confirmações para `UserConfirmationService`
+  - Criar `LocationService` para geolocalização
+- **Benefício**: Separação de responsabilidades, testabilidade
+
+### 5.6 Refatoração - Outros
+- **Status**: ⏳ Pendente
+- **Prioridade**: Baixa
+- **Ações planejadas**:
+  - Remover strings hardcoded ("Carregando suas confirmações…", "Nenhuma partida anterior")
+  - Usar `UiTextService` para todos os textos
+  - Extrair constantes (default city, etc.)
+  - Adicionar testes unitários para lógica de tabs e filtros
+  - Considerar usar `CascadingValue` para cidade selecionada entre páginas
+- **Benefício**: Internacionalização, manutenibilidade, qualidade
+
+---
+
+## Fase 6: Validação em Produção
 
 **Objetivo**: Garantir que fluxos críticos funcionam em ambiente real.
 
-### 4.1 Testar fluxo Pix completo em produção (EfiBank)
+### 6.1 Testar fluxo Pix completo em produção (EfiBank)
 - **Status**: Pendente
 - **Prioridade**: Alta
 
-### 4.2 Ativar webhook AbacatePay em produção
+### 6.2 Ativar webhook AbacatePay em produção
 - **Status**: Pendente
 - **Prioridade**: Alta
 
-### 4.3 Implantar alertas reais e validar escalonamento fim a fim
+### 6.3 Implantar alertas reais e validar escalonamento fim a fim
 - **Status**: Pendente
 - **Prioridade**: Alta
 
@@ -179,18 +250,20 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
 1. **Qualidade primeiro**: Base sólida reduz regressões em features futuras
 2. **UX depois**: Melhorias visíveis para usuário aumentam valor percebido
 3. **Operação depois**: Melhorias internas que não impactam usuário diretamente
-4. **Produção por último**: Validar tudo junto em ambiente real, não em pedaços
+4. **Tela inicial depois**: Melhoria focada em UX de página crítica
+5. **Produção por último**: Validar tudo junto em ambiente real, não em pedaços
 
 ---
 
 ## Estimativa de Esforço
 
-- Fase 1 (Qualidade): 2-3 semanas
-- Fase 2 (UX): 3-4 semanas
-- Fase 3 (Operação): 1-2 semanas
-- Fase 4 (Produção): 1 semana
+- Fase 1 (Qualidade): 2-3 semanas ✅
+- Fase 2 (UX): 3-4 semanas ✅
+- Fase 3 (Operação): 1-2 semanas ✅
+- Fase 5 (Tela Inicial): 2-3 semanas ⏳
+- Fase 6 (Produção): 1 semana ⏳
 
-**Total**: 7-10 semanas
+**Total**: 9-13 semanas
 
 ---
 
