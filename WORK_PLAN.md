@@ -1,7 +1,7 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 23/06/2026 | Base: `main`
-> 1,911/1,911 testes passando | 0 erros de build | 0 warnings CS1998/CS0649/CS86xx
+> Atualizado em 24/06/2026 | Base: `main`
+> 1,691/1,691 testes passando | 0 erros de build | 0 warnings CS1998/CS0649/CS86xx
 
 Este documento define a ordem de trabalho atual para melhorias de qualidade, UX e operação antes da validação em produção.
 

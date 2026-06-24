@@ -123,10 +123,10 @@
 ## Backlog
 
 ### P2 — Produto
-- [ ] Integração WhatsApp real com opt-in
-- [ ] Indicadores de ocupação, inadimplência e conversão por grupo
-- [ ] Página de histórico de pagamentos do jogador (auto-serviço)
-- [ ] Ajustes de UX responsiva e acessibilidade AA
+- [x] Integração WhatsApp real com opt-in
+- [x] Indicadores de ocupação, inadimplência e conversão por grupo
+- [x] Página de histórico de pagamentos do jogador (auto-serviço)
+- [x] Ajustes de UX responsiva e acessibilidade AA
 
 ### P3 — Qualidade de Código
 - [ ] Expandir cobertura scoped CSS (42 de 97 páginas têm `.razor.css`, faltam 55)
