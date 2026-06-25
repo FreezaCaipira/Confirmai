@@ -525,6 +525,19 @@
     background: rgba(96, 165, 250, 0.08);
 }
 
+.payment-view-proof-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    color: #64748b;
+    border-color: rgba(100, 116, 139, 0.3);
+}
+
+.payment-view-proof-btn:disabled:hover {
+    background: transparent;
+    border-color: rgba(100, 116, 139, 0.3);
+    color: #64748b;
+}
+
 .payment-marking {
     display: inline-flex;
     align-items: center;

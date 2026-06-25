@@ -79,13 +79,11 @@
                                         </span>
                                     </div>
                                     <div class="payment-history-actions">
-                                        @if (h.HasProof && h.ConfirmationId.HasValue)
-                                        {
-                                            <button class="payment-view-proof-btn" type="button"
-                                                    @onclick="@(e => ViewProofHandler(h.ConfirmationId.Value))">
-                                                <i class="fas fa-camera"></i> Comprovante
-                                            </button>
-                                        }
+                                        <button class="payment-view-proof-btn" type="button"
+                                                disabled="@(h.HasProof && h.ConfirmationId.HasValue ? null : true)"
+                                                @onclick="@(e => h.HasProof && h.ConfirmationId.HasValue ? ViewProofHandler(h.ConfirmationId.Value) : null)">
+                                            <i class="fas fa-camera"></i> Comprovante
+                                        </button>
                                         <a class="payment-entry-link" href="@h.EventHref" target="_blank" rel="noopener">
                                             <i class="fas fa-external-link-alt"></i> Ver partida
                                         </a>
