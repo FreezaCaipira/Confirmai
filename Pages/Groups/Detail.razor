@@ -342,7 +342,7 @@ else
 
                             <li class="pending-request-item @(isUrgent ? "pending-request-item--urgent" : "") @(selectedRequestIds.Contains(req.Id) ? "pending-request-item--selected" : "")">
                                 <div class="pending-request-checkbox">
-                                    <input type="checkbox" id="req-@req.Id" @bind="selectedRequestIds" value="@req.Id" />
+                                    <input type="checkbox" id="req-@req.Id" checked="@selectedRequestIds.Contains(req.Id)" @onchange="(e) => ToggleRequestSelection(req.Id, e.Value is true)" />
                                 </div>
                                 <div class="pending-request-info">
                                     <span class="pending-request-name">@(req.User?.FullName ?? req.User?.UserName ?? "Usuário")</span>
@@ -818,6 +818,18 @@ else
     private void ClearSelection()
     {
         selectedRequestIds.Clear();
+    }
+
+    private void ToggleRequestSelection(int requestId, bool isSelected)
+    {
+        if (isSelected)
+        {
+            selectedRequestIds.Add(requestId);
+        }
+        else
+        {
+            selectedRequestIds.Remove(requestId);
+        }
     }
 
     // ── Pagamentos ────────────────────────────────────────────────
