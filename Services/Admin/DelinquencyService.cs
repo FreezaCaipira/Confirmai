@@ -126,7 +126,7 @@ public class DelinquencyService
                 adminName,
                 c.MarkedPaidAt!.Value,
                 c.Id,
-                !string.IsNullOrWhiteSpace(c.PixProofUrl));
+                c.PixProofImageData != null && c.PixProofImageData.Length > 0);
         }).ToList();
 
         return paymentHistory;

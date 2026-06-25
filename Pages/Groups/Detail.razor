@@ -983,7 +983,7 @@ else
             var href      = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
             var userName  = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
             var adminName = adminMap.TryGetValue(c.MarkedPaidByUserId!, out var n) ? n : "Admin";
-            return new PaymentHistoryEntry(userName, c.Event.StartsAt, c.Event.Price ?? 0, href, adminName, c.MarkedPaidAt!.Value, c.Id, !string.IsNullOrWhiteSpace(c.PixProofUrl));
+            return new PaymentHistoryEntry(userName, c.Event.StartsAt, c.Event.Price ?? 0, href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
         }).ToList();
 
         // Comprovantes pendentes de confirmação (enviados mas não marcados como pagos)
