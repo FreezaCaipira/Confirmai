@@ -124,7 +124,9 @@ public class DelinquencyService
                 c.Event.Price ?? 0,
                 href,
                 adminName,
-                c.MarkedPaidAt!.Value);
+                c.MarkedPaidAt!.Value,
+                c.Id,
+                !string.IsNullOrWhiteSpace(c.PixProofUrl));
         }).ToList();
 
         return paymentHistory;
@@ -153,7 +155,9 @@ public record PaymentHistoryEntry(
     decimal EventPrice,
     string EventHref,
     string AdminName,
-    DateTime MarkedAt);
+    DateTime MarkedAt,
+    int? ConfirmationId = null,
+    bool HasProof = false);
 
 public record PendingProofEntry(
     int ConfirmationId,

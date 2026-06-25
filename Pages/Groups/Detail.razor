@@ -839,7 +839,7 @@ else
     private List<UserDelinquency>       delinquencyList         = new();
     private List<PaymentHistoryEntry>   paymentHistory          = new();
     private List<PendingProofEntry>     pendingProofList        = new();  // Comprovantes pendentes de confirmação
-    private string                      paymentTab              = "proofs"; // "proofs" | "delinquent" | "history"
+    private string                      paymentTab              = "delinquent"; // "delinquent" | "history"
     private string?                     selectedPaymentUserId   = null;
     private int?                        markingPaidId           = null;
     private string?                     notifyingUserId         = null;
@@ -983,7 +983,7 @@ else
             var href      = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
             var userName  = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
             var adminName = adminMap.TryGetValue(c.MarkedPaidByUserId!, out var n) ? n : "Admin";
-            return new PaymentHistoryEntry(userName, c.Event.StartsAt, c.Event.Price ?? 0, href, adminName, c.MarkedPaidAt!.Value);
+            return new PaymentHistoryEntry(userName, c.Event.StartsAt, c.Event.Price ?? 0, href, adminName, c.MarkedPaidAt!.Value, c.Id, !string.IsNullOrWhiteSpace(c.PixProofUrl));
         }).ToList();
 
         // Comprovantes pendentes de confirmação (enviados mas não marcados como pagos)

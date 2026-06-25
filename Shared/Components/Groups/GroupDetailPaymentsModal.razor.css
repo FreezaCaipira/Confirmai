@@ -190,10 +190,17 @@
 /* History List */
 /* ──────────────────────────────────────────────────────────── */
 
+.payment-history-filters {
+    padding: 1rem 1.75rem 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
 .payment-history-list {
     list-style: none;
     margin: 0;
-    padding: 1.25rem 1.75rem;
+    padding: 1rem 1.75rem 1.25rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -596,4 +603,106 @@
     background: rgba(74, 222, 128, 0.15);
     color: #4ade80;
     border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* Delinquent Detail Panel */
+/* ──────────────────────────────────────────────────────────── */
+
+.payment-detail-panel {
+    background: rgba(15, 26, 48, 0.8);
+    border-left: 3px solid rgba(239, 68, 68, 0.4);
+    border-radius: 0 0 8px 8px;
+    margin-top: -0.5rem;
+    margin-bottom: 0.75rem;
+    padding: 1rem 1.25rem;
+}
+
+.payment-detail-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.payment-summary-label {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.payment-summary-total {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #f87171;
+}
+
+.payment-detail-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.payment-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 6px;
+    gap: 0.5rem;
+}
+
+.payment-detail-date {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+
+.payment-detail-price {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f87171;
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* Notify Actions */
+/* ──────────────────────────────────────────────────────────── */
+
+.payment-notify-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.25rem;
+}
+
+.payment-notified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #4ade80;
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+    background: rgba(74, 222, 128, 0.15);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.payment-notifying {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.payment-chevron {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 0.75rem;
 }

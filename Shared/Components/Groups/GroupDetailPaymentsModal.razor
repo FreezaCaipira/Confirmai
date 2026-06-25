@@ -20,14 +20,9 @@
                         type="button"
                         @onclick="HandleTabDelinquent">
                     <i class="fas fa-exclamation-triangle"></i> Pendentes
-                </button>
-                <button class="payment-tab @(PaymentTab == "proofs" ? "payment-tab--active" : "")" 
-                        type="button"
-                        @onclick="HandleTabProofs">
-                    <i class="fas fa-file-upload"></i> Comprovantes
-                    @if (PendingProofList?.Count > 0)
+                    @if (DelinquencyList?.Count > 0)
                     {
-                        <span class="payment-tab-count">@PendingProofList.Count</span>
+                        <span class="payment-tab-count">@DelinquencyList.Count</span>
                     }
                 </button>
                 <button class="payment-tab @(PaymentTab == "history" ? "payment-tab--active" : "")" 
@@ -39,7 +34,7 @@
                         <span class="payment-tab-count">@PaymentHistory.Count</span>
                     }
                 </button>
-                <button class="payment-refresh-btn" type="button" @onclick="HandleRefresh" title="Recarregar lista de delinquência">
+                <button class="payment-refresh-btn" type="button" @onclick="HandleRefresh" title="Recarregar lista">
                     <i class="fas @(IsLoadingPayments ? "fa-spinner fa-spin" : "fa-sync-alt")"></i> <span>Recarregar</span>
                 </button>
             </div>
@@ -50,7 +45,16 @@
             }
             else if (PaymentTab == "history")
             {
-                @if (PaymentHistory?.Count == 0)
+                <div class="payment-history-filters">
+                    <select class="input input--sm" @bind="HistoryFilterUserId" style="width: auto;">
+                        <option value="">Todos os participantes</option>
+                        @foreach (var userId in PaymentHistory?.Select(h => h.UserName).Distinct() ?? Enumerable.Empty<string>())
+                        {
+                            <option value="@userId">@userId</option>
+                        }
+                    </select>
+                </div>
+                @if (FilteredHistory?.Count == 0)
                 {
                     <div class="payment-empty">
                         <i class="fas fa-history"></i>
@@ -60,7 +64,7 @@
                 else
                 {
                     <ul class="payment-history-list">
-                        @foreach (var h in PaymentHistory ?? new())
+                        @foreach (var h in FilteredHistory ?? new())
                         {
                             <li class="payment-history-item">
                                 <div class="payment-history-user">@h.UserName</div>
@@ -68,65 +72,17 @@
                                     <span class="payment-history-date"><i class="fas fa-calendar-alt"></i> @Ui.FormatDateTime(h.EventDate.ToLocalTime(), "DateDefault")</span>
                                     <span class="payment-history-price">R$ @h.EventPrice.ToString("F2")</span>
                                     <a class="payment-entry-link" href="@h.EventHref" target="_blank" rel="noopener">Ver</a>
+                                    @if (h.HasProof && h.ConfirmationId.HasValue)
+                                    {
+                                        <button class="payment-view-proof-btn" type="button"
+                                                @onclick="@(e => ViewProofHandler(h.ConfirmationId.Value))">
+                                            <i class="fas fa-camera"></i> Comprovante
+                                        </button>
+                                    }
                                 </div>
                                 <div class="payment-history-admin">
                                     <i class="fas fa-user-shield"></i> Marcado por <strong>@h.AdminName</strong>
                                     em @Ui.FormatDateTime(h.MarkedAt.ToLocalTime(), "DateTimeDefault")
-                                </div>
-                            </li>
-                        }
-                    </ul>
-                }
-            }
-            else if (PaymentTab == "proofs")
-            {
-                @if (PendingProofList?.Count == 0)
-                {
-                    <div class="payment-empty">
-                        <i class="fas fa-file-upload"></i>
-                        <span>Nenhum comprovante pendente de confirmação.</span>
-                    </div>
-                }
-                else
-                {
-                    <ul class="payment-proofs-list">
-                        @foreach (var proof in PendingProofList ?? new())
-                        {
-                            <li class="payment-proof-item">
-                                <div class="payment-proof-header">
-                                    <div class="payment-proof-user">
-                                        <span class="payment-proof-name">@proof.UserName</span>
-                                        <span class="payment-proof-uploaded"><i class="fas fa-clock"></i> Enviado @Ui.FormatDateTime(proof.ProofUploadedAt.ToLocalTime(), "DateTimeDefault")</span>
-                                    </div>
-                                    <div class="payment-proof-meta">
-                                        <span class="payment-proof-event">@proof.EventName</span>
-                                        <span class="payment-proof-date">@Ui.FormatDateTime(proof.EventDate.ToLocalTime(), "DateDefault")</span>
-                                        <span class="payment-proof-price">R$ @proof.EventPrice.ToString("F2")</span>
-                                    </div>
-                                </div>
-                                <div class="payment-proof-actions">
-                                    <button class="payment-view-proof-btn" type="button"
-                                            @onclick="@(e => ViewProofHandler(proof.ConfirmationId))">
-                                        <i class="fas fa-camera"></i> Ver comprovante
-                                    </button>
-                                    <a href="@proof.EventHref" class="payment-entry-link" target="_blank">
-                                        <i class="fas fa-external-link-alt"></i> Ver partida
-                                    </a>
-                                    @if (MarkingPaidId == proof.ConfirmationId)
-                                    {
-                                        <span class="payment-marking"><i class="fas fa-spinner fa-spin"></i></span>
-                                    }
-                                    else if (CurrentUserId == CurrentReceiverId)
-                                    {
-                                        <span class="payment-receiver-badge"><i class="fas fa-wallet"></i> Recebedor</span>
-                                    }
-                                    else
-                                    {
-                                        <button class="payment-mark-paid-btn" type="button"
-                                                @onclick="@(e => MarkPaidHandler(proof.ConfirmationId, proof.UserId))">
-                                            <i class="fas fa-check"></i> Confirmar pagamento
-                                        </button>
-                                    }
                                 </div>
                             </li>
                         }
@@ -222,7 +178,14 @@
     public bool IsLoadingPayments { get; set; }
 
     [Parameter]
-    public string PaymentTab { get; set; } = "proofs";
+    public string PaymentTab { get; set; } = "delinquent";
+
+    private string HistoryFilterUserId { get; set; } = "";
+
+    private List<PaymentHistoryEntry>? FilteredHistory =>
+        string.IsNullOrEmpty(HistoryFilterUserId)
+            ? PaymentHistory
+            : PaymentHistory?.Where(h => h.UserName == HistoryFilterUserId).ToList();
 
     [Parameter]
     public string? SelectedPaymentUserId { get; set; }
@@ -283,10 +246,6 @@
         await OnTabChange.InvokeAsync("delinquent");
     }
 
-    private async Task HandleTabProofs()
-    {
-        await OnTabChange.InvokeAsync("proofs");
-    }
 
     private async Task HandleTabHistory()
     {
