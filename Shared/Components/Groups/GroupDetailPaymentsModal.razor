@@ -46,11 +46,11 @@
             else if (PaymentTab == "history")
             {
                 <div class="payment-history-filters">
-                    <select class="input input--sm" @bind="HistoryFilterUserId" style="width: auto;">
+                    <select @bind="HistoryFilterUserId">
                         <option value="">Todos os participantes</option>
-                        @foreach (var userId in PaymentHistory?.Select(h => h.UserName).Distinct() ?? Enumerable.Empty<string>())
+                        @foreach (var userName in PaymentHistory?.Select(h => h.UserName).Distinct().OrderBy(n => n) ?? Enumerable.Empty<string>())
                         {
-                            <option value="@userId">@userId</option>
+                            <option value="@userName">@userName</option>
                         }
                     </select>
                 </div>
@@ -67,22 +67,32 @@
                         @foreach (var h in FilteredHistory ?? new())
                         {
                             <li class="payment-history-item">
-                                <div class="payment-history-user">@h.UserName</div>
-                                <div class="payment-history-meta">
-                                    <span class="payment-history-date"><i class="fas fa-calendar-alt"></i> @Ui.FormatDateTime(h.EventDate.ToLocalTime(), "DateDefault")</span>
-                                    <span class="payment-history-price">R$ @h.EventPrice.ToString("F2")</span>
-                                    <a class="payment-entry-link" href="@h.EventHref" target="_blank" rel="noopener">Ver</a>
-                                    @if (h.HasProof && h.ConfirmationId.HasValue)
-                                    {
-                                        <button class="payment-view-proof-btn" type="button"
-                                                @onclick="@(e => ViewProofHandler(h.ConfirmationId.Value))">
-                                            <i class="fas fa-camera"></i> Comprovante
-                                        </button>
-                                    }
+                                <div class="payment-history-header">
+                                    <div class="payment-history-user">@h.UserName</div>
+                                    <div class="payment-history-price">R$ @h.EventPrice.ToString("F2")</div>
                                 </div>
-                                <div class="payment-history-admin">
-                                    <i class="fas fa-user-shield"></i> Marcado por <strong>@h.AdminName</strong>
-                                    em @Ui.FormatDateTime(h.MarkedAt.ToLocalTime(), "DateTimeDefault")
+                                <div class="payment-history-body">
+                                    <div class="payment-history-info">
+                                        <span class="payment-history-date"><i class="fas fa-calendar-alt"></i> @Ui.FormatDateTime(h.EventDate.ToLocalTime(), "DateDefault")</span>
+                                        <span class="payment-history-admin">
+                                            <i class="fas fa-user-shield"></i> @h.AdminName
+                                        </span>
+                                    </div>
+                                    <div class="payment-history-actions">
+                                        @if (h.HasProof && h.ConfirmationId.HasValue)
+                                        {
+                                            <button class="payment-view-proof-btn" type="button"
+                                                    @onclick="@(e => ViewProofHandler(h.ConfirmationId.Value))">
+                                                <i class="fas fa-camera"></i> Comprovante
+                                            </button>
+                                        }
+                                        <a class="payment-entry-link" href="@h.EventHref" target="_blank" rel="noopener">
+                                            <i class="fas fa-external-link-alt"></i> Ver partida
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="payment-history-footer">
+                                    Marcado em @Ui.FormatDateTime(h.MarkedAt.ToLocalTime(), "DateTimeDefault")
                                 </div>
                             </li>
                         }
