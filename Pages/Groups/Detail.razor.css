@@ -25,6 +25,16 @@
     flex-wrap: wrap;
 }
 
+.detail-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .detail-section-filters {
     display: flex;
     gap: 0.5rem;
@@ -34,6 +44,24 @@
 .input--sm {
     padding: 0.35rem 0.5rem;
     font-size: 0.85rem;
+}
+
+.input {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #1b3868;
+    border-radius: 6px;
+    background: #0d1825;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #4f9cf8;
+}
+
+.detail-section {
+    margin-bottom: 1.5rem;
 }
 
 .pending-request-item--urgent {
@@ -88,6 +116,16 @@
 .btn-cancel--sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.8rem;
+}
+
+.btn-cancel {
+    background: #4a4a4a;
+    color: #a0a0a0;
+}
+
+.btn-cancel:hover {
+    background: #5a5a5a;
+    color: #c0c0c0;
 }
 
 .pending-request-checkbox {
