@@ -47,13 +47,7 @@
         <CitySelector
             SelectedCityKey="@SelectedCityKey"
             SelectedCityKeyChanged="SelectedCityKeyChanged"
-            OtherStateCode="@otherStateCode"
-            OtherStateCodeChanged="OtherStateCodeChanged"
-            CustomCity="@CustomCity"
-            CustomCityChanged="CustomCityChanged"
-            Cities="@Cities"
-            OtherCityOptions="@otherCityOptions"
-            OnOtherCityChange="LoadOtherCitiesAsync" />
+            Cities="@Cities" />
 
         <section class="sports-grid" aria-label="Esportes disponíveis">
             <SportCard Sport="Sport.Futsal" Href="@FutsalHref" Description="@Ui["Index.FutsalCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@futsalMatchCount" />
@@ -187,7 +181,6 @@
     // ── Explorar state ─────────────────────────────────────────────
     private List<CityOption> Cities = new();
     private string SelectedCityKey = DefaultCityKey;
-    private string CustomCity = string.Empty;
     private int? futsalMatchCount = null;
     private int? pokerMatchCount = null;
 
@@ -195,21 +188,6 @@
     private async Task SelectedCityKeyChanged(string value)
     {
         SelectedCityKey = value;
-        await UpdateMatchCountsAsync();
-    }
-
-    private async Task OtherStateCodeChanged(string value)
-    {
-        Console.WriteLine($"OtherStateCodeChanged called with: {value}");
-        otherStateCode = value;
-        await LoadOtherCitiesAsync();
-        Console.WriteLine($"After LoadOtherCitiesAsync: {otherCityOptions.Count} cities");
-        await UpdateMatchCountsAsync();
-    }
-
-    private async Task CustomCityChanged(string value)
-    {
-        CustomCity = value;
         await UpdateMatchCountsAsync();
     }
 
@@ -234,12 +212,6 @@
     {
         get
         {
-            if (SelectedCityKey == OtherCityKey)
-            {
-                var trimmed = CustomCity.Trim();
-                if (string.IsNullOrEmpty(trimmed)) return new CityContext(null, null);
-                return new CityContext(trimmed, otherStateCode);
-            }
             var opt = Cities.FirstOrDefault(c => c.Key == SelectedCityKey);
             return opt is null ? new CityContext(null, null) : new CityContext(opt.City, opt.StateCode);
         }
@@ -247,14 +219,6 @@
 
     private string BuildHref(string basePath)
     {
-        if (SelectedCityKey == OtherCityKey)
-        {
-            var trimmed = CustomCity.Trim();
-            if (string.IsNullOrEmpty(trimmed)) return basePath;
-            return !string.IsNullOrEmpty(otherStateCode)
-                ? $"{basePath}?cidade={Uri.EscapeDataString(trimmed)}&estado={otherStateCode}"
-                : $"{basePath}?cidade={Uri.EscapeDataString(trimmed)}";
-        }
         var opt = Cities.FirstOrDefault(c => c.Key == SelectedCityKey);
         return opt is null
             ? basePath
@@ -300,34 +264,6 @@
         return filtered;
     }
 
-    // ── Outra cidade ───────────────────────────────────────────────
-    private string       otherStateCode  = string.Empty;
-    private List<IbgeMunicipio> otherCityOptions = new();
-
-    private async Task LoadOtherCitiesAsync()
-    {
-        Console.WriteLine($"LoadOtherCitiesAsync called with state: {otherStateCode}");
-        if (string.IsNullOrWhiteSpace(otherStateCode))
-        {
-            Console.WriteLine("State is empty, returning");
-            return;
-        }
-        try
-        {
-            var http   = HttpClientFactory.CreateClient();
-            var url = $"https://servicodados.ibge.gov.br/api/v1/localidades/estados/{otherStateCode}/municipios?orderBy=nome";
-            Console.WriteLine($"Fetching from: {url}");
-            var result = await http.GetFromJsonAsync<IbgeMunicipio[]>(url);
-            otherCityOptions = result?.ToList() ?? new();
-            Console.WriteLine($"Loaded {otherCityOptions.Count} cities from IBGE API");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error loading cities: {ex.Message}");
-            otherCityOptions = new();
-        }
-    }
-
     private async Task LoadMatchCountsAsync(AppDbContext db)
     {
         var (city, stateCode) = GetSelectedCityAndState();
@@ -352,12 +288,6 @@
 
     private (string? City, string? StateCode) GetSelectedCityAndState()
     {
-        if (SelectedCityKey == OtherCityKey)
-        {
-            var trimmed = CustomCity.Trim();
-            if (string.IsNullOrEmpty(trimmed)) return (null, null);
-            return (trimmed, otherStateCode);
-        }
         var opt = Cities.FirstOrDefault(c => c.Key == SelectedCityKey);
         return opt is null ? (null, null) : (opt.City, opt.StateCode);
     }

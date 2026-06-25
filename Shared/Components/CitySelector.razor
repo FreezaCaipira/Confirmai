@@ -3,10 +3,6 @@
 @inject UiTextService Ui
 @inject IJSRuntime JS
 
-@{
-    Console.WriteLine($"CitySelector rendered: SelectedCityKey={SelectedCityKey}, OtherCityKey={OtherCityKey}");
-}
-
 <div class="city-selector" aria-label="Filtro de cidade">
     <label class="city-label" for="city-select">
         <svg class="city-pin" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
@@ -23,7 +19,6 @@
             {
                 <option value="@c.Key">@c.Label</option>
             }
-            <option value="@OtherCityKey">@Ui["Index.OtherCity"]</option>
         </select>
         <button class="city-geo-btn" type="button" @onclick="GetUserLocation" title="Usar minha localização" aria-label="Usar minha localização">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -31,30 +26,6 @@
                 <polygon points="3 11 22 2 13 21 11 13 3 11" />
             </svg>
         </button>
-        @if (SelectedCityKey == OtherCityKey)
-        {
-            <select class="city-select" value="@OtherStateCode" @onchange="OnOtherStateCodeChanged">
-                <option value="">UF…</option>
-                @foreach (var uf in BrazilianStates)
-                {
-                    <option value="@uf">@uf</option>
-                }
-            </select>
-            <select class="city-select" value="@CustomCity" @onchange="OnCustomCityChanged">
-                <option value="">Cidade…</option>
-                @if (OtherCityOptions.Count > 0)
-                {
-                    @foreach (var opt in OtherCityOptions)
-                    {
-                        <option value="@opt.Nome">@opt.Nome</option>
-                    }
-                }
-                else
-                {
-                    <option disabled>Selecione um estado primeiro</option>
-                }
-            </select>
-        }
     </div>
 </div>
 
@@ -66,53 +37,12 @@
     public EventCallback<string> SelectedCityKeyChanged { get; set; }
 
     [Parameter]
-    public string OtherStateCode { get; set; } = string.Empty;
-
-    [Parameter]
-    public EventCallback<string> OtherStateCodeChanged { get; set; }
-
-    [Parameter]
-    public string CustomCity { get; set; } = string.Empty;
-
-    [Parameter]
-    public EventCallback<string> CustomCityChanged { get; set; }
-
-    [Parameter]
     public List<CityOption> Cities { get; set; } = new();
-
-    [Parameter]
-    public List<IbgeMunicipio> OtherCityOptions { get; set; } = new();
-
-    [Parameter]
-    public EventCallback OnOtherCityChange { get; set; }
-
-    private const string OtherCityKey = "__other__";
-
-    private static readonly string[] BrazilianStates = new[]
-    {
-        "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
-        "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
-        "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-    };
 
     private async Task OnSelectedCityKeyChanged(ChangeEventArgs e)
     {
         if (SelectedCityKeyChanged.HasDelegate)
             await SelectedCityKeyChanged.InvokeAsync(e.Value?.ToString());
-    }
-
-    private async Task OnOtherStateCodeChanged(ChangeEventArgs e)
-    {
-        var value = e.Value?.ToString();
-        if (OtherStateCodeChanged.HasDelegate)
-            await OtherStateCodeChanged.InvokeAsync(value);
-    }
-
-    private async Task OnCustomCityChanged(ChangeEventArgs e)
-    {
-        var value = e.Value?.ToString();
-        if (CustomCityChanged.HasDelegate)
-            await CustomCityChanged.InvokeAsync(value);
     }
 
     private async Task GetUserLocation()
@@ -141,18 +71,6 @@
                     {
                         if (SelectedCityKeyChanged.HasDelegate)
                             await SelectedCityKeyChanged.InvokeAsync(existingCity.Key);
-                    }
-                    else
-                    {
-                        // Set as "Other city"
-                        if (SelectedCityKeyChanged.HasDelegate)
-                            await SelectedCityKeyChanged.InvokeAsync(OtherCityKey);
-
-                        if (OtherStateCodeChanged.HasDelegate)
-                            await OtherStateCodeChanged.InvokeAsync(stateCode);
-
-                        if (CustomCityChanged.HasDelegate)
-                            await CustomCityChanged.InvokeAsync(city);
                     }
                 }
             }
