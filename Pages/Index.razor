@@ -48,7 +48,7 @@
             SelectedCityKey="@SelectedCityKey"
             SelectedCityKeyChanged="SelectedCityKeyChanged"
             OtherStateCode="@otherStateCode"
-            OtherStateCodeChanged="otherStateCodeChanged"
+            OtherStateCodeChanged="OtherStateCodeChanged"
             CustomCity="@CustomCity"
             CustomCityChanged="CustomCityChanged"
             Cities="@Cities"
@@ -198,9 +198,10 @@
         await UpdateMatchCountsAsync();
     }
 
-    private async Task otherStateCodeChanged(string value)
+    private async Task OtherStateCodeChanged(string value)
     {
         otherStateCode = value;
+        await LoadOtherCitiesAsync();
         await UpdateMatchCountsAsync();
     }
 

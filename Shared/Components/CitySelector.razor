@@ -29,7 +29,7 @@
         </button>
         @if (SelectedCityKey == OtherCityKey)
         {
-            <select class="city-select" @bind="OtherStateCode" @bind:after="OnOtherStateChanged">
+            <select class="city-select" @bind="OtherStateCode">
                 <option value="">UF…</option>
                 @foreach (var uf in BrazilianStates)
                 {
@@ -90,11 +90,6 @@
         "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
         "RS", "RO", "RR", "SC", "SP", "SE", "TO"
     };
-
-    private async Task OnOtherStateChanged()
-    {
-        await OnOtherCityChange.InvokeAsync();
-    }
 
     private async Task OnSelectedCityKeyChanged(ChangeEventArgs e)
     {
