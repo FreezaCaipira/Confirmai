@@ -120,6 +120,10 @@
     justify-content: center;
 }
 
+.sports-grid > .city-selector {
+    grid-column: 1 / -1;
+}
+
 /* ── Card base ───────────────────────────── */
 .sport-card {
     display: flex;
