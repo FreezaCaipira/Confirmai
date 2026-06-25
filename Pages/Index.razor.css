@@ -120,10 +120,6 @@
     justify-content: center;
 }
 
-.sports-grid > .city-selector {
-    grid-column: 1 / -1;
-}
-
 /* ── Card base ───────────────────────────── */
 .sport-card {
     display: flex;
@@ -282,10 +278,8 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: #111927;
-    border: 1px solid #1b3d6c;
-    border-radius: 10px;
-    padding: 0.6rem 1.1rem;
+    padding: 0.4rem 0.8rem;
+    margin-left: auto;
 }
 
 .city-label {
@@ -366,6 +360,8 @@
     padding: 0.3rem;
     width: 100%;
     max-width: 820px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .sports-tab {
