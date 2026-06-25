@@ -104,3 +104,128 @@
     background: rgba(244, 216, 161, 0.15);
     border-left: 3px solid var(--gold-deep);
 }
+
+/* Pending requests list */
+.pending-requests-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.pending-request-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #0d1825;
+    border: 1px solid #1b3868;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.pending-request-item:hover {
+    background: #0f1f30;
+    border-color: #2a5f9f;
+}
+
+.pending-request-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.pending-request-date {
+    color: #7aaccc;
+}
+
+.pending-request-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-approve,
+.btn-reject {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s;
+    border: none;
+}
+
+.btn-approve {
+    background: #14532d;
+    color: #4ade80;
+}
+
+.btn-approve:hover {
+    filter: brightness(1.2);
+}
+
+.btn-reject {
+    background: #3d1a1a;
+    color: #f87171;
+}
+
+.btn-reject:hover {
+    filter: brightness(1.2);
+}
+
+/* Pix notice */
+.detail-pix-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 8px;
+}
+
+.detail-pix-notice-icon {
+    color: #fbbf24;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.detail-pix-notice-body {
+    flex: 1;
+}
+
+.detail-pix-notice-body strong {
+    display: block;
+    color: #fbbf24;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.detail-pix-notice-body p {
+    margin: 0 0 0.5rem;
+    font-size: 0.85rem;
+    color: #8aacc8;
+    line-height: 1.4;
+}
+
+.detail-pix-notice-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fbbf24;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.detail-pix-notice-link:hover {
+    color: #fde68a;
+}
