@@ -325,6 +325,59 @@ docker compose --profile monitoring up -d prometheus alertmanager grafana
 
 ---
 
+## Workflow Senior x Pleno
+
+Modelo de trabalho hibrido para combinar capacidade arquitetural (Senior/cloud) com execucao massiva (Pleno/local).
+
+### Ciclo de Trabalho
+
+```
+Senior monta WORK_PLAN.md → Pleno executa fases → Senior revisa → Senior atualiza WORK_PLAN.md → ...
+```
+
+### Responsabilidades
+
+| Senior (Cloud) | Pleno (Local) |
+|----------------|---------------|
+| Arquitetura e decisoes de design | Implementacao mecanica |
+| Revisao de codigo pos-execucao | Execucao das fases do WORK_PLAN |
+| Montar/atualizar WORK_PLAN.md | Documentar problemas encontrados |
+| Definir interfaces de componentes | Aplicar patterns definidos |
+| Resolver conflitos de especificidade | Seguir regras a risca |
+| Auditoria de qualidade | Validacao por fase (build + test) |
+
+### Regras de Handoff
+
+1. **WORK_PLAN.md e o unico documento de trabalho** — nao criar novos .md
+2. Cada fase tem: branch, descricao, arquivos-alvo, comandos de validacao
+3. Pleno documenta bloqueios na secao "Problemas Encontrados" do WORK_PLAN
+4. 1 PR por fase, mergear antes de comecar a proxima
+5. Pleno NAO toma decisoes arquiteturais — quando em duvida, documentar e pular
+
+### Anti-Patterns (Pleno)
+
+- Usar `!important` em vez de resolver especificidade
+- Hardcodar cores em vez de usar CSS vars
+- Criar migrations sem verificar se relacao ja existe
+- Commitar debug code (`Console.Write`, `@debug`)
+- Modificar estrutura de arquivos sem autorizacao do Senior
+
+### Prompt Base para o Pleno
+
+```
+Voce e um dev pleno executando o WORK_PLAN.md deste repositorio.
+Siga as fases na ordem. Para cada fase:
+1. Crie a branch indicada
+2. Implemente as tarefas listadas
+3. Valide com os comandos indicados
+4. Se encontrar bloqueio, documente na secao "Problemas Encontrados"
+5. Abra PR quando a fase estiver completa
+
+REGRAS: [copiar secao "Regras para o Pleno" do WORK_PLAN.md]
+```
+
+---
+
 ## Referências Operacionais
 
 - [docs/deploy.md](docs/deploy.md) — Deploy com Docker + nginx + TLS

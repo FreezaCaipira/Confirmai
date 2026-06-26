@@ -1,364 +1,352 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 24/06/2026 | Base: `main`
-> 1,911/1,911 testes passando | 0 erros de build | 0 warnings CS1998/CS0649/CS86xx
+> Atualizado em 26/06/2026 | Base: `main` @ c5e2b6f | Ciclo 4
+> 1.674/1.674 testes passando | 0 erros de build | ~50 warnings (Windows)
 
-Este documento define a ordem de trabalho atual para melhorias de qualidade, UX e operação antes da validação em produção.
-
----
-
-## Fase 1: Qualidade de Código (Base Sólida) ✅
-
-**Objetivo**: Melhorar manutenibilidade, performance e testabilidade antes de novas features.
-**Status**: ✅ Completo
-
-### 1.1 Expandir cobertura scoped CSS
-- **Status**: ✅ Completo (0 páginas sem `.razor.css`)
-- **Prioridade**: Alta
-- **Ação**: Priorizar páginas mais usadas (Groups, Futsal, Payments)
-- **Benefício**: Isolamento de estilos, manutenção mais fácil
-
-### 1.2 Consolidar CSS duplicado
-- **Status**: ✅ Completo
-- **Prioridade**: Baixa
-- **Ações realizadas**:
-  - Criado `.content-hero` em `site.css` para hero pseudo-elements compartilhados
-  - Criado `.parchment-card` e `.parchment-card-light` em `site.css` para gradientes de parchment
-  - Removidas duplicações de `order-status-badge` em AdminUsers.razor.css e AdminVenues.razor.css
-  - Mantidos overrides específicos em PaymentsHistory.razor.css e ViewPayment.razor.css
-  - Limpos About.razor.css e Contact.razor.css (páginas de redirect)
-- **Benefício**: Redução de duplicação, manutenção centralizada
-
-### 1.3 Aumentar cobertura de testes (Checkpoints)
-- **Status**: ✅ Completo (serviços críticos cobertos)
-- **Prioridade**: Alta
-- **Meta**: 80%+ (atual: 9.9% - 11,732/118,427 linhas)
-- **Checkpoints**:
-  - **1.3.1**: ✅ Services críticos cobertos (Payment, Events, Admin) - 9.9% alcançado
-  - **1.3.2**: ⏭️ Pulado (baixo ROI - classes sem cobertura são state machines e DTOs)
-  - **1.3.3**: ⏭️ Pulado (baixo ROI - UI components têm pouco ROI)
-  - **1.3.4**: ⏭️ Pulado (baixo ROI - domínios já cobertos)
-- **Arquivos criados**:
-  - BtcPayWebhookServiceStaticTests.cs
-  - AdminLogsQueryOverridesParserStaticTests.cs
-  - LogServicePrivateTests.cs
-  - docs/TEST_COVERAGE_MAPPING.md
-- **Ação realizada**: Testes para métodos privados estáticos em serviços críticos, mapeamento de cobertura
-- **Benefício**: Serviços críticos cobertos, base sólida para Fase 2
-- **Nota**: ROI baixo para continuar - maioria dos serviços já tem testes extensivos
+Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
 ---
 
-## Fase 2: UX em Geral (Experiência do Usuário) 🔄
+## Historico de Ciclos
 
-**Objetivo**: Melhorar usabilidade e acessibilidade para todos os usuários.
-**Status**: ✅ Completo (5/5)
+### Ciclo 1 (Senior Cloud): Consolidacao de Docs + Testes
+- PR #6: Consolidacao de 22 .md espalhados em 3 centrais
+- PR #7: Correcao de 24 testes (575/575 passando)
+- PR #8: Merge para main
 
-### 2.1 UX de Grupos Privados
-- **Status**: ✅ Completo
-- **Prioridade**: Média
-- **Ações realizadas**:
-  - VenueManager/VenueEdit: aplicado seletor UF com lista de estados + API IBGE para cidades
-  - Groups/Detail: adicionado filtro de ordenação (mais recentes/mais antigas/nome A-Z)
-  - Groups/Detail: adicionado contexto visual (tempo de espera, indicador de urgência >48h, email)
-  - Groups/Detail: adicionado bulk actions (seleção múltipla, aprovar/rejeitar todos)
-  - Groups/Detail: adicionado checkbox de seleção com feedback visual
-- **Benefício**: Reduzir atrito em workflows comuns, melhorar triagem de solicitações
+### Ciclo 2 (Senior Cloud): Auditoria + Migration
+- PR #9: Migration `ServerApiKeys` pendente (fix startup crash)
+- PR #10: Auditoria Services — namespaces, GatewayService:ControllerBase, file-scoped
 
-### 2.2 Página de histórico de pagamentos do jogador
-- **Status**: ⚠️ Parcialmente Completo (com pendência de ajuste)
-- **Prioridade**: Média
-- **Ações realizadas**:
-  - Página PaymentsHistory.razor já existia em `/payments` com filtros implementados
-  - Adicionado botões de exportação CSV e HTML/PDF
-  - ExportToCsv: gera CSV com dados filtrados (data, produto, valor, status, gateway)
-  - ExportToPdf: gera tabela HTML com estilização para conversão em PDF
-  - Utiliza função JS existente ConfirmaiDownloadFile para downloads
-  - Atualizado layout de filtros para acomodar botões de exportação
-- **Pendência de ajuste**:
-  - Estilização de bordas das abas de histórico/pendências não funcionou corretamente
-  - Tentativas: classes CSS específicas por aba, ID-based selectors, inline styles
-  - Problema: conflito com estilos globais de `site.css` (body .entity-shell-card)
-  - Necessário: investigar estrutura CSS do site.css e refatorar para permitir override sem conflitos
-  - Requisito: aba "Enviados" (histórico) com bordas azuis, aba "Recebidos" (pendências) com bordas vermelhas
-- **Benefício**: Reduzir suporte, transparência para usuário
-
-### 2.3 Ajustes de UX responsiva e acessibilidade AA
-- **Status**: ✅ Completo
-- **Prioridade**: Média
-- **Ações realizadas**:
-  - Adicionado skip link para navegação por teclado em App.razor
-  - Adicionado id="main-content" e tabindex="-1" ao elemento main do MainLayout
-  - Melhorados estilos de foco: outline 3px para todos os elementos interativos
-  - Adicionado suporte a modo de alto contraste (@media prefers-contrast: high)
-  - Adicionado suporte a movimento reduzido (@media prefers-reduced-motion: reduce)
-  - Corrigido erro de sintaxe CSS em .oldsite-side-link
-- **Benefício**: Inclusão, compliance WCAG AA
-
-### 2.4 Indicadores de ocupação, inadimplência e conversão por grupo
-- **Status**: ✅ Completo
-- **Prioridade**: Baixa
-- **Ações realizadas**:
-  - Criado GroupMetricsService com cálculo de snapshot (membros, eventos, taxa de presença, pagamentos)
-  - Criado componente GroupMetrics com cards de métricas e alertas visuais
-  - Integrado em Groups/Detail (somente admin)
-  - Layout responsivo com grid CSS
-- **Benefício**: Visibilidade para admins, tomada de decisão
-
-### 2.5 Integração WhatsApp real com opt-in
-- **Status**: ✅ Completo
-- **Prioridade**: Baixa
-- **Ações realizadas**:
-  - Adicionado WhatsAppNumber e WhatsAppOptIn ao ApplicationUser
-  - Criado WhatsAppNotificationService com integração de API
-  - Adicionado migration AddWhatsAppOptIn
-  - Registrado serviços no Program.cs
-- **Benefício**: Engajamento, redução de no-shows
+### Ciclo 3 (Pleno Local): UX + Features + CSS
+- Fase 1 (Qualidade): Scoped CSS, consolidacao CSS, testes (COMPLETO)
+- Fase 2 (UX): Grupos privados, historico pagamentos, responsividade, metricas, WhatsApp (COMPLETO)
+- Fase 3 (Operacao): Virtual scrolling, baseline gateways, postmortem checklist (COMPLETO)
+- **Problemas**: CSS com `!important`, conflitos de especificidade, inline styles, pleno incapaz de override cores
 
 ---
 
-## Fase 3: Operação Contínua (Melhorias Operacionais)
+## Diagnostico CSS (Revisao Senior)
 
-**Objetivo**: Melhorar observabilidade, eficiência e resposta a incidentes.
-**Status**: ✅ Completo (3/3)
+**Vanilla CSS NAO impede responsividade mobile.** O problema e falta de disciplina arquitetural:
 
-### 3.1 Virtual scrolling para listas grandes
-- **Status**: ✅ Completo
-- **Prioridade**: Baixa
-- **Ações realizadas**:
-  - Implementado virtual scrolling com Microsoft.AspNetCore.Components.Web.Virtualization
-  - AdminLogs: ItemsProviderDelegate com page size 50
-  - AdminUsers: ItemsProviderDelegate com page size 50
-  - AdminPayments: ItemsProviderDelegate com page size 50
-  - Removidos controles de paginação (gerenciados pela virtualização)
-  - Adicionados containers com max-height 600px e scroll
-- **Benefício**: Performance em listas com 1000+ itens
+| Metrica | Valor | Meta |
+|---------|-------|------|
+| Hardcoded colors em Pages/*.css | 1.387 | <800 |
+| CSS vars usadas | 381 (de 68 definidas) | >800 |
+| `!important` em Pages/*.css | 16 | 0-1 |
+| Inline styles estaticos | ~35 | 0 |
+| @media queries (scoped) | 50 | 50 (padronizados) |
+| @media queries (site.css) | 31 | 31 |
 
-### 3.2 Definir baseline operacional semanal por gateway
-- **Status**: ✅ Completo
-- **Prioridade**: Baixa
-- **Ações realizadas**:
-  - Criado documento `docs/monitoring/gateway-baseline.md`
-  - Definidos baselines para EfiBank, AbacatePay, Appmax, BtcPay
-  - Métricas de volume, latência, erro e sucesso por gateway
-  - Thresholds de alerta P1/P2/P3
-  - Processo de revisão semanal com template de relatório
-  - Fontes de dados e processo de ajuste de thresholds
-- **Benefício**: Detecção proativa de problemas
+**Causa raiz dos problemas do Pleno**:
+1. `site.css` tem seletores globais (`.order-status-badge`, `body .entity-shell-card`) que sobrescrevem scoped CSS
+2. Ratio hardcoded/var de 3.6:1 — deveria ser invertido
+3. Breakpoints inconsistentes entre arquivos
+4. Pleno tentou workarounds (`!important`) em vez de resolver especificidade
 
-### 3.3 Formalizar ritual pós-incidente com checklist de causa raiz
-- **Status**: ✅ Completo
-- **Prioridade**: Baixa
-- **Ações realizadas**:
-  - Criado documento `docs/monitoring/postmortem-checklist.md`
-  - Checklist completo de preparação pré-reunião
-  - Agenda estruturada com análise de 5 Whys
-  - Categorias de causa raiz (código, configuração, infraestrutura, processo, humano)
-  - Template de post-mortem com timeline, análise e action items
-  - Diretrizes de cultura sem culpa (blameless)
-  - Processo de follow-up (1 semana, 1 mês, 3 meses)
-  - Métricas de incidentes e action items para tracking
-- **Benefício**: Aprendizado contínuo, prevenção de recorrência
+**Decisao**: NAO migrar para framework. Custo de 2-3 meses sem beneficio funcional. A arquitetura atual (Blazor .razor.css) JA E component CSS. Precisamos apenas disciplinar.
 
 ---
 
-## Fase 5: Melhorias na Tela Inicial (Index/Jogos) 📋
+## Regras para o Pleno (OBRIGATORIO)
 
-**Objetivo**: Melhorar UX, performance e manutenibilidade da página inicial de jogos.
-**Status**: ⏳ Pendente
-
-### 5.1 UX/UI - Explorar
-- **Status**: ⏳ Pendente
-- **Prioridade**: Média
-- **Ações planejadas**:
-  - Cards de esporte com imagens/ícones mais elaborados em vez de apenas emojis
-  - Adicionar contador de partidas disponíveis em cada esporte (ex: "12 partidas esta semana")
-  - Simplificar o fluxo de "Outra cidade" - atualmente requer selecionar UF e depois digitar cidade
-  - Adicionar geolocalização automática para sugerir cidade do usuário
-  - Empty state mais elaborado quando não há partidas na cidade selecionada
-- **Benefício**: Melhor primeira impressão, redução de atrito na descoberta
-
-### 5.2 UX/UI - Meus Jogos
-- **Status**: ⏳ Pendente
-- **Prioridade**: Média
-- **Ações planejadas**:
-  - Adicionar filtros por esporte (Futsal/Poker) e período
-  - Mostrar status do evento (confirmado, aguardando confirmação, vagas restantes)
-  - Cards mais informativos com preço, tipo de torneio, etc.
-  - Animação de transição entre abas
-  - Botão de "Redefinir filtros" quando há filtros ativos
-  - Destaque visual para eventos urgentes (ex: começando em < 24h)
-- **Benefício**: Usabilidade, engajamento, redução de no-shows
-
-### 5.3 UX/UI - Geral
-- **Status**: ⏳ Pendente
-- **Prioridade**: Baixa
-- **Ações planejadas**:
-  - News ticker com animação mais suave e carrossel automático
-  - Indicador de loading mais elaborado (skeleton screens)
-  - Responsividade melhorada para mobile
-  - Acessibilidade: melhor contraste, foco visível em elementos interativos
-- **Benefício**: Inclusão, experiência polida
-
-### 5.4 Refatoração - Componentização
-- **Status**: ⏳ Pendente
-- **Prioridade**: Média
-- **Ações planejadas**:
-  - Extrair `CitySelector` como componente reutilizável
-  - Extrair `SportCard` como componente
-  - Extrair `ConfirmationCard` como componente
-  - Extrair `MyGamesTabs` como componente
-  - Criar `EmptyState` component reutilizável
-- **Benefício**: Reutilização, manutenibilidade, testabilidade
-
-### 5.5 Refatoração - Services
-- **Status**: ⏳ Pendente
-- **Prioridade**: Baixa
-- **Ações planejadas**:
-  - Mover lógica de busca de cidades IBGE para `CityService`
-  - Mover lógica de confirmações para `UserConfirmationService`
-  - Criar `LocationService` para geolocalização
-- **Benefício**: Separação de responsabilidades, testabilidade
-
-### 5.6 Refatoração - Outros
-- **Status**: ⏳ Pendente
-- **Prioridade**: Baixa
-- **Ações planejadas**:
-  - Remover strings hardcoded ("Carregando suas confirmações…", "Nenhuma partida anterior")
-  - Usar `UiTextService` para todos os textos
-  - Extrair constantes (default city, etc.)
-  - Adicionar testes unitários para lógica de tabs e filtros
-  - Considerar usar `CascadingValue` para cidade selecionada entre páginas
-- **Benefício**: Internacionalização, manutenibilidade, qualidade
+1. **NUNCA usar `!important`** — se nao consegue override, documentar na secao "Problemas" e pular
+2. **NUNCA hardcodar cores** — usar vars CSS do `:root` (ver lista abaixo)
+3. **NUNCA commitar debug/logging temporario** (`Console.Write`, `Debug.Write`)
+4. **NUNCA injetar `AppDbContext` direto** — sempre `IDbContextFactory<AppDbContext>`
+5. **NUNCA criar arquivo `.razor.css` vazio** — so criar se tiver estilos reais
+6. **Validar cada fase**: `dotnet build` (0 errors) + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration"` (0 failed)
+7. **Branch separada** para cada fase: `refactor/fase-X-nome`
+8. **1 PR por fase** — mergear via PR, nunca push direto na main
+9. **Documentar bloqueios**: se nao resolver, escrever na secao "Problemas Encontrados" com arquivo, linha, e o que tentou
 
 ---
 
-## Fase 8: Metodologia de Desenvolvimento 📋
+## CSS Vars Permitidas (usar SEMPRE em vez de hex)
 
-**Objetivo**: Estabelecer abordagem estruturada que entende arquitetura macro antes de micro-mudanças.
-**Status**: ⏳ Pendente
-**Prioridade**: **CRÍTICA - BLOQUEANTE PARA TODO DESENVOLVIMENTO**
+```css
+/* Backgrounds */
+var(--bg-deepest)    /* #2f1a09 */
+var(--bg-deep)       /* #2f1d0b */
+var(--bg-dark)       /* #3d2d1d */
+var(--bg-dark-mid)   /* #4e2f16 */
+var(--bg-night)      /* #181818 */
+var(--bg-slate)      /* #23272b */
 
-### 8.1 Problemas identificados
-- **Abordagem reativa**: Tentativas de resolver micro problemas (cores, badges, UI) sem entender estrutura macro
-- **Ignorar arquitetura existente**: Adicionar relações EF Core sem verificar se já existem, criar migrations desnecessárias
-- **Workarquivos em vez de raiz**: Usar `!important`, inline styles, StateHasChanged sem entender ciclo de vida
-- **Falta de investigação**: Não verificar código existente antes de implementar mudanças
+/* Text/Surface */
+var(--parchment)     /* #efd6ac */
+var(--parchment-dark)/* #e2c493 */
+var(--parchment-light)/* #f0dbb4 */
+var(--parchment-soft)/* #f5e6c6 */
+var(--text-light)    /* #f0f0f0 */
 
-### 8.2 Exemplos de falhas recentes
-- **CSS**: Tentar mudar cores de badges sem entender que site.css sobrescreve estilos locais
-- **EF Core**: Adicionar coleção MatchSchedules em Group sem verificar que relação já existe via GroupId
-- **Breadcrumb**: Adicionar StateHasChanged sem entender ciclo de vida de componentes Blazor
-- **Indicador Auto**: Tentar carregar MatchSchedules via Include quando query separada seria mais eficiente
+/* Accent */
+var(--gold)          /* #f9a825 */
+var(--gold-deep)     /* #c99544 */
+var(--gold-dark)     /* #c17900 */
+var(--orange)        /* #cf5a16 */
+var(--green)         /* #6e9a3f */
+var(--green-light)   /* #8aba57 */
+var(--red)           /* #e53935 */
 
-### 8.3 Ações planejadas
-- **ANTES de qualquer mudança**: Investigar arquitetura existente (models, DbContext, CSS hierarchy)
-- **Verificar relações existentes**: Consultar AppDbContext antes de adicionar novas relações EF Core
-- **Entender CSS hierarchy**: Mapear ordem de carregamento e especificidade antes de mudar estilos
-- **Documentar decisões**: Registrar por que uma abordagem foi escolhida vs alternativas
-
-### 8.4 Benefício
-- Evitar migrations desnecessárias
-- Evitar conflitos CSS estruturais
-- Código mais consistente com arquitetura existente
-- Menos retrabalho
-
----
-
-## Fase 7: Refatoração de Estrutura CSS 🔧
-
-**Objetivo**: Resolver conflitos sistêmicos de especificidade CSS que impedem customização por componente.
-**Status**: ⏳ Pendente
-**Prioridade**: **ALTA - BLOQUEANTE PARA MELHORIAS VISUAIS**
-
-### 7.1 Problemas identificados
-- **Conflito de especificidade**: Estilos globais em `site.css` (ex: `.order-status-badge.aguardandopagamento`) sobrescrevem estilos locais de componentes
-- **Herança indesejada**: Classes de tema (ex: `entity-shell.parchment-a`) aplicam estilos globais que afetam componentes que não deveriam herdar
-- **Impossibilidade de override**: Mesmo com ID-based selectors, estilos globais prevalecem devido à ordem de carregamento e especificidade
-- **Workarounds necessários**: Uso de `!important` e inline styles indica falha na arquitetura CSS
-
-### 7.2 Problemas visuais específicos (BLOQUEIO ATUAL)
-
-#### 7.2.1 Tela de Partidas (Index/Futsal/Poker)
-- **Problema**: Badges de status exibem cores indesejadas (gold/dourado) que não fazem sentido semântico
-- **Causa**: Estilo global `.order-status-badge.aguardandopagamento` em `site.css` linha 2556-2559 define `background: #f5a623`
-- **Impacto**: Usuário não consegue customizar cores de status por componente
-- **Tentativas falhas**: ID-based selectors, remoção de classes de tema, ajuste de especificidade
-
-#### 7.2.2 Tela de Histórico Financeiro (PaymentsHistory)
-- **Problema**: Bordas dos cards na aba de histórico permanecem vermelhas quando deveriam ser azuis
-- **Causa**: Estilo global `body .entity-shell-card` em `site.css` linha 5205-5210 define `border-top: 2px solid #1a5298` (azul) mas conflito com outros estilos globais
-- **Requisito**: Aba "Enviados" (histórico) com bordas azuis, aba "Recebidos" (pendências) com bordas vermelhas
-- **Tentativas falhas**: Classes específicas por aba, ID-based selectors, inline styles, remoção de `entity-shell` class
-- **Impacto**: Diferenciação visual entre histórico (pagamentos realizados) e pendências não funciona
-
-### 7.3 Ações planejadas
-- **CRÍTICO**: Migrar estilos globais específicos de componente para arquivos `.razor.css` locais
-- **CRÍTICO**: Remover ou limitar escopo de classes de tema que aplicam estilos globais
-- Estabelecer convenção de nomenclatura que evite conflitos (ex: prefixos por componente)
-- Implementar CSS Modules ou Scoped CSS onde aplicável
-- Documentar hierarquia de especificidade esperada
-- Considerar refatoração completa de `site.css` para separar estilos globais de estilos de componente
-
-### 7.4 Componentes afetados
-- **PaymentsHistory**: badges de status, bordas de cards/tabelas (BLOQUEIO ATIVO)
-- **Index/Futsal/Poker**: badges de status de partidas (BLOQUEIO ATIVO)
-- **Breadcrumb**: atualização ao navegar (BLOQUEIO ATIVO)
-- Outros componentes que herdam estilos de `entity-shell` e temas globais
-
-### 7.5 Benefício
-- Customização por componente sem conflitos
-- Manutenibilidade melhorada
-- Eliminação de workarquivos (`!important`, inline styles)
-- **Desbloqueio de melhorias visuais planejadas**
-
-### 7.6 Nota
-Esta fase é **PRÉ-REQUISITO** para qualquer melhoria visual futura. Sem resolver a estrutura CSS base, customizações visuais continuarão falhando independentemente da abordagem utilizada.
+/* Borders */
+var(--brown-border)  /* #8a6739 */
+var(--brown-border-light) /* #8f6a3d */
+```
 
 ---
 
-## Fase 6: Validação em Produção
+## Ciclo 4 — Tarefas Ativas
 
-**Objetivo**: Garantir que fluxos críticos funcionam em ambiente real.
+### Fase 1: Corrigir Warnings de Compilacao — P0
+**Branch**: `fix/compiler-warnings`
+**Estimativa**: ~50 warnings
 
-### 6.1 Testar fluxo Pix completo em produção (EfiBank)
-- **Status**: Pendente
-- **Prioridade**: Alta
+#### 1.1 — CS1998: async method lacks await (14 ocorrencias)
+- Arquivos: `Profile.razor`, `Escalacao.razor`, `Features.razor`, `Detail.razor` (Groups, Futsal), `EventPayment.razor`, `AdminUsers.razor`, `Create.razor` (Futsal), `CertificateHealthCheckService.cs`
+- Fix: Remover `async` do metodo OU adicionar `await Task.CompletedTask` se precisa manter a signature
+- Preferir: remover `async` quando nao ha nenhum `await` no corpo
 
-### 6.2 Ativar webhook AbacatePay em produção
-- **Status**: Pendente
-- **Prioridade**: Alta
+#### 1.2 — CS0649: field never assigned (8 ocorrencias)
+- Arquivos: `Detail.razor` (Groups), `EventPayment.razor`, `Poker/Index.razor`, `Mailbox.razor`, `AdminPayments.razor`, `Escalacao.razor`, `Payment.razor`
+- Campos: `_copyCodeTask`, `_copyAdminPixTask`, `_menuFocusOutTask`, `_copyInviteTask`, `threadStreamRef`, `statusTransitionConfirmationId`, `_copyTask`, `_copyBrCodeTask`
+- Fix: Se campo nao e usado, remover. Se e usado via JS interop, inicializar como `null!` ou tornar nullable (`?`)
 
-### 6.3 Implantar alertas reais e validar escalonamento fim a fim
-- **Status**: Pendente
-- **Prioridade**: Alta
+#### 1.3 — CS8618/CS8602/CS8604: null reference warnings (8 ocorrencias)
+- Arquivos: `PendingWebhooksAlertService.cs`, `CertificateHealthCheckService.cs`, `FutsalOutfieldGroup.razor`, `Detail.razor` (Futsal, Groups), `EventPaymentHeader.razor`, `AdminPaymentsSummaryPanel.razor`, `Futsal/Edit.razor`
+- Fix: Adicionar `?` (nullable), `= null!`, ou null-check dependendo do caso
+
+#### 1.4 — RZ10012: unexpected markup element (2 ocorrencias)
+- Arquivo: `Escalacao.razor` — referencia `EscalacaoConfirmed` e `EscalacaoVoting` sem @using
+- Fix: Adicionar `@using` no `_Imports.razor` da pasta OU mover componentes para pasta com `_Imports.razor`
+
+#### 1.5 — CS0105: duplicate using (1)
+- Arquivo: `PixPayloadBuilder.cs` — `System.Globalization` duplicado
+- Fix: Remover a linha duplicada
+
+#### 1.6 — SYSLIB0057: obsolete X509Certificate2 constructor (1)
+- Arquivo: `CertificateHealthCheckService.cs`
+- Fix: Substituir `new X509Certificate2(path, password)` por `X509CertificateLoader.LoadPkcs12FromFile(path, password)`
+
+**Validacao**:
+```powershell
+dotnet build 2>&1 | Select-String "warning" | Measure-Object
+# Meta: 0
+```
 
 ---
 
-## Justificativa da Ordem
+### Fase 2: Eliminar !important em Scoped CSS — P0
+**Branch**: `refactor/remove-important`
+**Estimativa**: 16 ocorrencias em 8 arquivos
 
-1. **Qualidade primeiro**: Base sólida reduz regressões em features futuras
-2. **UX depois**: Melhorias visíveis para usuário aumentam valor percebido
-3. **Operação depois**: Melhorias internas que não impactam usuário diretamente
-4. **Tela inicial depois**: Melhoria focada em UX de página crítica
-5. **Produção por último**: Validar tudo junto em ambiente real, não em pedaços
+Para CADA `!important`:
+1. Identificar qual regra em `site.css` causa conflito
+2. No `.razor.css`, aumentar especificidade do seletor (ex: `.entity-shell .meu-seletor`)
+3. Se nao funcionar com especificidade, documentar na secao "Problemas" e pular
+
+| Arquivo | Regra | Acao |
+|---------|-------|------|
+| `Groups/Ranking.razor.css` | `color: #fbbf24 !important` | Trocar por `var(--gold)` + especificidade |
+| `Groups/Payments.razor.css` | `color: #4ade80 !important` | Trocar por `var(--green-light)` + especificidade |
+| `Admin/AdminPayments.razor.css` | `z-index: 20000 !important` | Verificar se precisa z-index layer |
+| `Poker/Detail.razor.css` | `color: #a78bfa !important` | Badge — aumentar especificidade |
+| `Poker/Detail.razor.css` | `border-color: #dc2626 !important` | Error state — seletor mais especifico |
+| `Payment/EventPayment.razor.css` | `text-decoration: none !important` | Verificar heranca link styles |
+| `Futsal/Create.razor.css` | Focus styles ×3 | `:focus-visible` com classe mais especifica |
+| `Futsal/Edit.razor.css` | Focus styles ×3 | Mesmo pattern de Create |
+| `Futsal/Escalacao.razor.css` | background + border ×3 | Active state — especificidade |
+| `Components/Profile/AvatarUploadSection.razor.css` | `display: none !important` | **IGNORAR** — pattern input[type=file] |
+
+**Validacao**:
+```powershell
+Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String "!important" | Measure-Object
+# Meta: 0 (ou 1 se manter AvatarUpload)
+```
 
 ---
 
-## Estimativa de Esforço
+### Fase 3: Converter Hardcoded Colors para CSS Vars — P1
+**Branch**: `refactor/css-vars-consistency`
+**Estimativa**: ~200+ substituicoes nos 10 maiores
 
-- Fase 1 (Qualidade): 2-3 semanas ✅
-- Fase 2 (UX): 3-4 semanas ✅
-- Fase 3 (Operação): 1-2 semanas ✅
-- Fase 5 (Tela Inicial): 2-3 semanas ⏳
-- Fase 6 (Produção): 1 semana ⏳
+Arquivos alvo (por tamanho):
+1. `Pages/Payment/Payment.razor.css` (835L)
+2. `Shared/Components/Groups/GroupDetailPaymentsModal.razor.css` (792L)
+3. `Pages/Futsal/Escalacao.razor.css` (764L)
+4. `Pages/Mailbox.razor.css` (721L)
+5. `Pages/Admin/AdminLogs.razor.css` (658L)
+6. `Pages/Index.razor.css` (607L)
+7. `Pages/Groups/Payments.razor.css` (556L)
+8. `Pages/Payment/EventPayment.razor.css` (555L)
+9. `Pages/Payment/ViewPayment.razor.css` (549L)
+10. `Pages/Docs/Integration.razor.css` (499L)
 
-**Total**: 9-13 semanas
+**Mapeamento de cores**:
+```
+#2f1a09, #2f1d0b          -> var(--bg-deepest) ou var(--bg-deep)
+#3d2d1d                   -> var(--bg-dark)
+#4e2f16                   -> var(--bg-dark-mid)
+#181818                   -> var(--bg-night)
+#23272b, #23272f          -> var(--bg-slate)
+#efd6ac                   -> var(--parchment)
+#e2c493                   -> var(--parchment-dark)
+#f0dbb4                   -> var(--parchment-light)
+#f5e6c6                   -> var(--parchment-soft)
+#f9a825                   -> var(--gold)
+#c99544                   -> var(--gold-deep)
+#8a6739, #8f6a3d          -> var(--brown-border)
+#cf5a16                   -> var(--orange)
+#6e9a3f                   -> var(--green)
+#e53935                   -> var(--red)
+#f0f0f0, #f1f5f9          -> var(--text-light)
+```
+
+Se uma cor hex NAO tem var correspondente: documentar na secao "Cores sem Var".
+
+**Validacao**:
+```powershell
+Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String '#[0-9a-fA-F]{3,6}' | Measure-Object
+# Meta: <800 (de 1.387)
+```
 
 ---
 
-## Referências
+### Fase 4: Padronizar Breakpoints Responsivos — P1
+**Branch**: `refactor/responsive-breakpoints`
 
-- [ROADMAP.md](ROADMAP.md) - Roadmap detalhado de features
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Guia de contribuição
-- [docs/](docs/) - Documentação operacional
+Adicionar ao topo de `site.css` (depois do `:root`):
+```css
+/* === BREAKPOINTS PADRAO === */
+/* Mobile-first: estilos base sao mobile.
+   Usar @media (min-width: Xpx) para expandir.
+   
+   --bp-sm: 640px   (mobile landscape)
+   --bp-md: 768px   (tablet)
+   --bp-lg: 1024px  (desktop)
+   --bp-xl: 1440px  (wide desktop)
+*/
+```
+
+Auditar os 50 `@media` queries em `.razor.css`:
+- Se usa breakpoint fora dos 4 padrao, ajustar para o mais proximo
+- Se usa `max-width`, converter para `min-width` (mobile-first)
+- NAO refatorar `site.css` nesta fase
+
+**Validacao**:
+```powershell
+Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String "@media" | Select-String -NotMatch "640|768|1024|1440" | Measure-Object
+# Meta: 0
+```
+
+---
+
+### Fase 5: Eliminar Inline Styles Estaticos — P2
+**Branch**: `refactor/remove-inline-styles`
+**Estimativa**: ~35 ocorrencias
+
+**Excecoes (NAO converter)**:
+- `style="display:none"` em `<InputFile>` — pattern legitimo
+- `style="@variavel"` — binding dinamico, manter
+
+Arquivos com mais inline styles:
+- `Pages/Groups/Ranking.razor` (skeleton styles)
+- `Pages/Poker/Detail.razor` (skeleton styles)
+- `Pages/Poker/Create.razor` (form hints)
+- `Pages/Admin/AdminVenues.razor` (action rows)
+- `Pages/VenueManager/Venues.razor` (action rows)
+- `Pages/Admin/AdminVenueEdit.razor` (hr separator)
+
+Para cada inline style: criar classe no `.razor.css` correspondente.
+
+**Validacao**:
+```powershell
+Get-ChildItem -Recurse -Filter "*.razor" Pages/ | Select-String 'style="' | Where-Object { $_ -notmatch 'display:none|@' } | Measure-Object
+# Meta: 0
+```
+
+---
+
+### Fase 6: Decomposicao de Componentes (Preparacao) — P2
+**Branch**: `refactor/component-decomposition-prep`
+
+**APENAS IDENTIFICAR** — nao implementar decomposicao.
+
+Paginas >600L sem decomposicao completa:
+| Pagina | Linhas | Secoes candidatas |
+|--------|--------|-------------------|
+| `Poker/Detail.razor` | 628 | HeaderSection, PlayersSection, AdminPanel |
+| `Payment/Payment.razor` | 620 | FormSection, SummarySection, QRSection |
+| `Poker/Create.razor` | 608 | FormSection, PreviewSection |
+
+Documentar com comentario no topo:
+```razor
+@* === DECOMPOSITION CANDIDATES ===
+   Section: [nome] -- lines [X-Y] -- candidate for extraction
+=== END DECOMPOSITION === *@
+```
+
+O Senior definira parametros e interfaces dos componentes no proximo ciclo.
+
+**Validacao**: `dotnet build` sem erros (so documentacao).
+
+---
+
+## Ordem de Execucao
+
+```
+Fase 1 (warnings) -> Fase 2 (!important) -> Fase 3 (CSS vars) -> Fase 4 (breakpoints) -> Fase 5 (inline) -> Fase 6 (prep)
+```
+
+Cada fase = 1 branch + 1 PR. Mergear antes de comecar a proxima.
+
+---
+
+## Comandos de Validacao Completos
+
+```powershell
+# Build (Windows):
+dotnet build
+
+# Tests (excluir ProgramConfiguration que precisa Postgres):
+dotnet test --filter "FullyQualifiedName!~ProgramConfiguration"
+
+# Contar warnings:
+dotnet build 2>&1 | Select-String "warning" | Measure-Object
+
+# Contar !important:
+Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String "!important" | Measure-Object
+
+# Contar inline styles:
+Get-ChildItem -Recurse -Filter "*.razor" Pages/ | Select-String 'style="' | Where-Object { $_ -notmatch 'display:none|@' } | Measure-Object
+
+# Contar hardcoded colors:
+Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String '#[0-9a-fA-F]{3,6}' | Measure-Object
+```
+
+---
+
+## Problemas Encontrados pelo Pleno
+<!-- Pleno: documente aqui qualquer bloqueio que encontrar -->
+
+### Cores sem Var correspondente
+<!-- Liste aqui cores hex que nao tem var no :root -->
+
+### Conflitos de especificidade nao resolvidos
+<!-- Liste aqui seletores que nao conseguiu override sem !important -->
+
+### Outras observacoes
+<!-- Qualquer coisa que o Senior deve saber -->
+
+---
+
+## Metricas de Sucesso (antes -> depois)
+
+| Metrica | Antes | Meta |
+|---------|-------|------|
+| Warnings (build) | ~50 | 0 |
+| `!important` em Pages/*.css | 16 | 0-1 |
+| Hardcoded colors em Pages/*.css | 1.387 | <800 |
+| Inline styles estaticos | ~35 | 0 |
+| @media fora do padrao | ? | 0 |
