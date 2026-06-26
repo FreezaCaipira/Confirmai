@@ -1,15 +1,17 @@
 /* ── Title ────────────────────────────────────────────────────── */
 .ranking-title {
     color: #fbbf24 !important;
+    text-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* ── Footnote ─────────────────────────────────────────────────── */
 .ranking-footnote {
     margin-top: 1rem;
     font-size: 0.78rem;
-    color: var(--ci-text-info, #8fc2f3);
+    color: #cbd5e1;
     display: flex;
     align-items: center;
     gap: 0.35rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 

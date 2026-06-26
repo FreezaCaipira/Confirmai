@@ -84,51 +84,34 @@
                             </div>
                         }
 
-                        @if (past.Any() || cancelled.Any())
+                        @if (past.Any())
                         {
-                            <MyGamesTabs
-                                ShowCancelled="@showCancelled"
-                                PreviousCount="@past.Count"
-                                CancelledCount="@cancelled.Count"
-                                OnPreviousClick="() => showCancelled = false"
-                                OnCancelledClick="() => showCancelled = true" />
+                            <div class="my-conf-section my-conf-section--past">
+                                <h2 class="my-conf-section-title">
+                                    <i class="fas fa-history"></i> @Ui["Index.Previous"] (@past.Count)
+                                </h2>
+                                <div class="my-conf-list">
+                                    @foreach (var c in past)
+                                    {
+                                        <ConfirmationCard Confirmation="@c" IsPast="true" IsCancelled="false" />
+                                    }
+                                </div>
+                            </div>
+                        }
 
-                            @if (!showCancelled)
-                            {
-                                @if (past.Any())
-                                {
-                                    <div class="my-conf-section my-conf-section--past">
-                                        <div class="my-conf-list">
-                                            @foreach (var c in past)
-                                            {
-                                                <ConfirmationCard Confirmation="@c" IsPast="true" IsCancelled="false" />
-                                            }
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <p class="listing-state">@Ui["Index.NoPrevious"]</p>
-                                }
-                            }
-                            else
-                            {
-                                @if (cancelled.Any())
-                                {
-                                    <div class="my-conf-section">
-                                        <div class="my-conf-list">
-                                            @foreach (var c in cancelled)
-                                            {
-                                                <ConfirmationCard Confirmation="@c" IsPast="true" IsCancelled="true" />
-                                            }
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <p class="listing-state">@Ui["Index.NoCancelled"]</p>
-                                }
-                            }
+                        @if (cancelled.Any())
+                        {
+                            <div class="my-conf-section my-conf-section--cancelled">
+                                <h2 class="my-conf-section-title">
+                                    <i class="fas fa-times-circle"></i> @Ui["Index.Cancelled"] (@cancelled.Count)
+                                </h2>
+                                <div class="my-conf-list">
+                                    @foreach (var c in cancelled)
+                                    {
+                                        <ConfirmationCard Confirmation="@c" IsPast="true" IsCancelled="true" />
+                                    }
+                                </div>
+                            </div>
                         }
                     }
                 </div>
@@ -214,7 +197,6 @@
     private List<EventConfirmation> allCancelled = new();
     private bool confLoaded    = false;
     private bool confLoading   = false;
-    private bool showCancelled = false;
     private string userId      = string.Empty;
 
     // ── Meus Jogos filters ────────────────────────────────────────

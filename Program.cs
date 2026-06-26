@@ -128,7 +128,7 @@ builder.Services.AddScoped<AppmaxPixService>();
 builder.Services.AddScoped<EfiBankWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
 builder.Services.AddScoped<LanguagePreferenceService>();
-builder.Services.AddScoped<UiTextService>();
+builder.Services.AddScoped<UiTextService>(sp => new UiTextService(sp.GetRequiredService<LanguagePreferenceService>()));
 builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<GroupMetricsService>();
 builder.Services.AddScoped<WhatsAppNotificationService>();

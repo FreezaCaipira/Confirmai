@@ -18,11 +18,11 @@
 @inject UiTextService T
 @inject PaymentEventBus PaymentEventBus
 
-<div class="entity-shell parchment-a payments-history-shell">
+<div id="payments-history-page" class="payments-history-shell" style="background: #0a0f18;">
     <section class="entity-shell-grid" aria-label="@T["PaymentHistory.Aria"]">
-        <article class="entity-shell-card entity-shell-main">
+        <article class="entity-shell-card entity-shell-main" style="@(activeTab == "sent" ? "border: 1px solid #1b3d6c; border-top: 1px solid #1b3d6c; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.1); background: #0a0f18; border-radius: 8px; padding: 1.5rem;" : "border: 1px solid #7f1d1d; border-top: 1px solid #7f1d1d; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(239, 68, 68, 0.1); background: #0a0f18; border-radius: 8px; padding: 1.5rem;")">
             <h1 class="page-section-title">@T["PaymentHistory.Title"]</h1>
-            <div class="filter-bar admin-filter-card payments-filter-card">
+            <div class="filter-bar admin-filter-card payments-filter-card" style="@(activeTab == "sent" ? "border: 1px solid #1b3d6c;" : "border: 1px solid #7f1d1d;")">
                 <input type="number" placeholder="@T["PaymentHistory.Filter.MinValue"]" @bind="filterMinAmount" min="0" />
                 <input type="number" placeholder="@T["PaymentHistory.Filter.MaxValue"]" @bind="filterMaxAmount" min="0" />
                 <select @bind="filterStatus">
@@ -65,8 +65,8 @@
 
             <AdminDataState IsLoading="@(filteredPayments == null)" IsEmpty="@(filteredPayments != null && !filteredPayments.Any())" LoadingText="@T["Common.Loading"]" EmptyText="@T["PaymentHistory.Empty"]" EmptyIcon="fas fa-money-bill-wave" EmptyHint="@T["PaymentHistory.EmptyHint"]">
                 <div class="payments-table-wrap">
-                <table class="product-table payments-history-table">
-        <thead>
+                <table class="product-table payments-history-table" style="@(activeTab == "sent" ? "border: 1px solid #1b3868;" : "border: 1px solid #7f1d1d;")">
+        <thead style="@(activeTab == "sent" ? "background: #0a1928; border-bottom: 1px solid #1a5298; color: #4f9cf8;" : "background: #1a0a0a; border-bottom: 1px solid #7f1d1d; color: #fca5a5;")">
             <tr>
                 <th>@T["Common.Date"]</th>
                 <th>@T["PaymentHistory.Product"]</th>
@@ -83,8 +83,8 @@
         <tbody>
         @foreach (var p in filteredPayments?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<PaymentRecord>())
         {
-            <tr>
-                <td data-label="@T["Common.Date"]">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+            <tr style="@(activeTab == "sent" ? "border-bottom: 1px solid #1b3d6c;" : (p.IsPaid ? "border-bottom: 1px solid #7f1d1d;" : "border-bottom: 1px solid #ef4444;"))">
+                <td data-label="@T["Common.Date"]" style="@(activeTab == "sent" ? "color: #8aacc8;" : "color: #fca5a5;")">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                 <td data-label="@T["PaymentHistory.Product"]">@GetProductDisplayName(p)</td>
                 @if (activeTab == "received")
                 {

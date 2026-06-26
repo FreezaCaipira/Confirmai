@@ -13,25 +13,29 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(26, 90, 176, 0.1);
+    background: #0a0f18;
     border: 1px solid #2d6a8a;
     border-radius: 8px;
     transition: all 0.15s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .metric-card:hover {
-    background: rgba(26, 90, 176, 0.15);
+    background: #0f1825;
     border-color: #4f9cf8;
+    box-shadow: 0 6px 12px rgba(79, 156, 248, 0.3);
 }
 
 .metric-card--alert {
-    background: rgba(191, 64, 64, 0.15);
+    background: #1a0a0a;
     border-color: #b71c1c;
+    box-shadow: 0 4px 8px rgba(183, 28, 28, 0.3);
 }
 
 .metric-card--alert:hover {
-    background: rgba(191, 64, 64, 0.2);
+    background: #2a0f0f;
     border-color: #c62828;
+    box-shadow: 0 6px 12px rgba(198, 40, 40, 0.4);
 }
 
 .metric-icon {
@@ -43,31 +47,37 @@
     border-radius: 8px;
     font-size: 1.25rem;
     flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .metric-icon--members {
-    background: rgba(79, 156, 248, 0.2);
-    color: #4f9cf8;
+    background: linear-gradient(180deg, #4f9cf8 0%, #1a5ab0 50%, #0d3270 100%);
+    color: #e0f2fe;
+    text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
 }
 
 .metric-icon--events {
-    background: rgba(156, 39, 176, 0.2);
-    color: #9c27b0;
+    background: linear-gradient(180deg, #9c27b0 0%, #6a1b9a 50%, #4a148c 100%);
+    color: #e1bee7;
+    text-shadow: 0 0 10px rgba(156, 39, 176, 0.5);
 }
 
 .metric-icon--attendance {
-    background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
+    background: linear-gradient(180deg, #4caf50 0%, #2e7d32 50%, #1b5e20 100%);
+    color: #c8e6c9;
+    text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
 
 .metric-icon--payments {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
+    background: linear-gradient(180deg, #ffc107 0%, #ff9800 50%, #f57c00 100%);
+    color: #fff8e1;
+    text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
 }
 
 .metric-icon--pending {
-    background: rgba(255, 152, 0, 0.2);
-    color: #ff9800;
+    background: linear-gradient(180deg, #ff9800 0%, #f57c00 50%, #e65100 100%);
+    color: #fff3e0;
+    text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
 }
 
 .metric-content {
@@ -77,21 +87,24 @@
 
 .metric-value {
     font-size: 1.5rem;
-    font-weight: 700;
-    color: #8aacc8;
+    font-weight: 800;
+    color: #e0f2fe;
     line-height: 1.2;
+    text-shadow: 0 0 10px rgba(79, 156, 248, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .metric-label {
     font-size: 0.85rem;
-    color: #6082a0;
+    color: #cbd5e1;
     margin-top: 0.25rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .metric-sub {
     font-size: 0.75rem;
-    color: #4e6a82;
+    color: #94a3b8;
     margin-top: 0.15rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .metric-sub--good {

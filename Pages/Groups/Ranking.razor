@@ -80,7 +80,7 @@ else
 
             @* ── Tabela ────────────────────────────────────────────────── *@
             <RankingTable
-                RankingRows="@rankingRowsDynamic"
+                RankingRows="@rankingRowsTable"
                 CurrentUserId="@currentUserId" />
 
             <p class="ranking-footnote">
@@ -116,7 +116,14 @@ else
     private int             currentYear  = DateTime.Now.Year;
     private List<RankingRow> rankingRows = new();
 
-    private List<dynamic>? rankingRowsDynamic => rankingRows.Cast<dynamic>().ToList();
+    private List<Shared.Components.Groups.RankingTable.RankingRow> rankingRowsTable =>
+        rankingRows.Select(r => new Shared.Components.Groups.RankingTable.RankingRow(
+            r.UserId,
+            r.UserName,
+            r.GamesPlayed,
+            r.Highlights,
+            r.Wins
+        )).ToList();
 
     private List<(int EventId, DateTime StartsAt, string WinnerUserId)> allMvpWinners = new();
 

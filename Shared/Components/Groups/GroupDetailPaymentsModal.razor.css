@@ -625,10 +625,12 @@
     border: 1px solid rgba(239, 68, 68, 0.2);
     border-radius: 8px;
     padding: 1rem 1.25rem;
-    padding-right: 2.5rem;
+    padding-right: 3.5rem;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
@@ -648,6 +650,7 @@
     font-weight: 700;
     color: #f1f5f9;
     font-size: 0.95rem;
+    min-width: 150px;
 }
 
 .payment-user-meta {
@@ -655,6 +658,7 @@
     gap: 0.5rem;
     flex-wrap: wrap;
     align-items: center;
+    flex: 1;
 }
 
 .payment-badge {
@@ -757,7 +761,7 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    margin-top: 0.25rem;
+    margin-top: 0;
 }
 
 .payment-notified-badge {

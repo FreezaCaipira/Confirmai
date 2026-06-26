@@ -33,6 +33,9 @@ internal static class PaymentTexts
         ["PaymentHistory.Title"] = "Historico de faturas",
         ["PaymentHistory.Subtitle"] = "Acompanhe suas transacoes e pagamentos",
         ["PaymentHistory.Empty"] = "Nenhuma transacao encontrada",
+        ["PaymentHistory.EmptyHint"] = "Quando voce fizer pagamentos, eles aparecerao aqui.",
+        ["PaymentHistory.TabSent"] = "Enviados",
+        ["PaymentHistory.TabReceived"] = "Recebidos",
         ["PaymentHistory.Date"] = "Data",
         ["PaymentHistory.Product"] = "Produto",
         ["PaymentHistory.Amount"] = "Valor",
@@ -41,8 +44,12 @@ internal static class PaymentTexts
         ["PaymentHistory.View"] = "Visualizar",
         ["PaymentHistory.Filter.Status"] = "Status",
         ["PaymentHistory.Filter.Product"] = "Produto...",
+        ["PaymentHistory.Filter.MinValue"] = "Valor minimo",
+        ["PaymentHistory.Filter.MaxValue"] = "Valor maximo",
+        ["PaymentHistory.Filter.Gateway"] = "Gateway...",
         ["PaymentHistory.Filter.MinAmount"] = "Valor minimo",
         ["PaymentHistory.Filter.MaxAmount"] = "Valor maximo",
+        ["PaymentHistory.Filter.AllStatus"] = "Todos os status",
         ["PaymentHistory.AllStatuses"] = "Todos os status",
 
         // PaymentView
@@ -175,8 +182,12 @@ internal static class PaymentTexts
         ["PaymentHistory.View"] = "View",
         ["PaymentHistory.Filter.Status"] = "Status",
         ["PaymentHistory.Filter.Product"] = "Product...",
+        ["PaymentHistory.Filter.MinValue"] = "Minimum value",
+        ["PaymentHistory.Filter.MaxValue"] = "Maximum value",
+        ["PaymentHistory.Filter.Gateway"] = "Gateway...",
         ["PaymentHistory.Filter.MinAmount"] = "Minimum amount",
         ["PaymentHistory.Filter.MaxAmount"] = "Maximum amount",
+        ["PaymentHistory.Filter.AllStatus"] = "All statuses",
         ["PaymentHistory.AllStatuses"] = "All statuses",
 
         // PaymentView
@@ -309,8 +320,12 @@ internal static class PaymentTexts
         ["PaymentHistory.View"] = "Ver",
         ["PaymentHistory.Filter.Status"] = "Estado",
         ["PaymentHistory.Filter.Product"] = "Producto...",
+        ["PaymentHistory.Filter.MinValue"] = "Monto minimo",
+        ["PaymentHistory.Filter.MaxValue"] = "Monto maximo",
+        ["PaymentHistory.Filter.Gateway"] = "Gateway...",
         ["PaymentHistory.Filter.MinAmount"] = "Monto minimo",
         ["PaymentHistory.Filter.MaxAmount"] = "Monto maximo",
+        ["PaymentHistory.Filter.AllStatus"] = "Todos los estados",
         ["PaymentHistory.AllStatuses"] = "Todos los estados",
 
         // PaymentView

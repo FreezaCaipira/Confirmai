@@ -2,28 +2,37 @@
     display: grid;
     gap: 0.28rem;
     padding: 0.72rem 1.1rem;
-    border-bottom: 1px solid var(--ci-border, #1b3d6c);
+    border-bottom: 2px solid;
+    border-image: linear-gradient(to right, #4f9cf8, #7dd3fc, #4f9cf8) 1;
+    background: #050810;
 }
 
 .profile-contact-row {
     display: flex;
     align-items: baseline;
     gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: #0a0f18;
+    border-radius: 4px;
+    border: 1px solid var(--ci-border, #1b3d6c);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .profile-contact-label {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 800;
-    color: var(--ci-text-subtle, #6082a0);
+    color: #cbd5e1;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     min-width: 72px;
     flex: 0 0 auto;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .profile-contact-value {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--ci-text-blue, #deeeff);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #e0f2fe;
     overflow-wrap: anywhere;
+    text-shadow: 0 0 8px rgba(79, 156, 248, 0.4);
 }

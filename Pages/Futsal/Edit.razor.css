@@ -12,31 +12,38 @@
     justify-content: flex-end;
     align-items: center;
     padding-top: 1.25rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 2px solid;
+    border-image: linear-gradient(to right, #4f9cf8, #7dd3fc, #4f9cf8) 1;
 }
 
 .edit-cancel-btn {
-    background: #b91c1c;
-    border-color: #991b1b;
+    background: linear-gradient(180deg, #f87171 0%, #ef4444 50%, #dc2626 100%);
+    border-color: #fca5a5;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
 }
 
 .edit-cancel-btn:hover:not(:disabled) {
-    background: #991b1b;
+    background: linear-gradient(180deg, #fca5a5 0%, #f87171 50%, #ef4444 100%);
+    border-color: #fecaca;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.5);
 }
 
 .edit-cancel-no-btn {
-    background: #334155;
-    border-color: #475569;
+    background: #1a2740;
+    border-color: #334155;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .edit-cancel-no-btn:hover:not(:disabled) {
-    background: #475569;
+    background: #2a3a55;
+    border-color: #475569;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 /* ── Input focus override (neutralize browser defaults) ─────────── */
 input:focus,
 select:focus,
 textarea:focus {
     outline: none !important;
-    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.15) !important;
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
     border-color: #4ade80 !important;
 }

@@ -66,7 +66,7 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
 - **Benefício**: Reduzir atrito em workflows comuns, melhorar triagem de solicitações
 
 ### 2.2 Página de histórico de pagamentos do jogador
-- **Status**: ✅ Completo
+- **Status**: ⚠️ Parcialmente Completo (com pendência de ajuste)
 - **Prioridade**: Média
 - **Ações realizadas**:
   - Página PaymentsHistory.razor já existia em `/payments` com filtros implementados
@@ -75,6 +75,12 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
   - ExportToPdf: gera tabela HTML com estilização para conversão em PDF
   - Utiliza função JS existente ConfirmaiDownloadFile para downloads
   - Atualizado layout de filtros para acomodar botões de exportação
+- **Pendência de ajuste**:
+  - Estilização de bordas das abas de histórico/pendências não funcionou corretamente
+  - Tentativas: classes CSS específicas por aba, ID-based selectors, inline styles
+  - Problema: conflito com estilos globais de `site.css` (body .entity-shell-card)
+  - Necessário: investigar estrutura CSS do site.css e refatorar para permitir override sem conflitos
+  - Requisito: aba "Enviados" (histórico) com bordas azuis, aba "Recebidos" (pendências) com bordas vermelhas
 - **Benefício**: Reduzir suporte, transparência para usuário
 
 ### 2.3 Ajustes de UX responsiva e acessibilidade AA
@@ -224,6 +230,90 @@ Este documento define a ordem de trabalho atual para melhorias de qualidade, UX 
   - Adicionar testes unitários para lógica de tabs e filtros
   - Considerar usar `CascadingValue` para cidade selecionada entre páginas
 - **Benefício**: Internacionalização, manutenibilidade, qualidade
+
+---
+
+## Fase 8: Metodologia de Desenvolvimento 📋
+
+**Objetivo**: Estabelecer abordagem estruturada que entende arquitetura macro antes de micro-mudanças.
+**Status**: ⏳ Pendente
+**Prioridade**: **CRÍTICA - BLOQUEANTE PARA TODO DESENVOLVIMENTO**
+
+### 8.1 Problemas identificados
+- **Abordagem reativa**: Tentativas de resolver micro problemas (cores, badges, UI) sem entender estrutura macro
+- **Ignorar arquitetura existente**: Adicionar relações EF Core sem verificar se já existem, criar migrations desnecessárias
+- **Workarquivos em vez de raiz**: Usar `!important`, inline styles, StateHasChanged sem entender ciclo de vida
+- **Falta de investigação**: Não verificar código existente antes de implementar mudanças
+
+### 8.2 Exemplos de falhas recentes
+- **CSS**: Tentar mudar cores de badges sem entender que site.css sobrescreve estilos locais
+- **EF Core**: Adicionar coleção MatchSchedules em Group sem verificar que relação já existe via GroupId
+- **Breadcrumb**: Adicionar StateHasChanged sem entender ciclo de vida de componentes Blazor
+- **Indicador Auto**: Tentar carregar MatchSchedules via Include quando query separada seria mais eficiente
+
+### 8.3 Ações planejadas
+- **ANTES de qualquer mudança**: Investigar arquitetura existente (models, DbContext, CSS hierarchy)
+- **Verificar relações existentes**: Consultar AppDbContext antes de adicionar novas relações EF Core
+- **Entender CSS hierarchy**: Mapear ordem de carregamento e especificidade antes de mudar estilos
+- **Documentar decisões**: Registrar por que uma abordagem foi escolhida vs alternativas
+
+### 8.4 Benefício
+- Evitar migrations desnecessárias
+- Evitar conflitos CSS estruturais
+- Código mais consistente com arquitetura existente
+- Menos retrabalho
+
+---
+
+## Fase 7: Refatoração de Estrutura CSS 🔧
+
+**Objetivo**: Resolver conflitos sistêmicos de especificidade CSS que impedem customização por componente.
+**Status**: ⏳ Pendente
+**Prioridade**: **ALTA - BLOQUEANTE PARA MELHORIAS VISUAIS**
+
+### 7.1 Problemas identificados
+- **Conflito de especificidade**: Estilos globais em `site.css` (ex: `.order-status-badge.aguardandopagamento`) sobrescrevem estilos locais de componentes
+- **Herança indesejada**: Classes de tema (ex: `entity-shell.parchment-a`) aplicam estilos globais que afetam componentes que não deveriam herdar
+- **Impossibilidade de override**: Mesmo com ID-based selectors, estilos globais prevalecem devido à ordem de carregamento e especificidade
+- **Workarounds necessários**: Uso de `!important` e inline styles indica falha na arquitetura CSS
+
+### 7.2 Problemas visuais específicos (BLOQUEIO ATUAL)
+
+#### 7.2.1 Tela de Partidas (Index/Futsal/Poker)
+- **Problema**: Badges de status exibem cores indesejadas (gold/dourado) que não fazem sentido semântico
+- **Causa**: Estilo global `.order-status-badge.aguardandopagamento` em `site.css` linha 2556-2559 define `background: #f5a623`
+- **Impacto**: Usuário não consegue customizar cores de status por componente
+- **Tentativas falhas**: ID-based selectors, remoção de classes de tema, ajuste de especificidade
+
+#### 7.2.2 Tela de Histórico Financeiro (PaymentsHistory)
+- **Problema**: Bordas dos cards na aba de histórico permanecem vermelhas quando deveriam ser azuis
+- **Causa**: Estilo global `body .entity-shell-card` em `site.css` linha 5205-5210 define `border-top: 2px solid #1a5298` (azul) mas conflito com outros estilos globais
+- **Requisito**: Aba "Enviados" (histórico) com bordas azuis, aba "Recebidos" (pendências) com bordas vermelhas
+- **Tentativas falhas**: Classes específicas por aba, ID-based selectors, inline styles, remoção de `entity-shell` class
+- **Impacto**: Diferenciação visual entre histórico (pagamentos realizados) e pendências não funciona
+
+### 7.3 Ações planejadas
+- **CRÍTICO**: Migrar estilos globais específicos de componente para arquivos `.razor.css` locais
+- **CRÍTICO**: Remover ou limitar escopo de classes de tema que aplicam estilos globais
+- Estabelecer convenção de nomenclatura que evite conflitos (ex: prefixos por componente)
+- Implementar CSS Modules ou Scoped CSS onde aplicável
+- Documentar hierarquia de especificidade esperada
+- Considerar refatoração completa de `site.css` para separar estilos globais de estilos de componente
+
+### 7.4 Componentes afetados
+- **PaymentsHistory**: badges de status, bordas de cards/tabelas (BLOQUEIO ATIVO)
+- **Index/Futsal/Poker**: badges de status de partidas (BLOQUEIO ATIVO)
+- **Breadcrumb**: atualização ao navegar (BLOQUEIO ATIVO)
+- Outros componentes que herdam estilos de `entity-shell` e temas globais
+
+### 7.5 Benefício
+- Customização por componente sem conflitos
+- Manutenibilidade melhorada
+- Eliminação de workarquivos (`!important`, inline styles)
+- **Desbloqueio de melhorias visuais planejadas**
+
+### 7.6 Nota
+Esta fase é **PRÉ-REQUISITO** para qualquer melhoria visual futura. Sem resolver a estrutura CSS base, customizações visuais continuarão falhando independentemente da abordagem utilizada.
 
 ---
 

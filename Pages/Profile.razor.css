@@ -13,8 +13,8 @@
 .profile-card {
     border: 1px solid var(--ci-border, #1b3d6c);
     border-radius: 8px;
-    background: var(--ci-bg-card, #111927);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(79, 156, 248, 0.06);
+    background: #0a0f1a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.1);
     overflow: hidden;
 }
 
@@ -24,17 +24,22 @@
     padding: 0.9rem 1.1rem;
     display: grid;
     gap: 0.56rem;
+    background: #050810;
+    border-bottom: 1px solid var(--ci-border, #1b3d6c);
 }
 
 .profile-message-title {
     margin: 0;
     font-family: var(--ci-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-    font-size: 0.92rem;
-    color: var(--ci-text, #f1f5f9);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #e0f2fe;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid var(--ci-border, #1b3d6c);
-    padding-bottom: 0.4rem;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid;
+    border-image: linear-gradient(to right, #4f9cf8, #7dd3fc, #4f9cf8) 1;
+    padding-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
 }
 
 .profile-chat-thread {
@@ -43,4 +48,9 @@
     max-height: 220px;
     overflow-y: auto;
     padding-right: 0.1rem;
+    background: #0a0f18;
+    border: 1px solid var(--ci-border, #1b3d6c);
+    border-radius: 4px;
+    padding: 0.5rem;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }

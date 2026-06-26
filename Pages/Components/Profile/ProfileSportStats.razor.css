@@ -1,15 +1,28 @@
 .profile-sport-card {
     border: 1px solid var(--ci-border, #1b3d6c);
     border-radius: 8px;
-    background: var(--ci-bg-card, #111927);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(79, 156, 248, 0.06);
+    background: #0a0f1a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.1);
     overflow: hidden;
 }
 
 .profile-sport-tabs {
     display: flex;
-    border-bottom: 1px solid var(--ci-border, #1b3d6c);
-    background: var(--ci-bg-card-deep, #0d1825);
+    border-bottom: 2px solid;
+    border-image: linear-gradient(to right, #4f9cf8, #7dd3fc, #4f9cf8) 1;
+    background: linear-gradient(180deg, #1a3a5c 0%, #0f2845 50%, #0a1f35 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(147, 197, 253, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.profile-sport-tabs::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(125, 211, 252, 0.5), transparent);
 }
 
 .profile-sport-tab {
@@ -17,25 +30,29 @@
     border: none;
     background: transparent;
     padding: 0.62rem 1rem;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     font-weight: 800;
-    color: var(--ci-text-muted, #8aacc8);
+    color: #cbd5e1;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     cursor: pointer;
     border-bottom: 3px solid transparent;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .profile-sport-tab:hover:not(.active) {
-    background: rgba(79, 156, 248, 0.08);
-    color: var(--ci-text, #f1f5f9);
+    background: rgba(79, 156, 248, 0.15);
+    color: #e0f2fe;
+    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.2);
 }
 
 .profile-sport-tab.active {
-    color: var(--ci-accent, #4f9cf8);
-    border-bottom-color: var(--ci-accent, #4f9cf8);
-    background: rgba(79, 156, 248, 0.07);
+    color: #e0f2fe;
+    border-bottom-color: #7dd3fc;
+    background: rgba(79, 156, 248, 0.2);
+    text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
+    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.3);
 }
 
 .profile-sport-stats {
@@ -43,6 +60,7 @@
     flex-wrap: wrap;
     gap: 0;
     padding: 1rem 1.1rem;
+    background: #050810;
 }
 
 .profile-stat-item {
@@ -53,6 +71,10 @@
     text-align: center;
     padding: 0.56rem 0.72rem;
     border-right: 1px dashed var(--ci-border, #1b3d6c);
+    background: #0a0f18;
+    border-radius: 4px;
+    margin: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .profile-stat-item:last-child {
@@ -61,16 +83,18 @@
 
 .profile-stat-number {
     font-family: var(--ci-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 900;
-    color: var(--ci-accent, #4f9cf8);
+    color: #7dd3fc;
     line-height: 1;
+    text-shadow: 0 0 15px rgba(79, 156, 248, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .profile-stat-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 800;
-    color: var(--ci-text-subtle, #6082a0);
+    color: #cbd5e1;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }

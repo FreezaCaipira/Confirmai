@@ -42,8 +42,10 @@ else
 }
 
 @code {
+    public record RankingRow(string UserId, string UserName, int GamesPlayed, int Highlights, int Wins);
+
     [Parameter]
-    public List<dynamic>? RankingRows { get; set; }
+    public List<RankingRow>? RankingRows { get; set; }
 
     [Parameter]
     public string? CurrentUserId { get; set; }
