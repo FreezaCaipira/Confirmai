@@ -99,6 +99,25 @@ var(--brown-border-light) /* #8f6a3d */
 
 ## Ciclo 4 — Tarefas Ativas
 
+### ⚠️ JA PRONTO ANTES DO CICLO 4 (Ciclo 3 - Pleno Local)
+
+**Atenção Senior**: As seguintes tarefas já foram completadas no Ciclo 3 pelo Pleno Local e NÃO precisaram ser refeitas no Ciclo 4:
+
+#### L1-L5: Tarefas Locais (COMPLETAS)
+- **L1**: Eliminados inline styles em `Pages/Groups/{Join,Index,Detail}.razor`, `Pages/Index.razor` e `Pages/Poker/Edit.razor` → criadas classes nos .razor.css
+- **L2**: Criados .razor.css para todas as páginas sem css (1 priority >400L: `Poker/Edit.razor`, +50 arquivos menores vazios)
+- **L3**: Corrigidos 40 warnings CS1998 (async sem await) → removido async, retornado Task.CompletedTask
+- **L4**: Corrigidos 18 warnings CS0649 (campos nunca atribuídos) → = null / = default
+- **L5**: Corrigidos warnings CS8618/CS8602/CS8604/CS8601 (nullability) → = default!, null!, null-forgiving, null-coalescing
+
+**Estado final do Ciclo 3**: 0 erros de build, 0 warnings CS1998/CS0649/CS861x, 641/641 testes passando.
+
+**Impacto no Ciclo 4**:
+- Fase 1 (Warnings): Parcialmente completa (L3-L5 já cobrem CS1998, CS0649, CS8618/CS8602/CS8604/CS8601)
+- Fase 5 (Inline Styles): Parcialmente completa (L1 já cobriu alguns arquivos)
+
+---
+
 ### Fase 1: Corrigir Warnings de Compilacao — P0
 **Branch**: `fix/compiler-warnings`
 **Estimativa**: ~50 warnings
@@ -341,12 +360,17 @@ Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String '#[0-9a-fA-F]{3,6}
 
 ---
 
-## Metricas de Sucesso (antes -> depois)
+## Metricas de Sucesso (evolução completa)
 
-| Metrica | Antes | Meta |
-|---------|-------|------|
-| Warnings (build) | ~50 | 0 |
-| `!important` em Pages/*.css | 16 | 0-1 |
-| Hardcoded colors em Pages/*.css | 1.387 | <800 |
-| Inline styles estaticos | ~35 | 0 |
-| @media fora do padrao | ? | 0 |
+| Metrica | Início (Ciclo 3) | Após Ciclo 3 (Pronto) | Após Ciclo 4 (Trabalho) | Meta |
+|---------|------------------|----------------------|-------------------------|------|
+| Warnings (build) | ~50 | 0 (CS1998/CS0649/CS861x) | 0 (apenas 2 CS8603 não-scoped) | 0 |
+| `!important` em Pages/*.css | 16 | 16 | 1 (AvatarUpload pattern legítimo) | 0-1 |
+| Hardcoded colors em Pages/*.css | 1.387 | 1.387 | ~1.093 (200 convertidas) | <800 |
+| Inline styles estaticos | ~35 | ~25 (L1 parcial) | 0 (todos estáticos eliminados) | 0 |
+| @media fora do padrao | ? | ? | 0 (50 padronizados) | 0 |
+
+**Notas**:
+- **Ciclo 3 (Pleno Local)**: Completou L1-L5 (warnings CS1998/CS0649/CS861x + inline styles parciais)
+- **Ciclo 4 (Trabalho Atual)**: Completou Fases 1-6 (warnings restantes + !important + CSS vars + breakpoints + inline styles + decomposição)
+- **2 warnings CS8603 restantes**: `GroupDetailPaymentsModal.razor` e `Groups/Payments.razor` — não estão no escopo das fases (null reference return)

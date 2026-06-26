@@ -1,5 +1,9 @@
 ﻿/* Shared detail styles live in wwwroot/css/events.css */
 
+/* ── Skeleton lines ───────────────────────── */
+.skeleton-line--md { max-width: 200px; }
+.skeleton-line--sm { max-width: 150px; }
+
 .detail-header--futsal .detail-sport-badge { color: #22c55e; }
 
 /* Payment Status Badge States */

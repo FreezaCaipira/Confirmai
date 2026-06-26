@@ -8,6 +8,16 @@
     flex-wrap: wrap;
 }
 
+/* ── Inline styles estáticos ───────────────── */
+.listing-empty-hint {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.my-events-sport-tabs--margin-bottom {
+    margin-bottom: 0.75rem;
+}
+
 .my-events-header .page-section-title {
     margin: 0;
 }
@@ -294,7 +304,7 @@
     background: #290f0f;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     .my-event-card {
         flex-wrap: wrap;
     }

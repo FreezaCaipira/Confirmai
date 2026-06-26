@@ -242,7 +242,7 @@
     background: #290f0f;
 }
 
-@media (max-width: 540px) {
+@media (max-width: 640px) {
     .my-conf-card {
         flex-wrap: wrap;
     }

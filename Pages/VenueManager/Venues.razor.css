@@ -9,3 +9,23 @@
 .page-section-header .page-section-title {
     margin: 0;
 }
+
+.listing-empty-hint {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.admin-actions-row {
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.admin-delete-prompt {
+    font-size: 0.8rem;
+    color: #f1f5f9;
+    white-space: nowrap;
+}
+
+.validation-message {
+    margin-top: 0.75rem;
+}

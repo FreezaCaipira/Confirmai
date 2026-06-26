@@ -4,3 +4,6 @@
    - PixReceiverSelector.razor.css: feat-pix-* classes
 */
 
+/* ── Skeleton lines ───────────────────────── */
+.skeleton-line--md { max-width: 200px; }
+

@@ -238,12 +238,13 @@
 }
 
 /* ── Responsive ──────────────────────────── */
-@media (max-width: 560px) {
+@media (max-width: 640px) {
     .event-card { flex-wrap: wrap; gap: 0.75rem; }
     .event-action { width: 100%; text-align: center; }
     .event-time { min-width: auto; }
 }
 
+.event-card {
     display: flex;
     align-items: center;
     gap: 1.25rem;
@@ -356,7 +357,7 @@
 }
 
 /* ── Responsive ──────────────────────────── */
-@media (max-width: 560px) {
+@media (max-width: 640px) {
     .event-card {
         flex-wrap: wrap;
         gap: 0.75rem;

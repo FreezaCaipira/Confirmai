@@ -5,6 +5,11 @@
    .save-btn, .cancel-btn, .validation-* são definidas em
    Pages/Futsal/Create.razor.css e compartilhadas via bundle global. */
 
+/* ── Inline styles estáticos ───────────────── */
+.form-hint--margin-bottom { margin-bottom: 0.5rem; }
+.validation-message--margin-top { margin-top: 0.5rem; }
+.collision-link { margin-left: 0.45rem; color: #93c5fd; }
+
 /* ── Seletor de tipo ─────────────────────── */
 .poker-type-selector {
     display: flex;

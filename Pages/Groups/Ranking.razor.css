@@ -1,8 +1,12 @@
 /* ── Title ────────────────────────────────────────────────────── */
-.ranking-title {
-    color: #fbbf24 !important;
+.detail-title.ranking-title {
+    color: var(--gold);
     text-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3);
 }
+
+/* ── Skeleton lines ───────────────────────── */
+.skeleton-line--md { max-width: 200px; }
+.skeleton-line--sm { max-width: 150px; }
 
 /* ── Footnote ─────────────────────────────────────────────────── */
 .ranking-footnote {

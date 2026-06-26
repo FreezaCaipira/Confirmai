@@ -6,7 +6,7 @@
 .admin-logs-shell .log-level-info,
 .admin-logs-shell .log-source-badge.admin-orders-review,
 .admin-logs-shell .log-table th {
-    color: #5a3518;
+    color: var(--brown-text);
 }
 
 /* Inline history link inside message cell */
@@ -21,16 +21,16 @@
     border-radius: 4px;
     font-size: 0.78rem;
     vertical-align: middle;
-    background: #00acc1;
-    color: #fff;
+    background: var(--green);
+    color: var(--text-light);
     text-decoration: none;
     box-shadow: none;
     transition: background 0.2s ease;
 }
 
 .admin-logs-shell .logs-timeline-link:hover {
-    background: #00838f;
-    color: #fff;
+    background: var(--green-dark);
+    color: var(--text-light);
 }
 
 .admin-logs-shell .logs-main-filter-bar {
@@ -62,7 +62,7 @@
 
 .admin-logs-shell .logs-filter-group-label {
     background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
-    color: #ffe9be;
+    color: var(--parchment-light);
     padding: 0.3rem 0.7rem;
     border-radius: 4px;
     font-size: 0.76rem;
@@ -82,7 +82,7 @@
 .admin-logs-shell .logs-total-count {
     font-size: 0.92rem;
     margin: 0.3rem 0 0.5rem;
-    color: #5a3418;
+    color: var(--brown-text);
     text-shadow: none;
 }
 
@@ -93,7 +93,7 @@
 .admin-logs-shell .log-table-container {
     max-height: 600px;
     overflow-y: auto;
-    border: 1px solid #7f5c1c;
+    border: 1px solid var(--brown-border);
     border-radius: 4px;
     background: var(--parchment);
 }
@@ -102,7 +102,7 @@
     padding: 0.58rem 0.5rem;
     font-size: 0.88rem;
     white-space: nowrap;
-    color: #efc17c;
+    color: var(--gold-soft);
 }
 
 .admin-logs-shell .log-table td {
@@ -120,9 +120,9 @@
 }
 
 .admin-logs-shell .pagination button {
-    background: linear-gradient(180deg, #d4a43a 0%, #a87c28 100%);
-    border: 1px solid #7f5c1c;
-    color: #2e1702;
+    background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold-dark) 100%);
+    border: 1px solid var(--brown-border);
+    color: var(--brown-deep);
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 700;
     border-radius: 4px;
@@ -141,47 +141,47 @@
 }
 
 .admin-logs-shell .pagination .pagination-info {
-    color: #4d2f16;
+    color: var(--brown-text-dark);
     font-weight: 800;
     font-size: 0.9rem;
 }
 
 .admin-logs-shell .orders-review-restored-notice {
     margin-bottom: 0.55rem;
-    border-left: 3px solid #b56a1f;
+    border-left: 3px solid var(--rust);
     background: var(--parchment-light);
-    color: #5a3418;
+    color: var(--brown-text);
 }
 
 .admin-logs-shell .orders-review-sort-summary {
     margin-bottom: 0.3rem;
-    color: #5a3418;
+    color: var(--brown-text);
     text-shadow: none;
 }
 
 .admin-logs-shell .orders-review-restored-close {
-    color: #8f4f17;
+    color: var(--rust);
 }
 
 .admin-logs-shell .orders-review-restored-close:hover {
-    color: #6f3c10;
+    color: var(--rust-dark);
 }
 
 .admin-logs-shell .log-source-badge.admin-orders-review {
-    background: #d9c096;
-    border-color: #9a7442;
+    background: var(--parchment-light);
+    border-color: var(--brown-border);
 }
 
 .admin-logs-shell .evidence-link {
-    color: #5a3518;
+    color: var(--brown-text);
 }
 
 .admin-logs-shell .evidence-link:hover {
-    color: #3f240f;
+    color: var(--brown-deep);
 }
 
 .admin-logs-shell .logs-empty-state {
-    color: #5a3418;
+    color: var(--brown-text);
     font-weight: 700;
     margin: 0.2rem 0 0.9rem;
 }
@@ -195,21 +195,21 @@
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
-    color: #efc17c;
+    color: var(--gold-soft);
 }
 
 .admin-logs-shell .table-sort-btn:hover,
 .admin-logs-shell .table-sort-btn.active {
-    color: #ffd89a;
+    color: var(--gold);
 }
 
 .admin-logs-shell .logs-main-filter-bar .logs-export-btn,
 .admin-logs-shell .logs-main-filter-bar button,
 .admin-logs-shell .logs-chip-group button,
 .admin-logs-shell .filter-bar button.quick-range-btn {
-    background: linear-gradient(180deg, #d4a43a 0%, #a87c28 100%);
-    color: #2e1702;
-    border: 1px solid #7f5c1c;
+    background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold-dark) 100%);
+    color: var(--brown-deep);
+    border: 1px solid var(--brown-border);
     border-radius: 4px;
     box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.25), 0 2px 6px rgba(32, 18, 8, 0.18);
     text-shadow: none;
@@ -227,7 +227,7 @@
 .admin-logs-shell .logs-quick-range-bar .quick-range-btn.active,
 .admin-logs-shell .logs-audit-filter-bar .quick-range-btn.active {
     background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
-    color: #ffe9be;
+    color: var(--parchment-light);
     border: 1px solid var(--rust);
     box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.12), 0 1px 3px rgba(34, 16, 6, 0.25);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -248,21 +248,21 @@
 }
 
 .admin-logs-shell .log-level-badge.log-level-info {
-    background: linear-gradient(180deg, #7ea9d6 0%, #5f89b4 100%);
-    color: #f4f9ff;
-    border-color: #4f7ca9;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent) 100%);
+    color: var(--ci-accent-mid);
+    border-color: var(--ci-accent);
 }
 
 .admin-logs-shell .log-level-badge.log-level-warning {
-    background: linear-gradient(180deg, #e0bb6a 0%, #c79b43 100%);
-    color: #3b240b;
-    border-color: #ad8235;
+    background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold-deep) 100%);
+    color: var(--brown-deep);
+    border-color: var(--gold-dark);
 }
 
 .admin-logs-shell .log-level-badge.log-level-error {
-    background: linear-gradient(180deg, #c76758 0%, #a34a3d 100%);
-    color: #fff1ee;
-    border-color: #8a3f34;
+    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
+    color: var(--parchment-soft);
+    border-color: var(--rust-dark);
 }
 
 /* Filter sizing */
@@ -300,13 +300,13 @@
 }
 
 /* Responsive */
-@media (max-width: 1100px) {
+@media (max-width: 1024px) {
     .admin-logs-shell .logs-main-filter-bar {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 768px) {
     .admin-logs-shell .logs-main-filter-bar {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -322,7 +322,7 @@
     }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
     .admin-logs-shell .logs-main-filter-bar {
         grid-template-columns: 1fr;
     }
@@ -352,7 +352,7 @@
 .log-level-info,
 .log-source-badge.admin-orders-review,
 .log-table th {
-    color: #5a3518;
+    color: var(--brown-text);
 }
 
 
@@ -384,8 +384,8 @@
 }
 
 .logs-filter-group-label {
-    background: linear-gradient(180deg, #5d4024 0%, #4a321c 100%);
-    color: #ffe9be;
+    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
+    color: var(--parchment-light);
     padding: 0.3rem 0.7rem;
     border-radius: 4px;
     font-size: 0.76rem;
@@ -405,7 +405,7 @@
 .logs-total-count {
     font-size: 0.92rem;
     margin: 0.3rem 0 0.5rem;
-    color: #5a3418;
+    color: var(--brown-text);
 }
 
 .log-table {
@@ -433,9 +433,9 @@
 }
 
 .pagination button {
-    background: linear-gradient(180deg, #d4a43a 0%, #a87c28 100%);
-    border: 1px solid #7f5c1c;
-    color: #2e1702;
+    background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold-dark) 100%);
+    border: 1px solid var(--brown-border);
+    color: var(--brown-deep);
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 700;
     border-radius: 4px;
@@ -454,7 +454,7 @@
 }
 
 .pagination .pagination-info {
-    color: #4d2f16;
+    color: var(--brown-text-dark);
     font-weight: 800;
     font-size: 0.9rem;
 }
@@ -468,13 +468,13 @@
 }
 
 
-@media (max-width: 1100px) {
+@media (max-width: 1024px) {
     .logs-main-filter-bar {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 768px) {
     .logs-main-filter-bar {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -490,7 +490,7 @@
     }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
     .logs-main-filter-bar {
         grid-template-columns: 1fr;
     }
@@ -515,19 +515,19 @@
 
 .logs-total-count,
 .orders-review-sort-summary {
-    color: #5a3418;
+    color: var(--brown-text);
     text-shadow: none;
 }
 
 .logs-empty-state {
-    color: #5a3418;
+    color: var(--brown-text);
     font-weight: 700;
     margin: 0.2rem 0 0.9rem;
 }
 
 .log-table th,
 .table-sort-btn {
-    color: #efc17c;
+    color: var(--gold-soft);
 }
 
 .table-sort-btn {
@@ -543,16 +543,16 @@
 
 .table-sort-btn:hover,
 .table-sort-btn.active {
-    color: #ffd89a;
+    color: var(--gold);
 }
 
 .logs-main-filter-bar .logs-export-btn,
 .logs-main-filter-bar button,
 .logs-chip-group button,
 .filter-bar button.quick-range-btn {
-    background: linear-gradient(180deg, #d4a43a 0%, #a87c28 100%);
-    color: #2e1702;
-    border: 1px solid #7f5c1c;
+    background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold-dark) 100%);
+    color: var(--brown-deep);
+    border: 1px solid var(--brown-border);
     border-radius: 4px;
     box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.25), 0 2px 6px rgba(32, 18, 8, 0.18);
     text-shadow: none;
@@ -570,24 +570,24 @@
 .logs-quick-range-bar .quick-range-btn.active,
 .logs-audit-filter-bar .quick-range-btn.active {
     background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
-    color: #ffe9be;
+    color: var(--parchment-light);
     border: 1px solid var(--rust);
     box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.12), 0 1px 3px rgba(34, 16, 6, 0.25);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .orders-review-restored-notice {
-    border-left: 3px solid #b56a1f;
+    border-left: 3px solid var(--rust);
     background: var(--parchment-light);
-    color: #5a3418;
+    color: var(--brown-text);
 }
 
 .orders-review-restored-close {
-    color: #8f4f17;
+    color: var(--rust);
 }
 
 .orders-review-restored-close:hover {
-    color: #6f3c10;
+    color: var(--rust-dark);
 }
 
 .log-level-badge {
@@ -605,21 +605,21 @@
 }
 
 .log-level-badge.log-level-info {
-    background: linear-gradient(180deg, #7ea9d6 0%, #5f89b4 100%);
-    color: #f4f9ff;
-    border-color: #4f7ca9;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent) 100%);
+    color: var(--ci-accent-mid);
+    border-color: var(--ci-accent);
 }
 
 .log-level-badge.log-level-warning {
-    background: linear-gradient(180deg, #e0bb6a 0%, #c79b43 100%);
-    color: #3b240b;
-    border-color: #ad8235;
+    background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold-deep) 100%);
+    color: var(--brown-deep);
+    border-color: var(--gold-dark);
 }
 
 .log-level-badge.log-level-error {
-    background: linear-gradient(180deg, #c76758 0%, #a34a3d 100%);
-    color: #fff1ee;
-    border-color: #8a3f34;
+    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
+    color: var(--parchment-soft);
+    border-color: var(--rust-dark);
 }
 
 
