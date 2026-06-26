@@ -356,7 +356,12 @@ Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String '#[0-9a-fA-F]{3,6}
 <!-- Liste aqui seletores que nao conseguiu override sem !important -->
 
 ### Outras observacoes
-<!-- Qualquer coisa que o Senior deve saber -->
+
+**Teste já falhando antes do Ciclo 4**:
+- `AdminLogsQueryStringIntegrationTests.AdminLogsPage_QueryStringFilters_AreAppliedOnInitialRender` - Já falhava no commit anterior (56f450c)
+- HTML retornado não contém a mensagem esperada (apenas `<!DOCTYPE html>`)
+- Não relacionado com mudanças de CSS do Ciclo 4
+- Precisa de investigação separada pelo Senior
 
 ---
 
