@@ -313,7 +313,7 @@
     font-size: 1rem;
     font-weight: 800;
     color: var(--red-soft);
-    text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+    text-shadow: 0 0 10px var(--red-light-lg);
 }
 
 .payments-detail-list {

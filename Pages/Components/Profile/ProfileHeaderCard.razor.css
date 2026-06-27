@@ -25,7 +25,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(to right, transparent, rgba(125, 211, 252, 0.5), transparent);
+    background: linear-gradient(to right, transparent, var(--sky-blue-md), transparent);
 }
 
 .profile-avatar-img {

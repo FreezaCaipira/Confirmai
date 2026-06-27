@@ -72,7 +72,7 @@
 }
 
 .pending-request-item--urgent {
-    background: rgba(248, 113, 113, 0.08);
+    background: var(--red-light-sm);
     border-left: 3px solid var(--red-soft);
 }
 

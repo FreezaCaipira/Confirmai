@@ -116,7 +116,7 @@
 }
 
 .payment-tab-count {
-    background: rgba(248, 113, 113, 0.2);
+    background: var(--red-light-md);
     color: var(--red-text-light);
     font-size: 0.75rem;
     padding: 0.15rem 0.4rem;

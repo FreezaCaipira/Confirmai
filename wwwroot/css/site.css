@@ -246,6 +246,17 @@
     --purple-md:           rgba(124, 58, 237, 0.12);
     --purple-lg:           rgba(124, 58, 237, 0.18);
     --purple-xl:           rgba(124, 58, 237, 0.3);
+    
+    /* Sky blue opacity */
+    --sky-blue-md:         rgba(125, 211, 252, 0.5);
+    
+    /* Red-light opacity */
+    --red-light-sm:        rgba(248, 113, 113, 0.08);
+    --red-light-md:        rgba(248, 113, 113, 0.2);
+    --red-light-lg:        rgba(248, 113, 113, 0.5);
+    
+    /* Red-dark opacity */
+    --red-dark-md:         rgba(183, 28, 28, 0.3);
 }
 
 /* ================================================================

@@ -29,7 +29,7 @@
 .metric-card--alert {
     background: var(--red-bg-dark);
     border-color: var(--red-border);
-    box-shadow: 0 4px 8px rgba(183, 28, 28, 0.3);
+    box-shadow: 0 4px 8px var(--red-dark-md);
 }
 
 .metric-card--alert:hover {
