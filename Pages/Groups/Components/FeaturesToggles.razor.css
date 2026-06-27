@@ -69,7 +69,7 @@
 .feat-gateway-note {
     margin: 0.45rem 0 0;
     font-size: 0.78rem;
-    color: var(--ci-text-info, #8fc2f3);
+    color: var(--ci-text-info);
 }
 
 /* ── Toggle switch ─────────────────────────────────────────────── */

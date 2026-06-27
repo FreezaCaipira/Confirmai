@@ -31,7 +31,7 @@
 }
 
 .my-conf-tab {
-    border: 1px solid var(--ci-border, #1b3868);
+    border: 1px solid var(--ci-border);
     background: var(--ci-bg-card, var(--ci-bg-card-deep));
     color: var(--ci-text-muted, var(--ci-text-subtle));
     min-height: 2rem;
@@ -57,7 +57,7 @@
 
 .my-conf-tab:hover:not(.active) {
     background: rgba(79, 156, 248, 0.06);
-    color: var(--ci-text, #c9daea);
+    color: var(--ci-text);
 }
 
 /* ── Section heading ─────────────────────────────────────────── */

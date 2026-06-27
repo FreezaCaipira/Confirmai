@@ -1,5 +1,5 @@
 .profile-card {
-    border: 1px solid var(--ci-border, #1b3d6c);
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
     background: #0a0f1a;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.1);

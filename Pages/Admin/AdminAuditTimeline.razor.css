@@ -3,16 +3,16 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    background: var(--bg-night-cool, #1e2635);
-    border: 1px solid var(--border-slate, #3a4255);
+    background: var(--bg-night-cool);
+    border: 1px solid var(--border-slate);
     border-radius: 6px;
     margin-bottom: 1rem;
     font-size: 0.875rem;
-    color: var(--link-blue, #7eb3e8);
+    color: var(--link-blue);
 }
 
 .admin-audit-timeline-shell .timeline-entity-sep {
-    color: var(--border-slate, #3a4255);
+    color: var(--border-slate);
 }
 
 .admin-audit-timeline-shell .timeline-actions {
@@ -24,7 +24,7 @@
 .admin-audit-timeline-shell .timeline-ts {
     white-space: nowrap;
     font-size: 0.8rem;
-    color: var(--text-muted, #9aa0ab);
+    color: var(--text-muted);
 }
 
 .admin-audit-timeline-shell .timeline-event-type {
@@ -34,7 +34,7 @@
     border: 1px solid rgba(126, 179, 232, 0.2);
     border-radius: 4px;
     padding: 1px 5px;
-    color: var(--link-blue, #7eb3e8);
+    color: var(--link-blue);
     white-space: nowrap;
 }
 
@@ -45,7 +45,7 @@
 .admin-audit-timeline-shell .timeline-metadata-toggle {
     cursor: pointer;
     font-size: 0.75rem;
-    color: var(--link-blue, #7eb3e8);
+    color: var(--link-blue);
     user-select: none;
 }
 
@@ -54,8 +54,8 @@
     font-size: 0.72rem;
     white-space: pre-wrap;
     word-break: break-all;
-    background: var(--bg-night, #171c27);
-    border: 1px solid var(--border-slate, #3a4255);
+    background: var(--bg-night);
+    border: 1px solid var(--border-slate);
     border-radius: 4px;
     padding: 0.4rem 0.5rem;
     max-height: 200px;
@@ -70,13 +70,13 @@
 }
 
 .admin-audit-timeline-shell .timeline-table th {
-    background: var(--bg-night-cool, #1e2635);
-    color: var(--link-blue, #7eb3e8);
+    background: var(--bg-night-cool);
+    color: var(--link-blue);
     font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     padding: 0.45rem 0.6rem;
-    border-bottom: 1px solid var(--border-slate, #3a4255);
+    border-bottom: 1px solid var(--border-slate);
     text-align: left;
 }
 
@@ -99,7 +99,7 @@
 
     .admin-audit-timeline-shell .timeline-table tr {
         display: block;
-        border-bottom: 2px solid var(--border-slate, #3a4255);
+        border-bottom: 2px solid var(--border-slate);
         margin-bottom: 0.5rem;
     }
 
@@ -115,7 +115,7 @@
     .admin-audit-timeline-shell .timeline-table td::before {
         content: attr(data-label);
         font-weight: 600;
-        color: var(--link-blue, #7eb3e8);
+        color: var(--link-blue);
         min-width: 90px;
         font-size: 0.75rem;
     }

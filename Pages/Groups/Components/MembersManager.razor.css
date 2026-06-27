@@ -130,7 +130,7 @@
 .feat-role-note {
     margin: -0.35rem 0 0.9rem;
     font-size: 0.82rem;
-    color: var(--ci-text-info, #8fc2f3);
+    color: var(--ci-text-info);
     display: flex;
     align-items: center;
     gap: 0.4rem;

@@ -106,11 +106,11 @@
     align-items: center;
     gap: 0.5rem;
     padding: 2rem 1rem;
-    color: var(--ci-text-info, #8fc2f3);
+    color: var(--ci-text-info);
     font-size: 0.9rem;
 }
 
 .ranking-empty i {
     font-size: 2rem;
-    color: var(--ci-text-info-strong, #b7dbff);
+    color: var(--ci-text-info-strong);
 }
