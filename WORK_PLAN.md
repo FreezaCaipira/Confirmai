@@ -1,7 +1,7 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/07/2026 | Base: `main` + `refactor/css-vars-consistency` | Ciclo 5
-> 1.674/1.674 testes passando | 0 erros de build | 2 warnings projeto (CS8603)
+> Atualizado em 27/06/2026 | Base: `main` + `refactor/css-vars-consistency` | Ciclo 5 (CONCLUÍDO)
+> 1.674/1.674 testes passando | 0 erros de build | 0 warnings projeto (CS8603 corrigidos)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -37,6 +37,22 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
   3. ~400 hardcoded restantes TEM var equivalente direto (ex: #1b3d6c=--ci-border, #4f9cf8=--ci-accent)
   4. ~200 hardcoded NAO tem var no design system (precisam novas vars: #4ade80, #e0f2fe, #cbd5e1, #f87171, etc.)
   5. Teste `AdminLogsQueryStringIntegrationTests` continua falhando (pre-existente, nao do Ciclo 4)
+
+### Ciclo 5 (Pleno Local): Refatoracao CSS - Hardcoded Colors + Inline Styles
+- Branches: `refactor/ciclo5-fase1-new-vars`, `refactor/ciclo5-fase2-css-vars-ci`, `refactor/ciclo5-fase3-css-vars-warm`, `refactor/ciclo5-fase4-payments-history`, `refactor/ciclo5-fase5-inline-cleanup`, `refactor/ciclo5-fase6-cs8603`
+- **Resultados**:
+  - Fase 1: Adicionadas 11 novas vars CSS ao `:root` (warm/parchment theme)
+  - Fase 2: Convertidas cores hardcoded em 8 arquivos CI theme (Payments.razor.css, PaymentsHistory.razor.css, MyEvents/Index.razor.css, ViewPayment.razor.css, AdminPayments.razor.css, EventPayment.razor.css, MyConfirmations/Index.razor.css, Futsal/Index.razor.css)
+  - Fase 3: Convertidas cores hardcoded em 7 arquivos Warm + Mixed theme (Integration.razor.css, Poker/Index.razor.css, Poker/Detail.razor.css, AdminLanguages.razor.css, ProductForm.razor.css, Groups/Detail.razor.css, Futsal/Detail.razor.css)
+  - Fase 4: Refatorados 8 inline styles condicionais em PaymentsHistory.razor para classes CSS
+  - Fase 5: Eliminados 6 inline styles estáticos restantes (AdminVenueEdit.razor, AdminUserView.razor, AdminVenues.razor, EventPaymentProof.razor, AdminPaymentsSummaryPanel.razor.css)
+  - Fase 6: Corrigidos 2 warnings CS8603 usando Task.CompletedTask (GroupDetailPaymentsModal.razor, Payments.razor)
+- **Métricas finais**:
+  - Warnings: 2 → 0 (CS8603 corrigidos)
+  - Inline styles estaticos: 6 → 0
+  - Inline styles dinamicos: ~14 → ~8 (PaymentsHistory.razor refatorado)
+  - Hardcoded colors convertidas: ~300+ (estimado)
+- **PRs criadas**: 6 PRs (1 por fase)
 
 ---
 
