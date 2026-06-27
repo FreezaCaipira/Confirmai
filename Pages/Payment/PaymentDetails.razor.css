@@ -21,7 +21,7 @@
 
 .payment-receipt-subtitle {
     margin: 0.35rem 0 0;
-    color: #b7c4cf;
+    color: var(--ci-text-blue);
     font-size: 0.97rem;
 }
 
@@ -34,15 +34,15 @@
 }
 
 .payment-receipt-status.paid {
-    background: #2e7d3233;
-    color: #9ff0b3;
-    border: 1px solid #2e7d3299;
+    background: rgba(46, 125, 50, 0.2);
+    color: var(--green-bright);
+    border: 1px solid rgba(46, 125, 50, 0.6);
 }
 
 .payment-receipt-status.pending {
-    background: #ff980033;
-    color: #ffd699;
-    border: 1px solid #ff980099;
+    background: rgba(255, 152, 0, 0.2);
+    color: var(--amber-warm);
+    border: 1px solid rgba(255, 152, 0, 0.6);
 }
 
 .payment-receipt-grid {
@@ -56,7 +56,7 @@
     border: 1px solid var(--border-slate);
     padding: 1.2rem;
     border-radius: 12px;
-    box-shadow: 0 2px 12px #0004;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
     min-width: 0;
 }
 
@@ -130,8 +130,8 @@
 }
 
 .payment-link-btn {
-    background: #2980b9;
-    color: #fff;
+    background: var(--ci-accent);
+    color: var(--white);
     border: none;
     border-radius: 8px;
     padding: 0.6rem 1rem;
@@ -145,8 +145,8 @@
 }
 
 .payment-link-btn:hover {
-    background: #1f5f8a;
-    color: #fff;
+    background: var(--ci-accent-mid);
+    color: var(--white);
 }
 
 .payment-link-text {
@@ -183,8 +183,8 @@
 
 .payment-reference-actions .payment-btn,
 .payment-reference-actions .payment-btn:visited {
-    background: #43a047;
-    color: #fff;
+    background: var(--green-bright);
+    color: var(--white);
     border: none;
     border-radius: 8px;
     padding: 0.6rem 1rem;
@@ -199,8 +199,8 @@
 }
 
 .payment-reference-actions .payment-btn:hover {
-    background: #388e3c;
-    color: #fff;
+    background: var(--green-strong);
+    color: var(--white);
 }
 
 /* Extracted from site.css: page-specific rules */
