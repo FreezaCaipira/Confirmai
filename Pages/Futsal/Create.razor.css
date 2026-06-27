@@ -1,9 +1,9 @@
 ﻿/* Shared form/detail styles live in wwwroot/css/events.css */
 
-.create-event-title i { color: #4ade80; text-shadow: 0 0 15px rgba(74, 222, 128, 0.6); }
+.create-event-title i { color: var(--green-bright); text-shadow: 0 0 15px rgba(74, 222, 128, 0.6); }
 
 /* ── Inline styles estáticos ───────────────── */
-.collision-link { margin-left: 0.45rem; color: #93c5fd; }
+.collision-link { margin-left: 0.45rem; color: var(--link-info); }
 
 /* ── Input focus override (neutralize browser defaults) ─────────── */
 .create-event-form input:focus,
@@ -20,9 +20,9 @@
     align-items: center;
     gap: 0.45rem;
     font-size: 0.82rem;
-    color: #4f9cf8;
-    background: #0a0f18;
-    border: 1px solid #1c3048;
+    color: var(--ci-accent);
+    background: var(--ci-bg-deepest);
+    border: 1px solid var(--ci-border-alt);
     border-radius: 7px;
     padding: 0.45rem 0.75rem;
     margin-top: -0.25rem;
@@ -44,9 +44,9 @@
     gap: 0.3rem;
     padding: 0.35rem 0.85rem;
     border-radius: 20px;
-    background: #0a0f18;
-    border: 1px solid #1b3d6c;
-    color: #cbd5e1;
+    background: var(--ci-bg-deepest);
+    border: 1px solid var(--ci-border);
+    color: var(--ci-surface-muted);
     font-size: 0.82rem;
     font-weight: 800;
     cursor: pointer;
@@ -58,9 +58,9 @@
 .weekday-chip input[type=checkbox] { display: none; }
 
 .weekday-chip--on {
-    background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
-    border-color: #86efac;
-    color: #f0fdf4;
+    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
+    border-color: var(--futsal-green-pale);
+    color: var(--green-soft);
     box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
 }
 
@@ -71,7 +71,7 @@
     gap: 0.6rem;
     font-size: 0.88rem;
     font-weight: 800;
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
     cursor: pointer;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
