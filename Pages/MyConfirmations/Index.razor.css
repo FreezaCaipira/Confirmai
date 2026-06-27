@@ -10,7 +10,7 @@
     text-decoration: none;
     background: var(--futsal-green-dark);
     color: var(--futsal-green-pale);
-    border: 1.5px solid #166534;
+    border: 1.5px solid var(--green-strong);
     transition: filter 0.15s;
 }
 
@@ -126,7 +126,7 @@
 }
 
 .my-conf-sport--futsal { background: var(--futsal-bg-dark); border: 1px solid var(--futsal-green-dark); }
-.my-conf-sport--poker  { background: #1a0a2e; border: 1px solid var(--poker-bg-deepest); }
+.my-conf-sport--poker  { background: var(--poker-bg-deepest); border: 1px solid var(--poker-bg-deepest); }
 
 /* ── Body ────────────────────────────────────────────────────── */
 .my-conf-body {
