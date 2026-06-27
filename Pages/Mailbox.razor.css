@@ -195,7 +195,7 @@
 .mailbox-folder-tab:hover:not(.active) {
     background: var(--ci-bg-card);
     color: var(--ci-text);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--shadow-lg);
 }
 
 .mailbox-list.mailbox-list-compact {
@@ -281,7 +281,7 @@
 
 .mailbox-list-item:not(.active):hover {
     background: var(--ci-bg-card);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--shadow-lg);
 }
 
 .mailbox-list-item-head {
@@ -464,7 +464,7 @@
     background: var(--ci-bg);
     display: grid;
     gap: 0.2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--shadow-lg);
 }
 
 .mailbox-thread-bubble.incoming {

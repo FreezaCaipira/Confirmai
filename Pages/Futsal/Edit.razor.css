@@ -37,7 +37,7 @@
 .edit-cancel-no-btn:hover:not(:disabled) {
     background: var(--ci-bg-alt);
     border-color: var(--slate-muted);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--shadow-lg);
 }
 /* ── Input focus override (neutralize browser defaults) ─────────── */
 .edit-event-form input:focus,

@@ -81,7 +81,7 @@
     background: var(--ci-bg-deepest);
     display: grid;
     gap: 0.2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--shadow-lg);
 }
 
 .mailbox-thread-bubble.incoming {

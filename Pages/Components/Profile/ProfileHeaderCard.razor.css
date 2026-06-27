@@ -76,5 +76,5 @@
     color: var(--ci-surface-muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px var(--text-shadow-sm);
 }
