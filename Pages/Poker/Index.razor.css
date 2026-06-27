@@ -72,13 +72,13 @@
     transition: background 0.13s;
 }
 
-.create-poker-menu-item:hover { background: #1b3d6c; }
+.create-poker-menu-item:hover { background: var(--ci-border); }
 
 .create-poker-menu-item i {
     font-size: 1.1rem;
     width: 1.5rem;
     text-align: center;
-    color: #a78bfa;
+    color: var(--poker-accent);
     flex-shrink: 0;
 }
 
@@ -91,7 +91,7 @@
 .create-poker-menu-item small {
     display: block;
     font-size: 0.75rem;
-    color: #6082a0;
+    color: var(--ci-text-subtle);
 }
 
 /* ── Event card base ─────────────────────── */
@@ -111,11 +111,11 @@
 
 .event-card--poker {
     border-color: #3b0764;
-    border-left: 3px solid #7c3aed;
+    border-left: 3px solid var(--poker-accent-deep);
 }
 .event-card--poker:hover {
-    border-color: #7c3aed;
-    border-left-color: #a78bfa;
+    border-color: var(--poker-accent-deep);
+    border-left-color: var(--poker-accent);
     box-shadow: 0 6px 20px rgba(124, 58, 237, 0.18);
 }
 
@@ -123,7 +123,7 @@
 .event-time {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #a78bfa;
+    color: var(--poker-accent);
     letter-spacing: -0.02em;
     min-width: 3.5rem;
     text-align: center;
@@ -146,7 +146,7 @@
     font-size: 1rem;
     font-weight: 700;
     margin: 0;
-    color: #f1f5f9;
+    color: var(--ci-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -162,7 +162,7 @@
 }
 
 .event-location--locked {
-    color: #6082a0;
+    color: var(--ci-text-subtle);
     font-style: italic;
 }
 
@@ -185,9 +185,9 @@
     flex-shrink: 0;
 }
 
-.poker-type-badge--tourney { background: #1e1034; color: #a78bfa; border: 1px solid #4c1d95; }
-.poker-type-badge--cash    { background: #14290f; color: #4ade80; border: 1px solid #14532d; }
-.poker-type-badge--home    { background: #1a1209; color: #fbbf24; border: 1px solid #78350f; }
+.poker-type-badge--tourney { background: #1e1034; color: var(--poker-accent); border: 1px solid #4c1d95; }
+.poker-type-badge--cash    { background: #14290f; color: var(--green-bright); border: 1px solid #14532d; }
+.poker-type-badge--home    { background: #1a1209; color: var(--amber); border: 1px solid #78350f; }
 
 /* ── Meta chips ──────────────────────────── */
 .meta-chip {
@@ -195,17 +195,17 @@
     align-items: center;
     gap: 0.3rem;
     font-size: 0.76rem;
-    color: #8aacc8;
-    background: #0d1825;
-    border: 1px solid #1b3d6c;
+    color: var(--ci-text-muted);
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
     border-radius: 20px;
     padding: 0.18rem 0.6rem;
 }
 
-.meta-chip--players { border-color: #2d1a4a; color: #c4b5fd; }
-.meta-chip--gtd     { border-color: #14532d; color: #4ade80; font-weight: 700; }
-.meta-chip--latereg { border-color: #78350f; color: #fbbf24; }
-.meta-chip--confirmed { background: rgba(22, 163, 74, 0.12); border-color: rgba(74, 222, 128, 0.35); color: #4ade80; font-weight: 700; }
+.meta-chip--players { border-color: #2d1a4a; color: var(--poker-text); }
+.meta-chip--gtd     { border-color: #14532d; color: var(--green-bright); font-weight: 700; }
+.meta-chip--latereg { border-color: #78350f; color: var(--amber); }
+.meta-chip--confirmed { background: rgba(22, 163, 74, 0.12); border-color: rgba(74, 222, 128, 0.35); color: var(--green-bright); font-weight: 700; }
 
 .event-card--confirmed {
     box-shadow: 0 2px 10px rgba(22, 163, 74, 0.15), 0 0 0 1px rgba(74, 222, 128, 0.08);
@@ -213,7 +213,7 @@
 
 .event-bonus {
     font-size: 0.8rem;
-    color: #6082a0;
+    color: var(--ci-text-subtle);
     margin: 0.4rem 0 0;
     font-style: italic;
 }
@@ -223,7 +223,7 @@
     flex-shrink: 0;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #a78bfa;
+    color: var(--poker-accent);
     text-decoration: none;
     white-space: nowrap;
     padding: 0.4rem 0.9rem;
@@ -234,7 +234,7 @@
 
 .event-action:hover {
     background: rgba(167, 139, 250, 0.08);
-    border-color: #a78bfa;
+    border-color: var(--poker-accent);
 }
 
 /* ── Responsive ──────────────────────────── */
@@ -262,7 +262,7 @@
 }
 
 .event-card--poker:hover {
-    border-color: #7c3aed;
+    border-color: var(--poker-accent-deep);
     box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
 }
 
@@ -270,7 +270,7 @@
 .event-time {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #a78bfa;
+    color: var(--poker-accent);
     letter-spacing: -0.02em;
     min-width: 3.5rem;
     text-align: center;
@@ -288,7 +288,7 @@
     font-size: 1rem;
     font-weight: 700;
     margin: 0 0 0.2rem;
-    color: #f1f5f9;
+    color: var(--ci-text);
     font-family: inherit;
     text-shadow: none;
     text-transform: none;
@@ -318,21 +318,21 @@
     align-items: center;
     gap: 0.3rem;
     font-size: 0.76rem;
-    color: #8aacc8;
-    background: #0d1825;
-    border: 1px solid #1b3d6c;
+    color: var(--ci-text-muted);
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
     border-radius: 20px;
     padding: 0.18rem 0.6rem;
 }
 
 .meta-chip--players {
     border-color: #2d1a4a;
-    color: #c4b5fd;
+    color: var(--poker-text);
 }
 
 .event-bonus {
     font-size: 0.8rem;
-    color: #6082a0;
+    color: var(--ci-text-subtle);
     margin: 0.4rem 0 0;
     font-style: italic;
 }
@@ -342,7 +342,7 @@
     flex-shrink: 0;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #a78bfa;
+    color: var(--poker-accent);
     text-decoration: none;
     white-space: nowrap;
     padding: 0.4rem 0.9rem;
@@ -353,7 +353,7 @@
 
 .event-action:hover {
     background: rgba(167, 139, 250, 0.08);
-    border-color: #a78bfa;
+    border-color: var(--poker-accent);
 }
 
 /* ── Responsive ──────────────────────────── */

@@ -5,7 +5,7 @@
 .skeleton-line--sm { max-width: 150px; }
 
 /* ── Header poker ────────────────────────── */
-.detail-header--poker .detail-sport-badge { color: #a78bfa; }
+.detail-header--poker .detail-sport-badge { color: var(--poker-accent); }
 
 .detail-poker-badge-row {
     display: flex;
@@ -14,7 +14,7 @@
     margin-bottom: 0.15rem;
 }
 
-.detail-header--poker .detail-sport-badge--poker { color: #a78bfa; }
+.detail-header--poker .detail-sport-badge--poker { color: var(--poker-accent); }
 
 /* ── Tipo badge (no header) ──────────────── */
 .poker-type-badge--detail {
@@ -25,14 +25,14 @@
     font-weight: 700;
 }
 
-.poker-type-badge--tourney { background: #1e1034; color: #a78bfa; border: 1px solid #4c1d95; }
-.poker-type-badge--cash    { background: #14290f; color: #4ade80; border: 1px solid #14532d; }
-.poker-type-badge--home    { background: #1a1209; color: #fbbf24; border: 1px solid #78350f; }
+.poker-type-badge--tourney { background: #1e1034; color: var(--poker-accent); border: 1px solid #4c1d95; }
+.poker-type-badge--cash    { background: #14290f; color: var(--green-bright); border: 1px solid #14532d; }
+.poker-type-badge--home    { background: #1a1209; color: var(--amber); border: 1px solid #78350f; }
 
 /* ── Casa de poker ───────────────────────── */
 .detail-poker-house {
     font-size: 0.88rem;
-    color: #a78bfa;
+    color: var(--poker-accent);
     margin: 0;
     display: flex;
     align-items: center;
@@ -42,7 +42,7 @@
 /* ── Late reg chip ───────────────────────── */
 .detail-chip--latereg {
     border-color: #78350f;
-    color: #fbbf24;
+    color: var(--amber);
     background: #1a1209;
 }
 
@@ -85,7 +85,7 @@
     border-radius: 8px;
     border: 1px solid #44403c;
     background: #1a1209;
-    color: #fbbf24;
+    color: var(--amber);
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -114,7 +114,7 @@
 
 .homegame-code-error {
     font-size: 0.8rem;
-    color: #f87171;
+    color: var(--red-soft);
     margin: 0;
 }
 
@@ -128,11 +128,11 @@
     border: 1px solid #14532d;
     border-radius: 10px;
     font-size: 0.87rem;
-    color: #4ade80;
+    color: var(--green-bright);
     font-weight: 600;
 }
 
-.homegame-unlocked-notice i { color: #4ade80; }
+.homegame-unlocked-notice i { color: var(--green-bright); }
 
 /* ── Poker details grid ──────────────────── */
 .poker-details-grid {
@@ -145,7 +145,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
-    background: #0d1825;
+    background: var(--ci-bg-card-deep);
     border: 1px solid #1b3868;
     border-radius: 10px;
     padding: 0.65rem 0.85rem;
@@ -165,8 +165,8 @@
     color: #e2e8f0;
 }
 
-.poker-detail-value--price { color: #4ade80; }
-.poker-detail-value--gtd   { color: #fbbf24; font-size: 1.1rem; }
+.poker-detail-value--price { color: var(--green-bright); }
+.poker-detail-value--gtd   { color: var(--amber); font-size: 1.1rem; }
 
 /* ── Cash includes ───────────────────────── */
 .cash-includes-block {
@@ -174,7 +174,7 @@
     align-items: flex-start;
     gap: 0.5rem;
     padding: 0.65rem 0.85rem;
-    background: #0d1825;
+    background: var(--ci-bg-card-deep);
     border: 1px solid #1b3868;
     border-radius: 10px;
     margin-top: 0.5rem;
@@ -183,22 +183,22 @@
 .cash-includes-label {
     font-size: 0.78rem;
     font-weight: 700;
-    color: #a78bfa;
+    color: var(--poker-accent);
     white-space: nowrap;
 }
 
 .cash-includes-value {
     font-size: 0.87rem;
-    color: #8aacc8;
+    color: var(--ci-text-muted);
 }
 
 /* ── Confirm btn poker variant ───────────── */
 .confirm-btn--poker {
-    background: #7c3aed;
+    background: var(--poker-accent-deep);
     color: #fff;
     border: none;
 }
 
 .confirm-btn--poker:hover { background: #6d28d9; }
 
-.confirmed-label--poker { color: #a78bfa; background: #1e1034; border-color: #4c1d95; }
+.confirmed-label--poker { color: var(--poker-accent); background: #1e1034; border-color: #4c1d95; }
