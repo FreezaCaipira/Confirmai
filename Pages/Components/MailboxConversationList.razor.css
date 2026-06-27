@@ -1,6 +1,6 @@
 .mailbox-list-pane {
     border: 1px solid var(--ci-border);
-    background: #050810;
+    background: var(--ci-bg-deepest);
     border-radius: 4px;
     padding: 0.5rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -15,7 +15,7 @@
 
 .mailbox-folder-tab {
     border: 1px solid var(--ci-border);
-    background: #0f1825;
+    background: var(--ci-bg-mid);
     color: var(--ci-text-muted);
     min-height: 1.9rem;
     font-size: 0.72rem;
@@ -30,13 +30,13 @@
 
 .mailbox-folder-tab.active {
     border-color: var(--ci-accent-mid);
-    background: #1a3a5c;
+    background: var(--ci-border-alt);
     color: var(--ci-accent);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.4), inset 0 0 0 1px rgba(79, 156, 248, 0.2);
 }
 
 .mailbox-folder-tab:hover:not(.active) {
-    background: #162030;
+    background: var(--ci-bg-card);
     color: var(--ci-text);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
@@ -61,7 +61,7 @@
 
 .mailbox-list-item {
     border: 1px solid var(--ci-border);
-    background: #0f1825;
+    background: var(--ci-bg-mid);
     border-radius: 6px;
     padding: 0.56rem 0.58rem;
     text-align: left;
@@ -123,12 +123,12 @@
 
 .mailbox-list-item.active {
     border-color: var(--ci-accent-mid);
-    background: #0a1525;
+    background: var(--ci-bg-alt);
     box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.3), 0 6px 12px rgba(79, 156, 248, 0.3), 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .mailbox-list-item:not(.active):hover {
-    background: #162030;
+    background: var(--ci-bg-card);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
@@ -177,11 +177,11 @@
 }
 
 .mailbox-list-item.active .mailbox-list-item-head strong {
-    color: #f1f5f9;
+    color: var(--ci-text);
 }
 
 .mailbox-list-item.active .mailbox-list-item-head span {
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
 }
 
 .mailbox-list-item-time {
@@ -194,7 +194,7 @@
 }
 
 .mailbox-list-item.active .mailbox-list-item-time {
-    color: #94a3b8;
+    color: var(--slate-muted);
 }
 
 .mailbox-list-item-peer {
@@ -212,9 +212,9 @@
 }
 
 .mailbox-list-item.active .mailbox-chip {
-    background: #0f1a2e;
-    border-color: #4f9cf8;
-    color: #e0f2fe;
+    background: var(--ci-bg-mid);
+    border-color: var(--ci-accent);
+    color: var(--ci-surface-light);
 }
 
 .mailbox-chip-alert {
@@ -231,7 +231,7 @@
 }
 
 .mailbox-list-item.active .mailbox-list-item-snippet {
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
 }
 
 .mailbox-pagination {

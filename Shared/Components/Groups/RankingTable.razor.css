@@ -6,7 +6,7 @@
     padding: 0.3rem 0.85rem;
     font-size: 0.72rem;
     font-weight: 700;
-    color: #64748b;
+    color: var(--slate-mid);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     margin-bottom: 0.2rem;
@@ -43,18 +43,18 @@
     text-align: center;
     font-weight: 700;
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--slate-mid);
     flex-shrink: 0;
 }
 
-.ranking-medal--gold   { color: #fbbf24; }
-.ranking-medal--silver { color: #94a3b8; }
-.ranking-medal--bronze { color: #cd7c39; }
+.ranking-medal--gold   { color: var(--amber); }
+.ranking-medal--silver { color: var(--slate-muted); }
+.ranking-medal--bronze { color: var(--brown-mid); }
 
 .ranking-name {
     flex: 1;
     min-width: 0;
-    color: #e2e8f0;
+    color: var(--ci-surface-muted);
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -67,36 +67,36 @@
 .ranking-col {
     font-size: 0.84rem;
     font-weight: 700;
-    color: #93c5fd;
+    color: var(--link-info);
     flex-shrink: 0;
     min-width: 5.5rem;
     text-align: center;
 }
 
 .ranking-col--label {
-    color: #64748b;
+    color: var(--slate-mid);
     font-size: 0.75rem;
     min-width: 5.5rem;
 }
 
 .ranking-col--label-games {
-    color: #93c5fd;
+    color: var(--link-info);
 }
 
 .ranking-col--label-highlight {
-    color: #a78bfa;
+    color: var(--poker-accent);
 }
 
 .ranking-col--label-wins {
-    color: #fbbf24;
+    color: var(--amber);
 }
 
 .ranking-col--wins {
-    color: #fbbf24;
+    color: var(--amber);
 }
 
 .ranking-col--highlight {
-    color: #a78bfa;
+    color: var(--poker-accent);
 }
 
 /* ── Empty state ──────────────────────────────────────────────── */

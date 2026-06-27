@@ -2,8 +2,8 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: #111927;
-    border: 1px solid #1b3d6c;
+    background: var(--ci-bg-deepest);
+    border: 1px solid var(--ci-border);
     border-radius: 10px;
     padding: 0.6rem 1.1rem;
     margin-bottom: 1.5rem;
@@ -15,7 +15,7 @@
     gap: 0.4rem;
     font-size: 0.78rem;
     font-weight: 600;
-    color: #6082a0;
+    color: var(--ci-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.07em;
     white-space: nowrap;
@@ -23,7 +23,7 @@
 }
 
 .city-pin {
-    color: #4f9cf8;
+    color: var(--ci-accent);
     flex-shrink: 0;
 }
 
@@ -37,13 +37,13 @@
 .city-select {
     appearance: none;
     -webkit-appearance: none;
-    background-color: #0d1825;
+    background-color: var(--ci-bg-alt);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.55rem center;
     background-size: 0.8rem;
-    color: #f1f5f9;
-    border: 1px solid #1b3d6c;
+    color: var(--ci-text);
+    border: 1px solid var(--ci-border);
     border-radius: 7px;
     padding: 0.32rem 1.8rem 0.32rem 0.6rem;
     font-size: 0.9rem;
@@ -54,7 +54,7 @@
 }
 
 .city-select:focus {
-    border-color: #4f9cf8;
+    border-color: var(--ci-accent);
 }
 
 .city-geo-btn {
@@ -62,19 +62,19 @@
     align-items: center;
     justify-content: center;
     padding: 0.32rem 0.6rem;
-    background: #0d1825;
-    border: 1px solid #1b3d6c;
+    background: var(--ci-bg-alt);
+    border: 1px solid var(--ci-border);
     border-radius: 7px;
-    color: #6082a0;
+    color: var(--ci-text-muted);
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
 
 .city-geo-btn:hover {
-    background: #112240;
-    color: #4f9cf8;
-    border-color: #4f9cf8;
+    background: var(--ci-bg-card);
+    color: var(--ci-accent);
+    border-color: var(--ci-accent);
 }
 
 .city-geo-btn:active {
