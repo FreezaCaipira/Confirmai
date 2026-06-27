@@ -44,7 +44,7 @@
 
 .sport-card--futsal .sport-card-count:not(.sport-card-count--empty) {
     color: var(--futsal-green-pale);
-    background: #123020;
+    background: var(--futsal-green-dark);
     border-color: var(--green-bright);
 }
 
@@ -67,7 +67,7 @@
 
 .sport-card--poker .sport-card-count:not(.sport-card-count--empty) {
     color: var(--ci-surface-light);
-    background: #13304b;
+    background: var(--ci-bg-deep);
     border-color: var(--ci-accent);
 }
 
