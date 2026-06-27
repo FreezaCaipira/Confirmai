@@ -99,9 +99,11 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 5. **NUNCA criar arquivo `.razor.css` vazio** — so criar se tiver estilos reais
 6. **NUNCA introduzir novas cores hardcoded** ao converter inline → classe CSS. Usar vars existentes ou documentar
 7. **Validar cada fase**: `dotnet build` (0 errors) + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration"` (0 failed)
-8. **Branch separada** para cada fase: `refactor/ciclo5-fase-X-nome`
-9. **1 PR por fase** — mergear via PR, nunca push direto na main
+8. **Branch única por ciclo** — usar uma só branch para todo o ciclo (ex: `refactor/ciclo5-css-refactor`), não uma branch por fase
+9. **1 PR por ciclo** — mergear via PR, nunca push direto na main
 10. **Documentar bloqueios**: se nao resolver, escrever na secao "Problemas Encontrados" com arquivo, linha, e o que tentou
+
+**Lição aprendida do Ciclo 5**: Usar uma branch por fase (6 branches) cria fragmentação desnecessária. Melhor usar uma branch única por ciclo e fazer commits por fase dentro dela. Isso simplifica o fluxo de revisão e merge.
 
 ---
 
