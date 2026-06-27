@@ -60,7 +60,7 @@
 .my-events-create-btn--futsal {
     background: var(--futsal-green-dark);
     color: var(--futsal-green-pale);
-    border: 1.5px solid #166534;
+    border: 1.5px solid var(--green-strong);
 }
 
 .my-events-create-btn--poker {

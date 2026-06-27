@@ -28,7 +28,7 @@
 }
 
 .feat-member-name {
-    color: #e2e8f0;
+    color: var(--ci-surface-muted);
     font-size: 0.9rem;
     white-space: nowrap;
     overflow: hidden;
@@ -58,25 +58,25 @@
 .feat-role-btn--promote {
     background: rgba(96, 165, 250, 0.1);
     border-color: rgba(96, 165, 250, 0.5);
-    color: #93c5fd;
+    color: var(--link-info);
 }
 
 .feat-role-btn--promote:not(:disabled):hover {
     background: rgba(96, 165, 250, 0.2);
     border-color: rgba(96, 165, 250, 0.8);
-    color: #bfdbfe;
+    color: var(--ci-surface-light);
 }
 
 .feat-role-btn--demote {
     background: rgba(248, 113, 113, 0.1);
     border-color: rgba(248, 113, 113, 0.5);
-    color: #fca5a5;
+    color: var(--red-soft);
 }
 
 .feat-role-btn--demote:not(:disabled):hover {
     background: rgba(248, 113, 113, 0.2);
     border-color: rgba(248, 113, 113, 0.8);
-    color: #fecaca;
+    color: var(--red-pale);
 }
 
 .feat-role-confirm {
@@ -88,7 +88,7 @@
 
 .feat-role-confirm-text {
     font-size: 0.74rem;
-    color: #fbbf24;
+    color: var(--amber);
     background: rgba(251, 191, 36, 0.08);
     border: 1px solid rgba(251, 191, 36, 0.3);
     border-radius: 6px;
@@ -106,25 +106,25 @@
 .feat-role-btn--confirm-yes {
     background: rgba(74, 222, 128, 0.1);
     border-color: rgba(74, 222, 128, 0.55);
-    color: #86efac;
+    color: var(--futsal-green-pale);
 }
 
 .feat-role-btn--confirm-yes:not(:disabled):hover {
     background: rgba(74, 222, 128, 0.2);
     border-color: rgba(74, 222, 128, 0.85);
-    color: #bbf7d0;
+    color: var(--futsal-green-pale);
 }
 
 .feat-role-btn--confirm-no {
     background: rgba(248, 113, 113, 0.1);
     border-color: rgba(248, 113, 113, 0.55);
-    color: #fca5a5;
+    color: var(--red-soft);
 }
 
 .feat-role-btn--confirm-no:not(:disabled):hover {
     background: rgba(248, 113, 113, 0.2);
     border-color: rgba(248, 113, 113, 0.85);
-    color: #fecaca;
+    color: var(--red-pale);
 }
 
 .feat-role-note {
