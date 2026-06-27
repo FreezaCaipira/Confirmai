@@ -1,10 +1,10 @@
 ﻿.crypto-quote-row {
     display: flex;
     align-items: center;
-    background: linear-gradient(90deg, var(--bg-slate) 60%, #181c20 100%);
+    background: linear-gradient(90deg, var(--bg-slate) 60%, var(--ci-bg-deepest) 100%);
     border: 1px solid var(--border-slate);
     border-radius: 14px;
-    box-shadow: 0 2px 16px #000a;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
     margin-bottom: 2.5rem;
     padding: 2rem 2.5rem;
     width: 100%;
@@ -25,7 +25,7 @@
     font-weight: bold;
     color: var(--gold);
     letter-spacing: 2px;
-    text-shadow: 0 2px 12px #000a;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
     text-transform: uppercase;
 }
 
@@ -54,19 +54,19 @@
     width: 64px;
     height: 64px;
     margin-right: 0.5rem;
-    filter: drop-shadow(0 2px 8px #0008);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
 }
 
 .crypto-amount {
     font-size: 1.4rem;
     font-weight: bold;
-    color: #f8f8f2;
+    color: var(--ci-text);
     letter-spacing: 1px;
 }
 
 .crypto-currency {
     font-size: 1.1rem;
-    color: #b0b0b0;
+    color: var(--ci-text-muted);
     margin-bottom: 0.2rem;
     letter-spacing: 1px;
 }
@@ -75,7 +75,7 @@
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--link-blue);
-    text-shadow: 0 2px 8px #0008;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .crypto-usd-col .crypto-value {
@@ -83,7 +83,7 @@
 }
 
 .crypto-brl-col .crypto-value {
-    color: #4caf50;
+    color: var(--green-bright);
 }
 
 @media (max-width: 900px) {

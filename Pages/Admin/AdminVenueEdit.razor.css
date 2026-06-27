@@ -4,8 +4,8 @@
     justify-content: space-between;
     gap: 0.75rem;
     padding: 0.7rem 0.9rem;
-    background: #0b1928;
-    border: 1px solid #1b3d6c;
+    background: var(--ci-bg-deepest);
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
 }
 
@@ -13,13 +13,13 @@
     display: block;
     font-weight: 600;
     font-size: 0.9rem;
-    color: #e2e8f0;
+    color: var(--ci-surface-muted);
 }
 
 .venue-admin-email {
     display: block;
     font-size: 0.78rem;
-    color: #6082a0;
+    color: var(--ci-text-muted);
     margin-top: 0.1rem;
 }
 
@@ -39,14 +39,14 @@
     gap: 0.75rem;
     margin-top: 0.5rem;
     padding: 0.6rem 0.9rem;
-    background: #091420;
-    border: 1px solid #1a5298;
+    background: var(--ci-bg-alt);
+    border: 1px solid var(--ci-border-dim);
     border-radius: 8px;
     font-size: 0.85rem;
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
 }
 
 .venue-section-divider {
-    border-color: #1c2a3b;
+    border-color: var(--ci-border-alt);
     margin: 1.25rem 0;
 }
