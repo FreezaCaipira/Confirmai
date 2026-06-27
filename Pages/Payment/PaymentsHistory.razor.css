@@ -4,17 +4,17 @@
 
 /* Base styles using ID for specificity */
 #payments-history-page {
-    background: #0a0f18;
+    background: var(--ci-bg);
 }
 
 #payments-history-page .entity-shell-card {
-    background: #0a0f18;
+    background: var(--ci-bg);
     border-radius: 8px;
     padding: 1.5rem;
 }
 
 #payments-history-page .page-section-title {
-    color: #e0f2fe;
+    color: var(--ci-surface-light);
     font-size: 1.5rem;
     font-weight: 800;
     margin: 0 0 1rem;
@@ -22,7 +22,7 @@
 }
 
 #payments-history-page .filter-bar {
-    background: #0d1825;
+    background: var(--ci-bg-card-deep);
     border-radius: 8px;
     padding: 0.75rem;
     margin-bottom: 1rem;
@@ -32,8 +32,8 @@
 #payments-history-page .filter-bar input,
 #payments-history-page .filter-bar select,
 #payments-history-page .filter-bar input[type="date"] {
-    background: #0a0f18;
-    color: #f1f5f9;
+    background: var(--ci-bg);
+    color: var(--ci-text);
     border-radius: 6px;
 }
 
@@ -42,8 +42,8 @@
 }
 
 #payments-history-page .filter-bar button {
-    background: #0d1825;
-    color: #4f9cf8;
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-accent);
     border-radius: 6px;
     font-weight: 700;
 }
@@ -81,59 +81,59 @@
 
 #payments-history-page .order-status-badge.pago {
     background: #0a2018;
-    color: #4ade80;
+    color: var(--green-bright);
     border: 1px solid #14532d;
     text-shadow: none;
 }
 
 #payments-history-page .order-status-badge.aguardandopagamento {
     background: #0a1928;
-    color: #4f9cf8;
-    border: 1px solid #1a5298;
+    color: var(--ci-accent);
+    border: 1px solid var(--ci-border-dim);
 }
 
 /* ========================================
    SENT TAB (History) - Blue Theme
    ======================================== */
 #payments-history-page.payments-history-shell--sent .entity-shell-card {
-    border: 1px solid #1b3d6c;
-    border-top: 1px solid #1b3d6c;
+    border: 1px solid var(--ci-border);
+    border-top: 1px solid var(--ci-border);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.1);
 }
 
 #payments-history-page.payments-history-shell--sent .filter-bar {
-    border: 1px solid #1b3d6c;
+    border: 1px solid var(--ci-border);
 }
 
 #payments-history-page.payments-history-shell--sent .filter-bar input,
 #payments-history-page.payments-history-shell--sent .filter-bar select,
 #payments-history-page.payments-history-shell--sent .filter-bar input[type="date"] {
-    border: 1px solid #1b3d6c;
+    border: 1px solid var(--ci-border);
 }
 
 #payments-history-page.payments-history-shell--sent .filter-bar button {
-    border: 1px solid #1b3d6c;
+    border: 1px solid var(--ci-border);
 }
 
 #payments-history-page.payments-history-shell--sent .filter-bar button:hover {
-    border-color: #4f9cf8;
+    border-color: var(--ci-accent);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table {
-    border: 1px solid #1b3868;
+    border: 1px solid var(--ci-border-soft);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table th {
     background: #0a1928;
-    border-bottom: 1px solid #1a5298;
-    color: #4f9cf8;
+    border-bottom: 1px solid var(--ci-border-dim);
+    color: var(--ci-accent);
     text-shadow: none;
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table td {
     background: transparent;
     border-bottom: 1px solid #0f1f30;
-    color: #8aacc8;
+    color: var(--ci-text-muted);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table tr:nth-child(even) td {
@@ -146,53 +146,53 @@
 
 #payments-history-page.payments-history-shell--sent .payments-history-table .payment-row-paid td,
 #payments-history-page.payments-history-shell--sent .payments-history-table .payment-row-pending td {
-    border-bottom-color: #1b3d6c;
+    border-bottom-color: var(--ci-border);
 }
 
 /* ========================================
    RECEIVED TAB (Pending) - Red Theme
    ======================================== */
 #payments-history-page.payments-history-shell--received .entity-shell-card {
-    border: 1px solid #7f1d1d;
-    border-top: 1px solid #7f1d1d;
+    border: 1px solid var(--red-border);
+    border-top: 1px solid var(--red-border);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(239, 68, 68, 0.1);
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar {
-    border: 1px solid #7f1d1d;
+    border: 1px solid var(--red-border);
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar input,
 #payments-history-page.payments-history-shell--received .filter-bar select,
 #payments-history-page.payments-history-shell--received .filter-bar input[type="date"] {
-    border: 1px solid #7f1d1d;
+    border: 1px solid var(--red-border);
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar button {
-    border: 1px solid #7f1d1d;
-    color: #f87171;
+    border: 1px solid var(--red-border);
+    color: var(--red-soft);
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar button:hover {
     border-color: #ef4444;
-    color: #fca5a5;
+    color: var(--red-text-light);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table {
-    border: 1px solid #7f1d1d;
+    border: 1px solid var(--red-border);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table th {
     background: #1a0a0a;
-    border-bottom: 1px solid #7f1d1d;
-    color: #fca5a5;
+    border-bottom: 1px solid var(--red-border);
+    color: var(--red-text-light);
     text-shadow: none;
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table td {
     background: transparent;
     border-bottom: 1px solid #2d0a0a;
-    color: #fca5a5;
+    color: var(--red-text-light);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table tr:nth-child(even) td {
@@ -204,7 +204,7 @@
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table .payment-row-paid td {
-    border-bottom-color: #7f1d1d;
+    border-bottom-color: var(--red-border);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table .payment-row-pending td {
@@ -228,9 +228,9 @@
     font-family: inherit;
     cursor: pointer;
     border-radius: 8px;
-    border: 1px solid #1b3d6c;
-    background: #0d1825;
-    color: #6082a0;
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-subtle);
     transition: border-color 0.15s, color 0.15s, background 0.15s;
     line-height: 1.2;
     text-align: left;
@@ -239,14 +239,14 @@
 
 .payments-tab-btn:hover:not(.active) {
     border-color: #2d6a8a;
-    color: #8aacc8;
+    color: var(--ci-text-muted);
     background: rgba(26, 90, 176, 0.1);
 }
 
 .payments-tab-btn.active {
     background: #0a1928;
     border-color: #1a5ab0;
-    color: #4f9cf8;
+    color: var(--ci-accent);
     cursor: default;
 }
 
@@ -261,14 +261,14 @@
     font-size: 0.75rem;
     font-weight: 900;
     background: rgba(26, 90, 176, 0.25);
-    color: #6082a0;
+    color: var(--ci-text-subtle);
     margin-left: 0.1rem;
     line-height: 1;
 }
 
 .payments-tab-btn.active .payments-tab-count {
     background: rgba(79, 156, 248, 0.2);
-    color: #4f9cf8;
+    color: var(--ci-accent);
 }
 
 .payments-filter-card {
@@ -404,7 +404,7 @@
 
 .payments-history-shell .payments-history-table .order-status-badge.pago {
     background: #0a2018;
-    color: #4ade80;
+    color: var(--green-bright);
     border: 1px solid #14532d;
     text-shadow: none;
 }
@@ -424,7 +424,7 @@
 }
 
 .payments-history-shell .payments-history-pagination .pagination-info {
-    color: #6082a0;
+    color: var(--ci-text-subtle);
     font-weight: 800;
     text-shadow: none;
 }
@@ -445,7 +445,7 @@
     font-weight: 600;
     border: 1px solid #2d6a8a;
     background: rgba(26, 90, 176, 0.15);
-    color: #8aacc8;
+    color: var(--ci-text-muted);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.15s;
@@ -453,7 +453,7 @@
 
 .export-btn:hover {
     background: rgba(26, 90, 176, 0.25);
-    border-color: #4f9cf8;
+    border-color: var(--ci-accent);
     color: #a8ccf8;
 }
 

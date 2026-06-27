@@ -27,10 +27,10 @@
     gap: 0.75rem;
     padding: 1.25rem 1.75rem;
     border-bottom: 2px solid;
-    border-image: linear-gradient(to right, #4f9cf8, #7dd3fc, #4f9cf8) 1;
+    border-image: linear-gradient(to right, var(--ci-accent), #7dd3fc, var(--ci-accent)) 1;
     align-items: center;
     flex-wrap: wrap;
-    background: linear-gradient(180deg, #1a3a5c 0%, #0f2845 50%, #0a1f35 100%);
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, #0f2845 50%, #0a1f35 100%);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(147, 197, 253, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
     position: relative;
 }
@@ -46,9 +46,9 @@
 }
 
 .payments-tab {
-    background: #0a0f18;
-    border: 1px solid #1b3d6c;
-    color: #94a3b8;
+    background: var(--ci-bg);
+    border: 1px solid var(--ci-border);
+    color: var(--slate-muted);
     font-size: 0.95rem;
     font-weight: 800;
     padding: 0.6rem 1.2rem;
@@ -64,21 +64,21 @@
 
 .payments-tab:hover {
     background: #162030;
-    border-color: #4f9cf8;
-    color: #cbd5e1;
+    border-color: var(--ci-accent);
+    color: var(--ci-surface-muted);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3);
 }
 
 .payments-tab--active {
-    color: #e0f2fe;
-    border-color: #4f9cf8;
-    background: #1a3a5c;
+    color: var(--ci-surface-light);
+    border-color: var(--ci-accent);
+    background: var(--ci-accent-mid);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3), inset 0 0 0 1px rgba(79, 156, 248, 0.2);
     text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
 }
 
 .payments-tab-count {
-    background: linear-gradient(180deg, #f87171 0%, #ef4444 50%, #dc2626 100%);
+    background: linear-gradient(180deg, var(--red-soft) 0%, #ef4444 50%, #dc2626 100%);
     color: #fef2f2;
     font-size: 0.75rem;
     padding: 0.15rem 0.4rem;
@@ -88,9 +88,9 @@
 }
 
 .payments-refresh-btn {
-    background: linear-gradient(180deg, #4f9cf8 0%, #1a5ab0 50%, #0d3270 100%);
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
     border: 1px solid #7dd3fc;
-    color: #e0f2fe;
+    color: var(--ci-surface-light);
     font-size: 0.95rem;
     font-weight: 800;
     padding: 0.6rem 1.2rem;
@@ -107,8 +107,8 @@
 }
 
 .payments-refresh-btn:hover {
-    background: linear-gradient(180deg, #7dd3fc 0%, #4f9cf8 50%, #1a5ab0 100%);
-    border-color: #93c5fd;
+    background: linear-gradient(180deg, #7dd3fc 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
+    border-color: var(--link-info);
     color: #ffffff;
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.5);
 }
@@ -125,7 +125,7 @@
 .payments-loading {
     padding: 2rem;
     text-align: center;
-    color: #94a3b8;
+    color: var(--slate-muted);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -136,9 +136,9 @@
 .payments-empty {
     padding: 2rem;
     text-align: center;
-    color: #e0f2fe;
-    background: #0a0f18;
-    border: 1px solid #1b3d6c;
+    color: var(--ci-surface-light);
+    background: var(--ci-bg);
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -150,7 +150,7 @@
 
 .payments-empty i {
     font-size: 2.5rem;
-    color: #4f9cf8;
+    color: var(--ci-accent);
     text-shadow: 0 0 15px rgba(79, 156, 248, 0.5);
 }
 
@@ -166,11 +166,11 @@
 }
 
 .payments-history-filters select {
-    background: #0a0f18;
-    border: 1px solid #1b3d6c;
+    background: var(--ci-bg);
+    border: 1px solid var(--ci-border);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
-    color: #f1f5f9;
+    color: var(--ci-text);
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s;
@@ -178,18 +178,18 @@
 }
 
 .payments-history-filters select:hover {
-    border-color: #4f9cf8;
+    border-color: var(--ci-accent);
 }
 
 .payments-history-filters select:focus {
     outline: none;
-    border-color: #4f9cf8;
+    border-color: var(--ci-accent);
     box-shadow: 0 0 0 2px rgba(79, 156, 248, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .payments-history-filters select option {
-    background: #0a0f18;
-    color: #f1f5f9;
+    background: var(--ci-bg);
+    color: var(--ci-text);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -206,7 +206,7 @@
 }
 
 .payments-user-item {
-    background: #0a0f18;
+    background: var(--ci-bg);
     border: 1px solid #ef4444;
     border-radius: 8px;
     padding: 1rem 1.25rem;
@@ -224,19 +224,19 @@
 
 .payments-user-item:hover {
     background: #1a0a0a;
-    border-color: #f87171;
+    border-color: var(--red-soft);
     box-shadow: 0 6px 12px rgba(239, 68, 68, 0.5);
 }
 
 .payments-user-item--selected {
     background: #2a0f0f;
-    border-color: #f87171;
+    border-color: var(--red-soft);
     box-shadow: 0 6px 12px rgba(239, 68, 68, 0.4), inset 0 0 0 1px rgba(239, 68, 68, 0.3);
 }
 
 .payments-user-name {
     font-weight: 800;
-    color: #e0f2fe;
+    color: var(--ci-surface-light);
     font-size: 0.95rem;
     min-width: 150px;
     text-shadow: 0 0 8px rgba(79, 156, 248, 0.3);
@@ -262,21 +262,21 @@
 }
 
 .payments-badge--games {
-    background: linear-gradient(180deg, #4f9cf8 0%, #1a5ab0 50%, #0d3270 100%);
-    color: #e0f2fe;
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
+    color: var(--ci-surface-light);
     border: 1px solid #7dd3fc;
 }
 
 .payments-badge--amount {
-    background: linear-gradient(180deg, #f87171 0%, #ef4444 50%, #dc2626 100%);
+    background: linear-gradient(180deg, var(--red-soft) 0%, #ef4444 50%, #dc2626 100%);
     color: #fef2f2;
     border: 1px solid #fca5a5;
 }
 
 .payments-badge--proof {
-    background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
     color: #f0fdf4;
-    border: 1px solid #86efac;
+    border: 1px solid var(--green-soft);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -284,7 +284,7 @@
 /* ──────────────────────────────────────────────────────────── */
 
 .payments-detail-panel {
-    background: #0a0f18;
+    background: var(--ci-bg);
     border-left: 3px solid #ef4444;
     border-radius: 0 0 8px 8px;
     margin-top: -0.5rem;
@@ -304,7 +304,7 @@
 
 .payments-summary-label {
     font-size: 0.85rem;
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
     font-weight: 800;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -312,7 +312,7 @@
 .payments-summary-total {
     font-size: 1rem;
     font-weight: 800;
-    color: #f87171;
+    color: var(--red-soft);
     text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
 }
 
@@ -330,8 +330,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0.75rem;
-    background: #0a0f18;
-    border: 1px solid #1b3d6c;
+    background: var(--ci-bg);
+    border: 1px solid var(--ci-border);
     border-radius: 6px;
     gap: 0.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -339,20 +339,20 @@
 
 .payments-detail-date {
     font-size: 0.85rem;
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .payments-detail-price {
     font-size: 0.85rem;
     font-weight: 800;
-    color: #4ade80;
+    color: var(--green-bright);
     text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
 }
 
 .payments-detail-admin {
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: var(--slate-muted);
     display: flex;
     align-items: center;
     gap: 0.3rem;
@@ -385,13 +385,13 @@
     color: #f0fdf4;
     padding: 0.3rem 0.6rem;
     border-radius: 5px;
-    background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
-    border: 1px solid #86efac;
+    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    border: 1px solid var(--green-soft);
     box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
 }
 
 .payments-notifying {
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
     font-size: 0.85rem;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -460,7 +460,7 @@
 }
 
 .payments-view-proof-btn:hover {
-    color: #93c5fd;
+    color: var(--link-info);
     border-color: rgba(96, 165, 250, 0.6);
     background: rgba(96, 165, 250, 0.08);
 }
@@ -484,7 +484,7 @@
     gap: 0.3rem;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #fbbf24;
+    color: var(--amber);
     text-decoration: none;
     border: 1px solid rgba(161, 118, 24, 0.35);
     padding: 0.3rem 0.6rem;
@@ -534,7 +534,7 @@
     right: 1rem;
     background: transparent;
     border: none;
-    color: #94a3b8;
+    color: var(--slate-muted);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0;
@@ -549,7 +549,7 @@
 
 .payment-proof-viewer-close:hover {
     background: rgba(148, 163, 184, 0.1);
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
 }
 
 .payment-proof-img {
