@@ -537,7 +537,7 @@
     font-weight: 700;
     padding: 0.12rem 0.45rem;
     border-radius: 10px;
-    background: rgba(22, 163, 74, 0.12);
+    background: var(--green-dark-md);
     color: var(--green-light);
     border: 1px solid rgba(74, 222, 128, 0.35);
     display: inline-flex;

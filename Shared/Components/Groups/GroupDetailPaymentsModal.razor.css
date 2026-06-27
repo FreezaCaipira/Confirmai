@@ -22,7 +22,7 @@
 
 .payment-modal {
     background: var(--ci-bg-alt);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid var(--slate-border-lg);
     border-radius: 12px;
     max-width: 950px;
     width: 95%;
@@ -40,7 +40,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem 1.75rem;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    border-bottom: 1px solid var(--slate-border-md);
     gap: 1rem;
 }
 
@@ -112,7 +112,7 @@
 .payment-tab--active {
     color: var(--ci-text);
     border-color: rgba(148, 163, 184, 0.3);
-    background: rgba(148, 163, 184, 0.05);
+    background: var(--slate-border-sm);
 }
 
 .payment-tab-count {
@@ -439,7 +439,7 @@
 
 .payment-proof-box {
     background: var(--ci-bg-alt);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid var(--slate-border-lg);
     border-radius: 12px;
     max-width: 500px;
     width: 100%;
@@ -487,7 +487,7 @@
     height: auto;
     max-height: 500px;
     border-radius: 8px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid var(--slate-border-lg);
     background: var(--overlay-sm);
 }
 

@@ -227,6 +227,25 @@
     --red-opacity-sm:      rgba(239, 68, 68, 0.2);
     --red-opacity-md:      rgba(239, 68, 68, 0.3);
     --red-opacity-lg:      rgba(239, 68, 68, 0.5);
+    
+    /* Slate border opacity */
+    --slate-border-sm:     rgba(148, 163, 184, 0.1);
+    --slate-border-md:     rgba(148, 163, 184, 0.15);
+    --slate-border-lg:     rgba(148, 163, 184, 0.2);
+    --slate-border-xl:     rgba(148, 163, 184, 0.3);
+    
+    /* Green-dark opacity */
+    --green-dark-sm:       rgba(22, 163, 74, 0.1);
+    --green-dark-md:       rgba(22, 163, 74, 0.12);
+    --green-dark-lg:       rgba(22, 163, 74, 0.15);
+    --green-dark-xl:       rgba(22, 163, 74, 0.3);
+    --green-dark-2xl:      rgba(22, 163, 74, 0.4);
+    
+    /* Purple opacity */
+    --purple-sm:           rgba(124, 58, 237, 0.1);
+    --purple-md:           rgba(124, 58, 237, 0.12);
+    --purple-lg:           rgba(124, 58, 237, 0.18);
+    --purple-xl:           rgba(124, 58, 237, 0.3);
 }
 
 /* ================================================================
