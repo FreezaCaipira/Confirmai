@@ -114,6 +114,31 @@
     --text-primary:    var(--ci-text);
     --text-muted:      var(--ci-text-muted);
     --accent-gold:     var(--gold);
+
+    /* ── Status/feedback extras ── */
+    --green-bright:    #4ade80;   /* success badges, confirmations */
+    --green-soft:      #86efac;   /* success highlights */
+    --red-soft:        #f87171;   /* error text, danger highlights */
+    --red-border:      #7f1d1d;   /* received tab borders */
+    --red-text-light:  #fca5a5;   /* received tab text */
+    --amber:           #fbbf24;   /* poker/alert accent */
+
+    /* ── Cool surfaces extras ── */
+    --ci-surface-muted:  #cbd5e1; /* disabled text, placeholders */
+    --ci-surface-light:  #e0f2fe; /* info highlights, badges */
+    --ci-border-soft:    #1b3868; /* alternate border shade */
+
+    /* ── Poker/violet theme ── */
+    --poker-accent:      #a78bfa; /* poker badges, headers */
+    --poker-accent-deep: #7c3aed; /* poker backgrounds */
+    --poker-text:        #c4b5fd; /* poker text */
+
+    /* ── Link extras ── */
+    --link-info:         #93c5fd; /* collision links, info links */
+
+    /* ── Neutral ── */
+    --text-muted-gray:   #888;    /* secondary text, timestamps */
+    --slate-muted:       #94a3b8; /* tertiary text */
 }
 
 /* ================================================================
