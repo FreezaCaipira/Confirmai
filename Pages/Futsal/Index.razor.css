@@ -23,8 +23,8 @@
     gap: 0.4rem;
     padding: 0.38rem 0.95rem;
     border-radius: 8px;
-    background: linear-gradient(180deg, #4f9cf8 0%, #1a5ab0 50%, #0d3270 100%);
-    color: #e0f2fe;
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
+    color: var(--ci-surface-light);
     font-weight: 800;
     font-size: 0.82rem;
     text-decoration: none;
@@ -35,8 +35,8 @@
 }
 
 .btn-create-event:hover {
-    background: linear-gradient(180deg, #7dd3fc 0%, #4f9cf8 50%, #1a5ab0 100%);
-    border-color: #93c5fd;
+    background: linear-gradient(180deg, #7dd3fc 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
+    border-color: var(--link-info);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.5);
 }
 
@@ -47,7 +47,7 @@
     gap: 1.25rem;
     padding: 1rem 1.25rem;
     border-radius: 12px;
-    background: #0a0f18;
+    background: var(--ci-bg);
     border: 1px solid #1e3a5f;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.1);
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
@@ -63,7 +63,7 @@
 
 .event-card--futsal:hover {
     border-color: #16a34a;
-    border-left-color: #4ade80;
+    border-left-color: var(--green-bright);
     box-shadow: 0 12px 32px rgba(22, 163, 74, 0.4), 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
@@ -71,7 +71,7 @@
 .event-time {
     font-size: 1.3rem;
     font-weight: 800;
-    color: #4ade80;
+    color: var(--green-bright);
     letter-spacing: -0.02em;
     min-width: 3.5rem;
     text-align: center;
@@ -98,7 +98,7 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 800;
-    color: #e0f2fe;
+    color: var(--ci-surface-light);
     font-family: inherit;
     text-shadow: 0 0 10px rgba(79, 156, 248, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
     text-transform: none;
@@ -121,7 +121,7 @@
 
 .event-location {
     font-size: 0.78rem;
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
     margin: 0 0 0.5rem;
     white-space: nowrap;
     overflow: hidden;
@@ -140,9 +140,9 @@
     align-items: center;
     gap: 0.3rem;
     font-size: 0.76rem;
-    color: #cbd5e1;
-    background: #0a0f18;
-    border: 1px solid #1b3d6c;
+    color: var(--ci-surface-muted);
+    background: var(--ci-bg);
+    border: 1px solid var(--ci-border);
     border-radius: 20px;
     padding: 0.18rem 0.6rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -154,8 +154,8 @@
 }
 
 .meta-chip--confirmed {
-    background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
-    border-color: #86efac;
+    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    border-color: var(--green-soft);
     color: #f0fdf4;
     font-weight: 800;
     box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
@@ -163,7 +163,7 @@
 
 /* ── Confirmed card highlight ────────────── */
 .event-card--confirmed {
-    border-left-color: #4ade80;
+    border-left-color: var(--green-bright);
     box-shadow: 0 8px 24px rgba(22, 163, 74, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(74, 222, 128, 0.2);
 }
 
@@ -172,7 +172,7 @@
     flex-shrink: 0;
     font-size: 0.82rem;
     font-weight: 800;
-    color: #4ade80;
+    color: var(--green-bright);
     text-decoration: none;
     white-space: nowrap;
     padding: 0.4rem 0.9rem;
@@ -183,8 +183,8 @@
 }
 
 .event-action:hover {
-    background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
-    border-color: #86efac;
+    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    border-color: var(--green-soft);
     color: #f0fdf4;
     box-shadow: 0 4px 8px rgba(74, 222, 128, 0.5);
 }

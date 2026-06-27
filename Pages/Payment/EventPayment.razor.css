@@ -23,13 +23,13 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #86efac;
+    color: var(--green-soft);
     margin-bottom: 0.5rem;
 }
 
 .evpay-admin-pix-hint {
     font-size: 0.82rem;
-    color: #94a3b8;
+    color: var(--slate-muted);
     margin: 0 0 0.75rem;
     line-height: 1.45;
 }
@@ -61,7 +61,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.83rem;
-    color: #94a3b8;
+    color: var(--slate-muted);
     margin: 0.25rem 0 0;
     line-height: 1.5;
 }
@@ -82,7 +82,7 @@
 .evpay-admin-pix-copy {
     background: rgba(74, 222, 128, 0.1);
     border: 1px solid rgba(74, 222, 128, 0.4);
-    color: #86efac;
+    color: var(--green-soft);
     font-size: 0.8rem;
     font-weight: 600;
     padding: 0.4rem 0.8rem;
@@ -197,7 +197,7 @@
 .evpay-summary-amount {
     font-size: 1.35rem;
     font-weight: 800;
-    color: #4ade80;
+    color: var(--green-bright);
 }
 
 /* ── Status pago ─────────────────────────────────────────────── */
@@ -213,12 +213,12 @@
 .evpay-status--paid {
     background: rgba(22,163,74,0.1);
     border: 1px solid rgba(74,222,128,0.25);
-    color: #4ade80;
+    color: var(--green-bright);
 }
 
 .evpay-status--paid i { font-size: 1.4rem; margin-top: 0.1rem; }
 .evpay-status--paid strong { display: block; font-size: 0.95rem; margin-bottom: 0.2rem; }
-.evpay-status--paid p { margin: 0; font-size: 0.82rem; color: #86efac; }
+.evpay-status--paid p { margin: 0; font-size: 0.82rem; color: var(--green-soft); }
 
 /* ── Métodos de pagamento ────────────────────────────────────── */
 .evpay-methods { margin-bottom: 1.1rem; }
@@ -277,13 +277,13 @@
     padding: 0.1rem 0.45rem;
     border-radius: 8px;
     background: rgba(34,197,94,0.12);
-    color: #4ade80;
+    color: var(--green-bright);
     border: 1px solid rgba(74,222,128,0.25);
 }
 
 .evpay-method-badge--soon {
     background: rgba(148,163,184,0.1);
-    color: #94a3b8;
+    color: var(--slate-muted);
     border-color: rgba(148,163,184,0.2);
 }
 
@@ -335,9 +335,9 @@
 /* ── Error ───────────────────────────────────────────────────── */
 .evpay-error {
     font-size: 0.82rem;
-    color: #f87171;
+    color: var(--red-soft);
     background: #290f0f;
-    border: 1px solid #7f1d1d;
+    border: 1px solid var(--red-border);
     border-radius: 8px;
     padding: 0.5rem 0.8rem;
     margin-bottom: 0.75rem;
@@ -375,7 +375,7 @@
     gap: 0.5rem;
     font-size: 0.9rem;
     font-weight: 700;
-    color: #93c5fd;
+    color: var(--link-info);
     letter-spacing: 0.02em;
     text-shadow: 0 0 12px rgba(147,197,253,0.4);
 }
@@ -385,7 +385,7 @@
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    background: #93c5fd;
+    background: var(--link-info);
     box-shadow: 0 0 6px rgba(147,197,253,0.7);
     animation: evpay-pulse 1.4s ease-in-out infinite;
 }
@@ -435,7 +435,7 @@
 /* ── Copy button ─────────────────────────────────────────────── */
 .evpay-action-btn--copy {
     background: rgba(99,179,255,0.15);
-    color: #93c5fd;
+    color: var(--link-info);
     border: 1.5px solid rgba(99,179,255,0.5);
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -466,14 +466,14 @@
     gap: 0.5rem;
     font-size: 0.82rem;
     font-weight: 700;
-    color: #fbbf24;
+    color: var(--amber);
     letter-spacing: 0.03em;
     text-transform: uppercase;
 }
 
 .evpay-proof-hint {
     font-size: 0.82rem;
-    color: #94a3b8;
+    color: var(--slate-muted);
     margin: 0;
     line-height: 1.5;
 }
@@ -498,7 +498,7 @@
 .evpay-proof-btn:hover {
     background: rgba(251, 191, 36, 0.22);
     border-color: rgba(251, 191, 36, 0.85);
-    color: #fbbf24;
+    color: var(--amber);
 }
 .evpay-proof-btn--update {
     background: rgba(96, 165, 250, 0.1);
@@ -508,7 +508,7 @@
 .evpay-proof-btn--update:hover {
     background: rgba(96, 165, 250, 0.2);
     border-color: rgba(96, 165, 250, 0.8);
-    color: #93c5fd;
+    color: var(--link-info);
 }
 
 .evpay-proof-sent {
@@ -516,11 +516,11 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.83rem;
-    color: #86efac;
+    color: var(--green-soft);
 }
 
 .evpay-proof-sent-icon {
-    color: #4ade80;
+    color: var(--green-bright);
     font-size: 1rem;
     flex-shrink: 0;
 }
@@ -536,13 +536,13 @@
 
 .evpay-proof-error {
     font-size: 0.82rem;
-    color: #f87171;
+    color: var(--red-soft);
     margin: 0;
 }
 
 .evpay-proof-success {
     font-size: 0.82rem;
-    color: #86efac;
+    color: var(--green-soft);
     margin: 0.5rem 0 0;
     display: flex;
     align-items: center;
