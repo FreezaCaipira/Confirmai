@@ -1,7 +1,7 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 26/06/2026 | Base: `main` @ c5e2b6f | Ciclo 4
-> 1.674/1.674 testes passando | 0 erros de build | ~50 warnings (Windows)
+> Atualizado em 14/07/2026 | Base: `main` + `refactor/css-vars-consistency` | Ciclo 5
+> 1.674/1.674 testes passando | 0 erros de build | 2 warnings projeto (CS8603)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -19,265 +19,355 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - PR #10: Auditoria Services — namespaces, GatewayService:ControllerBase, file-scoped
 
 ### Ciclo 3 (Pleno Local): UX + Features + CSS
-- Fase 1 (Qualidade): Scoped CSS, consolidacao CSS, testes (COMPLETO)
-- Fase 2 (UX): Grupos privados, historico pagamentos, responsividade, metricas, WhatsApp (COMPLETO)
-- Fase 3 (Operacao): Virtual scrolling, baseline gateways, postmortem checklist (COMPLETO)
-- **Problemas**: CSS com `!important`, conflitos de especificidade, inline styles, pleno incapaz de override cores
+- Scoped CSS, consolidacao CSS, testes, UX grupos, historico pagamentos, virtual scrolling
+- **Problemas**: CSS com `!important`, conflitos de especificidade, inline styles
+
+### Ciclo 4 (Pleno Local): Disciplina CSS + Warnings
+- Branch: `refactor/css-vars-consistency`
+- **Resultados**:
+  - Warnings: ~50 → 2 (CS8603 em 2 .razor, nao-criticos)
+  - `!important`: 16 → 1 (AvatarUpload pattern legitimo)
+  - Breakpoints: padronizados 50 @media queries (640/768/1024/1440px)
+  - Hardcoded colors: 1.387 → 1.099 (~288 convertidas para vars)
+  - Inline styles estaticos: ~35 → 6 restantes
+  - Inline styles BEM: criou classes `--hidden`, `--margin-top` etc. (bom pattern)
+- **Problemas identificados pelo Senior**:
+  1. Pleno introduziu 16 NOVAS cores hardcoded ao converter inline → CSS classes (ex: `.collision-link { color: #93c5fd }`)
+  2. `PaymentsHistory.razor` tem blocos massivos de inline style condicional com 20+ cores hardcoded
+  3. ~400 hardcoded restantes TEM var equivalente direto (ex: #1b3d6c=--ci-border, #4f9cf8=--ci-accent)
+  4. ~200 hardcoded NAO tem var no design system (precisam novas vars: #4ade80, #e0f2fe, #cbd5e1, #f87171, etc.)
+  5. Teste `AdminLogsQueryStringIntegrationTests` continua falhando (pre-existente, nao do Ciclo 4)
 
 ---
 
-## Diagnostico CSS (Revisao Senior)
+## Diagnostico CSS Atualizado (Pos-Ciclo 4)
 
-**Vanilla CSS NAO impede responsividade mobile.** O problema e falta de disciplina arquitetural:
+| Metrica | Ciclo 3 | Pos-Ciclo 4 | Meta Ciclo 5 |
+|---------|---------|-------------|--------------|
+| Hardcoded colors em Pages/*.css | 1.387 | 1.099 | <500 |
+| CSS vars usadas em Pages/*.css | 381 | 673 | >900 |
+| `!important` em Pages/*.css | 16 | 1 | 1 |
+| Inline styles estaticos | ~35 | 6 | 0 |
+| Inline styles dinamicos com hardcoded | ~5 | ~14 | <5 |
+| @media fora do padrao | muitos | 0 | 0 |
+| Warnings (projeto principal) | ~50 | 2 | 0 |
 
-| Metrica | Valor | Meta |
-|---------|-------|------|
-| Hardcoded colors em Pages/*.css | 1.387 | <800 |
-| CSS vars usadas | 381 (de 68 definidas) | >800 |
-| `!important` em Pages/*.css | 16 | 0-1 |
-| Inline styles estaticos | ~35 | 0 |
-| @media queries (scoped) | 50 | 50 (padronizados) |
-| @media queries (site.css) | 31 | 31 |
+**Top 15 arquivos com mais hardcoded colors restantes** (estes sao o foco do Ciclo 5):
 
-**Causa raiz dos problemas do Pleno**:
-1. `site.css` tem seletores globais (`.order-status-badge`, `body .entity-shell-card`) que sobrescrevem scoped CSS
-2. Ratio hardcoded/var de 3.6:1 — deveria ser invertido
-3. Breakpoints inconsistentes entre arquivos
-4. Pleno tentou workarounds (`!important`) em vez de resolver especificidade
-
-**Decisao**: NAO migrar para framework. Custo de 2-3 meses sem beneficio funcional. A arquitetura atual (Blazor .razor.css) JA E component CSS. Precisamos apenas disciplinar.
+| # | Arquivo | Hardcoded | Muitas com var equivalente? |
+|---|---------|-----------|---------------------------|
+| 1 | Groups/Payments.razor.css | 72 | Sim — --ci-border, --ci-accent, --ci-text |
+| 2 | Payment/PaymentsHistory.razor.css | 66 | Sim — --ci-* tokens |
+| 3 | Docs/Integration.razor.css | 64 | Parcial |
+| 4 | MyEvents/Index.razor.css | 59 | Sim — --ci-* tokens |
+| 5 | Poker/Index.razor.css | 50 | Parcial — violets sem var |
+| 6 | Payment/ViewPayment.razor.css | 41 | Sim — --ci-* tokens |
+| 7 | Poker/Detail.razor.css | 39 | Parcial — violets sem var |
+| 8 | Admin/AdminLanguages.razor.css | 38 | Sim |
+| 9 | Admin/AdminPayments.razor.css | 37 | Sim |
+| 10 | Product/ProductForm.razor.css | 35 | Parcial |
+| 11 | Payment/EventPayment.razor.css | 33 | Sim |
+| 12 | MyConfirmations/Index.razor.css | 32 | Sim |
+| 13 | Groups/Detail.razor.css | 30 | Sim |
+| 14 | Futsal/Index.razor.css | 29 | Sim |
+| 15 | Futsal/Detail.razor.css | 29 | Sim |
 
 ---
 
 ## Regras para o Pleno (OBRIGATORIO)
 
 1. **NUNCA usar `!important`** — se nao consegue override, documentar na secao "Problemas" e pular
-2. **NUNCA hardcodar cores** — usar vars CSS do `:root` (ver lista abaixo)
+2. **NUNCA hardcodar cores** — usar vars CSS do `:root` (ver lista abaixo). Se nao existe var, documentar na secao "Cores sem Var"
 3. **NUNCA commitar debug/logging temporario** (`Console.Write`, `Debug.Write`)
 4. **NUNCA injetar `AppDbContext` direto** — sempre `IDbContextFactory<AppDbContext>`
 5. **NUNCA criar arquivo `.razor.css` vazio** — so criar se tiver estilos reais
-6. **Validar cada fase**: `dotnet build` (0 errors) + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration"` (0 failed)
-7. **Branch separada** para cada fase: `refactor/fase-X-nome`
-8. **1 PR por fase** — mergear via PR, nunca push direto na main
-9. **Documentar bloqueios**: se nao resolver, escrever na secao "Problemas Encontrados" com arquivo, linha, e o que tentou
+6. **NUNCA introduzir novas cores hardcoded** ao converter inline → classe CSS. Usar vars existentes ou documentar
+7. **Validar cada fase**: `dotnet build` (0 errors) + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration"` (0 failed)
+8. **Branch separada** para cada fase: `refactor/ciclo5-fase-X-nome`
+9. **1 PR por fase** — mergear via PR, nunca push direto na main
+10. **Documentar bloqueios**: se nao resolver, escrever na secao "Problemas Encontrados" com arquivo, linha, e o que tentou
 
 ---
 
 ## CSS Vars Permitidas (usar SEMPRE em vez de hex)
 
 ```css
+/* ── Warm theme (parchment/medieval) ── */
+
 /* Backgrounds */
-var(--bg-deepest)    /* #2f1a09 */
-var(--bg-deep)       /* #2f1d0b */
-var(--bg-dark)       /* #3d2d1d */
-var(--bg-dark-mid)   /* #4e2f16 */
-var(--bg-night)      /* #181818 */
-var(--bg-slate)      /* #23272b */
+var(--bg-deepest)        /* #2f1a09 */
+var(--bg-deep)           /* #2f1d0b */
+var(--bg-dark)           /* #3d2d1d */
+var(--bg-dark-mid)       /* #4e2f16 */
+var(--bg-dark-soft)      /* #4b2c13 */
+var(--bg-night)          /* #181818 */
+var(--bg-night-cool)     /* #181c22 */
+var(--bg-slate)          /* #23272b */
+var(--bg-slate-warm)     /* #23272f */
 
-/* Text/Surface */
-var(--parchment)     /* #efd6ac */
-var(--parchment-dark)/* #e2c493 */
-var(--parchment-light)/* #f0dbb4 */
-var(--parchment-soft)/* #f5e6c6 */
-var(--text-light)    /* #f0f0f0 */
+/* Parchment surfaces */
+var(--parchment-dark)    /* #e2c493 */
+var(--parchment)         /* #efd6ac */
+var(--parchment-mid)     /* #e7cfa6 */
+var(--parchment-light)   /* #f0dbb4 */
+var(--parchment-soft)    /* #f5e6c6 */
+var(--parchment-cream)   /* #f8edd5 */
+var(--parchment-warm)    /* #f3e4c6 */
+var(--parchment-muted)   /* #ddc9a3 */
+var(--parchment-glow)    /* #ddbc89 */
 
-/* Accent */
-var(--gold)          /* #f9a825 */
-var(--gold-deep)     /* #c99544 */
-var(--gold-dark)     /* #c17900 */
-var(--orange)        /* #cf5a16 */
-var(--green)         /* #6e9a3f */
-var(--green-light)   /* #8aba57 */
-var(--red)           /* #e53935 */
+/* Gold accents */
+var(--gold)              /* #f9a825 */
+var(--gold-deep)         /* #c99544 */
+var(--gold-dark)         /* #c17900 */
+var(--gold-amber)        /* #bf7f26 */
+var(--gold-light)        /* #e0a33f */
+var(--gold-soft)         /* #f6cf8a */
 
-/* Borders */
-var(--brown-border)  /* #8a6739 */
-var(--brown-border-light) /* #8f6a3d */
+/* Brown spectrum */
+var(--brown-border)      /* #8a6739 */
+var(--brown-border-light)/* #8f6a3d */
+var(--brown-border-warm) /* #8f6f42 */
+var(--brown-border-accent)/* #8e6a3b */
+var(--brown-mid)         /* #7a5728 */
+var(--brown-label)       /* #7f4f23 */
+var(--brown-text)        /* #6b4726 */
+var(--brown-text-dark)   /* #6a4523 */
+var(--brown-deep)        /* #a5681f */
+
+/* Rust & orange */
+var(--rust)              /* #6a2810 */
+var(--rust-dark)         /* #57210d */
+var(--rust-orange)       /* #7a2f0e */
+var(--orange)            /* #cf5a16 */
+
+/* Status colors */
+var(--green)             /* #6e9a3f */
+var(--green-light)       /* #8aba57 */
+var(--green-dark)        /* #5f8a33 */
+var(--red)               /* #e53935 */
+var(--text-light)        /* #f0f0f0 */
+var(--link-blue)         /* #8ab4f8 */
+
+/* ── Cool/navy theme (Confirmai dark) ── */
+
+var(--ci-bg)             /* #090f18 */
+var(--ci-bg-card)        /* #111927 */
+var(--ci-bg-card-deep)   /* #0d1825 */
+var(--ci-bg-input)       /* #07111d */
+var(--ci-accent)         /* #4f9cf8 */
+var(--ci-accent-mid)     /* #1a5ab0 */
+var(--ci-accent-dark)    /* #0d3270 */
+var(--ci-border)         /* #1b3d6c */
+var(--ci-border-dim)     /* #1a5298 */
+var(--ci-text)           /* #f1f5f9 */
+var(--ci-text-blue)      /* #deeeff */
+var(--ci-text-link)      /* #7ab6ff */
+var(--ci-text-muted)     /* #8aacc8 */
+var(--ci-text-subtle)    /* #6082a0 */
+var(--ci-text-info)      /* #8fc2f3 */
+var(--ci-text-info-strong)/* #b7dbff */
+var(--border-slate)      /* #314454 */
+
+/* Typography */
+var(--font-display)      /* "Cinzel", Georgia, serif */
+var(--font-accent)       /* "MedievalSharp", Georgia, cursive */
+var(--ci-font)           /* system sans-serif stack */
 ```
 
 ---
 
-## Ciclo 4 — Tarefas Ativas
+## Ciclo 5 — Tarefas Ativas
 
-### ⚠️ JA PRONTO ANTES DO CICLO 4 (Ciclo 3 - Pleno Local)
+### Fase 1: Adicionar vars para cores sem equivalente — P0
+**Branch**: `refactor/ciclo5-fase1-new-vars`
+**Estimativa**: ~30 min
 
-**Atenção Senior**: As seguintes tarefas já foram completadas no Ciclo 3 pelo Pleno Local e NÃO precisaram ser refeitas no Ciclo 4:
+Cores usadas frequentemente no projeto que NAO tem var no `:root`. Adicionar ao final do bloco `:root` em `wwwroot/css/site.css`:
 
-#### L1-L5: Tarefas Locais (COMPLETAS)
-- **L1**: Eliminados inline styles em `Pages/Groups/{Join,Index,Detail}.razor`, `Pages/Index.razor` e `Pages/Poker/Edit.razor` → criadas classes nos .razor.css
-- **L2**: Criados .razor.css para todas as páginas sem css (1 priority >400L: `Poker/Edit.razor`, +50 arquivos menores vazios)
-- **L3**: Corrigidos 40 warnings CS1998 (async sem await) → removido async, retornado Task.CompletedTask
-- **L4**: Corrigidos 18 warnings CS0649 (campos nunca atribuídos) → = null / = default
-- **L5**: Corrigidos warnings CS8618/CS8602/CS8604/CS8601 (nullability) → = default!, null!, null-forgiving, null-coalescing
+```css
+/* ── Status/feedback extras ── */
+--green-bright:    #4ade80;   /* success badges, confirmations */
+--green-soft:      #86efac;   /* success highlights */
+--red-soft:        #f87171;   /* error text, danger highlights */
+--red-border:      #7f1d1d;   /* received tab borders */
+--red-text-light:  #fca5a5;   /* received tab text */
+--amber:           #fbbf24;   /* poker/alert accent */
 
-**Estado final do Ciclo 3**: 0 erros de build, 0 warnings CS1998/CS0649/CS861x, 641/641 testes passando.
+/* ── Cool surfaces extras ── */
+--ci-surface-muted:  #cbd5e1; /* disabled text, placeholders */
+--ci-surface-light:  #e0f2fe; /* info highlights, badges */
+--ci-border-soft:    #1b3868; /* alternate border shade */
 
-**Impacto no Ciclo 4**:
-- Fase 1 (Warnings): Parcialmente completa (L3-L5 já cobrem CS1998, CS0649, CS8618/CS8602/CS8604/CS8601)
-- Fase 5 (Inline Styles): Parcialmente completa (L1 já cobriu alguns arquivos)
+/* ── Poker/violet theme ── */
+--poker-accent:      #a78bfa; /* poker badges, headers */
+--poker-accent-deep: #7c3aed; /* poker backgrounds */
+--poker-text:        #c4b5fd; /* poker text */
 
----
+/* ── Link extras ── */
+--link-info:         #93c5fd; /* collision links, info links */
 
-### Fase 1: Corrigir Warnings de Compilacao — P0
-**Branch**: `fix/compiler-warnings`
-**Estimativa**: ~50 warnings
+/* ── Neutral ── */
+--text-muted-gray:   #888;    /* secondary text, timestamps */
+--slate-muted:       #94a3b8; /* tertiary text */
+```
 
-#### 1.1 — CS1998: async method lacks await (14 ocorrencias)
-- Arquivos: `Profile.razor`, `Escalacao.razor`, `Features.razor`, `Detail.razor` (Groups, Futsal), `EventPayment.razor`, `AdminUsers.razor`, `Create.razor` (Futsal), `CertificateHealthCheckService.cs`
-- Fix: Remover `async` do metodo OU adicionar `await Task.CompletedTask` se precisa manter a signature
-- Preferir: remover `async` quando nao ha nenhum `await` no corpo
-
-#### 1.2 — CS0649: field never assigned (8 ocorrencias)
-- Arquivos: `Detail.razor` (Groups), `EventPayment.razor`, `Poker/Index.razor`, `Mailbox.razor`, `AdminPayments.razor`, `Escalacao.razor`, `Payment.razor`
-- Campos: `_copyCodeTask`, `_copyAdminPixTask`, `_menuFocusOutTask`, `_copyInviteTask`, `threadStreamRef`, `statusTransitionConfirmationId`, `_copyTask`, `_copyBrCodeTask`
-- Fix: Se campo nao e usado, remover. Se e usado via JS interop, inicializar como `null!` ou tornar nullable (`?`)
-
-#### 1.3 — CS8618/CS8602/CS8604: null reference warnings (8 ocorrencias)
-- Arquivos: `PendingWebhooksAlertService.cs`, `CertificateHealthCheckService.cs`, `FutsalOutfieldGroup.razor`, `Detail.razor` (Futsal, Groups), `EventPaymentHeader.razor`, `AdminPaymentsSummaryPanel.razor`, `Futsal/Edit.razor`
-- Fix: Adicionar `?` (nullable), `= null!`, ou null-check dependendo do caso
-
-#### 1.4 — RZ10012: unexpected markup element (2 ocorrencias)
-- Arquivo: `Escalacao.razor` — referencia `EscalacaoConfirmed` e `EscalacaoVoting` sem @using
-- Fix: Adicionar `@using` no `_Imports.razor` da pasta OU mover componentes para pasta com `_Imports.razor`
-
-#### 1.5 — CS0105: duplicate using (1)
-- Arquivo: `PixPayloadBuilder.cs` — `System.Globalization` duplicado
-- Fix: Remover a linha duplicada
-
-#### 1.6 — SYSLIB0057: obsolete X509Certificate2 constructor (1)
-- Arquivo: `CertificateHealthCheckService.cs`
-- Fix: Substituir `new X509Certificate2(path, password)` por `X509CertificateLoader.LoadPkcs12FromFile(path, password)`
+**IMPORTANTE**: NAO modificar nenhum arquivo CSS nesta fase. Apenas adicionar as vars ao `:root`.
 
 **Validacao**:
 ```powershell
-dotnet build 2>&1 | Select-String "warning" | Measure-Object
-# Meta: 0
+dotnet build
+# Meta: 0 errors
 ```
 
 ---
 
-### Fase 2: Eliminar !important em Scoped CSS — P0
-**Branch**: `refactor/remove-important`
-**Estimativa**: 16 ocorrencias em 8 arquivos
+### Fase 2: Converter hardcoded colors — Top 8 arquivos (CI theme) — P0
+**Branch**: `refactor/ciclo5-fase2-css-vars-ci`
+**Estimativa**: ~300 substituicoes
 
-Para CADA `!important`:
-1. Identificar qual regra em `site.css` causa conflito
-2. No `.razor.css`, aumentar especificidade do seletor (ex: `.entity-shell .meu-seletor`)
-3. Se nao funcionar com especificidade, documentar na secao "Problemas" e pular
+Arquivos com mais hardcoded de cores CI (navy theme):
+1. `Pages/Groups/Payments.razor.css` (72)
+2. `Pages/Payment/PaymentsHistory.razor.css` (66)
+3. `Pages/MyEvents/Index.razor.css` (59)
+4. `Pages/Payment/ViewPayment.razor.css` (41)
+5. `Pages/Admin/AdminPayments.razor.css` (37)
+6. `Pages/Payment/EventPayment.razor.css` (33)
+7. `Pages/MyConfirmations/Index.razor.css` (32)
+8. `Pages/Futsal/Index.razor.css` (29)
 
-| Arquivo | Regra | Acao |
-|---------|-------|------|
-| `Groups/Ranking.razor.css` | `color: #fbbf24 !important` | Trocar por `var(--gold)` + especificidade |
-| `Groups/Payments.razor.css` | `color: #4ade80 !important` | Trocar por `var(--green-light)` + especificidade |
-| `Admin/AdminPayments.razor.css` | `z-index: 20000 !important` | Verificar se precisa z-index layer |
-| `Poker/Detail.razor.css` | `color: #a78bfa !important` | Badge — aumentar especificidade |
-| `Poker/Detail.razor.css` | `border-color: #dc2626 !important` | Error state — seletor mais especifico |
-| `Payment/EventPayment.razor.css` | `text-decoration: none !important` | Verificar heranca link styles |
-| `Futsal/Create.razor.css` | Focus styles ×3 | `:focus-visible` com classe mais especifica |
-| `Futsal/Edit.razor.css` | Focus styles ×3 | Mesmo pattern de Create |
-| `Futsal/Escalacao.razor.css` | background + border ×3 | Active state — especificidade |
-| `Components/Profile/AvatarUploadSection.razor.css` | `display: none !important` | **IGNORAR** — pattern input[type=file] |
+**Mapeamento principal (CI theme)**:
+```
+#1b3d6c           -> var(--ci-border)
+#1b3868           -> var(--ci-border-soft)
+#4f9cf8           -> var(--ci-accent)
+#1a5ab0           -> var(--ci-accent-mid)
+#0d3270           -> var(--ci-accent-dark)
+#8aacc8           -> var(--ci-text-muted)
+#6082a0           -> var(--ci-text-subtle)
+#f1f5f9           -> var(--ci-text)
+#0a0f18, #090f18  -> var(--ci-bg)
+#0d1825           -> var(--ci-bg-card-deep)
+#111927           -> var(--ci-bg-card)
+#07111d           -> var(--ci-bg-input)
+#1a5298           -> var(--ci-border-dim)
+#deeeff           -> var(--ci-text-blue)
+#7ab6ff           -> var(--ci-text-link)
 
-**Validacao**:
-```powershell
-Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String "!important" | Measure-Object
-# Meta: 0 (ou 1 se manter AvatarUpload)
+#4ade80           -> var(--green-bright)
+#86efac           -> var(--green-soft)
+#f87171           -> var(--red-soft)
+#7f1d1d           -> var(--red-border)
+#fca5a5           -> var(--red-text-light)
+#cbd5e1           -> var(--ci-surface-muted)
+#e0f2fe           -> var(--ci-surface-light)
+#93c5fd           -> var(--link-info)
+#94a3b8           -> var(--slate-muted)
+#888              -> var(--text-muted-gray)
+#fff              -> #fff (OK manter — branco puro)
 ```
 
----
-
-### Fase 3: Converter Hardcoded Colors para CSS Vars — P1
-**Branch**: `refactor/css-vars-consistency`
-**Estimativa**: ~200+ substituicoes nos 10 maiores
-
-Arquivos alvo (por tamanho):
-1. `Pages/Payment/Payment.razor.css` (835L)
-2. `Shared/Components/Groups/GroupDetailPaymentsModal.razor.css` (792L)
-3. `Pages/Futsal/Escalacao.razor.css` (764L)
-4. `Pages/Mailbox.razor.css` (721L)
-5. `Pages/Admin/AdminLogs.razor.css` (658L)
-6. `Pages/Index.razor.css` (607L)
-7. `Pages/Groups/Payments.razor.css` (556L)
-8. `Pages/Payment/EventPayment.razor.css` (555L)
-9. `Pages/Payment/ViewPayment.razor.css` (549L)
-10. `Pages/Docs/Integration.razor.css` (499L)
-
-**Mapeamento de cores**:
-```
-#2f1a09, #2f1d0b          -> var(--bg-deepest) ou var(--bg-deep)
-#3d2d1d                   -> var(--bg-dark)
-#4e2f16                   -> var(--bg-dark-mid)
-#181818                   -> var(--bg-night)
-#23272b, #23272f          -> var(--bg-slate)
-#efd6ac                   -> var(--parchment)
-#e2c493                   -> var(--parchment-dark)
-#f0dbb4                   -> var(--parchment-light)
-#f5e6c6                   -> var(--parchment-soft)
-#f9a825                   -> var(--gold)
-#c99544                   -> var(--gold-deep)
-#8a6739, #8f6a3d          -> var(--brown-border)
-#cf5a16                   -> var(--orange)
-#6e9a3f                   -> var(--green)
-#e53935                   -> var(--red)
-#f0f0f0, #f1f5f9          -> var(--text-light)
-```
-
-Se uma cor hex NAO tem var correspondente: documentar na secao "Cores sem Var".
+**Regra**: Se a cor hex nao esta no mapeamento acima, NAO converter. Documentar na secao "Cores sem Var".
 
 **Validacao**:
 ```powershell
 Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String '#[0-9a-fA-F]{3,6}' | Measure-Object
-# Meta: <800 (de 1.387)
+# Meta: <700 (de 1.099)
 ```
 
 ---
 
-### Fase 4: Padronizar Breakpoints Responsivos — P1
-**Branch**: `refactor/responsive-breakpoints`
+### Fase 3: Converter hardcoded colors — Top 7 arquivos (Warm + Mixed) — P1
+**Branch**: `refactor/ciclo5-fase3-css-vars-warm`
+**Estimativa**: ~200 substituicoes
 
-Adicionar ao topo de `site.css` (depois do `:root`):
-```css
-/* === BREAKPOINTS PADRAO === */
-/* Mobile-first: estilos base sao mobile.
-   Usar @media (min-width: Xpx) para expandir.
-   
-   --bp-sm: 640px   (mobile landscape)
-   --bp-md: 768px   (tablet)
-   --bp-lg: 1024px  (desktop)
-   --bp-xl: 1440px  (wide desktop)
-*/
+Arquivos com cores warm/mixed theme:
+1. `Pages/Docs/Integration.razor.css` (64)
+2. `Pages/Poker/Index.razor.css` (50)
+3. `Pages/Poker/Detail.razor.css` (39)
+4. `Pages/Admin/AdminLanguages.razor.css` (38)
+5. `Pages/Product/ProductForm.razor.css` (35)
+6. `Pages/Groups/Detail.razor.css` (30)
+7. `Pages/Futsal/Detail.razor.css` (29)
+
+**Mapeamento adicional (warm/poker)**:
 ```
-
-Auditar os 50 `@media` queries em `.razor.css`:
-- Se usa breakpoint fora dos 4 padrao, ajustar para o mais proximo
-- Se usa `max-width`, converter para `min-width` (mobile-first)
-- NAO refatorar `site.css` nesta fase
+#a78bfa           -> var(--poker-accent)
+#7c3aed           -> var(--poker-accent-deep)
+#c4b5fd           -> var(--poker-text)
+#fbbf24           -> var(--amber)
+#efd6ac           -> var(--parchment)
+#e2c493           -> var(--parchment-dark)
+#f0dbb4           -> var(--parchment-light)
+#f5e6c6           -> var(--parchment-soft)
+#f9a825           -> var(--gold)
+#c99544           -> var(--gold-deep)
+#c17900           -> var(--gold-dark)
+#8a6739, #8f6a3d  -> var(--brown-border)
+#cf5a16           -> var(--orange)
+#6e9a3f           -> var(--green)
+#e53935           -> var(--red)
+```
 
 **Validacao**:
 ```powershell
-Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String "@media" | Select-String -NotMatch "640|768|1024|1440" | Measure-Object
+Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String '#[0-9a-fA-F]{3,6}' | Measure-Object
+# Meta: <500
+```
+
+---
+
+### Fase 4: Refatorar PaymentsHistory.razor inline styles — P1
+**Branch**: `refactor/ciclo5-fase4-payments-history`
+**Estimativa**: ~1h
+
+`PaymentsHistory.razor` tem blocos massivos de inline style condicional. Exemplo atual:
+```razor
+style="@(activeTab == "sent" ? "border: 1px solid #1b3d6c; ..." : "border: 1px solid #7f1d1d; ...")"
+```
+
+Converter para classes CSS condicionais:
+```razor
+class="@(activeTab == "sent" ? "tab-sent" : "tab-received")"
+```
+
+E definir `.tab-sent` e `.tab-received` no `PaymentsHistory.razor.css` usando vars:
+```css
+.tab-sent {
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg);
+    /* ... */
+}
+.tab-received {
+    border: 1px solid var(--red-border);
+    background: var(--ci-bg);
+    /* ... */
+}
+```
+
+Linhas alvo em `PaymentsHistory.razor`: 21, 23, 25, 68, 69, 86, 87.
+
+**Validacao**:
+```powershell
+dotnet build
+Get-ChildItem -Filter "PaymentsHistory.razor" Pages/Payment/ | Select-String 'style="' | Where-Object { $_ -notmatch '@' } | Measure-Object
 # Meta: 0
 ```
 
 ---
 
-### Fase 5: Eliminar Inline Styles Estaticos — P2
-**Branch**: `refactor/remove-inline-styles`
-**Estimativa**: ~35 ocorrencias
+### Fase 5: Eliminar 6 inline styles estaticos restantes — P2
+**Branch**: `refactor/ciclo5-fase5-inline-cleanup`
+**Estimativa**: ~20 min
 
-**Excecoes (NAO converter)**:
-- `style="display:none"` em `<InputFile>` — pattern legitimo
-- `style="@variavel"` — binding dinamico, manter
-
-Arquivos com mais inline styles:
-- `Pages/Groups/Ranking.razor` (skeleton styles)
-- `Pages/Poker/Detail.razor` (skeleton styles)
-- `Pages/Poker/Create.razor` (form hints)
-- `Pages/Admin/AdminVenues.razor` (action rows)
-- `Pages/VenueManager/Venues.razor` (action rows)
-- `Pages/Admin/AdminVenueEdit.razor` (hr separator)
-
-Para cada inline style: criar classe no `.razor.css` correspondente.
+| Arquivo | Linha | Style | Acao |
+|---------|-------|-------|------|
+| `Admin/AdminVenues.razor` | 87 | `gap:0.4rem;align-items:center` | Criar `.admin-actions-row--compact` |
+| `Admin/AdminVenues.razor` | 88 | `font-size:0.8rem;color:#f1f5f9;...` | Criar `.admin-remove-label` |
+| `Admin/AdminVenueEdit.razor` | 107 | `border-color:#1c2a3b;margin:1.25rem 0` | Criar `.venue-divider` |
+| `Payment/PaymentsHistory.razor` | 21 | `background: #0a0f18` | Mover para `.payments-history-shell` no .razor.css |
+| `Payment/Components/EventPaymentProof.razor` | 50 | `animation: fadeout 3s...` | Criar `.evpay-proof-fadeout` |
+| `Components/Profile/AvatarUploadSection.razor` | 12 | `display:none` | **IGNORAR** — pattern `<InputFile>` legitimo |
 
 **Validacao**:
 ```powershell
@@ -287,35 +377,27 @@ Get-ChildItem -Recurse -Filter "*.razor" Pages/ | Select-String 'style="' | Wher
 
 ---
 
-### Fase 6: Decomposicao de Componentes (Preparacao) — P2
-**Branch**: `refactor/component-decomposition-prep`
+### Fase 6: Corrigir 2 warnings CS8603 restantes — P2
+**Branch**: `refactor/ciclo5-fase6-warnings`
+**Estimativa**: ~10 min
 
-**APENAS IDENTIFICAR** — nao implementar decomposicao.
+| Arquivo | Warning | Fix |
+|---------|---------|-----|
+| `Pages/Groups/Components/GroupDetailPaymentsModal.razor` | CS8603: Possible null reference return | Adicionar null-check ou `?` |
+| `Pages/Groups/Payments.razor` | CS8603: Possible null reference return | Adicionar null-check ou `?` |
 
-Paginas >600L sem decomposicao completa:
-| Pagina | Linhas | Secoes candidatas |
-|--------|--------|-------------------|
-| `Poker/Detail.razor` | 628 | HeaderSection, PlayersSection, AdminPanel |
-| `Payment/Payment.razor` | 620 | FormSection, SummarySection, QRSection |
-| `Poker/Create.razor` | 608 | FormSection, PreviewSection |
-
-Documentar com comentario no topo:
-```razor
-@* === DECOMPOSITION CANDIDATES ===
-   Section: [nome] -- lines [X-Y] -- candidate for extraction
-=== END DECOMPOSITION === *@
+**Validacao**:
+```powershell
+dotnet build 2>&1 | Select-String "warning CS" | Measure-Object
+# Meta: 0 (no projeto principal, warnings de testes sao OK)
 ```
-
-O Senior definira parametros e interfaces dos componentes no proximo ciclo.
-
-**Validacao**: `dotnet build` sem erros (so documentacao).
 
 ---
 
 ## Ordem de Execucao
 
 ```
-Fase 1 (warnings) -> Fase 2 (!important) -> Fase 3 (CSS vars) -> Fase 4 (breakpoints) -> Fase 5 (inline) -> Fase 6 (prep)
+Fase 1 (novas vars) -> Fase 2 (CI colors) -> Fase 3 (warm colors) -> Fase 4 (PaymentsHistory) -> Fase 5 (inline) -> Fase 6 (warnings)
 ```
 
 Cada fase = 1 branch + 1 PR. Mergear antes de comecar a proxima.
@@ -328,20 +410,23 @@ Cada fase = 1 branch + 1 PR. Mergear antes de comecar a proxima.
 # Build (Windows):
 dotnet build
 
-# Tests (excluir ProgramConfiguration que precisa Postgres):
-dotnet test --filter "FullyQualifiedName!~ProgramConfiguration"
+# Tests (excluir ProgramConfiguration que precisa Postgres + AdminLogsQueryString pre-existente):
+dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
 
-# Contar warnings:
-dotnet build 2>&1 | Select-String "warning" | Measure-Object
+# Contar warnings do projeto (excluir testes):
+dotnet build 2>&1 | Select-String "warning CS" | Where-Object { $_ -notmatch "Tests" } | Measure-Object
 
 # Contar !important:
 Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String "!important" | Measure-Object
 
-# Contar inline styles:
+# Contar inline styles estaticos:
 Get-ChildItem -Recurse -Filter "*.razor" Pages/ | Select-String 'style="' | Where-Object { $_ -notmatch 'display:none|@' } | Measure-Object
 
 # Contar hardcoded colors:
 Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String '#[0-9a-fA-F]{3,6}' | Measure-Object
+
+# Contar CSS vars usadas:
+Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String 'var\(--' | Measure-Object
 ```
 
 ---
@@ -350,7 +435,7 @@ Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String '#[0-9a-fA-F]{3,6}
 <!-- Pleno: documente aqui qualquer bloqueio que encontrar -->
 
 ### Cores sem Var correspondente
-<!-- Liste aqui cores hex que nao tem var no :root -->
+<!-- Liste aqui cores hex que nao tem var no :root NEM no mapeamento acima -->
 
 ### Conflitos de especificidade nao resolvidos
 <!-- Liste aqui seletores que nao conseguiu override sem !important -->
@@ -363,19 +448,18 @@ Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String '#[0-9a-fA-F]{3,6}
 - Não relacionado com mudanças de CSS do Ciclo 4
 - Precisa de investigação separada pelo Senior
 
+**Nota**: O teste `AdminLogsQueryStringIntegrationTests` falha porque usa HTTP GET numa pagina Blazor Server que carrega dados assincronamente apos o circuito SignalR ser estabelecido. O HTML pre-renderizado nao contem os dados. O Senior investigara e corrigira esse teste separadamente.
+
 ---
 
-## Metricas de Sucesso (evolução completa)
+## Metricas de Sucesso (evolucao completa)
 
-| Metrica | Início (Ciclo 3) | Após Ciclo 3 (Pronto) | Após Ciclo 4 (Trabalho) | Meta |
-|---------|------------------|----------------------|-------------------------|------|
-| Warnings (build) | ~50 | 0 (CS1998/CS0649/CS861x) | 0 (apenas 2 CS8603 não-scoped) | 0 |
-| `!important` em Pages/*.css | 16 | 16 | 1 (AvatarUpload pattern legítimo) | 0-1 |
-| Hardcoded colors em Pages/*.css | 1.387 | 1.387 | ~1.093 (200 convertidas) | <800 |
-| Inline styles estaticos | ~35 | ~25 (L1 parcial) | 0 (todos estáticos eliminados) | 0 |
-| @media fora do padrao | ? | ? | 0 (50 padronizados) | 0 |
-
-**Notas**:
-- **Ciclo 3 (Pleno Local)**: Completou L1-L5 (warnings CS1998/CS0649/CS861x + inline styles parciais)
-- **Ciclo 4 (Trabalho Atual)**: Completou Fases 1-6 (warnings restantes + !important + CSS vars + breakpoints + inline styles + decomposição)
-- **2 warnings CS8603 restantes**: `GroupDetailPaymentsModal.razor` e `Groups/Payments.razor` — não estão no escopo das fases (null reference return)
+| Metrica | Ciclo 3 | Pos-Ciclo 4 | Meta Ciclo 5 |
+|---------|---------|-------------|--------------|
+| Warnings (projeto) | ~50 | 2 | 0 |
+| `!important` em Pages/*.css | 16 | 1 | 1 |
+| Hardcoded colors em Pages/*.css | 1.387 | 1.099 | <500 |
+| CSS vars usadas em Pages/*.css | 381 | 673 | >900 |
+| Inline styles estaticos | ~35 | 6 | 0 |
+| Inline styles dinamicos c/ hardcoded | ~5 | ~14 | <5 |
+| @media fora do padrao | muitos | 0 | 0 |
