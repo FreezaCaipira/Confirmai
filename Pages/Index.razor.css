@@ -194,12 +194,12 @@
 }
 
 .sport-card--poker::before {
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, transparent 60%);
+    background: linear-gradient(135deg, var(--purple-sm) 0%, transparent 60%);
 }
 
 .sport-card--poker:hover {
     border-color: var(--poker-accent);
-    box-shadow: 0 14px 36px rgba(124, 58, 237, 0.3), 0 8px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 14px 36px var(--purple-xl), 0 8px 16px var(--shadow-lg);
 }
 
 .sport-card--poker:hover::before {

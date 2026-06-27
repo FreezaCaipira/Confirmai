@@ -64,7 +64,7 @@
 .event-card--futsal:hover {
     border-color: var(--green-bright);
     border-left-color: var(--green-bright);
-    box-shadow: 0 12px 32px rgba(22, 163, 74, 0.4), 0 6px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 12px 32px var(--green-dark-2xl), 0 6px 16px var(--shadow-lg);
 }
 
 /* ── Time badge ──────────────────────────── */
