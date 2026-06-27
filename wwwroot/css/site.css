@@ -139,6 +139,35 @@
     /* ── Neutral ── */
     --text-muted-gray:   #888;    /* secondary text, timestamps */
     --slate-muted:       #94a3b8; /* tertiary text */
+
+    /* ── Ciclo 6 — Novas vars ── */
+
+    /* Futsal theme */
+    --futsal-green-dark:   #14532d;
+    --futsal-green-pale:   #bbf7d0;
+    --futsal-bg-dark:      #0a2018;
+    --futsal-text-light:   #f0fdf4;
+
+    /* Poker theme extras */
+    --poker-bg-deepest:    #3b0764;
+    --poker-bg-dark:       #4c1d95;
+
+    /* CI extras */
+    --ci-bg-deepest:       #050810;
+    --ci-accent-light:     #7dd3fc;
+    --ci-bg-alt:           #0a1928;
+    --ci-border-alt:       #1a3a5c;
+
+    /* Status extras */
+    --red-strong:          #ef4444;
+    --red-pale:            #fecaca;
+    --red-lightest:        #fef2f2;
+    --amber-light:         #fcd34d;
+    --amber-warm:          #fde68a;
+
+    /* Neutrals */
+    --slate-light:         #e2e8f0;
+    --slate-mid:           #64748b;
 }
 
 /* ================================================================
