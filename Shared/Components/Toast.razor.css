@@ -9,7 +9,7 @@
     color: var(--white);
     font-weight: bold;
     font-size: 1.1rem;
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 16px var(--shadow-xl);
     z-index: 9999;
     opacity: 0.97;
     animation: toast-in 0.3s;

@@ -168,6 +168,95 @@
     /* Neutrals */
     --slate-light:         #e2e8f0;
     --slate-mid:           #64748b;
+
+    /* ── Ciclo 6 — Shadow/Opacity vars ── */
+    
+    /* Black opacity shadows */
+    --shadow-sm:           rgba(0, 0, 0, 0.25);
+    --shadow-md:           rgba(0, 0, 0, 0.3);
+    --shadow-lg:           rgba(0, 0, 0, 0.4);
+    --shadow-xl:           rgba(0, 0, 0, 0.5);
+    --shadow-2xl:          rgba(0, 0, 0, 0.6);
+    --shadow-3xl:          rgba(0, 0, 0, 0.7);
+    --shadow-4xl:          rgba(0, 0, 0, 0.85);
+    
+    /* Accent shadows */
+    --shadow-accent-sm:    rgba(79, 156, 248, 0.3);
+    --shadow-accent-md:    rgba(79, 156, 248, 0.4);
+    --shadow-accent-lg:    rgba(79, 156, 248, 0.5);
+    
+    /* Green shadows */
+    --shadow-green-sm:     rgba(74, 222, 128, 0.3);
+    --shadow-green-lg:     rgba(74, 222, 128, 0.6);
+    
+    /* Red shadows */
+    --shadow-red-sm:       rgba(239, 68, 68, 0.3);
+    
+    /* Text shadows */
+    --text-shadow-sm:      rgba(0, 0, 0, 0.3);
+    --text-shadow-md:      rgba(0, 0, 0, 0.35);
+    --text-shadow-lg:      rgba(0, 0, 0, 0.45);
+    --text-shadow-xl:      rgba(0, 0, 0, 0.5);
+    
+    /* Inset shadows */
+    --inset-accent-sm:     rgba(147, 197, 253, 0.2);
+    --inset-accent-md:     rgba(79, 156, 248, 0.3);
+    
+    /* Background overlays */
+    --overlay-sm:          rgba(0, 0, 0, 0.3);
+    --overlay-md:          rgba(0, 0, 0, 0.5);
+    --overlay-lg:          rgba(0, 0, 0, 0.55);
+    --overlay-xl:          rgba(0, 0, 0, 0.7);
+    --overlay-2xl:         rgba(0, 0, 0, 0.85);
+    
+    /* Accent blue opacity */
+    --accent-opacity-sm:   rgba(79, 156, 248, 0.2);
+    --accent-opacity-md:   rgba(79, 156, 248, 0.3);
+    --accent-opacity-lg:   rgba(79, 156, 248, 0.4);
+    --accent-opacity-xl:   rgba(79, 156, 248, 0.5);
+    --accent-opacity-2xl:  rgba(79, 156, 248, 0.6);
+    
+    /* Green opacity */
+    --green-opacity-sm:    rgba(74, 222, 128, 0.2);
+    --green-opacity-md:    rgba(74, 222, 128, 0.3);
+    --green-opacity-lg:    rgba(74, 222, 128, 0.35);
+    --green-opacity-xl:    rgba(74, 222, 128, 0.5);
+    --green-opacity-2xl:   rgba(74, 222, 128, 0.6);
+    
+    /* Red opacity */
+    --red-opacity-sm:      rgba(239, 68, 68, 0.2);
+    --red-opacity-md:      rgba(239, 68, 68, 0.3);
+    --red-opacity-lg:      rgba(239, 68, 68, 0.5);
+    
+    /* Slate border opacity */
+    --slate-border-sm:     rgba(148, 163, 184, 0.1);
+    --slate-border-md:     rgba(148, 163, 184, 0.15);
+    --slate-border-lg:     rgba(148, 163, 184, 0.2);
+    --slate-border-xl:     rgba(148, 163, 184, 0.3);
+    
+    /* Green-dark opacity */
+    --green-dark-sm:       rgba(22, 163, 74, 0.1);
+    --green-dark-md:       rgba(22, 163, 74, 0.12);
+    --green-dark-lg:       rgba(22, 163, 74, 0.15);
+    --green-dark-xl:       rgba(22, 163, 74, 0.3);
+    --green-dark-2xl:      rgba(22, 163, 74, 0.4);
+    
+    /* Purple opacity */
+    --purple-sm:           rgba(124, 58, 237, 0.1);
+    --purple-md:           rgba(124, 58, 237, 0.12);
+    --purple-lg:           rgba(124, 58, 237, 0.18);
+    --purple-xl:           rgba(124, 58, 237, 0.3);
+    
+    /* Sky blue opacity */
+    --sky-blue-md:         rgba(125, 211, 252, 0.5);
+    
+    /* Red-light opacity */
+    --red-light-sm:        rgba(248, 113, 113, 0.08);
+    --red-light-md:        rgba(248, 113, 113, 0.2);
+    --red-light-lg:        rgba(248, 113, 113, 0.5);
+    
+    /* Red-dark opacity */
+    --red-dark-md:         rgba(183, 28, 28, 0.3);
 }
 
 /* ================================================================

@@ -23,13 +23,13 @@
 .metric-card:hover {
     background: var(--ci-bg-mid);
     border-color: var(--ci-accent);
-    box-shadow: 0 6px 12px rgba(79, 156, 248, 0.3);
+    box-shadow: 0 6px 12px var(--accent-opacity-md);
 }
 
 .metric-card--alert {
     background: var(--red-bg-dark);
     border-color: var(--red-border);
-    box-shadow: 0 4px 8px rgba(183, 28, 28, 0.3);
+    box-shadow: 0 4px 8px var(--red-dark-md);
 }
 
 .metric-card--alert:hover {
@@ -47,7 +47,7 @@
     border-radius: 8px;
     font-size: 1.25rem;
     flex-shrink: 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .metric-icon--members {
@@ -90,21 +90,21 @@
     font-weight: 800;
     color: var(--ci-surface-light);
     line-height: 1.2;
-    text-shadow: 0 0 10px rgba(79, 156, 248, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 10px var(--accent-opacity-lg), 0 2px 4px var(--shadow-md);
 }
 
 .metric-label {
     font-size: 0.85rem;
     color: var(--ci-surface-muted);
     margin-top: 0.25rem;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px var(--text-shadow-sm);
 }
 
 .metric-sub {
     font-size: 0.75rem;
     color: var(--slate-muted);
     margin-top: 0.15rem;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px var(--text-shadow-sm);
 }
 
 .metric-sub--good {

@@ -54,7 +54,7 @@
     width: 64px;
     height: 64px;
     margin-right: 0.5rem;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0 2px 8px var(--shadow-lg));
 }
 
 .crypto-amount {
@@ -75,7 +75,7 @@
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--link-blue);
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    text-shadow: 0 2px 8px var(--text-shadow-sm);
 }
 
 .crypto-usd-col .crypto-value {

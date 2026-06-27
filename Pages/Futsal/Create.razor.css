@@ -52,7 +52,7 @@
     cursor: pointer;
     transition: background 0.14s, border-color 0.14s, color 0.14s, box-shadow 0.14s;
     user-select: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .weekday-chip input[type=checkbox] { display: none; }
@@ -73,7 +73,7 @@
     font-weight: 800;
     color: var(--ci-surface-muted);
     cursor: pointer;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px var(--text-shadow-sm);
 }
 
 /* form-actions, save-btn, cancel-btn, validation-* → events.css */

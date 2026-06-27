@@ -29,7 +29,7 @@
     grid-template-columns: 1fr;
     align-items: center;
     gap: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(147, 197, 253, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px var(--shadow-md), inset 0 1px 0 var(--inset-accent-sm), inset 0 -1px 0 var(--shadow-md);
     position: relative;
 }
 
@@ -40,7 +40,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(to right, transparent, rgba(125, 211, 252, 0.5), transparent);
+    background: linear-gradient(to right, transparent, var(--sky-blue-md), transparent);
 }
 
 .mailbox-page-title {
@@ -182,7 +182,7 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
     transition: color 0.15s ease, background 0.15s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .mailbox-folder-tab.active {
@@ -195,7 +195,7 @@
 .mailbox-folder-tab:hover:not(.active) {
     background: var(--ci-bg-card);
     color: var(--ci-text);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--shadow-lg);
 }
 
 .mailbox-list.mailbox-list-compact {
@@ -221,7 +221,7 @@
     cursor: pointer;
     display: block;
     position: relative;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .mailbox-list-item-main {
@@ -276,12 +276,12 @@
 .mailbox-list-item.active {
     border-color: var(--ci-accent-mid);
     background: var(--ci-accent-mid);
-    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.3), 0 6px 12px rgba(79, 156, 248, 0.3), 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 0 0 1px var(--accent-opacity-md), 0 6px 12px var(--accent-opacity-md), 0 4px 8px var(--shadow-lg);
 }
 
 .mailbox-list-item:not(.active):hover {
     background: var(--ci-bg-card);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--shadow-lg);
 }
 
 .mailbox-list-item-head {
@@ -373,7 +373,7 @@
     font-weight: 700;
     color: var(--ci-text-muted);
     background: var(--ci-bg);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .mailbox-chip-alert {
@@ -464,7 +464,7 @@
     background: var(--ci-bg);
     display: grid;
     gap: 0.2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--shadow-lg);
 }
 
 .mailbox-thread-bubble.incoming {
