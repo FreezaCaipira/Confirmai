@@ -81,7 +81,7 @@
                                     <div class="payment-history-actions">
                                         <button class="payment-view-proof-btn" type="button"
                                                 disabled="@(h.HasProof && h.ConfirmationId.HasValue ? null : true)"
-                                                @onclick="@(e => h.HasProof && h.ConfirmationId.HasValue ? ViewProofHandler(h.ConfirmationId.Value) : null)">
+                                                @onclick="@(e => h.HasProof && h.ConfirmationId.HasValue ? ViewProofHandler(h.ConfirmationId.Value) : System.Threading.Tasks.Task.CompletedTask)">
                                             <i class="fas fa-camera"></i> Comprovante
                                         </button>
                                         <a class="payment-entry-link" href="@h.EventHref" target="_blank" rel="noopener">

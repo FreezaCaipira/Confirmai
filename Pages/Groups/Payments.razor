@@ -149,7 +149,7 @@ else
                                                 <div class="payments-detail-actions">
                                                     <button class="payments-view-proof-btn" type="button"
                                                             disabled="@(entry.HasProof && entry.ConfirmationId.HasValue ? null : true)"
-                                                            @onclick="@(e => entry.HasProof && entry.ConfirmationId.HasValue ? HandleViewProof(entry.ConfirmationId.Value) : null)"
+                                                            @onclick="@(e => entry.HasProof && entry.ConfirmationId.HasValue ? HandleViewProof(entry.ConfirmationId.Value) : System.Threading.Tasks.Task.CompletedTask)"
                                                             title="Ver comprovante">
                                                         <i class="fas fa-camera"></i>
                                                     </button>
