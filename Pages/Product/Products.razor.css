@@ -9,7 +9,7 @@
 .product-table th,
 .product-table td {
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--slate-mid);
     text-align: left;
 }
 
@@ -30,7 +30,7 @@
 
 button {
     margin-right: 0.5rem;
-    background: #222;
+    background: var(--ci-bg-card);
     color: var(--link-blue);
     border: none;
     padding: 0.4rem 1rem;
@@ -40,8 +40,8 @@ button {
 }
 
 button.danger {
-    background: #a33;
-    color: #fff;
+    background: var(--red-bg-dark);
+    color: var(--white);
 }
 
 button:hover {
@@ -60,11 +60,11 @@ button:hover {
 }
 
 .add-btn:hover {
-    background: #5a8fd6;
+    background: var(--ci-accent);
 }
 
 button.edit-btn {
-    background: #444b54;
+    background: var(--ci-bg-alt);
     color: var(--text-light);
     border: none;
     padding: 0.4rem 1rem;
@@ -76,7 +76,7 @@ button.edit-btn {
 }
 
 button.edit-btn:hover {
-    background: #5a6470;
+    background: var(--ci-bg-mid);
 }
 
 .primary-btn {
@@ -89,7 +89,7 @@ button.edit-btn:hover {
     font-size: 1.1rem;
     cursor: pointer;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 8px #0004;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     display: inline-flex;
     align-items: center;
     transition: background 0.2s;

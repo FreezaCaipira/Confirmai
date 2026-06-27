@@ -9,7 +9,7 @@
 
 .admin-security-shell .security-header h3 {
     color: var(--ci-text-blue);
-    background: linear-gradient(180deg, #0f2a3f 0%, #0a1f30 100%);
+    background: linear-gradient(180deg, var(--ci-bg-mid) 0%, var(--ci-bg-alt) 100%);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
     border-bottom: 1px solid var(--ci-border);
@@ -49,14 +49,14 @@
 
 .admin-security-shell .security-boolean-badge.on {
     color: var(--green-bright);
-    background: #0e2a1a;
-    border-color: #1e5f3a;
+    background: var(--futsal-bg-dark);
+    border-color: var(--futsal-green-dark);
 }
 
 .admin-security-shell .security-boolean-badge.off {
     color: var(--red-soft);
-    background: #2a0e0e;
-    border-color: #5f1e1e;
+    background: var(--red-bg-dark);
+    border-color: var(--red-border);
 }
 
 .admin-security-shell .security-toggle input[type="checkbox"] {
@@ -74,7 +74,7 @@
 
 .security-header h3 {
     color: var(--ci-text-blue);
-    background: linear-gradient(180deg, #0f2a3f 0%, #0a1f30 100%);
+    background: linear-gradient(180deg, var(--ci-bg-mid) 0%, var(--ci-bg-alt) 100%);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
     border-bottom: 1px solid var(--ci-border);
@@ -114,14 +114,14 @@
 
 .security-boolean-badge.on {
     color: var(--green-bright);
-    background: #0e2a1a;
-    border-color: #1e5f3a;
+    background: var(--futsal-bg-dark);
+    border-color: var(--futsal-green-dark);
 }
 
 .security-boolean-badge.off {
     color: var(--red-soft);
-    background: #2a0e0e;
-    border-color: #5f1e1e;
+    background: var(--red-bg-dark);
+    border-color: var(--red-border);
 }
 
 .security-toggle input[type="checkbox"] {

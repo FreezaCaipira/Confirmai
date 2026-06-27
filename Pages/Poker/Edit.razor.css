@@ -4,5 +4,5 @@
 
 .collision-link {
     margin-left: .45rem;
-    color: #93c5fd;
+    color: var(--ci-accent-light);
 }

@@ -28,11 +28,11 @@
 
 .my-conf-card--cancelled {
     opacity: 0.6;
-    border-color: #ef4444;
+    border-color: var(--red-strong);
 }
 
 .my-conf-card--urgent {
-    border-color: #f97316;
+    border-color: var(--amber-mid);
     background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(249, 115, 22, 0.1) 100%);
     animation: pulse 2s ease-in-out infinite;
 }
@@ -96,7 +96,7 @@
 
 .meta-chip--confirmed {
     background: rgba(74, 222, 128, 0.2);
-    color: #4ade80;
+    color: var(--green-bright);
 }
 
 .my-conf-cancelled {
@@ -108,7 +108,7 @@
     font-size: 0.75rem;
     font-weight: 500;
     background: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
+    color: var(--red-strong);
 }
 
 .my-conf-pos {
@@ -128,7 +128,7 @@
 }
 
 .my-conf-price {
-    color: #4ade80;
+    color: var(--green-bright);
     font-weight: 500;
 }
 
@@ -154,9 +154,9 @@
 
 .my-conf-btn--view {
     background: var(--accent-gold);
-    color: #000;
+    color: var(--ci-bg-deepest);
 }
 
 .my-conf-btn--view:hover {
-    background: #d4a843;
+    background: var(--gold-amber);
 }

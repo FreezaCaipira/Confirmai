@@ -5,9 +5,9 @@
     align-items: end;
     margin-bottom: 0.72rem;
     padding: 0.56rem;
-    border: 1px solid var(--ci-border, #1b3d6c);
+    border: 1px solid var(--ci-border);
     border-radius: 4px;
-    background: #050810;
+    background: var(--ci-bg-deepest);
     box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -19,7 +19,7 @@
 .mailbox-filter-field label {
     font-size: 0.7rem;
     font-weight: 700;
-    color: var(--ci-text-muted, #8aacc8);
+    color: var(--ci-text-muted);
 }
 
 .mailbox-search {
@@ -31,7 +31,7 @@
     align-items: center;
     gap: 0.38rem;
     font-size: 0.73rem;
-    color: var(--ci-text, #f1f5f9);
+    color: var(--ci-text);
     font-weight: 700;
 }
 
@@ -45,9 +45,9 @@
     min-height: 1.85rem;
     padding: 0.18rem 0.55rem;
     border-radius: 3px;
-    border: 1px solid var(--ci-border, #1b3d6c);
-    background: #0f1825;
-    color: var(--ci-text, #f1f5f9);
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-deep);
+    color: var(--ci-text);
     font-size: 0.72rem;
     font-weight: 700;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -59,10 +59,10 @@
     width: 100%;
     box-sizing: border-box;
     min-height: 1.82rem;
-    border: 1px solid var(--ci-border, #1b3d6c);
+    border: 1px solid var(--ci-border);
     border-radius: 4px;
-    background: var(--ci-bg-input, #07111d);
-    color: var(--ci-text, #f1f5f9);
+    background: var(--ci-bg-input);
+    color: var(--ci-text);
     padding: 0.16rem 0.4rem;
     font-size: 0.76rem;
 }

@@ -7,7 +7,7 @@
 
 .admin-delete-prompt {
     font-size: 0.8rem;
-    color: #f1f5f9;
+    color: var(--ci-surface-light);
     white-space: nowrap;
 }
 

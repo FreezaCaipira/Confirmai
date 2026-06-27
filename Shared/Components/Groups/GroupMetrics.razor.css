@@ -13,28 +13,28 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: #0a0f18;
-    border: 1px solid #2d6a8a;
+    background: var(--ci-bg-deepest);
+    border: 1px solid var(--ci-border-alt);
     border-radius: 8px;
     transition: all 0.15s;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .metric-card:hover {
-    background: #0f1825;
-    border-color: #4f9cf8;
+    background: var(--ci-bg-mid);
+    border-color: var(--ci-accent);
     box-shadow: 0 6px 12px rgba(79, 156, 248, 0.3);
 }
 
 .metric-card--alert {
-    background: #1a0a0a;
-    border-color: #b71c1c;
+    background: var(--red-bg-dark);
+    border-color: var(--red-border);
     box-shadow: 0 4px 8px rgba(183, 28, 28, 0.3);
 }
 
 .metric-card--alert:hover {
-    background: #2a0f0f;
-    border-color: #c62828;
+    background: var(--red-bg-dark);
+    border-color: var(--red-strong);
     box-shadow: 0 6px 12px rgba(198, 40, 40, 0.4);
 }
 
@@ -51,32 +51,32 @@
 }
 
 .metric-icon--members {
-    background: linear-gradient(180deg, #4f9cf8 0%, #1a5ab0 50%, #0d3270 100%);
-    color: #e0f2fe;
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent) 100%);
+    color: var(--ci-surface-light);
     text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
 }
 
 .metric-icon--events {
-    background: linear-gradient(180deg, #9c27b0 0%, #6a1b9a 50%, #4a148c 100%);
-    color: #e1bee7;
+    background: linear-gradient(180deg, var(--poker-accent) 0%, var(--poker-bg-dark) 50%, var(--poker-bg-deepest) 100%);
+    color: var(--poker-text);
     text-shadow: 0 0 10px rgba(156, 39, 176, 0.5);
 }
 
 .metric-icon--attendance {
-    background: linear-gradient(180deg, #4caf50 0%, #2e7d32 50%, #1b5e20 100%);
-    color: #c8e6c9;
+    background: linear-gradient(180deg, var(--green-bright) 0%, var(--futsal-green-dark) 50%, var(--bg-deepest) 100%);
+    color: var(--futsal-green-pale);
     text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
 
 .metric-icon--payments {
-    background: linear-gradient(180deg, #ffc107 0%, #ff9800 50%, #f57c00 100%);
-    color: #fff8e1;
+    background: linear-gradient(180deg, var(--amber) 0%, var(--amber-mid) 50%, var(--amber-dark) 100%);
+    color: var(--parchment-cream);
     text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
 }
 
 .metric-icon--pending {
-    background: linear-gradient(180deg, #ff9800 0%, #f57c00 50%, #e65100 100%);
-    color: #fff3e0;
+    background: linear-gradient(180deg, var(--amber-mid) 0%, var(--amber-dark) 50%, var(--amber-strong) 100%);
+    color: var(--parchment-soft);
     text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
 }
 
@@ -88,35 +88,35 @@
 .metric-value {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #e0f2fe;
+    color: var(--ci-surface-light);
     line-height: 1.2;
     text-shadow: 0 0 10px rgba(79, 156, 248, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .metric-label {
     font-size: 0.85rem;
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
     margin-top: 0.25rem;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .metric-sub {
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--slate-muted);
     margin-top: 0.15rem;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .metric-sub--good {
-    color: #4ade80;
+    color: var(--green-bright);
 }
 
 .metric-sub--warning {
-    color: #fbbf24;
+    color: var(--amber);
 }
 
 .metric-sub--alert {
-    color: #f87171;
+    color: var(--red-soft);
     font-weight: 600;
 }
 

@@ -2,7 +2,7 @@
 .esc-not-found {
     text-align: center;
     padding: 3rem 1rem;
-    color: var(--text-muted, #6b7280);
+    color: var(--text-muted);
 }
 
 /* ── Gate (lock / not-member) ───────────────────────────────────────────── */
@@ -129,7 +129,7 @@
 
 .esc-date {
     font-size: .9rem;
-    color: var(--text-muted, #9ca3af);
+    color: var(--text-muted);
     margin-bottom: 1.25rem;
 }
 .esc-date i { margin-right: .35rem; }
@@ -236,7 +236,7 @@
 
 .esc-player:hover { background: rgba(96, 165, 250, 0.18); }
 
-.esc-player--gk { color: var(--ci-accent, #4f9cf8); font-weight: 600; }
+.esc-player--gk { color: var(--ci-accent); font-weight: 600; }
 
 .esc-player.esc-player--mvp {
     background: linear-gradient(90deg, rgba(251,191,36,.18) 0%, rgba(8,18,30,.46) 70%);
@@ -257,7 +257,7 @@
 .esc-player-num {
     min-width: 1.4rem;
     text-align: right;
-    color: var(--text-muted, #9ca3af);
+    color: var(--text-muted);
     font-size: .8rem;
 }
 
@@ -279,7 +279,7 @@
     font-size: .9rem;
     font-weight: 600;
     margin: 0 0 .5rem;
-    color: var(--text-muted, #9ca3af);
+    color: var(--text-muted);
 }
 
 /* ── Share bar ──────────────────────────────────────────────────────────── */
@@ -408,7 +408,7 @@
 }
 
 .esc-modal {
-    background: var(--ci-bg-card, #111927);
+    background: var(--ci-bg-card);
     border-radius: 14px;
     padding: 1.5rem;
     max-width: 420px;

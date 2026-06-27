@@ -12,7 +12,7 @@
 .ranking-footnote {
     margin-top: 1rem;
     font-size: 0.78rem;
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
     display: flex;
     align-items: center;
     gap: 0.35rem;

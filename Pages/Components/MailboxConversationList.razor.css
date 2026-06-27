@@ -1,6 +1,6 @@
 .mailbox-list-pane {
-    border: 1px solid var(--ci-border, #1b3d6c);
-    background: #050810;
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-deepest);
     border-radius: 4px;
     padding: 0.5rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -14,9 +14,9 @@
 }
 
 .mailbox-folder-tab {
-    border: 1px solid var(--ci-border, #1b3d6c);
-    background: #0f1825;
-    color: var(--ci-text-muted, #8aacc8);
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-mid);
+    color: var(--ci-text-muted);
     min-height: 1.9rem;
     font-size: 0.72rem;
     font-weight: 700;
@@ -29,15 +29,15 @@
 }
 
 .mailbox-folder-tab.active {
-    border-color: var(--ci-accent-mid, #1a5ab0);
-    background: #1a3a5c;
-    color: var(--ci-accent, #4f9cf8);
+    border-color: var(--ci-accent-mid);
+    background: var(--ci-border-alt);
+    color: var(--ci-accent);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.4), inset 0 0 0 1px rgba(79, 156, 248, 0.2);
 }
 
 .mailbox-folder-tab:hover:not(.active) {
-    background: #162030;
-    color: var(--ci-text, #f1f5f9);
+    background: var(--ci-bg-card);
+    color: var(--ci-text);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
@@ -56,16 +56,16 @@
 .mailbox-list-pane .mailbox-pagination {
     margin-top: 0.7rem;
     padding-top: 0.44rem;
-    border-top: 1px dashed var(--ci-border, #1b3d6c);
+    border-top: 1px dashed var(--ci-border);
 }
 
 .mailbox-list-item {
-    border: 1px solid var(--ci-border, #1b3d6c);
-    background: #0f1825;
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-mid);
     border-radius: 6px;
     padding: 0.56rem 0.58rem;
     text-align: left;
-    color: var(--ci-text, #f1f5f9);
+    color: var(--ci-text);
     cursor: pointer;
     display: block;
     position: relative;
@@ -87,7 +87,7 @@
 }
 
 .mailbox-list-item-main:focus-visible {
-    outline: 1px dashed var(--ci-accent, #4f9cf8);
+    outline: 1px dashed var(--ci-accent);
     outline-offset: 2px;
 }
 
@@ -100,35 +100,35 @@
     font-size: 0.66rem;
     min-height: 1.65rem;
     padding: 0.18rem 0.46rem;
-    border-color: var(--ci-border, #1b3d6c);
-    background: var(--ci-bg-card-deep, #0d1825);
-    color: var(--ci-text-muted, #8aacc8);
+    border-color: var(--ci-border);
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-muted);
     font-weight: 700;
 }
 
 .mailbox-list-item-mark-read:hover,
 .mailbox-list-item-mark-read:focus-visible {
     background: rgba(79, 156, 248, 0.1);
-    color: var(--ci-text, #f1f5f9);
+    color: var(--ci-text);
 }
 
 .mailbox-list-item.unread {
-    border-color: var(--ci-accent-mid, #1a5ab0);
+    border-color: var(--ci-accent-mid);
     box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.15);
 }
 
 .mailbox-list-item.sent {
-    background: var(--ci-bg-card-deep, #0d1825);
+    background: var(--ci-bg-card-deep);
 }
 
 .mailbox-list-item.active {
-    border-color: var(--ci-accent-mid, #1a5ab0);
-    background: #0a1525;
+    border-color: var(--ci-accent-mid);
+    background: var(--ci-bg-alt);
     box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.3), 0 6px 12px rgba(79, 156, 248, 0.3), 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .mailbox-list-item:not(.active):hover {
-    background: #162030;
+    background: var(--ci-bg-card);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
@@ -154,9 +154,9 @@
     place-items: center;
     font-size: 0.58rem;
     font-weight: 800;
-    color: var(--ci-text, #f1f5f9);
-    border: 1px solid var(--ci-border-dim, #1a5298);
-    background: linear-gradient(180deg, var(--ci-accent-mid, #1a5ab0) 0%, var(--ci-accent-dark, #0d3270) 100%);
+    color: var(--ci-text);
+    border: 1px solid var(--ci-border-dim);
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
     flex: 0 0 auto;
 }
 
@@ -170,18 +170,18 @@
     font-size: 0.6rem;
     line-height: 1;
     font-weight: 800;
-    color: var(--ci-bg-card-deep, #0d1825);
-    border: 1px solid var(--ci-accent, #4f9cf8);
-    background: var(--ci-accent, #4f9cf8);
+    color: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-accent);
+    background: var(--ci-accent);
     flex: 0 0 auto;
 }
 
 .mailbox-list-item.active .mailbox-list-item-head strong {
-    color: #f1f5f9;
+    color: var(--ci-text);
 }
 
 .mailbox-list-item.active .mailbox-list-item-head span {
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
 }
 
 .mailbox-list-item-time {
@@ -190,16 +190,16 @@
     right: 0.58rem;
     font-weight: 700;
     font-size: 0.64rem;
-    color: var(--ci-text-subtle, #6082a0);
+    color: var(--ci-text-subtle);
 }
 
 .mailbox-list-item.active .mailbox-list-item-time {
-    color: #94a3b8;
+    color: var(--slate-muted);
 }
 
 .mailbox-list-item-peer {
     margin-top: 0.24rem;
-    color: var(--ci-text-muted, #8aacc8);
+    color: var(--ci-text-muted);
     font-size: 0.7rem;
     font-weight: 700;
 }
@@ -212,26 +212,26 @@
 }
 
 .mailbox-list-item.active .mailbox-chip {
-    background: #0f1a2e;
-    border-color: #4f9cf8;
-    color: #e0f2fe;
+    background: var(--ci-bg-mid);
+    border-color: var(--ci-accent);
+    color: var(--ci-surface-light);
 }
 
 .mailbox-chip-alert {
-    border-color: var(--ci-accent-mid, #1a5ab0);
-    color: var(--ci-accent, #4f9cf8);
+    border-color: var(--ci-accent-mid);
+    color: var(--ci-accent);
     background: rgba(79, 156, 248, 0.1);
 }
 
 .mailbox-list-item-snippet {
     margin-top: 0.22rem;
-    color: var(--ci-text-muted, #8aacc8);
+    color: var(--ci-text-muted);
     font-size: 0.74rem;
     line-height: 1.35;
 }
 
 .mailbox-list-item.active .mailbox-list-item-snippet {
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
 }
 
 .mailbox-pagination {
@@ -246,23 +246,23 @@
     min-height: 1.85rem;
     padding: 0.18rem 0.55rem;
     border-radius: 3px;
-    border: 1px solid var(--ci-border, #1b3d6c);
-    background: var(--ci-bg-card, #111927);
-    color: var(--ci-text, #f1f5f9);
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-card);
+    color: var(--ci-text);
     font-size: 0.72rem;
     font-weight: 700;
 }
 
 .mailbox-pagination span {
-    color: var(--ci-text-subtle, #6082a0);
+    color: var(--ci-text-subtle);
     font-size: 0.74rem;
 }
 
 .market-empty {
-    color: var(--ci-text-subtle, #6082a0);
+    color: var(--ci-text-subtle);
     font-size: 0.74rem;
     background: transparent;
-    border-color: var(--ci-border, #1b3d6c);
+    border-color: var(--ci-border);
 }
 
 @media (max-width: 1024px) {

@@ -6,10 +6,10 @@
     max-width: 340px;
     padding: 1rem 1.5rem;
     border-radius: 8px;
-    color: #fff;
+    color: var(--white);
     font-weight: bold;
     font-size: 1.1rem;
-    box-shadow: 0 2px 16px #000a;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
     z-index: 9999;
     opacity: 0.97;
     animation: toast-in 0.3s;
@@ -28,7 +28,7 @@
 }
 
 .toast-success {
-    background: #43a047;
+    background: var(--green-strong);
 }
 
 .toast-error {
@@ -36,10 +36,10 @@
 }
 
 .toast-info {
-    background: #1976d2;
+    background: var(--ci-accent);
 }
 
 .toast-warning {
-    background: #fbc02d;
-    color: #222;
+    background: var(--amber);
+    color: var(--ci-bg-card);
 }

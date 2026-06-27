@@ -3,7 +3,7 @@
 .admin-users-shell .users-table-container {
     max-height: 600px;
     overflow-y: auto;
-    border: 1px solid #7f5c1c;
+    border: 1px solid var(--brown-border);
     border-radius: 4px;
     background: var(--parchment);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 244, 214, 0.5);

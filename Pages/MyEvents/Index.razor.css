@@ -58,15 +58,15 @@
 }
 
 .my-events-create-btn--futsal {
-    background: #14532d;
-    color: #bbf7d0;
-    border: 1.5px solid #166534;
+    background: var(--futsal-green-dark);
+    color: var(--futsal-green-pale);
+    border: 1.5px solid var(--green-strong);
 }
 
 .my-events-create-btn--poker {
-    background: #3b0764;
-    color: #e9d5ff;
-    border: 1.5px solid #4c1d95;
+    background: var(--poker-bg-deepest);
+    color: var(--poker-text);
+    border: 1.5px solid var(--poker-bg-dark);
 }
 
 /* ── Sport tabs ──────────────────────────────────────────────── */
@@ -91,7 +91,7 @@
 }
 
 .my-events-tab:hover {
-    border-color: #2d6a8a;
+    border-color: var(--ci-border-alt);
     color: var(--ci-text-muted);
 }
 
@@ -102,15 +102,15 @@
 }
 
 .my-events-tab--futsal.my-events-tab--active {
-    background: #0a2018;
-    border-color: #14532d;
+    background: var(--futsal-bg-dark);
+    border-color: var(--futsal-green-dark);
     color: var(--green-bright);
 }
 
 .my-events-tab--poker.my-events-tab--active {
-    background: #1a0a2e;
-    border-color: #3b0764;
-    color: #c084fc;
+    background: var(--poker-bg-deepest);
+    border-color: var(--poker-bg-deepest);
+    color: var(--poker-accent);
 }
 
 /* ── Event list ──────────────────────────────────────────────── */
@@ -126,7 +126,7 @@
     gap: 0.75rem;
     padding: 0.75rem 0.9rem;
     background: var(--ci-bg-card-deep);
-    border: 1px solid #1b3868;
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
     transition: border-color 0.15s, opacity 0.2s;
 }
@@ -155,13 +155,13 @@
 }
 
 .my-event-sport-badge--futsal {
-    background: #0a2018;
-    border: 1px solid #14532d;
+    background: var(--futsal-bg-dark);
+    border: 1px solid var(--futsal-green-dark);
 }
 
 .my-event-sport-badge--poker {
-    background: #1a0a2e;
-    border: 1px solid #3b0764;
+    background: var(--poker-bg-deepest);
+    border: 1px solid var(--poker-bg-deepest);
 }
 
 .my-event-body {
@@ -179,7 +179,7 @@
 
 .my-event-name {
     font-size: 0.95rem;
-    color: #f1f5f9;
+    color: var(--ci-text);
     font-weight: 700;
 }
 
@@ -193,21 +193,21 @@
 }
 
 .my-event-status--active {
-    background: #0a2018;
+    background: var(--futsal-bg-dark);
     color: var(--green-bright);
-    border: 1px solid #14532d;
+    border: 1px solid var(--futsal-green-dark);
 }
 
 .my-event-status--past {
-    background: #1a2535;
+    background: var(--ci-bg-card);
     color: var(--ci-text-subtle);
     border: 1px solid var(--ci-border);
 }
 
 .my-event-status--cancelled {
-    background: #290f0f;
-    color: #f87171;
-    border: 1px solid #7f1d1d;
+    background: var(--red-bg-dark);
+    color: var(--red-soft);
+    border: 1px solid var(--red-border);
 }
 
 .my-event-type-badge {
@@ -218,33 +218,33 @@
 }
 
 .my-event-type-badge--tournament {
-    background: #1c1508;
-    color: #fbbf24;
-    border: 1px solid #78350f;
+    background: var(--brown-deep);
+    color: var(--amber);
+    border: 1px solid var(--brown-mid);
 }
 
 .my-event-type-badge--cashgame {
-    background: #0a2018;
+    background: var(--futsal-bg-dark);
     color: var(--green-bright);
-    border: 1px solid #14532d;
+    border: 1px solid var(--futsal-green-dark);
 }
 
 .my-event-type-badge--homegame {
-    background: #1a0a2e;
-    color: #c084fc;
-    border: 1px solid #3b0764;
+    background: var(--poker-bg-deepest);
+    color: var(--poker-accent);
+    border: 1px solid var(--poker-bg-deepest);
 }
 
 .my-event-meta {
     margin: 0 0 0.18rem;
     font-size: 0.8rem;
-    color: #94b4cc;
+    color: var(--ci-text-blue);
 }
 
 .my-event-location {
     margin: 0;
     font-size: 0.78rem;
-    color: #7a9ab4;
+    color: var(--ci-text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -291,17 +291,17 @@
 
 .my-event-action-btn--view:hover {
     border-color: var(--ci-accent);
-    color: #82bdd8;
+    color: var(--link-info);
 }
 
 .my-event-action-btn--cancel {
     background: transparent;
-    color: #f87171;
-    border-color: #7f1d1d;
+    color: var(--red-soft);
+    border-color: var(--red-border);
 }
 
 .my-event-action-btn--cancel:hover:not(:disabled) {
-    background: #290f0f;
+    background: var(--red-bg-dark);
 }
 
 @media (max-width: 640px) {
@@ -337,7 +337,7 @@
     gap: 0.75rem;
     padding: 0.75rem 0.9rem;
     background: var(--ci-bg-card-deep);
-    border: 1px solid #1b3868;
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
     transition: border-color 0.15s, opacity 0.2s;
 }

@@ -36,5 +36,5 @@
 }
 
 .my-conf-browse-btn--poker:hover {
-    border-color: #f472b6;
+    border-color: var(--pink-mid);
 }

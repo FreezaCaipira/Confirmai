@@ -1,5 +1,5 @@
 ﻿.parchment-lab-page .entity-shell-main {
-    background: linear-gradient(166deg, #ebd2a5 0%, #ddb983 52%, #cfa36d 100%);
+    background: linear-gradient(166deg, var(--gold-soft) 0%, var(--gold-dark) 52%, var(--brown-mid) 100%);
 }
 
 .parchment-grid {
@@ -13,7 +13,7 @@
     isolation: isolate;
     overflow: hidden;
     border-radius: 12px;
-    border: 1px solid #866338;
+    border: 1px solid var(--brown-border);
     padding: 0.95rem 1rem;
     min-height: 220px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -26,13 +26,13 @@
 
 .parchment-sample h3 {
     margin: 0;
-    color: #4b2f16;
+    color: var(--brown-text);
     font-family: "Times New Roman", Georgia, serif;
 }
 
 .parchment-sample p,
 .parchment-sample li {
-    color: #55361c;
+    color: var(--brown-text);
     line-height: 1.52;
 }
 
@@ -63,7 +63,7 @@
 }
 
 .parchment-sample-a {
-    background: linear-gradient(168deg, #efdbb6 0%, #e4c792 58%, #d8b27b 100%);
+    background: linear-gradient(168deg, var(--parchment-soft) 0%, var(--gold-soft) 58%, var(--gold-dark) 100%);
 }
 
 .parchment-sample-a::before {
@@ -75,7 +75,7 @@
 }
 
 .parchment-sample-b {
-    background: linear-gradient(166deg, #e6c994 0%, #d8b177 56%, #c69359 100%);
+    background: linear-gradient(166deg, var(--gold-soft) 0%, var(--gold-dark) 56%, var(--brown-mid) 100%);
 }
 
 .parchment-sample-b::before {
@@ -89,8 +89,8 @@
 }
 
 .parchment-sample-c {
-    background: linear-gradient(167deg, #e2c08a 0%, #d1a86f 52%, #bf8e57 100%);
-    border-color: #7f5a2f;
+    background: linear-gradient(167deg, var(--gold-soft) 0%, var(--gold-dark) 52%, var(--brown-mid) 100%);
+    border-color: var(--brown-border);
 }
 
 .parchment-sample-c::before {
@@ -102,8 +102,8 @@
 }
 
 .parchment-sample-d {
-    background: linear-gradient(166deg, #edd6a9 0%, #ddb67c 54%, #cb9b61 100%);
-    border: 1px solid #7a552a;
+    background: linear-gradient(166deg, var(--gold-soft) 0%, var(--gold-dark) 54%, var(--brown-mid) 100%);
+    border: 1px solid var(--brown-border);
     box-shadow: inset 0 0 0 1px rgba(252, 229, 179, 0.36), 0 10px 22px rgba(0, 0, 0, 0.26);
 }
 
@@ -121,7 +121,7 @@
     border: 1px dashed var(--brown-border);
     border-radius: 10px;
     padding: 0.65rem 0.75rem;
-    color: #51331a;
+    color: var(--brown-text);
     background: rgba(248, 233, 204, 0.62);
     font-weight: 600;
 }

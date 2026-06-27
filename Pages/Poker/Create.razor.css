@@ -8,7 +8,7 @@
 /* ── Inline styles estáticos ───────────────── */
 .form-hint--margin-bottom { margin-bottom: 0.5rem; }
 .validation-message--margin-top { margin-top: 0.5rem; }
-.collision-link { margin-left: 0.45rem; color: #93c5fd; }
+.collision-link { margin-left: 0.45rem; color: var(--link-info); }
 
 /* ── Seletor de tipo ─────────────────────── */
 .poker-type-selector {
@@ -23,9 +23,9 @@
     min-width: 100px;
     padding: 0.55rem 0.75rem;
     border-radius: 8px;
-    border: 1px solid #1b3d6c;
-    background: #111927;
-    color: #6082a0;
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-deepest);
+    color: var(--ci-text-muted);
     font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
@@ -36,9 +36,9 @@
     transition: background 0.14s, border-color 0.14s, color 0.14s;
 }
 
-.poker-type-tab.is-active--tourney { background: #1e1034; border-color: #7c3aed; color: #a78bfa; }
-.poker-type-tab.is-active--cash    { background: #14290f; border-color: #16a34a; color: #4ade80; }
-.poker-type-tab.is-active--home    { background: #1a1209; border-color: #d97706; color: #fbbf24; }
+.poker-type-tab.is-active--tourney { background: var(--poker-bg-deepest); border-color: var(--poker-accent); color: var(--poker-text); }
+.poker-type-tab.is-active--cash    { background: var(--futsal-bg-dark); border-color: var(--green-bright); color: var(--green-bright); }
+.poker-type-tab.is-active--home    { background: var(--brown-deep); border-color: var(--amber-mid); color: var(--amber); }
 
 /* ── Modalidade chips ────────────────────── */
 .modality-grid {
@@ -54,9 +54,9 @@
     gap: 0.3rem;
     padding: 0.35rem 0.85rem;
     border-radius: 20px;
-    background: #111927;
-    border: 1px solid #1b3d6c;
-    color: #8aacc8;
+    background: var(--ci-bg-deepest);
+    border: 1px solid var(--ci-border);
+    color: var(--ci-text-blue);
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
@@ -67,9 +67,9 @@
 .modality-chip input[type=radio] { display: none; }
 
 .modality-chip--on {
-    background: #1e1034;
-    border-color: #7c3aed;
-    color: #a78bfa;
+    background: var(--poker-bg-deepest);
+    border-color: var(--poker-accent);
+    color: var(--poker-text);
 }
 
 /* ── Home Game notice ────────────────────── */
@@ -77,22 +77,22 @@
     display: flex;
     align-items: flex-start;
     gap: 0.85rem;
-    background: #1a1209;
-    border: 1px solid #78350f;
+    background: var(--brown-deep);
+    border: 1px solid var(--brown-mid);
     border-radius: 10px;
     padding: 1rem 1.1rem;
     margin-bottom: 1.25rem;
-    color: #fbbf24;
+    color: var(--amber);
 }
 
 .homegame-notice i { font-size: 1.3rem; margin-top: 0.15rem; flex-shrink: 0; }
 .homegame-notice strong { display: block; font-size: 0.9rem; margin-bottom: 0.3rem; }
-.homegame-notice p { font-size: 0.82rem; color: #b45309; margin: 0; line-height: 1.5; }
+.homegame-notice p { font-size: 0.82rem; color: var(--amber-dark); margin: 0; line-height: 1.5; }
 
 /* ── Save button poker variant ───────────── */
 .save-btn--poker {
-    background: #7c3aed;
-    border-color: #6d28d9;
+    background: var(--poker-accent);
+    border-color: var(--poker-bg-dark);
 }
 
-.save-btn--poker:hover:not(:disabled) { background: #6d28d9; }
+.save-btn--poker:hover:not(:disabled) { background: var(--poker-bg-dark); }

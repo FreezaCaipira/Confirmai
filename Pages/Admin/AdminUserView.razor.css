@@ -17,11 +17,11 @@
     margin: 0 0 0.42rem;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.97rem;
-    color: #ffe6b6;
+    color: var(--parchment-soft);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     padding: 0.38rem 0.6rem;
-    background: linear-gradient(180deg, #7a2f0e 0%, #57210d 100%);
+    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
     border-radius: 4px;
     text-shadow: 0 1px 0 rgba(33, 15, 5, 0.55);
     margin: -0.64rem -0.64rem 0.5rem;
@@ -39,7 +39,7 @@
     margin: 0;
     font-size: 0.72rem;
     font-weight: 800;
-    color: #5f3d1e;
+    color: var(--brown-text);
     text-transform: uppercase;
     letter-spacing: 0.02em;
 }
@@ -48,7 +48,7 @@
     margin: 0;
     font-size: 0.82rem;
     font-weight: 700;
-    color: #4a2c15;
+    color: var(--brown-text);
     min-width: 0;
     overflow-wrap: anywhere;
 }
@@ -56,7 +56,7 @@
 .admin-profile-governance-copy {
     margin: 0 0 0.42rem;
     font-size: 0.78rem;
-    color: #4e3118;
+    color: var(--brown-text);
     line-height: 1.34;
 }
 
@@ -89,22 +89,22 @@
 .role-toggle-info strong {
     display: block;
     font-size: 0.88rem;
-    color: #3d230f;
+    color: var(--brown-text);
     margin-bottom: 0.12rem;
 }
 
 .role-toggle-info small {
     font-size: 0.76rem;
-    color: #7a5c38;
+    color: var(--brown-text);
 }
 
 .role-toggle-btn {
     flex-shrink: 0;
     padding: 0.35rem 0.85rem;
     border-radius: 5px;
-    border: 1.5px solid #b45309;
-    background: #fff7ed;
-    color: #92400e;
+    border: 1.5px solid var(--amber-mid);
+    background: var(--parchment-cream);
+    color: var(--amber-dark);
     font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
@@ -112,17 +112,17 @@
 }
 
 .role-toggle-btn:hover:not(:disabled) {
-    background: #fde68a;
+    background: var(--amber-warm);
 }
 
 .role-toggle-btn--active {
-    background: #fee2e2;
-    border-color: #dc2626;
-    color: #991b1b;
+    background: var(--red-pale);
+    border-color: var(--red-dark);
+    color: var(--red-strong);
 }
 
 .role-toggle-btn--active:hover:not(:disabled) {
-    background: #fecaca;
+    background: var(--red-pale);
 }
 
 .role-toggle-btn:disabled {
@@ -136,7 +136,7 @@
 
 .admin-user-stat-card {
     border: 1px solid var(--brown-border-accent);
-    background: linear-gradient(180deg, #f7ebd1 0%, #ecd6b0 100%);
+    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-light) 100%);
     border-radius: 6px;
     padding: 0.4rem;
     display: grid;
@@ -146,13 +146,13 @@
 .admin-user-stat-label {
     font-size: 0.67rem;
     font-weight: 700;
-    color: #6a4728;
+    color: var(--brown-text);
 }
 
 .admin-user-stat-value {
     font-size: 1rem;
     font-weight: 900;
-    color: #4a2b14;
+    color: var(--brown-text);
 }
 
 /* Outfit */
@@ -177,8 +177,8 @@
 .action-row .mk-btn {
     min-width: 120px;
     padding: 0.44rem 1.2rem;
-    border: 2px solid #7a3e1f;
-    border-image: linear-gradient(to bottom right, #c9a06a, #7a5028 40%, #4a2e15 70%, #8b6839) 1;
+    border: 2px solid var(--brown-mid);
+    border-image: linear-gradient(to bottom right, var(--gold-soft), var(--gold-dark) 40%, var(--bg-dark) 70%, var(--gold-soft)) 1;
     border-radius: 0;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.88rem;
@@ -190,20 +190,20 @@
 }
 
 .action-row .mk-btn-muted {
-    background: linear-gradient(180deg, #d8c39b 0%, #baa074 100%);
-    color: #3c250f;
+    background: linear-gradient(180deg, var(--parchment-mid) 0%, var(--parchment-dark) 100%);
+    color: var(--brown-text);
     text-shadow: 0 1px 0 rgba(255, 240, 200, 0.35);
 }
 
 .action-row .mk-btn-secondary {
-    background: linear-gradient(180deg, #b07830 0%, #8a5a1e 100%);
-    color: #ffe6b6;
+    background: linear-gradient(180deg, var(--gold-amber) 0%, var(--gold-dark) 100%);
+    color: var(--parchment-soft);
     text-shadow: 0 1px 0 rgba(33, 15, 5, 0.45);
 }
 
 .action-row .mk-btn-primary {
-    background: linear-gradient(180deg, #7a2f0e 0%, #57210d 100%);
-    color: #ffe6b6;
+    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
+    color: var(--parchment-soft);
     text-shadow: 0 1px 0 rgba(33, 15, 5, 0.55);
 }
 

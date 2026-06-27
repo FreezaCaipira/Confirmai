@@ -3,8 +3,8 @@
     gap: 0.28rem;
     padding: 0.72rem 1.1rem;
     border-bottom: 2px solid;
-    border-image: linear-gradient(to right, #4f9cf8, #7dd3fc, #4f9cf8) 1;
-    background: #050810;
+    border-image: linear-gradient(to right, var(--ci-accent), var(--ci-accent-light), var(--ci-accent)) 1;
+    background: var(--ci-bg-deepest);
 }
 
 .profile-contact-row {
@@ -12,16 +12,16 @@
     align-items: baseline;
     gap: 0.5rem;
     padding: 0.25rem 0.5rem;
-    background: #0a0f18;
+    background: var(--ci-bg-deepest);
     border-radius: 4px;
-    border: 1px solid var(--ci-border, #1b3d6c);
+    border: 1px solid var(--ci-border);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .profile-contact-label {
     font-size: 0.75rem;
     font-weight: 800;
-    color: #cbd5e1;
+    color: var(--ci-surface-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     min-width: 72px;
@@ -32,7 +32,7 @@
 .profile-contact-value {
     font-size: 0.9rem;
     font-weight: 700;
-    color: #e0f2fe;
+    color: var(--ci-surface-light);
     overflow-wrap: anywhere;
     text-shadow: 0 0 8px rgba(79, 156, 248, 0.4);
 }

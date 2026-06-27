@@ -188,8 +188,8 @@
 
 /* ── Poker ───────────────────────────────── */
 .sport-card--poker {
-    border-color: #7c3aed;
-    border-top: 3px solid #a78bfa;
+    border-color: var(--poker-bg-dark);
+    border-top: 3px solid var(--poker-accent);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(124, 58, 237, 0.2);
 }
 
@@ -198,7 +198,7 @@
 }
 
 .sport-card--poker:hover {
-    border-color: #a78bfa;
+    border-color: var(--poker-accent);
     box-shadow: 0 14px 36px rgba(124, 58, 237, 0.3), 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
@@ -207,11 +207,11 @@
 }
 
 .sport-card--poker .sport-card-name {
-    color: #c4b5fd;
+    color: var(--poker-text);
 }
 
 .sport-card--poker .sport-card-cta {
-    color: #c4b5fd;
+    color: var(--poker-text);
 }
 
 /* ── Card parts ──────────────────────────── */
@@ -393,9 +393,9 @@
 .my-conf-browse-btn:hover { filter: brightness(1.15); }
 
 .my-conf-browse-btn--poker {
-    background: #7c3aed;
-    color: #c4b5fd;
-    border-color: #7c3aed;
+    background: var(--poker-bg-dark);
+    color: var(--poker-text);
+    border-color: var(--poker-bg-dark);
 }
 
 /* ── History sub-tabs ────────────────────────────────────────── */
@@ -482,7 +482,7 @@
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3);
 }
 .my-conf-card--past { opacity: 0.7; }
-.my-conf-card--cancelled { opacity: 0.6; border-color: #3d1515; }
+.my-conf-card--cancelled { opacity: 0.6; border-color: var(--red-bg-dark); }
 
 /* ── Sport badge ─────────────────────────────────────────────── */
 .my-conf-sport {
@@ -497,7 +497,7 @@
 }
 
 .my-conf-sport--futsal { background: var(--green-dark); border: 1px solid var(--green-dark); }
-.my-conf-sport--poker  { background: #7c3aed; border: 1px solid #7c3aed; }
+.my-conf-sport--poker  { background: var(--poker-bg-dark); border: 1px solid var(--poker-bg-dark); }
 
 /* ── Body ────────────────────────────────────────────────────── */
 .my-conf-body { flex: 1; min-width: 0; }
@@ -510,7 +510,7 @@
     margin-bottom: 0.2rem;
 }
 
-.my-conf-name { font-size: 0.92rem; color: #e0f2fe; font-weight: 700; text-shadow: 0 0 8px rgba(79, 156, 248, 0.3); }
+.my-conf-name { font-size: 0.92rem; color: var(--ci-surface-light); font-weight: 700; text-shadow: 0 0 8px rgba(79, 156, 248, 0.3); }
 
 .my-conf-pos {
     font-size: 0.72rem;
@@ -545,7 +545,7 @@
     gap: 0.25rem;
 }
 
-.my-conf-meta { margin: 0 0 0.12rem; font-size: 0.78rem; color: #94a3b8; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+.my-conf-meta { margin: 0 0 0.12rem; font-size: 0.78rem; color: var(--slate-muted); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
 
 /* ── Actions ─────────────────────────────────────────────────── */
 .my-conf-actions {

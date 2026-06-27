@@ -1,5 +1,5 @@
 .profile-edit-details {
-    border-top: 1px solid var(--ci-border, #1b3d6c);
+    border-top: 1px solid var(--ci-border);
     margin-bottom: 0.5rem;
 }
 
@@ -7,7 +7,7 @@
     padding: 0.56rem 1.1rem;
     font-size: 0.8rem;
     font-weight: 800;
-    color: var(--ci-text-muted, #8aacc8);
+    color: var(--ci-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     cursor: pointer;
@@ -45,7 +45,7 @@
     height: 56px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--ci-border-dim, #1a5298);
+    border: 2px solid var(--ci-border-dim);
 }
 
 .profile-avatar-upload {
@@ -62,7 +62,7 @@
 
 .profile-avatar-hint {
     font-size: 0.72rem;
-    color: var(--ci-text-subtle, #6082a0);
+    color: var(--ci-text-subtle);
     font-weight: 600;
 }
 
@@ -70,7 +70,7 @@
     margin: 0.4rem 0 0;
     font-size: 0.82rem;
     font-weight: 700;
-    color: var(--ci-text-blue, #deeeff);
+    color: var(--ci-text-blue);
     padding: 0.28rem 0.52rem;
     border-radius: 4px;
     background: rgba(79, 156, 248, 0.12);
@@ -84,10 +84,10 @@
     gap: 0.4rem;
     min-height: 2rem;
     padding: 0.34rem 0.9rem;
-    border: 1px solid var(--ci-border, #1b3d6c);
+    border: 1px solid var(--ci-border);
     border-radius: 4px;
-    background: var(--ci-bg-card-deep, #0d1825);
-    color: var(--ci-text-muted, #8aacc8);
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-muted);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -98,8 +98,8 @@
 
 .mk-btn:hover:not(:disabled) {
     background: rgba(79, 156, 248, 0.1);
-    border-color: var(--ci-border-dim, #1a5298);
-    color: var(--ci-text, #f1f5f9);
+    border-color: var(--ci-border-dim);
+    color: var(--ci-text);
 }
 
 .mk-btn:disabled {
@@ -108,13 +108,13 @@
 }
 
 .mk-btn-primary {
-    background: var(--ci-accent-mid, #1a5ab0);
-    border-color: var(--ci-border-dim, #1a5298);
-    color: var(--ci-text, #f1f5f9);
+    background: var(--ci-accent-mid);
+    border-color: var(--ci-border-dim);
+    color: var(--ci-text);
 }
 
 .mk-btn-primary:hover:not(:disabled) {
-    background: var(--ci-accent, #4f9cf8);
-    border-color: var(--ci-accent, #4f9cf8);
-    color: #fff;
+    background: var(--ci-accent);
+    border-color: var(--ci-accent);
+    color: var(--white);
 }
