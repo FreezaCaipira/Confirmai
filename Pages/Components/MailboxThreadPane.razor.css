@@ -263,7 +263,7 @@
     padding: 0;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1024px) {
     .mailbox-thread-stream {
         max-height: 260px;
     }

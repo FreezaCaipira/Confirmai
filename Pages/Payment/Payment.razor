@@ -1,4 +1,10 @@
-﻿@page "/marketplace/buy/{ProductId:int}"
+﻿@* === DECOMPOSITION CANDIDATES ===
+   Section: FormSection -- lines [15-250] -- candidate for extraction
+   Section: SummarySection -- lines [255-400] -- candidate for extraction
+   Section: QRSection -- lines [405-550] -- candidate for extraction
+=== END DECOMPOSITION === *@
+
+@page "/marketplace/buy/{ProductId:int}"
 
 @attribute [Authorize]
 

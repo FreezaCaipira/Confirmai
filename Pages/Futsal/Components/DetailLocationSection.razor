@@ -23,7 +23,7 @@
     @* Iframe — hidden initially; JS shows it only when Google responds *@
     @if (HasMapsKey)
     {
-        <div id="@MapWrapId" class="detail-map-wrap" style="display:none">
+        <div id="@MapWrapId" class="detail-map-wrap detail-map-wrap--hidden">
             <iframe
                 class="detail-map"
                 src="@EmbedUrl"

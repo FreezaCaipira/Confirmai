@@ -190,7 +190,7 @@
 }
 
 /* ── Responsive ──────────────────────────── */
-@media (max-width: 560px) {
+@media (max-width: 640px) {
     .event-card {
         flex-wrap: wrap;
         gap: 0.75rem;

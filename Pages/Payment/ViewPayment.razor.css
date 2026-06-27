@@ -270,7 +270,7 @@
     border: 1px solid var(--green-dark);
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1024px) {
     .view-pay-grid {
         grid-template-columns: 1fr;
     }
@@ -535,7 +535,7 @@
     width: 100%;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .payment-container .payment-details-container {
         flex-direction: column;
         align-items: center;

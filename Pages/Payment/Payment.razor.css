@@ -16,7 +16,7 @@
 
 .tibia-pay-card-head {
     margin: 0.46rem 0.46rem 0;
-    border: 1px solid #7a5a30;
+    border: 1px solid var(--brown-border-light);
     background: linear-gradient(180deg, rgba(112, 84, 52, 0.92) 0%, rgba(78, 58, 36, 0.92) 100%);
 }
 
@@ -24,7 +24,7 @@
     margin: 0;
     padding: 0.3rem 0.5rem;
     text-align: center;
-    color: #ffe6be;
+    color: var(--parchment-light);
     font-size: 1.16rem;
     font-family: Georgia, "Times New Roman", serif;
 }
@@ -83,13 +83,13 @@
 
 .tibia-pay-value-price {
     font-weight: 700;
-    color: #4b260f;
+    color: var(--brown-text);
 }
 
 .tibia-pay-value-total {
     font-size: 1.02rem;
     font-weight: 800;
-    color: #6f280d;
+    color: var(--brown-text-dark);
 }
 
 .tibia-pay-product-image {
@@ -141,17 +141,17 @@
 
 .tibia-pay-select {
     min-height: 2.26rem;
-    border: 1px solid #8d5a2d;
+    border: 1px solid var(--brown-border);
     padding: 0.34rem 2.1rem 0.34rem 0.56rem;
     background:
         linear-gradient(180deg, rgba(254, 241, 211, 0.98) 0%, rgba(236, 210, 161, 0.96) 100%),
-        linear-gradient(180deg, #edd5ab 0%, #dcb98a 100%);
-    color: #321b0b;
+        linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment-mid) 100%);
+    color: var(--brown-deep);
     appearance: none;
     -webkit-appearance: none;
     background-image:
-        linear-gradient(45deg, transparent 50%, #6d3a16 50%),
-        linear-gradient(135deg, #6d3a16 50%, transparent 50%);
+        linear-gradient(45deg, transparent 50%, var(--rust-orange) 50%),
+        linear-gradient(135deg, var(--rust-orange) 50%, transparent 50%);
     background-position:
         calc(100% - 14px) calc(50% - 3px),
         calc(100% - 8px) calc(50% - 3px);
@@ -180,30 +180,30 @@
 }
 
 .tibia-pay-product-title {
-    color: #4a2410;
+    color: var(--brown-text);
     text-shadow: 0 1px 0 rgba(255, 247, 227, 0.8);
 }
 
 .tibia-pay-value {
-    color: #241305;
+    color: var(--brown-deep);
 }
 
 .tibia-pay-seller-link-wrap {
-    color: #2b1608;
+    color: var(--brown-deep);
 }
 
 .evidence-link:visited {
-    color: #7b3410;
+    color: var(--rust);
 }
 
 .tibia-pay-label {
-    color: #4f2e14;
+    color: var(--brown-text);
 }
 
 .tibia-pay-card-checkout .tibia-pay-label,
 .tibia-pay-card-checkout .tibia-pay-value,
 .tibia-pay-card-checkout .tibia-pay-switch-text {
-    color: #2b1709;
+    color: var(--brown-deep);
 }
 
 .tibia-pay-status-block,
@@ -233,8 +233,8 @@
     width: auto;
     min-height: 2rem;
     padding: 0.36rem 0.75rem;
-    border-color: #8c4d1d;
-    background: linear-gradient(180deg, #f4ca76 0%, #dcaa50 55%, #bf842f 100%);
+    border-color: var(--brown-border);
+    background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold-deep) 55%, var(--gold-dark) 100%);
     box-shadow: inset 0 1px 0 rgba(255, 240, 196, 0.86), 0 1px 3px rgba(79, 41, 14, 0.28);
 }
 
@@ -248,14 +248,14 @@
 }
 
 .tibia-pay-waiting-title {
-    color: #4a250d;
+    color: var(--brown-text);
     font-size: 0.85rem;
     font-weight: 900;
     line-height: 1.2;
 }
 
 .tibia-pay-waiting-hint {
-    color: #5b3215;
+    color: var(--brown-text-dark);
     font-size: 0.76rem;
     font-weight: 700;
     line-height: 1.25;
@@ -266,11 +266,11 @@
     margin-top: 0;
     font-family: Consolas, "Courier New", monospace;
     font-size: 0.84rem;
-    color: #fff2db;
+    color: var(--parchment-light);
     line-height: 1.34;
     word-break: break-all;
-    background: linear-gradient(180deg, #b96e30 0%, #955221 100%);
-    border: 1px solid #ca8b49;
+    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
+    border: 1px solid var(--brown-border-light);
     border-radius: 3px;
     padding: 0.4rem 0.46rem;
     box-shadow: inset 0 1px 0 rgba(255, 232, 193, 0.38);
@@ -291,10 +291,10 @@
     justify-content: center;
     width: 32px;
     min-width: 32px;
-    border: 1px solid #ca8b49;
+    border: 1px solid var(--brown-border-light);
     border-radius: 3px;
-    background: linear-gradient(180deg, #d4711e 0%, #b35512 100%);
-    color: #fff5e6;
+    background: linear-gradient(180deg, var(--orange) 0%, var(--rust-orange) 100%);
+    color: var(--parchment-soft);
     font-size: 0.82rem;
     cursor: pointer;
     transition: filter 0.14s ease;
@@ -317,9 +317,9 @@
     overflow-x: auto;
     white-space: pre;
     font-size: 0.82rem;
-    color: #fff2dc;
-    background: linear-gradient(180deg, #b3682c 0%, #8f4d1d 100%);
-    border: 1px solid #c88743;
+    color: var(--parchment-soft);
+    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
+    border: 1px solid var(--brown-border-light);
     border-radius: 3px;
     padding: 0.42rem 0.46rem;
 }
@@ -329,7 +329,7 @@
 }
 
 .no-gateways-hint {
-    color: #5f3011;
+    color: var(--brown-text-dark);
     font-size: 0.86rem;
     font-weight: 700;
     line-height: 1.4;
@@ -349,15 +349,15 @@
     font-weight: 700;
     text-align: center;
     overflow-wrap: anywhere;
-    color: #351b0b;
+    color: var(--brown-deep);
     background: linear-gradient(180deg, rgba(247, 212, 161, 0.95) 0%, rgba(236, 189, 128, 0.92) 100%);
     border: 1px solid rgba(192, 132, 66, 0.9);
 }
 
 .tibia-pay-pill-warn {
-    color: #fff2db;
-    background: #8a451a;
-    border: 1px solid #c2823d;
+    color: var(--parchment-light);
+    background: var(--rust);
+    border: 1px solid var(--brown-border-light);
     text-shadow: none;
     box-shadow: none;
     filter: none;
@@ -400,9 +400,9 @@
 .tibia-pay-switch-lever {
     width: 52px;
     height: 24px;
-    border: 1px solid #7b4d24;
+    border: 1px solid var(--brown-border);
     border-radius: 999px;
-    background: linear-gradient(180deg, #d8c5a3 0%, #b9996d 100%);
+    background: linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment) 100%);
     position: relative;
 }
 
@@ -411,8 +411,8 @@
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    border: 1px solid #6d431f;
-    background: linear-gradient(180deg, #f3d08e 0%, #d8a24a 100%);
+    border: 1px solid var(--rust-dark);
+    background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold-deep) 100%);
     position: absolute;
     top: 2px;
     left: 2px;
@@ -420,8 +420,8 @@
 }
 
 .tibia-pay-switch input:checked + .tibia-pay-switch-lever {
-    background: linear-gradient(180deg, #d4711e 0%, #b35512 100%);
-    border-color: #7a3510;
+    background: linear-gradient(180deg, var(--orange) 0%, var(--rust-orange) 100%);
+    border-color: var(--rust-dark);
 }
 
 .tibia-pay-switch input:checked + .tibia-pay-switch-lever::before {
@@ -429,23 +429,23 @@
 }
 
 .tibia-pay-switch-text {
-    color: #3f2613;
+    color: var(--brown-text);
     font-size: 0.88rem;
     font-weight: 800;
 }
 
 .tibia-pay-shell .evidence-link,
 .evidence-link {
-    color: #8f3d13;
+    color: var(--rust);
     font-weight: 800;
     text-decoration: underline;
 }
 
 .tibia-pay-btn {
-    border: 1px solid #7a3510;
+    border: 1px solid var(--rust-dark);
     border-radius: 2px;
-    background: linear-gradient(180deg, #d4711e 0%, #bc5a14 58%, #993e0d 100%);
-    color: #fff5e6;
+    background: linear-gradient(180deg, var(--orange) 0%, var(--rust-orange) 58%, var(--rust) 100%);
+    color: var(--parchment-soft);
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.9rem;
     font-weight: 700;
@@ -460,7 +460,7 @@
 }
 
 .tibia-pay-btn-secondary {
-    background: linear-gradient(180deg, #c46118 0%, #a84e12 58%, #8a3a0c 100%);
+    background: linear-gradient(180deg, var(--orange) 0%, var(--rust-orange) 58%, var(--rust-dark) 100%);
 }
 
 .tibia-pay-form-grid .tibia-pay-btn {
@@ -469,22 +469,22 @@
 
 
 .tibia-pay-shell {
-    --tp-ink: #3f2613;
-    --tp-ink-soft: #634125;
+    --tp-ink: var(--brown-text);
+    --tp-ink-soft: var(--brown-text-dark);
     --tp-frame: var(--brown-border-light);
-    --tp-frame-soft: #b88a57;
+    --tp-frame-soft: var(--brown-border-light);
     --tp-paper-top: var(--parchment-cream);
     --tp-paper-bottom: var(--parchment-mid);
-    --tp-btn-top: #d4711e;
-    --tp-btn-mid: #bc5a14;
-    --tp-btn-bottom: #993e0d;
-    --tp-btn-alt-top: #c46118;
-    --tp-btn-alt-mid: #a84e12;
-    --tp-btn-alt-bottom: #8a3a0c;
-    --tp-ok-bg: #dff3d9;
-    --tp-ok-ink: #245626;
-    --tp-warn-bg: #ffe7b0;
-    --tp-warn-ink: #734707;
+    --tp-btn-top: var(--orange);
+    --tp-btn-mid: var(--rust-orange);
+    --tp-btn-bottom: var(--rust);
+    --tp-btn-alt-top: var(--orange);
+    --tp-btn-alt-mid: var(--rust-orange);
+    --tp-btn-alt-bottom: var(--rust-dark);
+    --tp-ok-bg: var(--green-light);
+    --tp-ok-ink: var(--green-dark);
+    --tp-warn-bg: var(--gold-soft);
+    --tp-warn-ink: var(--gold-dark);
 }
 
 .tibia-pay-shell .entity-shell-card.entity-shell-main {
@@ -509,46 +509,46 @@
 .tibia-pay-info-block,
 
 .tibia-pay-value b {
-    color: #4c2610;
+    color: var(--brown-text);
 }
 
 .tibia-pay-shell .payment-inline-feedback-warning {
-    color: #351b0b;
+    color: var(--brown-deep);
     background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold-amber) 100%);
     border: 1px solid var(--brown-deep);
 }
 
 .tibia-pay-shell .payment-inline-feedback-success {
-    color: #17320d;
+    color: var(--green-dark);
     background: linear-gradient(180deg, var(--green-light) 0%, var(--green) 100%);
     border: 1px solid var(--green-dark);
 }
 
 .tibia-pay-shell .payment-inline-feedback-error {
-    color: #3b0e0e;
-    background: linear-gradient(180deg, #f8d0d0 0%, #e8a5a5 100%);
-    border: 1px solid #a03030;
+    color: var(--red);
+    background: linear-gradient(180deg, var(--parchment-soft) 0%, var(--parchment-light) 100%);
+    border: 1px solid var(--red);
 }
 
 .tibia-pay-shell .payment-inline-feedback-info {
-    color: #1a2a3a;
-    background: linear-gradient(180deg, #d4e6f5 0%, #b5cfe5 100%);
-    border: 1px solid #5a8ab0;
+    color: var(--bg-slate);
+    background: linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment) 100%);
+    border: 1px solid var(--brown-border-light);
 }
 
 .tibia-pay-shell .evidence-link:visited {
-    color: #7b3410;
+    color: var(--rust);
 }
 
 .tibia-pay-shell .evidence-link:hover,
 
 .tibia-pay-shell .evidence-link:focus-visible {
-    color: #6f2e0e;
+    color: var(--rust-dark);
 }
 
 .tibia-pay-select:focus {
     outline: none;
-    border-color: #b77940;
+    border-color: var(--brown-border-light);
     box-shadow: 0 0 0 2px rgba(181, 109, 50, 0.2);
 }
 
@@ -575,7 +575,7 @@
 .tibia-pay-pill-ok {
     color: var(--tp-ok-ink);
     background: var(--tp-ok-bg);
-    border: 1px solid #9bc29b;
+    border: 1px solid var(--green-light);
 }
 
     .tibia-pay-shell .entity-shell-card.entity-shell-main {
@@ -703,7 +703,7 @@
     width: 100%;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .payment-container .payment-details-container {
         flex-direction: column;
         align-items: center;
@@ -722,10 +722,10 @@
     align-items: flex-start;
     gap: 0.55rem;
     padding: 0.55rem 0.75rem;
-    background: linear-gradient(180deg, #fdf2f1 0%, #fad7d3 100%);
-    border: 1px solid #b03a2e;
+    background: linear-gradient(180deg, var(--parchment-soft) 0%, var(--parchment-light) 100%);
+    border: 1px solid var(--red);
     border-radius: 3px;
-    color: #7b2218;
+    color: var(--red);
     font-size: 0.84rem;
     font-weight: 600;
     line-height: 1.45;
@@ -734,22 +734,22 @@
 .tibia-pay-no-intermediary-warning i {
     margin-top: 0.15rem;
     flex-shrink: 0;
-    color: #c0392b;
+    color: var(--red);
     font-size: 0.9rem;
 }
 
 .tibia-pay-no-intermediary-warning strong {
-    color: #7b2218;
+    color: var(--red);
 }
 
 /* -- No linked character warning -- */
 .tibia-pay-no-char-warning {
     padding: 0.75rem 1rem;
-    background: #3a1208;
-    border: 1px solid #7a2f0e;
+    background: var(--bg-deep);
+    border: 1px solid var(--rust);
     border-left-width: 4px;
     border-radius: 0 6px 6px 0;
-    color: #ffe9be;
+    color: var(--parchment-light);
 }
 
 .tibia-pay-no-char-warning strong {
@@ -757,7 +757,7 @@
     font-size: 0.9rem;
     font-weight: 800;
     margin-bottom: 0.35rem;
-    color: #f4a080;
+    color: var(--gold-soft);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
@@ -765,7 +765,7 @@
 .tibia-pay-no-char-warning p {
     margin: 0;
     font-size: 0.84rem;
-    color: #ffe9be;
+    color: var(--parchment-light);
     line-height: 1.45;
 }
 
@@ -780,7 +780,7 @@
 /* Extracted from site.css: page-specific rules */
 .private-key-value {
     background: var(--bg-slate);
-    color: #fff;
+    color: var(--text-light);
     font-family: monospace;
     font-size: 1.08em;
     border-radius: 6px;
@@ -795,18 +795,18 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: linear-gradient(180deg, #f7ead0 0%, #e8d5a8 100%);
-    border: 1px solid #b08050;
+    background: linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment) 100%);
+    border: 1px solid var(--brown-border);
     border-radius: 8px;
     padding: 0.85rem 1rem;
     margin-bottom: 0.75rem;
     font-size: 0.88rem;
-    color: #4a2f0e;
+    color: var(--brown-text);
 }
 
 .inv-countdown-icon {
     font-size: 1.4rem;
-    color: #7a2f0e;
+    color: var(--rust);
     flex-shrink: 0;
 }
 
@@ -816,13 +816,13 @@
 }
 
 .inv-countdown-text strong {
-    color: #5d2c0a;
+    color: var(--brown-text-dark);
 }
 
 .inv-countdown-timer {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #7a2f0e;
+    color: var(--rust);
     font-variant-numeric: tabular-nums;
     min-width: 3.5rem;
     text-align: right;

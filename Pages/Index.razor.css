@@ -95,7 +95,7 @@
 .sports-hero-title {
     font-size: 1.85rem;
     font-weight: 800;
-    color: #e0f2fe;
+    color: var(--ci-accent-mid);
     margin: 0 0 0.5rem;
     letter-spacing: -0.01em;
     font-family: inherit;
@@ -105,7 +105,7 @@
 
 .sports-hero-sub {
     font-size: 1rem;
-    color: #cbd5e1;
+    color: var(--ci-text);
     margin: 0;
     font-family: inherit;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -130,9 +130,9 @@
     padding: 2rem 1.75rem 1.5rem;
     border-radius: 14px;
     text-decoration: none;
-    color: #f1f5f9;
-    background: #0a0f1a;
-    border: 1px solid #1b3868;
+    color: var(--ci-text);
+    background: var(--ci-bg);
+    border: 1px solid var(--ci-border);
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     position: relative;
     overflow: hidden;
@@ -154,14 +154,14 @@
 }
 
 .sport-card:focus-visible {
-    outline: 2px solid #2e6496;
+    outline: 2px solid var(--ci-accent-mid);
     outline-offset: 2px;
 }
 
 /* ── Futsal ──────────────────────────────── */
 .sport-card--futsal {
-    border-color: #14532d;
-    border-top: 3px solid #16a34a;
+    border-color: var(--green-dark);
+    border-top: 3px solid var(--green);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(22, 163, 74, 0.2);
 }
 
@@ -170,7 +170,7 @@
 }
 
 .sport-card--futsal:hover {
-    border-color: #16a34a;
+    border-color: var(--green);
     box-shadow: 0 14px 36px rgba(22, 163, 74, 0.3), 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
@@ -179,17 +179,17 @@
 }
 
 .sport-card--futsal .sport-card-name {
-    color: #4ade80;
+    color: var(--green-light);
 }
 
 .sport-card--futsal .sport-card-cta {
-    color: #4ade80;
+    color: var(--green-light);
 }
 
 /* ── Poker ───────────────────────────────── */
 .sport-card--poker {
-    border-color: #3b0764;
-    border-top: 3px solid #7c3aed;
+    border-color: #7c3aed;
+    border-top: 3px solid #a78bfa;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(124, 58, 237, 0.2);
 }
 
@@ -198,7 +198,7 @@
 }
 
 .sport-card--poker:hover {
-    border-color: #7c3aed;
+    border-color: #a78bfa;
     box-shadow: 0 14px 36px rgba(124, 58, 237, 0.3), 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
@@ -207,11 +207,11 @@
 }
 
 .sport-card--poker .sport-card-name {
-    color: #a78bfa;
+    color: #c4b5fd;
 }
 
 .sport-card--poker .sport-card-cta {
-    color: #a78bfa;
+    color: #c4b5fd;
 }
 
 /* ── Card parts ──────────────────────────── */
@@ -236,7 +236,7 @@
 
 .sport-card-desc {
     font-size: 0.92rem;
-    color: #cbd5e1;
+    color: var(--ci-text);
     margin: 0;
     line-height: 1.5;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -250,7 +250,7 @@
 }
 
 /* ── Responsive ──────────────────────────── */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     .sports-hero-title {
         font-size: 1.45rem;
     }
@@ -293,7 +293,7 @@
     gap: 0.4rem;
     font-size: 0.78rem;
     font-weight: 600;
-    color: #6082a0;
+    color: var(--ci-border-dim);
     text-transform: uppercase;
     letter-spacing: 0.07em;
     white-space: nowrap;
@@ -301,7 +301,7 @@
 }
 
 .city-pin {
-    color: #4f9cf8;
+    color: var(--ci-accent);
     flex-shrink: 0;
 }
 
@@ -315,13 +315,13 @@
 .city-select {
     appearance: none;
     -webkit-appearance: none;
-    background-color: #0a0f18;
+    background-color: var(--ci-bg);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.55rem center;
     background-size: 0.8rem;
-    color: #f1f5f9;
-    border: 1px solid #1b3d6c;
+    color: var(--ci-text);
+    border: 1px solid var(--ci-border);
     border-radius: 7px;
     padding: 0.32rem 1.8rem 0.32rem 0.6rem;
     font-size: 0.9rem;
@@ -333,14 +333,14 @@
 }
 
 .city-select:focus {
-    border-color: #4f9cf8;
+    border-color: var(--ci-accent);
     box-shadow: 0 0 0 2px rgba(79, 156, 248, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .city-input {
-    background: #0a0f18;
-    color: #f1f5f9;
-    border: 1px solid #1b3d6c;
+    background: var(--ci-bg);
+    color: var(--ci-text);
+    border: 1px solid var(--ci-border);
     border-radius: 7px;
     padding: 0.32rem 0.6rem;
     font-size: 0.9rem;
@@ -351,12 +351,12 @@
 }
 
 .city-input:focus {
-    border-color: #4f9cf8;
+    border-color: var(--ci-accent);
     box-shadow: 0 0 0 2px rgba(79, 156, 248, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .city-input::placeholder {
-    color: #374151;
+    color: var(--ci-border-dim);
 }
 
 /* ── Sports tabs (Explorar / Meus Jogos) ─────────────────────── */
@@ -384,18 +384,18 @@
     font-size: 0.85rem;
     font-weight: 700;
     text-decoration: none;
-    background: #14532d;
-    color: #bbf7d0;
-    border: 1.5px solid #166534;
+    background: var(--green-dark);
+    color: var(--green-light);
+    border: 1.5px solid var(--green);
     transition: filter 0.15s;
 }
 
 .my-conf-browse-btn:hover { filter: brightness(1.15); }
 
 .my-conf-browse-btn--poker {
-    background: #3b0764;
-    color: #e9d5ff;
-    border-color: #4c1d95;
+    background: #7c3aed;
+    color: #c4b5fd;
+    border-color: #7c3aed;
 }
 
 /* ── History sub-tabs ────────────────────────────────────────── */
@@ -407,9 +407,9 @@
 }
 
 .my-conf-tab {
-    border: 1px solid var(--ci-border, #1b3868);
-    background: #0a0f18;
-    color: #94a3b8;
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg);
+    color: var(--ci-border-dim);
     min-height: 2rem;
     font-size: 0.72rem;
     font-weight: 800;
@@ -427,16 +427,16 @@
 }
 
 .my-conf-tab.active {
-    border-color: #4f9cf8;
-    background: #1a3a5c;
-    color: #e0f2fe;
+    border-color: var(--ci-accent);
+    background: var(--ci-accent-mid);
+    color: var(--ci-accent-mid);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3), inset 0 0 0 1px rgba(79, 156, 248, 0.2);
     text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
 }
 
 .my-conf-tab:hover:not(.active) {
-    background: #162030;
-    color: #cbd5e1;
+    background: var(--ci-bg-card);
+    color: var(--ci-text);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
@@ -450,7 +450,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #cbd5e1;
+    color: var(--ci-text);
     margin: 0 0 0.4rem;
     display: flex;
     align-items: center;
@@ -470,15 +470,15 @@
     align-items: flex-start;
     gap: 0.6rem;
     padding: 0.6rem 0.75rem;
-    background: #0a0f18;
-    border: 1px solid #1b3868;
+    background: var(--ci-bg);
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
     transition: border-color 0.15s, box-shadow 0.15s;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .my-conf-card:hover { 
-    border-color: #4f9cf8; 
+    border-color: var(--ci-accent); 
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3);
 }
 .my-conf-card--past { opacity: 0.7; }
@@ -496,8 +496,8 @@
     font-size: 1rem;
 }
 
-.my-conf-sport--futsal { background: #0a2018; border: 1px solid #14532d; }
-.my-conf-sport--poker  { background: #1a0a2e; border: 1px solid #3b0764; }
+.my-conf-sport--futsal { background: var(--green-dark); border: 1px solid var(--green-dark); }
+.my-conf-sport--poker  { background: #7c3aed; border: 1px solid #7c3aed; }
 
 /* ── Body ────────────────────────────────────────────────────── */
 .my-conf-body { flex: 1; min-width: 0; }
@@ -517,9 +517,9 @@
     font-weight: 700;
     padding: 0.12rem 0.45rem;
     border-radius: 10px;
-    background: #0a2018;
-    color: #4ade80;
-    border: 1px solid #14532d;
+    background: var(--green-dark);
+    color: var(--green-light);
+    border: 1px solid var(--green-dark);
 }
 
 .my-conf-cancelled {
@@ -527,9 +527,9 @@
     font-weight: 700;
     padding: 0.12rem 0.45rem;
     border-radius: 10px;
-    background: #290f0f;
-    color: #f87171;
-    border: 1px solid #7f1d1d;
+    background: var(--red);
+    color: var(--red);
+    border: 1px solid var(--red);
 }
 
 .meta-chip--confirmed {
@@ -538,7 +538,7 @@
     padding: 0.12rem 0.45rem;
     border-radius: 10px;
     background: rgba(22, 163, 74, 0.12);
-    color: #4ade80;
+    color: var(--green-light);
     border: 1px solid rgba(74, 222, 128, 0.35);
     display: inline-flex;
     align-items: center;
@@ -575,9 +575,9 @@
 }
 
 .my-conf-btn--view {
-    background: #0f1825;
-    color: #4f9cf8;
-    border-color: #1b3d6c;
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-accent);
+    border-color: var(--ci-border);
     padding: 0.45rem 1rem;
     font-size: 0.82rem;
     gap: 0.4rem;
@@ -586,9 +586,9 @@
 }
 
 .my-conf-btn--view:hover {
-    background: #1a3a5c;
-    border-color: #4f9cf8;
-    color: #e0f2fe;
+    background: var(--ci-accent-mid);
+    border-color: var(--ci-accent);
+    color: var(--ci-accent-mid);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3);
 }
 
@@ -600,7 +600,7 @@
     flex-wrap: wrap;
 }
 
-@media (max-width: 540px) {
+@media (max-width: 640px) {
     .my-conf-card { flex-wrap: wrap; }
     .my-conf-actions { flex-direction: row; width: 100%; }
     .my-conf-btn { flex: 1; }

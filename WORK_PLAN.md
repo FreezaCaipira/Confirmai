@@ -441,7 +441,12 @@ Get-ChildItem -Recurse -Filter "*.css" Pages/ | Select-String 'var\(--' | Measur
 <!-- Liste aqui seletores que nao conseguiu override sem !important -->
 
 ### Outras observacoes
-<!-- Qualquer coisa que o Senior deve saber -->
+
+**Teste já falhando antes do Ciclo 4**:
+- `AdminLogsQueryStringIntegrationTests.AdminLogsPage_QueryStringFilters_AreAppliedOnInitialRender` - Já falhava no commit anterior (56f450c)
+- HTML retornado não contém a mensagem esperada (apenas `<!DOCTYPE html>`)
+- Não relacionado com mudanças de CSS do Ciclo 4
+- Precisa de investigação separada pelo Senior
 
 **Nota**: O teste `AdminLogsQueryStringIntegrationTests` falha porque usa HTTP GET numa pagina Blazor Server que carrega dados assincronamente apos o circuito SignalR ser estabelecido. O HTML pre-renderizado nao contem os dados. O Senior investigara e corrigira esse teste separadamente.
 

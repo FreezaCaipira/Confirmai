@@ -105,7 +105,7 @@
             </div>
         </div>
 
-        <label class="switch-label" style="margin-top:.5rem">
+        <label class="switch-label switch-label--margin-top">
             <input type="checkbox" @bind="Form.RotateInGoal" @bind:after="OnRotateInGoalChanged" />
             Revezar jogadores de linha no gol
         </label>
@@ -132,7 +132,7 @@
             @SaveError
             @if (!string.IsNullOrWhiteSpace(CollisionHref))
             {
-                <a href="@CollisionHref" style="margin-left:.45rem;color:#93c5fd">@Confirmai.Services.Events.EventCollisionService.OpenExistingEventLinkText</a>
+                <a href="@CollisionHref" class="collision-link">@Confirmai.Services.Events.EventCollisionService.OpenExistingEventLinkText</a>
             }
         </p>
     }

@@ -304,7 +304,7 @@
     justify-content: center;
     padding: 1rem;
     background: rgba(2, 8, 18, 0.72);
-    z-index: 20000 !important;
+    z-index: 20000;
 }
 
 .admin-payments-shell .admin-payments-modal-backdrop--open {
@@ -368,7 +368,7 @@
 }
 
 /* At ≤900px: tighten filter-bar to 2-col grid and let table scroll */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .admin-payments-shell .filter-bar.admin-filter-card {
         gap: 0.45rem;
     }
@@ -420,7 +420,7 @@
 
 /* At ≤700px: already handled globally by site.css card-stacking (.payments-table) */
 /* Add min-width guard so the card columns stay readable */
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .admin-payments-shell .payments-table td:before {
         min-width: 80px;
         flex-shrink: 0;

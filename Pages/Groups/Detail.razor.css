@@ -47,6 +47,10 @@
     font-size: 0.85rem;
 }
 
+.input--width-auto {
+    width: auto;
+}
+
 .input {
     padding: 0.4rem 0.6rem;
     border: 1px solid #1b3868;

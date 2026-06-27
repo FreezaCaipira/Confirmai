@@ -1,5 +1,9 @@
 ﻿/* Shared detail styles live in wwwroot/css/events.css */
 
+/* ── Skeleton lines ───────────────────────── */
+.skeleton-line--md { max-width: 200px; }
+.skeleton-line--sm { max-width: 150px; }
+
 /* ── Header poker ────────────────────────── */
 .detail-header--poker .detail-sport-badge { color: #a78bfa; }
 
@@ -10,7 +14,7 @@
     margin-bottom: 0.15rem;
 }
 
-.detail-sport-badge--poker { color: #a78bfa !important; }
+.detail-header--poker .detail-sport-badge--poker { color: #a78bfa; }
 
 /* ── Tipo badge (no header) ──────────────── */
 .poker-type-badge--detail {
@@ -92,7 +96,7 @@
 }
 
 .homegame-code-input:focus   { border-color: #d97706; }
-.homegame-code-input--error  { border-color: #dc2626 !important; }
+.homegame-code-input.homegame-code-input--error { border-color: var(--red); }
 
 .homegame-enter-btn {
     padding: 0.55rem 1.1rem;

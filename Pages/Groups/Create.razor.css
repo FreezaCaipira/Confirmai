@@ -6,6 +6,10 @@
     margin-top: 0.75rem;
 }
 
+.input-file--hidden {
+    display: none;
+}
+
 .upload-preview {
     flex-shrink: 0;
     width: 160px;
