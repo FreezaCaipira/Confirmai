@@ -52,7 +52,7 @@
     height: 180px;
     border-radius: 8px;
     border: 2px solid rgba(74, 222, 128, 0.3);
-    background: #fff;
+    background: var(--white);
     padding: 6px;
 }
 
@@ -74,7 +74,7 @@
     padding: 0.4rem 0.75rem;
     font-family: monospace;
     font-size: 0.9rem;
-    color: #d1fae5;
+    color: var(--futsal-green-pale);
     word-break: break-all;
     user-select: all;
 }
@@ -99,7 +99,7 @@
 .evpay-admin-pix-copy:hover {
     background: rgba(74, 222, 128, 0.2);
     border-color: rgba(74, 222, 128, 0.65);
-    color: #bbf7d0;
+    color: var(--futsal-green-pale);
 }
 
 .evpay-main {
@@ -135,7 +135,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #22c55e;
+    color: var(--green-bright);
     background: rgba(34,197,94,0.08);
     border: 1px solid rgba(34,197,94,0.2);
     border-radius: 20px;
@@ -254,7 +254,7 @@
 .evpay-method-option input[type="radio"] { display: none; }
 
 .evpay-method-option--selected {
-    border-color: #3b82f6;
+    border-color: var(--ci-accent);
     background: rgba(59,130,246,0.08);
 }
 
@@ -307,8 +307,8 @@
 }
 
 .evpay-action-btn--pay {
-    background: #16a34a;
-    color: #fff;
+    background: var(--green-strong);
+    color: var(--white);
 }
 .evpay-action-btn--pay:hover:not(:disabled) { filter: brightness(1.1); }
 .evpay-action-btn--pay:disabled { opacity: 0.55; cursor: not-allowed; }
@@ -336,7 +336,7 @@
 .evpay-error {
     font-size: 0.82rem;
     color: var(--red-soft);
-    background: #290f0f;
+    background: var(--red-bg-dark);
     border: 1px solid var(--red-border);
     border-radius: 8px;
     padding: 0.5rem 0.8rem;
@@ -357,7 +357,7 @@
     aspect-ratio: 1 / 1;
     border-radius: 12px;
     overflow: hidden;
-    background: #fff;
+    background: var(--white);
     padding: 10px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.4);
 }
@@ -422,7 +422,7 @@
     padding: 0.55rem 0.75rem;
     font-size: 0.72rem;
     font-family: 'Courier New', monospace;
-    color: #a8c4e0;
+    color: var(--ci-surface-muted);
     word-break: break-all;
     overflow-wrap: break-word;
     white-space: normal;
@@ -443,7 +443,7 @@
 }
 .evpay-action-btn--copy:hover {
     background: rgba(99,179,255,0.25);
-    color: #bfdbfe;
+    color: var(--ci-surface-light);
     border-color: rgba(99,179,255,0.75);
     filter: none;
 }
