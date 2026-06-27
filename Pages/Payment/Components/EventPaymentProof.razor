@@ -21,7 +21,7 @@
             {
                 <i class="fas fa-sync-alt"></i> <span>Atualizar comprovante</span>
             }
-            <InputFile OnChange="HandleProofUpload" accept="image/jpeg,image/png,image/webp" style="display:none" disabled="@UploadingProof" />
+            <InputFile OnChange="HandleProofUpload" accept="image/jpeg,image/png,image/webp" class="evpay-proof-input-hidden" disabled="@UploadingProof" />
         </label>
     }
     else
@@ -38,7 +38,7 @@
             {
                 <i class="fas fa-upload"></i> <span>Enviar comprovante</span>
             }
-            <InputFile OnChange="HandleProofUpload" accept="image/jpeg,image/png,image/webp" style="display:none" disabled="@UploadingProof" />
+            <InputFile OnChange="HandleProofUpload" accept="image/jpeg,image/png,image/webp" class="evpay-proof-input-hidden" disabled="@UploadingProof" />
         </label>
     }
     @if (!string.IsNullOrWhiteSpace(ProofError))
@@ -47,7 +47,7 @@
     }
     @if (!string.IsNullOrWhiteSpace(ProofSuccessMessage))
     {
-        <p class="evpay-proof-success" style="animation: fadeout 3s forwards; animation-delay: 2s;">
+        <p class="evpay-proof-success evpay-proof-success--fadeout">
             <i class="fas fa-check-circle"></i> @ProofSuccessMessage
         </p>
     }

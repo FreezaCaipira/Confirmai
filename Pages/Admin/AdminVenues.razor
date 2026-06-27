@@ -84,8 +84,8 @@
                                 <td data-label="Ações">
                                     @if (confirmDeleteId == v.Id)
                                     {
-                                        <div class="admin-actions-row" style="gap:0.4rem;align-items:center">
-                                            <span style="font-size:0.8rem;color:#f1f5f9;white-space:nowrap">Remover?</span>
+                                        <div class="admin-actions-row admin-actions-row--compact">
+                                            <span class="admin-delete-prompt">Remover?</span>
                                             <button class="danger-btn action-btn icon-only" title="Confirmar"
                                                     @onclick='() => DeleteVenue(v.Id)'>
                                                 <i class="fas fa-check"></i>
@@ -132,7 +132,7 @@
 
             @if (!string.IsNullOrWhiteSpace(deleteError))
             {
-                <p class="validation-message" style="margin-top:0.75rem">@deleteError</p>
+                <p class="validation-message validation-message--margin-top-lg">@deleteError</p>
             }
         </article>
     </section>

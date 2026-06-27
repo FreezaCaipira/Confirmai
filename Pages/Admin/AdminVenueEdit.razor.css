@@ -45,3 +45,8 @@
     font-size: 0.85rem;
     color: #cbd5e1;
 }
+
+.venue-section-divider {
+    border-color: #1c2a3b;
+    margin: 1.25rem 0;
+}
