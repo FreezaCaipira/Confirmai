@@ -58,12 +58,12 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 ### Ciclo 6 (Pleno Local): Refatoracao CSS Final - Eliminacao Total de Hardcoded Colors
 - Branch: `refactor/ciclo6-css-vars-final`
 - **Resultados**:
-  - 5 commits por ciclo (Ciclo 11-15), branch unica
+  - 9 commits por ciclo (Ciclo 11-15), branch unica
   - Convertidos ~74 hardcoded colors em 37 arquivos `.razor.css` (Ciclo 11-14)
-  - Ciclo 15: Adicionadas 27 vars de rgba (shadow, overlay, text-shadow, accent/green/red opacity)
-  - Ciclo 15: Convertidos ~200 padrões rgba para CSS vars em 60+ arquivos
+  - Ciclo 15: Adicionadas 40+ vars de rgba (shadow, overlay, text-shadow, accent/green/red/slate/purple/sky-blue opacity)
+  - Ciclo 15: Convertidos ~250 padrões rgba para CSS vars em 70+ arquivos
   - **Hardcoded colors total: 0** (meta <550 — SUPERADA)
-  - **CSS vars usadas: ~1.453** (meta >1.400 — ATINGIDA com folga)
+  - **CSS vars usadas: ~1.476** (meta >1.400 — ATINGIDA com folga)
   - **Fallbacks `var(--xx, #hex)`: 0** (meta 0 — ATINGIDA)
   - **`!important`: 1** (meta 1 — ATINGIDA, AvatarUpload pattern legitimo)
   - Build: 0 erros, 47 warnings (pré-existentes)
@@ -72,7 +72,7 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
   - Ciclo 12 (6 arquivos, 17 cores): Profile, ProfileContactsDisplay, UserSummaryCard, RankingViewSelector, ViewPayment, Payment
   - Ciclo 13 (6 arquivos, 12 cores): SportCard, GroupDetailPaymentsModal, Footer, Venues, MyConfirmations/Index, AdminUserView
   - Ciclo 14 (19 arquivos, 19 cores): MainLayout, GroupMetrics, MyGamesTabs, EmptyState, MailboxFilters, ChatComposeBox, AvatarUploadSection, Poker/Detail, Poker/Edit, Poker/Index, Groups/Ranking, Groups/Detail, Futsal/Components/EditEventForm, Admin/AdminAuditTimeline, Admin/AdminUsers, Admin/AdminVenues, Admin/Components/AdminPaymentsTable, Docs/Integration (removido hex de comentário)
-  - Ciclo 15 (60+ arquivos, ~200 padrões rgba): Adicionadas vars de rgba e convertidos padrões de shadow/text-shadow/overlay em massa
+  - Ciclo 15 (70+ arquivos, ~250 padrões rgba): Adicionadas 40+ vars de rgba e convertidos padrões de shadow/text-shadow/overlay/gradient em massa
 - **Status**: PR pronto para revisão do senior
 
 ---
