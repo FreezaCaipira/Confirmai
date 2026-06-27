@@ -52,13 +52,7 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
   - Inline styles estaticos: 6 → 0
   - Inline styles dinamicos: ~14 → ~8 (PaymentsHistory.razor refatorado)
   - Hardcoded colors convertidas: ~300+ (estimado)
-- **PRs para criar manualmente** (CLI gh não disponível):
-  1. `refactor/ciclo5-fase1-new-vars` → main: "Ciclo 5 Fase 1: Adicionar vars CSS para cores sem equivalente"
-  2. `refactor/ciclo5-fase2-css-vars-ci` → main: "Ciclo 5 Fase 2: Converter hardcoded colors - Top 8 arquivos (CI theme)"
-  3. `refactor/ciclo5-fase3-css-vars-warm` → main: "Ciclo 5 Fase 3: Converter hardcoded colors - Top 7 arquivos (Warm + Mixed)"
-  4. `refactor/ciclo5-fase4-payments-history` → main: "Ciclo 5 Fase 4: Refatorar PaymentsHistory.razor inline styles"
-  5. `refactor/ciclo5-fase5-inline-cleanup` → main: "Ciclo 5 Fase 5: Eliminar 6 inline styles estaticos restantes"
-  6. `refactor/ciclo5-fase6-cs8603` → main: "Ciclo 5 Fase 6: Corrigir 2 warnings CS8603 restantes"
+- **PRs criadas e mergiadas**: 6 PRs (1 por fase) → todas mergiadas na main
 
 ---
 
