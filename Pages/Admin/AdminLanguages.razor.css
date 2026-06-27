@@ -4,15 +4,15 @@
 .admin-security-shell .security-label,
 .admin-security-shell .security-input-grid label,
 .admin-security-shell .security-baseline-group h5 {
-    color: #6082a0;
+    color: var(--ci-text-subtle);
 }
 
 .admin-security-shell .security-header h3 {
-    color: #deeeff;
+    color: var(--ci-text-blue);
     background: linear-gradient(180deg, #0f2a3f 0%, #0a1f30 100%);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
-    border-bottom: 1px solid #1b3d6c;
+    border-bottom: 1px solid var(--ci-border);
     text-shadow: none;
     font-family: var(--font-display);
     text-transform: uppercase;
@@ -25,42 +25,42 @@
 .admin-security-shell .security-toggle,
 .admin-security-shell .security-input-grid input,
 .admin-security-shell .security-input-grid select {
-    color: #deeeff;
+    color: var(--ci-text-blue);
 }
 
 .admin-security-shell .security-panel {
-    background: #0d1825;
-    border: 1px solid #1b3d6c;
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
 }
 
 .admin-security-shell .security-baseline-row {
-    border-bottom: 1px dashed #1b3d6c;
+    border-bottom: 1px dashed var(--ci-border);
 }
 
 .admin-security-shell .security-baseline-group {
-    border-top: 1px solid #1b3d6c;
+    border-top: 1px solid var(--ci-border);
 }
 
 .admin-security-shell .security-env-pill {
-    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
-    border: 1px solid #1a5298;
-    color: #deeeff;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 1px solid var(--ci-border-dim);
+    color: var(--ci-text-blue);
 }
 
 .admin-security-shell .security-boolean-badge.on {
-    color: #4ade80;
+    color: var(--green-bright);
     background: #0e2a1a;
     border-color: #1e5f3a;
 }
 
 .admin-security-shell .security-boolean-badge.off {
-    color: #f87171;
+    color: var(--red-soft);
     background: #2a0e0e;
     border-color: #5f1e1e;
 }
 
 .admin-security-shell .security-toggle input[type="checkbox"] {
-    accent-color: #4f9cf8;
+    accent-color: var(--ci-accent);
 }
 
 /* --- Structural styles --- */
@@ -69,15 +69,15 @@
 .security-label,
 .security-input-grid label,
 .security-baseline-group h5 {
-    color: #6082a0;
+    color: var(--ci-text-subtle);
 }
 
 .security-header h3 {
-    color: #deeeff;
+    color: var(--ci-text-blue);
     background: linear-gradient(180deg, #0f2a3f 0%, #0a1f30 100%);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
-    border-bottom: 1px solid #1b3d6c;
+    border-bottom: 1px solid var(--ci-border);
     text-shadow: none;
     font-family: var(--font-display);
     text-transform: uppercase;
@@ -90,42 +90,42 @@
 .security-toggle,
 .security-input-grid input,
 .security-input-grid select {
-    color: #deeeff;
+    color: var(--ci-text-blue);
 }
 
 .security-panel {
-    background: #0d1825;
-    border: 1px solid #1b3d6c;
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
 }
 
 .security-baseline-row {
-    border-bottom: 1px dashed #1b3d6c;
+    border-bottom: 1px dashed var(--ci-border);
 }
 
 .security-baseline-group {
-    border-top: 1px solid #1b3d6c;
+    border-top: 1px solid var(--ci-border);
 }
 
 .security-env-pill {
-    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
-    border: 1px solid #1a5298;
-    color: #deeeff;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 1px solid var(--ci-border-dim);
+    color: var(--ci-text-blue);
 }
 
 .security-boolean-badge.on {
-    color: #4ade80;
+    color: var(--green-bright);
     background: #0e2a1a;
     border-color: #1e5f3a;
 }
 
 .security-boolean-badge.off {
-    color: #f87171;
+    color: var(--red-soft);
     background: #2a0e0e;
     border-color: #5f1e1e;
 }
 
 .security-toggle input[type="checkbox"] {
-    accent-color: #4f9cf8;
+    accent-color: var(--ci-accent);
 }
 
 @media (max-width: 1024px) {

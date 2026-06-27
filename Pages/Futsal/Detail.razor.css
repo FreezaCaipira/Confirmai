@@ -8,20 +8,20 @@
 
 /* Payment Status Badge States */
 .player-tag--paid {
-    background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
-    border: 1px solid #86efac;
+    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    border: 1px solid var(--green-soft);
     color: #f0fdf4;
     box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
 }
 
 .player-tag--paid:hover {
-    background: linear-gradient(180deg, #86efac 0%, #4ade80 50%, #22c55e 100%);
+    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, #22c55e 100%);
     border-color: #bbf7d0;
     box-shadow: 0 4px 8px rgba(74, 222, 128, 0.5);
 }
 
 .player-tag--proof-pending {
-    background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    background: linear-gradient(180deg, var(--amber) 0%, #f59e0b 50%, #d97706 100%);
     border: 1px solid #fcd34d;
     color: #fffbeb;
     cursor: pointer;
@@ -30,41 +30,41 @@
 }
 
 .player-tag--proof-pending:hover {
-    background: linear-gradient(180deg, #fcd34d 0%, #fbbf24 50%, #f59e0b 100%);
+    background: linear-gradient(180deg, #fcd34d 0%, var(--amber) 50%, #f59e0b 100%);
     border-color: #fde68a;
     box-shadow: 0 4px 8px rgba(251, 191, 36, 0.5);
 }
 
 .player-tag--pay-pending {
-    background: linear-gradient(180deg, #f87171 0%, #ef4444 50%, #dc2626 100%);
-    border: 1px solid #fca5a5;
+    background: linear-gradient(180deg, var(--red-soft) 0%, #ef4444 50%, #dc2626 100%);
+    border: 1px solid var(--red-text-light);
     color: #fef2f2;
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
 }
 
 .player-tag--pay-pending:hover {
-    background: linear-gradient(180deg, #fca5a5 0%, #f87171 50%, #ef4444 100%);
+    background: linear-gradient(180deg, var(--red-text-light) 0%, var(--red-soft) 50%, #ef4444 100%);
     border-color: #fecaca;
     box-shadow: 0 4px 8px rgba(239, 68, 68, 0.5);
 }
 
 .player-tag--pay-btn {
-    background: linear-gradient(180deg, #4f9cf8 0%, #1a5ab0 50%, #0d3270 100%);
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
     border: 1px solid #7dd3fc;
-    color: #e0f2fe;
+    color: var(--ci-surface-light);
     cursor: pointer;
     transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(79, 156, 248, 0.3);
 }
 
 .player-tag--pay-btn:hover {
-    background: linear-gradient(180deg, #7dd3fc 0%, #4f9cf8 50%, #1a5ab0 100%);
-    border-color: #93c5fd;
+    background: linear-gradient(180deg, #7dd3fc 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
+    border-color: var(--link-info);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.5);
 }
 
 .player-tag--receiver-badge {
-    background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    background: linear-gradient(180deg, var(--amber) 0%, #f59e0b 50%, #d97706 100%);
     border: 1px solid #fcd34d;
     color: #fffbeb;
     display: inline-flex;
@@ -75,14 +75,14 @@
 
 /* Goalkeeper "Não Paga" Badge */
 .player-tag--no-pay {
-    background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
-    border: 1px solid #86efac;
+    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    border: 1px solid var(--green-soft);
     color: #f0fdf4;
     box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
 }
 
 .player-tag--no-pay:hover {
-    background: linear-gradient(180deg, #86efac 0%, #4ade80 50%, #22c55e 100%);
+    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, #22c55e 100%);
     border-color: #bbf7d0;
     box-shadow: 0 4px 8px rgba(74, 222, 128, 0.5);
 }

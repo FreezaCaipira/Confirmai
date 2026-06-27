@@ -20,8 +20,8 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #2e1709;
-    border-bottom: 2px solid #7a5028;
+    color: var(--brown-text);
+    border-bottom: 2px solid var(--brown-border);
     padding-bottom: 0.36rem;
     margin-bottom: 0.82rem;
 }
@@ -36,11 +36,11 @@
     margin-bottom: 0.28rem;
     font-size: 0.86rem;
     font-weight: 700;
-    color: #2e1709;
+    color: var(--brown-text);
 }
 
 .pf-required {
-    color: #b5391a;
+    color: var(--orange);
     font-weight: 700;
 }
 
@@ -62,7 +62,7 @@
     max-height: 120px;
     margin-top: 0.4rem;
     border-radius: 4px;
-    border: 1px solid #7a5028;
+    border: 1px solid var(--brown-border);
 }
 
 /* Server checkbox list */
@@ -78,29 +78,29 @@
     gap: 0.5rem;
     font-size: 0.88rem;
     font-weight: 600;
-    color: #2e1709;
+    color: var(--brown-text);
     cursor: pointer;
 }
 
 .pf-server-item input[type="checkbox"] {
-    accent-color: #7a5028;
+    accent-color: var(--brown-border);
 }
 
 .pf-inactive-badge {
     font-size: 0.76rem;
-    color: #8b6a3e;
+    color: var(--parchment-muted);
     font-style: italic;
 }
 
 .pf-empty-hint {
     font-size: 0.82rem;
-    color: #6b5035;
+    color: var(--brown-muted);
     font-style: italic;
 }
 
 /* Parchment-a overrides */
 .product-form {
-    color: #3e2410;
+    color: var(--brown-deep);
 }
 
 /* Accent color picker */
@@ -114,7 +114,7 @@
     width: 42px;
     height: 42px;
     padding: 2px;
-    border: 2px solid #7a5028;
+    border: 2px solid var(--brown-border);
     border-radius: 6px;
     cursor: pointer;
     background: transparent;
@@ -131,8 +131,8 @@
     width: 28px;
     height: 28px;
     border-radius: 4px;
-    border: 1px solid #7a5028;
-    background: var(--accent-preview, #a0522d);
+    border: 1px solid var(--brown-border);
+    background: var(--accent-preview, var(--rust));
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
 }
 
@@ -140,7 +140,7 @@
     display: flex;
     flex-direction: column;
     font-size: 0.82rem;
-    color: #4f3117;
+    color: var(--brown-dark);
     line-height: 1.3;
 }
 
@@ -150,7 +150,7 @@
 }
 
 .accent-color-meta small {
-    color: #6b5035;
+    color: var(--brown-muted);
     font-family: monospace;
     font-size: 0.76rem;
 }
@@ -161,33 +161,33 @@
     align-items: flex-start;
     gap: 0.4rem;
     padding: 0.58rem 0.72rem;
-    background: #faf0db;
-    border: 2px dashed #7a5028;
+    background: var(--parchment-light);
+    border: 2px dashed var(--brown-border);
     border-radius: 6px;
     transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .pf-file-drop:hover {
-    border-color: #5d3c1f;
-    background: #f6eacf;
+    border-color: var(--brown-border-warm);
+    background: var(--parchment-soft);
 }
 
 .pf-file-drop input[type="file"] {
     font-size: 0.82rem;
-    color: #5d3c1f;
+    color: var(--brown-border-warm);
     cursor: pointer;
 }
 
 .pf-file-hint {
     font-size: 0.78rem;
-    color: #6b5035;
+    color: var(--brown-muted);
     font-style: italic;
 }
 
 .pf-submit-row {
     margin-top: 1.2rem;
     padding-top: 0.8rem;
-    border-top: 1px dotted #7a5028;
+    border-top: 1px dotted var(--brown-border);
     display: flex;
     justify-content: center;
     gap: 0.6rem;
@@ -198,8 +198,8 @@
     min-width: 180px;
     min-height: 2.4rem;
     padding: 0.44rem 1.4rem;
-    border: 2px solid #7a3e1f;
-    border-image: linear-gradient(to bottom right, #c9a06a, #7a5028 40%, #4a2e15 70%, #8b6839) 1;
+    border: 2px solid var(--rust);
+    border-image: linear-gradient(to bottom right, var(--gold-amber), var(--brown-border) 40%, var(--brown-deep) 70%, var(--brown-mid)) 1;
     border-radius: 0;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.96rem;
@@ -211,26 +211,26 @@
 }
 
 .pf-submit-btn {
-    background: linear-gradient(180deg, #7a2f0e 0%, #57210d 100%);
-    color: #ffe6b6;
+    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
+    color: var(--parchment-light);
     text-shadow: 0 1px 0 rgba(33, 15, 5, 0.55);
     box-shadow: inset 0 0 0 1px rgba(223, 136, 72, 0.26), 0 2px 5px rgba(42, 23, 9, 0.3);
 }
 
 .pf-cancel-btn {
-    background: linear-gradient(180deg, #d8c39b 0%, #baa074 100%);
-    color: #3c250f;
+    background: linear-gradient(180deg, var(--parchment-mid) 0%, var(--parchment-muted) 100%);
+    color: var(--brown-text);
     text-shadow: 0 1px 0 rgba(255, 240, 200, 0.35);
     box-shadow: inset 0 0 0 1px rgba(255, 240, 200, 0.2), 0 2px 5px rgba(42, 23, 9, 0.15);
 }
 
 .pf-submit-btn:hover {
-    background: linear-gradient(180deg, #8a3a12 0%, #63270f 100%);
+    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
     transform: translateY(-1px);
 }
 
 .pf-cancel-btn:hover {
-    background: linear-gradient(180deg, #e1cfac 0%, #c7af85 100%);
+    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-mid) 100%);
     transform: translateY(-1px);
 }
 
@@ -247,21 +247,21 @@
 
 .cancel-btn,
 .warning-btn {
-    background: linear-gradient(180deg, #d8c39b 0%, #baa074 100%);
-    border: 1px solid #8f7248;
-    color: #3c250f;
+    background: linear-gradient(180deg, var(--parchment-mid) 0%, var(--parchment-muted) 100%);
+    border: 1px solid var(--brown-border);
+    color: var(--brown-text);
 }
 
 .cancel-btn:hover,
 .warning-btn:hover {
-    background: linear-gradient(180deg, #e1cfac 0%, #c7af85 100%);
-    color: #2f1c0c;
+    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-mid) 100%);
+    color: var(--brown-deep);
 }
 
 .loading-spinner {
     text-align: center;
     padding: 1rem 0;
-    color: #4f3117;
+    color: var(--brown-dark);
 }
 
 .loading-spinner .oi {
