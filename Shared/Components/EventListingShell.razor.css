@@ -14,16 +14,16 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.82rem;
-    color: #6082a0;
+    color: var(--ci-text-muted);
 }
 
 .listing-pin {
-    color: #4f9cf8;
+    color: var(--ci-accent);
     flex-shrink: 0;
 }
 
 .listing-location-change {
-    color: #4f9cf8;
+    color: var(--ci-accent);
     text-decoration: none;
     font-weight: 600;
     margin-left: 0.15rem;
@@ -37,8 +37,8 @@
 .date-selector {
     display: flex;
     align-items: stretch;
-    background: #111927;
-    border: 1px solid #1b3d6c;
+    background: var(--ci-bg-deepest);
+    border: 1px solid var(--ci-border);
     border-radius: 10px;
     overflow: hidden;
 }
@@ -46,7 +46,7 @@
 .date-nav {
     background: transparent;
     border: none;
-    color: #8aacc8;
+    color: var(--ci-text-blue);
     padding: 0.55rem 1.1rem;
     font-size: 1.4rem;
     line-height: 1;
@@ -57,16 +57,16 @@
 }
 
 .date-nav:hover {
-    color: #f1f5f9;
-    background: #162030;
+    color: var(--ci-text);
+    background: var(--ci-bg-mid);
 }
 
 .date-display {
     background: transparent;
     border: none;
-    border-left: 1px solid #1b3d6c;
-    border-right: 1px solid #1b3d6c;
-    color: #f1f5f9;
+    border-left: 1px solid var(--ci-border);
+    border-right: 1px solid var(--ci-border);
+    color: var(--ci-text);
     padding: 0.55rem 1.5rem;
     font-size: 0.92rem;
     font-weight: 600;
@@ -78,15 +78,15 @@
 }
 
 .date-display:hover {
-    background: #162030;
+    background: var(--ci-bg-mid);
 }
 
 .date-input {
-    background: #0d1825;
-    color: #f1f5f9;
+    background: var(--ci-bg-alt);
+    color: var(--ci-text);
     border: none;
-    border-left: 1px solid #1b3d6c;
-    border-right: 1px solid #1b3d6c;
+    border-left: 1px solid var(--ci-border);
+    border-right: 1px solid var(--ci-border);
     padding: 0.5rem 0.85rem;
     font-size: 0.9rem;
     outline: none;
@@ -96,7 +96,7 @@
 
 /* ── States ──────────────────────────────── */
 .listing-state {
-    color: #6082a0;
+    color: var(--ci-text-muted);
     font-size: 0.92rem;
     text-align: center;
     padding: 2.5rem 1rem;
@@ -112,9 +112,9 @@
 
 .btn-today {
     background: transparent;
-    border: 1px solid #1b3d6c;
+    border: 1px solid var(--ci-border);
     border-radius: 7px;
-    color: #8aacc8;
+    color: var(--ci-text-blue);
     padding: 0.35rem 1rem;
     font-size: 0.85rem;
     cursor: pointer;
@@ -122,8 +122,8 @@
 }
 
 .btn-today:hover {
-    border-color: #4f9cf8;
-    color: #4f9cf8;
+    border-color: var(--ci-accent);
+    color: var(--ci-accent);
 }
 
 /* ── Event list container ────────────────── */
@@ -145,7 +145,7 @@
 
 .skel {
     border-radius: 5px;
-    background: linear-gradient(90deg, #111927 25%, #1d2f44 50%, #111927 75%);
+    background: linear-gradient(90deg, var(--ci-bg-deepest) 25%, var(--ci-bg-card) 50%, var(--ci-bg-deepest) 75%);
     background-size: 600px 100%;
     animation: skeleton-shimmer 1.4s ease-in-out infinite;
 }
@@ -156,9 +156,9 @@
     gap: 1.25rem;
     padding: 1rem 1.25rem;
     border-radius: 12px;
-    background: #1a2740;
-    border: 1px solid #1e3a5f;
-    border-left: 3px solid #1b3d6c;
+    background: var(--ci-bg-card);
+    border: 1px solid var(--ci-border-alt);
+    border-left: 3px solid var(--ci-border);
     width: 100%;
     box-sizing: border-box;
 }
