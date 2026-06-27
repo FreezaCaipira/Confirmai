@@ -13,30 +13,30 @@
     align-items: center;
     padding-top: 1.25rem;
     border-top: 2px solid;
-    border-image: linear-gradient(to right, #4f9cf8, #7dd3fc, #4f9cf8) 1;
+    border-image: linear-gradient(to right, var(--ci-accent), var(--ci-accent-light), var(--ci-accent)) 1;
 }
 
 .edit-cancel-btn {
-    background: linear-gradient(180deg, #f87171 0%, #ef4444 50%, #dc2626 100%);
-    border-color: #fca5a5;
+    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
+    border-color: var(--red-pale);
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
 }
 
 .edit-cancel-btn:hover:not(:disabled) {
-    background: linear-gradient(180deg, #fca5a5 0%, #f87171 50%, #ef4444 100%);
-    border-color: #fecaca;
+    background: linear-gradient(180deg, var(--red-pale) 0%, var(--red-soft) 50%, var(--red-strong) 100%);
+    border-color: var(--red-pale);
     box-shadow: 0 4px 8px rgba(239, 68, 68, 0.5);
 }
 
 .edit-cancel-no-btn {
-    background: #1a2740;
-    border-color: #334155;
+    background: var(--ci-bg-card);
+    border-color: var(--slate-mid);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .edit-cancel-no-btn:hover:not(:disabled) {
-    background: #2a3a55;
-    border-color: #475569;
+    background: var(--ci-bg-alt);
+    border-color: var(--slate-muted);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 /* ── Input focus override (neutralize browser defaults) ─────────── */
