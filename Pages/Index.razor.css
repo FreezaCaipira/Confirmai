@@ -99,7 +99,7 @@
     margin: 0 0 0.5rem;
     letter-spacing: -0.01em;
     font-family: inherit;
-    text-shadow: 0 0 15px rgba(79, 156, 248, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 15px var(--accent-opacity-xl), 0 2px 4px var(--shadow-md);
     text-transform: none;
 }
 
@@ -162,7 +162,7 @@
 .sport-card--futsal {
     border-color: var(--green-dark);
     border-top: 3px solid var(--green);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(22, 163, 74, 0.2);
+    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--green-opacity-lg);
 }
 
 .sport-card--futsal::before {
@@ -171,7 +171,7 @@
 
 .sport-card--futsal:hover {
     border-color: var(--green);
-    box-shadow: 0 14px 36px rgba(22, 163, 74, 0.3), 0 8px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 14px 36px var(--green-opacity-md), 0 8px 16px var(--shadow-lg);
 }
 
 .sport-card--futsal:hover::before {
@@ -190,7 +190,7 @@
 .sport-card--poker {
     border-color: var(--poker-bg-dark);
     border-top: 3px solid var(--poker-accent);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(124, 58, 237, 0.2);
+    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-sm);
 }
 
 .sport-card--poker::before {
