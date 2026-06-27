@@ -474,7 +474,7 @@
     border: none;
     font-size: 0.98rem;
     cursor: pointer;
-    box-shadow: 0 2px 8px #0004;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     transition: background 0.2s, color 0.2s;
     display: inline-flex;
     align-items: center;

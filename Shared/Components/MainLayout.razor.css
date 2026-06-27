@@ -129,7 +129,7 @@ header {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    background: linear-gradient(180deg, var(--ci-bg-card) 0%, #1a2637 100%);
+    background: linear-gradient(180deg, var(--ci-bg-card) 0%, var(--ci-bg-deep) 100%);
     border: 1px solid var(--ci-border-dim);
     border-radius: 999px;
     padding: 0.12rem 0.35rem;

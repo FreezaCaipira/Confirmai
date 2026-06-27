@@ -60,7 +60,7 @@
     padding: 0.4rem 0.5rem;
     max-height: 200px;
     overflow-y: auto;
-    color: #c5d0de;
+    color: var(--ci-surface-muted);
 }
 
 /* inherit log-table styles from site.css / AdminLogs.razor.css theme */

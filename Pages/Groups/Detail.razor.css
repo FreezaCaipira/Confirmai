@@ -211,7 +211,7 @@
 }
 
 .btn-approve {
-    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
     color: var(--green-soft);
     box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
 }

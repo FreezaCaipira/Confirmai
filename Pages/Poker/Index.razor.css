@@ -251,7 +251,7 @@
     padding: 1rem 1.25rem;
     border-radius: 12px;
     background: var(--ci-bg-dark);
-    border: 1px solid #1b3868;
+    border: 1px solid var(--ci-border-alt);
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
     width: 100%;
     box-sizing: border-box;

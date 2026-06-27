@@ -116,5 +116,5 @@
 .mk-btn-primary:hover:not(:disabled) {
     background: var(--ci-accent);
     border-color: var(--ci-accent);
-    color: #fff;
+    color: var(--white);
 }

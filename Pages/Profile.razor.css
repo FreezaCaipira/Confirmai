@@ -48,7 +48,7 @@
     max-height: 220px;
     overflow-y: auto;
     padding-right: 0.1rem;
-    background: #0a0f18;
+    background: var(--ci-bg-deepest);
     border: 1px solid var(--ci-border);
     border-radius: 4px;
     padding: 0.5rem;

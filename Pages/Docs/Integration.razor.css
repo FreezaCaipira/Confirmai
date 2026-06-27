@@ -194,7 +194,7 @@
 }
 
 /* --- Tab groups (CANARY / TFS 1.x)
- *  Fundo: tom claro do marrom-ferrugem (var(--rust) em 15% de opacidade sobre branco ≈ #f2e2da)
+ *  Fundo: tom claro do marrom-ferrugem (var(--rust) em 15% de opacidade sobre branco)
  *  Texto: var(--rust) (mesmo marrom da bolinha)
  * --- */
 .integration-tab-group {
