@@ -11,7 +11,7 @@
     padding: 1rem;
     border-radius: 14px;
     border: 1px solid rgba(130, 170, 205, 0.4);
-    background: linear-gradient(180deg, var(--ci-bg) 0%, #050810 100%);
+    background: linear-gradient(180deg, var(--ci-bg) 0%, var(--ci-bg-deepest) 100%);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.2);
 }
 
@@ -68,7 +68,7 @@
 }
 
 .admin-payments-shell .admin-payments-auto-refresh-toggle input {
-    accent-color: #60a5fa;
+    accent-color: var(--ci-accent);
 }
 
 .admin-payments-shell .admin-payments-auto-refresh-pill {
@@ -82,9 +82,9 @@
 }
 
 .admin-payments-shell .admin-payments-auto-refresh-pill--paused {
-    color: #fcd34d;
+    color: var(--amber-light);
     background: linear-gradient(180deg, var(--amber) 0%, #f59e0b 50%, #d97706 100%);
-    border-color: #fcd34d;
+    border-color: var(--amber-light);
     box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
 }
 
@@ -97,7 +97,7 @@
 }
 
 .admin-payments-shell .admin-payments-severity-pill--ok {
-    color: #f0fdf4;
+    color: var(--green-soft);
     background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
     border-color: var(--green-soft);
     box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
@@ -106,14 +106,14 @@
 .admin-payments-shell .admin-payments-severity-pill--warning {
     color: #fffbeb;
     background: linear-gradient(180deg, var(--amber) 0%, #f59e0b 50%, #d97706 100%);
-    border-color: #fcd34d;
+    border-color: var(--amber-light);
     box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
 }
 
 .admin-payments-shell .admin-payments-severity-pill--critical {
-    color: #fef2f2;
+    color: var(--red-lightest);
     background: linear-gradient(180deg, var(--red-soft) 0%, #ef4444 50%, #dc2626 100%);
-    border-color: #fca5a5;
+    border-color: var(--red-pale);
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
 }
 
@@ -125,7 +125,7 @@
 }
 
 .admin-payments-shell .admin-payments-summary-meta span {
-    color: #b8d1e8;
+    color: var(--ci-text-blue);
     font-size: 0.8rem;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .admin-payments-shell .admin-payments-summary-age {
-    color: #c9ddf0;
+    color: var(--ci-text-link);
     font-weight: 600;
 }
 
@@ -164,11 +164,11 @@
 }
 
 .admin-payments-shell .admin-payments-summary-age--warning {
-    color: #ffd39b;
+    color: var(--amber-warm);
 }
 
 .admin-payments-shell .admin-payments-trend--warning {
-    color: #ffd39b;
+    color: var(--amber-warm);
     font-weight: 700;
 }
 
@@ -182,7 +182,7 @@
 
 .admin-payments-shell .admin-payments-sweep-history-title {
     display: block;
-    color: #b8d1e8;
+    color: var(--ci-text-blue);
     font-size: 0.82rem;
     font-weight: 700;
     margin-bottom: 0.38rem;
@@ -210,7 +210,7 @@
 }
 
 .admin-payments-shell .admin-payments-sweep-history li {
-    color: #9fbad5;
+    color: var(--ci-text-subtle);
     font-size: 0.78rem;
     margin: 0.15rem 0;
 }
@@ -225,7 +225,7 @@
 
 .admin-payments-shell .admin-payments-gateway-telemetry-title {
     display: block;
-    color: #b8d1e8;
+    color: var(--ci-text-blue);
     font-size: 0.82rem;
     font-weight: 700;
     margin-bottom: 0.38rem;
@@ -242,7 +242,7 @@
     padding: 0.4rem 0.35rem;
     text-align: left;
     border-bottom: 1px solid rgba(130, 170, 205, 0.14);
-    color: #bfd6ea;
+    color: var(--ci-text-blue);
 }
 
 .admin-payments-shell .admin-payments-gateway-severity {
@@ -262,13 +262,13 @@
 }
 
 .admin-payments-shell .admin-payments-gateway-severity--warning {
-    color: #ffd9a8;
+    color: var(--amber-warm);
     background: rgba(251, 191, 36, 0.12);
     border-color: rgba(251, 191, 36, 0.34);
 }
 
 .admin-payments-shell .admin-payments-gateway-severity--critical {
-    color: #fecaca;
+    color: var(--red-pale);
     background: rgba(248, 113, 113, 0.12);
     border-color: rgba(248, 113, 113, 0.42);
 }
@@ -283,17 +283,17 @@
 
 .admin-payments-shell .admin-payments-reconcile-label {
     font-size: 0.75rem;
-    color: #8aacc8;
+    color: var(--ci-text-muted);
 }
 
 .admin-payments-shell .admin-payments-reconcile-result--error {
     border-color: rgba(248, 113, 113, 0.4);
-    color: #fecaca;
+    color: var(--red-pale);
 }
 
 .admin-payments-shell .admin-payments-reconcile-result--ok {
     border-color: rgba(74, 222, 128, 0.4);
-    color: #bbf7d0;
+    color: var(--green-soft);
 }
 
 .admin-payments-shell .admin-payments-modal-backdrop {
@@ -335,7 +335,7 @@
 .admin-payments-shell .admin-payments-modal-header h2 {
     margin: 0;
     font-size: 1rem;
-    color: #e5f2ff;
+    color: var(--ci-text-info-strong);
 }
 
 .admin-payments-shell .admin-payments-tools-grid {
@@ -354,13 +354,13 @@
 .admin-payments-shell .admin-payments-tools-section h3 {
     margin: 0;
     font-size: 0.9rem;
-    color: #d7e9fb;
+    color: var(--ci-text-blue);
 }
 
 .admin-payments-shell .admin-payments-tools-description {
     margin: 0.25rem 0 0.6rem;
     font-size: 0.78rem;
-    color: #9bb8d3;
+    color: var(--ci-text-muted);
 }
 
 .admin-payments-shell .admin-payments-reconcile-bar--modal {

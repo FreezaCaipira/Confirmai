@@ -25,9 +25,9 @@
     font-weight: 700;
 }
 
-.poker-type-badge--tourney { background: #1e1034; color: var(--poker-accent); border: 1px solid #4c1d95; }
-.poker-type-badge--cash    { background: #14290f; color: var(--green-bright); border: 1px solid #14532d; }
-.poker-type-badge--home    { background: #1a1209; color: var(--amber); border: 1px solid #78350f; }
+.poker-type-badge--tourney { background: var(--poker-bg-deepest); color: var(--poker-accent); border: 1px solid var(--poker-bg-dark); }
+.poker-type-badge--cash    { background: var(--futsal-bg-dark); color: var(--green-bright); border: 1px solid var(--futsal-green-dark); }
+.poker-type-badge--home    { background: var(--brown-deep); color: var(--amber); border: 1px solid var(--brown-mid); }
 
 /* ── Casa de poker ───────────────────────── */
 .detail-poker-house {
@@ -41,9 +41,9 @@
 
 /* ── Late reg chip ───────────────────────── */
 .detail-chip--latereg {
-    border-color: #78350f;
+    border-color: var(--brown-mid);
     color: var(--amber);
-    background: #1a1209;
+    background: var(--brown-deep);
 }
 
 /* ── Home Game — lock screen ─────────────── */
@@ -53,21 +53,21 @@
     align-items: center;
     gap: 1rem;
     padding: 2rem 1rem;
-    background: #0d1420;
-    border: 1px dashed #78350f;
+    background: var(--ci-bg-mid);
+    border: 1px dashed var(--brown-mid);
     border-radius: 14px;
     text-align: center;
 }
 
 .homegame-lock-icon {
     font-size: 2.5rem;
-    color: #d97706;
+    color: var(--amber-mid);
     opacity: 0.7;
 }
 
 .homegame-lock-text {
     font-size: 0.88rem;
-    color: #78716c;
+    color: var(--slate-warm);
     line-height: 1.6;
     margin: 0;
     max-width: 340px;
@@ -83,8 +83,8 @@
     width: 120px;
     padding: 0.55rem 0.9rem;
     border-radius: 8px;
-    border: 1px solid #44403c;
-    background: #1a1209;
+    border: 1px solid var(--slate-dark);
+    background: var(--brown-deep);
     color: var(--amber);
     font-size: 1.05rem;
     font-weight: 700;
@@ -95,14 +95,14 @@
     transition: border-color 0.14s;
 }
 
-.homegame-code-input:focus   { border-color: #d97706; }
+.homegame-code-input:focus   { border-color: var(--amber-mid); }
 .homegame-code-input.homegame-code-input--error { border-color: var(--red); }
 
 .homegame-enter-btn {
     padding: 0.55rem 1.1rem;
     border-radius: 8px;
-    background: #d97706;
-    color: #fff;
+    background: var(--amber-mid);
+    color: var(--white);
     font-weight: 700;
     font-size: 0.88rem;
     border: none;
@@ -110,7 +110,7 @@
     transition: background 0.14s;
 }
 
-.homegame-enter-btn:hover { background: #b45309; }
+.homegame-enter-btn:hover { background: var(--amber-dark); }
 
 .homegame-code-error {
     font-size: 0.8rem;
@@ -125,7 +125,7 @@
     gap: 0.65rem;
     padding: 0.75rem 1rem;
     background: #0a1e10;
-    border: 1px solid #14532d;
+    border: 1px solid var(--futsal-green-dark);
     border-radius: 10px;
     font-size: 0.87rem;
     color: var(--green-bright);
@@ -146,7 +146,7 @@
     flex-direction: column;
     gap: 0.2rem;
     background: var(--ci-bg-card-deep);
-    border: 1px solid #1b3868;
+    border: 1px solid var(--ci-border);
     border-radius: 10px;
     padding: 0.65rem 0.85rem;
 }
@@ -156,13 +156,13 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #475569;
+    color: var(--slate-mid);
 }
 
 .poker-detail-value {
     font-size: 0.97rem;
     font-weight: 700;
-    color: #e2e8f0;
+    color: var(--ci-text);
 }
 
 .poker-detail-value--price { color: var(--green-bright); }
@@ -175,7 +175,7 @@
     gap: 0.5rem;
     padding: 0.65rem 0.85rem;
     background: var(--ci-bg-card-deep);
-    border: 1px solid #1b3868;
+    border: 1px solid var(--ci-border);
     border-radius: 10px;
     margin-top: 0.5rem;
 }
@@ -195,10 +195,10 @@
 /* ── Confirm btn poker variant ───────────── */
 .confirm-btn--poker {
     background: var(--poker-accent-deep);
-    color: #fff;
+    color: var(--white);
     border: none;
 }
 
-.confirm-btn--poker:hover { background: #6d28d9; }
+.confirm-btn--poker:hover { background: var(--poker-bg-dark); }
 
-.confirmed-label--poker { color: var(--poker-accent); background: #1e1034; border-color: #4c1d95; }
+.confirmed-label--poker { color: var(--poker-accent); background: var(--poker-bg-deepest); border-color: var(--poker-bg-dark); }

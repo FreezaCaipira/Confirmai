@@ -53,10 +53,10 @@
 
 .input {
     padding: 0.4rem 0.6rem;
-    border: 1px solid #1b3868;
+    border: 1px solid var(--ci-border);
     border-radius: 6px;
     background: var(--ci-bg);
-    color: #e2e8f0;
+    color: var(--ci-text);
     font-size: 0.9rem;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -126,13 +126,13 @@
 }
 
 .btn-cancel {
-    background: #4a4a4a;
-    color: #a0a0a0;
+    background: var(--slate-mid);
+    color: var(--slate-light);
 }
 
 .btn-cancel:hover {
-    background: #5a5a5a;
-    color: #c0c0c0;
+    background: var(--slate-dark);
+    color: var(--slate-pale);
 }
 
 .pending-request-checkbox {
@@ -166,7 +166,7 @@
     gap: 0.75rem;
     padding: 0.75rem 1rem;
     background: var(--ci-bg);
-    border: 1px solid #1b3868;
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
     border-left: 3px solid transparent;
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
@@ -174,7 +174,7 @@
 }
 
 .pending-request-item:hover {
-    background: #0f1825;
+    background: var(--ci-bg-card);
     border-color: var(--ci-accent);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3);
 }
@@ -212,7 +212,7 @@
 
 .btn-approve {
     background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
-    color: #f0fdf4;
+    color: var(--green-soft);
     box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
 }
 
@@ -222,8 +222,8 @@
 }
 
 .btn-reject {
-    background: linear-gradient(180deg, var(--red-soft) 0%, #ef4444 50%, #dc2626 100%);
-    color: #fef2f2;
+    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-dark) 100%);
+    color: var(--red-lightest);
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
 }
 
@@ -273,7 +273,7 @@
     position: relative;
     max-width: 90vw;
     max-height: 90vh;
-    background: #1e293b;
+    background: var(--ci-bg-mid);
     border-radius: 12px;
     padding: 1rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -286,7 +286,7 @@
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
-    background: #ef4444;
+    background: var(--red-strong);
     color: white;
     border: none;
     cursor: pointer;
@@ -299,7 +299,7 @@
 }
 
 .payment-proof-viewer-close:hover {
-    background: #dc2626;
+    background: var(--red-dark);
     transform: scale(1.1);
 }
 
@@ -336,5 +336,5 @@
 }
 
 .detail-pix-notice-link:hover {
-    color: #fde68a;
+    color: var(--amber-warm);
 }

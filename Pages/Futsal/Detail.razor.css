@@ -4,53 +4,53 @@
 .skeleton-line--md { max-width: 200px; }
 .skeleton-line--sm { max-width: 150px; }
 
-.detail-header--futsal .detail-sport-badge { color: #22c55e; }
+.detail-header--futsal .detail-sport-badge { color: var(--green-bright); }
 
 /* Payment Status Badge States */
 .player-tag--paid {
-    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-bright) 50%, var(--green-strong) 100%);
     border: 1px solid var(--green-soft);
-    color: #f0fdf4;
+    color: var(--green-soft);
     box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
 }
 
 .player-tag--paid:hover {
-    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, #22c55e 100%);
-    border-color: #bbf7d0;
+    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, var(--green-bright) 100%);
+    border-color: var(--futsal-green-pale);
     box-shadow: 0 4px 8px rgba(74, 222, 128, 0.5);
 }
 
 .player-tag--proof-pending {
-    background: linear-gradient(180deg, var(--amber) 0%, #f59e0b 50%, #d97706 100%);
-    border: 1px solid #fcd34d;
-    color: #fffbeb;
+    background: linear-gradient(180deg, var(--amber) 0%, var(--amber-mid) 50%, var(--amber-dark) 100%);
+    border: 1px solid var(--amber-light);
+    color: var(--amber-lightest);
     cursor: pointer;
     transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
 }
 
 .player-tag--proof-pending:hover {
-    background: linear-gradient(180deg, #fcd34d 0%, var(--amber) 50%, #f59e0b 100%);
-    border-color: #fde68a;
+    background: linear-gradient(180deg, var(--amber-light) 0%, var(--amber) 50%, var(--amber-mid) 100%);
+    border-color: var(--amber-warm);
     box-shadow: 0 4px 8px rgba(251, 191, 36, 0.5);
 }
 
 .player-tag--pay-pending {
-    background: linear-gradient(180deg, var(--red-soft) 0%, #ef4444 50%, #dc2626 100%);
+    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-dark) 100%);
     border: 1px solid var(--red-text-light);
-    color: #fef2f2;
+    color: var(--red-lightest);
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
 }
 
 .player-tag--pay-pending:hover {
-    background: linear-gradient(180deg, var(--red-text-light) 0%, var(--red-soft) 50%, #ef4444 100%);
-    border-color: #fecaca;
+    background: linear-gradient(180deg, var(--red-text-light) 0%, var(--red-soft) 50%, var(--red-strong) 100%);
+    border-color: var(--red-pale);
     box-shadow: 0 4px 8px rgba(239, 68, 68, 0.5);
 }
 
 .player-tag--pay-btn {
     background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
-    border: 1px solid #7dd3fc;
+    border: 1px solid var(--ci-accent-light);
     color: var(--ci-surface-light);
     cursor: pointer;
     transition: all 0.2s;
@@ -58,15 +58,15 @@
 }
 
 .player-tag--pay-btn:hover {
-    background: linear-gradient(180deg, #7dd3fc 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
+    background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
     border-color: var(--link-info);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.5);
 }
 
 .player-tag--receiver-badge {
-    background: linear-gradient(180deg, var(--amber) 0%, #f59e0b 50%, #d97706 100%);
-    border: 1px solid #fcd34d;
-    color: #fffbeb;
+    background: linear-gradient(180deg, var(--amber) 0%, var(--amber-mid) 50%, var(--amber-dark) 100%);
+    border: 1px solid var(--amber-light);
+    color: var(--amber-lightest);
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
@@ -75,15 +75,15 @@
 
 /* Goalkeeper "Não Paga" Badge */
 .player-tag--no-pay {
-    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-bright) 50%, var(--green-strong) 100%);
     border: 1px solid var(--green-soft);
-    color: #f0fdf4;
+    color: var(--green-soft);
     box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
 }
 
 .player-tag--no-pay:hover {
-    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, #22c55e 100%);
-    border-color: #bbf7d0;
+    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, var(--green-bright) 100%);
+    border-color: var(--futsal-green-pale);
     box-shadow: 0 4px 8px rgba(74, 222, 128, 0.5);
 }
 

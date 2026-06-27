@@ -8,8 +8,8 @@
     font-size: 0.85rem;
     font-weight: 700;
     text-decoration: none;
-    background: #14532d;
-    color: #bbf7d0;
+    background: var(--futsal-green-dark);
+    color: var(--futsal-green-pale);
     border: 1.5px solid #166534;
     transition: filter 0.15s;
 }
@@ -17,9 +17,9 @@
 .my-conf-browse-btn:hover { filter: brightness(1.15); }
 
 .my-conf-browse-btn--poker {
-    background: #3b0764;
-    color: #e9d5ff;
-    border-color: #4c1d95;
+    background: var(--poker-bg-deepest);
+    color: var(--poker-text);
+    border-color: var(--poker-bg-dark);
 }
 
 /* ── History tabs ────────────────────────────────────────────── */
@@ -95,7 +95,7 @@
     gap: 0.7rem;
     padding: 0.7rem 0.85rem;
     background: var(--ci-bg-card-deep);
-    border: 1px solid #1b3868;
+    border: 1px solid var(--ci-border);
     border-radius: 8px;
     transition: border-color 0.15s;
 }
@@ -110,7 +110,7 @@
 
 .my-conf-card--cancelled {
     opacity: 0.6;
-    border-color: #3d1515;
+    border-color: var(--red-bg-dark);
 }
 
 /* ── Sport badge ─────────────────────────────────────────────── */
@@ -125,8 +125,8 @@
     font-size: 1rem;
 }
 
-.my-conf-sport--futsal { background: #0a2018; border: 1px solid #14532d; }
-.my-conf-sport--poker  { background: #1a0a2e; border: 1px solid #3b0764; }
+.my-conf-sport--futsal { background: var(--futsal-bg-dark); border: 1px solid var(--futsal-green-dark); }
+.my-conf-sport--poker  { background: #1a0a2e; border: 1px solid var(--poker-bg-deepest); }
 
 /* ── Body ────────────────────────────────────────────────────── */
 .my-conf-body {
@@ -144,7 +144,7 @@
 
 .my-conf-name {
     font-size: 0.92rem;
-    color: #e2e8f0;
+    color: var(--ci-text);
     font-weight: 600;
 }
 
@@ -153,9 +153,9 @@
     font-weight: 700;
     padding: 0.12rem 0.45rem;
     border-radius: 10px;
-    background: #0a2018;
-    color: #4ade80;
-    border: 1px solid #14532d;
+    background: var(--futsal-bg-dark);
+    color: var(--green-bright);
+    border: 1px solid var(--futsal-green-dark);
 }
 
 .my-conf-cancelled {
@@ -163,9 +163,9 @@
     font-weight: 700;
     padding: 0.12rem 0.45rem;
     border-radius: 10px;
-    background: #290f0f;
-    color: #f87171;
-    border: 1px solid #7f1d1d;
+    background: var(--red-bg-dark);
+    color: var(--red-soft);
+    border: 1px solid var(--red-border);
 }
 
 .meta-chip--confirmed {
@@ -174,7 +174,7 @@
     padding: 0.12rem 0.45rem;
     border-radius: 10px;
     background: rgba(22,163,74,0.12);
-    color: #4ade80;
+    color: var(--green-bright);
     border: 1px solid rgba(74,222,128,0.35);
     display: inline-flex;
     align-items: center;
@@ -227,19 +227,19 @@
 }
 
 .my-conf-btn--view:hover {
-    background: #112240;
+    background: var(--ci-bg-mid);
     border-color: var(--ci-accent);
-    color: #93c5fd;
+    color: var(--link-info);
 }
 
 .my-conf-btn--cancel {
     background: transparent;
-    color: #f87171;
-    border-color: #7f1d1d;
+    color: var(--red-soft);
+    border-color: var(--red-border);
 }
 
 .my-conf-btn--cancel:hover:not(:disabled) {
-    background: #290f0f;
+    background: var(--red-bg-dark);
 }
 
 @media (max-width: 640px) {

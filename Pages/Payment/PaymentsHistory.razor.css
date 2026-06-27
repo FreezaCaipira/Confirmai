@@ -38,7 +38,7 @@
 }
 
 #payments-history-page .filter-bar input::placeholder {
-    color: #475569;
+    color: var(--slate-mid);
 }
 
 #payments-history-page .filter-bar button {
@@ -49,7 +49,7 @@
 }
 
 #payments-history-page .filter-bar button:hover {
-    color: #82bdd8;
+    color: var(--link-info);
     background: rgba(79, 156, 248, 0.08);
 }
 
@@ -80,14 +80,14 @@
 }
 
 #payments-history-page .order-status-badge.pago {
-    background: #0a2018;
+    background: var(--futsal-bg-dark);
     color: var(--green-bright);
-    border: 1px solid #14532d;
+    border: 1px solid var(--futsal-green-dark);
     text-shadow: none;
 }
 
 #payments-history-page .order-status-badge.aguardandopagamento {
-    background: #0a1928;
+    background: var(--ci-bg-alt);
     color: var(--ci-accent);
     border: 1px solid var(--ci-border-dim);
 }
@@ -124,7 +124,7 @@
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table th {
-    background: #0a1928;
+    background: var(--ci-bg-alt);
     border-bottom: 1px solid var(--ci-border-dim);
     color: var(--ci-accent);
     text-shadow: none;
@@ -132,12 +132,12 @@
 
 #payments-history-page.payments-history-shell--sent .payments-history-table td {
     background: transparent;
-    border-bottom: 1px solid #0f1f30;
+    border-bottom: 1px solid var(--ci-border-alt);
     color: var(--ci-text-muted);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table tr:nth-child(even) td {
-    background: #0b1928;
+    background: var(--ci-bg-alt);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table tr:hover td {
@@ -174,7 +174,7 @@
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar button:hover {
-    border-color: #ef4444;
+    border-color: var(--red-strong);
     color: var(--red-text-light);
 }
 
@@ -191,7 +191,7 @@
 
 #payments-history-page.payments-history-shell--received .payments-history-table td {
     background: transparent;
-    border-bottom: 1px solid #2d0a0a;
+    border-bottom: 1px solid var(--ci-border-alt);
     color: var(--red-text-light);
 }
 
@@ -208,7 +208,7 @@
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table .payment-row-pending td {
-    border-bottom-color: #ef4444;
+    border-bottom-color: var(--red-strong);
 }
 
 
@@ -238,14 +238,14 @@
 }
 
 .payments-tab-btn:hover:not(.active) {
-    border-color: #2d6a8a;
+    border-color: var(--ci-border-alt);
     color: var(--ci-text-muted);
     background: rgba(26, 90, 176, 0.1);
 }
 
 .payments-tab-btn.active {
-    background: #0a1928;
-    border-color: #1a5ab0;
+    background: var(--ci-bg-alt);
+    border-color: var(--ci-accent-mid);
     color: var(--ci-accent);
     cursor: default;
 }
@@ -403,9 +403,9 @@
 }
 
 .payments-history-shell .payments-history-table .order-status-badge.pago {
-    background: #0a2018;
+    background: var(--futsal-bg-dark);
     color: var(--green-bright);
-    border: 1px solid #14532d;
+    border: 1px solid var(--futsal-green-dark);
     text-shadow: none;
 }
 
@@ -443,7 +443,7 @@
     min-height: 2.35rem;
     font-size: 0.85rem;
     font-weight: 600;
-    border: 1px solid #2d6a8a;
+    border: 1px solid var(--ci-border-alt);
     background: rgba(26, 90, 176, 0.15);
     color: var(--ci-text-muted);
     border-radius: 6px;
@@ -454,7 +454,7 @@
 .export-btn:hover {
     background: rgba(26, 90, 176, 0.25);
     border-color: var(--ci-accent);
-    color: #a8ccf8;
+    color: var(--ci-text-blue);
 }
 
 .export-btn:disabled {
@@ -513,7 +513,7 @@
 
 /* Table header - sent theme */
 .payments-history-shell--sent .payments-history-table thead {
-    background: #0a1928;
+    background: var(--ci-bg-alt);
     border-bottom: 1px solid var(--ci-border-dim);
     color: var(--ci-accent);
 }
@@ -537,7 +537,7 @@
 
 /* Table row - received pending theme */
 .payments-history-shell--received .payments-history-table tbody tr--pending {
-    border-bottom: 1px solid #ef4444;
+    border-bottom: 1px solid var(--red-strong);
 }
 
 /* Table cell date - sent theme */
