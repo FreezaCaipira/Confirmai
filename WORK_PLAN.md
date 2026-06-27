@@ -83,7 +83,7 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 |---------|---------|-------------|-------------|-------------|--------------|
 | Hardcoded colors total | 1.387 | 1.099 | 867 | 0 | <550 |
 | Hardcoded puros (sem fallback) | — | — | 689 | 0 | <400 |
-| CSS vars usadas | 381 | 673 | 1.175 | ~1.453 | >1.400 |
+| CSS vars usadas | 381 | 673 | 1.175 | ~1.476 | >1.400 |
 | `!important` em Pages/*.css | 16 | 1 | 1 | 1 | 1 |
 | Inline styles estaticos | ~35 | 6 | 0 | 0 | 0 |
 | Warnings (projeto principal) | ~50 | 2 | 0 | 0 | 0 |
