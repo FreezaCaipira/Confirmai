@@ -1,7 +1,7 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/07/2026 | Base: `main` + `refactor/css-vars-consistency` | Ciclo 5
-> 1.674/1.674 testes passando | 0 erros de build | 2 warnings projeto (CS8603)
+> Atualizado em 27/06/2026 | Base: `main` + `refactor/css-vars-consistency` | Ciclo 5 (CONCLUÍDO)
+> 1.674/1.674 testes passando | 0 erros de build | 0 warnings projeto (CS8603 corrigidos)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -37,6 +37,28 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
   3. ~400 hardcoded restantes TEM var equivalente direto (ex: #1b3d6c=--ci-border, #4f9cf8=--ci-accent)
   4. ~200 hardcoded NAO tem var no design system (precisam novas vars: #4ade80, #e0f2fe, #cbd5e1, #f87171, etc.)
   5. Teste `AdminLogsQueryStringIntegrationTests` continua falhando (pre-existente, nao do Ciclo 4)
+
+### Ciclo 5 (Pleno Local): Refatoracao CSS - Hardcoded Colors + Inline Styles
+- Branches: `refactor/ciclo5-fase1-new-vars`, `refactor/ciclo5-fase2-css-vars-ci`, `refactor/ciclo5-fase3-css-vars-warm`, `refactor/ciclo5-fase4-payments-history`, `refactor/ciclo5-fase5-inline-cleanup`, `refactor/ciclo5-fase6-cs8603`
+- **Resultados**:
+  - Fase 1: Adicionadas 11 novas vars CSS ao `:root` (warm/parchment theme)
+  - Fase 2: Convertidas cores hardcoded em 8 arquivos CI theme (Payments.razor.css, PaymentsHistory.razor.css, MyEvents/Index.razor.css, ViewPayment.razor.css, AdminPayments.razor.css, EventPayment.razor.css, MyConfirmations/Index.razor.css, Futsal/Index.razor.css)
+  - Fase 3: Convertidas cores hardcoded em 7 arquivos Warm + Mixed theme (Integration.razor.css, Poker/Index.razor.css, Poker/Detail.razor.css, AdminLanguages.razor.css, ProductForm.razor.css, Groups/Detail.razor.css, Futsal/Detail.razor.css)
+  - Fase 4: Refatorados 8 inline styles condicionais em PaymentsHistory.razor para classes CSS
+  - Fase 5: Eliminados 6 inline styles estáticos restantes (AdminVenueEdit.razor, AdminUserView.razor, AdminVenues.razor, EventPaymentProof.razor, AdminPaymentsSummaryPanel.razor.css)
+  - Fase 6: Corrigidos 2 warnings CS8603 usando Task.CompletedTask (GroupDetailPaymentsModal.razor, Payments.razor)
+- **Métricas finais**:
+  - Warnings: 2 → 0 (CS8603 corrigidos)
+  - Inline styles estaticos: 6 → 0
+  - Inline styles dinamicos: ~14 → ~8 (PaymentsHistory.razor refatorado)
+  - Hardcoded colors convertidas: ~300+ (estimado)
+- **PRs para criar manualmente** (CLI gh não disponível):
+  1. `refactor/ciclo5-fase1-new-vars` → main: "Ciclo 5 Fase 1: Adicionar vars CSS para cores sem equivalente"
+  2. `refactor/ciclo5-fase2-css-vars-ci` → main: "Ciclo 5 Fase 2: Converter hardcoded colors - Top 8 arquivos (CI theme)"
+  3. `refactor/ciclo5-fase3-css-vars-warm` → main: "Ciclo 5 Fase 3: Converter hardcoded colors - Top 7 arquivos (Warm + Mixed)"
+  4. `refactor/ciclo5-fase4-payments-history` → main: "Ciclo 5 Fase 4: Refatorar PaymentsHistory.razor inline styles"
+  5. `refactor/ciclo5-fase5-inline-cleanup` → main: "Ciclo 5 Fase 5: Eliminar 6 inline styles estaticos restantes"
+  6. `refactor/ciclo5-fase6-cs8603` → main: "Ciclo 5 Fase 6: Corrigir 2 warnings CS8603 restantes"
 
 ---
 
@@ -83,9 +105,11 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 5. **NUNCA criar arquivo `.razor.css` vazio** — so criar se tiver estilos reais
 6. **NUNCA introduzir novas cores hardcoded** ao converter inline → classe CSS. Usar vars existentes ou documentar
 7. **Validar cada fase**: `dotnet build` (0 errors) + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration"` (0 failed)
-8. **Branch separada** para cada fase: `refactor/ciclo5-fase-X-nome`
-9. **1 PR por fase** — mergear via PR, nunca push direto na main
+8. **Branch única por ciclo** — usar uma só branch para todo o ciclo (ex: `refactor/ciclo5-css-refactor`), não uma branch por fase
+9. **1 PR por ciclo** — mergear via PR, nunca push direto na main
 10. **Documentar bloqueios**: se nao resolver, escrever na secao "Problemas Encontrados" com arquivo, linha, e o que tentou
+
+**Lição aprendida do Ciclo 5**: Usar uma branch por fase (6 branches) cria fragmentação desnecessária. Melhor usar uma branch única por ciclo e fazer commits por fase dentro dela. Isso simplifica o fluxo de revisão e merge.
 
 ---
 
