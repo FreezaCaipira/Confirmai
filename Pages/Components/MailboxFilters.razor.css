@@ -73,7 +73,7 @@
     padding: 0;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1024px) {
     .mailbox-filters {
         grid-template-columns: 1fr;
         align-items: stretch;

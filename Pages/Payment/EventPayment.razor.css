@@ -301,7 +301,7 @@
     font-weight: 700;
     border: none;
     cursor: pointer;
-    text-decoration: none !important;
+    text-decoration: none;
     transition: filter 0.15s;
     margin-bottom: 0.5rem;
 }

@@ -37,7 +37,7 @@
             {
                 <div class="listing-state listing-empty">
                     <p>Você ainda não cadastrou nenhuma quadra.</p>
-                    <p style="color:#888;font-size:.9rem">Use o botão "Nova Quadra" para começar.</p>
+                    <p class="listing-empty-hint">Use o botão "Nova Quadra" para começar.</p>
                 </div>
             }
             else
@@ -76,8 +76,8 @@
                                 <td data-label="Ações">
                                     @if (confirmDeleteId == v.Id)
                                     {
-                                        <div class="admin-actions-row" style="gap:0.4rem;align-items:center">
-                                            <span style="font-size:0.8rem;color:#f1f5f9;white-space:nowrap">Remover?</span>
+                                        <div class="admin-actions-row">
+                                            <span class="admin-delete-prompt">Remover?</span>
                                             <button class="danger-btn action-btn icon-only" title="Confirmar remoção"
                                                     @onclick='() => DeleteVenue(v.Id)'>
                                                 <i class="fas fa-check"></i>
@@ -112,7 +112,7 @@
 
             @if (!string.IsNullOrWhiteSpace(deleteError))
             {
-                <p class="validation-message" style="margin-top:0.75rem">@deleteError</p>
+                <p class="validation-message">@deleteError</p>
             }
         </article>
     </section>

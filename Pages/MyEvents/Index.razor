@@ -58,7 +58,7 @@
                 {
                     <div class="listing-state listing-empty">
                         <p>Nenhum agendamento recorrente.</p>
-                        <p style="color:#888;font-size:.9rem">Crie uma partida recorrente em <a href="/futsal/create">Nova Partida</a>.</p>
+                        <p class="listing-empty-hint">Crie uma partida recorrente em <a href="/futsal/create">Nova Partida</a>.</p>
                     </div>
                 }
                 else
@@ -66,7 +66,7 @@
                     @* Filtro por cidade (Gap A) *@
                     @if (ScheduleCities.Count > 1)
                     {
-                        <div class="my-events-sport-tabs" style="margin-bottom:.75rem">
+                        <div class="my-events-sport-tabs my-events-sport-tabs--margin-bottom">
                             <button class="my-events-tab @(scheduleCityFilter is null ? "my-events-tab--active" : "")"
                                     @onclick="() => scheduleCityFilter = null">
                                 Todas
@@ -137,7 +137,7 @@
             {
                 <div class="listing-state listing-empty">
                     <p>Você ainda não criou nenhum evento.</p>
-                    <p style="color:#888;font-size:.9rem">Use os botões acima para criar sua primeira partida ou torneio.</p>
+                    <p class="listing-empty-hint">Use os botões acima para criar sua primeira partida ou torneio.</p>
                 </div>
             }
             else

@@ -325,7 +325,7 @@
     text-overflow: ellipsis;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1440px) {
     .payments-filter-card {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -334,7 +334,7 @@
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .payments-filter-card {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -346,7 +346,7 @@
     }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 640px) {
     .payments-filter-card {
         grid-template-columns: 1fr;
     }

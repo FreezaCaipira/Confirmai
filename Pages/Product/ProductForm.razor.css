@@ -269,7 +269,7 @@
     vertical-align: middle;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     .product-form {
         padding: 1rem 1rem 1.2rem;
     }

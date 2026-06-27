@@ -45,7 +45,7 @@
     }
     else if (IsMember || IsAdmin || EditingScore)
     {
-        <div class="esc-score-inputs" style="margin-top:.25rem">
+        <div class="esc-score-inputs esc-score-inputs--margin-top">
             <label class="esc-score-label">🟡 @TeamAName</label>
             <input class="esc-score-input" type="number" min="0" max="99"
                    @bind="@ScoreInputA" @bind:event="oninput" placeholder="0" />

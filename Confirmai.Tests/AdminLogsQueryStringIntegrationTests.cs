@@ -33,15 +33,44 @@ public class AdminLogsQueryStringIntegrationTests : IClassFixture<IntegrationTes
         await SeedLogAsync(excludedByDateMessage, AuditEvents.PaymentReconciliationPanelStale, new DateTime(2026, 5, 1, 12, 0, 0, DateTimeKind.Utc));
         await SeedLogAsync(excludedByEventMessage, AuditEvents.PaymentConfirmed, new DateTime(2026, 5, 25, 12, 0, 0, DateTimeKind.Utc));
 
+        // Verify the page returns 200 OK for authenticated admin
         using var client = CreateAuthenticatedClient(userId: "admin-logs-query-int", userName: "admin", roles: "admin");
-
         var response = await client.GetAsync("/admin/logs?eventType=payment.reconciliation.panel.stale&startDate=2026-05-22&endDate=2026-05-28");
-        var html = await response.Content.ReadAsStringAsync();
-
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains(includedMessage, html, StringComparison.Ordinal);
-        Assert.DoesNotContain(excludedByDateMessage, html, StringComparison.Ordinal);
-        Assert.DoesNotContain(excludedByEventMessage, html, StringComparison.Ordinal);
+
+        // Verify query string filters produce correct results at the service layer.
+        // The Blazor page uses Virtualize which loads data via SignalR circuit,
+        // so the pre-rendered HTML does not contain log rows. We verify the
+        // query-override → service pipeline directly instead.
+        var queryOverrides = AdminLogsQueryOverridesParser.Parse(
+            new Uri("https://localhost/admin/logs?eventType=payment.reconciliation.panel.stale&startDate=2026-05-22&endDate=2026-05-28"));
+
+        var filterState = AdminLogsFilterStateMerger.ApplyQueryOverrides(
+            new AdminLogsFilterState(), queryOverrides);
+
+        var criteria = new AdminLogFilterCriteria
+        {
+            EventType = filterState.EventType,
+            StartDate = filterState.StartDate,
+            EndDate = filterState.EndDate
+        };
+
+        using var scope = _factory.Services.CreateScope();
+        var queryService = scope.ServiceProvider.GetRequiredService<AdminLogsQueryService>();
+
+        var pageData = await queryService.GetPageDataAsync(
+            primaryCriteria: criteria,
+            auditCountsCriteria: criteria,
+            sortColumn: AdminLogSortColumn.Timestamp,
+            sortAscending: false,
+            requestedPage: 1,
+            pageSize: 100);
+
+        var messages = pageData.Logs.Select(l => l.Message).ToList();
+
+        Assert.Contains(includedMessage, messages);
+        Assert.DoesNotContain(excludedByDateMessage, messages);
+        Assert.DoesNotContain(excludedByEventMessage, messages);
     }
 
     private async Task SeedLogAsync(string message, string eventType, DateTime timestampUtc)

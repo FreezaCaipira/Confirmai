@@ -265,7 +265,7 @@
     border-color: var(--ci-border, #1b3d6c);
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1024px) {
     .mailbox-list-compact {
         max-height: 300px;
     }

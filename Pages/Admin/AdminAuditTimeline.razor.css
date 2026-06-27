@@ -92,7 +92,7 @@
 }
 
 /* Responsive: stack on narrow screens */
-@media (max-width: 860px) {
+@media (max-width: 768px) {
     .admin-audit-timeline-shell .timeline-table thead {
         display: none;
     }

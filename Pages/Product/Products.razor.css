@@ -111,7 +111,7 @@ button.edit-btn:hover {
     margin-right: 0.5rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .primary-btn {
         width: 100%;
         justify-content: center;
@@ -130,7 +130,7 @@ button.edit-btn:hover {
     }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
     .product-thumbnail {
         max-width: 48px;
         max-height: 48px;

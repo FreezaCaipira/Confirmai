@@ -1,3 +1,8 @@
+@* === DECOMPOSITION CANDIDATES ===
+   Section: FormSection -- lines [15-350] -- candidate for extraction
+   Section: PreviewSection -- lines [355-500] -- candidate for extraction
+=== END DECOMPOSITION === *@
+
 @page "/poker/create"
 
 @attribute [Authorize]
@@ -22,7 +27,7 @@
     <div class="create-event-card">
         @if (preselectedGroup is not null)
         {
-            <p class="form-hint" style="margin-bottom:.5rem">
+            <p class="form-hint form-hint--margin-bottom">
                 <i class="fas fa-users"></i> Evento para o grupo <strong>@preselectedGroup.Name</strong>
             </p>
         }
@@ -298,11 +303,11 @@
             }
             @if (!string.IsNullOrWhiteSpace(saveError))
             {
-                <p class="validation-message" style="margin-top:.5rem">
+                <p class="validation-message validation-message--margin-top">
                     @saveError
                     @if (!string.IsNullOrWhiteSpace(collisionHref))
                     {
-                        <a href="@collisionHref" style="margin-left:.45rem;color:#93c5fd">@Confirmai.Services.Events.EventCollisionService.OpenExistingEventLinkText</a>
+                        <a href="@collisionHref" class="collision-link">@Confirmai.Services.Events.EventCollisionService.OpenExistingEventLinkText</a>
                     }
                 </p>
             }

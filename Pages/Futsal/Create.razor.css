@@ -2,13 +2,16 @@
 
 .create-event-title i { color: #4ade80; text-shadow: 0 0 15px rgba(74, 222, 128, 0.6); }
 
+/* ── Inline styles estáticos ───────────────── */
+.collision-link { margin-left: 0.45rem; color: #93c5fd; }
+
 /* ── Input focus override (neutralize browser defaults) ─────────── */
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none !important;
-    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
-    border-color: #4ade80 !important;
+.create-event-form input:focus,
+.create-event-form select:focus,
+.create-event-form textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    border-color: var(--green-light);
 }
 
 /* ── Venue preview ───────────────────────── */
