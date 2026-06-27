@@ -1,0 +1,8 @@
+/* AdminPaymentsSummaryPanel specific styles */
+
+.admin-payments-sparkline-point {
+    width: 100%;
+    background: var(--ci-accent);
+    border-radius: 2px;
+    transition: height 0.3s ease;
+}

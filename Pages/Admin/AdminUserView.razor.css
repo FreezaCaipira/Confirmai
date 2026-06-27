@@ -130,6 +130,10 @@
     cursor: not-allowed;
 }
 
+.validation-message--margin-top {
+    margin-top: 0.5rem;
+}
+
 .admin-user-stat-card {
     border: 1px solid var(--brown-border-accent);
     background: linear-gradient(180deg, #f7ebd1 0%, #ecd6b0 100%);
