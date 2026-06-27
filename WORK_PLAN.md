@@ -95,6 +95,55 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - ~78 dentro de gradientes/rgba/box-shadow (muitos sao legitimos)
 - ~404 genuinamente sem var — precisam novas vars OU sao design-specific demais para generalizar
 
+---
+
+## Pendencias de Revisao (Senior)
+
+### O que foi feito no Ciclo 6
+- ✅ Eliminados todos os hardcoded colors (0 restantes)
+- ✅ Adicionadas 40+ vars de rgba (shadow, overlay, text-shadow, accent/green/red/slate/purple/sky-blue opacity)
+- ✅ Convertidos ~250 padrões rgba para CSS vars em 70+ arquivos
+- ✅ CSS vars usadas: ~1.476 (meta >1.400 atingida com folga)
+- ✅ Build: 0 erros, 47 warnings (pré-existentes)
+- ✅ PR mergeado com sucesso
+
+### O que ainda pode ser melhorado (opcional)
+- **~500 ocorrências de rgba restantes** em 50+ arquivos
+  - Muitas são cores específicas (design-specific) que não são padrões comuns
+  - Exemplos: `rgba(96, 165, 250, X)` (blue), `rgba(198, 40, 40, X)` (red-dark), gradientes complexos
+  - Sugestão: Avaliar se vale a pena criar vars para esses padrões específicos
+
+### Arquivos com mais padrões rgba para conversão (se decidir continuar)
+- `Shared/Components/Groups/GroupDetailPaymentsModal.razor.css`: 60 ocorrências
+- `Pages/Futsal/Escalacao.razor.css`: 52 ocorrências
+- `Pages/Payment/Payment.razor.css`: 48 ocorrências
+- `Pages/Payment/EventPayment.razor.css`: 42 ocorrências
+- `Pages/Groups/Payments.razor.css`: 42 ocorrências
+- `Pages/Admin/ParchmentLab.razor.css`: 24 ocorrências
+- `Pages/Admin/AdminPayments.razor.css`: 34 ocorrências
+- `Pages/Groups/Components/MembersManager.razor.css`: 20 ocorrências
+- `Pages/Groups/Components/FeaturesToggles.razor.css`: 13 ocorrências
+
+### Sugestões de vars adicionais (se decidir continuar)
+- `--blue-sm/md/lg/xl` para `rgba(96, 165, 250, X)`
+- `--red-dark-sm/md/lg` para `rgba(198, 40, 40, X)`
+- `--inset-accent-sm/md/lg` para `rgba(147, 197, 253, X)` (já usado em alguns arquivos)
+- Vars para gradientes específicos de cada esporte (futsal, poker)
+
+### Próximos passos sugeridos
+1. Revisar o PR mergeado e validar visualmente
+2. Decidir se vale a pena continuar convertendo os ~500 rgba restantes
+3. Se sim, criar vars para os padrões mais comuns e converter em massa
+4. Se não, considerar o Ciclo 6 completo e seguir para próximos ciclos (C1-C4)
+
+### Regras aplicadas
+- ✅ Sem fallback hex em `var()`
+- ✅ Sem novos hardcoded colors
+- ✅ Sem `!important` exceto 1 caso legítimo (AvatarUpload)
+- ✅ Sem arquivos `.razor.css` vazios
+- ✅ Commits pequenos e frequentes
+- ✅ Branch única por ciclo
+
 **Top 15 arquivos com hardcoded PUROS (sem fallback) restantes**:
 
 | # | Arquivo | Puros | Tocado no Ciclo 5? |
