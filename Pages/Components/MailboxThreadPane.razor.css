@@ -1,6 +1,6 @@
 .mailbox-thread-pane {
     border: 1px solid var(--ci-border);
-    background: #050810;
+    background: var(--ci-bg-deepest);
     border-radius: 4px;
     padding: 0.5rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -78,7 +78,7 @@
     padding: 0.44rem;
     max-width: 78%;
     width: fit-content;
-    background: #0a0f18;
+    background: var(--ci-bg-deepest);
     display: grid;
     gap: 0.2rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
@@ -91,7 +91,7 @@
 .mailbox-thread-bubble.outgoing {
     justify-self: end;
     border-color: var(--ci-accent-mid);
-    background: #1a3a5c;
+    background: var(--ci-border-alt);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.4);
 }
 
@@ -102,7 +102,7 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer {
     border-color: var(--ci-border-dim);
-    background: #0f1a2e;
+    background: var(--ci-bg-mid);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.25);
 }
 
@@ -118,7 +118,7 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller {
     border-color: var(--ci-accent-mid);
-    background: #1a3a5c;
+    background: var(--ci-border-alt);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3);
 }
 
@@ -134,7 +134,7 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-admin {
     border-color: var(--ci-border);
-    background: #0f1218;
+    background: var(--ci-bg-alt);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -219,7 +219,7 @@
     color: var(--ci-text-subtle);
     font-size: 0.76rem;
     text-align: center;
-    background: #050810;
+    background: var(--ci-bg-deepest);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 

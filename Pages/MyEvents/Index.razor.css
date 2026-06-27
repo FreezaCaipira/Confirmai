@@ -91,7 +91,7 @@
 }
 
 .my-events-tab:hover {
-    border-color: #2d6a8a;
+    border-color: var(--ci-border-alt);
     color: var(--ci-text-muted);
 }
 
@@ -108,7 +108,7 @@
 }
 
 .my-events-tab--poker.my-events-tab--active {
-    background: #1a0a2e;
+    background: var(--poker-bg-deepest);
     border-color: var(--poker-bg-deepest);
     color: var(--poker-accent);
 }
@@ -160,7 +160,7 @@
 }
 
 .my-event-sport-badge--poker {
-    background: #1a0a2e;
+    background: var(--poker-bg-deepest);
     border: 1px solid var(--poker-bg-deepest);
 }
 
@@ -199,13 +199,13 @@
 }
 
 .my-event-status--past {
-    background: #1a2535;
+    background: var(--ci-bg-card);
     color: var(--ci-text-subtle);
     border: 1px solid var(--ci-border);
 }
 
 .my-event-status--cancelled {
-    background: #290f0f;
+    background: var(--red-bg-dark);
     color: var(--red-soft);
     border: 1px solid var(--red-border);
 }
@@ -218,9 +218,9 @@
 }
 
 .my-event-type-badge--tournament {
-    background: #1c1508;
+    background: var(--brown-deep);
     color: var(--amber);
-    border: 1px solid #78350f;
+    border: 1px solid var(--brown-mid);
 }
 
 .my-event-type-badge--cashgame {
@@ -230,7 +230,7 @@
 }
 
 .my-event-type-badge--homegame {
-    background: #1a0a2e;
+    background: var(--poker-bg-deepest);
     color: var(--poker-accent);
     border: 1px solid var(--poker-bg-deepest);
 }
@@ -301,7 +301,7 @@
 }
 
 .my-event-action-btn--cancel:hover:not(:disabled) {
-    background: #290f0f;
+    background: var(--red-bg-dark);
 }
 
 @media (max-width: 640px) {
