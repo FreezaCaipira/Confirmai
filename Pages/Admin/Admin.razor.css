@@ -1,7 +1,7 @@
 ﻿.admin-welcome {
     font-size: 1.25rem;
     font-weight: 800;
-    color: #5b391f;
+    color: var(--brown-text);
     margin: 0;
     text-shadow: 0 0 10px rgba(201, 160, 106, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -17,12 +17,12 @@
     align-items: center;
     gap: 0.7rem;
     flex-wrap: wrap;
-    color: #5b391f;
+    color: var(--brown-text);
 }
 
 .fiat-select {
     background: rgba(255, 248, 231, 0.88);
-    color: #4e3119;
+    color: var(--brown-text);
     border: 1px solid var(--brown-border-warm);
     border-radius: 6px;
     padding: 0.35rem 0.6rem;
@@ -32,7 +32,7 @@
 .fee-input {
     width: 120px;
     background: rgba(255, 248, 231, 0.88);
-    color: #4e3119;
+    color: var(--brown-text);
     border: 1px solid var(--brown-border-warm);
     border-radius: 6px;
     padding: 0.35rem 0.6rem;
@@ -48,11 +48,11 @@
 }
 
 .operation-fee-message.ok {
-    color: #335f2f;
+    color: var(--futsal-green-dark);
 }
 
 .operation-fee-message.error {
-    color: #8b2f21;
+    color: var(--red-bg-dark);
 }
 
 .security-settings-card {
@@ -93,7 +93,7 @@
     margin: 0;
     font-size: 0.96rem;
     font-weight: 800;
-    color: #4e3119;
+    color: var(--brown-text);
     text-shadow: 0 0 8px rgba(201, 160, 106, 0.3);
 }
 
@@ -282,48 +282,48 @@
 }
 
 .entity-shell.admin-page .details-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, #1a5ab0 0%, #0d3270 100%);
-    color: #deeeff;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent) 100%);
+    color: var(--ci-surface-light);
 }
 
 .entity-shell.admin-page .details-btn.action-btn.icon-only i {
-    color: #deeeff;
+    color: var(--ci-surface-light);
 }
 
 .entity-shell.admin-page .edit-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, #2d6a8a 0%, #1a5ab0 100%);
-    color: #e8f4ff;
+    background: linear-gradient(180deg, var(--ci-border-alt) 0%, var(--ci-accent-mid) 100%);
+    color: var(--ci-surface-light);
 }
 
 .entity-shell.admin-page .edit-btn.action-btn.icon-only i {
-    color: #e8f4ff;
+    color: var(--ci-surface-light);
 }
 
 .entity-shell.admin-page .success-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, #1e5f3a 0%, #153f28 100%);
-    color: #a3e9c0;
+    background: linear-gradient(180deg, var(--futsal-green-dark) 0%, var(--futsal-bg-dark) 100%);
+    color: var(--futsal-green-pale);
 }
 
 .entity-shell.admin-page .success-btn.action-btn.icon-only i {
-    color: #a3e9c0;
+    color: var(--futsal-green-pale);
 }
 
 .entity-shell.admin-page .warning-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, #7c3a16 0%, #5a2810 100%);
-    color: #ffd4a8;
+    background: linear-gradient(180deg, var(--brown-deep) 0%, var(--bg-deepest) 100%);
+    color: var(--amber-light);
 }
 
 .entity-shell.admin-page .warning-btn.action-btn.icon-only i {
-    color: #ffd4a8;
+    color: var(--amber-light);
 }
 
 .entity-shell.admin-page .danger.action-btn.icon-only {
-    background: linear-gradient(180deg, #7c2e28 0%, #5a1e1a 100%);
-    color: #ffe8e4;
+    background: linear-gradient(180deg, var(--red-bg-dark) 0%, var(--red-border) 100%);
+    color: var(--red-pale);
 }
 
 .entity-shell.admin-page .danger.action-btn.icon-only i {
-    color: #ffe8e4;
+    color: var(--red-pale);
 }
 
 .entity-shell.admin-page .action-btn.icon-only:hover {
@@ -400,12 +400,12 @@
 }
 
 .admin-reconciliation-health-grid span {
-    color: #b7cee2;
+    color: var(--ci-surface-muted);
     font-size: 0.85rem;
 }
 
 .admin-reconciliation-health-grid .admin-reconciliation-trend-warning {
-    color: #ffd39b;
+    color: var(--gold-soft);
     font-weight: 700;
 }
 
@@ -421,7 +421,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.22rem;
-    color: #b7cee2;
+    color: var(--ci-surface-muted);
     font-size: 0.8rem;
     min-width: 160px;
 }
