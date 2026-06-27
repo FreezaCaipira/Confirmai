@@ -465,3 +465,87 @@
 .export-btn .fa {
     font-size: 0.9rem;
 }
+
+/* ── Inline style replacements for conditional styling ───────────────── */
+.payments-history-shell--bg {
+    background: var(--ci-bg);
+}
+
+/* Entity shell card - sent theme */
+.payments-history-shell--sent .entity-shell-card {
+    border: 1px solid var(--ci-border);
+    border-top: 1px solid var(--ci-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.1);
+    background: var(--ci-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+/* Entity shell card - received theme */
+.payments-history-shell--received .entity-shell-card {
+    border: 1px solid var(--red-border);
+    border-top: 1px solid var(--red-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(239, 68, 68, 0.1);
+    background: var(--ci-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+/* Filter bar - sent theme */
+.payments-history-shell--sent .payments-filter-card {
+    border: 1px solid var(--ci-border);
+}
+
+/* Filter bar - received theme */
+.payments-history-shell--received .payments-filter-card {
+    border: 1px solid var(--red-border);
+}
+
+/* Table - sent theme */
+.payments-history-shell--sent .payments-history-table {
+    border: 1px solid var(--ci-border-soft);
+}
+
+/* Table - received theme */
+.payments-history-shell--received .payments-history-table {
+    border: 1px solid var(--red-border);
+}
+
+/* Table header - sent theme */
+.payments-history-shell--sent .payments-history-table thead {
+    background: #0a1928;
+    border-bottom: 1px solid var(--ci-border-dim);
+    color: var(--ci-accent);
+}
+
+/* Table header - received theme */
+.payments-history-shell--received .payments-history-table thead {
+    background: #1a0a0a;
+    border-bottom: 1px solid var(--red-border);
+    color: var(--red-text-light);
+}
+
+/* Table row - sent theme */
+.payments-history-shell--sent .payments-history-table tbody tr {
+    border-bottom: 1px solid var(--ci-border);
+}
+
+/* Table row - received paid theme */
+.payments-history-shell--received .payments-history-table tbody tr--paid {
+    border-bottom: 1px solid var(--red-border);
+}
+
+/* Table row - received pending theme */
+.payments-history-shell--received .payments-history-table tbody tr--pending {
+    border-bottom: 1px solid #ef4444;
+}
+
+/* Table cell date - sent theme */
+.payments-history-shell--sent .payments-history-table td--date {
+    color: var(--ci-text-muted);
+}
+
+/* Table cell date - received theme */
+.payments-history-shell--received .payments-history-table td--date {
+    color: var(--red-text-light);
+}
