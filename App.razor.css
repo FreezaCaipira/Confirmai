@@ -2,17 +2,17 @@
     margin: 3rem auto;
     max-width: 480px;
     background: var(--ci-bg-card);
-    color: #f1f5f9;
-    border: 1px solid #1c3a54;
+    color: var(--ci-text);
+    border: 1px solid var(--ci-border-alt);
     border-radius: 16px;
-    box-shadow: 0 2px 24px #000a;
+    box-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
     padding: 2.5rem 2rem;
     text-align: center;
 }
 
 .not-found-icon {
     font-size: 3rem;
-    color: #f87171;
+    color: var(--red-soft);
 }
 
 .not-found-title {
@@ -21,7 +21,7 @@
 }
 
 .not-found-description {
-    color: #94a3b8;
+    color: var(--slate-muted);
     margin-bottom: 2rem;
     line-height: 1.6;
 }
@@ -29,7 +29,7 @@
 .not-found-home-link {
     display: inline-block;
     background: var(--ci-accent-mid);
-    color: #fff;
+    color: var(--white);
     font-weight: 700;
     padding: 0.65rem 1.8rem;
     border-radius: 8px;

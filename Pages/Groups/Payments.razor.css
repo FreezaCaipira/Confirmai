@@ -78,7 +78,7 @@
 }
 
 .payments-tab-count {
-    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, #dc2626 100%);
+    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
     color: var(--red-lightest);
     font-size: 0.75rem;
     padding: 0.15rem 0.4rem;
@@ -268,13 +268,13 @@
 }
 
 .payments-badge--amount {
-    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, #dc2626 100%);
+    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
     color: var(--red-lightest);
     border: 1px solid var(--red-pale);
 }
 
 .payments-badge--proof {
-    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
     color: var(--green-soft);
     border: 1px solid var(--green-soft);
 }
@@ -385,7 +385,7 @@
     color: var(--green-soft);
     padding: 0.3rem 0.6rem;
     border-radius: 5px;
-    background: linear-gradient(180deg, var(--green-bright) 0%, #22c55e 50%, #16a34a 100%);
+    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
     border: 1px solid var(--green-soft);
     box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
 }
@@ -560,3 +560,5 @@
     border: 1px solid rgba(148, 163, 184, 0.2);
     background: rgba(0, 0, 0, 0.3);
 }
+
+
