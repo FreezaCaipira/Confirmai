@@ -168,6 +168,46 @@
     /* Neutrals */
     --slate-light:         #e2e8f0;
     --slate-mid:           #64748b;
+
+    /* ── Ciclo 6 — Shadow/Opacity vars ── */
+    
+    /* Black opacity shadows */
+    --shadow-sm:           rgba(0, 0, 0, 0.25);
+    --shadow-md:           rgba(0, 0, 0, 0.3);
+    --shadow-lg:           rgba(0, 0, 0, 0.4);
+    --shadow-xl:           rgba(0, 0, 0, 0.5);
+    --shadow-2xl:          rgba(0, 0, 0, 0.6);
+    --shadow-3xl:          rgba(0, 0, 0, 0.7);
+    --shadow-4xl:          rgba(0, 0, 0, 0.85);
+    
+    /* Accent shadows */
+    --shadow-accent-sm:    rgba(79, 156, 248, 0.3);
+    --shadow-accent-md:    rgba(79, 156, 248, 0.4);
+    --shadow-accent-lg:    rgba(79, 156, 248, 0.5);
+    
+    /* Green shadows */
+    --shadow-green-sm:     rgba(74, 222, 128, 0.3);
+    --shadow-green-lg:     rgba(74, 222, 128, 0.6);
+    
+    /* Red shadows */
+    --shadow-red-sm:       rgba(239, 68, 68, 0.3);
+    
+    /* Text shadows */
+    --text-shadow-sm:      rgba(0, 0, 0, 0.3);
+    --text-shadow-md:      rgba(0, 0, 0, 0.35);
+    --text-shadow-lg:      rgba(0, 0, 0, 0.45);
+    --text-shadow-xl:      rgba(0, 0, 0, 0.5);
+    
+    /* Inset shadows */
+    --inset-accent-sm:     rgba(147, 197, 253, 0.2);
+    --inset-accent-md:     rgba(79, 156, 248, 0.3);
+    
+    /* Background overlays */
+    --overlay-sm:          rgba(0, 0, 0, 0.3);
+    --overlay-md:          rgba(0, 0, 0, 0.5);
+    --overlay-lg:          rgba(0, 0, 0, 0.55);
+    --overlay-xl:          rgba(0, 0, 0, 0.7);
+    --overlay-2xl:         rgba(0, 0, 0, 0.85);
 }
 
 /* ================================================================

@@ -15,7 +15,7 @@
     background: linear-gradient(120deg, rgba(22, 34, 52, 0.96) 0%, rgba(8, 15, 24, 0.96) 75%);
     border: 1px solid var(--ci-border-alt);
     border-radius: 14px;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 14px 34px var(--shadow-xl);
 }
 
 .cookie-consent-content {
@@ -83,7 +83,7 @@
     position: fixed;
     inset: 0;
     z-index: 5100;
-    background: rgba(0, 0, 0, 0.55);
+    background: var(--overlay-lg);
     display: flex;
     align-items: center;
     justify-content: center;

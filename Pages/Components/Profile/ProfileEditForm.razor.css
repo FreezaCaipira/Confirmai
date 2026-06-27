@@ -127,7 +127,7 @@
     cursor: pointer;
     text-decoration: none;
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .mk-btn:hover:not(:disabled) {

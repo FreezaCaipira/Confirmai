@@ -59,7 +59,7 @@
     align-items: center;
     gap: 0.5rem;
     white-space: nowrap;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .payments-tab:hover {
@@ -258,7 +258,7 @@
     font-weight: 800;
     padding: 0.3rem 0.6rem;
     border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .payments-badge--games {
@@ -334,7 +334,7 @@
     border: 1px solid var(--ci-border);
     border-radius: 6px;
     gap: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .payments-detail-date {

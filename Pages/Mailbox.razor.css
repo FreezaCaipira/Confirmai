@@ -182,7 +182,7 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
     transition: color 0.15s ease, background 0.15s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .mailbox-folder-tab.active {
@@ -221,7 +221,7 @@
     cursor: pointer;
     display: block;
     position: relative;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .mailbox-list-item-main {
@@ -373,7 +373,7 @@
     font-weight: 700;
     color: var(--ci-text-muted);
     background: var(--ci-bg);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .mailbox-chip-alert {

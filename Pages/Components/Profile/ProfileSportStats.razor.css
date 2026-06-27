@@ -74,7 +74,7 @@
     background: var(--ci-bg-deepest);
     border-radius: 4px;
     margin: 0.25rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .profile-stat-item:last-child {
