@@ -1145,6 +1145,31 @@
     border: 1px solid rgba(234, 179, 8, 0.4);
 }
 
+.events-recurring-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    margin-bottom: 0.6rem;
+    border-radius: 8px;
+    background: rgba(79, 156, 248, 0.08);
+    border: 1px solid rgba(79, 156, 248, 0.25);
+    color: var(--ci-text-blue);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.events-recurring-notice i {
+    font-size: 0.85rem;
+    color: var(--ci-accent);
+}
+
+.et-recurring-icon {
+    font-size: 0.7rem;
+    color: var(--ci-accent);
+    opacity: 0.7;
+}
+
 .et-time {
     display: block;
     color: var(--ci-text-subtle);

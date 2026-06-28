@@ -213,6 +213,13 @@ else
                         }
                     </div>
                 </div>
+                @if (displayedEvents.Any(e => e.RachaScheduleId.HasValue))
+                {
+                    <div class="events-recurring-notice">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Partidas geradas automaticamente (semanal)</span>
+                    </div>
+                }
                 <table class="events-table">
                     <thead>
                         <tr>
@@ -244,6 +251,10 @@ else
                                     <td>
                                         <div class="et-cell">
                                             <span class="et-num">#@(eventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
+                                            @if (ev.RachaScheduleId.HasValue)
+                                            {
+                                                <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
+                                            }
                                             <div class="et-cell-info">
                                                 <span class="et-date-wrap">
                                                     <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
