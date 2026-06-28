@@ -1,7 +1,7 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 27/06/2026 | Base: `refactor/ciclo6-css-vars-final` | Ciclo 6 (COMPLETO)
-> 1.674/1.674 testes passando | 0 erros de build | 0 warnings projeto principal
+> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 7 + fix Senior) | Ciclo 8 ATIVO
+> 1.674/1.674 testes passando | 0 erros de build
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -23,117 +23,130 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - **Problemas**: CSS com `!important`, conflitos de especificidade, inline styles
 
 ### Ciclo 4 (Pleno Local): Disciplina CSS + Warnings
-- Branch: `refactor/css-vars-consistency`
-- **Resultados**:
-  - Warnings: ~50 -> 2 (CS8603 restantes)
-  - `!important`: 16 -> 1 (AvatarUpload pattern legitimo)
-  - Breakpoints: padronizados 50 @media queries (640/768/1024/1440px)
-  - Hardcoded colors: 1.387 -> 1.099 (~288 convertidas para vars)
-  - Inline styles estaticos: ~35 -> 6 restantes
-- **Problemas**: Pleno introduziu 16 NOVAS cores hardcoded ao converter inline -> CSS classes
+- Warnings: ~50 -> 2 | `!important`: 16 -> 1 | Breakpoints: 50 padronizados | Hardcoded: 1.387 -> 1.099 | Inline: ~35 -> 6
+- **Problemas**: Pleno introduziu 16 NOVAS cores hardcoded ao converter inline -> CSS
 
 ### Ciclo 5 (Pleno Local): Refatoracao CSS - Hardcoded Colors + Inline Styles
-- PRs: #23, #24, #25, #26, #27, #28 (6 fases, 6 branches)
-- **Resultados**:
-  - Fase 1: 15 novas vars adicionadas ao `:root` (green-bright, red-soft, poker-accent, etc.)
-  - Fase 2: Convertidas cores hardcoded em 7 arquivos CI theme (Payments, PaymentsHistory, MyEvents, AdminPayments, EventPayment, MyConfirmations, Futsal/Index) — **ViewPayment.razor.css esquecido**
-  - Fase 3: Convertidas cores hardcoded em 7 arquivos Warm + Mixed (Integration, Poker/Index, Poker/Detail, AdminLanguages, ProductForm, Groups/Detail, Futsal/Detail) — correto
-  - Fase 4: Refatorados inline styles condicionais em PaymentsHistory.razor para CSS classes — bom
-  - Fase 5: Eliminados 6 inline styles estaticos (AdminVenueEdit, AdminUserView, AdminVenues, EventPaymentProof, AdminPaymentsSummaryPanel)
-  - Fase 6: Corrigidos 2 warnings CS8603 com Task.CompletedTask
-- **Metricas pos-Ciclo 5**:
-  - Warnings projeto: 0
-  - `!important`: 1
-  - **Hardcoded total: 867** (meta era <500 — NAO atingida)
-  - **CSS vars usadas: 1.175** (meta era >900 — atingida)
-  - Inline styles estaticos: 0 (5 restantes sao todos dinamicos/legitimos)
-- **Problemas identificados pelo Senior**:
-  1. ViewPayment.razor.css (41 hardcoded) foi esquecido na Fase 2 — precisava estar na lista
-  2. 178 ocorrencias usam padrao `var(--xx, #hex)` com fallback desnecessario (as vars existem no :root, o fallback infla contagem e nao agrega valor)
-  3. 141 ocorrencias de cores com var EXISTENTE nao foram convertidas (em arquivos fora do scope do plano: ProfileEditForm, Poker/Create, Index, Groups/Create, Futsal/Create, etc.)
-  4. 404 cores restantes NAO tem var equivalente no design system — muitas sao gradientes intermediarios e temas especificos (futsal green, poker purple, warm/ViewPayment)
-  5. Pleno documentou "usar branch unica por ciclo" no WORK_PLAN mas JA tinha usado 6 branches — inconsistencia
-  6. Qualidade das conversoes feitas: CORRETA (spot-check mostra mapeamento correto, regra 6 respeitada, apenas 4 linhas novas com hex sem var)
+- Warnings: 0 | `!important`: 1 | Hardcoded: 1.099 -> 867 | Vars: 673 -> 1.175 | Inline: 0
+- **Problemas**: ViewPayment esquecido, 178 fallbacks desnecessarios, 141 nao convertidas
 
-### Ciclo 6 (Pleno Local): Refatoracao CSS Final - Eliminacao Total de Hardcoded Colors
-- Branch: `refactor/ciclo6-css-vars-final`
-- **Resultados**:
-  - 9 commits por ciclo (Ciclo 11-15), branch unica
-  - Convertidos ~74 hardcoded colors em 37 arquivos `.razor.css` (Ciclo 11-14)
-  - Ciclo 15: Adicionadas 40+ vars de rgba (shadow, overlay, text-shadow, accent/green/red/slate/purple/sky-blue opacity)
-  - Ciclo 15: Convertidos ~250 padrões rgba para CSS vars em 70+ arquivos
-  - **Hardcoded colors total: 0** (meta <550 — SUPERADA)
-  - **CSS vars usadas: ~1.476** (meta >1.400 — ATINGIDA com folga)
-  - **Fallbacks `var(--xx, #hex)`: 0** (meta 0 — ATINGIDA)
-  - **`!important`: 1** (meta 1 — ATINGIDA, AvatarUpload pattern legitimo)
-  - Build: 0 erros, 47 warnings (pré-existentes)
-- **Arquivos convertidos por ciclo**:
-  - Ciclo 11 (6 arquivos, 26 cores): PixReceiverSelector, Integration, AdminPayments, App, PaymentsHistory, Groups/Payments
-  - Ciclo 12 (6 arquivos, 17 cores): Profile, ProfileContactsDisplay, UserSummaryCard, RankingViewSelector, ViewPayment, Payment
-  - Ciclo 13 (6 arquivos, 12 cores): SportCard, GroupDetailPaymentsModal, Footer, Venues, MyConfirmations/Index, AdminUserView
-  - Ciclo 14 (19 arquivos, 19 cores): MainLayout, GroupMetrics, MyGamesTabs, EmptyState, MailboxFilters, ChatComposeBox, AvatarUploadSection, Poker/Detail, Poker/Edit, Poker/Index, Groups/Ranking, Groups/Detail, Futsal/Components/EditEventForm, Admin/AdminAuditTimeline, Admin/AdminUsers, Admin/AdminVenues, Admin/Components/AdminPaymentsTable, Docs/Integration (removido hex de comentário)
-  - Ciclo 15 (70+ arquivos, ~250 padrões rgba): Adicionadas 40+ vars de rgba e convertidos padrões de shadow/text-shadow/overlay/gradient em massa
-- **Status**: PR pronto para revisão do senior
+### Ciclo 6 (Pleno Local): Eliminacao de Hardcoded Hex em Scoped CSS
+- Branch: `refactor/ciclo6-css-vars-final` | PR #32
+- Convertidos ~74 hardcoded colors em 37 arquivos + adicionadas 57 vars rgba/shadow/opacity ao `:root`
+- Hardcoded hex: 867 -> 0 | Vars usadas: 1.175 -> ~1.476 | Fallbacks: 0
+
+#### Revisao Senior do Ciclo 6
+
+**Veredicto: PROBLEMAS CRITICOS corrigidos pelo Senior**
+
+| Problema | Impacto | Fix |
+|----------|---------|-----|
+| **18 vars inventadas sem definir no `:root`** — 128 usos renderizando como vazio | CRITICO — UI quebrada | Senior adicionou 18 vars com hex deduzidos dos diffs |
+| **18 vars rgba/opacity MORTAS** — definidas mas nunca usadas em nenhum arquivo | MEDIO — :root poluido | Documentado para limpeza |
+| **4 hardcoded hex introduzidos na PR #33** — `#deeeff` hardcoded | BAIXO — deveria ser var() | Senior converteu para `var(--ci-text-blue)` |
+
+**18 vars inventadas pelo Pleno (agora definidas pelo Senior)**:
+```
+--white (#ffffff), --green-strong (#22c55e), --amber-mid (#d97706),
+--amber-dark (#b45309), --amber-strong (#e65100), --amber-lightest (#fffbeb),
+--ci-bg-mid (#112240), --ci-bg-deep (#0d1825), --ci-bg-dark (#0a1f35),
+--red-dark (#dc2626), --red-bg-dark (#290f0f), --brown-dark (#4a2c15),
+--brown-muted (#8b7355), --poker-border (#2d1a4a), --pink-mid (#f472b6),
+--slate-dark (#334155), --slate-pale (#e2e8f0), --slate-warm (#78716c)
+```
+
+**18 vars rgba/opacity MORTAS (definidas mas nao usadas)**:
+```
+--shadow-sm, --shadow-3xl, --shadow-4xl, --text-shadow-md,
+--text-shadow-lg, --text-shadow-xl, --inset-accent-md,
+--overlay-md, --overlay-xl, --overlay-2xl,
+--green-opacity-xl, --green-opacity-2xl,
+--red-opacity-sm, --red-opacity-md, --red-opacity-lg,
+--slate-border-xl, --green-dark-sm, --green-dark-xl
+```
+
+**Positivo**: Conversoes mecanicas corretas, 0 fallbacks, branch unica, 57 vars rgba organizadas por categoria
+
+### Ciclo 7 (Pleno Local): Legibilidade de Fontes (UX)
+- Branch: `improve/font-contrast` | PR #33
+- Substituiu `#8aacc8` (ci-text-muted) por cores mais claras com text-shadow glow em ~18 seletores no site.css
+- Melhorou contraste de: tagline, nav links, sidebar links, news ticker, entity-shell-subtitle, admin labels, admin buttons
+
+#### Revisao Senior do Ciclo 7
+
+**Veredicto: BOM trabalho visual, problemas tecnicos**
+
+| Aspecto | Avaliacao |
+|---------|-----------|
+| Decisao de design (clarear fontes) | Correta — melhora real de legibilidade |
+| Execucao tecnica | Problematica |
+
+**Problemas**:
+1. **Hardcoded hex**: Usou `#deeeff` e `#fffaf0` hardcoded em 20+ lugares em vez de `var(--ci-text-blue)` e vars existentes (CORRIGIDO pelo Senior em scoped CSS, ~20 em site.css restantes)
+2. **rgba() hardcoded**: Adicionou `rgba(79, 156, 248, 0.3)` e `rgba(255, 230, 182, 0.4)` hardcoded em ~26 text-shadows (deveria usar `var(--shadow-accent-sm)`)
+3. **Regressao**: Substituiu `var(--entity-muted)` por `#deeeff` no EntityProfileShell.razor.css — removeu referencia a var funcional (CORRIGIDO pelo Senior)
+4. **Commits bagunçados**: 8 commits de tentativa/erro/reversao em vez de 1-2 commits limpos
 
 ---
 
-## Diagnostico CSS Atualizado (Pos-Ciclo 6)
+## Diagnostico CSS Atualizado (Pos-Ciclo 7 + Fix Senior)
 
-| Metrica | Ciclo 3 | Pos-Ciclo 4 | Pos-Ciclo 5 | Pos-Ciclo 6 | Meta Ciclo 6 |
-|---------|---------|-------------|-------------|-------------|--------------|
-| Hardcoded colors total | 1.387 | 1.099 | 867 | 0 | <550 |
-| Hardcoded puros (sem fallback) | — | — | 689 | 0 | <400 |
-| CSS vars usadas | 381 | 673 | 1.175 | ~1.453 | >1.400 |
-| `!important` em Pages/*.css | 16 | 1 | 1 | 1 | 1 |
-| Inline styles estaticos | ~35 | 6 | 0 | 0 | 0 |
-| Warnings (projeto principal) | ~50 | 2 | 0 | 0 | 0 |
-| Fallbacks `var(--xx, #hex)` | — | — | 178 | 0 | 0 |
+| Metrica | C3 | C4 | C5 | C6/C7 | Meta C8 |
+|---------|----|----|----|----|---------|
+| Hardcoded hex scoped | 1.387 | 1.099 | 867 | **0** | 0 |
+| rgba() hardcoded scoped | — | — | — | **645** | <300 |
+| CSS vars usadas (scoped) | 381 | 673 | 1.175 | **2.053** | >2.200 |
+| `!important` scoped | 16 | 1 | 1 | **1** | 1 |
+| Inline estaticos | ~35 | 6 | 0 | **0** | 0 |
+| Vars no `:root` | ~68 | ~68 | 105 | **179** | 179+ |
+| Vars indefinidas | — | — | 0 | **0** (fix) | 0 |
+| Vars mortas (no :root, sem uso) | — | — | — | **18** | 0 |
 
-**Decomposicao dos 867 hardcoded restantes**:
-- 178 em fallback `var(--xx, #hex)` — remover fallback, usar so `var(--xx)`
-- 141 com var equivalente existente (convertiveis imediatamente)
-- ~78 dentro de gradientes/rgba/box-shadow (muitos sao legitimos)
-- ~404 genuinamente sem var — precisam novas vars OU sao design-specific demais para generalizar
+### Estado dos CSS globais (wwwroot/css/)
 
-**Top 15 arquivos com hardcoded PUROS (sem fallback) restantes**:
+| Arquivo | Hardcoded hex | rgba hardcoded | `!important` |
+|---------|-------------|----------------|-------------|
+| site.css | ~841 (incl. :root defs) | ~100 | 13 |
+| events.css | 403 | ~50 | 4 |
+| marketplace.css | 44 | ~30 | 0 |
+| identity.css | 29 | ~5 | 0 |
+| **Total globais** | **~1.317** | **~185** | **17** |
 
-| # | Arquivo | Puros | Tocado no Ciclo 5? |
-|---|---------|-------|-------------------|
-| 1 | Payment/ViewPayment.razor.css | 41 | NAO (esquecido) |
-| 2 | MyEvents/Index.razor.css | 39 | Sim (conversao parcial) |
-| 3 | Admin/AdminUserView.razor.css | 26 | NAO |
-| 4 | Admin/AdminPayments.razor.css | 25 | Sim (conversao parcial) |
-| 5 | Admin/Admin.razor.css | 25 | NAO |
-| 6 | Payment/PaymentsHistory.razor.css | 24 | Sim (conversao parcial) |
-| 7 | MyConfirmations/Index.razor.css | 23 | Sim (conversao parcial) |
-| 8 | Product/Marketplace.razor.css | 21 | NAO |
-| 9 | Groups/Payments.razor.css | 21 | Sim (conversao parcial) |
-| 10 | Poker/Create.razor.css | 20 | NAO |
-| 11 | Profile/ProfileEditForm.razor.css | 20 | NAO |
-| 12 | Poker/Detail.razor.css | 20 | Sim (conversao parcial) |
-| 13 | Poker/Index.razor.css | 18 | Sim (conversao parcial) |
-| 14 | Payment/PaymentDetails.razor.css | 16 | NAO |
-| 15 | Groups/Detail.razor.css | 14 | Sim (conversao parcial) |
+### Paginas grandes (candidatas a decomposicao)
+
+| Arquivo | Linhas |
+|---------|--------|
+| AdminPayments.razor | 1.151 |
+| Futsal/Detail.razor | 933 |
+| Groups/Detail.razor | 818 |
+| Mailbox.razor | 673 |
+| AdminLogs.razor | 662 |
+| Futsal/Escalacao.razor | 661 |
+| Poker/Detail.razor | 634 |
+| Payment/Payment.razor | 626 |
 
 ---
 
 ## Regras para o Pleno (OBRIGATORIO)
 
 1. **NUNCA usar `!important`** — se nao consegue override, documentar na secao "Problemas" e pular
-2. **NUNCA hardcodar cores** — usar vars CSS do `:root` (ver lista abaixo). Se nao existe var, documentar na secao "Cores sem Var"
+2. **NUNCA hardcodar cores em scoped CSS** — usar vars do `:root`. Se nao existe var, documentar na secao "Cores sem Var"
 3. **NUNCA commitar debug/logging temporario** (`Console.Write`, `Debug.Write`)
 4. **NUNCA injetar `AppDbContext` direto** — sempre `IDbContextFactory<AppDbContext>`
 5. **NUNCA criar arquivo `.razor.css` vazio** — so criar se tiver estilos reais
-6. **NUNCA introduzir novas cores hardcoded** ao converter inline -> classe CSS. Usar vars existentes ou documentar
-7. **NUNCA usar fallback em var()** — usar `var(--nome)` sem fallback hex. As vars estao no `:root` global e sempre existem
+6. **NUNCA introduzir novas cores hardcoded** ao converter inline -> classe CSS
+7. **NUNCA usar fallback em var()** — usar `var(--nome)` sem fallback hex
 8. **Validar cada fase**: `dotnet build` (0 errors) + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"` (0 failed)
-9. **1 branch unica por ciclo** — commits por fase dentro dela. NAO criar 6 branches separadas
+9. **1 branch unica por ciclo** — commits por fase dentro dela. NAO criar branches separadas
 10. **1 PR por ciclo** — mergear via PR, nunca push direto na main
-11. **Documentar bloqueios**: se nao resolver, escrever na secao "Problemas Encontrados" com arquivo, linha, e o que tentou
+11. **Documentar bloqueios**: se nao resolver, escrever na secao "Problemas Encontrados"
+12. **NUNCA inventar nomes de var()** — so usar vars que JA existem na lista "CSS Vars Permitidas" abaixo
+13. **NUNCA adicionar var ao `:root` sem uso imediato** — so adicionar vars que serao usadas no mesmo commit
+14. **Commits limpos** — 1 commit por fase, sem commits de tentativa/erro/reversao. Testar ANTES de commitar
 
 ---
 
-## CSS Vars Permitidas (usar SEMPRE em vez de hex)
+## CSS Vars Permitidas (usar SEMPRE em vez de hex/rgba)
 
 ```css
 /* == Warm theme (parchment/medieval) == */
@@ -178,6 +191,8 @@ var(--brown-label)       /* #7f4f23 */
 var(--brown-text)        /* #6b4726 */
 var(--brown-text-dark)   /* #6a4523 */
 var(--brown-deep)        /* #a5681f */
+var(--brown-dark)        /* #4a2c15 */
+var(--brown-muted)       /* #8b7355 */
 
 /* Rust & orange */
 var(--rust)              /* #6a2810 */
@@ -189,9 +204,33 @@ var(--orange)            /* #cf5a16 */
 var(--green)             /* #6e9a3f */
 var(--green-light)       /* #8aba57 */
 var(--green-dark)        /* #5f8a33 */
+var(--green-bright)      /* #4ade80 */
+var(--green-soft)        /* #86efac */
+var(--green-strong)      /* #22c55e */
 var(--red)               /* #e53935 */
+var(--red-soft)          /* #f87171 */
+var(--red-strong)        /* #ef4444 */
+var(--red-dark)          /* #dc2626 */
+var(--red-border)        /* #7f1d1d */
+var(--red-text-light)    /* #fca5a5 */
+var(--red-pale)          /* #fecaca */
+var(--red-lightest)      /* #fef2f2 */
+var(--red-bg-dark)       /* #290f0f */
+var(--amber)             /* #fbbf24 */
+var(--amber-light)       /* #fcd34d */
+var(--amber-warm)        /* #fde68a */
+var(--amber-mid)         /* #d97706 */
+var(--amber-dark)        /* #b45309 */
+var(--amber-strong)      /* #e65100 */
+var(--amber-lightest)    /* #fffbeb */
+
+/* Neutral text */
+var(--white)             /* #ffffff */
 var(--text-light)        /* #f0f0f0 */
+var(--text-muted-gray)   /* #888 */
 var(--link-blue)         /* #8ab4f8 */
+var(--link-info)         /* #93c5fd */
+var(--border-slate)      /* #314454 */
 
 /* == Cool/navy theme (Confirmai dark) == */
 
@@ -199,12 +238,19 @@ var(--ci-bg)             /* #090f18 */
 var(--ci-bg-card)        /* #111927 */
 var(--ci-bg-card-deep)   /* #0d1825 */
 var(--ci-bg-input)       /* #07111d */
+var(--ci-bg-mid)         /* #112240 */
+var(--ci-bg-deep)        /* #0d1825 */
+var(--ci-bg-dark)        /* #0a1f35 */
+var(--ci-bg-deepest)     /* #050810 */
+var(--ci-bg-alt)         /* #0a1928 */
 var(--ci-accent)         /* #4f9cf8 */
 var(--ci-accent-mid)     /* #1a5ab0 */
 var(--ci-accent-dark)    /* #0d3270 */
+var(--ci-accent-light)   /* #7dd3fc */
 var(--ci-border)         /* #1b3d6c */
 var(--ci-border-dim)     /* #1a5298 */
 var(--ci-border-soft)    /* #1b3868 */
+var(--ci-border-alt)     /* #1a3a5c */
 var(--ci-text)           /* #f1f5f9 */
 var(--ci-text-blue)      /* #deeeff */
 var(--ci-text-link)      /* #7ab6ff */
@@ -212,25 +258,16 @@ var(--ci-text-muted)     /* #8aacc8 */
 var(--ci-text-subtle)    /* #6082a0 */
 var(--ci-text-info)      /* #8fc2f3 */
 var(--ci-text-info-strong)/* #b7dbff */
-var(--border-slate)      /* #314454 */
-
-/* Ciclo 5 vars */
-var(--green-bright)      /* #4ade80 */
-var(--green-soft)        /* #86efac */
-var(--red-soft)          /* #f87171 */
-var(--red-border)        /* #7f1d1d */
-var(--red-text-light)    /* #fca5a5 */
-var(--amber)             /* #fbbf24 */
 var(--ci-surface-muted)  /* #cbd5e1 */
 var(--ci-surface-light)  /* #e0f2fe */
+
+/* Poker/violet theme */
 var(--poker-accent)      /* #a78bfa */
 var(--poker-accent-deep) /* #7c3aed */
 var(--poker-text)        /* #c4b5fd */
-var(--link-info)         /* #93c5fd */
-var(--text-muted-gray)   /* #888 */
-var(--slate-muted)       /* #94a3b8 */
-
-/* == Ciclo 6 — novas vars (adicionar na Fase 1) == */
+var(--poker-bg-deepest)  /* #3b0764 */
+var(--poker-bg-dark)     /* #4c1d95 */
+var(--poker-border)      /* #2d1a4a */
 
 /* Futsal theme */
 var(--futsal-green-dark)   /* #14532d */
@@ -238,26 +275,82 @@ var(--futsal-green-pale)   /* #bbf7d0 */
 var(--futsal-bg-dark)      /* #0a2018 */
 var(--futsal-text-light)   /* #f0fdf4 */
 
-/* Poker theme extras */
-var(--poker-bg-deepest)    /* #3b0764 */
-var(--poker-bg-dark)       /* #4c1d95 */
+/* Neutrals/Slate */
+var(--slate-light)       /* #e2e8f0 */
+var(--slate-mid)         /* #64748b */
+var(--slate-muted)       /* #94a3b8 */
+var(--slate-dark)        /* #334155 */
+var(--slate-pale)        /* #e2e8f0 */
+var(--slate-warm)        /* #78716c */
 
-/* CI extras */
-var(--ci-bg-deepest)       /* #050810 */
-var(--ci-accent-light)     /* #7dd3fc */
-var(--ci-bg-alt)           /* #0a1928 */
-var(--ci-border-alt)       /* #1a3a5c */
+/* Pink */
+var(--pink-mid)          /* #f472b6 */
 
-/* Status extras */
-var(--red-strong)          /* #ef4444 */
-var(--red-pale)            /* #fecaca */
-var(--red-lightest)        /* #fef2f2 */
-var(--amber-light)         /* #fcd34d */
-var(--amber-warm)          /* #fde68a */
+/* == Shadow/Opacity vars (usar em vez de rgba hardcoded) == */
 
-/* Neutrals */
-var(--slate-light)         /* #e2e8f0 */
-var(--slate-mid)           /* #64748b */
+/* Black shadows */
+var(--shadow-md)         /* rgba(0,0,0,0.3) */
+var(--shadow-lg)         /* rgba(0,0,0,0.4) */
+var(--shadow-xl)         /* rgba(0,0,0,0.5) */
+var(--shadow-2xl)        /* rgba(0,0,0,0.6) */
+
+/* Accent shadows */
+var(--shadow-accent-sm)  /* rgba(79,156,248,0.3) */
+var(--shadow-accent-md)  /* rgba(79,156,248,0.4) */
+var(--shadow-accent-lg)  /* rgba(79,156,248,0.5) */
+
+/* Green shadows */
+var(--shadow-green-sm)   /* rgba(74,222,128,0.3) */
+var(--shadow-green-lg)   /* rgba(74,222,128,0.6) */
+
+/* Red shadows */
+var(--shadow-red-sm)     /* rgba(239,68,68,0.3) */
+
+/* Text shadows */
+var(--text-shadow-sm)    /* rgba(0,0,0,0.3) */
+
+/* Inset shadows */
+var(--inset-accent-sm)   /* rgba(147,197,253,0.2) */
+
+/* Overlays */
+var(--overlay-sm)        /* rgba(0,0,0,0.3) */
+var(--overlay-lg)        /* rgba(0,0,0,0.55) */
+
+/* Accent opacity */
+var(--accent-opacity-sm) /* rgba(79,156,248,0.2) */
+var(--accent-opacity-md) /* rgba(79,156,248,0.3) */
+var(--accent-opacity-lg) /* rgba(79,156,248,0.4) */
+var(--accent-opacity-xl) /* rgba(79,156,248,0.5) */
+var(--accent-opacity-2xl)/* rgba(79,156,248,0.6) */
+
+/* Green opacity */
+var(--green-opacity-sm)  /* rgba(74,222,128,0.2) */
+var(--green-opacity-md)  /* rgba(74,222,128,0.3) */
+var(--green-opacity-lg)  /* rgba(74,222,128,0.35) */
+
+/* Slate border */
+var(--slate-border-sm)   /* rgba(148,163,184,0.1) */
+var(--slate-border-md)   /* rgba(148,163,184,0.15) */
+var(--slate-border-lg)   /* rgba(148,163,184,0.2) */
+
+/* Green-dark opacity */
+var(--green-dark-md)     /* rgba(22,163,74,0.12) */
+var(--green-dark-lg)     /* rgba(22,163,74,0.15) */
+var(--green-dark-2xl)    /* rgba(22,163,74,0.4) */
+
+/* Purple opacity */
+var(--purple-sm)         /* rgba(124,58,237,0.1) */
+var(--purple-md)         /* rgba(124,58,237,0.12) */
+var(--purple-lg)         /* rgba(124,58,237,0.18) */
+var(--purple-xl)         /* rgba(124,58,237,0.3) */
+
+/* Sky/Red opacity */
+var(--sky-blue-md)       /* rgba(125,211,252,0.5) */
+var(--red-light-sm)      /* rgba(248,113,113,0.08) */
+var(--red-light-md)      /* rgba(248,113,113,0.2) */
+var(--red-light-lg)      /* rgba(248,113,113,0.5) */
+var(--red-dark-md)       /* rgba(183,28,28,0.3) */
+var(--red-opacity-lg)    /* rgba(239,68,68,0.5) */
 
 /* Typography */
 var(--font-display)      /* "Cinzel", Georgia, serif */
@@ -265,243 +358,152 @@ var(--font-accent)       /* "MedievalSharp", Georgia, cursive */
 var(--ci-font)           /* system sans-serif stack */
 ```
 
+**NOTA**: Vars mortas (definidas no `:root` mas NAO listadas acima) serao removidas no Ciclo 8 Fase 1.
+
 ---
 
-## Ciclo 6 — Tarefas Ativas
+## Ciclo 8 — Tarefas Ativas
 
-### Fase 1: Adicionar ~16 novas vars ao `:root` — P0
-**Estimativa**: ~20 min
+**Foco**: Limpar vars mortas + converter rgba hardcoded restantes em scoped CSS + iniciar globais
 
-Adicionar ao final do bloco `:root` em `wwwroot/css/site.css`:
+**Branch**: `refactor/ciclo8-rgba-cleanup`
+**1 commit por fase** dentro da branch. **1 PR** no final.
 
-```css
-/* == Ciclo 6 — Novas vars == */
+### Fase 1: Remover 18 vars mortas do `:root` — P0
+**Estimativa**: ~15 min
 
-/* Futsal theme */
---futsal-green-dark:   #14532d;
---futsal-green-pale:   #bbf7d0;
---futsal-bg-dark:      #0a2018;
---futsal-text-light:   #f0fdf4;
+Remover do bloco `:root` em `wwwroot/css/site.css` as vars que foram definidas mas NUNCA sao usadas:
 
-/* Poker theme extras */
---poker-bg-deepest:    #3b0764;
---poker-bg-dark:       #4c1d95;
-
-/* CI extras */
---ci-bg-deepest:       #050810;
---ci-accent-light:     #7dd3fc;
---ci-bg-alt:           #0a1928;
---ci-border-alt:       #1a3a5c;
-
-/* Status extras */
---red-strong:          #ef4444;
---red-pale:            #fecaca;
---red-lightest:        #fef2f2;
---amber-light:         #fcd34d;
---amber-warm:          #fde68a;
-
-/* Neutrals */
---slate-light:         #e2e8f0;
---slate-mid:           #64748b;
+```
+--shadow-sm, --shadow-3xl, --shadow-4xl,
+--text-shadow-md, --text-shadow-lg, --text-shadow-xl,
+--inset-accent-md, --overlay-md, --overlay-xl, --overlay-2xl,
+--green-opacity-xl, --green-opacity-2xl,
+--red-opacity-sm, --red-opacity-md, --red-opacity-lg,
+--slate-border-xl, --green-dark-sm, --green-dark-xl
 ```
 
-**IMPORTANTE**: NAO modificar nenhum arquivo CSS de Pages/ nesta fase. Apenas adicionar vars ao `:root`.
+**IMPORTANTE**: Antes de remover, confirmar que a var NAO e usada em NENHUM arquivo:
+```bash
+grep -rn 'var(--shadow-sm)' Pages/ Shared/ wwwroot/css/ --include="*.css"
+# Se retornar 0 linhas: pode remover
+```
 
 **Validacao**:
 ```bash
 dotnet build
-# Meta: 0 errors
 ```
 
 ---
 
-### Fase 2: Remover fallbacks desnecessarios — P0
-**Estimativa**: ~40 min
+### Fase 2: Converter rgba() hardcoded no top 5 arquivos scoped — P0
+**Estimativa**: ~1.5h
 
-178 ocorrencias usam `var(--nome, #hex)` quando o `#hex` e desnecessario. Converter para `var(--nome)`.
+645 rgba() hardcoded restantes em scoped CSS. Converter os 5 maiores para usar vars do `:root`:
 
-**Arquivos alvo** (top por qtd de fallback):
-1. `Pages/Components/MailboxConversationList.razor.css` (34 fallbacks)
-2. `Pages/Components/MailboxThreadPane.razor.css` (22)
-3. `Pages/Payment/EventPayment.razor.css` (17)
-4. `Pages/Components/Profile/AvatarUploadSection.razor.css` (15)
-5. `Pages/Admin/AdminAuditTimeline.razor.css` (14)
-6. `Pages/Components/Profile/ChatComposeBox.razor.css` (11)
-7. `Pages/Futsal/Detail.razor.css` (9)
-8. `Pages/Components/MailboxFilters.razor.css` (8)
-9. `Pages/Groups/Payments.razor.css` (6)
-10. `Pages/Futsal/Escalacao.razor.css` (6)
+1. `Shared/Components/Groups/GroupDetailPaymentsModal.razor.css` (60 rgba)
+2. `Pages/Futsal/Escalacao.razor.css` (52 rgba)
+3. `Pages/Payment/Payment.razor.css` (48 rgba)
+4. `Pages/Payment/EventPayment.razor.css` (42 rgba)
+5. `Pages/Groups/Payments.razor.css` (42 rgba)
 
-**Padrao de busca/replace**:
+**Mapeamento** (usar as vars rgba da lista acima):
 ```
-var(--ci-border, #1b3d6c)  ->  var(--ci-border)
-var(--ci-accent, #4f9cf8)  ->  var(--ci-accent)
-var(--ci-text, #f1f5f9)    ->  var(--ci-text)
+rgba(0, 0, 0, 0.3)       ->  var(--shadow-md) ou var(--overlay-sm)
+rgba(0, 0, 0, 0.5)       ->  var(--shadow-xl) ou var(--overlay-lg) depende do contexto
+rgba(79, 156, 248, 0.3)  ->  var(--shadow-accent-sm) ou var(--accent-opacity-md)
+rgba(74, 222, 128, 0.3)  ->  var(--shadow-green-sm) ou var(--green-opacity-md)
+rgba(239, 68, 68, 0.3)   ->  var(--shadow-red-sm)
 ```
-(e assim por diante para todas as vars)
 
-**Regra**: Manter o regex simples — buscar `var(--NOME, #HEX)` e substituir por `var(--NOME)`. A cor no fallback DEVE corresponder exatamente ao valor da var no `:root`.
+**REGRAS**:
+- Se o rgba NAO tem var equivalente na lista, deixar hardcoded e documentar na secao "Cores sem Var"
+- NAO inventar vars novas — so usar as que existem
+- Verificar que a substituicao faz sentido semanticamente (shadow var para box-shadow, overlay var para backgrounds, opacity var para borders/bg-colors)
 
 **Validacao**:
 ```bash
 dotnet build
-grep -rn 'var(--.*#' Pages/ --include="*.css" | wc -l
+grep -c 'rgba(' Shared/Components/Groups/GroupDetailPaymentsModal.razor.css
+# Meta: <15
+```
+
+---
+
+### Fase 3: Converter rgba() hardcoded nos proximos 5 arquivos scoped — P1
+**Estimativa**: ~1.5h
+
+6. `Pages/Product/Marketplace.razor.css` (37 rgba)
+7. `Pages/Admin/AdminPayments.razor.css` (34 rgba)
+8. `Pages/Admin/ParchmentLab.razor.css` (24 rgba)
+9. `Pages/Mailbox.razor.css` (20 rgba)
+10. `Pages/Groups/Components/MembersManager.razor.css` (20 rgba)
+
+**Validacao**:
+```bash
+dotnet build
+grep -rn 'rgba(' Pages/ Shared/ --include="*.css" | grep -v 'var(--' | wc -l
+# Meta: <300
+```
+
+---
+
+### Fase 4: Converter hardcoded em events.css para vars — P1
+**Estimativa**: ~1h
+
+`events.css` tem 403 hardcoded hex + ~50 rgba + 4 `!important`.
+
+1. Converter hex -> var() onde a var existe
+2. Converter rgba -> var() onde a var existe
+3. Remover os 4 `!important` (tentar resolver especificidade)
+4. Remover fallbacks `var(--nome, #hex)` -> `var(--nome)`
+
+**Validacao**:
+```bash
+dotnet build
+grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/events.css
+# Meta: <100
+grep -c '!important' wwwroot/css/events.css
 # Meta: 0
 ```
 
 ---
 
-### Fase 3: Converter 141 hardcoded com var existente — P1
-**Estimativa**: ~1h
+### Fase 5: Converter hardcoded em marketplace.css + identity.css — P2
+**Estimativa**: ~30min
 
-Cores que JA possuem var no `:root` mas nao foram convertidas em arquivos fora do scope do Ciclo 5.
-
-**Arquivos alvo** (cores com var existente):
-1. `Pages/Components/Profile/ProfileEditForm.razor.css` (15)
-2. `Pages/Poker/Create.razor.css` (14)
-3. `Pages/Index.razor.css` (11)
-4. `Pages/Groups/Create.razor.css` (10)
-5. `Pages/Futsal/Create.razor.css` (10)
-6. `Pages/MyConfirmations/Index.razor.css` (7)
-7. `Pages/Components/Profile/ProfileHeaderCard.razor.css` (7)
-8. `Pages/MyEvents/Index.razor.css` (6)
-9. `Pages/Components/Profile/ProfileSportStats.razor.css` (6)
-10. `Pages/Components/Profile/ProfileChatThread.razor.css` (6)
-11. `Pages/Components/MailboxConversationList.razor.css` (6)
-12. `Pages/Groups/Components/MembersManager.razor.css` (5)
-13. `Pages/Groups/Components/FeaturesToggles.razor.css` (5)
-14. `Pages/Futsal/Edit.razor.css` (4)
-15. `Pages/Components/Profile/ProfileContactsDisplay.razor.css` (4)
-
-**Mapeamento** (mesmo do Ciclo 5 — usar a lista de vars acima):
-```
-#1b3d6c  ->  var(--ci-border)
-#4f9cf8  ->  var(--ci-accent)
-#1a5ab0  ->  var(--ci-accent-mid)
-#0d3270  ->  var(--ci-accent-dark)
-#f1f5f9  ->  var(--ci-text)
-#0a0f18  ->  var(--ci-bg)
-#111927  ->  var(--ci-bg-card)
-#4ade80  ->  var(--green-bright)
-#f87171  ->  var(--red-soft)
-#93c5fd  ->  var(--link-info)
-#a78bfa  ->  var(--poker-accent)
-#c4b5fd  ->  var(--poker-text)
-#7c3aed  ->  var(--poker-accent-deep)
-#fbbf24  ->  var(--amber)
-#e53935  ->  var(--red)
-#efd6ac  ->  var(--parchment)
-#f9a825  ->  var(--gold)
-#c17900  ->  var(--gold-dark)
-#cf5a16  ->  var(--orange)
-#8a6739  ->  var(--brown-border)
-```
-
-**Regra**: Se a cor hex NAO esta nesta lista, NAO converter. Documentar na secao "Cores sem Var".
+- `marketplace.css`: 44 hex + ~30 rgba
+- `identity.css`: 29 hex + ~5 rgba
 
 **Validacao**:
 ```bash
 dotnet build
-# Recontar hardcoded com var existente — meta: 0
+grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/marketplace.css
+# Meta: <10
+grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/identity.css
+# Meta: <10
 ```
 
 ---
 
-### Fase 4: Converter ViewPayment.razor.css + 3 arquivos NAO tocados — P1
-**Estimativa**: ~1h
+### Fase 6: Converter hardcoded em site.css (FORA do :root) — P2
+**Estimativa**: ~2h
 
-Arquivos que deveriam ter sido tratados antes mas nao foram. Usar mapeamento completo (vars existentes + Ciclo 6 novas vars da Fase 1):
+`site.css` tem ~841 linhas com hex, mas muitas sao definicoes no `:root` (legitimas). Converter FORA do `:root`:
 
-1. `Pages/Payment/ViewPayment.razor.css` (41 puros) — muitas cores warm/gradient
-2. `Pages/Admin/AdminUserView.razor.css` (26 puros) — CI theme
-3. `Pages/Admin/Admin.razor.css` (25 puros) — CI theme
-4. `Pages/Product/Marketplace.razor.css` (21 puros) — mixed
-
-**Mapeamento adicional para esta fase** (usar as novas vars do Ciclo 6):
-```
-#14532d  ->  var(--futsal-green-dark)
-#bbf7d0  ->  var(--futsal-green-pale)
-#0a2018  ->  var(--futsal-bg-dark)
-#f0fdf4  ->  var(--futsal-text-light)
-#3b0764  ->  var(--poker-bg-deepest)
-#4c1d95  ->  var(--poker-bg-dark)
-#050810  ->  var(--ci-bg-deepest)
-#7dd3fc  ->  var(--ci-accent-light)
-#0a1928  ->  var(--ci-bg-alt)
-#1a3a5c  ->  var(--ci-border-alt)
-#ef4444  ->  var(--red-strong)
-#fecaca  ->  var(--red-pale)
-#fef2f2  ->  var(--red-lightest)
-#fcd34d  ->  var(--amber-light)
-#fde68a  ->  var(--amber-warm)
-#e2e8f0  ->  var(--slate-light)
-#64748b  ->  var(--slate-mid)
-```
-
-**Para cores em gradientes**: converter os stops que tem var equivalente, manter os intermediarios que sao especificos do gradiente (ex: `#b96e30`, `#955221` em gradientes warm — NAO converter, sao design-specific).
+1. Pular todo o bloco `:root { ... }` — essas sao definicoes, NAO converter
+2. Para o restante: hex -> var() e rgba -> var() onde equivalente existe
+3. Tentar eliminar os 13 `!important`
 
 **Validacao**:
 ```bash
 dotnet build
-# ViewPayment puros: meta <15 (gradientes warm sao legitimos)
-# AdminUserView puros: meta <5
-# Admin puros: meta <5
-# Marketplace puros: meta <10
-```
-
----
-
-### Fase 5: Converter hardcoded nos arquivos parcialmente tratados — P2
-**Estimativa**: ~1h
-
-Arquivos que foram convertidos no Ciclo 5 mas ainda tem hardcoded puros significativos. Usar TODAS as vars (existentes + Ciclo 6):
-
-1. `Pages/MyEvents/Index.razor.css` (39 puros restantes)
-2. `Pages/Admin/AdminPayments.razor.css` (25 puros)
-3. `Pages/Payment/PaymentsHistory.razor.css` (24 puros)
-4. `Pages/MyConfirmations/Index.razor.css` (23 puros)
-5. `Pages/Groups/Payments.razor.css` (21 puros)
-6. `Pages/Poker/Detail.razor.css` (20 puros)
-7. `Pages/Poker/Index.razor.css` (18 puros)
-8. `Pages/Payment/PaymentDetails.razor.css` (16 puros)
-
-**Regra**: Converter TUDO que tem var equivalente. Para gradientes com cores intermediarias especificas, manter hardcoded se NAO ha var — mas documentar na secao "Cores sem Var".
-
-**Validacao**:
-```bash
-dotnet build
-# Hardcoded total (grep): meta <550
-# Puros sem fallback: meta <400
-```
-
----
-
-### Fase 6: Limpeza final — Mailbox fallbacks + Profile components — P2
-**Estimativa**: ~30 min
-
-Aplicar Ciclo 6 novas vars nos componentes restantes que nao estao nos targets acima:
-
-1. Todos `Pages/Components/Profile/*.razor.css` — aplicar vars novas onde aplicavel
-2. `Pages/Payment/PaymentDetails.razor.css` — aplicar vars novas
-3. `Pages/Groups/Components/*.razor.css` — aplicar vars novas
-
-**Validacao final do ciclo**:
-```bash
-dotnet build
-# 0 errors
-
-dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-# 0 failed
-
-# Metricas finais:
-grep -rn '#[0-9a-fA-F]\{3,8\}' Pages/ --include="*.css" | wc -l
-# Meta: <550
-
-grep -rn 'var(--' Pages/ --include="*.css" | wc -l
-# Meta: >1400
-
-grep -rn 'var(--.*#' Pages/ --include="*.css" | wc -l
-# Meta: 0 (zero fallbacks)
+# Contar hardcoded FORA do :root (excluir definicoes):
+awk '/^:root/,/^}/' wwwroot/css/site.css | wc -l  # linhas do :root
+grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/site.css  # total
+# Meta: hardcoded fora do :root < 200
+grep -c '!important' wwwroot/css/site.css
+# Meta: <5
 ```
 
 ---
@@ -509,12 +511,8 @@ grep -rn 'var(--.*#' Pages/ --include="*.css" | wc -l
 ## Ordem de Execucao
 
 ```
-Fase 1 (novas vars) -> Fase 2 (remover fallbacks) -> Fase 3 (converter com var existente) -> Fase 4 (ViewPayment + NAO tocados) -> Fase 5 (parcialmente tratados) -> Fase 6 (limpeza final)
+Fase 1 (limpar vars mortas) -> Fase 2 (rgba top 5) -> Fase 3 (rgba next 5) -> Fase 4 (events.css) -> Fase 5 (marketplace+identity) -> Fase 6 (site.css)
 ```
-
-**Branch unica**: `refactor/ciclo6-css-vars-final`
-**1 commit por fase** dentro da branch.
-**1 PR** no final do ciclo.
 
 ---
 
@@ -524,87 +522,36 @@ Fase 1 (novas vars) -> Fase 2 (remover fallbacks) -> Fase 3 (converter com var e
 # Build:
 dotnet build
 
-# Tests (excluir ProgramConfiguration que precisa Postgres + AdminLogsQueryString corrigido mas depende de infra):
+# Tests:
 dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
 
-# Contar hardcoded colors total:
-grep -rn '#[0-9a-fA-F]\{3,8\}' Pages/ --include="*.css" | wc -l
+# Contar hardcoded hex em scoped CSS (deve ser 0):
+grep -rn '#[0-9a-fA-F]\{3,8\}' Pages/ Shared/ --include="*.css" | wc -l
 
-# Contar hardcoded PUROS (sem fallback):
-grep -rn '#[0-9a-fA-F]\{3,8\}' Pages/ --include="*.css" | grep -v 'var(--' | wc -l
+# Contar rgba hardcoded em scoped CSS:
+grep -rn 'rgba(' Pages/ Shared/ --include="*.css" | grep -v 'var(--' | wc -l
 
-# Contar fallbacks desnecessarios:
-grep -rn 'var(--.*#' Pages/ --include="*.css" | wc -l
+# Contar CSS vars usadas (scoped):
+grep -rn 'var(--' Pages/ Shared/ --include="*.css" | wc -l
 
-# Contar CSS vars usadas:
-grep -rn 'var(--' Pages/ --include="*.css" | wc -l
+# Contar !important total:
+grep -rn '!important' Pages/ Shared/ wwwroot/css/ --include="*.css" | wc -l
 
-# Contar !important:
-grep -rn '!important' Pages/ --include="*.css" | wc -l
+# Verificar vars indefinidas:
+grep -oP '^\s*--([\w-]+)\s*:' wwwroot/css/site.css | sed 's/^\s*--//' | sed 's/\s*://' | sort -u > /tmp/defined.txt
+grep -rPoh 'var\(--([\w-]+)\)' Pages/ Shared/ --include="*.css" | grep -oP '\-\-([\w-]+)' | sed 's/^--//' | sort -u > /tmp/used.txt
+grep -rPoh '^\s*--([\w-]+)\s*:' Pages/ Shared/ --include="*.css" | sed 's/^\s*--//' | sed 's/\s*://' | sort -u > /tmp/local.txt
+cat /tmp/defined.txt /tmp/local.txt | sort -u > /tmp/all.txt
+comm -23 /tmp/used.txt /tmp/all.txt
+# Meta: 0 linhas
 
-# Contar inline styles:
-grep -rn 'style="' Pages/ --include="*.razor" | grep -v 'display:none' | grep -v '@' | wc -l
+# Verificar vars mortas (definidas mas nao usadas):
+while IFS= read -r var; do
+  count=$(grep -rPo "var\(--${var}\)" Pages/ Shared/ wwwroot/css/ --include="*.css" | wc -l)
+  if [ "$count" -eq 0 ]; then echo "MORTA: --$var"; fi
+done < /tmp/defined.txt
+# Meta: 0
 ```
-
----
-
-## Ciclo 7 (UX Improvements): Legibilidade de Fontes
-
-### Branch
-- `improve/font-contrast`
-
-### Objetivo
-Melhorar a legibilidade de fontes no sistema, especialmente em backgrounds escuros/opacos.
-
-### Problemas Identificados (UX Testing)
-- **Subtitle principal do app** (`oldsite-tagline`): quase ilegível
-- **Menu grupos, esportes, pagamentos** (`oldsite-top-nav a`): fonte muito escura, confunde com background
-- **Novidades** (`oldsite-news-ticker`): mesmo problema de contraste
-- **Sidebar links** (`oldsite-side-link`): fonte muito escura
-
-### Causa Raiz
-O app tem predominância de cores escuras/ofuscas/opacas. Quando as fontes também são escuras, há sérios problemas de contraste/legibilidade.
-
-### Melhorias Implementadas
-- `oldsite-tagline`: `#e8c89a` → `#fff5e6` + text-shadow glow
-- `oldsite-top-nav a`: `#ffe6b6` → `#fffaf0` + text-shadow glow
-- `oldsite-top-nav-user`: `#ffe6b6` → `#fffaf0` + text-shadow glow
-- `oldsite-side-group-title`: `#ffe7c2` → `#fffaf0` + text-shadow glow
-- `oldsite-side-link`: `#f4dcba` → `#fff5e6` + text-shadow glow
-- `layout-news-ticker`: `#8aacc8` → `#deeeff` + text-shadow glow
-- `oldsite-news-ticker-text` (news ticker text): adicionado `#deeeff` + text-shadow glow
-- `oldsite-news-ticker-dot` (news ticker dots): apenas `.active` fica claro (`#4f9cf8` + glow), as demais continuam `#1b3d6c`
-- `entity-shell-subtitle` (main subtitle): `var(--entity-muted)` → `#deeeff` + text-shadow glow (em site.css, EntityProfileShell.razor.css e AdminLanguages.razor.css)
-- **Todas as 14 ocorrências de `#8aacc8` em site.css**: convertidas para `#deeeff` ou `#fffaf0` com text-shadow glow
-  - Sidebar nav links
-  - Payment chip text
-  - Top nav logout
-  - Widget text (p, small, ol)
-  - Widget ol/li
-  - Widget links
-  - Product table td
-  - Admin settings card
-  - Admin table td
-  - Admin label
-  - Admin notice
-  - Payment details card
-  - APV row dt/dd
-  - APV btn-back
-  - Form group label
-  - Cancel btn
-  - Entity shell card p/li
-
-### Pattern Visual Sugerido (para WORK_PLAN/Contributing)
-**Regra de Contraste de Fontes:**
-- Em backgrounds escuros/opacos, usar cores de texto claras com alto contraste
-- Adicionar text-shadow glow suave para melhorar legibilidade
-- Exemplo: `color: #fffaf0; text-shadow: 0 0 6px rgba(255, 230, 182, 0.3);`
-- Evitar cores de texto que se misturam com o background (ex: `#ffe6b6` em `#3b2617`)
-
-### Status
-- ✅ Build: 0 erros, 47 warnings (pré-existentes)
-- ✅ Branch criada e pushada
-- ⏳ Aguardando validação visual do senior
 
 ---
 
@@ -612,11 +559,14 @@ O app tem predominância de cores escuras/ofuscas/opacas. Quando as fontes tamb�
 <!-- Pleno: documente aqui qualquer bloqueio que encontrar -->
 
 ### Cores sem Var correspondente
-<!-- Liste aqui cores hex que nao tem var no :root NEM no mapeamento acima -->
-<!-- Manter apenas cores que aparecem 3+ vezes e nao sao intermediarios de gradiente -->
+<!-- Liste aqui rgba() que nao tem var equivalente na lista -->
+<!-- Formato: rgba(r,g,b,a) | arquivo | contexto (shadow, overlay, border) -->
 
 ### Conflitos de especificidade nao resolvidos
-<!-- Liste aqui seletores que nao conseguiu override sem !important -->
+<!-- Liste aqui seletores com !important que nao conseguiu resolver -->
+
+### Problemas de conversao rgba
+<!-- Liste aqui rgba() que tem a mesma cor base mas opacidade diferente das vars existentes -->
 
 ### Outras observacoes
 <!-- Notas gerais sobre decisoes tomadas -->
@@ -625,11 +575,15 @@ O app tem predominância de cores escuras/ofuscas/opacas. Quando as fontes tamb�
 
 ## Metricas de Sucesso (evolucao completa)
 
-| Metrica | Ciclo 3 | Pos-Ciclo 4 | Pos-Ciclo 5 | Meta Ciclo 6 |
-|---------|---------|-------------|-------------|--------------|
-| Warnings (projeto) | ~50 | 2 | 0 | 0 |
-| `!important` em Pages/*.css | 16 | 1 | 1 | 1 |
-| Hardcoded colors total | 1.387 | 1.099 | 867 | <550 |
-| CSS vars usadas | 381 | 673 | 1.175 | >1.400 |
-| Inline styles estaticos | ~35 | 6 | 0 | 0 |
-| Fallbacks `var(--xx, #hex)` | — | — | 178 | 0 |
+| Metrica | C3 | C4 | C5 | C6/C7 | Meta C8 |
+|---------|----|----|----|----|---------|
+| Warnings (projeto) | ~50 | 2 | 0 | 0 | 0 |
+| `!important` scoped | 16 | 1 | 1 | 1 | 1 |
+| `!important` global | — | — | — | 17 | <5 |
+| Hardcoded hex scoped | 1.387 | 1.099 | 867 | 0 | 0 |
+| rgba() hardcoded scoped | — | — | — | 645 | <300 |
+| Hardcoded hex global | — | — | — | ~1.317 | <600 |
+| CSS vars usadas | 381 | 673 | 1.175 | 2.053 | >2.200 |
+| Inline estaticos | ~35 | 6 | 0 | 0 | 0 |
+| Vars no `:root` | ~68 | ~68 | 105 | 179 | ~161 |
+| Vars mortas | — | — | — | 18 | 0 |

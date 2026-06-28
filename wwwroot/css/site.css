@@ -257,6 +257,44 @@
     
     /* Red-dark opacity */
     --red-dark-md:         rgba(183, 28, 28, 0.3);
+
+    /* ── Fix Senior — vars inventadas pelo Pleno sem definir ── */
+
+    /* Basics */
+    --white:               #ffffff;
+
+    /* CI navy extras (gradients, deep surfaces) */
+    --ci-bg-mid:           #112240;
+    --ci-bg-deep:          #0d1825;
+    --ci-bg-dark:          #0a1f35;
+
+    /* Green spectrum */
+    --green-strong:        #22c55e;
+
+    /* Amber spectrum */
+    --amber-mid:           #d97706;
+    --amber-dark:          #b45309;
+    --amber-strong:        #e65100;
+    --amber-lightest:      #fffbeb;
+
+    /* Red spectrum extras */
+    --red-dark:            #dc2626;
+    --red-bg-dark:         #290f0f;
+
+    /* Brown text extras */
+    --brown-dark:          #4a2c15;
+    --brown-muted:         #8b7355;
+
+    /* Poker extras */
+    --poker-border:        #2d1a4a;
+
+    /* Pink */
+    --pink-mid:            #f472b6;
+
+    /* Slate extras */
+    --slate-dark:          #334155;
+    --slate-pale:          #e2e8f0;
+    --slate-warm:          #78716c;
 }
 
 /* ================================================================
