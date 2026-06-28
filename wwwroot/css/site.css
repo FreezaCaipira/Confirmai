@@ -3254,13 +3254,13 @@ body .oldsite-logo {
 
 body .oldsite-tagline {
     margin: 0.16rem 0 0;
-    color: #e8c89a;
+    color: #fff5e6;
     font-family: var(--font-accent);
     font-size: 1.05rem;
     letter-spacing: 0.04em;
     position: relative;
     z-index: 1;
-    text-shadow: 0 1px 0 #2a1a0a;
+    text-shadow: 0 1px 0 #2a1a0a, 0 0 8px rgba(255, 230, 182, 0.3);
 }
 
 body .oldsite-playerline {
@@ -3302,7 +3302,7 @@ body .oldsite-top-nav a {
     justify-content: center;
     gap: 0.35rem;
     padding: 0.25rem 1rem;
-    color: #ffe6b6;
+    color: #fffaf0;
     text-decoration: none;
     text-transform: capitalize;
     font-size: 0.78rem;
@@ -3310,6 +3310,7 @@ body .oldsite-top-nav a {
     border-right: 1px solid rgba(255, 201, 126, 0.2);
     position: relative;
     z-index: 2;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.4);
 }
 
 body .oldsite-top-nav .oldsite-top-nav-mailbox {
@@ -3404,8 +3405,9 @@ body .oldsite-top-nav .oldsite-top-nav-user {
     min-height: 28px;
     margin-left: 0;
     padding: 0.25rem 0.8rem;
-    color: #ffe6b6;
+    color: #fffaf0;
     border-right: 0;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.4);
 }
 
 body .oldsite-top-nav .oldsite-top-nav-profile-link {
@@ -4854,13 +4856,14 @@ body .oldsite-left-column .oldsite-side-group-title {
     padding: 0.24rem 0.42rem;
     border-bottom: 1px solid #7f3d16;
     background: linear-gradient(180deg, #bb4a14 0%, #8a320f 100%);
-    color: #ffe7c2;
+    color: #fffaf0;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.85rem;
     line-height: 1.1;
     letter-spacing: 0.02em;
     text-transform: none;
     text-align: left;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.3);
 }
 
 body .oldsite-left-column .oldsite-side-group .oldsite-side-link {
@@ -4871,12 +4874,13 @@ body .oldsite-left-column .oldsite-side-group .oldsite-side-link {
     border-radius: 0;
     background: transparent;
     box-shadow: none;
-    color: #f4dcba;
+    color: #fff5e6;
     font-family: Verdana, Tahoma, sans-serif;
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0;
     line-height: 1.15;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.3);
     text-transform: none;
     justify-content: flex-start;
     text-align: left;
