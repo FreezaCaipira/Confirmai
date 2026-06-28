@@ -573,8 +573,8 @@ O app tem predominância de cores escuras/ofuscas/opacas. Quando as fontes tamb�
 - `oldsite-side-link`: `#f4dcba` → `#fff5e6` + text-shadow glow
 - `layout-news-ticker`: `#8aacc8` → `#deeeff` + text-shadow glow
 - `oldsite-news-ticker-text` (news ticker text): adicionado `#deeeff` + text-shadow glow
-- `oldsite-news-ticker-dot` (news ticker dots): `#1b3d6c` → `#4f9cf8` + box-shadow glow
-- `entity-shell-subtitle` (main subtitle): `#6082a0` → `#deeeff` + text-shadow glow
+- `oldsite-news-ticker-dot` (news ticker dots): apenas `.active` fica claro (`#4f9cf8` + glow), as demais continuam `#1b3d6c`
+- `entity-shell-subtitle` (main subtitle): `var(--entity-muted)` → `#deeeff` + text-shadow glow (em site.css, EntityProfileShell.razor.css e AdminLanguages.razor.css)
 - **Todas as 14 ocorrências de `#8aacc8` em site.css**: convertidas para `#deeeff` ou `#fffaf0` com text-shadow glow
   - Sidebar nav links
   - Payment chip text

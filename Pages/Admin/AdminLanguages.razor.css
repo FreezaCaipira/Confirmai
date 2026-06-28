@@ -69,9 +69,9 @@
 .security-header p,
 .security-label,
 .security-input-grid label,
-.security-b#deeeff;
-    roup hhadow: 0 0 6px rg a(79, 156, 248, 0.3
-    color: var(--ci-text-subtle);
+.security-baseline-group h5 {
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .security-header h3 {
