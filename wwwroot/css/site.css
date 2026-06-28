@@ -5194,7 +5194,7 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
     background: #111927;
     border: 1px solid #1b3d6c;
     border-radius: 5px;
-    color: #8aacc8;
+    color: #deeeff;
     box-shadow: none;
 }
 
@@ -5203,6 +5203,7 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
     border: 1px solid rgba(21, 61, 90, 0.32);
     color: #4f9cf8;
     letter-spacing: 0.04em;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 /* ── Right column widgets ─────────────────────────────────────── */
