@@ -13,10 +13,7 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: var(--ci-bg-deepest);
-    border: 1px solid var(--ci-border-alt);
-    border-radius: 8px;
-    transition: all 0.15s;
+    background: var(--ci-bg-card);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 

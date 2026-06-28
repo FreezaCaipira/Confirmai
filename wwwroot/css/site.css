@@ -5250,7 +5250,7 @@ body .main-content::before {
 /* ── Main content card (entity-shell-card) ────────────────────── */
 body .oldsite-main-content .entity-shell-card,
 body .entity-shell-card {
-    background: var(--ci-bg-card-deep);
+    background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
     border-top: 2px solid var(--ci-border-dim);
     box-shadow: none;

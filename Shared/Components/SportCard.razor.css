@@ -5,9 +5,7 @@
     border-radius: 8px;
     text-decoration: none;
     color: var(--ci-text);
-    background: var(--ci-bg-deepest);
-    border: 1px solid var(--ci-border-alt);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    background: var(--ci-bg-card);
     position: relative;
     overflow: hidden;
 }

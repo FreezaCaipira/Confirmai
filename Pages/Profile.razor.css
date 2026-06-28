@@ -13,7 +13,7 @@
 .profile-card {
     border: 1px solid var(--ci-border);
     border-radius: 8px;
-    background: var(--ci-bg-deepest);
+    background: var(--ci-bg-card);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.1);
     overflow: hidden;
 }
@@ -24,7 +24,7 @@
     padding: 0.9rem 1.1rem;
     display: grid;
     gap: 0.56rem;
-    background: var(--ci-bg-deepest);
+    background: var(--ci-bg-card);
     border-bottom: 1px solid var(--ci-border);
 }
 
@@ -48,7 +48,7 @@
     max-height: 220px;
     overflow-y: auto;
     padding-right: 0.1rem;
-    background: var(--ci-bg-deepest);
+    background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
     border-radius: 4px;
     padding: 0.5rem;
