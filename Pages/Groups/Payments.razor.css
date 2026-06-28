@@ -228,6 +228,23 @@
     box-shadow: 0 6px 12px var(--red-opacity-lg);
 }
 
+/* History tab — neutral green/teal instead of red */
+.payments-user-item--history {
+    border-color: var(--ci-border);
+    box-shadow: 0 4px 8px var(--shadow-md);
+}
+
+.payments-user-item--history:hover {
+    border-color: var(--green-strong);
+    box-shadow: 0 6px 12px rgba(34, 197, 94, 0.2);
+}
+
+.payments-user-item--history.payments-user-item--selected {
+    background: rgba(34, 197, 94, 0.08);
+    border-color: var(--green-strong);
+    box-shadow: 0 6px 12px rgba(34, 197, 94, 0.25), inset 0 0 0 1px rgba(34, 197, 94, 0.15);
+}
+
 .payments-user-item--selected {
     background: var(--red-bg-dark);
     border-color: var(--red-soft);
@@ -293,6 +310,11 @@
     box-shadow: 0 4px 8px var(--shadow-red-sm), inset 0 2px 4px var(--shadow-lg);
 }
 
+.payments-detail-panel--history {
+    border-left-color: var(--green-strong);
+    box-shadow: 0 4px 8px rgba(34, 197, 94, 0.15), inset 0 2px 4px var(--shadow-lg);
+}
+
 .payments-detail-summary {
     display: flex;
     justify-content: space-between;
@@ -300,6 +322,15 @@
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.payments-detail-panel--history .payments-detail-summary {
+    border-bottom-color: rgba(34, 197, 94, 0.2);
+}
+
+.payments-detail-panel--history .payments-summary-total {
+    color: var(--green-bright);
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
 }
 
 .payments-summary-label {
