@@ -919,6 +919,12 @@
     border-color: rgba(251,146,60,0.3);
 }
 
+.player-tag--weekly {
+    color: var(--link-info);
+    background: rgba(96,165,250,0.1);
+    border-color: rgba(96,165,250,0.3);
+}
+
 /* ── Events table (group join / group detail) ────────────────────── */
 .detail-events-header {
     display: grid;
