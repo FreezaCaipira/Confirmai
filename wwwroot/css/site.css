@@ -2925,8 +2925,9 @@ body::before {
 
 .entity-shell-subtitle {
     margin: 0.58rem 0 0;
-    color: var(--entity-muted);
+    color: #deeeff;
     line-height: 1.58;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
     max-width: 74ch;
 }
 
@@ -4958,16 +4959,16 @@ body .oldsite-news-ticker .oldsite-news-ticker-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #4f9cf8;
+    background: #1b3d6c;
     border: 1px solid #243447;
     transition: background 0.3s, transform 0.3s;
-    box-shadow: 0 0 6px rgba(79, 156, 248, 0.5);
 }
 
 body .oldsite-news-ticker .oldsite-news-ticker-dot.active {
-    background: #1a5ab0;
+    background: #4f9cf8;
     border-color: #1a5298;
     transform: scale(1.15);
+    box-shadow: 0 0 6px rgba(79, 156, 248, 0.5);
 }
 
 body .oldsite-center-column {
