@@ -7,7 +7,7 @@
 }
 
 .evpay-qr-image {
-    width: min(280px, 90%);
+    width: min(170px, 90%);
     aspect-ratio: 1 / 1;
     border-radius: 12px;
     overflow: hidden;
