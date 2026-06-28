@@ -40,17 +40,6 @@
     color: var(--futsal-green-pale);
 }
 
-.sport-card--futsal .sport-card-count:not(.sport-card-count--empty) {
-    color: var(--futsal-green-pale);
-    background: var(--futsal-green-dark);
-    border-color: var(--green-bright);
-}
-
-.sport-card--futsal .sport-card-count--empty {
-    color: var(--ci-text-blue);
-    background: var(--ci-bg-alt);
-    border-color: var(--ci-border);
-}
 
 /* ── Poker header ───────────────────────── */
 .sport-card--poker .sport-card-header {
@@ -63,17 +52,6 @@
     color: var(--ci-surface-light);
 }
 
-.sport-card--poker .sport-card-count:not(.sport-card-count--empty) {
-    color: var(--ci-surface-light);
-    background: var(--ci-bg-deep);
-    border-color: var(--ci-accent);
-}
-
-.sport-card--poker .sport-card-count--empty {
-    color: var(--ci-text-blue);
-    background: var(--ci-bg-alt);
-    border-color: var(--ci-border);
-}
 
 /* ── Card body ──────────────────────────── */
 .sport-card-body {
@@ -103,19 +81,48 @@
     flex: 1;
 }
 
-.sport-card-count {
-    font-size: 0.75rem;
-    font-weight: 700;
-    border-radius: 10px;
-    padding: 0.08rem 0.55rem;
-    border: 1px solid;
-}
 
 .sport-card-desc {
     font-size: 0.92rem;
     color: var(--ci-text-blue);
     margin: 0;
     line-height: 1.5;
+}
+
+.sport-card-events {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ci-text-muted);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    align-self: flex-start;
+}
+
+.sport-card-events i {
+    font-size: 0.72rem;
+    color: var(--ci-accent);
+}
+
+.sport-card-events--empty {
+    color: var(--ci-text-subtle);
+    opacity: 0.7;
+}
+
+.sport-card-events--empty i {
+    color: var(--ci-text-subtle);
+}
+
+.sport-card--futsal .sport-card-events:not(.sport-card-events--empty) i {
+    color: var(--green-bright);
+}
+
+.sport-card--poker .sport-card-events:not(.sport-card-events--empty) i {
+    color: var(--poker-accent);
 }
 
 .sport-card-cta {

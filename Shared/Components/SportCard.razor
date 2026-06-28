@@ -4,15 +4,16 @@
 <a href="@Href" class="sport-card sport-card--@SportClass">
     <div class="sport-card-header">
         <span class="sport-card-label">@Icon @Name</span>
-        @if (MatchCount.HasValue)
-        {
-            <span class="sport-card-count @(MatchCount.Value == 0 ? "sport-card-count--empty" : "")">
-                @MatchCount.Value
-            </span>
-        }
     </div>
     <div class="sport-card-body">
         <p class="sport-card-desc">@Description</p>
+        @if (MatchCount.HasValue)
+        {
+            <span class="sport-card-events @(MatchCount.Value == 0 ? "sport-card-events--empty" : "")">
+                <i class="fas fa-calendar-day"></i>
+                @MatchCount.Value evento@(MatchCount.Value != 1 ? "s" : "")
+            </span>
+        }
         <span class="sport-card-cta">@CtaText</span>
     </div>
 </a>
