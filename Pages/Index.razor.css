@@ -8,6 +8,22 @@
     gap: 1.5rem;
 }
 
+.sports-shell {
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 2rem;
+    background: var(--ci-bg-card);
+    border: 1px solid var(--ci-border-alt);
+    border-top: 2px solid var(--ci-border-dim);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
 /* ── Meus Jogos Filters ───────────────────── */
 .my-conf-filters {
     display: flex;
@@ -117,7 +133,6 @@
     grid-template-columns: repeat(auto-fit, minmax(270px, 370px));
     gap: 1.5rem;
     width: 100%;
-    max-width: 820px;
     justify-content: center;
 }
 
@@ -364,14 +379,12 @@
     display: flex;
     justify-content: center;
     width: 100%;
-    max-width: 820px;
     margin-bottom: 1rem;
 }
 
 /* ── Meus Jogos container ────────────────────────────────────── */
 .my-conf-container {
     width: 100%;
-    max-width: 820px;
 }
 
 /* ── Browse buttons (empty state) ───────────────────────────── */
