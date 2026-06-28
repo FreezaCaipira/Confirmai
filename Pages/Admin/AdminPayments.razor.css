@@ -12,7 +12,7 @@
     border-radius: 14px;
     border: 1px solid rgba(130, 170, 205, 0.4);
     background: linear-gradient(180deg, var(--ci-bg) 0%, var(--ci-bg-deepest) 100%);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.2);
+    box-shadow: 0 12px 32px var(--shadow-2xl), 0 6px 16px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-sm);
 }
 
 .admin-payments-shell .admin-payments-summary-grid {
@@ -41,7 +41,7 @@
     font-size: 1.35rem;
     color: var(--ci-surface-light);
     font-weight: 800;
-    text-shadow: 0 0 15px rgba(79, 156, 248, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 15px var(--shadow-accent-lg), 0 2px 4px var(--text-shadow-sm);
 }
 
 .admin-payments-shell .admin-payments-summary-actions {
@@ -100,7 +100,7 @@
     color: var(--green-soft);
     background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
     border-color: var(--green-soft);
-    box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-green-sm);
 }
 
 .admin-payments-shell .admin-payments-severity-pill--warning {
@@ -114,7 +114,7 @@
     color: var(--red-lightest);
     background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
     border-color: var(--red-pale);
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-red-sm);
 }
 
 .admin-payments-shell .admin-payments-summary-meta {

@@ -646,6 +646,8 @@ rgba(0, 0, 0, 0.7)      — base matches --shadow-* but opacity 0.7 has no var (
 ### Outras observacoes
 Fase 2: 49 conversoes realizadas nos 5 arquivos. 195 rgba() restantes sem var equivalente — cores base (blue-400, slate-800, amber-400, emerald-500, white, parchment/brown spectrum) nao tem vars rgba definidas no :root. Documentado acima para avaliacao do Senior sobre adicionar novas vars em ciclo futuro.
 
+Fase 3: 13 conversoes realizadas nos 5 arquivos. Marketplace (0 conversoes — todos rgba sao warm/brown spectrum sem vars) e ParchmentLab (0 conversoes — todos rgba sao brown/warm spectrum sem vars). AdminPayments (4), Mailbox (5), MembersManager (4). 122 rgba() restantes sem var equivalente — mesmas cores base sem vars rgba (azul-400, amber-400, warm browns, white, slate-700). Cores adicionais sem var: rgba(130, 170, 205, ...) (border slate), rgba(248, 113, 113, 0.1/0.12/0.4/0.42/0.55/0.8/0.85) (red-light em opacidades sem var), rgba(74, 222, 128, 0.1/0.12/0.34/0.55/0.85) (green-bright em opacidades sem var), rgba(251, 191, 36, 0.08/0.12/0.3/0.34) (amber em opacidades sem var).
+
 ---
 
 ## Metricas de Sucesso (evolucao completa)
