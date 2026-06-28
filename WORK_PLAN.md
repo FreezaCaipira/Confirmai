@@ -571,6 +571,25 @@ O app tem predominância de cores escuras/ofuscas/opacas. Quando as fontes tamb�
 - `oldsite-top-nav-user`: `#ffe6b6` → `#fffaf0` + text-shadow glow
 - `oldsite-side-group-title`: `#ffe7c2` → `#fffaf0` + text-shadow glow
 - `oldsite-side-link`: `#f4dcba` → `#fff5e6` + text-shadow glow
+- `layout-news-ticker`: `#8aacc8` → `#deeeff` + text-shadow glow
+- **Todas as 14 ocorrências de `#8aacc8` em site.css**: convertidas para `#deeeff` ou `#fffaf0` com text-shadow glow
+  - Sidebar nav links
+  - Payment chip text
+  - Top nav logout
+  - Widget text (p, small, ol)
+  - Widget ol/li
+  - Widget links
+  - Product table td
+  - Admin settings card
+  - Admin table td
+  - Admin label
+  - Admin notice
+  - Payment details card
+  - APV row dt/dd
+  - APV btn-back
+  - Form group label
+  - Cancel btn
+  - Entity shell card p/li
 
 ### Pattern Visual Sugerido (para WORK_PLAN/Contributing)
 **Regra de Contraste de Fontes:**
