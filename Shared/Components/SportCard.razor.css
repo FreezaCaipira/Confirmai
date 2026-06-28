@@ -43,13 +43,13 @@
 
 /* ── Poker header ───────────────────────── */
 .sport-card--poker .sport-card-header {
-    background: linear-gradient(180deg, var(--ci-bg-card) 0%, var(--ci-accent-mid) 100%);
-    border-color: var(--ci-accent);
-    box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.34);
+    background: linear-gradient(180deg, var(--poker-bg-dark) 0%, var(--poker-accent-deep) 100%);
+    border-color: var(--poker-accent);
+    box-shadow: inset 0 1px 0 rgba(196, 181, 253, 0.30);
 }
 
 .sport-card--poker .sport-card-label {
-    color: var(--ci-surface-light);
+    color: var(--poker-text);
 }
 
 
@@ -69,7 +69,7 @@
 }
 
 .sport-card--poker .sport-card-body {
-    border-color: var(--ci-accent);
+    border-color: var(--poker-accent);
 }
 
 /* ── Card parts ──────────────────────────── */
