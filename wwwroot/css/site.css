@@ -6270,7 +6270,8 @@ body .entity-shell-card li {
 }
 
 body .entity-shell-subtitle {
-    color: #6082a0;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 /* ── Google Maps Places Autocomplete dropdown ───────────────────── */
