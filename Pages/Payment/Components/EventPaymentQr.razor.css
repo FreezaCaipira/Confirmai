@@ -16,9 +16,11 @@
     box-shadow: 0 4px 24px var(--shadow-lg);
 }
 
-.evpay-qr-image img {
+.evpay-qr-image :global(img) {
+    display: block;
     width: 100%;
     height: 100%;
+    max-width: 100%;
     object-fit: contain;
 }
 

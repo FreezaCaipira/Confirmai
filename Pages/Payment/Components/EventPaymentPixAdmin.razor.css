@@ -45,6 +45,8 @@
     border: 2px solid var(--green-opacity-md);
     background: var(--white);
     padding: 6px;
+    display: block;
+    max-width: 100%;
 }
 
 .evpay-admin-pix-no-key {
