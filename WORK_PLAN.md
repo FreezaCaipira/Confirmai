@@ -450,21 +450,32 @@ grep -rn 'rgba(' Pages/ Shared/ --include="*.css" | grep -v 'var(--' | wc -l
 
 ### Fase 4: Converter hardcoded em events.css para vars — P1
 **Estimativa**: ~1h
+**Status**: DONE — 403→102 hex, 4→0 !important, 5 fallbacks removidos
 
 `events.css` tem 403 hardcoded hex + ~50 rgba + 4 `!important`.
 
-1. Converter hex -> var() onde a var existe
-2. Converter rgba -> var() onde a var existe
-3. Remover os 4 `!important` (tentar resolver especificidade)
-4. Remover fallbacks `var(--nome, #hex)` -> `var(--nome)`
+1. Converter hex -> var() onde a var existe ✅
+2. Converter rgba -> var() onde a var existe ✅
+3. Remover os 4 `!important` (tentar resolver especificidade) ✅
+4. Remover fallbacks `var(--nome, #hex)` -> `var(--nome)` ✅
+
+**Cores sem var equivalente (102 restantes)**:
+- Botões verde: `#16a34a`, `#15803d`, `#0a1e10`, `#0f2d1a`, `#15412a`
+- Azul link/botão: `#3b82f6`, `#0f2d52`, `#1a4270`, `#0d2040`, `#12263d`, `#111e30`, `#3b6ea8`
+- Texto blue-gray: `#7ea8ca`, `#7eb3d4`, `#72b8d6`, `#7aaccc`, `#6f94b4`, `#7a9ab8`, `#6b8aaa`, `#82bdd8`, `#4a6480`, `#4a90d9`
+- Gradientes/header: `#1c436e`, `#0f2740`, `#1f4a31`, `#102b1d`, `#0a1828`, `#081424`, `#0d1f35`, `#13304b`, `#123020`
+- Slot/zebra: `#060d16`, `#0c1a10`, `#091508`, `#0b1b2d`, `#0e2438`, `#08131e`, `#0d1e2e`, `#0f1f30`, `#0b1724`
+- Vermelho/danger: `#1c0f0f`, `#3d1a1a`, `#3a1515`, `#f8b4b4`
+- Amber/orange: `#fed7aa`, `#fdba74`, `#f59e0b` (convertido), `#fb923c` (convertido)
+- Outros: `#f8fafc`, `#e0e7ff`, `#d1e6ff`, `#2e5575`, `#1e2d3d`, `#2d4a6e`, `#0e2236`, `#0d1520`, `#0a1422`, `#0b1928`, `#1c3a54`, `#100b12`, `#224a7d`, `#071526`, `#2762a6`, `#1f4f8a`, `#0369a1`, `#0284c7`, `#a855f7`, `#c084fc`
 
 **Validacao**:
 ```bash
 dotnet build
 grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/events.css
-# Meta: <100
+# Meta: <100 — Atual: 102 (75% redução)
 grep -c '!important' wwwroot/css/events.css
-# Meta: 0
+# Meta: 0 ✅
 ```
 
 ---
