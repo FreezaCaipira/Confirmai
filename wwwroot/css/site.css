@@ -172,13 +172,10 @@
     /* ── Ciclo 6 — Shadow/Opacity vars ── */
     
     /* Black opacity shadows */
-    --shadow-sm:           rgba(0, 0, 0, 0.25);
     --shadow-md:           rgba(0, 0, 0, 0.3);
     --shadow-lg:           rgba(0, 0, 0, 0.4);
     --shadow-xl:           rgba(0, 0, 0, 0.5);
     --shadow-2xl:          rgba(0, 0, 0, 0.6);
-    --shadow-3xl:          rgba(0, 0, 0, 0.7);
-    --shadow-4xl:          rgba(0, 0, 0, 0.85);
     
     /* Accent shadows */
     --shadow-accent-sm:    rgba(79, 156, 248, 0.3);
@@ -194,20 +191,13 @@
     
     /* Text shadows */
     --text-shadow-sm:      rgba(0, 0, 0, 0.3);
-    --text-shadow-md:      rgba(0, 0, 0, 0.35);
-    --text-shadow-lg:      rgba(0, 0, 0, 0.45);
-    --text-shadow-xl:      rgba(0, 0, 0, 0.5);
     
     /* Inset shadows */
     --inset-accent-sm:     rgba(147, 197, 253, 0.2);
-    --inset-accent-md:     rgba(79, 156, 248, 0.3);
     
     /* Background overlays */
     --overlay-sm:          rgba(0, 0, 0, 0.3);
-    --overlay-md:          rgba(0, 0, 0, 0.5);
     --overlay-lg:          rgba(0, 0, 0, 0.55);
-    --overlay-xl:          rgba(0, 0, 0, 0.7);
-    --overlay-2xl:         rgba(0, 0, 0, 0.85);
     
     /* Accent blue opacity */
     --accent-opacity-sm:   rgba(79, 156, 248, 0.2);
@@ -220,25 +210,15 @@
     --green-opacity-sm:    rgba(74, 222, 128, 0.2);
     --green-opacity-md:    rgba(74, 222, 128, 0.3);
     --green-opacity-lg:    rgba(74, 222, 128, 0.35);
-    --green-opacity-xl:    rgba(74, 222, 128, 0.5);
-    --green-opacity-2xl:   rgba(74, 222, 128, 0.6);
-    
-    /* Red opacity */
-    --red-opacity-sm:      rgba(239, 68, 68, 0.2);
-    --red-opacity-md:      rgba(239, 68, 68, 0.3);
-    --red-opacity-lg:      rgba(239, 68, 68, 0.5);
     
     /* Slate border opacity */
     --slate-border-sm:     rgba(148, 163, 184, 0.1);
     --slate-border-md:     rgba(148, 163, 184, 0.15);
     --slate-border-lg:     rgba(148, 163, 184, 0.2);
-    --slate-border-xl:     rgba(148, 163, 184, 0.3);
     
     /* Green-dark opacity */
-    --green-dark-sm:       rgba(22, 163, 74, 0.1);
     --green-dark-md:       rgba(22, 163, 74, 0.12);
     --green-dark-lg:       rgba(22, 163, 74, 0.15);
-    --green-dark-xl:       rgba(22, 163, 74, 0.3);
     --green-dark-2xl:      rgba(22, 163, 74, 0.4);
     
     /* Purple opacity */
