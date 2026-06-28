@@ -1,4 +1,105 @@
-/* EventPaymentProof specific styles */
+.evpay-proof {
+    margin-top: 1.25rem;
+    background: rgba(15, 26, 48, 0.6);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.evpay-proof-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.evpay-proof-hint {
+    font-size: 0.82rem;
+    color: var(--slate-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.evpay-proof-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    background: rgba(251, 191, 36, 0.12);
+    border: 1.5px solid rgba(251, 191, 36, 0.55);
+    color: rgba(251, 191, 36, 0.9);
+    border-radius: 8px;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+    align-self: flex-start;
+}
+
+.evpay-proof-btn:hover {
+    background: rgba(251, 191, 36, 0.22);
+    border-color: rgba(251, 191, 36, 0.85);
+    color: var(--amber);
+}
+
+.evpay-proof-btn--update {
+    background: rgba(96, 165, 250, 0.1);
+    border-color: rgba(96, 165, 250, 0.45);
+    color: rgba(96, 165, 250, 0.85);
+}
+
+.evpay-proof-btn--update:hover {
+    background: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.8);
+    color: var(--link-info);
+}
+
+.evpay-proof-sent {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.83rem;
+    color: var(--green-soft);
+}
+
+.evpay-proof-sent-icon {
+    color: var(--green-bright);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.evpay-proof-thumb {
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: var(--overlay-sm);
+}
+
+.evpay-proof-error {
+    font-size: 0.82rem;
+    color: var(--red-soft);
+    margin: 0;
+}
+
+.evpay-proof-success {
+    font-size: 0.82rem;
+    color: var(--green-soft);
+    margin: 0.5rem 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
 
 .evpay-proof-input-hidden {
     display: none;
