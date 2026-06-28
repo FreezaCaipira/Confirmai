@@ -4,7 +4,8 @@
 .admin-security-shell .security-label,
 .admin-security-shell .security-input-grid label,
 .admin-security-shell .security-baseline-group h5 {
-    color: var(--ci-text-subtle);
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .admin-security-shell .security-header h3 {
@@ -68,7 +69,8 @@
 .security-header p,
 .security-label,
 .security-input-grid label,
-.security-baseline-group h5 {
+.security-b#deeeff;
+    roup hhadow: 0 0 6px rg a(79, 156, 248, 0.3
     color: var(--ci-text-subtle);
 }
 
