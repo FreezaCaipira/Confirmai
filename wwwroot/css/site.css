@@ -4958,9 +4958,10 @@ body .oldsite-news-ticker .oldsite-news-ticker-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #1b3d6c;
+    background: #4f9cf8;
     border: 1px solid #243447;
     transition: background 0.3s, transform 0.3s;
+    box-shadow: 0 0 6px rgba(79, 156, 248, 0.5);
 }
 
 body .oldsite-news-ticker .oldsite-news-ticker-dot.active {
