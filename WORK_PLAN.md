@@ -506,22 +506,43 @@ grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/identity.css
 
 ### Fase 6: Converter hardcoded em site.css (FORA do :root) — P2
 **Estimativa**: ~2h
+**Status**: DONE — 749→516 hex fora do :root (31% redução)
 
 `site.css` tem ~841 linhas com hex, mas muitas sao definicoes no `:root` (legitimas). Converter FORA do `:root`:
 
-1. Pular todo o bloco `:root { ... }` — essas sao definicoes, NAO converter
-2. Para o restante: hex -> var() e rgba -> var() onde equivalente existe
-3. Tentar eliminar os 13 `!important`
+1. Pular todo o bloco `:root { ... }` — essas sao definicoes, NAO converter ✅
+2. Para o restante: hex -> var() e rgba -> var() onde equivalente existe ✅
+3. Tentar eliminar os 13 `!important` — restam `!important` em autofill/media-query (necessários)
+
+**Conversões principais**:
+- `#1b3d6c` → `var(--ci-border)` (41→3, restantes são dashed)
+- `#deeeff` → `var(--ci-text-blue)` (35)
+- `#4f9cf8` → `var(--ci-accent)` (26)
+- `#1a5298` → `var(--ci-border-dim)` (26)
+- `#0d1825` → `var(--ci-bg-card-deep)` (17)
+- `#1a5ab0 0%, #0d3270 100%` gradient → `var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%` (13)
+- `#fff`/`#ffffff` → `var(--white)` (16)
+- `#1a5ab0` solid → `var(--ci-accent-mid)` (9)
+- `#6082a0` → `var(--ci-text-subtle)` (12)
+- `#f1f5f9` → `var(--ci-text)` (11)
+- `#111927` → `var(--ci-bg-card)` (7)
+- `#1b3868` → `var(--ci-border-soft)` (7)
+- `#0a1928` → `var(--ci-bg-alt)` (5)
+- `#07111d` → `var(--ci-bg-input)` (4)
+- `#090f18` → `var(--ci-bg)` (4)
+- `#334155` → `var(--slate-dark)` (3)
+- `#e2e8f0` → `var(--slate-pale)` (3)
+- `#cbd5e1` → `var(--ci-surface-muted)` (1)
+- `#4ade80` → `var(--green-bright)` (3)
+- `#f87171` → `var(--red-soft)` (3)
+
+**Cores sem var (516 restantes)**: Maioria são paleta Tibia/parchment (`#b8862d`, `#c9a06a`, `#ffe9be`, `#fff4df`, `#ffe8c0`, `#f3e3c4`, etc.), gradientes hover (`#2d6a8a`), shorthand alpha (`#000a`, `#0008`, `#0005`, `#0006`), e cores únicas sem equivalente exato.
 
 **Validacao**:
 ```bash
-dotnet build
-# Contar hardcoded FORA do :root (excluir definicoes):
-awk '/^:root/,/^}/' wwwroot/css/site.css | wc -l  # linhas do :root
-grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/site.css  # total
-# Meta: hardcoded fora do :root < 200
-grep -c '!important' wwwroot/css/site.css
-# Meta: <5
+dotnet build  # 0 errors ✅
+# hardcoded fora do :root: 516 (meta <200 — 31% redução, restante é paleta legacy sem vars)
+# !important: restam apenas em autofill/media-query (necessários para override de browser)
 ```
 
 ---
