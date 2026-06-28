@@ -142,21 +142,6 @@ else
 
             <hr class="detail-divider">
 
-            @* ── Métricas (somente admin) ───────────────────────────── *@
-            @if (isAdmin)
-            {
-                <section class="detail-section">
-                    <div class="detail-section-header">
-                        <h2 class="detail-section-title">
-                            <i class="fas fa-chart-line"></i> Métricas
-                        </h2>
-                    </div>
-                    <GroupMetrics GroupId="@group.Id" />
-                </section>
-
-                <hr class="detail-divider">
-            }
-
             @* ── Membros ────────────────────────────────────────────── *@
             <section class="detail-section">
                 <div class="detail-section-header">
@@ -185,7 +170,19 @@ else
                     OnToggleMembersView="@ToggleMembersView" />
             </section>
 
-            <hr class="detail-divider">
+            @* ── Métricas (somente admin) ───────────────────────────── *@
+            @if (isAdmin)
+            {
+                <hr class="detail-divider">
+                <section class="detail-section">
+                    <div class="detail-section-header">
+                        <h2 class="detail-section-title">
+                            <i class="fas fa-chart-line"></i> Métricas
+                        </h2>
+                    </div>
+                    <GroupMetrics GroupId="@group.Id" />
+                </section>
+            }
 
             @* ── Partidas ───────────────────────────────────────────── *@
             <section class="detail-section">

@@ -1030,7 +1030,7 @@
 
 .events-table tbody tr.events-table-row {
     cursor: pointer;
-    border-bottom: 1px solid #0d1f35;
+    border-bottom: 1px solid var(--ci-border-dim);
     transition: background 0.12s;
 }
 
@@ -1039,7 +1039,7 @@
 }
 
 .events-table tbody tr.events-table-row:hover {
-    background: #0d1f35;
+    background: rgba(79, 156, 248, 0.06);
 }
 
 .events-table td {
