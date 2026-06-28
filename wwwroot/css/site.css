@@ -493,10 +493,11 @@ body::before {
 }
 
 .sidebar nav ul li a {
-    color: #8aacc8;
+    color: #deeeff;
     text-decoration: none;
     font-weight: 600;
     letter-spacing: 0.02em;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
     padding: 0.56rem 0.78rem;
     border-radius: 8px;
     display: flex;
@@ -2924,8 +2925,9 @@ body::before {
 
 .entity-shell-subtitle {
     margin: 0.58rem 0 0;
-    color: var(--entity-muted);
+    color: #deeeff;
     line-height: 1.58;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
     max-width: 74ch;
 }
 
@@ -3254,13 +3256,13 @@ body .oldsite-logo {
 
 body .oldsite-tagline {
     margin: 0.16rem 0 0;
-    color: #e8c89a;
+    color: #fff5e6;
     font-family: var(--font-accent);
     font-size: 1.05rem;
     letter-spacing: 0.04em;
     position: relative;
     z-index: 1;
-    text-shadow: 0 1px 0 #2a1a0a;
+    text-shadow: 0 1px 0 #2a1a0a, 0 0 8px rgba(255, 230, 182, 0.3);
 }
 
 body .oldsite-playerline {
@@ -3302,7 +3304,7 @@ body .oldsite-top-nav a {
     justify-content: center;
     gap: 0.35rem;
     padding: 0.25rem 1rem;
-    color: #ffe6b6;
+    color: #fffaf0;
     text-decoration: none;
     text-transform: capitalize;
     font-size: 0.78rem;
@@ -3310,6 +3312,7 @@ body .oldsite-top-nav a {
     border-right: 1px solid rgba(255, 201, 126, 0.2);
     position: relative;
     z-index: 2;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.4);
 }
 
 body .oldsite-top-nav .oldsite-top-nav-mailbox {
@@ -3404,8 +3407,9 @@ body .oldsite-top-nav .oldsite-top-nav-user {
     min-height: 28px;
     margin-left: 0;
     padding: 0.25rem 0.8rem;
-    color: #ffe6b6;
+    color: #fffaf0;
     border-right: 0;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.4);
 }
 
 body .oldsite-top-nav .oldsite-top-nav-profile-link {
@@ -4586,10 +4590,11 @@ body .oldsite-payment-chip img {
 }
 
 body .oldsite-payment-chip span {
-    color: #8aacc8 !important;
+    color: #deeeff !important;
     font-size: 0.82rem;
     font-weight: 500;
     line-height: 1.4;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
     letter-spacing: 0;
 }
 
@@ -4854,13 +4859,14 @@ body .oldsite-left-column .oldsite-side-group-title {
     padding: 0.24rem 0.42rem;
     border-bottom: 1px solid #7f3d16;
     background: linear-gradient(180deg, #bb4a14 0%, #8a320f 100%);
-    color: #ffe7c2;
+    color: #fffaf0;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.85rem;
     line-height: 1.1;
     letter-spacing: 0.02em;
     text-transform: none;
     text-align: left;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.3);
 }
 
 body .oldsite-left-column .oldsite-side-group .oldsite-side-link {
@@ -4871,12 +4877,13 @@ body .oldsite-left-column .oldsite-side-group .oldsite-side-link {
     border-radius: 0;
     background: transparent;
     box-shadow: none;
-    color: #f4dcba;
+    color: #fff5e6;
     font-family: Verdana, Tahoma, sans-serif;
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0;
     line-height: 1.15;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.3);
     text-transform: none;
     justify-content: flex-start;
     text-align: left;
@@ -4958,9 +4965,10 @@ body .oldsite-news-ticker .oldsite-news-ticker-dot {
 }
 
 body .oldsite-news-ticker .oldsite-news-ticker-dot.active {
-    background: #1a5ab0;
+    background: #4f9cf8;
     border-color: #1a5298;
     transform: scale(1.15);
+    box-shadow: 0 0 6px rgba(79, 156, 248, 0.5);
 }
 
 body .oldsite-center-column {
@@ -5161,7 +5169,8 @@ body .oldsite-top-nav .oldsite-top-nav-user {
 
 body .oldsite-top-nav .oldsite-top-nav-logout {
     border-left: 1px solid #1b3d6c;
-    color: #8aacc8;
+    color: #fffaf0;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.4);
 }
 
 body .oldsite-top-nav .oldsite-top-nav-mailbox-icon {
@@ -5190,7 +5199,7 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
     background: #111927;
     border: 1px solid #1b3d6c;
     border-radius: 5px;
-    color: #8aacc8;
+    color: #deeeff;
     box-shadow: none;
 }
 
@@ -5199,6 +5208,7 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
     border: 1px solid rgba(21, 61, 90, 0.32);
     color: #4f9cf8;
     letter-spacing: 0.04em;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 /* ── Right column widgets ─────────────────────────────────────── */
@@ -5237,9 +5247,10 @@ body .oldsite-widget h3 {
 body .oldsite-widget p,
 body .oldsite-widget small,
 body .oldsite-widget ol {
-    color: #8aacc8;
+    color: #deeeff;
     padding: 0.4rem 0.7rem;
     font-size: 0.78rem;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 /* ── Footer ───────────────────────────────────────────────────── */
@@ -5283,10 +5294,11 @@ body .oldsite-footer {
 /* Nuke ALL amber ol/li rules from the legacy Tibia blocks */
 body .oldsite-widget ol,
 body .oldsite-widget ol li {
-    color: #8aacc8;
+    color: #deeeff;
     border-bottom: none;
     list-style: none;
     padding: 0;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
     margin: 0;
     background: transparent;
     font-size: 0.82rem;
@@ -5304,10 +5316,11 @@ body .oldsite-widget ol li:nth-child(even) {
 body .oldsite-widget ol li a {
     display: block;
     padding: 0.38rem 0.55rem;
-    color: #8aacc8;
+    color: #deeeff;
     text-decoration: none;
     font-size: 0.82rem;
     font-weight: 500;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
     border-radius: 5px;
     transition: background 0.15s ease, color 0.15s ease;
 }
@@ -5442,7 +5455,8 @@ body .entity-shell.parchment-a .product-table th {
 body .entity-shell.parchment-a .product-table td {
     background: transparent;
     border-bottom: 1px solid #0f1f30;
-    color: #8aacc8;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 body .entity-shell.parchment-a .product-table tr:nth-child(even) td {
@@ -5683,9 +5697,10 @@ body .oldsite-page {
     border: 1px solid #1b3d6c;
     border-radius: 8px;
     box-shadow: none;
-    color: #8aacc8;
+    color: #deeeff;
     margin: 0.55rem 0;
     padding: 0.75rem 1rem;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .entity-shell.admin-page .admin-settings-card b,
@@ -5841,7 +5856,8 @@ body .oldsite-page {
 .entity-shell.admin-page .product-table td {
     background: rgba(26, 90, 176, 0.18);
     border-bottom: 1px solid #0f1f30;
-    color: #8aacc8;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .entity-shell.admin-page table tr:nth-child(even) td,
@@ -5900,7 +5916,8 @@ body .oldsite-page {
 }
 
 .entity-shell.admin-page .label {
-    color: #8aacc8;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .entity-shell.admin-page .operation-fee-message.ok {
@@ -5929,7 +5946,8 @@ body .oldsite-page {
 .entity-shell.admin-page .orders-review-restored-notice {
     background: #0d1825;
     border-left-color: #2d6a8a;
-    color: #8aacc8;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .entity-shell.admin-page .orders-review-restored-close {
@@ -5948,7 +5966,8 @@ body .oldsite-page {
     background: #0d1825;
     border: 1px solid #1b3d6c;
     box-shadow: none;
-    color: #8aacc8;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .entity-shell.admin-page .payment-details-card .label {
@@ -5985,7 +6004,8 @@ body .oldsite-page {
 .entity-shell.admin-page .apv-row dt,
 .entity-shell.admin-page .apv-row dd {
     border-right-color: #1b3d6c;
-    color: #8aacc8;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .entity-shell.admin-page .apv-row dt {
@@ -5999,7 +6019,8 @@ body .oldsite-page {
 .entity-shell.admin-page .apv-btn-back {
     background: #0d1825;
     border: 1px solid #1b3d6c;
-    color: #8aacc8;
+    color: #fffaf0;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.4);
 }
 
 .entity-shell.admin-page .apv-btn-edit {
@@ -6044,7 +6065,8 @@ body .oldsite-page {
 
 /* Form pages */
 .entity-shell.admin-page .form-group label {
-    color: #8aacc8;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .entity-shell.admin-page .form-group .input,
@@ -6092,7 +6114,8 @@ body .oldsite-page {
     background: #0d1825;
     border: 1px solid #1b3d6c;
     box-shadow: none;
-    color: #8aacc8;
+    color: #fffaf0;
+    text-shadow: 0 0 6px rgba(255, 230, 182, 0.4);
 }
 
 .entity-shell.admin-page .cancel-btn:hover {
@@ -6244,11 +6267,13 @@ body .admin-empty-state-hint {
 /* ── entity-muted remnants: --brown-text (#6b4726) on dark bg ──── */
 body .entity-shell-card p,
 body .entity-shell-card li {
-    color: #8aacc8;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 body .entity-shell-subtitle {
-    color: #6082a0;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 /* ── Google Maps Places Autocomplete dropdown ───────────────────── */

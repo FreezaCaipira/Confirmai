@@ -36,9 +36,10 @@
 
 .entity-shell-subtitle {
     margin: 0.58rem 0 0;
-    color: var(--entity-muted);
+    color: #deeeff;
     line-height: 1.58;
     max-width: 74ch;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 .entity-shell-grid {

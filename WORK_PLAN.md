@@ -548,6 +548,66 @@ grep -rn 'style="' Pages/ --include="*.razor" | grep -v 'display:none' | grep -v
 
 ---
 
+## Ciclo 7 (UX Improvements): Legibilidade de Fontes
+
+### Branch
+- `improve/font-contrast`
+
+### Objetivo
+Melhorar a legibilidade de fontes no sistema, especialmente em backgrounds escuros/opacos.
+
+### Problemas Identificados (UX Testing)
+- **Subtitle principal do app** (`oldsite-tagline`): quase ilegível
+- **Menu grupos, esportes, pagamentos** (`oldsite-top-nav a`): fonte muito escura, confunde com background
+- **Novidades** (`oldsite-news-ticker`): mesmo problema de contraste
+- **Sidebar links** (`oldsite-side-link`): fonte muito escura
+
+### Causa Raiz
+O app tem predominância de cores escuras/ofuscas/opacas. Quando as fontes também são escuras, há sérios problemas de contraste/legibilidade.
+
+### Melhorias Implementadas
+- `oldsite-tagline`: `#e8c89a` → `#fff5e6` + text-shadow glow
+- `oldsite-top-nav a`: `#ffe6b6` → `#fffaf0` + text-shadow glow
+- `oldsite-top-nav-user`: `#ffe6b6` → `#fffaf0` + text-shadow glow
+- `oldsite-side-group-title`: `#ffe7c2` → `#fffaf0` + text-shadow glow
+- `oldsite-side-link`: `#f4dcba` → `#fff5e6` + text-shadow glow
+- `layout-news-ticker`: `#8aacc8` → `#deeeff` + text-shadow glow
+- `oldsite-news-ticker-text` (news ticker text): adicionado `#deeeff` + text-shadow glow
+- `oldsite-news-ticker-dot` (news ticker dots): apenas `.active` fica claro (`#4f9cf8` + glow), as demais continuam `#1b3d6c`
+- `entity-shell-subtitle` (main subtitle): `var(--entity-muted)` → `#deeeff` + text-shadow glow (em site.css, EntityProfileShell.razor.css e AdminLanguages.razor.css)
+- **Todas as 14 ocorrências de `#8aacc8` em site.css**: convertidas para `#deeeff` ou `#fffaf0` com text-shadow glow
+  - Sidebar nav links
+  - Payment chip text
+  - Top nav logout
+  - Widget text (p, small, ol)
+  - Widget ol/li
+  - Widget links
+  - Product table td
+  - Admin settings card
+  - Admin table td
+  - Admin label
+  - Admin notice
+  - Payment details card
+  - APV row dt/dd
+  - APV btn-back
+  - Form group label
+  - Cancel btn
+  - Entity shell card p/li
+
+### Pattern Visual Sugerido (para WORK_PLAN/Contributing)
+**Regra de Contraste de Fontes:**
+- Em backgrounds escuros/opacos, usar cores de texto claras com alto contraste
+- Adicionar text-shadow glow suave para melhorar legibilidade
+- Exemplo: `color: #fffaf0; text-shadow: 0 0 6px rgba(255, 230, 182, 0.3);`
+- Evitar cores de texto que se misturam com o background (ex: `#ffe6b6` em `#3b2617`)
+
+### Status
+- ✅ Build: 0 erros, 47 warnings (pré-existentes)
+- ✅ Branch criada e pushada
+- ⏳ Aguardando validação visual do senior
+
+---
+
 ## Problemas Encontrados pelo Pleno
 <!-- Pleno: documente aqui qualquer bloqueio que encontrar -->
 

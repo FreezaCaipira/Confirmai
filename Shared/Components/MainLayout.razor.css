@@ -33,6 +33,8 @@
 /* ── News ticker animation ───────────────────────────────────────────── */
 .oldsite-news-ticker-text {
     animation: ticker-fade 0.5s ease-in-out;
+    color: #deeeff;
+    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
 }
 
 @keyframes ticker-fade {
