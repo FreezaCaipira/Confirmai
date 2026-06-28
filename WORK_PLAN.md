@@ -572,6 +572,8 @@ O app tem predominância de cores escuras/ofuscas/opacas. Quando as fontes tamb�
 - `oldsite-side-group-title`: `#ffe7c2` → `#fffaf0` + text-shadow glow
 - `oldsite-side-link`: `#f4dcba` → `#fff5e6` + text-shadow glow
 - `layout-news-ticker`: `#8aacc8` → `#deeeff` + text-shadow glow
+- `oldsite-news-ticker-text` (news ticker text): adicionado `#deeeff` + text-shadow glow
+- `oldsite-news-ticker-dot` (news ticker dots): `#1b3d6c` → `#4f9cf8` + box-shadow glow
 - `entity-shell-subtitle` (main subtitle): `#6082a0` → `#deeeff` + text-shadow glow
 - **Todas as 14 ocorrências de `#8aacc8` em site.css**: convertidas para `#deeeff` ou `#fffaf0` com text-shadow glow
   - Sidebar nav links
