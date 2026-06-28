@@ -562,14 +562,89 @@ done < /tmp/defined.txt
 <!-- Liste aqui rgba() que nao tem var equivalente na lista -->
 <!-- Formato: rgba(r,g,b,a) | arquivo | contexto (shadow, overlay, border) -->
 
+rgba(96, 165, 250, ...)   | GroupDetailPaymentsModal, Payments, EventPayment | border, bg, shadow
+rgba(30, 41, 59, ...)     | GroupDetailPaymentsModal                          | bg, border
+rgba(91, 163, 255, ...)   | GroupDetailPaymentsModal                          | border
+rgba(251, 191, 36, ...)   | GroupDetailPaymentsModal, Payments, EventPayment, Escalacao | border, bg, text
+rgba(245, 158, 11, ...)   | GroupDetailPaymentsModal, Payments                | border, bg
+rgba(16, 185, 129, ...)   | GroupDetailPaymentsModal, Payments                | border, bg
+rgba(100, 116, 139, ...)  | GroupDetailPaymentsModal, Payments                | border
+rgba(161, 118, 24, ...)   | GroupDetailPaymentsModal, Payments                | border
+rgba(253, 230, 138, ...)  | GroupDetailPaymentsModal, Payments                | border
+rgba(15, 26, 48, ...)     | GroupDetailPaymentsModal, EventPayment            | bg, border
+rgba(10, 22, 40, ...)     | Escalacao, EventPayment                           | bg
+rgba(51, 76, 120, ...)    | Escalacao                                         | bg, border
+rgba(255, 255, 255, ...)  | Escalacao, EventPayment                           | border, bg, text
+rgba(34, 197, 94, ...)    | Escalacao, EventPayment                           | bg, border
+rgba(59, 130, 246, ...)   | Escalacao, EventPayment                           | bg
+rgba(8, 18, 30, ...)      | Escalacao                                         | bg
+rgba(7, 20, 36, ...)      | Escalacao                                         | bg
+rgba(29, 78, 143, ...)    | Escalacao                                         | shadow
+rgba(37, 99, 235, ...)    | Escalacao                                         | shadow
+rgba(191, 219, 254, ...)  | Escalacao                                         | shadow
+rgba(219, 234, 254, ...)  | Escalacao                                         | shadow
+rgba(99, 179, 255, ...)   | EventPayment                                      | bg, border, text
+rgba(147, 197, 253, ...)  | EventPayment                                      | text-shadow
+rgba(112, 84, 52, ...)    | Payment                                           | bg
+rgba(78, 58, 36, ...)     | Payment                                           | bg
+rgba(116, 76, 37, ...)    | Payment                                           | border
+rgba(255, 251, 241, ...)  | Payment                                           | bg
+rgba(242, 226, 191, ...)  | Payment                                           | bg
+rgba(123, 79, 35, ...)    | Payment                                           | border
+rgba(184, 114, 39, ...)   | Payment                                           | bg
+rgba(255, 244, 218, ...)  | Payment                                           | bg
+rgba(255, 231, 189, ...)  | Payment                                           | shadow
+rgba(130, 87, 42, ...)    | Payment                                           | border
+rgba(250, 239, 214, ...)  | Payment                                           | bg
+rgba(252, 243, 221, ...)  | Payment                                           | bg
+rgba(128, 89, 45, ...)    | Payment                                           | border
+rgba(255, 251, 240, ...)  | Payment                                           | bg
+rgba(245, 231, 203, ...)  | Payment                                           | bg
+rgba(255, 245, 223, ...)  | Payment                                           | shadow
+rgba(254, 241, 211, ...)  | Payment                                           | bg
+rgba(236, 210, 161, ...)  | Payment                                           | bg
+rgba(255, 247, 227, ...)  | Payment                                           | shadow, text
+rgba(145, 95, 43, ...)    | Payment                                           | shadow
+rgba(95, 57, 23, ...)     | Payment                                           | bg
+rgba(93, 55, 22, ...)     | Payment                                           | bg
+rgba(238, 210, 162, ...)  | Payment                                           | bg
+rgba(224, 191, 138, ...)  | Payment                                           | bg
+rgba(148, 98, 43, ...)    | Payment                                           | border
+rgba(255, 240, 196, ...)  | Payment                                           | shadow
+rgba(79, 41, 14, ...)     | Payment                                           | shadow
+rgba(243, 205, 143, ...)  | Payment                                           | bg
+rgba(230, 179, 101, ...)  | Payment                                           | bg
+rgba(171, 112, 43, ...)   | Payment                                           | border
+rgba(255, 232, 193, ...)  | Payment                                           | shadow
+rgba(255, 200, 130, ...)  | Payment                                           | shadow
+rgba(247, 212, 161, ...)  | Payment                                           | bg
+rgba(236, 189, 128, ...)  | Payment                                           | bg
+rgba(192, 132, 66, ...)   | Payment                                           | border
+rgba(60, 20, 0, ...)      | Payment                                           | text-shadow
+rgba(34, 19, 8, ...)      | Payment                                           | shadow
+rgba(31, 79, 138, ...)    | GroupDetailPaymentsModal                          | bg
+rgba(23, 63, 115, ...)    | GroupDetailPaymentsModal                          | bg
+rgba(74, 222, 128, 0.5)   | GroupDetailPaymentsModal, Payments                | border, text-shadow (between --green-opacity-lg 0.35 and --shadow-green-lg 0.6)
+rgba(74, 222, 128, 0.15)  | GroupDetailPaymentsModal                          | bg (between --green-dark-lg 0.15 but different base color)
+rgba(239, 68, 68, 0.4)    | GroupDetailPaymentsModal, Payments                | border, shadow (between --shadow-red-sm 0.3 and --red-opacity-lg 0.5)
+rgba(239, 68, 68, 0.15)   | GroupDetailPaymentsModal                          | bg (no red opacity var at 0.15)
+rgba(239, 68, 68, 0.2)    | GroupDetailPaymentsModal, Payments                | border (no red opacity var at 0.2)
+rgba(0, 0, 0, 0.7)        | GroupDetailPaymentsModal, Payments                | overlay (between --shadow-2xl 0.6 and no overlay var at 0.7)
+
 ### Conflitos de especificidade nao resolvidos
 <!-- Liste aqui seletores com !important que nao conseguiu resolver -->
 
 ### Problemas de conversao rgba
 <!-- Liste aqui rgba() que tem a mesma cor base mas opacidade diferente das vars existentes -->
 
+rgba(74, 222, 128, 0.5)  — base matches --green-opacity-* but opacity 0.5 has no var (closest: --green-opacity-lg 0.35, --shadow-green-lg 0.6)
+rgba(239, 68, 68, 0.4)  — base matches --shadow-red-sm but opacity 0.4 has no var (closest: --shadow-red-sm 0.3, --red-opacity-lg 0.5)
+rgba(239, 68, 68, 0.15) — base matches --shadow-red-sm but opacity 0.15 has no var
+rgba(239, 68, 68, 0.2)  — base matches --shadow-red-sm but opacity 0.2 has no var
+rgba(0, 0, 0, 0.7)      — base matches --shadow-* but opacity 0.7 has no var (closest: --shadow-2xl 0.6)
+
 ### Outras observacoes
-<!-- Notas gerais sobre decisoes tomadas -->
+Fase 2: 49 conversoes realizadas nos 5 arquivos. 195 rgba() restantes sem var equivalente — cores base (blue-400, slate-800, amber-400, emerald-500, white, parchment/brown spectrum) nao tem vars rgba definidas no :root. Documentado acima para avaliacao do Senior sobre adicionar novas vars em ciclo futuro.
 
 ---
 

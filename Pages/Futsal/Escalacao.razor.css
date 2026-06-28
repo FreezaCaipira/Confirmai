@@ -28,7 +28,7 @@
     height: 64px;
     border-radius: 50%;
     background: rgba(51,76,120,.25);
-    border: 1px solid rgba(79,156,248,.2);
+    border: 1px solid var(--accent-opacity-sm);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,7 +39,7 @@
 
 .esc-gate-icon--past {
     background: rgba(79,156,248,.1);
-    border-color: rgba(79,156,248,.3);
+    border-color: var(--accent-opacity-md);
     color: var(--ci-accent);
 }
 
@@ -65,7 +65,7 @@
     margin-top: .5rem;
     padding: .45rem 1rem;
     border-radius: 8px;
-    border: 1px solid rgba(79,156,248,.3);
+    border: 1px solid var(--accent-opacity-md);
     color: var(--ci-accent);
     font-size: .85rem;
     font-weight: 600;
@@ -399,7 +399,7 @@
 .esc-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.6);
+    background: var(--shadow-2xl);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -413,7 +413,7 @@
     padding: 1.5rem;
     max-width: 420px;
     width: 100%;
-    box-shadow: 0 8px 40px rgba(0,0,0,.5);
+    box-shadow: 0 8px 40px var(--shadow-xl);
 }
 
 .esc-modal p {
@@ -535,7 +535,7 @@
     width: 3.5rem;
     padding: .4rem .5rem;
     border-radius: 7px;
-    border: 1px solid rgba(79,156,248,.4);
+    border: 1px solid var(--accent-opacity-lg);
     background: rgba(10,22,40,.7);
     color: var(--ci-text);
     font-size: 1.2rem;
@@ -672,7 +672,7 @@
     padding: .65rem .85rem;
     border-radius: 8px;
     background: rgba(79,156,248,.07);
-    border: 1px solid rgba(79,156,248,.2);
+    border: 1px solid var(--accent-opacity-sm);
     color: var(--ci-accent-mid);
     font-size: .875rem;
 }
@@ -682,7 +682,7 @@
 .esc-vote-change-btn {
     flex-shrink: 0;
     background: none;
-    border: 1px solid rgba(79,156,248,.3);
+    border: 1px solid var(--accent-opacity-md);
     border-radius: 6px;
     color: var(--ci-accent-mid);
     font-size: .75rem;
