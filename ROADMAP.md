@@ -118,6 +118,13 @@
 - [ ] Filtros e contexto visual para decisões de triagem
 - [ ] `VenueManager/VenueEdit.razor`: aplicar melhoria UF/IBGE do admin
 
+### UX Iterativo (Ciclo 8 — 28/06/2026)
+- [x] Inverter seções Métricas/Membros na página de grupo
+- [x] Melhorar contraste dos subcards de métricas
+- [x] Delimitar separadoras da tabela de partidas (visíveis mas suaves)
+- [x] Badge para partidas geradas automaticamente (semanal)
+- [x] Remover borda vermelha da aba Histórico de pagamentos do grupo
+
 ---
 
 ## Backlog

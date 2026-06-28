@@ -87,6 +87,31 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 3. **Regressao**: Substituiu `var(--entity-muted)` por `#deeeff` no EntityProfileShell.razor.css — removeu referencia a var funcional (CORRIGIDO pelo Senior)
 4. **Commits bagunçados**: 8 commits de tentativa/erro/reversao em vez de 1-2 commits limpos
 
+### Ciclo 8 — Sessao UX Interativa (Pleno Local)
+- Branch: `refactor/ciclo8-rgba-cleanup` (continuada)
+- Commits: `f490e78`, `17b3600`, `91a6674`
+
+#### Melhorias de UI/UX aplicadas (28/06/2026)
+
+**Grupo Detail (`/grupo/{id}`)**:
+1. **Inversao de secoes**: Membros agora aparece antes de Metricas (mais relevante primeiro)
+2. **Contraste de subcards de metricas**: `.metric-card` alterado de `--ci-bg-card` para `--ci-bg-card-deep` com borda `--ci-border` visivel e `border-radius: 10px`
+3. **Separadoras da tabela de partidas**: `border-bottom` das linhas trocado de `#0d1f35` (quase invisivel) para `var(--ci-border-dim)` (azul claramente visivel); hover usa tint accent sutil
+4. **Badge de partidas semanais**: Banner `.events-recurring-notice` no topo da listagem quando ha eventos com `RachaScheduleId`; icone `fa-sync-alt` por linha (`et-recurring-icon`) com tooltip
+
+**Pagamentos do Grupo (`/grupo/{id}/pagamentos`)**:
+5. **Aba Historico sem borda vermelha**: Cards da aba Historico usavam o mesmo estilo vermelho da aba Pendentes (border `--red-strong`, shadow `--shadow-red-sm`). Adicionadas classes modifier `--history` com tema verde neutro:
+   - `.payments-user-item--history`: borda neutra + hover verde
+   - `.payments-user-item--history--selected`: selecao verde sutil
+   - `.payments-detail-panel--history`: borda esquerda verde + total em verde
+
+**Arquivos modificados**:
+- `Pages/Groups/Detail.razor` (reorder + recurring badge)
+- `Shared/Components/Groups/GroupMetrics.razor.css` (contraste subcards)
+- `wwwroot/css/events.css` (separadoras + recurring notice CSS)
+- `Pages/Groups/Payments.razor` (history modifier classes)
+- `Pages/Groups/Payments.razor.css` (history neutral styling)
+
 ---
 
 ## Diagnostico CSS Atualizado (Pos-Ciclo 7 + Fix Senior)
