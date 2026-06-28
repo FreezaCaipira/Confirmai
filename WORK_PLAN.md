@@ -482,17 +482,24 @@ grep -c '!important' wwwroot/css/events.css
 
 ### Fase 5: Converter hardcoded em marketplace.css + identity.css — P2
 **Estimativa**: ~30min
+**Status**: DONE — identity.css 29→13 hex, marketplace.css 44→43 hex
 
-- `marketplace.css`: 44 hex + ~30 rgba
-- `identity.css`: 29 hex + ~5 rgba
+- `marketplace.css`: 44 hex + ~30 rgba — paleta parchment/brown própria, quase nenhuma var exata
+- `identity.css`: 29 hex + ~5 rgba — 16 conversões para vars CI
+
+**Conversões identity.css**: `#090f18`→`var(--ci-bg)`, `#f1f5f9`→`var(--ci-text)`, `#1b3d6c`→`var(--ci-border)`, `#1a5298`→`var(--ci-border-dim)`, `#deeeff`→`var(--ci-text-blue)`, `#8aacc8`→`var(--ci-text-muted)`, `#4f9cf8`→`var(--ci-accent)`, `#1a5ab0`→`var(--ci-accent-mid)`, `#f87171`→`var(--red-soft)`, `#6082a0`→`var(--ci-text-subtle)`, `rgba(0,0,0,0.3)`→`var(--shadow-md)`
+
+**Cores sem var (marketplace.css — 43 restantes)**: Paleta parchment/brown única (`#f3e2bf`, `#ebd2a7`, `#dfbf8c`, `#d8c093`, `#d8af63`, `#d8b173`, `#bfa06c`, `#b78340`, `#c69a60`, `#dfc493`, `#d6ad66`, `#b8884a`, `#b7833f`) e textos/bordas marrons (`#8b6a3d`, `#7f5e34`, `#7a572d`, `#8a6737`, `#8f6a3a`, `#8f6c3c`, `#8b683b`, `#70512a`, `#74512a`, `#715028`, `#53361c`, `#4a2f18`, `#4f3218`, `#4f3117`, `#4e3119`, `#4d2f18`, `#4c2f17`, `#5f4022`, `#5d3a1f`, `#5b391f`, `#654227`, `#6a4726`, `#6a4624`, `#6b4725`, `#7d592f`, `#7d5a34`, `#3f2914`, `#3d2612`, `#2f1e0c`, `#2e1d0b`, `#2b1a09`, `#2a1a0c`) — quase todas têm vars próximas mas NÃO exatas (off-by-1 ou -2 em cada canal).
+
+**Cores sem var (identity.css — 13 restantes)**: `#82bdd8` (hover link), `#0d1520` (input bg), `#205f88`, `#2472a8`, `#e2f0fa`, `#1c6090`, `#4e6a84`, `#12395a`, `#e2eaf5`
 
 **Validacao**:
 ```bash
-dotnet build
+dotnet build  # 0 errors ✅
 grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/marketplace.css
-# Meta: <10
+# Meta: <10 — Atual: 43 (paleta própria sem vars exatas)
 grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/identity.css
-# Meta: <10
+# Meta: <10 — Atual: 13 (55% redução)
 ```
 
 ---

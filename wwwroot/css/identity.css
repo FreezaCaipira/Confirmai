@@ -6,21 +6,21 @@
     justify-content: center;
     padding: 24px 12px;
     box-sizing: border-box;
-    background: #090f18;
-    color: #f1f5f9;
+    background: var(--ci-bg);
+    color: var(--ci-text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
 .identity-container {
-    --identity-border: #1b3d6c;
+    --identity-border: var(--ci-border);
     --identity-rhythm-tight: 0.65rem;
     --identity-rhythm-base: 0.95rem;
     --identity-rhythm-loose: 1.2rem;
     width: min(480px, 100%);
     margin: 0;
-    background: linear-gradient(154deg, #111927 0%, #0d1520 100%);
-    border: 1px solid #1b3d6c;
-    border-top: 2px solid #1a5298;
+    background: linear-gradient(154deg, var(--ci-bg-card) 0%, #0d1520 100%);
+    border: 1px solid var(--ci-border);
+    border-top: 2px solid var(--ci-border-dim);
     border-radius: 14px;
     box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.12), 0 12px 30px rgba(0, 0, 0, 0.45);
     padding: 2rem 1.9rem 1.6rem;
@@ -40,7 +40,7 @@
 .identity-container h1,
 .identity-container h2,
 .identity-container h3 {
-    color: #deeeff;
+    color: var(--ci-text-blue);
     margin-top: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     text-shadow: none;
@@ -69,7 +69,7 @@
 }
 
 .identity-container label {
-    color: #8aacc8;
+    color: var(--ci-text-muted);
     font-weight: 500;
     font-size: 0.88rem;
     position: relative;
@@ -85,10 +85,10 @@
     font-size: 0.97rem;
     box-sizing: border-box;
     border-radius: 7px;
-    border: 1px solid #1b3d6c;
+    border: 1px solid var(--ci-border);
     background: #0d1520;
     color: #e2eaf5;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 1px 3px var(--shadow-md);
     transition: border-color 0.2s, box-shadow 0.2s;
     position: relative;
     z-index: 1;
@@ -109,13 +109,13 @@
 .identity-container select:focus,
 .identity-container textarea:focus {
     outline: none;
-    border-color: #1a5ab0;
+    border-color: var(--ci-accent-mid);
     box-shadow: 0 0 0 2px rgba(26, 90, 176, 0.28);
 }
 
 .identity-container button,
 .identity-container input[type="submit"] {
-    background: linear-gradient(180deg, #1a5ab0 0%, #12395a 100%);
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, #12395a 100%);
     color: #e2f0fa;
     border: 1px solid #1c6090;
     padding: 0.68rem 1.1rem;
@@ -141,7 +141,7 @@
 }
 
 .identity-container a {
-    color: #4f9cf8;
+    color: var(--ci-accent);
     text-decoration: none;
 }
 
@@ -154,7 +154,7 @@
     top: 0.9rem;
     left: 1rem;
     text-decoration: none;
-    color: #4f9cf8;
+    color: var(--ci-accent);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -199,7 +199,7 @@
 .identity-remember input[type="checkbox"] {
     width: auto;
     margin: 0;
-    accent-color: #4f9cf8;
+    accent-color: var(--ci-accent);
 }
 
 .identity-remember label {
@@ -209,7 +209,7 @@
 
 .validation-summary-errors,
 .text-danger {
-    color: #f87171;
+    color: var(--red-soft);
 }
 
 .identity-container > .validation-summary-errors,
@@ -233,14 +233,14 @@
     justify-content: center;
     margin-top: var(--identity-rhythm-loose);
     padding-top: var(--identity-rhythm-tight);
-    border-top: 1px solid #1b3d6c;
+    border-top: 1px solid var(--ci-border);
     font-size: 0.92rem;
     position: relative;
     z-index: 1;
 }
 
 .identity-actions a {
-    color: #4f9cf8;
+    color: var(--ci-accent);
     text-decoration: underline;
     transition: color 0.2s;
 }
@@ -250,7 +250,7 @@
 }
 
 .identity-muted {
-    color: #6082a0;
+    color: var(--ci-text-subtle);
     line-height: 1.45;
     position: relative;
     z-index: 1;
@@ -259,7 +259,7 @@
 .identity-footer {
     margin-top: calc(var(--identity-rhythm-loose) + 0.2rem);
     text-align: center;
-    color: #4f9cf8;
+    color: var(--ci-accent);
     font-size: 0.88rem;
     position: relative;
     z-index: 1;
