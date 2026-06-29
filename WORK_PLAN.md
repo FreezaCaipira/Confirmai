@@ -1,6 +1,6 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 9 + revisao Senior) | Ciclo 10 ATIVO
+> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 10 + revisao Senior) | Ciclo 11 ATIVO
 > 1.674/1.674 testes passando | 0 erros de build | 0 warnings
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
@@ -46,122 +46,122 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 
 ### Ciclo 9 (Pleno Local): rgba Scoped + Decomposicao de Paginas
 - Branch: `refactor/ciclo9-vars-decomp` | PR #38
-- **Fase 1**: 11 novas vars rgba adicionadas ao `:root` (accent-opacity-xs/2xs, green-opacity-xl/2xl, shadow-3xl, blue300-opacity-xs/sm, red-opacity-sm/md, amber-opacity-sm)
-- **Fase 2**: 53 rgba convertidos em 8 arquivos scoped (de ~112 planejados)
-- **Fase 3**: 17 rgba convertidos em events.css (de ~254)
-- **Fase 4**: 16 rgba convertidos em site.css fora do `:root` (de ~154)
-- **Fase 5**: Groups/Detail.razor decomposto (826L -> 297L template + 407L code-behind + 2 sub-componentes)
-- **Fase 6**: Payment/Payment.razor decomposto (626L -> 87L template + 554L code-behind + 2 sub-componentes)
+- 11 novas vars rgba, 53 rgba convertidos em scoped, decomposicao Groups/Detail (297L) e Payment (87L)
+- **Problemas**: Conversao rgba insuficiente (123 convertiveis nao convertidos). Senior adicionou regra 17
+
+### Ciclo 10 (Pleno Local): rgba Complete + Decomposicao de Paginas
+- Branch: `refactor/ciclo10-rgba-complete-decomp` | PR #40
+- **Fase 1**: 165 rgba convertidos em 32 arquivos scoped (regra 17 seguida — TODOS os arquivos)
+- **Fase 2**: events.css rgba parcial (237 -> 220) + identity.css hex zerado (12 -> 0) + 4 fallbacks corrigidos
+- **Fase 3**: site.css hex convertidos (#ffffff -> var(--white), #fffbeb -> var(--amber-lightest))
+- **Fase 4**: Mailbox.razor decomposto (673L -> 66L template + 614L code-behind + 3 sub-componentes)
+- **Fase 5**: Poker/Detail.razor decomposto (635L -> 315L template + 194L code-behind + PokerDetailInfo)
+- **Fase 6**: Poker/Create.razor decomposto (614L -> 319L template + 276L code-behind)
 - **Detalhes da revisao Senior**: ver secao abaixo
 
 ---
 
-## Revisao Senior do Ciclo 9
+## Revisao Senior do Ciclo 10
 
-### Veredicto: DECOMPOSICAO EXCELENTE, CONVERSAO RGBA INSUFICIENTE
+### Veredicto: MELHOR CICLO ATE AGORA — conversao completa, decomposicao excelente
 
-| Metrica | C8 | C9 | Meta C9 | Status |
+| Metrica | C9 | C10 | Meta C10 | Status |
 |---------|----|----|---------|--------|
 | Hardcoded hex scoped | 0 | **0** | 0 | Atingido |
-| rgba() hardcoded scoped | 531 | **478** | <350 | **NAO atingido** |
-| CSS vars usadas (scoped) | 1.998 | **2.051** | >2.200 | Parcial |
+| rgba() hardcoded scoped | 478 | **378** | <350 | Proximo |
+| rgba convertiveis restantes | 123 | **0** | 0 | **Atingido** |
+| CSS vars usadas (scoped) | 2.051 | **2.149** | >2.200 | Proximo |
 | `!important` scoped | 1 | **1** | 1 | Atingido |
-| `!important` global | 12 | **11** | — | Estavel |
-| Hardcoded hex global | 166 | **166** | — | Nao era meta |
-| rgba() hardcoded global | 446 | **413** | — | Nao era meta |
-| Vars no `:root` | 158 | **168** | ~169 | Atingido |
+| `!important` global | 11 | **12** | — | Estavel |
+| Hardcoded hex global | 166 | **153** | — | Melhoria |
+| identity.css hex | 12 | **0** | 0 | **Zerado** |
+| events.css rgba | 237 | **220** | <180 | Parcial |
+| site.css rgba | 138 | **136** | — | Estavel |
+| Vars no `:root` | 168 | **168** | — | Estavel |
 | Vars indefinidas | 0 | **0** | 0 | Atingido |
-| Vars mortas | 0 | **1** (--entity-bg, scoped) | 0 | Aceitavel |
+| Vars mortas | 1 | **1** (--entity-bg) | 0 | Aceitavel |
+| Fallbacks | 4 | **0** | 0 | **Corrigido** |
 | Build warnings | 0 | **0** | 0 | Atingido |
-| Fallbacks | 0 | **4** | 0 | Regressao menor |
-| Groups/Detail.razor | 826L | **297L** | <400L | **Superado** |
-| Payment/Payment.razor | 626L | **87L** | <400L | **Superado** |
+| Mailbox.razor | 673L | **66L** | <400L | **Superado** |
+| Poker/Detail.razor | 635L | **315L** | <400L | **Superado** |
+| Poker/Create.razor | 614L | **319L** | <400L | **Superado** |
 
 ### O que deu CERTO
 
-**Decomposicao (Fases 5-6) — EXCELENTE**:
-- `Groups/Detail.razor`: 826L -> 297L template + 407L code-behind. Padrao correto: `partial class`, `IAsyncDisposable`, `IDbContextFactory`, sub-componentes com `[Parameter]` e `EventCallback`
-- `Payment/Payment.razor`: 626L -> 87L template + 554L code-behind. Sub-componentes `PaymentProductSummary` e `PaymentCheckoutPanel` com tipagem limpa
-- `GroupDetailEvents` e `GroupDetailPendingRequests` extraidos com parametros bem tipados
-- Groups/Detail usa `IDbContextFactory` (padrao correto), Payment usa `AppDbContext` direto (pre-existente, nao introducido pelo Pleno)
+**Conversao rgba (Fase 1) — EXCELENTE**:
+- 165 rgba convertidos em **32 arquivos** — cobertura total, regra 17 respeitada
+- Zero rgba convertiveis restantes (verificado por grep: todos os padroes com var existente foram convertidos)
+- Mesmo arquivo `Pages/Docs/Integration.razor.css` (binary) foi incluido
 
-**Vars adicionadas (Fase 1)**: Todas 11 novas vars estao em uso (verificado por grep). Regra 13 respeitada.
+**Decomposicao (Fases 4-6) — EXCELENTE**:
+- `Mailbox.razor`: 673L -> 66L. Tres sub-componentes limpos: `MailboxFilters`, `MailboxConversationList`, `MailboxThreadPane`. Usa `IDbContextFactory` (correto)
+- `Poker/Detail.razor`: 635L -> 315L. `PokerDetailInfo` extraido com `[Parameter] Event`. Usa `IDbContextFactory` (correto)
+- `Poker/Create.razor`: 614L -> 319L. Code-behind com `CreatePokerEventForm` sealed class. Usa `IDbContextFactory` (correto)
 
-**Commits**: 6 commits limpos, 1 por fase, branch unica. Regra 9 e 14 respeitadas.
+**Fallbacks corrigidos**: Os 4 fallbacks de Ciclo 9 foram eliminados (events.css, identity.css)
 
-### O que NAO deu certo
+**Commits**: 6 commits limpos, 1 por fase, branch unica. Regras 9 e 14 respeitadas
 
-**Conversao rgba (Fases 2-4) — INSUFICIENTE**:
-- Fase 2 converteu apenas 53 de ~112 rgba convertiveis em scoped CSS
-- Restam **123 rgba que TEM var existente** e NAO foram convertidas:
-  - `rgba(0,0,0,0.3)` -> `var(--shadow-md)`: **16 usos restantes**
-  - `rgba(0,0,0,0.4)` -> `var(--shadow-lg)`: **19 usos restantes**
-  - `rgba(79,156,248,0.1)` -> `var(--accent-opacity-xs)`: **16 usos restantes**
-  - `rgba(79,156,248,0.3)` -> `var(--accent-opacity-md)`: **13 usos restantes**
-  - `rgba(79,156,248,0.5)` -> `var(--accent-opacity-xl)`: **12 usos restantes**
-  - `rgba(79,156,248,0.4)` -> `var(--accent-opacity-lg)`: **9 usos restantes**
-  - `rgba(0,0,0,0.6)` -> `var(--shadow-2xl)`: **6 usos restantes**
-  - `rgba(0,0,0,0.5)` -> `var(--shadow-xl)`: **4 usos restantes**
-  - E mais ~28 usos de green-opacity, red-opacity, accent-opacity
-- Isso NAO e aceitavel — as vars existem, o mapeamento foi fornecido, bastava aplicar
-- Fase 3 (events.css): apenas 17 convertidos. O arquivo tem formatacao diferente (`rgba(96,165,250,0.3)` sem espacos) que pode ter confundido o Pleno
+### Problemas encontrados
 
-**4 fallbacks reintroduzidos**:
-- `events.css:2082`: `background: #0e2236;` (hex inline junto com var)
-- `identity.css:21,118`: gradientes lineares com hex inline
-- `site.css:6211`: comentario com hex (nao e codigo, baixo impacto)
+**Encoding corrompido (13 + 7 + 4 = 24 linhas em 6 arquivos)**:
+O Pleno corrompeu encoding UTF-8 -> Latin-1 em comentarios CSS ao editar os arquivos:
+- `events.css`: 13 linhas (em dashes `—` -> `�`, acentos `á/ó/ã` -> `�`)
+- `Pages/Docs/Integration.razor.css`: 7 linhas
+- `Pages/Futsal/Create.razor.css`: 1 linha
+- `Pages/Product/Products.razor.css`: 1 linha
+- `Shared/Components/CookieConsent.razor.css`: 1 linha
+- `Shared/Components/MainLayout.razor.css`: 1 linha
 
-### Nova regra para o Pleno
+**Fix aplicado pelo Senior**: Restaurados os caracteres UTF-8 originais a partir do git history.
 
-**Regra 17**: Ao converter rgba -> var, cobrir TODOS os arquivos scoped (.razor.css), nao apenas os 8-10 maiores. Usar o mapeamento fornecido como checklist e verificar cada padrao com grep global.
+**Nova regra 18**: NUNCA salvar arquivos CSS com encoding diferente de UTF-8. Se o editor local nao suporta UTF-8, nao editar linhas com caracteres acentuados.
+
+**events.css conversao parcial**: Apenas 17 de 237 rgba convertidos. Os restantes (220) sao padroes unicos sem var correspondente (opacities especificas de events: `rgba(96,165,250,0.35)`, `rgba(239,68,68,0.08)`, `rgba(251,191,36,0.85)`, etc.).
 
 ---
 
-## Metricas Atuais (pos-Ciclo 9)
+## Metricas Atuais (pos-Ciclo 10 + fix Senior)
 
-| Metrica | C3 | C4 | C5 | C6/C7 | C8 | C9 |
+| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 |
 |---------|----|----|----|----|-----|-----|
-| Warnings (build) | ~50 | 2 | 0 | 0 | 0 | **0** |
-| `!important` scoped | 16 | 1 | 1 | 1 | 1 | **1** |
-| `!important` global | — | — | — | 17 | 12 | **11** |
-| Hardcoded hex scoped | 1.387 | 1.099 | 867 | 0 | 0 | **0** |
-| rgba() hardcoded scoped | — | — | — | 645 | 531 | **478** |
-| Hardcoded hex global | — | — | — | ~1.317 | 166 | **166** |
-| rgba() hardcoded global | — | — | — | ~185 | 446 | **413** |
-| CSS vars (scoped) | 381 | 673 | 1.175 | 2.053 | 1.998 | **2.051** |
-| CSS vars total | — | — | — | — | 3.513 | **3.609** |
-| Inline estaticos | ~35 | 6 | 0 | 0 | 0 | **0** |
-| Vars no `:root` | ~68 | ~68 | 105 | 179 | 158 | **168** |
-| Vars indefinidas | — | — | 0 | 0 | 0 | **0** |
-| Vars mortas `:root` | — | — | — | 18 | 0 | **0** |
-| Fallbacks | — | — | 178 | 0 | 0 | **4** |
+| Warnings (build) | 2 | 0 | 0 | 0 | 0 | **0** |
+| `!important` scoped | 1 | 1 | 1 | 1 | 1 | **1** |
+| `!important` global | — | — | 17 | 12 | 11 | **12** |
+| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | **0** |
+| rgba() hardcoded scoped | — | — | 645 | 531 | 478 | **378** |
+| Hardcoded hex global | — | — | ~1.317 | 166 | 166 | **153** |
+| rgba() hardcoded global | — | — | ~185 | 446 | 413 | **394** |
+| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | **2.149** |
+| CSS vars total | — | — | — | 3.513 | 3.609 | **3.739** |
+| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | **168** |
+| Vars indefinidas | — | 0 | 0 | 0 | 0 | **0** |
+| Vars mortas `:root` | — | — | 18 | 0 | 0 | **0** |
+| Fallbacks | — | 178 | 0 | 0 | 4 | **0** |
 
-### Estado dos CSS globais (pos-Ciclo 9)
+### Estado dos CSS globais (pos-Ciclo 10)
 
 | Arquivo | Hex hardcoded | rgba hardcoded | `!important` | var() usadas |
 |---------|-------------|----------------|-------------|--------------|
-| site.css (fora :root) | 4 | 138 | 11 | ~1.100 |
-| events.css | 111 | 237 | 0 | ~400 |
+| site.css (fora :root) | 2 | 136 | 11 | ~1.100 |
+| events.css | 110 | 220 | 0 | ~400 |
 | marketplace.css | 43 | 35 | 0 | 1 |
-| identity.css | 12 | 3 | 0 | 32 |
-| **Total globais** | **170** | **413** | **11** | **~1.533** |
+| identity.css | 0 | 3 | 0 | ~32 |
+| **Total globais** | **155** | **394** | **11** | **~1.533** |
 
 ### Paginas grandes (>500 linhas)
 
 | Arquivo | Linhas | Status |
 |---------|--------|--------|
-| AdminPayments.razor | 1.156 | 4 sub-componentes extraidos |
+| AdminPayments.razor | 1.156 | 4 sub-componentes ja extraidos |
 | Futsal/Detail.razor | 931 | 9 sub-componentes em Components/ |
-| Mailbox.razor | 673 | Candidato decomposicao |
 | Payment/EventPayment.razor | 667 | 7 sub-componentes em Components/ |
 | Futsal/Escalacao.razor | 661 | 6 sub-componentes em Components/ |
 | Admin/AdminLogs.razor | 656 | 1 sub-componente (AdminLogsTable) |
-| Poker/Detail.razor | 634 | Candidato decomposicao |
-| Poker/Create.razor | 613 | Candidato decomposicao |
 | Groups/Payments.razor | 560 | Candidato decomposicao |
 | Poker/Edit.razor | 547 | Candidato decomposicao |
 
-*Groups/Detail (297L) e Payment/Payment (87L) saíram da lista — decomposicao Ciclo 9 bem-sucedida.*
+*Mailbox (66L), Poker/Detail (315L), Poker/Create (319L) saíram da lista — decomposicao Ciclo 10.*
 
 ---
 
@@ -183,7 +183,8 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 14. **Commits limpos** — 1 commit por fase, sem commits de tentativa/erro/reversao. Testar ANTES de commitar
 15. **NUNCA remover var do `:root` sem verificar uso em TODOS os arquivos** — usar `grep -rn 'var(--nome)' Pages/ Shared/ wwwroot/css/` antes de remover. Se tem uso, NAO remover
 16. **Separar CSS refactoring de features UX** — nao misturar os dois no mesmo ciclo/PR
-17. **Cobrir TODOS os arquivos ao converter rgba** — nao pular arquivos. Usar grep global para encontrar todos os usos de cada padrao e converter todos de uma vez
+17. **Cobrir TODOS os arquivos ao converter rgba** — grep global para cada padrao, converter todos de uma vez
+18. **NUNCA salvar CSS com encoding diferente de UTF-8** — verificar encoding antes de commitar. Se o editor corromper acentos em comentarios, reverter a linha com `git checkout -- arquivo` antes de commitar
 
 ---
 
@@ -411,169 +412,141 @@ var(--ci-font)           /* system sans-serif stack */
 
 ---
 
-## Ciclo 10 — Tarefas Ativas
+## Ciclo 11 — Tarefas Ativas
 
-**Foco**: Completar conversao rgba scoped (que ficou pendente no Ciclo 9) + iniciar decomposicao de paginas grandes
+**Foco**: Criar vars para rgba frequentes em events.css + marketplace.css refactoring + decomposicao
 
-**Branch**: `refactor/ciclo10-rgba-complete-decomp`
+**Branch**: `refactor/ciclo11-events-marketplace-decomp`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 
-### Fase 1: Converter 123 rgba com vars existentes em scoped CSS — P0
-**Estimativa**: ~2h
+### Fase 1: Adicionar ~12 novas vars rgba ao `:root` para events.css — P0
+**Estimativa**: ~20 min
 
-O Ciclo 9 deixou 123 rgba que TEM var equivalente sem converter. Usar o mapeamento abaixo e converter **TODOS** os arquivos scoped (Pages/ e Shared/ *.razor.css).
+events.css tem 220 rgba, muitos com 3-6 usos cada. Adicionar vars para os padroes mais frequentes:
 
-**Procedimento**:
-1. Para cada padrao na tabela, executar: `grep -rn 'PADRAO' Pages/ Shared/ --include="*.css"`
-2. Substituir cada ocorrencia pela var correspondente
-3. Verificar com `dotnet build` apos cada arquivo
+```css
+/* Blue-300 mid opacity (96,165,250) */
+--blue300-opacity-md:  rgba(96, 165, 250, 0.3);    /* 6 usos */
+--blue300-opacity-lg:  rgba(96, 165, 250, 0.35);   /* 4 usos */
+--blue300-opacity-xl:  rgba(96, 165, 250, 0.5);    /* 3 usos */
+--blue300-opacity-2xl: rgba(96, 165, 250, 0.85);   /* 4 usos */
 
-**Mapeamento COMPLETO** (mesma lista do Ciclo 9 — TODOS devem ser convertidos):
-```
-rgba(0, 0, 0, 0.3)         -> var(--shadow-md)          [16 usos]
-rgba(0, 0, 0, 0.4)         -> var(--shadow-lg)          [19 usos]
-rgba(0, 0, 0, 0.5)         -> var(--shadow-xl)          [4 usos]
-rgba(0, 0, 0, 0.6)         -> var(--shadow-2xl)         [6 usos]
-rgba(0, 0, 0, 0.7)         -> var(--shadow-3xl)         [1 uso]
-rgba(79, 156, 248, 0.1)    -> var(--accent-opacity-xs)  [16 usos]
-rgba(79, 156, 248, 0.15)   -> var(--accent-opacity-2xs) [7 usos]
-rgba(79, 156, 248, 0.2)    -> var(--accent-opacity-sm)  [5 usos]
-rgba(79, 156, 248, 0.3)    -> var(--accent-opacity-md)  [13 usos]
-rgba(79, 156, 248, 0.4)    -> var(--accent-opacity-lg)  [9 usos]
-rgba(79, 156, 248, 0.5)    -> var(--accent-opacity-xl)  [12 usos]
-rgba(74, 222, 128, 0.3)    -> var(--green-opacity-md)   [5 usos]
-rgba(74, 222, 128, 0.35)   -> var(--green-opacity-lg)   [4 usos]
-rgba(239, 68, 68, 0.2)     -> var(--red-opacity-sm)     [1 uso]
-rgba(239, 68, 68, 0.3)     -> var(--shadow-red-sm)      [1 uso]
-rgba(239, 68, 68, 0.5)     -> var(--red-opacity-lg)     [1 uso]
-rgba(251, 191, 36, 0.3)    -> var(--amber-opacity-sm)   [2 usos]
-rgba(147, 197, 253, 0.2)   -> var(--inset-accent-sm)    [1 uso]
+/* Red event opacity (239,68,68) */
+--red-opacity-xs:      rgba(239, 68, 68, 0.08);    /* 6 usos */
+--red-opacity-lg-mid:  rgba(239, 68, 68, 0.35);    /* 6 usos */
+
+/* Amber event opacity (251,191,36) */
+--amber-opacity-xs:    rgba(251, 191, 36, 0.08);   /* 5 usos */
+--amber-opacity-md:    rgba(251, 191, 36, 0.25);   /* 3 usos */
+--amber-opacity-lg:    rgba(251, 191, 36, 0.35);   /* 3 usos */
+--amber-opacity-2xl:   rgba(251, 191, 36, 0.85);   /* 3 usos */
+
+/* Emerald (52,211,153) */
+--emerald-opacity-md:  rgba(52, 211, 153, 0.3);    /* 3 usos */
+
+/* Slate extended (148,163,184) */
+--slate-border-xl:     rgba(148, 163, 184, 0.25);  /* 3 usos */
 ```
 
-**ATENCAO**: Alguns arquivos usam formatacao sem espacos (`rgba(0,0,0,0.3)`) e outros com espacos (`rgba(0, 0, 0, 0.3)`). Buscar AMBOS os formatos:
-```bash
-grep -rn 'rgba(0, 0, 0, 0.3)\|rgba(0,0,0,0.3)\|rgba(0,0,0,.3)' Pages/ Shared/ --include="*.css"
-```
+**Total**: ~12 novas vars para ~49 usos em events.css
 
-**Validacao**:
-```bash
-dotnet build
-# Verificar que TODOS os padroes acima tem 0 ocorrencias restantes:
-grep -rn 'rgba(0, 0, 0, 0.3)\|rgba(0,0,0,0.3)' Pages/ Shared/ --include="*.css" | wc -l
-# Meta: 0 para cada padrao da tabela
-```
+**Validacao**: `dotnet build`
 
 ---
 
-### Fase 2: Converter rgba com vars existentes em events.css — P0
+### Fase 2: Converter rgba em events.css usando novas + existentes vars — P0
 **Estimativa**: ~1.5h
 
-events.css tem 237 rgba. Muitos usam formatacao SEM espacos. Converter usando o mesmo mapeamento da Fase 1, mas tambem incluir padroes com formatacao compacta:
+Converter os ~49 rgba que agora tem vars (da Fase 1) + qualquer padrao restante com var existente.
 
-```
-rgba(0,0,0,.3)             -> var(--shadow-md)
-rgba(0,0,0,.4)             -> var(--shadow-lg)
-rgba(0,0,0,.5)             -> var(--shadow-xl)
-rgba(96,165,250,0.3)       -> var(--blue300-opacity-sm) [NOTA: 96,165,250 = blue-300, nao accent]
-rgba(96,165,250,0.5)       -> var(--sky-blue-md)        [NOTA: reutilizar se for 125,211,252 — senao DOCUMENTAR]
-rgba(74,222,128,0.35)      -> var(--green-opacity-lg)
-rgba(74,222,128,0.3)       -> var(--green-opacity-md)
-rgba(239,68,68,0.35)       -> DOCUMENTAR (sem var existente)
-rgba(239,68,68,0.08)       -> DOCUMENTAR (sem var existente)
-rgba(251,191,36,0.08)      -> DOCUMENTAR (sem var existente)
-```
-
-**IMPORTANTE**: Para cores sem var correspondente, NAO inventar vars. Documentar na secao "Cores sem Var" no fim deste arquivo.
+**ATENCAO encoding**: NAO editar linhas com caracteres acentuados nos comentarios. Se precisar editar perto de um comentario com acentos, copiar a linha original sem modificar o comentario.
 
 **Validacao**:
 ```bash
 dotnet build
 grep -c 'rgba(' wwwroot/css/events.css
-# Meta: <180 (muitos serao unicos sem var)
+# Meta: <175
 ```
 
 ---
 
-### Fase 3: Converter rgba com vars existentes em site.css (fora do :root) — P1
-**Estimativa**: ~1h
+### Fase 3: Refatorar marketplace.css — hex -> vars — P1
+**Estimativa**: ~1.5h
 
-site.css tem 138 rgba fora do `:root`. Converter os padroes com var existente.
+marketplace.css tem 43 hex e apenas 1 var usage. E o CSS global menos refatorado. Os hex sao todos tons de brown/parchment que tem vars existentes:
 
-Os 4 hex restantes em site.css (`#e0f7f4`, `#ffffff`, `#ecfdf5`, `#fffbeb`) sao text colors de botoes metalicos. Converter:
 ```
-#ffffff  -> var(--white)
-#fffbeb  -> var(--amber-lightest)
-#e0f7f4  -> DOCUMENTAR (sem var)
-#ecfdf5  -> DOCUMENTAR (sem var)
+#d8c093 -> var(--parchment-dark)    ou similar
+#bfa06c -> var(--gold-deep)         ou similar
+#7f5e34 -> var(--brown-mid)         ou similar
+#3f2914 -> var(--bg-dark)           ou similar
+#2f1e0c -> var(--bg-deep)           ou similar
 ```
+
+**PROCEDIMENTO**: Para cada hex, encontrar a var mais proxima na lista permitida. Se nao existir var proxima, documentar na secao "Cores sem Var".
 
 **Validacao**:
 ```bash
 dotnet build
+grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/marketplace.css
+# Meta: <15
 ```
 
 ---
 
-### Fase 4: Decomposicao de Mailbox.razor (673L -> <400L) — P2
-**Estimativa**: ~2h
+### Fase 4: Decomposicao de Groups/Payments.razor (560L -> <400L) — P2
+**Estimativa**: ~1.5h
 
-Extrair sub-componentes seguindo o padrao de Groups/Detail (Ciclo 9):
+Extrair sub-componentes seguindo o padrao de Mailbox (Ciclo 10):
 
-1. `MailboxConversationList` — lista lateral de conversas
-2. `MailboxMessageThread` — thread de mensagens da conversa selecionada
-3. `MailboxComposePanel` — formulario de nova mensagem/resposta
+1. `GroupPaymentsSummary` — resumo financeiro do grupo
+2. `GroupPaymentsTable` — tabela de pagamentos com filtros
 
 **REGRAS de decomposicao**:
 - Componente filho recebe dados via `[Parameter]`
 - Eventos de volta via `[Parameter] EventCallback`
 - CSS vai no `.razor.css` do componente filho (NAO global)
-- Se o CSS precisa estilizar netos, usar `::deep` (NAO mover para global)
-- O `.razor` pai fica como orquestrador (lifecycle, data loading, routing)
-- Usar `partial class` com code-behind `.razor.cs` para logica C#
+- Usar `partial class` com code-behind `.razor.cs`
+- Usar `IDbContextFactory<AppDbContext>` (NAO AppDbContext direto)
 
 **Validacao**:
 ```bash
 dotnet build
 dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Mailbox.razor
+wc -l Pages/Groups/Payments.razor
 # Meta: <400
 ```
 
 ---
 
-### Fase 5: Decomposicao de Poker/Detail.razor (634L -> <400L) — P2
+### Fase 5: Decomposicao de Poker/Edit.razor (547L -> <400L) — P2
 **Estimativa**: ~1.5h
 
-Similar a Fase 4. Seguir o padrao de Futsal/Detail que ja tem 9 sub-componentes:
+Similar a Poker/Create. Extrair:
 
-1. `PokerDetailHeader` — cabecalho + badges + status
-2. `PokerDetailPlayers` — lista de jogadores + confirmacoes
-3. `PokerDetailPayments` — resumo de pagamentos + acoes admin
+1. Code-behind `Poker/Edit.razor.cs` — logica de edicao
+2. Reutilizar `PokerDetailInfo` se aplicavel
 
 **Validacao**:
 ```bash
 dotnet build
 dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Poker/Detail.razor
+wc -l Pages/Poker/Edit.razor
 # Meta: <400
 ```
 
 ---
 
-### Fase 6: Decomposicao de Poker/Create.razor (613L -> <400L) — P2
-**Estimativa**: ~1.5h
+### Fase 6: Converter rgba restantes em site.css (fora do :root) — P1
+**Estimativa**: ~1h
 
-Extrair formulario de criacao:
+site.css tem 136 rgba fora do `:root`. Muitos sao padroes unicos de metallic gradients. Converter os que tem var existente e documentar os que nao tem.
 
-1. `PokerCreateForm` — campos do formulario de criacao
-2. `PokerCreatePreview` — preview do evento antes de criar
+Os 2 hex restantes (`#e0f7f4`, `#ecfdf5`) sao mint green sem var — documentar na secao "Cores sem Var".
 
 **Validacao**:
 ```bash
 dotnet build
-dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Poker/Create.razor
-# Meta: <400
 ```
 
 ---
@@ -581,10 +554,10 @@ wc -l Pages/Poker/Create.razor
 ## Ordem de Execucao
 
 ```
-Fase 1 (rgba scoped TODOS) -> Fase 2 (events.css rgba) -> Fase 3 (site.css rgba+hex) -> Fase 4 (decomp Mailbox) -> Fase 5 (decomp Poker/Detail) -> Fase 6 (decomp Poker/Create)
+Fase 1 (novas vars) -> Fase 2 (events.css rgba) -> Fase 3 (marketplace.css hex) -> Fase 4 (decomp Groups/Payments) -> Fase 5 (decomp Poker/Edit) -> Fase 6 (site.css rgba)
 ```
 
-**Meta Ciclo 10**: rgba scoped <350, rgba events <180, 3 paginas decompostas (<400L cada)
+**Meta Ciclo 11**: events.css rgba <175, marketplace.css hex <15, 2 paginas decompostas (<400L cada), site.css rgba <120
 
 ---
 
@@ -617,12 +590,23 @@ cat /tmp/defined.txt /tmp/local.txt | sort -u > /tmp/all.txt
 comm -23 /tmp/used.txt /tmp/all.txt
 # Meta: 0 linhas
 
-# Verificar vars mortas (definidas mas nao usadas):
+# Verificar vars mortas:
 while IFS= read -r var; do
   count=$(grep -rPo "var\(--${var}\)" Pages/ Shared/ wwwroot/css/ --include="*.css" | wc -l)
   if [ "$count" -eq 0 ]; then echo "MORTA: --$var"; fi
 done < /tmp/defined.txt
 # Meta: 0
+
+# Verificar encoding UTF-8:
+python3 -c "
+import glob
+for p in ['Pages/**/*.css','Shared/**/*.css','wwwroot/css/*.css']:
+    for f in glob.glob(p, recursive=True):
+        with open(f,'rb') as fh:
+            try: fh.read().decode('utf-8')
+            except: print(f'ENCODING: {f}')
+"
+# Meta: 0 arquivos listados
 ```
 
 ---
@@ -631,8 +615,8 @@ done < /tmp/defined.txt
 <!-- Pleno: documente aqui qualquer bloqueio que encontrar -->
 
 ### Cores sem Var correspondente
-<!-- Liste aqui rgba() que nao tem var equivalente na lista -->
-<!-- Formato: rgba(r,g,b,a) | arquivo | contexto (shadow, overlay, border) -->
+<!-- Liste aqui rgba() ou hex que nao tem var equivalente na lista -->
+<!-- Formato: valor | arquivo | contexto (shadow, overlay, border, gradient) -->
 
 ### Conflitos de especificidade nao resolvidos
 <!-- Liste aqui seletores com !important que nao conseguiu resolver -->
