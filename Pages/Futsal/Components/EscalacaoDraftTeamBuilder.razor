@@ -19,7 +19,7 @@
             @foreach (var s in TeamA.Where(s => s.IsGoalkeeper))
             {
                 <li class="esc-player esc-player--gk">
-                    <span class="esc-player-icon">🥅</span>
+                    <span class="esc-player-icon">�</span>
                     <span class="esc-player-name">@s.Name</span>
                     <button class="esc-move-btn" title="Mover para Time B" @onclick="() => HandleMovePlayer(s, true)">
                         <i class="fas fa-arrow-right"></i>
@@ -59,7 +59,7 @@
                     <button class="esc-move-btn" title="Mover para Time A" @onclick="() => HandleMovePlayer(s, false)">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <span class="esc-player-icon">🥅</span>
+                    <span class="esc-player-icon">�</span>
                     <span class="esc-player-name">@s.Name</span>
                 </li>
             }
