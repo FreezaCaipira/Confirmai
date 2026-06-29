@@ -91,6 +91,8 @@
             "convite"   => "Convite",
             "grupos"    => "Grupos",
             "grupo"     => "Grupo",
+            "futsal"    => "Futsal",
+            "poker"     => "Poker",
             "edit" => T["Breadcrumb.Edit"],
             "view" => T["Breadcrumb.View"],
             "buy" => T["Breadcrumb.Buy"],
@@ -139,7 +141,29 @@
         var currentUri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var currentQuery = QueryHelpers.ParseQuery(currentUri.Query);
 
-        var path = string.Join('/', OriginalSegments.Take(index + 1));
+        // Use the raw path segments (including IDs) to build intermediate URLs
+        var rawPath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+        var rawSegments = rawPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        // Map raw segments to the same indices as filtered segments by walking both lists
+        var filteredIndex = -1;
+        var rawIndexUpTo = -1;
+        for (int i = 0; i < rawSegments.Length; i++)
+        {
+            if (!IsIdSegment(rawSegments[i]))
+                filteredIndex++;
+
+            if (filteredIndex == index)
+            {
+                rawIndexUpTo = i;
+                break;
+            }
+        }
+
+        if (rawIndexUpTo < 0)
+            return "/";
+
+        var path = string.Join('/', rawSegments.Take(rawIndexUpTo + 1));
         var target = "/" + path;
 
         // For payment routes, prefer exact returnUrl (origin page) when available.
