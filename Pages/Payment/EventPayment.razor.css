@@ -99,6 +99,40 @@
     margin: 0 0 0.75rem;
 }
 
+.evpay-admin-confirm-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.evpay-admin-confirm-label {
+    font-size: 0.88rem;
+    color: var(--ci-text-muted);
+}
+
+.evpay-admin-confirm-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.evpay-admin-confirm-btn--yes {
+    flex: 1;
+    background: rgba(74, 222, 128, 0.15);
+    border-color: rgba(74, 222, 128, 0.5);
+}
+
+.evpay-admin-confirm-btn--no {
+    flex: 1;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: var(--red-soft);
+}
+
+.evpay-admin-confirm-btn--no:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.55);
+}
+
 .evpay-admin-review .detail-back-link {
     display: inline-flex;
     align-items: center;

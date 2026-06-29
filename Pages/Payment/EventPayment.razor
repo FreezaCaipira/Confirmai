@@ -56,7 +56,23 @@
 
                 @if (conf.PaymentStatus == EventConfirmationPaymentStatus.Paid || payState == PayState.Paid)
                 {
-                    <EventPaymentStatus BackUrl="@backUrl" />
+                    @if (isAdminViewing)
+                    {
+                        <div class="evpay-status evpay-status--paid">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <strong>Pagamento confirmado</strong>
+                                <p>Pagamento de @conf.User?.FullName foi confirmado.</p>
+                            </div>
+                        </div>
+                        <a href="@backUrl" class="evpay-action-btn evpay-action-btn--back">
+                            <i class="fas fa-arrow-left"></i> Voltar para a partida
+                        </a>
+                    }
+                    else
+                    {
+                        <EventPaymentStatus BackUrl="@backUrl" />
+                    }
                 }
                 else if (isAdminViewing)
                 {
@@ -75,30 +91,64 @@
                             {
                                 <p class="evpay-admin-error">Erro ao confirmar pagamento. Tente novamente.</p>
                             }
-                            <button class="evpay-admin-confirm-btn" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
-                                @if (adminMarkPaidLoading)
-                                {
-                                    <i class="fas fa-spinner fa-spin"></i> <span>Confirmando…</span>
-                                }
-                                else
-                                {
+                            @if (adminConfirmPay)
+                            {
+                                <div class="evpay-admin-confirm-row">
+                                    <span class="evpay-admin-confirm-label">Confirmar pagamento de @conf.User?.FullName?</span>
+                                    <div class="evpay-admin-confirm-actions">
+                                        <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--yes" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
+                                            @if (adminMarkPaidLoading)
+                                            {
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-check"></i> <span>Sim, confirmar</span>
+                                            }
+                                        </button>
+                                        <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--no" type="button" @onclick="() => adminConfirmPay = false">
+                                            <i class="fas fa-times"></i> <span>Cancelar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <button class="evpay-admin-confirm-btn" type="button" @onclick="() => adminConfirmPay = true">
                                     <i class="fas fa-check"></i> <span>Confirmar pagamento</span>
-                                }
-                            </button>
+                                </button>
+                            }
                         }
                         else
                         {
                             <p class="evpay-admin-no-proof">O jogador ainda não enviou comprovante.</p>
-                            <button class="evpay-admin-confirm-btn" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
-                                @if (adminMarkPaidLoading)
-                                {
-                                    <i class="fas fa-spinner fa-spin"></i> <span>Confirmando…</span>
-                                }
-                                else
-                                {
+                            @if (adminConfirmPay)
+                            {
+                                <div class="evpay-admin-confirm-row">
+                                    <span class="evpay-admin-confirm-label">Marcar @conf.User?.FullName como pago?</span>
+                                    <div class="evpay-admin-confirm-actions">
+                                        <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--yes" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
+                                            @if (adminMarkPaidLoading)
+                                            {
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-check"></i> <span>Sim, confirmar</span>
+                                            }
+                                        </button>
+                                        <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--no" type="button" @onclick="() => adminConfirmPay = false">
+                                            <i class="fas fa-times"></i> <span>Cancelar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <button class="evpay-admin-confirm-btn" type="button" @onclick="() => adminConfirmPay = true">
                                     <i class="fas fa-check"></i> <span>Marcar como pago</span>
-                                }
-                            </button>
+                                </button>
+                            }
                         }
                         <a href="@backUrl" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar para a partida</a>
                     </div>
@@ -162,6 +212,7 @@
     private bool isAdminViewing;
     private bool adminMarkPaidLoading;
     private bool adminMarkPaidError;
+    private bool adminConfirmPay;
 
     private PayState payState = PayState.Idle;
     private string?  brCode;
