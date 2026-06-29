@@ -272,6 +272,30 @@
     --slate-dark:          #334155;
     --slate-pale:          #e2e8f0;
     --slate-warm:          #78716c;
+
+    /* ── Ciclo 9 Fase 1 — novas vars rgba ── */
+
+    /* Accent subtle (blue-400 low opacity) */
+    --accent-opacity-xs:   rgba(79, 156, 248, 0.1);
+    --accent-opacity-2xs:  rgba(79, 156, 248, 0.15);
+
+    /* Green mid opacity */
+    --green-opacity-xl:    rgba(74, 222, 128, 0.5);
+    --green-opacity-2xl:   rgba(74, 222, 128, 0.6);
+
+    /* Black heavy */
+    --shadow-3xl:          rgba(0, 0, 0, 0.7);
+
+    /* Blue-300 (96,165,250) — cor diferente de accent (79,156,248) */
+    --blue300-opacity-xs:  rgba(96, 165, 250, 0.1);
+    --blue300-opacity-sm:  rgba(96, 165, 250, 0.2);
+
+    /* Red mid opacity */
+    --red-opacity-sm:      rgba(239, 68, 68, 0.2);
+    --red-opacity-md:      rgba(239, 68, 68, 0.4);
+
+    /* Amber opacity (251,191,36) */
+    --amber-opacity-sm:    rgba(251, 191, 36, 0.3);
 }
 
 /* ================================================================
