@@ -1,5 +1,4 @@
 @inject UiTextService T
-@using Microsoft.AspNetCore.Components.Web.Virtualization
 
 @if (TotalItems == 0)
 {
@@ -36,7 +35,8 @@ else
                 </tr>
             </thead>
             <tbody>
-                <Virtualize Context="log" ItemsProvider="LoadLogsAsync" OverscanCount="10">
+                @foreach (var log in Logs)
+                {
                     <tr>
                         <td data-label="@T["AdminLogs.DateTime"]">@log.Timestamp.ToLocalTime().ToString("dd MMM yyyy, HH:mm:ss")</td>
                         <td data-label="@T["AdminLogs.Level"]">
@@ -72,15 +72,33 @@ else
                         </td>
                         <td data-label="@T["AdminLogs.Exception"]" class="logs-exception-cell">@log.Exception</td>
                     </tr>
-                </Virtualize>
+                }
             </tbody>
         </table>
     </div>
+
+    @if (TotalPages > 1)
+    {
+        <div class="pagination admin-users-pagination">
+            <button type="button" @onclick="PrevPage" disabled="@(CurrentPage <= 1)">@T["Common.Previous"]</button>
+            <span class="pagination-info">@T["Common.Page"] @CurrentPage @T["Common.Of"] @TotalPages</span>
+            <button type="button" @onclick="NextPage" disabled="@(CurrentPage >= TotalPages)">@T["Common.Next"]</button>
+        </div>
+    }
 }
 
 @code {
     [Parameter]
     public int TotalItems { get; set; }
+
+    [Parameter]
+    public List<AppLog> Logs { get; set; } = new();
+
+    [Parameter]
+    public int CurrentPage { get; set; }
+
+    [Parameter]
+    public int TotalPages { get; set; }
 
     [Parameter]
     public string CurrentSortColumn { get; set; } = "Timestamp";
@@ -92,7 +110,10 @@ else
     public EventCallback<string> OnSort { get; set; }
 
     [Parameter]
-    public ItemsProviderDelegate<AppLog> LoadLogsAsync { get; set; } = default!;
+    public EventCallback OnPrevPage { get; set; }
+
+    [Parameter]
+    public EventCallback OnNextPage { get; set; }
 
     private string GetLevelBadgeClass(string? level)
     {
@@ -117,4 +138,7 @@ else
 
     private static string SourceBadgeClass(string source)
         => "log-source-badge";
+
+    private async Task PrevPage() => await OnPrevPage.InvokeAsync();
+    private async Task NextPage() => await OnNextPage.InvokeAsync();
 }
