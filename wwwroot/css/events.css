@@ -3491,6 +3491,9 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     pointer-events: none;
 }
 
+.esc-team--a .esc-player { justify-content: flex-end; }
+.esc-team--b .esc-player { justify-content: flex-start; }
+
 .esc-player-list .esc-player:nth-child(even) {
     background: rgba(255,255,255,.07);
 }
