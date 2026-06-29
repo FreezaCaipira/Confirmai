@@ -1,0 +1,325 @@
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Confirmai.Data;
+using Confirmai.Enums;
+using Confirmai.Models;
+using Confirmai.Pages.Futsal.Components;
+using Confirmai.Services;
+using Confirmai.Services.Core;
+using Confirmai.Services.Events;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.EntityFrameworkCore;
+
+namespace Confirmai.Pages.Futsal;
+
+public partial class Create
+{
+    // ── Query param ──────────────────────────────────────────────────────────
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int? GroupId { get; set; }
+
+    // ── Form model ──────────────────────────────────────────────────────────
+
+    private sealed class CreateMatchForm
+    {
+        // GroupName só é usado quando nenhum grupo é pré-selecionado (legacy flow)
+        [StringLength(120, ErrorMessage = "Máximo 120 caracteres.")]
+        public string GroupName { get; set; } = string.Empty;
+
+        public string? LocalName { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Selecione a quadra.")]
+        public int VenueId { get; set; } = 0;
+
+        [Required(ErrorMessage = "Informe a data.")]
+        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+
+        public TimeOnly Time { get; set; } = new TimeOnly(20, 0);
+
+        public int DurationMinutes { get; set; } = 90;
+
+        [Range(1, 100, ErrorMessage = "Mínimo 1 jogador.")]
+        public int MaxPlayers { get; set; } = 10;
+
+        public int MaxGoalkeepers { get; set; } = 2;
+
+        public bool RotateInGoal { get; set; } = false;
+
+        [Range(0, 10000, ErrorMessage = "Valor inválido.")]
+        public decimal Price { get; set; } = 0;
+
+        public bool RecurrenceEnabled { get; set; } = false;
+        public HashSet<DayOfWeek> SelectedDays { get; set; } = new();
+        public bool IsPrivate { get; set; } = true;
+    }
+
+    // ── State ────────────────────────────────────────────────────────────────
+
+    private CreateMatchForm form             = new();
+    private List<Venue>    venues            = new();
+    private Venue?         selectedVenue;
+    private Group?         preselectedGroup;
+    private bool           isLoading        = true;
+    private bool           isSaving         = false;
+    private string         saveError        = string.Empty;
+    private string?        collisionHref;
+    private string         subFormat        = "futsal";
+
+    // ── Options ──────────────────────────────────────────────────────────────
+
+    private static readonly (int Min, string Label)[] DurationOptions =
+    [
+        (60,  "1h"),
+        (75,  "1h15min"),
+        (90,  "1h30min"),
+        (105, "1h45min"),
+        (120, "2h"),
+        (150, "2h30min"),
+        (180, "3h"),
+    ];
+
+    private static readonly (DayOfWeek Dow, string Label)[] WeekdayOptions =
+    [
+        (DayOfWeek.Monday,    "Seg"),
+        (DayOfWeek.Tuesday,   "Ter"),
+        (DayOfWeek.Wednesday, "Qua"),
+        (DayOfWeek.Thursday,  "Qui"),
+        (DayOfWeek.Friday,    "Sex"),
+        (DayOfWeek.Saturday,  "Sáb"),
+        (DayOfWeek.Sunday,    "Dom"),
+    ];
+
+    // ── Lifecycle ────────────────────────────────────────────────────────────
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Se veio com ?groupId, verificar se o usuário é admin do grupo
+        if (GroupId.HasValue)
+        {
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+            preselectedGroup = await db.Groups
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.Id == GroupId.Value
+                    && g.Members.Any(m => m.UserId == userId && m.Role == GroupMemberRole.Admin));
+
+            if (preselectedGroup is null)
+            {
+                NavigationManager.NavigateTo("/grupos");
+                return;
+            }
+
+            venues = await db.Venues
+                .Where(v => v.IsActive)
+                .OrderBy(v => v.City)
+                .ThenBy(v => v.Name)
+                .ToListAsync();
+        }
+        else
+        {
+            // Sem groupId: redirecionar para /grupos para criar/selecionar um grupo
+            NavigationManager.NavigateTo("/grupos");
+            return;
+        }
+
+        isLoading = false;
+    }
+
+    private void OnVenueChanged()
+    {
+        selectedVenue = venues.FirstOrDefault(v => v.Id == form.VenueId);
+    }
+
+    private void OnRotateInGoalChanged()
+    {
+        if (form.RotateInGoal) form.MaxGoalkeepers = 0;
+        else if (form.MaxGoalkeepers == 0) form.MaxGoalkeepers = 2;
+    }
+
+    private void OnSubFormatChanged(ChangeEventArgs e)
+    {
+        subFormat = e.Value?.ToString() ?? "futsal";
+        (form.MaxPlayers, form.MaxGoalkeepers) = subFormat switch
+        {
+            "society" => (14, 2),
+            "campo"   => (24, 2),
+            _         => (10, 2),   // futsal
+        };
+    }
+
+    private void ToggleDay(DayOfWeek dow, bool on)
+    {
+        if (on) form.SelectedDays.Add(dow);
+        else    form.SelectedDays.Remove(dow);
+    }
+
+    private void OnTimeChange(ChangeEventArgs e)
+        => form.Time = TimeOnly.TryParse(e.Value?.ToString(), out var t) ? t : new TimeOnly(19, 0);
+
+    // Callback wrappers for child components
+    private Task SubFormatChangedCallback(string newFormat)
+    {
+        subFormat = newFormat;
+        (form.MaxPlayers, form.MaxGoalkeepers) = subFormat switch
+        {
+            "society" => (14, 2),
+            "campo"   => (24, 2),
+            _         => (10, 2),   // futsal
+        };
+        return Task.CompletedTask;
+    }
+
+    private Task VenueChangedCallback()
+    { OnVenueChanged(); return Task.CompletedTask; }
+
+    private Task TimeChangeCallback(TimeOnly newTime)
+    { form.Time = newTime; return Task.CompletedTask; }
+
+    private Task RotateInGoalChangedCallback()
+    { OnRotateInGoalChanged(); return Task.CompletedTask; }
+
+    private Task ToggleDayCallback((DayOfWeek dow, bool on) args)
+    { ToggleDay(args.dow, args.on); return Task.CompletedTask; }
+
+    private async Task Save()
+    {
+        isSaving  = true;
+        saveError = string.Empty;
+        collisionHref = null;
+
+        try
+        {
+            var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                saveError = "Você precisa estar autenticado.";
+                return;
+            }
+
+            var venue = venues.FirstOrDefault(v => v.Id == form.VenueId);
+            if (venue is null)
+            {
+                saveError = "Quadra inválida.";
+                return;
+            }
+
+            // StartsAt em UTC
+            var startsAt = DateTime.SpecifyKind(
+                form.Date.ToDateTime(form.Time),
+                DateTimeKind.Utc);
+
+            await using var db = await DbFactory.CreateDbContextAsync();
+
+            Group group;
+            if (preselectedGroup is not null)
+            {
+                // Usar grupo existente
+                group = preselectedGroup;
+            }
+            else
+            {
+                // 1 — Criar Group
+                group = new Group
+                {
+                    Name            = form.GroupName,
+                    Sport           = Sport.Futsal,
+                    City            = venue.City,
+                    StateCode       = venue.StateCode,
+                    IsActive        = true,
+                    IsPrivate       = true,
+                    CreatedByUserId = userId,
+                    InviteCode      = Guid.NewGuid().ToString("N")[..8].ToUpper(),
+                };
+                db.Groups.Add(group);
+                await db.SaveChangesAsync();
+
+                // 2 — Criar GroupMember (criador = Admin)
+                db.GroupMembers.Add(new GroupMember
+                {
+                    GroupId = group.Id,
+                    UserId  = userId,
+                    Role    = GroupMemberRole.Admin,
+                });
+            }
+
+            // 3 — Criar Event
+            var collision = await EventCollisionService.FindGroupTimeCollisionAsync(group.Id, startsAt);
+            if (collision is not null)
+            {
+                saveError = EventCollisionService.BuildConflictMessage(collision.StartsAt);
+                collisionHref = $"/futsal/{collision.EventId}";
+                isSaving  = false;
+                return;
+            }
+
+            var ev = new Event
+            {
+                GroupId         = group.Id,
+                Sport           = Sport.Futsal,
+                VenueId         = venue.Id,
+                Location        = venue.Address,
+                LocalName       = form.LocalName,
+                StartsAt        = startsAt,
+                DurationMinutes = form.DurationMinutes,
+                Price           = form.Price,
+                MaxPlayers      = form.MaxPlayers,
+                MaxGoalkeepers  = form.MaxGoalkeepers > 0 ? form.MaxGoalkeepers : null,
+                PlayersPerSide  = subFormat switch { "society" => 7, "campo" => 11, _ => 5 },
+                IsActive        = true,
+                CreatedByUserId = userId,
+            };
+            db.Events.Add(ev);
+
+            // 4 — Criar MatchSchedule para cada dia selecionado (se periódico)
+            if (form.RecurrenceEnabled && form.SelectedDays.Any())
+            {
+                foreach (var dow in form.SelectedDays)
+                {
+                    db.RachaSchedules.Add(new MatchSchedule
+                    {
+                        GroupId         = group.Id,
+                        VenueId         = venue.Id,
+                        DayOfWeek       = dow,
+                        TimeOfDay       = form.Time,
+                        DurationMinutes = form.DurationMinutes,
+                        Price           = form.Price,
+                        MaxPlayers      = form.MaxPlayers,
+                        MaxGoalkeepers  = form.MaxGoalkeepers > 0 ? form.MaxGoalkeepers : null,
+                        LocalName       = form.LocalName,
+                        IsActive        = true,
+                        CreatedByUserId = userId,
+                    });
+                }
+            }
+
+            await db.SaveChangesAsync();
+            await LogService.AuditAsync(
+                AuditEvents.EventCreated,
+                AuditEntities.Event,
+                ev.Id.ToString(),
+                $"Partida criada: \"{ev.LocalName ?? ev.Group?.Name}\" em {ev.StartsAt:dd/MM/yyyy HH:mm} (grupo #{ev.GroupId})",
+                userId, "EventCreate");
+            NavigationManager.NavigateTo($"/futsal/{ev.Id}");
+        }
+        catch (Exception ex)
+        {
+            saveError = $"Erro ao criar partida: {ex.Message}";
+            isSaving  = false;
+        }
+    }
+
+    private static string VenueTypeLabel(VenueType t) => t switch
+    {
+        VenueType.Quadra  => "Quadra",
+        VenueType.Society => "Society",
+        VenueType.Campo   => "Campo",
+        _                 => t.ToString()
+    };
+}

@@ -1,4 +1,4 @@
-@page "/meus-eventos"
+﻿@page "/meus-eventos"
 
 @attribute [Authorize]
 
@@ -16,7 +16,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject EventNotificationService NotificationService
 
-<PageTitle>Meus Eventos — Confirmai</PageTitle>
+<PageTitle>Meus Eventos â€” Confirmai</PageTitle>
 
 <div class="entity-shell">
 
@@ -33,7 +33,7 @@
                         </button>
                         <button class="my-events-tab @(view == "schedules" ? "my-events-tab--active" : "")"
                                 @onclick='() => view = "schedules"'>
-                            🔁 Recorrências (@schedules.Count)
+                            ðŸ” RecorrÃªncias (@schedules.Count)
                         </button>
                     </div>
                     <div class="my-events-create-btns">
@@ -49,11 +49,11 @@
 
             @if (isLoading)
             {
-                <p class="listing-state">Carregando seus eventos…</p>
+                <p class="listing-state">Carregando seus eventosâ€¦</p>
             }
             else if (view == "schedules")
             {
-                @* ── Recorrências ────────────────────────────────────────── *@
+                @* â”€â”€ RecorrÃªncias â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
                 @if (!schedules.Any())
                 {
                     <div class="listing-state listing-empty">
@@ -86,7 +86,7 @@
                         {
                             var futureCount = scheduleFutureCounts.GetValueOrDefault(s.Id, 0);
                             <div class="my-schedule-card @(!s.IsActive ? "my-schedule-card--inactive" : "")">
-                                <div class="my-event-sport-badge my-event-sport-badge--futsal">⚽</div>
+                                <div class="my-event-sport-badge my-event-sport-badge--futsal">âš½</div>
 
                                 <div class="my-event-body">
                                     <div class="my-event-name-row">
@@ -96,25 +96,25 @@
                                         </span>
                                     </div>
                                     <p class="my-event-meta">
-                                        📅 @DayName(s.DayOfWeek) às @s.TimeOfDay.ToString("HH:mm")
-                                        &nbsp;·&nbsp;
-                                        👥 @s.MaxPlayers vagas@(s.MaxGoalkeepers.HasValue ? $" ({s.MaxGoalkeepers} GK)" : "")
-                                        &nbsp;·&nbsp;
+                                        ðŸ“… @DayName(s.DayOfWeek) Ã s @s.TimeOfDay.ToString("HH:mm")
+                                        &nbsp;Â·&nbsp;
+                                        ðŸ‘¥ @s.MaxPlayers vagas@(s.MaxGoalkeepers.HasValue ? $" ({s.MaxGoalkeepers} GK)" : "")
+                                        &nbsp;Â·&nbsp;
                                         R$ @s.Price.ToString("N2", PtBr)
                                     </p>
                                     @if (s.Venue is not null)
                                     {
-                                        <p class="my-event-location">📍 @s.Venue.Name — @s.Venue.City</p>
+                                        <p class="my-event-location">ðŸ“ @s.Venue.Name â€” @s.Venue.City</p>
                                     }
                                     @if (futureCount > 0)
                                     {
-                                        <p class="my-schedule-future-count">🗓 @futureCount partida@(futureCount == 1 ? "" : "s") futuras geradas</p>
+                                        <p class="my-schedule-future-count">ðŸ—“ @futureCount partida@(futureCount == 1 ? "" : "s") futuras geradas</p>
                                     }
                                     @if (scheduleNextEvents.TryGetValue(s.Id, out var nextEv))
                                     {
                                         <p class="my-schedule-next-event">
-                                            🔔 Próxima: @nextEv.StartsAt.ToLocalTime().ToString("ddd dd/MM HH:mm", PtBr)
-                                            &nbsp;·&nbsp; @nextEv.Confirmed/@s.MaxPlayers confirmados
+                                            ðŸ”” PrÃ³xima: @nextEv.StartsAt.ToLocalTime().ToString("ddd dd/MM HH:mm", PtBr)
+                                            &nbsp;Â·&nbsp; @nextEv.Confirmed/@s.MaxPlayers confirmados
                                             &nbsp;<a href="/futsal/@nextEv.EventId">ver</a>
                                         </p>
                                     }
@@ -125,7 +125,7 @@
                                     <button class="my-event-action-btn @(s.IsActive ? "my-event-action-btn--cancel" : "my-event-action-btn--view")"
                                             disabled="@(togglingScheduleId == s.Id)"
                                             @onclick="() => ToggleSchedule(s)">
-                                        @(togglingScheduleId == s.Id ? "…" : s.IsActive ? "Pausar" : "Retomar")
+                                        @(togglingScheduleId == s.Id ? "â€¦" : s.IsActive ? "Pausar" : "Retomar")
                                     </button>
                                 </div>
                             </div>
@@ -136,8 +136,8 @@
             else if (!events.Any())
             {
                 <div class="listing-state listing-empty">
-                    <p>Você ainda não criou nenhum evento.</p>
-                    <p class="listing-empty-hint">Use os botões acima para criar sua primeira partida ou torneio.</p>
+                    <p>VocÃª ainda nÃ£o criou nenhum evento.</p>
+                    <p class="listing-empty-hint">Use os botÃµes acima para criar sua primeira partida ou torneio.</p>
                 </div>
             }
             else
@@ -152,14 +152,14 @@
                     {
                         <button class="my-events-tab my-events-tab--futsal @(sportFilter == Sport.Futsal ? "my-events-tab--active" : "")"
                                 @onclick='() => sportFilter = Sport.Futsal'>
-                            ⚽ Futsal (@events.Count(e => e.Sport == Sport.Futsal))
+                            âš½ Futsal (@events.Count(e => e.Sport == Sport.Futsal))
                         </button>
                     }
                     @if (events.Any(e => e.Sport == Sport.Poker))
                     {
                         <button class="my-events-tab my-events-tab--poker @(sportFilter == Sport.Poker ? "my-events-tab--active" : "")"
                                 @onclick='() => sportFilter = Sport.Poker'>
-                            🃏 Poker (@events.Count(e => e.Sport == Sport.Poker))
+                            ðŸƒ Poker (@events.Count(e => e.Sport == Sport.Poker))
                         </button>
                     }
                 </div>
@@ -173,7 +173,7 @@
 
                         <div class="my-event-card @(!ev.IsActive ? "my-event-card--inactive" : isPast ? "my-event-card--past" : "")">
                             <div class="my-event-sport-badge @(isFutsal ? "my-event-sport-badge--futsal" : "my-event-sport-badge--poker")">
-                                @(isFutsal ? "⚽" : "🃏")
+                                @(isFutsal ? "âš½" : "ðŸƒ")
                             </div>
 
                             <div class="my-event-body">
@@ -199,13 +199,13 @@
                                     }
                                 </div>
                                 <p class="my-event-meta">
-                                    📅 @ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy 'às' HH:mm", PtBr)
-                                    &nbsp;·&nbsp;
-                                    👥 @ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $"/{ev.MaxPlayers}" : "") confirmados
+                                    ðŸ“… @ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy 'Ã s' HH:mm", PtBr)
+                                    &nbsp;Â·&nbsp;
+                                    ðŸ‘¥ @ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $"/{ev.MaxPlayers}" : "") confirmados
                                 </p>
                                 @if (!string.IsNullOrWhiteSpace(ev.Location))
                                 {
-                                    <p class="my-event-location">📍 @ev.Location</p>
+                                    <p class="my-event-location">ðŸ“ @ev.Location</p>
                                 }
                             </div>
 
@@ -218,7 +218,7 @@
                                     <button class="my-event-action-btn my-event-action-btn--cancel"
                                             disabled="@(cancellingId == ev.Id)"
                                             @onclick="() => CancelEvent(ev)">
-                                        @(cancellingId == ev.Id ? "…" : "Cancelar")
+                                        @(cancellingId == ev.Id ? "â€¦" : "Cancelar")
                                     </button>
                                 }
                             </div>
@@ -232,171 +232,3 @@
 
 </div>
 
-@code {
-    private static readonly CultureInfo PtBr = new("pt-BR");
-
-    private List<Event>              events              = new();
-    private List<MatchSchedule>      schedules           = new();
-    private Dictionary<int, int>     scheduleFutureCounts = new();
-    private Dictionary<int, (int EventId, DateTime StartsAt, int Confirmed)> scheduleNextEvents = new();
-    private bool                     isLoading           = true;
-    private Sport?                   sportFilter         = null;
-    private string?                  scheduleCityFilter  = null;
-    private int?                     cancellingId        = null;
-    private int?                     togglingScheduleId  = null;
-    private string                   view                = "events";
-    private string                   currentUserId       = string.Empty;
-
-    private List<string> ScheduleCities =>
-        schedules
-            .Select(s => s.Venue?.City)
-            .Where(c => !string.IsNullOrWhiteSpace(c))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(c => c)
-            .ToList()!;
-
-    private IEnumerable<MatchSchedule> FilteredSchedules =>
-        scheduleCityFilter is null
-            ? schedules
-            : schedules.Where(s => string.Equals(s.Venue?.City, scheduleCityFilter, StringComparison.OrdinalIgnoreCase));
-
-    private IEnumerable<Event> FilteredEvents =>
-        sportFilter.HasValue
-            ? events.Where(e => e.Sport == sportFilter.Value)
-            : events;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
-        var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            isLoading = false;
-            return;
-        }
-
-        currentUserId = userId;
-
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var now = DateTime.UtcNow;
-        var raw = await db.Events
-            .Include(e => e.Group)
-            .Include(e => e.Confirmations)
-            .Where(e => e.CreatedByUserId == userId)
-            .ToListAsync();
-
-        events = raw
-            .OrderBy(e => e.StartsAt < now)                                             // upcoming first
-            .ThenBy(e => e.StartsAt < now ? long.MaxValue - e.StartsAt.Ticks            // past: more recent first
-                                          : e.StartsAt.Ticks)                           // upcoming: nearest first
-            .ToList();
-
-        schedules = await db.RachaSchedules
-            .Include(s => s.Group)
-            .Include(s => s.Venue)
-            .Where(s => s.CreatedByUserId == userId)
-            .OrderByDescending(s => s.IsActive)
-            .ThenBy(s => s.DayOfWeek)
-            .ThenBy(s => s.TimeOfDay)
-            .ToListAsync();
-
-        // Gap G: contar partidas futuras geradas por cada schedule
-        var scheduleIds = schedules.Select(s => s.Id).ToList();
-        if (scheduleIds.Count > 0)
-        {
-            scheduleFutureCounts = await db.Events
-                .Where(e => e.RachaScheduleId.HasValue
-                         && scheduleIds.Contains(e.RachaScheduleId!.Value)
-                         && e.StartsAt > now
-                         && e.IsActive)
-                .GroupBy(e => e.RachaScheduleId!.Value)
-                .Select(g => new { ScheduleId = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.ScheduleId, x => x.Count);
-
-            // Next upcoming event + confirmation count per schedule
-            var nextRows = await db.Events
-                .Where(e => e.RachaScheduleId.HasValue
-                         && scheduleIds.Contains(e.RachaScheduleId!.Value)
-                         && e.StartsAt > now
-                         && e.IsActive)
-                .Select(e => new
-                {
-                    ScheduleId     = e.RachaScheduleId!.Value,
-                    e.Id,
-                    e.StartsAt,
-                    Confirmed      = e.Confirmations.Count,
-                })
-                .ToListAsync();
-
-            scheduleNextEvents = nextRows
-                .GroupBy(e => e.ScheduleId)
-                .ToDictionary(
-                    g => g.Key,
-                    g => { var f = g.OrderBy(e => e.StartsAt).First(); return (f.Id, f.StartsAt, f.Confirmed); });
-        }
-
-        isLoading = false;
-    }
-
-    private async Task CancelEvent(Event ev)
-    {
-        cancellingId = ev.Id;
-        try
-        {
-            await using var db = await DbFactory.CreateDbContextAsync();
-            var entity = await db.Events.FindAsync(ev.Id);
-            if (entity is not null)
-            {
-                entity.IsActive = false;
-                await db.SaveChangesAsync();
-                ev.IsActive = false;
-            }
-
-            if (!string.IsNullOrWhiteSpace(currentUserId))
-                await NotificationService.NotifyEventCancelledAsync(ev.Id, currentUserId);
-        }
-        finally
-        {
-            cancellingId = null;
-        }
-    }
-
-    private async Task ToggleSchedule(MatchSchedule s)
-    {
-        togglingScheduleId = s.Id;
-        try
-        {
-            await using var db = await DbFactory.CreateDbContextAsync();
-            var entity = await db.RachaSchedules.FindAsync(s.Id);
-            if (entity is not null && entity.CreatedByUserId == currentUserId)
-            {
-                entity.IsActive = !entity.IsActive;
-                await db.SaveChangesAsync();
-                s.IsActive = entity.IsActive;
-            }
-        }
-        finally
-        {
-            togglingScheduleId = null;
-        }
-    }
-
-    private static string PokerTypeLabel(PokerEventType t) => t switch
-    {
-        PokerEventType.CashGame  => "Cash Game",
-        PokerEventType.HomeGame  => "Home Game",
-        _                        => "Torneio",
-    };
-
-    private static string DayName(DayOfWeek d) => d switch
-    {
-        DayOfWeek.Monday    => "Segunda-feira",
-        DayOfWeek.Tuesday   => "Terça-feira",
-        DayOfWeek.Wednesday => "Quarta-feira",
-        DayOfWeek.Thursday  => "Quinta-feira",
-        DayOfWeek.Friday    => "Sexta-feira",
-        DayOfWeek.Saturday  => "Sábado",
-        _                   => "Domingo",
-    };
-}
