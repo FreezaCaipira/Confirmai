@@ -1,4 +1,4 @@
-ï»¿.product-table {
+.product-table {
     width: 100%;
     background: var(--bg-slate);
     color: var(--text-light);
@@ -89,7 +89,7 @@ button.edit-btn:hover {
     font-size: 1.1rem;
     cursor: pointer;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px var(--shadow-md);
     display: inline-flex;
     align-items: center;
     transition: background 0.2s;
@@ -117,7 +117,7 @@ button.edit-btn:hover {
         justify-content: center;
     }
 
-    .product-table td[data-label="AÃ§Ãµes"] {
+    .product-table td[data-label="Ações"] {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;

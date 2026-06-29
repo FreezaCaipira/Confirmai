@@ -19,13 +19,13 @@
 .edit-cancel-btn {
     background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
     border-color: var(--red-pale);
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-red-sm);
 }
 
 .edit-cancel-btn:hover:not(:disabled) {
     background: linear-gradient(180deg, var(--red-pale) 0%, var(--red-soft) 50%, var(--red-strong) 100%);
     border-color: var(--red-pale);
-    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.5);
+    box-shadow: 0 4px 8px var(--red-opacity-lg);
 }
 
 .edit-cancel-no-btn {
@@ -44,6 +44,6 @@
 .edit-event-form select:focus,
 .edit-event-form textarea:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 2px var(--green-opacity-md), inset 0 2px 4px var(--shadow-lg);
     border-color: var(--green-light);
 }

@@ -7,7 +7,7 @@
     border: 1px dashed var(--ci-border);
     border-radius: 4px;
     background: var(--ci-bg-deepest);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 2px 4px var(--shadow-lg);
 }
 
 .profile-chat-bubble {
@@ -30,7 +30,7 @@
     justify-self: end;
     border-color: var(--ci-accent);
     background: var(--ci-border-alt);
-    box-shadow: 0 2px 4px rgba(79, 156, 248, 0.3);
+    box-shadow: 0 2px 4px var(--accent-opacity-md);
 }
 
 .profile-chat-bubble p {
@@ -44,7 +44,7 @@
 
 .profile-chat-bubble.outgoing p {
     color: var(--ci-surface-light);
-    text-shadow: 0 0 8px rgba(79, 156, 248, 0.4);
+    text-shadow: 0 0 8px var(--accent-opacity-lg);
 }
 
 .profile-chat-meta {

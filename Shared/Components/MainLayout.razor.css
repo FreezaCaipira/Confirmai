@@ -1,4 +1,4 @@
-﻿/* ── Cycling nav icon (Esportes) ──────────────────────────────────────────── */
+/* -- Cycling nav icon (Esportes) -------------------------------------------- */
 .nav-icon-cycle {
     display: inline-grid;
     vertical-align: middle;
@@ -30,7 +30,7 @@
     100%     { opacity: 0; }
 }
 
-/* ── News ticker animation ───────────────────────────────────────────── */
+/* -- News ticker animation --------------------------------------------- */
 .oldsite-news-ticker-text {
     animation: ticker-fade 0.5s ease-in-out;
     color: var(--ci-text-blue);
@@ -100,7 +100,7 @@ header {
     width: 1px;
     height: 18px;
     transform: translateY(-50%);
-    background: linear-gradient(180deg, rgba(79, 156, 248, 0) 0%, rgba(79, 156, 248, 0.5) 48%, rgba(79, 156, 248, 0) 100%);
+    background: linear-gradient(180deg, rgba(79, 156, 248, 0) 0%, var(--accent-opacity-xl) 48%, rgba(79, 156, 248, 0) 100%);
 }
 
 .header-actions > span:not(.currency-indicator)::after {
@@ -326,7 +326,7 @@ footer.oldsite-footer {
     }
 }
 
-/* ── Sidebar widget links (scoped to MainLayout — loads last, wins) ── */
+/* -- Sidebar widget links (scoped to MainLayout � loads last, wins) -- */
 .oldsite-widget ol {
     list-style: none;
     padding: 0.35rem 0.7rem 0.5rem;

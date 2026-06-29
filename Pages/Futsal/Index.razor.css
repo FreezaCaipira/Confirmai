@@ -1,4 +1,4 @@
-﻿/* ── Page wrapper ────────────────────────── */
+/* -- Page wrapper -------------------------- */
 .listing-page {
     display: flex;
     flex-direction: column;
@@ -7,7 +7,7 @@
     padding: 1.25rem 1rem 2.5rem;
 }
 
-/* ── Actions row ────────────────────────── */
+/* -- Actions row -------------------------- */
 .listing-page-actions {
     width: 100%;
     max-width: 760px;
@@ -16,7 +16,7 @@
     margin-bottom: 0.1rem;
 }
 
-/* ── Criar Partida button ────────────────── */
+/* -- Criar Partida button ------------------ */
 .btn-create-event {
     display: inline-flex;
     align-items: center;
@@ -30,17 +30,17 @@
     text-decoration: none;
     border: 1px solid var(--ci-accent-light);
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-    box-shadow: 0 2px 4px rgba(79, 156, 248, 0.3);
-    text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
+    box-shadow: 0 2px 4px var(--accent-opacity-md);
+    text-shadow: 0 0 10px var(--accent-opacity-xl);
 }
 
 .btn-create-event:hover {
     background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
     border-color: var(--link-info);
-    box-shadow: 0 4px 8px rgba(79, 156, 248, 0.5);
+    box-shadow: 0 4px 8px var(--accent-opacity-xl);
 }
 
-/* ── Event card base ─────────────────────── */
+/* -- Event card base ----------------------- */
 .event-card {
     display: flex;
     align-items: center;
@@ -67,7 +67,7 @@
     box-shadow: 0 12px 32px var(--green-dark-2xl), 0 6px 16px var(--shadow-lg);
 }
 
-/* ── Time badge ──────────────────────────── */
+/* -- Time badge ---------------------------- */
 .event-time {
     font-size: 1.3rem;
     font-weight: 800;
@@ -77,10 +77,10 @@
     text-align: center;
     flex-shrink: 0;
     line-height: 1;
-    text-shadow: 0 0 15px rgba(74, 222, 128, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 15px rgba(74, 222, 128, 0.6), 0 2px 4px var(--shadow-md);
 }
 
-/* ── Body ────────────────────────────────── */
+/* -- Body ---------------------------------- */
 .event-body {
     flex: 1;
     min-width: 0;
@@ -100,7 +100,7 @@
     font-weight: 800;
     color: var(--ci-surface-light);
     font-family: inherit;
-    text-shadow: 0 0 10px rgba(79, 156, 248, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 10px var(--accent-opacity-lg), 0 2px 4px var(--shadow-md);
     text-transform: none;
     letter-spacing: -0.01em;
     white-space: nowrap;
@@ -145,7 +145,7 @@
     border: 1px solid var(--ci-border);
     border-radius: 20px;
     padding: 0.18rem 0.6rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .meta-chip--gk {
@@ -158,16 +158,16 @@
     border-color: var(--green-soft);
     color: var(--green-soft);
     font-weight: 800;
-    box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
+    box-shadow: 0 2px 4px var(--green-opacity-md);
 }
 
-/* ── Confirmed card highlight ────────────── */
+/* -- Confirmed card highlight -------------- */
 .event-card--confirmed {
     border-left-color: var(--green-bright);
     box-shadow: 0 8px 24px var(--green-opacity-md), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--green-opacity-lg);
 }
 
-/* ── Action button ───────────────────────── */
+/* -- Action button ------------------------- */
 .event-action {
     flex-shrink: 0;
     font-size: 0.82rem;
@@ -179,7 +179,7 @@
     border: 1px solid var(--futsal-green-dark);
     border-radius: 7px;
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-    box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
+    box-shadow: 0 2px 4px var(--green-opacity-md);
 }
 
 .event-action:hover {
@@ -189,7 +189,7 @@
     box-shadow: 0 4px 8px rgba(74, 222, 128, 0.5);
 }
 
-/* ── Responsive ──────────────────────────── */
+/* -- Responsive ---------------------------- */
 @media (max-width: 640px) {
     .event-card {
         flex-wrap: wrap;

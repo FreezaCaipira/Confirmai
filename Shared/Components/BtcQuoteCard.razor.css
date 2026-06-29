@@ -1,10 +1,10 @@
-﻿.crypto-quote-row {
+.crypto-quote-row {
     display: flex;
     align-items: center;
     background: linear-gradient(90deg, var(--bg-slate) 60%, var(--ci-bg-deepest) 100%);
     border: 1px solid var(--border-slate);
     border-radius: 14px;
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 16px var(--shadow-xl);
     margin-bottom: 2.5rem;
     padding: 2rem 2.5rem;
     width: 100%;
@@ -25,7 +25,7 @@
     font-weight: bold;
     color: var(--gold);
     letter-spacing: 2px;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 2px 12px var(--shadow-xl);
     text-transform: uppercase;
 }
 

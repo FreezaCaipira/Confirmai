@@ -1,0 +1,148 @@
+@using Confirmai.Enums
+@using Confirmai.Models
+
+<div class="poker-detail-info">
+    @if (Ev.PokerEventType == PokerEventType.Tournament)
+    {
+        <section class="detail-section">
+            <h2 class="detail-section-title">Estrutura</h2>
+            <div class="poker-details-grid">
+                @if (Ev.Modality.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Modalidade</span>
+                        <span class="poker-detail-value">@ModalityLabel(Ev.Modality.Value)</span>
+                    </div>
+                }
+                @if (Ev.StartingStack.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Fichas iniciais</span>
+                        <span class="poker-detail-value">@Ev.StartingStack.Value.ToString("N0")</span>
+                    </div>
+                }
+                @if (Ev.InitialBlindBB.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Blind inicial</span>
+                        <span class="poker-detail-value">@Ev.InitialBlindBB.Value BB</span>
+                    </div>
+                }
+                @if (Ev.MaxPlayers != 0)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Máx. jogadores</span>
+                        <span class="poker-detail-value">@Ev.MaxPlayers</span>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="detail-section">
+            <h2 class="detail-section-title">Preços</h2>
+            <div class="poker-details-grid">
+                @if (Ev.BuyInAmount.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Buy-in</span>
+                        <span class="poker-detail-value poker-detail-value--price">R$ @Ev.BuyInAmount.Value.ToString("N2")</span>
+                    </div>
+                }
+                @if (Ev.GTD.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">GTD</span>
+                        <span class="poker-detail-value poker-detail-value--gtd">R$ @Ev.GTD.Value.ToString("N2")</span>
+                    </div>
+                }
+                @if (Ev.RebuyAmount.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Rebuy</span>
+                        <span class="poker-detail-value">R$ @Ev.RebuyAmount.Value.ToString("N2")</span>
+                    </div>
+                }
+                @if (Ev.RebuyDoubleAmount.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Rebuy duplo</span>
+                        <span class="poker-detail-value">R$ @Ev.RebuyDoubleAmount.Value.ToString("N2")</span>
+                    </div>
+                }
+                @if (Ev.AddonAmount.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Add-on</span>
+                        <span class="poker-detail-value">R$ @Ev.AddonAmount.Value.ToString("N2")</span>
+                    </div>
+                }
+                @if (Ev.AddonDoubleAmount.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Add-on duplo</span>
+                        <span class="poker-detail-value">R$ @Ev.AddonDoubleAmount.Value.ToString("N2")</span>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+    else if (Ev.PokerEventType == PokerEventType.CashGame)
+    {
+        <section class="detail-section">
+            <h2 class="detail-section-title">Stacks</h2>
+            <div class="poker-details-grid">
+                @if (Ev.Modality.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Modalidade</span>
+                        <span class="poker-detail-value">@ModalityLabel(Ev.Modality.Value)</span>
+                    </div>
+                }
+                @if (Ev.CashMinBuyIn.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Stack mínimo</span>
+                        <span class="poker-detail-value poker-detail-value--price">R$ @Ev.CashMinBuyIn.Value.ToString("N2")</span>
+                    </div>
+                }
+                @if (Ev.CashMaxBuyIn.HasValue)
+                {
+                    <div class="poker-detail-item">
+                        <span class="poker-detail-label">Stack máximo</span>
+                        <span class="poker-detail-value poker-detail-value--price">R$ @Ev.CashMaxBuyIn.Value.ToString("N2")</span>
+                    </div>
+                }
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Ev.CashIncludes))
+            {
+                <div class="cash-includes-block">
+                    <span class="cash-includes-label"><i class="fas fa-gift"></i> Incluso:</span>
+                    <span class="cash-includes-value">@Ev.CashIncludes</span>
+                </div>
+            }
+        </section>
+    }
+    else if (Ev.PokerEventType == PokerEventType.HomeGame)
+    {
+        <div class="homegame-unlocked-notice">
+            <i class="fas fa-unlock"></i>
+            <span>Acesso concedido. Bem-vindo ao home game!</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Event Ev { get; set; } = default!;
+
+    private static string ModalityLabel(PokerModality m) => m switch
+    {
+        PokerModality.Vanilla => "Vanilla (Texas NL)",
+        PokerModality.PKO => "PKO",
+        PokerModality.Freezeout => "Freezeout",
+        PokerModality.PLO4 => "PLO 4 cartas",
+        PokerModality.PLO5 => "PLO 5 cartas",
+        PokerModality.PLO6 => "PLO 6 cartas",
+        PokerModality.DealerChoice => "Dealer's Choice",
+        _ => m.ToString()
+    };
+}

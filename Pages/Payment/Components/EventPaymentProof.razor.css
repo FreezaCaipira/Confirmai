@@ -1,7 +1,7 @@
 .evpay-proof {
     margin-top: 1.25rem;
     background: rgba(15, 26, 48, 0.6);
-    border: 1px solid rgba(251, 191, 36, 0.3);
+    border: 1px solid var(--amber-opacity-sm);
     border-radius: 12px;
     padding: 1rem 1.1rem;
     display: flex;

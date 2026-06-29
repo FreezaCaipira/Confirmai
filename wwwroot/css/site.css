@@ -1,4 +1,4 @@
-﻿/* ================================================================
+/* ================================================================
    CONFIRMAI — GLOBAL STYLESHEET
 
    Sections:
@@ -4881,7 +4881,7 @@ body .oldsite-news-ticker .oldsite-news-ticker-dot.active {
     background: var(--ci-accent);
     border-color: var(--ci-border-dim);
     transform: scale(1.15);
-    box-shadow: 0 0 6px rgba(79, 156, 248, 0.5);
+    box-shadow: 0 0 6px var(--accent-opacity-xl);
 }
 
 body .oldsite-center-column {
@@ -5758,7 +5758,7 @@ body .oldsite-page {
 
 .entity-shell.admin-page .history-btn:hover {
     background: linear-gradient(180deg, rgba(20, 184, 166, 1) 0%, rgba(13, 148, 136, 1) 100%);
-    color: #ffffff;
+    color: var(--white);
 }
 
 /* Success button — metallic green */
@@ -5777,8 +5777,8 @@ body .oldsite-page {
 .entity-shell.admin-page .warning-btn {
     background: linear-gradient(180deg, rgba(251, 191, 36, 0.7) 0%, rgba(217, 160, 20, 0.85) 100%);
     border: 1px solid rgba(251, 191, 36, 0.4);
-    color: #fffbeb;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    color: var(--amber-lightest);
+    box-shadow: 0 2px 6px var(--shadow-md), inset 0 1px 0 var(--accent-opacity-sm);
 }
 
 .entity-shell.admin-page .warning-btn:hover {

@@ -3,7 +3,7 @@
     background: var(--ci-bg-deepest);
     border-radius: 4px;
     padding: 0.5rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px var(--shadow-lg), inset 0 2px 4px var(--shadow-md);
 }
 
 .mailbox-folder-tabs {
@@ -32,7 +32,7 @@
     border-color: var(--ci-accent-mid);
     background: var(--ci-border-alt);
     color: var(--ci-accent);
-    box-shadow: 0 4px 8px rgba(79, 156, 248, 0.4), inset 0 0 0 1px rgba(79, 156, 248, 0.2);
+    box-shadow: 0 4px 8px var(--accent-opacity-lg), inset 0 0 0 1px var(--accent-opacity-sm);
 }
 
 .mailbox-folder-tab:hover:not(.active) {
@@ -108,13 +108,13 @@
 
 .mailbox-list-item-mark-read:hover,
 .mailbox-list-item-mark-read:focus-visible {
-    background: rgba(79, 156, 248, 0.1);
+    background: var(--accent-opacity-xs);
     color: var(--ci-text);
 }
 
 .mailbox-list-item.unread {
     border-color: var(--ci-accent-mid);
-    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.15);
+    box-shadow: inset 0 0 0 1px var(--accent-opacity-2xs);
 }
 
 .mailbox-list-item.sent {
@@ -124,7 +124,7 @@
 .mailbox-list-item.active {
     border-color: var(--ci-accent-mid);
     background: var(--ci-bg-alt);
-    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.3), 0 6px 12px rgba(79, 156, 248, 0.3), 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 0 0 1px var(--accent-opacity-md), 0 6px 12px var(--accent-opacity-md), 0 4px 8px var(--shadow-lg);
 }
 
 .mailbox-list-item:not(.active):hover {
@@ -220,7 +220,7 @@
 .mailbox-chip-alert {
     border-color: var(--ci-accent-mid);
     color: var(--ci-accent);
-    background: rgba(79, 156, 248, 0.1);
+    background: var(--accent-opacity-xs);
 }
 
 .mailbox-list-item-snippet {

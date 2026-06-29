@@ -18,7 +18,7 @@
     --identity-rhythm-loose: 1.2rem;
     width: min(480px, 100%);
     margin: 0;
-    background: linear-gradient(154deg, var(--ci-bg-card) 0%, #0d1520 100%);
+    background: linear-gradient(154deg, var(--ci-bg-card) 0%, var(--ci-bg-deepest) 100%);
     border: 1px solid var(--ci-border);
     border-top: 2px solid var(--ci-border-dim);
     border-radius: 14px;
@@ -86,8 +86,8 @@
     box-sizing: border-box;
     border-radius: 7px;
     border: 1px solid var(--ci-border);
-    background: #0d1520;
-    color: #e2eaf5;
+    background: var(--ci-bg-deepest);
+    color: var(--ci-text);
     box-shadow: inset 0 1px 3px var(--shadow-md);
     transition: border-color 0.2s, box-shadow 0.2s;
     position: relative;
@@ -101,7 +101,7 @@
 }
 
 .identity-container input::placeholder {
-    color: #4e6a84;
+    color: var(--ci-text-subtle);
     opacity: 1;
 }
 
@@ -115,9 +115,9 @@
 
 .identity-container button,
 .identity-container input[type="submit"] {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, #12395a 100%);
-    color: #e2f0fa;
-    border: 1px solid #1c6090;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    color: var(--ci-text);
+    border: 1px solid var(--ci-border-dim);
     padding: 0.68rem 1.1rem;
     border-radius: 8px;
     margin: var(--identity-rhythm-base) auto 0;
@@ -135,8 +135,8 @@
 
 .identity-container button:hover,
 .identity-container input[type="submit"]:hover {
-    background: linear-gradient(180deg, #205f88 0%, #164570 100%);
-    border-color: #2472a8;
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 100%);
+    border-color: var(--ci-border-dim);
     transform: translateY(-1px);
 }
 
@@ -146,7 +146,7 @@
 }
 
 .identity-container a:hover {
-    color: #82bdd8;
+    color: var(--ci-text-info);
 }
 
 .identity-home-link {
@@ -164,7 +164,7 @@
 }
 
 .identity-home-link:hover {
-    color: #82bdd8;
+    color: var(--ci-text-info);
 }
 
 .identity-home-arrow {
@@ -246,7 +246,7 @@
 }
 
 .identity-actions a:hover {
-    color: #82bdd8;
+    color: var(--ci-text-info);
 }
 
 .identity-muted {

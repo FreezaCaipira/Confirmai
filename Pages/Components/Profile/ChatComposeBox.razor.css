@@ -6,7 +6,7 @@
     padding: 0.28rem 0.52rem;
     border-radius: 4px;
     background: rgba(79, 156, 248, 0.12);
-    border: 1px solid rgba(79, 156, 248, 0.3);
+    border: 1px solid var(--accent-opacity-md);
 }
 
 .profile-chat-textarea {
@@ -40,7 +40,7 @@
 }
 
 .mk-btn:hover:not(:disabled) {
-    background: rgba(79, 156, 248, 0.1);
+    background: var(--accent-opacity-xs);
     border-color: var(--ci-border-dim);
     color: var(--ci-text);
 }
