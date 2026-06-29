@@ -25,7 +25,6 @@
     --bg-deep:    var(--ci-bg-card-deep);
     --bg-dark:    var(--ci-bg-card);
     --bg-dark-mid: var(--ci-bg-card);
-    --bg-dark-soft: var(--ci-bg-card);
 
     /* -- Legacy cool-tone backgrounds (aliased to CI tokens) -- */
     --bg-night:      var(--ci-bg-card-deep);
@@ -86,7 +85,6 @@
 
     /* -- Typography (aliased to CI font) -- */
     --font-display: var(--ci-font);
-    --font-accent:  var(--ci-font);
 
     /* ── Confirmai dark navy tokens (use these for all new code) ── */
     --ci-bg:           #090f18;
@@ -146,7 +144,6 @@
     --futsal-green-dark:   #14532d;
     --futsal-green-pale:   #bbf7d0;
     --futsal-bg-dark:      #0a2018;
-    --futsal-text-light:   #f0fdf4;
 
     /* Poker theme extras */
     --poker-bg-deepest:    #3b0764;
@@ -184,10 +181,10 @@
     
     /* Green shadows */
     --shadow-green-sm:     rgba(74, 222, 128, 0.3);
-    --shadow-green-lg:     rgba(74, 222, 128, 0.6);
     
     /* Red shadows */
     --shadow-red-sm:       rgba(239, 68, 68, 0.3);
+    --red-opacity-lg:      rgba(239, 68, 68, 0.5);
     
     /* Text shadows */
     --text-shadow-sm:      rgba(0, 0, 0, 0.3);
