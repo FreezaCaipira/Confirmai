@@ -412,31 +412,39 @@ var(--ci-font)           /* system sans-serif stack */
 
 ---
 
-## Ciclo 11 — Tarefas Ativas
+## Ciclo 11 — Tarefas Ativas (PLANO COMPLETO — TODO O TRABALHO RESTANTE)
 
-**Foco**: Criar vars para rgba frequentes em events.css + marketplace.css refactoring + decomposicao
+> **OBJETIVO**: Este ciclo cobre TODO o trabalho de CSS + decomposicao restante.
+> Sao 10 fases — o Pleno executa todas sequencialmente, sem esperar revisao Senior entre elas.
+> Senior so revisara ao final de TODAS as fases.
 
-**Branch**: `refactor/ciclo11-events-marketplace-decomp`
+**Branch**: `refactor/ciclo11-final-cleanup`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 
-### Fase 1: Adicionar ~12 novas vars rgba ao `:root` para events.css — P0
-**Estimativa**: ~20 min
+---
 
-events.css tem 220 rgba, muitos com 3-6 usos cada. Adicionar vars para os padroes mais frequentes:
+### BLOCO A — CSS GLOBAL (Fases 1-5)
+
+#### Fase 1: Adicionar ~20 novas vars rgba ao `:root` — P0
+**Estimativa**: ~30 min
+
+Adicionar vars para os padroes rgba frequentes (3+ usos) em events.css, scoped CSS e site.css:
 
 ```css
-/* Blue-300 mid opacity (96,165,250) */
+/* Blue-300 mid opacity (96,165,250) — usados em events.css e scoped */
 --blue300-opacity-md:  rgba(96, 165, 250, 0.3);    /* 6 usos */
 --blue300-opacity-lg:  rgba(96, 165, 250, 0.35);   /* 4 usos */
---blue300-opacity-xl:  rgba(96, 165, 250, 0.5);    /* 3 usos */
---blue300-opacity-2xl: rgba(96, 165, 250, 0.85);   /* 4 usos */
+--blue300-opacity-xl:  rgba(96, 165, 250, 0.5);    /* 6 usos */
+--blue300-opacity-2xl: rgba(96, 165, 250, 0.6);    /* 3 usos */
+--blue300-opacity-3xl: rgba(96, 165, 250, 0.85);   /* 4 usos */
 
 /* Red event opacity (239,68,68) */
 --red-opacity-xs:      rgba(239, 68, 68, 0.08);    /* 6 usos */
---red-opacity-lg-mid:  rgba(239, 68, 68, 0.35);    /* 6 usos */
+--red-opacity-2xs:     rgba(239, 68, 68, 0.1);     /* 3 usos */
+--red-opacity-mid:     rgba(239, 68, 68, 0.35);    /* 6 usos */
 
 /* Amber event opacity (251,191,36) */
---amber-opacity-xs:    rgba(251, 191, 36, 0.08);   /* 5 usos */
+--amber-opacity-xs:    rgba(251, 191, 36, 0.08);   /* 9 usos */
 --amber-opacity-md:    rgba(251, 191, 36, 0.25);   /* 3 usos */
 --amber-opacity-lg:    rgba(251, 191, 36, 0.35);   /* 3 usos */
 --amber-opacity-2xl:   rgba(251, 191, 36, 0.85);   /* 3 usos */
@@ -444,109 +452,220 @@ events.css tem 220 rgba, muitos com 3-6 usos cada. Adicionar vars para os padroe
 /* Emerald (52,211,153) */
 --emerald-opacity-md:  rgba(52, 211, 153, 0.3);    /* 3 usos */
 
+/* Teal (16,185,129) */
+--teal-opacity-xs:     rgba(16, 185, 129, 0.1);    /* 3 usos */
+
 /* Slate extended (148,163,184) */
 --slate-border-xl:     rgba(148, 163, 184, 0.25);  /* 3 usos */
+
+/* Navy/CI accent (26,90,176) — usados em scoped e site.css */
+--ci-accent-opacity-xs: rgba(26, 90, 176, 0.12);   /* 6 usos */
+--ci-accent-opacity-sm: rgba(26, 90, 176, 0.18);   /* 2 usos */
+--ci-accent-opacity-md: rgba(26, 90, 176, 0.2);    /* 3 usos */
+--ci-accent-opacity-lg: rgba(26, 90, 176, 0.25);   /* 8 usos */
+
+/* Slate functional (100,116,139) */
+--slate-functional-md: rgba(100, 116, 139, 0.3);   /* 4 usos */
+
+/* Black additional */
+--shadow-sm:           rgba(0, 0, 0, 0.25);        /* 7 usos */
+--shadow-xs:           rgba(0, 0, 0, 0.2);         /* 4 usos */
+--shadow-2xs:          rgba(0, 0, 0, 0.15);        /* 3 usos */
+--shadow-light:        rgba(0, 0, 0, 0.35);        /* 3 usos */
 ```
 
-**Total**: ~12 novas vars para ~49 usos em events.css
-
-**Validacao**: `dotnet build`
+**Validacao**: `dotnet build` + verificar que cada var e usada PELO MENOS 1 vez no mesmo commit
 
 ---
 
-### Fase 2: Converter rgba em events.css usando novas + existentes vars — P0
-**Estimativa**: ~1.5h
+#### Fase 2: Converter rgba em events.css usando novas + existentes vars — P0
+**Estimativa**: ~2h
 
-Converter os ~49 rgba que agora tem vars (da Fase 1) + qualquer padrao restante com var existente.
+Converter TODOS os rgba em events.css que agora tem vars correspondentes.
 
-**ATENCAO encoding**: NAO editar linhas com caracteres acentuados nos comentarios. Se precisar editar perto de um comentario com acentos, copiar a linha original sem modificar o comentario.
+**ATENCAO encoding (regra 18)**: NAO editar linhas com caracteres acentuados nos comentarios CSS. Se precisar editar perto de um comentario com acentos, copiar a linha original sem modificar.
+
+**Procedimento**: Para cada var nova da Fase 1, fazer `grep -n 'rgba(96, 165, 250, 0.3)' wwwroot/css/events.css` e substituir TODOS os matches.
 
 **Validacao**:
 ```bash
 dotnet build
 grep -c 'rgba(' wwwroot/css/events.css
-# Meta: <175
+# Meta: <170 (de 220 atual)
 ```
 
 ---
 
-### Fase 3: Refatorar marketplace.css — hex -> vars — P1
+#### Fase 3: Converter rgba em events.css — hex restantes — P1
 **Estimativa**: ~1.5h
 
-marketplace.css tem 43 hex e apenas 1 var usage. E o CSS global menos refatorado. Os hex sao todos tons de brown/parchment que tem vars existentes:
+events.css ainda tem 110 hex. Muitos sao cores que ja tem vars. Converter TODOS os hex que tem var na lista permitida.
 
-```
-#d8c093 -> var(--parchment-dark)    ou similar
-#bfa06c -> var(--gold-deep)         ou similar
-#7f5e34 -> var(--brown-mid)         ou similar
-#3f2914 -> var(--bg-dark)           ou similar
-#2f1e0c -> var(--bg-deep)           ou similar
+**Procedimento**: Comparar cada hex unico com a lista de vars. Se match exato ou proximo, converter.
+
+**Validacao**:
+```bash
+dotnet build
+grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/events.css
+# Meta: <50
 ```
 
-**PROCEDIMENTO**: Para cada hex, encontrar a var mais proxima na lista permitida. Se nao existir var proxima, documentar na secao "Cores sem Var".
+---
+
+#### Fase 4: Refatorar marketplace.css — hex + rgba -> vars — P1
+**Estimativa**: ~1.5h
+
+marketplace.css tem 43 hex e 35 rgba com apenas 1 var usage. E o CSS global menos refatorado.
+
+**Mapeamento de hex -> vars existentes**:
+```
+#d8c093 -> var(--parchment-dark)
+#bfa06c -> var(--gold-deep)
+#7f5e34 -> var(--brown-mid)
+#7a572d -> var(--brown-mid)
+#3f2914 -> var(--brown-dark)
+#2f1e0c -> var(--bg-deep)
+#f3e2bf -> var(--parchment-soft)
+#ebd2a7 -> var(--parchment)
+#dfc493 -> var(--parchment-dark)
+```
+
+Para cada hex, encontrar a var mais proxima na lista permitida. Para rgba, verificar se alguma var de shadow/opacity se aplica. Se nao existir var proxima, documentar na secao "Cores sem Var".
 
 **Validacao**:
 ```bash
 dotnet build
 grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/marketplace.css
+# Meta: <10
+grep -c 'rgba(' wwwroot/css/marketplace.css
 # Meta: <15
 ```
 
 ---
 
-### Fase 4: Decomposicao de Groups/Payments.razor (560L -> <400L) — P2
-**Estimativa**: ~1.5h
+#### Fase 5: Converter rgba restantes em scoped CSS + site.css — P1
+**Estimativa**: ~2h
 
-Extrair sub-componentes seguindo o padrao de Mailbox (Ciclo 10):
+**Scoped CSS**: 378 rgba restantes. Muitos sao padroes unicos (336 patterns), mas ha ~87 usos com 3+ ocorrencias que agora tem vars (da Fase 1). Converter TODOS que tem var correspondente via grep global (regra 17).
 
-1. `GroupPaymentsSummary` — resumo financeiro do grupo
-2. `GroupPaymentsTable` — tabela de pagamentos com filtros
+**site.css fora do :root**: 91 rgba restantes. Converter os que tem var e documentar os que nao tem (metallic gradients, one-off opacities).
 
-**REGRAS de decomposicao**:
+Os 2 hex restantes em site.css (`#e0f7f4`, `#ecfdf5`) sao mint green sem var — documentar na secao "Cores sem Var".
+
+**Validacao**:
+```bash
+dotnet build
+grep -rn 'rgba(' Pages/ Shared/ --include="*.css" | grep -v 'var(--' | wc -l
+# Meta: <300 (de 378 atual — muitos sao opacities unicas de warm theme)
+```
+
+---
+
+### BLOCO B — DECOMPOSICAO DE TODAS AS PAGINAS GRANDES (Fases 6-10)
+
+**Regras de decomposicao** (aplicam a TODAS as fases abaixo):
 - Componente filho recebe dados via `[Parameter]`
 - Eventos de volta via `[Parameter] EventCallback`
 - CSS vai no `.razor.css` do componente filho (NAO global)
-- Usar `partial class` com code-behind `.razor.cs`
+- Usar `partial class` com code-behind `.razor.cs` para TODA pagina
 - Usar `IDbContextFactory<AppDbContext>` (NAO AppDbContext direto)
+- Se a pagina ja usa `@inject AppDbContext Db`, converter para `IDbContextFactory` durante a decomposicao
+
+---
+
+#### Fase 6: Decomposicao de AdminPayments.razor (1.156L) — P2
+**Estimativa**: ~2h
+
+Ja tem 4 sub-componentes extraidos (`AdminPaymentsFilters`, `AdminPaymentsSummaryPanel`, `AdminPaymentsTable`, `AdminPaymentsAdvancedToolsModal`). O template principal ainda esta com 1.156L — extrair code-behind:
+
+1. Criar `AdminPayments.razor.cs` com toda a logica (campos, metodos, lifecycle)
+2. Template fica com markup puro (~400-500L — aceitavel dado que ja tem 4 sub-componentes)
 
 **Validacao**:
 ```bash
 dotnet build
 dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Groups/Payments.razor
-# Meta: <400
+wc -l Pages/Admin/AdminPayments.razor
+# Meta: <600 (ja tem sub-componentes, o template e denso)
 ```
 
 ---
 
-### Fase 5: Decomposicao de Poker/Edit.razor (547L -> <400L) — P2
-**Estimativa**: ~1.5h
+#### Fase 7: Decomposicao de Futsal/Detail.razor (931L) — P2
+**Estimativa**: ~2h
 
-Similar a Poker/Create. Extrair:
+Ja tem 9+ sub-componentes em `Pages/Futsal/Components/`. Extrair code-behind:
 
-1. Code-behind `Poker/Edit.razor.cs` — logica de edicao
-2. Reutilizar `PokerDetailInfo` se aplicavel
+1. Criar `Futsal/Detail.razor.cs` com toda a logica
+2. Template fica com markup referenciando os sub-componentes
 
 **Validacao**:
 ```bash
 dotnet build
 dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Poker/Edit.razor
-# Meta: <400
+wc -l Pages/Futsal/Detail.razor
+# Meta: <500 (ja tem muitos sub-componentes, template denso)
 ```
 
 ---
 
-### Fase 6: Converter rgba restantes em site.css (fora do :root) — P1
-**Estimativa**: ~1h
+#### Fase 8: Decomposicao de Groups/Payments.razor (560L), Poker/Edit.razor (547L), Groups/Features.razor (461L) — P2
+**Estimativa**: ~3h (3 paginas menores)
 
-site.css tem 136 rgba fora do `:root`. Muitos sao padroes unicos de metallic gradients. Converter os que tem var existente e documentar os que nao tem.
+Para cada pagina:
+1. Criar code-behind `.razor.cs` com toda a logica
+2. Extrair sub-componentes se necessario (Groups/Payments: tabela + resumo; Poker/Edit: form fields; Groups/Features: toggles)
+3. Se usa `AppDbContext` direto, converter para `IDbContextFactory`
 
-Os 2 hex restantes (`#e0f7f4`, `#ecfdf5`) sao mint green sem var — documentar na secao "Cores sem Var".
-
-**Validacao**:
+**Validacao** (para cada pagina):
 ```bash
 dotnet build
+dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
+wc -l Pages/Groups/Payments.razor     # Meta: <350
+wc -l Pages/Poker/Edit.razor          # Meta: <350
+wc -l Pages/Groups/Features.razor     # Meta: <300
+```
+
+---
+
+#### Fase 9: Decomposicao de EventPayment (667L), Escalacao (661L), AdminLogs (656L) — P2
+**Estimativa**: ~3h (3 paginas medias)
+
+**EventPayment.razor** (667L): Ja tem 7 sub-componentes em `Pages/Payment/Components/`. Criar code-behind.
+- **ATENCAO**: Esta pagina usa `@inject AppDbContext Db` — converter para `IDbContextFactory`
+
+**Escalacao.razor** (661L): Criar code-behind + extrair sub-componentes se necessario.
+
+**AdminLogs.razor** (656L): Ja tem `AdminLogsTable`. Criar code-behind.
+
+**Validacao** (para cada pagina):
+```bash
+dotnet build
+dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
+wc -l Pages/Payment/EventPayment.razor  # Meta: <400
+wc -l Pages/Futsal/Escalacao.razor      # Meta: <400
+wc -l Pages/Admin/AdminLogs.razor       # Meta: <400
+```
+
+---
+
+#### Fase 10: Decomposicao de PaymentsHistory (419L), Futsal/Create (418L), Admin (410L), MyEvents/Index (402L) — P2
+**Estimativa**: ~3h (4 paginas menores, perto do limite)
+
+Para cada pagina: criar code-behind `.razor.cs` com toda a logica.
+
+**ATENCAO**:
+- `PaymentsHistory.razor` usa `@inject AppDbContext Db` — converter para `IDbContextFactory`
+- `PaymentDetails.razor` (separado, nao na lista) tambem usa AppDbContext — converter se tocar
+
+**Validacao** (para cada pagina):
+```bash
+dotnet build
+dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
+wc -l Pages/Payment/PaymentsHistory.razor  # Meta: <250
+wc -l Pages/Futsal/Create.razor            # Meta: <250
+wc -l Pages/Admin/Admin.razor              # Meta: <250
+wc -l Pages/MyEvents/Index.razor           # Meta: <250
 ```
 
 ---
@@ -554,10 +673,21 @@ dotnet build
 ## Ordem de Execucao
 
 ```
-Fase 1 (novas vars) -> Fase 2 (events.css rgba) -> Fase 3 (marketplace.css hex) -> Fase 4 (decomp Groups/Payments) -> Fase 5 (decomp Poker/Edit) -> Fase 6 (site.css rgba)
+BLOCO A (CSS):
+  Fase 1 (novas vars) -> Fase 2 (events.css rgba) -> Fase 3 (events.css hex) -> Fase 4 (marketplace.css) -> Fase 5 (scoped + site.css)
+
+BLOCO B (Decomposicao):
+  Fase 6 (AdminPayments 1156L) -> Fase 7 (Futsal/Detail 931L) -> Fase 8 (3 paginas ~500L) -> Fase 9 (3 paginas ~660L) -> Fase 10 (4 paginas ~410L)
 ```
 
-**Meta Ciclo 11**: events.css rgba <175, marketplace.css hex <15, 2 paginas decompostas (<400L cada), site.css rgba <120
+**Metas Ciclo 11**:
+- events.css rgba <170, events.css hex <50
+- marketplace.css hex <10, rgba <15
+- Scoped rgba <300
+- site.css rgba (fora :root) <80
+- TODAS as 12 paginas >400L com code-behind `.razor.cs`
+- TODAS as paginas com `AppDbContext` direto migradas para `IDbContextFactory`
+- 0 vars indefinidas, 0 vars mortas, 0 encoding issues
 
 ---
 
