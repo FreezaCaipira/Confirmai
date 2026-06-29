@@ -146,3 +146,63 @@
 .evpay-admin-review .detail-back-link:hover {
     color: var(--link-info);
 }
+
+/* ── Admin success (paid) ────────────────────────────────────── */
+.evpay-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.evpay-status--paid {
+    background: rgba(22, 163, 74, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.25);
+    color: var(--green-bright);
+}
+
+.evpay-status--paid i {
+    font-size: 1.4rem;
+    margin-top: 0.1rem;
+}
+
+.evpay-status--paid strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+
+.evpay-status--paid p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--green-soft);
+}
+
+.evpay-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: filter 0.15s;
+    margin-bottom: 0.5rem;
+}
+
+.evpay-action-btn--back {
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-muted);
+    border: 1px solid var(--ci-border);
+}
+
+.evpay-action-btn--back:hover {
+    filter: brightness(1.1);
+}
