@@ -3468,14 +3468,15 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     justify-content: center;
     gap: .5rem;
     font-size: .9rem;
-    padding: .35rem .5rem;
+    padding: .35rem 2rem;
     border-radius: 6px;
     background: rgba(8, 18, 30, 0.46);
     transition: background .15s, border-color .15s;
+    position: relative;
 }
 
-.esc-team--a .esc-move-btn { margin-left: auto; }
-.esc-team--b .esc-move-btn { margin-right: auto; }
+.esc-team--a .esc-move-btn { position: absolute; right: .5rem; }
+.esc-team--b .esc-move-btn { position: absolute; left: .5rem; }
 
 .esc-player-list .esc-player:nth-child(even) {
     background: rgba(255,255,255,.07);
