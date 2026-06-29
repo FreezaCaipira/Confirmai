@@ -187,13 +187,13 @@
     --red-opacity-lg:      rgba(239, 68, 68, 0.5);
     
     /* Text shadows */
-    --text-shadow-sm:      rgba(0, 0, 0, 0.3);
+    --text-shadow-sm:      var(--shadow-md);
     
     /* Inset shadows */
     --inset-accent-sm:     rgba(147, 197, 253, 0.2);
     
     /* Background overlays */
-    --overlay-sm:          rgba(0, 0, 0, 0.3);
+    --overlay-sm:          var(--shadow-md);
     --overlay-lg:          rgba(0, 0, 0, 0.55);
     
     /* Accent blue opacity */
@@ -527,7 +527,7 @@ body::before {
     text-decoration: none;
     font-weight: 600;
     letter-spacing: 0.02em;
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
     padding: 0.56rem 0.78rem;
     border-radius: 8px;
     display: flex;
@@ -560,7 +560,7 @@ body::before {
 .sidebar nav ul li a:hover {
     color: var(--ci-text-link);
     background: rgba(26, 90, 176, 0.22);
-    border-color: rgba(79, 156, 248, 0.4);
+    border-color: var(--accent-opacity-lg);
     transform: translateX(2px);
 }
 
@@ -973,7 +973,7 @@ body::before {
 .back-btn:hover,
 .view-btn:hover,
 .history-btn:hover {
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 10px var(--shadow-md);
 }
 
 .btn:active,
@@ -2324,7 +2324,7 @@ textarea:focus-visible {
 
 .breadcrumb-nav a:hover {
     color: var(--ci-accent);
-    background: rgba(79, 156, 248, 0.10);
+    background: var(--accent-opacity-xs);
     text-decoration: none;
 }
 
@@ -2941,7 +2941,7 @@ body::before {
     margin: 0.58rem 0 0;
     color: var(--ci-text-blue);
     line-height: 1.58;
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
     max-width: 74ch;
 }
 
@@ -4507,7 +4507,7 @@ body .oldsite-payment-chip span {
     font-size: 0.82rem;
     font-weight: 500;
     line-height: 1.4;
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
     letter-spacing: 0;
 }
 
@@ -4958,7 +4958,7 @@ body .mailbox-page .mailbox-pagination .mk-btn {
 }
 
 body .mailbox-page .mailbox-pagination .mk-btn:hover:not(:disabled) {
-    background: rgba(79, 156, 248, 0.1);
+    background: var(--accent-opacity-xs);
     border-color: var(--ci-border-dim);
     color: var(--ci-text);
     filter: none;
@@ -5121,7 +5121,7 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
     border: 1px solid rgba(21, 61, 90, 0.32);
     color: var(--ci-accent);
     letter-spacing: 0.04em;
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 /* ── Right column widgets ─────────────────────────────────────── */
@@ -5163,7 +5163,7 @@ body .oldsite-widget ol {
     color: var(--ci-text-blue);
     padding: 0.4rem 0.7rem;
     font-size: 0.78rem;
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 /* ── Footer ───────────────────────────────────────────────────── */
@@ -5210,7 +5210,7 @@ body .oldsite-widget ol li {
     border-bottom: none;
     list-style: none;
     padding: 0;
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
     margin: 0;
     background: transparent;
     font-size: 0.82rem;
@@ -5232,7 +5232,7 @@ body .oldsite-widget ol li a {
     text-decoration: none;
     font-size: 0.82rem;
     font-weight: 500;
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
     border-radius: 5px;
     transition: background 0.15s ease, color 0.15s ease;
 }
@@ -5368,7 +5368,7 @@ body .entity-shell.parchment-a .product-table td {
     background: transparent;
     border-bottom: 1px solid var(--ci-border-dim);
     color: var(--ci-text-blue);
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 body .entity-shell.parchment-a .product-table tr:nth-child(even) td {
@@ -5612,7 +5612,7 @@ body .oldsite-page {
     color: var(--ci-text-blue);
     margin: 0.55rem 0;
     padding: 0.75rem 1rem;
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 .entity-shell.admin-page .admin-settings-card b,
@@ -5857,7 +5857,7 @@ body .oldsite-page {
     background: rgba(26, 90, 176, 0.18);
     border-bottom: 1px solid var(--ci-border-dim);
     color: var(--ci-text-blue);
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 .entity-shell.admin-page table tr:nth-child(even) td,
@@ -5917,7 +5917,7 @@ body .oldsite-page {
 
 .entity-shell.admin-page .label {
     color: var(--ci-text-blue);
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 .entity-shell.admin-page .operation-fee-message.ok {
@@ -5947,7 +5947,7 @@ body .oldsite-page {
     background: var(--ci-bg-card-deep);
     border-left-color: var(--ci-accent-mid);
     color: var(--ci-text-blue);
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 .entity-shell.admin-page .orders-review-restored-close {
@@ -5967,7 +5967,7 @@ body .oldsite-page {
     border: 1px solid var(--ci-border);
     box-shadow: none;
     color: var(--ci-text-blue);
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 .entity-shell.admin-page .payment-details-card .label {
@@ -6005,7 +6005,7 @@ body .oldsite-page {
 .entity-shell.admin-page .apv-row dd {
     border-right-color: var(--ci-border);
     color: var(--ci-text-blue);
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 .entity-shell.admin-page .apv-row dt {
@@ -6066,7 +6066,7 @@ body .oldsite-page {
 /* Form pages */
 .entity-shell.admin-page .form-group label {
     color: var(--ci-text-blue);
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 .entity-shell.admin-page .form-group .input,
@@ -6268,12 +6268,12 @@ body .admin-empty-state-hint {
 body .entity-shell-card p,
 body .entity-shell-card li {
     color: var(--ci-text-blue);
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 body .entity-shell-subtitle {
     color: var(--ci-text-blue);
-    text-shadow: 0 0 6px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
 /* ── Google Maps Places Autocomplete dropdown ───────────────────── */
@@ -6282,7 +6282,7 @@ body .entity-shell-subtitle {
     background: var(--ci-bg-card-deep);
     border: 1px solid var(--ci-border);
     border-radius: 0 0 8px 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 24px var(--shadow-xl);
     font-family: inherit;
 }
 .pac-item {
@@ -6464,7 +6464,7 @@ input:autofill:focus {
     color: var(--amber-light);
     background: linear-gradient(180deg, var(--amber) 0%, var(--amber-dark) 50%, var(--amber-mid) 100%);
     border-color: var(--amber-light);
-    box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+    box-shadow: 0 2px 4px var(--amber-opacity-sm);
 }
 
 .admin-payments-shell .admin-payments-severity-pill {
@@ -6486,7 +6486,7 @@ input:autofill:focus {
     color: var(--parchment-cream);
     background: linear-gradient(180deg, var(--amber) 0%, var(--amber-dark) 50%, var(--amber-mid) 100%);
     border-color: var(--amber-light);
-    box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+    box-shadow: 0 2px 4px var(--amber-opacity-sm);
 }
 
 .admin-payments-shell .admin-payments-severity-pill--critical {
