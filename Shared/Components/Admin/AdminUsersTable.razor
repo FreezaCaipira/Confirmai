@@ -1,6 +1,5 @@
 @using Confirmai.Models
 @using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.Components.Web.Virtualization
 
 @if (TotalItems == 0)
 {
@@ -21,7 +20,8 @@ else
                 </tr>
             </thead>
             <tbody>
-                <Virtualize Context="u" ItemsProvider="LoadUsersAsync" OverscanCount="10">
+                @foreach (var u in Users)
+                {
                     <tr>
                         <td data-label="@T["AdminUsers.User"]">@u.UserName</td>
                         <td data-label="@T["AdminUsers.Email"]">@u.Email</td>
@@ -66,10 +66,19 @@ else
                             </div>
                         </td>
                     </tr>
-                </Virtualize>
+                }
             </tbody>
         </table>
     </div>
+
+    @if (TotalPages > 1)
+    {
+        <div class="pagination admin-users-pagination">
+            <button type="button" @onclick="PrevPage" disabled="@(CurrentPage <= 1)">@T["Common.Previous"]</button>
+            <span class="pagination-info">@T["Common.Page"] @CurrentPage @T["Common.Of"] @TotalPages</span>
+            <button type="button" @onclick="NextPage" disabled="@(CurrentPage >= TotalPages)">@T["Common.Next"]</button>
+        </div>
+    }
 }
 
 @code {
@@ -77,7 +86,16 @@ else
     public int TotalItems { get; set; }
 
     [Parameter]
+    public List<ApplicationUser> Users { get; set; } = new();
+
+    [Parameter]
     public Dictionary<string, string> UserRoles { get; set; } = new();
+
+    [Parameter]
+    public int CurrentPage { get; set; }
+
+    [Parameter]
+    public int TotalPages { get; set; }
 
     [Parameter]
     public EventCallback<string> OnViewUser { get; set; }
@@ -95,7 +113,10 @@ else
     public EventCallback<string> OnDeleteUser { get; set; }
 
     [Parameter]
-    public ItemsProviderDelegate<ApplicationUser> LoadUsersAsync { get; set; } = default!;
+    public EventCallback OnPrevPage { get; set; }
+
+    [Parameter]
+    public EventCallback OnNextPage { get; set; }
 
     [Inject]
     public UiTextService T { get; set; } = default!;
@@ -124,4 +145,7 @@ else
     {
         await OnDeleteUser.InvokeAsync(userId);
     }
+
+    private async Task PrevPage() => await OnPrevPage.InvokeAsync();
+    private async Task NextPage() => await OnNextPage.InvokeAsync();
 }

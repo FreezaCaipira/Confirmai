@@ -30,7 +30,7 @@ internal static class PaymentTexts
         ["PaymentBuy.Processing"] = "Processando pagamento...",
 
         // PaymentHistory
-        ["PaymentHistory.Title"] = "Historico de faturas",
+        ["PaymentHistory.Title"] = "Meus pagamentos",
         ["PaymentHistory.Subtitle"] = "Acompanhe suas transacoes e pagamentos",
         ["PaymentHistory.Empty"] = "Nenhuma transacao encontrada",
         ["PaymentHistory.EmptyHint"] = "Quando voce fizer pagamentos, eles aparecerao aqui.",
@@ -171,7 +171,7 @@ internal static class PaymentTexts
         ["PaymentBuy.Processing"] = "Processing payment...",
 
         // PaymentHistory
-        ["PaymentHistory.Title"] = "Invoice History",
+        ["PaymentHistory.Title"] = "My Payments",
         ["PaymentHistory.Subtitle"] = "Track your transactions and payments",
         ["PaymentHistory.Empty"] = "No transactions found",
         ["PaymentHistory.Date"] = "Date",
@@ -309,7 +309,7 @@ internal static class PaymentTexts
         ["PaymentBuy.Processing"] = "Procesando pago...",
 
         // PaymentHistory
-        ["PaymentHistory.Title"] = "Historial de facturas",
+        ["PaymentHistory.Title"] = "Mis pagamentos",
         ["PaymentHistory.Subtitle"] = "Rastrea tus transacciones y pagos",
         ["PaymentHistory.Empty"] = "No se encontraron transacciones",
         ["PaymentHistory.Date"] = "Fecha",

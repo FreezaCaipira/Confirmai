@@ -167,7 +167,7 @@
     width: 100%;
     min-height: 42px;
     border-radius: 7px;
-    border: 1px solid #8f6f42;
+    border: 1px solid var(--brown-border-warm);
     background: rgba(255, 248, 231, 0.86);
     color: #4e3119;
     padding: 0.52rem 0.66rem;

@@ -19,7 +19,7 @@
             @foreach (var c in ConfirmationsA.Where(c => c.Position == FutsalPosition.Goalkeeper))
             {
                 <li class="esc-player esc-player--gk @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
-                    <span class="esc-player-icon">🥅</span>
+                    <i class="fas fa-hand-paper esc-player-icon"></i>
                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
                     @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
                 </li>
@@ -52,7 +52,7 @@
             @foreach (var c in ConfirmationsB.Where(c => c.Position == FutsalPosition.Goalkeeper))
             {
                 <li class="esc-player esc-player--gk @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
-                    <span class="esc-player-icon">🥅</span>
+                    <i class="fas fa-hand-paper esc-player-icon"></i>
                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
                     @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
                 </li>

@@ -5,9 +5,7 @@
     border-radius: 8px;
     text-decoration: none;
     color: var(--ci-text);
-    background: var(--ci-bg-deepest);
-    border: 1px solid var(--ci-border-alt);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    background: var(--ci-bg-card);
     position: relative;
     overflow: hidden;
 }
@@ -42,40 +40,18 @@
     color: var(--futsal-green-pale);
 }
 
-.sport-card--futsal .sport-card-count:not(.sport-card-count--empty) {
-    color: var(--futsal-green-pale);
-    background: var(--futsal-green-dark);
-    border-color: var(--green-bright);
-}
-
-.sport-card--futsal .sport-card-count--empty {
-    color: var(--ci-text-blue);
-    background: var(--ci-bg-alt);
-    border-color: var(--ci-border);
-}
 
 /* ── Poker header ───────────────────────── */
 .sport-card--poker .sport-card-header {
-    background: linear-gradient(180deg, var(--ci-bg-card) 0%, var(--ci-accent-mid) 100%);
-    border-color: var(--ci-accent);
-    box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.34);
+    background: linear-gradient(180deg, var(--poker-bg-dark) 0%, var(--poker-accent-deep) 100%);
+    border-color: var(--poker-accent);
+    box-shadow: inset 0 1px 0 rgba(196, 181, 253, 0.30);
 }
 
 .sport-card--poker .sport-card-label {
-    color: var(--ci-surface-light);
+    color: var(--poker-text);
 }
 
-.sport-card--poker .sport-card-count:not(.sport-card-count--empty) {
-    color: var(--ci-surface-light);
-    background: var(--ci-bg-deep);
-    border-color: var(--ci-accent);
-}
-
-.sport-card--poker .sport-card-count--empty {
-    color: var(--ci-text-blue);
-    background: var(--ci-bg-alt);
-    border-color: var(--ci-border);
-}
 
 /* ── Card body ──────────────────────────── */
 .sport-card-body {
@@ -93,7 +69,7 @@
 }
 
 .sport-card--poker .sport-card-body {
-    border-color: var(--ci-accent);
+    border-color: var(--poker-accent);
 }
 
 /* ── Card parts ──────────────────────────── */
@@ -105,19 +81,48 @@
     flex: 1;
 }
 
-.sport-card-count {
-    font-size: 0.75rem;
-    font-weight: 700;
-    border-radius: 10px;
-    padding: 0.08rem 0.55rem;
-    border: 1px solid;
-}
 
 .sport-card-desc {
     font-size: 0.92rem;
     color: var(--ci-text-blue);
     margin: 0;
     line-height: 1.5;
+}
+
+.sport-card-events {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ci-text-muted);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    align-self: flex-start;
+}
+
+.sport-card-events i {
+    font-size: 0.72rem;
+    color: var(--ci-accent);
+}
+
+.sport-card-events--empty {
+    color: var(--ci-text-subtle);
+    opacity: 0.7;
+}
+
+.sport-card-events--empty i {
+    color: var(--ci-text-subtle);
+}
+
+.sport-card--futsal .sport-card-events:not(.sport-card-events--empty) i {
+    color: var(--green-bright);
+}
+
+.sport-card--poker .sport-card-events:not(.sport-card-events--empty) i {
+    color: var(--poker-accent);
 }
 
 .sport-card-cta {
@@ -132,5 +137,5 @@
 }
 
 .sport-card--poker .sport-card-cta {
-    color: var(--poker-accent);
+    color: var(--poker-text);
 }

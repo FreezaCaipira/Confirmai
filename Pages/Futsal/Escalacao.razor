@@ -622,7 +622,7 @@ else
 
         sb.AppendLine("*🟡 TIME A*");
         foreach (var c in teamAConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
-            sb.AppendLine($"🥅 {c.User.FullName ?? c.User.Email}");
+            sb.AppendLine($"� {c.User.FullName ?? c.User.Email}");
         int i = 1;
         foreach (var c in teamAConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
             sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
@@ -630,7 +630,7 @@ else
 
         sb.AppendLine("*🔵 TIME B*");
         foreach (var c in teamBConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
-            sb.AppendLine($"🥅 {c.User.FullName ?? c.User.Email}");
+            sb.AppendLine($"� {c.User.FullName ?? c.User.Email}");
         i = 1;
         foreach (var c in teamBConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
             sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");

@@ -87,6 +87,126 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 3. **Regressao**: Substituiu `var(--entity-muted)` por `#deeeff` no EntityProfileShell.razor.css — removeu referencia a var funcional (CORRIGIDO pelo Senior)
 4. **Commits bagunçados**: 8 commits de tentativa/erro/reversao em vez de 1-2 commits limpos
 
+### Ciclo 8 — Sessao UX Interativa (Pleno Local)
+- Branch: `refactor/ciclo8-rgba-cleanup` (continuada)
+- Commits: `f490e78`, `17b3600`, `91a6674` (sessao 1 — 28/06/2026)
+- Commits: `d53e8e6` ate `728f4f8` (sessao 2 — 29/06/2026)
+
+#### Melhorias de UI/UX aplicadas (28/06/2026)
+
+**Grupo Detail (`/grupo/{id}`)**:
+1. **Inversao de secoes**: Membros agora aparece antes de Metricas (mais relevante primeiro)
+2. **Contraste de subcards de metricas**: `.metric-card` alterado de `--ci-bg-card` para `--ci-bg-card-deep` com borda `--ci-border` visivel e `border-radius: 10px`
+3. **Separadoras da tabela de partidas**: `border-bottom` das linhas trocado de `#0d1f35` (quase invisivel) para `var(--ci-border-dim)` (azul claramente visivel); hover usa tint accent sutil
+4. **Badge de partidas semanais**: Banner `.events-recurring-notice` no topo da listagem quando ha eventos com `RachaScheduleId`; icone `fa-sync-alt` por linha (`et-recurring-icon`) com tooltip
+
+**Pagamentos do Grupo (`/grupo/{id}/pagamentos`)**:
+5. **Aba Historico sem borda vermelha**: Cards da aba Historico usavam o mesmo estilo vermelho da aba Pendentes (border `--red-strong`, shadow `--shadow-red-sm`). Adicionadas classes modifier `--history` com tema verde neutro:
+   - `.payments-user-item--history`: borda neutra + hover verde
+   - `.payments-user-item--history--selected`: selecao verde sutil
+   - `.payments-detail-panel--history`: borda esquerda verde + total em verde
+
+**Arquivos modificados**:
+- `Pages/Groups/Detail.razor` (reorder + recurring badge)
+- `Shared/Components/Groups/GroupMetrics.razor.css` (contraste subcards)
+- `wwwroot/css/events.css` (separadoras + recurring notice CSS)
+- `Pages/Groups/Payments.razor` (history modifier classes)
+- `Pages/Groups/Payments.razor.css` (history neutral styling)
+
+#### Melhorias de UI/UX aplicadas (29/06/2026) — Sessao 2
+
+**Escalacao Futsal (`/futsal/{id}/escalacao`)**:
+6. **Icone de goleiro corrompido**: Emoji de goleiro (🧤/🥅) estava corrompido em todos os componentes. Substituido por icone Font Awesome `fa-hand-paper` em:
+   - `EscalacaoDraftTeamBuilder.razor`
+   - `FutsalGoalkeeperGroup.razor`
+   - `Futsal/Index.razor`
+   - `EscalacaoConfirmed.razor`
+   - `EventPaymentSummary.razor`
+7. **Centralizacao de nomes e titulos**: Titulos dos times, nomes e numeros dos jogadores agora estao centralizados. Botoes de mover (setas) posicionados absolutamente nas bordas para nao afetar o centro.
+8. **Botao shuffle com tema metalico**: Botao de embaralhar times recebeu gradiente azul metalico consistente com o tema dark.
+9. **Modal de confirmacao com tema azul metalico**: Modal de confirmar escalacao estilizado com gradiente azul metalico.
+10. **Legibilidade de texto em fundo escuro**: Time B (fundo escuro) tinha input com texto ilegivel. Corrigido contraste.
+11. **Botao rejeitar cookie**: Melhorado contraste do botao "Rejeitar" no cookie consent.
+12. **Botoes de mover time**: Adicionada cor distinctiva para legibilidade.
+
+**Pagamentos de Evento (`/payment/{id}`)**:
+13. **QR code reduzido ~40%**: Codigos QR estavam muito grandes. Reduzidos para melhor proporcao na tela.
+14. **CSS movido para componentes filhos**: Scoped CSS do EventPayment movido para EventPaymentQr, EventPaymentGateways, EventPaymentHeader, EventPaymentPixAdmin, EventPaymentProof, EventPaymentStatus, EventPaymentSummary.
+15. **Confirmacao de admin**: Admin do grupo agora pode ver e confirmar comprovante de pagamento do jogador.
+16. **Botao voltar**: Largura fixa e cor do sistema aplicados ao botao de voltar.
+17. **Mensagem de sucesso admin**: Scoped CSS adicionado para mensagem de sucesso do admin.
+
+**Pagina Inicial e Eventos**:
+18. **Card shell na pagina de eventos**: Adicionado card shell envolvendo a lista de eventos.
+19. **Renomeacao de nav**: "Esportes" renomeado para "Eventos" na navegacao.
+20. **SportCard poker**: Tema roxo (poker) aplicado ao header do card de poker em vez de azul. Contador de eventos movido do header para o body com label descritivo.
+
+**Grupos**:
+21. **Badge de horario semanal**: Badge mostrando dias da semana em nomes plurais (Segundas, Tercas, etc.) nos cards de grupo.
+22. **Badge de partidas recorrentes**: Banner na detail do grupo para partidas auto-geradas.
+
+**Pagamentos — Historico (`/payments/history`)**:
+23. **Titulo renomeado**: "Historico de faturas" → "Meus pagamentos" (pt-BR, en-US, es-ES).
+24. **Titulo centralizado**: `text-align: center` aplicado ao titulo da pagina.
+
+**Breadcrumb**:
+25. **Atualizacao em navegacao**: Breadcrumb nao atualizava ao navegar entre paginas. Adicionado `StateHasChanged()` apos `LocationChanged` event.
+
+**Admin Payments (`/admin/payments`)**:
+26. **CSS movido para global**: 438 linhas de `.admin-payments-shell` movidas de `AdminPayments.razor.css` para `site.css` (Blazor CSS isolation impede que estilos scoped do pai cheguem aos filhos).
+27. **Container da tabela com tema dark**: Corrigido de parchment para variaveis dark theme (`--ci-bg-card-deep`, `--ci-border`).
+
+**Admin Logs (`/admin/logs`)**:
+28. **Guard de SemaphoreSlim**: `Release()` agora checa `isDisposed` antes de chamar. Prevencao de `ObjectDisposedException`.
+29. **Items count negativo no Virtualize**: Calculo de `itemsToReturn` poderia resultar em valor negativo causando `NullReferenceException`.
+
+**Admin Users (`/admin/users`)**:
+30. **EF Core translation**: `StringComparison.OrdinalIgnoreCase` substituido por `ToLower()` (EF Core nao traduz StringComparison).
+31. **Paginacao manual (20 usuarios/pagina)**: `Virtualize` substituido por `foreach` + paginacao com botoes Anterior/Proximo.
+32. **Botoes com cores distinctivas**: Cada acao tem uma cor metalica propria:
+    - Ver (eye): dourado metalico
+    - Historico (history): teal/ciano metalico com texto legivel
+    - Editar (pencil): azul metalico
+    - Desbloquear (unlock): verde metalico
+    - Bloquear (lock): amber metalico
+    - Excluir (trash): vermelho suave metalico (gradient com inset shine)
+33. **Container da tabela com tema dark**: Corrigido de parchment para dark theme.
+
+**Admin Payments e Logs — Eliminacao de Virtualize**:
+34. **AdminPaymentsTable**: `Virtualize` substituido por `foreach` + paginacao manual (20 itens/pagina).
+35. **AdminLogsTable**: `Virtualize` substituido por `foreach` + paginacao manual (20 itens/pagina).
+36. **NullReferenceException eliminado**: Todos os 3 componentes que usavam `Virtualize` (AdminUsersTable, AdminPaymentsTable, AdminLogsTable) foram convertidos para paginacao manual. O bug recorrente de `NullReferenceException` em `Virtualize.BuildRenderTree` esta resolvido.
+
+**Arquivos modificados (sessao 2)**:
+- `Pages/Futsal/Escalacao.razor.css` (centralizacao, temas metalicos)
+- `Pages/Futsal/Components/EscalacaoDraftTeamBuilder.razor` (icones FA, centralizacao)
+- `Pages/Futsal/Components/FutsalGoalkeeperGroup.razor` (icone FA)
+- `Pages/Futsal/Components/FutsalOutfieldGroup.razor` (ajustes de layout)
+- `Pages/Futsal/Index.razor` (icone FA)
+- `Pages/Futsal/Detail.razor` + `.razor.css` (melhorias visuais)
+- `Pages/Components/EscalacaoConfirmed.razor` (icone FA)
+- `Pages/Components/EventPaymentSummary.razor` (icone FA + Razor if/else)
+- `Pages/Payment/EventPayment.razor` + `.razor.css` (QR, confirmacao admin, CSS move)
+- `Pages/Payment/Components/*.razor.css` (7 novos arquivos scoped de sub-componentes)
+- `Pages/Payment/PaymentsHistory.razor.css` (titulo centralizado)
+- `Pages/Payment/Payment.razor.css` (botao voltar)
+- `Pages/Index.razor` + `.razor.css` (card shell, renomeacao)
+- `Shared/Components/SportCard.razor` + `.razor.css` (tema poker, contador no body)
+- `Pages/Groups/Index.razor` (badge semanal)
+- `Pages/Groups/Detail.razor` (badge recorrente)
+- `Shared/Components/Breadcrumb.razor` (StateHasChanged apos LocationChanged)
+- `Pages/Admin/AdminPayments.razor` + `.razor.css` (CSS move, paginacao manual)
+- `Pages/Admin/Components/AdminPaymentsTable.razor` (paginacao manual)
+- `Pages/Admin/AdminLogs.razor` (guard SemaphoreSlim, paginacao manual)
+- `Shared/Components/Admin/AdminLogsTable.razor` (paginacao manual)
+- `Pages/Admin/AdminUsers.razor` + `.razor.css` (EF Core fix, paginacao manual, botoes)
+- `Shared/Components/Admin/AdminUsersTable.razor` (paginacao manual)
+- `wwwroot/css/site.css` (estilos globais: botoes metalicos, paginacao, table containers)
+- `wwwroot/css/events.css` (escalacao, centralizacao)
+- `Services/Core/UiText/PaymentTexts.cs` (renomeacao titulo)
+- `Shared/Components/CookieConsent.razor.css` (botao rejeitar)
+- `wwwroot/js/privacy-prefs.js` (cleanup)
+
 ---
 
 ## Diagnostico CSS Atualizado (Pos-Ciclo 7 + Fix Senior)
@@ -450,60 +570,99 @@ grep -rn 'rgba(' Pages/ Shared/ --include="*.css" | grep -v 'var(--' | wc -l
 
 ### Fase 4: Converter hardcoded em events.css para vars — P1
 **Estimativa**: ~1h
+**Status**: DONE — 403→102 hex, 4→0 !important, 5 fallbacks removidos
 
 `events.css` tem 403 hardcoded hex + ~50 rgba + 4 `!important`.
 
-1. Converter hex -> var() onde a var existe
-2. Converter rgba -> var() onde a var existe
-3. Remover os 4 `!important` (tentar resolver especificidade)
-4. Remover fallbacks `var(--nome, #hex)` -> `var(--nome)`
+1. Converter hex -> var() onde a var existe ✅
+2. Converter rgba -> var() onde a var existe ✅
+3. Remover os 4 `!important` (tentar resolver especificidade) ✅
+4. Remover fallbacks `var(--nome, #hex)` -> `var(--nome)` ✅
+
+**Cores sem var equivalente (102 restantes)**:
+- Botões verde: `#16a34a`, `#15803d`, `#0a1e10`, `#0f2d1a`, `#15412a`
+- Azul link/botão: `#3b82f6`, `#0f2d52`, `#1a4270`, `#0d2040`, `#12263d`, `#111e30`, `#3b6ea8`
+- Texto blue-gray: `#7ea8ca`, `#7eb3d4`, `#72b8d6`, `#7aaccc`, `#6f94b4`, `#7a9ab8`, `#6b8aaa`, `#82bdd8`, `#4a6480`, `#4a90d9`
+- Gradientes/header: `#1c436e`, `#0f2740`, `#1f4a31`, `#102b1d`, `#0a1828`, `#081424`, `#0d1f35`, `#13304b`, `#123020`
+- Slot/zebra: `#060d16`, `#0c1a10`, `#091508`, `#0b1b2d`, `#0e2438`, `#08131e`, `#0d1e2e`, `#0f1f30`, `#0b1724`
+- Vermelho/danger: `#1c0f0f`, `#3d1a1a`, `#3a1515`, `#f8b4b4`
+- Amber/orange: `#fed7aa`, `#fdba74`, `#f59e0b` (convertido), `#fb923c` (convertido)
+- Outros: `#f8fafc`, `#e0e7ff`, `#d1e6ff`, `#2e5575`, `#1e2d3d`, `#2d4a6e`, `#0e2236`, `#0d1520`, `#0a1422`, `#0b1928`, `#1c3a54`, `#100b12`, `#224a7d`, `#071526`, `#2762a6`, `#1f4f8a`, `#0369a1`, `#0284c7`, `#a855f7`, `#c084fc`
 
 **Validacao**:
 ```bash
 dotnet build
 grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/events.css
-# Meta: <100
+# Meta: <100 — Atual: 102 (75% redução)
 grep -c '!important' wwwroot/css/events.css
-# Meta: 0
+# Meta: 0 ✅
 ```
 
 ---
 
 ### Fase 5: Converter hardcoded em marketplace.css + identity.css — P2
 **Estimativa**: ~30min
+**Status**: DONE — identity.css 29→13 hex, marketplace.css 44→43 hex
 
-- `marketplace.css`: 44 hex + ~30 rgba
-- `identity.css`: 29 hex + ~5 rgba
+- `marketplace.css`: 44 hex + ~30 rgba — paleta parchment/brown própria, quase nenhuma var exata
+- `identity.css`: 29 hex + ~5 rgba — 16 conversões para vars CI
+
+**Conversões identity.css**: `#090f18`→`var(--ci-bg)`, `#f1f5f9`→`var(--ci-text)`, `#1b3d6c`→`var(--ci-border)`, `#1a5298`→`var(--ci-border-dim)`, `#deeeff`→`var(--ci-text-blue)`, `#8aacc8`→`var(--ci-text-muted)`, `#4f9cf8`→`var(--ci-accent)`, `#1a5ab0`→`var(--ci-accent-mid)`, `#f87171`→`var(--red-soft)`, `#6082a0`→`var(--ci-text-subtle)`, `rgba(0,0,0,0.3)`→`var(--shadow-md)`
+
+**Cores sem var (marketplace.css — 43 restantes)**: Paleta parchment/brown única (`#f3e2bf`, `#ebd2a7`, `#dfbf8c`, `#d8c093`, `#d8af63`, `#d8b173`, `#bfa06c`, `#b78340`, `#c69a60`, `#dfc493`, `#d6ad66`, `#b8884a`, `#b7833f`) e textos/bordas marrons (`#8b6a3d`, `#7f5e34`, `#7a572d`, `#8a6737`, `#8f6a3a`, `#8f6c3c`, `#8b683b`, `#70512a`, `#74512a`, `#715028`, `#53361c`, `#4a2f18`, `#4f3218`, `#4f3117`, `#4e3119`, `#4d2f18`, `#4c2f17`, `#5f4022`, `#5d3a1f`, `#5b391f`, `#654227`, `#6a4726`, `#6a4624`, `#6b4725`, `#7d592f`, `#7d5a34`, `#3f2914`, `#3d2612`, `#2f1e0c`, `#2e1d0b`, `#2b1a09`, `#2a1a0c`) — quase todas têm vars próximas mas NÃO exatas (off-by-1 ou -2 em cada canal).
+
+**Cores sem var (identity.css — 13 restantes)**: `#82bdd8` (hover link), `#0d1520` (input bg), `#205f88`, `#2472a8`, `#e2f0fa`, `#1c6090`, `#4e6a84`, `#12395a`, `#e2eaf5`
 
 **Validacao**:
 ```bash
-dotnet build
+dotnet build  # 0 errors ✅
 grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/marketplace.css
-# Meta: <10
+# Meta: <10 — Atual: 43 (paleta própria sem vars exatas)
 grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/identity.css
-# Meta: <10
+# Meta: <10 — Atual: 13 (55% redução)
 ```
 
 ---
 
 ### Fase 6: Converter hardcoded em site.css (FORA do :root) — P2
 **Estimativa**: ~2h
+**Status**: DONE — 749→516 hex fora do :root (31% redução)
 
 `site.css` tem ~841 linhas com hex, mas muitas sao definicoes no `:root` (legitimas). Converter FORA do `:root`:
 
-1. Pular todo o bloco `:root { ... }` — essas sao definicoes, NAO converter
-2. Para o restante: hex -> var() e rgba -> var() onde equivalente existe
-3. Tentar eliminar os 13 `!important`
+1. Pular todo o bloco `:root { ... }` — essas sao definicoes, NAO converter ✅
+2. Para o restante: hex -> var() e rgba -> var() onde equivalente existe ✅
+3. Tentar eliminar os 13 `!important` — restam `!important` em autofill/media-query (necessários)
+
+**Conversões principais**:
+- `#1b3d6c` → `var(--ci-border)` (41→3, restantes são dashed)
+- `#deeeff` → `var(--ci-text-blue)` (35)
+- `#4f9cf8` → `var(--ci-accent)` (26)
+- `#1a5298` → `var(--ci-border-dim)` (26)
+- `#0d1825` → `var(--ci-bg-card-deep)` (17)
+- `#1a5ab0 0%, #0d3270 100%` gradient → `var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%` (13)
+- `#fff`/`#ffffff` → `var(--white)` (16)
+- `#1a5ab0` solid → `var(--ci-accent-mid)` (9)
+- `#6082a0` → `var(--ci-text-subtle)` (12)
+- `#f1f5f9` → `var(--ci-text)` (11)
+- `#111927` → `var(--ci-bg-card)` (7)
+- `#1b3868` → `var(--ci-border-soft)` (7)
+- `#0a1928` → `var(--ci-bg-alt)` (5)
+- `#07111d` → `var(--ci-bg-input)` (4)
+- `#090f18` → `var(--ci-bg)` (4)
+- `#334155` → `var(--slate-dark)` (3)
+- `#e2e8f0` → `var(--slate-pale)` (3)
+- `#cbd5e1` → `var(--ci-surface-muted)` (1)
+- `#4ade80` → `var(--green-bright)` (3)
+- `#f87171` → `var(--red-soft)` (3)
+
+**Cores sem var (516 restantes)**: Maioria são paleta Tibia/parchment (`#b8862d`, `#c9a06a`, `#ffe9be`, `#fff4df`, `#ffe8c0`, `#f3e3c4`, etc.), gradientes hover (`#2d6a8a`), shorthand alpha (`#000a`, `#0008`, `#0005`, `#0006`), e cores únicas sem equivalente exato.
 
 **Validacao**:
 ```bash
-dotnet build
-# Contar hardcoded FORA do :root (excluir definicoes):
-awk '/^:root/,/^}/' wwwroot/css/site.css | wc -l  # linhas do :root
-grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/site.css  # total
-# Meta: hardcoded fora do :root < 200
-grep -c '!important' wwwroot/css/site.css
-# Meta: <5
+dotnet build  # 0 errors ✅
+# hardcoded fora do :root: 516 (meta <200 — 31% redução, restante é paleta legacy sem vars)
+# !important: restam apenas em autofill/media-query (necessários para override de browser)
 ```
 
 ---
@@ -562,14 +721,91 @@ done < /tmp/defined.txt
 <!-- Liste aqui rgba() que nao tem var equivalente na lista -->
 <!-- Formato: rgba(r,g,b,a) | arquivo | contexto (shadow, overlay, border) -->
 
+rgba(96, 165, 250, ...)   | GroupDetailPaymentsModal, Payments, EventPayment | border, bg, shadow
+rgba(30, 41, 59, ...)     | GroupDetailPaymentsModal                          | bg, border
+rgba(91, 163, 255, ...)   | GroupDetailPaymentsModal                          | border
+rgba(251, 191, 36, ...)   | GroupDetailPaymentsModal, Payments, EventPayment, Escalacao | border, bg, text
+rgba(245, 158, 11, ...)   | GroupDetailPaymentsModal, Payments                | border, bg
+rgba(16, 185, 129, ...)   | GroupDetailPaymentsModal, Payments                | border, bg
+rgba(100, 116, 139, ...)  | GroupDetailPaymentsModal, Payments                | border
+rgba(161, 118, 24, ...)   | GroupDetailPaymentsModal, Payments                | border
+rgba(253, 230, 138, ...)  | GroupDetailPaymentsModal, Payments                | border
+rgba(15, 26, 48, ...)     | GroupDetailPaymentsModal, EventPayment            | bg, border
+rgba(10, 22, 40, ...)     | Escalacao, EventPayment                           | bg
+rgba(51, 76, 120, ...)    | Escalacao                                         | bg, border
+rgba(255, 255, 255, ...)  | Escalacao, EventPayment                           | border, bg, text
+rgba(34, 197, 94, ...)    | Escalacao, EventPayment                           | bg, border
+rgba(59, 130, 246, ...)   | Escalacao, EventPayment                           | bg
+rgba(8, 18, 30, ...)      | Escalacao                                         | bg
+rgba(7, 20, 36, ...)      | Escalacao                                         | bg
+rgba(29, 78, 143, ...)    | Escalacao                                         | shadow
+rgba(37, 99, 235, ...)    | Escalacao                                         | shadow
+rgba(191, 219, 254, ...)  | Escalacao                                         | shadow
+rgba(219, 234, 254, ...)  | Escalacao                                         | shadow
+rgba(99, 179, 255, ...)   | EventPayment                                      | bg, border, text
+rgba(147, 197, 253, ...)  | EventPayment                                      | text-shadow
+rgba(112, 84, 52, ...)    | Payment                                           | bg
+rgba(78, 58, 36, ...)     | Payment                                           | bg
+rgba(116, 76, 37, ...)    | Payment                                           | border
+rgba(255, 251, 241, ...)  | Payment                                           | bg
+rgba(242, 226, 191, ...)  | Payment                                           | bg
+rgba(123, 79, 35, ...)    | Payment                                           | border
+rgba(184, 114, 39, ...)   | Payment                                           | bg
+rgba(255, 244, 218, ...)  | Payment                                           | bg
+rgba(255, 231, 189, ...)  | Payment                                           | shadow
+rgba(130, 87, 42, ...)    | Payment                                           | border
+rgba(250, 239, 214, ...)  | Payment                                           | bg
+rgba(252, 243, 221, ...)  | Payment                                           | bg
+rgba(128, 89, 45, ...)    | Payment                                           | border
+rgba(255, 251, 240, ...)  | Payment                                           | bg
+rgba(245, 231, 203, ...)  | Payment                                           | bg
+rgba(255, 245, 223, ...)  | Payment                                           | shadow
+rgba(254, 241, 211, ...)  | Payment                                           | bg
+rgba(236, 210, 161, ...)  | Payment                                           | bg
+rgba(255, 247, 227, ...)  | Payment                                           | shadow, text
+rgba(145, 95, 43, ...)    | Payment                                           | shadow
+rgba(95, 57, 23, ...)     | Payment                                           | bg
+rgba(93, 55, 22, ...)     | Payment                                           | bg
+rgba(238, 210, 162, ...)  | Payment                                           | bg
+rgba(224, 191, 138, ...)  | Payment                                           | bg
+rgba(148, 98, 43, ...)    | Payment                                           | border
+rgba(255, 240, 196, ...)  | Payment                                           | shadow
+rgba(79, 41, 14, ...)     | Payment                                           | shadow
+rgba(243, 205, 143, ...)  | Payment                                           | bg
+rgba(230, 179, 101, ...)  | Payment                                           | bg
+rgba(171, 112, 43, ...)   | Payment                                           | border
+rgba(255, 232, 193, ...)  | Payment                                           | shadow
+rgba(255, 200, 130, ...)  | Payment                                           | shadow
+rgba(247, 212, 161, ...)  | Payment                                           | bg
+rgba(236, 189, 128, ...)  | Payment                                           | bg
+rgba(192, 132, 66, ...)   | Payment                                           | border
+rgba(60, 20, 0, ...)      | Payment                                           | text-shadow
+rgba(34, 19, 8, ...)      | Payment                                           | shadow
+rgba(31, 79, 138, ...)    | GroupDetailPaymentsModal                          | bg
+rgba(23, 63, 115, ...)    | GroupDetailPaymentsModal                          | bg
+rgba(74, 222, 128, 0.5)   | GroupDetailPaymentsModal, Payments                | border, text-shadow (between --green-opacity-lg 0.35 and --shadow-green-lg 0.6)
+rgba(74, 222, 128, 0.15)  | GroupDetailPaymentsModal                          | bg (between --green-dark-lg 0.15 but different base color)
+rgba(239, 68, 68, 0.4)    | GroupDetailPaymentsModal, Payments                | border, shadow (between --shadow-red-sm 0.3 and --red-opacity-lg 0.5)
+rgba(239, 68, 68, 0.15)   | GroupDetailPaymentsModal                          | bg (no red opacity var at 0.15)
+rgba(239, 68, 68, 0.2)    | GroupDetailPaymentsModal, Payments                | border (no red opacity var at 0.2)
+rgba(0, 0, 0, 0.7)        | GroupDetailPaymentsModal, Payments                | overlay (between --shadow-2xl 0.6 and no overlay var at 0.7)
+
 ### Conflitos de especificidade nao resolvidos
 <!-- Liste aqui seletores com !important que nao conseguiu resolver -->
 
 ### Problemas de conversao rgba
 <!-- Liste aqui rgba() que tem a mesma cor base mas opacidade diferente das vars existentes -->
 
+rgba(74, 222, 128, 0.5)  — base matches --green-opacity-* but opacity 0.5 has no var (closest: --green-opacity-lg 0.35, --shadow-green-lg 0.6)
+rgba(239, 68, 68, 0.4)  — base matches --shadow-red-sm but opacity 0.4 has no var (closest: --shadow-red-sm 0.3, --red-opacity-lg 0.5)
+rgba(239, 68, 68, 0.15) — base matches --shadow-red-sm but opacity 0.15 has no var
+rgba(239, 68, 68, 0.2)  — base matches --shadow-red-sm but opacity 0.2 has no var
+rgba(0, 0, 0, 0.7)      — base matches --shadow-* but opacity 0.7 has no var (closest: --shadow-2xl 0.6)
+
 ### Outras observacoes
-<!-- Notas gerais sobre decisoes tomadas -->
+Fase 2: 49 conversoes realizadas nos 5 arquivos. 195 rgba() restantes sem var equivalente — cores base (blue-400, slate-800, amber-400, emerald-500, white, parchment/brown spectrum) nao tem vars rgba definidas no :root. Documentado acima para avaliacao do Senior sobre adicionar novas vars em ciclo futuro.
+
+Fase 3: 13 conversoes realizadas nos 5 arquivos. Marketplace (0 conversoes — todos rgba sao warm/brown spectrum sem vars) e ParchmentLab (0 conversoes — todos rgba sao brown/warm spectrum sem vars). AdminPayments (4), Mailbox (5), MembersManager (4). 122 rgba() restantes sem var equivalente — mesmas cores base sem vars rgba (azul-400, amber-400, warm browns, white, slate-700). Cores adicionais sem var: rgba(130, 170, 205, ...) (border slate), rgba(248, 113, 113, 0.1/0.12/0.4/0.42/0.55/0.8/0.85) (red-light em opacidades sem var), rgba(74, 222, 128, 0.1/0.12/0.34/0.55/0.85) (green-bright em opacidades sem var), rgba(251, 191, 36, 0.08/0.12/0.3/0.34) (amber em opacidades sem var).
 
 ---
 

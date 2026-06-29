@@ -68,9 +68,9 @@
 }
 
 .cookie-btn.cookie-btn-soft {
-    background: var(--brown-deep);
-    border-color: var(--gold-dark);
-    color: var(--parchment-cream);
+    background: rgba(79,156,248,.12);
+    border-color: var(--ci-accent);
+    color: var(--ci-text-info-strong);
 }
 
 .cookie-btn.cookie-btn-primary {

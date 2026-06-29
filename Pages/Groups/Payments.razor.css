@@ -15,7 +15,7 @@
     align-items: center;
     gap: 0.6rem;
     color: var(--green-light);
-    text-shadow: 0 0 15px rgba(74, 222, 128, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 15px rgba(74, 222, 128, 0.6), 0 2px 4px var(--text-shadow-sm);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -31,7 +31,7 @@
     align-items: center;
     flex-wrap: wrap;
     background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-bg-mid) 50%, var(--ci-bg-dark) 100%);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(147, 197, 253, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px var(--shadow-lg), inset 0 1px 0 var(--inset-accent-sm), inset 0 -1px 0 var(--shadow-md);
     position: relative;
 }
 
@@ -42,7 +42,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(to right, transparent, rgba(125, 211, 252, 0.5), transparent);
+    background: linear-gradient(to right, transparent, var(--sky-blue-md), transparent);
 }
 
 .payments-tab {
@@ -66,15 +66,15 @@
     background: var(--ci-bg-card);
     border-color: var(--ci-accent);
     color: var(--ci-surface-muted);
-    box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3);
+    box-shadow: 0 4px 8px var(--shadow-accent-sm);
 }
 
 .payments-tab--active {
     color: var(--ci-surface-light);
     border-color: var(--ci-accent);
     background: var(--ci-accent-mid);
-    box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3), inset 0 0 0 1px rgba(79, 156, 248, 0.2);
-    text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
+    box-shadow: 0 4px 8px var(--shadow-accent-sm), inset 0 0 0 1px var(--accent-opacity-sm);
+    text-shadow: 0 0 10px var(--shadow-accent-lg);
 }
 
 .payments-tab-count {
@@ -84,7 +84,7 @@
     padding: 0.15rem 0.4rem;
     border-radius: 3px;
     font-weight: 800;
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-red-sm);
 }
 
 .payments-refresh-btn {
@@ -102,15 +102,15 @@
     gap: 0.5rem;
     margin-left: auto;
     white-space: nowrap;
-    box-shadow: 0 2px 4px rgba(79, 156, 248, 0.3);
-    text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
+    box-shadow: 0 2px 4px var(--shadow-accent-sm);
+    text-shadow: 0 0 10px var(--shadow-accent-lg);
 }
 
 .payments-refresh-btn:hover {
     background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
     border-color: var(--link-info);
     color: var(--white);
-    box-shadow: 0 4px 8px rgba(79, 156, 248, 0.5);
+    box-shadow: 0 4px 8px var(--shadow-accent-lg);
 }
 
 .payments-refresh-btn:disabled {
@@ -145,13 +145,13 @@
     align-items: center;
     gap: 0.75rem;
     margin: 1rem;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 2px 4px var(--shadow-lg);
 }
 
 .payments-empty i {
     font-size: 2.5rem;
     color: var(--ci-accent);
-    text-shadow: 0 0 15px rgba(79, 156, 248, 0.5);
+    text-shadow: 0 0 15px var(--shadow-accent-lg);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -174,7 +174,7 @@
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 2px 4px var(--shadow-md);
 }
 
 .payments-history-filters select:hover {
@@ -184,7 +184,7 @@
 .payments-history-filters select:focus {
     outline: none;
     border-color: var(--ci-accent);
-    box-shadow: 0 0 0 2px rgba(79, 156, 248, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0 2px var(--shadow-accent-sm), inset 0 2px 4px var(--shadow-md);
 }
 
 .payments-history-filters select option {
@@ -219,19 +219,36 @@
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
-    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 4px 8px var(--shadow-red-sm);
 }
 
 .payments-user-item:hover {
     background: var(--ci-bg-deepest);
     border-color: var(--red-soft);
-    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.5);
+    box-shadow: 0 6px 12px var(--red-opacity-lg);
+}
+
+/* History tab — neutral green/teal instead of red */
+.payments-user-item--history {
+    border-color: var(--ci-border);
+    box-shadow: 0 4px 8px var(--shadow-md);
+}
+
+.payments-user-item--history:hover {
+    border-color: var(--green-strong);
+    box-shadow: 0 6px 12px rgba(34, 197, 94, 0.2);
+}
+
+.payments-user-item--history.payments-user-item--selected {
+    background: rgba(34, 197, 94, 0.08);
+    border-color: var(--green-strong);
+    box-shadow: 0 6px 12px rgba(34, 197, 94, 0.25), inset 0 0 0 1px rgba(34, 197, 94, 0.15);
 }
 
 .payments-user-item--selected {
     background: var(--red-bg-dark);
     border-color: var(--red-soft);
-    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.4), inset 0 0 0 1px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.4), inset 0 0 0 1px var(--shadow-red-sm);
 }
 
 .payments-user-name {
@@ -239,7 +256,7 @@
     color: var(--ci-surface-light);
     font-size: 0.95rem;
     min-width: 150px;
-    text-shadow: 0 0 8px rgba(79, 156, 248, 0.3);
+    text-shadow: 0 0 8px var(--shadow-accent-sm);
 }
 
 .payments-user-meta {
@@ -290,7 +307,12 @@
     margin-top: -0.5rem;
     margin-bottom: 0.75rem;
     padding: 1rem 1.25rem;
-    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--shadow-red-sm), inset 0 2px 4px var(--shadow-lg);
+}
+
+.payments-detail-panel--history {
+    border-left-color: var(--green-strong);
+    box-shadow: 0 4px 8px rgba(34, 197, 94, 0.15), inset 0 2px 4px var(--shadow-lg);
 }
 
 .payments-detail-summary {
@@ -300,6 +322,15 @@
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.payments-detail-panel--history .payments-detail-summary {
+    border-bottom-color: rgba(34, 197, 94, 0.2);
+}
+
+.payments-detail-panel--history .payments-summary-total {
+    color: var(--green-bright);
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
 }
 
 .payments-summary-label {
@@ -387,7 +418,7 @@
     border-radius: 5px;
     background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
     border: 1px solid var(--green-soft);
-    box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
+    box-shadow: 0 2px 4px var(--shadow-green-sm);
 }
 
 .payments-notifying {
@@ -519,13 +550,13 @@
 
 .payment-proof-viewer-content {
     background: var(--ci-bg-alt);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid var(--slate-border-lg);
     border-radius: 12px;
     max-width: 500px;
     width: 100%;
     padding: 1.5rem;
     position: relative;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 25px -5px var(--shadow-xl);
 }
 
 .payment-proof-viewer-close {
@@ -548,7 +579,7 @@
 }
 
 .payment-proof-viewer-close:hover {
-    background: rgba(148, 163, 184, 0.1);
+    background: var(--slate-border-sm);
     color: var(--ci-surface-muted);
 }
 
@@ -557,8 +588,8 @@
     height: auto;
     max-height: 500px;
     border-radius: 8px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--slate-border-lg);
+    background: var(--overlay-sm);
 }
 
 

@@ -1,10 +1,3 @@
-/* Status badges use base styles from site.css */
-
-.admin-users-shell .users-table-container {
-    max-height: 600px;
-    overflow-y: auto;
-    border: 1px solid var(--brown-border);
-    border-radius: 4px;
-    background: var(--parchment);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 244, 214, 0.5);
-}
+/* All admin-users styles moved to wwwroot/css/site.css (global)
+   because Blazor CSS isolation prevents parent scoped styles
+   from reaching child components like AdminUsersTable. */

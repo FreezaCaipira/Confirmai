@@ -1,6 +1,6 @@
 ﻿.entity-shell {
-    --entity-bg:     var(--ci-bg-deepest);
-    --entity-card:   var(--ci-bg-deepest);
+    --entity-bg:     var(--ci-bg);
+    --entity-card:   var(--ci-bg-card);
     --entity-line:   var(--ci-border);
     --entity-accent: var(--ci-accent);
     --entity-ink:    var(--ci-text);
@@ -57,7 +57,7 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background: var(--ci-bg-deepest);
+    background: var(--ci-bg-card);
     border: 1px solid var(--ci-border-alt);
     border-top: 2px solid var(--ci-border-dim);
     border-radius: 14px;
@@ -93,7 +93,7 @@
 .entity-shell .form-group select,
 .entity-shell .form-group input[type="number"],
 .entity-shell .form-group input[type="text"] {
-    background: var(--ci-bg-deepest);
+    background: var(--ci-bg-input);
     color: var(--ci-text);
     border: 1px solid var(--ci-border);
     border-radius: 6px;

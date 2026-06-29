@@ -259,7 +259,7 @@ else
                                                     }
                                                     else if (c.PixProofUploadedAt.HasValue)
                                                     {
-                                                        <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
+                                                        <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal(c.Id)" title="Comprovante enviado - clique para gerenciar">
                                                             <i class="fas fa-image"></i> 📎 comprovante
                                                         </button>
                                                     }
@@ -312,7 +312,7 @@ else
                                             {
                                                 @if (isAdmin)
                                                 {
-                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal()" title="Comprovante enviado - clique para gerenciar">
+                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal(c.Id)" title="Comprovante enviado - clique para gerenciar">
                                                         <i class="fas fa-image"></i> 📎 comprovante
                                                     </button>
                                                 }
@@ -886,11 +886,9 @@ else
         await LoadEvent();
     }
 
-    private void NavigateToPaymentsModal()
+    private void NavigateToPaymentsModal(int confirmationId)
     {
-        if (ev is null) return;
-        // Navigate to admin payments page where admin can manage all payments
-        NavigationManager.NavigateTo("/admin/payments");
+        NavigationManager.NavigateTo($"/pagamento/evento/{confirmationId}");
     }
 
     // Callback wrappers for child components
@@ -927,7 +925,7 @@ else
     private async Task AdminRemoveGoalkeeperSlotCallback()
         => await AdminRemoveGoalkeeperSlot();
 
-    private Task NavigateToPaymentsModalCallback()
-    { NavigateToPaymentsModal(); return Task.CompletedTask; }
+    private Task NavigateToPaymentsModalCallback(int confirmationId)
+    { NavigateToPaymentsModal(confirmationId); return Task.CompletedTask; }
 
 }

@@ -1,7 +1,6 @@
 @using Confirmai.Data
 @using Confirmai.Models
 @using Microsoft.AspNetCore.Components
-@using Microsoft.AspNetCore.Components.Web.Virtualization
 
 @if (TotalItems == 0)
 {
@@ -23,7 +22,8 @@ else
                 </tr>
             </thead>
             <tbody>
-                <Virtualize Context="p" ItemsProvider="LoadPaymentsAsync" OverscanCount="10">
+                @foreach (var p in Payments)
+                {
                     <tr>
                         <td data-label="User">
                             @if (p.User != null)
@@ -58,15 +58,31 @@ else
                             </div>
                         </td>
                     </tr>
-                </Virtualize>
+                }
             </tbody>
         </table>
     </div>
+
+    @if (TotalPages > 1)
+    {
+        <div class="pagination admin-users-pagination">
+            <button type="button" @onclick="PrevPage" disabled="@(CurrentPage <= 1)">Prev</button>
+            <span class="pagination-info">Page @CurrentPage of @TotalPages</span>
+            <button type="button" @onclick="NextPage" disabled="@(CurrentPage >= TotalPages)">Next</button>
+        </div>
+    }
 }
 
 @code {
     [Parameter] public int TotalItems { get; set; }
+    [Parameter] public List<PaymentRecord> Payments { get; set; } = new();
+    [Parameter] public int CurrentPage { get; set; }
+    [Parameter] public int TotalPages { get; set; }
     [Parameter] public Func<decimal, MarkupString>? FormatAmount { get; set; }
     [Parameter] public EventCallback<int> OnViewPayment { get; set; }
-    [Parameter] public ItemsProviderDelegate<PaymentRecord> LoadPaymentsAsync { get; set; } = default!;
+    [Parameter] public EventCallback OnPrevPage { get; set; }
+    [Parameter] public EventCallback OnNextPage { get; set; }
+
+    private async Task PrevPage() => await OnPrevPage.InvokeAsync();
+    private async Task NextPage() => await OnNextPage.InvokeAsync();
 }

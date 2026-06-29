@@ -1,7 +1,7 @@
 .profile-sport-card {
     border: 1px solid var(--ci-border);
     border-radius: 8px;
-    background: var(--ci-bg-deepest);
+    background: var(--ci-bg-card);
     box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-sm);
     overflow: hidden;
 }
@@ -60,7 +60,7 @@
     flex-wrap: wrap;
     gap: 0;
     padding: 1rem 1.1rem;
-    background: var(--ci-bg-deepest);
+    background: var(--ci-bg-card);
 }
 
 .profile-stat-item {

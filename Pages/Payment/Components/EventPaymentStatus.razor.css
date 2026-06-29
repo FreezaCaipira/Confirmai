@@ -1,0 +1,44 @@
+.evpay-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.evpay-status--paid {
+    background: rgba(22,163,74,0.1);
+    border: 1px solid rgba(74,222,128,0.25);
+    color: var(--green-bright);
+}
+
+.evpay-status--paid i { font-size: 1.4rem; margin-top: 0.1rem; }
+.evpay-status--paid strong { display: block; font-size: 0.95rem; margin-bottom: 0.2rem; }
+.evpay-status--paid p { margin: 0; font-size: 0.82rem; color: var(--green-soft); }
+
+.evpay-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: filter 0.15s;
+    margin-bottom: 0.5rem;
+}
+
+.evpay-action-btn--back {
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-muted);
+    border: 1px solid var(--ci-border);
+}
+
+.evpay-action-btn--back:hover { filter: brightness(1.1); }

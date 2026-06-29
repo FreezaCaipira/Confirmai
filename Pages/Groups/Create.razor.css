@@ -19,8 +19,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--ci-bg-deepest);
-    overflow: hidden;
+    background: var(--ci-bg-card);
     box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 

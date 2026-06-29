@@ -19,22 +19,26 @@
             @foreach (var s in TeamA.Where(s => s.IsGoalkeeper))
             {
                 <li class="esc-player esc-player--gk">
-                    <span class="esc-player-icon">🥅</span>
                     <span class="esc-player-name">@s.Name</span>
-                    <button class="esc-move-btn" title="Mover para Time B" @onclick="() => HandleMovePlayer(s, true)">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
+                    <span class="esc-player-side">
+                        <i class="fas fa-hand-paper esc-player-icon"></i>
+                        <button class="esc-move-btn" title="Mover para Time B" @onclick="() => HandleMovePlayer(s, true)">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </span>
                 </li>
             }
             @{ int draftNumA = 1; }
             @foreach (var s in TeamA.Where(s => !s.IsGoalkeeper))
             {
                 <li class="esc-player">
-                    <span class="esc-player-num">@(draftNumA++)</span>
                     <span class="esc-player-name">@s.Name</span>
-                    <button class="esc-move-btn" title="Mover para Time B" @onclick="() => HandleMovePlayer(s, true)">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
+                    <span class="esc-player-side">
+                        <span class="esc-player-num">@(draftNumA++)</span>
+                        <button class="esc-move-btn" title="Mover para Time B" @onclick="() => HandleMovePlayer(s, true)">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </span>
                 </li>
             }
         </ul>
@@ -56,10 +60,12 @@
             @foreach (var s in TeamB.Where(s => s.IsGoalkeeper))
             {
                 <li class="esc-player esc-player--gk">
-                    <button class="esc-move-btn" title="Mover para Time A" @onclick="() => HandleMovePlayer(s, false)">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <span class="esc-player-icon">🥅</span>
+                    <span class="esc-player-side">
+                        <button class="esc-move-btn" title="Mover para Time A" @onclick="() => HandleMovePlayer(s, false)">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <i class="fas fa-hand-paper esc-player-icon"></i>
+                    </span>
                     <span class="esc-player-name">@s.Name</span>
                 </li>
             }
@@ -67,10 +73,12 @@
             @foreach (var s in TeamB.Where(s => !s.IsGoalkeeper))
             {
                 <li class="esc-player">
-                    <button class="esc-move-btn" title="Mover para Time A" @onclick="() => HandleMovePlayer(s, false)">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <span class="esc-player-num">@(draftNumB++)</span>
+                    <span class="esc-player-side">
+                        <button class="esc-move-btn" title="Mover para Time A" @onclick="() => HandleMovePlayer(s, false)">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <span class="esc-player-num">@(draftNumB++)</span>
+                    </span>
                     <span class="esc-player-name">@s.Name</span>
                 </li>
             }

@@ -37,7 +37,7 @@
 .date-selector {
     display: flex;
     align-items: stretch;
-    background: var(--ci-bg-deepest);
+    background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
     border-radius: 10px;
     overflow: hidden;

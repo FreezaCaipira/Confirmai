@@ -1,4 +1,5 @@
-﻿@page "/jogos"
+﻿@page "/eventos"
+@page "/jogos"
 @attribute [AllowAnonymous]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
@@ -24,6 +25,8 @@
 
 <CascadingValue Value="CurrentCityContext">
     <div class="sports-page">
+
+    <div class="sports-shell">
 
     <div class="sports-tabs">
         <CitySelector
@@ -123,6 +126,7 @@
             </NotAuthorized>
         </AuthorizeView>
     }
+    </div>
     </div>
 </CascadingValue>
 
@@ -308,7 +312,7 @@
     private async Task SetTabAsync(string tab)
     {
         activeTab = tab;
-        NavigationManager.NavigateTo(tab == TabMyGames ? "/jogos?tab=meus-jogos" : "/jogos", replace: true);
+        NavigationManager.NavigateTo(tab == TabMyGames ? "/eventos?tab=meus-jogos" : "/eventos", replace: true);
         if (tab == TabMyGames && !confLoaded)
             await LoadConfirmationsAsync();
     }

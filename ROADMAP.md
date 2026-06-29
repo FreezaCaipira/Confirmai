@@ -118,6 +118,30 @@
 - [ ] Filtros e contexto visual para decisões de triagem
 - [ ] `VenueManager/VenueEdit.razor`: aplicar melhoria UF/IBGE do admin
 
+### UX Iterativo (Ciclo 8 — 28-29/06/2026)
+- [x] Inverter seções Métricas/Membros na página de grupo
+- [x] Melhorar contraste dos subcards de métricas
+- [x] Delimitar separadoras da tabela de partidas (visíveis mas suaves)
+- [x] Badge para partidas geradas automaticamente (semanal)
+- [x] Remover borda vermelha da aba Histórico de pagamentos do grupo
+- [x] Substituir emoji de goleiro corrompido por ícone Font Awesome
+- [x] Centralizar nomes, números e títulos na escalação de futsal
+- [x] Tema metálico azul no modal de confirmação e botão shuffle
+- [x] Melhorar legibilidade do Time B (fundo escuro) e botão rejeitar cookie
+- [x] Reduzir QR code ~40% e mover CSS para sub-componentes de pagamento
+- [x] Admin do grupo pode ver e confirmar comprovante de pagamento
+- [x] Card shell na página de eventos + renomear nav "Esportes" → "Eventos"
+- [x] SportCard poker com tema roxo e contador no body
+- [x] Badge de horário semanal nos cards de grupo
+- [x] Renomear título "Histórico de faturas" → "Meus pagamentos"
+- [x] Breadcrumb atualiza ao navegar (StateHasChanged após LocationChanged)
+- [x] Admin Payments: mover CSS scoped para global (Blazor isolation)
+- [x] Admin Logs: guard SemaphoreSlim.Release contra disposal
+- [x] Admin Users: fix EF Core translation (ToLower ao invés de StringComparison)
+- [x] Paginação manual (20/página) em Admin Users, Admin Payments, Admin Logs
+- [x] Botões com cores metálicas distintas na tabela de usuários
+- [x] Eliminar todos os componentes Virtualize (NullReferenceException resolvido)
+
 ---
 
 ## Backlog
@@ -136,7 +160,7 @@
 ### P4 — Operação Contínua
 - [ ] Definir baseline operacional semanal por gateway
 - [ ] Formalizar ritual pós-incidente com checklist de causa raiz
-- [ ] Virtual scrolling para listas grandes
+- [x] ~~Virtual scrolling para listas grandes~~ → Substituído por paginação manual (20 itens/página) em todas as tabelas admin
 
 ---
 

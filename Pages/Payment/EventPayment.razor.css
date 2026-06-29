@@ -6,102 +6,6 @@
     margin-right: auto;
 }
 
-/* ── Pix Direto do Organizador ───────────────────────────────── */
-.evpay-admin-pix {
-    margin-top: 1.5rem;
-    background: rgba(10, 36, 22, 0.55);
-    border: 1px solid rgba(74, 222, 128, 0.25);
-    border-radius: 10px;
-    padding: 1rem 1.1rem;
-}
-
-.evpay-admin-pix-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--green-soft);
-    margin-bottom: 0.5rem;
-}
-
-.evpay-admin-pix-hint {
-    font-size: 0.82rem;
-    color: var(--slate-muted);
-    margin: 0 0 0.75rem;
-    line-height: 1.45;
-}
-
-.evpay-admin-pix-key {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-}
-
-.evpay-admin-pix-qr {
-    display: flex;
-    justify-content: center;
-    margin: 0.75rem 0;
-}
-
-.evpay-admin-pix-qr :global(.qr-code-image) {
-    width: 180px;
-    height: 180px;
-    border-radius: 8px;
-    border: 2px solid rgba(74, 222, 128, 0.3);
-    background: var(--white);
-    padding: 6px;
-}
-
-.evpay-admin-pix-no-key {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.83rem;
-    color: var(--slate-muted);
-    margin: 0.25rem 0 0;
-    line-height: 1.5;
-}
-
-.evpay-admin-pix-code {
-    flex: 1;
-    background: rgba(15, 26, 48, 0.7);
-    border: 1px solid rgba(74, 222, 128, 0.3);
-    border-radius: 6px;
-    padding: 0.4rem 0.75rem;
-    font-family: monospace;
-    font-size: 0.9rem;
-    color: var(--futsal-green-pale);
-    word-break: break-all;
-    user-select: all;
-}
-
-.evpay-admin-pix-copy {
-    background: rgba(74, 222, 128, 0.1);
-    border: 1px solid rgba(74, 222, 128, 0.4);
-    color: var(--green-soft);
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: opacity 0.15s;
-}
-
-.evpay-admin-pix-copy:hover {
-    background: rgba(74, 222, 128, 0.2);
-    border-color: rgba(74, 222, 128, 0.65);
-    color: var(--futsal-green-pale);
-}
-
 .evpay-main {
     width: 100%;
     max-width: 100%;
@@ -118,438 +22,188 @@
     text-align: center;
 }
 
-/* ── Header ──────────────────────────────────────────────────── */
-.evpay-header {
-    margin-bottom: 1.25rem;
-}
-
-.evpay-header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.6rem;
-}
-
-.evpay-sport-badge {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--green-bright);
-    background: rgba(34,197,94,0.08);
-    border: 1px solid rgba(34,197,94,0.2);
-    border-radius: 20px;
-    padding: 0.2rem 0.7rem;
-}
-
-.evpay-title {
-    font-size: 1.45rem;
-    font-weight: 700;
-    color: var(--ci-text);
-    margin: 0 0 0.35rem;
-}
-
-.evpay-meta {
-    font-size: 0.83rem;
-    color: var(--ci-text-muted);
-    margin: 0 0 0.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-/* ── Summary card ────────────────────────────────────────────── */
-.evpay-summary-card {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
+/* ── Admin review ────────────────────────────────────────────── */
+.evpay-admin-review {
+    margin-top: 1.5rem;
+    background: rgba(10, 30, 48, 0.55);
+    border: 1px solid rgba(96, 165, 250, 0.25);
     border-radius: 10px;
     padding: 1rem 1.1rem;
-    margin-bottom: 1.25rem;
 }
 
-.evpay-summary-row {
+.evpay-admin-review-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0.35rem 0;
-    font-size: 0.88rem;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--link-info);
+    margin-bottom: 0.75rem;
 }
 
-.evpay-summary-label {
+.evpay-admin-proof {
+    margin-bottom: 1rem;
+}
+
+.evpay-admin-proof-label {
+    font-size: 0.82rem;
+    color: var(--slate-muted);
+    margin: 0 0 0.5rem;
+}
+
+.evpay-admin-proof-img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.evpay-admin-no-proof {
+    color: var(--slate-muted);
+    font-size: 0.88rem;
+    margin: 0 0 1rem;
+}
+
+.evpay-admin-confirm-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: var(--green-bright);
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.evpay-admin-confirm-btn:hover:not(:disabled) {
+    background: rgba(74, 222, 128, 0.2);
+    border-color: rgba(74, 222, 128, 0.6);
+}
+
+.evpay-admin-confirm-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.evpay-admin-error {
+    color: var(--red-soft);
+    font-size: 0.83rem;
+    margin: 0 0 0.75rem;
+}
+
+.evpay-admin-confirm-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.evpay-admin-confirm-label {
+    font-size: 0.88rem;
     color: var(--ci-text-muted);
 }
 
-.evpay-summary-value {
-    color: var(--ci-text);
-    font-weight: 500;
+.evpay-admin-confirm-actions {
+    display: flex;
+    gap: 0.5rem;
 }
 
-.evpay-summary-divider {
-    height: 1px;
-    background: var(--ci-border);
-    margin: 0.4rem 0;
+.evpay-admin-confirm-btn--yes {
+    flex: 1;
+    background: rgba(74, 222, 128, 0.15);
+    border-color: rgba(74, 222, 128, 0.5);
 }
 
-.evpay-summary-row--total {
-    padding-top: 0.5rem;
+.evpay-admin-confirm-btn--no {
+    flex: 1;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: var(--red-soft);
 }
 
-.evpay-summary-amount {
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: var(--green-bright);
+.evpay-admin-confirm-btn--no:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.55);
 }
 
-/* ── Status pago ─────────────────────────────────────────────── */
+.evpay-admin-review .detail-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--slate-muted);
+    text-decoration: none;
+}
+
+.evpay-admin-review .detail-back-link:hover {
+    color: var(--link-info);
+}
+
+/* ── Admin success (paid) ────────────────────────────────────── */
 .evpay-status {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-    border-radius: 10px;
     padding: 1rem 1.1rem;
+    border-radius: 10px;
+    margin-top: 1.5rem;
     margin-bottom: 1rem;
 }
 
 .evpay-status--paid {
-    background: rgba(22,163,74,0.1);
-    border: 1px solid rgba(74,222,128,0.25);
+    background: rgba(22, 163, 74, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.25);
     color: var(--green-bright);
 }
 
-.evpay-status--paid i { font-size: 1.4rem; margin-top: 0.1rem; }
-.evpay-status--paid strong { display: block; font-size: 0.95rem; margin-bottom: 0.2rem; }
-.evpay-status--paid p { margin: 0; font-size: 0.82rem; color: var(--green-soft); }
-
-/* ── Métodos de pagamento ────────────────────────────────────── */
-.evpay-methods { margin-bottom: 1.1rem; }
-
-.evpay-methods-title {
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--ci-text-muted);
-    margin: 0 0 0.6rem;
+.evpay-status--paid i {
+    font-size: 1.4rem;
+    margin-top: 0.1rem;
 }
 
-.evpay-method-list {
-    display: flex;
-    gap: 0.6rem;
-    flex-wrap: wrap;
+.evpay-status--paid strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
 }
 
-.evpay-method-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.55rem 1rem;
-    border: 1.5px solid var(--ci-border);
-    border-radius: 10px;
-    background: var(--ci-bg-card-deep);
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-    user-select: none;
+.evpay-status--paid p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--green-soft);
 }
 
-.evpay-method-option input[type="radio"] { display: none; }
-
-.evpay-method-option--selected {
-    border-color: var(--ci-accent);
-    background: rgba(59,130,246,0.08);
-}
-
-.evpay-method-option--disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-.evpay-method-icon { font-size: 1.1rem; }
-
-.evpay-method-name {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--ci-text);
-}
-
-.evpay-method-badge {
-    font-size: 0.68rem;
-    font-weight: 700;
-    padding: 0.1rem 0.45rem;
-    border-radius: 8px;
-    background: rgba(34,197,94,0.12);
-    color: var(--green-bright);
-    border: 1px solid rgba(74,222,128,0.25);
-}
-
-.evpay-method-badge--soon {
-    background: rgba(148,163,184,0.1);
-    color: var(--slate-muted);
-    border-color: rgba(148,163,184,0.2);
-}
-
-/* ── Botões de ação ──────────────────────────────────────────── */
 .evpay-action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.45rem;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
+    gap: 0.5rem;
+    width: fit-content;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
     text-decoration: none;
-    transition: filter 0.15s;
+    cursor: pointer;
+    transition: all 0.2s;
     margin-bottom: 0.5rem;
 }
 
-.evpay-action-btn--pay {
-    background: var(--green-strong);
-    color: var(--white);
-}
-.evpay-action-btn--pay:hover:not(:disabled) { filter: brightness(1.1); }
-.evpay-action-btn--pay:disabled { opacity: 0.55; cursor: not-allowed; }
-
 .evpay-action-btn--back {
-    background: var(--ci-bg-card-deep);
-    color: var(--ci-text-muted);
-    border: 1px solid var(--ci-border);
-}
-.evpay-action-btn--back:hover { filter: brightness(1.1); }
-
-/* ── Disclaimer ──────────────────────────────────────────────── */
-.evpay-disclaimer {
-    font-size: 0.75rem;
-    color: var(--ci-text-subtle);
-    text-align: center;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-}
-
-/* ── Error ───────────────────────────────────────────────────── */
-.evpay-error {
-    font-size: 0.82rem;
-    color: var(--red-soft);
-    background: var(--red-bg-dark);
-    border: 1px solid var(--red-border);
-    border-radius: 8px;
-    padding: 0.5rem 0.8rem;
-    margin-bottom: 0.75rem;
-}
-
-/* ── QR Code section ─────────────────────────────────────────── */
-.evpay-qr-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem 0 1rem;
-}
-
-.evpay-qr-image {
-    width: min(280px, 90%);
-    aspect-ratio: 1 / 1;
-    border-radius: 12px;
-    overflow: hidden;
-    background: var(--white);
-    padding: 10px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-}
-
-.evpay-qr-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-/* ── Awaiting indicator ──────────────────────────────────────── */
-.evpay-awaiting {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--link-info);
-    letter-spacing: 0.02em;
-    text-shadow: 0 0 12px rgba(147,197,253,0.4);
-}
-
-.evpay-awaiting-dot {
-    display: inline-block;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--link-info);
-    box-shadow: 0 0 6px rgba(147,197,253,0.7);
-    animation: evpay-pulse 1.4s ease-in-out infinite;
-}
-
-@keyframes evpay-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.45; transform: scale(0.65); }
-}
-
-/* ── BR Code (copia-e-cola) ──────────────────────────────────── */
-.evpay-brcode-wrap {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.evpay-brcode-label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: var(--ci-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding-left: 0.1rem;
-}
-
-.evpay-brcode {
-    width: 100%;
-    box-sizing: border-box;
-    margin: 0;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(96,165,250,0.2);
-    border-radius: 8px;
-    padding: 0.55rem 0.75rem;
-    font-size: 0.72rem;
-    font-family: 'Courier New', monospace;
-    color: var(--ci-surface-muted);
-    word-break: break-all;
-    overflow-wrap: break-word;
-    white-space: normal;
-    overflow: hidden;
-    text-align: left;
-    user-select: all;
-    cursor: text;
-}
-
-/* ── Copy button ─────────────────────────────────────────────── */
-.evpay-action-btn--copy {
-    background: rgba(99,179,255,0.15);
-    color: var(--link-info);
-    border: 1.5px solid rgba(99,179,255,0.5);
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-shadow: 0 0 8px rgba(147,197,253,0.35);
-}
-.evpay-action-btn--copy:hover {
-    background: rgba(99,179,255,0.25);
-    color: var(--ci-surface-light);
-    border-color: rgba(99,179,255,0.75);
-    filter: none;
-}
-
-/* ── Comprovante de pagamento ────────────────────────────────── */
-.evpay-proof {
-    margin-top: 1.25rem;
-    background: rgba(15, 26, 48, 0.6);
-    border: 1px solid rgba(251, 191, 36, 0.3);
-    border-radius: 12px;
-    padding: 1rem 1.1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.evpay-proof-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--amber);
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-}
-
-.evpay-proof-hint {
-    font-size: 0.82rem;
-    color: var(--slate-muted);
-    margin: 0;
-    line-height: 1.5;
-}
-
-.evpay-proof-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    background: rgba(251, 191, 36, 0.12);
-    border: 1.5px solid rgba(251, 191, 36, 0.55);
-    color: rgba(251, 191, 36, 0.9);
-    border-radius: 8px;
-    padding: 0.55rem 1.1rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-    user-select: none;
-    align-self: flex-start;
-}
-.evpay-proof-btn:hover {
-    background: rgba(251, 191, 36, 0.22);
-    border-color: rgba(251, 191, 36, 0.85);
-    color: var(--amber);
-}
-.evpay-proof-btn--update {
     background: rgba(96, 165, 250, 0.1);
-    border-color: rgba(96, 165, 250, 0.45);
-    color: rgba(96, 165, 250, 0.85);
-}
-.evpay-proof-btn--update:hover {
-    background: rgba(96, 165, 250, 0.2);
-    border-color: rgba(96, 165, 250, 0.8);
     color: var(--link-info);
+    border: 1px solid rgba(96, 165, 250, 0.3);
 }
 
-.evpay-proof-sent {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.83rem;
-    color: var(--green-soft);
-}
-
-.evpay-proof-sent-icon {
-    color: var(--green-bright);
-    font-size: 1rem;
-    flex-shrink: 0;
-}
-
-.evpay-proof-thumb {
-    width: 100%;
-    max-height: 220px;
-    object-fit: contain;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(0,0,0,0.3);
-}
-
-.evpay-proof-error {
-    font-size: 0.82rem;
-    color: var(--red-soft);
-    margin: 0;
-}
-
-.evpay-proof-success {
-    font-size: 0.82rem;
-    color: var(--green-soft);
-    margin: 0.5rem 0 0;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-@keyframes fadeout {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
+.evpay-action-btn--back:hover {
+    background: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.5);
 }

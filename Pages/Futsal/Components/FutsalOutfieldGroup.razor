@@ -48,7 +48,7 @@
                                     }
                                     else if (c.PixProofUploadedAt.HasValue)
                                     {
-                                        <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="HandleNavigateToPaymentsModal" title="Comprovante enviado - clique para gerenciar">
+                                        <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => HandleNavigateToPaymentsModal(c.Id)" title="Comprovante enviado - clique para gerenciar">
                                             <i class="fas fa-image"></i> 📎 comprovante
                                         </button>
                                     }
@@ -205,7 +205,7 @@
     [Parameter] public EventCallback<int> OnAdminRemoveConfirmation { get; set; }
     [Parameter] public EventCallback OnAdminAddOutfieldSlot { get; set; }
     [Parameter] public EventCallback OnAdminRemoveOutfieldSlot { get; set; }
-    [Parameter] public EventCallback OnNavigateToPaymentsModal { get; set; }
+    [Parameter] public EventCallback<int> OnNavigateToPaymentsModal { get; set; }
 
     private async Task HandleConfirmAs(FutsalPosition pos)
         => await OnConfirmAs.InvokeAsync();
@@ -234,6 +234,6 @@
     private async Task HandleAdminRemoveOutfieldSlot()
         => await OnAdminRemoveOutfieldSlot.InvokeAsync();
 
-    private async Task HandleNavigateToPaymentsModal()
-        => await OnNavigateToPaymentsModal.InvokeAsync();
+    private async Task HandleNavigateToPaymentsModal(int confirmationId)
+        => await OnNavigateToPaymentsModal.InvokeAsync(confirmationId);
 }

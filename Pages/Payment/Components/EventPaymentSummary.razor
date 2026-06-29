@@ -10,7 +10,14 @@
     <div class="evpay-summary-row">
         <span class="evpay-summary-label">Posição</span>
         <span class="evpay-summary-value">
-            @(Confirmation?.Position == FutsalPosition.Goalkeeper ? "🥅 Goleiro" : "⚽ Linha")
+            @if (Confirmation?.Position == FutsalPosition.Goalkeeper)
+            {
+                <span><i class="fas fa-hand-paper"></i> Goleiro</span>
+            }
+            else
+            {
+                <span>⚽ Linha</span>
+            }
         </span>
     </div>
     <div class="evpay-summary-divider"></div>

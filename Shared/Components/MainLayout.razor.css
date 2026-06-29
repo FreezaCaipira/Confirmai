@@ -180,7 +180,7 @@ header {
 .main-content {
     flex: 1;
     padding: 2rem 1.35rem;
-    background: var(--ci-bg-deepest);
+    background: var(--ci-bg);
     border: 1px solid var(--ci-border-alt);
     border-top: 2px solid var(--ci-border-dim);
     box-shadow: none;
