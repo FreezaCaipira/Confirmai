@@ -21,3 +21,80 @@
     color: var(--ci-text-muted);
     text-align: center;
 }
+
+/* ── Admin review ────────────────────────────────────────────── */
+.evpay-admin-review {
+    margin-top: 1.5rem;
+    background: rgba(10, 30, 48, 0.55);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+}
+
+.evpay-admin-review-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--link-info);
+    margin-bottom: 0.75rem;
+}
+
+.evpay-admin-proof {
+    margin-bottom: 1rem;
+}
+
+.evpay-admin-proof-label {
+    font-size: 0.82rem;
+    color: var(--slate-muted);
+    margin: 0 0 0.5rem;
+}
+
+.evpay-admin-proof-img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.evpay-admin-no-proof {
+    color: var(--slate-muted);
+    font-size: 0.88rem;
+    margin: 0 0 1rem;
+}
+
+.evpay-admin-confirm-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: var(--green-bright);
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.evpay-admin-confirm-btn:hover:not(:disabled) {
+    background: rgba(74, 222, 128, 0.2);
+    border-color: rgba(74, 222, 128, 0.6);
+}
+
+.evpay-admin-confirm-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.evpay-admin-error {
+    color: var(--red-soft);
+    font-size: 0.83rem;
+    margin: 0 0 0.75rem;
+}

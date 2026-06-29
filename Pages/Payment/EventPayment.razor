@@ -7,6 +7,7 @@
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Pages.Payment.Components
+@using Confirmai.Services.Admin
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -18,6 +19,7 @@
 @inject NavigationManager NavigationManager
 @inject EventPaymentGatewayFactory EventGatewayFactory
 @inject PixProofUploadService PixProofUploadService
+@inject AdminConfirmationService AdminConfirmationService
 @inject ILogger<EventPayment> _logger
 
 <PageTitle>Pagamento — Confirmai</PageTitle>
@@ -55,6 +57,51 @@
                 @if (conf.PaymentStatus == EventConfirmationPaymentStatus.Paid || payState == PayState.Paid)
                 {
                     <EventPaymentStatus BackUrl="@backUrl" />
+                }
+                else if (isAdminViewing)
+                {
+                    <div class="evpay-admin-review">
+                        <div class="evpay-admin-review-header">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Revisão de pagamento — @conf.User?.FullName</span>
+                        </div>
+                        @if (conf.PixProofUploadedAt.HasValue)
+                        {
+                            <div class="evpay-admin-proof">
+                                <p class="evpay-admin-proof-label">Comprovante enviado em @conf.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</p>
+                                <img src="/api/pix-proof/@conf.Id" class="evpay-admin-proof-img" alt="Comprovante Pix" />
+                            </div>
+                            @if (adminMarkPaidError)
+                            {
+                                <p class="evpay-admin-error">Erro ao confirmar pagamento. Tente novamente.</p>
+                            }
+                            <button class="evpay-admin-confirm-btn" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
+                                @if (adminMarkPaidLoading)
+                                {
+                                    <i class="fas fa-spinner fa-spin"></i> <span>Confirmando…</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-check"></i> <span>Confirmar pagamento</span>
+                                }
+                            </button>
+                        }
+                        else
+                        {
+                            <p class="evpay-admin-no-proof">O jogador ainda não enviou comprovante.</p>
+                            <button class="evpay-admin-confirm-btn" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
+                                @if (adminMarkPaidLoading)
+                                {
+                                    <i class="fas fa-spinner fa-spin"></i> <span>Confirmando…</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-check"></i> <span>Marcar como pago</span>
+                                }
+                            </button>
+                        }
+                        <a href="@backUrl" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar para a partida</a>
+                    </div>
                 }
                 else if (payState == PayState.AwaitingPayment)
                 {
@@ -112,6 +159,9 @@
     private readonly List<EventPaymentGatewayOption> comingSoonGateways = [];
     private string selectedGatewayName = string.Empty;
     private bool groupGatewaysEnabled;
+    private bool isAdminViewing;
+    private bool adminMarkPaidLoading;
+    private bool adminMarkPaidError;
 
     private PayState payState = PayState.Idle;
     private string?  brCode;
@@ -136,11 +186,20 @@
         userId   = auth.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
         await using var db = await DbFactory.CreateDbContextAsync();
+
+        // Admin can view any confirmation in their group; non-admin can only view their own
+        var groupAdminIds = await db.GroupMembers
+            .Where(m => m.UserId == userId && m.Role == GroupMemberRole.Admin)
+            .Select(m => m.GroupId)
+            .ToListAsync();
+
         conf = await db.EventConfirmations
             .Include(c => c.Event).ThenInclude(e => e.Group).ThenInclude(g => g.Members).ThenInclude(m => m.User)
             .Include(c => c.User)
-            .FirstOrDefaultAsync(c => c.Id == ConfirmationId && c.UserId == userId);
+            .FirstOrDefaultAsync(c => c.Id == ConfirmationId &&
+                (c.UserId == userId || groupAdminIds.Contains(c.Event.GroupId)));
 
+        isAdminViewing = conf is not null && conf.UserId != userId;
         groupGatewaysEnabled = conf?.Event.Group.EnablePaymentGateways ?? false;
         if (groupGatewaysEnabled)
         {
@@ -148,8 +207,8 @@
             selectedGatewayName = availableGateways.FirstOrDefault()?.Name ?? string.Empty;
         }
 
-        // Redirecionar se não tem preço ou é goleiro
-        if (conf is not null && (conf.Event.Price is null || conf.Position == FutsalPosition.Goalkeeper))
+        // Redirecionar se não tem preço ou é goleiro (admin revisando não é redirecionado)
+        if (conf is not null && !isAdminViewing && (conf.Event.Price is null || conf.Position == FutsalPosition.Goalkeeper))
         {
             var backUrl = conf.Event.Sport == Sport.Futsal
                 ? $"/futsal/{conf.Event.Id}"
@@ -502,6 +561,36 @@
         _copyBrCodeCts?.Dispose();
         _copyAdminPixCts?.Dispose();
         _uploadProofCts?.Dispose();
+    }
+
+    private async Task AdminMarkPaid()
+    {
+        if (conf is null) return;
+        adminMarkPaidLoading = true;
+        adminMarkPaidError = false;
+        StateHasChanged();
+        try
+        {
+            var result = await AdminConfirmationService.TogglePaidAsync(conf.Id, userId);
+            if (result.Found && result.Updated)
+            {
+                conf.HasPaid = true;
+                conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+                payState = PayState.Paid;
+            }
+            else
+            {
+                adminMarkPaidError = true;
+            }
+        }
+        catch
+        {
+            adminMarkPaidError = true;
+        }
+        finally
+        {
+            adminMarkPaidLoading = false;
+        }
     }
 
     // Callback wrappers for child components
