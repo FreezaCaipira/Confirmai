@@ -98,3 +98,17 @@
     font-size: 0.83rem;
     margin: 0 0 0.75rem;
 }
+
+.evpay-admin-review .detail-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--slate-muted);
+    text-decoration: none;
+}
+
+.evpay-admin-review .detail-back-link:hover {
+    color: var(--link-info);
+}
