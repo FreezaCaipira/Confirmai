@@ -327,19 +327,88 @@
     --slate-border-xl:     rgba(148, 163, 184, 0.25);
 
     /* Navy/CI accent (26,90,176) */
-    --ci-accent-opacity-xs: var(--ci-accent-opacity-xs);
-    --ci-accent-opacity-sm: var(--ci-accent-opacity-sm);
-    --ci-accent-opacity-md: var(--ci-accent-opacity-md);
-    --ci-accent-opacity-lg: var(--ci-accent-opacity-lg);
+    --ci-accent-opacity-xs: rgba(26, 90, 176, 0.12);
+    --ci-accent-opacity-sm: rgba(26, 90, 176, 0.18);
+    --ci-accent-opacity-md: rgba(26, 90, 176, 0.2);
+    --ci-accent-opacity-lg: rgba(26, 90, 176, 0.25);
 
     /* Slate functional (100,116,139) */
     --slate-functional-md: rgba(100, 116, 139, 0.3);
 
     /* Black additional */
-    --shadow-sm:           var(--shadow-sm);
-    --shadow-xs:           var(--shadow-xs);
+    --shadow-sm:           rgba(0, 0, 0, 0.25);
+    --shadow-xs:           rgba(0, 0, 0, 0.2);
     --shadow-2xs:          rgba(0, 0, 0, 0.15);
-    --shadow-light:        var(--shadow-light);
+    --shadow-light:        rgba(0, 0, 0, 0.35);
+
+    /* == Marketplace brown/parchment palette == */
+    --mk-brown-deepest:    #2b1a09;
+    --mk-brown-deep:       #4d2f18;
+    --mk-brown-dark:       #53361c;
+    --mk-brown:            #5f4022;
+    --mk-brown-mid:        #654227;
+    --mk-brown-warm:       #6b4725;
+    --mk-brown-light:      #7d5a34;
+    --mk-gold-dark:        #b7833f;
+    --mk-gold:             #b78340;
+    --mk-gold-light:       #d8af63;
+    --mk-gold-warm:        #d8b173;
+    --mk-brown-soft:       #5b391f;
+    --mk-brown-fade:       #2a1a0c;
+    --mk-brown-fade2:      #2f1e0c;
+    --mk-brown-deep2:      #3f2914;
+    --mk-brown-deep3:      #3d2612;
+    --mk-brown-deep4:      #4e3119;
+    --mk-brown-warm2:      #715028;
+    --mk-brown-warm3:      #70512a;
+    --mk-brown-warm4:      #74512a;
+    --mk-brown-light2:     #7f5e34;
+    --mk-brown-light3:     #7a572d;
+    --mk-brown-light4:     #8a6737;
+    --mk-brown-light5:     #8b6a3d;
+    --mk-brown-light6:     #8b683b;
+    --mk-brown-light7:     #8f6c3c;
+    --mk-gold-light2:      #bfa06c;
+    --mk-gold-light3:      #d8c093;
+    --mk-gold-light4:      #c69a60;
+    --mk-gold-warm2:       #ebd2a7;
+    --mk-gold-warm3:       #dfc493;
+
+    /* Marketplace rgba (brown/gold/parchment) */
+    --mk-brown-opacity-md:   rgba(97, 65, 34, 0.35);
+    --mk-brown-opacity-lg:   rgba(97, 65, 34, 0.42);
+    --mk-brown2-opacity-sm:  rgba(98, 64, 34, 0.15);
+    --mk-brown2-opacity-md:  rgba(98, 64, 34, 0.17);
+    --mk-brown2-opacity-lg:  rgba(98, 64, 34, 0.19);
+    --mk-brown2-opacity-xl:  rgba(98, 64, 34, 0.2);
+    --mk-brown3-opacity-md:  rgba(125, 90, 44, 0.5);
+    --mk-brown3-opacity-lg:  rgba(125, 90, 44, 0.6);
+    --mk-gold-opacity-sm:    rgba(156, 121, 63, 0.52);
+    --mk-gold2-opacity-xs:   rgba(194, 156, 101, 0.2);
+    --mk-gold3-opacity-sm:   rgba(234, 191, 109, 0.18);
+    --mk-gold3-opacity-md:   rgba(234, 191, 109, 0.2);
+    --mk-gold3-opacity-lg:   rgba(234, 191, 109, 0.22);
+    --mk-cream-opacity-sm:   rgba(255, 236, 197, 0.74);
+    --mk-cream2-opacity-md:  rgba(255, 244, 214, 0.7);
+    --mk-cream2-opacity-lg:  rgba(255, 244, 214, 0.76);
+    --mk-cream3-opacity-sm:  rgba(255, 248, 225, 0.38);
+    --mk-cream3-opacity-md:  rgba(255, 248, 230, 0.2);
+    --mk-cream3-opacity-lg:  rgba(255, 248, 230, 0.22);
+    --mk-cream3-opacity-xl:  rgba(255, 248, 231, 0.86);
+    --mk-cream4-opacity-sm:  rgba(255, 245, 217, 0.5);
+    --mk-cream4-opacity-md:  rgba(255, 245, 218, 0.54);
+    --mk-cream4-opacity-lg:  rgba(255, 245, 219, 0.44);
+    --mk-dark-opacity-md:    rgba(35, 25, 18, 0.42);
+    --mk-dark2-opacity-xl:   rgba(48, 35, 24, 0.95);
+    --mk-dark3-opacity-xl:   rgba(34, 24, 17, 0.98);
+    --mk-olive-opacity-xs:   rgba(137, 107, 68, 0.16);
+    --mk-amber-opacity-sm:   rgba(247, 220, 159, 0.18);
+    --mk-amber2-opacity-sm:  rgba(243, 214, 154, 0.16);
+    --mk-amber3-opacity-sm:  rgba(243, 224, 185, 0.74);
+    --mk-gold4-opacity-xs:   rgba(255, 231, 185, 0.08);
+    --mk-shadow-mk-md:       rgba(0, 0, 0, 0.26);
+    --mk-shadow-mk-lg:       rgba(0, 0, 0, 0.28);
+    --mk-shadow-mk-xl:       rgba(0, 0, 0, 0.38);
 }
 
 /* ================================================================

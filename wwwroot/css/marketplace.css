@@ -10,18 +10,18 @@
     inset: 0;
     pointer-events: none;
     background:
-        radial-gradient(circle at 9% 7%, rgba(247, 220, 159, 0.18) 0%, rgba(247, 220, 159, 0) 34%),
-        radial-gradient(circle at 86% 16%, rgba(137, 107, 68, 0.16) 0%, rgba(137, 107, 68, 0) 36%),
-        linear-gradient(180deg, rgba(35, 25, 18, 0.42) 0%, rgba(35, 25, 18, 0) 48%);
+        radial-gradient(circle at 9% 7%, var(--mk-amber-opacity-sm) 0%, transparent 34%),
+        radial-gradient(circle at 86% 16%, var(--mk-olive-opacity-xs) 0%, transparent 36%),
+        linear-gradient(180deg, var(--mk-dark-opacity-md) 0%, transparent 48%);
 }
 
 .mk-shell {
     position: relative;
     background:
-        radial-gradient(circle at 14% 0%, rgba(243, 214, 154, 0.16) 0%, rgba(243, 214, 154, 0) 40%),
-        linear-gradient(160deg, rgba(48, 35, 24, 0.95) 0%, rgba(34, 24, 17, 0.98) 100%);
-    border: 1px solid rgba(156, 121, 63, 0.52);
-    box-shadow: inset 0 0 0 1px rgba(255, 231, 185, 0.08), 0 18px 46px rgba(0, 0, 0, 0.38);
+        radial-gradient(circle at 14% 0%, var(--mk-amber2-opacity-sm) 0%, transparent 40%),
+        linear-gradient(160deg, var(--mk-dark2-opacity-xl) 0%, var(--mk-dark3-opacity-xl) 100%);
+    border: 1px solid var(--mk-gold-opacity-sm);
+    box-shadow: inset 0 0 0 1px var(--mk-gold4-opacity-xs), 0 18px 46px var(--mk-shadow-mk-xl);
 }
 
 .mk-shell::after {
@@ -30,10 +30,10 @@
     inset: 0;
     pointer-events: none;
     background:
-        radial-gradient(circle at 2% 2%, rgba(234, 191, 109, 0.22) 0 6px, transparent 8px),
-        radial-gradient(circle at 98% 2%, rgba(234, 191, 109, 0.2) 0 6px, transparent 8px),
-        radial-gradient(circle at 2% 98%, rgba(234, 191, 109, 0.18) 0 6px, transparent 8px),
-        radial-gradient(circle at 98% 98%, rgba(234, 191, 109, 0.22) 0 6px, transparent 8px);
+        radial-gradient(circle at 2% 2%, var(--mk-gold3-opacity-lg) 0 6px, transparent 8px),
+        radial-gradient(circle at 98% 2%, var(--mk-gold3-opacity-md) 0 6px, transparent 8px),
+        radial-gradient(circle at 2% 98%, var(--mk-gold3-opacity-sm) 0 6px, transparent 8px),
+        radial-gradient(circle at 98% 98%, var(--mk-gold3-opacity-lg) 0 6px, transparent 8px);
 }
 
 .mk-command-board,
@@ -42,14 +42,14 @@
 .mk-product-card {
     position: relative;
     background:
-        radial-gradient(circle at 17% 12%, rgba(255, 248, 225, 0.38) 0%, rgba(255, 248, 225, 0) 36%),
-        radial-gradient(circle at 84% 88%, rgba(194, 156, 101, 0.2) 0%, rgba(194, 156, 101, 0) 48%),
-        linear-gradient(172deg, #f3e2bf 0%, #ebd2a7 52%, #dfbf8c 100%);
-    border: 1px solid #8b6a3d;
+        radial-gradient(circle at 17% 12%, var(--mk-cream3-opacity-sm) 0%, transparent 36%),
+        radial-gradient(circle at 84% 88%, var(--mk-gold2-opacity-xs) 0%, transparent 48%),
+        linear-gradient(172deg, var(--mk-gold-warm) 0%, var(--mk-gold-warm2) 52%, var(--mk-gold-warm) 100%);
+    border: 1px solid var(--mk-brown-light5);
     box-shadow:
-        inset 0 0 0 1px rgba(255, 244, 214, 0.7),
-        inset 0 8px 18px rgba(255, 248, 230, 0.22),
-        0 7px 16px rgba(0, 0, 0, 0.26);
+        inset 0 0 0 1px var(--mk-cream2-opacity-md),
+        inset 0 8px 18px var(--mk-cream3-opacity-lg),
+        0 7px 16px var(--mk-shadow-mk-md);
 }
 
 .mk-command-board::before,
@@ -62,10 +62,10 @@
     pointer-events: none;
     border-radius: inherit;
     background:
-        radial-gradient(circle at top left, rgba(98, 64, 34, 0.19) 0 12px, transparent 14px),
-        radial-gradient(circle at top right, rgba(98, 64, 34, 0.17) 0 12px, transparent 14px),
-        radial-gradient(circle at bottom left, rgba(98, 64, 34, 0.15) 0 13px, transparent 15px),
-        radial-gradient(circle at bottom right, rgba(98, 64, 34, 0.2) 0 14px, transparent 16px);
+        radial-gradient(circle at top left, var(--mk-brown2-opacity-lg) 0 12px, transparent 14px),
+        radial-gradient(circle at top right, var(--mk-brown2-opacity-md) 0 12px, transparent 14px),
+        radial-gradient(circle at bottom left, var(--mk-brown2-opacity-sm) 0 13px, transparent 15px),
+        radial-gradient(circle at bottom right, var(--mk-brown2-opacity-xl) 0 14px, transparent 16px);
     mix-blend-mode: multiply;
 }
 
@@ -76,13 +76,13 @@
 }
 
 .mk-ticker {
-    border: 1px solid rgba(125, 90, 44, 0.6);
+    border: 1px solid var(--mk-brown3-opacity-lg);
     border-radius: 8px;
     padding: 0.62rem 0.78rem;
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    background: rgba(255, 242, 210, 0.38);
+    background: var(--mk-cream3-opacity-sm);
     margin-bottom: 0.8rem;
 }
 
@@ -90,24 +90,24 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-size: 0.72rem;
-    color: #53361c;
-    border-right: 1px solid rgba(97, 65, 34, 0.42);
+    color: var(--mk-brown-dark);
+    border-right: 1px solid var(--mk-brown-opacity-lg);
     padding-right: 0.7rem;
     font-family: "Times New Roman", Georgia, serif;
     font-weight: 700;
 }
 
 .mk-ticker-text {
-    color: #4a2f18;
+    color: var(--mk-brown-deep);
     font-size: 0.92rem;
     font-weight: 600;
 }
 
 .mk-server-pill {
     border-radius: 999px;
-    border: 1px solid #7f5e34;
-    color: #3f2914;
-    background: rgba(255, 236, 197, 0.74);
+    border: 1px solid var(--mk-brown-light2);
+    color: var(--mk-brown-deep2);
+    background: var(--mk-cream-opacity-sm);
     padding: 0.18rem 0.52rem;
     font-size: 0.71rem;
     text-transform: uppercase;
@@ -116,10 +116,10 @@
 }
 
 .mk-server-clear {
-    border: 1px solid #7a572d;
+    border: 1px solid var(--mk-brown-light3);
     border-radius: 8px;
-    background: linear-gradient(180deg, #d8c093 0%, #bfa06c 100%);
-    color: #2f1e0c;
+    background: linear-gradient(180deg, var(--mk-gold-light3) 0%, var(--mk-gold-light2) 100%);
+    color: var(--mk-brown-fade2);
     font-weight: 700;
     padding: 0.32rem 0.58rem;
 }
@@ -132,22 +132,22 @@
 
 .mk-stat {
     border-radius: 8px;
-    border: 1px solid rgba(125, 90, 44, 0.5);
+    border: 1px solid var(--mk-brown3-opacity-md);
     padding: 0.52rem 0.64rem;
     display: flex;
     flex-direction: column;
     gap: 0.08rem;
-    background: rgba(255, 245, 219, 0.44);
+    background: var(--mk-cream4-opacity-lg);
 }
 
 .mk-stat strong {
-    color: #4f3218;
+    color: var(--mk-brown-deep);
     font-size: 1.02rem;
     font-family: "Times New Roman", Georgia, serif;
 }
 
 .mk-stat-label {
-    color: #6a4726;
+    color: var(--mk-brown-warm);
     text-transform: uppercase;
     letter-spacing: 0.07em;
     font-size: 0.72rem;
@@ -168,34 +168,34 @@
     min-height: 42px;
     border-radius: 7px;
     border: 1px solid var(--brown-border-warm);
-    background: rgba(255, 248, 231, 0.86);
-    color: #4e3119;
+    background: var(--mk-cream3-opacity-xl);
+    color: var(--mk-brown-deep4);
     padding: 0.52rem 0.66rem;
     font-size: 0.93rem;
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
 }
 
 .marketplace-page .mk-input::placeholder {
-    color: #7d5a34;
+    color: var(--mk-brown-light);
 }
 
 .marketplace-page .mk-btn {
     min-height: 42px;
     border-radius: 8px;
-    border: 1px solid #74512a;
+    border: 1px solid var(--mk-brown-warm4);
     font-weight: 700;
     font-family: "Times New Roman", Georgia, serif;
     letter-spacing: 0.03em;
 }
 
 .marketplace-page .mk-btn-primary {
-    color: #2b1a09;
-    background: linear-gradient(180deg, #d8af63 0%, #b78340 100%);
+    color: var(--mk-brown-deepest);
+    background: linear-gradient(180deg, var(--mk-gold-light) 0%, var(--mk-gold) 100%);
 }
 
 .marketplace-page .mk-btn-muted {
-    color: #2f1e0c;
-    background: linear-gradient(180deg, #d8c093 0%, #bfa06c 100%);
+    color: var(--mk-brown-fade2);
+    background: linear-gradient(180deg, var(--mk-gold-light3) 0%, var(--mk-gold-light2) 100%);
 }
 
 .mk-layout {
@@ -213,7 +213,7 @@
 .mk-side-card h3,
 .mk-side-card h4 {
     margin: 0 0 0.55rem;
-    color: #4c2f17;
+    color: var(--mk-brown-deep);
     font-family: "Times New Roman", Georgia, serif;
     letter-spacing: 0.04em;
 }
@@ -233,17 +233,17 @@
     text-align: left;
     margin-bottom: 0.45rem;
     border-radius: 7px;
-    border: 1px solid #8a6737;
+    border: 1px solid var(--mk-brown-light4);
     padding: 0.46rem 0.56rem;
-    color: #5b391f;
-    background: rgba(255, 245, 218, 0.54);
+    color: var(--mk-brown-soft);
+    background: var(--mk-cream4-opacity-md);
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
 }
 
 .marketplace-page .mk-category-link.active {
-    border-color: #715028;
-    color: #2e1d0b;
-    background: linear-gradient(180deg, #d8b173 0%, #b8884a 100%);
+    border-color: var(--mk-brown-warm2);
+    color: var(--mk-brown-deepest);
+    background: linear-gradient(180deg, var(--mk-gold-warm) 0%, var(--mk-gold-dark) 100%);
 }
 
 .mk-main-column {
@@ -268,11 +268,11 @@
 
 .mk-product-card:hover {
     transform: translateY(-2px);
-    border-color: #7a572d;
+    border-color: var(--mk-brown-light3);
     box-shadow:
-        inset 0 0 0 1px rgba(255, 244, 214, 0.76),
-        inset 0 8px 18px rgba(255, 248, 230, 0.2),
-        0 10px 18px rgba(0, 0, 0, 0.28);
+        inset 0 0 0 1px var(--mk-cream2-opacity-lg),
+        inset 0 8px 18px var(--mk-cream3-opacity-md),
+        0 10px 18px var(--mk-shadow-mk-lg);
 }
 
 .mk-product-image {
@@ -280,8 +280,8 @@
     height: 100px;
     border-radius: 9px;
     overflow: hidden;
-    border: 1px solid #8f6a3a;
-    background: linear-gradient(165deg, #dfc493 0%, #c69a60 100%);
+    border: 1px solid var(--mk-brown-light);
+    background: linear-gradient(165deg, var(--mk-gold-warm3) 0%, var(--mk-gold-light4) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -294,7 +294,7 @@
 }
 
 .mk-img-placeholder {
-    color: #5d3a1f;
+    color: var(--mk-brown-soft);
     letter-spacing: 0.08em;
     font-size: 0.78rem;
     font-weight: 700;
@@ -314,7 +314,7 @@
 
 .mk-title {
     margin: 0;
-    color: #4f3117;
+    color: var(--mk-brown-deep);
     font-size: 1.08rem;
     font-family: "Times New Roman", Georgia, serif;
     letter-spacing: 0.01em;
@@ -328,13 +328,13 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 700;
-    border: 1px solid #7f5e34;
-    color: #3f2914;
-    background: rgba(255, 236, 197, 0.74);
+    border: 1px solid var(--mk-brown-light2);
+    color: var(--mk-brown-deep2);
+    background: var(--mk-cream-opacity-sm);
 }
 
 .mk-price {
-    color: #3d2612;
+    color: var(--mk-brown-deep3);
     font-weight: 700;
     margin-bottom: 0.33rem;
     font-family: "Times New Roman", Georgia, serif;
@@ -342,7 +342,7 @@
 
 .mk-desc {
     margin: 0;
-    color: #5f4022;
+    color: var(--mk-brown);
     font-size: 0.92rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -365,7 +365,7 @@
 }
 
 .mk-meta-label {
-    color: #7d592f;
+    color: var(--mk-brown-light);
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -379,10 +379,10 @@
 }
 
 .marketplace-page .buy-btn {
-    border: 1px solid #70512a;
+    border: 1px solid var(--mk-brown-warm3);
     border-radius: 8px;
-    background: linear-gradient(180deg, #d6ad66 0%, #b7833f 100%);
-    color: #2a1a0c;
+    background: linear-gradient(180deg, var(--mk-gold-light) 0%, var(--mk-gold-dark) 100%);
+    color: var(--mk-brown-fade);
     font-weight: 700;
     font-family: "Times New Roman", Georgia, serif;
     padding: 0.5rem 0.84rem;
@@ -397,7 +397,7 @@
 
 .mk-side-note {
     margin: 0;
-    color: #654227;
+    color: var(--mk-brown-mid);
     font-size: 0.85rem;
 }
 
@@ -409,13 +409,13 @@
 
 .mk-radar-item {
     border-radius: 7px;
-    border: 1px solid #8f6c3c;
+    border: 1px solid var(--mk-brown-light7);
     padding: 0.44rem 0.52rem;
-    background: rgba(255, 245, 217, 0.5);
+    background: var(--mk-cream4-opacity-sm);
 }
 
 .mk-radar-name {
-    color: #4d2f18;
+    color: var(--mk-brown-deep);
     font-size: 0.84rem;
     white-space: nowrap;
     overflow: hidden;
@@ -423,17 +423,17 @@
 }
 
 .mk-radar-price {
-    color: #6a4624;
+    color: var(--mk-brown-warm);
     font-size: 0.78rem;
     margin-top: 0.1rem;
 }
 
 .market-empty {
     border-radius: 10px;
-    border: 1px dashed #8b683b;
-    color: #6b4725;
+    border: 1px dashed var(--mk-brown-light6);
+    color: var(--mk-brown-warm);
     padding: 1rem;
-    background: rgba(243, 224, 185, 0.74);
+    background: var(--mk-amber3-opacity-sm);
 }
 
 .marketplace-pagination {
@@ -499,7 +499,7 @@
 
     .mk-ticker-label {
         border-right: 0;
-        border-bottom: 1px solid rgba(97, 65, 34, 0.35);
+        border-bottom: 1px solid var(--mk-brown-opacity-md);
         padding-right: 0;
         padding-bottom: 0.2rem;
     }
