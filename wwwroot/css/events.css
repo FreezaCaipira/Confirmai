@@ -1228,8 +1228,39 @@
     border-color: rgba(52,211,153,0.3);
 }
 
-/* Admin: pendente (azul neutro) */
+/* Admin: pendente (âmbar) */
 .player-tag--pay-pending {
+    color: var(--amber);
+    background: rgba(251,191,36,0.08);
+    border-color: rgba(251,191,36,0.25);
+}
+
+/* Comprovante / Pagar / Não paga — azul neutro sistema */
+.player-tag--proof-pending {
+    color: var(--link-info);
+    background: rgba(96,165,250,0.1);
+    border-color: rgba(96,165,250,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.player-tag--proof-pending:hover {
+    background: rgba(96,165,250,0.2);
+    border-color: rgba(96,165,250,0.5);
+}
+
+.player-tag--pay-btn {
+    color: var(--link-info);
+    background: rgba(96,165,250,0.1);
+    border-color: rgba(96,165,250,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.player-tag--pay-btn:hover {
+    background: rgba(96,165,250,0.2);
+    border-color: rgba(96,165,250,0.5);
+}
+
+.player-tag--no-pay {
     color: var(--link-info);
     background: rgba(96,165,250,0.1);
     border-color: rgba(96,165,250,0.3);
