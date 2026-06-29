@@ -87,7 +87,7 @@ public class UiTextServiceRefactoringTests : IDisposable
         var ui = new UiTextService(_languageService);
 
         Assert.Equal("Finalizar compra", ui.Get("PaymentBuy.Title"));
-        Assert.Equal("Historico de faturas", ui.Get("PaymentHistory.Title"));
+        Assert.Equal("Meus pagamentos", ui.Get("PaymentHistory.Title"));
         Assert.Equal("Produtos", ui.Get("Products.Title"));
         Assert.Equal("Marketplace", ui.Get("Marketplace.Title"));
     }
