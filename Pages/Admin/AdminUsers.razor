@@ -9,7 +9,6 @@
 @using Confirmai.Models
 @using Microsoft.JSInterop
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.Web.Virtualization
 
 @inject LogService LogService
 @inject AdminUsersFilterStateService AdminUsersFilterStateService
@@ -38,13 +37,17 @@
 
             <AdminUsersTable
                 TotalItems="@totalUsers"
+                Users="@currentPageUsers"
                 UserRoles="@userRoles"
+                CurrentPage="@currentPage"
+                TotalPages="@totalPages"
                 OnViewUser="@ViewUser"
                 OnEditUser="@EditUser"
                 OnLockUser="@LockUser"
                 OnUnlockUser="@UnlockUser"
                 OnDeleteUser="@DeleteUser"
-                LoadUsersAsync="@LoadVirtualizedUsersAsync" />
+                OnPrevPage="@GoToPrevPage"
+                OnNextPage="@GoToNextPage" />
         </article>
     </section>
 
@@ -59,10 +62,13 @@
     [Inject] IJSRuntime JS { get; set; } = default!;
     [CascadingParameter] public Toast? ToastRef { get; set; }
     private Dictionary<string, string> userRoles = new();
+    private List<ApplicationUser> currentPageUsers = new();
     private bool filtersLoaded;
     private bool showRestoredFiltersNotice;
     private int totalUsers;
-    private const int VirtualizePageSize = 50;
+    private int currentPage = 1;
+    private int totalPages = 1;
+    private const int PageSize = 20;
 
     private string filterUserName = "";
     private string filterEmail = "";
@@ -71,7 +77,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadUsersCountAsync();
+        await LoadUsersPageAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -83,20 +89,13 @@
 
         await LoadFilterStateFromStorageAsync();
         filtersLoaded = true;
+        currentPage = 1;
+        await LoadUsersPageAsync();
     }
 
-    private async Task LoadUsersCountAsync()
+    private async Task LoadUsersPageAsync()
     {
         await using var db = await DbFactory.CreateDbContextAsync();
-        totalUsers = await db.Users.CountAsync();
-    }
-
-    private async ValueTask<ItemsProviderResult<ApplicationUser>> LoadVirtualizedUsersAsync(ItemsProviderRequest request)
-    {
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        var startIndex = request.StartIndex;
-        var count = request.Count;
 
         var query = db.Users.AsNoTracking();
 
@@ -129,16 +128,21 @@
             query = query.Where(u => u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now);
         }
 
-        var totalCount = await query.CountAsync();
+        totalUsers = await query.CountAsync();
+        totalPages = Math.Max(1, (int)Math.Ceiling((double)totalUsers / PageSize));
+
+        if (currentPage > totalPages)
+            currentPage = totalPages;
 
         var users = await query
             .OrderBy(u => u.UserName)
-            .Skip(startIndex)
-            .Take(count)
+            .Skip((currentPage - 1) * PageSize)
+            .Take(PageSize)
             .ToListAsync();
 
         var roleMap = await db.UserRoles
             .Join(db.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+            .Where(x => users.Select(u => u.Id).Contains(x.UserId))
             .GroupBy(x => x.UserId)
             .ToDictionaryAsync(g => g.Key, g => string.Join(", ", g.Select(x => x.Name)));
 
@@ -148,13 +152,33 @@
             userRoles[user.Id] = roleMap.TryGetValue(user.Id, out var roles) ? roles : "-";
         }
 
-        return new ItemsProviderResult<ApplicationUser>(users, totalCount);
+        currentPageUsers = users;
     }
 
     private async Task ApplyFiltersAndPersist()
     {
         showRestoredFiltersNotice = false;
+        currentPage = 1;
+        await LoadUsersPageAsync();
         await PersistFilterStateAsync();
+    }
+
+    private async Task GoToPrevPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            await LoadUsersPageAsync();
+        }
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            await LoadUsersPageAsync();
+        }
     }
 
     private async Task LockUser(string userId)
@@ -172,6 +196,7 @@
                                         level: "Warning",
                                         userId: userId);
             ToastRef?.Show(T["AdminUsers.LockedToast"], "warning");
+            await LoadUsersPageAsync();
         }
         else
         {
@@ -190,6 +215,7 @@
                                         level: "Info",
                                         userId: userId);
             ToastRef?.Show(T["AdminUsers.UnlockedToast"], "success");
+            await LoadUsersPageAsync();
         }
         else
         {
@@ -229,6 +255,7 @@
                     source: AdminAuditSources.Identity,
                     level: "Warning");
                 ToastRef?.Show(T["AdminUsers.DeletedToast"], "info");
+                await LoadUsersPageAsync();
             }
             else
             {
@@ -298,6 +325,8 @@
         filterRole = "";
         filterStatus = "";
         showRestoredFiltersNotice = false;
+        currentPage = 1;
+        await LoadUsersPageAsync();
         await PersistFilterStateAsync();
     }
 }

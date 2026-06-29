@@ -5715,10 +5715,98 @@ body .oldsite-page {
 
 .entity-shell.admin-page .danger,
 .entity-shell.admin-page .danger-btn {
-    background: var(--red-strong);
-    border: 1px solid var(--red-dark);
-    box-shadow: none;
+    background: linear-gradient(180deg, rgba(248, 113, 113, 0.45) 0%, rgba(220, 80, 80, 0.55) 100%);
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     color: var(--ci-text);
+}
+
+.entity-shell.admin-page .danger:hover,
+.entity-shell.admin-page .danger-btn:hover {
+    background: linear-gradient(180deg, rgba(248, 113, 113, 0.6) 0%, rgba(220, 80, 80, 0.7) 100%);
+    border-color: rgba(248, 113, 113, 0.5);
+}
+
+/* History button — ensure legibility with distinct teal/cyan */
+.entity-shell.admin-page .history-btn {
+    background: linear-gradient(180deg, rgba(20, 184, 166, 0.8) 0%, rgba(13, 148, 136, 0.9) 100%);
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    color: #e0f7f4;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.entity-shell.admin-page .history-btn:hover {
+    background: linear-gradient(180deg, rgba(20, 184, 166, 1) 0%, rgba(13, 148, 136, 1) 100%);
+    color: #ffffff;
+}
+
+/* Success button — metallic green */
+.entity-shell.admin-page .success-btn {
+    background: linear-gradient(180deg, rgba(74, 222, 128, 0.7) 0%, rgba(34, 197, 94, 0.85) 100%);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: #ecfdf5;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.entity-shell.admin-page .success-btn:hover {
+    background: linear-gradient(180deg, rgba(74, 222, 128, 0.9) 0%, rgba(34, 197, 94, 1) 100%);
+}
+
+/* Warning button — metallic amber */
+.entity-shell.admin-page .warning-btn {
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.7) 0%, rgba(217, 160, 20, 0.85) 100%);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    color: #fffbeb;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.entity-shell.admin-page .warning-btn:hover {
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.9) 0%, rgba(217, 160, 20, 1) 100%);
+}
+
+/* Users table container — dark theme */
+.admin-users-shell .users-table-container {
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    background: var(--ci-bg-card-deep);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Users pagination */
+.admin-users-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.5rem 0;
+}
+
+.admin-users-pagination button {
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 1px solid var(--ci-border-dim);
+    color: var(--ci-text-blue);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    cursor: pointer;
+}
+
+.admin-users-pagination button:hover:not(:disabled) {
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-dark) 100%);
+}
+
+.admin-users-pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.admin-users-pagination .pagination-info {
+    color: var(--ci-text-blue);
+    font-size: 0.88rem;
+    font-weight: 600;
 }
 
 /* Tables */
