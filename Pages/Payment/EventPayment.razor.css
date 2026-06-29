@@ -84,8 +84,8 @@
 }
 
 .evpay-admin-confirm-btn:hover:not(:disabled) {
-    background: rgba(74, 222, 128, 0.2);
-    border-color: rgba(74, 222, 128, 0.6);
+    background: var(--green-opacity-sm);
+    border-color: var(--green-opacity-2xl);
 }
 
 .evpay-admin-confirm-btn:disabled {
@@ -118,7 +118,7 @@
 .evpay-admin-confirm-btn--yes {
     flex: 1;
     background: rgba(74, 222, 128, 0.15);
-    border-color: rgba(74, 222, 128, 0.5);
+    border-color: var(--green-opacity-xl);
 }
 
 .evpay-admin-confirm-btn--no {
@@ -129,7 +129,7 @@
 }
 
 .evpay-admin-confirm-btn--no:hover:not(:disabled) {
-    background: rgba(239, 68, 68, 0.2);
+    background: var(--red-opacity-sm);
     border-color: rgba(239, 68, 68, 0.55);
 }
 
@@ -198,12 +198,12 @@
 }
 
 .evpay-action-btn--back {
-    background: rgba(96, 165, 250, 0.1);
+    background: var(--blue300-opacity-xs);
     color: var(--link-info);
     border: 1px solid rgba(96, 165, 250, 0.3);
 }
 
 .evpay-action-btn--back:hover {
-    background: rgba(96, 165, 250, 0.2);
+    background: var(--blue300-opacity-sm);
     border-color: rgba(96, 165, 250, 0.5);
 }
