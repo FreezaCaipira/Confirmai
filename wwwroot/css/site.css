@@ -1,4 +1,4 @@
-﻿/* ================================================================
+/* ================================================================
    CONFIRMAI — GLOBAL STYLESHEET
 
    Sections:
@@ -4881,7 +4881,7 @@ body .oldsite-news-ticker .oldsite-news-ticker-dot.active {
     background: var(--ci-accent);
     border-color: var(--ci-border-dim);
     transform: scale(1.15);
-    box-shadow: 0 0 6px rgba(79, 156, 248, 0.5);
+    box-shadow: 0 0 6px var(--accent-opacity-xl);
 }
 
 body .oldsite-center-column {
