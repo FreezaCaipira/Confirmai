@@ -89,7 +89,8 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 
 ### Ciclo 8 — Sessao UX Interativa (Pleno Local)
 - Branch: `refactor/ciclo8-rgba-cleanup` (continuada)
-- Commits: `f490e78`, `17b3600`, `91a6674`
+- Commits: `f490e78`, `17b3600`, `91a6674` (sessao 1 — 28/06/2026)
+- Commits: `d53e8e6` ate `728f4f8` (sessao 2 — 29/06/2026)
 
 #### Melhorias de UI/UX aplicadas (28/06/2026)
 
@@ -111,6 +112,100 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - `wwwroot/css/events.css` (separadoras + recurring notice CSS)
 - `Pages/Groups/Payments.razor` (history modifier classes)
 - `Pages/Groups/Payments.razor.css` (history neutral styling)
+
+#### Melhorias de UI/UX aplicadas (29/06/2026) — Sessao 2
+
+**Escalacao Futsal (`/futsal/{id}/escalacao`)**:
+6. **Icone de goleiro corrompido**: Emoji de goleiro (🧤/🥅) estava corrompido em todos os componentes. Substituido por icone Font Awesome `fa-hand-paper` em:
+   - `EscalacaoDraftTeamBuilder.razor`
+   - `FutsalGoalkeeperGroup.razor`
+   - `Futsal/Index.razor`
+   - `EscalacaoConfirmed.razor`
+   - `EventPaymentSummary.razor`
+7. **Centralizacao de nomes e titulos**: Titulos dos times, nomes e numeros dos jogadores agora estao centralizados. Botoes de mover (setas) posicionados absolutamente nas bordas para nao afetar o centro.
+8. **Botao shuffle com tema metalico**: Botao de embaralhar times recebeu gradiente azul metalico consistente com o tema dark.
+9. **Modal de confirmacao com tema azul metalico**: Modal de confirmar escalacao estilizado com gradiente azul metalico.
+10. **Legibilidade de texto em fundo escuro**: Time B (fundo escuro) tinha input com texto ilegivel. Corrigido contraste.
+11. **Botao rejeitar cookie**: Melhorado contraste do botao "Rejeitar" no cookie consent.
+12. **Botoes de mover time**: Adicionada cor distinctiva para legibilidade.
+
+**Pagamentos de Evento (`/payment/{id}`)**:
+13. **QR code reduzido ~40%**: Codigos QR estavam muito grandes. Reduzidos para melhor proporcao na tela.
+14. **CSS movido para componentes filhos**: Scoped CSS do EventPayment movido para EventPaymentQr, EventPaymentGateways, EventPaymentHeader, EventPaymentPixAdmin, EventPaymentProof, EventPaymentStatus, EventPaymentSummary.
+15. **Confirmacao de admin**: Admin do grupo agora pode ver e confirmar comprovante de pagamento do jogador.
+16. **Botao voltar**: Largura fixa e cor do sistema aplicados ao botao de voltar.
+17. **Mensagem de sucesso admin**: Scoped CSS adicionado para mensagem de sucesso do admin.
+
+**Pagina Inicial e Eventos**:
+18. **Card shell na pagina de eventos**: Adicionado card shell envolvendo a lista de eventos.
+19. **Renomeacao de nav**: "Esportes" renomeado para "Eventos" na navegacao.
+20. **SportCard poker**: Tema roxo (poker) aplicado ao header do card de poker em vez de azul. Contador de eventos movido do header para o body com label descritivo.
+
+**Grupos**:
+21. **Badge de horario semanal**: Badge mostrando dias da semana em nomes plurais (Segundas, Tercas, etc.) nos cards de grupo.
+22. **Badge de partidas recorrentes**: Banner na detail do grupo para partidas auto-geradas.
+
+**Pagamentos — Historico (`/payments/history`)**:
+23. **Titulo renomeado**: "Historico de faturas" → "Meus pagamentos" (pt-BR, en-US, es-ES).
+24. **Titulo centralizado**: `text-align: center` aplicado ao titulo da pagina.
+
+**Breadcrumb**:
+25. **Atualizacao em navegacao**: Breadcrumb nao atualizava ao navegar entre paginas. Adicionado `StateHasChanged()` apos `LocationChanged` event.
+
+**Admin Payments (`/admin/payments`)**:
+26. **CSS movido para global**: 438 linhas de `.admin-payments-shell` movidas de `AdminPayments.razor.css` para `site.css` (Blazor CSS isolation impede que estilos scoped do pai cheguem aos filhos).
+27. **Container da tabela com tema dark**: Corrigido de parchment para variaveis dark theme (`--ci-bg-card-deep`, `--ci-border`).
+
+**Admin Logs (`/admin/logs`)**:
+28. **Guard de SemaphoreSlim**: `Release()` agora checa `isDisposed` antes de chamar. Prevencao de `ObjectDisposedException`.
+29. **Items count negativo no Virtualize**: Calculo de `itemsToReturn` poderia resultar em valor negativo causando `NullReferenceException`.
+
+**Admin Users (`/admin/users`)**:
+30. **EF Core translation**: `StringComparison.OrdinalIgnoreCase` substituido por `ToLower()` (EF Core nao traduz StringComparison).
+31. **Paginacao manual (20 usuarios/pagina)**: `Virtualize` substituido por `foreach` + paginacao com botoes Anterior/Proximo.
+32. **Botoes com cores distinctivas**: Cada acao tem uma cor metalica propria:
+    - Ver (eye): dourado metalico
+    - Historico (history): teal/ciano metalico com texto legivel
+    - Editar (pencil): azul metalico
+    - Desbloquear (unlock): verde metalico
+    - Bloquear (lock): amber metalico
+    - Excluir (trash): vermelho suave metalico (gradient com inset shine)
+33. **Container da tabela com tema dark**: Corrigido de parchment para dark theme.
+
+**Admin Payments e Logs — Eliminacao de Virtualize**:
+34. **AdminPaymentsTable**: `Virtualize` substituido por `foreach` + paginacao manual (20 itens/pagina).
+35. **AdminLogsTable**: `Virtualize` substituido por `foreach` + paginacao manual (20 itens/pagina).
+36. **NullReferenceException eliminado**: Todos os 3 componentes que usavam `Virtualize` (AdminUsersTable, AdminPaymentsTable, AdminLogsTable) foram convertidos para paginacao manual. O bug recorrente de `NullReferenceException` em `Virtualize.BuildRenderTree` esta resolvido.
+
+**Arquivos modificados (sessao 2)**:
+- `Pages/Futsal/Escalacao.razor.css` (centralizacao, temas metalicos)
+- `Pages/Futsal/Components/EscalacaoDraftTeamBuilder.razor` (icones FA, centralizacao)
+- `Pages/Futsal/Components/FutsalGoalkeeperGroup.razor` (icone FA)
+- `Pages/Futsal/Components/FutsalOutfieldGroup.razor` (ajustes de layout)
+- `Pages/Futsal/Index.razor` (icone FA)
+- `Pages/Futsal/Detail.razor` + `.razor.css` (melhorias visuais)
+- `Pages/Components/EscalacaoConfirmed.razor` (icone FA)
+- `Pages/Components/EventPaymentSummary.razor` (icone FA + Razor if/else)
+- `Pages/Payment/EventPayment.razor` + `.razor.css` (QR, confirmacao admin, CSS move)
+- `Pages/Payment/Components/*.razor.css` (7 novos arquivos scoped de sub-componentes)
+- `Pages/Payment/PaymentsHistory.razor.css` (titulo centralizado)
+- `Pages/Payment/Payment.razor.css` (botao voltar)
+- `Pages/Index.razor` + `.razor.css` (card shell, renomeacao)
+- `Shared/Components/SportCard.razor` + `.razor.css` (tema poker, contador no body)
+- `Pages/Groups/Index.razor` (badge semanal)
+- `Pages/Groups/Detail.razor` (badge recorrente)
+- `Shared/Components/Breadcrumb.razor` (StateHasChanged apos LocationChanged)
+- `Pages/Admin/AdminPayments.razor` + `.razor.css` (CSS move, paginacao manual)
+- `Pages/Admin/Components/AdminPaymentsTable.razor` (paginacao manual)
+- `Pages/Admin/AdminLogs.razor` (guard SemaphoreSlim, paginacao manual)
+- `Shared/Components/Admin/AdminLogsTable.razor` (paginacao manual)
+- `Pages/Admin/AdminUsers.razor` + `.razor.css` (EF Core fix, paginacao manual, botoes)
+- `Shared/Components/Admin/AdminUsersTable.razor` (paginacao manual)
+- `wwwroot/css/site.css` (estilos globais: botoes metalicos, paginacao, table containers)
+- `wwwroot/css/events.css` (escalacao, centralizacao)
+- `Services/Core/UiText/PaymentTexts.cs` (renomeacao titulo)
+- `Shared/Components/CookieConsent.razor.css` (botao rejeitar)
+- `wwwroot/js/privacy-prefs.js` (cleanup)
 
 ---
 
