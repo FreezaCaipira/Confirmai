@@ -186,23 +186,24 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    width: 100%;
-    padding: 0.7rem 1rem;
+    width: fit-content;
+    padding: 0.7rem 1.2rem;
     border-radius: 8px;
     font-size: 0.88rem;
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
-    transition: filter 0.15s;
+    transition: all 0.2s;
     margin-bottom: 0.5rem;
 }
 
 .evpay-action-btn--back {
-    background: var(--ci-bg-card-deep);
-    color: var(--ci-text-muted);
-    border: 1px solid var(--ci-border);
+    background: rgba(96, 165, 250, 0.1);
+    color: var(--link-info);
+    border: 1px solid rgba(96, 165, 250, 0.3);
 }
 
 .evpay-action-btn--back:hover {
-    filter: brightness(1.1);
+    background: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.5);
 }
