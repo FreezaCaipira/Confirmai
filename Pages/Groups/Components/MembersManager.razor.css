@@ -68,7 +68,7 @@
 }
 
 .feat-role-btn--demote {
-    background: rgba(248, 113, 113, 0.1);
+    background: var(--red-soft-opacity-xs);
     border-color: var(--red-light-lg);
     color: var(--red-soft);
 }
@@ -104,7 +104,7 @@
 }
 
 .feat-role-btn--confirm-yes {
-    background: rgba(74, 222, 128, 0.1);
+    background: var(--green-opacity-sm);
     border-color: rgba(74, 222, 128, 0.55);
     color: var(--futsal-green-pale);
 }
@@ -116,7 +116,7 @@
 }
 
 .feat-role-btn--confirm-no {
-    background: rgba(248, 113, 113, 0.1);
+    background: var(--red-soft-opacity-xs);
     border-color: rgba(248, 113, 113, 0.55);
     color: var(--red-soft);
 }

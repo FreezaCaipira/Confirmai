@@ -72,8 +72,8 @@
     gap: 0.5rem;
     width: 100%;
     justify-content: center;
-    background: rgba(74, 222, 128, 0.1);
-    border: 1px solid rgba(74, 222, 128, 0.4);
+    background: var(--green-opacity-sm);
+    border: 1px solid var(--green-opacity-2xl);
     color: var(--green-bright);
     font-size: 0.9rem;
     font-weight: 700;
@@ -117,7 +117,7 @@
 
 .evpay-admin-confirm-btn--yes {
     flex: 1;
-    background: rgba(74, 222, 128, 0.15);
+    background: var(--green-opacity-sm);
     border-color: var(--green-opacity-xl);
 }
 
@@ -159,8 +159,8 @@
 }
 
 .evpay-status--paid {
-    background: rgba(22, 163, 74, 0.1);
-    border: 1px solid rgba(74, 222, 128, 0.25);
+    background: var(--green-opacity-sm);
+    border: 1px solid var(--green-opacity-md);
     color: var(--green-bright);
 }
 

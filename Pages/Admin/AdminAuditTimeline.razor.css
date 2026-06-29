@@ -88,7 +88,7 @@
 }
 
 .admin-audit-timeline-shell .timeline-table tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--white-opacity-2xs);
 }
 
 /* Responsive: stack on narrow screens */

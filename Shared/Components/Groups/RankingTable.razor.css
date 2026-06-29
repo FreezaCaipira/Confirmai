@@ -34,7 +34,7 @@
 }
 
 .ranking-row--me {
-    border-color: rgba(96, 165, 250, 0.4);
+    border-color: var(--blue300-opacity-xl);
     background: rgba(10, 28, 60, 0.65);
 }
 

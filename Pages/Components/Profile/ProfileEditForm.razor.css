@@ -106,7 +106,7 @@
     color: var(--ci-text-blue);
     padding: 0.28rem 0.52rem;
     border-radius: 4px;
-    background: rgba(79, 156, 248, 0.12);
+    background: var(--accent-opacity-sm);
     border: 1px solid var(--accent-opacity-md);
 }
 

@@ -1,7 +1,7 @@
 .evpay-admin-pix {
     margin-top: 1.5rem;
     background: rgba(10, 36, 22, 0.55);
-    border: 1px solid rgba(74, 222, 128, 0.25);
+    border: 1px solid var(--green-opacity-md);
     border-radius: 10px;
     padding: 1rem 1.1rem;
 }
@@ -73,8 +73,8 @@
 }
 
 .evpay-admin-pix-copy {
-    background: rgba(74, 222, 128, 0.1);
-    border: 1px solid rgba(74, 222, 128, 0.4);
+    background: var(--green-opacity-sm);
+    border: 1px solid var(--green-opacity-2xl);
     color: var(--green-soft);
     font-size: 0.8rem;
     font-weight: 600;

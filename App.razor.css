@@ -1,11 +1,11 @@
-﻿.not-found-card {
+.not-found-card {
     margin: 3rem auto;
     max-width: 480px;
     background: var(--ci-bg-card);
     color: var(--ci-text);
     border: 1px solid var(--ci-border-alt);
     border-radius: 16px;
-    box-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 24px var(--shadow-md);
     padding: 2.5rem 2rem;
     text-align: center;
 }

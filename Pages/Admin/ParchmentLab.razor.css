@@ -58,8 +58,8 @@
     pointer-events: none;
     opacity: 0.22;
     background:
-        repeating-linear-gradient(0deg, rgba(122, 86, 44, 0.12) 0 1px, rgba(122, 86, 44, 0) 1px 5px),
-        repeating-linear-gradient(90deg, rgba(146, 107, 63, 0.08) 0 1px, rgba(146, 107, 63, 0) 1px 7px);
+        repeating-linear-gradient(0deg, var(--mk-brown2-opacity-md) 0 1px, transparent 1px 5px),
+        repeating-linear-gradient(90deg, var(--mk-olive-opacity-xs) 0 1px, transparent 1px 7px);
 }
 
 .parchment-sample-a {
@@ -68,10 +68,10 @@
 
 .parchment-sample-a::before {
     background:
-        radial-gradient(128% 72% at 50% -20%, rgba(86, 59, 29, 0.34) 0%, rgba(86, 59, 29, 0.06) 52%, rgba(86, 59, 29, 0) 64%),
-        radial-gradient(128% 72% at 50% 120%, rgba(86, 59, 29, 0.38) 0%, rgba(86, 59, 29, 0.1) 52%, rgba(86, 59, 29, 0) 64%),
-        radial-gradient(76% 138% at -18% 50%, rgba(95, 67, 36, 0.38) 0%, rgba(95, 67, 36, 0.12) 56%, rgba(95, 67, 36, 0) 67%),
-        radial-gradient(76% 138% at 118% 50%, rgba(95, 67, 36, 0.38) 0%, rgba(95, 67, 36, 0.12) 56%, rgba(95, 67, 36, 0) 67%);
+        radial-gradient(128% 72% at 50% -20%, var(--mk-brown2-opacity-lg) 0%, var(--mk-brown6-opacity-xs) 52%, transparent 64%),
+        radial-gradient(128% 72% at 50% 120%, var(--mk-brown2-opacity-xl) 0%, var(--mk-brown2-opacity-xs) 52%, transparent 64%),
+        radial-gradient(76% 138% at -18% 50%, var(--mk-brown2-opacity-xl) 0%, var(--mk-brown2-opacity-md) 56%, transparent 67%),
+        radial-gradient(76% 138% at 118% 50%, var(--mk-brown2-opacity-xl) 0%, var(--mk-brown2-opacity-md) 56%, transparent 67%);
 }
 
 .parchment-sample-b {
@@ -80,12 +80,12 @@
 
 .parchment-sample-b::before {
     background:
-        radial-gradient(56% 52% at 0% 0%, rgba(80, 50, 24, 0.34) 0%, rgba(80, 50, 24, 0) 70%),
-        radial-gradient(56% 52% at 100% 0%, rgba(80, 50, 24, 0.34) 0%, rgba(80, 50, 24, 0) 70%),
-        radial-gradient(56% 52% at 0% 100%, rgba(80, 50, 24, 0.36) 0%, rgba(80, 50, 24, 0) 72%),
-        radial-gradient(56% 52% at 100% 100%, rgba(80, 50, 24, 0.36) 0%, rgba(80, 50, 24, 0) 72%),
-        radial-gradient(124% 80% at 50% -18%, rgba(97, 65, 31, 0.42) 0%, rgba(97, 65, 31, 0) 63%),
-        radial-gradient(124% 80% at 50% 120%, rgba(97, 65, 31, 0.45) 0%, rgba(97, 65, 31, 0) 64%);
+        radial-gradient(56% 52% at 0% 0%, var(--mk-brown2-opacity-lg) 0%, transparent 70%),
+        radial-gradient(56% 52% at 100% 0%, var(--mk-brown2-opacity-lg) 0%, transparent 70%),
+        radial-gradient(56% 52% at 0% 100%, var(--mk-brown2-opacity-lg) 0%, transparent 72%),
+        radial-gradient(56% 52% at 100% 100%, var(--mk-brown2-opacity-lg) 0%, transparent 72%),
+        radial-gradient(124% 80% at 50% -18%, var(--mk-dark-opacity-md) 0%, transparent 63%),
+        radial-gradient(124% 80% at 50% 120%, var(--mk-dark-opacity-md) 0%, transparent 64%);
 }
 
 .parchment-sample-c {
@@ -95,25 +95,25 @@
 
 .parchment-sample-c::before {
     background:
-        linear-gradient(180deg, rgba(255, 236, 196, 0.25) 0%, rgba(255, 236, 196, 0) 22%),
-        radial-gradient(130% 84% at 50% 120%, rgba(72, 45, 21, 0.42) 0%, rgba(72, 45, 21, 0.08) 52%, rgba(72, 45, 21, 0) 63%),
-        radial-gradient(80% 144% at -16% 50%, rgba(80, 51, 25, 0.4) 0%, rgba(80, 51, 25, 0.12) 58%, rgba(80, 51, 25, 0) 69%),
-        radial-gradient(80% 144% at 116% 50%, rgba(80, 51, 25, 0.4) 0%, rgba(80, 51, 25, 0.12) 58%, rgba(80, 51, 25, 0) 69%);
+        linear-gradient(180deg, rgba(255, 236, 196, 0.25) 0%, transparent 22%),
+        radial-gradient(130% 84% at 50% 120%, var(--mk-dark-opacity-md) 0%, var(--mk-brown6-opacity-xs) 52%, transparent 63%),
+        radial-gradient(80% 144% at -16% 50%, var(--mk-brown2-opacity-xl) 0%, var(--mk-brown2-opacity-md) 58%, transparent 69%),
+        radial-gradient(80% 144% at 116% 50%, var(--mk-brown2-opacity-xl) 0%, var(--mk-brown2-opacity-md) 58%, transparent 69%);
 }
 
 .parchment-sample-d {
     background: linear-gradient(166deg, var(--gold-soft) 0%, var(--gold-dark) 54%, var(--brown-mid) 100%);
     border: 1px solid var(--brown-border);
-    box-shadow: inset 0 0 0 1px rgba(252, 229, 179, 0.36), 0 10px 22px rgba(0, 0, 0, 0.26);
+    box-shadow: inset 0 0 0 1px var(--pay-cream6-opacity-sm), 0 10px 22px var(--mk-shadow-mk-md);
 }
 
 .parchment-sample-d::before {
     background:
-        radial-gradient(58% 54% at 0% 0%, rgba(73, 44, 21, 0.42) 0%, rgba(73, 44, 21, 0) 72%),
-        radial-gradient(58% 54% at 100% 0%, rgba(73, 44, 21, 0.42) 0%, rgba(73, 44, 21, 0) 72%),
-        radial-gradient(58% 54% at 0% 100%, rgba(73, 44, 21, 0.44) 0%, rgba(73, 44, 21, 0) 74%),
-        radial-gradient(58% 54% at 100% 100%, rgba(73, 44, 21, 0.44) 0%, rgba(73, 44, 21, 0) 74%),
-        linear-gradient(180deg, rgba(255, 235, 190, 0.24) 0%, rgba(255, 235, 190, 0) 23%);
+        radial-gradient(58% 54% at 0% 0%, var(--mk-dark-opacity-md) 0%, transparent 72%),
+        radial-gradient(58% 54% at 100% 0%, var(--mk-dark-opacity-md) 0%, transparent 72%),
+        radial-gradient(58% 54% at 0% 100%, var(--mk-dark-opacity-md) 0%, transparent 74%),
+        radial-gradient(58% 54% at 100% 100%, var(--mk-dark-opacity-md) 0%, transparent 74%),
+        linear-gradient(180deg, var(--pay-cream6-opacity-sm) 0%, transparent 23%);
 }
 
 .parchment-choice-hint {
@@ -122,7 +122,7 @@
     border-radius: 10px;
     padding: 0.65rem 0.75rem;
     color: var(--brown-text);
-    background: rgba(248, 233, 204, 0.62);
+    background: var(--pay-cream3-opacity-lg);
     font-weight: 600;
 }
 

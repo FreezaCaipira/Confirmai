@@ -174,7 +174,7 @@ header {
 }
 
 .btn-link:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--white-opacity-xs);
 }
 
 .main-content {
@@ -191,7 +191,7 @@ header {
 .main-content:hover {
     border-color: var(--ci-accent-mid);
     border-top-color: var(--ci-border-alt);
-    box-shadow: 0 0 0 1px var(--ci-accent-opacity-md), 0 8px 32px rgba(26, 90, 176, 0.14);
+    box-shadow: 0 0 0 1px var(--ci-accent-opacity-md), 0 8px 32px var(--ci-accent-opacity-sm);
 }
 
 .main-content::before {
@@ -341,7 +341,7 @@ footer.oldsite-footer {
 }
 
 .oldsite-widget ol li:nth-child(even) {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--white-opacity-2xs);
 }
 
 .oldsite-widget ol li a {

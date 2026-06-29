@@ -272,7 +272,7 @@
     border-radius: 3px;
     cursor: pointer;
     transition: filter 0.12s ease, transform 0.1s ease;
-    border: 1px solid rgba(26, 90, 176, 0.4);
+    border: 1px solid var(--ci-accent-opacity-lg);
 }
 
 .entity-shell.admin-page .action-btn.icon-only i {

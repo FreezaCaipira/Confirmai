@@ -51,7 +51,7 @@
 
 #payments-history-page .filter-bar button:hover {
     color: var(--link-info);
-    background: rgba(79, 156, 248, 0.08);
+    background: var(--accent-opacity-xs);
 }
 
 #payments-history-page .payments-history-table {
@@ -445,7 +445,7 @@
     font-size: 0.85rem;
     font-weight: 600;
     border: 1px solid var(--ci-border-alt);
-    background: rgba(26, 90, 176, 0.15);
+    background: var(--ci-accent-opacity-sm);
     color: var(--ci-text-muted);
     border-radius: 6px;
     cursor: pointer;

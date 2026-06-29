@@ -1,4 +1,4 @@
-﻿.sports-page {
+.sports-page {
     min-height: 55vh;
     display: flex;
     flex-direction: column;
@@ -181,7 +181,7 @@
 }
 
 .sport-card--futsal::before {
-    background: linear-gradient(135deg, rgba(22, 163, 74, 0.1) 0%, transparent 60%);
+    background: linear-gradient(135deg, var(--green-opacity-sm) 0%, transparent 60%);
 }
 
 .sport-card--futsal:hover {

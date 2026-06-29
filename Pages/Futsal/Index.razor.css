@@ -77,7 +77,7 @@
     text-align: center;
     flex-shrink: 0;
     line-height: 1;
-    text-shadow: 0 0 15px rgba(74, 222, 128, 0.6), 0 2px 4px var(--shadow-md);
+    text-shadow: 0 0 15px var(--green-opacity-2xl), 0 2px 4px var(--shadow-md);
 }
 
 /* -- Body ---------------------------------- */
@@ -186,7 +186,7 @@
     background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-bright) 50%, var(--green-bright) 100%);
     border-color: var(--green-soft);
     color: var(--green-soft);
-    box-shadow: 0 4px 8px rgba(74, 222, 128, 0.5);
+    box-shadow: 0 4px 8px var(--green-opacity-xl);
 }
 
 /* -- Responsive ---------------------------- */

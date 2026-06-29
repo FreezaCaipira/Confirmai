@@ -58,7 +58,7 @@
 }
 
 .my-conf-sport--futsal {
-    background: rgba(74, 222, 128, 0.1);
+    background: var(--green-opacity-sm);
 }
 
 .my-conf-sport--poker {
@@ -95,7 +95,7 @@
 }
 
 .meta-chip--confirmed {
-    background: rgba(74, 222, 128, 0.2);
+    background: var(--green-opacity-sm);
     color: var(--green-bright);
 }
 
