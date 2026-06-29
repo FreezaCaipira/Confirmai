@@ -142,7 +142,7 @@
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table tr:hover td {
-    background: rgba(26, 90, 176, 0.25);
+    background: var(--ci-accent-opacity-lg);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table .payment-row-paid td,
@@ -156,7 +156,7 @@
 #payments-history-page.payments-history-shell--received .entity-shell-card {
     border: 1px solid var(--red-border);
     border-top: 1px solid var(--red-border);
-    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px rgba(239, 68, 68, 0.1);
+    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--red-opacity-2xs);
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar {
@@ -261,7 +261,7 @@
     border-radius: 999px;
     font-size: 0.75rem;
     font-weight: 900;
-    background: rgba(26, 90, 176, 0.25);
+    background: var(--ci-accent-opacity-lg);
     color: var(--ci-text-subtle);
     margin-left: 0.1rem;
     line-height: 1;
@@ -453,7 +453,7 @@
 }
 
 .export-btn:hover {
-    background: rgba(26, 90, 176, 0.25);
+    background: var(--ci-accent-opacity-lg);
     border-color: var(--ci-accent);
     color: var(--ci-text-blue);
 }
@@ -486,7 +486,7 @@
 .payments-history-shell--received .entity-shell-card {
     border: 1px solid var(--red-border);
     border-top: 1px solid var(--red-border);
-    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px rgba(239, 68, 68, 0.1);
+    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--red-opacity-2xs);
     background: var(--ci-bg);
     border-radius: 8px;
     padding: 1.5rem;

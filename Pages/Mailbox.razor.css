@@ -500,7 +500,7 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller {
     border-color: var(--ci-accent-mid);
-    background: rgba(26, 90, 176, 0.25);
+    background: var(--ci-accent-opacity-lg);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller .mailbox-thread-body {

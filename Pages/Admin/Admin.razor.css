@@ -3,7 +3,7 @@
     font-weight: 800;
     color: var(--brown-text);
     margin: 0;
-    text-shadow: 0 0 10px rgba(201, 160, 106, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 0 10px rgba(201, 160, 106, 0.4), 0 2px 4px var(--shadow-xs);
 }
 
 .admin-settings-card {
@@ -26,7 +26,7 @@
     border: 1px solid var(--brown-border-warm);
     border-radius: 6px;
     padding: 0.35rem 0.6rem;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 2px 4px var(--shadow-2xs);
 }
 
 .fee-input {
@@ -36,7 +36,7 @@
     border: 1px solid var(--brown-border-warm);
     border-radius: 6px;
     padding: 0.35rem 0.6rem;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 2px 4px var(--shadow-2xs);
 }
 
 .fee-input[type="text"] {

@@ -158,7 +158,7 @@
     border: 2px solid var(--green);
     color: var(--parchment-cream);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-    box-shadow: inset 0 1px 0 rgba(180, 255, 200, 0.3), inset 0 -1px 0 rgba(0, 50, 15, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
+    box-shadow: inset 0 1px 0 rgba(180, 255, 200, 0.3), inset 0 -1px 0 rgba(0, 50, 15, 0.4), 0 2px 6px var(--shadow-sm);
 }
 
 .view-pay-btn-confirm-pix:hover {
@@ -387,7 +387,7 @@
     border: 2px solid var(--green);
     color: var(--parchment-cream);
     text-shadow: 0 1px 2px var(--shadow-xl);
-    box-shadow: inset 0 1px 0 rgba(180, 255, 200, 0.3), inset 0 -1px 0 rgba(0, 50, 15, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
+    box-shadow: inset 0 1px 0 rgba(180, 255, 200, 0.3), inset 0 -1px 0 rgba(0, 50, 15, 0.4), 0 2px 6px var(--shadow-sm);
 }
 
 .view-pay-shell .payment-inline-feedback {
