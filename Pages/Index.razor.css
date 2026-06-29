@@ -151,7 +151,7 @@
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 156, 248, 0.1);
+    box-shadow: 0 8px 24px var(--shadow-3xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-xs);
 }
 
 /* Subtle gradient overlay on hover */
@@ -244,7 +244,7 @@
     font-weight: 800;
     margin: 0 0 0.35rem;
     font-family: inherit;
-    text-shadow: 0 0 10px rgba(79, 156, 248, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 10px var(--accent-opacity-lg), 0 2px 4px var(--shadow-md);
     text-transform: none;
     letter-spacing: -0.01em;
 }
@@ -344,12 +344,12 @@
     cursor: pointer;
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 2px 4px var(--shadow-md);
 }
 
 .city-select:focus {
     border-color: var(--ci-accent);
-    box-shadow: 0 0 0 2px rgba(79, 156, 248, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0 2px var(--accent-opacity-md), inset 0 2px 4px var(--shadow-md);
 }
 
 .city-input {
@@ -362,12 +362,12 @@
     min-width: 210px;
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 2px 4px var(--shadow-md);
 }
 
 .city-input:focus {
     border-color: var(--ci-accent);
-    box-shadow: 0 0 0 2px rgba(79, 156, 248, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0 2px var(--accent-opacity-md), inset 0 2px 4px var(--shadow-md);
 }
 
 .city-input::placeholder {
@@ -443,8 +443,8 @@
     border-color: var(--ci-accent);
     background: var(--ci-accent-mid);
     color: var(--ci-accent-mid);
-    box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3), inset 0 0 0 1px rgba(79, 156, 248, 0.2);
-    text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
+    box-shadow: 0 4px 8px var(--accent-opacity-md), inset 0 0 0 1px var(--accent-opacity-sm);
+    text-shadow: 0 0 10px var(--accent-opacity-lg);
 }
 
 .my-conf-tab:hover:not(.active) {
@@ -492,7 +492,7 @@
 
 .my-conf-card:hover { 
     border-color: var(--ci-accent); 
-    box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3);
+    box-shadow: 0 4px 8px var(--accent-opacity-md);
 }
 .my-conf-card--past { opacity: 0.7; }
 .my-conf-card--cancelled { opacity: 0.6; border-color: var(--red-bg-dark); }
@@ -523,7 +523,7 @@
     margin-bottom: 0.2rem;
 }
 
-.my-conf-name { font-size: 0.92rem; color: var(--ci-surface-light); font-weight: 700; text-shadow: 0 0 8px rgba(79, 156, 248, 0.3); }
+.my-conf-name { font-size: 0.92rem; color: var(--ci-surface-light); font-weight: 700; text-shadow: 0 0 8px var(--accent-opacity-md); }
 
 .my-conf-pos {
     font-size: 0.72rem;
@@ -552,7 +552,7 @@
     border-radius: 10px;
     background: var(--green-dark-md);
     color: var(--green-light);
-    border: 1px solid rgba(74, 222, 128, 0.35);
+    border: 1px solid var(--green-opacity-md);
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
@@ -602,7 +602,7 @@
     background: var(--ci-accent-mid);
     border-color: var(--ci-accent);
     color: var(--ci-accent-mid);
-    box-shadow: 0 4px 8px rgba(79, 156, 248, 0.3);
+    box-shadow: 0 4px 8px var(--accent-opacity-md);
 }
 
 /* ── Empty state browse buttons ─────────────────────────────── */

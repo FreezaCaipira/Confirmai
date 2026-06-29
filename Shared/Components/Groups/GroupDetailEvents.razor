@@ -1,0 +1,98 @@
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Confirmai.Services
+@inject NavigationManager NavigationManager
+@inject UiTextService Ui
+
+@if (DisplayedEvents.Any(e => e.RachaScheduleId.HasValue))
+{
+    <div class="events-recurring-notice">
+        <i class="fas fa-sync-alt"></i>
+        <span>Partidas geradas automaticamente (semanal)</span>
+    </div>
+}
+<table class="events-table">
+    <thead>
+        <tr>
+            <th class="et-th-data"><span class="et-num-ph"></span>Data</th>
+            <th>Jogadores</th>
+            <th>Status</th>
+            <th class="events-access-col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (DisplayedEvents.Count == 0)
+        {
+            <tr>
+                <td colspan="4" class="et-empty">
+                    <i class="fas fa-calendar-plus"></i>
+                    @(ShowPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida próxima.")
+                </td>
+            </tr>
+        }
+        else
+        {
+            var nextUpcomingEventId = UpcomingEvents.FirstOrDefault()?.Id;
+            @foreach (var ev in DisplayedEvents)
+            {
+                var href   = Group.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
+                var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
+                var isNextUpcoming = !ShowPastEvents && nextUpcomingEventId.HasValue && ev.Id == nextUpcomingEventId.Value;
+                <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
+                    <td>
+                        <div class="et-cell">
+                            <span class="et-num">#@(EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
+                            @if (ev.RachaScheduleId.HasValue)
+                            {
+                                <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
+                            }
+                            <div class="et-cell-info">
+                                <span class="et-date-wrap">
+                                    <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
+                                    @if (isNextUpcoming)
+                                    {
+                                        <span class="event-next-badge">pr&oacute;xima</span>
+                                    }
+                                </span>
+                                <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="et-players @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
+                    </td>
+                    <td>
+                        @if (!ev.IsActive)
+                        {
+                            <span class="player-tag player-tag--cancel">cancelado</span>
+                        }
+                        else if (isFull)
+                        {
+                            <span class="player-tag player-tag--full">lotado</span>
+                        }
+                        else
+                        {
+                            <span class="player-tag player-tag--open">aberto</span>
+                        }
+                    </td>
+                    <td class="events-access-col">
+                        <button class="event-access-btn"
+                                type="button"
+                                @onclick:stopPropagation="true"
+                                @onclick="() => NavigationManager.NavigateTo(href)">
+                            Acessar
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public Group?                    Group            { get; set; }
+    [Parameter] public List<Event>               DisplayedEvents  { get; set; } = new();
+    [Parameter] public List<Event>               UpcomingEvents   { get; set; } = new();
+    [Parameter] public bool                      ShowPastEvents   { get; set; }
+    [Parameter] public Dictionary<int, int>      EventNumbers     { get; set; } = new();
+}

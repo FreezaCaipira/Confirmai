@@ -56,13 +56,13 @@
 }
 
 .feat-role-btn--promote {
-    background: rgba(96, 165, 250, 0.1);
+    background: var(--blue300-opacity-xs);
     border-color: rgba(96, 165, 250, 0.5);
     color: var(--link-info);
 }
 
 .feat-role-btn--promote:not(:disabled):hover {
-    background: rgba(96, 165, 250, 0.2);
+    background: var(--blue300-opacity-sm);
     border-color: rgba(96, 165, 250, 0.8);
     color: var(--ci-surface-light);
 }

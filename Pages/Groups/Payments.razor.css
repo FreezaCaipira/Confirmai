@@ -15,7 +15,7 @@
     align-items: center;
     gap: 0.6rem;
     color: var(--green-light);
-    text-shadow: 0 0 15px rgba(74, 222, 128, 0.6), 0 2px 4px var(--text-shadow-sm);
+    text-shadow: 0 0 15px var(--green-opacity-2xl), 0 2px 4px var(--text-shadow-sm);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -248,7 +248,7 @@
 .payments-user-item--selected {
     background: var(--red-bg-dark);
     border-color: var(--red-soft);
-    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.4), inset 0 0 0 1px var(--shadow-red-sm);
+    box-shadow: 0 6px 12px var(--red-opacity-md), inset 0 0 0 1px var(--shadow-red-sm);
 }
 
 .payments-user-name {
@@ -321,7 +321,7 @@
     align-items: center;
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+    border-bottom: 1px solid var(--red-opacity-sm);
 }
 
 .payments-detail-panel--history .payments-detail-summary {
@@ -330,7 +330,7 @@
 
 .payments-detail-panel--history .payments-summary-total {
     color: var(--green-bright);
-    text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+    text-shadow: 0 0 10px var(--green-opacity-xl);
 }
 
 .payments-summary-label {
@@ -378,7 +378,7 @@
     font-size: 0.85rem;
     font-weight: 800;
     color: var(--green-bright);
-    text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+    text-shadow: 0 0 10px var(--green-opacity-xl);
 }
 
 .payments-detail-admin {
@@ -540,7 +540,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--shadow-3xl);
     display: flex;
     align-items: center;
     justify-content: center;

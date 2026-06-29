@@ -111,7 +111,7 @@
 
 .payment-tab--active {
     color: var(--ci-text);
-    border-color: rgba(148, 163, 184, 0.3);
+    border-color: var(--slate-border-lg);
     background: var(--slate-border-sm);
 }
 
@@ -125,7 +125,7 @@
 }
 
 .payment-refresh-btn {
-    background: rgba(96, 165, 250, 0.1);
+    background: var(--blue300-opacity-xs);
     border: 1px solid rgba(96, 165, 250, 0.4);
     color: var(--ci-accent);
     font-size: 0.95rem;
@@ -142,7 +142,7 @@
 }
 
 .payment-refresh-btn:hover {
-    background: rgba(96, 165, 250, 0.2);
+    background: var(--blue300-opacity-sm);
     border-color: rgba(96, 165, 250, 0.7);
     color: var(--link-info);
 }
@@ -215,7 +215,7 @@
 .payment-history-filters select:focus {
     outline: none;
     border-color: var(--ci-accent);
-    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+    box-shadow: 0 0 0 2px var(--blue300-opacity-sm);
 }
 
 .payment-history-filters select option {
@@ -262,7 +262,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--ci-accent);
-    background: rgba(96, 165, 250, 0.1);
+    background: var(--blue300-opacity-xs);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
 }
@@ -429,7 +429,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--shadow-3xl);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -503,7 +503,7 @@
     font-weight: 600;
     color: var(--white);
     text-decoration: none;
-    border: 1px solid rgba(74, 222, 128, 0.5);
+    border: 1px solid var(--green-opacity-xl);
     padding: 0.4rem 0.8rem;
     border-radius: 5px;
     transition: all 0.2s;
@@ -622,7 +622,7 @@
 
 .payment-user-item {
     background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    border: 1px solid var(--red-opacity-sm);
     border-radius: 8px;
     padding: 1rem 1.25rem;
     padding-right: 3.5rem;
@@ -638,7 +638,7 @@
 
 .payment-user-item:hover {
     background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(239, 68, 68, 0.4);
+    border-color: var(--red-opacity-md);
 }
 
 .payment-user-item--selected {
@@ -695,7 +695,7 @@
 
 .payment-detail-panel {
     background: rgba(15, 26, 48, 0.8);
-    border-left: 3px solid rgba(239, 68, 68, 0.4);
+    border-left: 3px solid var(--red-opacity-md);
     border-radius: 0 0 8px 8px;
     margin-top: -0.5rem;
     margin-bottom: 0.75rem;
@@ -708,7 +708,7 @@
     align-items: center;
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+    border-bottom: 1px solid var(--red-opacity-sm);
 }
 
 .payment-summary-label {
