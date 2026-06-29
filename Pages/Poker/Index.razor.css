@@ -1,4 +1,4 @@
-﻿/* ── Page wrapper ────────────────────────── */
+/* -- Page wrapper -------------------------- */
 .listing-page {
     display: flex;
     flex-direction: column;
@@ -7,7 +7,7 @@
     padding: 1.25rem 1rem 2.5rem;
 }
 
-/* ── Criar Evento dropdown ───────────────── */
+/* -- Criar Evento dropdown ----------------- */
 .create-poker-dropdown {
     position: relative;
     align-self: flex-end;
@@ -57,7 +57,7 @@
     border: 1px solid var(--poker-border);
     border-radius: 12px;
     min-width: 220px;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    box-shadow: 0 12px 32px var(--shadow-xl);
     z-index: 50;
     overflow: hidden;
 }
@@ -94,7 +94,7 @@
     color: var(--ci-text-subtle);
 }
 
-/* ── Event card base ─────────────────────── */
+/* -- Event card base ----------------------- */
 .event-card {
     display: flex;
     align-items: center;
@@ -103,7 +103,7 @@
     border-radius: 12px;
     background: var(--ci-bg-card);
     border: 1px solid var(--ci-border-alt);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 10px var(--shadow-lg);
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
     width: 100%;
     box-sizing: border-box;
@@ -119,7 +119,7 @@
     box-shadow: 0 6px 20px var(--purple-lg);
 }
 
-/* ── Time badge ──────────────────────────── */
+/* -- Time badge ---------------------------- */
 .event-time {
     font-size: 1.3rem;
     font-weight: 700;
@@ -131,7 +131,7 @@
     line-height: 1;
 }
 
-/* ── Body ────────────────────────────────── */
+/* -- Body ---------------------------------- */
 .event-body { flex: 1; min-width: 0; }
 
 .event-name-row {
@@ -174,7 +174,7 @@
     gap: 0.35rem;
 }
 
-/* ── Badges tipo poker ───────────────────── */
+/* -- Badges tipo poker --------------------- */
 .poker-type-badge {
     display: inline-block;
     padding: 1px 8px;
@@ -189,7 +189,7 @@
 .poker-type-badge--cash    { background: var(--futsal-bg-dark); color: var(--green-bright); border: 1px solid var(--futsal-green-dark); }
 .poker-type-badge--home    { background: var(--brown-deep); color: var(--amber); border: 1px solid var(--brown-mid); }
 
-/* ── Meta chips ──────────────────────────── */
+/* -- Meta chips ---------------------------- */
 .meta-chip {
     display: inline-flex;
     align-items: center;
@@ -205,7 +205,7 @@
 .meta-chip--players { border-color: var(--poker-border); color: var(--poker-text); }
 .meta-chip--gtd     { border-color: var(--futsal-green-dark); color: var(--green-bright); font-weight: 700; }
 .meta-chip--latereg { border-color: var(--brown-mid); color: var(--amber); }
-.meta-chip--confirmed { background: rgba(22, 163, 74, 0.12); border-color: rgba(74, 222, 128, 0.35); color: var(--green-bright); font-weight: 700; }
+.meta-chip--confirmed { background: rgba(22, 163, 74, 0.12); border-color: var(--green-opacity-lg); color: var(--green-bright); font-weight: 700; }
 
 .event-card--confirmed {
     box-shadow: 0 2px 10px var(--green-dark-lg), 0 0 0 1px var(--green-opacity-sm);
@@ -218,7 +218,7 @@
     font-style: italic;
 }
 
-/* ── Action button ───────────────────────── */
+/* -- Action button ------------------------- */
 .event-action {
     flex-shrink: 0;
     font-size: 0.82rem;
@@ -237,7 +237,7 @@
     border-color: var(--poker-accent);
 }
 
-/* ── Responsive ──────────────────────────── */
+/* -- Responsive ---------------------------- */
 @media (max-width: 640px) {
     .event-card { flex-wrap: wrap; gap: 0.75rem; }
     .event-action { width: 100%; text-align: center; }
@@ -266,7 +266,7 @@
     box-shadow: 0 8px 24px var(--purple-md);
 }
 
-/* ── Time badge ──────────────────────────── */
+/* -- Time badge ---------------------------- */
 .event-time {
     font-size: 1.3rem;
     font-weight: 700;
@@ -278,7 +278,7 @@
     line-height: 1;
 }
 
-/* ── Body ────────────────────────────────── */
+/* -- Body ---------------------------------- */
 .event-body {
     flex: 1;
     min-width: 0;
@@ -337,7 +337,7 @@
     font-style: italic;
 }
 
-/* ── Action button ───────────────────────── */
+/* -- Action button ------------------------- */
 .event-action {
     flex-shrink: 0;
     font-size: 0.82rem;
@@ -356,7 +356,7 @@
     border-color: var(--poker-accent);
 }
 
-/* ── Responsive ──────────────────────────── */
+/* -- Responsive ---------------------------- */
 @media (max-width: 640px) {
     .event-card {
         flex-wrap: wrap;

@@ -1,20 +1,20 @@
-﻿/* Shared form/detail styles live in wwwroot/css/events.css */
+/* Shared form/detail styles live in wwwroot/css/events.css */
 
 .create-event-title i { color: var(--green-bright); text-shadow: 0 0 15px rgba(74, 222, 128, 0.6); }
 
-/* ── Inline styles estáticos ───────────────── */
+/* -- Inline styles est�ticos ----------------- */
 .collision-link { margin-left: 0.45rem; color: var(--link-info); }
 
-/* ── Input focus override (neutralize browser defaults) ─────────── */
+/* -- Input focus override (neutralize browser defaults) ----------- */
 .create-event-form input:focus,
 .create-event-form select:focus,
 .create-event-form textarea:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 2px var(--green-opacity-md), inset 0 2px 4px var(--shadow-lg);
     border-color: var(--green-light);
 }
 
-/* ── Venue preview ───────────────────────── */
+/* -- Venue preview ------------------------- */
 .venue-preview {
     display: flex;
     align-items: center;
@@ -26,11 +26,11 @@
     border-radius: 7px;
     padding: 0.45rem 0.75rem;
     margin-top: -0.25rem;
-    box-shadow: 0 2px 4px rgba(79, 156, 248, 0.3);
-    text-shadow: 0 0 8px rgba(79, 156, 248, 0.4);
+    box-shadow: 0 2px 4px var(--accent-opacity-md);
+    text-shadow: 0 0 8px var(--accent-opacity-lg);
 }
 
-/* ── Weekday chips ───────────────────────── */
+/* -- Weekday chips ------------------------- */
 .weekday-grid {
     display: flex;
     flex-wrap: wrap;
@@ -61,10 +61,10 @@
     background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
     border-color: var(--futsal-green-pale);
     color: var(--green-soft);
-    box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
+    box-shadow: 0 2px 4px var(--green-opacity-md);
 }
 
-/* ── Switch toggle label ─────────────────── */
+/* -- Switch toggle label ------------------- */
 .switch-label {
     display: flex;
     align-items: center;
@@ -76,4 +76,4 @@
     text-shadow: 0 1px 2px var(--text-shadow-sm);
 }
 
-/* form-actions, save-btn, cancel-btn, validation-* → events.css */
+/* form-actions, save-btn, cancel-btn, validation-* ? events.css */

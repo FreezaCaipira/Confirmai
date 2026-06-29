@@ -1,4 +1,4 @@
-﻿/* ── Browse buttons (empty state) ───────────────────────────── */
+/* -- Browse buttons (empty state) ----------------------------- */
 .my-conf-browse-btn {
     display: inline-flex;
     align-items: center;
@@ -22,7 +22,7 @@
     border-color: var(--poker-bg-dark);
 }
 
-/* ── History tabs ────────────────────────────────────────────── */
+/* -- History tabs ---------------------------------------------- */
 .my-conf-history-tabs {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -51,7 +51,7 @@
 
 .my-conf-tab.active {
     border-color: var(--ci-border);
-    background: rgba(79, 156, 248, 0.1);
+    background: var(--accent-opacity-xs);
     color: var(--ci-accent);
 }
 
@@ -60,7 +60,7 @@
     color: var(--ci-text);
 }
 
-/* ── Section heading ─────────────────────────────────────────── */
+/* -- Section heading ------------------------------------------- */
 .my-conf-section {
     margin-bottom: 1.5rem;
 }
@@ -81,14 +81,14 @@
     gap: 0.4rem;
 }
 
-/* ── Confirmation list ───────────────────────────────────────── */
+/* -- Confirmation list ----------------------------------------- */
 .my-conf-list {
     display: flex;
     flex-direction: column;
     gap: 0.55rem;
 }
 
-/* ── Confirmation card ───────────────────────────────────────── */
+/* -- Confirmation card ----------------------------------------- */
 .my-conf-card {
     display: flex;
     align-items: flex-start;
@@ -113,7 +113,7 @@
     border-color: var(--red-bg-dark);
 }
 
-/* ── Sport badge ─────────────────────────────────────────────── */
+/* -- Sport badge ----------------------------------------------- */
 .my-conf-sport {
     flex-shrink: 0;
     width: 2.2rem;
@@ -128,7 +128,7 @@
 .my-conf-sport--futsal { background: var(--futsal-bg-dark); border: 1px solid var(--futsal-green-dark); }
 .my-conf-sport--poker  { background: var(--poker-bg-deepest); border: 1px solid var(--poker-bg-deepest); }
 
-/* ── Body ────────────────────────────────────────────────────── */
+/* -- Body ------------------------------------------------------ */
 .my-conf-body {
     flex: 1;
     min-width: 0;
@@ -175,7 +175,7 @@
     border-radius: 10px;
     background: rgba(22,163,74,0.12);
     color: var(--green-bright);
-    border: 1px solid rgba(74,222,128,0.35);
+    border: 1px solid var(--green-opacity-lg);
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
@@ -187,7 +187,7 @@
     color: var(--ci-text-subtle);
 }
 
-/* ── Actions ─────────────────────────────────────────────────── */
+/* -- Actions --------------------------------------------------- */
 .my-conf-actions {
     display: flex;
     flex-direction: column;

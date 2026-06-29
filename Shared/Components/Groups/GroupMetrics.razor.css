@@ -16,7 +16,7 @@
     background: var(--ci-bg-card-deep);
     border: 1px solid var(--ci-border);
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px var(--shadow-md);
 }
 
 .metric-card:hover {
@@ -52,7 +52,7 @@
 .metric-icon--members {
     background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent) 100%);
     color: var(--ci-surface-light);
-    text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
+    text-shadow: 0 0 10px var(--accent-opacity-xl);
 }
 
 .metric-icon--events {

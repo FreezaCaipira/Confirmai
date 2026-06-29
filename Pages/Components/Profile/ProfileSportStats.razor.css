@@ -42,17 +42,17 @@
 }
 
 .profile-sport-tab:hover:not(.active) {
-    background: rgba(79, 156, 248, 0.15);
+    background: var(--accent-opacity-2xs);
     color: var(--ci-surface-light);
-    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.2);
+    box-shadow: inset 0 0 0 1px var(--accent-opacity-sm);
 }
 
 .profile-sport-tab.active {
     color: var(--ci-surface-light);
     border-bottom-color: var(--ci-accent-light);
-    background: rgba(79, 156, 248, 0.2);
-    text-shadow: 0 0 10px rgba(79, 156, 248, 0.5);
-    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.3);
+    background: var(--accent-opacity-sm);
+    text-shadow: 0 0 10px var(--accent-opacity-xl);
+    box-shadow: inset 0 0 0 1px var(--accent-opacity-md);
 }
 
 .profile-sport-stats {

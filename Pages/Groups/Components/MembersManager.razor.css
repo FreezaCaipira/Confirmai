@@ -90,7 +90,7 @@
     font-size: 0.74rem;
     color: var(--amber);
     background: rgba(251, 191, 36, 0.08);
-    border: 1px solid rgba(251, 191, 36, 0.3);
+    border: 1px solid var(--amber-opacity-sm);
     border-radius: 6px;
     padding: 0.2rem 0.5rem;
     white-space: nowrap;

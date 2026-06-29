@@ -24,7 +24,7 @@
 }
 
 .feature-card--on {
-    border-color: rgba(74, 222, 128, 0.35);
+    border-color: var(--green-opacity-lg);
     background: rgba(10, 36, 22, 0.55);
 }
 
@@ -111,7 +111,7 @@
 }
 
 .feature-toggle input:checked ~ .feature-toggle-track {
-    background: rgba(74, 222, 128, 0.35);
+    background: var(--green-opacity-lg);
     border-color: rgba(74, 222, 128, 0.5);
 }
 

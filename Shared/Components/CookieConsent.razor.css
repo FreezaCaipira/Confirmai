@@ -1,6 +1,6 @@
-﻿/* ================================================================
+/* ================================================================
    CookieConsent component styles
-   Extracted from site.css — scoped to this component via Blazor
+   Extracted from site.css � scoped to this component via Blazor
    CSS isolation. .is-hidden stays in site.css (toggled by JS).
    ================================================================ */
 
@@ -95,7 +95,7 @@
     background: linear-gradient(180deg, var(--ci-bg-deepest) 0%, var(--ci-bg-alt) 100%);
     border: 1px solid var(--ci-accent-mid);
     border-radius: 12px;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 14px 30px var(--shadow-xl);
     padding: 1.05rem;
 }
 

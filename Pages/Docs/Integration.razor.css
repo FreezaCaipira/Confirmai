@@ -1,8 +1,8 @@
-ï»¿/* ===== Integration page â€” scoped styles =====
-   ATENÃ‡ÃƒO: Scoped .razor.css sÃ³ entra em vigor apÃ³s restart do servidor.
+/* ===== Integration page — scoped styles =====
+   ATENÇÃO: Scoped .razor.css só entra em vigor após restart do servidor.
    Para titles (h3), o site.css global tem .oldsite-main-content .entity-shell-card h3
    com especificidade (0,2,2). Usamos .integration-article .integration-step-title
-   que apÃ³s scoping fica (0,3,0) e ganha.
+   que após scoping fica (0,3,0) e ganha.
    ============================================ */
 
 /* --- Title bar (rust gradient, texto claro) --- */
@@ -19,7 +19,7 @@
     font-family: var(--font-display);
     font-size: 1.4rem;
     color: var(--parchment-light);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    text-shadow: 0 1px 3px var(--shadow-xl);
     letter-spacing: 0.04em;
 }
 
@@ -106,7 +106,7 @@
     align-items: center;
     justify-content: center;
     margin-top: 0.15rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 3px var(--shadow-md);
 }
 
 .integration-step-body {
@@ -116,8 +116,8 @@
 
 /*
  * ESPECIFICIDADE: site.css tem body .oldsite-main-content .entity-shell-card h3 = (0,2,2)
- * Este seletor apÃ³s scoping = .integration-article[b-x] .integration-step-title[b-x] = (0,3,0)
- * (0,3,0) > (0,2,2) â€” ganha.
+ * Este seletor após scoping = .integration-article[b-x] .integration-step-title[b-x] = (0,3,0)
+ * (0,3,0) > (0,2,2) — ganha.
  */
 .integration-article .integration-step-title {
     margin: 0 0 0.5rem;
@@ -343,7 +343,7 @@
 
 /* --- Alt-cards (sem HTTP)
  *  Fundo: tom claro ferrugem
- *  TÃ­tulo h4: var(--rust)
+ *  Título h4: var(--rust)
  * --- */
 .integration-alt-cards {
     display: grid;
@@ -379,7 +379,7 @@
 
 /* --- Security grid
  *  Fundo: mesmo tom claro
- *  TÃ­tulo strong: var(--rust)
+ *  Título strong: var(--rust)
  * --- */
 .integration-security-grid {
     display: grid;

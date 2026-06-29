@@ -1,4 +1,4 @@
-﻿/* ── Layout ─────────────────────────────────────────────────────────────── */
+/* -- Layout --------------------------------------------------------------- */
 
 .mailbox-page {
     max-width: 980px;
@@ -10,7 +10,7 @@
     border: 1px solid var(--ci-border);
     border-radius: 8px;
     background: var(--ci-bg);
-    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px rgba(79, 156, 248, 0.1);
+    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-xs);
     padding: 1rem 1.05rem;
 }
 
@@ -18,7 +18,7 @@
     margin-top: 0.7rem;
 }
 
-/* ── Header ──────────────────────────────────────────────────────────────── */
+/* -- Header ---------------------------------------------------------------- */
 .mailbox-page-header {
     margin: -1rem -1.05rem 0.72rem;
     padding: 0.5rem 0.75rem;
@@ -260,13 +260,13 @@
 
 .mailbox-list-item-mark-read:hover,
 .mailbox-list-item-mark-read:focus-visible {
-    background: rgba(79, 156, 248, 0.1);
+    background: var(--accent-opacity-xs);
     color: var(--ci-text);
 }
 
 .mailbox-list-item.unread {
     border-color: var(--ci-accent-mid);
-    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.15);
+    box-shadow: inset 0 0 0 1px var(--accent-opacity-2xs);
 }
 
 .mailbox-list-item.sent {
@@ -379,7 +379,7 @@
 .mailbox-chip-alert {
     border-color: var(--ci-accent-mid);
     color: var(--ci-accent);
-    background: rgba(79, 156, 248, 0.1);
+    background: var(--accent-opacity-xs);
 }
 
 .mailbox-list-item-snippet {
@@ -479,7 +479,7 @@
 }
 
 .mailbox-thread-bubble.outgoing .mailbox-thread-body {
-    background: rgba(79, 156, 248, 0.1);
+    background: var(--accent-opacity-xs);
     border-color: var(--ci-accent-mid);
 }
 
@@ -505,7 +505,7 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller .mailbox-thread-body {
     border-color: var(--ci-accent-mid);
-    background: rgba(79, 156, 248, 0.1);
+    background: var(--accent-opacity-xs);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller .mailbox-thread-author,
@@ -533,7 +533,7 @@
     justify-content: space-between;
     gap: 0.4rem;
     align-items: baseline;
-    border-bottom: 1px solid rgba(79, 156, 248, 0.15);
+    border-bottom: 1px solid var(--accent-opacity-2xs);
     padding-bottom: 0.12rem;
 }
 
@@ -611,7 +611,7 @@
 
 .mailbox-card.unread {
     border-color: var(--ci-accent-mid);
-    box-shadow: inset 0 0 0 1px rgba(79, 156, 248, 0.15);
+    box-shadow: inset 0 0 0 1px var(--accent-opacity-2xs);
 }
 
 .mailbox-card.sent {
