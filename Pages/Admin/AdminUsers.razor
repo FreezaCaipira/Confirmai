@@ -102,19 +102,19 @@
 
         if (!string.IsNullOrWhiteSpace(filterUserName))
         {
-            query = query.Where(u => u.UserName != null && u.UserName.Contains(filterUserName, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(u => u.UserName != null && u.UserName.ToLower().Contains(filterUserName.ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(filterEmail))
         {
-            query = query.Where(u => u.Email != null && u.Email.Contains(filterEmail, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(u => u.Email != null && u.Email.ToLower().Contains(filterEmail.ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(filterRole))
         {
             var userIdsWithRole = await db.UserRoles
                 .Join(db.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
-                .Where(x => x.Name != null && x.Name.Contains(filterRole, StringComparison.OrdinalIgnoreCase))
+                .Where(x => x.Name != null && x.Name.ToLower().Contains(filterRole.ToLower()))
                 .Select(x => x.UserId)
                 .ToListAsync();
             query = query.Where(u => userIdsWithRole.Contains(u.Id));
