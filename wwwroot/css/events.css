@@ -3474,10 +3474,6 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     transition: background .15s, border-color .15s;
 }
 
-.esc-player:has(.esc-move-btn) {
-    justify-content: space-between;
-}
-
 .esc-player-list .esc-player:nth-child(even) {
     background: rgba(255,255,255,.07);
 }
