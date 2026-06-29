@@ -326,7 +326,7 @@ footer.oldsite-footer {
     }
 }
 
-/* -- Sidebar widget links (scoped to MainLayout � loads last, wins) -- */
+/* ── Sidebar widget links (scoped to MainLayout — loads last, wins) ── */
 .oldsite-widget ol {
     list-style: none;
     padding: 0.35rem 0.7rem 0.5rem;
