@@ -2,7 +2,7 @@
 
 .create-event-title i { color: var(--green-bright); text-shadow: 0 0 15px rgba(74, 222, 128, 0.6); }
 
-/* -- Inline styles est�ticos ----------------- */
+/* ── Inline styles estáticos ───────────────── */
 .collision-link { margin-left: 0.45rem; color: var(--link-info); }
 
 /* -- Input focus override (neutralize browser defaults) ----------- */

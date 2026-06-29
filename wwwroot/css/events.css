@@ -1,5 +1,5 @@
 /* ================================================================
-   EVENTS.CSS � Shared styles for event create/detail pages
+   EVENTS.CSS — Shared styles for event create/detail pages
    (Futsal + Poker)
 
    Loaded globally in _Host.cshtml.
@@ -136,7 +136,7 @@
 .detail-not-found h2 { color: var(--ci-text-info-strong); margin-bottom: 0.75rem; }
 .detail-not-found a  { color: var(--ci-text-link); font-size: 0.9rem; }
 
-/* -- Page card � utilit�rio para wrappers de conte�do principal -- */
+/* ── Page card — utilitário para wrappers de conteúdo principal ── */
 .page-card {
     background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
@@ -458,7 +458,7 @@
     padding: 0.6rem 1rem;
 }
 
-/* -- Barra de qu�rum -------------------------------------------- */
+/* ── Barra de quórum ──────────────────────────────────────────── */
 .quorum-bar {
     display: flex;
     align-items: center;
@@ -708,12 +708,12 @@
 }
 
 .player-item--waitlist { opacity: 0.65; }
-/* rotation slots: jogadores que revezam � fundo levemente diferente */
+/* rotation slots: jogadores que revezam — fundo levemente diferente */
 .players-list .player-item.player-item--rotation {
     background: #0c1a10;
 }
 .players-list .player-item.player-item--rotation:nth-child(even) { background: #091508; }
-/* empty decorative slots � no bg override so zebra applies */
+/* empty decorative slots — no bg override so zebra applies */
 .player-item--empty    { opacity: 0.38; }
 /* clickable vacant slot */
 .player-item--slot {
@@ -1205,7 +1205,7 @@
     padding: 1px 7px;
 }
 
-/* Admin toggle button � shared base */
+/* Admin toggle button — shared base */
 .player-tag--admin-pay {
     font-size: 0.7rem;
     font-weight: 700;
@@ -1228,14 +1228,14 @@
     border-color: rgba(52,211,153,0.3);
 }
 
-/* Admin: pendente (�mbar) */
+/* Admin: pendente (âmbar) */
 .player-tag--pay-pending {
     color: var(--amber);
     background: rgba(251,191,36,0.08);
     border-color: rgba(251,191,36,0.25);
 }
 
-/* Comprovante / Pagar / N�o paga � azul neutro sistema */
+/* Comprovante / Pagar / Não paga — azul neutro sistema */
 .player-tag--proof-pending {
     color: var(--link-info);
     background: var(--blue300-opacity-xs);
@@ -1266,7 +1266,7 @@
     border-color: var(--blue300-opacity-sm);
 }
 
-/* Own pending � clickable pay badge */
+/* Own pending — clickable pay badge */
 a.player-tag--pay-link {
     display: inline-flex;
     align-items: center;
@@ -1283,7 +1283,7 @@ a.player-tag--pay-link:hover {
     border-color: rgba(96,165,250,0.5);
 }
 
-/* Own row � cancel badge */
+/* Own row — cancel badge */
 button.player-tag--cancel {
     color: var(--red-soft);
     background: rgba(239,68,68,0.08);
@@ -2625,7 +2625,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     font-size: 0.82rem;
 }
 
-/* -- Notifica��o por usu�rio -- */
+/* ── Notificação por usuário ── */
 .dlq-notify-actions {
     display: flex;
     align-items: center;
@@ -2723,7 +2723,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     padding: 1px 6px;
 }
 
-/* -- Hist�rico de pagamentos manuais -- */
+/* ── Histórico de pagamentos manuais ── */
 .dlq-history-list {
     list-style: none;
     padding: 0;
@@ -3238,7 +3238,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 .btn-reject:hover { background: #3a1515; }
 
 /* ================================================================
-   ESCALACAO � Global styles for lineup/escalacao page
+   ESCALACAO — Global styles for lineup/escalacao page
    (Moved from Escalacao.razor.css because Blazor CSS isolation
    prevents parent scoped styles from reaching child components)
    ================================================================ */

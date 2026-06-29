@@ -117,7 +117,7 @@ button.edit-btn:hover {
         justify-content: center;
     }
 
-    .product-table td[data-label="Ações"] {
+    .product-table td[data-label="AÃ§Ãµes"] {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
