@@ -21,46 +21,35 @@
 }
 
 .player-tag--proof-pending {
-    background: linear-gradient(180deg, var(--amber) 0%, var(--amber-mid) 50%, var(--amber-dark) 100%);
-    border: 1px solid var(--amber-light);
-    color: var(--amber-lightest);
+    background: rgba(96,165,250,0.1);
+    border: 1px solid rgba(96,165,250,0.3);
+    color: var(--link-info);
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
 }
 
 .player-tag--proof-pending:hover {
-    background: linear-gradient(180deg, var(--amber-light) 0%, var(--amber) 50%, var(--amber-mid) 100%);
-    border-color: var(--amber-warm);
-    box-shadow: 0 4px 8px rgba(251, 191, 36, 0.5);
+    background: rgba(96,165,250,0.2);
+    border-color: rgba(96,165,250,0.5);
 }
 
 .player-tag--pay-pending {
-    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-dark) 100%);
-    border: 1px solid var(--red-text-light);
-    color: var(--red-lightest);
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-}
-
-.player-tag--pay-pending:hover {
-    background: linear-gradient(180deg, var(--red-text-light) 0%, var(--red-soft) 50%, var(--red-strong) 100%);
-    border-color: var(--red-pale);
-    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.5);
+    background: rgba(96,165,250,0.1);
+    border: 1px solid rgba(96,165,250,0.3);
+    color: var(--link-info);
 }
 
 .player-tag--pay-btn {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-accent-light);
-    color: var(--ci-surface-light);
+    background: rgba(96,165,250,0.1);
+    border: 1px solid rgba(96,165,250,0.3);
+    color: var(--link-info);
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 2px 4px rgba(79, 156, 248, 0.3);
 }
 
 .player-tag--pay-btn:hover {
-    background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
-    border-color: var(--link-info);
-    box-shadow: 0 4px 8px rgba(79, 156, 248, 0.5);
+    background: rgba(96,165,250,0.2);
+    border-color: rgba(96,165,250,0.5);
 }
 
 .player-tag--receiver-badge {
@@ -75,16 +64,14 @@
 
 /* Goalkeeper "Não Paga" Badge */
 .player-tag--no-pay {
-    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-bright) 50%, var(--green-strong) 100%);
-    border: 1px solid var(--green-soft);
-    color: var(--green-soft);
-    box-shadow: 0 2px 4px rgba(74, 222, 128, 0.3);
+    background: rgba(96,165,250,0.1);
+    border: 1px solid rgba(96,165,250,0.3);
+    color: var(--link-info);
 }
 
 .player-tag--no-pay:hover {
-    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, var(--green-bright) 100%);
-    border-color: var(--futsal-green-pale);
-    box-shadow: 0 4px 8px rgba(74, 222, 128, 0.5);
+    background: rgba(96,165,250,0.2);
+    border-color: rgba(96,165,250,0.5);
 }
 
 @keyframes fadeIn {
