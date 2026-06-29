@@ -1,5 +1,5 @@
-﻿/* ================================================================
-   EVENTS.CSS — Shared styles for event create/detail pages
+/* ================================================================
+   EVENTS.CSS � Shared styles for event create/detail pages
    (Futsal + Poker)
 
    Loaded globally in _Host.cshtml.
@@ -7,7 +7,7 @@
    specific overrides on top of these base styles.
    ================================================================ */
 
-/* ── Loading / not-found states ─────────────────────────────────── */
+/* -- Loading / not-found states ----------------------------------- */
 
 /* Skeleton Loading Animation */
 @keyframes shimmer {
@@ -136,7 +136,7 @@
 .detail-not-found h2 { color: var(--ci-text-info-strong); margin-bottom: 0.75rem; }
 .detail-not-found a  { color: var(--ci-text-link); font-size: 0.9rem; }
 
-/* ── Page card — utilitário para wrappers de conteúdo principal ── */
+/* -- Page card � utilit�rio para wrappers de conte�do principal -- */
 .page-card {
     background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
@@ -145,7 +145,7 @@
     padding: 1.25rem 1.5rem;
 }
 
-/* ── Detail page shell ───────────────────────────────────────────── */
+/* -- Detail page shell --------------------------------------------- */
 .detail-page {
     display: flex;
     justify-content: center;
@@ -165,7 +165,7 @@
     gap: 1.5rem;
 }
 
-/* ── Detail header ───────────────────────────────────────────────── */
+/* -- Detail header ------------------------------------------------- */
 .detail-header { display: flex; flex-direction: column; gap: 0.4rem; }
 
 .detail-header-top {
@@ -282,7 +282,7 @@
     text-decoration: underline;
 }
 
-/* ── Info chips ──────────────────────────────────────────────────── */
+/* -- Info chips ---------------------------------------------------- */
 .detail-chips {
     display: flex;
     flex-wrap: wrap;
@@ -303,7 +303,7 @@
 
 .detail-chip--price { border-color: var(--futsal-green-dark); color: var(--green-bright); font-weight: 700; }
 
-/* ── Admin bar (edit button) ─────────────────────────────────────── */
+/* -- Admin bar (edit button) --------------------------------------- */
 .detail-admin-bar {
     display: flex;
     justify-content: flex-end;
@@ -419,7 +419,7 @@
     color: var(--ci-text-muted);
 }
 
-/* ── Edit page danger zone ───────────────────────────────────────── */
+/* -- Edit page danger zone ----------------------------------------- */
 .edit-danger-zone {
     margin-top: 2rem;
     padding-top: 1.25rem;
@@ -430,7 +430,7 @@
     flex-wrap: wrap;
 }
 
-/* ── Cancelled banner ────────────────────────────────────────────── */
+/* -- Cancelled banner ---------------------------------------------- */
 .cancelled-banner {
     display: flex;
     align-items: center;
@@ -458,7 +458,7 @@
     padding: 0.6rem 1rem;
 }
 
-/* ── Barra de quórum ──────────────────────────────────────────── */
+/* -- Barra de qu�rum -------------------------------------------- */
 .quorum-bar {
     display: flex;
     align-items: center;
@@ -499,7 +499,7 @@
     margin: 0;
 }
 
-/* ── Detail section ──────────────────────────────────────────────── */
+/* -- Detail section ------------------------------------------------ */
 .detail-section { display: flex; flex-direction: column; gap: 0.5rem; }
 
 .detail-divider {
@@ -517,7 +517,7 @@
     margin: 0 0 0.25rem;
 }
 
-/* ── Players group container ─────────────────────────────────────── */
+/* -- Players group container --------------------------------------- */
 .players-group {
     display: flex;
     flex-direction: column;
@@ -538,7 +538,7 @@
     margin-top: 3rem;
 }
 
-/* ── Players group header ────────────────────────────────────────── */
+/* -- Players group header ------------------------------------------ */
 .players-group-header {
     display: flex;
     align-items: center;
@@ -610,7 +610,7 @@
     border-color: var(--red-border);
 }
 
-/* ── Players list ─────────────────────────────────────────────────── */
+/* -- Players list --------------------------------------------------- */
 .players-list {
     list-style: none;
     padding: 0;
@@ -708,12 +708,12 @@
 }
 
 .player-item--waitlist { opacity: 0.65; }
-/* rotation slots: jogadores que revezam — fundo levemente diferente */
+/* rotation slots: jogadores que revezam � fundo levemente diferente */
 .players-list .player-item.player-item--rotation {
     background: #0c1a10;
 }
 .players-list .player-item.player-item--rotation:nth-child(even) { background: #091508; }
-/* empty decorative slots — no bg override so zebra applies */
+/* empty decorative slots � no bg override so zebra applies */
 .player-item--empty    { opacity: 0.38; }
 /* clickable vacant slot */
 .player-item--slot {
@@ -738,7 +738,7 @@
 .player-name        { flex: 1; font-size: 0.9rem; color: var(--slate-light); font-weight: 500; }
 .player-slot-empty  { flex: 1; color: #2e5575; font-size: 0.85rem; }
 
-/* ── Admin: adicionar / remover vaga ─────────────────────────── */
+/* -- Admin: adicionar / remover vaga --------------------------- */
 .slot-controls {
     display: flex;
     gap: 0.35rem;
@@ -864,7 +864,7 @@
     align-items: center;
     gap: 0.35rem;
     background: rgba(74, 222, 128, 0.08);
-    border: 1px solid rgba(74, 222, 128, 0.35);
+    border: 1px solid var(--green-opacity-lg);
     border-radius: 999px;
     color: var(--green-bright);
     font-size: 0.78rem;
@@ -910,7 +910,7 @@
 .player-tag--open {
     color: var(--green-bright);
     background: rgba(74,222,128,0.1);
-    border-color: rgba(74,222,128,0.3);
+    border-color: var(--green-opacity-md);
 }
 
 .player-tag--full {
@@ -922,10 +922,10 @@
 .player-tag--weekly {
     color: var(--link-info);
     background: var(--blue300-opacity-xs);
-    border-color: rgba(96,165,250,0.3);
+    border-color: var(--blue300-opacity-sm);
 }
 
-/* ── Events table (group join / group detail) ────────────────────── */
+/* -- Events table (group join / group detail) ---------------------- */
 .detail-events-header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -1205,7 +1205,7 @@
     padding: 1px 7px;
 }
 
-/* Admin toggle button — shared base */
+/* Admin toggle button � shared base */
 .player-tag--admin-pay {
     font-size: 0.7rem;
     font-weight: 700;
@@ -1228,18 +1228,18 @@
     border-color: rgba(52,211,153,0.3);
 }
 
-/* Admin: pendente (âmbar) */
+/* Admin: pendente (�mbar) */
 .player-tag--pay-pending {
     color: var(--amber);
     background: rgba(251,191,36,0.08);
     border-color: rgba(251,191,36,0.25);
 }
 
-/* Comprovante / Pagar / Não paga — azul neutro sistema */
+/* Comprovante / Pagar / N�o paga � azul neutro sistema */
 .player-tag--proof-pending {
     color: var(--link-info);
     background: var(--blue300-opacity-xs);
-    border-color: rgba(96,165,250,0.3);
+    border-color: var(--blue300-opacity-sm);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -1251,7 +1251,7 @@
 .player-tag--pay-btn {
     color: var(--link-info);
     background: var(--blue300-opacity-xs);
-    border-color: rgba(96,165,250,0.3);
+    border-color: var(--blue300-opacity-sm);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -1263,10 +1263,10 @@
 .player-tag--no-pay {
     color: var(--link-info);
     background: var(--blue300-opacity-xs);
-    border-color: rgba(96,165,250,0.3);
+    border-color: var(--blue300-opacity-sm);
 }
 
-/* Own pending — clickable pay badge */
+/* Own pending � clickable pay badge */
 a.player-tag--pay-link {
     display: inline-flex;
     align-items: center;
@@ -1275,7 +1275,7 @@ a.player-tag--pay-link {
     cursor: pointer;
     color: var(--link-info);
     background: var(--blue300-opacity-xs);
-    border-color: rgba(96,165,250,0.3);
+    border-color: var(--blue300-opacity-sm);
     transition: all 0.2s;
 }
 a.player-tag--pay-link:hover {
@@ -1283,7 +1283,7 @@ a.player-tag--pay-link:hover {
     border-color: rgba(96,165,250,0.5);
 }
 
-/* Own row — cancel badge */
+/* Own row � cancel badge */
 button.player-tag--cancel {
     color: var(--red-soft);
     background: rgba(239,68,68,0.08);
@@ -1344,7 +1344,7 @@ button.player-tag--admin-remove:hover {
 button.player-tag--admin-pay-yes {
     color: var(--green-bright);
     background: rgba(74,222,128,0.08);
-    border-color: rgba(74,222,128,0.35);
+    border-color: var(--green-opacity-lg);
     cursor: pointer;
     padding: 1px 6px;
     transition: filter 0.12s;
@@ -1386,7 +1386,7 @@ button.player-tag--admin-remove-no {
 }
 button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
-/* ── Confirm action area ─────────────────────────────────────────── */
+/* -- Confirm action area ------------------------------------------- */
 .detail-action { display: flex; flex-direction: column; gap: 0.75rem; }
 
 .confirm-btn {
@@ -1433,7 +1433,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 .confirmed-block { display: flex; flex-direction: column; gap: 0.5rem; }
 
-/* ── Inline confirmed banner (above player list) ─────────────── */
+/* -- Inline confirmed banner (above player list) --------------- */
 .confirmed-inline-banner {
     display: flex;
     align-items: center;
@@ -1564,7 +1564,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     background: #111e30;
 }
 
-/* ── Invite block (group detail page) ───────────────────────────── */
+/* -- Invite block (group detail page) ----------------------------- */
 .invite-block {
     display: flex;
     flex-direction: column;
@@ -1665,7 +1665,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: var(--slate-light);
 }
 
-/* ── Invite modal ────────────────────────────────────────────────── */
+/* -- Invite modal -------------------------------------------------- */
 .invite-modal-backdrop {
     position: fixed;
     inset: 0;
@@ -1683,7 +1683,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     border-radius: 14px;
     width: 100%;
     max-width: 480px;
-    box-shadow: 0 12px 40px rgba(0,0,0,.6);
+    box-shadow: 0 12px 40px var(--shadow-2xl);
     overflow: hidden;
 }
 
@@ -1837,7 +1837,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     flex-shrink: 0;
 }
 
-/* ── Create event page shell ─────────────────────────────────────── */
+/* -- Create event page shell --------------------------------------- */
 .create-event-page {
     display: flex;
     justify-content: center;
@@ -1866,7 +1866,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     gap: 0.5rem;
 }
 
-/* ── Fieldsets ───────────────────────────────────────────────────── */
+/* -- Fieldsets ----------------------------------------------------- */
 .form-section {
     border: 1px solid #1c3a54;
     border-radius: 10px;
@@ -1883,7 +1883,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     padding: 0 0.4rem;
 }
 
-/* ── Form rows ───────────────────────────────────────────────────── */
+/* -- Form rows ----------------------------------------------------- */
 .form-row-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1896,7 +1896,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     gap: 1rem;
 }
 
-/* ── Form group ──────────────────────────────────────────────────── */
+/* -- Form group ---------------------------------------------------- */
 .form-group {
     display: flex;
     flex-direction: column;
@@ -1947,7 +1947,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 .form-hint--warn { color: var(--amber-mid); font-size: 0.82rem; }
 .required       { color: var(--red-soft); }
 
-/* ── Price input with R$ prefix ─────────────────────────────────── */
+/* -- Price input with R$ prefix ----------------------------------- */
 .input-prefix-wrap {
     display: flex;
     align-items: stretch;
@@ -1970,7 +1970,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 .input-prefix-wrap .input { border: none; border-radius: 0; flex: 1; }
 
-/* ── Date / time picker icons ────────────────────────────────────── */
+/* -- Date / time picker icons -------------------------------------- */
 .form-group input[type="date"]::-webkit-calendar-picker-indicator,
 .form-group input[type="time"]::-webkit-calendar-picker-indicator,
 .create-event-page input[type="date"]::-webkit-calendar-picker-indicator,
@@ -1980,7 +1980,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     opacity: 1;
 }
 
-/* ── Form actions ────────────────────────────────────────────────── */
+/* -- Form actions -------------------------------------------------- */
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -2020,7 +2020,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 .validation-summary { color: var(--red-soft); font-size: 0.85rem; margin-bottom: 1rem; }
 .validation-message { color: var(--red-soft); font-size: 0.8rem; }
 
-/* ── Responsive ──────────────────────────────────────────────────── */
+/* -- Responsive ---------------------------------------------------- */
 @media (max-width: 560px) {
     .detail-card       { padding: 1.25rem 1rem; }
     .detail-title      { font-size: 1.25rem; }
@@ -2033,7 +2033,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .form-row-3 { grid-template-columns: 1fr; }
 }
 
-/* ── Venue map embed ─────────────────────────────────────────────── */
+/* -- Venue map embed ----------------------------------------------- */
 .detail-map-wrap {
     border-radius: 10px;
     overflow: hidden;
@@ -2079,7 +2079,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     transition: border-color 0.14s, background 0.14s;
     cursor: pointer;
 }
-.detail-map-placeholder:hover { border-color: var(--ci-accent); background: #0e2236; }
+.detail-map-placeholder:hover { border-color: var(--ci-accent); background: var(--ci-bg-deep); }
 .detail-map-placeholder > .fa-map-marker-alt {
     font-size: 1.25rem;
     color: var(--ci-accent);
@@ -2097,7 +2097,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 }
 .detail-map-placeholder-ext { font-size: 0.8rem; color: var(--ci-accent); flex-shrink: 0; }
 
-/* ── Groups listing page (/grupos) ───────────────────────────────── */
+/* -- Groups listing page (/grupos) --------------------------------- */
 .groups-page {
     max-width: 980px;
     margin: 0 auto;
@@ -2336,7 +2336,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     display: block;
 }
 
-/* ── Pagamentos ─────────────────────────────────────────────────── */
+/* -- Pagamentos --------------------------------------------------- */
 .detail-section-header {
     display: flex;
     align-items: center;
@@ -2498,7 +2498,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 .dlq-badge--games {
     color: var(--link-info);
     background: var(--blue300-opacity-xs);
-    border-color: rgba(96,165,250,0.3);
+    border-color: var(--blue300-opacity-sm);
 }
 
 .dlq-badge--amount {
@@ -2607,7 +2607,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     font-weight: 700;
     color: var(--green-bright);
     background: rgba(74,222,128,0.08);
-    border: 1px solid rgba(74,222,128,0.35);
+    border: 1px solid var(--green-opacity-lg);
     border-radius: 7px;
     padding: 0.22rem 0.65rem;
     cursor: pointer;
@@ -2625,7 +2625,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     font-size: 0.82rem;
 }
 
-/* ── Notificação por usuário ── */
+/* -- Notifica��o por usu�rio -- */
 .dlq-notify-actions {
     display: flex;
     align-items: center;
@@ -2658,7 +2658,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 .dlq-notify-btn--whatsapp {
     color: var(--green-bright);
-    border-color: rgba(74,222,128,0.35);
+    border-color: var(--green-opacity-lg);
 }
 .dlq-notify-btn--whatsapp:hover {
     background: rgba(74,222,128,0.12);
@@ -2683,7 +2683,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     font-size: 0.82rem;
 }
 
-/* ── Tabs ── */
+/* -- Tabs -- */
 .dlq-tabs {
     display: flex;
     border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -2723,7 +2723,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     padding: 1px 6px;
 }
 
-/* ── Histórico de pagamentos manuais ── */
+/* -- Hist�rico de pagamentos manuais -- */
 .dlq-history-list {
     list-style: none;
     padding: 0;
@@ -2774,7 +2774,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: rgba(255,255,255,0.7);
 }
 
-/* ── Proof badge on delinquency user row ───────────────────────── */
+/* -- Proof badge on delinquency user row ------------------------- */
 .dlq-badge--proof {
     color: var(--amber-warm);
     background: rgba(251,191,36,0.12);
@@ -2784,7 +2784,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     gap: 0.3rem;
 }
 
-/* ── View-proof button inside entry row ────────────────────────── */
+/* -- View-proof button inside entry row -------------------------- */
 .dlq-view-proof-btn {
     display: inline-flex;
     align-items: center;
@@ -2805,7 +2805,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: var(--amber-warm);
 }
 
-/* ── Proof lightbox overlay ─────────────────────────────────────── */
+/* -- Proof lightbox overlay --------------------------------------- */
 .dlq-proof-overlay {
     position: fixed;
     inset: 0;
@@ -2873,7 +2873,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: var(--ci-text-info);
 }
 
-/* ── Join by code (grupos page) ─────────────────────────────────── */
+/* -- Join by code (grupos page) ----------------------------------- */
 .join-code-section {
     margin: 0;
     width: min(100%, 380px);
@@ -3051,7 +3051,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: rgba(255, 220, 180, 0.98);
 }
 
-/* ── Pix notice banner (Detail page, admin only) ────────────── */
+/* -- Pix notice banner (Detail page, admin only) -------------- */
 .detail-pix-notice {
     display: flex;
     gap: 0.9rem;
@@ -3139,7 +3139,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: var(--amber);
 }
 
-/* ── Group detail: join request section ──────────────────────────── */
+/* -- Group detail: join request section ---------------------------- */
 .join-request-section {
     background: #0a1825;
     border: 1px solid var(--ci-border);
@@ -3168,7 +3168,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     gap: 0.45rem;
 }
 
-/* ── Admin: pending join requests ───────────────────────────────── */
+/* -- Admin: pending join requests --------------------------------- */
 .pending-requests-list {
     list-style: none;
     padding: 0;
@@ -3238,12 +3238,12 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 .btn-reject:hover { background: #3a1515; }
 
 /* ================================================================
-   ESCALACAO — Global styles for lineup/escalacao page
+   ESCALACAO � Global styles for lineup/escalacao page
    (Moved from Escalacao.razor.css because Blazor CSS isolation
    prevents parent scoped styles from reaching child components)
    ================================================================ */
 
-/* ── Loading / not-found ─────────────────────────────────────────── */
+/* -- Loading / not-found ------------------------------------------- */
 .esc-loading,
 .esc-not-found {
     text-align: center;
@@ -3251,7 +3251,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: var(--ci-text-muted);
 }
 
-/* ── Gate (lock / not-member) ────────────────────────────────────── */
+/* -- Gate (lock / not-member) -------------------------------------- */
 .esc-card--gate {
     min-height: 320px;
     display: flex;
@@ -3323,7 +3323,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: var(--ci-text);
 }
 
-/* ── Page shell ─────────────────────────────────────────────────── */
+/* -- Page shell --------------------------------------------------- */
 .esc-page {
     max-width: 860px;
     margin: 2rem auto;
@@ -3351,7 +3351,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(79, 156, 248, 0.14);
 }
 
-/* ── Header ─────────────────────────────────────────────────────── */
+/* -- Header ------------------------------------------------------- */
 .esc-header-top {
     display: flex;
     align-items: center;
@@ -3377,7 +3377,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 }
 .esc-date i { margin-right: .35rem; }
 
-/* ── Confirmed badge ────────────────────────────────────────────── */
+/* -- Confirmed badge ---------------------------------------------- */
 .esc-confirmed-badge {
     display: flex;
     align-items: center;
@@ -3392,7 +3392,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 }
 .esc-confirmed-badge i { font-size: 1rem; }
 
-/* ── Teams grid ─────────────────────────────────────────────────── */
+/* -- Teams grid --------------------------------------------------- */
 .esc-teams {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -3418,7 +3418,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 .esc-team--a .esc-team-title,
 .esc-team--b .esc-team-title {
     color: var(--ci-text);
-    text-shadow: 0 1px 2px rgba(0,0,0,.5);
+    text-shadow: 0 1px 2px var(--shadow-xl);
 }
 
 .esc-team-title {
@@ -3452,7 +3452,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 .esc-team-name-input--a { color: var(--gold); }
 .esc-team-name-input--b { color: var(--ci-text-info-strong); }
 
-/* ── Player list ────────────────────────────────────────────────── */
+/* -- Player list -------------------------------------------------- */
 .esc-player-list {
     list-style: none;
     margin: 0;
@@ -3527,7 +3527,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 .esc-player-icon { font-size: 1rem; color: var(--ci-text-info-strong); }
 
-/* ── Reserva block ──────────────────────────────────────────────── */
+/* -- Reserva block ------------------------------------------------ */
 .esc-reserva {
     margin: 0 0 1.25rem;
     padding: .875rem 1rem;
@@ -3543,7 +3543,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     color: var(--ci-text-muted);
 }
 
-/* ── Share bar ──────────────────────────────────────────────────── */
+/* -- Share bar ---------------------------------------------------- */
 .esc-share-bar {
     display: flex;
     gap: .75rem;
@@ -3552,7 +3552,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     margin-bottom: .5rem;
 }
 
-/* ── Draft actions ──────────────────────────────────────────────── */
+/* -- Draft actions ------------------------------------------------ */
 .esc-draft-actions {
     display: flex;
     gap: .75rem;
@@ -3567,7 +3567,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     gap: .55rem;
 }
 
-/* ── Buttons ────────────────────────────────────────────────────── */
+/* -- Buttons ------------------------------------------------------ */
 .esc-btn {
     display: inline-flex;
     align-items: center;
@@ -3589,7 +3589,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     border-color: #3a6a9e;
     color: var(--ci-text);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 4px 14px var(--shadow-md);
-    text-shadow: 0 1px 2px rgba(0,0,0,.4);
+    text-shadow: 0 1px 2px var(--shadow-lg);
 }
 .esc-btn--primary:not(:disabled):hover {
     background: linear-gradient(180deg, #3a6a9e 0%, #2c5a8e 100%);
@@ -3601,7 +3601,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     border-color: #4a5b6e;
     color: var(--ci-text);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-    text-shadow: 0 1px 2px rgba(0,0,0,.4);
+    text-shadow: 0 1px 2px var(--shadow-lg);
 }
 .esc-btn--secondary:not(:disabled):hover {
     background: linear-gradient(180deg, #4a5b6e 0%, #3a4a5e 100%);
@@ -3612,8 +3612,8 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     background: linear-gradient(180deg, #5a6b7e 0%, #2c3a4b 50%, #1a2735 100%);
     border-color: #6a7b8e;
     color: var(--ci-text);
-    box-shadow: 0 6px 18px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.15), inset 0 -1px 0 var(--shadow-md);
-    text-shadow: 0 1px 2px rgba(0,0,0,.5);
+    box-shadow: 0 6px 18px var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.15), inset 0 -1px 0 var(--shadow-md);
+    text-shadow: 0 1px 2px var(--shadow-xl);
 }
 .esc-btn--shuffle:not(:disabled):hover {
     border-color: #8a9bb0;
@@ -3640,7 +3640,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 }
 .esc-btn--danger-ghost:hover { background: rgba(239,68,68,.08); }
 
-/* ── Reset zone ─────────────────────────────────────────────────── */
+/* -- Reset zone --------------------------------------------------- */
 .esc-reset-zone {
     margin-top: 1.75rem;
     padding-top: 1rem;
@@ -3649,7 +3649,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     justify-content: flex-end;
 }
 
-/* ── Error ──────────────────────────────────────────────────────── */
+/* -- Error -------------------------------------------------------- */
 .esc-error {
     color: var(--red);
     font-size: .875rem;
@@ -3665,7 +3665,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     gap: .4rem;
 }
 
-/* ── Modal ──────────────────────────────────────────────────────── */
+/* -- Modal -------------------------------------------------------- */
 .esc-modal-overlay {
     position: fixed;
     inset: 0;
@@ -3685,7 +3685,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     padding: 1.5rem;
     max-width: 420px;
     width: 100%;
-    box-shadow: 0 12px 48px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);
+    box-shadow: 0 12px 48px var(--shadow-2xl), inset 0 1px 0 rgba(255,255,255,.08);
 }
 
 .esc-modal p {
@@ -3693,7 +3693,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     line-height: 1.55;
     color: var(--ci-text);
     font-size: .95rem;
-    text-shadow: 0 1px 2px rgba(0,0,0,.5);
+    text-shadow: 0 1px 2px var(--shadow-xl);
 }
 
 .esc-modal-actions {
@@ -3702,7 +3702,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     justify-content: flex-end;
 }
 
-/* ── Move player button ─────────────────────────────────────────── */
+/* -- Move player button ------------------------------------------- */
 .esc-move-btn {
     flex-shrink: 0;
     background: var(--accent-opacity-xs);
@@ -3721,7 +3721,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     background: rgba(79,156,248,.25);
 }
 
-/* ── Section title (score + vote headers) ───────────────────────── */
+/* -- Section title (score + vote headers) ------------------------- */
 .esc-section-header {
     display: flex;
     align-items: center;
@@ -3746,7 +3746,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     gap: .4rem;
 }
 
-/* ── Score section ──────────────────────────────────────────────── */
+/* -- Score section ------------------------------------------------ */
 .esc-score-section {
     margin-top: 1.5rem;
     padding: 1rem 1.1rem;
@@ -3862,7 +3862,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     margin: .25rem 0 0;
 }
 
-/* ── Vote section ───────────────────────────────────────────────── */
+/* -- Vote section ------------------------------------------------- */
 .esc-vote-section {
     margin-top: 1.25rem;
     padding: 1rem 1.1rem;
@@ -3908,7 +3908,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     transform: translateX(2px);
 }
 .esc-vote-item:hover:not(.esc-vote-item--me)::after {
-    content: "⮞";
+    content: "?";
     position: absolute;
     right: .75rem;
     color: rgba(251,191,36,.6);
@@ -3994,7 +3994,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     gap: .3rem;
 }
 
-/* ── MVP Banner ─────────────────────────────────────────────────── */
+/* -- MVP Banner --------------------------------------------------- */
 .esc-mvp-banner {
     display: flex;
     align-items: center;
