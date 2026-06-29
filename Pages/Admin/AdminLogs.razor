@@ -186,7 +186,8 @@
         }
         finally
         {
-            loadLogsLock.Release();
+            if (!isDisposed)
+                loadLogsLock.Release();
         }
     }
 
@@ -218,14 +219,18 @@
 
             var logs = data.Logs ?? new List<AppLog>();
             var offsetInPage = startIndex % VirtualizePageSize;
-            var itemsToReturn = Math.Min(count, logs.Count - offsetInPage);
+            var available = logs.Count - offsetInPage;
+            if (available <= 0)
+                return new ItemsProviderResult<AppLog>(new List<AppLog>(), data.TotalLogs);
+            var itemsToReturn = Math.Min(count, available);
             var slicedLogs = logs.Skip(offsetInPage).Take(itemsToReturn).ToList();
 
             return new ItemsProviderResult<AppLog>(slicedLogs, data.TotalLogs);
         }
         finally
         {
-            loadLogsLock.Release();
+            if (!isDisposed)
+                loadLogsLock.Release();
         }
     }
 
