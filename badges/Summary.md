@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 06/29/2026 - 07:36:03 |
-| Coverage date: | 06/29/2026 - 07:35:57 |
+| Generated on: | 06/29/2026 - 07:54:23 |
+| Coverage date: | 06/29/2026 - 07:54:16 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 410 |
 | Files: | 449 |
-| **Line coverage:** | 91.3% (109268 of 119617) |
-| Covered lines: | 109268 |
-| Uncovered lines: | 10349 |
+| **Line coverage:** | 91.3% (109269 of 119617) |
+| Covered lines: | 109269 |
+| Uncovered lines: | 10348 |
 | Coverable lines: | 119617 |
 | Total lines: | 148053 |
 | **Branch coverage:** | 30% (2295 of 7630) |
 | Covered branches: | 2295 |
 | Total branches: | 7630 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 155_28355975992 |
+| Tag: | 157_28356888409 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **109268** | **10349** | **119617** | **155472** | **91.3%** | **2295** | **7630** | **30%** |
+| **Confirmai** | **109269** | **10348** | **119617** | **155472** | **91.3%** | **2295** | **7630** | **30%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -433,7 +433,7 @@
 | Confirmai.Shared.Helpers.EventAccess | 6 | 0 | 6 | 31 | 100% | 14 | 14 | 100% |
 | Confirmai.Shared.Helpers.EventMinimums | 22 | 0 | 22 | 49 | 100% | 6 | 6 | 100% |
 | Confirmai.Shared.IbgeMunicipio | 0 | 1 | 1 | 29 | 0% | 0 | 0 |  |
-| Confirmai.Shared.MainLayout | 106 | 35 | 141 | 370 | 75.1% | 48 | 70 | 68.5% |
+| Confirmai.Shared.MainLayout | 107 | 34 | 141 | 370 | 75.8% | 48 | 70 | 68.5% |
 | Confirmai.Shared.RouteNotAuthorized | 8 | 0 | 8 | 30 | 100% | 5 | 6 | 83.3% |
 | Program | 384 | 137 | 521 | 677 | 73.7% | 50 | 84 | 59.5% |
 | System.Text.RegularExpressions.Generated | 258 | 32 | 290 | 816 | 88.9% | 121 | 150 | 80.6% |
