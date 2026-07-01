@@ -1,0 +1,471 @@
+using System.Security.Claims;
+using System.Text;
+using Confirmai.Data;
+using Confirmai.Enums;
+using Confirmai.Models;
+using Confirmai.Pages.Components;
+using Confirmai.Pages.Futsal.Components;
+using Confirmai.Shared.Helpers;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.JSInterop;
+
+namespace Confirmai.Pages.Futsal;
+
+public partial class Escalacao : IAsyncDisposable
+{
+    [Parameter] public int Id { get; set; }
+
+    private Event?   ev        = null;
+    private bool     isLoading = true;
+    private string?  currentUserId;
+    private bool     isAdmin;
+
+    private List<PlayerSlot> teamA    = new();
+    private List<PlayerSlot> teamB    = new();
+    private List<PlayerSlot> reservas = new();
+
+    private bool    showConfirmModal = false;
+    private bool    showResetModal   = false;
+    private bool    isSaving         = false;
+    private bool    copied           = false;
+    private string? actionError;
+
+    private CancellationTokenSource? _copyCts;
+    private Task? _copyTask = null;
+
+    // ── Post-match state ─────────────────────────────────────────────────────
+    private bool isPastEvent;
+    private bool isMember;
+    private List<PostMatchVote> allVotes = new();
+    private PostMatchVote?       myVote;
+    private int?   scoreInputA;
+    private int?   scoreInputB;
+    private bool   editingScore = false;
+    private string? scoreError;
+    private string? voteError;
+    private string? scoreRegisteredByName;
+    private bool   isEditingVote = false;
+    private string  teamAName     = "Time A";
+    private string  teamBName     = "Time B";
+
+    private bool TeamsAreBalanced =>
+        Math.Abs(teamA.Count(s => !s.IsGoalkeeper) - teamB.Count(s => !s.IsGoalkeeper)) <= 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await LoadEvent();
+        if (ev?.LineupConfirmedAt is null && isAdmin)
+            Randomize();
+    }
+
+    // ── Component Callback Wrappers ──────────────────────────────────────
+
+    private async Task SaveTeamNamesCallback()
+        => await SaveTeamNames();
+
+    private Task MovePlayerCallback((PlayerSlot Slot, bool ToTeamB) args)
+    { MovePlayer(args.Slot, args.ToTeamB); return Task.CompletedTask; }
+
+    private async Task RandomizeCallback()
+    {
+        Randomize();
+        await Task.CompletedTask;
+    }
+
+    private async Task ShowConfirmModalChangedCallback(bool value)
+    {
+        showConfirmModal = value;
+        await Task.CompletedTask;
+    }
+
+    private async Task ConfirmarEscalacaoCallback()
+        => await ConfirmarEscalacao();
+
+    private async Task EditingScoreChangedCallback(bool value)
+    {
+        editingScore = value;
+        await Task.CompletedTask;
+    }
+
+    private async Task SaveScoreCallback()
+        => await SaveScore();
+
+    private async Task CopyToClipboardCallback()
+        => await CopyToClipboard();
+
+    private async Task ShareOnWhatsAppCallback()
+        => await ShareOnWhatsApp();
+
+    private async Task LoadEvent()
+    {
+        isLoading = true;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        ev = await db.Events
+            .Include(e => e.Group)
+                .ThenInclude(g => g.Members)
+            .Include(e => e.Confirmations)
+                .ThenInclude(c => c.User)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
+        isAdmin = EventAccess.IsAdmin(ev, currentUserId);
+
+        if (ev is not null)
+        {
+            isPastEvent = ev.StartsAt.AddMinutes(ev.DurationMinutes ?? 120) < DateTime.UtcNow;
+            isMember    = currentUserId is not null &&
+                          ev.Group.Members.Any(m => m.UserId == currentUserId);
+
+            allVotes = await db.PostMatchVotes
+                .Where(v => v.EventId == Id)
+                .ToListAsync();
+            myVote = currentUserId is not null
+                ? allVotes.FirstOrDefault(v => v.VoterUserId == currentUserId)
+                : null;
+
+            scoreInputA = ev.ScoreTeamA;
+            scoreInputB = ev.ScoreTeamB;
+
+            if (ev.ScoreRegisteredByUserId is not null)
+            {
+                var registrant = await db.Users
+                    .Where(u => u.Id == ev.ScoreRegisteredByUserId)
+                    .Select(u => u.FullName ?? u.Email)
+                    .FirstOrDefaultAsync();
+                scoreRegisteredByName = registrant;
+            }
+
+            teamAName = ev.TeamAName ?? "Time A";
+            teamBName = ev.TeamBName ?? "Time B";
+        }
+
+        isLoading = false;
+    }
+
+    private async Task SaveTeamNames()
+    {
+        if (ev is null) return;
+        var nameA = string.IsNullOrWhiteSpace(teamAName) ? "Time A" : teamAName.Trim();
+        var nameB = string.IsNullOrWhiteSpace(teamBName) ? "Time B" : teamBName.Trim();
+        teamAName = nameA;
+        teamBName = nameB;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var dbEv = await db.Events.FindAsync(Id);
+        if (dbEv is null) return;
+        dbEv.TeamAName = nameA == "Time A" ? null : nameA;
+        dbEv.TeamBName = nameB == "Time B" ? null : nameB;
+        await db.SaveChangesAsync();
+    }
+
+    private async Task HandleTeamNamesChanged((string TeamA, string TeamB) names)
+    {
+        teamAName = names.TeamA;
+        teamBName = names.TeamB;
+        await SaveTeamNames();
+    }
+
+    private async Task HandleEditingVoteChanged(bool isEditing)
+    {
+        isEditingVote = isEditing;
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+
+    private void Randomize()
+    {
+        if (ev is null) return;
+
+        var gks = ev.Confirmations
+            .Where(c => c.Position == FutsalPosition.Goalkeeper)
+            .OrderBy(c => c.ConfirmedAt)
+            .ToList();
+
+        var outfield = ev.Confirmations
+            .Where(c => c.Position != FutsalPosition.Goalkeeper)
+            .OrderBy(_ => Random.Shared.Next())
+            .ToList();
+
+        teamA.Clear(); teamB.Clear(); reservas.Clear();
+
+        if (gks.Count >= 1)
+            teamA.Add(new PlayerSlot(gks[0].UserId, gks[0].User.FullName ?? gks[0].User.Email!, true));
+        if (gks.Count >= 2)
+            teamB.Add(new PlayerSlot(gks[1].UserId, gks[1].User.FullName ?? gks[1].User.Email!, true));
+
+        for (int i = 0; i < outfield.Count; i++)
+        {
+            var p    = outfield[i];
+            var slot = new PlayerSlot(p.UserId, p.User.FullName ?? p.User.Email!, false);
+            if (i % 2 == 0) teamA.Add(slot);
+            else             teamB.Add(slot);
+        }
+
+        // Se número ímpar de linha: o último (que foi para teamA) vira reserva
+        if (outfield.Count % 2 != 0 && teamA.Count > 0)
+        {
+            var last = teamA.Last(s => !s.IsGoalkeeper);
+            teamA.Remove(last);
+            reservas.Add(last);
+        }
+    }
+
+    private void MovePlayer(PlayerSlot slot, bool toTeamB)
+    {
+        if (toTeamB)
+        {
+            teamA.Remove(slot);
+            if (slot.IsGoalkeeper)
+            {
+                var existing = teamB.FirstOrDefault(s => s.IsGoalkeeper);
+                if (existing is not null) { teamB.Remove(existing); teamA.Add(existing); }
+            }
+            teamB.Add(slot);
+        }
+        else
+        {
+            teamB.Remove(slot);
+            if (slot.IsGoalkeeper)
+            {
+                var existing = teamA.FirstOrDefault(s => s.IsGoalkeeper);
+                if (existing is not null) { teamA.Remove(existing); teamB.Add(existing); }
+            }
+            teamA.Add(slot);
+        }
+    }
+
+    private async Task ConfirmarEscalacao()
+    {
+        if (ev is null) return;
+        isSaving    = true;
+        actionError = null;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var userIdToTeam = new Dictionary<string, int?>();
+        foreach (var s in teamA)    userIdToTeam[s.UserId] = 0;
+        foreach (var s in teamB)    userIdToTeam[s.UserId] = 1;
+        foreach (var s in reservas) userIdToTeam[s.UserId] = null;
+
+        var confs = await db.EventConfirmations
+            .Where(c => c.EventId == Id)
+            .ToListAsync();
+
+        foreach (var c in confs)
+        {
+            if (userIdToTeam.TryGetValue(c.UserId, out var teamId))
+                c.TeamId = teamId;
+        }
+
+        var dbEv = await db.Events.FindAsync(Id);
+        if (dbEv is not null)
+            dbEv.LineupConfirmedAt = DateTime.UtcNow;
+
+        await db.SaveChangesAsync();
+        showConfirmModal = false;
+        isSaving         = false;
+        await LoadEvent();
+    }
+
+    // ── Post-match methods ───────────────────────────────────────────────────
+
+    private async Task CastVote(string votedForUserId)
+    {
+        if (currentUserId is null || votedForUserId == currentUserId) return;
+        voteError = null;
+        isSaving  = true;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var existing = await db.PostMatchVotes
+            .FirstOrDefaultAsync(v => v.EventId == Id && v.VoterUserId == currentUserId);
+        if (existing is not null)
+        {
+            existing.VotedForUserId = votedForUserId;
+            existing.VotedAt        = DateTime.UtcNow;
+        }
+        else
+        {
+            db.PostMatchVotes.Add(new PostMatchVote
+            {
+                EventId        = Id,
+                VoterUserId    = currentUserId,
+                VotedForUserId = votedForUserId,
+            });
+        }
+        await db.SaveChangesAsync();
+        isEditingVote = false;
+        isSaving      = false;
+        await LoadEvent();
+    }
+
+    private async Task SaveScore()
+    {
+        if (scoreInputA is null || scoreInputB is null) return;
+        scoreError = null;
+        isSaving   = true;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var dbEv = await db.Events.FindAsync(Id);
+        if (dbEv is not null)
+        {
+            dbEv.ScoreTeamA              = scoreInputA;
+            dbEv.ScoreTeamB              = scoreInputB;
+            dbEv.ScoreRegisteredByUserId = currentUserId;
+            dbEv.ScoreRegisteredAt       = DateTime.UtcNow;
+            await db.SaveChangesAsync();
+        }
+        editingScore = false;
+        isSaving     = false;
+        await LoadEvent();
+    }
+
+    // ── Escalação methods ────────────────────────────────────────────────────
+
+    private async Task ResetarEscalacao()
+    {
+        if (ev is null) return;
+        isSaving = true;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var confs = await db.EventConfirmations
+            .Where(c => c.EventId == Id)
+            .ToListAsync();
+        foreach (var c in confs)
+            c.TeamId = null;
+
+        var dbEv = await db.Events.FindAsync(Id);
+        if (dbEv is not null)
+            dbEv.LineupConfirmedAt = null;
+
+        await db.SaveChangesAsync();
+        showResetModal = false;
+        isSaving       = false;
+        await LoadEvent();
+        Randomize();
+    }
+
+    private async Task CopyToClipboard()
+    {
+        var text = BuildShareText();
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
+
+        _copyCts?.Cancel();
+        _copyCts = new CancellationTokenSource();
+        var ct = _copyCts.Token;
+
+        try
+        {
+            copied = true;
+            StateHasChanged();
+            await Task.Delay(2000, ct);
+            if (!ct.IsCancellationRequested)
+            {
+                copied = false;
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            copied = false;
+        }
+    }
+
+    private async Task ShareOnWhatsApp()
+    {
+        var url = $"https://wa.me/?text={Uri.EscapeDataString(BuildWhatsAppText())}";
+        await JS.InvokeVoidAsync("open", url, "_blank", "noopener,noreferrer");
+    }
+
+    private string BuildWhatsAppText()
+    {
+        if (ev is null) return string.Empty;
+
+        var sb = new StringBuilder();
+        var teamAConfs   = ev.Confirmations.Where(c => c.TeamId == 0).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
+        var teamBConfs   = ev.Confirmations.Where(c => c.TeamId == 1).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
+        var reservaConfs = ev.Confirmations.Where(c => c.TeamId == null).OrderBy(c => c.ConfirmedAt).ToList();
+
+        sb.AppendLine($"*Escalação — {ev.Group.Name}*");
+        sb.AppendLine(ev.StartsAt.ToString("dd/MM/yyyy HH:mm"));
+        sb.AppendLine();
+
+        sb.AppendLine("*TIME A*");
+        foreach (var c in teamAConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
+            sb.AppendLine($"(Goleiro) {c.User.FullName ?? c.User.Email}");
+        int i = 1;
+        foreach (var c in teamAConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
+            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
+        sb.AppendLine();
+
+        sb.AppendLine("*TIME B*");
+        foreach (var c in teamBConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
+            sb.AppendLine($"(Goleiro) {c.User.FullName ?? c.User.Email}");
+        i = 1;
+        foreach (var c in teamBConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
+            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
+
+        if (reservaConfs.Any())
+        {
+            sb.AppendLine();
+            sb.AppendLine("*Reservas*");
+            foreach (var c in reservaConfs)
+                sb.AppendLine($"- {c.User.FullName ?? c.User.Email}");
+        }
+
+        return sb.ToString().TrimEnd();
+    }
+
+    private string BuildShareText()
+    {
+        if (ev is null) return string.Empty;
+
+        var sb   = new StringBuilder();
+        var teamAConfs   = ev.Confirmations.Where(c => c.TeamId == 0).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
+        var teamBConfs   = ev.Confirmations.Where(c => c.TeamId == 1).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
+        var reservaConfs = ev.Confirmations.Where(c => c.TeamId == null).OrderBy(c => c.ConfirmedAt).ToList();
+
+        sb.AppendLine($"⚽ *Escalação — {ev.Group.Name}*");
+        sb.AppendLine($"📅 {ev.StartsAt.ToString("dd/MM/yyyy HH:mm")}");
+        sb.AppendLine();
+
+        sb.AppendLine("*🟡 TIME A*");
+        foreach (var c in teamAConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
+            sb.AppendLine($"🧤 {c.User.FullName ?? c.User.Email}");
+        int i = 1;
+        foreach (var c in teamAConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
+            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
+        sb.AppendLine();
+
+        sb.AppendLine("*🔵 TIME B*");
+        foreach (var c in teamBConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
+            sb.AppendLine($"🧤 {c.User.FullName ?? c.User.Email}");
+        i = 1;
+        foreach (var c in teamBConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
+            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
+
+        if (reservaConfs.Any())
+        {
+            sb.AppendLine();
+            sb.AppendLine("🔄 *Reserva*");
+            foreach (var c in reservaConfs)
+                sb.AppendLine($"• {c.User.FullName ?? c.User.Email}");
+        }
+
+        return sb.ToString().TrimEnd();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _copyCts?.Cancel();
+
+        if (_copyTask is not null)
+        {
+            try { await _copyTask; }
+            catch (OperationCanceledException) { }
+        }
+
+        _copyCts?.Dispose();
+    }
+}

@@ -1,4 +1,4 @@
-﻿/* ===== Integration page — scoped styles =====
+/* ===== Integration page — scoped styles =====
    ATENÇÃO: Scoped .razor.css só entra em vigor após restart do servidor.
    Para titles (h3), o site.css global tem .oldsite-main-content .entity-shell-card h3
    com especificidade (0,2,2). Usamos .integration-article .integration-step-title
@@ -263,8 +263,8 @@
     position: absolute;
     top: 0.4rem;
     right: 0.4rem;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: var(--white-opacity-sm);
+    border: 1px solid var(--white-opacity-md);
     border-radius: 3px;
     color: var(--parchment);
     font-size: 0.8rem;
@@ -273,7 +273,7 @@
 }
 
 .int-copy-btn:hover {
-    background: rgba(255,255,255,0.2);
+    background: var(--white-opacity-md);
 }
 
 /* --- Endpoint table --- */

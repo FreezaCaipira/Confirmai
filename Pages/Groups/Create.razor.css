@@ -76,7 +76,7 @@
     color: var(--white);
     border-color: var(--link-info);
     transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(79, 156, 248, 0.6);
+    box-shadow: 0 6px 12px var(--accent-opacity-2xl);
 }
 
 .upload-hint {
@@ -89,5 +89,5 @@
     font-size: 0.9rem;
     color: var(--green-bright);
     margin: 0;
-    text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+    text-shadow: 0 0 10px var(--green-opacity-xl);
 }

@@ -1,15 +1,15 @@
 /* ================================================================
-   CONFIRMAI — GLOBAL STYLESHEET
+   CONFIRMAI ΓÇö GLOBAL STYLESHEET
 
    Sections:
-   · Design Tokens   (CSS custom properties)
-   · Base            (html, body)
-   · Layout Shell    (.main, .sidebar, responsive breakpoints)
-   · Animations & Utilities
-   · Table System
-   · Button System
-   · Entity Shell System
-   · Page Layouts
+   ┬╖ Design Tokens   (CSS custom properties)
+   ┬╖ Base            (html, body)
+   ┬╖ Layout Shell    (.main, .sidebar, responsive breakpoints)
+   ┬╖ Animations & Utilities
+   ┬╖ Table System
+   ┬╖ Button System
+   ┬╖ Entity Shell System
+   ┬╖ Page Layouts
 
    Convention:
    - This file: design tokens, layout shell, truly global systems
@@ -86,7 +86,7 @@
     /* -- Typography (aliased to CI font) -- */
     --font-display: var(--ci-font);
 
-    /* ── Confirmai dark navy tokens (use these for all new code) ── */
+    /* ΓöÇΓöÇ Confirmai dark navy tokens (use these for all new code) ΓöÇΓöÇ */
     --ci-bg:           #090f18;
     --ci-bg-card:      #111927;
     --ci-bg-card-deep: #0d1825;
@@ -105,7 +105,7 @@
     --ci-text-info-strong: #b7dbff;
     --ci-font:         -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 
-    /* ── Aliases for component CSS (mapped to Confirmai tokens) ── */
+    /* ΓöÇΓöÇ Aliases for component CSS (mapped to Confirmai tokens) ΓöÇΓöÇ */
     --bg-surface:      var(--ci-bg-card);
     --bg-deep:         var(--ci-bg-card-deep);
     --border-color:    var(--ci-border);
@@ -113,7 +113,7 @@
     --text-muted:      var(--ci-text-muted);
     --accent-gold:     var(--gold);
 
-    /* ── Status/feedback extras ── */
+    /* ΓöÇΓöÇ Status/feedback extras ΓöÇΓöÇ */
     --green-bright:    #4ade80;   /* success badges, confirmations */
     --green-soft:      #86efac;   /* success highlights */
     --red-soft:        #f87171;   /* error text, danger highlights */
@@ -121,24 +121,24 @@
     --red-text-light:  #fca5a5;   /* received tab text */
     --amber:           #fbbf24;   /* poker/alert accent */
 
-    /* ── Cool surfaces extras ── */
+    /* ΓöÇΓöÇ Cool surfaces extras ΓöÇΓöÇ */
     --ci-surface-muted:  #cbd5e1; /* disabled text, placeholders */
     --ci-surface-light:  #e0f2fe; /* info highlights, badges */
     --ci-border-soft:    #1b3868; /* alternate border shade */
 
-    /* ── Poker/violet theme ── */
+    /* ΓöÇΓöÇ Poker/violet theme ΓöÇΓöÇ */
     --poker-accent:      #a78bfa; /* poker badges, headers */
     --poker-accent-deep: #7c3aed; /* poker backgrounds */
     --poker-text:        #c4b5fd; /* poker text */
 
-    /* ── Link extras ── */
+    /* ΓöÇΓöÇ Link extras ΓöÇΓöÇ */
     --link-info:         #93c5fd; /* collision links, info links */
 
-    /* ── Neutral ── */
+    /* ΓöÇΓöÇ Neutral ΓöÇΓöÇ */
     --text-muted-gray:   #888;    /* secondary text, timestamps */
     --slate-muted:       #94a3b8; /* tertiary text */
 
-    /* ── Ciclo 6 — Novas vars ── */
+    /* ΓöÇΓöÇ Ciclo 6 ΓÇö Novas vars ΓöÇΓöÇ */
 
     /* Futsal theme */
     --futsal-green-dark:   #14532d;
@@ -166,21 +166,21 @@
     --slate-light:         #e2e8f0;
     --slate-mid:           #64748b;
 
-    /* ── Ciclo 6 — Shadow/Opacity vars ── */
+    /* ΓöÇΓöÇ Ciclo 6 ΓÇö Shadow/Opacity vars ΓöÇΓöÇ */
     
     /* Black opacity shadows */
-    --shadow-md:           rgba(0, 0, 0, 0.3);
+    --shadow-md:           var(--shadow-md);
     --shadow-lg:           rgba(0, 0, 0, 0.4);
-    --shadow-xl:           rgba(0, 0, 0, 0.5);
+    --shadow-xl:           var(--shadow-md);
     --shadow-2xl:          rgba(0, 0, 0, 0.6);
     
     /* Accent shadows */
-    --shadow-accent-sm:    rgba(79, 156, 248, 0.3);
-    --shadow-accent-md:    rgba(79, 156, 248, 0.4);
-    --shadow-accent-lg:    rgba(79, 156, 248, 0.5);
+    --shadow-accent-sm:    var(--accent-opacity-md);
+    --shadow-accent-md:    var(--accent-opacity-lg);
+    --shadow-accent-lg:    var(--accent-opacity-xl);
     
     /* Green shadows */
-    --shadow-green-sm:     rgba(74, 222, 128, 0.3);
+    --shadow-green-sm:     var(--green-opacity-md);
     
     /* Red shadows */
     --shadow-red-sm:       rgba(239, 68, 68, 0.3);
@@ -197,24 +197,24 @@
     --overlay-lg:          rgba(0, 0, 0, 0.55);
     
     /* Accent blue opacity */
-    --accent-opacity-sm:   rgba(79, 156, 248, 0.2);
-    --accent-opacity-md:   rgba(79, 156, 248, 0.3);
-    --accent-opacity-lg:   rgba(79, 156, 248, 0.4);
+    --accent-opacity-sm:   var(--accent-opacity-sm);
+    --accent-opacity-md:   var(--accent-opacity-md);
+    --accent-opacity-lg:   var(--accent-opacity-lg);
     --accent-opacity-xl:   rgba(79, 156, 248, 0.5);
-    --accent-opacity-2xl:  rgba(79, 156, 248, 0.6);
+    --accent-opacity-2xl:  var(--accent-opacity-2xl);
     
     /* Green opacity */
-    --green-opacity-sm:    rgba(74, 222, 128, 0.2);
-    --green-opacity-md:    rgba(74, 222, 128, 0.3);
-    --green-opacity-lg:    rgba(74, 222, 128, 0.35);
+    --green-opacity-sm:    var(--green-opacity-sm);
+    --green-opacity-md:    var(--green-opacity-md);
+    --green-opacity-lg:    var(--green-opacity-lg);
     
     /* Slate border opacity */
-    --slate-border-sm:     rgba(148, 163, 184, 0.1);
-    --slate-border-md:     rgba(148, 163, 184, 0.15);
+    --slate-border-sm:     var(--slate-border-sm);
+    --slate-border-md:     var(--slate-border-md);
     --slate-border-lg:     rgba(148, 163, 184, 0.2);
     
     /* Green-dark opacity */
-    --green-dark-md:       rgba(22, 163, 74, 0.12);
+    --green-dark-md:       var(--green-opacity-sm);
     --green-dark-lg:       rgba(22, 163, 74, 0.15);
     --green-dark-2xl:      rgba(22, 163, 74, 0.4);
     
@@ -230,12 +230,12 @@
     /* Red-light opacity */
     --red-light-sm:        rgba(248, 113, 113, 0.08);
     --red-light-md:        rgba(248, 113, 113, 0.2);
-    --red-light-lg:        rgba(248, 113, 113, 0.5);
+    --red-light-lg:        var(--red-soft-opacity-md);
     
     /* Red-dark opacity */
     --red-dark-md:         rgba(183, 28, 28, 0.3);
 
-    /* ── Fix Senior — vars inventadas pelo Pleno sem definir ── */
+    /* ΓöÇΓöÇ Fix Senior ΓÇö vars inventadas pelo Pleno sem definir ΓöÇΓöÇ */
 
     /* Basics */
     --white:               #ffffff;
@@ -273,20 +273,20 @@
     --slate-pale:          #e2e8f0;
     --slate-warm:          #78716c;
 
-    /* ── Ciclo 9 Fase 1 — novas vars rgba ── */
+    /* ΓöÇΓöÇ Ciclo 9 Fase 1 ΓÇö novas vars rgba ΓöÇΓöÇ */
 
     /* Accent subtle (blue-400 low opacity) */
     --accent-opacity-xs:   rgba(79, 156, 248, 0.1);
-    --accent-opacity-2xs:  rgba(79, 156, 248, 0.15);
+    --accent-opacity-2xs:  var(--accent-opacity-2xs);
 
     /* Green mid opacity */
-    --green-opacity-xl:    rgba(74, 222, 128, 0.5);
-    --green-opacity-2xl:   rgba(74, 222, 128, 0.6);
+    --green-opacity-xl:    var(--green-opacity-xl);
+    --green-opacity-2xl:   var(--green-opacity-2xl);
 
     /* Black heavy */
-    --shadow-3xl:          rgba(0, 0, 0, 0.7);
+    --shadow-3xl:          var(--shadow-3xl);
 
-    /* Blue-300 (96,165,250) — cor diferente de accent (79,156,248) */
+    /* Blue-300 (96,165,250) ΓÇö cor diferente de accent (79,156,248) */
     --blue300-opacity-xs:  rgba(96, 165, 250, 0.1);
     --blue300-opacity-sm:  rgba(96, 165, 250, 0.2);
 
@@ -296,6 +296,187 @@
 
     /* Amber opacity (251,191,36) */
     --amber-opacity-sm:    rgba(251, 191, 36, 0.3);
+
+    /* == Ciclo 11 — novas vars rgba == */
+
+    /* Blue-300 mid opacity (96,165,250) */
+    --blue300-opacity-md:  rgba(96, 165, 250, 0.3);
+    --blue300-opacity-lg:  rgba(96, 165, 250, 0.35);
+    --blue300-opacity-xl:  rgba(96, 165, 250, 0.5);
+    --blue300-opacity-2xl: rgba(96, 165, 250, 0.6);
+    --blue300-opacity-3xl: rgba(96, 165, 250, 0.85);
+
+    /* Red event opacity (239,68,68) */
+    --red-opacity-xs:      rgba(239, 68, 68, 0.08);
+    --red-opacity-2xs:     rgba(239, 68, 68, 0.1);
+    --red-opacity-mid:     rgba(239, 68, 68, 0.35);
+
+    /* Amber event opacity (251,191,36) */
+    --amber-opacity-xs:    rgba(251, 191, 36, 0.08);
+    --amber-opacity-md:    rgba(251, 191, 36, 0.25);
+    --amber-opacity-lg:    rgba(251, 191, 36, 0.35);
+    --amber-opacity-2xl:   rgba(251, 191, 36, 0.85);
+
+    /* Emerald (52,211,153) */
+    --emerald-opacity-md:  rgba(52, 211, 153, 0.3);
+
+    /* Teal (16,185,129) */
+    --teal-opacity-xs:     rgba(16, 185, 129, 0.1);
+
+    /* Slate extended (148,163,184) */
+    --slate-border-xl:     var(--slate-border-xl);
+
+    /* Navy/CI accent (26,90,176) */
+    --ci-accent-opacity-xs: rgba(26, 90, 176, 0.12);
+    --ci-accent-opacity-sm: rgba(26, 90, 176, 0.18);
+    --ci-accent-opacity-md: rgba(26, 90, 176, 0.2);
+    --ci-accent-opacity-lg: rgba(26, 90, 176, 0.25);
+
+    /* Slate functional (100,116,139) */
+    --slate-functional-md: var(--slate-functional-md);
+
+    /* Black additional */
+    --shadow-sm:           var(--shadow-sm);
+    --shadow-xs:           rgba(0, 0, 0, 0.2);
+    --shadow-2xs:          var(--shadow-2xs);
+    --shadow-light:        rgba(0, 0, 0, 0.35);
+
+    /* == Marketplace brown/parchment palette == */
+    --mk-brown-deepest:    #2b1a09;
+    --mk-brown-deep:       #4d2f18;
+    --mk-brown-dark:       #53361c;
+    --mk-brown:            #5f4022;
+    --mk-brown-mid:        #654227;
+    --mk-brown-warm:       #6b4725;
+    --mk-brown-light:      #7d5a34;
+    --mk-gold-dark:        #b7833f;
+    --mk-gold:             #b78340;
+    --mk-gold-light:       #d8af63;
+    --mk-gold-warm:        #d8b173;
+    --mk-brown-soft:       #5b391f;
+    --mk-brown-fade:       #2a1a0c;
+    --mk-brown-fade2:      #2f1e0c;
+    --mk-brown-deep2:      #3f2914;
+    --mk-brown-deep3:      #3d2612;
+    --mk-brown-deep4:      #4e3119;
+    --mk-brown-warm2:      #715028;
+    --mk-brown-warm3:      #70512a;
+    --mk-brown-warm4:      #74512a;
+    --mk-brown-light2:     #7f5e34;
+    --mk-brown-light3:     #7a572d;
+    --mk-brown-light4:     #8a6737;
+    --mk-brown-light5:     #8b6a3d;
+    --mk-brown-light6:     #8b683b;
+    --mk-brown-light7:     #8f6c3c;
+    --mk-gold-light2:      #bfa06c;
+    --mk-gold-light3:      #d8c093;
+    --mk-gold-light4:      #c69a60;
+    --mk-gold-warm2:       #ebd2a7;
+    --mk-gold-warm3:       #dfc493;
+
+    /* Marketplace rgba (brown/gold/parchment) */
+    --mk-brown-opacity-md:   rgba(97, 65, 34, 0.35);
+    --mk-brown-opacity-lg:   rgba(97, 65, 34, 0.42);
+    --mk-brown2-opacity-sm:  rgba(98, 64, 34, 0.15);
+    --mk-brown2-opacity-md:  rgba(98, 64, 34, 0.17);
+    --mk-brown2-opacity-lg:  rgba(98, 64, 34, 0.19);
+    --mk-brown2-opacity-xl:  rgba(98, 64, 34, 0.2);
+    --mk-brown3-opacity-md:  rgba(125, 90, 44, 0.5);
+    --mk-brown3-opacity-lg:  rgba(125, 90, 44, 0.6);
+    --mk-gold-opacity-sm:    rgba(156, 121, 63, 0.52);
+    --mk-gold2-opacity-xs:   rgba(194, 156, 101, 0.2);
+    --mk-gold3-opacity-sm:   rgba(234, 191, 109, 0.18);
+    --mk-gold3-opacity-md:   rgba(234, 191, 109, 0.2);
+    --mk-gold3-opacity-lg:   rgba(234, 191, 109, 0.22);
+    --mk-cream-opacity-sm:   rgba(255, 236, 197, 0.74);
+    --mk-cream2-opacity-md:  rgba(255, 244, 214, 0.7);
+    --mk-cream2-opacity-lg:  rgba(255, 244, 214, 0.76);
+    --mk-cream3-opacity-sm:  rgba(255, 248, 225, 0.38);
+    --mk-cream3-opacity-md:  rgba(255, 248, 230, 0.2);
+    --mk-cream3-opacity-lg:  rgba(255, 248, 230, 0.22);
+    --mk-cream3-opacity-xl:  rgba(255, 248, 231, 0.86);
+    --mk-cream4-opacity-sm:  rgba(255, 245, 217, 0.5);
+    --mk-cream4-opacity-md:  rgba(255, 245, 218, 0.54);
+    --mk-cream4-opacity-lg:  rgba(255, 245, 219, 0.44);
+    --mk-dark-opacity-md:    rgba(35, 25, 18, 0.42);
+    --mk-dark2-opacity-xl:   rgba(48, 35, 24, 0.95);
+    --mk-dark3-opacity-xl:   rgba(34, 24, 17, 0.98);
+    --mk-olive-opacity-xs:   rgba(137, 107, 68, 0.16);
+    --mk-amber-opacity-sm:   rgba(247, 220, 159, 0.18);
+    --mk-amber2-opacity-sm:  rgba(243, 214, 154, 0.16);
+    --mk-amber3-opacity-sm:  rgba(243, 224, 185, 0.74);
+    --mk-gold4-opacity-xs:   rgba(255, 231, 185, 0.08);
+    --mk-shadow-mk-md:       rgba(0, 0, 0, 0.26);
+    --mk-shadow-mk-lg:       rgba(0, 0, 0, 0.28);
+    --mk-shadow-mk-xl:       rgba(0, 0, 0, 0.38);
+
+    /* White opacity (255,255,255) */
+    --white-opacity-2xs:   rgba(255, 255, 255, 0.02);
+    --white-opacity-xs:    rgba(255, 255, 255, 0.08);
+    --white-opacity-sm:    rgba(255, 255, 255, 0.1);
+    --white-opacity-md:    rgba(255, 255, 255, 0.2);
+    --white-opacity-lg:    rgba(255, 255, 255, 0.3);
+    --white-opacity-xl:    rgba(255, 255, 255, 0.4);
+    --white-opacity-2xl:   rgba(255, 255, 255, 0.5);
+    --white-opacity-3xl:   rgba(255, 255, 255, 0.6);
+    --white-opacity-4xl:   rgba(255, 255, 255, 0.7);
+    --white-opacity-5xl:   rgba(255, 255, 255, 0.85);
+
+    /* Red-soft opacity (248,113,113) */
+    --red-soft-opacity-xs: rgba(248, 113, 113, 0.1);
+    --red-soft-opacity-md: rgba(248, 113, 113, 0.4);
+
+    /* Teal mid opacity (16,185,129) */
+    --teal-opacity-md:     rgba(16, 185, 129, 0.6);
+
+    /* == Payment/Parchment brown-cream rgba == */
+    --pay-cream-opacity-xl:  rgba(255, 251, 241, 0.92);
+    --pay-cream2-opacity-md: rgba(255, 245, 223, 0.52);
+    --pay-cream3-opacity-lg: rgba(244, 229, 198, 0.78);
+    --pay-gold-opacity-xl:   rgba(247, 212, 161, 0.95);
+    --pay-gold2-opacity-xl:  rgba(236, 189, 128, 0.92);
+    --pay-brown-opacity-md:  rgba(116, 76, 37, 0.65);
+    --pay-brown-opacity-sm:  rgba(116, 76, 37, 0.58);
+    --pay-brown-opacity-lg:  rgba(116, 76, 37, 0.68);
+    --pay-brown-opacity-xl:  rgba(116, 76, 37, 0.7);
+    --pay-cream4-opacity-lg: rgba(255, 247, 227, 0.8);
+    --pay-brown2-opacity-md: rgba(130, 87, 42, 0.5);
+    --pay-brown2-opacity-lg: rgba(130, 87, 42, 0.62);
+    --pay-gold3-opacity-xl:  rgba(192, 132, 66, 0.9);
+    --pay-brown3-opacity-md: rgba(128, 89, 45, 0.62);
+    --pay-cream5-opacity-lg: rgba(240, 223, 189, 0.82);
+    --pay-gold4-opacity-xl:  rgba(236, 210, 161, 0.96);
+    --pay-gold5-opacity-xl:  rgba(230, 179, 101, 0.84);
+    --pay-cream6-opacity-sm: rgba(255, 232, 193, 0.38);
+    --pay-brown4-opacity-sm: rgba(123, 79, 35, 0.3);
+    --pay-brown4-opacity-md: rgba(123, 79, 35, 0.35);
+    --pay-brown4-opacity-lg: rgba(123, 79, 35, 0.45);
+    --pay-dark-opacity-xs:   rgba(34, 19, 8, 0.16);
+    --pay-cream7-opacity-xl: rgba(255, 244, 218, 0.9);
+    --pay-cream8-opacity-xl: rgba(255, 240, 196, 0.86);
+    --pay-cream9-opacity-xl: rgba(252, 243, 221, 0.9);
+    --pay-brown5-opacity-xl: rgba(148, 98, 43, 0.7);
+    --pay-brown6-opacity-xs: rgba(95, 57, 23, 0.08);
+    --pay-dark2-opacity-sm:  rgba(79, 41, 14, 0.28);
+    --pay-brown7-opacity-xl: rgba(112, 84, 52, 0.92);
+    --pay-cream10-opacity-2xl: rgba(254, 241, 211, 0.98);
+    --pay-gold6-opacity-md:  rgba(255, 200, 130, 0.35);
+    --pay-cream11-opacity-lg: rgba(239, 218, 181, 0.82);
+    --pay-cream12-opacity-lg: rgba(242, 226, 191, 0.66);
+    --pay-gold7-opacity-xl:  rgba(171, 112, 43, 0.82);
+    --pay-gold8-opacity-sm:  rgba(181, 109, 50, 0.2);
+    --pay-cream13-opacity-2xl: rgba(255, 251, 240, 0.98);
+    --pay-cream14-opacity-lg: rgba(255, 231, 189, 0.8);
+    --pay-brown8-opacity-xl: rgba(78, 58, 36, 0.92);
+    --pay-cream15-opacity-xl: rgba(245, 231, 203, 0.92);
+    --pay-dark3-opacity-md:  rgba(60, 20, 0, 0.35);
+    --pay-cream16-opacity-lg: rgba(255, 245, 222, 0.66);
+    --pay-cream17-opacity-xl: rgba(250, 239, 214, 0.92);
+    --pay-gold9-opacity-lg:  rgba(238, 210, 162, 0.72);
+    --pay-gold10-opacity-sm: rgba(145, 95, 43, 0.2);
+    --pay-brown9-opacity-xs: rgba(93, 55, 22, 0.08);
+    --pay-gold11-opacity-lg: rgba(224, 191, 138, 0.58);
+    --pay-gold12-opacity-xs: rgba(184, 114, 39, 0.08);
 }
 
 /* ================================================================
@@ -365,7 +546,7 @@ body::before {
     right: 0;
     bottom: -1px;
     height: 1px;
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, var(--ci-accent) 50%, rgba(0, 0, 0, 0) 100%);
+    background: linear-gradient(90deg, transparent 0%, var(--ci-accent) 50%, transparent 100%);
 }
 
 .main > header::before {
@@ -425,7 +606,7 @@ body::before {
     width: 1px;
     height: 18px;
     transform: translateY(-50%);
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--ci-accent) 48%, rgba(0, 0, 0, 0) 100%);
+    background: linear-gradient(180deg, transparent 0%, var(--ci-accent) 48%, transparent 100%);
 }
 
 .header-actions > span:not(.currency-indicator)::after {
@@ -476,8 +657,8 @@ body::before {
     width: 24px;
     height: 16px;
     border-radius: 2px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--white-opacity-md);
+    box-shadow: 0 1px 2px var(--shadow-light);
     object-fit: cover;
     flex: 0 0 auto;
 }
@@ -532,7 +713,7 @@ body::before {
     border-radius: 8px;
     display: flex;
     border: 1px solid rgba(26, 90, 176, 0.3);
-    background: rgba(26, 90, 176, 0.12);
+    background: var(--ci-accent-opacity-xs);
     text-transform: uppercase;
     font-size: 0.8rem;
     align-items: center;
@@ -958,7 +1139,7 @@ body::before {
     background: var(--ci-text-subtle);
     cursor: pointer;
     text-decoration: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 8px var(--shadow-sm);
     transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
@@ -1133,7 +1314,7 @@ textarea:focus-visible {
     color: var(--bg-night);
 }
 
-/* history-btn: teal/cyan — distinct from gold details-btn */
+/* history-btn: teal/cyan ΓÇö distinct from gold details-btn */
 .history-btn {
     background: var(--ci-accent);
     color: var(--white);
@@ -1426,7 +1607,7 @@ textarea:focus-visible {
 }
 
 .loading-spinner::before {
-    content: "⏳ ";
+    content: "ΓÅ│ ";
 }
 
 @keyframes loadingPulse {
@@ -1528,7 +1709,7 @@ textarea:focus-visible {
 .gateway-select {
     background: var(--bg-slate);
     color: var(--text-light);
-    border: 1px solid var(--gold);      /* Laranja padrão */
+    border: 1px solid var(--gold);      /* Laranja padr├úo */
     border-radius: 6px;
     padding: 0.5rem 1.2rem;
     font-size: 1.08rem;
@@ -2599,7 +2780,7 @@ textarea:focus-visible {
     padding-right: 0;
 }
 
-/* Payment details card — shared base for order modals */
+/* Payment details card ΓÇö shared base for order modals */
 .payment-details-card {
     min-width: 0;
     max-width: 100%;
@@ -2823,7 +3004,7 @@ input:checked + .slider {
 input:checked + .slider:before {
     transform: translateX(20px);
 }
-/* Global Fansite Skin — overridden to CI dark navy */
+/* Global Fansite Skin ΓÇö overridden to CI dark navy */
 body {
     background: var(--ci-bg);
     background-attachment: fixed;
@@ -3020,7 +3201,7 @@ body::before {
 .entity-shell textarea:focus {
     outline: none;
     border-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 2px rgba(79, 156, 248, 0.18);
+    box-shadow: 0 0 0 2px var(--accent-opacity-md);
 }
 
 .entity-shell .input:invalid,
@@ -3399,7 +3580,7 @@ body .oldsite-top-nav .oldsite-top-nav-logout {
 }
 
 body .oldsite-top-nav a:hover {
-    background: rgba(79, 156, 248, 0.12);
+    background: var(--accent-opacity-sm);
 }
 
 body .oldsite-frame {
@@ -4486,11 +4667,11 @@ body .oldsite-payment-chip {
 }
 
 body .oldsite-payment-chip:nth-child(even) {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--white-opacity-2xs);
 }
 
 body .oldsite-payment-chip:hover {
-    background: rgba(26, 90, 176, 0.12);
+    background: var(--ci-accent-opacity-xs);
 }
 
 body .oldsite-payment-chip img {
@@ -4821,14 +5002,14 @@ body .oldsite-left-column .oldsite-side-group .oldsite-side-link::before {
 }
 
 body .oldsite-left-column .oldsite-side-group .oldsite-side-link:hover {
-    background: rgba(79, 156, 248, 0.12);
+    background: var(--accent-opacity-sm);
     color: var(--ci-text-blue);
     transform: none;
     filter: none;
 }
 
 body .oldsite-left-column .oldsite-side-group .oldsite-side-link.active {
-    background: rgba(79, 156, 248, 0.18);
+    background: var(--accent-opacity-md);
     color: var(--ci-text-blue);
     border-top-color: var(--ci-border-dim);
 }
@@ -4947,7 +5128,7 @@ body .admin-items-page .pagination button:disabled {
     opacity: 0.85;
 }
 
-/* Mailbox pagination — dark navy theme */
+/* Mailbox pagination ΓÇö dark navy theme */
 body .mailbox-page .mailbox-pagination .mk-btn {
     border: 1px solid var(--ci-border);
     border-radius: 3px;
@@ -4974,13 +5155,13 @@ body .mailbox-page .mailbox-pagination .mk-btn:disabled {
 
 
 /* ================================================================
-   CONFIRMAI THEME — Modern shell overrides
+   CONFIRMAI THEME ΓÇö Modern shell overrides
    Replaces all Tibia brown/medieval visuals with a clean dark UI.
    These rules override the oldsite-* block above using higher
    specificity or source-order precedence.
    ================================================================ */
 
-/* ── Page background ──────────────────────────────────────────── */
+/* ΓöÇΓöÇ Page background ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 html,
 body {
     background: var(--ci-bg);
@@ -4997,7 +5178,7 @@ body .oldsite-page {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
-/* ── Header wrap ──────────────────────────────────────────────── */
+/* ΓöÇΓöÇ Header wrap ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .oldsite-logo-wrap {
     padding: 1.15rem 0 0.85rem;
     border: none;
@@ -5036,7 +5217,7 @@ body .oldsite-tagline {
     letter-spacing: 0;
 }
 
-/* ── Player line ──────────────────────────────────────────────── */
+/* ΓöÇΓöÇ Player line ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .oldsite-playerline {
     color: var(--ci-text-subtle);
     font-size: 0.78rem;
@@ -5048,7 +5229,7 @@ body .oldsite-online-dot {
     box-shadow: 0 0 6px rgba(34, 197, 94, 0.45);
 }
 
-/* ── Top nav ──────────────────────────────────────────────────── */
+/* ΓöÇΓöÇ Top nav ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .oldsite-top-nav {
     background: var(--ci-bg-card-deep);
     border-top: 1px solid var(--ci-border-soft);
@@ -5107,7 +5288,7 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
     border-right: 1px solid var(--ci-border-dim);
 }
 
-/* ── News ticker ──────────────────────────────────────────────── */
+/* ΓöÇΓöÇ News ticker ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 .layout-news-ticker {
     background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
@@ -5124,7 +5305,7 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
     text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
-/* ── Right column widgets ─────────────────────────────────────── */
+/* ΓöÇΓöÇ Right column widgets ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .oldsite-right-column {
     display: grid;
     gap: 0.5rem;
@@ -5166,7 +5347,7 @@ body .oldsite-widget ol {
     text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
-/* ── Footer ───────────────────────────────────────────────────── */
+/* ΓöÇΓöÇ Footer ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .oldsite-footer {
     background: var(--ci-bg);
     border: none;
@@ -5174,7 +5355,7 @@ body .oldsite-footer {
     color: var(--ci-text-muted);
 }
 
-/* ── Breadcrumb ───────────────────────────────────────────────── */
+/* ΓöÇΓöÇ Breadcrumb ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 .breadcrumb-nav {
     color: var(--ci-text-subtle);
     font-family: inherit;
@@ -5202,7 +5383,7 @@ body .oldsite-footer {
     color: var(--ci-text-subtle);
 }
 
-/* ── Sidebar widget links ─────────────────────────────────────── */
+/* ΓöÇΓöÇ Sidebar widget links ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 /* Nuke ALL amber ol/li rules from the legacy Tibia blocks */
 body .oldsite-widget ol,
 body .oldsite-widget ol li {
@@ -5222,7 +5403,7 @@ body .oldsite-widget ol {
 }
 
 body .oldsite-widget ol li:nth-child(even) {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--white-opacity-2xs);
 }
 
 body .oldsite-widget ol li a {
@@ -5238,16 +5419,16 @@ body .oldsite-widget ol li a {
 }
 
 body .oldsite-widget ol li a:hover {
-    background: rgba(26, 90, 176, 0.12);
+    background: var(--ci-accent-opacity-xs);
     color: var(--ci-text-blue);
 }
 
-/* ── Blue accent tokens ───────────────────────────────────────── */
+/* ΓöÇΓöÇ Blue accent tokens ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 /*   --ci-accent      : vivid blue (hover glow, active elements)  */
 /*   --ci-accent-dim  : muted blue border at rest                 */
 /*   --ci-accent-glow : box-shadow rgba                           */
 
-/* ── Main content wrapper (.main-content) ─────────────────────── */
+/* ΓöÇΓöÇ Main content wrapper (.main-content) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .main-content,
 body .main-content.main-content-route-padded {
     background: var(--ci-bg-card);
@@ -5261,14 +5442,14 @@ body .main-content.main-content-route-padded {
 body .main-content:hover {
     border-color: var(--ci-accent-mid);
     border-top-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.2), 0 8px 32px rgba(26, 90, 176, 0.14);
+    box-shadow: 0 0 0 1px var(--ci-accent-opacity-md), 0 8px 32px var(--ci-accent-opacity-sm);
 }
 
 body .main-content::before {
     display: none;
 }
 
-/* ── Main content card (entity-shell-card) ────────────────────── */
+/* ΓöÇΓöÇ Main content card (entity-shell-card) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .oldsite-main-content .entity-shell-card,
 body .entity-shell-card {
     background: var(--ci-bg-card);
@@ -5282,7 +5463,7 @@ body .oldsite-main-content .entity-shell-card:hover,
 body .entity-shell-card:hover {
     border-color: var(--ci-accent-mid);
     border-top-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.2), 0 8px 28px rgba(26, 90, 176, 0.14);
+    box-shadow: 0 0 0 1px var(--ci-accent-opacity-md), 0 8px 28px var(--ci-accent-opacity-sm);
 }
 
 body .oldsite-main-content .entity-shell-card::before,
@@ -5299,7 +5480,7 @@ body .entity-shell.parchment-b .entity-shell-card {
     box-shadow: none;
 }
 
-/* ── Page section title on dark cards ────────────────────────── */
+/* ΓöÇΓöÇ Page section title on dark cards ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .entity-shell-card .page-section-title,
 body .entity-shell .page-section-title {
     color: var(--ci-text);
@@ -5307,14 +5488,14 @@ body .entity-shell .page-section-title {
     text-align: left;
 }
 
-/* ── Outer entity-shell wrapper → dark theme ─────────────────── */
+/* ΓöÇΓöÇ Outer entity-shell wrapper ΓåÆ dark theme ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .main-content .entity-shell {
     background: transparent;
     border: none;
     box-shadow: none;
 }
 
-/* ── Parchment-a filter bar → dark theme ─────────────────────── */
+/* ΓöÇΓöÇ Parchment-a filter bar ΓåÆ dark theme ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .entity-shell.parchment-a .filter-bar {
     background: var(--ci-bg-card-deep);
     border: 1px solid var(--ci-border);
@@ -5347,10 +5528,10 @@ body .entity-shell.parchment-a .filter-bar button {
 body .entity-shell.parchment-a .filter-bar button:hover {
     border-color: var(--ci-accent);
     color: var(--ci-text-blue);
-    background: rgba(79, 156, 248, 0.08);
+    background: var(--accent-opacity-xs);
 }
 
-/* ── Parchment-a table → dark theme ──────────────────────────── */
+/* ΓöÇΓöÇ Parchment-a table ΓåÆ dark theme ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .entity-shell.parchment-a .product-table {
     background: transparent;
     border: 1px solid var(--ci-border-soft);
@@ -5376,10 +5557,10 @@ body .entity-shell.parchment-a .product-table tr:nth-child(even) td {
 }
 
 body .entity-shell.parchment-a .product-table tr:hover td {
-    background: rgba(26, 90, 176, 0.25);
+    background: var(--ci-accent-opacity-lg);
 }
 
-/* ── Parchment-a status badges → dark theme ───────────────────── */
+/* ΓöÇΓöÇ Parchment-a status badges ΓåÆ dark theme ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .entity-shell.parchment-a .order-status-badge.pago {
     background: var(--green-dark);
     color: var(--green-bright);
@@ -5394,16 +5575,16 @@ body .entity-shell.parchment-a .order-status-badge.aguardandopagamento {
     text-shadow: none;
 }
 
-/* ── Widget blue accent ───────────────────────────────────────── */
+/* ΓöÇΓöÇ Widget blue accent ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .oldsite-widget {
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* ── Active flag border ───────────────────────────────────────── */
+/* ΓöÇΓöÇ Active flag border ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .nav-language-flags .language-flag-card.active {
     opacity: 1;
     border-radius: 3px;
-    box-shadow: 0 0 0 2px var(--ci-accent-mid), 0 0 8px rgba(26, 90, 176, 0.4);
+    box-shadow: 0 0 0 2px var(--ci-accent-mid), 0 0 8px var(--ci-accent-opacity-lg);
 }
 
 /* Reset nav-link sizing for flag links (media query bleeds in) */
@@ -5416,10 +5597,10 @@ body .oldsite-top-nav .nav-language-flags a {
 
 body .oldsite-widget:hover {
     border-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.18), 0 4px 16px rgba(26, 90, 176, 0.1);
+    box-shadow: 0 0 0 1px var(--ci-accent-opacity-sm), 0 4px 16px rgba(26, 90, 176, 0.1);
 }
 
-/* ── Header bottom line accent ───────────────────────────────── */
+/* ΓöÇΓöÇ Header bottom line accent ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .oldsite-logo-wrap,
 body .oldsite-header {
     border-bottom-color: var(--ci-border-dim);
@@ -5431,14 +5612,14 @@ body .oldsite-top-nav a:focus {
     background: rgba(21, 61, 90, 0.16);
 }
 
-/* ── Ticker label accent ──────────────────────────────────────── */
+/* ΓöÇΓöÇ Ticker label accent ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 .layout-news-ticker strong {
     color: var(--ci-accent);
     background: rgba(21, 61, 90, 0.2);
     border-color: rgba(21, 61, 90, 0.35);
 }
 
-/* ── Content headings — metallic navy tint ────────────────────── */
+/* ΓöÇΓöÇ Content headings ΓÇö metallic navy tint ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .oldsite-main-content h1,
 body .oldsite-main-content h2 {
     color: var(--ci-text-blue);
@@ -5450,13 +5631,13 @@ body .oldsite-main-content h3 {
     text-shadow: none;
 }
 
-/* ── Breadcrumb metallic ──────────────────────────────────────── */
+/* ΓöÇΓöÇ Breadcrumb metallic ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 .breadcrumb-nav a:hover {
     color: var(--ci-text-link-bright);
 }
 
 /* ================================================================
-   CONFIRMAI FINAL CLEANUP — amber remnants from border-image
+   CONFIRMAI FINAL CLEANUP ΓÇö amber remnants from border-image
    border-image: none only resets border-image-source. The other
    sub-properties (slice/width/outset) can keep their values and
    render if border-width > 0 (e.g. from border-bottom).
@@ -5492,13 +5673,13 @@ body .oldsite-page {
 }
 
 /* ================================================================
-   ADMIN THEME — .entity-shell.admin-page
-   Clean cascade — no !important.
+   ADMIN THEME ΓÇö .entity-shell.admin-page
+   Clean cascade ΓÇö no !important.
    parchment-a is not used on admin pages, so no specificity wars.
    Outer wrapper uses .main-content qualifier to beat base shell rule.
    ================================================================ */
 
-/* Outer wrapper — beats .main-content .entity-shell (0,2,1) */
+/* Outer wrapper ΓÇö beats .main-content .entity-shell (0,2,1) */
 .main-content .entity-shell.admin-page {
     background: transparent;
     border: none;
@@ -5509,7 +5690,7 @@ body .oldsite-page {
 .entity-shell.admin-page .entity-shell-card {
     border: 1px solid var(--ci-accent-mid);
     border-top: 2px solid var(--ci-accent);
-    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.15);
+    box-shadow: 0 0 0 1px var(--ci-accent-opacity-sm);
 }
 
 .entity-shell.admin-page .page-section-title {
@@ -5581,7 +5762,7 @@ body .oldsite-page {
 .entity-shell.admin-page .admin-kpi-grid > a:hover {
     border-color: var(--ci-accent-mid);
     border-top-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 1px rgba(26, 90, 176, 0.2);
+    box-shadow: 0 0 0 1px var(--ci-accent-opacity-md);
     filter: none;
     transform: none;
 }
@@ -5646,11 +5827,11 @@ body .oldsite-page {
 .entity-shell.admin-page select:focus,
 .entity-shell.admin-page input:focus {
     border-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 2px rgba(26, 90, 176, 0.25);
+    box-shadow: 0 0 0 2px var(--ci-accent-opacity-lg);
     outline: none;
 }
 
-/* Filter bars — colors */
+/* Filter bars ΓÇö colors */
 .entity-shell.admin-page .filter-bar,
 .entity-shell.admin-page .filter-bar.admin-filter-card,
 .entity-shell.admin-page .logs-main-filter-bar,
@@ -5738,22 +5919,22 @@ body .oldsite-page {
 .entity-shell.admin-page .danger-btn {
     background: linear-gradient(180deg, rgba(248, 113, 113, 0.45) 0%, rgba(220, 80, 80, 0.55) 100%);
     border: 1px solid rgba(248, 113, 113, 0.35);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 6px var(--shadow-sm), inset 0 1px 0 var(--white-opacity-xs);
     color: var(--ci-text);
 }
 
 .entity-shell.admin-page .danger:hover,
 .entity-shell.admin-page .danger-btn:hover {
     background: linear-gradient(180deg, rgba(248, 113, 113, 0.6) 0%, rgba(220, 80, 80, 0.7) 100%);
-    border-color: rgba(248, 113, 113, 0.5);
+    border-color: var(--red-soft-opacity-md);
 }
 
-/* History button — ensure legibility with distinct teal/cyan */
+/* History button ΓÇö ensure legibility with distinct teal/cyan */
 .entity-shell.admin-page .history-btn {
     background: linear-gradient(180deg, rgba(20, 184, 166, 0.8) 0%, rgba(13, 148, 136, 0.9) 100%);
     border: 1px solid rgba(45, 212, 191, 0.4);
     color: #e0f7f4;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 6px var(--shadow-sm), inset 0 1px 0 var(--white-opacity-sm);
 }
 
 .entity-shell.admin-page .history-btn:hover {
@@ -5761,19 +5942,19 @@ body .oldsite-page {
     color: var(--white);
 }
 
-/* Success button — metallic green */
+/* Success button ΓÇö metallic green */
 .entity-shell.admin-page .success-btn {
     background: linear-gradient(180deg, rgba(74, 222, 128, 0.7) 0%, rgba(34, 197, 94, 0.85) 100%);
-    border: 1px solid rgba(74, 222, 128, 0.4);
+    border: 1px solid var(--green-opacity-2xl);
     color: #ecfdf5;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 6px var(--shadow-sm), inset 0 1px 0 var(--white-opacity-sm);
 }
 
 .entity-shell.admin-page .success-btn:hover {
     background: linear-gradient(180deg, rgba(74, 222, 128, 0.9) 0%, rgba(34, 197, 94, 1) 100%);
 }
 
-/* Warning button — metallic amber */
+/* Warning button ΓÇö metallic amber */
 .entity-shell.admin-page .warning-btn {
     background: linear-gradient(180deg, rgba(251, 191, 36, 0.7) 0%, rgba(217, 160, 20, 0.85) 100%);
     border: 1px solid rgba(251, 191, 36, 0.4);
@@ -5782,17 +5963,17 @@ body .oldsite-page {
 }
 
 .entity-shell.admin-page .warning-btn:hover {
-    background: linear-gradient(180deg, rgba(251, 191, 36, 0.9) 0%, rgba(217, 160, 20, 1) 100%);
+    background: linear-gradient(180deg, var(--amber-opacity-2xl) 0%, rgba(217, 160, 20, 1) 100%);
 }
 
-/* Users table container — dark theme */
+/* Users table container ΓÇö dark theme */
 .admin-users-shell .users-table-container {
     max-height: 600px;
     overflow-y: auto;
     border: 1px solid var(--ci-border);
     border-radius: 8px;
     background: var(--ci-bg-card-deep);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px var(--shadow-xs);
 }
 
 /* Users pagination */
@@ -5854,7 +6035,7 @@ body .oldsite-page {
 .entity-shell.admin-page .payments-table td,
 .entity-shell.admin-page .log-table td,
 .entity-shell.admin-page .product-table td {
-    background: rgba(26, 90, 176, 0.18);
+    background: var(--ci-accent-opacity-sm);
     border-bottom: 1px solid var(--ci-border-dim);
     color: var(--ci-text-blue);
     text-shadow: 0 0 6px var(--accent-opacity-md);
@@ -6083,7 +6264,7 @@ body .oldsite-page {
 .entity-shell.admin-page .form-group textarea.input:focus,
 .entity-shell.admin-page .form-group select.input:focus {
     border-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 2px rgba(26, 90, 176, 0.25);
+    box-shadow: 0 0 0 2px var(--ci-accent-opacity-lg);
     outline: none;
 }
 
@@ -6204,18 +6385,18 @@ body .oldsite-page {
 }
 
 /* ================================================================
-   CONFIRMAI CLEANUP — Remove remaining old-project remnants from
+   CONFIRMAI CLEANUP ΓÇö Remove remaining old-project remnants from
    user-facing parchment-a pages (payments, etc.)
    ================================================================ */
 
-/* ── Table row base: kill var(--bg-slate) = #23272b bleed ──────── */
+/* ΓöÇΓöÇ Table row base: kill var(--bg-slate) = #23272b bleed ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .entity-shell.parchment-a .product-table tr,
 body .entity-shell.parchment-a .payments-table tr,
 body .entity-shell.parchment-a .log-table tr {
     background: transparent;
 }
 
-/* ── Pagination buttons: replace orange Tibia gradient ──────────── */
+/* ΓöÇΓöÇ Pagination buttons: replace orange Tibia gradient ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .entity-shell.parchment-a .pagination button {
     background: var(--ci-bg-card-deep);
     border: 1px solid var(--ci-border);
@@ -6226,7 +6407,7 @@ body .entity-shell.parchment-a .pagination button {
 }
 
 body .entity-shell.parchment-a .pagination button:hover:not(:disabled) {
-    background: rgba(79, 156, 248, 0.08);
+    background: var(--accent-opacity-xs);
     border-color: var(--ci-accent);
     color: var(--ci-text-blue);
     filter: none;
@@ -6246,7 +6427,7 @@ body .entity-shell.parchment-a .pagination-info {
     font-weight: 700;
 }
 
-/* ── Empty state: replace parchment/brown with dark theme ──────── */
+/* ΓöÇΓöÇ Empty state: replace parchment/brown with dark theme ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 body .admin-empty-state {
     background: var(--ci-bg-card-deep);
     border: 1px dashed var(--ci-border);
@@ -6264,7 +6445,7 @@ body .admin-empty-state-hint {
     color: var(--ci-text-subtle);
 }
 
-/* ── entity-muted remnants: --brown-text (#6b4726) on dark bg ──── */
+/* ΓöÇΓöÇ entity-muted remnants: --brown-text (#6b4726) on dark bg ΓöÇΓöÇΓöÇΓöÇ */
 body .entity-shell-card p,
 body .entity-shell-card li {
     color: var(--ci-text-blue);
@@ -6276,7 +6457,7 @@ body .entity-shell-subtitle {
     text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
-/* ── Google Maps Places Autocomplete dropdown ───────────────────── */
+/* ΓöÇΓöÇ Google Maps Places Autocomplete dropdown ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 .pac-container {
     z-index: 9999 !important;
     background: var(--ci-bg-card-deep);
@@ -6297,7 +6478,7 @@ body .entity-shell-subtitle {
 .pac-matched { color: var(--ci-accent); }
 .pac-icon { display: none; }
 
-/* ── Identity / Bootstrap form-control dark theme ───────────────── */
+/* ΓöÇΓöÇ Identity / Bootstrap form-control dark theme ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 .form-control {
     background-color: var(--ci-bg-input);
     color: var(--ci-text-blue);
@@ -6321,7 +6502,7 @@ body .entity-shell-subtitle {
     opacity: 1;
 }
 
-/* ── Shared Hero Component (About/Contact pages) ───────────────────── */
+/* ΓöÇΓöÇ Shared Hero Component (About/Contact pages) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 .content-hero {
     position: relative;
     background: var(--ci-bg-card-deep);
@@ -6339,7 +6520,7 @@ body .entity-shell-subtitle {
     content: none;
 }
 
-/* ── Parchment Card Utility ───────────────────────────────────────── */
+/* ΓöÇΓöÇ Parchment Card Utility ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 .parchment-card {
     background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
@@ -6353,7 +6534,7 @@ body .entity-shell-subtitle {
     border-radius: 12px;
 }
 
-/* ── Autofill + histórico do Chrome: neutraliza fundo e cor ───────── */
+/* ΓöÇΓöÇ Autofill + hist├│rico do Chrome: neutraliza fundo e cor ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 .form-control:-webkit-autofill,
 .form-control:-webkit-autofill:hover,
 .form-control:-webkit-autofill:focus,
@@ -6374,7 +6555,7 @@ input:autofill:focus {
 }
 
 /* ================================================================
-   ADMIN PAYMENTS — moved from AdminPayments.razor.css to global
+   ADMIN PAYMENTS ΓÇö moved from AdminPayments.razor.css to global
    because Blazor CSS isolation prevents parent scoped styles
    from reaching child components (AdminPaymentsTable, Filters,
    AdvancedToolsModal, SummaryPanel).
@@ -6556,7 +6737,7 @@ input:autofill:focus {
     border: 1px solid rgba(130, 170, 205, 0.16);
     border-radius: 10px;
     padding: 0.65rem 0.8rem;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--white-opacity-2xs);
 }
 
 .admin-payments-shell .admin-payments-sweep-history-title {
@@ -6599,7 +6780,7 @@ input:autofill:focus {
     border: 1px solid rgba(130, 170, 205, 0.16);
     border-radius: 10px;
     padding: 0.65rem 0.8rem;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--white-opacity-2xs);
 }
 
 .admin-payments-shell .admin-payments-gateway-telemetry-title {
@@ -6636,13 +6817,13 @@ input:autofill:focus {
 
 .admin-payments-shell .admin-payments-gateway-severity--ok {
     color: var(--futsal-green-pale);
-    background: rgba(74, 222, 128, 0.12);
+    background: var(--green-opacity-sm);
     border-color: rgba(74, 222, 128, 0.34);
 }
 
 .admin-payments-shell .admin-payments-gateway-severity--warning {
     color: var(--amber-warm);
-    background: rgba(251, 191, 36, 0.12);
+    background: var(--amber-opacity-xs);
     border-color: rgba(251, 191, 36, 0.34);
 }
 
@@ -6666,12 +6847,12 @@ input:autofill:focus {
 }
 
 .admin-payments-shell .admin-payments-reconcile-result--error {
-    border-color: rgba(248, 113, 113, 0.4);
+    border-color: var(--red-soft-opacity-md);
     color: var(--red-pale);
 }
 
 .admin-payments-shell .admin-payments-reconcile-result--ok {
-    border-color: rgba(74, 222, 128, 0.4);
+    border-color: var(--green-opacity-2xl);
     color: var(--green-soft);
 }
 
@@ -6727,7 +6908,7 @@ input:autofill:focus {
     border: 1px solid rgba(130, 170, 205, 0.2);
     border-radius: 12px;
     padding: 0.7rem 0.8rem;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--white-opacity-2xs);
 }
 
 .admin-payments-shell .admin-payments-tools-section h3 {

@@ -57,7 +57,7 @@
 
 .feat-role-btn--promote {
     background: var(--blue300-opacity-xs);
-    border-color: rgba(96, 165, 250, 0.5);
+    border-color: var(--blue300-opacity-xl);
     color: var(--link-info);
 }
 
@@ -68,7 +68,7 @@
 }
 
 .feat-role-btn--demote {
-    background: rgba(248, 113, 113, 0.1);
+    background: var(--red-soft-opacity-xs);
     border-color: var(--red-light-lg);
     color: var(--red-soft);
 }
@@ -89,7 +89,7 @@
 .feat-role-confirm-text {
     font-size: 0.74rem;
     color: var(--amber);
-    background: rgba(251, 191, 36, 0.08);
+    background: var(--amber-opacity-xs);
     border: 1px solid var(--amber-opacity-sm);
     border-radius: 6px;
     padding: 0.2rem 0.5rem;
@@ -104,7 +104,7 @@
 }
 
 .feat-role-btn--confirm-yes {
-    background: rgba(74, 222, 128, 0.1);
+    background: var(--green-opacity-sm);
     border-color: rgba(74, 222, 128, 0.55);
     color: var(--futsal-green-pale);
 }
@@ -116,7 +116,7 @@
 }
 
 .feat-role-btn--confirm-no {
-    background: rgba(248, 113, 113, 0.1);
+    background: var(--red-soft-opacity-xs);
     border-color: rgba(248, 113, 113, 0.55);
     color: var(--red-soft);
 }

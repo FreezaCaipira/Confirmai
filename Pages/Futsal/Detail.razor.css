@@ -1,4 +1,4 @@
-﻿/* Shared detail styles live in wwwroot/css/events.css */
+/* Shared detail styles live in wwwroot/css/events.css */
 
 /* ── Skeleton lines ───────────────────────── */
 .skeleton-line--md { max-width: 200px; }
@@ -22,7 +22,7 @@
 
 .player-tag--proof-pending {
     background: var(--blue300-opacity-xs);
-    border: 1px solid rgba(96,165,250,0.3);
+    border: 1px solid var(--blue300-opacity-md);
     color: var(--link-info);
     cursor: pointer;
     transition: all 0.2s;
@@ -30,18 +30,18 @@
 
 .player-tag--proof-pending:hover {
     background: var(--blue300-opacity-sm);
-    border-color: rgba(96,165,250,0.5);
+    border-color: var(--blue300-opacity-xl);
 }
 
 .player-tag--pay-pending {
-    background: rgba(251,191,36,0.08);
-    border: 1px solid rgba(251,191,36,0.25);
+    background: var(--amber-opacity-xs);
+    border: 1px solid var(--amber-opacity-md);
     color: var(--amber);
 }
 
 .player-tag--pay-btn {
     background: var(--blue300-opacity-xs);
-    border: 1px solid rgba(96,165,250,0.3);
+    border: 1px solid var(--blue300-opacity-md);
     color: var(--link-info);
     cursor: pointer;
     transition: all 0.2s;
@@ -49,7 +49,7 @@
 
 .player-tag--pay-btn:hover {
     background: var(--blue300-opacity-sm);
-    border-color: rgba(96,165,250,0.5);
+    border-color: var(--blue300-opacity-xl);
 }
 
 .player-tag--receiver-badge {
@@ -65,13 +65,13 @@
 /* Goalkeeper "Não Paga" Badge */
 .player-tag--no-pay {
     background: var(--blue300-opacity-xs);
-    border: 1px solid rgba(96,165,250,0.3);
+    border: 1px solid var(--blue300-opacity-md);
     color: var(--link-info);
 }
 
 .player-tag--no-pay:hover {
     background: var(--blue300-opacity-sm);
-    border-color: rgba(96,165,250,0.5);
+    border-color: var(--blue300-opacity-xl);
 }
 
 @keyframes fadeIn {

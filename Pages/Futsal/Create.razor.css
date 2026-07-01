@@ -1,6 +1,6 @@
 /* Shared form/detail styles live in wwwroot/css/events.css */
 
-.create-event-title i { color: var(--green-bright); text-shadow: 0 0 15px rgba(74, 222, 128, 0.6); }
+.create-event-title i { color: var(--green-bright); text-shadow: 0 0 15px var(--green-opacity-2xl); }
 
 /* ── Inline styles estáticos ───────────────── */
 .collision-link { margin-left: 0.45rem; color: var(--link-info); }

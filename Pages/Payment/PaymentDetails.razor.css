@@ -1,4 +1,4 @@
-﻿.payment-receipt-shell {
+.payment-receipt-shell {
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
@@ -56,7 +56,7 @@
     border: 1px solid var(--border-slate);
     padding: 1.2rem;
     border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 12px var(--shadow-sm);
     min-width: 0;
 }
 

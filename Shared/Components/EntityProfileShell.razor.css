@@ -1,4 +1,4 @@
-﻿.entity-shell {
+.entity-shell {
     --entity-bg:     var(--ci-bg);
     --entity-card:   var(--ci-bg-card);
     --entity-line:   var(--ci-border);
@@ -111,7 +111,7 @@
 .entity-shell .input:focus {
     outline: none;
     border-color: var(--ci-border-alt);
-    box-shadow: 0 0 0 2px rgba(26, 90, 176, 0.25);
+    box-shadow: 0 0 0 2px var(--ci-accent-opacity-lg);
 }
 
 .entity-shell .input:invalid,

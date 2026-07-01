@@ -33,9 +33,9 @@
     justify-content: center;
     gap: 0.5rem;
     cursor: pointer;
-    background: rgba(251, 191, 36, 0.12);
-    border: 1.5px solid rgba(251, 191, 36, 0.55);
-    color: rgba(251, 191, 36, 0.9);
+    background: var(--amber-opacity-xs);
+    border: 1.5px solid var(--amber-opacity-lg);
+    color: var(--amber-opacity-2xl);
     border-radius: 8px;
     padding: 0.55rem 1.1rem;
     font-size: 0.85rem;
@@ -47,18 +47,18 @@
 
 .evpay-proof-btn:hover {
     background: rgba(251, 191, 36, 0.22);
-    border-color: rgba(251, 191, 36, 0.85);
+    border-color: var(--amber-opacity-2xl);
     color: var(--amber);
 }
 
 .evpay-proof-btn--update {
-    background: rgba(96, 165, 250, 0.1);
+    background: var(--blue300-opacity-xs);
     border-color: rgba(96, 165, 250, 0.45);
-    color: rgba(96, 165, 250, 0.85);
+    color: var(--blue300-opacity-3xl);
 }
 
 .evpay-proof-btn--update:hover {
-    background: rgba(96, 165, 250, 0.2);
+    background: var(--blue300-opacity-sm);
     border-color: rgba(96, 165, 250, 0.8);
     color: var(--link-info);
 }
@@ -82,7 +82,7 @@
     max-height: 220px;
     object-fit: contain;
     border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid var(--white-opacity-xs);
     background: var(--overlay-sm);
 }
 

@@ -238,7 +238,7 @@
     align-items: flex-start;
     gap: 0.75rem;
     padding: 1rem;
-    background: rgba(251, 191, 36, 0.08);
+    background: var(--amber-opacity-xs);
     border: 1px solid var(--amber-opacity-sm);
     border-radius: 8px;
 }

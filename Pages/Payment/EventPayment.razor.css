@@ -57,7 +57,7 @@
     width: 100%;
     max-width: 400px;
     border-radius: 8px;
-    border: 1px solid rgba(96, 165, 250, 0.3);
+    border: 1px solid var(--blue300-opacity-md);
 }
 
 .evpay-admin-no-proof {
@@ -72,8 +72,8 @@
     gap: 0.5rem;
     width: 100%;
     justify-content: center;
-    background: rgba(74, 222, 128, 0.1);
-    border: 1px solid rgba(74, 222, 128, 0.4);
+    background: var(--green-opacity-sm);
+    border: 1px solid var(--green-opacity-2xl);
     color: var(--green-bright);
     font-size: 0.9rem;
     font-weight: 700;
@@ -117,14 +117,14 @@
 
 .evpay-admin-confirm-btn--yes {
     flex: 1;
-    background: rgba(74, 222, 128, 0.15);
+    background: var(--green-opacity-sm);
     border-color: var(--green-opacity-xl);
 }
 
 .evpay-admin-confirm-btn--no {
     flex: 1;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: var(--red-opacity-2xs);
+    border: 1px solid var(--red-opacity-mid);
     color: var(--red-soft);
 }
 
@@ -159,8 +159,8 @@
 }
 
 .evpay-status--paid {
-    background: rgba(22, 163, 74, 0.1);
-    border: 1px solid rgba(74, 222, 128, 0.25);
+    background: var(--green-opacity-sm);
+    border: 1px solid var(--green-opacity-md);
     color: var(--green-bright);
 }
 
@@ -200,10 +200,10 @@
 .evpay-action-btn--back {
     background: var(--blue300-opacity-xs);
     color: var(--link-info);
-    border: 1px solid rgba(96, 165, 250, 0.3);
+    border: 1px solid var(--blue300-opacity-md);
 }
 
 .evpay-action-btn--back:hover {
     background: var(--blue300-opacity-sm);
-    border-color: rgba(96, 165, 250, 0.5);
+    border-color: var(--blue300-opacity-xl);
 }

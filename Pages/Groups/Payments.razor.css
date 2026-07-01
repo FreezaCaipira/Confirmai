@@ -236,13 +236,13 @@
 
 .payments-user-item--history:hover {
     border-color: var(--green-strong);
-    box-shadow: 0 6px 12px rgba(34, 197, 94, 0.2);
+    box-shadow: 0 6px 12px var(--green-opacity-md);
 }
 
 .payments-user-item--history.payments-user-item--selected {
-    background: rgba(34, 197, 94, 0.08);
+    background: var(--green-opacity-sm);
     border-color: var(--green-strong);
-    box-shadow: 0 6px 12px rgba(34, 197, 94, 0.25), inset 0 0 0 1px rgba(34, 197, 94, 0.15);
+    box-shadow: 0 6px 12px var(--green-opacity-md), inset 0 0 0 1px var(--green-opacity-sm);
 }
 
 .payments-user-item--selected {
@@ -312,7 +312,7 @@
 
 .payments-detail-panel--history {
     border-left-color: var(--green-strong);
-    box-shadow: 0 4px 8px rgba(34, 197, 94, 0.15), inset 0 2px 4px var(--shadow-lg);
+    box-shadow: 0 4px 8px var(--green-opacity-sm), inset 0 2px 4px var(--shadow-lg);
 }
 
 .payments-detail-summary {
@@ -325,7 +325,7 @@
 }
 
 .payments-detail-panel--history .payments-detail-summary {
-    border-bottom-color: rgba(34, 197, 94, 0.2);
+    border-bottom-color: var(--green-opacity-md);
 }
 
 .payments-detail-panel--history .payments-summary-total {
@@ -443,7 +443,7 @@
 
 .payments-notify-btn--email {
     color: var(--amber-mid);
-    border-color: rgba(245, 158, 11, 0.3);
+    border-color: var(--amber-opacity-sm);
 }
 
 .payments-notify-btn--email:hover {
@@ -458,7 +458,7 @@
 
 .payments-notify-btn--whatsapp:hover {
     background: rgba(16, 185, 129, 0.15);
-    border-color: rgba(16, 185, 129, 0.6);
+    border-color: var(--teal-opacity-md);
 }
 
 .payments-chevron {
@@ -482,7 +482,7 @@
     font-weight: 600;
     color: var(--ci-accent);
     text-decoration: none;
-    border: 1px solid rgba(96, 165, 250, 0.35);
+    border: 1px solid var(--blue300-opacity-lg);
     padding: 0.4rem 0.8rem;
     border-radius: 5px;
     transition: all 0.2s;
@@ -492,20 +492,20 @@
 
 .payments-view-proof-btn:hover {
     color: var(--link-info);
-    border-color: rgba(96, 165, 250, 0.6);
-    background: rgba(96, 165, 250, 0.08);
+    border-color: var(--blue300-opacity-2xl);
+    background: var(--blue300-opacity-xs);
 }
 
 .payments-view-proof-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
     color: var(--slate-mid);
-    border-color: rgba(100, 116, 139, 0.3);
+    border-color: var(--slate-functional-md);
 }
 
 .payments-view-proof-btn:disabled:hover {
     background: transparent;
-    border-color: rgba(100, 116, 139, 0.3);
+    border-color: var(--slate-functional-md);
     color: var(--slate-mid);
 }
 
@@ -527,7 +527,7 @@
 .payments-entry-link:hover {
     color: var(--amber-warm);
     border-color: rgba(253, 230, 138, 0.6);
-    background: rgba(251, 191, 36, 0.08);
+    background: var(--amber-opacity-xs);
 }
 
 /* ──────────────────────────────────────────────────────────── */

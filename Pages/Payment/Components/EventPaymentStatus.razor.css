@@ -8,8 +8,8 @@
 }
 
 .evpay-status--paid {
-    background: rgba(22,163,74,0.1);
-    border: 1px solid rgba(74,222,128,0.25);
+    background: var(--green-opacity-sm);
+    border: 1px solid var(--green-opacity-md);
     color: var(--green-bright);
 }
 

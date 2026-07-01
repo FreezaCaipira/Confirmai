@@ -490,7 +490,7 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer .mailbox-thread-body {
     border-color: var(--ci-border-dim);
-    background: rgba(79, 156, 248, 0.07);
+    background: var(--accent-opacity-xs);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-buyer .mailbox-thread-author,
@@ -500,7 +500,7 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller {
     border-color: var(--ci-accent-mid);
-    background: rgba(26, 90, 176, 0.25);
+    background: var(--ci-accent-opacity-lg);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-seller .mailbox-thread-body {
@@ -515,12 +515,12 @@
 
 .mailbox-thread-bubble.mailbox-thread-bubble-admin {
     border-color: var(--ci-border);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--white-opacity-2xs);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-admin .mailbox-thread-body {
     border-color: var(--ci-border);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--white-opacity-2xs);
 }
 
 .mailbox-thread-bubble.mailbox-thread-bubble-admin .mailbox-thread-author,
