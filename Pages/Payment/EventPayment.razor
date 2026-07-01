@@ -1,4 +1,4 @@
-﻿@page "/pagamento/evento/{ConfirmationId:int}"
+@page "/pagamento/evento/{ConfirmationId:int}"
 
 @attribute [Authorize]
 @implements IAsyncDisposable
@@ -22,7 +22,7 @@
 @inject AdminConfirmationService AdminConfirmationService
 @inject ILogger<EventPayment> _logger
 
-<PageTitle>Pagamento â€” Confirmai</PageTitle>
+<PageTitle>Pagamento — Confirmai</PageTitle>
 
 <div class="entity-shell">
     <section class="entity-shell-grid" aria-label="Pagamento de partida">
@@ -30,12 +30,12 @@
 
             @if (isLoading)
             {
-                <p class="listing-state">Carregandoâ€¦</p>
+                <p class="listing-state">Carregando…</p>
             }
             else if (conf is null)
             {
                 <div class="evpay-not-found">
-                    <p>ConfirmaÃ§Ã£o nÃ£o encontrada.</p>
+                    <p>Confirmação não encontrada.</p>
                     <a href="/" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
                 </div>
             }
@@ -79,12 +79,12 @@
                     <div class="evpay-admin-review">
                         <div class="evpay-admin-review-header">
                             <i class="fas fa-user-shield"></i>
-                            <span>RevisÃ£o de pagamento â€” @conf.User?.FullName</span>
+                            <span>Revisão de pagamento — @conf.User?.FullName</span>
                         </div>
                         @if (conf.PixProofUploadedAt.HasValue)
                         {
                             <div class="evpay-admin-proof">
-                                <p class="evpay-admin-proof-label">Comprovante enviado em @conf.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'Ã s' HH:mm")</p>
+                                <p class="evpay-admin-proof-label">Comprovante enviado em @conf.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</p>
                                 <img src="/api/pix-proof/@conf.Id" class="evpay-admin-proof-img" alt="Comprovante Pix" />
                             </div>
                             @if (adminMarkPaidError)
@@ -121,7 +121,7 @@
                         }
                         else
                         {
-                            <p class="evpay-admin-no-proof">O jogador ainda nÃ£o enviou comprovante.</p>
+                            <p class="evpay-admin-no-proof">O jogador ainda não enviou comprovante.</p>
                             @if (adminConfirmPay)
                             {
                                 <div class="evpay-admin-confirm-row">

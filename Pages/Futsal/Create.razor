@@ -1,4 +1,4 @@
-﻿@page "/futsal/create"
+@page "/futsal/create"
 
 @attribute [Authorize]
 
@@ -20,14 +20,14 @@
 @inject LogService LogService
 
 
-<PageTitle>Criar Partida Â· Futsal Â· Confirmai</PageTitle>
+<PageTitle>Criar Partida · Futsal · Confirmai</PageTitle>
 
 <div class="create-event-page">
     <div class="create-event-card">
         <h1 class="create-event-title">
             <i class="fas fa-futbol"></i>
             @(preselectedGroup is not null
-                ? $"Nova Partida â€” {preselectedGroup.Name}"
+                ? $"Nova Partida — {preselectedGroup.Name}"
                 : "Nova Partida de Futsal")
         </h1>
 
@@ -41,7 +41,7 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary class="validation-summary" />
 
-                @* â”€â”€ Identidade da partida â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+                @* ── Identidade da partida ─────────────────────────────────────────────────── *@
                 <FutsalMatchIdentity
                     GroupName="@form.GroupName"
                     LocalName="@form.LocalName"
@@ -49,37 +49,37 @@
                     PreselectedGroup="@preselectedGroup"
                     OnSubFormatChanged="@SubFormatChangedCallback" />
 
-                @* â”€â”€ Quadra â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+                @* ── Quadra ────────────────────────────────────────────────────────────────── *@
                 <VenueSelector
                     Venues="@venues"
                     SelectedVenueId="@form.VenueId"
                     SelectedVenue="@selectedVenue"
                     OnVenueChanged="@VenueChangedCallback" />
 
-                @* â”€â”€ Data, hora e duraÃ§Ã£o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+                @* ── Data, hora e duração ───────────────────────────────────────────────────── *@
                 <DateTimeSelector
                     Date="@form.Date"
                     Time="@form.Time"
                     DurationMinutes="@form.DurationMinutes"
                     OnTimeChange="@TimeChangeCallback" />
 
-                @* â”€â”€ Vagas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+                @* ── Vagas ──────────────────────────────────────────────────────────────────── *@
                 <SlotsAndGoalkeeperConfig
                     MaxPlayers="@form.MaxPlayers"
                     MaxGoalkeepers="@form.MaxGoalkeepers"
                     RotateInGoal="@form.RotateInGoal"
                     OnRotateInGoalChanged="@RotateInGoalChangedCallback" />
 
-                @* â”€â”€ Valor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+                @* ── Valor ──────────────────────────────────────────────────────────────────── *@
                 <PriceInput Price="@form.Price" />
 
-                @* â”€â”€ Periodicidade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+                @* ── Periodicidade ──────────────────────────────────────────────────────────── *@
                 <RecurrenceScheduler
                     RecurrenceEnabled="@form.RecurrenceEnabled"
                     SelectedDays="@form.SelectedDays"
                     OnToggleDay="@ToggleDayCallback" />
 
-                @* â”€â”€ Privacidade: grupos sÃ£o sempre privados â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+                @* ── Privacidade: grupos são sempre privados ─────────────────────────────────── *@
 
                 @if (!string.IsNullOrWhiteSpace(saveError))
                 {
@@ -98,7 +98,7 @@
                         Cancelar
                     </button>
                     <button class="save-btn" type="submit" disabled="@(isSaving || !venues.Any())">
-                        @(isSaving ? "Criandoâ€¦" : "Criar Partida")
+                        @(isSaving ? "Criando…" : "Criar Partida")
                     </button>
                 </div>
 

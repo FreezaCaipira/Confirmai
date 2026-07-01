@@ -1,4 +1,4 @@
-﻿@page "/futsal/{Id:int}/escalacao"
+@page "/futsal/{Id:int}/escalacao"
 
 @using System.Security.Claims
 @using System.Text
@@ -17,17 +17,17 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
-<PageTitle>@(isPastEvent ? "PÃ³s-Partida" : "EscalaÃ§Ã£o") Â· Confirmai</PageTitle>
+<PageTitle>@(isPastEvent ? "Pós-Partida" : "Escalação") · Confirmai</PageTitle>
 
 @if (isLoading)
 {
-    <div class="esc-loading">Carregandoâ€¦</div>
+    <div class="esc-loading">Carregando…</div>
 }
 else if (ev is null)
 {
     <div class="esc-not-found">
-        <h2>Partida nÃ£o encontrada.</h2>
-        <a href="/futsal">â† Voltar</a>
+        <h2>Partida não encontrada.</h2>
+        <a href="/futsal">← Voltar</a>
     </div>
 }
 else if (!isPastEvent && ev.LineupConfirmedAt is null && !isAdmin)
@@ -36,9 +36,9 @@ else if (!isPastEvent && ev.LineupConfirmedAt is null && !isAdmin)
         <div class="esc-card esc-card--gate">
             <div class="esc-gate">
                 <div class="esc-gate-icon"><i class="fas fa-lock"></i></div>
-                <h2 class="esc-gate-title">EscalaÃ§Ã£o nÃ£o disponÃ­vel</h2>
-                <p class="esc-gate-msg">A escalaÃ§Ã£o ainda nÃ£o foi montada pelo organizador.</p>
-                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar Ã  partida</a>
+                <h2 class="esc-gate-title">Escalação não disponível</h2>
+                <p class="esc-gate-msg">A escalação ainda não foi montada pelo organizador.</p>
+                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar à partida</a>
             </div>
         </div>
     </div>
@@ -49,9 +49,9 @@ else if (isPastEvent && !isMember && !isAdmin)
         <div class="esc-card esc-card--gate">
             <div class="esc-gate">
                 <div class="esc-gate-icon esc-gate-icon--past"><i class="fas fa-flag-checkered"></i></div>
-                <h2 class="esc-gate-title">PÃ³s-Partida</h2>
+                <h2 class="esc-gate-title">Pós-Partida</h2>
                 <p class="esc-gate-msg">Apenas membros do grupo podem ver o resumo e votar no destaque.</p>
-                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar Ã  partida</a>
+                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar à partida</a>
             </div>
         </div>
     </div>
@@ -65,18 +65,18 @@ else
                     <h1 class="esc-title">
                         @if (isPastEvent)
                         {
-                            <span><i class="fas fa-flag-checkered"></i> PÃ³s-Partida</span>
+                            <span><i class="fas fa-flag-checkered"></i> Pós-Partida</span>
                         }
                         else if (ev.LineupConfirmedAt is null)
                         {
-                            <span>Montar EscalaÃ§Ã£o</span>
+                            <span>Montar Escalação</span>
                         }
                         else
                         {
-                            <span>EscalaÃ§Ã£o</span>
+                            <span>Escalação</span>
                         }
                     </h1>
-                    <a class="detail-back-link" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar Ã  partida</a>
+                    <a class="detail-back-link" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar à partida</a>
                 </div>
                 <p class="esc-date">
                     <i class="fas fa-calendar-alt"></i>
@@ -84,14 +84,14 @@ else
                 </p>
             </header>
 
-            @* â”€â”€ Estado: Confirmada â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+            @* ── Estado: Confirmada ───────────────────────────────────── *@
             @if (ev.LineupConfirmedAt is not null)
             {
                 @if (!isPastEvent)
                 {
                     <div class="esc-confirmed-badge">
                         <i class="fas fa-check-circle"></i>
-                        EscalaÃ§Ã£o confirmada em @ev.LineupConfirmedAt.Value.ToLocalTime().ToString("dd/MM HH:mm")
+                        Escalação confirmada em @ev.LineupConfirmedAt.Value.ToLocalTime().ToString("dd/MM HH:mm")
                     </div>
                 }
 
@@ -104,7 +104,7 @@ else
                     OnTeamNamesChanged="@HandleTeamNamesChanged"
                     AllVotes="@allVotes" />
 
-                @* â”€â”€ Placar pÃ³s-partida â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+                @* ── Placar pós-partida ───────────────────────────────── *@
                 @if (isPastEvent)
                 {
                     <EscalacaoScoreEditor
@@ -153,7 +153,7 @@ else
                     {
                         <div class="esc-reset-zone">
                             <button class="esc-btn esc-btn--danger-ghost" @onclick="() => showResetModal = true">
-                                <i class="fas fa-undo"></i> Resetar escalaÃ§Ã£o
+                                <i class="fas fa-undo"></i> Resetar escalação
                             </button>
                         </div>
                     }
@@ -161,11 +161,11 @@ else
                     {
                         <div class="esc-modal-overlay">
                             <div class="esc-modal">
-                                <p>Tem certeza? A escalaÃ§Ã£o serÃ¡ desfeita e os jogadores voltarÃ£o a nÃ£o ter time atribuÃ­do.</p>
+                                <p>Tem certeza? A escalação será desfeita e os jogadores voltarão a não ter time atribuído.</p>
                                 <div class="esc-modal-actions">
                                     <button class="esc-btn esc-btn--secondary" @onclick="() => showResetModal = false" disabled="@isSaving">Cancelar</button>
                                     <button class="esc-btn esc-btn--danger" @onclick="ResetarEscalacao" disabled="@isSaving">
-                                        @(isSaving ? "Resetandoâ€¦" : "Sim, resetar")
+                                        @(isSaving ? "Resetando…" : "Sim, resetar")
                                     </button>
                                 </div>
                             </div>
@@ -174,7 +174,7 @@ else
                 }
             }
 
-            @* â”€â”€ Estado: Draft (admin montando) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+            @* ── Estado: Draft (admin montando) ──────────────────────── *@
             else
             {
                 <EscalacaoDraftTeamBuilder
