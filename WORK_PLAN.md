@@ -1,7 +1,8 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 12 + revisao Senior) | Refatoracao CSS CONCLUIDA
+> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 12 + investigacao Senior) | Refatoracao CSS CONCLUIDA
 > 1.674/1.674 testes passando | 0 erros de build | 0 warnings | 0 AppDbContext direto
+> Ciclo 13: Background + Mobile + Navegacao | Ciclo 14: Refresh Token / Sessao Persistente
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -62,7 +63,12 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 
 ### Ciclo 12 (Pleno Local): UX/UI Fixes + Cleanup Tecnico (11 fases + 6 extras)
 - Branch: `fix/ciclo12-ux-cleanup` | PR #44
-- **Detalhes da revisao Senior**: ver secao abaixo
+- Causa raiz card grupo: 17 vars auto-referenciais quebrando gradientes/sombras
+- Binding placar corrigido com `EventCallback<int?>`
+- AppDbContext direto: 3 -> 0 (IDbContextFactory zerado)
+- xUnit2013: 49 -> 0 warnings
+- **Problema pendente**: background das telas `/eventos`, `/futsal`, `/poker` nao alinhado com `/grupos`
+- **Investigacao Senior**: ver secao "Investigacao Senior: Background das telas de eventos"
 
 ---
 
@@ -204,6 +210,7 @@ Todas as paginas agora usam `IDbContextFactory<AppDbContext>`. 0 paginas com `@i
 18. **NUNCA salvar CSS com encoding diferente de UTF-8** -- verificar encoding antes de commitar. Se o editor corromper acentos em comentarios, reverter a linha com `git checkout -- arquivo` antes de commitar
 19. **Verificar encoding em TODOS os CSS apos cada fase** -- rodar script de verificacao UTF-8 (ver secao Comandos de Validacao). Inclui site.css, events.css, marketplace.css, identity.css e TODOS os scoped CSS
 20. **NUNCA criar arquivos de docs separados** -- consolidar TUDO no WORK_PLAN.md. Nao criar arquivos em `docs/`, `.md` avulsos, etc.
+21. **Rebuild limpo antes de testar mudancas visuais** -- ao alterar CSS (especialmente scoped CSS), sempre fazer `dotnet clean && dotnet build` e testar com Ctrl+F5 (hard refresh). Hot-reload pode nao aplicar scoped CSS corretamente
 
 ---
 
@@ -473,26 +480,114 @@ Trabalho restante e predominantemente **arquitetural e de UX** (nao CSS).
 
 ---
 
-## Ciclo 13 -- Backlog Arquitetural
+## Investigacao Senior: Background das telas de eventos
 
-> Estes pontos sao mudancas maiores. O dono do projeto deve priorizar com base no roadmap.
+### Problema
+A tela inicial (`/grupos`) tem um visual coeso com `.groups-block` (degrade sutil, borda azul, sombra inset).
+As telas `/eventos`, `/futsal`, `/poker` deveriam replicar esse padrao mas apresentam visual diferente.
 
-**Branch**: `feat/ciclo13-architecture`
+### Diagnostico do Senior (analise de codigo)
+
+**Referencia (padrao correto): `.groups-block` em `events.css` (GLOBAL)**:
+```css
+background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+border: 1px solid var(--ci-border);        /* #1b3d6c — azul claro */
+border-radius: 14px;
+box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);  /* brilho sutil no topo */
+```
+
+**`/futsal` e `/poker`: `.listing-block` em `EventListingShell.razor.css` (SCOPED)**:
+```css
+/* IDENTICO ao .groups-block — CSS correto */
+background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+border: 1px solid var(--ci-border);
+border-radius: 14px;
+box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+```
+Status: CSS esta correto. O scoped CSS bundle gera `.listing-block[b-7yv3gvojvj]` corretamente.
+
+**`/eventos`: `.sports-shell` em `Pages/Index.razor.css` (SCOPED) — DIFERENTE**:
+```css
+background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+border: 1px solid var(--ci-border-alt);    /* #1a3a5c — DIFERENTE, mais escuro */
+border-top: 2px solid var(--ci-border-dim); /* EXTRA: borda grossa no topo */
+border-radius: 14px;
+box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg);  /* DIFERENTE: sombra EXTERNA */
+```
+
+### Causa raiz: 2 problemas
+
+**Problema 1 — `/eventos` tem CSS divergente**:
+`.sports-shell` usa `var(--ci-border-alt)` (#1a3a5c, mais escuro) em vez de `var(--ci-border)` (#1b3d6c, mais claro),
+tem borda extra no topo, e usa sombra externa em vez de inset. Isso cria visual diferente.
+
+**Problema 2 — Cache/hot-reload durante testes do Pleno**:
+O Pleno fez 3 tentativas de fix (commits `19bf314`, `0763d5a`, `1c311f0`, `d59be9e`) e a CSS final do `.listing-block`
+esta correta, mas o resultado "nao vai, desisti" sugere que o browser servia CSS cacheado.
+Em Blazor Server, o scoped CSS bundle (`Confirmai.styles.css`) tem fingerprint via `asp-append-version="true"`,
+mas durante desenvolvimento com hot-reload, o browser pode manter a versao antiga em cache.
+
+### Fix documentado no Ciclo 13 (Fase 1)
+
+---
+
+## Ciclo 13 -- Background + Mobile + Navegacao
+
+> Ciclo focado em UX/layout. NAO inclui implementacao de features (refresh token fica no Ciclo 14).
+
+**Branch**: `fix/ciclo13-ux-layout`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 
-### Fase 1: Verificar background de `/eventos`, `/futsal`, `/poker` -- P1
+### Fase 1: Corrigir background de `/eventos` + verificar `/futsal` e `/poker` -- P0
 **Estimativa**: ~30 min
 
-O Pleno tentou alinhar backgrounds dessas telas ao padrao de `/grupos` no Ciclo 12 mas o resultado nao foi confirmado visualmente.
+**Passo 1 — Fix `.sports-shell` em `Pages/Index.razor.css`**:
 
-**Procedimento**:
-1. `dotnet clean && dotnet build`
-2. Rodar o app e testar com Ctrl+F5 (sem cache) em `/eventos`, `/futsal`, `/poker`
-3. Comparar visualmente com `/grupos` (referencia)
-4. Se background esta correto, documentar como resolvido
-5. Se nao, investigar se o Blazor scoped CSS do `EventListingShell.razor.css` aplica corretamente os atributos `b-xxx`
+Alterar de:
+```css
+.sports-shell {
+    /* ... layout props ... */
+    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+    border: 1px solid var(--ci-border-alt);
+    border-top: 2px solid var(--ci-border-dim);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg);
+    /* ... */
+}
+```
 
-**Validacao**: comparacao visual entre telas
+Para (mesmo padrao de `.groups-block`):
+```css
+.sports-shell {
+    /* ... layout props ... */
+    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+    border: 1px solid var(--ci-border);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+    /* ... */
+}
+```
+
+Remover: `border-top: 2px solid var(--ci-border-dim);`
+Trocar: `var(--ci-border-alt)` -> `var(--ci-border)`
+Trocar: sombra externa -> `inset 0 1px 0 rgba(79, 156, 248, 0.14)`
+
+**Passo 2 — Rebuild limpo**:
+```bash
+dotnet clean
+dotnet build
+```
+
+**Passo 3 — Verificar `/futsal` e `/poker`**:
+Abrir no browser com Ctrl+F5 (hard refresh). Comparar visualmente com `/grupos`.
+Se `.listing-block` renderizar corretamente, esta resolvido.
+Se NAO renderizar, inspecionar no DevTools:
+1. Clicar com botao direito no `.listing-block` -> Inspecionar
+2. Verificar se o elemento tem atributo `b-7yv3gvojvj` (ou similar)
+3. Se NAO tem atributo, o problema e CSS isolation do Blazor
+4. Nesse caso: mover CSS de `.listing-block` para `events.css` (global, ao lado de `.groups-block`)
+
+**Validacao**: `dotnet build` + comparar visualmente `/eventos`, `/futsal`, `/poker` com `/grupos`
 
 ---
 
@@ -506,29 +601,16 @@ Verificar layout em viewport 375px e 414px. Breakpoints ja padronizados (640/768
 2. Testar telas: `/grupos`, `/grupo/{id}`, `/futsal/{id}`, `/pagamentos-historico`, `/perfil`
 3. Documentar problemas: overflow horizontal, touch targets <44px, texto cortado, botoes sobrepostos
 4. Corrigir o que for possivel via media queries nos scoped CSS
-5. Documentar o que precisar de mudanca estrutural
+5. Documentar o que precisar de mudanca estrutural na secao "Problemas Encontrados"
 
-**Validacao**: `dotnet build` + screenshots em 375px e 414px
-
----
-
-### Fase 3: Implementar refresh token / sliding expiration -- P0
-**Estimativa**: ~3h
-
-O sistema usa Blazor Server (circuito SignalR). Avaliar:
-1. Se o cookie ja tem `SlidingExpiration = true` em `Program.cs` (pode ja estar configurado)
-2. Se nao, configurar sliding expiration no cookie de autenticacao
-3. Testar sessao longa (>30min) sem perda de autenticacao
-4. Se necessario, implementar `ITicketStore` com armazenamento em banco
-
-**Validacao**: `dotnet build` + `dotnet test` + testar sessao longa
+**Validacao**: `dotnet build` + verificar visualmente em 375px e 414px
 
 ---
 
-### Fase 4: Repensar fluxo de navegacao -- P1
+### Fase 3: Repensar fluxo de navegacao -- P1
 **Estimativa**: ~3h
 
-Fluxo atual: tela inicial = `/grupos`. Proposta:
+Fluxo atual: tela inicial = `/grupos`. Proposta do dono:
 - Tela inicial = proximas partidas (eventos)
 - Grupos -> ver eventos do grupo -> criar partida dentro do grupo
 - Separar criacao de partida da tela geral de eventos
@@ -537,22 +619,107 @@ Fluxo atual: tela inicial = `/grupos`. Proposta:
 1. Criar nova pagina `Pages/Home.razor` com `@page "/"` mostrando proximas partidas
 2. Mover `@page "/"` de `Groups/Index.razor` para so `@page "/grupos"`
 3. Adicionar navegacao coerente: Home -> Grupos -> Grupo -> Partida
-4. Mover btn "Criar Partida" para dentro da tela do grupo
+4. Mover btn "Criar Partida" para dentro da tela do grupo (nao faz sentido na tela geral de eventos)
+5. Ajustar links no `MainLayout.razor` (nav superior) para refletir novo fluxo
 
-**Validacao**: `dotnet build` + `dotnet test` + testar navegacao completa
+**Validacao**: `dotnet build` + `dotnet test` + verificar navegacao completa
 
 ---
 
-### Fase 5: Investigar e resolver problema de background das telas de eventos -- P2
+## Ciclo 14 -- Refresh Token / Sessao Persistente
+
+> Ciclo separado por ser mudanca arquitetural que requer orientacao detalhada do Senior.
+
+**Branch**: `feat/ciclo14-refresh-token`
+**1 commit por fase** dentro da branch. **1 PR** no final.
+
+### Contexto tecnico (analise do Senior)
+
+O sistema JA tem:
+- `SlidingExpiration = true` (Program.cs L212)
+- `ExpireTimeSpan = 30 min` (producao) / `60 min` (dev) — via `SecurityPolicyDefaults.cs`
+- `SecurityStampValidator` a cada 30s (Program.cs L220-223)
+- `RevalidatingIdentityAuthenticationStateProvider` que revalida security stamp a cada 30s
+
+**O problema**: Em Blazor Server, o usuario raramente faz requisicoes HTTP apos o carregamento inicial.
+A comunicacao passa a ser via WebSocket (SignalR). O `SlidingExpiration` do cookie so e renovado
+em requisicoes HTTP. Resultado: o cookie pode expirar enquanto o circuito SignalR esta ativo.
+Quando o usuario finalmente recarrega a pagina, o cookie ja expirou e ele perde a sessao.
+
+### Fase 1: Aumentar timeout e adicionar ping periodico -- P0
 **Estimativa**: ~1.5h
 
-Se a Fase 1 confirmar que o background ainda nao esta alinhado:
-1. Verificar se `EventListingShell.razor.css` gera o atributo `b-xxx` correto no HTML renderizado
-2. Inspecionar no browser: comparar seletores aplicados em `.listing-block` vs `.groups-block`
-3. Se o scoped CSS nao e aplicado, pode ser necessario mover os estilos para `events.css` (global) ou usar CSS do parent page
-4. Alternativa: usar classes globais em vez de scoped no componente compartilhado
+**Passo 1 — Aumentar `SessionTimeoutMinutes`**:
+Em `Configuration/SecurityPolicyDefaults.cs`:
+- Produção (L44): `SessionTimeoutMinutes: 30` -> `SessionTimeoutMinutes: 480` (8 horas)
+- Desenvolvimento (L31): `SessionTimeoutMinutes: 60` -> `SessionTimeoutMinutes: 720` (12 horas)
 
-**Validacao**: comparacao visual entre todas as telas de listagem
+Justificativa: usuarios de app esportivo esperam sessao longa (abrem de manha, usam ao longo do dia).
+
+**Passo 2 — Criar endpoint de keep-alive**:
+Criar `Controllers/PingController.cs`:
+```csharp
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Confirmai.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class PingController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult Get() => Ok();
+}
+```
+
+Registrar em `Program.cs` (antes de `app.Run()`):
+```csharp
+app.MapControllers();
+```
+
+Verificar se `AddControllers()` ja esta registrado em `builder.Services`. Se nao, adicionar.
+
+**Passo 3 — Criar script JS de keep-alive**:
+Criar `wwwroot/js/session-keepalive.js`:
+```javascript
+(function () {
+    var intervalMs = 15 * 60 * 1000; // 15 minutos
+    setInterval(function () {
+        fetch('/api/ping', { credentials: 'same-origin' })
+            .catch(function () { /* silently ignore */ });
+    }, intervalMs);
+})();
+```
+
+**Passo 4 — Registrar o script em `Pages/_Host.cshtml`**:
+Adicionar antes de `blazor.server.js`:
+```html
+<script src="/js/session-keepalive.js" asp-append-version="true"></script>
+```
+
+**Validacao**:
+```bash
+dotnet build
+dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
+```
+NOTA: o teste `SecurityPolicyDefaultsTests` vai falhar porque espera `SessionTimeoutMinutes: 30`.
+Atualizar os testes:
+- `Confirmai.Tests/SecurityPolicyDefaultsTests.cs` L23: `Assert.Equal(60, ...)` -> `Assert.Equal(720, ...)`
+- `Confirmai.Tests/SecurityPolicyDefaultsTests.cs` L42: `Assert.Equal(30, ...)` -> `Assert.Equal(480, ...)`
+- `Confirmai.Tests/ConfigurationDefaultsTests.cs` L22: `Assert.Equal(60, ...)` -> `Assert.Equal(720, ...)`
+
+### Fase 2: Testar sessao longa -- P0
+**Estimativa**: ~30 min
+
+1. Rodar o app
+2. Fazer login
+3. Verificar no DevTools > Network que `/api/ping` e chamado a cada 15 min
+4. Verificar que o cookie `Confirmai.session` tem `Expires` atualizado apos cada ping
+5. Verificar que o usuario nao perde sessao apos 30+ min de uso
+
+**Validacao**: sessao permanece ativa por >1h sem necessidade de re-login
 
 ---
 
