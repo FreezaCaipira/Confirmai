@@ -8,7 +8,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
 
-@inject AppDbContext Db
+@inject IDbContextFactory<AppDbContext> DbFactory
 @inject BitcoinPaymentFactory PaymentFactory
 @inject NavigationManager NavigationManager
 @inject LogService LogService
@@ -189,7 +189,8 @@
         btcUsdRate = quote?.btc_usd;
         btcBrlRate = quote?.btc_brl;
 
-        payment = await Db.Payments
+        await using var db = await DbFactory.CreateDbContextAsync();
+        payment = await db.Payments
             .Include(p => p.User)
             .Include(p => p.Seller)
             .Include(p => p.Product)
