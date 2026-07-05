@@ -1,6 +1,6 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 10 + revisao Senior) | Ciclo 11 ATIVO
+> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 11 + revisao Senior) | Refatoracao CSS CONCLUIDA
 > 1.674/1.674 testes passando | 0 erros de build | 0 warnings
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
@@ -16,7 +16,7 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 
 ### Ciclo 2 (Senior Cloud): Auditoria + Migration
 - PR #9: Migration `ServerApiKeys` pendente (fix startup crash)
-- PR #10: Auditoria Services — namespaces, GatewayService:ControllerBase, file-scoped
+- PR #10: Auditoria Services -- namespaces, GatewayService:ControllerBase, file-scoped
 
 ### Ciclo 3 (Pleno Local): UX + Features + CSS
 - Scoped CSS, consolidacao CSS, testes, UX grupos, historico pagamentos, virtual scrolling
@@ -32,11 +32,11 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 
 ### Ciclo 6 (Pleno Local): Eliminacao de Hardcoded Hex em Scoped CSS
 - Hardcoded hex: 867 -> 0 | Vars usadas: 1.175 -> ~1.476 | Fallbacks: 0
-- **Problemas CRITICOS**: 18 vars inventadas sem definir (128 usos, UI quebrada) — corrigido pelo Senior. 18 vars mortas no `:root`
+- **Problemas CRITICOS**: 18 vars inventadas sem definir (128 usos, UI quebrada) -- corrigido pelo Senior. 18 vars mortas no `:root`
 
 ### Ciclo 7 (Pleno Local): Legibilidade de Fontes (UX)
 - Melhorou contraste de fontes com text-shadow glow
-- **Problemas**: Hardcoded hex/rgba em vez de vars existentes, commits bagunçados
+- **Problemas**: Hardcoded hex/rgba em vez de vars existentes, commits baguncados
 
 ### Ciclo 8 (Pleno Local): rgba Cleanup + UX/UI Interativo
 - **CSS Fases 1-6**: vars mortas removidas, rgba scoped parcial, events.css/identity.css/site.css convertidos
@@ -51,140 +51,159 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 
 ### Ciclo 10 (Pleno Local): rgba Complete + Decomposicao de Paginas
 - Branch: `refactor/ciclo10-rgba-complete-decomp` | PR #40
-- **Fase 1**: 165 rgba convertidos em 32 arquivos scoped (regra 17 seguida — TODOS os arquivos)
-- **Fase 2**: events.css rgba parcial (237 -> 220) + identity.css hex zerado (12 -> 0) + 4 fallbacks corrigidos
-- **Fase 3**: site.css hex convertidos (#ffffff -> var(--white), #fffbeb -> var(--amber-lightest))
-- **Fase 4**: Mailbox.razor decomposto (673L -> 66L template + 614L code-behind + 3 sub-componentes)
-- **Fase 5**: Poker/Detail.razor decomposto (635L -> 315L template + 194L code-behind + PokerDetailInfo)
-- **Fase 6**: Poker/Create.razor decomposto (614L -> 319L template + 276L code-behind)
+- 165 rgba convertidos em 32 arquivos, events.css/identity.css/site.css convertidos, 3 decomposicoes
+- **Problemas**: Encoding UTF-8 corrompido em 6 CSS files (corrigido pelo Senior). Regra 18 adicionada
+
+### Ciclo 11 (Pleno Local): CSS Final + Decomposicao Completa (10 fases)
+- Branch: `refactor/ciclo11-final-cleanup` | PR #42
 - **Detalhes da revisao Senior**: ver secao abaixo
 
 ---
 
-## Revisao Senior do Ciclo 10
+## Revisao Senior do Ciclo 11
 
-### Veredicto: MELHOR CICLO ATE AGORA — conversao completa, decomposicao excelente
+### Veredicto: EXCELENTE -- Ciclo mais ambicioso, TODAS as 10 fases executadas, metas superadas
 
-| Metrica | C9 | C10 | Meta C10 | Status |
-|---------|----|----|---------|--------|
+| Metrica | C10 | C11 | Meta C11 | Status |
+|---------|-----|-----|----------|--------|
 | Hardcoded hex scoped | 0 | **0** | 0 | Atingido |
-| rgba() hardcoded scoped | 478 | **378** | <350 | Proximo |
-| rgba convertiveis restantes | 123 | **0** | 0 | **Atingido** |
-| CSS vars usadas (scoped) | 2.051 | **2.149** | >2.200 | Proximo |
+| rgba() hardcoded scoped | 378 | **185** | <300 | **Superado** |
+| CSS vars usadas (scoped) | 2.149 | **2.344** | >2.200 | **Superado** |
 | `!important` scoped | 1 | **1** | 1 | Atingido |
-| `!important` global | 11 | **12** | — | Estavel |
-| Hardcoded hex global | 166 | **153** | — | Melhoria |
-| identity.css hex | 12 | **0** | 0 | **Zerado** |
-| events.css rgba | 237 | **220** | <180 | Parcial |
-| site.css rgba | 138 | **136** | — | Estavel |
-| Vars no `:root` | 168 | **168** | — | Estavel |
-| Vars indefinidas | 0 | **0** | 0 | Atingido |
-| Vars mortas | 1 | **1** (--entity-bg) | 0 | Aceitavel |
-| Fallbacks | 4 | **0** | 0 | **Corrigido** |
+| `!important` global | 12 | **11** | -- | Estavel |
+| events.css hex | 110 | **0** | <50 | **Zerado** |
+| events.css rgba | 220 | **161** | <170 | **Atingido** |
+| marketplace.css hex | 43 | **0** | <10 | **Zerado** |
+| marketplace.css rgba | 35 | **0** | <15 | **Zerado** |
+| site.css hex (fora :root) | 6 | **4** | -- | Melhoria |
+| site.css rgba (fora :root) | 136 | **53** | <80 | **Atingido** |
+| identity.css rgba | 3 | **3** | -- | Estavel |
+| Vars no `:root` | 168 | **317** | -- | +149 |
+| Vars indefinidas | 0 | **0** (apos fix) | 0 | Atingido |
+| Vars mortas `:root` | 0 | **0** (apos fix) | 0 | Atingido |
+| Fallbacks | 0 | **0** | 0 | Atingido |
 | Build warnings | 0 | **0** | 0 | Atingido |
-| Mailbox.razor | 673L | **66L** | <400L | **Superado** |
-| Poker/Detail.razor | 635L | **315L** | <400L | **Superado** |
-| Poker/Create.razor | 614L | **319L** | <400L | **Superado** |
+| Pages >400L sem code-behind | 12 | **0** | 0 | **Zerado** |
+| Pages com `AppDbContext` direto | 6 | **3** | -- | Melhoria |
 
 ### O que deu CERTO
 
-**Conversao rgba (Fase 1) — EXCELENTE**:
-- 165 rgba convertidos em **32 arquivos** — cobertura total, regra 17 respeitada
-- Zero rgba convertiveis restantes (verificado por grep: todos os padroes com var existente foram convertidos)
-- Mesmo arquivo `Pages/Docs/Integration.razor.css` (binary) foi incluido
+**Bloco A -- CSS (Fases 1-5) -- EXCELENTE**:
+- **Fase 1**: 24 novas vars + 90 conversoes iniciais -- pipeline limpa, vars usadas imediatamente
+- **Fase 2**: events.css rgba 197 -> 169 -- meta <170 atingida
+- **Fase 3**: events.css hex 125 -> 0 -- ZERADO (meta era <50!)
+- **Fase 4**: marketplace.css hex 51 -> 0, rgba 43 -> 0 -- arquivo CSS global mais limpo do projeto
+- **Fase 5**: scoped rgba 613 -> 288, site.css rgba reduzido -- metas superadas
 
-**Decomposicao (Fases 4-6) — EXCELENTE**:
-- `Mailbox.razor`: 673L -> 66L. Tres sub-componentes limpos: `MailboxFilters`, `MailboxConversationList`, `MailboxThreadPane`. Usa `IDbContextFactory` (correto)
-- `Poker/Detail.razor`: 635L -> 315L. `PokerDetailInfo` extraido com `[Parameter] Event`. Usa `IDbContextFactory` (correto)
-- `Poker/Create.razor`: 614L -> 319L. Code-behind com `CreatePokerEventForm` sealed class. Usa `IDbContextFactory` (correto)
+**Bloco B -- Decomposicao (Fases 6-10) -- EXCELENTE**:
+- **TODAS as 12 paginas** decompostas com code-behind `.razor.cs`:
 
-**Fallbacks corrigidos**: Os 4 fallbacks de Ciclo 9 foram eliminados (events.css, identity.css)
+| Pagina | Antes | Depois (razor) | Code-behind |
+|--------|-------|----------------|-------------|
+| AdminPayments | 1.156L | 113L | 1.061L |
+| Futsal/Detail | 931L | 483L | 422L |
+| Groups/Payments | 560L | 264L | 311L |
+| Poker/Edit | 547L | 311L | 248L |
+| Groups/Features | 461L | 115L | 360L |
+| EventPayment | 667L | 198L | 484L |
+| Escalacao | 661L | 206L | 471L |
+| AdminLogs | 656L | 109L | 556L |
+| PaymentsHistory | 419L | 149L | 293L |
+| Futsal/Create | 418L | 109L | 325L |
+| Admin | 410L | 151L | 276L |
+| MyEvents/Index | 402L | 234L | 181L |
 
-**Commits**: 6 commits limpos, 1 por fase, branch unica. Regras 9 e 14 respeitadas
+- Todas usam `partial class` (correto)
+- `IDbContextFactory` usado em todas as paginas decompostas (correto)
+- Encoding fix commit incluido (7 arquivos .razor corrigidos)
+- 11 commits limpos (1 por fase + 1 encoding fix), branch unica, 1 PR -- regras 9, 14 respeitadas
 
-### Problemas encontrados
+### Problemas encontrados e corrigidos pelo Senior
 
-**Encoding corrompido (13 + 7 + 4 = 24 linhas em 6 arquivos)**:
-O Pleno corrompeu encoding UTF-8 -> Latin-1 em comentarios CSS ao editar os arquivos:
-- `events.css`: 13 linhas (em dashes `—` -> `�`, acentos `á/ó/ã` -> `�`)
-- `Pages/Docs/Integration.razor.css`: 7 linhas
-- `Pages/Futsal/Create.razor.css`: 1 linha
-- `Pages/Product/Products.razor.css`: 1 linha
-- `Shared/Components/CookieConsent.razor.css`: 1 linha
-- `Shared/Components/MainLayout.razor.css`: 1 linha
+**1. 9 vars CSS inventadas/indefinidas (critico)**:
+O Pleno usou `var(--nome)` em 9 nomes que NAO estavam definidos:
+- `--ci-text-link-bright` (2 usos, site.css) -- original era `#bae6fd`
+- `--yellow-dark` (1 uso), `--yellow-bright` (1 uso), `--yellow-strong` (1 uso) -- originais: `#1c1508`, `#fbbf24`, `#78350f`
+- `--mk-brown2-opacity-xs` (1 uso, ParchmentLab), `--mk-brown6-opacity-xs` (2 usos, ParchmentLab)
 
-**Fix aplicado pelo Senior**: Restaurados os caracteres UTF-8 originais a partir do git history.
+**Fix**: Senior adicionou as 9 vars ao `:root` com valores hex deduzidos dos diffs originais.
 
-**Nova regra 18**: NUNCA salvar arquivos CSS com encoding diferente de UTF-8. Se o editor local nao suporta UTF-8, nao editar linhas com caracteres acentuados.
+**2. 6 vars mortas no `:root`**:
+`--white-opacity-lg`, `--white-opacity-xl`, `--white-opacity-2xl`, `--white-opacity-3xl`, `--white-opacity-4xl`, `--white-opacity-5xl` -- definidas mas zero usos em qualquer arquivo.
 
-**events.css conversao parcial**: Apenas 17 de 237 rgba convertidos. Os restantes (220) sao padroes unicos sem var correspondente (opacities especificas de events: `rgba(96,165,250,0.35)`, `rgba(239,68,68,0.08)`, `rgba(251,191,36,0.85)`, etc.).
+**Fix**: Senior removeu as 6 vars mortas.
+
+**3. Encoding UTF-8 corrompido em site.css (61 linhas)**:
+Apesar da regra 18 e do encoding fix commit do Pleno, `site.css` teve 61 linhas com mojibake nos comentarios (`--` -> `ΓöÇ`, `--` -> `ΓÇö`). O Pleno corrigiu .razor mas ignorou o site.css.
+
+**Fix**: Senior restaurou encoding UTF-8 em todas as 61 linhas.
 
 ---
 
-## Metricas Atuais (pos-Ciclo 10 + fix Senior)
+## Metricas Atuais (pos-Ciclo 11 + fix Senior)
 
-| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 |
-|---------|----|----|----|----|-----|-----|
-| Warnings (build) | 2 | 0 | 0 | 0 | 0 | **0** |
-| `!important` scoped | 1 | 1 | 1 | 1 | 1 | **1** |
-| `!important` global | — | — | 17 | 12 | 11 | **12** |
-| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | **0** |
-| rgba() hardcoded scoped | — | — | 645 | 531 | 478 | **378** |
-| Hardcoded hex global | — | — | ~1.317 | 166 | 166 | **153** |
-| rgba() hardcoded global | — | — | ~185 | 446 | 413 | **394** |
-| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | **2.149** |
-| CSS vars total | — | — | — | 3.513 | 3.609 | **3.739** |
-| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | **168** |
-| Vars indefinidas | — | 0 | 0 | 0 | 0 | **0** |
-| Vars mortas `:root` | — | — | 18 | 0 | 0 | **0** |
-| Fallbacks | — | 178 | 0 | 0 | 4 | **0** |
+| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 |
+|---------|----|----|-------|----|----|-----|-----|
+| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | **0** |
+| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
+| `!important` global | -- | -- | 17 | 12 | 11 | 12 | **11** |
+| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | **0** |
+| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | **185** |
+| Hardcoded hex global | -- | -- | ~1.317 | 166 | 166 | 153 | **4** |
+| rgba() hardcoded global | -- | -- | ~185 | 446 | 413 | 394 | **217** |
+| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | **2.344** |
+| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | **4.246** |
+| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | **317** |
+| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | **0** |
+| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | **0** |
+| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | **0** |
+| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | **0** |
 
-### Estado dos CSS globais (pos-Ciclo 10)
+### Estado dos CSS globais (pos-Ciclo 11)
 
 | Arquivo | Hex hardcoded | rgba hardcoded | `!important` | var() usadas |
 |---------|-------------|----------------|-------------|--------------|
-| site.css (fora :root) | 2 | 136 | 11 | ~1.100 |
-| events.css | 110 | 220 | 0 | ~400 |
-| marketplace.css | 43 | 35 | 0 | 1 |
+| site.css (fora :root) | 4 | 53 | 11 | ~1.900 |
+| events.css | 0 | 161 | 0 | ~598 |
+| marketplace.css | 0 | 0 | 0 | ~79 |
 | identity.css | 0 | 3 | 0 | ~32 |
-| **Total globais** | **155** | **394** | **11** | **~1.533** |
+| **Total globais** | **4** | **217** | **11** | **~2.609** |
 
-### Paginas grandes (>500 linhas)
+### Paginas grandes -- TODAS decompostas
 
-| Arquivo | Linhas | Status |
-|---------|--------|--------|
-| AdminPayments.razor | 1.156 | 4 sub-componentes ja extraidos |
-| Futsal/Detail.razor | 931 | 9 sub-componentes em Components/ |
-| Payment/EventPayment.razor | 667 | 7 sub-componentes em Components/ |
-| Futsal/Escalacao.razor | 661 | 6 sub-componentes em Components/ |
-| Admin/AdminLogs.razor | 656 | 1 sub-componente (AdminLogsTable) |
-| Groups/Payments.razor | 560 | Candidato decomposicao |
-| Poker/Edit.razor | 547 | Candidato decomposicao |
+Nenhuma pagina >400L sem code-behind. Unica pagina >400L com code-behind: `Futsal/Detail.razor` (483L) -- aceitavel dado que ja tem 9+ sub-componentes.
 
-*Mailbox (66L), Poker/Detail (315L), Poker/Create (319L) saíram da lista — decomposicao Ciclo 10.*
+### AppDbContext direto restante (3 paginas)
+
+| Pagina | Status |
+|--------|--------|
+| Payment/ViewPayment.razor | AppDbContext direto (nao decompostas neste ciclo) |
+| Payment/Payment.razor | AppDbContext direto (ja decomposta em Ciclo 9) |
+| Payment/PaymentDetails.razor | AppDbContext direto (nao decompostas neste ciclo) |
 
 ---
 
 ## Regras para o Pleno (OBRIGATORIO)
 
-1. **NUNCA usar `!important`** — se nao consegue override, documentar na secao "Problemas" e pular
-2. **NUNCA hardcodar cores em scoped CSS** — usar vars do `:root`. Se nao existe var, documentar na secao "Cores sem Var"
+1. **NUNCA usar `!important`** -- se nao consegue override, documentar na secao "Problemas" e pular
+2. **NUNCA hardcodar cores em scoped CSS** -- usar vars do `:root`. Se nao existe var, documentar na secao "Cores sem Var"
 3. **NUNCA commitar debug/logging temporario** (`Console.Write`, `Debug.Write`)
-4. **NUNCA injetar `AppDbContext` direto** — sempre `IDbContextFactory<AppDbContext>`
-5. **NUNCA criar arquivo `.razor.css` vazio** — so criar se tiver estilos reais
+4. **NUNCA injetar `AppDbContext` direto** -- sempre `IDbContextFactory<AppDbContext>`
+5. **NUNCA criar arquivo `.razor.css` vazio** -- so criar se tiver estilos reais
 6. **NUNCA introduzir novas cores hardcoded** ao converter inline -> classe CSS
-7. **NUNCA usar fallback em var()** — usar `var(--nome)` sem fallback hex
+7. **NUNCA usar fallback em var()** -- usar `var(--nome)` sem fallback hex
 8. **Validar cada fase**: `dotnet build` (0 errors) + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"` (0 failed)
-9. **1 branch unica por ciclo** — commits por fase dentro dela. NAO criar branches separadas
-10. **1 PR por ciclo** — mergear via PR, nunca push direto na main
+9. **1 branch unica por ciclo** -- commits por fase dentro dela. NAO criar branches separadas
+10. **1 PR por ciclo** -- mergear via PR, nunca push direto na main
 11. **Documentar bloqueios**: se nao resolver, escrever na secao "Problemas Encontrados"
-12. **NUNCA inventar nomes de var()** — so usar vars que JA existem na lista "CSS Vars Permitidas" abaixo
-13. **NUNCA adicionar var ao `:root` sem uso imediato** — so adicionar vars que serao usadas no mesmo commit
-14. **Commits limpos** — 1 commit por fase, sem commits de tentativa/erro/reversao. Testar ANTES de commitar
-15. **NUNCA remover var do `:root` sem verificar uso em TODOS os arquivos** — usar `grep -rn 'var(--nome)' Pages/ Shared/ wwwroot/css/` antes de remover. Se tem uso, NAO remover
-16. **Separar CSS refactoring de features UX** — nao misturar os dois no mesmo ciclo/PR
-17. **Cobrir TODOS os arquivos ao converter rgba** — grep global para cada padrao, converter todos de uma vez
-18. **NUNCA salvar CSS com encoding diferente de UTF-8** — verificar encoding antes de commitar. Se o editor corromper acentos em comentarios, reverter a linha com `git checkout -- arquivo` antes de commitar
+12. **NUNCA inventar nomes de var()** -- so usar vars que JA existem na lista "CSS Vars Permitidas" abaixo
+13. **NUNCA adicionar var ao `:root` sem uso imediato** -- so adicionar vars que serao usadas no mesmo commit
+14. **Commits limpos** -- 1 commit por fase, sem commits de tentativa/erro/reversao. Testar ANTES de commitar
+15. **NUNCA remover var do `:root` sem verificar uso em TODOS os arquivos** -- usar `grep -rn 'var(--nome)' Pages/ Shared/ wwwroot/css/` antes de remover. Se tem uso, NAO remover
+16. **Separar CSS refactoring de features UX** -- nao misturar os dois no mesmo ciclo/PR
+17. **Cobrir TODOS os arquivos ao converter rgba** -- grep global para cada padrao, converter todos de uma vez
+18. **NUNCA salvar CSS com encoding diferente de UTF-8** -- verificar encoding antes de commitar. Se o editor corromper acentos em comentarios, reverter a linha com `git checkout -- arquivo` antes de commitar
+19. **Verificar encoding em TODOS os CSS apos cada fase** -- rodar script de verificacao UTF-8 (ver secao Comandos de Validacao). Inclui site.css, events.css, marketplace.css, identity.css e TODOS os scoped CSS
 
 ---
 
@@ -264,6 +283,9 @@ var(--amber-mid)         /* #d97706 */
 var(--amber-dark)        /* #b45309 */
 var(--amber-strong)      /* #e65100 */
 var(--amber-lightest)    /* #fffbeb */
+var(--yellow-dark)       /* #1c1508 */
+var(--yellow-bright)     /* #fbbf24 */
+var(--yellow-strong)     /* #78350f */
 
 /* Neutral text */
 var(--white)             /* #ffffff */
@@ -295,6 +317,7 @@ var(--ci-border-alt)     /* #1a3a5c */
 var(--ci-text)           /* #f1f5f9 */
 var(--ci-text-blue)      /* #deeeff */
 var(--ci-text-link)      /* #7ab6ff */
+var(--ci-text-link-bright) /* #bae6fd */
 var(--ci-text-muted)     /* #8aacc8 */
 var(--ci-text-subtle)    /* #6082a0 */
 var(--ci-text-info)      /* #8fc2f3 */
@@ -410,284 +433,213 @@ var(--font-display)      /* "Cinzel", Georgia, serif */
 var(--ci-font)           /* system sans-serif stack */
 ```
 
+> **NOTA**: Existem ~130 vars adicionais de opacity/marketplace no `:root` (mk-brown*, mk-gold*, mk-cream*, pay-cream*, etc.) que nao estao listadas aqui por brevidade. Consultar o `:root` em `site.css` para a lista completa.
+
 ---
 
-## Ciclo 11 — Tarefas Ativas (PLANO COMPLETO — TODO O TRABALHO RESTANTE)
+## Estado Final da Refatoracao CSS
 
-> **OBJETIVO**: Este ciclo cobre TODO o trabalho de CSS + decomposicao restante.
-> Sao 10 fases — o Pleno executa todas sequencialmente, sem esperar revisao Senior entre elas.
-> Senior so revisara ao final de TODAS as fases.
+A refatoracao CSS iniciada no Ciclo 4 esta **essencialmente concluida**. Os numeros restantes sao predominantemente padroes unicos (1-2 usos) que nao justificam novas vars:
 
-**Branch**: `refactor/ciclo11-final-cleanup`
+- **185 rgba scoped**: 183 padroes unicos -- genuinamente diferentes opacidades por contexto
+- **161 rgba events.css**: 130 padroes unicos -- opacidades especificas por tipo de evento
+- **53 rgba site.css**: quase todos 1-off (metallic gradients, specific opacity)
+- **4 hex site.css**: 2 mint green (`#e0f7f4`, `#ecfdf5`) sem var equivalente
+
+**Criar vars para esses padroes seria contraproducente**: inflaria o `:root` (ja com 317 vars) sem beneficio real de reuso.
+
+### Trabalho restante (nao-CSS)
+
+| Item | Descricao | Prioridade |
+|------|-----------|------------|
+| AppDbContext -> IDbContextFactory | 3 paginas restantes: ViewPayment, Payment, PaymentDetails | P1 |
+| !important site.css | 11 ocorrencias, maioria legitima (autofill, accessibility, modals) | P3 |
+| Build warnings (Tests) | 49 warnings de xUnit2013 no projeto de testes (nao afetam producao) | P3 |
+
+---
+
+## Ciclo 12 -- UX/UI Fixes + Cleanup Tecnico
+
+> Ciclo misto: 8 pontos UX/UI levantados em testes do sistema + 3 tarefas de cleanup tecnico.
+> Pontos 9-11 do backlog (mobile, refresh token, repensamento de fluxo) ficam para o Ciclo 13 por serem mudancas arquiteturais maiores.
+
+**Branch**: `fix/ciclo12-ux-cleanup`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 
 ---
 
-### BLOCO A — CSS GLOBAL (Fases 1-5)
+### BLOCO A -- FIXES UX/UI (Fases 1-8)
 
-#### Fase 1: Adicionar ~20 novas vars rgba ao `:root` — P0
+#### Fase 1: Card do grupo perdeu efeito de estilizacao -- P0
 **Estimativa**: ~30 min
 
-Adicionar vars para os padroes rgba frequentes (3+ usos) em events.css, scoped CSS e site.css:
+O card de grupo em `Pages/Groups/Index.razor` perdeu efeito visual. O styling esta em `wwwroot/css/events.css` (classes `.group-card`, `.group-card-overlay`, `.group-card:hover`).
 
-```css
-/* Blue-300 mid opacity (96,165,250) — usados em events.css e scoped */
---blue300-opacity-md:  rgba(96, 165, 250, 0.3);    /* 6 usos */
---blue300-opacity-lg:  rgba(96, 165, 250, 0.35);   /* 4 usos */
---blue300-opacity-xl:  rgba(96, 165, 250, 0.5);    /* 6 usos */
---blue300-opacity-2xl: rgba(96, 165, 250, 0.6);    /* 3 usos */
---blue300-opacity-3xl: rgba(96, 165, 250, 0.85);   /* 4 usos */
+**Procedimento**:
+1. Verificar se `.group-card` em `events.css` (linha ~2957) tem gradientes/sombras/hover corretos
+2. Comparar com versao anterior (`git diff HEAD~15 -- wwwroot/css/events.css | grep group-card`)
+3. Restaurar efeitos que foram perdidos na conversao hex -> var do Ciclo 11
+4. Testar visualmente: o card deve ter overlay com gradiente, hover com elevacao, sombra sutil
 
-/* Red event opacity (239,68,68) */
---red-opacity-xs:      rgba(239, 68, 68, 0.08);    /* 6 usos */
---red-opacity-2xs:     rgba(239, 68, 68, 0.1);     /* 3 usos */
---red-opacity-mid:     rgba(239, 68, 68, 0.35);    /* 6 usos */
-
-/* Amber event opacity (251,191,36) */
---amber-opacity-xs:    rgba(251, 191, 36, 0.08);   /* 9 usos */
---amber-opacity-md:    rgba(251, 191, 36, 0.25);   /* 3 usos */
---amber-opacity-lg:    rgba(251, 191, 36, 0.35);   /* 3 usos */
---amber-opacity-2xl:   rgba(251, 191, 36, 0.85);   /* 3 usos */
-
-/* Emerald (52,211,153) */
---emerald-opacity-md:  rgba(52, 211, 153, 0.3);    /* 3 usos */
-
-/* Teal (16,185,129) */
---teal-opacity-xs:     rgba(16, 185, 129, 0.1);    /* 3 usos */
-
-/* Slate extended (148,163,184) */
---slate-border-xl:     rgba(148, 163, 184, 0.25);  /* 3 usos */
-
-/* Navy/CI accent (26,90,176) — usados em scoped e site.css */
---ci-accent-opacity-xs: rgba(26, 90, 176, 0.12);   /* 6 usos */
---ci-accent-opacity-sm: rgba(26, 90, 176, 0.18);   /* 2 usos */
---ci-accent-opacity-md: rgba(26, 90, 176, 0.2);    /* 3 usos */
---ci-accent-opacity-lg: rgba(26, 90, 176, 0.25);   /* 8 usos */
-
-/* Slate functional (100,116,139) */
---slate-functional-md: rgba(100, 116, 139, 0.3);   /* 4 usos */
-
-/* Black additional */
---shadow-sm:           rgba(0, 0, 0, 0.25);        /* 7 usos */
---shadow-xs:           rgba(0, 0, 0, 0.2);         /* 4 usos */
---shadow-2xs:          rgba(0, 0, 0, 0.15);        /* 3 usos */
---shadow-light:        rgba(0, 0, 0, 0.35);        /* 3 usos */
-```
-
-**Validacao**: `dotnet build` + verificar que cada var e usada PELO MENOS 1 vez no mesmo commit
+**Validacao**: `dotnet build` + verificar visualmente em `/grupos`
 
 ---
 
-#### Fase 2: Converter rgba em events.css usando novas + existentes vars — P0
-**Estimativa**: ~2h
+#### Fase 2: Partidas em nova janela na tela do grupo -- P1
+**Estimativa**: ~30 min
 
-Converter TODOS os rgba em events.css que agora tem vars correspondentes.
+Na tela `Pages/Groups/Detail.razor`, avaliar se links para partidas devem abrir em nova aba.
 
-**ATENCAO encoding (regra 18)**: NAO editar linhas com caracteres acentuados nos comentarios CSS. Se precisar editar perto de um comentario com acentos, copiar a linha original sem modificar.
+**Procedimento**:
+1. Identificar os links de partida no `Detail.razor`
+2. Se o link navega para `/futsal/{id}`, considerar se `target="_blank"` faz sentido no contexto SPA
+3. **DECISAO**: Em Blazor Server (SPA), abrir nova janela quebra o circuito SignalR. Manter navegacao interna a menos que o dono do projeto insista.
+4. Se decidir abrir nova aba, usar `<a href="/futsal/{id}" target="_blank">` e documentar que cria novo circuito
 
-**Procedimento**: Para cada var nova da Fase 1, fazer `grep -n 'rgba(96, 165, 250, 0.3)' wwwroot/css/events.css` e substituir TODOS os matches.
-
-**Validacao**:
-```bash
-dotnet build
-grep -c 'rgba(' wwwroot/css/events.css
-# Meta: <170 (de 220 atual)
-```
+**Validacao**: `dotnet build` + testar navegacao em `/grupo/{id}`
 
 ---
 
-#### Fase 3: Converter rgba em events.css — hex restantes — P1
+#### Fase 3: Pagamentos pendentes -- btn comprovante + btns email/zap -- P1
+**Estimativa**: ~1h
+
+Na tela de pagamentos pendentes, avaliar:
+1. **Btn comprovante**: verificar se esta posicionado de forma logica. Se nao, mover para posicao mais intuitiva
+2. **Btns email e WhatsApp**: verificar se existem e estao funcionais. Se faltam, adicionar botoes para enviar lembrete por email/WhatsApp
+
+**Arquivos**: `Pages/Payment/PaymentsHistory.razor`, `Pages/Payment/PaymentsHistory.razor.cs`, `Pages/Payment/PaymentsHistory.razor.css`
+
+**Validacao**: `dotnet build` + testar visualmente nos pagamentos pendentes
+
+---
+
+#### Fase 4: Pagamentos historico -- caracteres bugados + valor verde -- P0
+**Estimativa**: ~1h
+
+Duas questoes na tela `Pages/Payment/PaymentsHistory.razor`:
+1. **Caracteres bugados**: Verificar encoding de strings exibidas (pode ser UiText com encoding errado ou dados do banco com acentos corrompidos). Verificar `PaymentsHistory.razor.css` por mojibake nos comentarios
+2. **Valor verde**: O CSS mostra `color: var(--green-bright)` nas linhas 85 e 408 do `.razor.css`. Avaliar se o valor monetario deve ser verde (pode confundir com "pago" quando o pagamento esta pendente). Se sim, usar cor neutra (`var(--ci-text)`) para valores e manter verde so para status "Pago"
+
+**Validacao**: `dotnet build` + testar visualmente em `/pagamentos-historico`
+
+---
+
+#### Fase 5: Pos-partida -- legibilidade + btn confirmar placar + btn edit -- P1
 **Estimativa**: ~1.5h
 
-events.css ainda tem 110 hex. Muitos sao cores que ja tem vars. Converter TODOS os hex que tem var na lista permitida.
+Na tela de `Pages/Futsal/Detail.razor` apos a partida terminar:
+1. **Legibilidade**: Textos com baixo contraste contra fundo escuro. Verificar cores de texto no CSS scoped (`Detail.razor.css`) e global (`events.css`). Usar vars de texto legiveis (`var(--ci-text)`, `var(--ci-text-blue)`)
+2. **Btn confirmar placar nao faz nada**: O componente `EscalacaoScoreEditor.razor` pode ter evento `@onclick` sem handler funcional ou handler que falha silenciosamente. Verificar binding e logica no code-behind
+3. **Btn edit**: Avaliar se faz sentido ter btn de editar na tela pos-partida. Se a partida ja terminou, editar nao deveria ser permitido. Esconder btn quando `ev.Status == EventStatus.Finished`
 
-**Procedimento**: Comparar cada hex unico com a lista de vars. Se match exato ou proximo, converter.
-
-**Validacao**:
-```bash
-dotnet build
-grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/events.css
-# Meta: <50
-```
+**Validacao**: `dotnet build` + `dotnet test` + testar visualmente apos uma partida encerrada
 
 ---
 
-#### Fase 4: Refatorar marketplace.css — hex + rgba -> vars — P1
+#### Fase 6: Edit partida -- endereco diferente + texto exposto -- P1
+**Estimativa**: ~1h
+
+Na tela `Pages/Futsal/Edit.razor`:
+1. **Endereco**: O campo de endereco nao exibe o endereco da mesma forma que na tela da partida (`Detail.razor`). Verificar como o endereco e renderizado em ambas as telas e unificar o formato
+2. **Texto exposto no fim da pagina**: Pode ser um bloco `@code` mal fechado, texto de debug ou conteudo HTML fora de tag. Inspecionar o final de `Edit.razor` e remover/encapsular texto exposto
+
+**Validacao**: `dotnet build` + testar visualmente em `/futsal/edit/{id}`
+
+---
+
+#### Fase 7: Tela eventos -- background invertido + btn criar partida -- P1
+**Estimativa**: ~1h
+
+Na tela `Pages/MyEvents/Index.razor`:
+1. **Background invertido**: O CSS (`Index.razor.css`) pode ter cores de fundo trocadas (ex: fundo escuro onde deveria ser claro ou vice-versa). Verificar classes `entity-shell` e background vars
+2. **Btn criar partida**: Avaliar se faz sentido ter btn "Criar Partida" aqui. Se o fluxo ideal e Grupos -> Eventos, considerar trocar por "Ver Grupos" (`/grupos`) ou mover btn de criacao para dentro da tela do grupo
+3. Se decidir manter os dois, documentar o racional
+
+**Validacao**: `dotnet build` + testar visualmente em `/meus-eventos`
+
+---
+
+#### Fase 8: Layout profile vs resto das telas -- P2
 **Estimativa**: ~1.5h
 
-marketplace.css tem 43 hex e 35 rgba com apenas 1 var usage. E o CSS global menos refatorado.
+A tela `Pages/Profile.razor` usa layout diferente das demais (nao usa `entity-shell` padrao). Avaliar:
+1. Verificar se `Profile.razor` usa `entity-shell` ou wrapper customizado
+2. Comparar com layout de outras telas (ex: `Groups/Detail`, `Futsal/Detail`)
+3. Se divergir, padronizar para usar `entity-shell` com os mesmos tokens de background/border
+4. Verificar tambem se `ProfileHeaderCard.razor`, `ProfileEditForm.razor` seguem o mesmo pattern
 
-**Mapeamento de hex -> vars existentes**:
-```
-#d8c093 -> var(--parchment-dark)
-#bfa06c -> var(--gold-deep)
-#7f5e34 -> var(--brown-mid)
-#7a572d -> var(--brown-mid)
-#3f2914 -> var(--brown-dark)
-#2f1e0c -> var(--bg-deep)
-#f3e2bf -> var(--parchment-soft)
-#ebd2a7 -> var(--parchment)
-#dfc493 -> var(--parchment-dark)
-```
-
-Para cada hex, encontrar a var mais proxima na lista permitida. Para rgba, verificar se alguma var de shadow/opacity se aplica. Se nao existir var proxima, documentar na secao "Cores sem Var".
-
-**Validacao**:
-```bash
-dotnet build
-grep -c '#[0-9a-fA-F]\{3,8\}' wwwroot/css/marketplace.css
-# Meta: <10
-grep -c 'rgba(' wwwroot/css/marketplace.css
-# Meta: <15
-```
+**Validacao**: `dotnet build` + comparar visualmente Profile vs outras telas
 
 ---
 
-#### Fase 5: Converter rgba restantes em scoped CSS + site.css — P1
-**Estimativa**: ~2h
+### BLOCO B -- CLEANUP TECNICO (Fases 9-11)
 
-**Scoped CSS**: 378 rgba restantes. Muitos sao padroes unicos (336 patterns), mas ha ~87 usos com 3+ ocorrencias que agora tem vars (da Fase 1). Converter TODOS que tem var correspondente via grep global (regra 17).
+#### Fase 9: Migrar 3 paginas de AppDbContext -> IDbContextFactory -- P1
+**Estimativa**: ~1h
 
-**site.css fora do :root**: 91 rgba restantes. Converter os que tem var e documentar os que nao tem (metallic gradients, one-off opacities).
-
-Os 2 hex restantes em site.css (`#e0f7f4`, `#ecfdf5`) sao mint green sem var — documentar na secao "Cores sem Var".
-
-**Validacao**:
-```bash
-dotnet build
-grep -rn 'rgba(' Pages/ Shared/ --include="*.css" | grep -v 'var(--' | wc -l
-# Meta: <300 (de 378 atual — muitos sao opacities unicas de warm theme)
-```
-
----
-
-### BLOCO B — DECOMPOSICAO DE TODAS AS PAGINAS GRANDES (Fases 6-10)
-
-**Regras de decomposicao** (aplicam a TODAS as fases abaixo):
-- Componente filho recebe dados via `[Parameter]`
-- Eventos de volta via `[Parameter] EventCallback`
-- CSS vai no `.razor.css` do componente filho (NAO global)
-- Usar `partial class` com code-behind `.razor.cs` para TODA pagina
-- Usar `IDbContextFactory<AppDbContext>` (NAO AppDbContext direto)
-- Se a pagina ja usa `@inject AppDbContext Db`, converter para `IDbContextFactory` durante a decomposicao
-
----
-
-#### Fase 6: Decomposicao de AdminPayments.razor (1.156L) — P2
-**Estimativa**: ~2h
-
-Ja tem 4 sub-componentes extraidos (`AdminPaymentsFilters`, `AdminPaymentsSummaryPanel`, `AdminPaymentsTable`, `AdminPaymentsAdvancedToolsModal`). O template principal ainda esta com 1.156L — extrair code-behind:
-
-1. Criar `AdminPayments.razor.cs` com toda a logica (campos, metodos, lifecycle)
-2. Template fica com markup puro (~400-500L — aceitavel dado que ja tem 4 sub-componentes)
+Migrar `ViewPayment.razor`, `Payment.razor`, `PaymentDetails.razor`:
+1. Substituir `@inject AppDbContext Db` por `@inject IDbContextFactory<AppDbContext> DbFactory`
+2. Em cada metodo, usar `await using var db = await DbFactory.CreateDbContextAsync();`
+3. Se a pagina nao tem code-behind, criar `.razor.cs` com `partial class`
 
 **Validacao**:
 ```bash
 dotnet build
 dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Admin/AdminPayments.razor
-# Meta: <600 (ja tem sub-componentes, o template e denso)
+grep -rn '@inject AppDbContext' Pages/ Shared/ --include="*.razor"
+# Meta: 0 resultados
 ```
 
 ---
 
-#### Fase 7: Decomposicao de Futsal/Detail.razor (931L) — P2
-**Estimativa**: ~2h
+#### Fase 10: Reduzir !important em site.css -- P3
+**Estimativa**: ~30 min
 
-Ja tem 9+ sub-componentes em `Pages/Futsal/Components/`. Extrair code-behind:
+Analisar os 11 `!important` em site.css. Os seguintes sao LEGITIMOS e devem ser mantidos:
+- Linhas 1255-1257: `prefers-reduced-motion` (padrao de acessibilidade W3C)
+- Linhas 6549-6555: Override de autofill do Chrome (necessario)
+- Linha 6464: `z-index: 9999` em modal (pattern aceitavel)
 
-1. Criar `Futsal/Detail.razor.cs` com toda a logica
-2. Template fica com markup referenciando os sub-componentes
+Os seguintes PODEM ser removidos via refatoracao de especificidade:
+- Linha 883: `display: none !important` -- verificar se cascade resolve
+- Linha 4689: `color !important` -- verificar especificidade
 
-**Validacao**:
-```bash
-dotnet build
-dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Futsal/Detail.razor
-# Meta: <500 (ja tem muitos sub-componentes, template denso)
-```
+**Validacao**: testar visualmente apos cada remocao.
 
 ---
 
-#### Fase 8: Decomposicao de Groups/Payments.razor (560L), Poker/Edit.razor (547L), Groups/Features.razor (461L) — P2
-**Estimativa**: ~3h (3 paginas menores)
+#### Fase 11: Eliminar warnings xUnit2013 nos testes -- P3
+**Estimativa**: ~30 min
 
-Para cada pagina:
-1. Criar code-behind `.razor.cs` com toda a logica
-2. Extrair sub-componentes se necessario (Groups/Payments: tabela + resumo; Poker/Edit: form fields; Groups/Features: toggles)
-3. Se usa `AppDbContext` direto, converter para `IDbContextFactory`
+49 warnings `xUnit2013: Do not use Assert.Equal() to check for collection size`. Substituir:
+- `Assert.Equal(1, collection.Count)` -> `Assert.Single(collection)`
+- `Assert.Equal(0, collection.Count)` -> `Assert.Empty(collection)`
 
-**Validacao** (para cada pagina):
-```bash
-dotnet build
-dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Groups/Payments.razor     # Meta: <350
-wc -l Pages/Poker/Edit.razor          # Meta: <350
-wc -l Pages/Groups/Features.razor     # Meta: <300
-```
+**Validacao**: `dotnet build 2>&1 | grep 'warning' | grep -v 'xUnit'` -> 0 resultados
 
 ---
 
-#### Fase 9: Decomposicao de EventPayment (667L), Escalacao (661L), AdminLogs (656L) — P2
-**Estimativa**: ~3h (3 paginas medias)
+## Ciclo 13 -- Backlog Arquitetural (para ciclo futuro)
 
-**EventPayment.razor** (667L): Ja tem 7 sub-componentes em `Pages/Payment/Components/`. Criar code-behind.
-- **ATENCAO**: Esta pagina usa `@inject AppDbContext Db` — converter para `IDbContextFactory`
+> Estes pontos sao mudancas maiores que requerem planejamento e possivelmente mais de 1 ciclo.
 
-**Escalacao.razor** (661L): Criar code-behind + extrair sub-componentes se necessario.
+### 13.1: Testar versao web mobile -- P1
+Verificar responsividade em viewport mobile (375px, 414px). Usar breakpoints ja padronizados (640/768/1024/1440px).
+- Testar telas principais: grupos, partida, pagamentos, perfil
+- Documentar problemas de overflow, touch targets <44px, texto cortado
 
-**AdminLogs.razor** (656L): Ja tem `AdminLogsTable`. Criar code-behind.
+### 13.2: Implementar refresh token -- P0
+O sistema atual nao renova tokens de autenticacao automaticamente. Implementar:
+- Refresh token com `ITicketStore` ou cookie sliding expiration
+- Testar sessao longa (>30min) sem perda de autenticacao
+- Avaliar impacto em Blazor Server (circuito SignalR ja mantem sessao)
 
-**Validacao** (para cada pagina):
-```bash
-dotnet build
-dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Payment/EventPayment.razor  # Meta: <400
-wc -l Pages/Futsal/Escalacao.razor      # Meta: <400
-wc -l Pages/Admin/AdminLogs.razor       # Meta: <400
-```
-
----
-
-#### Fase 10: Decomposicao de PaymentsHistory (419L), Futsal/Create (418L), Admin (410L), MyEvents/Index (402L) — P2
-**Estimativa**: ~3h (4 paginas menores, perto do limite)
-
-Para cada pagina: criar code-behind `.razor.cs` com toda a logica.
-
-**ATENCAO**:
-- `PaymentsHistory.razor` usa `@inject AppDbContext Db` — converter para `IDbContextFactory`
-- `PaymentDetails.razor` (separado, nao na lista) tambem usa AppDbContext — converter se tocar
-
-**Validacao** (para cada pagina):
-```bash
-dotnet build
-dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-wc -l Pages/Payment/PaymentsHistory.razor  # Meta: <250
-wc -l Pages/Futsal/Create.razor            # Meta: <250
-wc -l Pages/Admin/Admin.razor              # Meta: <250
-wc -l Pages/MyEvents/Index.razor           # Meta: <250
-```
-
----
-
-## Ordem de Execucao
-
-```
-BLOCO A (CSS):
-  Fase 1 (novas vars) -> Fase 2 (events.css rgba) -> Fase 3 (events.css hex) -> Fase 4 (marketplace.css) -> Fase 5 (scoped + site.css)
-
-BLOCO B (Decomposicao):
-  Fase 6 (AdminPayments 1156L) -> Fase 7 (Futsal/Detail 931L) -> Fase 8 (3 paginas ~500L) -> Fase 9 (3 paginas ~660L) -> Fase 10 (4 paginas ~410L)
-```
-
-**Metas Ciclo 11**:
-- events.css rgba <170, events.css hex <50
-- marketplace.css hex <10, rgba <15
-- Scoped rgba <300
-- site.css rgba (fora :root) <80
-- TODAS as 12 paginas >400L com code-behind `.razor.cs`
-- TODAS as paginas com `AppDbContext` direto migradas para `IDbContextFactory`
-- 0 vars indefinidas, 0 vars mortas, 0 encoding issues
+### 13.3: Repensar fluxo de navegacao -- P1
+Fluxo atual: tela inicial = Grupos. Proposta:
+- Tela inicial = Eventos (proximas partidas)
+- Grupos -> ver eventos do grupo -> criar partida dentro do grupo
+- Separar criacao de partida da tela geral de eventos
+- Requer: alterar `@page "/"` de `Groups/Index.razor` para nova pagina de eventos, criar navegacao coerente
 
 ---
 
@@ -714,8 +666,8 @@ grep -rn '!important' Pages/ Shared/ wwwroot/css/ --include="*.css" | wc -l
 
 # Verificar vars indefinidas:
 grep -oP '^\s*--([\w-]+)\s*:' wwwroot/css/site.css | sed 's/^\s*--//' | sed 's/\s*://' | sort -u > /tmp/defined.txt
-grep -rPoh 'var\(--([\w-]+)\)' Pages/ Shared/ --include="*.css" | grep -oP '\-\-([\w-]+)' | sed 's/^--//' | sort -u > /tmp/used.txt
-grep -rPoh '^\s*--([\w-]+)\s*:' Pages/ Shared/ --include="*.css" | sed 's/^\s*--//' | sed 's/\s*://' | sort -u > /tmp/local.txt
+grep -rPoh 'var\(--([\w-]+)\)' Pages/ Shared/ wwwroot/css/ --include="*.css" | grep -oP '\-\-([\w-]+)' | sed 's/^--//' | sort -u > /tmp/used.txt
+grep -rPoh '^\s*--([\w-]+)\s*:' Pages/ Shared/ wwwroot/css/ --include="*.css" | sed 's/^\s*--//' | sed 's/\s*://' | sort -u > /tmp/local.txt
 cat /tmp/defined.txt /tmp/local.txt | sort -u > /tmp/all.txt
 comm -23 /tmp/used.txt /tmp/all.txt
 # Meta: 0 linhas
@@ -727,7 +679,7 @@ while IFS= read -r var; do
 done < /tmp/defined.txt
 # Meta: 0
 
-# Verificar encoding UTF-8:
+# Verificar encoding UTF-8 em TODOS os CSS (inclui site.css!):
 python3 -c "
 import glob
 for p in ['Pages/**/*.css','Shared/**/*.css','wwwroot/css/*.css']:
@@ -735,6 +687,13 @@ for p in ['Pages/**/*.css','Shared/**/*.css','wwwroot/css/*.css']:
         with open(f,'rb') as fh:
             try: fh.read().decode('utf-8')
             except: print(f'ENCODING: {f}')
+for p in ['wwwroot/css/*.css']:
+    for f in glob.glob(p, recursive=True):
+        with open(f,'r') as fh:
+            for i,line in enumerate(fh,1):
+                if 'ΓöÇ' in line or 'ΓÇö' in line:
+                    print(f'MOJIBAKE: {f}:{i}')
+                    break
 "
 # Meta: 0 arquivos listados
 ```
