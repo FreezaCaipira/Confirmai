@@ -1,6 +1,4 @@
 .entity-shell {
-    --entity-bg:     var(--ci-bg);
-    --entity-card:   var(--ci-bg-card);
     --entity-line:   var(--ci-border);
     --entity-accent: var(--ci-accent);
     --entity-ink:    var(--ci-text);

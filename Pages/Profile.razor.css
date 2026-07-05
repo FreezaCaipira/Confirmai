@@ -6,7 +6,6 @@
     max-width: 760px;
     margin: 1.5rem auto;
     padding: 0 1rem;
-    --entity-bg: var(--ci-bg-card);
     --entity-line: var(--ci-border);
     --entity-accent: var(--ci-accent);
     --entity-ink: var(--ci-text);
