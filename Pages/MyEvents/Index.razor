@@ -88,7 +88,11 @@
                         @foreach (var s in FilteredSchedules)
                         {
                             var futureCount = scheduleFutureCounts.GetValueOrDefault(s.Id, 0);
-                            <div class="my-schedule-card @(!s.IsActive ? "my-schedule-card--inactive" : "")">
+                            <div class="my-schedule-card my-event-card--futsal @(!s.IsActive ? "my-schedule-card--inactive" : "")">
+                                <div class="my-event-card-overlay"></div>
+                                <div class="my-event-card-bg-icon">
+                                    <i class="fas fa-futbol"></i>
+                                </div>
                                 <div class="my-event-sport-badge my-event-sport-badge--futsal">⚽</div>
 
                                 <div class="my-event-body">
@@ -174,7 +178,11 @@
                         var isPast   = ev.StartsAt < DateTime.UtcNow;
                         var detailUrl = isFutsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
 
-                        <div class="my-event-card @(!ev.IsActive ? "my-event-card--inactive" : isPast ? "my-event-card--past" : "")">
+                        <div class="my-event-card @(isFutsal ? "my-event-card--futsal" : "my-event-card--poker") @(!ev.IsActive ? "my-event-card--inactive" : isPast ? "my-event-card--past" : "")">
+                            <div class="my-event-card-overlay"></div>
+                            <div class="my-event-card-bg-icon">
+                                <i class="@(isFutsal ? "fas fa-futbol" : "fas fa-cards")"></i>
+                            </div>
                             <div class="my-event-sport-badge @(isFutsal ? "my-event-sport-badge--futsal" : "my-event-sport-badge--poker")">
                                 @(isFutsal ? "⚽" : "🃏")
                             </div>
