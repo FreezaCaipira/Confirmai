@@ -6,16 +6,23 @@
     max-width: 760px;
     margin: 1.5rem auto;
     padding: 0 1rem;
+    --entity-bg: var(--ci-bg-card);
+    --entity-line: var(--ci-border);
+    --entity-accent: var(--ci-accent);
+    --entity-ink: var(--ci-text);
+    --entity-muted: var(--ci-text-blue);
 }
 
 /* -- Card base ------------------------------------------------------------- */
 
 .profile-card {
     border: 1px solid var(--ci-border);
-    border-radius: 8px;
+    border-top: 2px solid var(--ci-border-dim);
+    border-radius: 14px;
     background: var(--ci-bg-card);
-    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-xs);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
+    transition: border-color 0.25s ease, border-top-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 /* -- Card de mensagem (parent wrapper) ------------------------------------- */
