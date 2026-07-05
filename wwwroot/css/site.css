@@ -4686,7 +4686,7 @@ body .oldsite-payment-chip img {
 }
 
 body .oldsite-payment-chip span {
-    color: var(--ci-text-blue) !important;
+    color: var(--ci-text-blue);
     font-size: 0.82rem;
     font-weight: 500;
     line-height: 1.4;
