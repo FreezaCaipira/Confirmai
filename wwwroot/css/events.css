@@ -3766,7 +3766,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 .esc-score-team {
     font-size: 1.05rem;
-    color: var(--ci-border-dim);
+    color: var(--ci-text-muted);
     font-weight: 700;
 }
 
@@ -3780,7 +3780,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 .esc-score-sep {
     font-size: 1.2rem;
-    color: var(--ci-border-dim);
+    color: var(--ci-text-muted);
     font-weight: 700;
 }
 
@@ -3792,7 +3792,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 }
 .esc-score-winner--a  { color: var(--gold); }
 .esc-score-winner--b  { color: var(--ci-accent-mid); }
-.esc-score-winner--draw { color: var(--ci-border-dim); }
+.esc-score-winner--draw { color: var(--ci-text-muted); }
 
 .esc-score-inputs {
     display: flex;
@@ -3821,7 +3821,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 .esc-score-label {
     font-size: .8rem;
-    color: var(--ci-border-dim);
+    color: var(--ci-text-muted);
     font-weight: 600;
 }
 
@@ -3842,10 +3842,10 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     flex-wrap: wrap;
 }
 
-.esc-score-registered-by strong { color: var(--ci-border-dim); }
+.esc-score-registered-by strong { color: var(--ci-text-muted); }
 
 .esc-score-registered-when {
-    color: var(--ci-border-dim);
+    color: var(--ci-text-muted);
 }
 
 .esc-btn--sm {
@@ -3855,7 +3855,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 .esc-hint {
     font-size: .82rem;
-    color: var(--ci-border-dim);
+    color: var(--ci-text-muted);
     display: flex;
     align-items: center;
     gap: .35rem;

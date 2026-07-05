@@ -33,7 +33,7 @@
             }
         }
     }
-    @if (CanEdit)
+    @if (CanEdit && !IsPastEvent)
     {
         <a class="detail-admin-btn" href="/futsal/@EventId/edit">
             <i class="fas fa-pen"></i> Editar partida
