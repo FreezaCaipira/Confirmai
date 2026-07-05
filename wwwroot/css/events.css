@@ -2235,7 +2235,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 .group-card--action-required {
     border-color: rgba(248, 113, 113, 0.45);
-    background: var(--poker-bg-deepest);
+    background: var(--red-bg-dark);
 }
 
 .groups-filter-toggle {
