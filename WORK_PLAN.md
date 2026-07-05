@@ -458,15 +458,123 @@ A refatoracao CSS iniciada no Ciclo 4 esta **essencialmente concluida**. Os nume
 
 ---
 
-## Ciclo 12 -- Tarefas (se necessario)
+## Ciclo 12 -- UX/UI Fixes + Cleanup Tecnico
 
-> **NOTA DO SENIOR**: A refatoracao CSS esta concluida. O proximo ciclo deve focar em trabalho funcional, nao mais CSS.
-> As 3 tarefas abaixo sao opcoes de cleanup leve. O dono do projeto deve decidir se vale um ciclo ou se prefere focar em features.
+> Ciclo misto: 8 pontos UX/UI levantados em testes do sistema + 3 tarefas de cleanup tecnico.
+> Pontos 9-11 do backlog (mobile, refresh token, repensamento de fluxo) ficam para o Ciclo 13 por serem mudancas arquiteturais maiores.
 
-**Branch**: `refactor/ciclo12-cleanup`
+**Branch**: `fix/ciclo12-ux-cleanup`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 
-### Fase 1: Migrar 3 paginas de AppDbContext -> IDbContextFactory -- P1
+---
+
+### BLOCO A -- FIXES UX/UI (Fases 1-8)
+
+#### Fase 1: Card do grupo perdeu efeito de estilizacao -- P0
+**Estimativa**: ~30 min
+
+O card de grupo em `Pages/Groups/Index.razor` perdeu efeito visual. O styling esta em `wwwroot/css/events.css` (classes `.group-card`, `.group-card-overlay`, `.group-card:hover`).
+
+**Procedimento**:
+1. Verificar se `.group-card` em `events.css` (linha ~2957) tem gradientes/sombras/hover corretos
+2. Comparar com versao anterior (`git diff HEAD~15 -- wwwroot/css/events.css | grep group-card`)
+3. Restaurar efeitos que foram perdidos na conversao hex -> var do Ciclo 11
+4. Testar visualmente: o card deve ter overlay com gradiente, hover com elevacao, sombra sutil
+
+**Validacao**: `dotnet build` + verificar visualmente em `/grupos`
+
+---
+
+#### Fase 2: Partidas em nova janela na tela do grupo -- P1
+**Estimativa**: ~30 min
+
+Na tela `Pages/Groups/Detail.razor`, avaliar se links para partidas devem abrir em nova aba.
+
+**Procedimento**:
+1. Identificar os links de partida no `Detail.razor`
+2. Se o link navega para `/futsal/{id}`, considerar se `target="_blank"` faz sentido no contexto SPA
+3. **DECISAO**: Em Blazor Server (SPA), abrir nova janela quebra o circuito SignalR. Manter navegacao interna a menos que o dono do projeto insista.
+4. Se decidir abrir nova aba, usar `<a href="/futsal/{id}" target="_blank">` e documentar que cria novo circuito
+
+**Validacao**: `dotnet build` + testar navegacao em `/grupo/{id}`
+
+---
+
+#### Fase 3: Pagamentos pendentes -- btn comprovante + btns email/zap -- P1
+**Estimativa**: ~1h
+
+Na tela de pagamentos pendentes, avaliar:
+1. **Btn comprovante**: verificar se esta posicionado de forma logica. Se nao, mover para posicao mais intuitiva
+2. **Btns email e WhatsApp**: verificar se existem e estao funcionais. Se faltam, adicionar botoes para enviar lembrete por email/WhatsApp
+
+**Arquivos**: `Pages/Payment/PaymentsHistory.razor`, `Pages/Payment/PaymentsHistory.razor.cs`, `Pages/Payment/PaymentsHistory.razor.css`
+
+**Validacao**: `dotnet build` + testar visualmente nos pagamentos pendentes
+
+---
+
+#### Fase 4: Pagamentos historico -- caracteres bugados + valor verde -- P0
+**Estimativa**: ~1h
+
+Duas questoes na tela `Pages/Payment/PaymentsHistory.razor`:
+1. **Caracteres bugados**: Verificar encoding de strings exibidas (pode ser UiText com encoding errado ou dados do banco com acentos corrompidos). Verificar `PaymentsHistory.razor.css` por mojibake nos comentarios
+2. **Valor verde**: O CSS mostra `color: var(--green-bright)` nas linhas 85 e 408 do `.razor.css`. Avaliar se o valor monetario deve ser verde (pode confundir com "pago" quando o pagamento esta pendente). Se sim, usar cor neutra (`var(--ci-text)`) para valores e manter verde so para status "Pago"
+
+**Validacao**: `dotnet build` + testar visualmente em `/pagamentos-historico`
+
+---
+
+#### Fase 5: Pos-partida -- legibilidade + btn confirmar placar + btn edit -- P1
+**Estimativa**: ~1.5h
+
+Na tela de `Pages/Futsal/Detail.razor` apos a partida terminar:
+1. **Legibilidade**: Textos com baixo contraste contra fundo escuro. Verificar cores de texto no CSS scoped (`Detail.razor.css`) e global (`events.css`). Usar vars de texto legiveis (`var(--ci-text)`, `var(--ci-text-blue)`)
+2. **Btn confirmar placar nao faz nada**: O componente `EscalacaoScoreEditor.razor` pode ter evento `@onclick` sem handler funcional ou handler que falha silenciosamente. Verificar binding e logica no code-behind
+3. **Btn edit**: Avaliar se faz sentido ter btn de editar na tela pos-partida. Se a partida ja terminou, editar nao deveria ser permitido. Esconder btn quando `ev.Status == EventStatus.Finished`
+
+**Validacao**: `dotnet build` + `dotnet test` + testar visualmente apos uma partida encerrada
+
+---
+
+#### Fase 6: Edit partida -- endereco diferente + texto exposto -- P1
+**Estimativa**: ~1h
+
+Na tela `Pages/Futsal/Edit.razor`:
+1. **Endereco**: O campo de endereco nao exibe o endereco da mesma forma que na tela da partida (`Detail.razor`). Verificar como o endereco e renderizado em ambas as telas e unificar o formato
+2. **Texto exposto no fim da pagina**: Pode ser um bloco `@code` mal fechado, texto de debug ou conteudo HTML fora de tag. Inspecionar o final de `Edit.razor` e remover/encapsular texto exposto
+
+**Validacao**: `dotnet build` + testar visualmente em `/futsal/edit/{id}`
+
+---
+
+#### Fase 7: Tela eventos -- background invertido + btn criar partida -- P1
+**Estimativa**: ~1h
+
+Na tela `Pages/MyEvents/Index.razor`:
+1. **Background invertido**: O CSS (`Index.razor.css`) pode ter cores de fundo trocadas (ex: fundo escuro onde deveria ser claro ou vice-versa). Verificar classes `entity-shell` e background vars
+2. **Btn criar partida**: Avaliar se faz sentido ter btn "Criar Partida" aqui. Se o fluxo ideal e Grupos -> Eventos, considerar trocar por "Ver Grupos" (`/grupos`) ou mover btn de criacao para dentro da tela do grupo
+3. Se decidir manter os dois, documentar o racional
+
+**Validacao**: `dotnet build` + testar visualmente em `/meus-eventos`
+
+---
+
+#### Fase 8: Layout profile vs resto das telas -- P2
+**Estimativa**: ~1.5h
+
+A tela `Pages/Profile.razor` usa layout diferente das demais (nao usa `entity-shell` padrao). Avaliar:
+1. Verificar se `Profile.razor` usa `entity-shell` ou wrapper customizado
+2. Comparar com layout de outras telas (ex: `Groups/Detail`, `Futsal/Detail`)
+3. Se divergir, padronizar para usar `entity-shell` com os mesmos tokens de background/border
+4. Verificar tambem se `ProfileHeaderCard.razor`, `ProfileEditForm.razor` seguem o mesmo pattern
+
+**Validacao**: `dotnet build` + comparar visualmente Profile vs outras telas
+
+---
+
+### BLOCO B -- CLEANUP TECNICO (Fases 9-11)
+
+#### Fase 9: Migrar 3 paginas de AppDbContext -> IDbContextFactory -- P1
 **Estimativa**: ~1h
 
 Migrar `ViewPayment.razor`, `Payment.razor`, `PaymentDetails.razor`:
@@ -482,7 +590,9 @@ grep -rn '@inject AppDbContext' Pages/ Shared/ --include="*.razor"
 # Meta: 0 resultados
 ```
 
-### Fase 2: Reduzir !important em site.css -- P3
+---
+
+#### Fase 10: Reduzir !important em site.css -- P3
 **Estimativa**: ~30 min
 
 Analisar os 11 `!important` em site.css. Os seguintes sao LEGITIMOS e devem ser mantidos:
@@ -496,7 +606,9 @@ Os seguintes PODEM ser removidos via refatoracao de especificidade:
 
 **Validacao**: testar visualmente apos cada remocao.
 
-### Fase 3: Eliminar warnings xUnit2013 nos testes -- P3
+---
+
+#### Fase 11: Eliminar warnings xUnit2013 nos testes -- P3
 **Estimativa**: ~30 min
 
 49 warnings `xUnit2013: Do not use Assert.Equal() to check for collection size`. Substituir:
@@ -504,6 +616,30 @@ Os seguintes PODEM ser removidos via refatoracao de especificidade:
 - `Assert.Equal(0, collection.Count)` -> `Assert.Empty(collection)`
 
 **Validacao**: `dotnet build 2>&1 | grep 'warning' | grep -v 'xUnit'` -> 0 resultados
+
+---
+
+## Ciclo 13 -- Backlog Arquitetural (para ciclo futuro)
+
+> Estes pontos sao mudancas maiores que requerem planejamento e possivelmente mais de 1 ciclo.
+
+### 13.1: Testar versao web mobile -- P1
+Verificar responsividade em viewport mobile (375px, 414px). Usar breakpoints ja padronizados (640/768/1024/1440px).
+- Testar telas principais: grupos, partida, pagamentos, perfil
+- Documentar problemas de overflow, touch targets <44px, texto cortado
+
+### 13.2: Implementar refresh token -- P0
+O sistema atual nao renova tokens de autenticacao automaticamente. Implementar:
+- Refresh token com `ITicketStore` ou cookie sliding expiration
+- Testar sessao longa (>30min) sem perda de autenticacao
+- Avaliar impacto em Blazor Server (circuito SignalR ja mantem sessao)
+
+### 13.3: Repensar fluxo de navegacao -- P1
+Fluxo atual: tela inicial = Grupos. Proposta:
+- Tela inicial = Eventos (proximas partidas)
+- Grupos -> ver eventos do grupo -> criar partida dentro do grupo
+- Separar criacao de partida da tela geral de eventos
+- Requer: alterar `@page "/"` de `Groups/Index.razor` para nova pagina de eventos, criar navegacao coerente
 
 ---
 
