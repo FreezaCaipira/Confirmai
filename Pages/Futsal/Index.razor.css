@@ -42,17 +42,19 @@
 
 /* -- Event card base ----------------------- */
 .event-card {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 1.25rem;
     padding: 1rem 1.25rem;
     border-radius: 12px;
-    background: var(--ci-bg);
+    background: linear-gradient(135deg, var(--futsal-bg-dark) 0%, var(--ci-bg-deepest) 100%);
     border: 1px solid var(--ci-border-alt);
     box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-sm);
-    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.2s;
     width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .event-card--futsal {
@@ -65,10 +67,31 @@
     border-color: var(--green-bright);
     border-left-color: var(--green-bright);
     box-shadow: 0 12px 32px var(--green-dark-2xl), 0 6px 16px var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.event-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, var(--shadow-md) 0%, rgba(0, 0, 0, 0.5) 100%);
+    pointer-events: none;
+}
+
+.event-card-bg-icon {
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    font-size: 3.5rem;
+    color: rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* -- Time badge ---------------------------- */
 .event-time {
+    position: relative;
+    z-index: 1;
     font-size: 1.3rem;
     font-weight: 800;
     color: var(--green-bright);
@@ -82,6 +105,8 @@
 
 /* -- Body ---------------------------------- */
 .event-body {
+    position: relative;
+    z-index: 1;
     flex: 1;
     min-width: 0;
 }
@@ -169,6 +194,8 @@
 
 /* -- Action button ------------------------- */
 .event-action {
+    position: relative;
+    z-index: 1;
     flex-shrink: 0;
     font-size: 0.82rem;
     font-weight: 800;

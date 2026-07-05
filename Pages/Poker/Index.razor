@@ -59,6 +59,8 @@
                 var isUserConfirmed = currentUserId is not null && ev.Confirmations.Any(c => c.UserId == currentUserId);
             }
             <article class="event-card event-card--poker @(isUserConfirmed ? "event-card--confirmed" : string.Empty)">
+                <div class="event-card-overlay"></div>
+                <div class="event-card-bg-icon"><i class="fas fa-cards"></i></div>
                 <div class="event-time">@ev.StartsAt.ToString("HH:mm")</div>
                 <div class="event-body">
                     <div class="event-name-row">
