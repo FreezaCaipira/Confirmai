@@ -1,4 +1,28 @@
-﻿/* ── Header (updated for view tabs) ─────────────────────────── */
+﻿/* ── Page container (matches groups-page pattern) ─────────────── */
+.events-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+.events-block {
+    margin: 0 auto 1.25rem;
+    max-width: 860px;
+    padding: 0.95rem 1rem 1rem;
+    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+    border: 1px solid var(--ci-border);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+}
+
+.events-block .page-section-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--ci-accent);
+    margin: 0;
+}
+
+/* ── Header (updated for view tabs) ─────────────────────────── */
 .my-events-header {
     display: flex;
     align-items: flex-start;
@@ -124,10 +148,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.62rem;
-}
-
-.entity-shell-card {
-    background: var(--ci-bg-card-deep);
 }
 
 .my-event-card {
@@ -362,6 +382,10 @@
 }
 
 @media (max-width: 640px) {
+    .events-block {
+        padding: 0.8rem 0.8rem 0.9rem;
+    }
+
     .my-event-card {
         flex-wrap: wrap;
     }
