@@ -5,6 +5,7 @@
 @using System.Globalization
 @inject IDbContextFactory<AppDbContext> DbFactory
 
+<div class="listing-block">
 <div class="event-listing">
 
     @if (!string.IsNullOrEmpty(City))
@@ -90,6 +91,7 @@
         </ol>
     }
 
+</div>
 </div>
 
 @code {
