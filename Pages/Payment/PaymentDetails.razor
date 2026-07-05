@@ -5,7 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 @using Confirmai.Shared.Helpers
 
-@inject AppDbContext Db
+@inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager Navigation
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
@@ -103,7 +103,8 @@
         btcUsdRate = quote?.btc_usd;
         btcBrlRate = quote?.btc_brl;
 
-        payment = await Db.Payments
+        await using var db = await DbFactory.CreateDbContextAsync();
+        payment = await db.Payments
             .Include(p => p.Product)
             .ThenInclude(product => product!.User)
             .FirstOrDefaultAsync(p => p.Id == PaymentId);

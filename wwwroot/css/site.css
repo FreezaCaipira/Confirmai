@@ -170,9 +170,9 @@
     /* ── Ciclo 6 — Shadow/Opacity vars ── */
     
     /* Black opacity shadows */
-    --shadow-md:           var(--shadow-md);
+    --shadow-md:           rgba(0, 0, 0, 0.3);
     --shadow-lg:           rgba(0, 0, 0, 0.4);
-    --shadow-xl:           var(--shadow-md);
+    --shadow-xl:           rgba(0, 0, 0, 0.3);
     --shadow-2xl:          rgba(0, 0, 0, 0.6);
     
     /* Accent shadows */
@@ -188,30 +188,30 @@
     --red-opacity-lg:      rgba(239, 68, 68, 0.5);
     
     /* Text shadows */
-    --text-shadow-sm:      var(--shadow-md);
+    --text-shadow-sm:      rgba(0, 0, 0, 0.3);
     
     /* Inset shadows */
     --inset-accent-sm:     rgba(147, 197, 253, 0.2);
     
     /* Background overlays */
-    --overlay-sm:          var(--shadow-md);
+    --overlay-sm:          rgba(0, 0, 0, 0.3);
     --overlay-lg:          rgba(0, 0, 0, 0.55);
     
     /* Accent blue opacity */
-    --accent-opacity-sm:   var(--accent-opacity-sm);
-    --accent-opacity-md:   var(--accent-opacity-md);
-    --accent-opacity-lg:   var(--accent-opacity-lg);
+    --accent-opacity-sm:   rgba(79, 156, 248, 0.2);
+    --accent-opacity-md:   rgba(79, 156, 248, 0.3);
+    --accent-opacity-lg:   rgba(79, 156, 248, 0.4);
     --accent-opacity-xl:   rgba(79, 156, 248, 0.5);
-    --accent-opacity-2xl:  var(--accent-opacity-2xl);
+    --accent-opacity-2xl:  rgba(79, 156, 248, 0.6);
     
     /* Green opacity */
-    --green-opacity-sm:    var(--green-opacity-sm);
-    --green-opacity-md:    var(--green-opacity-md);
-    --green-opacity-lg:    var(--green-opacity-lg);
+    --green-opacity-sm:    rgba(74, 222, 128, 0.2);
+    --green-opacity-md:    rgba(74, 222, 128, 0.3);
+    --green-opacity-lg:    rgba(74, 222, 128, 0.35);
     
     /* Slate border opacity */
-    --slate-border-sm:     var(--slate-border-sm);
-    --slate-border-md:     var(--slate-border-md);
+    --slate-border-sm:     rgba(148, 163, 184, 0.1);
+    --slate-border-md:     rgba(148, 163, 184, 0.15);
     --slate-border-lg:     rgba(148, 163, 184, 0.2);
     
     /* Green-dark opacity */
@@ -231,7 +231,7 @@
     /* Red-light opacity */
     --red-light-sm:        rgba(248, 113, 113, 0.08);
     --red-light-md:        rgba(248, 113, 113, 0.2);
-    --red-light-lg:        var(--red-soft-opacity-md);
+    --red-light-lg:        rgba(248, 113, 113, 0.4);
     
     /* Red-dark opacity */
     --red-dark-md:         rgba(183, 28, 28, 0.3);
@@ -283,14 +283,14 @@
 
     /* Accent subtle (blue-400 low opacity) */
     --accent-opacity-xs:   rgba(79, 156, 248, 0.1);
-    --accent-opacity-2xs:  var(--accent-opacity-2xs);
+    --accent-opacity-2xs:  rgba(79, 156, 248, 0.15);
 
     /* Green mid opacity */
-    --green-opacity-xl:    var(--green-opacity-xl);
-    --green-opacity-2xl:   var(--green-opacity-2xl);
+    --green-opacity-xl:    rgba(74, 222, 128, 0.5);
+    --green-opacity-2xl:   rgba(74, 222, 128, 0.6);
 
     /* Black heavy */
-    --shadow-3xl:          var(--shadow-3xl);
+    --shadow-3xl:          rgba(0, 0, 0, 0.7);
 
     /* Blue-300 (96,165,250) — cor diferente de accent (79,156,248) */
     --blue300-opacity-xs:  rgba(96, 165, 250, 0.1);
@@ -330,7 +330,7 @@
     --teal-opacity-xs:     rgba(16, 185, 129, 0.1);
 
     /* Slate extended (148,163,184) */
-    --slate-border-xl:     var(--slate-border-xl);
+    --slate-border-xl:     rgba(148, 163, 184, 0.3);
 
     /* Navy/CI accent (26,90,176) */
     --ci-accent-opacity-xs: rgba(26, 90, 176, 0.12);
@@ -339,12 +339,12 @@
     --ci-accent-opacity-lg: rgba(26, 90, 176, 0.25);
 
     /* Slate functional (100,116,139) */
-    --slate-functional-md: var(--slate-functional-md);
+    --slate-functional-md: rgba(100, 116, 139, 0.3);
 
     /* Black additional */
-    --shadow-sm:           var(--shadow-sm);
+    --shadow-sm:           rgba(0, 0, 0, 0.25);
     --shadow-xs:           rgba(0, 0, 0, 0.2);
-    --shadow-2xs:          var(--shadow-2xs);
+    --shadow-2xs:          rgba(0, 0, 0, 0.15);
     --shadow-light:        rgba(0, 0, 0, 0.35);
 
     /* == Marketplace brown/parchment palette == */
@@ -4686,7 +4686,7 @@ body .oldsite-payment-chip img {
 }
 
 body .oldsite-payment-chip span {
-    color: var(--ci-text-blue) !important;
+    color: var(--ci-text-blue);
     font-size: 0.82rem;
     font-weight: 500;
     line-height: 1.4;

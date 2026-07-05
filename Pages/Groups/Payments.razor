@@ -22,7 +22,7 @@
 @inject LogService                     LogService
 @inject UiTextService                  Ui
 
-<PageTitle>Pagamentos â€” @(group?.Name ?? "Grupo") Â· Confirmai</PageTitle>
+<PageTitle>Pagamentos — @(group?.Name ?? "Grupo") · Confirmai</PageTitle>
 
 @if (isLoading)
 {
@@ -51,8 +51,8 @@
 else if (group is null || !isAdmin)
 {
     <div class="detail-not-found">
-        <h2>Acesso nÃ£o autorizado.</h2>
-        <a href="/grupo/@Id">â† Voltar</a>
+        <h2>Acesso não autorizado.</h2>
+        <a href="/grupo/@Id">← Voltar</a>
     </div>
 }
 else
@@ -63,7 +63,7 @@ else
             <header class="detail-header">
                 <div class="detail-header-top">
                     <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "âš½ Futsal" : "ðŸƒ Poker")
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
                     </span>
                     <a href="/grupo/@Id" class="detail-back-link">
                         <i class="fas fa-arrow-left"></i> Voltar
@@ -72,7 +72,7 @@ else
                 <h1 class="detail-title payments-title"><i class="fas fa-money-bill-wave"></i> Pagamentos</h1>
             </header>
 
-            @* â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+            @* ── Tabs ──────────────────────────────────────────────── *@
             <div class="payments-tabs">
                 <button class="payments-tab @(paymentTab == "delinquent" ? "payments-tab--active" : "")"
                         type="button"
@@ -86,7 +86,7 @@ else
                 <button class="payments-tab @(paymentTab == "history" ? "payments-tab--active" : "")"
                         type="button"
                         @onclick="@(() => HandleTabChange("history"))">
-                    <i class="fas fa-history"></i> HistÃ³rico
+                    <i class="fas fa-history"></i> Histórico
                     @if (paymentHistory?.Count > 0)
                     {
                         <span class="payments-tab-count">@paymentHistory.Count</span>
@@ -99,7 +99,7 @@ else
 
             @if (isLoadingPayments)
             {
-                <div class="payments-loading"><i class="fas fa-spinner fa-spin"></i> Carregandoâ€¦</div>
+                <div class="payments-loading"><i class="fas fa-spinner fa-spin"></i> Carregando…</div>
             }
             else if (paymentTab == "history")
             {
@@ -205,7 +205,7 @@ else
                                 else
                                 {
                                     <button class="payments-notify-btn payments-notify-btn--email" type="button"
-                                            title="Enviar e-mail de cobranÃ§a"
+                                            title="Enviar e-mail de cobrança"
                                             @onclick="() => HandleNotifyDelinquencyAsync(d)">
                                         <i class="fas fa-envelope"></i>
                                     </button>
@@ -232,9 +232,17 @@ else
                                         <li class="payments-detail-item">
                                             <span class="payments-detail-date">@Ui.FormatDateTime(entry.EventDate.ToLocalTime(), "DateDefault")</span>
                                             <span class="payments-detail-price">R$ @entry.EventPrice.ToString("F2")</span>
-                                            <a href="@entry.EventHref" class="payments-entry-link">
-                                                Ver
-                                            </a>
+                                            <div class="payments-detail-actions">
+                                                <button class="payments-view-proof-btn" type="button"
+                                                        disabled="@(entry.HasProof ? null : true)"
+                                                        @onclick="@(e => entry.HasProof ? HandleViewProof(entry.ConfirmationId) : System.Threading.Tasks.Task.CompletedTask)"
+                                                        title="Ver comprovante">
+                                                    <i class="fas fa-camera"></i>
+                                                </button>
+                                                <a class="payments-entry-link" href="@entry.EventHref" title="Ver partida">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </a>
+                                            </div>
                                         </li>
                                     }
                                 </ul>

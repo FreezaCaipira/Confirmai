@@ -13,7 +13,7 @@
     max-width: 880px;
     margin: 0 auto;
     padding: 1.5rem 1.5rem 2rem;
-    background: var(--ci-bg-card);
+    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
     border: 1px solid var(--ci-border-alt);
     border-top: 2px solid var(--ci-border-dim);
     border-radius: 14px;
@@ -22,6 +22,30 @@
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
+}
+
+/* ── Meus Eventos button ─────────────────── */
+.my-events-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 100%);
+    color: var(--ci-surface-light);
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-decoration: none;
+    border: 1px solid var(--ci-accent-light);
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 4px var(--accent-opacity-md);
+    text-shadow: 0 1px 3px var(--shadow-md);
+}
+
+.my-events-link-btn:hover {
+    background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 100%);
+    border-color: var(--link-info);
+    box-shadow: 0 4px 8px var(--accent-opacity-xl);
 }
 
 /* ── Meus Jogos Filters ───────────────────── */
@@ -377,7 +401,10 @@
 /* ── Sports tabs (Explorar / Meus Jogos) ─────────────────────── */
 .sports-tabs {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     width: 100%;
     margin-bottom: 1rem;
 }

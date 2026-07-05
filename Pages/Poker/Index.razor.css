@@ -1,10 +1,12 @@
 /* -- Page wrapper -------------------------- */
 .listing-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 55vh;
-    padding: 1.25rem 1rem 2.5rem;
+    gap: 1.25rem;
 }
 
 /* -- Criar Evento dropdown ----------------- */
@@ -96,17 +98,19 @@
 
 /* -- Event card base ----------------------- */
 .event-card {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 1.25rem;
     padding: 1rem 1.25rem;
     border-radius: 12px;
-    background: var(--ci-bg-card);
+    background: linear-gradient(135deg, var(--poker-bg-deepest) 0%, var(--ci-bg-deepest) 100%);
     border: 1px solid var(--ci-border-alt);
     box-shadow: 0 2px 10px var(--shadow-lg);
-    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.2s;
     width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .event-card--poker {
@@ -117,10 +121,31 @@
     border-color: var(--poker-accent-deep);
     border-left-color: var(--poker-accent);
     box-shadow: 0 6px 20px var(--purple-lg);
+    transform: translateY(-2px);
+}
+
+.event-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, var(--shadow-md) 0%, rgba(0, 0, 0, 0.5) 100%);
+    pointer-events: none;
+}
+
+.event-card-bg-icon {
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    font-size: 3.5rem;
+    color: rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* -- Time badge ---------------------------- */
 .event-time {
+    position: relative;
+    z-index: 1;
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--poker-accent);
@@ -132,7 +157,12 @@
 }
 
 /* -- Body ---------------------------------- */
-.event-body { flex: 1; min-width: 0; }
+.event-body {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0;
+}
 
 .event-name-row {
     display: flex;
@@ -146,7 +176,8 @@
     font-size: 1rem;
     font-weight: 700;
     margin: 0;
-    color: var(--ci-text);
+    color: var(--ci-surface-light);
+    text-shadow: 0 2px 4px var(--shadow-md);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -220,6 +251,8 @@
 
 /* -- Action button ------------------------- */
 .event-action {
+    position: relative;
+    z-index: 1;
     flex-shrink: 0;
     font-size: 0.82rem;
     font-weight: 600;
@@ -244,131 +277,3 @@
     .event-time { min-width: auto; }
 }
 
-.event-card {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 1rem 1.25rem;
-    border-radius: 12px;
-    background: var(--ci-bg-dark);
-    border: 1px solid var(--ci-border-alt);
-    transition: border-color 0.18s ease, box-shadow 0.18s ease;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.event-card--poker {
-    border-color: var(--poker-bg-deepest);
-}
-
-.event-card--poker:hover {
-    border-color: var(--poker-accent-deep);
-    box-shadow: 0 8px 24px var(--purple-md);
-}
-
-/* -- Time badge ---------------------------- */
-.event-time {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--poker-accent);
-    letter-spacing: -0.02em;
-    min-width: 3.5rem;
-    text-align: center;
-    flex-shrink: 0;
-    line-height: 1;
-}
-
-/* -- Body ---------------------------------- */
-.event-body {
-    flex: 1;
-    min-width: 0;
-}
-
-.event-name {
-    font-size: 1rem;
-    font-weight: 700;
-    margin: 0 0 0.2rem;
-    color: var(--ci-text);
-    font-family: inherit;
-    text-shadow: none;
-    text-transform: none;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.event-location {
-    font-size: 0.8rem;
-    color: var(--ci-text-subtle);
-    margin: 0 0 0.5rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.event-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-}
-
-.meta-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.76rem;
-    color: var(--ci-text-muted);
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    border-radius: 20px;
-    padding: 0.18rem 0.6rem;
-}
-
-.meta-chip--players {
-    border-color: var(--poker-border);
-    color: var(--poker-text);
-}
-
-.event-bonus {
-    font-size: 0.8rem;
-    color: var(--ci-text-subtle);
-    margin: 0.4rem 0 0;
-    font-style: italic;
-}
-
-/* -- Action button ------------------------- */
-.event-action {
-    flex-shrink: 0;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--poker-accent);
-    text-decoration: none;
-    white-space: nowrap;
-    padding: 0.4rem 0.9rem;
-    border: 1px solid var(--poker-bg-deepest);
-    border-radius: 7px;
-    transition: background 0.15s, border-color 0.15s;
-}
-
-.event-action:hover {
-    background: rgba(167, 139, 250, 0.08);
-    border-color: var(--poker-accent);
-}
-
-/* -- Responsive ---------------------------- */
-@media (max-width: 640px) {
-    .event-card {
-        flex-wrap: wrap;
-        gap: 0.75rem;
-    }
-
-    .event-action {
-        width: 100%;
-        text-align: center;
-    }
-
-    .event-time {
-        min-width: auto;
-    }
-}

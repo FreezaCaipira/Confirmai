@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using Confirmai.Configuration;
+using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Pages.Payment;
 using Confirmai.Services;
@@ -25,6 +26,8 @@ namespace Confirmai.Pages.Payment;
 
 public partial class Payment : IAsyncDisposable
 {
+    [Inject] private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
+
     [Parameter] public int ProductId { get; set; }
     public Confirmai.Models.Product? product;
     private ApplicationUser? sellerUser;
@@ -101,14 +104,15 @@ public partial class Payment : IAsyncDisposable
         btcUsdRate = quote?.btc_usd;
         btcBrlRate = quote?.btc_brl;
 
-        product = await Db.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == ProductId);
+        await using var db = await DbFactory.CreateDbContextAsync();
+        product = await db.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == ProductId);
         isLoading = false;
 
         if (query.TryGetValue("sellerId", out var querySellerIdVal))
         {
             var sellerIdStr = querySellerIdVal.LastOrDefault();
             if (!string.IsNullOrWhiteSpace(sellerIdStr))
-                sellerUser = await Db.Users.FirstOrDefaultAsync(u => u.Id == sellerIdStr);
+                sellerUser = await db.Users.FirstOrDefaultAsync(u => u.Id == sellerIdStr);
         }
         sellerUser ??= product?.User;
 
@@ -237,8 +241,9 @@ public partial class Payment : IAsyncDisposable
                 PrivateKey = privateKey,
             };
 
-            Db.Payments.Add(paymentRecord);
-            await Db.SaveChangesAsync();
+            await using var db = await DbFactory.CreateDbContextAsync();
+            db.Payments.Add(paymentRecord);
+            await db.SaveChangesAsync();
 
             await LogService.LogAsync(
                 $"EndereÃ§o/invoice gerado para produto {ProductId} via {SelectedMethod}.",
@@ -294,7 +299,8 @@ public partial class Payment : IAsyncDisposable
         try
         {
             var normalizedAddress = Address.Trim();
-            PaymentRecord? payment = await Db.Payments.FirstOrDefaultAsync(p => p.Address == normalizedAddress);
+            await using var db = await DbFactory.CreateDbContextAsync();
+            PaymentRecord? payment = await db.Payments.FirstOrDefaultAsync(p => p.Address == normalizedAddress);
             if (payment == null)
             {
                 NotifyUser(T["PaymentBuy.NotFoundByAddress"], "error");
@@ -484,8 +490,9 @@ public partial class Payment : IAsyncDisposable
                 PrivateKey = null,
             };
 
-            Db.Payments.Add(paymentRecord);
-            await Db.SaveChangesAsync();
+            await using var pixDb = await DbFactory.CreateDbContextAsync();
+            pixDb.Payments.Add(paymentRecord);
+            await pixDb.SaveChangesAsync();
 
             await LogService.LogAsync(
                 $"QR PIX gerado para produto {ProductId} via {(AbacatePayOpts.Value.IsEnabled ? "AbacatePay" : "payload estatico")}.",
@@ -535,7 +542,8 @@ public partial class Payment : IAsyncDisposable
             return null;
         }
 
-        var sellerPixKey = await Db.Users
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var sellerPixKey = await db.Users
             .AsNoTracking()
             .Where(u => u.Id == sellerUserId)
             .Select(u => u.PixKey)

@@ -110,8 +110,8 @@ else
                     <EscalacaoScoreEditor
                         ScoreTeamA="@ev.ScoreTeamA"
                         ScoreTeamB="@ev.ScoreTeamB"
-                        ScoreInputA="@scoreInputA"
-                        ScoreInputB="@scoreInputB"
+                        @bind-ScoreInputA="scoreInputA"
+                        @bind-ScoreInputB="scoreInputB"
                         EditingScore="@editingScore"
                         ScoreError="@scoreError"
                         TeamAName="@teamAName"

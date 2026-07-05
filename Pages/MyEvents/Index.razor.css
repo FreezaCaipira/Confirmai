@@ -1,4 +1,28 @@
-﻿/* ── Header (updated for view tabs) ─────────────────────────── */
+﻿/* ── Page container (matches groups-page pattern) ─────────────── */
+.events-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+.events-block {
+    margin: 0 auto 1.25rem;
+    max-width: 860px;
+    padding: 0.95rem 1rem 1rem;
+    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+    border: 1px solid var(--ci-border);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+}
+
+.events-block .page-section-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--ci-accent);
+    margin: 0;
+}
+
+/* ── Header (updated for view tabs) ─────────────────────────── */
 .my-events-header {
     display: flex;
     align-items: flex-start;
@@ -63,6 +87,12 @@
     border: 1.5px solid var(--green-strong);
 }
 
+.my-events-create-btn--groups {
+    background: var(--ci-bg-card);
+    color: var(--ci-accent);
+    border: 1.5px solid var(--ci-accent-mid);
+}
+
 .my-events-create-btn--poker {
     background: var(--poker-bg-deepest);
     color: var(--poker-text);
@@ -96,7 +126,7 @@
 }
 
 .my-events-tab--active {
-    background: var(--ci-bg-card-deep);
+    background: var(--ci-bg-card);
     color: var(--ci-accent);
     border-color: var(--ci-accent-mid);
 }
@@ -121,18 +151,56 @@
 }
 
 .my-event-card {
+    position: relative;
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
     padding: 0.75rem 0.9rem;
-    background: var(--ci-bg-card-deep);
+    background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
-    border-radius: 8px;
-    transition: border-color 0.15s, opacity 0.2s;
+    border-radius: 10px;
+    transition: border-color 0.2s, opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
 }
 
-.my-event-card:hover {
-    border-color: var(--ci-accent-mid);
+.my-event-card--futsal {
+    background: linear-gradient(135deg, var(--futsal-bg-dark) 0%, var(--ci-bg-deepest) 100%);
+    border-color: var(--futsal-green-dark);
+}
+
+.my-event-card--poker {
+    background: linear-gradient(135deg, var(--poker-bg-deepest) 0%, var(--ci-bg-deepest) 100%);
+    border-color: var(--poker-bg-dark);
+}
+
+.my-event-card--futsal:hover {
+    border-color: var(--green-strong);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px var(--shadow-2xl);
+}
+
+.my-event-card--poker:hover {
+    border-color: var(--poker-accent-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px var(--shadow-2xl);
+}
+
+.my-event-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, var(--shadow-md) 0%, rgba(0, 0, 0, 0.6) 100%);
+    pointer-events: none;
+}
+
+.my-event-card-bg-icon {
+    position: absolute;
+    top: 50%;
+    right: 1.2rem;
+    transform: translateY(-50%);
+    font-size: 3.5rem;
+    color: rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .my-event-card--inactive {
@@ -144,6 +212,8 @@
 }
 
 .my-event-sport-badge {
+    position: relative;
+    z-index: 1;
     flex-shrink: 0;
     width: 2.4rem;
     height: 2.4rem;
@@ -165,6 +235,8 @@
 }
 
 .my-event-body {
+    position: relative;
+    z-index: 1;
     flex: 1;
     min-width: 0;
 }
@@ -179,8 +251,9 @@
 
 .my-event-name {
     font-size: 0.95rem;
-    color: var(--ci-text);
+    color: var(--white);
     font-weight: 700;
+    text-shadow: 0 1px 3px var(--shadow-lg);
 }
 
 .my-event-status {
@@ -238,13 +311,15 @@
 .my-event-meta {
     margin: 0 0 0.18rem;
     font-size: 0.8rem;
-    color: var(--ci-text-blue);
+    color: var(--ci-surface-light);
+    text-shadow: 0 1px 2px var(--shadow-md);
 }
 
 .my-event-location {
     margin: 0;
     font-size: 0.78rem;
-    color: var(--ci-text-muted);
+    color: var(--ci-surface-muted);
+    text-shadow: 0 1px 2px var(--shadow-md);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -252,6 +327,8 @@
 
 /* ── Actions ─────────────────────────────────────────────────── */
 .my-event-actions {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
@@ -284,7 +361,7 @@
 }
 
 .my-event-action-btn--view {
-    background: var(--ci-bg-card-deep);
+    background: var(--ci-bg-card);
     color: var(--ci-accent);
     border-color: var(--ci-border);
 }
@@ -305,6 +382,10 @@
 }
 
 @media (max-width: 640px) {
+    .events-block {
+        padding: 0.8rem 0.8rem 0.9rem;
+    }
+
     .my-event-card {
         flex-wrap: wrap;
     }
@@ -332,18 +413,22 @@
 }
 
 .my-schedule-card {
+    position: relative;
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
     padding: 0.75rem 0.9rem;
-    background: var(--ci-bg-card-deep);
+    background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
-    border-radius: 8px;
-    transition: border-color 0.15s, opacity 0.2s;
+    border-radius: 10px;
+    transition: border-color 0.2s, opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
 }
 
 .my-schedule-card:hover {
-    border-color: var(--ci-accent-mid);
+    border-color: var(--green-strong);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px var(--shadow-2xl);
 }
 
 .my-schedule-card--inactive {

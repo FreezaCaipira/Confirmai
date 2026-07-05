@@ -79,7 +79,7 @@ internal static class CoreTexts
         ["Common.Save"] = "Salvar",
         ["Common.Close"] = "Fechar",
         ["Common.Back"] = "Voltar",
-        ["Common.Next"] = "Proximo",
+        ["Common.Next"] = "Próximo",
         ["Common.Previous"] = "Anterior",
         ["Common.Search"] = "Buscar",
         ["Common.Filter"] = "Filtro",

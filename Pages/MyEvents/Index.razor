@@ -18,10 +18,9 @@
 
 <PageTitle>Meus Eventos — Confirmai</PageTitle>
 
-<div class="entity-shell">
+<div class="events-page">
 
-    <section class="entity-shell-grid" aria-label="Meus eventos criados">
-        <article class="entity-shell-card entity-shell-main">
+    <section class="events-block" aria-label="Meus eventos criados">
 
             <div class="my-events-header">
                 <h1 class="page-section-title">Meus Eventos</h1>
@@ -37,6 +36,9 @@
                         </button>
                     </div>
                     <div class="my-events-create-btns">
+                        <a href="/grupos" class="my-events-create-btn my-events-create-btn--groups">
+                            <i class="fas fa-users"></i> Ver Grupos
+                        </a>
                         <a href="/futsal/create" class="my-events-create-btn my-events-create-btn--futsal">
                             <i class="fas fa-futbol"></i> Nova Partida
                         </a>
@@ -85,7 +87,11 @@
                         @foreach (var s in FilteredSchedules)
                         {
                             var futureCount = scheduleFutureCounts.GetValueOrDefault(s.Id, 0);
-                            <div class="my-schedule-card @(!s.IsActive ? "my-schedule-card--inactive" : "")">
+                            <div class="my-schedule-card my-event-card--futsal @(!s.IsActive ? "my-schedule-card--inactive" : "")">
+                                <div class="my-event-card-overlay"></div>
+                                <div class="my-event-card-bg-icon">
+                                    <i class="fas fa-futbol"></i>
+                                </div>
                                 <div class="my-event-sport-badge my-event-sport-badge--futsal">⚽</div>
 
                                 <div class="my-event-body">
@@ -171,7 +177,11 @@
                         var isPast   = ev.StartsAt < DateTime.UtcNow;
                         var detailUrl = isFutsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
 
-                        <div class="my-event-card @(!ev.IsActive ? "my-event-card--inactive" : isPast ? "my-event-card--past" : "")">
+                        <div class="my-event-card @(isFutsal ? "my-event-card--futsal" : "my-event-card--poker") @(!ev.IsActive ? "my-event-card--inactive" : isPast ? "my-event-card--past" : "")">
+                            <div class="my-event-card-overlay"></div>
+                            <div class="my-event-card-bg-icon">
+                                <i class="@(isFutsal ? "fas fa-futbol" : "fas fa-cards")"></i>
+                            </div>
                             <div class="my-event-sport-badge @(isFutsal ? "my-event-sport-badge--futsal" : "my-event-sport-badge--poker")">
                                 @(isFutsal ? "⚽" : "🃏")
                             </div>
@@ -227,7 +237,6 @@
                 </div>
             }
 
-        </article>
     </section>
 
 </div>

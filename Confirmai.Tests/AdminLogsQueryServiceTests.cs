@@ -373,7 +373,7 @@ public class AdminLogsQueryServiceTests
 
         // Assert
         Assert.Equal(5, result.TotalLogs);
-        Assert.Equal(1, result.Logs.Count); // Minimum page size of 1
+        Assert.Single(result.Logs); // Minimum page size of 1
     }
 
     [Fact]
