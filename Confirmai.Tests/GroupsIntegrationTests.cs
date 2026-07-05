@@ -181,7 +181,7 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
             var testGroup = groupsForUser.FirstOrDefault(g => g.Id == pendingGroupId);
             Assert.NotNull(testGroup);
             Assert.NotEmpty(testGroup.Members);
-            Assert.Equal(1, testGroup.Members.Count);
+            Assert.Single(testGroup.Members);
             var adminMemberInQuery = testGroup.Members.First();
             Assert.Equal(adminUserId, adminMemberInQuery.UserId);
             Assert.Equal(GroupMemberRole.Admin, adminMemberInQuery.Role);
