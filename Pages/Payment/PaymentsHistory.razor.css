@@ -532,22 +532,22 @@
 }
 
 /* Table row - received paid theme */
-.payments-history-shell--received .payments-history-table tbody tr--paid {
+.payments-history-shell--received .payments-history-table tbody .tr--paid {
     border-bottom: 1px solid var(--red-border);
 }
 
 /* Table row - received pending theme */
-.payments-history-shell--received .payments-history-table tbody tr--pending {
+.payments-history-shell--received .payments-history-table tbody .tr--pending {
     border-bottom: 1px solid var(--red-strong);
 }
 
 /* Table cell date - sent theme */
-.payments-history-shell--sent .payments-history-table td--date {
+.payments-history-shell--sent .payments-history-table .td--date {
     color: var(--ci-text-muted);
 }
 
 /* Table cell date - received theme */
-.payments-history-shell--received .payments-history-table td--date {
+.payments-history-shell--received .payments-history-table .td--date {
     color: var(--red-text-light);
 }
 
