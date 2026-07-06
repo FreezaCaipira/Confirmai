@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 07/05/2026 - 19:50:25 |
-| Coverage date: | 07/05/2026 - 19:50:21 |
+| Generated on: | 07/06/2026 - 00:21:08 |
+| Coverage date: | 07/06/2026 - 00:21:02 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 413 |
 | Files: | 469 |
-| **Line coverage:** | 91.3% (109278 of 119679) |
-| Covered lines: | 109278 |
-| Uncovered lines: | 10401 |
+| **Line coverage:** | 91.3% (109279 of 119679) |
+| Covered lines: | 109279 |
+| Uncovered lines: | 10400 |
 | Coverable lines: | 119679 |
 | Total lines: | 148311 |
 | **Branch coverage:** | 29.9% (2297 of 7670) |
 | Covered branches: | 2297 |
 | Total branches: | 7670 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 174_28752774103 |
+| Tag: | 177_28759973191 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **109278** | **10401** | **119679** | **155730** | **91.3%** | **2297** | **7670** | **29.9%** |
+| **Confirmai** | **109279** | **10400** | **119679** | **155730** | **91.3%** | **2297** | **7670** | **29.9%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 23 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -436,7 +436,7 @@
 | Confirmai.Shared.Helpers.EventAccess | 6 | 0 | 6 | 31 | 100% | 14 | 14 | 100% |
 | Confirmai.Shared.Helpers.EventMinimums | 22 | 0 | 22 | 49 | 100% | 6 | 6 | 100% |
 | Confirmai.Shared.IbgeMunicipio | 0 | 1 | 1 | 29 | 0% | 0 | 0 |  |
-| Confirmai.Shared.MainLayout | 106 | 35 | 141 | 370 | 75.1% | 48 | 70 | 68.5% |
+| Confirmai.Shared.MainLayout | 107 | 34 | 141 | 370 | 75.8% | 48 | 70 | 68.5% |
 | Confirmai.Shared.RouteNotAuthorized | 8 | 0 | 8 | 30 | 100% | 5 | 6 | 83.3% |
 | Program | 384 | 137 | 521 | 677 | 73.7% | 50 | 84 | 59.5% |
 | System.Text.RegularExpressions.Generated | 258 | 32 | 290 | 816 | 88.9% | 121 | 150 | 80.6% |
