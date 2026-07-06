@@ -221,7 +221,6 @@
     
     /* Purple opacity */
     --purple-sm:           rgba(124, 58, 237, 0.1);
-    --purple-md:           rgba(124, 58, 237, 0.12);
     --purple-lg:           rgba(124, 58, 237, 0.18);
     --purple-xl:           rgba(124, 58, 237, 0.3);
     
@@ -3078,7 +3077,6 @@ body::before {
 
 /* Global entity-shell base: ensures parchment card look for ALL pages using entity-shell pattern */
 .entity-shell {
-    --entity-bg: var(--ci-bg-card);
     --entity-line: var(--ci-border);
     --entity-accent: var(--ci-accent);
     --entity-ink: var(--ci-text);

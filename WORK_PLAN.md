@@ -1,7 +1,8 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 11 + revisao Senior) | Refatoracao CSS CONCLUIDA
-> 1.674/1.674 testes passando | 0 erros de build | 0 warnings
+> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 12 + investigacao Senior) | Refatoracao CSS CONCLUIDA
+> 1.674/1.674 testes passando | 0 erros de build | 0 warnings | 0 AppDbContext direto
+> Ciclo 13: Background + Mobile + Navegacao | Ciclo 14: Refresh Token / Sessao Persistente
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -56,130 +57,134 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 
 ### Ciclo 11 (Pleno Local): CSS Final + Decomposicao Completa (10 fases)
 - Branch: `refactor/ciclo11-final-cleanup` | PR #42
-- **Detalhes da revisao Senior**: ver secao abaixo
+- Hardcoded hex scoped: 0 | rgba scoped: 185 | Vars: 2.344 | Vars no :root: 317
+- 12 paginas >400L decompostas com code-behind
+- **Problemas**: 9 vars inventadas, 6 vars mortas, encoding corrompido em site.css (corrigido pelo Senior)
+
+### Ciclo 12 (Pleno Local): UX/UI Fixes + Cleanup Tecnico (11 fases + 6 extras)
+- Branch: `fix/ciclo12-ux-cleanup` | PR #44
+- Causa raiz card grupo: 17 vars auto-referenciais quebrando gradientes/sombras
+- Binding placar corrigido com `EventCallback<int?>`
+- AppDbContext direto: 3 -> 0 (IDbContextFactory zerado)
+- xUnit2013: 49 -> 0 warnings
+- **Problema pendente**: background das telas `/eventos`, `/futsal`, `/poker` nao alinhado com `/grupos`
+- **Investigacao Senior**: ver secao "Investigacao Senior: Background das telas de eventos"
 
 ---
 
-## Revisao Senior do Ciclo 11
+## Revisao Senior do Ciclo 12
 
-### Veredicto: EXCELENTE -- Ciclo mais ambicioso, TODAS as 10 fases executadas, metas superadas
+### Veredicto: MUITO BOM -- UX fixes corretos, cleanup completo, problema critico encontrado e resolvido pelo Pleno
 
-| Metrica | C10 | C11 | Meta C11 | Status |
-|---------|-----|-----|----------|--------|
-| Hardcoded hex scoped | 0 | **0** | 0 | Atingido |
-| rgba() hardcoded scoped | 378 | **185** | <300 | **Superado** |
-| CSS vars usadas (scoped) | 2.149 | **2.344** | >2.200 | **Superado** |
-| `!important` scoped | 1 | **1** | 1 | Atingido |
-| `!important` global | 12 | **11** | -- | Estavel |
-| events.css hex | 110 | **0** | <50 | **Zerado** |
-| events.css rgba | 220 | **161** | <170 | **Atingido** |
-| marketplace.css hex | 43 | **0** | <10 | **Zerado** |
-| marketplace.css rgba | 35 | **0** | <15 | **Zerado** |
-| site.css hex (fora :root) | 6 | **4** | -- | Melhoria |
-| site.css rgba (fora :root) | 136 | **53** | <80 | **Atingido** |
-| identity.css rgba | 3 | **3** | -- | Estavel |
-| Vars no `:root` | 168 | **317** | -- | +149 |
-| Vars indefinidas | 0 | **0** (apos fix) | 0 | Atingido |
-| Vars mortas `:root` | 0 | **0** (apos fix) | 0 | Atingido |
-| Fallbacks | 0 | **0** | 0 | Atingido |
-| Build warnings | 0 | **0** | 0 | Atingido |
-| Pages >400L sem code-behind | 12 | **0** | 0 | **Zerado** |
-| Pages com `AppDbContext` direto | 6 | **3** | -- | Melhoria |
+| Metrica | C11 | C12 | Status |
+|---------|-----|-----|--------|
+| Build errors | 0 | **0** | Atingido |
+| Build warnings | 0 | **0** | Atingido |
+| Tests | 1.674 | **1.674** | Atingido |
+| Hardcoded hex scoped | 0 | **0** | Atingido |
+| rgba() hardcoded scoped | 185 | **189** | Estavel (+4 novos unicos) |
+| CSS vars usadas (scoped) | 2.344 | **2.364** | Melhoria |
+| `!important` scoped | 1 | **1** | Atingido |
+| `!important` global | 11 | **11** | Estavel |
+| Vars no `:root` | 317 | **315** (apos fix) | Melhoria |
+| Vars indefinidas | 0 | **0** | Atingido |
+| Vars mortas `:root` | 0 | **0** (apos fix) | Atingido |
+| AppDbContext direto | 3 | **0** | **Zerado** |
+| xUnit2013 warnings | 49 | **0** | **Zerado** |
+| Encoding | OK | **OK** | Atingido |
 
-### O que deu CERTO
+### Bloco A -- UX/UI Fixes: 7/8 executados
 
-**Bloco A -- CSS (Fases 1-5) -- EXCELENTE**:
-- **Fase 1**: 24 novas vars + 90 conversoes iniciais -- pipeline limpa, vars usadas imediatamente
-- **Fase 2**: events.css rgba 197 -> 169 -- meta <170 atingida
-- **Fase 3**: events.css hex 125 -> 0 -- ZERADO (meta era <50!)
-- **Fase 4**: marketplace.css hex 51 -> 0, rgba 43 -> 0 -- arquivo CSS global mais limpo do projeto
-- **Fase 5**: scoped rgba 613 -> 288, site.css rgba reduzido -- metas superadas
+**Fase 1 (Card grupo)**: Causa raiz identificada -- 17 vars CSS auto-referenciais no `:root` (ex: `--shadow-md: var(--shadow-md)` em vez do valor rgba). Pleno corrigiu TODAS, restaurando gradientes/sombras em todo o app. Fix critico e bem executado.
 
-**Bloco B -- Decomposicao (Fases 6-10) -- EXCELENTE**:
-- **TODAS as 12 paginas** decompostas com code-behind `.razor.cs`:
+**Fase 2 (Partidas nova janela)**: PULADA. Decisao correta -- em Blazor Server, `target="_blank"` cria novo circuito SignalR. Manter navegacao interna.
 
-| Pagina | Antes | Depois (razor) | Code-behind |
-|--------|-------|----------------|-------------|
-| AdminPayments | 1.156L | 113L | 1.061L |
-| Futsal/Detail | 931L | 483L | 422L |
-| Groups/Payments | 560L | 264L | 311L |
-| Poker/Edit | 547L | 311L | 248L |
-| Groups/Features | 461L | 115L | 360L |
-| EventPayment | 667L | 198L | 484L |
-| Escalacao | 661L | 206L | 471L |
-| AdminLogs | 656L | 109L | 556L |
-| PaymentsHistory | 419L | 149L | 293L |
-| Futsal/Create | 418L | 109L | 325L |
-| Admin | 410L | 151L | 276L |
-| MyEvents/Index | 402L | 234L | 181L |
+**Fase 3 (Btn comprovante)**: Corrigiu mojibake em `Groups/Payments.razor` + adicionou btn comprovante na aba Pendentes.
 
-- Todas usam `partial class` (correto)
-- `IDbContextFactory` usado em todas as paginas decompostas (correto)
-- Encoding fix commit incluido (7 arquivos .razor corrigidos)
-- 11 commits limpos (1 por fase + 1 encoding fix), branch unica, 1 PR -- regras 9, 14 respeitadas
+**Fase 4 (Caracteres bugados)**: Corrigiu acentos PT-BR/ES-ES em `PaymentTexts.cs`, `UtilityTexts.cs`, `CoreTexts.cs` + adicionou 6 chaves UiText faltantes + fix seletores CSS `.tr--paid`/`.tr--pending`/`.td--date`.
+
+**Fase 5 (Pos-partida)**: Fix REAL do binding placar -- `ScoreInputA`/`ScoreInputB` agora propagam via `EventCallback<int?>` para o parent. Legibilidade CSS melhorada. Btn Editar escondido quando partida encerrada.
+
+**Fase 6 (Edit partida)**: Removeu 45L de codigo duplicado exposto fora do `@code` block. Unificou formato de endereco com Detail.razor.
+
+**Fase 7 (Background eventos)**: Corrigiu background invertido + adicionou btn "Ver Grupos". NOTA: apos essa fase, Pleno fez 5 commits extras tentando alinhar backgrounds de `/futsal` e `/poker` sem sucesso confirmado pelo usuario.
+
+**Fase 8 (Profile layout)**: Padronizou Profile com tokens entity-shell (border-radius, border-top, box-shadow, transitions).
+
+### Bloco B -- Cleanup: 3/3 executados
+
+**Fase 9 (IDbContextFactory)**: Migrou ViewPayment, Payment, PaymentDetails. `grep '@inject AppDbContext'` retorna 0 resultados. Meta ZERADA.
+
+**Fase 10 (!important)**: Removeu 1 `!important` desnecessario em `oldsite-payment-chip span`. 10/11 restantes sao legitimos.
+
+**Fase 11 (xUnit2013)**: Substituiu `Assert.Equal(1, .Count)` -> `Assert.Single()` em 2 arquivos. 0 warnings xUnit2013.
+
+### Commits extras (fora do escopo do ciclo)
+
+O Pleno fez 6 commits adicionais apos as 11 fases, tentando alinhar backgrounds das telas `/eventos`, `/futsal`, `/poker` ao padrao de `/grupos`. Tres tentativas, nenhuma confirmada visualmente pelo usuario. O Pleno documentou tudo em `docs/ciclo12-revisao-senior.md` (removido pelo Senior -- consolidar em WORK_PLAN.md).
+
+Mudancas incluem:
+- Gradient+overlay nos event-card de `/futsal` e `/poker`
+- Degrade no `.sports-shell` de `/eventos`
+- Container `.listing-block` no `EventListingShell` compartilhado
+- Botao "Meus Eventos" na tela `/eventos`
+- Remocao de ~130L CSS duplicado em `Poker/Index.razor.css`
+
+**Analise Senior**: O problema de background pode ser cache do navegador ou hot reload nao aplicando scoped CSS. Recomendacao: rebuild limpo (`dotnet clean && dotnet build`) + Ctrl+F5 (sem cache) para confirmar. Se persistir, investigar se o Blazor CSS isolation esta aplicando corretamente os atributos `b-xxx` no `EventListingShell`.
 
 ### Problemas encontrados e corrigidos pelo Senior
 
-**1. 9 vars CSS inventadas/indefinidas (critico)**:
-O Pleno usou `var(--nome)` em 9 nomes que NAO estavam definidos:
-- `--ci-text-link-bright` (2 usos, site.css) -- original era `#bae6fd`
-- `--yellow-dark` (1 uso), `--yellow-bright` (1 uso), `--yellow-strong` (1 uso) -- originais: `#1c1508`, `#fbbf24`, `#78350f`
-- `--mk-brown2-opacity-xs` (1 uso, ParchmentLab), `--mk-brown6-opacity-xs` (2 usos, ParchmentLab)
+**1. 2 vars mortas no `:root`** (`--purple-md`, `--entity-bg`):
+Definidas mas sem nenhum `var(--purple-md)` ou `var(--entity-bg)` em qualquer arquivo. Senior removeu.
 
-**Fix**: Senior adicionou as 9 vars ao `:root` com valores hex deduzidos dos diffs originais.
+**2. `--entity-bg` e `--entity-card` mortas em scoped CSS**:
+Definidas em `Profile.razor.css`, `EntityProfileShell.razor.css` e `site.css` mas nunca consumidas via `var()`. Senior removeu de todos os 3 arquivos.
 
-**2. 6 vars mortas no `:root`**:
-`--white-opacity-lg`, `--white-opacity-xl`, `--white-opacity-2xl`, `--white-opacity-3xl`, `--white-opacity-4xl`, `--white-opacity-5xl` -- definidas mas zero usos em qualquer arquivo.
+**3. Arquivo docs separado**:
+Pleno criou `docs/ciclo12-revisao-senior.md` em vez de consolidar no WORK_PLAN.md. Senior removeu o arquivo (regra: docs no WORK_PLAN.md unico).
 
-**Fix**: Senior removeu as 6 vars mortas.
+### Positivo
+- 17 vars auto-referenciais identificadas e corrigidas -- excelente diagnostico da causa raiz
+- Binding placar corrigido com `EventCallback` -- fix tecnico correto
+- IDbContextFactory migrado em todas as 3 paginas restantes -- meta historica ZERADA
+- Commits de fase limpos (1 por fase), branch unica, 1 PR -- regras 9, 14 respeitadas
+- Documentou detalhadamente as tentativas de fix do background -- transparencia
 
-**3. Encoding UTF-8 corrompido em site.css (61 linhas)**:
-Apesar da regra 18 e do encoding fix commit do Pleno, `site.css` teve 61 linhas com mojibake nos comentarios (`--` -> `ΓöÇ`, `--` -> `ΓÇö`). O Pleno corrigiu .razor mas ignorou o site.css.
-
-**Fix**: Senior restaurou encoding UTF-8 em todas as 61 linhas.
+### Ressalvas
+- Regra 16 violada: misturou CSS refactoring com feature UX (gradient nos event-cards, botao Meus Eventos) no mesmo PR
+- 5 commits extras de tentativa/erro no background -- regra 14 parcialmente violada
+- Arquivo docs separado criado -- deve consolidar em WORK_PLAN.md
 
 ---
 
-## Metricas Atuais (pos-Ciclo 11 + fix Senior)
+## Metricas Atuais (pos-Ciclo 12 + fix Senior)
 
-| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 |
-|---------|----|----|-------|----|----|-----|-----|
-| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | **0** |
-| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
-| `!important` global | -- | -- | 17 | 12 | 11 | 12 | **11** |
-| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | **0** |
-| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | **185** |
-| Hardcoded hex global | -- | -- | ~1.317 | 166 | 166 | 153 | **4** |
-| rgba() hardcoded global | -- | -- | ~185 | 446 | 413 | 394 | **217** |
-| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | **2.344** |
-| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | **4.246** |
-| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | **317** |
-| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | **0** |
-| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | **0** |
-| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | **0** |
-| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | **0** |
-
-### Estado dos CSS globais (pos-Ciclo 11)
-
-| Arquivo | Hex hardcoded | rgba hardcoded | `!important` | var() usadas |
-|---------|-------------|----------------|-------------|--------------|
-| site.css (fora :root) | 4 | 53 | 11 | ~1.900 |
-| events.css | 0 | 161 | 0 | ~598 |
-| marketplace.css | 0 | 0 | 0 | ~79 |
-| identity.css | 0 | 3 | 0 | ~32 |
-| **Total globais** | **4** | **217** | **11** | **~2.609** |
+| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 | C12 |
+|---------|----|----|-------|----|----|-----|-----|-----|
+| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
+| `!important` global | -- | -- | 17 | 12 | 11 | 12 | 11 | **11** |
+| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | 0 | **0** |
+| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | 185 | **189** |
+| Hardcoded hex global | -- | -- | ~1.317 | 166 | 166 | 153 | 4 | **~103** |
+| rgba() hardcoded global | -- | -- | ~185 | 446 | 413 | 394 | 217 | **~360** |
+| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | 2.344 | **2.364** |
+| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | 4.246 | **4.690** |
+| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | 317 | **315** |
+| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | 0 | **0** |
+| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | 0 | **0** |
+| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | 0 | **0** |
+| AppDbContext direto | -- | -- | -- | -- | -- | -- | 3 | **0** |
+| xUnit2013 warnings | -- | -- | -- | -- | -- | -- | 49 | **0** |
 
 ### Paginas grandes -- TODAS decompostas
 
 Nenhuma pagina >400L sem code-behind. Unica pagina >400L com code-behind: `Futsal/Detail.razor` (483L) -- aceitavel dado que ja tem 9+ sub-componentes.
 
-### AppDbContext direto restante (3 paginas)
+### AppDbContext direto -- ZERADO
 
-| Pagina | Status |
-|--------|--------|
-| Payment/ViewPayment.razor | AppDbContext direto (nao decompostas neste ciclo) |
-| Payment/Payment.razor | AppDbContext direto (ja decomposta em Ciclo 9) |
-| Payment/PaymentDetails.razor | AppDbContext direto (nao decompostas neste ciclo) |
+Todas as paginas agora usam `IDbContextFactory<AppDbContext>`. 0 paginas com `@inject AppDbContext` direto.
 
 ---
 
@@ -204,6 +209,8 @@ Nenhuma pagina >400L sem code-behind. Unica pagina >400L com code-behind: `Futsa
 17. **Cobrir TODOS os arquivos ao converter rgba** -- grep global para cada padrao, converter todos de uma vez
 18. **NUNCA salvar CSS com encoding diferente de UTF-8** -- verificar encoding antes de commitar. Se o editor corromper acentos em comentarios, reverter a linha com `git checkout -- arquivo` antes de commitar
 19. **Verificar encoding em TODOS os CSS apos cada fase** -- rodar script de verificacao UTF-8 (ver secao Comandos de Validacao). Inclui site.css, events.css, marketplace.css, identity.css e TODOS os scoped CSS
+20. **NUNCA criar arquivos de docs separados** -- consolidar TUDO no WORK_PLAN.md. Nao criar arquivos em `docs/`, `.md` avulsos, etc.
+21. **Rebuild limpo antes de testar mudancas visuais** -- ao alterar CSS (especialmente scoped CSS), sempre fazer `dotnet clean && dotnet build` e testar com Ctrl+F5 (hard refresh). Hot-reload pode nao aplicar scoped CSS corretamente
 
 ---
 
@@ -458,188 +465,261 @@ A refatoracao CSS iniciada no Ciclo 4 esta **essencialmente concluida**. Os nume
 
 ---
 
-## Ciclo 12 -- UX/UI Fixes + Cleanup Tecnico
+## Estado Final pos-Ciclo 12
 
-> Ciclo misto: 8 pontos UX/UI levantados em testes do sistema + 3 tarefas de cleanup tecnico.
-> Pontos 9-11 do backlog (mobile, refresh token, repensamento de fluxo) ficam para o Ciclo 13 por serem mudancas arquiteturais maiores.
+A refatoracao CSS e cleanup tecnico estao **completos**. Marcos atingidos:
+- 0 hardcoded hex em scoped CSS (desde C6)
+- 0 `AppDbContext` direto (desde C12)
+- 0 paginas >400L sem code-behind (desde C11)
+- 0 build warnings (desde C5)
+- 0 xUnit2013 warnings (desde C12)
+- 315 vars no `:root`, 4.690 usos de `var()` total
+- 1 `!important` scoped (AvatarUpload pattern legitimo)
 
-**Branch**: `fix/ciclo12-ux-cleanup`
+Trabalho restante e predominantemente **arquitetural e de UX** (nao CSS).
+
+---
+
+## Investigacao Senior: Background das telas de eventos
+
+### Problema
+A tela inicial (`/grupos`) tem um visual coeso com `.groups-block` (degrade sutil, borda azul, sombra inset).
+As telas `/eventos`, `/futsal`, `/poker` deveriam replicar esse padrao mas apresentam visual diferente.
+
+### Diagnostico do Senior (analise de codigo)
+
+**Referencia (padrao correto): `.groups-block` em `events.css` (GLOBAL)**:
+```css
+background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+border: 1px solid var(--ci-border);        /* #1b3d6c — azul claro */
+border-radius: 14px;
+box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);  /* brilho sutil no topo */
+```
+
+**`/futsal` e `/poker`: `.listing-block` em `EventListingShell.razor.css` (SCOPED)**:
+```css
+/* IDENTICO ao .groups-block — CSS correto */
+background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+border: 1px solid var(--ci-border);
+border-radius: 14px;
+box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+```
+Status: CSS esta correto. O scoped CSS bundle gera `.listing-block[b-7yv3gvojvj]` corretamente.
+
+**`/eventos`: `.sports-shell` em `Pages/Index.razor.css` (SCOPED) — DIFERENTE**:
+```css
+background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+border: 1px solid var(--ci-border-alt);    /* #1a3a5c — DIFERENTE, mais escuro */
+border-top: 2px solid var(--ci-border-dim); /* EXTRA: borda grossa no topo */
+border-radius: 14px;
+box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg);  /* DIFERENTE: sombra EXTERNA */
+```
+
+### Causa raiz: 2 problemas
+
+**Problema 1 — `/eventos` tem CSS divergente**:
+`.sports-shell` usa `var(--ci-border-alt)` (#1a3a5c, mais escuro) em vez de `var(--ci-border)` (#1b3d6c, mais claro),
+tem borda extra no topo, e usa sombra externa em vez de inset. Isso cria visual diferente.
+
+**Problema 2 — Cache/hot-reload durante testes do Pleno**:
+O Pleno fez 3 tentativas de fix (commits `19bf314`, `0763d5a`, `1c311f0`, `d59be9e`) e a CSS final do `.listing-block`
+esta correta, mas o resultado "nao vai, desisti" sugere que o browser servia CSS cacheado.
+Em Blazor Server, o scoped CSS bundle (`Confirmai.styles.css`) tem fingerprint via `asp-append-version="true"`,
+mas durante desenvolvimento com hot-reload, o browser pode manter a versao antiga em cache.
+
+### Fix documentado no Ciclo 13 (Fase 1)
+
+---
+
+## Ciclo 13 -- Background + Mobile + Navegacao
+
+> Ciclo focado em UX/layout. NAO inclui implementacao de features (refresh token fica no Ciclo 14).
+
+**Branch**: `fix/ciclo13-ux-layout`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 
----
-
-### BLOCO A -- FIXES UX/UI (Fases 1-8)
-
-#### Fase 1: Card do grupo perdeu efeito de estilizacao -- P0
+### Fase 1: Corrigir background de `/eventos` + verificar `/futsal` e `/poker` -- P0
 **Estimativa**: ~30 min
 
-O card de grupo em `Pages/Groups/Index.razor` perdeu efeito visual. O styling esta em `wwwroot/css/events.css` (classes `.group-card`, `.group-card-overlay`, `.group-card:hover`).
+**Passo 1 — Fix `.sports-shell` em `Pages/Index.razor.css`**:
+
+Alterar de:
+```css
+.sports-shell {
+    /* ... layout props ... */
+    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+    border: 1px solid var(--ci-border-alt);
+    border-top: 2px solid var(--ci-border-dim);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg);
+    /* ... */
+}
+```
+
+Para (mesmo padrao de `.groups-block`):
+```css
+.sports-shell {
+    /* ... layout props ... */
+    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+    border: 1px solid var(--ci-border);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+    /* ... */
+}
+```
+
+Remover: `border-top: 2px solid var(--ci-border-dim);`
+Trocar: `var(--ci-border-alt)` -> `var(--ci-border)`
+Trocar: sombra externa -> `inset 0 1px 0 rgba(79, 156, 248, 0.14)`
+
+**Passo 2 — Rebuild limpo**:
+```bash
+dotnet clean
+dotnet build
+```
+
+**Passo 3 — Verificar `/futsal` e `/poker`**:
+Abrir no browser com Ctrl+F5 (hard refresh). Comparar visualmente com `/grupos`.
+Se `.listing-block` renderizar corretamente, esta resolvido.
+Se NAO renderizar, inspecionar no DevTools:
+1. Clicar com botao direito no `.listing-block` -> Inspecionar
+2. Verificar se o elemento tem atributo `b-7yv3gvojvj` (ou similar)
+3. Se NAO tem atributo, o problema e CSS isolation do Blazor
+4. Nesse caso: mover CSS de `.listing-block` para `events.css` (global, ao lado de `.groups-block`)
+
+**Validacao**: `dotnet build` + comparar visualmente `/eventos`, `/futsal`, `/poker` com `/grupos`
+
+---
+
+### Fase 2: Testar responsividade mobile -- P1
+**Estimativa**: ~2h
+
+Verificar layout em viewport 375px e 414px. Breakpoints ja padronizados (640/768/1024/1440px).
 
 **Procedimento**:
-1. Verificar se `.group-card` em `events.css` (linha ~2957) tem gradientes/sombras/hover corretos
-2. Comparar com versao anterior (`git diff HEAD~15 -- wwwroot/css/events.css | grep group-card`)
-3. Restaurar efeitos que foram perdidos na conversao hex -> var do Ciclo 11
-4. Testar visualmente: o card deve ter overlay com gradiente, hover com elevacao, sombra sutil
+1. Abrir DevTools do browser, ativar modo responsivo
+2. Testar telas: `/grupos`, `/grupo/{id}`, `/futsal/{id}`, `/pagamentos-historico`, `/perfil`
+3. Documentar problemas: overflow horizontal, touch targets <44px, texto cortado, botoes sobrepostos
+4. Corrigir o que for possivel via media queries nos scoped CSS
+5. Documentar o que precisar de mudanca estrutural na secao "Problemas Encontrados"
 
-**Validacao**: `dotnet build` + verificar visualmente em `/grupos`
+**Validacao**: `dotnet build` + verificar visualmente em 375px e 414px
 
 ---
 
-#### Fase 2: Partidas em nova janela na tela do grupo -- P1
-**Estimativa**: ~30 min
+### Fase 3: Repensar fluxo de navegacao -- P1
+**Estimativa**: ~3h
 
-Na tela `Pages/Groups/Detail.razor`, avaliar se links para partidas devem abrir em nova aba.
+Fluxo atual: tela inicial = `/grupos`. Proposta do dono:
+- Tela inicial = proximas partidas (eventos)
+- Grupos -> ver eventos do grupo -> criar partida dentro do grupo
+- Separar criacao de partida da tela geral de eventos
 
 **Procedimento**:
-1. Identificar os links de partida no `Detail.razor`
-2. Se o link navega para `/futsal/{id}`, considerar se `target="_blank"` faz sentido no contexto SPA
-3. **DECISAO**: Em Blazor Server (SPA), abrir nova janela quebra o circuito SignalR. Manter navegacao interna a menos que o dono do projeto insista.
-4. Se decidir abrir nova aba, usar `<a href="/futsal/{id}" target="_blank">` e documentar que cria novo circuito
+1. Criar nova pagina `Pages/Home.razor` com `@page "/"` mostrando proximas partidas
+2. Mover `@page "/"` de `Groups/Index.razor` para so `@page "/grupos"`
+3. Adicionar navegacao coerente: Home -> Grupos -> Grupo -> Partida
+4. Mover btn "Criar Partida" para dentro da tela do grupo (nao faz sentido na tela geral de eventos)
+5. Ajustar links no `MainLayout.razor` (nav superior) para refletir novo fluxo
 
-**Validacao**: `dotnet build` + testar navegacao em `/grupo/{id}`
-
----
-
-#### Fase 3: Pagamentos pendentes -- btn comprovante + btns email/zap -- P1
-**Estimativa**: ~1h
-
-Na tela de pagamentos pendentes, avaliar:
-1. **Btn comprovante**: verificar se esta posicionado de forma logica. Se nao, mover para posicao mais intuitiva
-2. **Btns email e WhatsApp**: verificar se existem e estao funcionais. Se faltam, adicionar botoes para enviar lembrete por email/WhatsApp
-
-**Arquivos**: `Pages/Payment/PaymentsHistory.razor`, `Pages/Payment/PaymentsHistory.razor.cs`, `Pages/Payment/PaymentsHistory.razor.css`
-
-**Validacao**: `dotnet build` + testar visualmente nos pagamentos pendentes
+**Validacao**: `dotnet build` + `dotnet test` + verificar navegacao completa
 
 ---
 
-#### Fase 4: Pagamentos historico -- caracteres bugados + valor verde -- P0
-**Estimativa**: ~1h
+## Ciclo 14 -- Refresh Token / Sessao Persistente
 
-Duas questoes na tela `Pages/Payment/PaymentsHistory.razor`:
-1. **Caracteres bugados**: Verificar encoding de strings exibidas (pode ser UiText com encoding errado ou dados do banco com acentos corrompidos). Verificar `PaymentsHistory.razor.css` por mojibake nos comentarios
-2. **Valor verde**: O CSS mostra `color: var(--green-bright)` nas linhas 85 e 408 do `.razor.css`. Avaliar se o valor monetario deve ser verde (pode confundir com "pago" quando o pagamento esta pendente). Se sim, usar cor neutra (`var(--ci-text)`) para valores e manter verde so para status "Pago"
+> Ciclo separado por ser mudanca arquitetural que requer orientacao detalhada do Senior.
 
-**Validacao**: `dotnet build` + testar visualmente em `/pagamentos-historico`
+**Branch**: `feat/ciclo14-refresh-token`
+**1 commit por fase** dentro da branch. **1 PR** no final.
 
----
+### Contexto tecnico (analise do Senior)
 
-#### Fase 5: Pos-partida -- legibilidade + btn confirmar placar + btn edit -- P1
+O sistema JA tem:
+- `SlidingExpiration = true` (Program.cs L212)
+- `ExpireTimeSpan = 30 min` (producao) / `60 min` (dev) — via `SecurityPolicyDefaults.cs`
+- `SecurityStampValidator` a cada 30s (Program.cs L220-223)
+- `RevalidatingIdentityAuthenticationStateProvider` que revalida security stamp a cada 30s
+
+**O problema**: Em Blazor Server, o usuario raramente faz requisicoes HTTP apos o carregamento inicial.
+A comunicacao passa a ser via WebSocket (SignalR). O `SlidingExpiration` do cookie so e renovado
+em requisicoes HTTP. Resultado: o cookie pode expirar enquanto o circuito SignalR esta ativo.
+Quando o usuario finalmente recarrega a pagina, o cookie ja expirou e ele perde a sessao.
+
+### Fase 1: Aumentar timeout e adicionar ping periodico -- P0
 **Estimativa**: ~1.5h
 
-Na tela de `Pages/Futsal/Detail.razor` apos a partida terminar:
-1. **Legibilidade**: Textos com baixo contraste contra fundo escuro. Verificar cores de texto no CSS scoped (`Detail.razor.css`) e global (`events.css`). Usar vars de texto legiveis (`var(--ci-text)`, `var(--ci-text-blue)`)
-2. **Btn confirmar placar nao faz nada**: O componente `EscalacaoScoreEditor.razor` pode ter evento `@onclick` sem handler funcional ou handler que falha silenciosamente. Verificar binding e logica no code-behind
-3. **Btn edit**: Avaliar se faz sentido ter btn de editar na tela pos-partida. Se a partida ja terminou, editar nao deveria ser permitido. Esconder btn quando `ev.Status == EventStatus.Finished`
+**Passo 1 — Aumentar `SessionTimeoutMinutes`**:
+Em `Configuration/SecurityPolicyDefaults.cs`:
+- Produção (L44): `SessionTimeoutMinutes: 30` -> `SessionTimeoutMinutes: 480` (8 horas)
+- Desenvolvimento (L31): `SessionTimeoutMinutes: 60` -> `SessionTimeoutMinutes: 720` (12 horas)
 
-**Validacao**: `dotnet build` + `dotnet test` + testar visualmente apos uma partida encerrada
+Justificativa: usuarios de app esportivo esperam sessao longa (abrem de manha, usam ao longo do dia).
 
----
+**Passo 2 — Criar endpoint de keep-alive**:
+Criar `Controllers/PingController.cs`:
+```csharp
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-#### Fase 6: Edit partida -- endereco diferente + texto exposto -- P1
-**Estimativa**: ~1h
+namespace Confirmai.Controllers;
 
-Na tela `Pages/Futsal/Edit.razor`:
-1. **Endereco**: O campo de endereco nao exibe o endereco da mesma forma que na tela da partida (`Detail.razor`). Verificar como o endereco e renderizado em ambas as telas e unificar o formato
-2. **Texto exposto no fim da pagina**: Pode ser um bloco `@code` mal fechado, texto de debug ou conteudo HTML fora de tag. Inspecionar o final de `Edit.razor` e remover/encapsular texto exposto
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class PingController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult Get() => Ok();
+}
+```
 
-**Validacao**: `dotnet build` + testar visualmente em `/futsal/edit/{id}`
+Registrar em `Program.cs` (antes de `app.Run()`):
+```csharp
+app.MapControllers();
+```
 
----
+Verificar se `AddControllers()` ja esta registrado em `builder.Services`. Se nao, adicionar.
 
-#### Fase 7: Tela eventos -- background invertido + btn criar partida -- P1
-**Estimativa**: ~1h
+**Passo 3 — Criar script JS de keep-alive**:
+Criar `wwwroot/js/session-keepalive.js`:
+```javascript
+(function () {
+    var intervalMs = 15 * 60 * 1000; // 15 minutos
+    setInterval(function () {
+        fetch('/api/ping', { credentials: 'same-origin' })
+            .catch(function () { /* silently ignore */ });
+    }, intervalMs);
+})();
+```
 
-Na tela `Pages/MyEvents/Index.razor`:
-1. **Background invertido**: O CSS (`Index.razor.css`) pode ter cores de fundo trocadas (ex: fundo escuro onde deveria ser claro ou vice-versa). Verificar classes `entity-shell` e background vars
-2. **Btn criar partida**: Avaliar se faz sentido ter btn "Criar Partida" aqui. Se o fluxo ideal e Grupos -> Eventos, considerar trocar por "Ver Grupos" (`/grupos`) ou mover btn de criacao para dentro da tela do grupo
-3. Se decidir manter os dois, documentar o racional
-
-**Validacao**: `dotnet build` + testar visualmente em `/meus-eventos`
-
----
-
-#### Fase 8: Layout profile vs resto das telas -- P2
-**Estimativa**: ~1.5h
-
-A tela `Pages/Profile.razor` usa layout diferente das demais (nao usa `entity-shell` padrao). Avaliar:
-1. Verificar se `Profile.razor` usa `entity-shell` ou wrapper customizado
-2. Comparar com layout de outras telas (ex: `Groups/Detail`, `Futsal/Detail`)
-3. Se divergir, padronizar para usar `entity-shell` com os mesmos tokens de background/border
-4. Verificar tambem se `ProfileHeaderCard.razor`, `ProfileEditForm.razor` seguem o mesmo pattern
-
-**Validacao**: `dotnet build` + comparar visualmente Profile vs outras telas
-
----
-
-### BLOCO B -- CLEANUP TECNICO (Fases 9-11)
-
-#### Fase 9: Migrar 3 paginas de AppDbContext -> IDbContextFactory -- P1
-**Estimativa**: ~1h
-
-Migrar `ViewPayment.razor`, `Payment.razor`, `PaymentDetails.razor`:
-1. Substituir `@inject AppDbContext Db` por `@inject IDbContextFactory<AppDbContext> DbFactory`
-2. Em cada metodo, usar `await using var db = await DbFactory.CreateDbContextAsync();`
-3. Se a pagina nao tem code-behind, criar `.razor.cs` com `partial class`
+**Passo 4 — Registrar o script em `Pages/_Host.cshtml`**:
+Adicionar antes de `blazor.server.js`:
+```html
+<script src="/js/session-keepalive.js" asp-append-version="true"></script>
+```
 
 **Validacao**:
 ```bash
 dotnet build
 dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"
-grep -rn '@inject AppDbContext' Pages/ Shared/ --include="*.razor"
-# Meta: 0 resultados
 ```
+NOTA: o teste `SecurityPolicyDefaultsTests` vai falhar porque espera `SessionTimeoutMinutes: 30`.
+Atualizar os testes:
+- `Confirmai.Tests/SecurityPolicyDefaultsTests.cs` L23: `Assert.Equal(60, ...)` -> `Assert.Equal(720, ...)`
+- `Confirmai.Tests/SecurityPolicyDefaultsTests.cs` L42: `Assert.Equal(30, ...)` -> `Assert.Equal(480, ...)`
+- `Confirmai.Tests/ConfigurationDefaultsTests.cs` L22: `Assert.Equal(60, ...)` -> `Assert.Equal(720, ...)`
 
----
-
-#### Fase 10: Reduzir !important em site.css -- P3
+### Fase 2: Testar sessao longa -- P0
 **Estimativa**: ~30 min
 
-Analisar os 11 `!important` em site.css. Os seguintes sao LEGITIMOS e devem ser mantidos:
-- Linhas 1255-1257: `prefers-reduced-motion` (padrao de acessibilidade W3C)
-- Linhas 6549-6555: Override de autofill do Chrome (necessario)
-- Linha 6464: `z-index: 9999` em modal (pattern aceitavel)
+1. Rodar o app
+2. Fazer login
+3. Verificar no DevTools > Network que `/api/ping` e chamado a cada 15 min
+4. Verificar que o cookie `Confirmai.session` tem `Expires` atualizado apos cada ping
+5. Verificar que o usuario nao perde sessao apos 30+ min de uso
 
-Os seguintes PODEM ser removidos via refatoracao de especificidade:
-- Linha 883: `display: none !important` -- verificar se cascade resolve
-- Linha 4689: `color !important` -- verificar especificidade
-
-**Validacao**: testar visualmente apos cada remocao.
-
----
-
-#### Fase 11: Eliminar warnings xUnit2013 nos testes -- P3
-**Estimativa**: ~30 min
-
-49 warnings `xUnit2013: Do not use Assert.Equal() to check for collection size`. Substituir:
-- `Assert.Equal(1, collection.Count)` -> `Assert.Single(collection)`
-- `Assert.Equal(0, collection.Count)` -> `Assert.Empty(collection)`
-
-**Validacao**: `dotnet build 2>&1 | grep 'warning' | grep -v 'xUnit'` -> 0 resultados
-
----
-
-## Ciclo 13 -- Backlog Arquitetural (para ciclo futuro)
-
-> Estes pontos sao mudancas maiores que requerem planejamento e possivelmente mais de 1 ciclo.
-
-### 13.1: Testar versao web mobile -- P1
-Verificar responsividade em viewport mobile (375px, 414px). Usar breakpoints ja padronizados (640/768/1024/1440px).
-- Testar telas principais: grupos, partida, pagamentos, perfil
-- Documentar problemas de overflow, touch targets <44px, texto cortado
-
-### 13.2: Implementar refresh token -- P0
-O sistema atual nao renova tokens de autenticacao automaticamente. Implementar:
-- Refresh token com `ITicketStore` ou cookie sliding expiration
-- Testar sessao longa (>30min) sem perda de autenticacao
-- Avaliar impacto em Blazor Server (circuito SignalR ja mantem sessao)
-
-### 13.3: Repensar fluxo de navegacao -- P1
-Fluxo atual: tela inicial = Grupos. Proposta:
-- Tela inicial = Eventos (proximas partidas)
-- Grupos -> ver eventos do grupo -> criar partida dentro do grupo
-- Separar criacao de partida da tela geral de eventos
-- Requer: alterar `@page "/"` de `Groups/Index.razor` para nova pagina de eventos, criar navegacao coerente
+**Validacao**: sessao permanece ativa por >1h sem necessidade de re-login
 
 ---
 
