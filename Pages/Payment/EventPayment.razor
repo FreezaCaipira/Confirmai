@@ -62,7 +62,7 @@
                             <i class="fas fa-check-circle"></i>
                             <div>
                                 <strong>Pagamento confirmado</strong>
-                                <p>Pagamento de @conf.User?.FullName foi confirmado.</p>
+                                <p>Pagamento de @(conf.User?.FullName ?? conf.User?.UserName ?? "Jogador") foi confirmado.</p>
                             </div>
                         </div>
                         <a href="@backUrl" class="evpay-action-btn evpay-action-btn--back">
@@ -79,7 +79,7 @@
                     <div class="evpay-admin-review">
                         <div class="evpay-admin-review-header">
                             <i class="fas fa-user-shield"></i>
-                            <span>Revisão de pagamento — @conf.User?.FullName</span>
+                            <span>Revisão de pagamento — @(conf.User?.FullName ?? conf.User?.UserName ?? "Jogador")</span>
                         </div>
                         @if (conf.PixProofUploadedAt.HasValue)
                         {
@@ -94,7 +94,7 @@
                             @if (adminConfirmPay)
                             {
                                 <div class="evpay-admin-confirm-row">
-                                    <span class="evpay-admin-confirm-label">Confirmar pagamento de @conf.User?.FullName?</span>
+                                    <span class="evpay-admin-confirm-label">Confirmar pagamento de @(conf.User?.FullName ?? conf.User?.UserName ?? "Jogador")?</span>
                                     <div class="evpay-admin-confirm-actions">
                                         <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--yes" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
                                             @if (adminMarkPaidLoading)
@@ -125,7 +125,7 @@
                             @if (adminConfirmPay)
                             {
                                 <div class="evpay-admin-confirm-row">
-                                    <span class="evpay-admin-confirm-label">Marcar @conf.User?.FullName como pago?</span>
+                                    <span class="evpay-admin-confirm-label">Marcar @(conf.User?.FullName ?? conf.User?.UserName ?? "Jogador") como pago?</span>
                                     <div class="evpay-admin-confirm-actions">
                                         <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--yes" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
                                             @if (adminMarkPaidLoading)

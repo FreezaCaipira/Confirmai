@@ -1,3 +1,25 @@
+/* Info box */
+.create-group-info-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+    background: rgba(79, 156, 248, 0.08);
+    border: 1px solid var(--ci-accent-opacity-md);
+    border-radius: 10px;
+    color: var(--ci-text-link-bright);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.create-group-info-box i {
+    color: var(--ci-accent);
+    font-size: 1rem;
+}
+
 /* Upload section styling */
 .upload-section {
     display: flex;

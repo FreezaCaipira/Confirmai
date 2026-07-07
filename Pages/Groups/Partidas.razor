@@ -1,0 +1,122 @@
+@page "/grupo/{Id:int}/partidas"
+
+@attribute [AllowAnonymous]
+
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Confirmai.Services
+@using Confirmai.Shared.Components.Groups
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider    AuthStateProvider
+@inject NavigationManager              NavigationManager
+@inject IConfiguration                 Config
+@inject UiTextService                  Ui
+
+<PageTitle>Partidas — @(group?.Name ?? "Grupo") · Confirmai</PageTitle>
+
+@if (isLoading)
+{
+    <div class="detail-loading">
+        <div class="detail-skeleton">
+            <div class="skeleton-header">
+                <div class="skeleton-line skeleton-line--sm"></div>
+                <div class="skeleton-line skeleton-line--lg"></div>
+                <div class="skeleton-line skeleton-line--md"></div>
+            </div>
+            <div class="skeleton-section">
+                <div class="skeleton-section-title"></div>
+                <div class="skeleton-list">
+                    <div class="skeleton-list-item">
+                        <div class="skeleton-list-item-avatar"></div>
+                        <div class="skeleton-list-item-content">
+                            <div class="skeleton-line skeleton-line--md"></div>
+                            <div class="skeleton-line skeleton-line--sm"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (group is null)
+{
+    <div class="detail-not-found">
+        <h2>Grupo não encontrado.</h2>
+        <a href="/">← Voltar</a>
+    </div>
+}
+else
+{
+    var isAdmin  = currentUserId is not null &&
+                   group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
+    var newEventHref = group.Sport == Sport.Futsal
+        ? $"/futsal/create?groupId={group.Id}"
+        : $"/poker/create?groupId={group.Id}";
+
+    <div class="detail-page">
+        <div class="detail-card">
+
+            <header class="detail-header">
+                <div class="detail-header-top">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                    </span>
+                    <a href="/grupo/@group.Id" class="detail-back-link">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </div>
+                <h1 class="detail-title"><i class="fas fa-calendar-alt"></i> Partidas — @group.Name</h1>
+            </header>
+
+            <section class="detail-section">
+                <h2 class="detail-section-title detail-events-title detail-events-title--no-mb partidas-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Partidas</span>
+                    <span class="detail-events-year">@eventsYear</span>
+                </h2>
+                @if (displayedEvents.Any(e => e.RachaScheduleId.HasValue))
+                {
+                    <div class="events-recurring-notice">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Partidas geradas automaticamente (semanal)</span>
+                    </div>
+                }
+                <div class="detail-events-tabs">
+                    <div class="detail-events-tabs-left">
+                        <button class="detail-events-tab @(!showPastEvents ? "active" : string.Empty)"
+                                type="button"
+                                @onclick="() => showPastEvents = false">
+                            <i class="fas fa-bolt"></i> Próximas (@upcomingEvents.Count)
+                        </button>
+                        <button class="detail-events-tab @(showPastEvents ? "active" : string.Empty)"
+                                type="button"
+                                @onclick="() => showPastEvents = true">
+                            <i class="fas fa-history"></i> Realizadas (@pastEvents.Count)
+                        </button>
+                    </div>
+                    <div class="detail-events-tabs-right">
+                        @if (isAdmin)
+                        {
+                            <a href="@newEventHref" class="groups-create-btn detail-events-create-btn">
+                                <i class="fas fa-plus"></i> Nova partida
+                            </a>
+                        }
+                    </div>
+                </div>
+                <GroupDetailEvents
+                    Group="@group"
+                    DisplayedEvents="@displayedEvents"
+                    UpcomingEvents="@upcomingEvents"
+                    ShowPastEvents="@showPastEvents"
+                    EventNumbers="@eventNumbers" />
+            </section>
+
+        </div>
+    </div>
+}

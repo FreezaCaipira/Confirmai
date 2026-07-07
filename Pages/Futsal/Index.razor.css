@@ -1,17 +1,8 @@
-/* -- Page wrapper -------------------------- */
-.listing-page {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem;
-}
+/* -- Page wrapper (global in events.css) ------------------- */
 
 .listing-page-actions {
-    width: 100%;
     max-width: 860px;
+    margin: 0 auto 1.5rem;
     display: flex;
     justify-content: flex-end;
 }
@@ -181,7 +172,7 @@
 .meta-chip--confirmed {
     background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-bright) 50%, var(--green-bright) 100%);
     border-color: var(--green-soft);
-    color: var(--green-soft);
+    color: var(--futsal-green-dark);
     font-weight: 800;
     box-shadow: 0 2px 4px var(--green-opacity-md);
 }
@@ -212,7 +203,7 @@
 .event-action:hover {
     background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-bright) 50%, var(--green-bright) 100%);
     border-color: var(--green-soft);
-    color: var(--green-soft);
+    color: var(--futsal-green-dark);
     box-shadow: 0 4px 8px var(--green-opacity-xl);
 }
 

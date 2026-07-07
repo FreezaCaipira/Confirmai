@@ -7,13 +7,14 @@
 }
 
 .evpay-qr-image {
-    width: min(170px, 90%);
+    width: 384px;
     aspect-ratio: 1 / 1;
     border-radius: 12px;
     overflow: hidden;
     background: var(--white);
-    padding: 10px;
+    padding: 8px;
     box-shadow: 0 4px 24px var(--shadow-lg);
+    margin: 0 auto;
 }
 
 .evpay-qr-image :global(img) {
@@ -76,7 +77,7 @@
     padding: 0.55rem 0.75rem;
     font-size: 0.72rem;
     font-family: 'Courier New', monospace;
-    color: var(--ci-surface-muted);
+    color: var(--ci-text-blue);
     word-break: break-all;
     overflow-wrap: break-word;
     white-space: normal;

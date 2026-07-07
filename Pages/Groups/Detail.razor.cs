@@ -16,7 +16,6 @@ public partial class Detail : IAsyncDisposable
     [Parameter] public int Id { get; set; }
 
     private Group?                    group            = null;
-    private List<Event>               recentEvents     = new();
     private List<GroupJoinRequest>    pendingRequests  = new();
     private GroupJoinRequest?         userJoinRequest  = null;
     private bool                      isLoading        = true;
@@ -42,9 +41,7 @@ public partial class Detail : IAsyncDisposable
     private CancellationTokenSource? _copyCodeCts;
     private Task? _copyInviteTask = null;
     private Task? _copyCodeTask = null;
-    private bool                      showPastEvents   = false;
     private bool                      showAllMembers   = false;
-    private const int                 MembersPreviewLimit = 8;
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,38 +65,6 @@ public partial class Detail : IAsyncDisposable
         {
             showAllMembers = false;
 
-            recentEvents = await db.Events
-                .Where(e => e.GroupId == Id)
-                .Include(e => e.Confirmations)
-                .OrderByDescending(e => e.StartsAt)
-                .Take(200)
-                .ToListAsync();
-
-            var nowUtc = DateTime.UtcNow;
-            upcomingEvents = recentEvents
-                .Where(e => e.StartsAt >= nowUtc)
-                .OrderBy(e => e.StartsAt)
-                .ToList();
-
-            pastEvents = recentEvents
-                .Where(e => e.StartsAt < nowUtc)
-                .OrderByDescending(e => e.StartsAt)
-                .ToList();
-
-            eventNumbers = recentEvents
-                .OrderBy(e => e.StartsAt)
-                .Select((e, i) => (e.Id, Num: i + 1))
-                .ToDictionary(x => x.Id, x => x.Num);
-
-            if (!showPastEvents && upcomingEvents.Count == 0 && pastEvents.Count > 0)
-            {
-                showPastEvents = true;
-            }
-            else if (showPastEvents && pastEvents.Count == 0 && upcomingEvents.Count > 0)
-            {
-                showPastEvents = false;
-            }
-
             pendingRequests = await db.GroupJoinRequests
                 .Where(r => r.GroupId == Id && r.Status == JoinRequestStatus.Pending)
                 .Include(r => r.User)
@@ -117,14 +82,6 @@ public partial class Detail : IAsyncDisposable
 
         isLoading = false;
     }
-
-    private List<Event> upcomingEvents = new();
-    private List<Event> pastEvents = new();
-    private Dictionary<int, int> eventNumbers = new();
-    private List<Event> displayedEvents => showPastEvents ? pastEvents : upcomingEvents;
-    private int eventsYear => displayedEvents.FirstOrDefault() is { } eventItem
-        ? eventItem.StartsAt.ToLocalTime().Year
-        : DateTime.Now.Year;
 
     private async Task CopyInviteLink(string url)
     {

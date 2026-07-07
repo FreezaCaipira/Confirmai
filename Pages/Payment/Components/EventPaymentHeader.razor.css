@@ -30,7 +30,7 @@
 
 .evpay-meta {
     font-size: 0.83rem;
-    color: var(--ci-text-muted);
+    color: var(--ci-text-blue);
     margin: 0 0 0.2rem;
     display: flex;
     align-items: center;
