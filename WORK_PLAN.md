@@ -1,6 +1,6 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 07/07/2026 | Base: `feat/ciclo14-refresh-token` (pos-Ciclo 14) | Refatoracao CSS CONCLUIDA
+> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 14) | Refatoracao CSS CONCLUIDA
 > 1.674/1.674 testes passando | 0 erros de build | 0 AppDbContext direto
 > Ciclo 14: Refresh Token / Sessao Persistente -- CONCLUIDO
 
@@ -80,7 +80,7 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - **Problemas**: docs separado (regra 20), arquivo vazio commitado, 1 rgba com var existente
 
 ### Ciclo 14 (Pleno Local): Refresh Token / Sessao Persistente
-- Branch: `feat/ciclo14-refresh-token` | PR pendente
+- Branch: `feat/ciclo14-refresh-token` | PR #48 + PR #49 (docs)
 - `SessionTimeoutMinutes`: 60->720 (dev, 12h), 30->480 (prod, 8h)
 - `PingController.cs` (novo): endpoint `[Authorize] GET /api/ping` -> `200 OK`
 - `session-keepalive.js` (novo): `fetch('/api/ping')` a cada 15min com `credentials: same-origin`
@@ -265,24 +265,63 @@ Arquivo vazio sem utilidade. Senior removeu.
 
 ---
 
-## Metricas Atuais (pos-Ciclo 13 + fix Senior)
+## Revisao Senior do Ciclo 14
 
-| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 | C12 | C13 |
-|---------|----|----|-------|----|----|-----|-----|-----|-----|
-| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
-| `!important` global | -- | -- | 17 | 12 | 11 | 12 | 11 | 11 | **11** |
-| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | 185 | 189 | **189** |
-| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | 2.344 | 2.364 | **2.360** |
-| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | 4.246 | 4.690 | **4.244** |
-| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | 317 | 315 | **315** |
-| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | 0 | 0 | **0** |
-| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | 0 | 0 | **0** |
-| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | 0 | 0 | **0** |
-| AppDbContext direto | -- | -- | -- | -- | -- | -- | 3 | 0 | **0** |
-| xUnit2013 warnings | -- | -- | -- | -- | -- | -- | 49 | 0 | **0** |
+### Veredicto: PERFEITO -- Implementacao exata conforme documentado, zero problemas
+
+| Metrica | C13 | C14 | Status |
+|---------|-----|-----|--------|
+| Build errors | 0 | **0** | Atingido |
+| Tests | 1.674 | **1.674** | Atingido |
+| SessionTimeoutMinutes (dev) | 60 | **720** | Atualizado |
+| SessionTimeoutMinutes (prod) | 30 | **480** | Atualizado |
+| PingController | -- | **Criado** | Novo |
+| session-keepalive.js | -- | **Criado** | Novo |
+| AddControllers/MapControllers | -- | **Registrado** | Novo |
+
+### O que o Pleno fez
+
+**Fase 1 (Refresh Token)**: Implementacao EXATA conforme orientacao do Senior:
+1. `SecurityPolicyDefaults.cs`: `SessionTimeoutMinutes` dev 60→720, prod 30→480
+2. `Controllers/PingController.cs`: endpoint `[Authorize] GET /api/ping` → `200 OK`
+3. `wwwroot/js/session-keepalive.js`: `fetch('/api/ping')` a cada 15min com `credentials: same-origin`
+4. `Program.cs`: `AddControllers()` + `MapControllers()` registrados
+5. `Pages/_Host.cshtml`: script antes de `blazor.server.js`
+6. Testes: 4 asserts atualizados (SecurityPolicyDefaultsTests + ConfigurationDefaultsTests)
+
+**Fase 2 (Validacao manual)**: Confirmada pelo Pleno -- ping 200 OK, cookie renovado, sessao ativa >15min
+
+### Problemas encontrados pelo Senior
+Nenhum. Codigo limpo, commits limpos, todas as regras respeitadas.
+
+### Positivo
+- Seguiu instrucoes do Senior ao pe da letra -- melhor ciclo em termos de aderencia
+- 1 commit de implementacao + 2 commits de docs (aceitavel)
+- Branch unica, PRs limpas (regras 9, 10, 14 respeitadas)
+- Testes atualizados ANTES de commitar (regra 8 respeitada)
+
+---
+
+## Metricas Atuais (pos-Ciclo 14)
+
+| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 | C12 | C13 | C14 |
+|---------|----|----|-------|----|----|-----|-----|-----|-----|-----|
+| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
+| `!important` global | -- | -- | 17 | 12 | 11 | 12 | 11 | 11 | 11 | **11** |
+| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | 185 | 189 | 189 | **189** |
+| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | 2.344 | 2.364 | 2.360 | **2.360** |
+| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | 4.246 | 4.690 | 4.244 | **4.244** |
+| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | 317 | 315 | 315 | **315** |
+| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | **0** |
+| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | 0 | 0 | 0 | **0** |
+| AppDbContext direto | -- | -- | -- | -- | -- | -- | 3 | 0 | 0 | **0** |
+| xUnit2013 warnings | -- | -- | -- | -- | -- | -- | 49 | 0 | 0 | **0** |
+| SessionTimeoutMinutes (dev) | -- | -- | -- | -- | -- | -- | -- | -- | 60 | **720** |
+| SessionTimeoutMinutes (prod) | -- | -- | -- | -- | -- | -- | -- | -- | 30 | **480** |
 
 ### Paginas grandes -- TODAS decompostas
 
@@ -561,19 +600,19 @@ A refatoracao CSS iniciada no Ciclo 4 esta **essencialmente concluida**. Os nume
 
 **Criar vars para esses padroes seria contraproducente**: inflaria o `:root` (ja com 317 vars) sem beneficio real de reuso.
 
-### Trabalho restante (nao-CSS)
+### Trabalho restante (nao-CSS) -- TODOS CONCLUIDOS
 
-| Item | Descricao | Prioridade |
-|------|-----------|------------|
-| AppDbContext -> IDbContextFactory | 3 paginas restantes: ViewPayment, Payment, PaymentDetails | P1 |
-| !important site.css | 11 ocorrencias, maioria legitima (autofill, accessibility, modals) | P3 |
-| Build warnings (Tests) | 49 warnings de xUnit2013 no projeto de testes (nao afetam producao) | P3 |
+| Item | Descricao | Prioridade | Status |
+|------|-----------|------------|--------|
+| AppDbContext -> IDbContextFactory | 3 paginas restantes: ViewPayment, Payment, PaymentDetails | P1 | **ZERADO (C12)** |
+| !important site.css | 11 ocorrencias, maioria legitima (autofill, accessibility, modals) | P3 | **Reducao parcial (C12)** |
+| Build warnings (Tests) | 49 warnings de xUnit2013 no projeto de testes (nao afetam producao) | P3 | **ZERADO (C12)** |
 
 ---
 
-## Estado Final pos-Ciclo 13
+## Estado Final pos-Ciclo 14
 
-Refatoracao CSS e cleanup tecnico **completos**. UX/layout reestruturado. Marcos:
+Refatoracao CSS, cleanup tecnico e infraestrutura de sessao **completos**. Marcos:
 - 0 hardcoded hex em scoped CSS (desde C6)
 - 0 `AppDbContext` direto (desde C12)
 - 0 paginas >400L sem code-behind (desde C11)
@@ -582,8 +621,9 @@ Refatoracao CSS e cleanup tecnico **completos**. UX/layout reestruturado. Marcos
 - Tela inicial = `/eventos` (desde C13)
 - Background `.sports-shell` / `.listing-block` alinhados com `.groups-block` (global em events.css)
 - 1 `!important` scoped (AvatarUpload pattern legitimo)
+- Refresh token via keep-alive JS (15min ping) + session timeout 720min dev / 480min prod (desde C14)
 
-Trabalho restante: **nenhum** (Ciclo 14 concluido). Aguardando proximo plano do Senior.
+Aguardando proximo plano do Senior.
 
 ---
 
