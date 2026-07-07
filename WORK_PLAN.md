@@ -625,6 +625,404 @@ Refatoracao CSS, cleanup tecnico e infraestrutura de sessao **completos**. Marco
 
 ---
 
+## Ciclo 15 -- Testes + UX Grupos Privados + Cleanup !important
+
+**Branch**: `fix/ciclo15-tests-ux-cleanup`
+**1 commit por fase** dentro da branch. **1 PR** no final.
+Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
+
+### Fase 1 — Testes do PingController (P1)
+
+Criar `Confirmai.Tests/PingControllerTests.cs`. Usar `IntegrationTestWebAppFactory` (ja existe no projeto, ver `AdminLogsQueryServiceIntegrationTests.cs` como referencia).
+
+```csharp
+// PingControllerTests.cs
+public class PingControllerTests : IClassFixture<IntegrationTestWebAppFactory>
+{
+    private readonly IntegrationTestWebAppFactory _factory;
+    public PingControllerTests(IntegrationTestWebAppFactory factory) => _factory = factory;
+
+    [Fact]
+    public async Task Ping_WithAuthenticatedUser_Returns200()
+    {
+        var client = _factory.CreateClient();
+        // Autenticar (ver padrao em FullFlowAuthenticationIdentityScenariosIntegrationTests.cs)
+        var response = await client.GetAsync("/api/ping");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Ping_WithoutAuthentication_ReturnsUnauthorized()
+    {
+        var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        var response = await client.GetAsync("/api/ping");
+        // Blazor Server redireciona para login (302) ou retorna 401
+        Assert.True(response.StatusCode == HttpStatusCode.Unauthorized
+                 || response.StatusCode == HttpStatusCode.Redirect);
+    }
+}
+```
+
+**Arquivo**: `Confirmai.Tests/PingControllerTests.cs`
+**Referencia**: `Confirmai.Tests/AdminLogsQueryServiceIntegrationTests.cs` (padrao IClassFixture)
+**Referencia**: `Confirmai.Tests/FullFlowAuthenticationIdentityScenariosIntegrationTests.cs` (padrao de auth)
+
+### Fase 2 — Testes do GroupMetricsService (P2)
+
+Criar `Confirmai.Tests/GroupMetricsServiceTests.cs`. Usar `TestDataFactory.CreateDbContext()` (in-memory EF Core).
+
+```csharp
+// Testes a implementar:
+[Fact] GetSnapshot_WithEventsAndMembers_CalculatesCorrectly()
+  // Criar grupo com 5 membros, 3 eventos (2 passados, 1 futuro)
+  // Criar confirmacoes e pagamentos
+  // Assert: TotalMembers=5, TotalEvents=3, UpcomingEvents=1, PaymentCompletionRate>0
+
+[Fact] GetSnapshot_GroupNotFound_ReturnsEmptySnapshot()
+  // groupId inexistente → snapshot com zeros
+
+[Fact] GetSnapshot_EmptyGroup_ReturnsZeros()
+  // grupo sem membros/eventos → TotalMembers=0, TotalEvents=0, etc.
+
+[Fact] GetMultipleSnapshots_ReturnsAllGroups()
+  // 2 grupos → dictionary com 2 entries
+
+[Fact] GetSnapshot_PaymentRate_CalculatesCorrectly()
+  // 10 confirmacoes, 7 pagas → PaymentCompletionRate=70.0
+```
+
+**Arquivo**: `Confirmai.Tests/GroupMetricsServiceTests.cs`
+**Referencia**: `Services/Groups/GroupMetricsService.cs` (95 linhas)
+**Modelo**: `GroupMetricsSnapshot` — 8 propriedades (TotalMembers, TotalEvents, UpcomingEvents, AverageAttendanceRate, PendingJoinRequests, TotalConfirmations, PaidConfirmations, PaymentCompletionRate)
+
+### Fase 3 — Testes do CityService (P2)
+
+Criar `Confirmai.Tests/CityServiceTests.cs`.
+
+```csharp
+// Testes a implementar:
+[Fact] GetCityOptions_WithActiveGroups_ReturnsDistinctCities()
+  // Criar 3 grupos ativos em 2 cidades → 2 CityOption
+  // Assert: format "Cidade|UF" no Value, "Cidade - UF" no Label
+
+[Fact] GetCityOptions_NoActiveGroups_ReturnsEmptyList()
+  // Sem grupos ativos → lista vazia
+
+[Fact] GetCityOptions_InactiveGroupsExcluded()
+  // Grupo com IsActive=false → nao aparece
+
+[Fact] GetIbgeMunicipios_EmptyStateCode_ReturnsEmpty()
+  // stateCode="" → lista vazia (sem chamada HTTP)
+
+[Fact] GetIbgeMunicipios_NullStateCode_ReturnsEmpty()
+  // stateCode=null → lista vazia
+```
+
+**NOTA sobre `GetIbgeMunicipiosAsync`**: Depende de API externa (IBGE). Testar apenas os edge cases (string vazia/null). NAO mockar HttpClient para a chamada real — baixo ROI.
+
+**Arquivo**: `Confirmai.Tests/CityServiceTests.cs`
+**Referencia**: `Services/CityService.cs` (64 linhas)
+**Modelo**: `CityOption` (Value, Label, City, StateCode)
+
+### Fase 4 — Testes do WhatsAppNotificationService (P2)
+
+Criar `Confirmai.Tests/WhatsAppNotificationServiceTests.cs`.
+
+```csharp
+// Testes a implementar (com HttpClient mockado):
+[Fact] SendNotification_NoConfig_ReturnsFalse()
+  // Config sem WhatsApp:ApiKey → false (sem chamada HTTP)
+
+[Fact] SendNotification_WithConfig_CallsApi()
+  // Config com ApiKey+ApiUrl + mock HttpMessageHandler → true
+
+[Fact] SendNotification_ApiError_ReturnsFalse()
+  // Mock retorna 500 → false (catch block)
+
+[Fact] SendEventReminder_FormatsMessageCorrectly()
+  // Verificar que a mensagem contem nome do evento e data
+
+[Fact] SendPaymentReminder_FormatsAmountCorrectly()
+  // Verificar formato "R$ 25,00"
+```
+
+**Arquivo**: `Confirmai.Tests/WhatsAppNotificationServiceTests.cs`
+**Referencia**: `Services/Notification/WhatsAppNotificationService.cs` (55 linhas)
+**Mock**: Usar `MockHttpMessageHandler` (ver padrao em `BitcoinPaymentFactoryTests.cs` se existir, ou criar custom handler)
+
+### Fase 5 — Testes do LocationService (P3)
+
+Criar `Confirmai.Tests/LocationServiceTests.cs`.
+
+```csharp
+// Testes do metodo estatico GetStateCode (via reflection ou por ReverseGeocodeAsync):
+[Fact] GetStateCode_ValidStates_ReturnsCorrectCodes()
+  // "Sao Paulo" → "SP", "Rio de Janeiro" → "RJ", etc.
+
+[Fact] GetStateCode_CaseInsensitive()
+  // "sao paulo" → "SP"
+
+[Fact] GetStateCode_InvalidState_ReturnsEmpty()
+  // "XYZ" → ""
+```
+
+**NOTA**: `LocationService` depende de `IJSRuntime` (browser API) e `HttpClient` (Nominatim). Testar apenas o metodo puro `GetStateCode` — para isso, extrair como `internal static` OU testar via `ReverseGeocodeAsync` com mock. Se for muito complexo, pular e documentar o motivo.
+
+**Arquivo**: `Confirmai.Tests/LocationServiceTests.cs`
+**Referencia**: `Services/LocationService.cs` (109 linhas)
+
+### Fase 6 — UX Grupos Privados: Atalhos de aprovacao/rejeicao
+
+**Problema**: Na `/grupos` (Index), admin ve badge "3 pendentes" mas precisa entrar na pagina do grupo para aprovar/rejeitar. Nao ha atalho direto.
+
+**Solucao**: Adicionar swipe actions ou botoes inline na listagem de grupos.
+
+**Implementacao**:
+
+1. Em `Pages/Groups/Index.razor`, adicionar botoes "Aprovar todos" e "Ver pendentes" no card do grupo quando `hasPending == true`:
+
+```razor
+@* Dentro do foreach, apos o badge de pendentes *@
+@if (hasPending)
+{
+    <div class="group-card-pending-actions" @onclick:stopPropagation="true">
+        <button class="btn btn--sm btn--success" @onclick="() => ApproveAllPending(g.Id)"
+                title="Aprovar todas as solicitações pendentes">
+            <i class="fas fa-check-double"></i> Aprovar @pendingCount
+        </button>
+    </div>
+}
+```
+
+2. No code-behind (`Index.razor` `@code`), adicionar o metodo `ApproveAllPending(int groupId)`:
+
+```csharp
+private async Task ApproveAllPending(int groupId)
+{
+    await using var db = await DbFactory.CreateDbContextAsync();
+    var pendingRequests = await db.GroupJoinRequests
+        .Where(r => r.GroupId == groupId && r.Status == JoinRequestStatus.Pending)
+        .Include(r => r.User)
+        .ToListAsync();
+
+    var group = await db.Groups.FindAsync(groupId);
+    if (group == null) return;
+
+    foreach (var req in pendingRequests)
+    {
+        var alreadyMember = await db.GroupMembers
+            .AnyAsync(m => m.GroupId == req.GroupId && m.UserId == req.UserId);
+        if (!alreadyMember)
+        {
+            db.GroupMembers.Add(new GroupMember
+            {
+                GroupId = req.GroupId, UserId = req.UserId,
+                Role = GroupMemberRole.Member, CreatedAt = DateTime.UtcNow,
+            });
+        }
+        req.Status = JoinRequestStatus.Approved;
+        req.RespondedAt = DateTime.UtcNow;
+        req.RespondedByUserId = currentUserId;
+
+        db.UserMailboxMessages.Add(new UserMailboxMessage
+        {
+            SenderUserId = null, RecipientUserId = req.UserId,
+            RecipientDisplayName = req.User?.UserName,
+            Subject = $"Voce foi aprovado em \"{group.Name}\"",
+            Body = $"Sua solicitacao para entrar no grupo **{group.Name}** foi aprovada!",
+            CreatedAt = DateTime.UtcNow,
+        });
+    }
+    await db.SaveChangesAsync();
+    await LoadGroups(); // recarrega a lista
+}
+```
+
+3. CSS para `.group-card-pending-actions` em `Index.razor.css`:
+   - Posicao absoluta no canto inferior direito do card
+   - Botao compacto com icone + numero
+   - Prevenir propagacao do click (nao navegar para o grupo)
+
+**Arquivos**:
+- `Pages/Groups/Index.razor` (template + code-behind)
+- `Pages/Groups/Index.razor.css` (estilo do botao)
+**Referencia**: `Pages/Groups/Detail.razor.cs:245-296` (logica de `ApproveSelected` — copiar padrao)
+
+### Fase 7 — Reduzir !important em site.css
+
+**Analise do Senior — 11 ocorrencias em site.css**:
+
+| Linha | Contexto | Veredicto |
+|-------|----------|-----------|
+| 882 | `.is-hidden { display: none !important }` | **LEGITIMO** — utility class precisa sobrescrever qualquer display |
+| 1254 | `@media (prefers-reduced-motion) animation-duration` | **LEGITIMO** — acessibilidade, padrao W3C |
+| 1255 | `@media (prefers-reduced-motion) animation-iteration-count` | **LEGITIMO** — acessibilidade |
+| 1256 | `@media (prefers-reduced-motion) transition-duration` | **LEGITIMO** — acessibilidade |
+| 6462 | `.pac-container { z-index: 9999 }` | **LEGITIMO** — Google Maps dropdown precisa ficar acima de modals |
+| 6547 | `input:-webkit-autofill box-shadow` | **LEGITIMO** — unico jeito de mudar cor de autofill no Chrome |
+| 6548 | `input:-webkit-autofill box-shadow (vendor prefix)` | **LEGITIMO** — idem |
+| 6549 | `input:-webkit-autofill -webkit-text-fill-color` | **LEGITIMO** — idem |
+| 6550 | `input:-webkit-autofill color` | **LEGITIMO** — idem |
+| 6553 | `input:-webkit-autofill outline: none` | **LEGITIMO** — idem |
+
+**Conclusao**: TODOS os 11 `!important` em site.css sao **LEGITIMOS**. Nao devem ser removidos.
+- `.is-hidden` — padrao utility-first (Bootstrap, Tailwind usam o mesmo)
+- `prefers-reduced-motion` — padrao de acessibilidade W3C
+- `.pac-container` — necessario para sobrescrever z-index inline do Google Maps JS
+- `input:-webkit-autofill` — UNICO jeito de corrigir o fundo azul/amarelo do Chrome autofill
+
+**Acao**: Documentar no commit que todos foram auditados e sao legitimos. NAO remover nenhum.
+
+---
+
+## Ciclo 16 -- Integracao WhatsApp Real + Baseline Operacional por Gateway
+
+**Branch**: `feat/ciclo16-whatsapp-baseline`
+**1 commit por fase** dentro da branch. **1 PR** no final.
+Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
+
+### Fase 1 — Configuracao WhatsApp: appsettings + opt-in
+
+**O que existe hoje**:
+- `WhatsAppNotificationService.cs` (55L) — pronto, le `WhatsApp:ApiKey` e `WhatsApp:ApiUrl` da config
+- `ApplicationUser.WhatsAppNumber` (string?) e `ApplicationUser.WhatsAppOptIn` (bool) — campos no modelo
+- Botoes "Cobrar via WhatsApp" nas paginas de pagamentos → abrem `wa.me` link (URL no browser, nao API)
+- Compartilhar escalacao no WhatsApp → `wa.me` link
+
+**O que falta**:
+1. Adicionar secao `WhatsApp` no `appsettings.json` e `appsettings.Development.json`:
+   ```json
+   "WhatsApp": {
+     "Enabled": false,
+     "ApiUrl": "",
+     "ApiKey": "",
+     "Provider": "evolution-api"
+   }
+   ```
+
+2. Criar tela de opt-in no perfil (`Pages/Profile.razor`):
+   - Campo "Numero WhatsApp" (input tel com mascara +55)
+   - Toggle "Receber notificacoes via WhatsApp"
+   - Salvar em `ApplicationUser.WhatsAppNumber` e `WhatsAppOptIn`
+
+3. Registrar `WhatsAppNotificationService` no DI (`Program.cs`):
+   ```csharp
+   builder.Services.AddHttpClient<WhatsAppNotificationService>();
+   ```
+
+**Arquivos**:
+- `appsettings.json`, `appsettings.Development.json`
+- `Pages/Profile.razor` (adicionar secao WhatsApp)
+- `Program.cs` (registrar no DI)
+- `Services/Notification/WhatsAppNotificationService.cs` (adicionar check de `Enabled`)
+
+### Fase 2 — Envio real de notificacoes WhatsApp
+
+**Substituir links `wa.me` por chamadas reais via API**:
+
+1. Em `Pages/Groups/Payments.razor.cs`, metodo `OpenWhatsAppDelinquency`:
+   - Se `WhatsApp:Enabled == true` e usuario tem `WhatsAppOptIn == true`:
+     → Chamar `WhatsAppNotificationService.SendPaymentReminderAsync()`
+   - Se nao: manter comportamento atual (abrir `wa.me` link)
+
+2. Em `Pages/Futsal/Escalacao.razor.cs`, metodo `ShareOnWhatsApp`:
+   - Se `WhatsApp:Enabled == true`:
+     → Enviar para todos os jogadores confirmados com opt-in
+   - Se nao: manter `wa.me` link
+
+3. Adicionar notificacoes automaticas (novos triggers):
+   - Evento criado → notificar membros do grupo com opt-in
+   - Pagamento confirmado → notificar jogador
+   - Solicitacao aprovada → notificar solicitante
+
+**Arquivos**:
+- `Pages/Groups/Payments.razor.cs`
+- `Pages/Futsal/Escalacao.razor.cs`
+- `Services/Notification/WhatsAppNotificationService.cs` (adicionar metodos de template)
+
+### Fase 3 — Admin: toggle WhatsApp + log de envios
+
+1. Em `Pages/Admin/AdminSettings.razor` (ou criar se nao existir):
+   - Toggle para habilitar/desabilitar WhatsApp
+   - Campo para ApiUrl e ApiKey (masked)
+   - Botao "Testar envio" → envia mensagem de teste para o admin
+
+2. Audit trail:
+   - Adicionar `AuditEvents.WhatsAppNotificationSent` e `AuditEvents.WhatsAppNotificationFailed`
+   - Logar cada envio no `LogService` com entityType=Notification
+
+**Arquivos**:
+- `Pages/Admin/AdminSettings.razor` (ou secao em AdminGateways)
+- `Services/Core/AuditEvents.cs` (novos eventos)
+- `Services/Notification/WhatsAppNotificationService.cs` (adicionar logging)
+
+### Fase 4 — Baseline Operacional por Gateway
+
+**O que e isso**: Um painel que mostra metricas semanais por gateway de pagamento. Serve para detectar degradacao (ex: EfiBank comecar a falhar mais) antes que vire incidente.
+
+**O que ja existe**:
+- `AdminPayments.razor.cs` L459-492 — `gatewayTelemetry` com Pending/StalePending/PaidTotal por gateway
+- `PendingWebhooksAlertService` — alerta quando webhooks ficam pendentes >1h
+- `DashboardMetricsService` — conta users e quote queries (basico)
+
+**O que criar**:
+
+1. Criar `Services/Payment/GatewayBaselineService.cs`:
+   ```csharp
+   public class GatewayBaselineSnapshot
+   {
+       public string GatewayName { get; set; }
+       public int TransactionsLast7Days { get; set; }
+       public int TransactionsLast30Days { get; set; }
+       public int SuccessCount { get; set; }
+       public int FailureCount { get; set; }
+       public int PendingCount { get; set; }
+       public decimal SuccessRate { get; set; }      // SuccessCount / Total * 100
+       public TimeSpan AverageConfirmationTime { get; set; }  // tempo medio entre criacao e pagamento
+       public DateTime? LastSuccessfulPayment { get; set; }
+       public string TrendLabel { get; set; }        // "estavel", "melhorando", "degradando"
+   }
+   ```
+
+2. Implementar consulta que agrupa por `PaymentGatewayName` e calcula:
+   - Volume (7d e 30d) via `ConfirmedAt` timestamp
+   - Taxa de sucesso: `Paid / (Paid + Failed + Pending) * 100`
+   - Tempo medio de confirmacao: `AVG(PaidAt - ConfirmedAt)` para pagamentos Paid
+   - Trend: comparar taxa de sucesso semana atual vs semana anterior
+   - Ultimo pagamento bem-sucedido: `MAX(PaidAt) WHERE Status=Paid`
+
+3. Criar componente `Shared/Components/GatewayBaselinePanel.razor`:
+   - Tabela com colunas: Gateway | Volume 7d | Volume 30d | Taxa Sucesso | Tempo Medio | Ultimo OK | Trend
+   - Cores: verde (>95% sucesso), amarelo (80-95%), vermelho (<80%)
+   - Trend com seta: ↑ melhorando, → estavel, ↓ degradando
+
+4. Adicionar painel em `Pages/Admin/AdminPayments.razor`:
+   - Nova secao "Baseline por Gateway" abaixo da telemetria existente
+   - Carregar dados do `GatewayBaselineService` no `OnInitializedAsync`
+
+**Arquivos**:
+- `Services/Payment/GatewayBaselineService.cs` (novo)
+- `Shared/Components/GatewayBaselinePanel.razor` + `.razor.css` (novo)
+- `Pages/Admin/AdminPayments.razor` + `.razor.cs` (adicionar secao)
+- `Program.cs` (registrar `GatewayBaselineService` como Scoped)
+
+### Fase 5 — Testes do GatewayBaselineService
+
+```csharp
+// Confirmai.Tests/GatewayBaselineServiceTests.cs
+[Fact] GetBaseline_WithPayments_CalculatesRates()
+[Fact] GetBaseline_NoPayments_ReturnsEmptyList()
+[Fact] GetBaseline_MultipleGateways_ReturnsAll()
+[Fact] GetBaseline_TrendCalculation_DetectsDegradation()
+```
+
+Usar `TestDataFactory.CreateDbContext()` com pagamentos em diferentes datas/estados.
+
+---
+
 ## Mapeamento de Testes -- Gaps e Oportunidades
 
 ### Estado atual
