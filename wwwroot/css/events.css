@@ -388,7 +388,7 @@ body .entity-shell-card.evpay-main {
 .detail-admin-btn--partidas:hover {
     border-color: var(--ci-text-link);
     color: var(--white);
-    background: rgba(79, 156, 248, 0.10);
+    background: var(--accent-opacity-xs);
 }
 
 .detail-admin-btn--danger {
