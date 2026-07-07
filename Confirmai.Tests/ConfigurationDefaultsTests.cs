@@ -19,7 +19,7 @@ public class ConfigurationDefaultsTests
         Assert.Equal(1, snapshot.PasswordRequiredUniqueChars);
         Assert.Equal(5, snapshot.LockoutMaxFailedAccessAttempts);
         Assert.Equal(15, snapshot.LockoutMinutes);
-        Assert.Equal(60, snapshot.SessionTimeoutMinutes);
+        Assert.Equal(720, snapshot.SessionTimeoutMinutes);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class ConfigurationDefaultsTests
         Assert.Equal(3, snapshot.PasswordRequiredUniqueChars);
         Assert.Equal(5, snapshot.LockoutMaxFailedAccessAttempts);
         Assert.Equal(15, snapshot.LockoutMinutes);
-        Assert.Equal(30, snapshot.SessionTimeoutMinutes);
+        Assert.Equal(480, snapshot.SessionTimeoutMinutes);
     }
 
     [Fact]
