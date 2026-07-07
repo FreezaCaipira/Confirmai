@@ -1,8 +1,8 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 13 + revisao Senior) | Refatoracao CSS CONCLUIDA
+> Atualizado em 07/07/2026 | Base: `feat/ciclo14-refresh-token` (pos-Ciclo 14) | Refatoracao CSS CONCLUIDA
 > 1.674/1.674 testes passando | 0 erros de build | 0 AppDbContext direto
-> Ciclo 14: Refresh Token / Sessao Persistente
+> Ciclo 14: Refresh Token / Sessao Persistente -- CONCLUIDO
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -78,6 +78,17 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - `body` background: `var(--ci-bg)` -> `var(--ci-bg-card)`, `.main-content` -> `transparent` (hierarquia visual)
 - Melhorias pagamento: QR ampliado, comprovante centralizado, nomes null-safe
 - **Problemas**: docs separado (regra 20), arquivo vazio commitado, 1 rgba com var existente
+
+### Ciclo 14 (Pleno Local): Refresh Token / Sessao Persistente
+- Branch: `feat/ciclo14-refresh-token` | PR pendente
+- `SessionTimeoutMinutes`: 60->720 (dev, 12h), 30->480 (prod, 8h)
+- `PingController.cs` (novo): endpoint `[Authorize] GET /api/ping` -> `200 OK`
+- `session-keepalive.js` (novo): `fetch('/api/ping')` a cada 15min com `credentials: same-origin`
+- `Program.cs`: `AddControllers()` + `MapControllers()` (nao existiam)
+- `_Host.cshtml`: script registrado antes de `blazor.server.js`
+- Testes: 4 asserts atualizados (SecurityPolicyDefaults + ConfigurationDefaults)
+- Fase 2 validada manualmente: ping 200 OK, cookie renovado, sessao ativa >15min
+- **Problemas**: nenhum
 
 ---
 
@@ -572,16 +583,21 @@ Refatoracao CSS e cleanup tecnico **completos**. UX/layout reestruturado. Marcos
 - Background `.sports-shell` / `.listing-block` alinhados com `.groups-block` (global em events.css)
 - 1 `!important` scoped (AvatarUpload pattern legitimo)
 
-Trabalho restante: **Ciclo 14 — Refresh Token / Sessao Persistente** (ver abaixo).
+Trabalho restante: **nenhum** (Ciclo 14 concluido). Aguardando proximo plano do Senior.
 
 ---
 
-## Ciclo 14 -- Refresh Token / Sessao Persistente
+## Ciclo 14 -- Refresh Token / Sessao Persistente (CONCLUIDO)
 
 > Ciclo separado por ser mudanca arquitetural que requer orientacao detalhada do Senior.
 
 **Branch**: `feat/ciclo14-refresh-token`
 **1 commit por fase** dentro da branch. **1 PR** no final.
+
+### Resultado
+- Fase 1 executada: 7 files changed, +29 -6
+- Fase 2 validada manualmente: `GET /api/ping` 200 OK, cookie renovado, keep-alive a cada 15min
+- 1.674/1.674 testes passando, 0 erros de build
 
 ### Contexto tecnico (analise do Senior)
 
