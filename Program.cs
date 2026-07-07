@@ -82,6 +82,7 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 builder.Services.AddServerSideBlazor(options =>
 {
     options.DetailedErrors = builder.Environment.IsDevelopment();
@@ -515,6 +516,7 @@ app.MapGet("/set-language/{languageCode}", (HttpContext context, string language
     return Results.LocalRedirect(target);
 });
 
+app.MapControllers();
 app.MapBlazorHub();
 app.MapRazorPages();
 app.MapFallbackToPage("/_Host");

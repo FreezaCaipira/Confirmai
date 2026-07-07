@@ -28,7 +28,7 @@ public static class SecurityPolicyDefaults
                 PasswordRequiredUniqueChars: 1,
                 LockoutMaxFailedAccessAttempts: 5,
                 LockoutMinutes: 15,
-                SessionTimeoutMinutes: 60);
+                SessionTimeoutMinutes: 720);
         }
 
         return new SecurityPolicySnapshot(
@@ -41,7 +41,7 @@ public static class SecurityPolicyDefaults
             PasswordRequiredUniqueChars: 3,
             LockoutMaxFailedAccessAttempts: 5,
             LockoutMinutes: 15,
-            SessionTimeoutMinutes: 30);
+            SessionTimeoutMinutes: 480);
     }
 }
 
