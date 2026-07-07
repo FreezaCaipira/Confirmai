@@ -623,7 +623,51 @@ Refatoracao CSS, cleanup tecnico e infraestrutura de sessao **completos**. Marco
 - 1 `!important` scoped (AvatarUpload pattern legitimo)
 - Refresh token via keep-alive JS (15min ping) + session timeout 720min dev / 480min prod (desde C14)
 
-Aguardando proximo plano do Senior.
+---
+
+## Mapeamento de Testes -- Gaps e Oportunidades
+
+### Estado atual
+- **1.674 testes** em **192 arquivos** de teste
+- **Cobertura**: 9.9% (11.733/118.427 linhas)
+- **Meta**: 15%+
+
+### Services SEM cobertura de testes (5/87)
+
+| Service | Dominio | Prioridade | Justificativa |
+|---------|---------|------------|---------------|
+| `PingController` | Controllers | **P1** | Novo no C14, endpoint critico de keep-alive, facil de testar |
+| `CityService` | Utility | P2 | CRUD de cidades, depende de DB |
+| `GroupMetricsService` | Groups | P2 | Calculos de metricas por grupo |
+| `LocationService` | Utility | P3 | Servico auxiliar de localizacao |
+| `WhatsAppNotificationService` | Notification | P3 | Depende de API externa |
+
+### Testes recomendados para o Pleno
+
+**P1 — PingController (novo, facil, alto valor)**:
+```csharp
+// PingControllerTests.cs
+[Fact] Ping_Authorized_Returns200()    // GET /api/ping com user autenticado → 200
+[Fact] Ping_Anonymous_Returns401()     // GET /api/ping sem auth → 401/redirect
+```
+Usar `IntegrationTestWebAppFactory` + `HttpClient` com/sem auth.
+
+**P2 — GroupMetricsService**:
+```csharp
+[Fact] GetMetrics_WithEvents_CalculatesCorrectly()
+[Fact] GetMetrics_EmptyGroup_ReturnsZeros()
+```
+
+**P2 — CityService**:
+```csharp
+[Fact] GetCities_ByState_FiltersCorrectly()
+[Fact] GetCity_ById_ReturnsExpected()
+```
+
+### O que NAO precisa de teste (baixo ROI)
+- Componentes Blazor (sub-componentes de UI) — cobertura minima, alto custo
+- Models/DTOs sem logica — triviais
+- `LocationService` e `WhatsAppNotificationService` — dependencias externas
 
 ---
 

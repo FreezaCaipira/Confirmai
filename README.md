@@ -9,11 +9,15 @@ Plataforma SaaS para organização de esportes amadores (Futsal) e eventos socia
 
 | Métrica | Valor |
 |---------|-------|
-| Testes | 1,911/1,911 passando |
+| Testes | 1.674/1.674 passando |
 | Build | 0 erros, 47 warnings preexistentes |
-| Idiomas | PT-BR, EN-US, ES-ES (697+ chaves traduzidas) |
-| CSS Scoped | 110+ arquivos `.razor.css` |
-| Services | 78 serviços organizados por domínio |
+| Idiomas | PT-BR, EN-US, ES-ES (833 chaves traduzidas) |
+| CSS Scoped | 118 arquivos `.razor.css` |
+| CSS Vars | 315 no `:root`, 4.244 usos totais |
+| Services | 87 serviços organizados por domínio |
+| Páginas Blazor | 139 (todas com code-behind quando >400L) |
+| Componentes | 37 compartilhados + 38 sub-componentes |
+| AppDbContext direto | 0 (100% IDbContextFactory) |
 
 ## Funcionalidades
 
@@ -33,7 +37,7 @@ Plataforma SaaS para organização de esportes amadores (Futsal) e eventos socia
 | Real-time | SignalR (PaymentHub) |
 | Pagamentos | BTCPayServer, AbacatePay, EfiBank, Appmax |
 | Monitoramento | Serilog, OpenTelemetry, Prometheus/Grafana |
-| Testes | xUnit + Moq (1,911/1,911 passando), Playwright E2E |
+| Testes | xUnit + Moq (1.674/1.674 passando), Playwright E2E |
 | CI | GitHub Actions (build + test + coverage) |
 
 ## Como rodar
@@ -79,15 +83,16 @@ cd e2e && npm install && npm run install:browsers && npm test
 
 ```
 Confirmai/
-├── Pages/                    # ~97 páginas Blazor organizadas por domínio
-│   ├── Admin/                # Dashboard admin + componentes
-│   ├── Futsal/               # Partidas, escalação, schedule
-│   ├── Groups/               # Grupos, ranking, configurações
-│   ├── Payment/              # Pagamentos, checkout, histórico
+├── Pages/                    # 139 páginas Blazor organizadas por domínio
+│   ├── Admin/                # Dashboard admin + 4 sub-componentes
+│   ├── Futsal/               # Partidas, escalação, schedule + 19 sub-componentes
+│   ├── Groups/               # Grupos, ranking, configurações + 3 sub-componentes
+│   ├── Payment/              # Pagamentos, checkout, histórico + 7 sub-componentes
 │   ├── Poker/                # Torneios de poker
 │   └── ...                   # Profile, Mailbox, VenueManager, etc.
-├── Shared/Components/        # 28 componentes reutilizáveis
-├── Services/                 # 78 serviços organizados por domínio
+├── Controllers/              # API controllers (PingController — keep-alive)
+├── Shared/Components/        # 37 componentes reutilizáveis
+├── Services/                 # 87 serviços organizados por domínio
 │   ├── Admin/                # Logs, filtros, segurança, auditoria
 │   ├── Core/                 # UiText, log, auth, certificados
 │   ├── Payment/              # Gateways, webhooks, reconciliação
@@ -102,8 +107,9 @@ Confirmai/
 ├── Data/                     # AppDbContext + Factory
 ├── Configuration/            # Options (BtcPay, Email, Security)
 ├── Hubs/                     # PaymentHub (SignalR)
-├── wwwroot/css/              # 4 CSS globais + 110+ scoped (.razor.css)
-├── Confirmai.Tests/          # xUnit (1,911 testes)
+├── wwwroot/css/              # 4 CSS globais + 118 scoped (.razor.css)
+├── wwwroot/js/               # session-keepalive.js, nav-progress.js, etc.
+├── Confirmai.Tests/          # xUnit (1.674 testes, 192 arquivos)
 └── e2e/                      # Playwright E2E (TypeScript)
 ```
 
@@ -111,8 +117,8 @@ Confirmai/
 
 | Documento | Descrição |
 |-----------|-----------|
-| [WORK_PLAN.md](WORK_PLAN.md) | Ordem de trabalho atual (Qualidade → UX → Operação → Produção) |
-| [ROADMAP.md](ROADMAP.md) | Progresso, prioridades e próximos passos |
+| [WORK_PLAN.md](WORK_PLAN.md) | Plano de trabalho, histórico de 14 ciclos, métricas, regras |
+| [ROADMAP.md](ROADMAP.md) | Funcionalidades concluídas, backlog e próximos passos |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Convenções, patterns e guia para contribuidores |
 | [docs/deploy.md](docs/deploy.md) | Guia completo de deploy com Docker |
 | [docs/production-checklist.md](docs/production-checklist.md) | Checklist de variáveis e verificações para produção |

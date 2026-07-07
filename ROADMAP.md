@@ -1,20 +1,28 @@
 # Roadmap Confirmai
 
-## Estado Atual (Junho 2026)
+## Estado Atual (Julho 2026) — pos-Ciclo 14
 
 ### Números do projeto
 
 | Métrica | Valor |
 |---------|-------|
-| Páginas Blazor | ~97 |
-| Componentes compartilhados | 28 |
-| Serviços | 78 (organizados em 10 domínios) |
-| Testes (xUnit) | 641 passando / 0 falhando / 641 total |
-| CSS scoped | 110+ arquivos (todos os .razor têm .razor.css) |
-| CSS globais | 4 arquivos |
-| StateHasChanged() | 13 chamadas em 7 arquivos |
-| IAsyncDisposable | 8 páginas implementam |
-| Warnings build | 0 CS1998, 0 CS0649, 0 CS86xx |
+| Páginas Blazor | 139 |
+| Componentes compartilhados | 37 |
+| Sub-componentes (Pages) | 38 (Admin 4, Futsal 19, Groups 3, Payment 7, Other 5) |
+| Serviços | 87 (organizados em 12 domínios) |
+| Testes (xUnit) | 1.674 passando / 0 falhando / 192 arquivos |
+| Cobertura | 9.9% (11.733/118.427 linhas) |
+| CSS scoped | 118 arquivos `.razor.css` |
+| CSS globais | 4 arquivos (site.css, events.css, identity.css, marketplace.css) |
+| CSS vars no `:root` | 315 (0 indefinidas, 0 mortas) |
+| CSS vars total usos | 4.244 |
+| Hardcoded hex scoped | 0 (desde Ciclo 6) |
+| AppDbContext direto | 0 (100% IDbContextFactory desde Ciclo 12) |
+| StateHasChanged() | 15 chamadas |
+| IAsyncDisposable | 7 páginas implementam |
+| Warnings build | 0 (47 preexistentes em dependencies) |
+| Idiomas | PT-BR, EN-US, ES-ES (833 chaves) |
+| Sessão | Keep-alive JS 15min + timeout 720min dev / 480min prod |
 
 ---
 
@@ -61,25 +69,40 @@
 
 ### Qualidade de Código
 - [x] Services reorganizados por domínio (`Admin/`, `Core/`, `Payment/`, `Events/`, etc.)
-- [x] UiTextService com i18n (PT-BR, EN-US, ES-ES completo - 691 chaves traduzidas)
-- [x] StateHasChanged() reduzido de 101 → 13 chamadas
-- [x] IAsyncDisposable implementado em 8 páginas críticas
-- [x] CSS Scoped Isolation corrigido (Phase 18): sub-componentes com `.razor.css` próprio
-- [x] L1: Eliminar ~20 inline styles estáticos (Groups/Join, Groups/Index, Groups/Detail, Index, Poker/Edit)
-- [x] L2: Criar `.razor.css` para todas as páginas (110+ arquivos, incluindo 1 priority >400L)
-- [x] L3: Corrigir 40 warnings CS1998 (async sem await) → remover async, retornar Task.CompletedTask
-- [x] L4: Corrigir 18 warnings CS0649 (campos nunca atribuídos) → = null / = default
-- [x] L5: Corrigir warnings CS8618/CS8602/CS8604/CS8601 (nullability) → default!, null!, null-coalescing
+- [x] UiTextService com i18n (PT-BR, EN-US, ES-ES completo — 833 chaves traduzidas)
+- [x] StateHasChanged() reduzido de 101 → 15 chamadas
+- [x] IAsyncDisposable implementado em 7 páginas críticas
+- [x] CSS Scoped Isolation corrigido: sub-componentes com `.razor.css` próprio
+- [x] Inline styles estáticos: ~35 → 0 (Ciclo 5)
+- [x] CSS scoped: 118 arquivos `.razor.css`
+- [x] Warnings: CS1998, CS0649, CS86xx → todos zerados
 - [x] CI com build + test + coverage (Coverlet → badge)
 - [x] Documentação consolidada: 22 .md → 3 centrais (README, ROADMAP, CONTRIBUTING) + docs operacionais
-- [x] 24 testes corrigidos (encoding UTF-8, chaves UiText, wiring de componentes, assertions)
+- [x] Testes: 575 → 1.674 (24 corrigidos + novos adicionados)
 - [x] AdminPayments sub-componentes com _Imports.razor e parâmetros tipados
-- [x] IDbContextFactory registrado no test factory para cobertura completa
-- [x] Migrar 6 services de AppDbContext → IDbContextFactory (LogService, AdminSettingsService, ProductService, PaymentConfirmationService, AdminSecurityPolicyService, DashboardMetricsService)
+- [x] IDbContextFactory: 100% das páginas migradas (0 `@inject AppDbContext` direto desde Ciclo 12)
+- [x] Migrar 6 services de AppDbContext → IDbContextFactory
+- [x] xUnit2013 warnings: 49 → 0 (Ciclo 12)
+
+### Refatoração CSS (Ciclos 4—11)
+- [x] Hardcoded hex em scoped CSS: 1.387 → 0
+- [x] rgba() hardcoded scoped: 645 → 185 (restantes são padrões únicos)
+- [x] CSS vars no `:root`: 68 → 315
+- [x] CSS vars usos totais: 673 → 4.244
+- [x] Fallbacks `var(--xx, #hex)`: 178 → 0
+- [x] `!important` scoped: 16 → 1 (AvatarUpload pattern legítimo)
+- [x] Páginas >400L sem code-behind: 12 → 0 (todas decompostas)
+- [x] Vars indefinidas: 0 (desde Ciclo 13)
+- [x] Vars mortas: 0 (desde Ciclo 13)
+
+### Infraestrutura de Sessão (Ciclo 14)
+- [x] Refresh token via keep-alive JS (`/api/ping` a cada 15min)
+- [x] Session timeout: 720min dev, 480min prod
+- [x] `AddControllers()` + `MapControllers()` registrados
 
 ### UX
-- [x] Grupos como tela inicial (`/`), Explorar em `/jogos`
-- [x] Navegação: Grupos → Jogos → Pagamentos
+- [x] Eventos como tela inicial (`/` = `/eventos` desde Ciclo 13)
+- [x] Navegação: Eventos → Grupos → Pagamentos
 - [x] Caixa de mensagens (`/mailbox`) com anexos e arquivamento
 - [x] Tema escuro, layout responsivo
 - [x] Cookie consent com personalização
@@ -101,61 +124,45 @@
 ## Em Andamento
 
 ### P0 — Validação em Produção
+- [ ] Deploy em produção e testes do usuário
 - [ ] Testar fluxo Pix completo em produção (EfiBank)
 - [ ] Ativar webhook AbacatePay em produção
 - [ ] Implantar alertas reais e validar escalonamento fim a fim
 - [x] ~~Investigar 24 testes falhando~~ → Corrigido (PR #7)
 
-### P1 — Decomposição de Componentes Grandes
-- [x] `Groups/Detail.razor` (947 linhas) — extrair sub-componentes
-- [x] `Futsal/Detail.razor` (933 linhas) — extrair sub-componentes
-- [x] `AdminLogs.razor` (695 linhas) — decompor
-- [x] `Mailbox.razor` (674 linhas) — já tem Components/, mas página raiz grande
-- [x] `Poker/Detail.razor` (628 linhas) — decompor
-
-### P2 — UX de Grupos Privados
-- [ ] Atalhos de aprovação/rejeição direta para admins
-- [ ] Filtros e contexto visual para decisões de triagem
-- [ ] `VenueManager/VenueEdit.razor`: aplicar melhoria UF/IBGE do admin
-
-### UX Iterativo (Ciclo 8 — 28-29/06/2026)
-- [x] Inverter seções Métricas/Membros na página de grupo
-- [x] Melhorar contraste dos subcards de métricas
-- [x] Delimitar separadoras da tabela de partidas (visíveis mas suaves)
-- [x] Badge para partidas geradas automaticamente (semanal)
-- [x] Remover borda vermelha da aba Histórico de pagamentos do grupo
-- [x] Substituir emoji de goleiro corrompido por ícone Font Awesome
-- [x] Centralizar nomes, números e títulos na escalação de futsal
-- [x] Tema metálico azul no modal de confirmação e botão shuffle
-- [x] Melhorar legibilidade do Time B (fundo escuro) e botão rejeitar cookie
-- [x] Reduzir QR code ~40% e mover CSS para sub-componentes de pagamento
-- [x] Admin do grupo pode ver e confirmar comprovante de pagamento
-- [x] Card shell na página de eventos + renomear nav "Esportes" → "Eventos"
-- [x] SportCard poker com tema roxo e contador no body
-- [x] Badge de horário semanal nos cards de grupo
-- [x] Renomear título "Histórico de faturas" → "Meus pagamentos"
-- [x] Breadcrumb atualiza ao navegar (StateHasChanged após LocationChanged)
-- [x] Admin Payments: mover CSS scoped para global (Blazor isolation)
-- [x] Admin Logs: guard SemaphoreSlim.Release contra disposal
-- [x] Admin Users: fix EF Core translation (ToLower ao invés de StringComparison)
-- [x] Paginação manual (20/página) em Admin Users, Admin Payments, Admin Logs
-- [x] Botões com cores metálicas distintas na tabela de usuários
-- [x] Eliminar todos os componentes Virtualize (NullReferenceException resolvido)
+### Concluído recentemente (Ciclos 8—14)
+- [x] Decomposição de TODAS as 12 páginas >400L com code-behind
+- [x] 36 melhorias de UX/UI (escalação, pagamentos, grupos, admin, navegação)
+- [x] Eliminação completa de Virtualize → paginação manual
+- [x] Causa raiz card grupo: 17 vars auto-referenciais corrigidas
+- [x] Background `.sports-shell`/`.listing-block` movido para global (events.css)
+- [x] Tela inicial reestruturada: `/` = `/eventos`
+- [x] Refresh token implementado (keep-alive JS + session timeout ampliado)
+- [x] IDbContextFactory ZERADO (0 `@inject AppDbContext` direto)
+- [x] xUnit2013 warnings ZERADO
 
 ---
 
 ## Backlog
 
-### P2 — Produto
+### P1 — Testes (trabalho para o Pleno)
+- [ ] Testes do `PingController` (novo no Ciclo 14 — 0% cobertura)
+- [ ] Testes dos 5 services sem cobertura: `CityService`, `GroupMetricsService`, `LocationService`, `WhatsAppNotificationService`, `IBitcoinPaymentService`
+- [ ] Aumentar cobertura de testes: 9.9% → meta 15%+
+
+### P2 — UX/Produto
+- [ ] Testar responsividade mobile (375px/414px)
+- [ ] Atalhos de aprovação/rejeição direta para admins (grupos privados)
+- [ ] Filtros e contexto visual para decisões de triagem
+- [ ] `VenueManager/VenueEdit.razor`: aplicar melhoria UF/IBGE do admin
 - [ ] Integração WhatsApp real com opt-in
 - [ ] Indicadores de ocupação, inadimplência e conversão por grupo
-- [ ] Página de histórico de pagamentos do jogador (auto-serviço)
 - [ ] Ajustes de UX responsiva e acessibilidade AA
 
 ### P3 — Qualidade de Código
-- [ ] Expandir cobertura scoped CSS (42 de 97 páginas têm `.razor.css`, faltam 55)
-- [ ] Consolidar CSS duplicado em utility classes / design tokens adicionais
-- [ ] Aumentar cobertura de testes → meta 80%+
+- [x] ~~Expandir cobertura scoped CSS~~ → 118 arquivos `.razor.css` (concluído)
+- [x] ~~Consolidar CSS duplicado~~ → 315 vars no `:root`, refatoração concluída
+- [ ] Reduzir `!important` em site.css (11 ocorrências, maioria legítima)
 
 ### P4 — Operação Contínua
 - [ ] Definir baseline operacional semanal por gateway

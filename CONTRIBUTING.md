@@ -19,7 +19,7 @@ Confirmai/
 │   ├── Poker/               # Torneios de poker
 │   ├── VenueManager/        # Gestão de quadras
 │   └── Components/          # Componentes de página compartilhados (Profile, Mailbox, etc.)
-├── Shared/Components/       # Componentes globais reutilizáveis (Layout, Toast, Breadcrumb, etc.)
+├── Shared/Components/       # 37 componentes globais reutilizáveis (Layout, Toast, Breadcrumb, etc.)
 ├── Services/                # Lógica de negócio organizada por domínio
 │   ├── Admin/               # Logs, filtros, auditoria, segurança, delinquência
 │   ├── Core/                # LogService, UiTextService, AuditEvents, Auth, certificados
@@ -32,7 +32,8 @@ Confirmai/
 │   ├── User/                # Preferências, claims, perfil
 │   └── Utility/             # Email, PII, produtos, testnet
 ├── wwwroot/                 # Estáticos (CSS, JS, imagens, uploads)
-├── Confirmai.Tests/         # xUnit + Moq (641 testes)
+├── Controllers/             # API controllers (PingController — keep-alive)
+├── Confirmai.Tests/         # xUnit + Moq (1.674 testes, 192 arquivos)
 └── e2e/                     # Playwright E2E (TypeScript, 20 specs)
 ```
 
@@ -161,7 +162,7 @@ Páginas grandes extraem sub-componentes em `Components/`:
 
 ```
 Pages/Admin/
-├── AdminPayments.razor              # página principal (1161 linhas)
+├── AdminPayments.razor              # página principal (decompós Ciclo 11)
 └── Components/
     ├── AdminPaymentsTable.razor      # tabela de pagamentos
     ├── AdminPaymentsFilters.razor    # barra de filtros
@@ -186,13 +187,14 @@ Sub-componentes recebem dados via `[Parameter]` e comunicam eventos via `EventCa
 
 ### CSS Isolation (scoped)
 
-- Cada componente/página tem seu `.razor.css` isolado (56 arquivos)
-- **Proibido**: `!important`, inline styles estáticos
+- Cada componente/página tem seu `.razor.css` isolado (118 arquivos)
+- **Proibido**: `!important`, inline styles estáticos, hardcoded hex/rgba (usar vars)
 - **Permitido**: inline styles para valores dinâmicos em runtime (`style="@BuildAccentStyle(color)"`)
+- **Regra**: nunca inventar nomes de var — consultar lista de vars permitidas no WORK_PLAN.md
 
 ### Design Tokens
 
-68 CSS custom properties em `:root` de `site.css`. Principais famílias:
+315 CSS custom properties em `:root` de `site.css`. Principais famílias:
 
 ```css
 /* Backgrounds (tema escuro/warm) */
@@ -208,7 +210,7 @@ Sub-componentes recebem dados via `[Parameter]` e comunicam eventos via `EventCa
 --text-primary, --text-muted, --text-on-dark
 ```
 
-Para código novo, usar as variáveis existentes em vez de cores hardcoded.
+Para código novo, usar as variáveis existentes em vez de cores hardcoded. Lista completa de vars permitidas no WORK_PLAN.md.
 
 ### Entity Shell System
 
@@ -243,7 +245,7 @@ Variantes de tema: `parchment-a` (6 páginas), `parchment-b` (3 páginas).
 dotnet test Confirmai.Tests/Confirmai.Tests.csproj
 ```
 
-- **xUnit + Moq**, in-memory EF Core via `TestDataFactory.CreateDbContext()`
+- **1.674 testes em 192 arquivos**, xUnit + Moq, in-memory EF Core via `TestDataFactory.CreateDbContext()`
 - Padrão de audit test: DB real + `LogService` real → chama serviço → `Assert` em `db.Logs`
 - `SignalRTestFactory.CreateHubContext()` para testes que precisam de `IHubContext<PaymentHub>`
 - `IntegrationTestWebAppFactory` para testes HTTP (`WebApplicationFactory`)
@@ -274,6 +276,7 @@ cd e2e && npm install && npm run install:browsers && npm test
 - **Headers** (em `Program.cs`): `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`
 - **Fontes externas** (Google Fonts, Font Awesome): `media="print"` + promoção via JS pós-load (respeita CSP)
 - **Identity**: lockout após 5 tentativas, cookie com sliding expiration, políticas de senha diferenciadas por ambiente
+- **Session keep-alive**: JS ping a cada 15min (`/api/ping`), session timeout 720min dev / 480min prod
 
 ---
 
@@ -351,8 +354,14 @@ Senior monta WORK_PLAN.md → Pleno executa fases → Senior revisa → Senior a
 1. **WORK_PLAN.md e o unico documento de trabalho** — nao criar novos .md
 2. Cada fase tem: branch, descricao, arquivos-alvo, comandos de validacao
 3. Pleno documenta bloqueios na secao "Problemas Encontrados" do WORK_PLAN
-4. 1 PR por fase, mergear antes de comecar a proxima
+4. 1 branch unica por ciclo, 1 commit por fase, 1 PR por ciclo
 5. Pleno NAO toma decisoes arquiteturais — quando em duvida, documentar e pular
+6. NUNCA usar fallback em var() — usar `var(--nome)` sem fallback hex
+7. NUNCA inventar nomes de var() — so usar vars listadas no WORK_PLAN.md
+8. NUNCA salvar CSS com encoding diferente de UTF-8
+9. Rebuild limpo antes de testar mudancas visuais: `dotnet clean && dotnet build` + Ctrl+F5
+
+Ver lista completa de 21 regras no WORK_PLAN.md.
 
 ### Anti-Patterns (Pleno)
 
