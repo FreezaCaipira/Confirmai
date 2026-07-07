@@ -1,19 +1,11 @@
-/* -- Page wrapper -------------------------- */
-.listing-page {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem;
-}
+/* -- Page wrapper (global in events.css) ------------------- */
 
 /* -- Criar Evento dropdown ----------------- */
 .create-poker-dropdown {
     position: relative;
-    align-self: flex-end;
-    margin-bottom: 0.25rem;
+    max-width: 860px;
+    margin: 0 auto 0.25rem;
+    text-align: right;
 }
 
 .btn-create-event {

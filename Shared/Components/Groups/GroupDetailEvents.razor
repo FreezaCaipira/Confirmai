@@ -4,13 +4,6 @@
 @inject NavigationManager NavigationManager
 @inject UiTextService Ui
 
-@if (DisplayedEvents.Any(e => e.RachaScheduleId.HasValue))
-{
-    <div class="events-recurring-notice">
-        <i class="fas fa-sync-alt"></i>
-        <span>Partidas geradas automaticamente (semanal)</span>
-    </div>
-}
 <table class="events-table">
     <thead>
         <tr>

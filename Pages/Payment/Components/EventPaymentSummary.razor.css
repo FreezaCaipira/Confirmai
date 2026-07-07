@@ -15,7 +15,7 @@
 }
 
 .evpay-summary-label {
-    color: var(--ci-text-muted);
+    color: var(--ci-text-blue);
 }
 
 .evpay-summary-value {

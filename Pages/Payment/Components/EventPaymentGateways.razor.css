@@ -60,7 +60,7 @@
 
 .evpay-method-badge--soon {
     background: var(--slate-border-sm);
-    color: var(--slate-muted);
+    color: var(--ci-text-muted);
     border-color: var(--slate-border-lg);
 }
 
@@ -92,7 +92,7 @@
 
 .evpay-disclaimer {
     font-size: 0.75rem;
-    color: var(--ci-text-subtle);
+    color: var(--ci-text-muted);
     text-align: center;
     margin: 0;
     display: flex;

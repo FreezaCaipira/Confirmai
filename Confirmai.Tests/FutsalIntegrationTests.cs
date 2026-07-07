@@ -73,7 +73,7 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var response = await client.GetAsync("/futsal");
         var content = await ReadContentAsync(response);
 
-        Assert.Contains("/futsal/create", content);
+        Assert.Contains("/grupos/criar", content);
     }
 
     // ──────────────────────────────────────────────

@@ -18,7 +18,6 @@
 @inject NavigationManager              NavigationManager
 @inject IConfiguration                 Config
 @inject IJSRuntime                     JS
-@inject UiTextService                  Ui
 
 <PageTitle>@(group?.Name ?? "Grupo") · Confirmai</PageTitle>
 
@@ -65,17 +64,6 @@ else
     var isMember  = currentUserId is not null &&
                    group.Members.Any(m => m.UserId == currentUserId);
     var baseUrl   = (Config["App:BaseUrl"]?.TrimEnd('/'))  ?? NavigationManager.BaseUri.TrimEnd('/');
-    var newEventHref = group.Sport == Sport.Futsal
-        ? $"/futsal/create?groupId={group.Id}"
-        : $"/poker/create?groupId={group.Id}";
-    var orderedMembers = group.Members
-        .OrderBy(m => m.Role == GroupMemberRole.Admin ? 0 : 1)
-        .ThenBy(m => m.CreatedAt)
-        .ToList();
-    var hasHiddenMembers = orderedMembers.Count > MembersPreviewLimit;
-    var visibleMembers = showAllMembers
-        ? orderedMembers
-        : orderedMembers.Take(MembersPreviewLimit);
 
     <div class="detail-page">
         <div class="detail-card">
@@ -141,13 +129,30 @@ else
 
             <hr class="detail-divider">
 
+            @* ── Métricas (somente admin) ───────────────────────────── *@
+            @if (isAdmin)
+            {
+                <section class="detail-section">
+                    <div class="detail-section-header">
+                        <h2 class="detail-section-title">
+                            <i class="fas fa-chart-line"></i> Métricas
+                        </h2>
+                    </div>
+                    <GroupMetrics GroupId="@group.Id" />
+                </section>
+            }
+
             @* ── Membros ────────────────────────────────────────────── *@
+            <hr class="detail-divider">
             <section class="detail-section">
                 <div class="detail-section-header">
                     <h2 class="detail-section-title">
                         <i class="fas fa-users"></i> Membros (@group.Members.Count)
                     </h2>
                     <div class="detail-section-actions">
+                        <a class="detail-admin-btn detail-admin-btn--partidas" href="/grupo/@group.Id/partidas">
+                            <i class="fas fa-calendar-alt"></i> Partidas
+                        </a>
                         @if (isMember && group.EnablePostMatchRanking)
                         {
                             <a class="detail-admin-btn detail-admin-btn--ranking" href="/grupo/@group.Id/ranking">
@@ -167,57 +172,6 @@ else
                     CurrentUserId="@currentUserId"
                     ShowAllMembers="@showAllMembers"
                     OnToggleMembersView="@ToggleMembersView" />
-            </section>
-
-            @* ── Métricas (somente admin) ───────────────────────────── *@
-            @if (isAdmin)
-            {
-                <hr class="detail-divider">
-                <section class="detail-section">
-                    <div class="detail-section-header">
-                        <h2 class="detail-section-title">
-                            <i class="fas fa-chart-line"></i> Métricas
-                        </h2>
-                    </div>
-                    <GroupMetrics GroupId="@group.Id" />
-                </section>
-            }
-
-            @* ── Partidas ───────────────────────────────────────────── *@
-            <section class="detail-section">
-                <h2 class="detail-section-title detail-events-title detail-events-title--no-mb">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Partidas</span>
-                    <span class="detail-events-year">@eventsYear</span>
-                </h2>
-                <div class="detail-events-tabs">
-                    <div class="detail-events-tabs-left">
-                        <button class="detail-events-tab @(!showPastEvents ? "active" : string.Empty)"
-                                type="button"
-                                @onclick="() => showPastEvents = false">
-                            <i class="fas fa-bolt"></i> Próximas (@upcomingEvents.Count)
-                        </button>
-                        <button class="detail-events-tab @(showPastEvents ? "active" : string.Empty)"
-                                type="button"
-                                @onclick="() => showPastEvents = true">
-                            <i class="fas fa-history"></i> Realizadas (@pastEvents.Count)
-                        </button>
-                    </div>
-                    <div class="detail-events-tabs-right">
-                        @if (isAdmin)
-                        {
-                            <a href="@newEventHref" class="groups-create-btn detail-events-create-btn">
-                                <i class="fas fa-plus"></i> Nova partida
-                            </a>
-                        }
-                    </div>
-                </div>
-                <GroupDetailEvents
-                    Group="@group"
-                    DisplayedEvents="@displayedEvents"
-                    UpcomingEvents="@upcomingEvents"
-                    ShowPastEvents="@showPastEvents"
-                    EventNumbers="@eventNumbers" />
             </section>
 
             @* ── Solicitações de entrada (admin) ─────────────────────── *@
