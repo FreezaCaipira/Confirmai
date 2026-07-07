@@ -1,8 +1,8 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 12 + investigacao Senior) | Refatoracao CSS CONCLUIDA
-> 1.674/1.674 testes passando | 0 erros de build | 0 warnings | 0 AppDbContext direto
-> Ciclo 13: Background + Mobile + Navegacao | Ciclo 14: Refresh Token / Sessao Persistente
+> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 13 + revisao Senior) | Refatoracao CSS CONCLUIDA
+> 1.674/1.674 testes passando | 0 erros de build | 0 AppDbContext direto
+> Ciclo 14: Refresh Token / Sessao Persistente
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -68,7 +68,16 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - AppDbContext direto: 3 -> 0 (IDbContextFactory zerado)
 - xUnit2013: 49 -> 0 warnings
 - **Problema pendente**: background das telas `/eventos`, `/futsal`, `/poker` nao alinhado com `/grupos`
-- **Investigacao Senior**: ver secao "Investigacao Senior: Background das telas de eventos"
+
+### Ciclo 13 (Pleno Local): Background + Navegacao + Reorganizacao UX
+- Branch: `fix/ciclo13-ux-layout` | PR #46
+- Background fix: moveu `.sports-shell`/`.listing-block` de scoped para global (`events.css`) — elimina risco de CSS isolation
+- Navegacao: tela inicial = `/eventos` (antes `/grupos`), nav reordenado, `Dashboard` redireciona para `/eventos`
+- Nova pagina `/grupo/{Id}/partidas` extraida de `Groups/Detail.razor` com `IDbContextFactory`
+- SportCard redesenhado com gradientes futsal/poker + emoji watermarks decorativos
+- `body` background: `var(--ci-bg)` -> `var(--ci-bg-card)`, `.main-content` -> `transparent` (hierarquia visual)
+- Melhorias pagamento: QR ampliado, comprovante centralizado, nomes null-safe
+- **Problemas**: docs separado (regra 20), arquivo vazio commitado, 1 rgba com var existente
 
 ---
 
@@ -157,26 +166,112 @@ Pleno criou `docs/ciclo12-revisao-senior.md` em vez de consolidar no WORK_PLAN.m
 
 ---
 
-## Metricas Atuais (pos-Ciclo 12 + fix Senior)
+## Revisao Senior do Ciclo 13
 
-| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 | C12 |
-|---------|----|----|-------|----|----|-----|-----|-----|
-| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
-| `!important` global | -- | -- | 17 | 12 | 11 | 12 | 11 | **11** |
-| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | 0 | **0** |
-| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | 185 | **189** |
-| Hardcoded hex global | -- | -- | ~1.317 | 166 | 166 | 153 | 4 | **~103** |
-| rgba() hardcoded global | -- | -- | ~185 | 446 | 413 | 394 | 217 | **~360** |
-| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | 2.344 | **2.364** |
-| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | 4.246 | **4.690** |
-| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | 317 | **315** |
-| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | 0 | **0** |
-| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | 0 | **0** |
-| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | 0 | **0** |
-| AppDbContext direto | -- | -- | -- | -- | -- | -- | 3 | **0** |
-| xUnit2013 warnings | -- | -- | -- | -- | -- | -- | 49 | **0** |
+### Veredicto: EXCELENTE -- Abordagem de background SUPERIOR ao planejado, navegacao reestruturada, UX melhorada
+
+| Metrica | C12 | C13 | Status |
+|---------|-----|-----|--------|
+| Build errors | 0 | **0** | Atingido |
+| Tests | 1.674 | **1.674** | Atingido |
+| Hardcoded hex scoped | 0 | **0** | Atingido |
+| rgba() hardcoded scoped | 189 | **189** | Estavel |
+| CSS vars (scoped) | 2.364 | **2.360** | Estavel (-4 movidas p/ global) |
+| `!important` scoped | 1 | **1** | Atingido |
+| Vars no `:root` | 315 | **315** | Atingido |
+| Vars indefinidas | 0 | **0** | Atingido |
+| Vars mortas | 0 | **0** | Atingido |
+| Tela inicial | /grupos | **/eventos** | **Atualizado** |
+
+### Fase 1 (Background fix): EXECUTADA -- abordagem MELHOR que a documentada
+
+O Senior documentou fix pontual em `.sports-shell` no scoped CSS. O Pleno tomou decisao SUPERIOR:
+**moveu `.sports-page`, `.sports-shell`, `.listing-page`, `.listing-block` de scoped CSS para global `events.css`**.
+Isso elimina completamente o risco de CSS isolation que era a causa raiz dos problemas de cache.
+
+CSS final alinhado com referencia `.groups-block`:
+```css
+background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+border: 1px solid var(--ci-border);
+border-radius: 14px;
+box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+```
+
+Bonus: mudou `body` background de `var(--ci-bg)` para `var(--ci-bg-card)` e `.main-content` para `transparent`,
+criando hierarquia visual entre body (#111927, claro) e blocos de conteudo (gradient #0a1928->#090f18, escuro).
+
+### Fase 2 (Mobile): PARCIAL
+
+Ajustes pontuais (`.sports-tabs` position static em 768px, `.my-events-link-btn` responsive),
+mas sem teste sistematico documentado. Aceitavel dado que o foco era a Fase 1 e 3.
+
+### Fase 3 (Navegacao): EXECUTADA CORRETAMENTE
+
+- `Index.razor`: `@page "/"` + `@page "/eventos"` (home = eventos)
+- `Groups/Index.razor`: removeu `@page "/"`
+- `Dashboard.razor`: redireciona para `/eventos` em vez de `/grupos`
+- `MainLayout.razor`: Eventos primeiro na nav, Grupos atras de `AuthorizeView`
+- `Futsal/Index.razor`: "Criar Partida" -> "Criar Grupo" (`/grupos/criar`)
+- Teste atualizado: `FutsalIntegrationTests` espera `/grupos/criar`
+
+### Mudancas extras (fora do escopo planejado)
+
+1. **Nova pagina `/grupo/{Id}/partidas`**: Extraiu secao de partidas de `Groups/Detail.razor` para pagina dedicada.
+   Usa `IDbContextFactory` (correto), `partial class`, code-behind limpo (79L). Boa decomposicao.
+
+2. **SportCard redesenhado**: Gradientes `futsal-green-dark`/`poker-bg-dark` no body, emoji watermarks via `::after`,
+   header centralizado. Mudanca visual significativa.
+
+3. **Pagamento**: QR ampliado (170px -> 384px), comprovante centralizado, nomes null-safe (`FullName ?? UserName ?? "Jogador"`).
+
+4. **`.detail-card` atualizado**: Mesmo gradient/border/shadow da referencia.
+
+5. **Readability**: `--slate-muted` -> `--ci-text-muted`, `--ci-text-muted` -> `--ci-text-blue` em pagamento.
+
+### Problemas encontrados e corrigidos pelo Senior
+
+**1. `rgba(79, 156, 248, 0.10)` hardcoded com var existente**:
+Em `events.css` `.detail-admin-btn--partidas:hover`. Convertido para `var(--accent-opacity-xs)`.
+
+**2. `docs/ciclo13-auditoria-css.md` (470L) criado**:
+Viola regra 20 (consolidar tudo no WORK_PLAN.md). Senior removeu o arquivo.
+
+**3. `.devin/workflows/meus-eventos.md` (0 bytes) commitado**:
+Arquivo vazio sem utilidade. Senior removeu.
+
+### Positivo
+- Decisao de mover CSS de scoped para global e SUPERIOR ao fix pontual -- elimina classe inteira de bugs
+- Navegacao reestruturada conforme solicitacao do dono do produto
+- Partidas extraida para pagina dedicada -- boa separacao de concerns
+- Nomes null-safe em pagamento -- fix defensivo correto
+- IDbContextFactory usado na nova pagina (regra 4 respeitada)
+- 0 vars indefinidas, 0 vars mortas -- disciplina mantida
+
+### Ressalvas
+- Regra 20 violada novamente (docs separado)
+- Regra 16 parcialmente violada (background fix + feature UX no mesmo PR)
+- `rgba(79, 156, 248, 0.08)` em `Create.razor.css` sem var (nenhuma var 0.08 existe, aceitavel)
+
+---
+
+## Metricas Atuais (pos-Ciclo 13 + fix Senior)
+
+| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 | C12 | C13 |
+|---------|----|----|-------|----|----|-----|-----|-----|-----|
+| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
+| `!important` global | -- | -- | 17 | 12 | 11 | 12 | 11 | 11 | **11** |
+| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | 185 | 189 | **189** |
+| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | 2.344 | 2.364 | **2.360** |
+| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | 4.246 | 4.690 | **4.244** |
+| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | 317 | 315 | **315** |
+| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | 0 | 0 | **0** |
+| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | 0 | 0 | **0** |
+| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | 0 | 0 | **0** |
+| AppDbContext direto | -- | -- | -- | -- | -- | -- | 3 | 0 | **0** |
+| xUnit2013 warnings | -- | -- | -- | -- | -- | -- | 49 | 0 | **0** |
 
 ### Paginas grandes -- TODAS decompostas
 
@@ -465,164 +560,19 @@ A refatoracao CSS iniciada no Ciclo 4 esta **essencialmente concluida**. Os nume
 
 ---
 
-## Estado Final pos-Ciclo 12
+## Estado Final pos-Ciclo 13
 
-A refatoracao CSS e cleanup tecnico estao **completos**. Marcos atingidos:
+Refatoracao CSS e cleanup tecnico **completos**. UX/layout reestruturado. Marcos:
 - 0 hardcoded hex em scoped CSS (desde C6)
 - 0 `AppDbContext` direto (desde C12)
 - 0 paginas >400L sem code-behind (desde C11)
-- 0 build warnings (desde C5)
-- 0 xUnit2013 warnings (desde C12)
-- 315 vars no `:root`, 4.690 usos de `var()` total
+- 0 vars indefinidas, 0 vars mortas (desde C13)
+- 315 vars no `:root`, 4.244 usos de `var()` total
+- Tela inicial = `/eventos` (desde C13)
+- Background `.sports-shell` / `.listing-block` alinhados com `.groups-block` (global em events.css)
 - 1 `!important` scoped (AvatarUpload pattern legitimo)
 
-Trabalho restante e predominantemente **arquitetural e de UX** (nao CSS).
-
----
-
-## Investigacao Senior: Background das telas de eventos
-
-### Problema
-A tela inicial (`/grupos`) tem um visual coeso com `.groups-block` (degrade sutil, borda azul, sombra inset).
-As telas `/eventos`, `/futsal`, `/poker` deveriam replicar esse padrao mas apresentam visual diferente.
-
-### Diagnostico do Senior (analise de codigo)
-
-**Referencia (padrao correto): `.groups-block` em `events.css` (GLOBAL)**:
-```css
-background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
-border: 1px solid var(--ci-border);        /* #1b3d6c — azul claro */
-border-radius: 14px;
-box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);  /* brilho sutil no topo */
-```
-
-**`/futsal` e `/poker`: `.listing-block` em `EventListingShell.razor.css` (SCOPED)**:
-```css
-/* IDENTICO ao .groups-block — CSS correto */
-background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
-border: 1px solid var(--ci-border);
-border-radius: 14px;
-box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
-```
-Status: CSS esta correto. O scoped CSS bundle gera `.listing-block[b-7yv3gvojvj]` corretamente.
-
-**`/eventos`: `.sports-shell` em `Pages/Index.razor.css` (SCOPED) — DIFERENTE**:
-```css
-background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
-border: 1px solid var(--ci-border-alt);    /* #1a3a5c — DIFERENTE, mais escuro */
-border-top: 2px solid var(--ci-border-dim); /* EXTRA: borda grossa no topo */
-border-radius: 14px;
-box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg);  /* DIFERENTE: sombra EXTERNA */
-```
-
-### Causa raiz: 2 problemas
-
-**Problema 1 — `/eventos` tem CSS divergente**:
-`.sports-shell` usa `var(--ci-border-alt)` (#1a3a5c, mais escuro) em vez de `var(--ci-border)` (#1b3d6c, mais claro),
-tem borda extra no topo, e usa sombra externa em vez de inset. Isso cria visual diferente.
-
-**Problema 2 — Cache/hot-reload durante testes do Pleno**:
-O Pleno fez 3 tentativas de fix (commits `19bf314`, `0763d5a`, `1c311f0`, `d59be9e`) e a CSS final do `.listing-block`
-esta correta, mas o resultado "nao vai, desisti" sugere que o browser servia CSS cacheado.
-Em Blazor Server, o scoped CSS bundle (`Confirmai.styles.css`) tem fingerprint via `asp-append-version="true"`,
-mas durante desenvolvimento com hot-reload, o browser pode manter a versao antiga em cache.
-
-### Fix documentado no Ciclo 13 (Fase 1)
-
----
-
-## Ciclo 13 -- Background + Mobile + Navegacao
-
-> Ciclo focado em UX/layout. NAO inclui implementacao de features (refresh token fica no Ciclo 14).
-
-**Branch**: `fix/ciclo13-ux-layout`
-**1 commit por fase** dentro da branch. **1 PR** no final.
-
-### Fase 1: Corrigir background de `/eventos` + verificar `/futsal` e `/poker` -- P0
-**Estimativa**: ~30 min
-
-**Passo 1 — Fix `.sports-shell` em `Pages/Index.razor.css`**:
-
-Alterar de:
-```css
-.sports-shell {
-    /* ... layout props ... */
-    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
-    border: 1px solid var(--ci-border-alt);
-    border-top: 2px solid var(--ci-border-dim);
-    border-radius: 14px;
-    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg);
-    /* ... */
-}
-```
-
-Para (mesmo padrao de `.groups-block`):
-```css
-.sports-shell {
-    /* ... layout props ... */
-    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
-    border: 1px solid var(--ci-border);
-    border-radius: 14px;
-    box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
-    /* ... */
-}
-```
-
-Remover: `border-top: 2px solid var(--ci-border-dim);`
-Trocar: `var(--ci-border-alt)` -> `var(--ci-border)`
-Trocar: sombra externa -> `inset 0 1px 0 rgba(79, 156, 248, 0.14)`
-
-**Passo 2 — Rebuild limpo**:
-```bash
-dotnet clean
-dotnet build
-```
-
-**Passo 3 — Verificar `/futsal` e `/poker`**:
-Abrir no browser com Ctrl+F5 (hard refresh). Comparar visualmente com `/grupos`.
-Se `.listing-block` renderizar corretamente, esta resolvido.
-Se NAO renderizar, inspecionar no DevTools:
-1. Clicar com botao direito no `.listing-block` -> Inspecionar
-2. Verificar se o elemento tem atributo `b-7yv3gvojvj` (ou similar)
-3. Se NAO tem atributo, o problema e CSS isolation do Blazor
-4. Nesse caso: mover CSS de `.listing-block` para `events.css` (global, ao lado de `.groups-block`)
-
-**Validacao**: `dotnet build` + comparar visualmente `/eventos`, `/futsal`, `/poker` com `/grupos`
-
----
-
-### Fase 2: Testar responsividade mobile -- P1
-**Estimativa**: ~2h
-
-Verificar layout em viewport 375px e 414px. Breakpoints ja padronizados (640/768/1024/1440px).
-
-**Procedimento**:
-1. Abrir DevTools do browser, ativar modo responsivo
-2. Testar telas: `/grupos`, `/grupo/{id}`, `/futsal/{id}`, `/pagamentos-historico`, `/perfil`
-3. Documentar problemas: overflow horizontal, touch targets <44px, texto cortado, botoes sobrepostos
-4. Corrigir o que for possivel via media queries nos scoped CSS
-5. Documentar o que precisar de mudanca estrutural na secao "Problemas Encontrados"
-
-**Validacao**: `dotnet build` + verificar visualmente em 375px e 414px
-
----
-
-### Fase 3: Repensar fluxo de navegacao -- P1
-**Estimativa**: ~3h
-
-Fluxo atual: tela inicial = `/grupos`. Proposta do dono:
-- Tela inicial = proximas partidas (eventos)
-- Grupos -> ver eventos do grupo -> criar partida dentro do grupo
-- Separar criacao de partida da tela geral de eventos
-
-**Procedimento**:
-1. Criar nova pagina `Pages/Home.razor` com `@page "/"` mostrando proximas partidas
-2. Mover `@page "/"` de `Groups/Index.razor` para so `@page "/grupos"`
-3. Adicionar navegacao coerente: Home -> Grupos -> Grupo -> Partida
-4. Mover btn "Criar Partida" para dentro da tela do grupo (nao faz sentido na tela geral de eventos)
-5. Ajustar links no `MainLayout.razor` (nav superior) para refletir novo fluxo
-
-**Validacao**: `dotnet build` + `dotnet test` + verificar navegacao completa
+Trabalho restante: **Ciclo 14 — Refresh Token / Sessao Persistente** (ver abaixo).
 
 ---
 
