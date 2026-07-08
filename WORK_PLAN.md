@@ -993,12 +993,15 @@ Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName
 - `Pages/Poker/Index.razor.css`
 - Outros arquivos CSS conforme necessário
 
-**Status**: ✅ Concluído (páginas principais)
+**Status**: ✅ Concluído (todas as páginas principais)
 - ✅ `/eventos` (Index.razor.css + site.css) - Commit 46b7be7
 - ✅ `/grupos` (events.css) - Commit 077aea9
 - ✅ `/grupo/{Id}` (events.css) - Commit aa41b06
 - ✅ `/futsal` (Futsal/Index.razor.css) - Commit 7cd83c4
 - ✅ `/poker` (Poker/Index.razor.css) - Commit a1022db
+- ✅ `/meus-eventos` (MyEvents/Index.razor.css) - Commit 94a11c7
+- ✅ `/profile` (Profile.razor.css + componentes) - Commit 08e7e57
+- ✅ `/admin` (Admin.razor.css) - Commit 9d81c28
 
 **Correções aplicadas**:
 - Adicionado breakpoint <375px para telas muito pequenas em todos os arquivos
@@ -1007,6 +1010,7 @@ Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName
 - Ajustado layouts para flex-direction: column em mobile
 - Ajustado grids para grid-template-columns: 1fr em mobile
 - Centralizado botões e ações em mobile
+- Ajustado avatares, badges e ícones para mobile pequeno
 
 ### Fase 3 — Testes mobile cross-browser
 
