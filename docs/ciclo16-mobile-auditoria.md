@@ -200,7 +200,41 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
 
 ### Página: `/poker` (Poker/Index.razor)
 
-**Status**: Pendente auditoria
+**Status**: ✅ Corrigido e commitado (a1022db)
+
+**Problemas identificados**:
+- Event cards com padding e fontes inadequados para mobile
+- Event time com tamanho muito grande para telas pequenas
+- Poker type badges e meta chips com fontes inadequadas
+- Dropdown de criar evento alinhado à direita em mobile
+- Menu dropdown com largura fixa inadequada para mobile
+- Background icon muito grande para telas pequenas
+
+**Correções aplicadas (Poker/Index.razor.css)**:
+- Expandir breakpoint <640px:
+  - event-card: padding 0.85rem 1rem, gap 0.75rem
+  - event-time: font-size 1.1rem, min-width: auto
+  - event-name: font-size 0.95rem
+  - event-location: font-size 0.75rem
+  - poker-type-badge: font-size 0.68rem, padding 1px 6px
+  - meta-chip: font-size 0.7rem, padding 0.15rem 0.5rem
+  - create-poker-dropdown: text-align: center
+  - create-poker-menu: left: 0, min-width: 100%
+- Adicionar breakpoint <375px:
+  - event-card: padding 0.75rem 0.85rem, gap 0.6rem
+  - event-time: font-size 1rem, min-width: 2.5rem
+  - event-name: font-size 0.9rem
+  - event-location: font-size 0.72rem
+  - event-meta: gap 0.25rem
+  - poker-type-badge: font-size 0.65rem, padding 1px 5px
+  - meta-chip: font-size 0.65rem, padding 0.12rem 0.4rem
+  - event-action: font-size 0.75rem, padding 0.35rem 0.7rem
+  - event-card-bg-icon: font-size 2.5rem, right: 1rem
+  - btn-create-event: font-size 0.8rem, padding 0.4rem 1rem
+  - create-poker-menu-item: padding 0.6rem 0.85rem, gap 0.6rem
+  - create-poker-menu-item i: font-size 1rem, width 1.3rem
+  - create-poker-menu-item strong: font-size 0.85rem
+  - create-poker-menu-item small: font-size 0.7rem
 
 ### Página: `/meus-eventos`
 
