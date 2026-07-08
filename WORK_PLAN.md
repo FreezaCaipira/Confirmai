@@ -967,7 +967,12 @@ Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName
    - Descrição do comportamento incorreto
    - Screenshot (opcional)
 
-**Arquivo de documentação**: `docs/ciclo16-mobile-auditoria.md` (criar para listar todos os problemas)
+**Arquivo de documentação**: `docs/ciclo16-mobile-auditoria.md` (criado para listar todos os problemas)
+
+**Status**: ✅ Concluído
+- Auditoria inicial baseada em 6 screenshots da página /eventos
+- Identificados problemas gerais: sidebar, grid, overflow, transições
+- Documentação criada e mantida atualizada com cada correção
 
 ### Fase 2 — Correção de problemas mobile (prioridade alta)
 
@@ -987,6 +992,21 @@ Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName
 - `Pages/Futsal/Index.razor.css`
 - `Pages/Poker/Index.razor.css`
 - Outros arquivos CSS conforme necessário
+
+**Status**: ✅ Concluído (páginas principais)
+- ✅ `/eventos` (Index.razor.css + site.css) - Commit 46b7be7
+- ✅ `/grupos` (events.css) - Commit 077aea9
+- ✅ `/grupo/{Id}` (events.css) - Commit aa41b06
+- ✅ `/futsal` (Futsal/Index.razor.css) - Commit 7cd83c4
+- ✅ `/poker` (Poker/Index.razor.css) - Commit a1022db
+
+**Correções aplicadas**:
+- Adicionado breakpoint <375px para telas muito pequenas em todos os arquivos
+- Expandido breakpoints existentes (<640px, <760px, <560px, <480px)
+- Reduzido padding, fontes e heights para economizar espaço
+- Ajustado layouts para flex-direction: column em mobile
+- Ajustado grids para grid-template-columns: 1fr em mobile
+- Centralizado botões e ações em mobile
 
 ### Fase 3 — Testes mobile cross-browser
 
