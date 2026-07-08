@@ -275,9 +275,29 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
   - my-event-card-bg-icon: font-size 2.5rem, right: 0.8rem
   - my-schedule-card: padding 0.6rem 0.7rem, gap 0.5rem
 
-### Página: `/profile`
+### Página: `/profile` (Profile.razor + componentes)
 
-**Status**: Pendente auditoria
+**Status**: ✅ Corrigido e commitado (08e7e57)
+
+**Problemas identificados**:
+- Profile page com padding e margin inadequados para mobile
+- Message card com fontes e padding inadequados
+- Chat thread com altura muito alta para mobile
+- Avatar com tamanho muito grande para telas pequenas
+- Header card com layout inadequado para mobile
+- Edit form grid não se ajustava para coluna única em mobile
+- Botões de ação não se ajustavam para mobile
+
+**Correções aplicadas**:
+- **Profile.razor.css**:
+  - Expandir breakpoint <640px: reduzir padding e margin, reduzir fontes, ajustar max-height do chat thread
+  - Adicionar breakpoint <375px: reduzir ainda mais padding, fontes e max-height
+- **ProfileHeaderCard.razor.css**:
+  - Expandir breakpoint <640px: avatar 60px, font-size 1.5rem, reduzir fontes de name e since
+  - Adicionar breakpoint <375px: avatar 52px, font-size 1.3rem, border-width 2px
+- **ProfileEditForm.razor.css**:
+  - Expandir breakpoint <640px: grid-template-columns 1fr, flex-direction: column nos actions, botões width 100%
+  - Adicionar breakpoint <375px: reduzir ainda mais fontes e padding de inputs e botões
 
 ### Página: `/admin`
 
