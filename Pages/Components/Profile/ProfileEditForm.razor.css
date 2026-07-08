@@ -155,3 +155,79 @@
     color: var(--white);
     box-shadow: 0 4px 8px var(--accent-opacity-xl);
 }
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .profile-edit-summary {
+        padding: 0.5rem 0.9rem;
+        font-size: 0.8rem;
+    }
+
+    .profile-edit-form {
+        padding: 0.85rem 0.9rem 0.9rem;
+    }
+
+    .profile-edit-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .profile-edit-grid .form-group > label {
+        font-size: 0.75rem;
+    }
+
+    .profile-edit-grid .form-group ::deep input,
+    .profile-edit-grid .form-group .input {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.5rem;
+    }
+
+    .profile-edit-actions {
+        flex-direction: column;
+    }
+
+    .mk-btn {
+        width: 100%;
+    }
+
+    .profile-feedback {
+        font-size: 0.78rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Mobile muito pequeno (<375px) */
+@media (max-width: 375px) {
+    .profile-edit-summary {
+        padding: 0.45rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .profile-edit-form {
+        padding: 0.75rem 0.75rem 0.75rem;
+    }
+
+    .profile-edit-grid {
+        gap: 0.65rem;
+    }
+
+    .profile-edit-grid .form-group > label {
+        font-size: 0.72rem;
+    }
+
+    .profile-edit-grid .form-group ::deep input,
+    .profile-edit-grid .form-group .input {
+        font-size: 0.82rem;
+        padding: 0.32rem 0.45rem;
+    }
+
+    .mk-btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+    }
+
+    .profile-feedback {
+        font-size: 0.75rem;
+        padding: 0.22rem 0.45rem;
+    }
+}
