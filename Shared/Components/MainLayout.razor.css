@@ -398,6 +398,7 @@ footer.oldsite-footer {
         gap: 0;
         z-index: 9999;
         box-shadow: 0 4px 12px var(--shadow-md);
+        overflow: hidden;
     }
 
     body .oldsite-top-nav.mobile-menu-open {
@@ -413,9 +414,8 @@ footer.oldsite-footer {
         background: var(--ci-bg-card);
         border-bottom: 1px solid var(--ci-border);
         order: -1;
-        max-width: 100%;
-        overflow: hidden;
         z-index: auto;
+        box-sizing: border-box;
     }
 
     body .oldsite-top-nav > a {
@@ -428,6 +428,7 @@ footer.oldsite-footer {
         border-right: none;
         z-index: auto;
         min-height: auto;
+        box-sizing: border-box;
     }
 
     body .oldsite-top-nav .oldsite-top-nav-mailbox-icon {
@@ -436,6 +437,7 @@ footer.oldsite-footer {
         border-right: none;
         border-bottom: 1px solid var(--ci-border-dim);
         min-height: auto;
+        box-sizing: border-box;
     }
 
     body .oldsite-top-nav .oldsite-top-nav-profile-link {
@@ -444,6 +446,11 @@ footer.oldsite-footer {
         border-right: none;
         border-bottom: 1px solid var(--ci-border-dim);
         min-height: auto;
+        box-sizing: border-box;
+    }
+
+    body .oldsite-top-nav .oldsite-top-nav-logout {
+        border-top: 1px solid var(--ci-border-dim);
     }
 
     body .oldsite-top-nav > a:last-child,
