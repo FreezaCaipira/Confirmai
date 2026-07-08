@@ -447,14 +447,6 @@ footer.oldsite-footer {
         border-bottom: 1px solid var(--ci-border-dim);
         min-height: auto;
         box-sizing: border-box;
-        color: var(--ci-text);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        font-size: 0.78rem;
-        font-weight: 700;
-        text-transform: capitalize;
     }
 
     body .oldsite-top-nav .oldsite-top-nav-profile-link {
@@ -464,14 +456,6 @@ footer.oldsite-footer {
         border-bottom: 1px solid var(--ci-border-dim);
         min-height: auto;
         box-sizing: border-box;
-        color: var(--ci-text);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        font-size: 0.78rem;
-        font-weight: 700;
-        text-transform: capitalize;
     }
 
     body .oldsite-top-nav .oldsite-top-nav-mailbox-icon:hover,
