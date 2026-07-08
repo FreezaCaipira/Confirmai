@@ -299,9 +299,43 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
   - Expandir breakpoint <640px: grid-template-columns 1fr, flex-direction: column nos actions, botões width 100%
   - Adicionar breakpoint <375px: reduzir ainda mais fontes e padding de inputs e botões
 
-### Página: `/admin`
+### Página: `/admin` (Admin.razor)
 
-**Status**: Pendente auditoria
+**Status**: ✅ Corrigido e commitado (9d81c28)
+
+**Problemas identificados**:
+- Admin settings card com padding inadequado para mobile
+- Security panels com layout inadequado para mobile
+- Admin nav com fontes e padding inadequados
+- KPI grid não se ajustava para mobile
+- Reconciliation health head e thresholds com layout inadequado
+- Fontes e badges inadequados para telas pequenas
+
+**Correções aplicadas (Admin.razor.css)**:
+- Expandir breakpoint <640px:
+  - admin-settings-card: padding 0.8rem, gap 0.6rem
+  - admin-welcome: font-size 1.1rem
+  - security-panels: grid-template-columns 1fr, gap 0.7rem
+  - security-panel: padding 0.75rem 0.85rem, gap 0.6rem
+  - admin-nav: margin reduzido, gap 0.5rem
+  - admin-nav a: font-size 0.7rem, padding 0.5rem 0.8rem
+  - admin-kpi-grid: grid-template-columns repeat(2, 1fr)
+  - admin-kpi-value: font-size 1.3rem
+  - admin-reconciliation-health-head: flex-direction: column
+  - admin-reconciliation-thresholds: flex-direction: column
+- Adicionar breakpoint <375px:
+  - admin-welcome: font-size 1rem
+  - admin-settings-card: padding 0.7rem 0.6rem, gap 0.5rem
+  - security-panel: padding 0.65rem 0.75rem, gap 0.5rem
+  - security-panel h4: font-size 0.85rem
+  - security-label, security-value: font-size 0.85rem
+  - security-boolean-badge: font-size 0.72rem, min-width 42px
+  - admin-nav: margin 1.2rem 0 0.8rem, gap 0.4rem
+  - admin-nav a: font-size 0.68rem, padding 0.45rem 0.7rem
+  - admin-kpi-grid: grid-template-columns 1fr
+  - admin-kpi-value: font-size 1.2rem
+  - fee-input, fiat-select: font-size 0.85rem, padding 0.32rem 0.5rem
+  - security-toggle input: width 14px, height 14px
 
 ## Breakpoints Globais (site.css)
 
