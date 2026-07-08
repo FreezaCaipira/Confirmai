@@ -94,7 +94,31 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
 
 ### Página: `/grupos` (Groups/Index.razor)
 
-**Status**: Pendente auditoria
+**Status**: ✅ Corrigido e commitado (077aea9)
+
+**Problemas identificados**:
+- Grid de grupos não se ajustava para coluna única em mobile
+- Cards de grupo com altura fixa muito alta para mobile
+- Fontes e padding inadequados para telas pequenas
+- Botão de aprovação pendente posicionado incorretamente em mobile pequeno
+
+**Correções aplicadas (events.css)**:
+- Expandir breakpoint <760px:
+  - groups-grid: grid-template-columns: 1fr
+  - group-card: min-height 220px (de 260px)
+  - Reduzir padding e fontes
+- Adicionar breakpoint <375px:
+  - groups-block: padding 0.6rem 0.5rem 0.7rem
+  - groups-title: font-size 1.1rem
+  - join-code-input: font-size 0.9rem, padding reduzido
+  - group-card: min-height 200px
+  - group-card-icon: font-size 3.5rem (de 4.5rem)
+  - group-card-sport: font-size 0.65rem
+  - player-tag: font-size 0.65rem, padding 0.2rem 0.4rem
+  - group-card-name: font-size 1rem
+  - group-card-meta: flex-direction: column, gap 0.3rem
+  - group-card-pending-actions: bottom 0.4rem, right 0.4rem
+  - group-card-approve-btn: font-size 0.75rem
 
 ### Página: `/grupo/{Id}` (Groups/Detail.razor)
 
