@@ -156,6 +156,7 @@
     --volleyball-text:     #fef3c7;
     --volleyball-bg-dark:  #1e3a8a;
     --volleyball-bg-deepest: #1e40af;
+    --volleyball-border:   #3b82f6;
 
     /* Beach Tennis theme (orange/teal) */
     --beachtennis-accent:  #fb923c;
@@ -163,6 +164,7 @@
     --beachtennis-text:    #fed7aa;
     --beachtennis-bg-dark: #0f766e;
     --beachtennis-bg-deepest: #115e59;
+    --beachtennis-border:  #14b8a6;
 
     /* Footvolley theme (blue/white) */
     --footvolley-accent:   #38bdf8;

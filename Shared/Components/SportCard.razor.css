@@ -57,7 +57,7 @@
 /* ── Volleyball header ───────────────────── */
 .sport-card--volleyball .sport-card-header {
     background: linear-gradient(180deg, var(--volleyball-bg-deepest) 0%, var(--volleyball-bg-dark) 100%);
-    border-color: var(--volleyball-bg-dark);
+    border-color: var(--volleyball-border);
     box-shadow: inset 0 1px 0 rgba(251, 191, 36, 0.30);
 }
 
@@ -69,7 +69,7 @@
 /* ── Beach Tennis header ─────────────────── */
 .sport-card--beachtennis .sport-card-header {
     background: linear-gradient(180deg, var(--beachtennis-bg-deepest) 0%, var(--beachtennis-bg-dark) 100%);
-    border-color: var(--beachtennis-bg-dark);
+    border-color: var(--beachtennis-border);
     box-shadow: inset 0 1px 0 rgba(251, 146, 60, 0.30);
 }
 
@@ -150,7 +150,7 @@
 
 /* ── Volleyball body ───────────────────── */
 .sport-card--volleyball .sport-card-body {
-    border-color: var(--volleyball-bg-dark);
+    border-color: var(--volleyball-border);
     background: linear-gradient(180deg, var(--volleyball-bg-dark) 0%, var(--volleyball-bg-deepest) 50%, var(--ci-bg) 100%);
 }
 
@@ -167,7 +167,7 @@
 
 /* ── Beach Tennis body ─────────────────── */
 .sport-card--beachtennis .sport-card-body {
-    border-color: var(--beachtennis-bg-dark);
+    border-color: var(--beachtennis-border);
     background: linear-gradient(180deg, var(--beachtennis-bg-dark) 0%, var(--beachtennis-bg-deepest) 50%, var(--ci-bg) 100%);
 }
 
