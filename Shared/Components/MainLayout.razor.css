@@ -398,6 +398,8 @@ footer.oldsite-footer {
         gap: 0.3rem;
         z-index: 9999;
         box-shadow: 0 4px 12px var(--shadow-md);
+        max-height: 80vh;
+        overflow-y: auto;
     }
 
     .oldsite-top-nav.mobile-menu-open {
@@ -408,10 +410,12 @@ footer.oldsite-footer {
         width: 100%;
         justify-content: center;
         margin-bottom: 0.5rem;
-        padding: 0.4rem;
+        padding: 0.3rem;
         background: var(--ci-bg-card);
         border-radius: 6px;
         order: -1;
+        max-width: 100%;
+        overflow: hidden;
     }
 
     .oldsite-top-nav > a {
