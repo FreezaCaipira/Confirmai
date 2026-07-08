@@ -150,6 +150,34 @@
     --poker-bg-deepest:    #3b0764;
     --poker-bg-dark:       #4c1d95;
 
+    /* Volleyball theme (blue/yellow) */
+    --volleyball-accent:   #fbbf24;
+    --volleyball-accent-deep: #d97706;
+    --volleyball-text:     #fef3c7;
+    --volleyball-bg-dark:  #1e3a8a;
+    --volleyball-bg-deepest: #1e40af;
+
+    /* Beach Tennis theme (orange/teal) */
+    --beachtennis-accent:  #fb923c;
+    --beachtennis-accent-deep: #ea580c;
+    --beachtennis-text:    #fed7aa;
+    --beachtennis-bg-dark: #0f766e;
+    --beachtennis-bg-deepest: #115e59;
+
+    /* Footvolley theme (blue/white) */
+    --footvolley-accent:   #38bdf8;
+    --footvolley-accent-deep: #0284c7;
+    --footvolley-text:     #e0f2fe;
+    --footvolley-bg-dark:  #0369a1;
+    --footvolley-bg-deepest: #075985;
+
+    /* Chess theme (black/white) */
+    --chess-accent:        #9ca3af;
+    --chess-accent-deep:   #4b5563;
+    --chess-text:          #f3f4f6;
+    --chess-bg-dark:       #1f2937;
+    --chess-bg-deepest:    #111827;
+
     /* CI extras */
     --ci-bg-deepest:       #050810;
     --ci-accent-light:     #7dd3fc;
