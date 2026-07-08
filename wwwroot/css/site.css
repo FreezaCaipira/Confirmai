@@ -3415,7 +3415,7 @@ body .oldsite-header {
     margin: 0 auto 0.55rem;
     text-align: center;
     position: relative;
-    isolation: isolate;
+    z-index: 100;
 }
 
 body .oldsite-logo-wrap {
