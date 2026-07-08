@@ -63,15 +63,19 @@
     .sports-tabs {
         position: static;
         flex-direction: column;
+        gap: 0.5rem;
     }
 
     .my-events-link-btn {
         position: static;
         transform: none;
+        width: 100%;
+        justify-content: center;
     }
 
     .sports-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
     .my-conf-filters {
@@ -114,6 +118,56 @@
 
     .city-geo-btn {
         width: 100%;
+    }
+}
+
+/* Mobile muito pequeno (<375px) */
+@media (max-width: 375px) {
+    .sports-hero-title {
+        font-size: 1.25rem;
+    }
+
+    .sports-hero-sub {
+        font-size: 0.85rem;
+    }
+
+    .sport-card {
+        padding: 1.25rem 1rem 1rem;
+    }
+
+    .sport-card-icon {
+        font-size: 2.2rem;
+    }
+
+    .sport-card-name {
+        font-size: 1.2rem;
+    }
+
+    .sport-card-desc {
+        font-size: 0.85rem;
+    }
+
+    .sport-card-cta {
+        font-size: 0.8rem;
+    }
+
+    .city-select,
+    .city-input {
+        font-size: 0.85rem;
+        padding: 0.28rem 0.5rem;
+    }
+
+    .my-conf-card {
+        padding: 0.5rem 0.6rem;
+    }
+
+    .my-conf-name {
+        font-size: 0.85rem;
+    }
+
+    .my-conf-btn {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
     }
 }
 
