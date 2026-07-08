@@ -1430,7 +1430,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     transition: background 0.15s;
 }
 
-.confirm-btn:hover       { background: var(--futsal-green-dark); }
+.confirm-btn:hover       { background: var(--green-dark); }
 .confirm-btn--full-width { width: 100%; }
 .confirm-btn--gk         { background: var(--ci-accent-mid); }
 .confirm-btn--gk:hover   { background: var(--ci-accent); }

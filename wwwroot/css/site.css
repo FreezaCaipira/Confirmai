@@ -71,7 +71,7 @@
     /* -- Status colors (aliased to CI status tokens) -- */
     --green:       var(--green-strong);
     --green-light: var(--green-bright);
-    --green-dark:  var(--green-strong);
+    --green-dark:  #166534;
     --red:         var(--red-strong);
 
     /* -- Neutral text (aliased to CI text) -- */
@@ -246,7 +246,7 @@
     --ci-bg-dark:          #0a1f35;
 
     /* Green spectrum */
-    --green-strong:        #22c55e;
+    --green-strong:        #15803d;
 
     /* Amber spectrum */
     --amber-mid:           #d97706;
@@ -1265,7 +1265,7 @@ textarea:focus-visible {
 }
 .btn--primary:hover,
 .save-btn:hover {
-    background: var(--green-strong);
+    background: var(--green-dark);
 }
 
 .btn--success,
