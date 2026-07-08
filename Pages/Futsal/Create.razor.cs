@@ -174,8 +174,12 @@ public partial class Create
         return Task.CompletedTask;
     }
 
-    private Task VenueChangedCallback()
-    { OnVenueChanged(); return Task.CompletedTask; }
+    private Task VenueChangedCallback(int venueId)
+    {
+        form.VenueId = venueId;
+        OnVenueChanged();
+        return Task.CompletedTask;
+    }
 
     private Task TimeChangeCallback(TimeOnly newTime)
     { form.Time = newTime; return Task.CompletedTask; }

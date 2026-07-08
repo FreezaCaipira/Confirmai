@@ -14,13 +14,13 @@
         }
         else
         {
-            <InputSelect class="input" @bind-Value="@SelectedVenueId" @bind-Value:after="HandleVenueChanged">
-                <option value="0">— Selecione a quadra —</option>
+            <select class="input" @onchange="HandleVenueChanged">
+                <option value="0" selected="@(SelectedVenueId == 0)">— Selecione a quadra —</option>
                 @foreach (var v in Venues)
                 {
-                    <option value="@v.Id">@v.Name (@VenueTypeLabel(v.Type)) — @v.City/@v.StateCode</option>
+                    <option value="@v.Id" selected="@(v.Id == SelectedVenueId)">@v.Name (@VenueTypeLabel(v.Type)) — @v.City/@v.StateCode</option>
                 }
-            </InputSelect>
+            </select>
         }
         @if (SelectedVenueId == 0)
         {
@@ -48,10 +48,13 @@
     public Venue? SelectedVenue { get; set; }
 
     [Parameter]
-    public EventCallback OnVenueChanged { get; set; }
+    public EventCallback<int> OnVenueChanged { get; set; }
 
-    private async Task HandleVenueChanged()
-        => await OnVenueChanged.InvokeAsync();
+    private async Task HandleVenueChanged(ChangeEventArgs e)
+    {
+        var venueId = int.Parse(e.Value?.ToString() ?? "0");
+        await OnVenueChanged.InvokeAsync(venueId);
+    }
 
     private static string VenueTypeLabel(VenueType t) => t switch
     {
