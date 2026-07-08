@@ -396,7 +396,7 @@ footer.oldsite-footer {
         border-bottom: 1px solid var(--ci-border);
         padding: 0.5rem;
         gap: 0.3rem;
-        z-index: 1000;
+        z-index: 9999;
         box-shadow: 0 4px 12px var(--shadow-md);
     }
 
