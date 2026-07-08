@@ -337,7 +337,99 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
   - fee-input, fiat-select: font-size 0.85rem, padding 0.32rem 0.5rem
   - security-toggle input: width 14px, height 14px
 
-## Breakpoints Globais (site.css)
+## Fase 3 — Testes Mobile Cross-Browser
+
+**Status**: ⏳ Em andamento (requer testes manuais)
+
+### Instruções para Testes Manuais
+
+**Aplicação rodando em**: http://localhost:5000
+
+#### Browsers para testar:
+1. **Chrome** (Desktop + Mobile DevTools)
+2. **Firefox** (Desktop + Mobile DevTools)
+3. **Edge** (Desktop + Mobile DevTools)
+4. **Safari** (se disponível no macOS/iOS)
+
+#### Tamanhos de tela para testar:
+- **320px** - Muito pequeno (iPhone SE antigo)
+- **375px** - Pequeno (iPhone SE, iPhone 12/13 mini)
+- **414px** - Médio (iPhone 12/13 Pro)
+- **768px** - Tablet (iPad portrait)
+- **1024px** - Tablet landscape
+
+#### Checklist por página:
+
+**Página `/eventos`**:
+- [ ] Sidebar não overflow horizontal
+- [ ] Sports tabs wrapping corretamente
+- [ ] Event cards em coluna única em mobile
+- [ ] City selector funcional
+- [ ] "My Conf" cards ajustados
+- [ ] Fontes legíveis em <375px
+
+**Página `/grupos`**:
+- [ ] Grid de grupos em coluna única em mobile
+- [ ] Cards com altura adequada
+- [ ] Botões de ação centralizados
+- [ ] Badges e fontes legíveis em <375px
+
+**Página `/grupo/{Id}`**:
+- [ ] Header e chips wrapping corretamente
+- [ ] Admin bar em coluna em mobile
+- [ ] Events tabs ajustados
+- [ ] Pending requests em coluna
+- [ ] Fontes e padding adequados em <375px
+
+**Página `/futsal`**:
+- [ ] Event cards wrapping corretamente
+- [ ] Time badge tamanho adequado
+- [ ] Meta chips legíveis
+- [ ] Botão de criar evento centralizado
+- [ ] Background icon não intrusivo em <375px
+
+**Página `/poker`**:
+- [ ] Event cards wrapping corretamente
+- [ ] Dropdown menu alinhado à esquerda em mobile
+- [ ] Type badges legíveis
+- [ ] Menu dropdown width 100% em mobile
+- [ ] Fontes e padding adequados em <375px
+
+**Página `/meus-eventos`**:
+- [ ] Header em coluna em mobile
+- [ ] View tabs e create buttons ajustados
+- [ ] Event cards wrapping corretamente
+- [ ] Sport badges tamanho adequado
+- [ ] Fontes e badges legíveis em <375px
+
+**Página `/profile`**:
+- [ ] Profile page padding adequado
+- [ ] Avatar tamanho adequado (60px -> 52px em <375px)
+- [ ] Edit form grid em coluna única
+- [ ] Botões width 100% em mobile
+- [ ] Chat thread altura adequada
+
+**Página `/admin`**:
+- [ ] Settings card padding adequado
+- [ ] Security panels em coluna única
+- [ ] Admin nav ajustado
+- [ ] KPI grid ajustado (2 colunas em mobile, 1 em <375px)
+- [ ] Fontes e badges legíveis em <375px
+
+#### Como testar:
+1. Abrir DevTools (F12)
+2. Ativar modo mobile (Ctrl+Shift+M)
+3. Selecionar dispositivo ou inserir largura manual
+4. Navegar por cada página
+5. Verificar itens do checklist
+6. Documentar problemas encontrados
+
+#### Problemas a documentar:
+- Página/componente
+- Largura de tela
+- Browser
+- Descrição do problema
+- Screenshot (opcional)
 
 **Breakpoints identificados**:
 - `@media (max-width: 980px)` - Sidebar reduzida
