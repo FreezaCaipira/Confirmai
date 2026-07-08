@@ -131,7 +131,7 @@
 }
 
 .sport-card--volleyball .sport-card-body::after {
-    content: "\1F9D6";
+    content: "🏐";
     position: absolute;
     bottom: -0.5rem;
     right: -0.3rem;
