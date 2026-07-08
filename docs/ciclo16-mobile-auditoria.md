@@ -236,9 +236,44 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
   - create-poker-menu-item strong: font-size 0.85rem
   - create-poker-menu-item small: font-size 0.7rem
 
-### Página: `/meus-eventos`
+### Página: `/meus-eventos` (MyEvents/Index.razor)
 
-**Status**: Pendente auditoria
+**Status**: ✅ Corrigido e commitado (94a11c7)
+
+**Problemas identificados**:
+- Event cards com padding inadequado para mobile
+- Header com layout horizontal inadequado
+- View tabs e create buttons não se ajustavam para mobile
+- Sport badges com tamanho muito grande para telas pequenas
+- Fontes e badges inadequados para telas pequenas
+- Background icon muito grande para telas pequenas
+
+**Correções aplicadas (MyEvents/Index.razor.css)**:
+- Expandir breakpoint <640px:
+  - events-block: padding 0.8rem 0.8rem 0.9rem
+  - my-event-card: padding 0.7rem 0.8rem, gap 0.6rem
+  - my-events-header: flex-direction: column, align-items: flex-start
+  - my-events-view-tabs: width 100%, justify-content: flex-start
+  - my-events-create-btns: width 100%, justify-content: flex-start
+  - my-event-sport-badge: width 2rem, height 2rem, font-size 1rem
+  - my-event-name: font-size 0.9rem
+  - my-event-meta: font-size 0.75rem
+  - my-event-location: font-size 0.73rem
+- Adicionar breakpoint <375px:
+  - events-block: padding 0.6rem 0.6rem 0.7rem
+  - events-block .page-section-title: font-size 1.2rem
+  - my-event-card: padding 0.6rem 0.7rem, gap 0.5rem
+  - my-event-sport-badge: width 1.8rem, height 1.8rem, font-size 0.9rem
+  - my-event-name: font-size 0.85rem
+  - my-event-status: font-size 0.65rem, padding 0.12rem 0.4rem
+  - my-event-type-badge: font-size 0.65rem, padding 0.12rem 0.4rem
+  - my-event-meta: font-size 0.7rem
+  - my-event-location: font-size 0.68rem
+  - my-event-action-btn: font-size 0.72rem, padding 0.28rem 0.6rem
+  - my-events-tab: font-size 0.75rem, padding 0.25rem 0.6rem
+  - my-events-create-btn: font-size 0.75rem, padding 0.35rem 0.7rem
+  - my-event-card-bg-icon: font-size 2.5rem, right: 0.8rem
+  - my-schedule-card: padding 0.6rem 0.7rem, gap 0.5rem
 
 ### Página: `/profile`
 
