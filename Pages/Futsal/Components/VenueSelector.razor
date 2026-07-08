@@ -30,10 +30,14 @@
 
     @if (SelectedVenue is not null)
     {
-        <div class="venue-preview">
+        <a class="venue-preview" href="@MapsSearchUrl" target="_blank" rel="noopener noreferrer">
             <i class="fas fa-map-marker-alt"></i>
-            <span>@SelectedVenue.Address · @SelectedVenue.City — @SelectedVenue.StateCode</span>
-        </div>
+            <div class="venue-preview-info">
+                <span class="venue-preview-name">@SelectedVenue.Name</span>
+                <span class="venue-preview-addr">@SelectedVenue.Address · @SelectedVenue.City/@SelectedVenue.StateCode</span>
+            </div>
+            <i class="fas fa-external-link-alt venue-preview-ext"></i>
+        </a>
     }
 </fieldset>
 
@@ -54,6 +58,13 @@
     {
         var venueId = int.Parse(e.Value?.ToString() ?? "0");
         await OnVenueChanged.InvokeAsync(venueId);
+    }
+
+    private string MapsSearchUrl
+    {
+        get => SelectedVenue is not null
+            ? $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString($"{SelectedVenue.Name}, {SelectedVenue.City}, {SelectedVenue.StateCode}, Brasil")}"
+            : "#";
     }
 
     private static string VenueTypeLabel(VenueType t) => t switch
