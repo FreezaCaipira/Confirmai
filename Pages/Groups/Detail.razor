@@ -218,6 +218,10 @@ else
                             <i class="fas fa-hourglass-half"></i>
                             Solicitação enviada — aguardando aprovação do administrador.
                         </p>
+                        <button class="cancel-join-btn" type="button" @onclick="CancelJoinRequest" disabled="@cancellingJoin">
+                            <i class="fas fa-times"></i>
+                            @(cancellingJoin ? "Cancelando…" : "Cancelar solicitação")
+                        </button>
                     }
                     else if (userJoinRequest?.Status == JoinRequestStatus.Rejected)
                     {

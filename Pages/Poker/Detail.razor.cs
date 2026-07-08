@@ -24,6 +24,7 @@ public partial class Detail
     private bool showCancelConfirm = false;
     private GroupJoinRequest? userJoinRequest = null;
     private bool requestingJoin = false;
+    private bool cancellingJoin = false;
     private string joinRequestError = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -94,6 +95,35 @@ public partial class Detail
         finally
         {
             requestingJoin = false;
+        }
+    }
+
+    private async Task CancelJoinRequestAsync()
+    {
+        if (currentUserId is null || ev is null || userJoinRequest is null) return;
+
+        cancellingJoin = true;
+        joinRequestError = string.Empty;
+
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var req = await db.GroupJoinRequests.FindAsync(userJoinRequest.Id);
+            if (req is not null && req.Status == JoinRequestStatus.Pending)
+            {
+                db.GroupJoinRequests.Remove(req);
+                await db.SaveChangesAsync();
+            }
+
+            await LoadEvent();
+        }
+        catch
+        {
+            joinRequestError = "Não foi possível cancelar a solicitação agora. Tente novamente em instantes.";
+        }
+        finally
+        {
+            cancellingJoin = false;
         }
     }
 

@@ -23,6 +23,7 @@ public partial class Detail : IAsyncDisposable
     private bool                      copiedInvite     = false;
     private bool                      copiedCode       = false;
     private bool                      requestingJoin   = false;
+    private bool                      cancellingJoin   = false;
     private string                    enteredCode      = string.Empty;
     private string                    codeError        = string.Empty;
     private string                    requestSortOrder = "newest";
@@ -159,6 +160,21 @@ public partial class Detail : IAsyncDisposable
             await db.SaveChangesAsync();
         }
         requestingJoin = false;
+        await LoadGroup();
+    }
+
+    private async Task CancelJoinRequest()
+    {
+        if (currentUserId is null || group is null || userJoinRequest is null) return;
+        cancellingJoin = true;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var req = await db.GroupJoinRequests.FindAsync(userJoinRequest.Id);
+        if (req is not null && req.Status == JoinRequestStatus.Pending)
+        {
+            db.GroupJoinRequests.Remove(req);
+            await db.SaveChangesAsync();
+        }
+        cancellingJoin = false;
         await LoadGroup();
     }
 
