@@ -14,21 +14,7 @@
     border-color: var(--green-light);
 }
 
-/* -- Venue preview ------------------------- */
-.venue-preview {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.82rem;
-    color: var(--ci-accent);
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-border-alt);
-    border-radius: 7px;
-    padding: 0.45rem 0.75rem;
-    margin-top: -0.25rem;
-    box-shadow: 0 2px 4px var(--accent-opacity-md);
-    text-shadow: 0 0 8px var(--accent-opacity-lg);
-}
+/* -- Venue preview: styles in events.css (shared with EditEventForm) -- */
 
 /* -- Weekday chips ------------------------- */
 .weekday-grid {

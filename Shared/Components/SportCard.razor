@@ -4,6 +4,10 @@
 <a href="@Href" class="sport-card sport-card--@SportClass">
     <div class="sport-card-header">
         <span class="sport-card-label">@Icon @Name</span>
+        @if (ComingSoon)
+        {
+            <span class="sport-card-badge">Em breve</span>
+        }
     </div>
     <div class="sport-card-body">
         <p class="sport-card-desc">@Description</p>
@@ -34,7 +38,39 @@
     [Parameter]
     public int? MatchCount { get; set; }
 
-    private string Icon => Sport == Sport.Futsal ? "⚽" : "🃏";
-    private string Name => Sport == Sport.Futsal ? "Futsal" : "Poker";
-    private string SportClass => Sport == Sport.Futsal ? "futsal" : "poker";
+    [Parameter]
+    public bool ComingSoon { get; set; }
+
+    private string Icon => Sport switch
+    {
+        Sport.Futsal => "⚽",
+        Sport.Poker => "🃏",
+        Sport.Volleyball => "🏐",
+        Sport.BeachTennis => "🎾",
+        Sport.Footvolley => "🏖️",
+        Sport.Chess => "♟️",
+        _ => "🏆"
+    };
+
+    private string Name => Sport switch
+    {
+        Sport.Futsal => "Futebol/Futsal",
+        Sport.Poker => "Poker",
+        Sport.Volleyball => "Vôlei",
+        Sport.BeachTennis => "Beach Tennis",
+        Sport.Footvolley => "Futevôlei",
+        Sport.Chess => "Xadrez",
+        _ => Sport.ToString()
+    };
+
+    private string SportClass => Sport switch
+    {
+        Sport.Futsal => "futsal",
+        Sport.Poker => "poker",
+        Sport.Volleyball => "volleyball",
+        Sport.BeachTennis => "beachtennis",
+        Sport.Footvolley => "footvolley",
+        Sport.Chess => "chess",
+        _ => "default"
+    };
 }

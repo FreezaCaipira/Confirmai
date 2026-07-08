@@ -10,3 +10,34 @@
     max-width: 860px;
     margin: 0 auto 1.25rem;
 }
+
+.group-card-pending-actions {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    z-index: 2;
+}
+
+.group-card-approve-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 0.4rem;
+    background: var(--green);
+    color: var(--white);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.group-card-approve-btn:hover:not(:disabled) {
+    background: var(--green-dark);
+}
+
+.group-card-approve-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

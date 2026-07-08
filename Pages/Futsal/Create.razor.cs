@@ -23,7 +23,7 @@ public partial class Create
 
     // ── Form model ──────────────────────────────────────────────────────────
 
-    private sealed class CreateMatchForm
+    public sealed class CreateMatchForm
     {
         // GroupName só é usado quando nenhum grupo é pré-selecionado (legacy flow)
         [StringLength(120, ErrorMessage = "Máximo 120 caracteres.")]
@@ -174,8 +174,12 @@ public partial class Create
         return Task.CompletedTask;
     }
 
-    private Task VenueChangedCallback()
-    { OnVenueChanged(); return Task.CompletedTask; }
+    private Task VenueChangedCallback(int venueId)
+    {
+        form.VenueId = venueId;
+        OnVenueChanged();
+        return Task.CompletedTask;
+    }
 
     private Task TimeChangeCallback(TimeOnly newTime)
     { form.Time = newTime; return Task.CompletedTask; }

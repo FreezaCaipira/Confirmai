@@ -71,7 +71,7 @@
     /* -- Status colors (aliased to CI status tokens) -- */
     --green:       var(--green-strong);
     --green-light: var(--green-bright);
-    --green-dark:  var(--green-strong);
+    --green-dark:  #166534;
     --red:         var(--red-strong);
 
     /* -- Neutral text (aliased to CI text) -- */
@@ -149,6 +149,40 @@
     /* Poker theme extras */
     --poker-bg-deepest:    #3b0764;
     --poker-bg-dark:       #4c1d95;
+
+    /* Volleyball theme (blue/yellow) */
+    --volleyball-accent:   #fbbf24;
+    --volleyball-accent-deep: #d97706;
+    --volleyball-text:     #fef3c7;
+    --volleyball-text-pale: #dbeafe;
+    --volleyball-bg-dark:  #1e3a8a;
+    --volleyball-bg-deepest: #1e40af;
+    --volleyball-border:   #3b82f6;
+
+    /* Beach Tennis theme (orange/teal) */
+    --beachtennis-accent:  #fb923c;
+    --beachtennis-accent-deep: #ea580c;
+    --beachtennis-text:    #fed7aa;
+    --beachtennis-text-pale: #ccfbf1;
+    --beachtennis-bg-dark: #0f766e;
+    --beachtennis-bg-deepest: #115e59;
+    --beachtennis-border:  #14b8a6;
+
+    /* Footvolley theme (blue/white) */
+    --footvolley-accent:   #38bdf8;
+    --footvolley-accent-deep: #0284c7;
+    --footvolley-text:     #e0f2fe;
+    --footvolley-text-pale: #f0f9ff;
+    --footvolley-bg-dark:  #0369a1;
+    --footvolley-bg-deepest: #075985;
+
+    /* Chess theme (black/white) */
+    --chess-accent:        #9ca3af;
+    --chess-accent-deep:   #4b5563;
+    --chess-text:          #f3f4f6;
+    --chess-text-pale:     #f9fafb;
+    --chess-bg-dark:       #1f2937;
+    --chess-bg-deepest:    #111827;
 
     /* CI extras */
     --ci-bg-deepest:       #050810;
@@ -246,7 +280,7 @@
     --ci-bg-dark:          #0a1f35;
 
     /* Green spectrum */
-    --green-strong:        #22c55e;
+    --green-strong:        #15803d;
 
     /* Amber spectrum */
     --amber-mid:           #d97706;
@@ -1265,7 +1299,7 @@ textarea:focus-visible {
 }
 .btn--primary:hover,
 .save-btn:hover {
-    background: var(--green-strong);
+    background: var(--green-dark);
 }
 
 .btn--success,

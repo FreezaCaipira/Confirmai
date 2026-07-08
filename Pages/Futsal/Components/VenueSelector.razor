@@ -14,13 +14,13 @@
         }
         else
         {
-            <InputSelect class="input" @bind-Value="@SelectedVenueId" @bind-Value:after="HandleVenueChanged">
-                <option value="0">— Selecione a quadra —</option>
+            <select class="input" @onchange="HandleVenueChanged">
+                <option value="0" selected="@(SelectedVenueId == 0)">— Selecione a quadra —</option>
                 @foreach (var v in Venues)
                 {
-                    <option value="@v.Id">@v.Name (@VenueTypeLabel(v.Type)) — @v.City/@v.StateCode</option>
+                    <option value="@v.Id" selected="@(v.Id == SelectedVenueId)">@v.Name (@VenueTypeLabel(v.Type)) — @v.City/@v.StateCode</option>
                 }
-            </InputSelect>
+            </select>
         }
         @if (SelectedVenueId == 0)
         {
@@ -30,10 +30,14 @@
 
     @if (SelectedVenue is not null)
     {
-        <div class="venue-preview">
+        <a class="venue-preview" href="@MapsSearchUrl" target="_blank" rel="noopener noreferrer">
             <i class="fas fa-map-marker-alt"></i>
-            <span>@SelectedVenue.Address · @SelectedVenue.City — @SelectedVenue.StateCode</span>
-        </div>
+            <div class="venue-preview-info">
+                <span class="venue-preview-name">@SelectedVenue.Name</span>
+                <span class="venue-preview-addr">@SelectedVenue.Address · @SelectedVenue.City/@SelectedVenue.StateCode</span>
+            </div>
+            <i class="fas fa-external-link-alt venue-preview-ext"></i>
+        </a>
     }
 </fieldset>
 
@@ -48,10 +52,20 @@
     public Venue? SelectedVenue { get; set; }
 
     [Parameter]
-    public EventCallback OnVenueChanged { get; set; }
+    public EventCallback<int> OnVenueChanged { get; set; }
 
-    private async Task HandleVenueChanged()
-        => await OnVenueChanged.InvokeAsync();
+    private async Task HandleVenueChanged(ChangeEventArgs e)
+    {
+        var venueId = int.Parse(e.Value?.ToString() ?? "0");
+        await OnVenueChanged.InvokeAsync(venueId);
+    }
+
+    private string MapsSearchUrl
+    {
+        get => SelectedVenue is not null
+            ? $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString($"{SelectedVenue.Name}, {SelectedVenue.City}, {SelectedVenue.StateCode}, Brasil")}"
+            : "#";
+    }
 
     private static string VenueTypeLabel(VenueType t) => t switch
     {

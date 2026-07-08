@@ -45,7 +45,11 @@
 
     <section class="sports-grid" aria-label="Esportes disponíveis">
         <SportCard Sport="Sport.Futsal" Href="@FutsalHref" Description="@Ui["Index.FutsalCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@futsalMatchCount" />
-        <SportCard Sport="Sport.Poker" Href="@PokerHref" Description="@Ui["Index.PokerCardDesc"]" CtaText="@Ui["Index.ViewTournaments"]" MatchCount="@pokerMatchCount" />
+        <SportCard Sport="Sport.Poker" Href="@PokerHref" Description="@Ui["Index.PokerCardDesc"]" CtaText="@Ui["Index.ViewTournaments"]" MatchCount="@pokerMatchCount" ComingSoon="true" />
+        <SportCard Sport="Sport.Volleyball" Href="@VolleyballHref" Description="Partidas de vôlei" CtaText="Ver partidas →" MatchCount="@volleyballMatchCount" ComingSoon="true" />
+        <SportCard Sport="Sport.BeachTennis" Href="@BeachTennisHref" Description="Partidas de beach tennis" CtaText="Ver partidas →" MatchCount="@beachTennisMatchCount" ComingSoon="true" />
+        <SportCard Sport="Sport.Footvolley" Href="@FootvolleyHref" Description="Partidas de futevôlei" CtaText="Ver partidas →" MatchCount="@footvolleyMatchCount" ComingSoon="true" />
+        <SportCard Sport="Sport.Chess" Href="@ChessHref" Description="Partidas de xadrez" CtaText="Ver partidas →" MatchCount="@chessMatchCount" ComingSoon="true" />
     </section>
 
     @if (activeTab == TabMyGames)
@@ -72,6 +76,10 @@
                                 <option value="">Todos os esportes</option>
                                 <option value="Futsal">⚽ Futsal</option>
                                 <option value="Poker">🃏 Poker</option>
+                                <option value="Volleyball">🏐 Vôlei</option>
+                                <option value="BeachTennis">🎾 Beach Tennis</option>
+                                <option value="Footvolley">🏖️ Futevôlei</option>
+                                <option value="Chess">♟️ Xadrez</option>
                             </select>
                             <select class="my-conf-filter" @bind="filterPeriod">
                                 <option value="all">Todos os períodos</option>
@@ -161,6 +169,10 @@
     private string SelectedCityKey = DefaultCityKey;
     private int? futsalMatchCount = null;
     private int? pokerMatchCount = null;
+    private int? volleyballMatchCount = null;
+    private int? beachTennisMatchCount = null;
+    private int? footvolleyMatchCount = null;
+    private int? chessMatchCount = null;
 
     // Callbacks for two-way binding with CitySelector
     private async Task SelectedCityKeyChanged(string value)
@@ -184,6 +196,10 @@
 
     private string FutsalHref => BuildHref("/futsal");
     private string PokerHref  => BuildHref("/poker");
+    private string VolleyballHref => BuildHref("/volleyball");
+    private string BeachTennisHref => BuildHref("/beachtennis");
+    private string FootvolleyHref => BuildHref("/footvolley");
+    private string ChessHref => BuildHref("/chess");
 
     // ── City Context for CascadingValue ───────────────────────────────
     private CityContext CurrentCityContext
@@ -248,6 +264,10 @@
         {
             futsalMatchCount = null;
             pokerMatchCount = null;
+            volleyballMatchCount = null;
+            beachTennisMatchCount = null;
+            footvolleyMatchCount = null;
+            chessMatchCount = null;
             return;
         }
 
@@ -259,6 +279,26 @@
 
         pokerMatchCount = await db.Events
             .Where(e => e.Sport == Sport.Poker && e.IsActive && e.StartsAt >= now)
+            .Where(e => e.Group.City == city && e.Group.StateCode == stateCode)
+            .CountAsync();
+
+        volleyballMatchCount = await db.Events
+            .Where(e => e.Sport == Sport.Volleyball && e.IsActive && e.StartsAt >= now)
+            .Where(e => e.Group.City == city && e.Group.StateCode == stateCode)
+            .CountAsync();
+
+        beachTennisMatchCount = await db.Events
+            .Where(e => e.Sport == Sport.BeachTennis && e.IsActive && e.StartsAt >= now)
+            .Where(e => e.Group.City == city && e.Group.StateCode == stateCode)
+            .CountAsync();
+
+        footvolleyMatchCount = await db.Events
+            .Where(e => e.Sport == Sport.Footvolley && e.IsActive && e.StartsAt >= now)
+            .Where(e => e.Group.City == city && e.Group.StateCode == stateCode)
+            .CountAsync();
+
+        chessMatchCount = await db.Events
+            .Where(e => e.Sport == Sport.Chess && e.IsActive && e.StartsAt >= now)
             .Where(e => e.Group.City == city && e.Group.StateCode == stateCode)
             .CountAsync();
     }

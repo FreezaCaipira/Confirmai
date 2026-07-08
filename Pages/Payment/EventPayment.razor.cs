@@ -305,17 +305,18 @@ public partial class EventPayment : IAsyncDisposable
 
             if (result.Success)
             {
-                // Update local state
                 conf.PixProofImageData = bytes;
                 conf.PixProofContentType = file.ContentType;
                 conf.PixProofUploadedAt = result.UploadedAt;
-                proofSuccessMessage = "Comprovante enviado com sucesso! O organizador será notificado.";
+                proofSuccessMessage = "Comprovante enviado com sucesso! Redirecionando…";
+                StateHasChanged();
 
-                // Auto-dismiss success message after 5 seconds
-                _uploadProofCts?.Cancel();
-                _uploadProofCts = new CancellationTokenSource();
-                var ct = _uploadProofCts.Token;
-                _uploadProofTask = DismissProofSuccessAsync(ct);
+                await Task.Delay(1500);
+
+                var backUrl = conf.Event.Sport == Sport.Futsal
+                    ? $"/futsal/{conf.Event.Id}"
+                    : $"/poker/{conf.Event.Id}";
+                NavigationManager.NavigateTo(backUrl);
             }
             else
             {

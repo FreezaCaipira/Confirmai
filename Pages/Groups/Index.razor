@@ -163,6 +163,22 @@
                                 }
                             </div>
                         </div>
+                        @if (hasPending)
+                        {
+                            <div class="group-card-pending-actions" @onclick:stopPropagation="true">
+                                <button class="group-card-approve-btn" @onclick="() => ApproveAllPending(g.Id)" disabled="@isProcessingApproval">
+                                    @if (isProcessingApproval && processingGroupId == g.Id)
+                                    {
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-check-double"></i>
+                                    }
+                                    Aprovar @pendingCount
+                                </button>
+                            </div>
+                        }
                     </a>
                 }
             </div>
@@ -215,6 +231,8 @@
 
     private string       joinCode      = string.Empty;
     private string       joinCodeError = string.Empty;
+    private bool         isProcessingApproval = false;
+    private int?         processingGroupId = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -317,5 +335,60 @@
             ? "background: linear-gradient(135deg, #1a472e 0%, #0f2619 100%);"  // Green for futsal
             : "background: linear-gradient(135deg, #2d1a47 0%, #1a0f26 100%);"  // Purple for poker
         ;
+    }
+
+    private async Task ApproveAllPending(int groupId)
+    {
+        if (currentUserId is null) return;
+        isProcessingApproval = true;
+        processingGroupId = groupId;
+
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var pendingRequests = await db.GroupJoinRequests
+                .Where(r => r.GroupId == groupId && r.Status == JoinRequestStatus.Pending)
+                .Include(r => r.User)
+                .ToListAsync();
+
+            var group = await db.Groups.FindAsync(groupId);
+            if (group == null) return;
+
+            foreach (var req in pendingRequests)
+            {
+                var alreadyMember = await db.GroupMembers
+                    .AnyAsync(m => m.GroupId == req.GroupId && m.UserId == req.UserId);
+                if (!alreadyMember)
+                {
+                    db.GroupMembers.Add(new GroupMember
+                    {
+                        GroupId = req.GroupId,
+                        UserId = req.UserId,
+                        Role = GroupMemberRole.Member,
+                        CreatedAt = DateTime.UtcNow,
+                    });
+                }
+                req.Status = JoinRequestStatus.Approved;
+                req.RespondedAt = DateTime.UtcNow;
+                req.RespondedByUserId = currentUserId;
+
+                db.UserMailboxMessages.Add(new UserMailboxMessage
+                {
+                    SenderUserId = null,
+                    RecipientUserId = req.UserId,
+                    RecipientDisplayName = req.User?.UserName,
+                    Subject = $"Você foi aprovado em \"{group.Name}\"",
+                    Body = $"Sua solicitação para entrar no grupo **{group.Name}** foi aprovada! Você já pode acessar o grupo.",
+                    CreatedAt = DateTime.UtcNow,
+                });
+            }
+            await db.SaveChangesAsync();
+            await LoadGroups();
+        }
+        finally
+        {
+            isProcessingApproval = false;
+            processingGroupId = null;
+        }
     }
 }
