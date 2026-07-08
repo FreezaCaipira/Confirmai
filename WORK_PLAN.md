@@ -884,6 +884,50 @@ private async Task ApproveAllPending(int groupId)
 
 **Acao**: Documentar no commit que todos foram auditados e sao legitimos. NAO remover nenhum.
 
+### Fase 8 — Melhorias UX vindas de testes do app (NOVA FASE PADRAO)
+
+**Contexto**: Durante testes manuais do app apos conclusao das fases 1-7, foram identificadas oportunidades de melhoria UX nos cards de esporte.
+
+**Implementacao**:
+
+1. **Adicionar novos esportes visualmente** (Volleyball, Beach Tennis, Footvolley, Chess):
+   - `Enums/Sport.cs`: Adicionar valores Volleyball=3, BeachTennis=4, Footvolley=5, Chess=6
+   - `Shared/Components/SportCard.razor`: Adicionar switch expressions para icons, names, CSS classes dos novos esportes
+   - `Pages/Index.razor`: Adicionar SportCards para novos esportes, opcoes no filtro dropdown, hrefs, e queries de match count em `LoadMatchCountsAsync`
+
+2. **Temas visuais consistentes** (cores, gradientes, marcas d'água):
+   - `wwwroot/css/site.css`: Adicionar CSS variables para novos esportes (accent, accent-deep, text, text-pale, bg-dark, bg-deepest, border)
+   - `Shared/Components/SportCard.razor.css`: Adicionar estilos header (gradient, border, box-shadow), body (gradient, border, watermark), label color, CTA color, event icon color para cada esporte
+
+3. **Badge "Em breve"**:
+   - `Shared/Components/SportCard.razor`: Adicionar parametro `ComingSoon` e badge no header
+   - `Shared/Components/SportCard.razor.css`: Estilizar badge com fundo translúcido e borda branca; mudar header para `justify-content: space-between`
+   - `Pages/Index.razor`: Adicionar `ComingSoon="true"` para todos exceto Futsal
+
+4. **Correcoes de cor**:
+   - Bordas do Volleyball e BeachTennis: usar `--border` (tom compatível com card) em vez de `--accent`
+   - CTA do Volleyball e BeachTennis: usar tons claros do tema (#93c5fd azul, #99f6e4 teal)
+   - Labels: usar `--text-pale` (tons muito claros) para todos os esportes
+
+5. **Marca d'água**:
+   - Volleyball: mudar de pessoa na praia para bola de vôlei (🏐)
+   - Footvolley: usar bola de futebol (⚽)
+
+6. **Titulo do Futsal**:
+   - Mudar de "Futsal" para "Futebol/Futsal"
+
+7. **Seta no CTA**:
+   - Adicionar "→" ao CtaText dos novos esportes via texto (padrao existente: "Ver partidas →", "Ver torneios →")
+
+**Arquivos**:
+- `Enums/Sport.cs`
+- `Shared/Components/SportCard.razor`
+- `Shared/Components/SportCard.razor.css`
+- `Pages/Index.razor`
+- `wwwroot/css/site.css`
+
+**NOTA**: A partir deste ciclo, todos os ciclos terão uma fase dedicada a "Melhorias UX vindas de testes do app" para capturar correções e refinamentos identificados durante testes manuais. Esta fase deve ser documentada no PR com solicitação de documentação formal da expectativa deste tipo de fase.
+
 ---
 
 ## Ciclo 16 -- Integracao WhatsApp Real + Baseline Operacional por Gateway
