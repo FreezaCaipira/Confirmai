@@ -876,20 +876,37 @@ body::before {
     }
 }
 
-/* Mobile muito pequeno (<375px) */
-@media (max-width: 375px) {
+/* Celulares médios (375px - 480px) - iPhone 12/13 Pro, Android grandes */
+@media (max-width: 480px) {
     .sidebar {
         padding: 0.25rem 0;
     }
 
     .sidebar nav ul {
         gap: 0.25rem;
-        padding: 0.15rem 0.3rem;
+        padding: 0.15rem 0.35rem;
     }
 
     .sidebar nav ul li a {
-        padding: 0.3rem 0.4rem;
-        font-size: 0.65rem;
+        padding: 0.3rem 0.45rem;
+        font-size: 0.68rem;
+    }
+}
+
+/* Mobile muito pequeno (<375px) */
+@media (max-width: 375px) {
+    .sidebar {
+        padding: 0.2rem 0;
+    }
+
+    .sidebar nav ul {
+        gap: 0.2rem;
+        padding: 0.12rem 0.3rem;
+    }
+
+    .sidebar nav ul li a {
+        padding: 0.25rem 0.4rem;
+        font-size: 0.62rem;
     }
 
     .main-content {
