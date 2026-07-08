@@ -1,8 +1,8 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 14) | Refatoracao CSS CONCLUIDA
-> 1.674/1.674 testes passando | 0 erros de build | 0 AppDbContext direto
-> Ciclo 14: Refresh Token / Sessao Persistente -- CONCLUIDO
+> Atualizado em 07/07/2026 | Base: `fix/ciclo15-tests-ux-cleanup` (pos-Ciclo 15) | Refatoracao CSS CONCLUIDA
+> 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto
+> Ciclo 15: Testes + UX Grupos Privados + Cleanup !important -- CONCLUIDO
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -88,6 +88,14 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - `_Host.cshtml`: script registrado antes de `blazor.server.js`
 - Testes: 4 asserts atualizados (SecurityPolicyDefaults + ConfigurationDefaults)
 - Fase 2 validada manualmente: ping 200 OK, cookie renovado, sessao ativa >15min
+- **Problemas**: nenhum
+
+### Ciclo 15 (Pleno Local): Testes + UX Grupos Privados + Cleanup !important
+- Branch: `fix/ciclo15-tests-ux-cleanup` | PR pendente
+- Fases 1-5: 20 novos testes (PingController, GroupMetricsService, CityService, WhatsAppNotificationService, LocationService)
+- Fase 6: Botao "Aprovar todos" na listagem de grupos com `@onclick:stopPropagation`
+- Fase 7: Auditoria `!important` no site.css (11/11 legitimos, nenhum removido)
+- 1.694/1.694 testes passando (+20 vs C14), 0 erros de build
 - **Problemas**: nenhum
 
 ---
