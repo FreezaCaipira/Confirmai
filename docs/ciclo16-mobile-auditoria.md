@@ -168,7 +168,35 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
 
 ### Página: `/futsal` (Futsal/Index.razor)
 
-**Status**: Pendente auditoria
+**Status**: ✅ Corrigido e commitado (7cd83c4)
+
+**Problemas identificados**:
+- Event cards com padding e fontes inadequados para mobile
+- Event time com tamanho muito grande para telas pequenas
+- Meta chips com fontes e padding inadequados
+- Botão de criar evento não centralizado em mobile
+- Background icon muito grande para telas pequenas
+
+**Correções aplicadas (Futsal/Index.razor.css)**:
+- Expandir breakpoint <640px:
+  - event-card: padding 0.85rem 1rem, gap 0.75rem
+  - event-time: font-size 1.1rem, min-width: auto
+  - event-name: font-size 0.95rem
+  - event-venue-name: font-size 0.78rem
+  - event-location: font-size 0.75rem
+  - meta-chip: font-size 0.7rem, padding 0.15rem 0.5rem
+  - listing-page-actions: justify-content: center
+- Adicionar breakpoint <375px:
+  - event-card: padding 0.75rem 0.85rem, gap 0.6rem
+  - event-time: font-size 1rem, min-width: 2.5rem
+  - event-name: font-size 0.9rem
+  - event-venue-name: font-size 0.75rem
+  - event-location: font-size 0.72rem
+  - event-meta: gap 0.25rem
+  - meta-chip: font-size 0.65rem, padding 0.12rem 0.4rem
+  - event-action: font-size 0.75rem, padding 0.35rem 0.7rem
+  - event-card-bg-icon: font-size 2.5rem, right: 1rem
+  - btn-create-event: font-size 0.75rem, padding 0.35rem 0.8rem
 
 ### Página: `/poker` (Poker/Index.razor)
 
