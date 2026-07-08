@@ -1436,6 +1436,24 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 .confirm-btn--gk:hover   { background: var(--ci-accent); }
 .confirm-btn--active     { box-shadow: 0 0 0 2px var(--green-bright); }
 
+.cancel-join-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: var(--red-strong);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+.cancel-join-btn:hover { background: var(--red-dark); }
+
 .position-choice { display: flex; flex-direction: column; gap: 0.65rem; }
 .position-label  { font-size: 0.82rem; color: var(--ci-text-subtle); margin: 0; }
 .position-btns   { display: flex; gap: 0.6rem; flex-wrap: wrap; }
