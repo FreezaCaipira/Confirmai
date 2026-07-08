@@ -388,6 +388,8 @@
 
     .my-event-card {
         flex-wrap: wrap;
+        padding: 0.7rem 0.8rem;
+        gap: 0.6rem;
     }
 
     .my-event-actions {
@@ -402,6 +404,113 @@
 
     .my-events-header-right {
         align-items: flex-start;
+    }
+
+    .my-events-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+    }
+
+    .my-events-view-tabs {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .my-events-create-btns {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .my-events-sport-tabs {
+        gap: 0.3rem;
+    }
+
+    .my-event-sport-badge {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
+    }
+
+    .my-event-name {
+        font-size: 0.9rem;
+    }
+
+    .my-event-meta {
+        font-size: 0.75rem;
+    }
+
+    .my-event-location {
+        font-size: 0.73rem;
+    }
+}
+
+/* Mobile muito pequeno (<375px) */
+@media (max-width: 375px) {
+    .events-block {
+        padding: 0.6rem 0.6rem 0.7rem;
+    }
+
+    .events-block .page-section-title {
+        font-size: 1.2rem;
+    }
+
+    .my-event-card {
+        padding: 0.6rem 0.7rem;
+        gap: 0.5rem;
+    }
+
+    .my-event-sport-badge {
+        width: 1.8rem;
+        height: 1.8rem;
+        font-size: 0.9rem;
+    }
+
+    .my-event-name {
+        font-size: 0.85rem;
+    }
+
+    .my-event-status {
+        font-size: 0.65rem;
+        padding: 0.12rem 0.4rem;
+    }
+
+    .my-event-type-badge {
+        font-size: 0.65rem;
+        padding: 0.12rem 0.4rem;
+    }
+
+    .my-event-meta {
+        font-size: 0.7rem;
+    }
+
+    .my-event-location {
+        font-size: 0.68rem;
+    }
+
+    .my-event-action-btn {
+        font-size: 0.72rem;
+        padding: 0.28rem 0.6rem;
+    }
+
+    .my-events-tab {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+    }
+
+    .my-events-create-btn {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.7rem;
+    }
+
+    .my-event-card-bg-icon {
+        font-size: 2.5rem;
+        right: 0.8rem;
+    }
+
+    .my-schedule-card {
+        padding: 0.6rem 0.7rem;
+        gap: 0.5rem;
     }
 }
 
