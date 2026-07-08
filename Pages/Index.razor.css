@@ -75,11 +75,10 @@
         width: 100%;
         max-width: 100%;
         justify-content: center;
-        font-size: 0.8rem;
-        padding: 0.4rem 0.8rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 0.75rem;
+        padding: 0.35rem 0.6rem;
+        white-space: normal;
+        overflow: visible;
     }
 
     .my-events-link-btn:hover {

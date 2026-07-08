@@ -385,7 +385,7 @@ footer.oldsite-footer {
         justify-content: center;
     }
 
-    .oldsite-top-nav {
+    body .oldsite-top-nav {
         display: none;
         flex-direction: column;
         position: absolute;
@@ -402,11 +402,13 @@ footer.oldsite-footer {
         overflow-y: auto;
     }
 
-    .oldsite-top-nav.mobile-menu-open {
+    body .oldsite-top-nav.mobile-menu-open {
         display: flex;
     }
 
-    .nav-language-flags {
+    body .oldsite-top-nav .nav-language-flags {
+        position: static;
+        transform: none;
         width: 100%;
         justify-content: center;
         padding: 0.5rem;
@@ -415,26 +417,48 @@ footer.oldsite-footer {
         order: -1;
         max-width: 100%;
         overflow: hidden;
+        z-index: auto;
     }
 
-    .oldsite-top-nav > a {
+    body .oldsite-top-nav > a {
         width: 100%;
         padding: 0.6rem 0.8rem;
         text-align: left;
         border-radius: 0;
         transition: background 0.15s;
         border-bottom: 1px solid var(--ci-border-dim);
+        border-right: none;
+        z-index: auto;
+        min-height: auto;
     }
 
-    .oldsite-top-nav > a:last-child {
+    body .oldsite-top-nav .oldsite-top-nav-mailbox-icon {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border-right: none;
+        border-bottom: 1px solid var(--ci-border-dim);
+        min-height: auto;
+    }
+
+    body .oldsite-top-nav .oldsite-top-nav-profile-link {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border-right: none;
+        border-bottom: 1px solid var(--ci-border-dim);
+        min-height: auto;
+    }
+
+    body .oldsite-top-nav > a:last-child,
+    body .oldsite-top-nav .oldsite-top-nav-mailbox-icon:last-child,
+    body .oldsite-top-nav .oldsite-top-nav-profile-link:last-child {
         border-bottom: none;
     }
 
-    .oldsite-top-nav > a:hover {
+    body .oldsite-top-nav > a:hover {
         background: var(--ci-accent-opacity-xs);
     }
 
-    .nav-flex-spacer {
+    body .oldsite-top-nav .nav-flex-spacer {
         display: none;
     }
 }
