@@ -2122,6 +2122,28 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 }
 .detail-map-placeholder-ext { font-size: 0.8rem; color: var(--ci-accent); flex-shrink: 0; }
 
+/* -- Venue preview (create/edit forms) ------------------------------ */
+.venue-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+    background: var(--ci-bg-alt);
+    border: 1px solid var(--ci-border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.14s, background 0.14s;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+.venue-preview:hover { border-color: var(--ci-accent); background: var(--ci-bg-deep); }
+.venue-preview > .fa-map-marker-alt { font-size: 1.25rem; color: var(--ci-accent); flex-shrink: 0; }
+.venue-preview-info { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; }
+.venue-preview-name { font-size: 0.92rem; font-weight: 600; color: var(--ci-text); }
+.venue-preview-addr { font-size: 0.78rem; color: var(--ci-text-muted); }
+.venue-preview-ext { font-size: 0.8rem; color: var(--ci-accent); flex-shrink: 0; }
+
 /* -- Groups listing page (/grupos) --------------------------------- */
 .groups-page {
     max-width: 980px;
