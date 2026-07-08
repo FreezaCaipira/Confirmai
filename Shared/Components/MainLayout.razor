@@ -33,7 +33,10 @@
                     <h1 class="oldsite-logo">Confirma Aí!</h1>
                     <p class="oldsite-tagline">Bora jogar!?</p>
                 </a>
-                <nav class="oldsite-top-nav" aria-label="Main menu">
+                <button class="mobile-menu-toggle" @onclick="ToggleMobileMenu" aria-label="Toggle menu" aria-expanded="@isMobileMenuOpen">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav class="oldsite-top-nav @(isMobileMenuOpen ? "mobile-menu-open" : "")" aria-label="Main menu">
                     <a href="/eventos"><span class="nav-icon-cycle" aria-hidden="true"><i class="fas fa-futbol nav-icon--a"></i><span class="nav-icon--b">🃏</span></span> @T["Nav.Sports"]</a>
                     <AuthorizeView>
                         <Authorized>
@@ -156,6 +159,7 @@
     private readonly SemaphoreSlim mailboxRefreshLock = new(1, 1);
     private bool isDisposed;
     private string[] newsTickerMessages = [];
+    private bool isMobileMenuOpen;
 
     private string[] BuildNewsTickerMessages() =>
     [
@@ -355,6 +359,11 @@
     private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
         _ = LoadCurrentUserAndUnreadCountSafeAsync();
+    }
+
+    private void ToggleMobileMenu()
+    {
+        isMobileMenuOpen = !isMobileMenuOpen;
     }
 
     public void Dispose()
