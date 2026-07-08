@@ -378,11 +378,20 @@ footer.oldsite-footer {
     border-color: var(--ci-accent);
 }
 
+.mobile-nav-text {
+    display: none;
+}
+
 @media (max-width: 700px) {
     .mobile-menu-toggle {
         display: inline-flex;
         align-items: center;
         justify-content: center;
+    }
+
+    .mobile-nav-text {
+        display: inline;
+        margin-left: 0.5rem;
     }
 
     body .oldsite-top-nav {

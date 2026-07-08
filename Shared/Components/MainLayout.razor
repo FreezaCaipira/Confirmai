@@ -81,6 +81,7 @@
 
                             <a href="/mailbox" class="oldsite-top-nav-mailbox-icon" title="@T["Nav.Mailbox"]" aria-label="@T["Nav.Mailbox"]">
                                 <img class="oldsite-mailbox-glyph" src="/images/icons/mail-letter.svg" alt="" aria-hidden="true" />
+                                <span class="mobile-nav-text">@T["Nav.Mailbox"]</span>
                                 @if (unreadMailboxCount > 0)
                                 {
                                     <span class="oldsite-top-nav-unread">@unreadMailboxCount</span>
@@ -90,6 +91,7 @@
                             {
                                 <a href="/profile/@currentUserId" class="oldsite-top-nav-profile-link" title="@T["Nav.Profile"]" aria-label="@T["Nav.Profile"]">
                                     <img class="oldsite-profile-glyph" src="/images/icons/user-profile.svg" alt="" aria-hidden="true" />
+                                    <span class="mobile-nav-text">@T["Nav.Profile"]</span>
                                 </a>
                             }
                             <span class="oldsite-top-nav-user">@T["Layout.Hello"], @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? T["Layout.UserFallback"] : context.User.Identity.Name)!</span>
