@@ -3058,6 +3058,116 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .join-code-row {
         flex-wrap: wrap;
     }
+
+    .groups-grid {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+    }
+
+    .group-card {
+        min-height: 220px;
+    }
+
+    .group-card-content {
+        padding: 1rem;
+    }
+
+    .group-card-name {
+        font-size: 1.1rem;
+    }
+
+    .group-card-location {
+        font-size: 0.85rem;
+    }
+
+    .group-card-meta {
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile muito pequeno (<375px) */
+@media (max-width: 375px) {
+    .groups-block {
+        padding: 0.6rem 0.5rem 0.7rem;
+    }
+
+    .groups-title {
+        font-size: 1.1rem;
+    }
+
+    .groups-block-sub {
+        font-size: 0.85rem;
+    }
+
+    .join-code-section {
+        width: 100%;
+    }
+
+    .join-code-input {
+        font-size: 0.9rem;
+        padding: 0.35rem 0.5rem;
+    }
+
+    .confirm-btn {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.7rem;
+    }
+
+    .groups-create-btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.8rem;
+    }
+
+    .group-card {
+        min-height: 200px;
+    }
+
+    .group-card-content {
+        padding: 0.85rem;
+        gap: 0.6rem;
+    }
+
+    .group-card-icon {
+        font-size: 3.5rem;
+    }
+
+    .group-card-sport {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.5rem;
+    }
+
+    .group-card-badges {
+        gap: 0.25rem;
+    }
+
+    .player-tag {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .group-card-name {
+        font-size: 1rem;
+    }
+
+    .group-card-location {
+        font-size: 0.8rem;
+    }
+
+    .group-card-meta {
+        font-size: 0.75rem;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .group-card-pending-actions {
+        bottom: 0.4rem;
+        right: 0.4rem;
+    }
+
+    .group-card-approve-btn {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
 }
 
 .group-card {
