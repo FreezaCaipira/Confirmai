@@ -404,6 +404,16 @@ footer.oldsite-footer {
         display: flex;
     }
 
+    .nav-language-flags {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        padding: 0.4rem;
+        background: var(--ci-bg-card);
+        border-radius: 6px;
+        order: -1;
+    }
+
     .oldsite-top-nav > a {
         width: 100%;
         padding: 0.5rem 0.8rem;
@@ -418,14 +428,5 @@ footer.oldsite-footer {
 
     .nav-flex-spacer {
         display: none;
-    }
-
-    .nav-language-flags {
-        width: 100%;
-        justify-content: center;
-        margin-top: 0.3rem;
-        padding: 0.3rem;
-        background: var(--ci-bg-card);
-        border-radius: 6px;
     }
 }

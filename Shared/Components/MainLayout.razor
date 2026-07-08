@@ -37,6 +37,26 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <nav class="oldsite-top-nav @(isMobileMenuOpen ? "mobile-menu-open" : "")" aria-label="Main menu">
+                    <div class="nav-language-flags" role="group" aria-label="@T["Layout.Language"]">
+                        <a class="language-flag-card lang-br @(IsLanguageSelected("pt-BR") ? "active" : string.Empty)"
+                           title="@T["Layout.LanguagePtBr"]"
+                           aria-label="@T["Layout.LanguagePtBr"]"
+                           href="@BuildLanguageUrl("pt-BR")">
+                            <img class="flag-icon" src="/images/flags/br.svg" alt="" aria-hidden="true" />
+                        </a>
+                        <a class="language-flag-card lang-us @(IsLanguageSelected("en-US") ? "active" : string.Empty)"
+                           title="@T["Layout.LanguageEnUs"]"
+                           aria-label="@T["Layout.LanguageEnUs"]"
+                           href="@BuildLanguageUrl("en-US")">
+                            <img class="flag-icon" src="/images/flags/us.svg" alt="" aria-hidden="true" />
+                        </a>
+                        <a class="language-flag-card lang-es @(IsLanguageSelected("es-ES") ? "active" : string.Empty)"
+                           title="@T["Layout.LanguageEsEs"]"
+                           aria-label="@T["Layout.LanguageEsEs"]"
+                           href="@BuildLanguageUrl("es-ES")">
+                            <img class="flag-icon" src="/images/flags/es.svg" alt="" aria-hidden="true" />
+                        </a>
+                    </div>
                     <a href="/eventos"><span class="nav-icon-cycle" aria-hidden="true"><i class="fas fa-futbol nav-icon--a"></i><span class="nav-icon--b">🃏</span></span> @T["Nav.Sports"]</a>
                     <AuthorizeView>
                         <Authorized>
@@ -80,27 +100,6 @@
                             <a href="/Identity/Account/Register">@T["Nav.Register"]</a>
                         </NotAuthorized>
                     </AuthorizeView>
-
-                    <div class="nav-language-flags" role="group" aria-label="@T["Layout.Language"]">
-                        <a class="language-flag-card lang-br @(IsLanguageSelected("pt-BR") ? "active" : string.Empty)"
-                           title="@T["Layout.LanguagePtBr"]"
-                           aria-label="@T["Layout.LanguagePtBr"]"
-                           href="@BuildLanguageUrl("pt-BR")">
-                            <img class="flag-icon" src="/images/flags/br.svg" alt="" aria-hidden="true" />
-                        </a>
-                        <a class="language-flag-card lang-us @(IsLanguageSelected("en-US") ? "active" : string.Empty)"
-                           title="@T["Layout.LanguageEnUs"]"
-                           aria-label="@T["Layout.LanguageEnUs"]"
-                           href="@BuildLanguageUrl("en-US")">
-                            <img class="flag-icon" src="/images/flags/us.svg" alt="" aria-hidden="true" />
-                        </a>
-                        <a class="language-flag-card lang-es @(IsLanguageSelected("es-ES") ? "active" : string.Empty)"
-                           title="@T["Layout.LanguageEsEs"]"
-                           aria-label="@T["Layout.LanguageEsEs"]"
-                           href="@BuildLanguageUrl("es-ES")">
-                            <img class="flag-icon" src="/images/flags/es.svg" alt="" aria-hidden="true" />
-                        </a>
-                    </div>
                 </nav>
             </header>
 
