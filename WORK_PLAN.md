@@ -1,6 +1,6 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 07/07/2026 | Base: `feat/ciclo14-refresh-token` (pos-Ciclo 14) | Refatoracao CSS CONCLUIDA
+> Atualizado em 14/07/2026 | Base: `main` (pos-Ciclo 14) | Refatoracao CSS CONCLUIDA
 > 1.674/1.674 testes passando | 0 erros de build | 0 AppDbContext direto
 > Ciclo 14: Refresh Token / Sessao Persistente -- CONCLUIDO
 
@@ -80,7 +80,7 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - **Problemas**: docs separado (regra 20), arquivo vazio commitado, 1 rgba com var existente
 
 ### Ciclo 14 (Pleno Local): Refresh Token / Sessao Persistente
-- Branch: `feat/ciclo14-refresh-token` | PR pendente
+- Branch: `feat/ciclo14-refresh-token` | PR #48 + PR #49 (docs)
 - `SessionTimeoutMinutes`: 60->720 (dev, 12h), 30->480 (prod, 8h)
 - `PingController.cs` (novo): endpoint `[Authorize] GET /api/ping` -> `200 OK`
 - `session-keepalive.js` (novo): `fetch('/api/ping')` a cada 15min com `credentials: same-origin`
@@ -265,24 +265,63 @@ Arquivo vazio sem utilidade. Senior removeu.
 
 ---
 
-## Metricas Atuais (pos-Ciclo 13 + fix Senior)
+## Revisao Senior do Ciclo 14
 
-| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 | C12 | C13 |
-|---------|----|----|-------|----|----|-----|-----|-----|-----|
-| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
-| `!important` global | -- | -- | 17 | 12 | 11 | 12 | 11 | 11 | **11** |
-| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | 185 | 189 | **189** |
-| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | 2.344 | 2.364 | **2.360** |
-| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | 4.246 | 4.690 | **4.244** |
-| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | 317 | 315 | **315** |
-| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | 0 | 0 | **0** |
-| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | 0 | 0 | **0** |
-| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | 0 | 0 | **0** |
-| AppDbContext direto | -- | -- | -- | -- | -- | -- | 3 | 0 | **0** |
-| xUnit2013 warnings | -- | -- | -- | -- | -- | -- | 49 | 0 | **0** |
+### Veredicto: PERFEITO -- Implementacao exata conforme documentado, zero problemas
+
+| Metrica | C13 | C14 | Status |
+|---------|-----|-----|--------|
+| Build errors | 0 | **0** | Atingido |
+| Tests | 1.674 | **1.674** | Atingido |
+| SessionTimeoutMinutes (dev) | 60 | **720** | Atualizado |
+| SessionTimeoutMinutes (prod) | 30 | **480** | Atualizado |
+| PingController | -- | **Criado** | Novo |
+| session-keepalive.js | -- | **Criado** | Novo |
+| AddControllers/MapControllers | -- | **Registrado** | Novo |
+
+### O que o Pleno fez
+
+**Fase 1 (Refresh Token)**: Implementacao EXATA conforme orientacao do Senior:
+1. `SecurityPolicyDefaults.cs`: `SessionTimeoutMinutes` dev 60→720, prod 30→480
+2. `Controllers/PingController.cs`: endpoint `[Authorize] GET /api/ping` → `200 OK`
+3. `wwwroot/js/session-keepalive.js`: `fetch('/api/ping')` a cada 15min com `credentials: same-origin`
+4. `Program.cs`: `AddControllers()` + `MapControllers()` registrados
+5. `Pages/_Host.cshtml`: script antes de `blazor.server.js`
+6. Testes: 4 asserts atualizados (SecurityPolicyDefaultsTests + ConfigurationDefaultsTests)
+
+**Fase 2 (Validacao manual)**: Confirmada pelo Pleno -- ping 200 OK, cookie renovado, sessao ativa >15min
+
+### Problemas encontrados pelo Senior
+Nenhum. Codigo limpo, commits limpos, todas as regras respeitadas.
+
+### Positivo
+- Seguiu instrucoes do Senior ao pe da letra -- melhor ciclo em termos de aderencia
+- 1 commit de implementacao + 2 commits de docs (aceitavel)
+- Branch unica, PRs limpas (regras 9, 10, 14 respeitadas)
+- Testes atualizados ANTES de commitar (regra 8 respeitada)
+
+---
+
+## Metricas Atuais (pos-Ciclo 14)
+
+| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 | C12 | C13 | C14 |
+|---------|----|----|-------|----|----|-----|-----|-----|-----|-----|
+| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
+| `!important` global | -- | -- | 17 | 12 | 11 | 12 | 11 | 11 | 11 | **11** |
+| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | 185 | 189 | 189 | **189** |
+| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | 2.344 | 2.364 | 2.360 | **2.360** |
+| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | 4.246 | 4.690 | 4.244 | **4.244** |
+| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | 317 | 315 | 315 | **315** |
+| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | **0** |
+| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | 0 | 0 | 0 | **0** |
+| AppDbContext direto | -- | -- | -- | -- | -- | -- | 3 | 0 | 0 | **0** |
+| xUnit2013 warnings | -- | -- | -- | -- | -- | -- | 49 | 0 | 0 | **0** |
+| SessionTimeoutMinutes (dev) | -- | -- | -- | -- | -- | -- | -- | -- | 60 | **720** |
+| SessionTimeoutMinutes (prod) | -- | -- | -- | -- | -- | -- | -- | -- | 30 | **480** |
 
 ### Paginas grandes -- TODAS decompostas
 
@@ -561,19 +600,19 @@ A refatoracao CSS iniciada no Ciclo 4 esta **essencialmente concluida**. Os nume
 
 **Criar vars para esses padroes seria contraproducente**: inflaria o `:root` (ja com 317 vars) sem beneficio real de reuso.
 
-### Trabalho restante (nao-CSS)
+### Trabalho restante (nao-CSS) -- TODOS CONCLUIDOS
 
-| Item | Descricao | Prioridade |
-|------|-----------|------------|
-| AppDbContext -> IDbContextFactory | 3 paginas restantes: ViewPayment, Payment, PaymentDetails | P1 |
-| !important site.css | 11 ocorrencias, maioria legitima (autofill, accessibility, modals) | P3 |
-| Build warnings (Tests) | 49 warnings de xUnit2013 no projeto de testes (nao afetam producao) | P3 |
+| Item | Descricao | Prioridade | Status |
+|------|-----------|------------|--------|
+| AppDbContext -> IDbContextFactory | 3 paginas restantes: ViewPayment, Payment, PaymentDetails | P1 | **ZERADO (C12)** |
+| !important site.css | 11 ocorrencias, maioria legitima (autofill, accessibility, modals) | P3 | **Reducao parcial (C12)** |
+| Build warnings (Tests) | 49 warnings de xUnit2013 no projeto de testes (nao afetam producao) | P3 | **ZERADO (C12)** |
 
 ---
 
-## Estado Final pos-Ciclo 13
+## Estado Final pos-Ciclo 14
 
-Refatoracao CSS e cleanup tecnico **completos**. UX/layout reestruturado. Marcos:
+Refatoracao CSS, cleanup tecnico e infraestrutura de sessao **completos**. Marcos:
 - 0 hardcoded hex em scoped CSS (desde C6)
 - 0 `AppDbContext` direto (desde C12)
 - 0 paginas >400L sem code-behind (desde C11)
@@ -582,8 +621,451 @@ Refatoracao CSS e cleanup tecnico **completos**. UX/layout reestruturado. Marcos
 - Tela inicial = `/eventos` (desde C13)
 - Background `.sports-shell` / `.listing-block` alinhados com `.groups-block` (global em events.css)
 - 1 `!important` scoped (AvatarUpload pattern legitimo)
+- Refresh token via keep-alive JS (15min ping) + session timeout 720min dev / 480min prod (desde C14)
 
-Trabalho restante: **nenhum** (Ciclo 14 concluido). Aguardando proximo plano do Senior.
+---
+
+## Ciclo 15 -- Testes + UX Grupos Privados + Cleanup !important
+
+**Branch**: `fix/ciclo15-tests-ux-cleanup`
+**1 commit por fase** dentro da branch. **1 PR** no final.
+Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
+
+### Fase 1 — Testes do PingController (P1)
+
+Criar `Confirmai.Tests/PingControllerTests.cs`. Usar `IntegrationTestWebAppFactory` (ja existe no projeto, ver `AdminLogsQueryServiceIntegrationTests.cs` como referencia).
+
+```csharp
+// PingControllerTests.cs
+public class PingControllerTests : IClassFixture<IntegrationTestWebAppFactory>
+{
+    private readonly IntegrationTestWebAppFactory _factory;
+    public PingControllerTests(IntegrationTestWebAppFactory factory) => _factory = factory;
+
+    [Fact]
+    public async Task Ping_WithAuthenticatedUser_Returns200()
+    {
+        var client = _factory.CreateClient();
+        // Autenticar (ver padrao em FullFlowAuthenticationIdentityScenariosIntegrationTests.cs)
+        var response = await client.GetAsync("/api/ping");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Ping_WithoutAuthentication_ReturnsUnauthorized()
+    {
+        var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        var response = await client.GetAsync("/api/ping");
+        // Blazor Server redireciona para login (302) ou retorna 401
+        Assert.True(response.StatusCode == HttpStatusCode.Unauthorized
+                 || response.StatusCode == HttpStatusCode.Redirect);
+    }
+}
+```
+
+**Arquivo**: `Confirmai.Tests/PingControllerTests.cs`
+**Referencia**: `Confirmai.Tests/AdminLogsQueryServiceIntegrationTests.cs` (padrao IClassFixture)
+**Referencia**: `Confirmai.Tests/FullFlowAuthenticationIdentityScenariosIntegrationTests.cs` (padrao de auth)
+
+### Fase 2 — Testes do GroupMetricsService (P2)
+
+Criar `Confirmai.Tests/GroupMetricsServiceTests.cs`. Usar `TestDataFactory.CreateDbContext()` (in-memory EF Core).
+
+```csharp
+// Testes a implementar:
+[Fact] GetSnapshot_WithEventsAndMembers_CalculatesCorrectly()
+  // Criar grupo com 5 membros, 3 eventos (2 passados, 1 futuro)
+  // Criar confirmacoes e pagamentos
+  // Assert: TotalMembers=5, TotalEvents=3, UpcomingEvents=1, PaymentCompletionRate>0
+
+[Fact] GetSnapshot_GroupNotFound_ReturnsEmptySnapshot()
+  // groupId inexistente → snapshot com zeros
+
+[Fact] GetSnapshot_EmptyGroup_ReturnsZeros()
+  // grupo sem membros/eventos → TotalMembers=0, TotalEvents=0, etc.
+
+[Fact] GetMultipleSnapshots_ReturnsAllGroups()
+  // 2 grupos → dictionary com 2 entries
+
+[Fact] GetSnapshot_PaymentRate_CalculatesCorrectly()
+  // 10 confirmacoes, 7 pagas → PaymentCompletionRate=70.0
+```
+
+**Arquivo**: `Confirmai.Tests/GroupMetricsServiceTests.cs`
+**Referencia**: `Services/Groups/GroupMetricsService.cs` (95 linhas)
+**Modelo**: `GroupMetricsSnapshot` — 8 propriedades (TotalMembers, TotalEvents, UpcomingEvents, AverageAttendanceRate, PendingJoinRequests, TotalConfirmations, PaidConfirmations, PaymentCompletionRate)
+
+### Fase 3 — Testes do CityService (P2)
+
+Criar `Confirmai.Tests/CityServiceTests.cs`.
+
+```csharp
+// Testes a implementar:
+[Fact] GetCityOptions_WithActiveGroups_ReturnsDistinctCities()
+  // Criar 3 grupos ativos em 2 cidades → 2 CityOption
+  // Assert: format "Cidade|UF" no Value, "Cidade - UF" no Label
+
+[Fact] GetCityOptions_NoActiveGroups_ReturnsEmptyList()
+  // Sem grupos ativos → lista vazia
+
+[Fact] GetCityOptions_InactiveGroupsExcluded()
+  // Grupo com IsActive=false → nao aparece
+
+[Fact] GetIbgeMunicipios_EmptyStateCode_ReturnsEmpty()
+  // stateCode="" → lista vazia (sem chamada HTTP)
+
+[Fact] GetIbgeMunicipios_NullStateCode_ReturnsEmpty()
+  // stateCode=null → lista vazia
+```
+
+**NOTA sobre `GetIbgeMunicipiosAsync`**: Depende de API externa (IBGE). Testar apenas os edge cases (string vazia/null). NAO mockar HttpClient para a chamada real — baixo ROI.
+
+**Arquivo**: `Confirmai.Tests/CityServiceTests.cs`
+**Referencia**: `Services/CityService.cs` (64 linhas)
+**Modelo**: `CityOption` (Value, Label, City, StateCode)
+
+### Fase 4 — Testes do WhatsAppNotificationService (P2)
+
+Criar `Confirmai.Tests/WhatsAppNotificationServiceTests.cs`.
+
+```csharp
+// Testes a implementar (com HttpClient mockado):
+[Fact] SendNotification_NoConfig_ReturnsFalse()
+  // Config sem WhatsApp:ApiKey → false (sem chamada HTTP)
+
+[Fact] SendNotification_WithConfig_CallsApi()
+  // Config com ApiKey+ApiUrl + mock HttpMessageHandler → true
+
+[Fact] SendNotification_ApiError_ReturnsFalse()
+  // Mock retorna 500 → false (catch block)
+
+[Fact] SendEventReminder_FormatsMessageCorrectly()
+  // Verificar que a mensagem contem nome do evento e data
+
+[Fact] SendPaymentReminder_FormatsAmountCorrectly()
+  // Verificar formato "R$ 25,00"
+```
+
+**Arquivo**: `Confirmai.Tests/WhatsAppNotificationServiceTests.cs`
+**Referencia**: `Services/Notification/WhatsAppNotificationService.cs` (55 linhas)
+**Mock**: Usar `MockHttpMessageHandler` (ver padrao em `BitcoinPaymentFactoryTests.cs` se existir, ou criar custom handler)
+
+### Fase 5 — Testes do LocationService (P3)
+
+Criar `Confirmai.Tests/LocationServiceTests.cs`.
+
+```csharp
+// Testes do metodo estatico GetStateCode (via reflection ou por ReverseGeocodeAsync):
+[Fact] GetStateCode_ValidStates_ReturnsCorrectCodes()
+  // "Sao Paulo" → "SP", "Rio de Janeiro" → "RJ", etc.
+
+[Fact] GetStateCode_CaseInsensitive()
+  // "sao paulo" → "SP"
+
+[Fact] GetStateCode_InvalidState_ReturnsEmpty()
+  // "XYZ" → ""
+```
+
+**NOTA**: `LocationService` depende de `IJSRuntime` (browser API) e `HttpClient` (Nominatim). Testar apenas o metodo puro `GetStateCode` — para isso, extrair como `internal static` OU testar via `ReverseGeocodeAsync` com mock. Se for muito complexo, pular e documentar o motivo.
+
+**Arquivo**: `Confirmai.Tests/LocationServiceTests.cs`
+**Referencia**: `Services/LocationService.cs` (109 linhas)
+
+### Fase 6 — UX Grupos Privados: Atalhos de aprovacao/rejeicao
+
+**Problema**: Na `/grupos` (Index), admin ve badge "3 pendentes" mas precisa entrar na pagina do grupo para aprovar/rejeitar. Nao ha atalho direto.
+
+**Solucao**: Adicionar swipe actions ou botoes inline na listagem de grupos.
+
+**Implementacao**:
+
+1. Em `Pages/Groups/Index.razor`, adicionar botoes "Aprovar todos" e "Ver pendentes" no card do grupo quando `hasPending == true`:
+
+```razor
+@* Dentro do foreach, apos o badge de pendentes *@
+@if (hasPending)
+{
+    <div class="group-card-pending-actions" @onclick:stopPropagation="true">
+        <button class="btn btn--sm btn--success" @onclick="() => ApproveAllPending(g.Id)"
+                title="Aprovar todas as solicitações pendentes">
+            <i class="fas fa-check-double"></i> Aprovar @pendingCount
+        </button>
+    </div>
+}
+```
+
+2. No code-behind (`Index.razor` `@code`), adicionar o metodo `ApproveAllPending(int groupId)`:
+
+```csharp
+private async Task ApproveAllPending(int groupId)
+{
+    await using var db = await DbFactory.CreateDbContextAsync();
+    var pendingRequests = await db.GroupJoinRequests
+        .Where(r => r.GroupId == groupId && r.Status == JoinRequestStatus.Pending)
+        .Include(r => r.User)
+        .ToListAsync();
+
+    var group = await db.Groups.FindAsync(groupId);
+    if (group == null) return;
+
+    foreach (var req in pendingRequests)
+    {
+        var alreadyMember = await db.GroupMembers
+            .AnyAsync(m => m.GroupId == req.GroupId && m.UserId == req.UserId);
+        if (!alreadyMember)
+        {
+            db.GroupMembers.Add(new GroupMember
+            {
+                GroupId = req.GroupId, UserId = req.UserId,
+                Role = GroupMemberRole.Member, CreatedAt = DateTime.UtcNow,
+            });
+        }
+        req.Status = JoinRequestStatus.Approved;
+        req.RespondedAt = DateTime.UtcNow;
+        req.RespondedByUserId = currentUserId;
+
+        db.UserMailboxMessages.Add(new UserMailboxMessage
+        {
+            SenderUserId = null, RecipientUserId = req.UserId,
+            RecipientDisplayName = req.User?.UserName,
+            Subject = $"Voce foi aprovado em \"{group.Name}\"",
+            Body = $"Sua solicitacao para entrar no grupo **{group.Name}** foi aprovada!",
+            CreatedAt = DateTime.UtcNow,
+        });
+    }
+    await db.SaveChangesAsync();
+    await LoadGroups(); // recarrega a lista
+}
+```
+
+3. CSS para `.group-card-pending-actions` em `Index.razor.css`:
+   - Posicao absoluta no canto inferior direito do card
+   - Botao compacto com icone + numero
+   - Prevenir propagacao do click (nao navegar para o grupo)
+
+**Arquivos**:
+- `Pages/Groups/Index.razor` (template + code-behind)
+- `Pages/Groups/Index.razor.css` (estilo do botao)
+**Referencia**: `Pages/Groups/Detail.razor.cs:245-296` (logica de `ApproveSelected` — copiar padrao)
+
+### Fase 7 — Reduzir !important em site.css
+
+**Analise do Senior — 11 ocorrencias em site.css**:
+
+| Linha | Contexto | Veredicto |
+|-------|----------|-----------|
+| 882 | `.is-hidden { display: none !important }` | **LEGITIMO** — utility class precisa sobrescrever qualquer display |
+| 1254 | `@media (prefers-reduced-motion) animation-duration` | **LEGITIMO** — acessibilidade, padrao W3C |
+| 1255 | `@media (prefers-reduced-motion) animation-iteration-count` | **LEGITIMO** — acessibilidade |
+| 1256 | `@media (prefers-reduced-motion) transition-duration` | **LEGITIMO** — acessibilidade |
+| 6462 | `.pac-container { z-index: 9999 }` | **LEGITIMO** — Google Maps dropdown precisa ficar acima de modals |
+| 6547 | `input:-webkit-autofill box-shadow` | **LEGITIMO** — unico jeito de mudar cor de autofill no Chrome |
+| 6548 | `input:-webkit-autofill box-shadow (vendor prefix)` | **LEGITIMO** — idem |
+| 6549 | `input:-webkit-autofill -webkit-text-fill-color` | **LEGITIMO** — idem |
+| 6550 | `input:-webkit-autofill color` | **LEGITIMO** — idem |
+| 6553 | `input:-webkit-autofill outline: none` | **LEGITIMO** — idem |
+
+**Conclusao**: TODOS os 11 `!important` em site.css sao **LEGITIMOS**. Nao devem ser removidos.
+- `.is-hidden` — padrao utility-first (Bootstrap, Tailwind usam o mesmo)
+- `prefers-reduced-motion` — padrao de acessibilidade W3C
+- `.pac-container` — necessario para sobrescrever z-index inline do Google Maps JS
+- `input:-webkit-autofill` — UNICO jeito de corrigir o fundo azul/amarelo do Chrome autofill
+
+**Acao**: Documentar no commit que todos foram auditados e sao legitimos. NAO remover nenhum.
+
+---
+
+## Ciclo 16 -- Integracao WhatsApp Real + Baseline Operacional por Gateway
+
+**Branch**: `feat/ciclo16-whatsapp-baseline`
+**1 commit por fase** dentro da branch. **1 PR** no final.
+Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
+
+### Fase 1 — Configuracao WhatsApp: appsettings + opt-in
+
+**O que existe hoje**:
+- `WhatsAppNotificationService.cs` (55L) — pronto, le `WhatsApp:ApiKey` e `WhatsApp:ApiUrl` da config
+- `ApplicationUser.WhatsAppNumber` (string?) e `ApplicationUser.WhatsAppOptIn` (bool) — campos no modelo
+- Botoes "Cobrar via WhatsApp" nas paginas de pagamentos → abrem `wa.me` link (URL no browser, nao API)
+- Compartilhar escalacao no WhatsApp → `wa.me` link
+
+**O que falta**:
+1. Adicionar secao `WhatsApp` no `appsettings.json` e `appsettings.Development.json`:
+   ```json
+   "WhatsApp": {
+     "Enabled": false,
+     "ApiUrl": "",
+     "ApiKey": "",
+     "Provider": "evolution-api"
+   }
+   ```
+
+2. Criar tela de opt-in no perfil (`Pages/Profile.razor`):
+   - Campo "Numero WhatsApp" (input tel com mascara +55)
+   - Toggle "Receber notificacoes via WhatsApp"
+   - Salvar em `ApplicationUser.WhatsAppNumber` e `WhatsAppOptIn`
+
+3. Registrar `WhatsAppNotificationService` no DI (`Program.cs`):
+   ```csharp
+   builder.Services.AddHttpClient<WhatsAppNotificationService>();
+   ```
+
+**Arquivos**:
+- `appsettings.json`, `appsettings.Development.json`
+- `Pages/Profile.razor` (adicionar secao WhatsApp)
+- `Program.cs` (registrar no DI)
+- `Services/Notification/WhatsAppNotificationService.cs` (adicionar check de `Enabled`)
+
+### Fase 2 — Envio real de notificacoes WhatsApp
+
+**Substituir links `wa.me` por chamadas reais via API**:
+
+1. Em `Pages/Groups/Payments.razor.cs`, metodo `OpenWhatsAppDelinquency`:
+   - Se `WhatsApp:Enabled == true` e usuario tem `WhatsAppOptIn == true`:
+     → Chamar `WhatsAppNotificationService.SendPaymentReminderAsync()`
+   - Se nao: manter comportamento atual (abrir `wa.me` link)
+
+2. Em `Pages/Futsal/Escalacao.razor.cs`, metodo `ShareOnWhatsApp`:
+   - Se `WhatsApp:Enabled == true`:
+     → Enviar para todos os jogadores confirmados com opt-in
+   - Se nao: manter `wa.me` link
+
+3. Adicionar notificacoes automaticas (novos triggers):
+   - Evento criado → notificar membros do grupo com opt-in
+   - Pagamento confirmado → notificar jogador
+   - Solicitacao aprovada → notificar solicitante
+
+**Arquivos**:
+- `Pages/Groups/Payments.razor.cs`
+- `Pages/Futsal/Escalacao.razor.cs`
+- `Services/Notification/WhatsAppNotificationService.cs` (adicionar metodos de template)
+
+### Fase 3 — Admin: toggle WhatsApp + log de envios
+
+1. Em `Pages/Admin/AdminSettings.razor` (ou criar se nao existir):
+   - Toggle para habilitar/desabilitar WhatsApp
+   - Campo para ApiUrl e ApiKey (masked)
+   - Botao "Testar envio" → envia mensagem de teste para o admin
+
+2. Audit trail:
+   - Adicionar `AuditEvents.WhatsAppNotificationSent` e `AuditEvents.WhatsAppNotificationFailed`
+   - Logar cada envio no `LogService` com entityType=Notification
+
+**Arquivos**:
+- `Pages/Admin/AdminSettings.razor` (ou secao em AdminGateways)
+- `Services/Core/AuditEvents.cs` (novos eventos)
+- `Services/Notification/WhatsAppNotificationService.cs` (adicionar logging)
+
+### Fase 4 — Baseline Operacional por Gateway
+
+**O que e isso**: Um painel que mostra metricas semanais por gateway de pagamento. Serve para detectar degradacao (ex: EfiBank comecar a falhar mais) antes que vire incidente.
+
+**O que ja existe**:
+- `AdminPayments.razor.cs` L459-492 — `gatewayTelemetry` com Pending/StalePending/PaidTotal por gateway
+- `PendingWebhooksAlertService` — alerta quando webhooks ficam pendentes >1h
+- `DashboardMetricsService` — conta users e quote queries (basico)
+
+**O que criar**:
+
+1. Criar `Services/Payment/GatewayBaselineService.cs`:
+   ```csharp
+   public class GatewayBaselineSnapshot
+   {
+       public string GatewayName { get; set; }
+       public int TransactionsLast7Days { get; set; }
+       public int TransactionsLast30Days { get; set; }
+       public int SuccessCount { get; set; }
+       public int FailureCount { get; set; }
+       public int PendingCount { get; set; }
+       public decimal SuccessRate { get; set; }      // SuccessCount / Total * 100
+       public TimeSpan AverageConfirmationTime { get; set; }  // tempo medio entre criacao e pagamento
+       public DateTime? LastSuccessfulPayment { get; set; }
+       public string TrendLabel { get; set; }        // "estavel", "melhorando", "degradando"
+   }
+   ```
+
+2. Implementar consulta que agrupa por `PaymentGatewayName` e calcula:
+   - Volume (7d e 30d) via `ConfirmedAt` timestamp
+   - Taxa de sucesso: `Paid / (Paid + Failed + Pending) * 100`
+   - Tempo medio de confirmacao: `AVG(PaidAt - ConfirmedAt)` para pagamentos Paid
+   - Trend: comparar taxa de sucesso semana atual vs semana anterior
+   - Ultimo pagamento bem-sucedido: `MAX(PaidAt) WHERE Status=Paid`
+
+3. Criar componente `Shared/Components/GatewayBaselinePanel.razor`:
+   - Tabela com colunas: Gateway | Volume 7d | Volume 30d | Taxa Sucesso | Tempo Medio | Ultimo OK | Trend
+   - Cores: verde (>95% sucesso), amarelo (80-95%), vermelho (<80%)
+   - Trend com seta: ↑ melhorando, → estavel, ↓ degradando
+
+4. Adicionar painel em `Pages/Admin/AdminPayments.razor`:
+   - Nova secao "Baseline por Gateway" abaixo da telemetria existente
+   - Carregar dados do `GatewayBaselineService` no `OnInitializedAsync`
+
+**Arquivos**:
+- `Services/Payment/GatewayBaselineService.cs` (novo)
+- `Shared/Components/GatewayBaselinePanel.razor` + `.razor.css` (novo)
+- `Pages/Admin/AdminPayments.razor` + `.razor.cs` (adicionar secao)
+- `Program.cs` (registrar `GatewayBaselineService` como Scoped)
+
+### Fase 5 — Testes do GatewayBaselineService
+
+```csharp
+// Confirmai.Tests/GatewayBaselineServiceTests.cs
+[Fact] GetBaseline_WithPayments_CalculatesRates()
+[Fact] GetBaseline_NoPayments_ReturnsEmptyList()
+[Fact] GetBaseline_MultipleGateways_ReturnsAll()
+[Fact] GetBaseline_TrendCalculation_DetectsDegradation()
+```
+
+Usar `TestDataFactory.CreateDbContext()` com pagamentos em diferentes datas/estados.
+
+---
+
+## Mapeamento de Testes -- Gaps e Oportunidades
+
+### Estado atual
+- **1.674 testes** em **192 arquivos** de teste
+- **Cobertura**: 9.9% (11.733/118.427 linhas)
+- **Meta**: 15%+
+
+### Services SEM cobertura de testes (5/87)
+
+| Service | Dominio | Prioridade | Justificativa |
+|---------|---------|------------|---------------|
+| `PingController` | Controllers | **P1** | Novo no C14, endpoint critico de keep-alive, facil de testar |
+| `CityService` | Utility | P2 | CRUD de cidades, depende de DB |
+| `GroupMetricsService` | Groups | P2 | Calculos de metricas por grupo |
+| `LocationService` | Utility | P3 | Servico auxiliar de localizacao |
+| `WhatsAppNotificationService` | Notification | P3 | Depende de API externa |
+
+### Testes recomendados para o Pleno
+
+**P1 — PingController (novo, facil, alto valor)**:
+```csharp
+// PingControllerTests.cs
+[Fact] Ping_Authorized_Returns200()    // GET /api/ping com user autenticado → 200
+[Fact] Ping_Anonymous_Returns401()     // GET /api/ping sem auth → 401/redirect
+```
+Usar `IntegrationTestWebAppFactory` + `HttpClient` com/sem auth.
+
+**P2 — GroupMetricsService**:
+```csharp
+[Fact] GetMetrics_WithEvents_CalculatesCorrectly()
+[Fact] GetMetrics_EmptyGroup_ReturnsZeros()
+```
+
+**P2 — CityService**:
+```csharp
+[Fact] GetCities_ByState_FiltersCorrectly()
+[Fact] GetCity_ById_ReturnsExpected()
+```
+
+### O que NAO precisa de teste (baixo ROI)
+- Componentes Blazor (sub-componentes de UI) — cobertura minima, alto custo
+- Models/DTOs sem logica — triviais
+- `LocationService` e `WhatsAppNotificationService` — dependencias externas
 
 ---
 
