@@ -399,7 +399,7 @@ footer.oldsite-footer {
         z-index: 9999;
         box-shadow: 0 4px 12px var(--shadow-md);
         max-height: 80vh;
-        overflow-y: auto;
+        overflow-y: hidden;
     }
 
     body .oldsite-top-nav.mobile-menu-open {
