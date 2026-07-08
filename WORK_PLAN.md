@@ -930,7 +930,79 @@ private async Task ApproveAllPending(int groupId)
 
 ---
 
-## Ciclo 16 -- Integracao WhatsApp Real + Baseline Operacional por Gateway
+## Ciclo 16 -- Mobile UX Fix
+
+**Branch**: `fix/ciclo16-mobile-ux`
+**1 commit por fase** dentro da branch. **1 PR** no final.
+Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
+
+### Contexto
+
+**Problema**: O layout mobile está totalmente quebrado. O comportamento foi replicado no Chrome DevTools (F12) ao alterar para mobile e diminuir a largura da tela. O layout estava ok em telas maiores, mas conforme a largura diminui, ele começa a se comportar da mesma forma que no celular pessoal.
+
+**Objetivo**: Corrigir todos os problemas de layout mobile para garantir uma experiência consistente em dispositivos móveis.
+
+### Fase 1 — Auditoria de problemas mobile
+
+**Ação**: Identificar todos os componentes e páginas com problemas de layout mobile.
+
+**Metodologia**:
+1. Usar Chrome DevTools (F12) em modo mobile (iPhone SE, iPhone 12 Pro, iPad)
+2. Navegar por todas as páginas principais:
+   - `/eventos` (home)
+   - `/grupos`
+   - `/grupo/{Id}` (detail)
+   - `/futsal`
+   - `/poker`
+   - `/meus-eventos`
+   - `/profile`
+   - `/admin`
+3. Documentar cada problema encontrado com:
+   - Página/componente
+   - Largura de tela onde o problema ocorre
+   - Descrição do comportamento incorreto
+   - Screenshot (opcional)
+
+**Arquivo de documentação**: `docs/ciclo16-mobile-auditoria.md` (criar para listar todos os problemas)
+
+### Fase 2 — Correção de problemas mobile (prioridade alta)
+
+**Ação**: Corrigir os problemas identificados na Fase 1, começando pelos mais críticos.
+
+**Abordagem**:
+1. Revisar breakpoints existentes em `site.css` e arquivos scoped
+2. Adicionar/ajustar media queries para telas mobile
+3. Corrigir overflow, wrapping, spacing e sizing
+4. Testar cada correção em múltiplos tamanhos de tela
+
+**Arquivos a modificar** (dependente da auditoria):
+- `wwwroot/css/site.css` (breakpoints globais)
+- `Pages/Index.razor.css` (home)
+- `Pages/Groups/Index.razor.css`
+- `Pages/Groups/Detail.razor.css`
+- `Pages/Futsal/Index.razor.css`
+- `Pages/Poker/Index.razor.css`
+- Outros arquivos CSS conforme necessário
+
+### Fase 3 — Testes mobile cross-browser
+
+**Ação**: Validar correções em múltiplos browsers e dispositivos.
+
+**Metodologia**:
+1. Testar em Chrome, Safari, Firefox (mobile)
+2. Validar em diferentes tamanhos de tela (320px, 375px, 414px, 768px)
+3. Verificar orientação portrait e landscape
+4. Testar scroll, zoom e interações touch
+
+### Fase 4 — Melhorias UX vindas de testes do app
+
+**Contexto**: Durante testes manuais do app após conclusão das fases 1-3, capturar correções e refinamentos identificados.
+
+**Implementação**: Documentar e implementar melhorias adicionais identificadas durante testes mobile.
+
+---
+
+## Ciclo 17 -- Integracao WhatsApp Real + Baseline Operacional por Gateway (MOVIDO)
 
 **Branch**: `feat/ciclo16-whatsapp-baseline`
 **1 commit por fase** dentro da branch. **1 PR** no final.
