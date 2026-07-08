@@ -930,17 +930,21 @@ private async Task ApproveAllPending(int groupId)
 
 ---
 
-## Ciclo 16 -- Mobile UX Fix
+## Ciclo 16 -- Mobile UX Fix (PRIORIDADE CRÍTICA)
 
 **Branch**: `fix/ciclo16-mobile-ux`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
 
-### Contexto
+### Contexto e Importância
 
-**Problema**: O layout mobile está totalmente quebrado. O comportamento foi replicado no Chrome DevTools (F12) ao alterar para mobile e diminuir a largura da tela. O layout estava ok em telas maiores, mas conforme a largura diminui, ele começa a se comportar da mesma forma que no celular pessoal.
+**Público predominante mobile**: Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A experiência mobile não é apenas uma melhoria UX, mas um requisito crítico de negócio.
 
-**Objetivo**: Corrigir todos os problemas de layout mobile para garantir uma experiência consistente em dispositivos móveis.
+**Problema identificado**: O layout mobile está totalmente quebrado. O comportamento foi replicado no Chrome DevTools (F12) ao alterar para mobile e diminuir a largura da tela. O layout estava ok em telas maiores, mas conforme a largura diminui, ele começa a se comportar da mesma forma que no celular pessoal.
+
+**Objetivo**: Corrigir todos os problemas de layout mobile para garantir uma experiência consistente e profissional em dispositivos móveis, que é o principal ponto de acesso dos usuários.
+
+**Prioridade**: CRÍTICA - Este ciclo deve receber máxima atenção e recursos, pois impacta diretamente a experiência do público principal do produto.
 
 ### Fase 1 — Auditoria de problemas mobile
 

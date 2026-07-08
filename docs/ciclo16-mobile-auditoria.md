@@ -1,8 +1,13 @@
-# Ciclo 16 - Auditoria de Problemas Mobile
+# Ciclo 16 - Auditoria de Problemas Mobile (PRIORIDADE CRÍTICA)
 
 **Data**: 08/07/2026
 **Branch**: `fix/ciclo16-mobile-ux`
+**Prioridade**: CRÍTICA - Público predominante mobile
 **Metodologia**: Chrome DevTools (F12) em modo mobile (iPhone SE, iPhone 12 Pro, iPad)
+
+## Contexto
+
+Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A experiência mobile não é apenas uma melhoria UX, mas um requisito crítico de negócio. Todos os problemas identificados nesta auditoria devem ser tratados com máxima prioridade.
 
 ## Problemas Identificados
 
