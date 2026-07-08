@@ -98,6 +98,20 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - 1.694/1.694 testes passando (+20 vs C14), 0 erros de build
 - **Problemas**: nenhum
 
+### Ciclo 16 (Pleno Local): Menu Mobile Hamburger (Em Andamento)
+- Branch: `fix/ciclo16-mobile-ux` | PR pendente
+- Fase 1: Implementação do menu hamburger (MainLayout.razor + MainLayout.razor.css)
+- Fase 2: Correção do z-index (site.css + MainLayout.razor.css)
+- Fase 3: Correção do city selector (CitySelector.razor.css)
+- Fase 4: Reorganização do menu mobile (internacionalização primeiro)
+- Fase 5: Ajuste do botão "Meus Eventos" (Index.razor.css)
+- Fase 6: Linhas separatorias e layout (MainLayout.razor.css)
+- Fase 7: Background da internacionalização (MainLayout.razor.css)
+- Fase 8: Textos em mensagens e perfil (MainLayout.razor + MainLayout.razor.css)
+- Fase 9: Correção de cor/fonte (MainLayout.razor.css)
+- **Status**: Menu mobile funcional, estrutura CSS estabelecida
+- **Problemas**: Breakpoints inconsistentes (700px vs 768px), elementos fora do media query
+
 ---
 
 ## Revisao Senior do Ciclo 12
