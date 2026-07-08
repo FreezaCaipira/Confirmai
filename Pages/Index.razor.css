@@ -72,13 +72,14 @@
     .my-events-link-btn {
         position: static;
         transform: none;
-        width: 100%;
+        width: auto;
         max-width: 100%;
         justify-content: center;
-        font-size: 0.75rem;
-        padding: 0.35rem 0.6rem;
-        white-space: normal;
-        overflow: visible;
+        font-size: 0.7rem;
+        padding: 0.3rem 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .my-events-link-btn i {
