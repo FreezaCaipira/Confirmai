@@ -291,9 +291,20 @@
     letter-spacing: 0.02em;
     color: var(--ci-accent);
     align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.sport-card-cta i {
+    font-size: 0.75rem;
 }
 
 .sport-card--futsal .sport-card-cta {
+    color: var(--green-bright);
+}
+
+.sport-card--futsal .sport-card-cta i {
     color: var(--green-bright);
 }
 
@@ -301,7 +312,15 @@
     color: var(--poker-text);
 }
 
+.sport-card--poker .sport-card-cta i {
+    color: var(--poker-text);
+}
+
 .sport-card--volleyball .sport-card-cta {
+    color: #93c5fd;
+}
+
+.sport-card--volleyball .sport-card-cta i {
     color: #93c5fd;
 }
 
@@ -309,10 +328,22 @@
     color: #99f6e4;
 }
 
+.sport-card--beachtennis .sport-card-cta i {
+    color: #99f6e4;
+}
+
 .sport-card--footvolley .sport-card-cta {
     color: var(--footvolley-accent);
 }
 
+.sport-card--footvolley .sport-card-cta i {
+    color: var(--footvolley-accent);
+}
+
 .sport-card--chess .sport-card-cta {
+    color: var(--chess-accent);
+}
+
+.sport-card--chess .sport-card-cta i {
     color: var(--chess-accent);
 }
