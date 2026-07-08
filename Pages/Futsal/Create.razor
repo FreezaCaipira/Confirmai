@@ -43,8 +43,7 @@
 
                 @* ── Identidade da partida ─────────────────────────────────────────────────── *@
                 <FutsalMatchIdentity
-                    GroupName="@form.GroupName"
-                    LocalName="@form.LocalName"
+                    Form="@form"
                     SubFormat="@subFormat"
                     PreselectedGroup="@preselectedGroup"
                     OnSubFormatChanged="@SubFormatChangedCallback" />
@@ -58,25 +57,20 @@
 
                 @* ── Data, hora e duração ───────────────────────────────────────────────────── *@
                 <DateTimeSelector
-                    Date="@form.Date"
-                    Time="@form.Time"
-                    DurationMinutes="@form.DurationMinutes"
+                    Form="@form"
                     OnTimeChange="@TimeChangeCallback" />
 
                 @* ── Vagas ──────────────────────────────────────────────────────────────────── *@
                 <SlotsAndGoalkeeperConfig
-                    MaxPlayers="@form.MaxPlayers"
-                    MaxGoalkeepers="@form.MaxGoalkeepers"
-                    RotateInGoal="@form.RotateInGoal"
+                    Form="@form"
                     OnRotateInGoalChanged="@RotateInGoalChangedCallback" />
 
                 @* ── Valor ──────────────────────────────────────────────────────────────────── *@
-                <PriceInput Price="@form.Price" />
+                <PriceInput Form="@form" />
 
                 @* ── Periodicidade ──────────────────────────────────────────────────────────── *@
                 <RecurrenceScheduler
-                    RecurrenceEnabled="@form.RecurrenceEnabled"
-                    SelectedDays="@form.SelectedDays"
+                    Form="@form"
                     OnToggleDay="@ToggleDayCallback" />
 
                 @* ── Privacidade: grupos são sempre privados ─────────────────────────────────── *@

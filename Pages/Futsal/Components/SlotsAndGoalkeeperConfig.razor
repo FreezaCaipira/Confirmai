@@ -1,33 +1,29 @@
+@using Confirmai.Pages.Futsal
+
 <fieldset class="form-section">
     <legend>Vagas</legend>
 
     <div class="form-row-2">
         <div class="form-group">
             <label>Vagas totais (linha + goleiros) <span class="required">*</span></label>
-            <InputNumber class="input" @bind-Value="@MaxPlayers" min="1" max="100" />
-            <ValidationMessage For="@(() => MaxPlayers)" class="validation-message" />
+            <InputNumber class="input" @bind-Value="@Form.MaxPlayers" min="1" max="100" />
+            <ValidationMessage For="@(() => Form.MaxPlayers)" class="validation-message" />
         </div>
         <div class="form-group">
             <label>Goleiros</label>
-            <InputNumber class="input" @bind-Value="@MaxGoalkeepers" min="0" max="10" disabled="@RotateInGoal" />
+            <InputNumber class="input" @bind-Value="@Form.MaxGoalkeepers" min="0" max="10" disabled="@Form.RotateInGoal" />
         </div>
     </div>
 
     <label class="switch-label switch-label--margin-top">
-        <input type="checkbox" @bind="RotateInGoal" @bind:after="HandleRotateInGoalChanged" />
+        <input type="checkbox" @bind="Form.RotateInGoal" @bind:after="HandleRotateInGoalChanged" />
         Revezar jogadores de linha no gol
     </label>
 </fieldset>
 
 @code {
     [Parameter]
-    public int MaxPlayers { get; set; } = 10;
-
-    [Parameter]
-    public int MaxGoalkeepers { get; set; } = 2;
-
-    [Parameter]
-    public bool RotateInGoal { get; set; }
+    public Create.CreateMatchForm Form { get; set; } = new();
 
     [Parameter]
     public EventCallback OnRotateInGoalChanged { get; set; }

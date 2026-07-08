@@ -1,21 +1,23 @@
+@using Confirmai.Pages.Futsal
+
 <fieldset class="form-section">
     <legend>Periodicidade</legend>
 
     <label class="switch-label">
-        <input type="checkbox" @bind="@RecurrenceEnabled" />
+        <input type="checkbox" @bind="@Form.RecurrenceEnabled" />
         Esta partida se repete semanalmente
     </label>
 
-    @if (RecurrenceEnabled)
+    @if (Form.RecurrenceEnabled)
     {
         <div class="form-group form-group--margin-top">
             <label>Dias da semana</label>
             <div class="weekday-grid">
                 @foreach (var (dow, label) in WeekdayOptions)
                 {
-                    <label class="weekday-chip @(SelectedDays.Contains(dow) ? "weekday-chip--on" : "")">
+                    <label class="weekday-chip @(Form.SelectedDays.Contains(dow) ? "weekday-chip--on" : "")">
                         <input type="checkbox"
-                               checked="@SelectedDays.Contains(dow)"
+                               checked="@Form.SelectedDays.Contains(dow)"
                                @onchange="e => HandleToggleDay(dow, (bool)(e.Value ?? false))" />
                         @label
                     </label>
@@ -27,10 +29,7 @@
 
 @code {
     [Parameter]
-    public bool RecurrenceEnabled { get; set; }
-
-    [Parameter]
-    public HashSet<DayOfWeek> SelectedDays { get; set; } = new();
+    public Create.CreateMatchForm Form { get; set; } = new();
 
     [Parameter]
     public EventCallback<(DayOfWeek, bool)> OnToggleDay { get; set; }

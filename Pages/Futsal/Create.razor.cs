@@ -23,7 +23,7 @@ public partial class Create
 
     // ── Form model ──────────────────────────────────────────────────────────
 
-    private sealed class CreateMatchForm
+    public sealed class CreateMatchForm
     {
         // GroupName só é usado quando nenhum grupo é pré-selecionado (legacy flow)
         [StringLength(120, ErrorMessage = "Máximo 120 caracteres.")]
