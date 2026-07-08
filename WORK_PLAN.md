@@ -1022,6 +1022,26 @@ Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName
 3. Verificar orientação portrait e landscape
 4. Testar scroll, zoom e interações touch
 
+**Status**: ⏳ Em andamento (instruções documentadas, aplicação rodando)
+
+**Aplicação rodando em**: http://localhost:5000
+
+**Instruções de teste documentadas em**: `docs/ciclo16-mobile-auditoria.md`
+
+**Checklist por página** (para testes manuais):
+- `/eventos` - Sidebar, sports tabs, event cards, city selector
+- `/grupos` - Grid de grupos, cards, botões
+- `/grupo/{Id}` - Header, admin bar, events tabs, pending requests
+- `/futsal` - Event cards, time badges, meta chips
+- `/poker` - Event cards, dropdown menu, type badges
+- `/meus-eventos` - Header, view tabs, create buttons, event cards
+- `/profile` - Profile page, avatar, edit form, chat thread
+- `/admin` - Settings card, security panels, KPI grid, nav
+
+**Browsers para testar**: Chrome, Firefox, Edge, Safari (se disponível)
+
+**Tamanhos de tela**: 320px, 375px, 414px, 768px, 1024px
+
 ### Fase 4 — Melhorias UX vindas de testes do app
 
 **Contexto**: Durante testes manuais do app após conclusão das fases 1-3, capturar correções e refinamentos identificados.
