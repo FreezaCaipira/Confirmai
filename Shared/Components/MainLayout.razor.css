@@ -447,6 +447,8 @@ footer.oldsite-footer {
         border-bottom: 1px solid var(--ci-border-dim);
         min-height: auto;
         box-sizing: border-box;
+        color: var(--ci-text);
+        text-decoration: none;
     }
 
     body .oldsite-top-nav .oldsite-top-nav-profile-link {
@@ -456,6 +458,13 @@ footer.oldsite-footer {
         border-bottom: 1px solid var(--ci-border-dim);
         min-height: auto;
         box-sizing: border-box;
+        color: var(--ci-text);
+        text-decoration: none;
+    }
+
+    body .oldsite-top-nav .oldsite-top-nav-mailbox-icon:hover,
+    body .oldsite-top-nav .oldsite-top-nav-profile-link:hover {
+        background: var(--ci-accent-opacity-xs);
     }
 
     body .oldsite-top-nav .oldsite-top-nav-logout {
