@@ -4,6 +4,10 @@
 <a href="@Href" class="sport-card sport-card--@SportClass">
     <div class="sport-card-header">
         <span class="sport-card-label">@Icon @Name</span>
+        @if (ComingSoon)
+        {
+            <span class="sport-card-badge">Em breve</span>
+        }
     </div>
     <div class="sport-card-body">
         <p class="sport-card-desc">@Description</p>
@@ -34,6 +38,9 @@
     [Parameter]
     public int? MatchCount { get; set; }
 
+    [Parameter]
+    public bool ComingSoon { get; set; }
+
     private string Icon => Sport switch
     {
         Sport.Futsal => "⚽",
@@ -47,7 +54,7 @@
 
     private string Name => Sport switch
     {
-        Sport.Futsal => "Futsal",
+        Sport.Futsal => "Futebol/Futsal",
         Sport.Poker => "Poker",
         Sport.Volleyball => "Vôlei",
         Sport.BeachTennis => "Beach Tennis",
