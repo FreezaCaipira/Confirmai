@@ -122,7 +122,49 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
 
 ### Página: `/grupo/{Id}` (Groups/Detail.razor)
 
-**Status**: Pendente auditoria
+**Status**: ✅ Corrigido e commitado (aa41b06)
+
+**Problemas identificados**:
+- Header e chips não se ajustavam para mobile
+- Admin bar com layout horizontal inadequado
+- Section header e filters com layout inadequado
+- Events tabs não se ajustavam para mobile
+- Pending requests com layout horizontal inadequado
+- Fontes e padding inadequados para telas pequenas
+
+**Correções aplicadas (events.css)**:
+- Expandir breakpoint <560px:
+  - detail-header-top: flex-direction: column, align-items: flex-start
+  - detail-chips: flex-wrap: wrap
+  - detail-admin-bar: flex-direction: column, width: 100%
+  - detail-admin-btn: width: 100%, justify-content: center
+  - detail-section-header: flex-direction: column
+  - detail-section-filters: width: 100%, flex-wrap: wrap
+- Expandir breakpoint <480px:
+  - detail-card: padding 1rem 0.8rem
+  - detail-title: font-size 1.1rem
+  - detail-sport-badge: font-size 0.7rem
+  - detail-chip: font-size 0.75rem
+  - detail-events-header: flex-direction: column
+  - detail-events-tabs: flex-direction: column, width: 100%
+  - detail-events-tab: flex: 1, justify-content: center
+  - pending-request-item: flex-direction: column
+  - pending-request-actions: width: 100%
+  - bulk-actions: width: 100%
+- Adicionar breakpoint <375px:
+  - detail-card: padding 0.85rem 0.6rem
+  - detail-title: font-size 1rem
+  - detail-sport-badge: font-size 0.65rem
+  - detail-chip: font-size 0.7rem
+  - detail-admin-btn: font-size 0.8rem
+  - detail-section-title: font-size 0.9rem
+  - detail-events-title: font-size 0.95rem
+  - detail-events-tab: font-size 0.75rem
+  - pending-request-item: padding 0.6rem 0.75rem
+  - pending-request-name: font-size 0.85rem
+  - pending-request-meta: flex-direction: column
+  - btn-approve, btn-reject: font-size 0.75rem
+  - detail-pix-notice: padding 0.75rem
 
 ### Página: `/futsal` (Futsal/Index.razor)
 
