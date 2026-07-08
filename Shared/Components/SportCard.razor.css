@@ -210,19 +210,19 @@
 }
 
 .sport-card--volleyball .sport-card-label {
-    color: var(--volleyball-text);
+    color: var(--volleyball-text-pale);
 }
 
 .sport-card--beachtennis .sport-card-label {
-    color: var(--beachtennis-text);
+    color: var(--beachtennis-text-pale);
 }
 
 .sport-card--footvolley .sport-card-label {
-    color: var(--footvolley-text);
+    color: var(--footvolley-text-pale);
 }
 
 .sport-card--chess .sport-card-label {
-    color: var(--chess-text);
+    color: var(--chess-text-pale);
 }
 
 
@@ -302,11 +302,11 @@
 }
 
 .sport-card--volleyball .sport-card-cta {
-    color: var(--volleyball-accent);
+    color: #93c5fd;
 }
 
 .sport-card--beachtennis .sport-card-cta {
-    color: var(--beachtennis-accent);
+    color: #99f6e4;
 }
 
 .sport-card--footvolley .sport-card-cta {
