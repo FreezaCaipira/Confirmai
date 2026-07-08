@@ -13,15 +13,52 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
 
 ### Página: `/eventos` (Index.razor)
 
-**Breakpoints existentes**:
-- `@media (max-width: 768px)` - Ajusta sports-tabs, my-events-link-btn, sports-grid
-- `@media (max-width: 640px)` - Ajusta hero, grid, city-selector
+**Screenshots analisados**: 1.PNG a 6.PNG (crescimento progressivo de largura)
 
-**Problemas potenciais**:
-- [ ] Investigar comportamento abaixo de 640px (iPhone SE: 375px)
-- [ ] Verificar overflow horizontal em telas muito pequenas
-- [ ] Validar wrapping dos cards de esporte
-- [ ] Testar city-selector em mobile
+**1.PNG - Largura muito pequena (~320px)**:
+- [ ] Sidebar ocupa largura total horizontalmente, navegadores ficam muito pequenos
+- [ ] Cards de esporte não visíveis ou cortados
+- [ ] Hero title muito grande para o espaço disponível
+- [ ] Overflow horizontal evidente
+
+**2.PNG - Largura pequena (~375px - iPhone SE)**:
+- [ ] Sidebar ainda ocupa muito espaço horizontal
+- [ ] Navegação horizontal com scroll no sidebar
+- [ ] Cards de esporte começam a aparecer mas layout comprimido
+- [ ] City-selector quebrado ou cortado
+
+**3.PNG - Largura média-pequena (~480px)**:
+- [ ] Sidebar ainda em modo horizontal ocupando espaço significativo
+- [ ] Grid de cards ainda não se ajustou para coluna única
+- [ ] Elementos sobrepostos ou com spacing inadequado
+- [ ] Botão "Meus Eventos" posicionado incorretamente
+
+**4.PNG - Largura média (~640px)**:
+- [ ] Sidebar começa a se ajustar mas ainda ocupa espaço
+- [ ] Grid de cards em transição entre multi-coluna e single-coluna
+- [ ] Filtros e city-selector com layout inconsistente
+- [ ] Padding/margin inadequado para o tamanho
+
+**5.PNG - Largura média-grande (~768px - tablet portrait)**:
+- [ ] Sidebar ainda visível quando deveria ser colapsada
+- [ ] Grid de cards em layout intermediário não otimizado
+- [ ] Elementos de UI não aproveitando o espaço disponível
+- [ ] Responsividade inconsistente entre componentes
+
+**6.PNG - Largura grande (~980px+)**:
+- [ ] Layout começa a se estabilizar mas ainda com problemas
+- [ ] Sidebar em tamanho intermediário não ideal
+- [ ] Cards e elementos com spacing desproporcional
+- [ ] Transição para desktop não suave
+
+**Problemas gerais identificados**:
+- [ ] Sidebar não colapsa adequadamente em mobile
+- [ ] Grid de cards não responde de forma consistente aos breakpoints
+- [ ] Overflow horizontal em múltiplas larguras
+- [ ] Elementos fixos (como "Meus Eventos") não se reposicionam corretamente
+- [ ] City-selector e filtros não se adaptam ao espaço disponível
+- [ ] Transições entre breakpoints não suaves
+- [ ] Falta de breakpoint padrão para telas muito pequenas (<375px)
 
 ### Página: `/grupos` (Groups/Index.razor)
 
