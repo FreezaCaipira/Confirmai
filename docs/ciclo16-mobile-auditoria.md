@@ -431,21 +431,27 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
 - Descrição do problema
 - Screenshot (opcional)
 
+## Breakpoints Globais (site.css)
+
 **Breakpoints identificados**:
 - `@media (max-width: 980px)` - Sidebar reduzida
 - `@media (max-width: 700px)` - Sidebar horizontal, main sem margin-left
+- `@media (max-width: 480px)` - **NOVO**: Celulares médios (iPhone 12/13 Pro, Android grandes)
+- `@media (max-width: 375px)` - Mobile muito pequeno
 - `@media (max-width: 760px)` - Vários componentes
-- `@media (max-width: 480px)` - Alguns componentes específicos
 - `@media (max-width: 520px)` - Componentes específicos
 - `@media (max-width: 1024px)` - Componentes específicos
 - `@media (max-width: 1120px)` - Componentes específicos
 - `@media (max-width: 1180px)` - Componentes específicos
-- `@media (max-width: 1280px)` - Componentes específicos
 
-**Observação**: Muitos breakpoints diferentes sem padronização clara. Possível causa de inconsistências.
+### Correção Adicional: Menu Superior em Celulares
 
-## Próximos Passos
+**Problema identificado**: Menu superior quebrava em celulares (mas funcionava em iPads)
 
-1. Testar cada página em Chrome DevTools com diferentes tamanhos de tela
-2. Documentar problemas específicos com screenshots
-3. Priorizar correções por criticidade
+**Correção aplicada (site.css)**:
+- Adicionado breakpoint `<480px` para celulares médios (iPhone 12/13 Pro, Android grandes)
+- Reduzido padding e gap da sidebar
+- Font-size dos links do menu: 0.68rem em <480px, 0.62rem em <375px
+- Isso garante que o menu não quebre em dispositivos entre 375px e 480px
+
+**Commit**: 3969373
