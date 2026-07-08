@@ -52,13 +52,45 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
 - [ ] Transição para desktop não suave
 
 **Problemas gerais identificados**:
-- [ ] Sidebar não colapsa adequadamente em mobile
-- [ ] Grid de cards não responde de forma consistente aos breakpoints
-- [ ] Overflow horizontal em múltiplas larguras
-- [ ] Elementos fixos (como "Meus Eventos") não se reposicionam corretamente
-- [ ] City-selector e filtros não se adaptam ao espaço disponível
-- [ ] Transições entre breakpoints não suaves
-- [ ] Falta de breakpoint padrão para telas muito pequenas (<375px)
+- [x] Sidebar não colapsa adequadamente em mobile
+- [x] Grid de cards não responde de forma consistente aos breakpoints
+- [x] Overflow horizontal em múltiplas larguras
+- [x] Elementos fixos (como "Meus Eventos") não se reposicionam corretamente
+- [x] City-selector e filtros não se adaptam ao espaço disponível
+- [x] Transições entre breakpoints não suaves
+- [x] Falta de breakpoint padrão para telas muito pequenas (<375px)
+
+### Correções Aplicadas (/eventos)
+
+**site.css**:
+- Ajustado sidebar para mobile (<700px): reduzido padding de 0.4rem para 0.3rem
+- Adicionado `-webkit-overflow-scrolling: touch` para scroll suave no sidebar
+- Reduzido fontes de navegação de 0.74rem para 0.7rem
+- Reduzido padding de links de 0.45rem 0.65rem para 0.35rem 0.5rem
+- Adicionado breakpoint <375px para telas muito pequenas:
+  - Padding sidebar: 0.25rem 0
+  - Fontes navegação: 0.65rem
+  - Padding links: 0.3rem 0.4rem
+  - Padding main-content: 0.5rem 0.4rem
+
+**Index.razor.css**:
+- Ajustado sports-tabs para mobile: flex-direction: column com gap 0.5rem
+- Ajustado my-events-link-btn: width 100%, justify-content: center
+- Ajustado sports-grid: grid-template-columns: 1fr com gap 1rem
+- Adicionado breakpoint <375px:
+  - Hero title: 1.25rem (de 1.45rem)
+  - Hero sub: 0.85rem
+  - Sport card padding: 1.25rem 1rem 1rem
+  - Sport card icon: 2.2rem (de 2.8rem)
+  - Sport card name: 1.2rem (de 1.45rem)
+  - Sport card desc: 0.85rem
+  - Sport card CTA: 0.8rem
+  - City selector inputs: font-size 0.85rem, padding reduzido
+  - My conf card: padding 0.5rem 0.6rem
+  - My conf name: 0.85rem
+  - My conf btn: font-size 0.7rem, padding 0.25rem 0.5rem
+
+**Status**: ✅ Corrigido e commitado (46b7be7)
 
 ### Página: `/grupos` (Groups/Index.razor)
 
