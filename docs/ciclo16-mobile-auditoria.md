@@ -455,3 +455,197 @@ Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A
 - Isso garante que o menu não quebre em dispositivos entre 375px e 480px
 
 **Commit**: 3969373
+
+## Fase 4 — Menu Mobile Hamburger (Correções Críticas)
+
+**Status**: ✅ Corrigido e commitado (Branch: fix/ciclo16-mobile-ux)
+
+### Problemas Identificados
+
+1. **Menu superior quebrava em celulares** (mas funcionava em iPads)
+2. **Menu hamburger abria por trás do layout** (z-index não funcionava)
+3. **City selector extrapolava suas divs** em mobile
+4. **Menu mobile desconfigurado visualmente** (internacionalização não aparecia primeiro)
+5. **Botão "Meus Eventos" extrapolava horizontalmente**
+6. **Linhas separatorias extrapolavam a direita do menu**
+7. **Faltava linha divisória acima do sair**
+8. **Background da internacionalização extrapolava/desalinhado**
+9. **Ícones de mensagens e perfil sem textos em mobile**
+
+### Correções Aplicadas
+
+#### 1. Implementação do Menu Hamburger (MainLayout.razor + MainLayout.razor.css)
+
+**Problema**: Menu superior quebrava em celulares, precisava de menu hamburger.
+
+**Solução**:
+- Adicionado botão `.mobile-menu-toggle` no MainLayout.razor
+- Adicionado estado `isMobileMenuOpen` e método `ToggleMobileMenu()`
+- CSS: menu hamburger visível apenas em `<700px`
+- CSS: menu dropdown com `position: absolute`, `z-index: 9999`
+
+**Commits**:
+- 8812f16: Implementação inicial do menu hamburger
+- 2c2193d: Reorganização do menu (internacionalização primeiro)
+
+#### 2. Correção do Z-Index (site.css + MainLayout.razor.css)
+
+**Problema**: Menu hamburger abria por trás do layout existente.
+
+**Causa**: `isolation: isolate` no header criava novo stacking context, impedindo z-index de funcionar.
+
+**Solução**:
+- Removido `isolation: isolate` de `.oldsite-header` no site.css
+- Adicionado `z-index: 100` ao header
+- Aumentado especificidade no MainLayout.razor.css usando `body .oldsite-top-nav`
+
+**Commits**:
+- 8812f16: Correção inicial do z-index
+- dbd2338: Aumento de especificidade CSS
+
+#### 3. Correção do City Selector (CitySelector.razor.css)
+
+**Problema**: City selector extrapolava suas divs em mobile.
+
+**Solução**:
+- Adicionado media query `<700px` no CitySelector.razor.css
+- Flex-direction: column, width 100%, gap 0.4rem
+- City-select: min-width: 0, width 100%
+- Adicionado media query `<375px` para telas muito pequenas
+- Padding e font-size reduzidos
+
+**Commit**: 8812f16
+
+#### 4. Reorganização do Menu Mobile (MainLayout.razor + MainLayout.razor.css)
+
+**Problema**: Internacionalização não aparecia primeiro no menu mobile.
+
+**Solução**:
+- Reordenado elementos no MainLayout.razor (nav-language-flags antes dos links)
+- CSS: `order: -1` para nav-language-flags
+- CSS: `position: static`, `transform: none` (era absolute com transform)
+- CSS: `z-index: auto` (era 1, links tinham 2)
+
+**Commits**:
+- 2c2193d: Reorganização inicial
+- dbd2338: Correção de especificidade e position/transform
+
+#### 5. Ajuste do Botão "Meus Eventos" (Index.razor.css)
+
+**Problema**: Botão extrapolava horizontalmente (6º report).
+
+**Solução**:
+- Múltiplas tentativas de ajuste (font-size, padding, white-space)
+- Solução final: `width: auto`, `max-width: 100%`
+- `white-space: nowrap`, `overflow: hidden`, `text-overflow: ellipsis`
+- Removido ícone (`display: none`) para reduzir largura
+
+**Commits**:
+- ddf007b: Ajuste inicial
+- 3787ce4: Diminuição vertical (revertido)
+- caab903: Remoção de ícone
+- 30c9cee: Ajuste final (width: auto)
+
+#### 6. Linhas Separatorias e Layout (MainLayout.razor.css)
+
+**Problema**: Linhas separatorias extrapolavam a direita, faltava linha acima do sair.
+
+**Solução**:
+- Adicionado `overflow: hidden` ao menu container
+- Adicionado `box-sizing: border-box` a todos os elementos
+- Adicionado `border-top` ao `.oldsite-top-nav-logout`
+- Removido `max-height` e `overflow-y` (causava barra de scroll)
+
+**Commits**:
+- 03a3f93: Correção das linhas separatorias
+- 3f6c1bf: Remoção da barra de scroll (revertido)
+- 3787ce4: Remoção de max-height/overflow-y
+
+#### 7. Background da Internacionalização (MainLayout.razor.css)
+
+**Problema**: Background extrapolava à direita e tinha lacuna à esquerda.
+
+**Solução**:
+- Removido `max-width` e `overflow` do nav-language-flags
+- Adicionado `box-sizing: border-box`
+- Padding: `0.5rem` (completo)
+
+**Commits**:
+- 03a3f93: Correção do background
+- 3787ce4: Ajuste de padding (revertido)
+- 03a3f93: Volta ao padding completo
+
+#### 8. Textos em Mensagens e Perfil (MainLayout.razor + MainLayout.razor.css)
+
+**Problema**: Ícones de mensagens e perfil sem textos em mobile.
+
+**Solução**:
+- Adicionado `<span class="mobile-nav-text">` com textos no MainLayout.razor
+- CSS: `display: none` por padrão (desktop)
+- CSS: `display: inline` em `<700px` (mobile)
+- CSS: `margin-left: 0.5rem` para espaçamento
+
+**Commit**: 14f3eb3
+
+#### 9. Correção de Cor/Fonte (MainLayout.razor.css)
+
+**Problema**: Ícones de mensagens e perfil com cor/fonte diferentes.
+
+**Solução**:
+- Tentativa inicial: adicionar color, font-size, font-weight, etc.
+- **Revertido**: isso afetava o layout da web
+- Solução final: manter apenas estilos de layout (width, padding, border, box-sizing)
+- Deixar cor/fonte herdar do site.css
+
+**Commits**:
+- d3bef78: Adição de cor/fonte
+- 5bc08e8: Adição de display/gap/font
+- c521904: Revert (remoção de estilos que afetavam web)
+
+### Estrutura CSS Final
+
+**Princípios**:
+1. Todos os estilos mobile dentro de `@media (max-width: 700px)`
+2. Não influenciar layout da web (estilos específicos apenas para mobile)
+3. Aumentar especificidade apenas quando necessário (`body .oldsite-top-nav`)
+4. Usar `box-sizing: border-box` para evitar overflow
+5. Herdar estilos do site.css sempre que possível
+
+**Breakpoints**:
+- `<700px`: Menu mobile habilitado
+- `<375px`: Ajustes para telas muito pequenas
+
+### Commits da Fase 4
+
+1. **8812f16**: Implementação do menu hamburger e correção do city selector
+2. **2c2193d**: Reorganização do menu (internacionalização primeiro)
+3. **ddf007b**: Correção do overflow do menu e botão meus eventos
+4. **acb8ba0**: Correção da sobreposição do menu e separadores
+5. **dbd2338**: Correção da especificidade CSS e botão meus eventos
+6. **3f6c1bf**: Remoção da barra de scroll visível
+7. **3787ce4**: Correção da barra scroll, lacuna internacionalização e botão
+8. **caab903**: Correção do background internacionalização e botão meus eventos
+9. **03a3f93**: Correção das linhas separatorias, background e linha acima do sair
+10. **14f3eb3**: Adição de textos às opções mensagens e perfil no menu mobile
+11. **d3bef78**: Correção da coloração dos ícones de mensagens e perfil
+12. **5bc08e8**: Correção da fonte e ícones de mensagens e perfil
+13. **c521904**: Revert - remoção de estilos que afetavam layout da web
+14. **30c9cee**: Ajuste final do botão meus eventos (width: auto)
+
+### Status Final
+
+✅ Menu mobile completamente funcional
+✅ Internacionalização aparece primeiro
+✅ City selector não extrapola
+✅ Botão meus eventos ajustado
+✅ Linhas separatorias corretas
+✅ Textos em mensagens e perfil (mobile only)
+✅ Layout da web não afetado
+✅ Estrutura CSS organizada e escalável
+
+### Próximos Passos
+
+1. Testar em múltiplos dispositivos e browsers
+2. Aplicar mesma estrutura CSS a outras telas que precisarem de ajustes mobile
+3. Documentar padrões CSS estabelecidos para uso futuro
+
