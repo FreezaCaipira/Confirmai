@@ -208,11 +208,15 @@
 }
 
 /* -- Responsive ---------------------------- */
-@media (max-width: 640px) {
+@media (max-width: 700px) {
     .event-card {
         flex-wrap: wrap;
         gap: 0.75rem;
         padding: 0.85rem 1rem;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
     }
 
     .event-action {
