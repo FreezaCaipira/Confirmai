@@ -265,18 +265,18 @@
     z-index: 1;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     .identity-body {
         align-items: flex-start;
         padding: 12px 8px;
     }
 
     .identity-container {
-        --identity-rhythm-tight: 0.48rem;
-        --identity-rhythm-base: 0.72rem;
-        --identity-rhythm-loose: 0.92rem;
+        --identity-rhythm-tight: 0.55rem;
+        --identity-rhythm-base: 0.85rem;
+        --identity-rhythm-loose: 1.1rem;
         width: min(480px, calc(100vw - 16px));
-        padding: 1.2rem 0.9rem 1rem;
+        padding: 1.5rem 1.2rem 1.3rem;
         border-radius: 12px;
     }
 
@@ -286,6 +286,24 @@
     }
 
     .identity-container > h2 {
-        font-size: 1.45rem;
+        font-size: 1.6rem;
+    }
+
+    .identity-container label {
+        font-size: 0.95rem;
+    }
+
+    .identity-container input,
+    .identity-container select,
+    .identity-container textarea {
+        font-size: 1rem;
+        padding: 0.7rem 0.9rem;
+    }
+
+    .identity-container button,
+    .identity-container input[type="submit"] {
+        font-size: 1.05rem;
+        padding: 0.75rem 1.2rem;
+        min-width: 200px;
     }
 }
