@@ -2254,6 +2254,18 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     border: 1px solid var(--ci-border);
     border-radius: 14px;
     box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+@media (max-width: 700px) {
+    .listing-block {
+        padding: 1rem 1rem 1.5rem;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
 }
 
 .groups-header {
