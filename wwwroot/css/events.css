@@ -3153,6 +3153,64 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         gap: 0.9rem;
     }
 
+    /* Simplify events table for mobile */
+    .events-table {
+        font-size: 0.78rem;
+    }
+
+    .events-table thead {
+        display: none;
+    }
+
+    .events-table tbody tr.events-table-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--ci-border-dim);
+    }
+
+    .events-table td {
+        display: block;
+        padding: 0;
+        border: none;
+    }
+
+    .et-cell {
+        gap: 0.6rem;
+    }
+
+    .et-cell-info {
+        gap: 0.1rem;
+    }
+
+    .et-date {
+        font-size: 0.82rem;
+    }
+
+    .et-time {
+        font-size: 0.74rem;
+    }
+
+    .et-players {
+        font-size: 0.8rem;
+    }
+
+    .events-access-col {
+        text-align: left;
+        margin-top: 0.25rem;
+    }
+
+    .event-access-btn {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .et-empty {
+        padding: 1.5rem 0.75rem;
+    }
+
     .group-card {
         min-height: 220px;
     }
