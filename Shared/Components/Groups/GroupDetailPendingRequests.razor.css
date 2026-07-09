@@ -1,15 +1,14 @@
 /* ── Pending Requests Styles ────────────────────────────────────────────── */
 
-.pending-requests-header {
+.detail-section-filters {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 1rem;
     flex-wrap: wrap;
 }
 
-.pending-requests-header select {
+.detail-section-filters .input.input--sm.input--width-auto {
     background: var(--ci-bg-input);
     color: var(--ci-text);
     border: 1px solid var(--ci-border);
@@ -20,17 +19,17 @@
     transition: border-color 0.15s, background 0.15s;
 }
 
-.pending-requests-header select:hover {
+.detail-section-filters .input.input--sm.input--width-auto:hover {
     border-color: var(--ci-accent);
 }
 
-.pending-requests-header select:focus {
+.detail-section-filters .input.input--sm.input--width-auto:focus {
     outline: none;
     border-color: var(--ci-accent);
     box-shadow: 0 0 0 2px var(--accent-opacity-xs);
 }
 
-.pending-requests-header select option {
+.detail-section-filters .input.input--sm.input--width-auto option {
     background: var(--ci-bg-card-deep);
     color: var(--ci-text);
     padding: 0.3rem 0.5rem;
@@ -103,7 +102,12 @@
     cursor: not-allowed;
 }
 
-.btn-clear {
+.btn-reject--sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.74rem;
+}
+
+.btn-cancel {
     background: var(--ci-bg-input);
     border: 1px solid var(--ci-border-dim);
     color: var(--ci-text-muted);
@@ -117,18 +121,23 @@
     transition: background 0.15s, border-color 0.15s;
 }
 
-.btn-clear:not(:disabled):hover {
+.btn-cancel:not(:disabled):hover {
     background: var(--ci-bg-mid);
     border-color: var(--ci-border);
     color: var(--ci-text);
 }
 
-.btn-clear:disabled {
+.btn-cancel:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }
 
-.pending-requests-list {
+.btn-cancel--sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.74rem;
+}
+
+.detail-section ul {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -179,6 +188,12 @@
     text-overflow: ellipsis;
 }
 
+.pending-request-email {
+    color: var(--ci-text-subtle);
+    font-size: 0.78rem;
+    margin-top: 0.1rem;
+}
+
 .pending-request-meta {
     display: flex;
     align-items: center;
@@ -186,6 +201,11 @@
     font-size: 0.78rem;
     color: var(--ci-text-subtle);
     margin-top: 0.15rem;
+}
+
+.pending-request-wait--urgent {
+    color: var(--amber);
+    font-weight: 600;
 }
 
 .pending-request-actions {
@@ -197,13 +217,13 @@
 
 /* Mobile responsive styles */
 @media (max-width: 760px) {
-    .pending-requests-header {
+    .detail-section-filters {
         flex-direction: column;
         align-items: stretch;
         gap: 0.75rem;
     }
 
-    .pending-requests-header select {
+    .detail-section-filters .input.input--sm.input--width-auto {
         width: 100%;
     }
 
