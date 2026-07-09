@@ -114,15 +114,74 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - Fase 12: Badge de aprovar no card do grupo (Index.razor.css position top)
 - Fase 13: Div de código para entrar em novo grupo mobile (events.css groups-block padding)
 - Fase 14: Scroll horizontal desnecessário na página de grupos (events.css box-sizing)
-- Fase 15: Botão de pagamentos no mobile (CONCLUÍDO - SOLUÇÃO: modificar site.css diretamente)
+- Fase 15: Botão de pagamentos no mobile (BLOQUEADO - NECESSITA DIRECIONAMENTO DO SENIOR)
 - **Status**: Menu mobile funcional, estrutura CSS estabelecida
 - **Problemas**: Breakpoints inconsistentes (700px vs 768px), elementos fora do media query
-- **PROBLEMA RESOLVIDO FASE 15**: Botão de pagamentos não acompanhava os demais botões no mobile. Tentativas anteriores falharam:
-  - Adicionar classe `oldsite-top-nav-payments-link` ao HTML
-  - Usar seletor de atributo `a[href="/payments"]`
-  - Usar `!important` para forçar estilos
-  - Adicionar classe compartilhada `oldsite-top-nav-link` a todos os links
-- **SOLUÇÃO FINAL**: Modificar diretamente o site.css no media query `@media (max-width: 700px)` para aplicar estilos corretos a `body .oldsite-top-nav a` (width 100%, padding 0.6rem 0.8rem, text-align left, border-bottom, border-right none, min-height auto, box-sizing border-box). Isso resolve o problema de specificity pois site.css é carregado globalmente via _Host.cshtml e tem prioridade sobre MainLayout.razor.css.
+- **PROBLEMA CRÍTICO FASE 15**: Botão de pagamentos não acompanha os demais botões no mobile. Nenhuma das tentativas funcionou.
+
+## Documentação Completa das Tentativas - Fase 15
+
+### Tentativa 1: Adicionar classe específica ao HTML
+- **Arquivo**: MainLayout.razor
+- **Mudança**: Adicionada classe `oldsite-top-nav-payments-link` ao link de pagamentos
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Criados estilos mobile específicos para `.oldsite-top-nav-payments-link`
+- **Resultado**: Sem efeito visual
+
+### Tentativa 2: Usar seletor de atributo
+- **Arquivo**: MainLayout.razor
+- **Mudança**: Removida classe `oldsite-top-nav-payments-link`
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Usar seletor de atributo `a[href="/payments"]` para estilos mobile
+- **Resultado**: Sem efeito visual
+
+### Tentativa 3: Usar !important para forçar estilos
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Adicionar `!important` a todos os estilos mobile de `body .oldsite-top-nav > a` e `a[href="/payments"]`
+- **Resultado**: Sem efeito visual
+
+### Tentativa 4: Adicionar classe compartilhada a todos os links
+- **Arquivo**: MainLayout.razor
+- **Mudança**: Adicionar classe `oldsite-top-nav-link` a todos os links de navegação (grupos, pagamentos, integration, admin)
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Criar estilos mobile específicos para `.oldsite-top-nav-link` com `!important`
+- **Resultado**: Sem efeito visual
+
+### Tentativa 5: Modificar site.css diretamente
+- **Arquivo**: site.css
+- **Mudança**: Alterar media query `@media (max-width: 700px)` para `body .oldsite-top-nav a`:
+  - width 100%, padding 0.6rem 0.8rem, text-align left, border-bottom, border-right none, min-height auto, box-sizing border-box
+  - Remover flex: 1 1 auto, min-width 132px, min-height 44px
+- **Resultado**: Sem efeito visual mesmo após dotnet clean + build
+
+### Tentativa 6: Remover !important do MainLayout.razor.css
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Remover `!important` para manter consistência com site.css
+- **Resultado**: Sem efeito visual
+
+## Análise Técnica
+
+### Estrutura CSS
+- site.css é carregado globalmente via _Host.cshtml
+- MainLayout.razor.css é carregado como scoped CSS com atributos `b-xxx`
+- site.css tem estilos `body .oldsite-top-nav a` com alta especificidade
+- MainLayout.razor.css tem estilos mobile em media query `@media (max-width: 700px)`
+
+### Possíveis Causas
+1. **Cache do navegador**: Hot reload não aplicando scoped CSS corretamente (regra 21)
+2. **Blazor CSS isolation**: Scoped CSS pode não estar aplicando corretamente
+3. **Specificidade**: Estilos globais do site.css podem estar prevalecendo
+4. **Media query não sendo ativada**: Breakpoint pode não estar sendo atingido
+5. **Estrutura HTML**: Link de pagamentos está dentro de AuthorizeView, pode afetar aplicação de estilos
+
+### Testes Realizados
+- dotnet clean + dotnet build
+- Ctrl+F5 (hard refresh) no navegador
+- Verificação de media query em devtools
+- Verificação de estilos aplicados no elemento
+
+## Solicitação ao Senior
+Favor direcionar como resolver o problema do botão de pagamentos no mobile. Todas as tentativas de CSS falharam sem efeito visual.
 
 ---
 
