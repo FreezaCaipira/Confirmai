@@ -3183,6 +3183,14 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         border: none;
     }
 
+    .events-table td:nth-child(3),
+    .events-table td:nth-child(4) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
     .et-cell {
         gap: 0.6rem;
     }
@@ -3205,7 +3213,6 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
     .events-access-col {
         text-align: left;
-        margin-top: 0.25rem;
     }
 
     .event-access-btn {
