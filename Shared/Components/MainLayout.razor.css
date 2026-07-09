@@ -428,26 +428,26 @@ footer.oldsite-footer {
     }
 
     body .oldsite-top-nav > a {
-        width: 100%;
-        padding: 0.6rem 0.8rem;
-        text-align: left;
-        border-radius: 0;
+        width: 100% !important;
+        padding: 0.6rem 0.8rem !important;
+        text-align: left !important;
+        border-radius: 0 !important;
         transition: background 0.15s;
-        border-bottom: 1px solid var(--ci-border-dim);
-        border-right: none;
+        border-bottom: 1px solid var(--ci-border-dim) !important;
+        border-right: none !important;
         z-index: auto;
         min-height: auto;
         box-sizing: border-box;
     }
 
     body .oldsite-top-nav a[href="/payments"] {
-        width: 100%;
-        padding: 0.6rem 0.8rem;
-        text-align: left;
-        border-radius: 0;
+        width: 100% !important;
+        padding: 0.6rem 0.8rem !important;
+        text-align: left !important;
+        border-radius: 0 !important;
         transition: background 0.15s;
-        border-bottom: 1px solid var(--ci-border-dim);
-        border-right: none;
+        border-bottom: 1px solid var(--ci-border-dim) !important;
+        border-right: none !important;
         z-index: auto;
         min-height: auto;
         box-sizing: border-box;
