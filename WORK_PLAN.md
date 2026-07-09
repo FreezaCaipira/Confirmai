@@ -114,15 +114,15 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - Fase 12: Badge de aprovar no card do grupo (Index.razor.css position top)
 - Fase 13: Div de código para entrar em novo grupo mobile (events.css groups-block padding)
 - Fase 14: Scroll horizontal desnecessário na página de grupos (events.css box-sizing)
-- Fase 15: Botão de pagamentos no mobile (EM PROGRESS - PROBLEMA CSS SPECIFICITY)
+- Fase 15: Botão de pagamentos no mobile (CONCLUÍDO - SOLUÇÃO: modificar site.css diretamente)
 - **Status**: Menu mobile funcional, estrutura CSS estabelecida
 - **Problemas**: Breakpoints inconsistentes (700px vs 768px), elementos fora do media query
-- **PROBLEMA CRÍTICO FASE 15**: Botão de pagamentos não acompanha os demais botões no mobile. Tentativas:
+- **PROBLEMA RESOLVIDO FASE 15**: Botão de pagamentos não acompanhava os demais botões no mobile. Tentativas anteriores falharam:
   - Adicionar classe `oldsite-top-nav-payments-link` ao HTML
   - Usar seletor de atributo `a[href="/payments"]`
   - Usar `!important` para forçar estilos
-  - Nenhuma funcionou - estilos globais do site.css prevalecem
-- **ANÁLISE**: site.css é carregado globalmente via _Host.cshtml e tem estilos `body .oldsite-top-nav a` com alta especificidade que sobrescrevem estilos mobile do MainLayout.razor.css
+  - Adicionar classe compartilhada `oldsite-top-nav-link` a todos os links
+- **SOLUÇÃO FINAL**: Modificar diretamente o site.css no media query `@media (max-width: 700px)` para aplicar estilos corretos a `body .oldsite-top-nav a` (width 100%, padding 0.6rem 0.8rem, text-align left, border-bottom, border-right none, min-height auto, box-sizing border-box). Isso resolve o problema de specificity pois site.css é carregado globalmente via _Host.cshtml e tem prioridade sobre MainLayout.razor.css.
 
 ---
 
