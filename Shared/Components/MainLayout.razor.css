@@ -440,6 +440,19 @@ footer.oldsite-footer {
         box-sizing: border-box;
     }
 
+    body .oldsite-top-nav a[href="/payments"] {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        text-align: left;
+        border-radius: 0;
+        transition: background 0.15s;
+        border-bottom: 1px solid var(--ci-border-dim);
+        border-right: none;
+        z-index: auto;
+        min-height: auto;
+        box-sizing: border-box;
+    }
+
     body .oldsite-top-nav .oldsite-top-nav-mailbox-icon {
         width: 100%;
         padding: 0.6rem 0.8rem;
@@ -460,19 +473,9 @@ footer.oldsite-footer {
         color: var(--ci-text);
     }
 
-    body .oldsite-top-nav .oldsite-top-nav-payments-link {
-        width: 100%;
-        padding: 0.6rem 0.8rem;
-        border-right: none;
-        border-bottom: 1px solid var(--ci-border-dim);
-        min-height: auto;
-        box-sizing: border-box;
-        color: var(--ci-text);
-    }
-
     body .oldsite-top-nav .oldsite-top-nav-mailbox-icon:hover,
     body .oldsite-top-nav .oldsite-top-nav-profile-link:hover,
-    body .oldsite-top-nav .oldsite-top-nav-payments-link:hover {
+    body .oldsite-top-nav a[href="/payments"]:hover {
         background: var(--ci-accent-opacity-xs);
     }
 
