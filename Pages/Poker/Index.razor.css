@@ -277,7 +277,8 @@
     .event-action {
         width: 100%;
         text-align: center;
-        padding: 0.4rem 0.6rem;
+        padding: 0.4rem 0.4rem;
+        font-size: 0.75rem;
     }
 
     .event-time {
