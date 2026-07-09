@@ -360,6 +360,7 @@
     private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
         _ = LoadCurrentUserAndUnreadCountSafeAsync();
+        isMobileMenuOpen = false;
     }
 
     private void ToggleMobileMenu()
