@@ -4202,8 +4202,13 @@ body .oldsite-footer {
     }
 
     body .oldsite-top-nav a {
-        flex: 1 1 auto;
-        min-width: 132px;
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        text-align: left;
+        border-bottom: 1px solid var(--ci-border-dim);
+        border-right: none;
+        min-height: auto;
+        box-sizing: border-box;
     }
 
     body .oldsite-top-nav .oldsite-top-nav-mailbox-icon {
@@ -4218,10 +4223,6 @@ body .oldsite-footer {
 
     body .oldsite-top-nav .oldsite-top-nav-logout {
         margin-left: 0;
-    }
-
-    body .oldsite-top-nav a {
-        min-height: 44px;
     }
 }
 
