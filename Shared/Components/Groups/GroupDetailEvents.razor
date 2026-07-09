@@ -49,6 +49,7 @@
                                 </span>
                                 <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
                             </div>
+                            <span class="et-players-mobile @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
                         </div>
                     </td>
                     <td>

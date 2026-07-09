@@ -3184,16 +3184,17 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     }
 
     .events-table td:nth-child(1) {
-        order: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .events-table td:nth-child(2) {
-        order: 3;
+        display: none;
     }
 
     .events-table td:nth-child(3),
     .events-table td:nth-child(4) {
-        order: 2;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -3202,6 +3203,40 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
     .et-cell {
         gap: 0.6rem;
+    }
+
+    .et-cell-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .et-date-wrap {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .et-players {
+        display: none;
+    }
+
+    .et-players-mobile {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--green-bright);
+    }
+
+    .et-players-mobile.et-players--full {
+        color: var(--amber-light);
+    }
+
+    .et-players-mobile.et-players--empty {
+        color: var(--ci-text-subtle);
+        font-size: 0.76rem;
+        font-weight: 500;
+        opacity: 0.78;
     }
 
     .et-cell-info {
