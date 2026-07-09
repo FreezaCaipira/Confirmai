@@ -2266,6 +2266,22 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         max-width: 100%;
         overflow: hidden;
     }
+
+    .listing-page-actions {
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .btn-create-event {
+        width: 100%;
+        justify-content: center;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.78rem;
+    }
+
+    .city-selector {
+        margin-bottom: 1rem;
+    }
 }
 
 .groups-header {
