@@ -41,3 +41,13 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+@media (max-width: 700px) {
+    .groups-block {
+        padding: 1rem 0.8rem 1.2rem;
+    }
+
+    .groups-entry-stack {
+        padding: 0 0.3rem;
+    }
+}
