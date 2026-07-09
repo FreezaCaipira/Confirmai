@@ -109,8 +109,20 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - Fase 7: Background da internacionalização (MainLayout.razor.css)
 - Fase 8: Textos em mensagens e perfil (MainLayout.razor + MainLayout.razor.css)
 - Fase 9: Correção de cor/fonte (MainLayout.razor.css)
+- Fase 10: Tela de login mobile (identity.css + _Layout.cshtml viewport meta tag)
+- Fase 11: Menu mobile colapsar automaticamente ao clicar (MainLayout.razor HandleLocationChanged)
+- Fase 12: Badge de aprovar no card do grupo (Index.razor.css position top)
+- Fase 13: Div de código para entrar em novo grupo mobile (events.css groups-block padding)
+- Fase 14: Scroll horizontal desnecessário na página de grupos (events.css box-sizing)
+- Fase 15: Botão de pagamentos no mobile (EM PROGRESS - PROBLEMA CSS SPECIFICITY)
 - **Status**: Menu mobile funcional, estrutura CSS estabelecida
 - **Problemas**: Breakpoints inconsistentes (700px vs 768px), elementos fora do media query
+- **PROBLEMA CRÍTICO FASE 15**: Botão de pagamentos não acompanha os demais botões no mobile. Tentativas:
+  - Adicionar classe `oldsite-top-nav-payments-link` ao HTML
+  - Usar seletor de atributo `a[href="/payments"]`
+  - Usar `!important` para forçar estilos
+  - Nenhuma funcionou - estilos globais do site.css prevalecem
+- **ANÁLISE**: site.css é carregado globalmente via _Host.cshtml e tem estilos `body .oldsite-top-nav a` com alta especificidade que sobrescrevem estilos mobile do MainLayout.razor.css
 
 ---
 

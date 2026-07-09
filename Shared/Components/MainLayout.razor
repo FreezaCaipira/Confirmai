@@ -60,20 +60,20 @@
                     <a href="/eventos"><span class="nav-icon-cycle" aria-hidden="true"><i class="fas fa-futbol nav-icon--a"></i><span class="nav-icon--b">🃏</span></span> @T["Nav.Sports"]</a>
                     <AuthorizeView>
                         <Authorized>
-                            <a href="/grupos"><i class="fas fa-users" aria-hidden="true"></i> Grupos</a>
+                            <a href="/grupos" class="oldsite-top-nav-link"><i class="fas fa-users" aria-hidden="true"></i> Grupos</a>
                         </Authorized>
                     </AuthorizeView>
                     <AuthorizeView>
                         <Authorized>
-                            <a href="/payments"><i class="fas fa-wallet" aria-hidden="true"></i> @T["Nav.Payments"]</a>
+                            <a href="/payments" class="oldsite-top-nav-link"><i class="fas fa-wallet" aria-hidden="true"></i> @T["Nav.Payments"]</a>
                             <AuthorizeView Policy="ServerAdmin">
                             <Authorized Context="gmContext">
-                                <a href="/docs/integration">@T["Nav.Integration"]</a>
+                                <a href="/docs/integration" class="oldsite-top-nav-link">@T["Nav.Integration"]</a>
                             </Authorized>
                         </AuthorizeView>
                             <AuthorizeView Roles="admin">
                                 <Authorized Context="adminContext">
-                                    <a href="/admin">Admin</a>
+                                    <a href="/admin" class="oldsite-top-nav-link">Admin</a>
                                 </Authorized>
                             </AuthorizeView>
 

@@ -440,7 +440,7 @@ footer.oldsite-footer {
         box-sizing: border-box;
     }
 
-    body .oldsite-top-nav a[href="/payments"] {
+    body .oldsite-top-nav .oldsite-top-nav-link {
         width: 100% !important;
         padding: 0.6rem 0.8rem !important;
         text-align: left !important;
@@ -475,7 +475,7 @@ footer.oldsite-footer {
 
     body .oldsite-top-nav .oldsite-top-nav-mailbox-icon:hover,
     body .oldsite-top-nav .oldsite-top-nav-profile-link:hover,
-    body .oldsite-top-nav a[href="/payments"]:hover {
+    body .oldsite-top-nav .oldsite-top-nav-link:hover {
         background: var(--ci-accent-opacity-xs);
     }
 
