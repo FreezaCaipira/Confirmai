@@ -3419,9 +3419,6 @@ body .oldsite-header {
 }
 
 .mobile-menu-toggle {
-    position: absolute;
-    top: 1.2rem;
-    right: 0.8rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
