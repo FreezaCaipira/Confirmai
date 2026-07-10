@@ -9,6 +9,19 @@
 .evpay-main {
     width: 100%;
     max-width: 100%;
+    overflow: hidden;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .entity-shell-grid {
+        max-width: 100%;
+        padding: 0 0.5rem;
+    }
+    
+    .evpay-main {
+        overflow: visible;
+    }
 }
 
 /* ── Not found ───────────────────────────────────────────────── */

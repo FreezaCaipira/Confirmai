@@ -43,6 +43,16 @@
     transition: background 0.15s, border-color 0.15s, color 0.15s;
     user-select: none;
     align-self: flex-start;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .evpay-proof-btn {
+        width: 100%;
+        padding: 0.55rem 0.8rem;
+    }
 }
 
 .evpay-proof-btn:hover {
