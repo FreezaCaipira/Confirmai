@@ -62,12 +62,14 @@ else
 
             <header class="detail-header">
                 <div class="detail-header-top">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
-                    </span>
                     <a href="/grupo/@group.Id" class="detail-back-link">
                         <i class="fas fa-arrow-left"></i> Voltar
                     </a>
+                </div>
+                <div class="detail-header-badge">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                    </span>
                 </div>
                 <h1 class="detail-title ranking-title"><i class="fas fa-trophy"></i> Ranking</h1>
             </header>

@@ -1,7 +1,8 @@
 /* ── Title ────────────────────────────────────────────────────── */
 .detail-title.ranking-title {
-    color: var(--gold);
+    color: var(--amber);
     text-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 2px 4px var(--shadow-md);
+    text-align: center;
 }
 
 /* ── Skeleton lines ───────────────────────── */
