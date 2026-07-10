@@ -44,11 +44,12 @@
                                 </div>
                                 <div class="et-cell-right">
                                     <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
+                                    <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
                                     @if (isNextUpcoming)
                                     {
                                         <span class="event-next-badge">pr&oacute;xima</span>
                                     }
-                                    <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                                    <i class="fas fa-chevron-right et-chevron-icon"></i>
                                 </div>
                             </div>
                             <div class="et-cell-meta">
