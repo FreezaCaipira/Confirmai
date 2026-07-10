@@ -1098,11 +1098,6 @@ body .entity-shell-card.evpay-main {
     vertical-align: middle;
 }
 
-.events-table td:first-child {
-    width: 35%;
-    max-width: 250px;
-}
-
 .events-access-col {
     text-align: right;
     white-space: nowrap;
