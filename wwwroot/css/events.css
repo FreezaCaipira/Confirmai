@@ -2183,6 +2183,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .player-item .player-tag--no-pay { display: none; }
     .player-item .player-tag--proof-pending { display: none; }
     .player-item .player-tag--pay-btn { display: none; }
+    .player-item .player-tag--cancel { gap: 0.35rem; }
 }
 
 /* Mobile muito pequeno (<375px) */
