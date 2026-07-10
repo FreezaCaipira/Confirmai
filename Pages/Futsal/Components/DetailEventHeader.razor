@@ -4,8 +4,10 @@
     <div class="detail-header-top">
         <a href="/grupo/@Event.GroupId" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
     </div>
-    <div class="detail-header-content">
+    <div class="detail-header-badge">
         <span class="detail-sport-badge">⚽ Futsal</span>
+    </div>
+    <div class="detail-header-content">
         <h1 class="detail-title detail-title--with-num">@Event.Group.Name <span class="detail-event-num">#@EventNumber</span></h1>
         @if (!string.IsNullOrWhiteSpace(Event.LocalName))
         {

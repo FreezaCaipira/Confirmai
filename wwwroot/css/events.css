@@ -195,6 +195,12 @@ body .entity-shell-card.evpay-main {
     gap: 0.5rem;
 }
 
+.detail-header-badge {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.4rem;
+}
+
 .detail-header-content {
     display: flex;
     flex-direction: column;

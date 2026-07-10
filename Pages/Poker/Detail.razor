@@ -85,13 +85,15 @@ else
                 <div class="detail-header-top">
                     <a href="/grupo/@ev.GroupId" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
                 </div>
-                <div class="detail-header-content">
+                <div class="detail-header-badge">
                     <div class="detail-poker-badge-row">
                         <span class="detail-sport-badge detail-sport-badge--poker">♠ Poker</span>
                         <span class="poker-type-badge--detail @TypeBadgeClass(ev.PokerEventType)">
                             @TypeLabel(ev.PokerEventType)
                         </span>
                     </div>
+                </div>
+                <div class="detail-header-content">
                     <h1 class="detail-title">
                         @if (isHomeGame && !isUnlocked)
                         {
