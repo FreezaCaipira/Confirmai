@@ -1168,11 +1168,17 @@ body .entity-shell-card.evpay-main {
 }
 
 .et-cell-header {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
 }
 
 .et-cell-right {
-    display: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
 }
 
 .et-cell-meta {
