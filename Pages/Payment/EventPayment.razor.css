@@ -117,6 +117,18 @@
     gap: 0.5rem;
 }
 
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .evpay-admin-confirm-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .evpay-admin-confirm-btn {
+        width: 100%;
+    }
+}
+
 .evpay-admin-confirm-btn--yes {
     flex: 1;
     background: var(--green-opacity-sm);
