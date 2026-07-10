@@ -3263,11 +3263,11 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
     /* Mobile: hide web-only columns, show mobile-only column */
     .web-only {
-        display: none;
+        display: none !important;
     }
 
     .mobile-only {
-        display: block;
+        display: block !important;
     }
 
     .et-cell {
