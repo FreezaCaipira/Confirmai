@@ -1166,6 +1166,26 @@ body .entity-shell-card.evpay-main {
     gap: 0.05rem;
 }
 
+.et-cell-header {
+    display: none;
+}
+
+.et-cell-right {
+    display: none;
+}
+
+.et-cell-meta {
+    display: none;
+}
+
+.et-players-mobile {
+    display: none;
+}
+
+.et-chevron-icon {
+    display: none;
+}
+
 .et-num {
     font-size: 0.72rem;
     font-weight: 700;
@@ -3295,6 +3315,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     }
 
     .et-chevron-icon {
+        display: block;
         position: absolute;
         right: 0.75rem;
         top: 50%;
