@@ -2086,7 +2086,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .detail-sport-badge { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
     .detail-chip { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
     .detail-events-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-    .detail-events-tabs { flex-direction: column; width: 100%; }
+    .detail-events-tabs { flex-direction: column-reverse; width: 100%; }
     .detail-events-tabs-left { width: 100%; }
     .detail-events-tabs-right { width: 100%; justify-content: center; }
     .detail-events-tab { flex: 1; justify-content: center; }
@@ -3259,6 +3259,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         border-radius: 4px;
         width: fit-content;
         pointer-events: none;
+        opacity: 0.7;
     }
 
     .et-recurring-icon {
@@ -3278,7 +3279,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         transform: translateY(-50%);
         font-size: 1.1rem;
         color: var(--ci-accent);
-        opacity: 0.6;
+        opacity: 0.7;
         transition: all 0.2s ease;
         pointer-events: none;
     }
