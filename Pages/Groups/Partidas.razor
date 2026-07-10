@@ -67,11 +67,13 @@ else
                     <span class="detail-sport-badge">
                         @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
                     </span>
+                </div>
+                <div class="detail-header-title-row">
+                    <h1 class="detail-title"><i class="fas fa-calendar-alt"></i> Partidas — @group.Name</h1>
                     <a href="/grupo/@group.Id" class="detail-back-link">
                         <i class="fas fa-arrow-left"></i> Voltar
                     </a>
                 </div>
-                <h1 class="detail-title"><i class="fas fa-calendar-alt"></i> Partidas — @group.Name</h1>
             </header>
 
             <section class="detail-section">
