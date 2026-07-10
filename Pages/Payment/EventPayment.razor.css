@@ -1,10 +1,9 @@
 /* ── Layout tightening for payment content ───────────────────── */
 .entity-shell-grid {
     grid-template-columns: minmax(0, 1fr);
-    max-width: 100%;
+    max-width: 580px;
     margin-left: auto;
     margin-right: auto;
-    padding: 0;
 }
 
 .evpay-main {
