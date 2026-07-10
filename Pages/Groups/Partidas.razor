@@ -64,15 +64,15 @@ else
 
             <header class="detail-header">
                 <div class="detail-header-top">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
-                    </span>
-                </div>
-                <div class="detail-header-title-row">
-                    <h1 class="detail-title"><i class="fas fa-calendar-alt"></i> Partidas — @group.Name</h1>
                     <a href="/grupo/@group.Id" class="detail-back-link">
                         <i class="fas fa-arrow-left"></i> Voltar
                     </a>
+                </div>
+                <div class="detail-header-title-row">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                    </span>
+                    <h1 class="detail-title"><i class="fas fa-calendar-alt"></i> Partidas — @group.Name</h1>
                 </div>
             </header>
 
