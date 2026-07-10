@@ -191,6 +191,15 @@ body .entity-shell-card.evpay-main {
     gap: 0.5rem;
 }
 
+.detail-header-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ci-text-blue);
+}
+
 .detail-back-link {
     display: inline-flex;
     align-items: center;
