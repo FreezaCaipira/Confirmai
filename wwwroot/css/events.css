@@ -1064,7 +1064,8 @@ body .entity-shell-card.evpay-main {
 }
 
 .events-table {
-    width: 100%;
+    width: fit-content;
+    margin-left: auto;
     border-collapse: collapse;
     font-size: 0.84rem;
 }
