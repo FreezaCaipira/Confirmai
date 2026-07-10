@@ -5,7 +5,7 @@
 .evpay-header-top {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     margin-bottom: 0.6rem;
 }
 
@@ -26,6 +26,7 @@
     font-weight: 700;
     color: var(--ci-text);
     margin: 0 0 0.35rem;
+    text-align: center;
 }
 
 .evpay-meta {
@@ -34,5 +35,6 @@
     margin: 0 0 0.2rem;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
 }
