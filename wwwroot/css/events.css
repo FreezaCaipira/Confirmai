@@ -3207,14 +3207,8 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .et-cell-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
         gap: 0.5rem;
-    }
-
-    .et-cell-left {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
     }
 
     .et-cell-right {
@@ -3223,6 +3217,10 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         gap: 0.3rem;
         flex-wrap: wrap;
         justify-content: flex-end;
+    }
+
+    .et-cell-left {
+        display: none;
     }
 
     .et-cell-info {
@@ -3245,6 +3243,9 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     }
 
     .et-num {
+        position: absolute;
+        left: 0.75rem;
+        top: 0.75rem;
         font-size: 0.7rem;
         font-weight: 700;
         color: var(--ci-text-info);
@@ -3252,11 +3253,16 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         padding: 0.15rem 0.4rem;
         border-radius: 4px;
         width: fit-content;
+        pointer-events: none;
     }
 
     .et-recurring-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 1.5rem;
         font-size: 0.7rem;
         color: var(--ci-accent);
+        pointer-events: none;
     }
 
     .event-next-badge {
