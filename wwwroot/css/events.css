@@ -1168,18 +1168,11 @@ body .entity-shell-card.evpay-main {
 }
 
 .et-cell-header {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.5rem;
+    display: none;
 }
 
 .et-cell-right {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    display: none;
 }
 
 .et-cell-meta {
@@ -1248,12 +1241,19 @@ body .entity-shell-card.evpay-main {
     color: var(--ci-accent);
     opacity: 0.7;
     display: inline-block;
+    margin-right: 0.3rem;
 }
 
 .et-time {
-    display: block;
+    display: inline-block;
     color: var(--ci-text-subtle);
     font-size: 0.76rem;
+    margin-left: 0.3rem;
+}
+
+.et-date {
+    font-weight: 600;
+    color: var(--ci-text);
 }
 
 .et-players {
