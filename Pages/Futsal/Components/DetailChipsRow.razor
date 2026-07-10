@@ -3,15 +3,11 @@
 <div class="detail-chips">
     <span class="detail-chip">
         <i class="fas fa-calendar-alt"></i>
-        @Event.StartsAt.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("pt-BR"))
+        @Event.StartsAt.ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("pt-BR"))
     </span>
     <span class="detail-chip">
         <i class="fas fa-clock"></i>
         @Event.StartsAt.ToString("HH:mm")
-        @if (Event.DurationMinutes.HasValue)
-        {
-            <span> · @(Event.DurationMinutes / 60)h@(Event.DurationMinutes % 60 != 0 ? $"{Event.DurationMinutes % 60}min" : "")</span>
-        }
     </span>
     @if (Event.Price.HasValue)
     {
