@@ -4,10 +4,12 @@
 
 <div class="evpay-header">
     <div class="evpay-header-top">
-        <span class="evpay-sport-badge">@(IsFutsal ? "⚽ Futsal" : "🃏 Poker")</span>
         <a href="@BackUrl" class="detail-back-link">
             <i class="fas fa-arrow-left"></i> Voltar
         </a>
+    </div>
+    <div class="evpay-header-badge">
+        <span class="evpay-sport-badge">@(IsFutsal ? "⚽ Futsal" : "🃏 Poker")</span>
     </div>
     <h1 class="evpay-title">@Event!.Group.Name</h1>
     <p class="evpay-meta">

@@ -9,6 +9,12 @@
     margin-bottom: 0.6rem;
 }
 
+.evpay-header-badge {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.6rem;
+}
+
 .evpay-sport-badge {
     font-size: 0.75rem;
     font-weight: 700;
