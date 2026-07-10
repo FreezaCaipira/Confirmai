@@ -21,7 +21,7 @@ else
             pos++;
             bool isMe = row.UserId == CurrentUserId;
             string medalClass = pos switch { 1 => "ranking-medal--gold", 2 => "ranking-medal--silver", 3 => "ranking-medal--bronze", _ => "" };
-            <li class="ranking-row @(isMe ? "ranking-row--me" : "")">
+            <li class="ranking-row @(isMe ? "ranking-row--me" : "")" @onclick="() => ToggleExpanded(row.UserId)">
                 <span class="ranking-pos @medalClass">
                     @if (pos <= 3)
                     {
@@ -36,6 +36,10 @@ else
                 <span class="ranking-col" title="Partidas">@row.GamesPlayed</span>
                 <span class="ranking-col ranking-col--highlight" title="Destaques">@row.Highlights</span>
                 <span class="ranking-col ranking-col--wins" title="Vitórias">@row.Wins</span>
+                @if (expandedUserId == row.UserId)
+                {
+                    <div class="ranking-name-tooltip">@row.UserName</div>
+                }
             </li>
         }
     </ol>
@@ -49,5 +53,11 @@ else
 
     [Parameter]
     public string? CurrentUserId { get; set; }
+
+    private string? expandedUserId;
+    private void ToggleExpanded(string userId)
+    {
+        expandedUserId = expandedUserId == userId ? null : userId;
+    }
 }
 
