@@ -34,20 +34,22 @@
                 <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
                     <td>
                         <div class="et-cell">
-                            <div class="et-cell-info">
-                                <span class="et-date-wrap">
+                            <div class="et-cell-header">
+                                <div class="et-cell-left">
                                     <span class="et-num">#@(EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
                                     @if (ev.RachaScheduleId.HasValue)
                                     {
                                         <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
                                     }
+                                </div>
+                                <div class="et-cell-right">
                                     <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
                                     @if (isNextUpcoming)
                                     {
                                         <span class="event-next-badge">pr&oacute;xima</span>
                                     }
-                                </span>
-                                <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                                    <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                                </div>
                             </div>
                             <div class="et-cell-meta">
                                 <span class="et-players-mobile @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">
