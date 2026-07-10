@@ -69,11 +69,8 @@ else
                     </a>
                 </div>
                 <div class="detail-header-title-row">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
-                    </span>
                     <span class="detail-header-subtitle">
-                        <i class="fas fa-calendar-alt"></i> Partidas <span class="detail-events-year">@eventsYear</span>
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker") — Partidas <span class="detail-events-year">@eventsYear</span>
                     </span>
                 </div>
                 <h1 class="detail-title">@group.Name</h1>
