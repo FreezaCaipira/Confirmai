@@ -1063,14 +1063,13 @@ body .entity-shell-card.evpay-main {
 }
 
 .events-table {
-    width: fit-content;
-    margin-left: auto;
+    width: 100%;
     border-collapse: collapse;
     font-size: 0.84rem;
 }
 
 .events-table thead th {
-    text-align: left;
+    text-align: right;
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -1097,6 +1096,7 @@ body .entity-shell-card.evpay-main {
 .events-table td {
     padding: 0.4rem 0.6rem;
     vertical-align: middle;
+    text-align: right;
 }
 
 .events-access-col {
