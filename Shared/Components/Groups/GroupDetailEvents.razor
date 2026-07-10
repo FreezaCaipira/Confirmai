@@ -37,11 +37,11 @@
                         <div class="et-cell">
                             <div class="et-cell-header">
                                 <div class="et-cell-right">
-                                    <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
                                     @if (ev.RachaScheduleId.HasValue)
                                     {
                                         <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
                                     }
+                                    <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
                                     <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
                                     @if (isNextUpcoming)
                                     {
