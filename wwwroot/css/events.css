@@ -3262,7 +3262,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         font-size: 0.8rem;
         font-weight: 700;
         color: #ffffff;
-        background: var(--ci-accent);
+        background: var(--ci-accent-mid);
         padding: 0.2rem 0.5rem;
         border-radius: 4px;
         width: fit-content;
@@ -3285,7 +3285,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         top: 50%;
         transform: translateY(-50%);
         font-size: 1.1rem;
-        color: #ffffff;
+        color: var(--ci-accent-mid);
         opacity: 0.9;
         transition: all 0.2s ease;
         pointer-events: none;
@@ -3293,7 +3293,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
     .events-table tbody tr.events-table-row:hover .et-chevron-icon {
         opacity: 1;
-        color: #ffffff;
+        color: var(--ci-accent-mid);
         transform: translateY(-50%) translateX(2px);
     }
 
