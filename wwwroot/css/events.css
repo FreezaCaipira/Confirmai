@@ -2177,14 +2177,14 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .player-item { padding: 0.4rem 0.6rem; gap: 0.4rem; }
     .player-slot-btn { font-size: 0.7rem; padding: 0.15rem 0.6rem; gap: 0.25rem; }
     .player-tag { font-size: 0.65rem; padding: 0.08rem 0.35rem; }
-    .player-tag--me { display: none; }
-    .player-tag--pay-pending { display: none; }
-    .player-tag--paid { display: none; }
-    .player-tag--no-pay { display: none; }
-    .player-tag--proof-pending { display: none; }
-    .player-tag--pay-btn { display: none; }
-    .player-tag--cancel { font-size: 0; padding: 0.3rem; }
-    .player-tag--cancel i { font-size: 0.75rem; }
+    .player-item .player-tag--me { display: none; }
+    .player-item .player-tag--pay-pending { display: none; }
+    .player-item .player-tag--paid { display: none; }
+    .player-item .player-tag--no-pay { display: none; }
+    .player-item .player-tag--proof-pending { display: none; }
+    .player-item .player-tag--pay-btn { display: none; }
+    .player-item .player-tag--cancel { font-size: 0; padding: 0.3rem; }
+    .player-item .player-tag--cancel i { font-size: 0.75rem; }
 }
 
 /* Mobile muito pequeno (<375px) */
