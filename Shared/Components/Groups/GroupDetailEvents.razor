@@ -7,7 +7,8 @@
 <table class="events-table">
     <thead>
         <tr>
-            <th class="et-th-data"><span class="et-num-ph"></span>Data</th>
+            <th>ID</th>
+            <th>Data</th>
             <th>Jogadores</th>
             <th>Status</th>
             <th class="events-access-col"></th>
@@ -17,7 +18,7 @@
         @if (DisplayedEvents.Count == 0)
         {
             <tr>
-                <td colspan="4" class="et-empty">
+                <td colspan="5" class="et-empty">
                     <i class="fas fa-calendar-plus"></i>
                     @(ShowPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida próxima.")
                 </td>
@@ -34,6 +35,8 @@
                 <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
                     <td>
                         <span class="et-num">#@(EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
+                    </td>
+                    <td>
                         <div class="et-cell">
                             <div class="et-cell-header">
                                 <div class="et-cell-right">
