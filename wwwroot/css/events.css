@@ -257,6 +257,11 @@ body .entity-shell-card.evpay-main {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: var(--green-bright);
+    background: var(--green-opacity-sm);
+    border: 1px solid var(--green-opacity-md);
+    border-radius: 20px;
+    padding: 0.2rem 0.7rem;
 }
 
 .detail-title {
