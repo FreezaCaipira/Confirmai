@@ -34,14 +34,14 @@
                 <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
                     <td>
                         <span class="et-num">#@(EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
-                        @if (ev.RachaScheduleId.HasValue)
-                        {
-                            <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
-                        }
                         <div class="et-cell">
                             <div class="et-cell-header">
                                 <div class="et-cell-right">
                                     <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
+                                    @if (ev.RachaScheduleId.HasValue)
+                                    {
+                                        <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
+                                    }
                                     <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
                                     @if (isNextUpcoming)
                                     {
