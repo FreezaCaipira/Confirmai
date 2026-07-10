@@ -35,14 +35,36 @@
                 <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
                     <td>
                         <span class="et-num">#@(EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
-                    </td>
-                    <td>
-                        @if (ev.RachaScheduleId.HasValue)
-                        {
-                            <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
-                        }
-                        <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
-                        <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                        <div class="et-cell">
+                            <div class="et-cell-header">
+                                <div class="et-cell-right">
+                                    @if (ev.RachaScheduleId.HasValue)
+                                    {
+                                        <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
+                                    }
+                                    <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
+                                    <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                                </div>
+                            </div>
+                            <div class="et-cell-meta">
+                                <span class="et-players-mobile @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">
+                                    <i class="fas fa-users"></i> @ev.Confirmations.Count / @ev.MaxPlayers
+                                </span>
+                                @if (!ev.IsActive)
+                                {
+                                    <span class="player-tag player-tag--cancel">cancelado</span>
+                                }
+                                else if (isFull)
+                                {
+                                    <span class="player-tag player-tag--full">lotado</span>
+                                }
+                                else
+                                {
+                                    <span class="player-tag player-tag--open">aberto</span>
+                                }
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right et-chevron-icon"></i>
                     </td>
                     <td>
                         <span class="et-players @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
