@@ -1098,6 +1098,11 @@ body .entity-shell-card.evpay-main {
     vertical-align: middle;
 }
 
+.events-table td:first-child {
+    width: 35%;
+    max-width: 250px;
+}
+
 .events-access-col {
     text-align: right;
     white-space: nowrap;
@@ -1169,7 +1174,7 @@ body .entity-shell-card.evpay-main {
 .et-cell-header {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
     gap: 0.5rem;
 }
 
@@ -1178,7 +1183,7 @@ body .entity-shell-card.evpay-main {
     align-items: center;
     gap: 0.3rem;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
 }
 
 .et-cell-meta {
@@ -1246,13 +1251,19 @@ body .entity-shell-card.evpay-main {
     font-size: 0.7rem;
     color: var(--ci-accent);
     opacity: 0.7;
-    display: none;
+    display: inline-block;
 }
 
 .et-time {
-    display: block;
+    display: inline-block;
     color: var(--ci-text-subtle);
     font-size: 0.76rem;
+    margin-left: 0.3rem;
+}
+
+.et-date {
+    font-weight: 600;
+    color: var(--ci-text);
 }
 
 .et-players {

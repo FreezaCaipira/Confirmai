@@ -43,10 +43,6 @@
                                     }
                                     <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
                                     <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
-                                    @if (isNextUpcoming)
-                                    {
-                                        <span class="event-next-badge">pr&oacute;xima</span>
-                                    }
                                 </div>
                             </div>
                             <div class="et-cell-meta">
@@ -72,6 +68,10 @@
                         <span class="et-players @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
                     </td>
                     <td>
+                        @if (isNextUpcoming)
+                        {
+                            <span class="event-next-badge">pr&oacute;xima</span>
+                        }
                         @if (!ev.IsActive)
                         {
                             <span class="player-tag player-tag--cancel">cancelado</span>
