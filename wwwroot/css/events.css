@@ -815,7 +815,7 @@ body .entity-shell-card.evpay-main {
     color: rgba(248, 113, 113, 0.65);
     font-size: 0.76rem;
     font-weight: 600;
-    padding: 0.4rem 0;
+    padding: 0.4rem 0.6rem;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -854,7 +854,7 @@ body .entity-shell-card.evpay-main {
     color: rgba(74, 222, 128, 0.85);
     font-size: 0.76rem;
     font-weight: 600;
-    padding: 0.4rem 0;
+    padding: 0.4rem 0.6rem;
     cursor: pointer;
     display: flex;
     align-items: center;
