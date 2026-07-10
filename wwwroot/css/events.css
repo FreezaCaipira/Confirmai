@@ -189,11 +189,13 @@ body .entity-shell-card.evpay-main {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    width: 100%;
 }
 
 .detail-header-subtitle {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.3rem;
     font-size: 0.85rem;
     font-weight: 600;
