@@ -1042,27 +1042,24 @@ body .entity-shell-card.evpay-main {
     gap: 0.35rem;
     padding: 0.35rem 0.7rem;
     border-radius: 9px;
-    border: 1px solid var(--ci-accent);
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
-    color: var(--ci-surface-light);
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-card-deep);
+    color: var(--link-info);
     font-size: 0.76rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
 }
 
 .detail-events-tab:hover:not(.active) {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
-    color: var(--white);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
+    background: var(--ci-bg-card);
+    color: var(--ci-text-blue);
 }
 
 .detail-events-tab.active {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
-    color: var(--white);
+    background: rgba(79, 156, 248, 0.14);
+    color: var(--ci-text-blue);
     border-color: var(--ci-accent);
-    box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
 }
 
 .events-table {
