@@ -3285,7 +3285,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         top: 50%;
         transform: translateY(-50%);
         font-size: 1.1rem;
-        color: var(--ci-accent-mid);
+        color: #ffffff;
         opacity: 0.9;
         transition: all 0.2s ease;
         pointer-events: none;
@@ -3293,7 +3293,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
     .events-table tbody tr.events-table-row:hover .et-chevron-icon {
         opacity: 1;
-        color: var(--ci-accent-mid);
+        color: #ffffff;
         transform: translateY(-50%) translateX(2px);
     }
 
