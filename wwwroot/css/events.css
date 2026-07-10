@@ -944,6 +944,7 @@ body .entity-shell-card.evpay-main {
     border: 1px solid var(--red-border);
     border-radius: 8px;
     padding: 1px 7px;
+    margin-left: 0.3rem;
 }
 
 .player-tag--admin {
@@ -1069,7 +1070,7 @@ body .entity-shell-card.evpay-main {
 }
 
 .events-table thead th {
-    text-align: left;
+    text-align: right;
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -1096,6 +1097,7 @@ body .entity-shell-card.evpay-main {
 .events-table td {
     padding: 0.55rem 0.75rem;
     vertical-align: middle;
+    text-align: right;
 }
 
 .events-access-col {
