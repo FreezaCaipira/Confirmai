@@ -62,6 +62,14 @@
         box-sizing: border-box;
     }
     
+    .evpay-proof-btn span {
+        display: none;
+    }
+    
+    .evpay-proof-btn i {
+        margin: 0;
+    }
+    
     .evpay-proof-thumb {
         max-width: 100%;
         height: auto;
@@ -126,6 +134,13 @@
 
 .evpay-proof-input-hidden {
     display: none;
+}
+
+/* Mobile adjustments for input file */
+@media (max-width: 480px) {
+    .evpay-proof-input-hidden {
+        display: none !important;
+    }
 }
 
 .evpay-proof-success--fadeout {
