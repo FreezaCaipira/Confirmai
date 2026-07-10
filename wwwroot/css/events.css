@@ -2182,8 +2182,8 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .player-tag--paid { display: none !important; }
     .player-tag--no-pay { display: none !important; }
     .player-tag--proof-pending { display: none !important; }
-    .player-tag--cancel { font-size: 0; padding: 0.3rem; }
-    .player-tag--cancel i { font-size: 0.75rem; }
+    .player-tag--cancel { font-size: 0 !important; padding: 0.3rem; }
+    .player-tag--cancel i { font-size: 0.75rem !important; }
 }
 
 /* Mobile muito pequeno (<375px) */
