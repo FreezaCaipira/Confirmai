@@ -2182,6 +2182,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .player-tag--paid { display: none; }
     .player-tag--no-pay { display: none; }
     .player-tag--proof-pending { display: none; }
+    .player-tag--pay-btn { display: none; }
     .player-tag--cancel { font-size: 0; padding: 0.3rem; }
     .player-tag--cancel i { font-size: 0.75rem; }
 }
