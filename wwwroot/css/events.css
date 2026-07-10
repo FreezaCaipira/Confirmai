@@ -3186,6 +3186,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         display: block;
         padding: 0;
         border: none;
+        position: relative;
     }
 
     .events-table td:nth-child(2) {
@@ -3264,15 +3265,25 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     }
 
     .et-chevron-icon {
-        font-size: 0.75rem;
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1rem;
         color: var(--ci-text-subtle);
-        opacity: 0.5;
-        transition: opacity 0.2s, color 0.2s;
+        opacity: 0.4;
+        transition: all 0.2s ease;
+        pointer-events: none;
     }
 
     .events-table tbody tr.events-table-row:hover .et-chevron-icon {
         opacity: 1;
         color: var(--ci-accent);
+        transform: translateY(-50%) translateX(2px);
+    }
+
+    .events-table tbody tr.events-table-row:active .et-chevron-icon {
+        transform: translateY(-50%) translateX(4px);
     }
 
     .et-cell-meta {
