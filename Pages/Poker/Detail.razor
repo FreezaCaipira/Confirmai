@@ -82,44 +82,49 @@ else
 
             @* ── Header ──────────────────────────────────────────────── *@
             <header class="detail-header detail-header--poker">
-                <div class="detail-poker-badge-row">
-                    <span class="detail-sport-badge detail-sport-badge--poker">♠ Poker</span>
-                    <span class="poker-type-badge--detail @TypeBadgeClass(ev.PokerEventType)">
-                        @TypeLabel(ev.PokerEventType)
-                    </span>
+                <div class="detail-header-top">
+                    <a href="/grupo/@ev.GroupId" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
                 </div>
-                <h1 class="detail-title">
-                    @if (isHomeGame && !isUnlocked)
+                <div class="detail-header-content">
+                    <div class="detail-poker-badge-row">
+                        <span class="detail-sport-badge detail-sport-badge--poker">♠ Poker</span>
+                        <span class="poker-type-badge--detail @TypeBadgeClass(ev.PokerEventType)">
+                            @TypeLabel(ev.PokerEventType)
+                        </span>
+                    </div>
+                    <h1 class="detail-title">
+                        @if (isHomeGame && !isUnlocked)
+                        {
+                            <span>@ev.Group.Name</span>
+                        }
+                        else
+                        {
+                            @ev.Group.Name
+                        }
+                    </h1>
+                    <p class="detail-group-ref">
+                        <i class="fas fa-users"></i>
+                        Abrir grupo: <a class="detail-group-link" href="/grupo/@ev.GroupId">@ev.Group.Name</a>
+                    </p>
+                    @if (!string.IsNullOrWhiteSpace(ev.PokerHouseName) && isUnlocked)
                     {
-                        <span>@ev.Group.Name</span>
+                        <p class="detail-poker-house">
+                            <i class="fas fa-building"></i> @ev.PokerHouseName
+                        </p>
                     }
-                    else
+                    @if (!string.IsNullOrWhiteSpace(ev.Location) && isUnlocked)
                     {
-                        @ev.Group.Name
+                        <p class="detail-location">
+                            <i class="fas fa-map-marker-alt"></i> @ev.Location
+                        </p>
                     }
-                </h1>
-                <p class="detail-group-ref">
-                    <i class="fas fa-users"></i>
-                    Abrir grupo: <a class="detail-group-link" href="/grupo/@ev.GroupId">@ev.Group.Name</a>
-                </p>
-                @if (!string.IsNullOrWhiteSpace(ev.PokerHouseName) && isUnlocked)
-                {
-                    <p class="detail-poker-house">
-                        <i class="fas fa-building"></i> @ev.PokerHouseName
-                    </p>
-                }
-                @if (!string.IsNullOrWhiteSpace(ev.Location) && isUnlocked)
-                {
-                    <p class="detail-location">
-                        <i class="fas fa-map-marker-alt"></i> @ev.Location
-                    </p>
-                }
-                @if (!string.IsNullOrWhiteSpace(ev.Group.City) && isUnlocked)
-                {
-                    <p class="detail-location">
-                        <i class="fas fa-city"></i> @ev.Group.City/@ev.Group.StateCode
-                    </p>
-                }
+                    @if (!string.IsNullOrWhiteSpace(ev.Group.City) && isUnlocked)
+                    {
+                        <p class="detail-location">
+                            <i class="fas fa-city"></i> @ev.Group.City/@ev.Group.StateCode
+                        </p>
+                    }
+                </div>
             </header>
 
             @if (isAdmin)
