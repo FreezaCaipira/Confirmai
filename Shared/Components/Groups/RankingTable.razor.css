@@ -32,7 +32,6 @@
     border: 1px solid rgba(51, 76, 120, 0.35);
     font-size: 0.875rem;
     position: relative;
-    cursor: pointer;
 }
 
 .ranking-row--me {
@@ -119,6 +118,7 @@
 
 /* ── Name tooltip (mobile) ───────────────────────────────────── */
 .ranking-name-tooltip {
+    display: none;
     position: absolute;
     bottom: 100%;
     left: 50%;
@@ -134,4 +134,15 @@
     z-index: 10;
     margin-bottom: 0.3rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Mobile-specific styles ─────────────────────────────────── */
+@media (max-width: 480px) {
+    .ranking-row {
+        cursor: pointer;
+    }
+
+    .ranking-name-tooltip {
+        display: block;
+    }
 }
