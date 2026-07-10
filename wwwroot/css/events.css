@@ -944,7 +944,6 @@ body .entity-shell-card.evpay-main {
     border: 1px solid var(--red-border);
     border-radius: 8px;
     padding: 1px 7px;
-    margin-left: 0.3rem;
 }
 
 .player-tag--admin {
@@ -1064,14 +1063,13 @@ body .entity-shell-card.evpay-main {
 }
 
 .events-table {
-    width: fit-content;
-    margin-left: auto;
+    width: 100%;
     border-collapse: collapse;
     font-size: 0.84rem;
 }
 
 .events-table thead th {
-    text-align: right;
+    text-align: left;
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -1098,7 +1096,6 @@ body .entity-shell-card.evpay-main {
 .events-table td {
     padding: 0.55rem 0.75rem;
     vertical-align: middle;
-    text-align: right;
 }
 
 .events-access-col {
@@ -1170,18 +1167,11 @@ body .entity-shell-card.evpay-main {
 }
 
 .et-cell-header {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.5rem;
+    display: none;
 }
 
 .et-cell-right {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    display: none;
 }
 
 .et-cell-meta {
@@ -1249,19 +1239,13 @@ body .entity-shell-card.evpay-main {
     font-size: 0.7rem;
     color: var(--ci-accent);
     opacity: 0.7;
-    display: inline-block;
+    display: none;
 }
 
 .et-time {
-    display: inline-block;
+    display: block;
     color: var(--ci-text-subtle);
     font-size: 0.76rem;
-    margin-left: 0.3rem;
-}
-
-.et-date {
-    font-weight: 600;
-    color: var(--ci-text);
 }
 
 .et-players {
