@@ -102,12 +102,38 @@
 ### Web (Padrão)
 - Tabelas em formato tradicional (thead, tbody, tr, td)
 - Layout em grid
+- Elementos mobile ocultos via classes base (`display: none`)
 
 ### Mobile (max-width: 480px)
 - Tabelas transformadas em cards
 - `thead` oculto
 - `tr` transformado em `flex` com `flex-direction: column`
 - `td` transformado em `block`
+- Elementos mobile visíveis via media query (`display: block/flex`)
+
+## Regras de Elementos Mobile
+
+### Classes Mobile - Ocultas na Web
+Classes específicas para mobile devem ser ocultas na web via classes base:
+```css
+.et-cell-header { display: none; }
+.et-cell-right { display: none; }
+.et-cell-meta { display: none; }
+.et-players-mobile { display: none; }
+.et-chevron-icon { display: none; }
+```
+
+### Media Query Mobile - Mostrar Elementos
+Na media query mobile, mostrar esses elementos:
+```css
+@media (max-width: 480px) {
+    .et-cell-header { display: flex; }
+    .et-cell-right { display: flex; }
+    .et-cell-meta { display: flex; }
+    .et-players-mobile { display: flex; }
+    .et-chevron-icon { display: block; }
+}
+```
 
 ## Regras Gerais
 
@@ -116,3 +142,4 @@
 3. **Breakpoints**: Usar 560px para mobile padrão, 480px para mobile estrito
 4. **Isolamento**: Mudanças mobile apenas via media queries, nunca em classes base
 5. **Consistência**: Aplicar mesmo padrão em todas as telas com header de detalhes
+6. **Elementos Mobile**: Classes mobile devem ser ocultas na web via `display: none` nas classes base, e mostradas apenas via media query mobile
