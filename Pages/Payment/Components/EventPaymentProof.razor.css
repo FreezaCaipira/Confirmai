@@ -7,6 +7,9 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .evpay-proof-header {
@@ -49,9 +52,19 @@
 
 /* Mobile adjustments */
 @media (max-width: 480px) {
+    .evpay-proof {
+        padding: 0.8rem;
+    }
+    
     .evpay-proof-btn {
         width: 100%;
         padding: 0.55rem 0.8rem;
+        box-sizing: border-box;
+    }
+    
+    .evpay-proof-thumb {
+        max-width: 100%;
+        height: auto;
     }
 }
 
