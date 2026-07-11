@@ -79,10 +79,10 @@
 }
 
 .payments-tab--delinquent {
-    border-color: var(--red-light);
-    background: linear-gradient(180deg, var(--red-light) 0%, var(--red-soft) 50%, var(--red-mid) 100%);
-    box-shadow: 0 4px 8px var(--shadow-red-sm), inset 0 0 0 1px var(--red-opacity-sm);
-    text-shadow: 0 0 10px var(--shadow-red-md);
+    border-color: var(--red-strong);
+    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
+    box-shadow: 0 4px 8px var(--shadow-red-sm), inset 0 0 0 1px var(--red-opacity-md);
+    text-shadow: 0 0 10px var(--shadow-red-lg);
 }
 
 .payments-tab--history {
@@ -103,7 +103,7 @@
 }
 
 .payments-tab-count--delinquent {
-    background: linear-gradient(180deg, var(--red-light) 0%, var(--red-soft) 50%, var(--red-strong) 100%);
+    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
     color: var(--red-lightest);
     box-shadow: 0 2px 4px var(--shadow-red-md);
 }
