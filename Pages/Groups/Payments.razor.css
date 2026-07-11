@@ -13,6 +13,7 @@
 .payments-title {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.6rem;
     color: var(--green-light);
     text-shadow: 0 0 15px var(--green-opacity-2xl), 0 2px 4px var(--text-shadow-sm);
