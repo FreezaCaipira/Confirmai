@@ -7,17 +7,20 @@
 <table class="events-table">
     <thead>
         <tr>
-            <th class="et-th-data"><span class="et-num-ph"></span>Data</th>
-            <th>Jogadores</th>
-            <th>Status</th>
-            <th class="events-access-col"></th>
+            <!-- Web headers -->
+            <th class="web-only"></th>
+            <th class="web-only">Data</th>
+            <th class="web-only">Jogadores</th>
+            <th class="web-only">Status</th>
+            <th class="events-access-col web-only"></th>
+            <!-- Mobile: no headers -->
         </tr>
     </thead>
     <tbody>
         @if (DisplayedEvents.Count == 0)
         {
             <tr>
-                <td colspan="4" class="et-empty">
+                <td colspan="6" class="et-empty">
                     <i class="fas fa-calendar-plus"></i>
                     @(ShowPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida próxima.")
                 </td>
@@ -31,30 +34,30 @@
                 var href   = Group.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
                 var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
                 var isNextUpcoming = !ShowPastEvents && nextUpcomingEventId.HasValue && ev.Id == nextUpcomingEventId.Value;
+                var eventNum = EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0;
                 <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
-                    <td>
-                        <div class="et-cell">
-                            <span class="et-num">#@(EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0)</span>
-                            @if (ev.RachaScheduleId.HasValue)
-                            {
-                                <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
-                            }
-                            <div class="et-cell-info">
-                                <span class="et-date-wrap">
-                                    <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
-                                    @if (isNextUpcoming)
-                                    {
-                                        <span class="event-next-badge">pr&oacute;xima</span>
-                                    }
-                                </span>
-                                <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
-                            </div>
-                        </div>
+                    <!-- Web: ID column -->
+                    <td class="web-only">
+                        <span class="et-num">#@eventNum</span>
                     </td>
-                    <td>
+                    
+                    <!-- Web: Date column -->
+                    <td class="web-only">
+                        @if (ev.RachaScheduleId.HasValue)
+                        {
+                            <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
+                        }
+                        <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
+                        <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                    </td>
+                    
+                    <!-- Web: Players column -->
+                    <td class="web-only">
                         <span class="et-players @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
                     </td>
-                    <td>
+                    
+                    <!-- Web: Status column -->
+                    <td class="web-only">
                         @if (!ev.IsActive)
                         {
                             <span class="player-tag player-tag--cancel">cancelado</span>
@@ -67,14 +70,55 @@
                         {
                             <span class="player-tag player-tag--open">aberto</span>
                         }
+                        @if (isNextUpcoming)
+                        {
+                            <span class="event-next-badge">pr&oacute;xima</span>
+                        }
                     </td>
-                    <td class="events-access-col">
+                    
+                    <!-- Web: Access column -->
+                    <td class="events-access-col web-only">
                         <button class="event-access-btn"
                                 type="button"
                                 @onclick:stopPropagation="true"
                                 @onclick="() => NavigationManager.NavigateTo(href)">
                             Acessar
                         </button>
+                    </td>
+                    
+                    <!-- Mobile: Card with all info -->
+                    <td class="mobile-only">
+                        <span class="et-num">#@eventNum</span>
+                        <div class="et-cell">
+                            <div class="et-cell-header">
+                                <div class="et-cell-right">
+                                    @if (ev.RachaScheduleId.HasValue)
+                                    {
+                                        <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
+                                    }
+                                    <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateDefault")</span>
+                                    <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                                </div>
+                            </div>
+                            <div class="et-cell-meta">
+                                <span class="et-players-mobile @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">
+                                    <i class="fas fa-users"></i> @ev.Confirmations.Count / @ev.MaxPlayers
+                                </span>
+                                @if (!ev.IsActive)
+                                {
+                                    <span class="player-tag player-tag--cancel">cancelado</span>
+                                }
+                                else if (isFull)
+                                {
+                                    <span class="player-tag player-tag--full">lotado</span>
+                                }
+                                else
+                                {
+                                    <span class="player-tag player-tag--open">aberto</span>
+                                }
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right et-chevron-icon"></i>
                     </td>
                 </tr>
             }

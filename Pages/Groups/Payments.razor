@@ -62,34 +62,36 @@ else
 
             <header class="detail-header">
                 <div class="detail-header-top">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
-                    </span>
                     <a href="/grupo/@Id" class="detail-back-link">
                         <i class="fas fa-arrow-left"></i> Voltar
                     </a>
+                </div>
+                <div class="detail-header-badge">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                    </span>
                 </div>
                 <h1 class="detail-title payments-title"><i class="fas fa-money-bill-wave"></i> Pagamentos</h1>
             </header>
 
             @* ── Tabs ──────────────────────────────────────────────── *@
             <div class="payments-tabs">
-                <button class="payments-tab @(paymentTab == "delinquent" ? "payments-tab--active" : "")"
+                <button class="payments-tab @(paymentTab == "delinquent" ? "payments-tab--active payments-tab--delinquent" : "")"
                         type="button"
                         @onclick="@(() => HandleTabChange("delinquent"))">
                     <i class="fas fa-exclamation-triangle"></i> Pendentes
                     @if (delinquencyList?.Count > 0)
                     {
-                        <span class="payments-tab-count">@delinquencyList.Count</span>
+                        <span class="payments-tab-count payments-tab-count--delinquent">@delinquencyList.Count</span>
                     }
                 </button>
-                <button class="payments-tab @(paymentTab == "history" ? "payments-tab--active" : "")"
+                <button class="payments-tab @(paymentTab == "history" ? "payments-tab--active payments-tab--history" : "")"
                         type="button"
                         @onclick="@(() => HandleTabChange("history"))">
                     <i class="fas fa-history"></i> Histórico
                     @if (paymentHistory?.Count > 0)
                     {
-                        <span class="payments-tab-count">@paymentHistory.Count</span>
+                        <span class="payments-tab-count payments-tab-count--history">@paymentHistory.Count</span>
                     }
                 </button>
                 <button class="payments-refresh-btn" type="button" @onclick="RefreshPayments" title="Recarregar lista">
@@ -131,7 +133,7 @@ else
                                 <span class="payments-user-name">@group.UserName</span>
                                 <div class="payments-user-meta">
                                     <span class="payments-badge payments-badge--games">@group.Entries.Count pagamento@(group.Entries.Count != 1 ? "s" : "")</span>
-                                    <span class="payments-badge payments-badge--amount">R$ @group.TotalAmount.ToString("F2")</span>
+                                    <span class="payments-badge payments-badge--amount payments-badge--amount--history">R$ @group.TotalAmount.ToString("F2")</span>
                                 </div>
                                 <i class="fas fa-chevron-@(isSelected ? "up" : "down") payments-chevron"></i>
                             </li>
@@ -186,12 +188,6 @@ else
                             <div class="payments-user-meta">
                                 <span class="payments-badge payments-badge--games">@d.Entries.Count jogo@(d.Entries.Count != 1 ? "s" : "")</span>
                                 <span class="payments-badge payments-badge--amount">R$ @d.TotalAmount.ToString("F2")</span>
-                                @if (d.Entries.Any(e => e.HasProof))
-                                {
-                                    <span class="payments-badge payments-badge--proof" title="Jogador enviou comprovante">
-                                        <i class="fas fa-camera"></i> Comprovante
-                                    </span>
-                                }
                             </div>
                             <div class="payments-notify-actions" @onclick:stopPropagation="true">
                                 @if (notifiedUserIds?.Contains(userId) == true)

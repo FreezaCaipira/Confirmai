@@ -98,6 +98,91 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - 1.694/1.694 testes passando (+20 vs C14), 0 erros de build
 - **Problemas**: nenhum
 
+### Ciclo 16 (Pleno Local): Menu Mobile Hamburger (Em Andamento)
+- Branch: `fix/ciclo16-mobile-ux` | PR pendente
+- Fase 1: Implementação do menu hamburger (MainLayout.razor + MainLayout.razor.css)
+- Fase 2: Correção do z-index (site.css + MainLayout.razor.css)
+- Fase 3: Correção do city selector (CitySelector.razor.css)
+- Fase 4: Reorganização do menu mobile (internacionalização primeiro)
+- Fase 5: Ajuste do botão "Meus Eventos" (Index.razor.css)
+- Fase 6: Linhas separatorias e layout (MainLayout.razor.css)
+- Fase 7: Background da internacionalização (MainLayout.razor.css)
+- Fase 8: Textos em mensagens e perfil (MainLayout.razor + MainLayout.razor.css)
+- Fase 9: Correção de cor/fonte (MainLayout.razor.css)
+- Fase 10: Tela de login mobile (identity.css + _Layout.cshtml viewport meta tag)
+- Fase 11: Menu mobile colapsar automaticamente ao clicar (MainLayout.razor HandleLocationChanged)
+- Fase 12: Badge de aprovar no card do grupo (Index.razor.css position top)
+- Fase 13: Div de código para entrar em novo grupo mobile (events.css groups-block padding)
+- Fase 14: Scroll horizontal desnecessário na página de grupos (events.css box-sizing)
+- Fase 15: Botão de pagamentos no mobile (BLOQUEADO - NECESSITA DIRECIONAMENTO DO SENIOR)
+- **Status**: Menu mobile funcional, estrutura CSS estabelecida
+- **Problemas**: Breakpoints inconsistentes (700px vs 768px), elementos fora do media query
+- **PROBLEMA CRÍTICO FASE 15**: Botão de pagamentos não acompanha os demais botões no mobile. Nenhuma das tentativas funcionou.
+
+## Documentação Completa das Tentativas - Fase 15
+
+### Tentativa 1: Adicionar classe específica ao HTML
+- **Arquivo**: MainLayout.razor
+- **Mudança**: Adicionada classe `oldsite-top-nav-payments-link` ao link de pagamentos
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Criados estilos mobile específicos para `.oldsite-top-nav-payments-link`
+- **Resultado**: Sem efeito visual
+
+### Tentativa 2: Usar seletor de atributo
+- **Arquivo**: MainLayout.razor
+- **Mudança**: Removida classe `oldsite-top-nav-payments-link`
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Usar seletor de atributo `a[href="/payments"]` para estilos mobile
+- **Resultado**: Sem efeito visual
+
+### Tentativa 3: Usar !important para forçar estilos
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Adicionar `!important` a todos os estilos mobile de `body .oldsite-top-nav > a` e `a[href="/payments"]`
+- **Resultado**: Sem efeito visual
+
+### Tentativa 4: Adicionar classe compartilhada a todos os links
+- **Arquivo**: MainLayout.razor
+- **Mudança**: Adicionar classe `oldsite-top-nav-link` a todos os links de navegação (grupos, pagamentos, integration, admin)
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Criar estilos mobile específicos para `.oldsite-top-nav-link` com `!important`
+- **Resultado**: Sem efeito visual
+
+### Tentativa 5: Modificar site.css diretamente
+- **Arquivo**: site.css
+- **Mudança**: Alterar media query `@media (max-width: 700px)` para `body .oldsite-top-nav a`:
+  - width 100%, padding 0.6rem 0.8rem, text-align left, border-bottom, border-right none, min-height auto, box-sizing border-box
+  - Remover flex: 1 1 auto, min-width 132px, min-height 44px
+- **Resultado**: Sem efeito visual mesmo após dotnet clean + build
+
+### Tentativa 6: Remover !important do MainLayout.razor.css
+- **Arquivo**: MainLayout.razor.css
+- **Mudança**: Remover `!important` para manter consistência com site.css
+- **Resultado**: Sem efeito visual
+
+## Análise Técnica
+
+### Estrutura CSS
+- site.css é carregado globalmente via _Host.cshtml
+- MainLayout.razor.css é carregado como scoped CSS com atributos `b-xxx`
+- site.css tem estilos `body .oldsite-top-nav a` com alta especificidade
+- MainLayout.razor.css tem estilos mobile em media query `@media (max-width: 700px)`
+
+### Possíveis Causas
+1. **Cache do navegador**: Hot reload não aplicando scoped CSS corretamente (regra 21)
+2. **Blazor CSS isolation**: Scoped CSS pode não estar aplicando corretamente
+3. **Specificidade**: Estilos globais do site.css podem estar prevalecendo
+4. **Media query não sendo ativada**: Breakpoint pode não estar sendo atingido
+5. **Estrutura HTML**: Link de pagamentos está dentro de AuthorizeView, pode afetar aplicação de estilos
+
+### Testes Realizados
+- dotnet clean + dotnet build
+- Ctrl+F5 (hard refresh) no navegador
+- Verificação de media query em devtools
+- Verificação de estilos aplicados no elemento
+
+## Solicitação ao Senior
+Favor direcionar como resolver o problema do botão de pagamentos no mobile. Todas as tentativas de CSS falharam sem efeito visual.
+
 ---
 
 ## Revisao Senior do Ciclo 12
@@ -930,7 +1015,127 @@ private async Task ApproveAllPending(int groupId)
 
 ---
 
-## Ciclo 16 -- Integracao WhatsApp Real + Baseline Operacional por Gateway
+## Ciclo 16 -- Mobile UX Fix (PRIORIDADE CRÍTICA)
+
+**Branch**: `fix/ciclo16-mobile-ux`
+**1 commit por fase** dentro da branch. **1 PR** no final.
+Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
+
+### Contexto e Importância
+
+**Público predominante mobile**: Este projeto terá a maioria dos usuários acessando via dispositivos móveis. A experiência mobile não é apenas uma melhoria UX, mas um requisito crítico de negócio.
+
+**Problema identificado**: O layout mobile está totalmente quebrado. O comportamento foi replicado no Chrome DevTools (F12) ao alterar para mobile e diminuir a largura da tela. O layout estava ok em telas maiores, mas conforme a largura diminui, ele começa a se comportar da mesma forma que no celular pessoal.
+
+**Objetivo**: Corrigir todos os problemas de layout mobile para garantir uma experiência consistente e profissional em dispositivos móveis, que é o principal ponto de acesso dos usuários.
+
+**Prioridade**: CRÍTICA - Este ciclo deve receber máxima atenção e recursos, pois impacta diretamente a experiência do público principal do produto.
+
+### Fase 1 — Auditoria de problemas mobile
+
+**Ação**: Identificar todos os componentes e páginas com problemas de layout mobile.
+
+**Metodologia**:
+1. Usar Chrome DevTools (F12) em modo mobile (iPhone SE, iPhone 12 Pro, iPad)
+2. Navegar por todas as páginas principais:
+   - `/eventos` (home)
+   - `/grupos`
+   - `/grupo/{Id}` (detail)
+   - `/futsal`
+   - `/poker`
+   - `/meus-eventos`
+   - `/profile`
+   - `/admin`
+3. Documentar cada problema encontrado com:
+   - Página/componente
+   - Largura de tela onde o problema ocorre
+   - Descrição do comportamento incorreto
+   - Screenshot (opcional)
+
+**Arquivo de documentação**: `docs/ciclo16-mobile-auditoria.md` (criado para listar todos os problemas)
+
+**Status**: ✅ Concluído
+- Auditoria inicial baseada em 6 screenshots da página /eventos
+- Identificados problemas gerais: sidebar, grid, overflow, transições
+- Documentação criada e mantida atualizada com cada correção
+
+### Fase 2 — Correção de problemas mobile (prioridade alta)
+
+**Ação**: Corrigir os problemas identificados na Fase 1, começando pelos mais críticos.
+
+**Abordagem**:
+1. Revisar breakpoints existentes em `site.css` e arquivos scoped
+2. Adicionar/ajustar media queries para telas mobile
+3. Corrigir overflow, wrapping, spacing e sizing
+4. Testar cada correção em múltiplos tamanhos de tela
+
+**Arquivos a modificar** (dependente da auditoria):
+- `wwwroot/css/site.css` (breakpoints globais)
+- `Pages/Index.razor.css` (home)
+- `Pages/Groups/Index.razor.css`
+- `Pages/Groups/Detail.razor.css`
+- `Pages/Futsal/Index.razor.css`
+- `Pages/Poker/Index.razor.css`
+- Outros arquivos CSS conforme necessário
+
+**Status**: ✅ Concluído (todas as páginas principais)
+- ✅ `/eventos` (Index.razor.css + site.css) - Commit 46b7be7
+- ✅ `/grupos` (events.css) - Commit 077aea9
+- ✅ `/grupo/{Id}` (events.css) - Commit aa41b06
+- ✅ `/futsal` (Futsal/Index.razor.css) - Commit 7cd83c4
+- ✅ `/poker` (Poker/Index.razor.css) - Commit a1022db
+- ✅ `/meus-eventos` (MyEvents/Index.razor.css) - Commit 94a11c7
+- ✅ `/profile` (Profile.razor.css + componentes) - Commit 08e7e57
+- ✅ `/admin` (Admin.razor.css) - Commit 9d81c28
+
+**Correções aplicadas**:
+- Adicionado breakpoint <375px para telas muito pequenas em todos os arquivos
+- Expandido breakpoints existentes (<640px, <760px, <560px, <480px)
+- Reduzido padding, fontes e heights para economizar espaço
+- Ajustado layouts para flex-direction: column em mobile
+- Ajustado grids para grid-template-columns: 1fr em mobile
+- Centralizado botões e ações em mobile
+- Ajustado avatares, badges e ícones para mobile pequeno
+
+### Fase 3 — Testes mobile cross-browser
+
+**Ação**: Validar correções em múltiplos browsers e dispositivos.
+
+**Metodologia**:
+1. Testar em Chrome, Safari, Firefox (mobile)
+2. Validar em diferentes tamanhos de tela (320px, 375px, 414px, 768px)
+3. Verificar orientação portrait e landscape
+4. Testar scroll, zoom e interações touch
+
+**Status**: ⏳ Em andamento (instruções documentadas, aplicação rodando)
+
+**Aplicação rodando em**: http://localhost:5000
+
+**Instruções de teste documentadas em**: `docs/ciclo16-mobile-auditoria.md`
+
+**Checklist por página** (para testes manuais):
+- `/eventos` - Sidebar, sports tabs, event cards, city selector
+- `/grupos` - Grid de grupos, cards, botões
+- `/grupo/{Id}` - Header, admin bar, events tabs, pending requests
+- `/futsal` - Event cards, time badges, meta chips
+- `/poker` - Event cards, dropdown menu, type badges
+- `/meus-eventos` - Header, view tabs, create buttons, event cards
+- `/profile` - Profile page, avatar, edit form, chat thread
+- `/admin` - Settings card, security panels, KPI grid, nav
+
+**Browsers para testar**: Chrome, Firefox, Edge, Safari (se disponível)
+
+**Tamanhos de tela**: 320px, 375px, 414px, 768px, 1024px
+
+### Fase 4 — Melhorias UX vindas de testes do app
+
+**Contexto**: Durante testes manuais do app após conclusão das fases 1-3, capturar correções e refinamentos identificados.
+
+**Implementação**: Documentar e implementar melhorias adicionais identificadas durante testes mobile.
+
+---
+
+## Ciclo 17 -- Integracao WhatsApp Real + Baseline Operacional por Gateway (MOVIDO)
 
 **Branch**: `feat/ciclo16-whatsapp-baseline`
 **1 commit por fase** dentro da branch. **1 PR** no final.

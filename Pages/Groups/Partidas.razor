@@ -64,22 +64,19 @@ else
 
             <header class="detail-header">
                 <div class="detail-header-top">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
-                    </span>
                     <a href="/grupo/@group.Id" class="detail-back-link">
                         <i class="fas fa-arrow-left"></i> Voltar
                     </a>
                 </div>
-                <h1 class="detail-title"><i class="fas fa-calendar-alt"></i> Partidas — @group.Name</h1>
+                <div class="detail-header-title-row">
+                    <span class="detail-header-subtitle">
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker") — Partidas <span class="detail-events-year">@eventsYear</span>
+                    </span>
+                </div>
+                <h1 class="detail-title">@group.Name</h1>
             </header>
 
             <section class="detail-section">
-                <h2 class="detail-section-title detail-events-title detail-events-title--no-mb partidas-title">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Partidas</span>
-                    <span class="detail-events-year">@eventsYear</span>
-                </h2>
                 @if (displayedEvents.Any(e => e.RachaScheduleId.HasValue))
                 {
                     <div class="events-recurring-notice">

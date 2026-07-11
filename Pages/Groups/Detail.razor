@@ -71,21 +71,23 @@ else
             @* ── Cabeçalho ─────────────────────────────────────────── *@
             <header class="detail-header">
                 <div class="detail-header-top">
+                    <a href="/grupos" class="detail-back-link">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </div>
+                <div class="detail-header-content">
                     <span class="detail-sport-badge">
                         @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
                     </span>
-                    <a href="/grupos" class="detail-back-link">
-                        <i class="fas fa-arrow-left"></i> Início
-                    </a>
+                    <h1 class="detail-title">@group.Name</h1>
+                    @if (!string.IsNullOrWhiteSpace(group.City))
+                    {
+                        <p class="detail-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            @group.City/@group.StateCode
+                        </p>
+                    }
                 </div>
-                <h1 class="detail-title">@group.Name</h1>
-                @if (!string.IsNullOrWhiteSpace(group.City))
-                {
-                    <p class="detail-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        @group.City/@group.StateCode
-                    </p>
-                }
                 @if (!group.IsActive)
                 {
                     <div class="cancelled-banner"><i class="fas fa-ban"></i> Grupo inativo.</div>

@@ -294,12 +294,12 @@ public class EventNotificationService
         });
         await db.SaveChangesAsync();
 
+        // E-mail best-effort — falhas são silenciosas para não bloquear o fluxo principal
         if (!string.IsNullOrWhiteSpace(user.Email))
         {
-            var subject  = $"[Confirmai] Pagamentos pendentes — {groupName}";
             var bodyHtml = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
-            try { await _emailSender.SendEmailAsync(user.Email, subject, bodyHtml); }
-            catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de inadimplência para {Email}", user.Email); }
+            try { await _emailSender.SendEmailAsync(user.Email, $"[Confirmai] Pagamentos pendentes — {groupName}", bodyHtml); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de cobrança para {Email}", user.Email); }
         }
 
         return (userName, user.Email, user.PhoneNumber);

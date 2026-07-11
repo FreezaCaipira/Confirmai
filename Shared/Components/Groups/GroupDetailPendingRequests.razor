@@ -8,35 +8,35 @@
         <h2 class="detail-section-title">
             <i class="fas fa-user-clock"></i> Solicitações pendentes (@PendingCount)
         </h2>
-        <div class="detail-section-filters">
-            <select class="input input--sm input--width-auto" value="@RequestSortOrder" @onchange="(e) => RequestSortOrderChanged.InvokeAsync((string)e.Value)">
-                <option value="newest">Mais recentes</option>
-                <option value="oldest">Mais antigas</option>
-                <option value="name">Nome A-Z</option>
-            </select>
-            @if (SelectedCount > 0)
-            {
-                <div class="bulk-actions">
-                    <span class="bulk-count">@SelectedCount selecionado@(SelectedCount == 1 ? "" : "s")</span>
-                    <button class="btn-approve btn-approve--sm" type="button"
-                            @onclick="OnApproveSelected"
-                            disabled="@IsBulkProcessing">
-                        <i class="fas fa-check"></i> Aprovar todos
-                    </button>
-                    <button class="btn-reject btn-reject--sm" type="button"
-                            @onclick="OnRejectSelected"
-                            disabled="@IsBulkProcessing">
-                        <i class="fas fa-times"></i> Rejeitar todos
-                    </button>
-                    <button class="btn-cancel btn-cancel--sm" type="button"
-                            @onclick="OnClearSelection"
-                            disabled="@IsBulkProcessing">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            }
-        </div>
+        <select class="input input--sm input--width-auto" value="@RequestSortOrder" @onchange="(e) => RequestSortOrderChanged.InvokeAsync((string)e.Value)">
+            <option value="newest">Mais recentes</option>
+            <option value="oldest">Mais antigas</option>
+            <option value="name">Nome A-Z</option>
+        </select>
     </div>
+    @if (SelectedCount > 0)
+    {
+        <div class="bulk-actions-row">
+            <div class="bulk-actions">
+                <span class="bulk-count">@SelectedCount selecionado@(SelectedCount == 1 ? "" : "s")</span>
+                <button class="btn-approve btn-approve--sm" type="button"
+                        @onclick="OnApproveSelected"
+                        disabled="@IsBulkProcessing">
+                    <i class="fas fa-check"></i> Aprovar todos
+                </button>
+                <button class="btn-reject btn-reject--sm" type="button"
+                        @onclick="OnRejectSelected"
+                        disabled="@IsBulkProcessing">
+                    <i class="fas fa-times"></i> Rejeitar todos
+                </button>
+                <button class="btn-cancel btn-cancel--sm" type="button"
+                        @onclick="OnClearSelection"
+                        disabled="@IsBulkProcessing">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    }
     <ul class="pending-requests-list">
         @foreach (var req in SortedPendingRequests)
         {
