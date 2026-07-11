@@ -294,14 +294,7 @@ public class EventNotificationService
         });
         await db.SaveChangesAsync();
 
-        if (!string.IsNullOrWhiteSpace(user.Email))
-        {
-            var subject  = $"[Confirmai] Pagamentos pendentes — {groupName}";
-            var bodyHtml = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
-            try { await _emailSender.SendEmailAsync(user.Email, subject, bodyHtml); }
-            catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de inadimplência para {Email}", user.Email); }
-        }
-
+        // Apenas envia mensagem interna (mailbox), não envia e-mail
         return (userName, user.Email, user.PhoneNumber);
     }
 }

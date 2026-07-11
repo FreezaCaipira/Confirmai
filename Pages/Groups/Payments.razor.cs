@@ -226,7 +226,7 @@ public partial class Payments
 
     private async Task HandleNotifyDelinquencyAsync(UserDelinquency delinquency)
     {
-        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Deseja notificar {delinquency.UserName} sobre os pagamentos em aberto? Uma mensagem será enviada por e-mail.");
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Deseja notificar {delinquency.UserName} sobre os pagamentos em aberto? Uma mensagem será enviada pelo sistema interno.");
         if (confirmed)
         {
             await AdminNotifyDelinquency(delinquency);
