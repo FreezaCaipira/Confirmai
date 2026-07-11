@@ -443,23 +443,27 @@
 }
 
 .payments-notify-btn--email {
-    color: var(--amber-mid);
-    border-color: var(--amber-opacity-sm);
+    color: var(--amber);
+    border-color: var(--amber-opacity-md);
+    background: rgba(245, 158, 11, 0.1);
 }
 
 .payments-notify-btn--email:hover {
-    background: rgba(245, 158, 11, 0.15);
-    border-color: rgba(245, 158, 11, 0.6);
+    background: rgba(245, 158, 11, 0.25);
+    border-color: var(--amber);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
 }
 
 .payments-notify-btn--whatsapp {
-    color: var(--green-strong);
-    border-color: rgba(16, 185, 129, 0.3);
+    color: var(--green-bright);
+    border-color: var(--green-opacity-md);
+    background: rgba(16, 185, 129, 0.1);
 }
 
 .payments-notify-btn--whatsapp:hover {
-    background: rgba(16, 185, 129, 0.15);
-    border-color: var(--teal-opacity-md);
+    background: rgba(16, 185, 129, 0.25);
+    border-color: var(--green-bright);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
 }
 
 .payments-chevron {
