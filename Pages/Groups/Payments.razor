@@ -226,12 +226,6 @@ else
                                         <li class="payments-detail-item">
                                             <span class="payments-detail-date">@Ui.FormatDateTime(entry.EventDate.ToLocalTime(), "DateDefault")</span>
                                             <span class="payments-detail-price">R$ @entry.EventPrice.ToString("F2")</span>
-                                            @if (entry.HasProof)
-                                            {
-                                                <span class="payments-badge payments-badge--proof" title="Jogador enviou comprovante">
-                                                    <i class="fas fa-camera"></i> Comprovante
-                                                </span>
-                                            }
                                             <div class="payments-detail-actions">
                                                 <button class="payments-view-proof-btn" type="button"
                                                         disabled="@(entry.HasProof ? null : true)"
