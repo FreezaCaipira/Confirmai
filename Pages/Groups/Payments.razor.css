@@ -653,8 +653,8 @@
         width: 100%;
         justify-content: center;
         margin-left: 0;
-        font-size: 0.85rem;
-        padding: 0.5rem 0.8rem;
+        font-size: 0.6rem;
+        padding: 0.35rem 0.6rem;
     }
 
     .payments-user-list {
