@@ -294,7 +294,14 @@ public class EventNotificationService
         });
         await db.SaveChangesAsync();
 
-        // Apenas envia mensagem interna (mailbox), não envia e-mail
+        // E-mail best-effort — falhas são silenciosas para não bloquear o fluxo principal
+        if (!string.IsNullOrWhiteSpace(user.Email))
+        {
+            var bodyHtml = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
+            try { await _emailSender.SendEmailAsync(user.Email, $"[Confirmai] Pagamentos pendentes — {groupName}", bodyHtml); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de cobrança para {Email}", user.Email); }
+        }
+
         return (userName, user.Email, user.PhoneNumber);
     }
 }
