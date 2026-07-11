@@ -76,22 +76,22 @@ else
 
             @* ── Tabs ──────────────────────────────────────────────── *@
             <div class="payments-tabs">
-                <button class="payments-tab @(paymentTab == "delinquent" ? "payments-tab--active" : "")"
+                <button class="payments-tab @(paymentTab == "delinquent" ? "payments-tab--active payments-tab--delinquent" : "")"
                         type="button"
                         @onclick="@(() => HandleTabChange("delinquent"))">
                     <i class="fas fa-exclamation-triangle"></i> Pendentes
                     @if (delinquencyList?.Count > 0)
                     {
-                        <span class="payments-tab-count">@delinquencyList.Count</span>
+                        <span class="payments-tab-count payments-tab-count--delinquent">@delinquencyList.Count</span>
                     }
                 </button>
-                <button class="payments-tab @(paymentTab == "history" ? "payments-tab--active" : "")"
+                <button class="payments-tab @(paymentTab == "history" ? "payments-tab--active payments-tab--history" : "")"
                         type="button"
                         @onclick="@(() => HandleTabChange("history"))">
                     <i class="fas fa-history"></i> Histórico
                     @if (paymentHistory?.Count > 0)
                     {
-                        <span class="payments-tab-count">@paymentHistory.Count</span>
+                        <span class="payments-tab-count payments-tab-count--history">@paymentHistory.Count</span>
                     }
                 </button>
                 <button class="payments-refresh-btn" type="button" @onclick="RefreshPayments" title="Recarregar lista">

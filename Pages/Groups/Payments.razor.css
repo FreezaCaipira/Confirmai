@@ -78,6 +78,20 @@
     text-shadow: 0 0 10px var(--shadow-accent-lg);
 }
 
+.payments-tab--delinquent {
+    border-color: var(--red-soft);
+    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
+    box-shadow: 0 4px 8px var(--shadow-red-sm), inset 0 0 0 1px var(--red-opacity-md);
+    text-shadow: 0 0 10px var(--shadow-red-lg);
+}
+
+.payments-tab--history {
+    border-color: var(--green-opacity-md);
+    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-strong) 50%, var(--green-border) 100%);
+    box-shadow: 0 4px 8px var(--shadow-green-sm), inset 0 0 0 1px var(--green-opacity-md);
+    text-shadow: 0 0 10px var(--shadow-green-lg);
+}
+
 .payments-tab-count {
     background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
     color: var(--red-lightest);
@@ -86,6 +100,18 @@
     border-radius: 3px;
     font-weight: 800;
     box-shadow: 0 2px 4px var(--shadow-red-sm);
+}
+
+.payments-tab-count--delinquent {
+    background: linear-gradient(180deg, var(--red-light) 0%, var(--red-soft) 50%, var(--red-strong) 100%);
+    color: var(--red-lightest);
+    box-shadow: 0 2px 4px var(--shadow-red-md);
+}
+
+.payments-tab-count--history {
+    background: linear-gradient(180deg, var(--green-light) 0%, var(--green-soft) 50%, var(--green-strong) 100%);
+    color: var(--green-lightest);
+    box-shadow: 0 2px 4px var(--shadow-green-md);
 }
 
 .payments-refresh-btn {
