@@ -366,6 +366,7 @@
     border-radius: 6px;
     gap: 0.5rem;
     box-shadow: 0 2px 4px var(--shadow-md);
+    flex-wrap: wrap;
 }
 
 .payments-detail-date {
