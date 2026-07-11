@@ -133,7 +133,7 @@ else
                                 <span class="payments-user-name">@group.UserName</span>
                                 <div class="payments-user-meta">
                                     <span class="payments-badge payments-badge--games">@group.Entries.Count pagamento@(group.Entries.Count != 1 ? "s" : "")</span>
-                                    <span class="payments-badge payments-badge--amount">R$ @group.TotalAmount.ToString("F2")</span>
+                                    <span class="payments-badge payments-badge--amount payments-badge--amount--history">R$ @group.TotalAmount.ToString("F2")</span>
                                 </div>
                                 <i class="fas fa-chevron-@(isSelected ? "up" : "down") payments-chevron"></i>
                             </li>

@@ -317,6 +317,12 @@
     border: 1px solid var(--red-pale);
 }
 
+.payments-badge--amount--history {
+    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-strong) 50%, var(--green-border) 100%);
+    color: var(--green-lightest);
+    border: 1px solid var(--green-pale);
+}
+
 .payments-badge--proof {
     background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
     color: var(--green-soft);
