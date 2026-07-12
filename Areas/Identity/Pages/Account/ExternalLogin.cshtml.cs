@@ -94,6 +94,18 @@ namespace Confirmai.Areas.Identity.Pages.Account
                 return LocalRedirect(returnUrl);
             }
 
+            if (signInResult.IsNotAllowed)
+            {
+                var linkedUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                if (linkedUser is not null && !linkedUser.EmailConfirmed)
+                {
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(linkedUser);
+                    await _userManager.ConfirmEmailAsync(linkedUser, token);
+                    await _signInManager.SignInAsync(linkedUser, isPersistent: false);
+                    return LocalRedirect(returnUrl);
+                }
+            }
+
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrWhiteSpace(email))
             {

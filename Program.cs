@@ -183,6 +183,7 @@ var emailEnabled = builder.Configuration.GetSection("Email").GetValue<bool>("Ena
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedEmail = securityPolicy.RequireConfirmedEmail && emailEnabled;
+        options.SignIn.RequireConfirmedAccount = true;
 
         options.Password.RequiredLength = securityPolicy.PasswordRequiredLength;
         options.Password.RequireDigit = securityPolicy.PasswordRequireDigit;
