@@ -18,7 +18,7 @@
 @inject LogService                     LogService
 @inject EventPaymentGatewayFactory     EventGatewayFactory
 
-<PageTitle>ConfiguraÃ§Ãµes â€” @(group?.Name ?? "Grupo") Â· Confirmai</PageTitle>
+<PageTitle>Configurações — @(group?.Name ?? "Grupo") · Confirmai</PageTitle>
 
 @if (isLoading)
 {
@@ -46,8 +46,8 @@
 else if (group is null || !isAdmin)
 {
     <div class="detail-not-found">
-        <h2>Acesso nÃ£o autorizado.</h2>
-        <a href="/">â† Voltar</a>
+        <h2>Acesso não autorizado.</h2>
+        <a href="/">← Voltar</a>
     </div>
 }
 else
@@ -62,16 +62,16 @@ else
             <header class="detail-header">
                 <div class="detail-header-top">
                     <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "âš½ Futsal" : "ðŸƒ Poker")
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
                     </span>
                     <a href="/grupo/@group.Id" class="detail-back-link">
                         <i class="fas fa-arrow-left"></i> @group.Name
                     </a>
                 </div>
-                <h1 class="detail-title">ConfiguraÃ§Ãµes do grupo</h1>
+                <h1 class="detail-title">Configurações do grupo</h1>
             </header>
 
-            @* â”€â”€ Funcionalidades â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+            @* ── Funcionalidades ────────────────────────────────────── *@
             <FeaturesToggles
                 Group="@group"
                 IsSaving="@isSaving"
@@ -83,7 +83,7 @@ else
 
             <hr class="detail-divider">
 
-            @* â”€â”€ Membros & PermissÃµes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+            @* ── Membros & Permissões ───────────────────────────────── *@
             <MembersManager
                 Members="@members"
                 CurrentUserId="@currentUserId"
@@ -100,7 +100,7 @@ else
 
             <hr class="detail-divider">
 
-            @* â”€â”€ Pix do Organizador â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ *@
+            @* ── Pix do Organizador ─────────────────────────────────── *@
             <PixReceiverSelector
                 PixAdmins="@pixAdmins"
                 SelectedPixReceiverId="@selectedPixReceiverId"
