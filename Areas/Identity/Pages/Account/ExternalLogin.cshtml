@@ -1,0 +1,13 @@
+@page
+@model Confirmai.Areas.Identity.Pages.Account.ExternalLoginModel
+@inject Confirmai.Services.Core.UiTextService T
+@{
+    ViewData["Title"] = T["Identity.ExternalLogin.Title"];
+}
+
+<h2 class="identity-login-heading">@T["Identity.ExternalLogin.Heading"]</h2>
+
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div class="text-danger">@Model.ErrorMessage</div>
+}

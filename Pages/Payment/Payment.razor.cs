@@ -192,7 +192,7 @@ public partial class Payment : IAsyncDisposable
         if (Amount < MinBtcAmount)
         {
             await LogService.LogAsync(
-                message: $"Tentativa de pagamento abaixo do mÃ­nimo: {Amount} BTC.",
+                message: $"Tentativa de pagamento abaixo do mínimo: {Amount} BTC.",
                 source: "Payment",
                 level: "Warning",
                 userId: sellerUser?.Id
@@ -246,7 +246,7 @@ public partial class Payment : IAsyncDisposable
             await db.SaveChangesAsync();
 
             await LogService.LogAsync(
-                $"EndereÃ§o/invoice gerado para produto {ProductId} via {SelectedMethod}.",
+                $"Endereço/invoice gerado para produto {ProductId} via {SelectedMethod}.",
                 source: "Payment",
                 level: "Info",
                 userId: userId
@@ -257,7 +257,7 @@ public partial class Payment : IAsyncDisposable
         catch (Exception ex)
         {
             await LogService.LogAsync(
-                "Erro ao gerar endereÃ§o/invoice.",
+                "Erro ao gerar endereço/invoice.",
                 source: "Payment",
                 level: "Error",
                 userId: sellerUser?.Id,

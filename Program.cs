@@ -22,6 +22,7 @@ using Confirmai.Configuration;
 using Confirmai.Hubs;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
@@ -182,6 +183,7 @@ var emailEnabled = builder.Configuration.GetSection("Email").GetValue<bool>("Ena
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedEmail = securityPolicy.RequireConfirmedEmail && emailEnabled;
+        options.SignIn.RequireConfirmedAccount = true;
 
         options.Password.RequiredLength = securityPolicy.PasswordRequiredLength;
         options.Password.RequireDigit = securityPolicy.PasswordRequireDigit;
@@ -254,8 +256,21 @@ builder.Services.AddHttpClient("AppmaxAuth", (sp, client) =>
         : opts.AuthBaseUrl);
 });
 
-builder.Services.AddAuthentication()
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+var authBuilder = builder.Services.AddAuthentication()
     .AddScheme<ApiKeyAuthOptions, ApiKeyAuthHandler>(ApiKeyAuthDefaults.AuthenticationScheme, _ => { });
+
+if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    authBuilder.AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+        options.CallbackPath = "/signin-google";
+    });
+}
 
 // S-7: Rate limiting
 builder.Services.AddRateLimiter(options =>

@@ -11,10 +11,11 @@ namespace Confirmai.Services.Core;
 public static class AuditEvents
 {
     // -- User / Identity --
-    public const string UserRegistered      = "user.registered";
-    public const string UserLoginSuccess    = "user.login.success";
-    public const string UserLoginFailed     = "user.login.failed";
-    public const string UserLockedOut       = "user.locked";
+    public const string UserRegistered           = "user.registered";
+    public const string UserLoginSuccess         = "user.login.success";
+    public const string UserLoginFailed          = "user.login.failed";
+    public const string UserLinkedExternalLogin  = "user.external_login.linked";
+    public const string UserLockedOut            = "user.locked";
     public const string UserPasswordChanged = "user.password.changed";
     public const string UserPasswordReset   = "user.password.reset";
     public const string UserRoleAssigned    = "user.role.assigned";

@@ -57,7 +57,7 @@
                             <img class="flag-icon" src="/images/flags/es.svg" alt="" aria-hidden="true" />
                         </a>
                     </div>
-                    <a href="/eventos"><span class="nav-icon-cycle" aria-hidden="true"><i class="fas fa-futbol nav-icon--a"></i><span class="nav-icon--b">🃏</span></span> @T["Nav.Sports"]</a>
+                    <a href="/eventos" class="oldsite-top-nav-link"><span class="nav-icon-cycle" aria-hidden="true"><i class="fas fa-futbol nav-icon--a"></i><span class="nav-icon--b">🃏</span></span> @T["Nav.Sports"]</a>
                     <AuthorizeView>
                         <Authorized>
                             <a href="/grupos" class="oldsite-top-nav-link"><i class="fas fa-users" aria-hidden="true"></i> Grupos</a>
@@ -79,7 +79,7 @@
 
                             <span class="nav-flex-spacer"></span>
 
-                            <a href="/mailbox" class="oldsite-top-nav-mailbox-icon" title="@T["Nav.Mailbox"]" aria-label="@T["Nav.Mailbox"]">
+                            <a href="/mailbox" class="oldsite-top-nav-link oldsite-top-nav-mailbox-icon" title="@T["Nav.Mailbox"]" aria-label="@T["Nav.Mailbox"]">
                                 <img class="oldsite-mailbox-glyph" src="/images/icons/mail-letter.svg" alt="" aria-hidden="true" />
                                 <span class="mobile-nav-text">@T["Nav.Mailbox"]</span>
                                 @if (unreadMailboxCount > 0)
@@ -89,17 +89,17 @@
                             </a>
                             @if (!string.IsNullOrWhiteSpace(currentUserId))
                             {
-                                <a href="/profile/@currentUserId" class="oldsite-top-nav-profile-link" title="@T["Nav.Profile"]" aria-label="@T["Nav.Profile"]">
+                                <a href="/profile/@currentUserId" class="oldsite-top-nav-link oldsite-top-nav-profile-link" title="@T["Nav.Profile"]" aria-label="@T["Nav.Profile"]">
                                     <img class="oldsite-profile-glyph" src="/images/icons/user-profile.svg" alt="" aria-hidden="true" />
                                     <span class="mobile-nav-text">@T["Nav.Profile"]</span>
                                 </a>
                             }
                             <span class="oldsite-top-nav-user">@T["Layout.Hello"], @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? T["Layout.UserFallback"] : context.User.Identity.Name)!</span>
-                            <a href="/Identity/Account/Logout" class="oldsite-top-nav-logout">@T["Layout.Logout"]</a>
+                            <a href="/Identity/Account/Logout" class="oldsite-top-nav-link oldsite-top-nav-logout">@T["Layout.Logout"]</a>
                         </Authorized>
                         <NotAuthorized>
-                            <a href="/Identity/Account/Login">@T["Nav.Login"]</a>
-                            <a href="/Identity/Account/Register">@T["Nav.Register"]</a>
+                            <a href="/Identity/Account/Login" class="oldsite-top-nav-link">@T["Nav.Login"]</a>
+                            <a href="/Identity/Account/Register" class="oldsite-top-nav-link">@T["Nav.Register"]</a>
                         </NotAuthorized>
                     </AuthorizeView>
                 </nav>

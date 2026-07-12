@@ -12,7 +12,7 @@
         }
     </div>
 
-    <p><b>UsuÃ¡rio:</b> @DisplayText(User.UserName)</p>
+    <p><b>Usuário:</b> @DisplayText(User.UserName)</p>
 
     @if (ShowUserId)
     {
@@ -21,11 +21,11 @@
 
     <p><b>Email:</b> @DisplayText(User.Email)</p>
     <p><b>Nome completo:</b> @DisplayText(User.FullName)</p>
-    <p><b>Data de nascimento:</b> @(User.BirthDate?.ToString("dd/MM/yyyy") ?? "NÃ£o informada")</p>
+    <p><b>Data de nascimento:</b> @(User.BirthDate?.ToString("dd/MM/yyyy") ?? "Não informada")</p>
 
     @if (ShowRoles)
     {
-        <p><b>PermissÃµes:</b> @(RoleList.Count > 0 ? string.Join(", ", RoleList) : "user")</p>
+        <p><b>Permissões:</b> @(RoleList.Count > 0 ? string.Join(", ", RoleList) : "user")</p>
     }
 
     @if (ShowStatus)
@@ -56,7 +56,7 @@
 
     private static string DisplayText(string? value)
     {
-        return string.IsNullOrWhiteSpace(value) ? "NÃ£o informado" : value;
+        return string.IsNullOrWhiteSpace(value) ? "Não informado" : value;
     }
 
     private static string GetInitial(string? text)

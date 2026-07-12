@@ -81,7 +81,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
                         AuditEvents.UserRegistered,
                         AuditEntities.User,
                         userId,
-                        $"Novo usu·rio registrado: {user.Email}.",
+                        $"Novo usu√°rio registrado: {user.Email}.",
                         actorUserId: userId,
                         source: AdminAuditSources.Identity,
                         metadata: new { UserId = userId, user.Email, HasPixKey = !string.IsNullOrEmpty(user.PixKey) });
@@ -105,7 +105,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
                         }
                         catch (Exception ex)
                         {
-                            await _log.LogAsync($"Falha ao enviar e-mail de confirmaÁ„o para {Input.Email}: {ex.Message}", source: "Register", level: "Error");
+                            await _log.LogAsync($"Falha ao enviar e-mail de confirma√ß√£o para {Input.Email}: {ex.Message}", source: "Register", level: "Error");
                         }
                     }
 
