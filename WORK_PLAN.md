@@ -1,8 +1,9 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 07/07/2026 | Base: `fix/ciclo15-tests-ux-cleanup` (pos-Ciclo 15) | Refatoracao CSS CONCLUIDA
-> 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto
-> Ciclo 15: Testes + UX Grupos Privados + Cleanup !important -- CONCLUIDO
+> Atualizado em 14/06/2026 | Base: `main` (pos-Ciclo 16) | Refatoracao CSS CONCLUIDA
+> 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste
+> Ciclo 15 (testes + UX grupos + !important) e Ciclo 16 (mobile UX) -- CONCLUIDOS e revisados
+> Proximo: Ciclo 17 -- WhatsApp real + Baseline por gateway + consolidar CSS do menu mobile (Fase 15)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -91,15 +92,17 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - **Problemas**: nenhum
 
 ### Ciclo 15 (Pleno Local): Testes + UX Grupos Privados + Cleanup !important
-- Branch: `fix/ciclo15-tests-ux-cleanup` | PR pendente
-- Fases 1-5: 20 novos testes (PingController, GroupMetricsService, CityService, WhatsAppNotificationService, LocationService)
+- Branch: `fix/ciclo15-tests-ux-cleanup` | PR #51 (merged)
+- Fases 1-5: 20 novos testes (PingController, GroupMetricsService, CityService, WhatsAppNotificationService, LocationService) -- 5 services sem teste ZERADO
 - Fase 6: Botao "Aprovar todos" na listagem de grupos com `@onclick:stopPropagation`
 - Fase 7: Auditoria `!important` no site.css (11/11 legitimos, nenhum removido)
+- Fase 8 (EXTRA fora do escopo): 4 novos esportes visuais (Volleyball/BeachTennis/Footvolley/Chess, cards "Em breve")
 - 1.694/1.694 testes passando (+20 vs C14), 0 erros de build
-- **Problemas**: nenhum
+- **Problemas**: 3 hardcoded hex + 8 vars mortas na Fase 8 (Senior corrigiu). Regra 16 violada (feature no ciclo de cleanup)
 
-### Ciclo 16 (Pleno Local): Menu Mobile Hamburger (Em Andamento)
-- Branch: `fix/ciclo16-mobile-ux` | PR pendente
+### Ciclo 16 (Pleno Local): Mobile UX -- Menu Hamburger + Header Consistente
+- Branch: `fix/ciclo16-mobile-ux` | PR #52 (merged)
+- DESVIO: ciclo planejado era WhatsApp+Baseline (movido para Ciclo 17). Pleno repriorizou para mobile UX.
 - Fase 1: Implementação do menu hamburger (MainLayout.razor + MainLayout.razor.css)
 - Fase 2: Correção do z-index (site.css + MainLayout.razor.css)
 - Fase 3: Correção do city selector (CitySelector.razor.css)
@@ -180,8 +183,8 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - Verificação de media query em devtools
 - Verificação de estilos aplicados no elemento
 
-## Solicitação ao Senior
-Favor direcionar como resolver o problema do botão de pagamentos no mobile. Todas as tentativas de CSS falharam sem efeito visual.
+## Solicitação ao Senior -- RESPONDIDA
+Ver **Revisao Senior do Ciclo 16 > Fase 15 BLOQUEADA** abaixo. Causa raiz: CSS do `oldsite-top-nav` fragmentado/duplicado entre `site.css` (global) e `MainLayout.razor.css` (scoped) -- mesmo padrao do bug de background dos Ciclos 12/13. Direcao: consolidar tudo em `site.css`, remover bloco mobile duplicado do scoped. Detalhado no Ciclo 17.
 
 ---
 
@@ -395,26 +398,134 @@ Nenhum. Codigo limpo, commits limpos, todas as regras respeitadas.
 
 ---
 
-## Metricas Atuais (pos-Ciclo 14)
+## Revisao Senior do Ciclo 15
 
-| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 | C12 | C13 | C14 |
-|---------|----|----|-------|----|----|-----|-----|-----|-----|-----|
-| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
-| `!important` global | -- | -- | 17 | 12 | 11 | 12 | 11 | 11 | 11 | **11** |
-| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | 185 | 189 | 189 | **189** |
-| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | 2.344 | 2.364 | 2.360 | **2.360** |
-| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | 4.246 | 4.690 | 4.244 | **4.244** |
-| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | 317 | 315 | 315 | **315** |
-| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | **0** |
-| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | 0 | 0 | 0 | **0** |
-| AppDbContext direto | -- | -- | -- | -- | -- | -- | 3 | 0 | 0 | **0** |
-| xUnit2013 warnings | -- | -- | -- | -- | -- | -- | 49 | 0 | 0 | **0** |
-| SessionTimeoutMinutes (dev) | -- | -- | -- | -- | -- | -- | -- | -- | 60 | **720** |
-| SessionTimeoutMinutes (prod) | -- | -- | -- | -- | -- | -- | -- | -- | 30 | **480** |
+### Veredicto: MUITO BOM -- 20 testes limpos, UX grupos correta, !important auditado. Scope creep na Fase 8 (novos esportes)
+
+| Metrica | C14 | C15 | Status |
+|---------|-----|-----|--------|
+| Build errors | 0 | **0** | Atingido |
+| Tests | 1.674 | **1.694** (+20) | Melhoria |
+| Test files | 192 | **197** (+5) | Melhoria |
+| Services sem teste | 5 | **0** | **Zerado** |
+| Hardcoded hex scoped | 0 | **0** (apos fix) | Atingido |
+| Vars indefinidas | 0 | **0** | Atingido |
+| Vars mortas `:root` | 0 | **0** (apos fix) | Atingido |
+
+### Bloco A -- Testes (Fases 1-5): 5/5 executados, cobertura ZERADA
+
+Os 5 services sem teste agora tem cobertura. 20 novos testes, todos passando:
+- **`PingControllerTests`** (2): auth 200 + anon 401/302 via `IntegrationTestWebAppFactory`. Padrao correto.
+- **`GroupMetricsServiceTests`** (5): snapshot com dados, grupo inexistente, grupo vazio, multi-grupo, payment rate 70%. Usa `IDbContextFactory` mock + `TestDataFactory`. Excelente.
+- **`CityServiceTests`** (5): cidades distintas, sem grupos, inativos excluidos, edge cases IBGE (vazio/null sem chamada HTTP). Seguiu a nota do Senior (nao mockar IBGE real).
+- **`WhatsAppNotificationServiceTests`** (5): sem config, com config, erro API 500, formatacao lembrete/pagamento. `MockHttpMessageHandler` proprio -- abordagem correta.
+- **`LocationServiceTests`** (3): `GetStateCode` puro via reflection (`BindingFlags.NonPublic | Static`). Testou so a logica pura como planejado.
+
+### Bloco B -- UX + Cleanup (Fases 6-7): executados
+
+**Fase 6 (Aprovar todos)**: `ApproveAllPending(groupId)` em `Groups/Index.razor` com `@onclick:stopPropagation`, botao so aparece quando `hasPending = isAdmin && pendingCount > 0`, spinner de processamento, mailbox preservada, `LoadGroups()` no fim. Reutilizou o padrao de `Detail.razor.cs`. Bom.
+
+**Fase 7 (!important)**: Auditoria confirmada -- 11/11 legitimos (utility, acessibilidade W3C, Google Maps z-index, autofill Chrome). Nenhum removido. Correto.
+
+### Fase 8 (EXTRA, fora do escopo) -- Novos esportes visualmente
+
+O Pleno adicionou 4 esportes ao `Enums/Sport.cs` (Volleyball, BeachTennis, Footvolley, Chess) com cards "Em breve", temas de cor e watermarks. **Isto NAO estava no workplan do Ciclo 15.** E uma decisao de produto (roadmap de esportes) que deveria ter sido um ciclo proprio com aprovacao previa (regra 16 -- separar features do escopo do ciclo).
+
+Funcionalmente os cards sao placeholders (`ComingSoon=true`, so Futsal ativo), entao nao ha risco de fluxo quebrado. Mas gerou lixo de CSS (ver problemas abaixo).
+
+### Problemas encontrados e corrigidos pelo Senior
+
+**1. 3 hardcoded hex em `SportCard.razor.css`** (Fase 8): `#fff`, `#93c5fd`, `#99f6e4`. Senior converteu para `var(--white)`, `var(--link-info)` e nova var `--beachtennis-cta`. Disciplina "0 hardcoded hex scoped" restaurada.
+
+**2. 4 vars mortas no `:root`** (Fase 8): `--volleyball-text`, `--beachtennis-text`, `--chess-text`, `--footvolley-text` -- definidas mas nunca usadas (so os `-text-pale` sao consumidos). Senior removeu (regra 13).
+
+**3. 4 vars `-accent-deep` mortas** (Fase 8): `--volleyball/beachtennis/footvolley/chess-accent-deep` -- 0 usos. Senior removeu.
+
+### Ressalvas
+- Regra 16 violada: Fase 8 (feature de produto) misturada no ciclo de testes/cleanup
+- Novos esportes introduziram 3 hardcoded hex + 8 vars mortas (mesmo padrao de scope creep dos ciclos CSS)
+
+---
+
+## Revisao Senior do Ciclo 16
+
+### Veredicto: BOM em UX mobile, mas DESVIO DE ESCOPO -- nao implementou o planejado (WhatsApp + Baseline). Fase 15 bloqueada.
+
+| Metrica | C15 | C16 | Status |
+|---------|-----|-----|--------|
+| Build errors | 0 | **0** | Atingido |
+| Tests | 1.694 | **1.694** | Atingido |
+| Hardcoded hex scoped | 0 | **0** (apos fix) | Atingido |
+| Vars indefinidas | 0 | **0** (apos fix) | Atingido |
+| WhatsApp real | pendente | **pendente** | NAO feito |
+| Baseline por gateway | pendente | **pendente** | NAO feito |
+
+### DESVIO DE ESCOPO (importante)
+
+O Ciclo 16 planejado era **Integracao WhatsApp Real + Baseline Operacional por Gateway**. O Pleno em vez disso executou um ciclo de **UX Mobile** (menu hamburger + padrao de header consistente em ~8 telas). O WhatsApp/Baseline foi movido para o **Ciclo 17** no WORK_PLAN.md.
+
+Isto foi uma repriorizacao (mobile e o publico predominante -- justificativa valida), mas o trabalho planejado do Ciclo 16 continua **pendente**. Registrado como Ciclo 17.
+
+### O que o Pleno fez (Mobile UX)
+
+- **Menu hamburger mobile** em `MainLayout.razor` + `MainLayout.razor.css` (nav vira coluna em `<700px`, colapsa ao navegar via `HandleLocationChanged`)
+- **Padrao de header consistente** (btn voltar / badge / titulo) em Pagamentos, Ranking, Futsal, Poker
+- Cores semanticas dos botoes Pendentes (vermelho) / Historico (accent), badge de valor verde metalico
+- Correcao de botoes extrapolando div, scroll horizontal em /grupos, viewport meta tag no login
+- Restaurou envio de email em `NotifyDelinquencyAsync` (commit 63be464)
+
+### Problemas encontrados e corrigidos pelo Senior
+
+**1. 3 vars indefinidas em `Groups/Payments.razor.css`** (commit 2f803da, cor do botao Pendentes): `--red-light`, `--shadow-red-lg`, `--shadow-red-md` usadas SEM fallback -> renderizam vazio (gradiente/sombra quebrados no botao "Pendentes" e badge). Mesmo problema recorrente da regra 12. Senior adicionou as 3 ao `:root` seguindo a escala red existente (sm=0.3, md=0.4, lg=0.5).
+
+**2. 3 arquivos .md soltos na raiz** (regra 20): `CSS_MOBILE_WEB_ISSUES.md`, `CSS_PATTERNS_HEADER.md`, `MOBILE_UX_CYCLE_16.md`. Senior removeu -- docs so no WORK_PLAN.md.
+
+### Fase 15 BLOQUEADA -- Direcao do Senior (botao Pagamentos no mobile)
+
+O Pleno tentou 6 abordagens para alinhar o link de pagamentos no menu mobile e todas falharam "sem efeito visual". **Causa raiz: CSS do `oldsite-top-nav` esta FRAGMENTADO e DUPLICADO entre global e scoped** -- exatamente o mesmo padrao que causou o bug de background dos Ciclos 12/13.
+
+Evidencia:
+- `site.css` tem **2 blocos base** `body .oldsite-top-nav {` (linhas ~3543 e ~5332) que se sobrescrevem
+- `site.css` tem regras mobile `body .oldsite-top-nav a` em `@media (max-width: 700px)` (~4225)
+- `MainLayout.razor.css` tem OUTRO `@media (max-width: 700px)` com `> a` E `.oldsite-top-nav-link` (scoped, ganha `[b-xxx]`)
+
+Com duas fontes de verdade competindo (uma global descendente `a`, outra scoped `> a` + classe), o cascade/especificidade fica fragil e o hot-reload nao reflete mudancas -- foi por isso que "nenhuma tentativa teve efeito".
+
+**Direcao para o Pleno (Ciclo 17, Fase mobile-nav)**: aplicar a solucao JA PROVADA no Ciclo 13 (background) -- **consolidar TODO o CSS do `oldsite-top-nav` numa unica fonte global (`site.css`) e REMOVER o bloco mobile duplicado de `MainLayout.razor.css`**. Passos:
+1. Mover as regras mobile de `MainLayout.razor.css` (`@media max-width:700px` do nav) para `site.css`
+2. Colapsar os 2 blocos base `body .oldsite-top-nav {` em um so
+3. Usar UM unico seletor para todos os links (`body .oldsite-top-nav a` OU `.oldsite-top-nav-link`, nao os dois) para o link de pagamentos herdar identico aos demais
+4. `dotnet clean && dotnet build` + Ctrl+F5 (regra 21) antes de validar
+
+Nota: as 6 tentativas falhas ja foram revertidas (nao ha seletores `payments-link`/`a[href="/payments"]` residuais no codigo atual -- confirmado pelo Senior).
+
+### Ressalvas
+- Desvio de escopo: ciclo planejado (WhatsApp/Baseline) nao foi feito -> Ciclo 17
+- Muitos commits de tentativa/erro nas cores dos botoes (regra 14): ef6c854, c0861de, 1aa0b94, 76d24fe, 2f803da... ~10 commits so ajustando o vermelho
+- 3 vars indefinidas reintroduzidas (regra 12 de novo)
+- 3 docs soltos (regra 20 de novo)
+
+---
+
+## Metricas Atuais (pos-Ciclo 16)
+
+| Metrica | C10 | C11 | C12 | C13 | C14 | C15 | C16 |
+|---------|-----|-----|-----|-----|-----|-----|-----|
+| Warnings (build) | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| Tests | 1.674 | 1.674 | 1.674 | 1.674 | 1.674 | 1.694 | **1.694** |
+| Test files | -- | -- | -- | -- | 192 | 197 | **197** |
+| Services sem teste | -- | -- | -- | -- | 5 | 0 | **0** |
+| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | **2** (2x `display:none`, legitimos) |
+| `!important` global | 12 | 11 | 11 | 11 | 11 | 11 | **11** |
+| Hardcoded hex scoped | 0 | 0 | 0 | 0 | 0 | 0 | **0** (apos fix) |
+| rgba() hardcoded scoped | 378 | 185 | 189 | 189 | 189 | 189 | **~189** |
+| Vars no `:root` | 168 | 317 | 315 | 315 | 315 | 337 | **337** (apos fix) |
+| Vars indefinidas | 0 | 0 | 0 | 0 | 0 | 0 | **0** (apos fix) |
+| Vars mortas `:root` | 0 | 0 | 0 | 0 | 0 | 0 | **0** (apos fix) |
+| Pages >400L sem code-behind | 9 | 0 | 0 | 0 | 0 | 0 | **0** |
+| AppDbContext direto | -- | 3 | 0 | 0 | 0 | 0 | **0** |
+| xUnit2013 warnings | -- | 49 | 0 | 0 | 0 | 0 | **0** |
+| SessionTimeoutMinutes (dev/prod) | -- | -- | -- | 60/30 | 720/480 | 720/480 | **720/480** |
 
 ### Paginas grandes -- TODAS decompostas
 
@@ -1135,11 +1246,25 @@ Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName
 
 ---
 
-## Ciclo 17 -- Integracao WhatsApp Real + Baseline Operacional por Gateway (MOVIDO)
+## Ciclo 17 -- Consolidar Menu Mobile + WhatsApp Real + Baseline Operacional por Gateway
 
-**Branch**: `feat/ciclo16-whatsapp-baseline`
+**Branch sugerida**: `feat/ciclo17-whatsapp-baseline`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
+
+### Fase 0 — Consolidar CSS do menu mobile (resolve Fase 15 do Ciclo 16)
+
+**Problema**: link de pagamentos nao alinha com os demais no menu mobile. Causa raiz: CSS do `oldsite-top-nav` duplicado entre global e scoped (mesmo padrao do bug de background dos Ciclos 12/13).
+
+**Procedimento** (aplicar a solucao provada no Ciclo 13):
+1. Mover as regras mobile do nav (`@media (max-width: 700px)` que estilizam `.oldsite-top-nav`) de `Shared/Components/MainLayout.razor.css` para `wwwroot/css/site.css`
+2. Remover essas regras do `MainLayout.razor.css` (elimina competicao scoped vs global)
+3. Colapsar os 2 blocos base `body .oldsite-top-nav {` de `site.css` (linhas ~3543 e ~5332) em um so
+4. Usar UM unico seletor de link (`body .oldsite-top-nav a` OU `.oldsite-top-nav-link`, nao ambos) para que o link de pagamentos herde identico aos demais
+5. `dotnet clean && dotnet build` + Ctrl+F5 antes de validar (regra 21)
+
+**Arquivos**: `wwwroot/css/site.css`, `Shared/Components/MainLayout.razor.css`
+**Nota**: nao ha seletores residuais `payments-link`/`a[href="/payments"]` (tentativas ja revertidas).
 
 ### Fase 1 — Configuracao WhatsApp: appsettings + opt-in
 

@@ -210,7 +210,7 @@
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 4px;
     padding: 0.2rem 0.5rem;
-    color: #fff;
+    color: var(--white);
 }
 
 .sport-card--futsal .sport-card-label {
@@ -314,11 +314,11 @@
 }
 
 .sport-card--volleyball .sport-card-cta {
-    color: #93c5fd;
+    color: var(--link-info);
 }
 
 .sport-card--beachtennis .sport-card-cta {
-    color: #99f6e4;
+    color: var(--beachtennis-cta);
 }
 
 .sport-card--footvolley .sport-card-cta {
