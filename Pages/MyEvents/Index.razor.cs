@@ -14,12 +14,15 @@ public partial class Index
 {
     private static readonly CultureInfo PtBr = new("pt-BR");
 
+    [SupplyParameterFromQuery(Name = "esporte")] public string? EsporteQuery { get; set; }
+
+    private Sport SelectedSport = Sport.Futsal;
+
     private List<Event>              events              = new();
     private List<MatchSchedule>      schedules           = new();
     private Dictionary<int, int>     scheduleFutureCounts = new();
     private Dictionary<int, (int EventId, DateTime StartsAt, int Confirmed)> scheduleNextEvents = new();
     private bool                     isLoading           = true;
-    private Sport?                   sportFilter         = null;
     private string?                  scheduleCityFilter  = null;
     private int?                     cancellingId        = null;
     private int?                     togglingScheduleId  = null;
@@ -39,13 +42,15 @@ public partial class Index
             ? schedules
             : schedules.Where(s => string.Equals(s.Venue?.City, scheduleCityFilter, StringComparison.OrdinalIgnoreCase));
 
-    private IEnumerable<Event> FilteredEvents =>
-        sportFilter.HasValue
-            ? events.Where(e => e.Sport == sportFilter.Value)
-            : events;
-
     protected override async Task OnInitializedAsync()
     {
+        SelectedSport = EsporteQuery?.ToLowerInvariant() switch
+        {
+            "poker"    => Sport.Poker,
+            "futsal"   => Sport.Futsal,
+            _           => Sport.Futsal
+        };
+
         var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -62,7 +67,7 @@ public partial class Index
         var raw = await db.Events
             .Include(e => e.Group)
             .Include(e => e.Confirmations)
-            .Where(e => e.CreatedByUserId == userId)
+            .Where(e => e.CreatedByUserId == userId && e.Sport == SelectedSport)
             .ToListAsync();
 
         events = raw
@@ -71,48 +76,49 @@ public partial class Index
                                           : e.StartsAt.Ticks)                           // upcoming: nearest first
             .ToList();
 
-        schedules = await db.RachaSchedules
-            .Include(s => s.Group)
-            .Include(s => s.Venue)
-            .Where(s => s.CreatedByUserId == userId)
-            .OrderByDescending(s => s.IsActive)
-            .ThenBy(s => s.DayOfWeek)
-            .ThenBy(s => s.TimeOfDay)
-            .ToListAsync();
-
-        // Gap G: contar partidas futuras geradas por cada schedule
-        var scheduleIds = schedules.Select(s => s.Id).ToList();
-        if (scheduleIds.Count > 0)
+        if (SelectedSport == Sport.Futsal)
         {
-            scheduleFutureCounts = await db.Events
-                .Where(e => e.RachaScheduleId.HasValue
-                         && scheduleIds.Contains(e.RachaScheduleId!.Value)
-                         && e.StartsAt > now
-                         && e.IsActive)
-                .GroupBy(e => e.RachaScheduleId!.Value)
-                .Select(g => new { ScheduleId = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.ScheduleId, x => x.Count);
-
-            // Next upcoming event + confirmation count per schedule
-            var nextRows = await db.Events
-                .Where(e => e.RachaScheduleId.HasValue
-                         && scheduleIds.Contains(e.RachaScheduleId!.Value)
-                         && e.StartsAt > now
-                         && e.IsActive)
-                .Select(e => new
-                {
-                    ScheduleId     = e.RachaScheduleId!.Value,
-                    e.Id,
-                    e.StartsAt,
-                    Confirmed      = e.Confirmations.Count,
-                })
+            schedules = await db.RachaSchedules
+                .Include(s => s.Group)
+                .Include(s => s.Venue)
+                .Where(s => s.CreatedByUserId == userId)
+                .OrderByDescending(s => s.IsActive)
+                .ThenBy(s => s.DayOfWeek)
+                .ThenBy(s => s.TimeOfDay)
                 .ToListAsync();
 
-            scheduleNextEvents = nextRows
-                .GroupBy(e => e.ScheduleId)
-                .ToDictionary(
-                    g => g.Key,
-                    g => { var f = g.OrderBy(e => e.StartsAt).First(); return (f.Id, f.StartsAt, f.Confirmed); });
+            var scheduleIds = schedules.Select(s => s.Id).ToList();
+            if (scheduleIds.Count > 0)
+            {
+                scheduleFutureCounts = await db.Events
+                    .Where(e => e.RachaScheduleId.HasValue
+                             && scheduleIds.Contains(e.RachaScheduleId!.Value)
+                             && e.StartsAt > now
+                             && e.IsActive)
+                    .GroupBy(e => e.RachaScheduleId!.Value)
+                    .Select(g => new { ScheduleId = g.Key, Count = g.Count() })
+                    .ToDictionaryAsync(x => x.ScheduleId, x => x.Count);
+
+                var nextRows = await db.Events
+                    .Where(e => e.RachaScheduleId.HasValue
+                             && scheduleIds.Contains(e.RachaScheduleId!.Value)
+                             && e.StartsAt > now
+                             && e.IsActive)
+                    .Select(e => new
+                    {
+                        ScheduleId     = e.RachaScheduleId!.Value,
+                        e.Id,
+                        e.StartsAt,
+                        Confirmed      = e.Confirmations.Count,
+                    })
+                    .ToListAsync();
+
+                scheduleNextEvents = nextRows
+                    .GroupBy(e => e.ScheduleId)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => { var f = g.OrderBy(e => e.StartsAt).First(); return (f.Id, f.StartsAt, f.Confirmed); });
+            }
         }
 
         isLoading = false;

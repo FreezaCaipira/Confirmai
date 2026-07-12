@@ -16,35 +16,41 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject EventNotificationService NotificationService
 
-<PageTitle>Meus Eventos — Confirmai</PageTitle>
+<PageTitle>Minhas Partidas — Confirmai</PageTitle>
 
 <div class="events-page">
 
-    <section class="events-block" aria-label="Meus eventos criados">
+    <section class="events-block" aria-label="Minhas partidas">
 
             <div class="my-events-header">
-                <h1 class="page-section-title">Meus Eventos</h1>
+                <h1 class="page-section-title">Minhas Partidas</h1>
                 <div class="my-events-header-right">
-                    <div class="my-events-view-tabs">
-                        <button class="my-events-tab @(view == "events" ? "my-events-tab--active" : "")"
-                                @onclick='() => view = "events"'>
-                            Partidas (@events.Count)
-                        </button>
-                        <button class="my-events-tab @(view == "schedules" ? "my-events-tab--active" : "")"
-                                @onclick='() => view = "schedules"'>
-                            🔁 Recorrências (@schedules.Count)
-                        </button>
-                    </div>
+                    @if (SelectedSport == Sport.Futsal)
+                    {
+                        <div class="my-events-view-tabs">
+                            <button class="my-events-tab @(view == "events" ? "my-events-tab--active" : "")"
+                                    @onclick='() => view = "events"'>
+                                Partidas (@events.Count)
+                            </button>
+                            <button class="my-events-tab @(view == "schedules" ? "my-events-tab--active" : "")"
+                                    @onclick='() => view = "schedules"'>
+                                🔁 Recorrências (@schedules.Count)
+                            </button>
+                        </div>
+                    }
                     <div class="my-events-create-btns">
-                        <a href="/grupos" class="my-events-create-btn my-events-create-btn--groups">
-                            <i class="fas fa-users"></i> Ver Grupos
-                        </a>
-                        <a href="/futsal/create" class="my-events-create-btn my-events-create-btn--futsal">
-                            <i class="fas fa-futbol"></i> Nova Partida
-                        </a>
-                        <a href="/poker/create?tipo=torneio" class="my-events-create-btn my-events-create-btn--poker">
-                            <i class="fas fa-trophy"></i> Novo Torneio
-                        </a>
+                        @if (SelectedSport == Sport.Futsal)
+                        {
+                            <a href="/futsal/create" class="my-events-create-btn my-events-create-btn--futsal">
+                                <i class="fas fa-futbol"></i> Nova Partida
+                            </a>
+                        }
+                        else if (SelectedSport == Sport.Poker)
+                        {
+                            <a href="/poker/create?tipo=torneio" class="my-events-create-btn my-events-create-btn--poker">
+                                <i class="fas fa-trophy"></i> Novo Torneio
+                            </a>
+                        }
                     </div>
                 </div>
             </div>
@@ -142,36 +148,14 @@
             else if (!events.Any())
             {
                 <div class="listing-state listing-empty">
-                    <p>Você ainda não criou nenhum evento.</p>
-                    <p class="listing-empty-hint">Use os botões acima para criar sua primeira partida ou torneio.</p>
+                    <p>Você ainda não criou nenhuma partida@(SelectedSport == Sport.Poker ? " ou torneio" : "").</p>
+                    <p class="listing-empty-hint">Use o botão acima para criar sua primeira partida@(SelectedSport == Sport.Poker ? " ou torneio" : "").</p>
                 </div>
             }
             else
             {
-                <!-- Filtro de esporte -->
-                <div class="my-events-sport-tabs">
-                    <button class="my-events-tab @(sportFilter == null ? "my-events-tab--active" : "")"
-                            @onclick='() => sportFilter = null'>
-                        Todos (@events.Count)
-                    </button>
-                    @if (events.Any(e => e.Sport == Sport.Futsal))
-                    {
-                        <button class="my-events-tab my-events-tab--futsal @(sportFilter == Sport.Futsal ? "my-events-tab--active" : "")"
-                                @onclick='() => sportFilter = Sport.Futsal'>
-                            ⚽ Futsal (@events.Count(e => e.Sport == Sport.Futsal))
-                        </button>
-                    }
-                    @if (events.Any(e => e.Sport == Sport.Poker))
-                    {
-                        <button class="my-events-tab my-events-tab--poker @(sportFilter == Sport.Poker ? "my-events-tab--active" : "")"
-                                @onclick='() => sportFilter = Sport.Poker'>
-                            🃏 Poker (@events.Count(e => e.Sport == Sport.Poker))
-                        </button>
-                    }
-                </div>
-
                 <div class="my-events-list">
-                    @foreach (var ev in FilteredEvents)
+                    @foreach (var ev in events)
                     {
                         var isFutsal = ev.Sport == Sport.Futsal;
                         var isPast   = ev.StartsAt < DateTime.UtcNow;

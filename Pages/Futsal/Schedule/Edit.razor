@@ -23,7 +23,7 @@
             <h1 class="create-event-title">
                 <i class="fas fa-sync-alt"></i> Editar Recorrência
             </h1>
-            <a href="/meus-eventos" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+            <a href="/meus-eventos?esporte=futsal" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
         </div>
 
         @if (isLoading)
@@ -34,7 +34,7 @@
         {
             <div class="detail-not-found">
                 <h2>Agendamento não encontrado.</h2>
-                <a href="/meus-eventos">← Voltar</a>
+                <a href="/meus-eventos?esporte=futsal">← Voltar</a>
             </div>
         }
         else if (accessDenied)
@@ -42,7 +42,7 @@
             <div class="detail-not-found">
                 <h2>Acesso negado.</h2>
                 <p>Apenas o criador pode editar este agendamento.</p>
-                <a href="/meus-eventos">← Voltar</a>
+                <a href="/meus-eventos?esporte=futsal">← Voltar</a>
             </div>
         }
         else
@@ -158,7 +158,7 @@
 
                 <div class="form-actions">
                     <button class="cancel-btn" type="button"
-                            @onclick='() => NavigationManager.NavigateTo("/meus-eventos")'>
+                            @onclick='() => NavigationManager.NavigateTo("/meus-eventos?esporte=futsal")'>
                         Cancelar
                     </button>
                     <button class="save-btn" type="submit" disabled="@isSaving">
@@ -307,7 +307,7 @@
             schedule.Price           = form.Price;
 
             await db.SaveChangesAsync();
-            NavigationManager.NavigateTo("/meus-eventos");
+            NavigationManager.NavigateTo("/meus-eventos?esporte=futsal");
         }
         catch (Exception ex)
         {

@@ -10,6 +10,11 @@
 <div class="listing-page">
     <AuthorizeView>
         <Authorized>
+            <div class="listing-page-actions">
+                <a href="/meus-eventos?esporte=poker" class="my-events-link-btn">
+                    <i class="fas fa-calendar-alt"></i> Minhas Partidas
+                </a>
+            </div>
             <div class="create-poker-dropdown @(showTypeMenu ? "is-open" : "")">
                 <button class="btn-create-event btn-create-event--poker"
                         @onclick="() => showTypeMenu = !showTypeMenu"
