@@ -1,5 +1,4 @@
 @using Confirmai.Enums
-@inject UiTextService Ui
 
 <a href="@Href" class="sport-card sport-card--@SportClass">
     <div class="sport-card-header">
@@ -15,7 +14,7 @@
         {
             <span class="sport-card-events @(MatchCount.Value == 0 ? "sport-card-events--empty" : "")">
                 <i class="fas fa-calendar-day"></i>
-                @MatchCount.Value evento@(MatchCount.Value != 1 ? "s" : "")
+                @MatchCount.Value @GetEventLabel(MatchCount.Value)
             </span>
         }
         <span class="sport-card-cta">@CtaText</span>
@@ -73,4 +72,8 @@
         Sport.Chess => "chess",
         _ => "default"
     };
+
+    private string GetEventLabel(int count) => Sport == Sport.Poker
+        ? (count == 1 ? "torneio" : "torneios")
+        : (count == 1 ? "partida" : "partidas");
 }
