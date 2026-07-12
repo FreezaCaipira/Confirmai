@@ -5,12 +5,12 @@
     gap: 0.4rem;
     padding: 0.42rem 0.9rem;
     border-radius: 8px;
-    background: var(--ci-bg-card-deep);
-    color: var(--ci-accent);
+    background: var(--ci-accent);
+    color: var(--ci-bg-card-deep);
     font-weight: 700;
     font-size: 0.82rem;
     text-decoration: none;
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--ci-accent);
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
     box-shadow: 0 2px 4px var(--shadow-md);
     white-space: nowrap;
@@ -22,8 +22,9 @@
 }
 
 .my-events-link-btn:hover {
-    background: var(--ci-bg-card);
-    border-color: var(--ci-accent);
+    background: var(--ci-accent-mid);
+    border-color: var(--ci-accent-mid);
+    color: var(--ci-text);
     box-shadow: 0 4px 8px var(--accent-opacity-sm);
     transform: translateY(-50%) scale(1.03);
 }
