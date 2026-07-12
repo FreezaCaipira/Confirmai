@@ -1,8 +1,10 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 07/07/2026 | Base: `fix/ciclo15-tests-ux-cleanup` (pos-Ciclo 15) | Refatoracao CSS CONCLUIDA
-> 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto
-> Ciclo 15: Testes + UX Grupos Privados + Cleanup !important -- CONCLUIDO
+> Atualizado em 14/06/2026 | Base: `main` (pos-Ciclo 16) | Refatoracao CSS CONCLUIDA
+> 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste
+> Ciclo 15 (testes + UX grupos + !important) e Ciclo 16 (mobile UX) -- CONCLUIDOS e revisados
+> Proximo: Ciclo 17 -- Login Google (OAuth, criar-ou-vincular) + email real/confirmacao + fix caracteres especiais + consolidar CSS do menu mobile
+> Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID | C20 WhatsApp+baseline (POSTERGADO)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -91,15 +93,17 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - **Problemas**: nenhum
 
 ### Ciclo 15 (Pleno Local): Testes + UX Grupos Privados + Cleanup !important
-- Branch: `fix/ciclo15-tests-ux-cleanup` | PR pendente
-- Fases 1-5: 20 novos testes (PingController, GroupMetricsService, CityService, WhatsAppNotificationService, LocationService)
+- Branch: `fix/ciclo15-tests-ux-cleanup` | PR #51 (merged)
+- Fases 1-5: 20 novos testes (PingController, GroupMetricsService, CityService, WhatsAppNotificationService, LocationService) -- 5 services sem teste ZERADO
 - Fase 6: Botao "Aprovar todos" na listagem de grupos com `@onclick:stopPropagation`
 - Fase 7: Auditoria `!important` no site.css (11/11 legitimos, nenhum removido)
+- Fase 8 (EXTRA, pedido do Robson): 4 novos esportes visuais (Volleyball/BeachTennis/Footvolley/Chess, cards "Em breve")
 - 1.694/1.694 testes passando (+20 vs C14), 0 erros de build
-- **Problemas**: nenhum
+- **Problemas**: 3 hardcoded hex + 8 vars mortas na Fase 8 (Senior corrigiu). Nao foi scope creep -- esportes pedidos pelo Robson (regra 22)
 
-### Ciclo 16 (Pleno Local): Menu Mobile Hamburger (Em Andamento)
-- Branch: `fix/ciclo16-mobile-ux` | PR pendente
+### Ciclo 16 (Pleno Local): Mobile UX -- Menu Hamburger + Header Consistente
+- Branch: `fix/ciclo16-mobile-ux` | PR #52 (merged)
+- DESVIO: ciclo planejado era WhatsApp+Baseline (postergado para Ciclo 20). Pleno repriorizou para mobile UX.
 - Fase 1: Implementação do menu hamburger (MainLayout.razor + MainLayout.razor.css)
 - Fase 2: Correção do z-index (site.css + MainLayout.razor.css)
 - Fase 3: Correção do city selector (CitySelector.razor.css)
@@ -180,8 +184,8 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - Verificação de media query em devtools
 - Verificação de estilos aplicados no elemento
 
-## Solicitação ao Senior
-Favor direcionar como resolver o problema do botão de pagamentos no mobile. Todas as tentativas de CSS falharam sem efeito visual.
+## Solicitação ao Senior -- RESPONDIDA
+Ver **Revisao Senior do Ciclo 16 > Fase 15 BLOQUEADA** abaixo. Causa raiz: CSS do `oldsite-top-nav` fragmentado/duplicado entre `site.css` (global) e `MainLayout.razor.css` (scoped) -- mesmo padrao do bug de background dos Ciclos 12/13. Direcao: consolidar tudo em `site.css`, remover bloco mobile duplicado do scoped. Detalhado no Ciclo 17.
 
 ---
 
@@ -395,26 +399,131 @@ Nenhum. Codigo limpo, commits limpos, todas as regras respeitadas.
 
 ---
 
-## Metricas Atuais (pos-Ciclo 14)
+## Revisao Senior do Ciclo 15
 
-| Metrica | C4 | C5 | C6/C7 | C8 | C9 | C10 | C11 | C12 | C13 | C14 |
-|---------|----|----|-------|----|----|-----|-----|-----|-----|-----|
-| Warnings (build) | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | **1** |
-| `!important` global | -- | -- | 17 | 12 | 11 | 12 | 11 | 11 | 11 | **11** |
-| Hardcoded hex scoped | 1.099 | 867 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| rgba() hardcoded scoped | -- | -- | 645 | 531 | 478 | 378 | 185 | 189 | 189 | **189** |
-| CSS vars (scoped) | 673 | 1.175 | 2.053 | 1.998 | 2.051 | 2.149 | 2.344 | 2.364 | 2.360 | **2.360** |
-| CSS vars total | -- | -- | -- | 3.513 | 3.609 | 3.739 | 4.246 | 4.690 | 4.244 | **4.244** |
-| Vars no `:root` | ~68 | 105 | 179 | 158 | 168 | 168 | 317 | 315 | 315 | **315** |
-| Vars indefinidas | -- | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| Vars mortas `:root` | -- | -- | 18 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
-| Fallbacks | -- | 178 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | **0** |
-| Pages >400L sem code-behind | -- | -- | -- | -- | 12 | 9 | 0 | 0 | 0 | **0** |
-| AppDbContext direto | -- | -- | -- | -- | -- | -- | 3 | 0 | 0 | **0** |
-| xUnit2013 warnings | -- | -- | -- | -- | -- | -- | 49 | 0 | 0 | **0** |
-| SessionTimeoutMinutes (dev) | -- | -- | -- | -- | -- | -- | -- | -- | 60 | **720** |
-| SessionTimeoutMinutes (prod) | -- | -- | -- | -- | -- | -- | -- | -- | 30 | **480** |
+### Veredicto: MUITO BOM -- 20 testes limpos, UX grupos correta, !important auditado. Scope creep na Fase 8 (novos esportes)
+
+| Metrica | C14 | C15 | Status |
+|---------|-----|-----|--------|
+| Build errors | 0 | **0** | Atingido |
+| Tests | 1.674 | **1.694** (+20) | Melhoria |
+| Test files | 192 | **197** (+5) | Melhoria |
+| Services sem teste | 5 | **0** | **Zerado** |
+| Hardcoded hex scoped | 0 | **0** (apos fix) | Atingido |
+| Vars indefinidas | 0 | **0** | Atingido |
+| Vars mortas `:root` | 0 | **0** (apos fix) | Atingido |
+
+### Bloco A -- Testes (Fases 1-5): 5/5 executados, cobertura ZERADA
+
+Os 5 services sem teste agora tem cobertura. 20 novos testes, todos passando:
+- **`PingControllerTests`** (2): auth 200 + anon 401/302 via `IntegrationTestWebAppFactory`. Padrao correto.
+- **`GroupMetricsServiceTests`** (5): snapshot com dados, grupo inexistente, grupo vazio, multi-grupo, payment rate 70%. Usa `IDbContextFactory` mock + `TestDataFactory`. Excelente.
+- **`CityServiceTests`** (5): cidades distintas, sem grupos, inativos excluidos, edge cases IBGE (vazio/null sem chamada HTTP). Seguiu a nota do Senior (nao mockar IBGE real).
+- **`WhatsAppNotificationServiceTests`** (5): sem config, com config, erro API 500, formatacao lembrete/pagamento. `MockHttpMessageHandler` proprio -- abordagem correta.
+- **`LocationServiceTests`** (3): `GetStateCode` puro via reflection (`BindingFlags.NonPublic | Static`). Testou so a logica pura como planejado.
+
+### Bloco B -- UX + Cleanup (Fases 6-7): executados
+
+**Fase 6 (Aprovar todos)**: `ApproveAllPending(groupId)` em `Groups/Index.razor` com `@onclick:stopPropagation`, botao so aparece quando `hasPending = isAdmin && pendingCount > 0`, spinner de processamento, mailbox preservada, `LoadGroups()` no fim. Reutilizou o padrao de `Detail.razor.cs`. Bom.
+
+**Fase 7 (!important)**: Auditoria confirmada -- 11/11 legitimos (utility, acessibilidade W3C, Google Maps z-index, autofill Chrome). Nenhum removido. Correto.
+
+### Fase 8 (EXTRA) -- Novos esportes visualmente (PEDIDO PELO ROBSON)
+
+O Pleno adicionou 4 esportes ao `Enums/Sport.cs` (Volleyball, BeachTennis, Footvolley, Chess) com cards "Em breve", temas de cor e watermarks. **Requisito do Robson** (nao foi iniciativa do Pleno) -- portanto NAO conta como scope creep (regra 22). Cards sao placeholders (`ComingSoon=true`, so Futsal ativo), sem risco de fluxo quebrado. Unica ressalva e a higiene de CSS (ver problemas abaixo), padrao normal de cleanup Senior.
+
+### Problemas encontrados e corrigidos pelo Senior
+
+**1. 3 hardcoded hex em `SportCard.razor.css`** (Fase 8): `#fff`, `#93c5fd`, `#99f6e4`. Senior converteu para `var(--white)`, `var(--link-info)` e nova var `--beachtennis-cta`. Disciplina "0 hardcoded hex scoped" restaurada.
+
+**2. 4 vars mortas no `:root`** (Fase 8): `--volleyball-text`, `--beachtennis-text`, `--chess-text`, `--footvolley-text` -- definidas mas nunca usadas (so os `-text-pale` sao consumidos). Senior removeu (regra 13).
+
+**3. 4 vars `-accent-deep` mortas** (Fase 8): `--volleyball/beachtennis/footvolley/chess-accent-deep` -- 0 usos. Senior removeu.
+
+### Ressalvas
+- Fase 8 (esportes, pedido do Robson) introduziu 3 hardcoded hex + 8 vars mortas -- higiene de CSS a observar em features com tema de cor, mas nao e scope creep
+
+---
+
+## Revisao Senior do Ciclo 16
+
+### Veredicto: BOM em UX mobile, mas DESVIO DE ESCOPO -- nao implementou o planejado (WhatsApp + Baseline). Fase 15 bloqueada.
+
+| Metrica | C15 | C16 | Status |
+|---------|-----|-----|--------|
+| Build errors | 0 | **0** | Atingido |
+| Tests | 1.694 | **1.694** | Atingido |
+| Hardcoded hex scoped | 0 | **0** (apos fix) | Atingido |
+| Vars indefinidas | 0 | **0** (apos fix) | Atingido |
+| WhatsApp real | pendente | **pendente** | NAO feito |
+| Baseline por gateway | pendente | **pendente** | NAO feito |
+
+### DESVIO DE ESCOPO (importante)
+
+O Ciclo 16 planejado era **Integracao WhatsApp Real + Baseline Operacional por Gateway**. O Pleno em vez disso executou um ciclo de **UX Mobile** (menu hamburger + padrao de header consistente em ~8 telas). O WhatsApp/Baseline foi movido para o **Ciclo 17** no WORK_PLAN.md.
+
+Isto foi uma repriorizacao (mobile e o publico predominante -- justificativa valida), mas o trabalho planejado do Ciclo 16 continua **pendente**. Registrado como Ciclo 17.
+
+### O que o Pleno fez (Mobile UX)
+
+- **Menu hamburger mobile** em `MainLayout.razor` + `MainLayout.razor.css` (nav vira coluna em `<700px`, colapsa ao navegar via `HandleLocationChanged`)
+- **Padrao de header consistente** (btn voltar / badge / titulo) em Pagamentos, Ranking, Futsal, Poker
+- Cores semanticas dos botoes Pendentes (vermelho) / Historico (accent), badge de valor verde metalico
+- Correcao de botoes extrapolando div, scroll horizontal em /grupos, viewport meta tag no login
+- Restaurou envio de email em `NotifyDelinquencyAsync` (commit 63be464)
+
+### Problemas encontrados e corrigidos pelo Senior
+
+**1. 3 vars indefinidas em `Groups/Payments.razor.css`** (commit 2f803da, cor do botao Pendentes): `--red-light`, `--shadow-red-lg`, `--shadow-red-md` usadas SEM fallback -> renderizam vazio (gradiente/sombra quebrados no botao "Pendentes" e badge). Mesmo problema recorrente da regra 12. Senior adicionou as 3 ao `:root` seguindo a escala red existente (sm=0.3, md=0.4, lg=0.5).
+
+**2. 3 arquivos .md soltos na raiz** (regra 20): `CSS_MOBILE_WEB_ISSUES.md`, `CSS_PATTERNS_HEADER.md`, `MOBILE_UX_CYCLE_16.md`. Senior removeu -- docs so no WORK_PLAN.md.
+
+### Fase 15 BLOQUEADA -- Direcao do Senior (botao Pagamentos no mobile)
+
+O Pleno tentou 6 abordagens para alinhar o link de pagamentos no menu mobile e todas falharam "sem efeito visual". **Causa raiz: CSS do `oldsite-top-nav` esta FRAGMENTADO e DUPLICADO entre global e scoped** -- exatamente o mesmo padrao que causou o bug de background dos Ciclos 12/13.
+
+Evidencia:
+- `site.css` tem **2 blocos base** `body .oldsite-top-nav {` (linhas ~3543 e ~5332) que se sobrescrevem
+- `site.css` tem regras mobile `body .oldsite-top-nav a` em `@media (max-width: 700px)` (~4225)
+- `MainLayout.razor.css` tem OUTRO `@media (max-width: 700px)` com `> a` E `.oldsite-top-nav-link` (scoped, ganha `[b-xxx]`)
+
+Com duas fontes de verdade competindo (uma global descendente `a`, outra scoped `> a` + classe), o cascade/especificidade fica fragil e o hot-reload nao reflete mudancas -- foi por isso que "nenhuma tentativa teve efeito".
+
+**Direcao para o Pleno (Ciclo 17, Fase mobile-nav)**: aplicar a solucao JA PROVADA no Ciclo 13 (background) -- **consolidar TODO o CSS do `oldsite-top-nav` numa unica fonte global (`site.css`) e REMOVER o bloco mobile duplicado de `MainLayout.razor.css`**. Passos:
+1. Mover as regras mobile de `MainLayout.razor.css` (`@media max-width:700px` do nav) para `site.css`
+2. Colapsar os 2 blocos base `body .oldsite-top-nav {` em um so
+3. Usar UM unico seletor para todos os links (`body .oldsite-top-nav a` OU `.oldsite-top-nav-link`, nao os dois) para o link de pagamentos herdar identico aos demais
+4. `dotnet clean && dotnet build` + Ctrl+F5 (regra 21) antes de validar
+
+Nota: as 6 tentativas falhas ja foram revertidas (nao ha seletores `payments-link`/`a[href="/payments"]` residuais no codigo atual -- confirmado pelo Senior).
+
+### Ressalvas
+- Desvio de escopo: ciclo planejado (WhatsApp/Baseline) nao foi feito -> Ciclo 17
+- Muitos commits de tentativa/erro nas cores dos botoes (regra 14): ef6c854, c0861de, 1aa0b94, 76d24fe, 2f803da... ~10 commits so ajustando o vermelho
+- 3 vars indefinidas reintroduzidas (regra 12 de novo)
+- 3 docs soltos (regra 20 de novo)
+
+---
+
+## Metricas Atuais (pos-Ciclo 16)
+
+| Metrica | C10 | C11 | C12 | C13 | C14 | C15 | C16 |
+|---------|-----|-----|-----|-----|-----|-----|-----|
+| Warnings (build) | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| Tests | 1.674 | 1.674 | 1.674 | 1.674 | 1.674 | 1.694 | **1.694** |
+| Test files | -- | -- | -- | -- | 192 | 197 | **197** |
+| Services sem teste | -- | -- | -- | -- | 5 | 0 | **0** |
+| `!important` scoped | 1 | 1 | 1 | 1 | 1 | 1 | **2** (2x `display:none`, legitimos) |
+| `!important` global | 12 | 11 | 11 | 11 | 11 | 11 | **11** |
+| Hardcoded hex scoped | 0 | 0 | 0 | 0 | 0 | 0 | **0** (apos fix) |
+| rgba() hardcoded scoped | 378 | 185 | 189 | 189 | 189 | 189 | **~189** |
+| Vars no `:root` | 168 | 317 | 315 | 315 | 315 | 337 | **337** (apos fix) |
+| Vars indefinidas | 0 | 0 | 0 | 0 | 0 | 0 | **0** (apos fix) |
+| Vars mortas `:root` | 0 | 0 | 0 | 0 | 0 | 0 | **0** (apos fix) |
+| Pages >400L sem code-behind | 9 | 0 | 0 | 0 | 0 | 0 | **0** |
+| AppDbContext direto | -- | 3 | 0 | 0 | 0 | 0 | **0** |
+| xUnit2013 warnings | -- | 49 | 0 | 0 | 0 | 0 | **0** |
+| SessionTimeoutMinutes (dev/prod) | -- | -- | -- | 60/30 | 720/480 | 720/480 | **720/480** |
 
 ### Paginas grandes -- TODAS decompostas
 
@@ -449,6 +558,7 @@ Todas as paginas agora usam `IDbContextFactory<AppDbContext>`. 0 paginas com `@i
 19. **Verificar encoding em TODOS os CSS apos cada fase** -- rodar script de verificacao UTF-8 (ver secao Comandos de Validacao). Inclui site.css, events.css, marketplace.css, identity.css e TODOS os scoped CSS
 20. **NUNCA criar arquivos de docs separados** -- consolidar TUDO no WORK_PLAN.md. Nao criar arquivos em `docs/`, `.md` avulsos, etc.
 21. **Rebuild limpo antes de testar mudancas visuais** -- ao alterar CSS (especialmente scoped CSS), sempre fazer `dotnet clean && dotnet build` e testar com Ctrl+F5 (hard refresh). Hot-reload pode nao aplicar scoped CSS corretamente
+22. **Requisitos vindos dos testes do Robson sao legitimos** -- bugs/melhorias/requisitos que o Robson levanta testando o app NAO sao "scope creep" e devem entrar na "Fase padrao de melhorias UX" do ciclo. A regra 16 (separar features) so se aplica a adicoes que o proprio Pleno inventa sem pedido (ex: novos esportes). Documentar cada item vindo do Robson na fase de melhorias antes de implementar
 
 ---
 
@@ -1135,11 +1245,154 @@ Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName
 
 ---
 
-## Ciclo 17 -- Integracao WhatsApp Real + Baseline Operacional por Gateway (MOVIDO)
+## Ciclo 17 -- Login Google (OAuth) + Fix Caracteres Especiais + Consolidar Menu Mobile
 
-**Branch**: `feat/ciclo16-whatsapp-baseline`
+**Branch sugerida**: `feat/ciclo17-google-login`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
+
+Ordem sugerida: Fase 1 (mobile nav, rapida) → Fase 2 (mojibake, rapida) → Fases 3-6 (Google OAuth, foco principal).
+
+### Fase 1 — Consolidar CSS do menu mobile (resolve Fase 15 do Ciclo 16)
+
+**Problema**: link de pagamentos nao alinha com os demais no menu mobile. Causa raiz: CSS do `oldsite-top-nav` duplicado entre global e scoped (mesmo padrao do bug de background dos Ciclos 12/13).
+
+**Procedimento** (aplicar a solucao provada no Ciclo 13):
+1. Mover as regras mobile do nav (`@media (max-width: 700px)` que estilizam `.oldsite-top-nav`) de `Shared/Components/MainLayout.razor.css` para `wwwroot/css/site.css`
+2. Remover essas regras do `MainLayout.razor.css` (elimina competicao scoped vs global)
+3. Colapsar os 2 blocos base `body .oldsite-top-nav {` de `site.css` (linhas ~3543 e ~5332) em um so
+4. Usar UM unico seletor de link (`body .oldsite-top-nav a` OU `.oldsite-top-nav-link`, nao ambos) para que o link de pagamentos herde identico aos demais
+5. `dotnet clean && dotnet build` + Ctrl+F5 antes de validar (regra 21)
+
+**Arquivos**: `wwwroot/css/site.css`, `Shared/Components/MainLayout.razor.css`
+**Nota**: nao ha seletores residuais `payments-link`/`a[href="/payments"]` (tentativas ja revertidas).
+
+### Fase 2 — Corrigir caracteres especiais (mojibake) — LOCAIS EXATOS
+
+**Problema**: texto com dupla codificacao UTF-8 (bytes UTF-8 lidos como Latin-1 e re-salvos). Ex: `ConfiguraÃ§Ãµes` deveria ser `Configurações`, `â€”` deveria ser `—`, `nÃ£o` → `não`, `EndereÃ§o` → `Endereço`, `Â·` → `·`, `â”€` → `─`.
+
+**4 arquivos afetados** (o Pleno deve reescrever essas strings em UTF-8 correto):
+
+1. **`Pages/Groups/Features.razor`** (linhas ~21, 49, 71):
+   - `ConfiguraÃ§Ãµes` → `Configurações`
+   - `â€”` → `—` | `Â·` → `·`
+   - `nÃ£o autorizado` → `não autorizado`
+
+2. **`Pages/Poker/Edit.razor`** (linhas ~32, 79, 81, 101, 110, 121, 125, 155, 175, 182):
+   - `nÃ£o encontrado` → `não encontrado`
+   - `EndereÃ§o` → `Endereço` | `nÃºmero` → `número`
+   - `HorÃ¡rio` → `Horário` | `inÃ­cio` → `início`
+   - `â€”` → `—` | `â”€` (box drawing nos comentarios `@* ─── *@`) → `─`
+   - `mÃ¡ximo` → `máximo` | `PreÃ§os` → `Preços`
+
+3. **`Pages/Payment/Payment.razor.cs`** (linhas ~195, 249, 260):
+   - `mÃ­nimo` → `mínimo`
+   - `EndereÃ§o/invoice` → `Endereço/invoice` (2x)
+
+4. **`Shared/Components/UserSummaryCard.razor`** (linhas ~15, 24, 59):
+   - `UsuÃ¡rio` → `Usuário`
+   - `NÃ£o informada` → `Não informada` | `NÃ£o informado` → `Não informado`
+
+**Procedimento seguro**: editar cada string manualmente (NAO usar sed em massa — risco de corromper mais). Salvar SEMPRE em UTF-8 sem BOM (regra 18/19). Verificar apos: `grep -rlP 'Ã©|Ã£|Ã§|Ã¡|Ã³|Ã­|â€|â”€' --include="*.cs" --include="*.razor" .` deve retornar 0 arquivos.
+
+**Nota Senior**: esses textos deveriam idealmente estar nos arquivos de UiText (i18n) e nao hardcoded no markup. Migrar para UiText fica como oportunidade futura (nao obrigatorio neste ciclo).
+
+### Fase 3 — Google OAuth: pacote + configuracao (backend)
+
+**Contexto**: o projeto usa ASP.NET Identity com paginas Razor em `/Identity/Account/*` e cookie auth. Google login usa o fluxo de external login padrao do Identity.
+
+1. Adicionar pacote: `dotnet add package Microsoft.AspNetCore.Authentication.Google`
+2. Em `Program.cs`, apos `AddIdentity`/`AddAuthentication`, registrar o provider:
+   ```csharp
+   builder.Services.AddAuthentication()
+       .AddGoogle(options =>
+       {
+           options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "";
+           options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "";
+           // callback padrao: /signin-google
+       });
+   ```
+3. Adicionar secao em `appsettings.json` (valores VAZIOS — segredos reais via user-secrets/env, NUNCA commitados):
+   ```json
+   "Authentication": { "Google": { "ClientId": "", "ClientSecret": "" } }
+   ```
+4. So habilitar o botao na UI quando `ClientId` estiver preenchido (evita erro em dev sem credenciais).
+
+### Fase 4 — Google OAuth: paginas de external login (UI) + comportamento CRIAR-OU-VINCULAR
+
+Verificar se existem as paginas scaffolded do Identity. Se nao, criar:
+- `Areas/Identity/Pages/Account/ExternalLogin.cshtml` (+ `.cs`): recebe o callback.
+- Em `Login.cshtml`: renderizar os botoes de provider externo (`Model.ExternalLogins`) — botao "Entrar com Google".
+
+**Comportamento exigido pelo Robson (criar-ou-vincular por email)** no `ExternalLogin.OnGetCallbackAsync`:
+1. `signInManager.ExternalLoginSignInAsync(...)` — se ja existe o login externo vinculado, **loga direto**.
+2. Se nao ha login externo vinculado, pegar o `email` do claim do Google e `userManager.FindByEmailAsync(email)`:
+   - **Se JA existe usuario com esse email** → `userManager.AddLoginAsync(existingUser, info)` (vincula o Google a conta existente) e loga. Nao criar conta duplicada.
+   - **Se NAO existe** → criar novo `ApplicationUser { Email, UserName = email, EmailConfirmed = true }` + `AddLoginAsync` + login.
+3. Apos criar, redirecionar para completar perfil se campos obrigatorios do dominio estiverem vazios (`BirthDate`, cidade, etc.).
+
+Pontos de atencao:
+- `ApplicationUser` tem campos custom — no primeiro login Google ficam nulos; garantir que o fluxo nao quebra (opcionais) e completar depois.
+- Email do Google ja vem verificado → `EmailConfirmed = true` (nao exigir novo email de confirmacao para contas Google).
+
+### Fase 5 — Emails reais + confirmacao de email (para cadastro tradicional)
+
+**Contexto**: hoje o cadastro por email/senha (nao-Google) provavelmente nao envia email real de confirmacao. O Robson quer emails reais + confirmacao funcionando.
+
+1. Implementar um `IEmailSender` real (SMTP ou provedor transacional — ex: SendGrid/Mailgun/SMTP do dominio). Config via `appsettings` + segredos fora do git (mesma abordagem do OAuth).
+2. Ativar `options.SignIn.RequireConfirmedAccount = true` no Identity (verificar valor atual em `Program.cs`).
+3. Fluxo de registro: enviar link de confirmacao (`/Identity/Account/ConfirmEmail`), bloquear login ate confirmar.
+4. Contas via Google entram com `EmailConfirmed = true` e nao passam por esse fluxo (ja verificado).
+5. Verificar/ajustar as paginas `Register.cshtml`, `RegisterConfirmation.cshtml`, `ConfirmEmail.cshtml`, `ResendEmailConfirmation.cshtml`.
+
+**Acao do Robson**: fornecer as credenciais SMTP/API do provedor de email (host, porta, usuario, senha/API key) — guardadas fora do git.
+
+### Fase 6 — Testes dos fluxos de login
+
+- `AddGoogle` so registrado quando ha `ClientId` (config guard).
+- Login expondo `ExternalLogins` renderiza o botao Google quando configurado.
+- `ExternalLogin` callback: (a) email existente → vincula sem criar duplicata; (b) email novo → cria com `EmailConfirmed = true`.
+- Cadastro tradicional exige confirmacao de email antes do login (`RequireConfirmedAccount`).
+- Usar `IntegrationTestWebAppFactory` seguindo o padrao dos testes existentes.
+
+### Fase 7 — Melhorias UX vindas de testes do app (FASE PADRAO)
+
+Reservada para requisitos/bugs/melhorias que o Robson levantar testando o app durante o ciclo. Documentar cada item aqui antes de implementar. (Ver regra 22.)
+
+---
+
+## O que o Robson precisa gerar para o Google OAuth (acao do usuario)
+
+Antes/durante o Ciclo 17, para o login funcionar em prod e dev:
+1. Google Cloud Console → **APIs & Services → Credentials → Create OAuth client ID** (tipo: Web application).
+2. **Authorized redirect URIs**: adicionar `https://<seu-dominio-prod>/signin-google` e `https://localhost:xxxx/signin-google` (porta do dev).
+3. Configurar a **OAuth consent screen** (nome do app, email de suporte, dominios autorizados).
+4. Copiar **Client ID** e **Client Secret**.
+5. Guardar os segredos FORA do git:
+   - Dev: `dotnet user-secrets set "Authentication:Google:ClientId" "..."` e idem para o secret
+   - Prod: variaveis de ambiente `Authentication__Google__ClientId` / `Authentication__Google__ClientSecret`
+
+Para email real + confirmacao (Fase 5): fornecer credenciais do provedor de email (SMTP host/porta/usuario/senha OU API key de SendGrid/Mailgun), tambem guardadas fora do git (user-secrets em dev, env vars em prod).
+
+---
+
+## Ciclo 18 (FUTURO) -- Mobile UX Critico: Fluxos Principais
+
+Auditar e garantir 100% no mobile os fluxos que os stakeholders mais usam:
+entrar em grupo (invite code) → ver eventos → confirmar presenca → pagar (Pix/BTC) → ver comprovante.
+Foco: alvos de toque >=44px, sem scroll horizontal, formularios/modais utilizaveis em 375px/414px, header consistente.
+Detalhar em fases proprias quando iniciarmos o ciclo.
+
+## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID
+
+Refatoracao ampla aplicando TDD e SOLID (+ padroes pertinentes de Blazor Server: separacao de logica em services testaveis, `IDbContextFactory`, componentizacao, evitar logica no markup, gestao de circuito/estado).
+Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quando priorizado.
+
+---
+
+## Ciclo 20 (POSTERGADO) -- Integracao WhatsApp Real + Baseline Operacional por Gateway
+
+**POSTERGADO** a pedido do Robson (aguardando ideias/sugestoes de outro dev). Conteudo mantido abaixo para referencia; revisar quando reativado.
 
 ### Fase 1 — Configuracao WhatsApp: appsettings + opt-in
 

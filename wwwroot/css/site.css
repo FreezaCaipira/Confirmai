@@ -118,6 +118,7 @@
     --green-bright:    #4ade80;   /* success badges, confirmations */
     --green-soft:      #86efac;   /* success highlights */
     --red-soft:        #f87171;   /* error text, danger highlights */
+    --red-light:       #fca5a5;   /* delinquent tab gradient top */
     --red-border:      #7f1d1d;   /* received tab borders */
     --red-text-light:  #fca5a5;   /* received tab text */
     --amber:           #fbbf24;   /* poker/alert accent */
@@ -152,8 +153,6 @@
 
     /* Volleyball theme (blue/yellow) */
     --volleyball-accent:   #fbbf24;
-    --volleyball-accent-deep: #d97706;
-    --volleyball-text:     #fef3c7;
     --volleyball-text-pale: #dbeafe;
     --volleyball-bg-dark:  #1e3a8a;
     --volleyball-bg-deepest: #1e40af;
@@ -161,8 +160,7 @@
 
     /* Beach Tennis theme (orange/teal) */
     --beachtennis-accent:  #fb923c;
-    --beachtennis-accent-deep: #ea580c;
-    --beachtennis-text:    #fed7aa;
+    --beachtennis-cta:     #99f6e4;
     --beachtennis-text-pale: #ccfbf1;
     --beachtennis-bg-dark: #0f766e;
     --beachtennis-bg-deepest: #115e59;
@@ -170,16 +168,12 @@
 
     /* Footvolley theme (blue/white) */
     --footvolley-accent:   #38bdf8;
-    --footvolley-accent-deep: #0284c7;
-    --footvolley-text:     #e0f2fe;
     --footvolley-text-pale: #f0f9ff;
     --footvolley-bg-dark:  #0369a1;
     --footvolley-bg-deepest: #075985;
 
     /* Chess theme (black/white) */
     --chess-accent:        #9ca3af;
-    --chess-accent-deep:   #4b5563;
-    --chess-text:          #f3f4f6;
     --chess-text-pale:     #f9fafb;
     --chess-bg-dark:       #1f2937;
     --chess-bg-deepest:    #111827;
@@ -219,6 +213,8 @@
     
     /* Red shadows */
     --shadow-red-sm:       rgba(239, 68, 68, 0.3);
+    --shadow-red-md:       rgba(239, 68, 68, 0.4);
+    --shadow-red-lg:       rgba(239, 68, 68, 0.5);
     --red-opacity-lg:      rgba(239, 68, 68, 0.5);
     
     /* Text shadows */
