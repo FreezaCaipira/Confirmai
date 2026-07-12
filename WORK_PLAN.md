@@ -3,7 +3,8 @@
 > Atualizado em 14/06/2026 | Base: `main` (pos-Ciclo 16) | Refatoracao CSS CONCLUIDA
 > 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste
 > Ciclo 15 (testes + UX grupos + !important) e Ciclo 16 (mobile UX) -- CONCLUIDOS e revisados
-> Proximo: Ciclo 17 -- WhatsApp real + Baseline por gateway + consolidar CSS do menu mobile (Fase 15)
+> Proximo: Ciclo 17 -- Login Google (OAuth) + fix caracteres especiais + consolidar CSS do menu mobile
+> Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID | C20 WhatsApp+baseline (POSTERGADO)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -560,6 +561,7 @@ Todas as paginas agora usam `IDbContextFactory<AppDbContext>`. 0 paginas com `@i
 19. **Verificar encoding em TODOS os CSS apos cada fase** -- rodar script de verificacao UTF-8 (ver secao Comandos de Validacao). Inclui site.css, events.css, marketplace.css, identity.css e TODOS os scoped CSS
 20. **NUNCA criar arquivos de docs separados** -- consolidar TUDO no WORK_PLAN.md. Nao criar arquivos em `docs/`, `.md` avulsos, etc.
 21. **Rebuild limpo antes de testar mudancas visuais** -- ao alterar CSS (especialmente scoped CSS), sempre fazer `dotnet clean && dotnet build` e testar com Ctrl+F5 (hard refresh). Hot-reload pode nao aplicar scoped CSS corretamente
+22. **Requisitos vindos dos testes do Robson sao legitimos** -- bugs/melhorias/requisitos que o Robson levanta testando o app NAO sao "scope creep" e devem entrar na "Fase padrao de melhorias UX" do ciclo. A regra 16 (separar features) so se aplica a adicoes que o proprio Pleno inventa sem pedido (ex: novos esportes). Documentar cada item vindo do Robson na fase de melhorias antes de implementar
 
 ---
 
@@ -1246,13 +1248,15 @@ Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName
 
 ---
 
-## Ciclo 17 -- Consolidar Menu Mobile + WhatsApp Real + Baseline Operacional por Gateway
+## Ciclo 17 -- Login Google (OAuth) + Fix Caracteres Especiais + Consolidar Menu Mobile
 
-**Branch sugerida**: `feat/ciclo17-whatsapp-baseline`
+**Branch sugerida**: `feat/ciclo17-google-login`
 **1 commit por fase** dentro da branch. **1 PR** no final.
 Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"`.
 
-### Fase 0 — Consolidar CSS do menu mobile (resolve Fase 15 do Ciclo 16)
+Ordem sugerida: Fase 1 (mobile nav, rapida) → Fase 2 (mojibake, rapida) → Fases 3-6 (Google OAuth, foco principal).
+
+### Fase 1 — Consolidar CSS do menu mobile (resolve Fase 15 do Ciclo 16)
 
 **Problema**: link de pagamentos nao alinha com os demais no menu mobile. Causa raiz: CSS do `oldsite-top-nav` duplicado entre global e scoped (mesmo padrao do bug de background dos Ciclos 12/13).
 
@@ -1265,6 +1269,111 @@ Validar cada fase com `dotnet build` + `dotnet test --filter "FullyQualifiedName
 
 **Arquivos**: `wwwroot/css/site.css`, `Shared/Components/MainLayout.razor.css`
 **Nota**: nao ha seletores residuais `payments-link`/`a[href="/payments"]` (tentativas ja revertidas).
+
+### Fase 2 — Corrigir caracteres especiais (mojibake) — LOCAIS EXATOS
+
+**Problema**: texto com dupla codificacao UTF-8 (bytes UTF-8 lidos como Latin-1 e re-salvos). Ex: `ConfiguraÃ§Ãµes` deveria ser `Configurações`, `â€”` deveria ser `—`, `nÃ£o` → `não`, `EndereÃ§o` → `Endereço`, `Â·` → `·`, `â”€` → `─`.
+
+**4 arquivos afetados** (o Pleno deve reescrever essas strings em UTF-8 correto):
+
+1. **`Pages/Groups/Features.razor`** (linhas ~21, 49, 71):
+   - `ConfiguraÃ§Ãµes` → `Configurações`
+   - `â€”` → `—` | `Â·` → `·`
+   - `nÃ£o autorizado` → `não autorizado`
+
+2. **`Pages/Poker/Edit.razor`** (linhas ~32, 79, 81, 101, 110, 121, 125, 155, 175, 182):
+   - `nÃ£o encontrado` → `não encontrado`
+   - `EndereÃ§o` → `Endereço` | `nÃºmero` → `número`
+   - `HorÃ¡rio` → `Horário` | `inÃ­cio` → `início`
+   - `â€”` → `—` | `â”€` (box drawing nos comentarios `@* ─── *@`) → `─`
+   - `mÃ¡ximo` → `máximo` | `PreÃ§os` → `Preços`
+
+3. **`Pages/Payment/Payment.razor.cs`** (linhas ~195, 249, 260):
+   - `mÃ­nimo` → `mínimo`
+   - `EndereÃ§o/invoice` → `Endereço/invoice` (2x)
+
+4. **`Shared/Components/UserSummaryCard.razor`** (linhas ~15, 24, 59):
+   - `UsuÃ¡rio` → `Usuário`
+   - `NÃ£o informada` → `Não informada` | `NÃ£o informado` → `Não informado`
+
+**Procedimento seguro**: editar cada string manualmente (NAO usar sed em massa — risco de corromper mais). Salvar SEMPRE em UTF-8 sem BOM (regra 18/19). Verificar apos: `grep -rlP 'Ã©|Ã£|Ã§|Ã¡|Ã³|Ã­|â€|â”€' --include="*.cs" --include="*.razor" .` deve retornar 0 arquivos.
+
+**Nota Senior**: esses textos deveriam idealmente estar nos arquivos de UiText (i18n) e nao hardcoded no markup. Migrar para UiText fica como oportunidade futura (nao obrigatorio neste ciclo).
+
+### Fase 3 — Google OAuth: pacote + configuracao (backend)
+
+**Contexto**: o projeto usa ASP.NET Identity com paginas Razor em `/Identity/Account/*` e cookie auth. Google login usa o fluxo de external login padrao do Identity.
+
+1. Adicionar pacote: `dotnet add package Microsoft.AspNetCore.Authentication.Google`
+2. Em `Program.cs`, apos `AddIdentity`/`AddAuthentication`, registrar o provider:
+   ```csharp
+   builder.Services.AddAuthentication()
+       .AddGoogle(options =>
+       {
+           options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "";
+           options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "";
+           // callback padrao: /signin-google
+       });
+   ```
+3. Adicionar secao em `appsettings.json` (valores VAZIOS — segredos reais via user-secrets/env, NUNCA commitados):
+   ```json
+   "Authentication": { "Google": { "ClientId": "", "ClientSecret": "" } }
+   ```
+4. So habilitar o botao na UI quando `ClientId` estiver preenchido (evita erro em dev sem credenciais).
+
+### Fase 4 — Google OAuth: paginas de external login (UI)
+
+Verificar se existem as paginas scaffolded do Identity. Se nao, criar:
+- `Areas/Identity/Pages/Account/ExternalLogin.cshtml` (+ `.cs`): recebe o callback, cria/associa `ApplicationUser`, preenche `Email`/`UserName`.
+- Em `Login.cshtml`: renderizar os botoes de provider externo (`Model.ExternalLogins`) — botao "Entrar com Google".
+
+Pontos de atencao para o modelo do projeto:
+- `ApplicationUser` tem campos custom (`WhatsAppNumber`, `BirthDate`, etc.) — no primeiro login Google, esses ficam nulos; garantir que o fluxo nao quebra (campos opcionais) e redirecionar para completar perfil se necessario.
+- Confirmar `RequireConfirmedAccount` — contas Google ja vem com email verificado pelo Google; setar `EmailConfirmed = true` ao criar via external login.
+
+### Fase 5 — Testes do fluxo de external login
+
+- Teste de que `AddGoogle` so e registrado quando ha `ClientId` (config guard).
+- Teste de que a pagina de Login expondo `ExternalLogins` renderiza o botao Google quando configurado.
+- Teste do `ExternalLoginModel.OnPostConfirmationAsync` criando usuario com `EmailConfirmed = true`.
+- Usar `IntegrationTestWebAppFactory` seguindo o padrao dos testes existentes.
+
+### Fase 6 — Melhorias UX vindas de testes do app (FASE PADRAO)
+
+Reservada para requisitos/bugs/melhorias que o Robson levantar testando o app durante o ciclo. Documentar cada item aqui antes de implementar. (Ver regra 22.)
+
+---
+
+## O que o Robson precisa gerar para o Google OAuth (acao do usuario)
+
+Antes/durante o Ciclo 17, para o login funcionar em prod e dev:
+1. Google Cloud Console → **APIs & Services → Credentials → Create OAuth client ID** (tipo: Web application).
+2. **Authorized redirect URIs**: adicionar `https://<seu-dominio-prod>/signin-google` e `https://localhost:xxxx/signin-google` (porta do dev).
+3. Configurar a **OAuth consent screen** (nome do app, email de suporte, dominios autorizados).
+4. Copiar **Client ID** e **Client Secret**.
+5. Guardar os segredos FORA do git:
+   - Dev: `dotnet user-secrets set "Authentication:Google:ClientId" "..."` e idem para o secret
+   - Prod: variaveis de ambiente `Authentication__Google__ClientId` / `Authentication__Google__ClientSecret`
+
+---
+
+## Ciclo 18 (FUTURO) -- Mobile UX Critico: Fluxos Principais
+
+Auditar e garantir 100% no mobile os fluxos que os stakeholders mais usam:
+entrar em grupo (invite code) → ver eventos → confirmar presenca → pagar (Pix/BTC) → ver comprovante.
+Foco: alvos de toque >=44px, sem scroll horizontal, formularios/modais utilizaveis em 375px/414px, header consistente.
+Detalhar em fases proprias quando iniciarmos o ciclo.
+
+## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID
+
+Refatoracao ampla aplicando TDD e SOLID (+ padroes pertinentes de Blazor Server: separacao de logica em services testaveis, `IDbContextFactory`, componentizacao, evitar logica no markup, gestao de circuito/estado).
+Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quando priorizado.
+
+---
+
+## Ciclo 20 (POSTERGADO) -- Integracao WhatsApp Real + Baseline Operacional por Gateway
+
+**POSTERGADO** a pedido do Robson (aguardando ideias/sugestoes de outro dev). Conteudo mantido abaixo para referencia; revisar quando reativado.
 
 ### Fase 1 — Configuracao WhatsApp: appsettings + opt-in
 
