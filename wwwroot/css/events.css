@@ -4712,15 +4712,15 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 /* ── Variant: Blue (Minhas Partidas) ──────────────────────── */
 .my-events-link-btn {
-    background: linear-gradient(180deg, var(--ci-text-link) 0%, var(--ci-text-info) 50%, var(--ci-text-muted) 100%);
+    background: linear-gradient(180deg, var(--ci-text-link) 0%, #4a8fd6 50%, #2d6bb0 100%);
     color: var(--ci-bg-deepest);
-    border: 1px solid var(--ci-text-link-bright);
+    border: 1px solid var(--ci-text-link);
     box-shadow: 0 2px 4px var(--blue300-opacity-md);
     text-shadow: 0 0 10px var(--blue300-opacity-xl);
 }
 
 .my-events-link-btn:hover {
-    background: linear-gradient(180deg, var(--ci-text-link-bright) 0%, var(--ci-text-link) 50%, var(--ci-text-info) 100%);
+    background: linear-gradient(180deg, var(--ci-text-link-bright) 0%, var(--ci-text-link) 50%, #4a8fd6 100%);
     border-color: var(--ci-text-link-bright);
     box-shadow: 0 4px 8px var(--blue300-opacity-xl);
 }
