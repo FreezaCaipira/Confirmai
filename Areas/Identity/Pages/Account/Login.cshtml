@@ -7,7 +7,7 @@
 
 <a href="/" class="identity-home-link identity-home-link-login">
     <span class="identity-home-arrow">&#8592;</span>
-    <span class="identity-home-text">Início</span>
+    <span class="identity-home-text">InÃ­cio</span>
 </a>
 
 <h2 class="identity-login-heading">@T["Identity.Login.Heading"]</h2>
@@ -32,6 +32,22 @@
     </div>
     <button type="submit">@T["Nav.Login"]</button>
 </form>
+
+@if (Model.ExternalLogins?.Count > 0)
+{
+    <div class="external-login">
+        <span class="external-login-divider">@T["Identity.ExternalLogin.Divider"]</span>
+        @foreach (var provider in Model.ExternalLogins)
+        {
+            <form method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                <input type="hidden" name="provider" value="@provider.Name" />
+                <button type="submit" class="external-login-btn external-login-btn--@provider.Name.ToLowerInvariant()">
+                    @T.Get("Identity.ExternalLogin.Provider", provider.DisplayName)
+                </button>
+            </form>
+        }
+    </div>
+}
 
 <div class="identity-actions">
     <a asp-page="./ForgotPassword">@T["Identity.Login.ForgotPassword"]</a>

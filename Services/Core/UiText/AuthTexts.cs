@@ -71,6 +71,15 @@ internal static class AuthTexts
         ["Identity.Email.ResetSubject"] = "Redefinir sua senha",
         ["Identity.Email.ResetBody"] = "Para redefinir sua senha, clique aqui: <a href='{0}'>{1}</a>.",
         ["Identity.Email.ResetAction"] = "redefinir senha",
+        ["Identity.ExternalLogin.Title"] = "Login externo",
+        ["Identity.ExternalLogin.Heading"] = "Login externo",
+        ["Identity.ExternalLogin.Divider"] = "ou",
+        ["Identity.ExternalLogin.Provider"] = "Entrar com {0}",
+        ["Identity.ExternalLogin.RemoteError"] = "Erro no login externo: {0}",
+        ["Identity.ExternalLogin.InfoError"] = "Não foi possível obter as informações do login externo.",
+        ["Identity.ExternalLogin.EmailRequired"] = "O provedor não retornou um email. Use outra forma de login.",
+        ["Identity.ExternalLogin.LinkError"] = "Não foi possível vincular o login externo.",
+        ["Identity.ExternalLogin.CreateError"] = "Não foi possível criar a conta com o login externo.",
     };
 
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -138,6 +147,15 @@ internal static class AuthTexts
         ["Identity.Email.ResetSubject"] = "Reset your password",
         ["Identity.Email.ResetBody"] = "To reset your password, click here: <a href='{0}'>{1}</a>.",
         ["Identity.Email.ResetAction"] = "reset password",
+        ["Identity.ExternalLogin.Title"] = "External login",
+        ["Identity.ExternalLogin.Heading"] = "External login",
+        ["Identity.ExternalLogin.Divider"] = "or",
+        ["Identity.ExternalLogin.Provider"] = "Sign in with {0}",
+        ["Identity.ExternalLogin.RemoteError"] = "External login error: {0}",
+        ["Identity.ExternalLogin.InfoError"] = "Could not retrieve external login information.",
+        ["Identity.ExternalLogin.EmailRequired"] = "The provider did not return an email. Use another login method.",
+        ["Identity.ExternalLogin.LinkError"] = "Could not link the external login.",
+        ["Identity.ExternalLogin.CreateError"] = "Could not create account with the external login.",
     };
 
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -205,6 +223,15 @@ internal static class AuthTexts
         ["Identity.Email.ResetSubject"] = "Restablece tu contrasena",
         ["Identity.Email.ResetBody"] = "Para restablecer tu contrasena, haz clic aqui: <a href='{0}'>{1}</a>.",
         ["Identity.Email.ResetAction"] = "restablecer contrasena",
+        ["Identity.ExternalLogin.Title"] = "Inicio de sesion externo",
+        ["Identity.ExternalLogin.Heading"] = "Inicio de sesion externo",
+        ["Identity.ExternalLogin.Divider"] = "o",
+        ["Identity.ExternalLogin.Provider"] = "Iniciar sesion con {0}",
+        ["Identity.ExternalLogin.RemoteError"] = "Error en el inicio de sesion externo: {0}",
+        ["Identity.ExternalLogin.InfoError"] = "No se pudo obtener la informacion del inicio de sesion externo.",
+        ["Identity.ExternalLogin.EmailRequired"] = "El proveedor no devolvio un email. Usa otro metodo de inicio de sesion.",
+        ["Identity.ExternalLogin.LinkError"] = "No se pudo vincular el inicio de sesion externo.",
+        ["Identity.ExternalLogin.CreateError"] = "No se pudo crear la cuenta con el inicio de sesion externo.",
     };
 
     public static IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> GetAllTexts()
