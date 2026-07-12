@@ -3,7 +3,7 @@
 > Atualizado em 14/06/2026 | Base: `main` (pos-Ciclo 16) | Refatoracao CSS CONCLUIDA
 > 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste
 > Ciclo 15 (testes + UX grupos + !important) e Ciclo 16 (mobile UX) -- CONCLUIDOS e revisados
-> Proximo: Ciclo 17 -- Login Google (OAuth) + fix caracteres especiais + consolidar CSS do menu mobile
+> Proximo: Ciclo 17 -- Login Google (OAuth, criar-ou-vincular) + email real/confirmacao + fix caracteres especiais + consolidar CSS do menu mobile
 > Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID | C20 WhatsApp+baseline (POSTERGADO)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
@@ -97,13 +97,13 @@ Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo 
 - Fases 1-5: 20 novos testes (PingController, GroupMetricsService, CityService, WhatsAppNotificationService, LocationService) -- 5 services sem teste ZERADO
 - Fase 6: Botao "Aprovar todos" na listagem de grupos com `@onclick:stopPropagation`
 - Fase 7: Auditoria `!important` no site.css (11/11 legitimos, nenhum removido)
-- Fase 8 (EXTRA fora do escopo): 4 novos esportes visuais (Volleyball/BeachTennis/Footvolley/Chess, cards "Em breve")
+- Fase 8 (EXTRA, pedido do Robson): 4 novos esportes visuais (Volleyball/BeachTennis/Footvolley/Chess, cards "Em breve")
 - 1.694/1.694 testes passando (+20 vs C14), 0 erros de build
-- **Problemas**: 3 hardcoded hex + 8 vars mortas na Fase 8 (Senior corrigiu). Regra 16 violada (feature no ciclo de cleanup)
+- **Problemas**: 3 hardcoded hex + 8 vars mortas na Fase 8 (Senior corrigiu). Nao foi scope creep -- esportes pedidos pelo Robson (regra 22)
 
 ### Ciclo 16 (Pleno Local): Mobile UX -- Menu Hamburger + Header Consistente
 - Branch: `fix/ciclo16-mobile-ux` | PR #52 (merged)
-- DESVIO: ciclo planejado era WhatsApp+Baseline (movido para Ciclo 17). Pleno repriorizou para mobile UX.
+- DESVIO: ciclo planejado era WhatsApp+Baseline (postergado para Ciclo 20). Pleno repriorizou para mobile UX.
 - Fase 1: Implementação do menu hamburger (MainLayout.razor + MainLayout.razor.css)
 - Fase 2: Correção do z-index (site.css + MainLayout.razor.css)
 - Fase 3: Correção do city selector (CitySelector.razor.css)
@@ -428,11 +428,9 @@ Os 5 services sem teste agora tem cobertura. 20 novos testes, todos passando:
 
 **Fase 7 (!important)**: Auditoria confirmada -- 11/11 legitimos (utility, acessibilidade W3C, Google Maps z-index, autofill Chrome). Nenhum removido. Correto.
 
-### Fase 8 (EXTRA, fora do escopo) -- Novos esportes visualmente
+### Fase 8 (EXTRA) -- Novos esportes visualmente (PEDIDO PELO ROBSON)
 
-O Pleno adicionou 4 esportes ao `Enums/Sport.cs` (Volleyball, BeachTennis, Footvolley, Chess) com cards "Em breve", temas de cor e watermarks. **Isto NAO estava no workplan do Ciclo 15.** E uma decisao de produto (roadmap de esportes) que deveria ter sido um ciclo proprio com aprovacao previa (regra 16 -- separar features do escopo do ciclo).
-
-Funcionalmente os cards sao placeholders (`ComingSoon=true`, so Futsal ativo), entao nao ha risco de fluxo quebrado. Mas gerou lixo de CSS (ver problemas abaixo).
+O Pleno adicionou 4 esportes ao `Enums/Sport.cs` (Volleyball, BeachTennis, Footvolley, Chess) com cards "Em breve", temas de cor e watermarks. **Requisito do Robson** (nao foi iniciativa do Pleno) -- portanto NAO conta como scope creep (regra 22). Cards sao placeholders (`ComingSoon=true`, so Futsal ativo), sem risco de fluxo quebrado. Unica ressalva e a higiene de CSS (ver problemas abaixo), padrao normal de cleanup Senior.
 
 ### Problemas encontrados e corrigidos pelo Senior
 
@@ -443,8 +441,7 @@ Funcionalmente os cards sao placeholders (`ComingSoon=true`, so Futsal ativo), e
 **3. 4 vars `-accent-deep` mortas** (Fase 8): `--volleyball/beachtennis/footvolley/chess-accent-deep` -- 0 usos. Senior removeu.
 
 ### Ressalvas
-- Regra 16 violada: Fase 8 (feature de produto) misturada no ciclo de testes/cleanup
-- Novos esportes introduziram 3 hardcoded hex + 8 vars mortas (mesmo padrao de scope creep dos ciclos CSS)
+- Fase 8 (esportes, pedido do Robson) introduziu 3 hardcoded hex + 8 vars mortas -- higiene de CSS a observar em features com tema de cor, mas nao e scope creep
 
 ---
 
@@ -1321,24 +1318,44 @@ Ordem sugerida: Fase 1 (mobile nav, rapida) → Fase 2 (mojibake, rapida) → Fa
    ```
 4. So habilitar o botao na UI quando `ClientId` estiver preenchido (evita erro em dev sem credenciais).
 
-### Fase 4 — Google OAuth: paginas de external login (UI)
+### Fase 4 — Google OAuth: paginas de external login (UI) + comportamento CRIAR-OU-VINCULAR
 
 Verificar se existem as paginas scaffolded do Identity. Se nao, criar:
-- `Areas/Identity/Pages/Account/ExternalLogin.cshtml` (+ `.cs`): recebe o callback, cria/associa `ApplicationUser`, preenche `Email`/`UserName`.
+- `Areas/Identity/Pages/Account/ExternalLogin.cshtml` (+ `.cs`): recebe o callback.
 - Em `Login.cshtml`: renderizar os botoes de provider externo (`Model.ExternalLogins`) — botao "Entrar com Google".
 
-Pontos de atencao para o modelo do projeto:
-- `ApplicationUser` tem campos custom (`WhatsAppNumber`, `BirthDate`, etc.) — no primeiro login Google, esses ficam nulos; garantir que o fluxo nao quebra (campos opcionais) e redirecionar para completar perfil se necessario.
-- Confirmar `RequireConfirmedAccount` — contas Google ja vem com email verificado pelo Google; setar `EmailConfirmed = true` ao criar via external login.
+**Comportamento exigido pelo Robson (criar-ou-vincular por email)** no `ExternalLogin.OnGetCallbackAsync`:
+1. `signInManager.ExternalLoginSignInAsync(...)` — se ja existe o login externo vinculado, **loga direto**.
+2. Se nao ha login externo vinculado, pegar o `email` do claim do Google e `userManager.FindByEmailAsync(email)`:
+   - **Se JA existe usuario com esse email** → `userManager.AddLoginAsync(existingUser, info)` (vincula o Google a conta existente) e loga. Nao criar conta duplicada.
+   - **Se NAO existe** → criar novo `ApplicationUser { Email, UserName = email, EmailConfirmed = true }` + `AddLoginAsync` + login.
+3. Apos criar, redirecionar para completar perfil se campos obrigatorios do dominio estiverem vazios (`BirthDate`, cidade, etc.).
 
-### Fase 5 — Testes do fluxo de external login
+Pontos de atencao:
+- `ApplicationUser` tem campos custom — no primeiro login Google ficam nulos; garantir que o fluxo nao quebra (opcionais) e completar depois.
+- Email do Google ja vem verificado → `EmailConfirmed = true` (nao exigir novo email de confirmacao para contas Google).
 
-- Teste de que `AddGoogle` so e registrado quando ha `ClientId` (config guard).
-- Teste de que a pagina de Login expondo `ExternalLogins` renderiza o botao Google quando configurado.
-- Teste do `ExternalLoginModel.OnPostConfirmationAsync` criando usuario com `EmailConfirmed = true`.
+### Fase 5 — Emails reais + confirmacao de email (para cadastro tradicional)
+
+**Contexto**: hoje o cadastro por email/senha (nao-Google) provavelmente nao envia email real de confirmacao. O Robson quer emails reais + confirmacao funcionando.
+
+1. Implementar um `IEmailSender` real (SMTP ou provedor transacional — ex: SendGrid/Mailgun/SMTP do dominio). Config via `appsettings` + segredos fora do git (mesma abordagem do OAuth).
+2. Ativar `options.SignIn.RequireConfirmedAccount = true` no Identity (verificar valor atual em `Program.cs`).
+3. Fluxo de registro: enviar link de confirmacao (`/Identity/Account/ConfirmEmail`), bloquear login ate confirmar.
+4. Contas via Google entram com `EmailConfirmed = true` e nao passam por esse fluxo (ja verificado).
+5. Verificar/ajustar as paginas `Register.cshtml`, `RegisterConfirmation.cshtml`, `ConfirmEmail.cshtml`, `ResendEmailConfirmation.cshtml`.
+
+**Acao do Robson**: fornecer as credenciais SMTP/API do provedor de email (host, porta, usuario, senha/API key) — guardadas fora do git.
+
+### Fase 6 — Testes dos fluxos de login
+
+- `AddGoogle` so registrado quando ha `ClientId` (config guard).
+- Login expondo `ExternalLogins` renderiza o botao Google quando configurado.
+- `ExternalLogin` callback: (a) email existente → vincula sem criar duplicata; (b) email novo → cria com `EmailConfirmed = true`.
+- Cadastro tradicional exige confirmacao de email antes do login (`RequireConfirmedAccount`).
 - Usar `IntegrationTestWebAppFactory` seguindo o padrao dos testes existentes.
 
-### Fase 6 — Melhorias UX vindas de testes do app (FASE PADRAO)
+### Fase 7 — Melhorias UX vindas de testes do app (FASE PADRAO)
 
 Reservada para requisitos/bugs/melhorias que o Robson levantar testando o app durante o ciclo. Documentar cada item aqui antes de implementar. (Ver regra 22.)
 
@@ -1354,6 +1371,8 @@ Antes/durante o Ciclo 17, para o login funcionar em prod e dev:
 5. Guardar os segredos FORA do git:
    - Dev: `dotnet user-secrets set "Authentication:Google:ClientId" "..."` e idem para o secret
    - Prod: variaveis de ambiente `Authentication__Google__ClientId` / `Authentication__Google__ClientSecret`
+
+Para email real + confirmacao (Fase 5): fornecer credenciais do provedor de email (SMTP host/porta/usuario/senha OU API key de SendGrid/Mailgun), tambem guardadas fora do git (user-secrets em dev, env vars em prod).
 
 ---
 
