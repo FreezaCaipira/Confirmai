@@ -2389,8 +2389,8 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         gap: 0.6rem;
     }
 
-    .btn-create-event {
-        width: 100%;
+    .btn-create-event,
+    .my-events-link-btn {
         justify-content: center;
         padding: 0.35rem 0.8rem;
         font-size: 0.78rem;
@@ -4679,24 +4679,44 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     margin: 0;
 }
 
-/* ── Minhas Partidas button (shared across sport pages) ──── */
+/* ── Listing action buttons (shared base) ─────────────────── */
+.btn-create-event,
 .my-events-link-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
     padding: 0.38rem 0.95rem;
     border-radius: 8px;
-    background: linear-gradient(180deg, var(--ci-text-link) 0%, var(--ci-text-info) 50%, var(--ci-text-muted) 100%);
-    color: var(--ci-bg-deepest);
     font-weight: 800;
     font-size: 0.82rem;
     text-decoration: none;
-    border: 1px solid var(--ci-text-link-bright);
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-    box-shadow: 0 2px 4px var(--blue300-opacity-md);
-    text-shadow: 0 0 10px var(--blue300-opacity-xl);
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+/* ── Variant: Gold (Criar Grupo / Criar Evento) ───────────── */
+.btn-create-event {
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
+    color: var(--ci-surface-light);
+    border: 1px solid var(--ci-accent-light);
+    box-shadow: 0 2px 4px var(--accent-opacity-md);
+    text-shadow: 0 0 10px var(--accent-opacity-xl);
+}
+
+.btn-create-event:hover {
+    background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
+    border-color: var(--ci-text-link);
+    box-shadow: 0 4px 8px var(--accent-opacity-xl);
+}
+
+/* ── Variant: Blue (Minhas Partidas) ──────────────────────── */
+.my-events-link-btn {
+    background: linear-gradient(180deg, var(--ci-text-link) 0%, var(--ci-text-info) 50%, var(--ci-text-muted) 100%);
+    color: var(--ci-bg-deepest);
+    border: 1px solid var(--ci-text-link-bright);
+    box-shadow: 0 2px 4px var(--blue300-opacity-md);
+    text-shadow: 0 0 10px var(--blue300-opacity-xl);
 }
 
 .my-events-link-btn:hover {
@@ -4706,6 +4726,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 }
 
 @media (max-width: 768px) {
+    .btn-create-event,
     .my-events-link-btn {
         font-size: 0.8rem;
         padding: 0.38rem 0.8rem;
