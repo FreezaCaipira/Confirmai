@@ -2386,6 +2386,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .listing-page-actions {
         justify-content: center;
         margin-bottom: 1rem;
+        gap: 0.6rem;
     }
 
     .btn-create-event {
@@ -4683,40 +4684,30 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.42rem 0.9rem;
+    padding: 0.38rem 0.95rem;
     border-radius: 8px;
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 100%);
-    color: var(--ci-text);
-    font-weight: 700;
+    background: linear-gradient(180deg, var(--link-info) 0%, #4a7fb8 50%, #3a6a9e 100%);
+    color: var(--ci-surface-light);
+    font-weight: 800;
     font-size: 0.82rem;
     text-decoration: none;
-    border: 1px solid var(--ci-accent-mid);
-    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s, filter 0.15s;
-    box-shadow: 0 2px 4px var(--shadow-md);
+    border: 1px solid #6ba0d8;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 4px rgba(74, 127, 184, 0.3);
+    text-shadow: 0 0 10px rgba(74, 127, 184, 0.4);
     white-space: nowrap;
     flex-shrink: 0;
 }
 
 .my-events-link-btn:hover {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 100%);
-    border-color: var(--ci-accent);
-    color: var(--ci-text);
-    filter: brightness(1.15);
-    box-shadow: 0 4px 8px var(--accent-opacity-md);
-    transform: scale(1.03);
+    background: linear-gradient(180deg, #6ba0d8 0%, var(--link-info) 50%, #4a7fb8 100%);
+    border-color: var(--link-info);
+    box-shadow: 0 4px 8px rgba(74, 127, 184, 0.4);
 }
 
 @media (max-width: 768px) {
     .my-events-link-btn {
         font-size: 0.8rem;
-        padding: 0.4rem 0.7rem;
-    }
-
-    .my-events-link-btn i {
-        display: none;
-    }
-
-    .my-events-link-btn:hover {
-        transform: scale(1.03);
+        padding: 0.38rem 0.8rem;
     }
 }

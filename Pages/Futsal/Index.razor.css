@@ -5,6 +5,7 @@
     margin: 0 auto 1.5rem;
     display: flex;
     justify-content: flex-end;
+    gap: 0.6rem;
 }
 
 /* -- Criar Partida button ------------------ */
@@ -250,6 +251,7 @@
 
     .listing-page-actions {
         justify-content: center;
+        gap: 0.6rem;
     }
 }
 
