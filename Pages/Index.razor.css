@@ -5,13 +5,13 @@
     gap: 0.4rem;
     padding: 0.42rem 0.9rem;
     border-radius: 8px;
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 100%);
     color: var(--ci-text);
     font-weight: 700;
     font-size: 0.82rem;
     text-decoration: none;
-    border: 1px solid var(--ci-accent-dark);
-    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    border: 1px solid var(--ci-accent-mid);
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s, filter 0.15s;
     box-shadow: 0 2px 4px var(--shadow-md);
     white-space: nowrap;
     flex-shrink: 0;
@@ -19,9 +19,10 @@
 
 .my-events-link-btn:hover {
     background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 100%);
-    border-color: var(--ci-accent-mid);
+    border-color: var(--ci-accent);
     color: var(--ci-text);
-    box-shadow: 0 4px 8px var(--accent-opacity-sm);
+    filter: brightness(1.15);
+    box-shadow: 0 4px 8px var(--accent-opacity-md);
     transform: scale(1.03);
 }
 
