@@ -5,28 +5,24 @@
     gap: 0.4rem;
     padding: 0.42rem 0.9rem;
     border-radius: 8px;
-    background: var(--ci-accent);
-    color: var(--ci-bg-card-deep);
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    color: var(--ci-text);
     font-weight: 700;
     font-size: 0.82rem;
     text-decoration: none;
-    border: 1px solid var(--ci-accent);
+    border: 1px solid var(--ci-accent-dark);
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
     box-shadow: 0 2px 4px var(--shadow-md);
     white-space: nowrap;
     flex-shrink: 0;
-    position: absolute;
-    right: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
 .my-events-link-btn:hover {
-    background: var(--ci-accent-mid);
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 100%);
     border-color: var(--ci-accent-mid);
     color: var(--ci-text);
     box-shadow: 0 4px 8px var(--accent-opacity-sm);
-    transform: translateY(-50%) scale(1.03);
+    transform: scale(1.03);
 }
 
 /* ── Meus Jogos Filters ───────────────────── */
@@ -64,10 +60,14 @@
     .sports-tabs {
         position: static;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0;
         width: 100%;
         max-width: 100%;
         overflow: hidden;
+    }
+
+    .sports-tabs-row {
+        padding: 0.75rem 0;
     }
 
     .my-events-link-btn {
@@ -490,13 +490,20 @@
 /* ── Sports tabs (Explorar / Meus Jogos) ─────────────────────── */
 .sports-tabs {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0;
     width: 100%;
     margin-bottom: 1rem;
+}
+
+.sports-tabs-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.75rem 0;
 }
 
 /* ── Meus Jogos container ────────────────────────────────────── */
