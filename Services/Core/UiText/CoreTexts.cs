@@ -24,7 +24,7 @@ internal static class CoreTexts
         ["Nav.Integration"] = "Integracao",
         ["Nav.Mailbox"] = "Caixa de Entrada",
         ["Nav.Profile"] = "Perfil",
-        ["Nav.Sports"] = "Eventos",
+        ["Nav.Sports"] = "Partidas",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Moeda ativa para exibicao de cotacao",
@@ -134,7 +134,7 @@ internal static class CoreTexts
         ["Nav.About"] = "About",
         ["Nav.Contact"] = "Contact",
         ["Nav.Payments"] = "Payments",
-        ["Nav.Sports"] = "Events",
+        ["Nav.Sports"] = "Matches",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Active currency for quote display",
@@ -247,7 +247,7 @@ internal static class CoreTexts
         ["Nav.Integration"] = "Integracion",
         ["Nav.Mailbox"] = "Bandeja de entrada",
         ["Nav.Profile"] = "Perfil",
-        ["Nav.Sports"] = "Eventos",
+        ["Nav.Sports"] = "Partidos",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Moneda activa para mostrar cotizacion",
