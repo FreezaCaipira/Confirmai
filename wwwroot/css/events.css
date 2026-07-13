@@ -4698,7 +4698,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 /* ── Variant: Gold (Criar Grupo / Criar Evento) ───────────── */
 .btn-create-event {
     background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
-    color: var(--ci-surface-light);
+    color: var(--ci-bg-deepest);
     border: 1px solid var(--ci-accent-light);
     box-shadow: 0 2px 4px var(--accent-opacity-md);
     text-shadow: 0 0 10px var(--accent-opacity-xl);

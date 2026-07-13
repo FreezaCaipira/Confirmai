@@ -34,7 +34,7 @@
 
 .btn-create-event--poker {
     background: var(--poker-bg-dark);
-    color: var(--white);
+    color: var(--ci-bg-deepest);
     border: 1px solid var(--poker-bg-deepest);
 }
 
