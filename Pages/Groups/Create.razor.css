@@ -114,7 +114,7 @@
     text-shadow: 0 0 10px var(--green-opacity-xl);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .upload-section {
         flex-direction: column;
         align-items: center;
@@ -136,5 +136,20 @@
         font-size: 0.8rem;
         padding: 0.7rem 0.75rem;
         gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .upload-preview {
+        width: 100px;
+        height: 100px;
+    }
+
+    .upload-placeholder span {
+        font-size: 0.7rem;
+    }
+
+    .upload-placeholder i {
+        font-size: 1.5rem;
     }
 }
