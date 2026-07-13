@@ -66,6 +66,14 @@
     font-size: 1.1rem;
 }
 
+.onboarding-hint-intro {
+    margin: 0 0 0.75rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--ci-text);
+    opacity: 0.85;
+}
+
 .onboarding-steps {
     display: flex;
     flex-direction: column;
