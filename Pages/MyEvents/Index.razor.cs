@@ -30,8 +30,8 @@ public partial class Index
     private string                   currentUserId       = string.Empty;
 
     private IEnumerable<Event> FilteredEvents =>
-        eventFilter == "cancelled"
-            ? events.Where(e => !e.IsActive)
+        eventFilter == "finished"
+            ? events.Where(e => !e.IsActive || e.StartsAt < DateTime.UtcNow)
             : events.Where(e => e.IsActive && e.StartsAt >= DateTime.UtcNow);
 
     private List<string> ScheduleCities =>

@@ -44,9 +44,9 @@
                             @onclick='() => eventFilter = "upcoming"'>
                         Próximas (@events.Count(e => e.IsActive && e.StartsAt >= DateTime.UtcNow))
                     </button>
-                    <button class="my-events-tab @(eventFilter == "cancelled" ? "my-events-tab--active" : "")"
-                            @onclick='() => eventFilter = "cancelled"'>
-                        Canceladas (@events.Count(e => !e.IsActive))
+                    <button class="my-events-tab @(eventFilter == "finished" ? "my-events-tab--active" : "")"
+                            @onclick='() => eventFilter = "finished"'>
+                        Encerradas (@events.Count(e => !e.IsActive || e.StartsAt < DateTime.UtcNow))
                     </button>
                 </div>
                 <div class="my-events-create-btns">
@@ -72,7 +72,7 @@
             else if (!FilteredEvents.Any())
             {
                 <div class="listing-state listing-empty">
-                    <p>Nenhuma partida @(eventFilter == "cancelled" ? "cancelada" : "próxima").</p>
+                    <p>Nenhuma partida @(eventFilter == "finished" ? "encerrada" : "próxima").</p>
                     <p class="listing-empty-hint">Use o botão acima para criar sua primeira partida@(SelectedSport == Sport.Poker ? " ou torneio" : "").</p>
                 </div>
             }
