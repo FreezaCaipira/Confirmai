@@ -138,29 +138,27 @@
 }
 
 .my-events-tab {
-    padding: 0.45rem 0.85rem;
-    border-radius: 10px;
-    border: 1px solid var(--ci-accent);
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid var(--ci-accent-mid);
     background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
     color: var(--ci-surface-light);
-    font-size: 0.84rem;
+    font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.13s, color 0.13s, border-color 0.13s;
     font-family: inherit;
 }
 
 .my-events-tab:hover {
+    border-color: var(--ci-accent);
     color: var(--white);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
 }
 
 .my-events-tab--active {
     background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 100%);
     color: var(--white);
     border-color: var(--ci-accent-light);
-    box-shadow: 0 4px 12px rgba(34, 109, 196, 0.28);
 }
 
 .my-events-tab--futsal.my-events-tab--active {
