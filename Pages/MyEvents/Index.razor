@@ -28,16 +28,15 @@
                 </a>
             </div>
 
-            <h1 class="page-section-title my-events-title">Minhas Partidas</h1>
-
-            @if (SelectedSport == Sport.Futsal)
-            {
-                <div class="my-events-action-row">
+            <div class="my-events-title-action-row">
+                <h1 class="page-section-title my-events-title">Minhas Partidas</h1>
+                @if (SelectedSport == Sport.Futsal)
+                {
                     <a href="/futsal/schedule/create" class="my-events-create-btn my-events-create-btn--futsal">
                         <i class="fas fa-sync-alt"></i> Recorrência semanal
                     </a>
-                </div>
-            }
+                }
+            </div>
 
             <div class="my-events-filter-row">
                 <div class="my-events-view-tabs">
@@ -115,7 +114,7 @@
 
                             <div class="my-event-actions">
                                 <a href="@detailUrl" class="my-event-action-btn my-event-action-btn--view">
-                                    Ver detalhes
+                                    Ver partida
                                 </a>
                             </div>
                         </div>
