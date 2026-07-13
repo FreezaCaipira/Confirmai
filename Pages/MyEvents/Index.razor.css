@@ -18,7 +18,7 @@
 .events-block .page-section-title {
     font-size: 1.4rem;
     font-weight: 800;
-    color: var(--ci-text-link-bright);
+    color: var(--ci-accent);
     margin: 0;
 }
 
@@ -142,7 +142,7 @@
     border-radius: 20px;
     border: 1px solid var(--ci-accent-mid);
     background: transparent;
-    color: var(--ci-text-link);
+    color: var(--ci-accent);
     font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
@@ -152,12 +152,12 @@
 
 .my-events-tab:hover {
     border-color: var(--ci-accent);
-    color: var(--ci-text-link-bright);
+    color: var(--ci-text-link);
 }
 
 .my-events-tab--active {
     background: var(--ci-bg-card);
-    color: var(--ci-text-link-bright);
+    color: var(--ci-accent);
     border-color: var(--ci-accent);
 }
 
