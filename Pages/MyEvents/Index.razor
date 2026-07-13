@@ -117,14 +117,6 @@
                                 <a href="@detailUrl" class="my-event-action-btn my-event-action-btn--view">
                                     Ver detalhes
                                 </a>
-                                @if (ev.IsActive && !isPast)
-                                {
-                                    <button class="my-event-action-btn my-event-action-btn--cancel"
-                                            disabled="@(cancellingId == ev.Id)"
-                                            @onclick="() => CancelEvent(ev)">
-                                        @(cancellingId == ev.Id ? "…" : "Cancelar")
-                                    </button>
-                                }
                             </div>
                         </div>
                     }
