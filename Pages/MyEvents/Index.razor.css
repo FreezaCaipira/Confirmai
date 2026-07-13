@@ -22,17 +22,15 @@
     margin: 0;
 }
 
-/* ── Title row (back button + centered title) ─────────────── */
-.my-events-title-row {
+/* ── Back row (only back button) ─────────────────────────────── */
+.my-events-back-row {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
     margin-bottom: 0.75rem;
 }
 
 .my-events-title {
-    flex: 1;
     text-align: center;
+    margin-bottom: 0.75rem;
 }
 
 /* ── Action row (right-aligned) ──────────────────────────────── */

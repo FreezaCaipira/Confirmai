@@ -22,12 +22,13 @@
 
     <section class="events-block" aria-label="Minhas partidas">
 
-            <div class="my-events-title-row">
+            <div class="my-events-back-row">
                 <a href="@(SelectedSport == Sport.Futsal ? "/futsal" : "/poker")" class="listing-back-btn">
                     <i class="fas fa-arrow-left"></i> Voltar
                 </a>
-                <h1 class="page-section-title my-events-title">Minhas Partidas</h1>
             </div>
+
+            <h1 class="page-section-title my-events-title">Minhas Partidas</h1>
 
             @if (SelectedSport == Sport.Futsal)
             {
