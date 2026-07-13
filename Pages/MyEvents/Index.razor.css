@@ -171,6 +171,43 @@
     color: var(--poker-accent);
 }
 
+/* ── Event date row (date in highlight) ─────────────────────── */
+.my-event-date-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.25rem;
+}
+
+.my-event-date {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--ci-text-link-bright);
+    text-transform: capitalize;
+}
+
+.my-event-time {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ci-text-link);
+}
+
+.my-event-group-name {
+    margin: 0 0 0.18rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--white);
+    text-shadow: 0 1px 3px var(--shadow-lg);
+}
+
+.my-event-venue {
+    margin: 0 0 0.1rem;
+    font-size: 0.8rem;
+    color: var(--ci-surface-light);
+    text-shadow: 0 1px 2px var(--shadow-md);
+}
+
 /* ── Event list ──────────────────────────────────────────────── */
 .my-events-list {
     display: flex;
@@ -338,14 +375,14 @@
 
 .my-event-meta {
     margin: 0 0 0.18rem;
-    font-size: 0.8rem;
-    color: var(--ci-surface-light);
+    font-size: 0.78rem;
+    color: var(--ci-surface-muted);
     text-shadow: 0 1px 2px var(--shadow-md);
 }
 
 .my-event-location {
     margin: 0;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: var(--ci-surface-muted);
     text-shadow: 0 1px 2px var(--shadow-md);
     white-space: nowrap;

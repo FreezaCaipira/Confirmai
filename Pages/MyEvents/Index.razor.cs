@@ -32,7 +32,7 @@ public partial class Index
     private IEnumerable<Event> FilteredEvents =>
         eventFilter == "finished"
             ? events.Where(e => !e.IsActive || e.StartsAt < DateTime.UtcNow)
-            : events.Where(e => e.IsActive && e.StartsAt >= DateTime.UtcNow);
+            : events.Where(e => e.IsActive && e.StartsAt >= DateTime.UtcNow).Take(5);
 
     private List<string> ScheduleCities =>
         schedules
@@ -72,6 +72,7 @@ public partial class Index
         var raw = await db.Events
             .Include(e => e.Group)
             .Include(e => e.Confirmations)
+            .Include(e => e.Venue)
             .Where(e => e.CreatedByUserId == userId && e.Sport == SelectedSport)
             .ToListAsync();
 
