@@ -113,3 +113,28 @@
     margin: 0;
     text-shadow: 0 0 10px var(--green-opacity-xl);
 }
+
+@media (max-width: 640px) {
+    .upload-section {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .upload-preview {
+        width: 120px;
+        height: 120px;
+    }
+
+    .upload-controls {
+        width: 100%;
+        align-items: center;
+        text-align: center;
+    }
+
+    .create-group-info-box {
+        font-size: 0.8rem;
+        padding: 0.7rem 0.75rem;
+        gap: 0.5rem;
+    }
+}
