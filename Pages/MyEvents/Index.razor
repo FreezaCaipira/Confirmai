@@ -50,20 +50,6 @@
                         Encerradas (@events.Count(e => !e.IsActive || e.StartsAt < DateTime.UtcNow))
                     </button>
                 </div>
-                <div class="my-events-create-btns">
-                    @if (SelectedSport == Sport.Futsal)
-                    {
-                        <a href="/futsal/create" class="my-events-create-btn my-events-create-btn--futsal">
-                            <i class="fas fa-plus"></i> Nova Partida
-                        </a>
-                    }
-                    else if (SelectedSport == Sport.Poker)
-                    {
-                        <a href="/poker/create?tipo=torneio" class="my-events-create-btn my-events-create-btn--poker">
-                            <i class="fas fa-trophy"></i> Novo Torneio
-                        </a>
-                    }
-                </div>
             </div>
 
             @if (isLoading)
