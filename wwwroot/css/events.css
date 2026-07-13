@@ -4700,25 +4700,27 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 .listing-back-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.38rem 0.95rem;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--ci-text-muted);
+    justify-content: center;
+    gap: 0.45rem;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
+    border: 1px solid var(--ci-accent);
+    border-radius: 10px;
+    color: var(--ci-surface-light);
+    font-size: 0.84rem;
     font-weight: 700;
-    font-size: 0.82rem;
+    padding: 0.45rem 0.85rem;
     text-decoration: none;
-    border: 1px solid var(--ci-border);
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
     white-space: nowrap;
+    transition: all 0.2s ease;
     flex-shrink: 0;
     margin-right: auto;
 }
 
 .listing-back-btn:hover {
-    background: var(--ci-bg-card-deep);
-    border-color: var(--ci-border-alt);
-    color: var(--ci-text);
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
 }
 
 /* ── Variant: Gold (Criar Grupo / Criar Evento) ───────────── */
