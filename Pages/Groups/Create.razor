@@ -10,6 +10,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
+@using System.Net.Http.Json
 @using Microsoft.EntityFrameworkCore
 
 @inject IDbContextFactory<AppDbContext> DbFactory
@@ -18,6 +19,7 @@
 @inject LogService                     LogService
 @inject IWebHostEnvironment            Env
 @inject IJSRuntime                     JS
+@inject IHttpClientFactory             HttpClientFactory
 
 <PageTitle>Criar Grupo — Confirmai</PageTitle>
 
@@ -91,13 +93,8 @@
 
                 <div class="form-row-2">
                     <div class="form-group">
-                        <label>Cidade <span class="required">*</span></label>
-                        <InputText class="input" @bind-Value="form.City" placeholder="São Paulo" />
-                        <ValidationMessage For="@(() => form.City)" class="validation-message" />
-                    </div>
-                    <div class="form-group">
                         <label>UF <span class="required">*</span></label>
-                        <InputSelect class="input" @bind-Value="form.StateCode">
+                        <InputSelect class="input" @bind-Value="form.StateCode" @bind-Value:after="OnStateChanged">
                             <option value="">— Selecione —</option>
                             <option value="EX">EX — Estrangeiro</option>
                             <option disabled>──────────────────</option>
@@ -107,6 +104,24 @@
                             }
                         </InputSelect>
                         <ValidationMessage For="@(() => form.StateCode)" class="validation-message" />
+                    </div>
+                    <div class="form-group">
+                        <label>Cidade <span class="required">*</span></label>
+                        @if (form.StateCode == "EX" || string.IsNullOrEmpty(form.StateCode) || !citiesByState.ContainsKey(form.StateCode))
+                        {
+                            <InputText class="input" @bind-Value="form.City" placeholder="Selecione a UF primeiro" disabled="@(string.IsNullOrEmpty(form.StateCode))" />
+                        }
+                        else
+                        {
+                            <InputSelect class="input" @bind-Value="form.City">
+                                <option value="">— Selecione —</option>
+                                @foreach (var city in citiesByState[form.StateCode])
+                                {
+                                    <option value="@city">@city</option>
+                                }
+                            </InputSelect>
+                        }
+                        <ValidationMessage For="@(() => form.City)" class="validation-message" />
                     </div>
                 </div>
             </fieldset>
@@ -152,6 +167,8 @@
     private bool            isSaving  = false;
     private string          saveError = string.Empty;
 
+    private Dictionary<string, string[]> citiesByState = new();
+
     private IBrowserFile?   logoFile = null;
     private string?         logoPreview = null;
     private string          logoFeedback = string.Empty;
@@ -160,6 +177,24 @@
     private static readonly string[] BrazilianStates =
         ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
          "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var http = HttpClientFactory.CreateClient();
+        try
+        {
+            citiesByState = await http.GetFromJsonAsync<Dictionary<string, string[]>>(NavigationManager.BaseUri + "data/cities.json") ?? new();
+        }
+        catch
+        {
+            citiesByState = new();
+        }
+    }
+
+    private void OnStateChanged()
+    {
+        form.City = string.Empty;
+    }
 
     private async Task Save()
     {
