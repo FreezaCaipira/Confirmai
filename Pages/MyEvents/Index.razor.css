@@ -418,14 +418,15 @@
 }
 
 .my-event-action-btn--view {
-    background: var(--ci-bg-card);
+    background: transparent;
     color: var(--ci-accent);
-    border-color: var(--ci-border);
+    border-color: var(--ci-accent);
 }
 
 .my-event-action-btn--view:hover {
+    background: var(--ci-accent-mid);
+    color: var(--white);
     border-color: var(--ci-accent);
-    color: var(--link-info);
 }
 
 .my-event-action-btn--cancel {
