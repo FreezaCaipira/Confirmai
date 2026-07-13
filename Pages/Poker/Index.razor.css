@@ -33,15 +33,16 @@
 }
 
 .btn-create-event--poker {
-    background: var(--poker-bg-dark);
+    background: linear-gradient(180deg, var(--poker-accent) 0%, var(--poker-accent-deep) 50%, var(--poker-bg-dark) 100%);
     color: var(--ci-bg-deepest);
-    border: 1px solid var(--poker-bg-deepest);
+    border: 1px solid var(--poker-accent);
+    text-shadow: 0 0 10px rgba(167, 139, 250, 0.4);
 }
 
 .btn-create-event--poker:hover,
 .create-poker-dropdown.is-open .btn-create-event--poker {
-    background: var(--poker-bg-deepest);
-    box-shadow: 0 4px 14px rgba(109, 40, 217, 0.3);
+    background: linear-gradient(180deg, var(--poker-text) 0%, var(--poker-accent) 50%, var(--poker-accent-deep) 100%);
+    box-shadow: 0 4px 14px rgba(167, 139, 250, 0.4);
 }
 
 .dropdown-arrow {
