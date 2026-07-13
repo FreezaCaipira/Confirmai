@@ -1,12 +1,16 @@
 $states = Invoke-RestMethod 'https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome'
-$result = [ordered]@{}
+$sb = [System.Text.StringBuilder]::new("{")
+$firstState = $true
 foreach ($s in $states) {
     $muns = Invoke-RestMethod "https://servicodados.ibge.gov.br/api/v1/localidades/estados/$($s.id)/municipios?orderBy=nome"
-    $names = $muns | ForEach-Object { $_.nome }
-    $result[$s.sigla] = $names
-    Write-Host "$($s.sigla): $($names.Count) cidades"
+    if (-not $firstState) { [void]$sb.Append(",") }
+    $firstState = $false
+    $cityNames = $muns | ForEach-Object { "`"$($_.nome)`"" }
+    $arr = [string]::Join(",", $cityNames)
+    [void]$sb.Append("`"$($s.sigla)`":[$arr]")
+    Write-Host "$($s.sigla): $($muns.Count) cidades"
 }
-$json = $result | ConvertTo-Json -Depth 3 -Compress
+[void]$sb.Append("}")
 $outPath = 'c:\FreezaSSD\Dev\Confirmai\wwwroot\data\cities.json'
-[System.IO.File]::WriteAllText($outPath, $json, [System.Text.Encoding]::UTF8)
+[System.IO.File]::WriteAllText($outPath, $sb.ToString(), [System.Text.Encoding]::UTF8)
 Write-Host "Done! File size:" ((Get-Item $outPath).Length) "bytes"

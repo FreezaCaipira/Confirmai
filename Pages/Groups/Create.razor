@@ -183,11 +183,14 @@
         try
         {
             var path = Path.Combine(Env.WebRootPath, "data", "cities.json");
+            Console.WriteLine($"[CreateGroup] Loading cities from: {path}");
             var json = await File.ReadAllTextAsync(path);
             citiesByState = JsonSerializer.Deserialize<Dictionary<string, string[]>>(json) ?? new();
+            Console.WriteLine($"[CreateGroup] Loaded {citiesByState.Count} states, SP has {citiesByState.GetValueOrDefault("SP")?.Length ?? 0} cities");
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"[CreateGroup] Failed to load cities.json: {ex.Message}");
             citiesByState = new();
         }
     }
