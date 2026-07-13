@@ -1,0 +1,203 @@
+/* ── Page container ─────────────────────────────────────────── */
+.schedule-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+.schedule-block {
+    margin: 0 auto 1.25rem;
+    max-width: 860px;
+    padding: 0.95rem 1rem 1rem;
+    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
+    border: 1px solid var(--ci-border);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+}
+
+.schedule-block .page-section-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--ci-accent);
+    margin: 0;
+}
+
+/* ── Back row ───────────────────────────────────────────────── */
+.schedule-back-row {
+    display: flex;
+    margin-bottom: 0.75rem;
+}
+
+/* ── Title + action row ─────────────────────────────────────── */
+.schedule-title-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.schedule-title {
+    text-align: center;
+    margin: 0;
+}
+
+/* ── Create button ──────────────────────────────────────────── */
+.schedule-create-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 10px;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
+    border: 1px solid var(--ci-accent);
+    color: var(--ci-surface-light);
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.schedule-create-btn:hover {
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
+}
+
+/* ── Schedule list ──────────────────────────────────────────── */
+.schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.62rem;
+}
+
+.schedule-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 12px;
+    border: 1px solid var(--ci-border);
+    background: var(--ci-bg-card);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.schedule-card:hover {
+    border-color: var(--ci-accent-mid);
+    box-shadow: 0 4px 14px rgba(79, 156, 248, 0.12);
+}
+
+.schedule-card--inactive {
+    opacity: 0.55;
+}
+
+/* ── Card body ──────────────────────────────────────────────── */
+.schedule-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.schedule-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.2rem;
+}
+
+.schedule-card-day {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--ci-text-link-bright);
+}
+
+.schedule-card-status {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 10px;
+}
+
+.schedule-card-status--inactive {
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-subtle);
+    border: 1px solid var(--ci-border);
+}
+
+.schedule-card-venue {
+    margin: 0 0 0.1rem;
+    font-size: 0.8rem;
+    color: var(--ci-surface-light);
+}
+
+.schedule-card-meta {
+    margin: 0 0 0.1rem;
+    font-size: 0.78rem;
+    color: var(--ci-surface-muted);
+}
+
+.schedule-card-next {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--ci-text-link);
+}
+
+.schedule-card-next--none {
+    color: var(--ci-text-subtle);
+    font-style: italic;
+}
+
+/* ── Card actions ───────────────────────────────────────────── */
+.schedule-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    justify-content: center;
+    align-self: center;
+}
+
+.schedule-card-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.32rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: border-color 0.14s, color 0.14s, background 0.14s;
+    background: transparent;
+    font-family: inherit;
+}
+
+.schedule-card-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.schedule-card-btn--edit {
+    color: var(--ci-accent);
+    border-color: var(--ci-accent);
+}
+
+.schedule-card-btn--edit:hover {
+    background: var(--ci-accent-mid);
+    color: var(--white);
+}
+
+.schedule-card-btn--toggle {
+    color: var(--ci-text-subtle);
+    border-color: var(--ci-border);
+}
+
+.schedule-card-btn--toggle:hover:not(:disabled) {
+    border-color: var(--ci-accent);
+    color: var(--ci-accent);
+}

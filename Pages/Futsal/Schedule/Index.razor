@@ -1,0 +1,118 @@
+@page "/futsal/schedule"
+@attribute [Authorize]
+
+@using System.Security.Claims
+@using Confirmai.Data
+@using Confirmai.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Recorrências — Confirmai</PageTitle>
+
+<div class="schedule-page">
+    <section class="schedule-block" aria-label="Recorrências semanais">
+
+        <div class="schedule-back-row">
+            <a href="/meus-eventos?esporte=futsal" class="listing-back-btn">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <div class="schedule-title-action-row">
+            <h1 class="page-section-title schedule-title">Recorrências Semanais</h1>
+            <a href="/futsal/schedule/create" class="schedule-create-btn">
+                <i class="fas fa-plus"></i> Nova Recorrência
+            </a>
+        </div>
+
+        @if (isLoading)
+        {
+            <p class="listing-state">Carregando suas recorrências…</p>
+        }
+        else if (!schedules.Any())
+        {
+            <div class="listing-state listing-empty">
+                <p>Nenhuma recorrência cadastrada.</p>
+                <p class="listing-empty-hint">Crie uma recorrência para gerar partidas automaticamente toda semana.</p>
+            </div>
+        }
+        else
+        {
+            <div class="schedule-list">
+                @foreach (var s in schedules)
+                {
+                    var dowLabel = WeekdayLabels[(int)s.DayOfWeek];
+                    var nextInfo = scheduleNextEvents.GetValueOrDefault(s.Id);
+                    var futureCount = scheduleFutureCounts.GetValueOrDefault(s.Id, 0);
+
+                    <div class="schedule-card @(!s.IsActive ? "schedule-card--inactive" : "")">
+                        <div class="schedule-card-body">
+                            <div class="schedule-card-header">
+                                <span class="schedule-card-day">@dowLabel — @s.TimeOfDay.ToString("HH:mm")</span>
+                                @if (!s.IsActive)
+                                {
+                                    <span class="schedule-card-status schedule-card-status--inactive">Inativa</span>
+                                }
+                            </div>
+                            <p class="schedule-card-venue">📍 @(s.Venue?.Name ?? "—") — @(s.Venue?.City ?? "")</p>
+                            <p class="schedule-card-meta">
+                                👥 @s.MaxPlayers jogadores
+                                @if (s.MaxGoalkeepers > 0)
+                                {
+                                    <span> · 🧤 @s.MaxGoalkeepers goleiros</span>
+                                }
+                                @if (s.Price > 0)
+                                {
+                                    <span> · R$ @s.Price.ToString("F2")</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(s.LocalName))
+                                {
+                                    <span> · @s.LocalName</span>
+                                }
+                            </p>
+                            @if (nextInfo.StartsAt != default)
+                            {
+                                <p class="schedule-card-next">
+                                    Próxima: @nextInfo.StartsAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                    · @nextInfo.Confirmed confirmados
+                                </p>
+                            }
+                            else if (s.IsActive)
+                            {
+                                <p class="schedule-card-next schedule-card-next--none">Nenhuma partida futura gerada.</p>
+                            }
+                        </div>
+
+                        <div class="schedule-card-actions">
+                            @if (s.IsActive)
+                            {
+                                <a href="/futsal/schedule/@s.Id/edit" class="schedule-card-btn schedule-card-btn--edit">
+                                    <i class="fas fa-pen"></i> Editar
+                                </a>
+                                <button class="schedule-card-btn schedule-card-btn--toggle"
+                                        disabled="@(togglingId == s.Id)"
+                                        @onclick="() => ToggleSchedule(s)">
+                                    @(togglingId == s.Id ? "…" : "Desativar")
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="schedule-card-btn schedule-card-btn--toggle"
+                                        disabled="@(togglingId == s.Id)"
+                                        @onclick="() => ToggleSchedule(s)">
+                                    @(togglingId == s.Id ? "…" : "Reativar")
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </section>
+</div>
