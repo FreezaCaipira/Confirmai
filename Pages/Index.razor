@@ -345,6 +345,13 @@
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
         userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
+        // Redirect authenticated users to /grupos (flow starts with groups)
+        if (auth.User.Identity?.IsAuthenticated == true)
+        {
+            NavigationManager.NavigateTo("/grupos");
+            return;
+        }
+
         // OnParametersSetAsync ran before us with empty userId; load now if still needed
         if (activeTab == TabMyGames && !confLoaded)
             await LoadConfirmationsAsync();
