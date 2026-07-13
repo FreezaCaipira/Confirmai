@@ -22,6 +22,36 @@
     margin: 0;
 }
 
+/* ── Title row (back button + centered title) ─────────────── */
+.my-events-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.my-events-title {
+    flex: 1;
+    text-align: center;
+}
+
+/* ── Action row (right-aligned) ──────────────────────────────── */
+.my-events-action-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.75rem;
+}
+
+/* ── Filter row (tabs + create btns, right-aligned) ────────── */
+.my-events-filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
 /* ── Header (updated for view tabs) ─────────────────────────── */
 .my-events-header {
     display: flex;

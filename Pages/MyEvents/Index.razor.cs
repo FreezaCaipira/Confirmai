@@ -26,8 +26,13 @@ public partial class Index
     private string?                  scheduleCityFilter  = null;
     private int?                     cancellingId        = null;
     private int?                     togglingScheduleId  = null;
-    private string                   view                = "events";
+    private string                   eventFilter         = "upcoming";
     private string                   currentUserId       = string.Empty;
+
+    private IEnumerable<Event> FilteredEvents =>
+        eventFilter == "cancelled"
+            ? events.Where(e => !e.IsActive)
+            : events.Where(e => e.IsActive && e.StartsAt >= DateTime.UtcNow);
 
     private List<string> ScheduleCities =>
         schedules
