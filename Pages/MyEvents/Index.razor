@@ -83,8 +83,12 @@
 
                             <div class="my-event-body">
                                 <div class="my-event-date-row">
-                                    <span class="my-event-date">@ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy", PtBr)</span>
-                                    <span class="my-event-time">@ev.StartsAt.ToLocalTime().ToString("HH:mm", PtBr)</span>
+                                    <span class="my-event-venue-date">
+                                        @{
+                                            var venueName = ev.Venue?.Name ?? ev.LocalName ?? ev.Group.Name;
+                                        }
+                                        @venueName — @ev.StartsAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm", PtBr)
+                                    </span>
                                     @if (!ev.IsActive)
                                     {
                                         <span class="my-event-status my-event-status--cancelled">Cancelado</span>
@@ -100,20 +104,12 @@
                                         </span>
                                     }
                                 </div>
-                                <p class="my-event-group-name">@ev.Group.Name</p>
                                 <p class="my-event-meta">
                                     👥 @ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $"/{ev.MaxPlayers}" : "") confirmados
                                 </p>
-                                @{
-                                    var venueName = ev.Venue?.Name ?? ev.LocalName;
-                                }
-                                @if (!string.IsNullOrWhiteSpace(venueName))
-                                {
-                                    <p class="my-event-venue">📍 @venueName</p>
-                                }
                                 @if (!string.IsNullOrWhiteSpace(ev.Location))
                                 {
-                                    <p class="my-event-location">@ev.Location</p>
+                                    <p class="my-event-location">📍 @ev.Location</p>
                                 }
                             </div>
 
