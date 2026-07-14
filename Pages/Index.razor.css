@@ -2,6 +2,8 @@
 .sports-back-row {
     display: flex;
     justify-content: flex-start;
+    align-self: flex-start;
+    width: 100%;
     margin-bottom: 0.75rem;
 }
 
