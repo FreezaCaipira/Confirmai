@@ -113,6 +113,30 @@ public partial class EventPayment : IAsyncDisposable
             payState = PayState.Idle;
             return;
         }
+
+        // Guarda-corpo: verificar se taxa está configurada e gateway suportado
+        if (FeeOptions.Value.IsConfigured)
+        {
+            if (!FeeOptions.Value.SupportedGateways.Contains(selectedGatewayName, StringComparer.OrdinalIgnoreCase))
+            {
+                errorMsg = "O gateway selecionado não suporta cobrança de taxa. Entre em contato com o administrador.";
+                payState = PayState.Idle;
+                return;
+            }
+
+            // Verificar se o grupo tem GroupPayoutAccount configurado
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var payoutAccount = await db.GroupPayoutAccounts
+                .FirstOrDefaultAsync(gpa => gpa.GroupId == conf.Event.GroupId && gpa.IsActive);
+            
+            if (payoutAccount is null)
+            {
+                errorMsg = "O organizador não configurou a chave PIX para repasse. Entre em contato com o administrador.";
+                payState = PayState.Idle;
+                return;
+            }
+        }
+
         payState = PayState.Generating;
         errorMsg = string.Empty;
 
