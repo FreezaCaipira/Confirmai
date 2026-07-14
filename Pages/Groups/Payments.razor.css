@@ -95,7 +95,7 @@
 
 .payments-tab-count {
     background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
-    color: var(--red-lightest);
+    color: var(--white);
     font-size: 0.75rem;
     padding: 0.15rem 0.4rem;
     border-radius: 3px;
@@ -104,8 +104,8 @@
 }
 
 .payments-tab-count--delinquent {
-    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
-    color: var(--red-lightest);
+    background: var(--white);
+    color: var(--red-border);
     box-shadow: 0 2px 4px var(--shadow-red-md);
 }
 
@@ -313,9 +313,9 @@
 }
 
 .payments-badge--amount {
-    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
-    color: var(--red-lightest);
-    border: 1px solid var(--red-pale);
+    background: linear-gradient(180deg, var(--red-strong) 0%, var(--red-border) 100%);
+    color: var(--white);
+    border: 1px solid var(--red-strong);
 }
 
 .payments-badge--amount--history {
@@ -377,8 +377,8 @@
 .payments-summary-total {
     font-size: 1rem;
     font-weight: 800;
-    color: var(--red-soft);
-    text-shadow: 0 0 10px var(--red-light-lg);
+    color: var(--red-light);
+    text-shadow: 0 1px 2px var(--text-shadow-sm);
 }
 
 .payments-detail-list {
