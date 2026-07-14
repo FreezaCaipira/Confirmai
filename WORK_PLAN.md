@@ -1557,15 +1557,24 @@ Fonte: https://dev.efipay.com.br/docs/api-pix/split-de-pagamento-pix
 
 **O unico jeito de aceitar "so a chave PIX do organizador" e o Modelo A (intermediacao)**, NAO split: o site recebe 100% na sua conta e depois faz um **Envio de Pix** (API "Envio e Pagamento Pix" do EfiBank) para a chave do organizador, retendo a taxa. Simples tecnicamente, mas o site fica no fluxo do dinheiro (retem valor de terceiro) -> intermediacao, com risco fiscal/regulatorio.
 
-### FORK REAL (aguardando decisao do Robson -- premissa anterior invalidada)
+### DECISAO DO ROBSON (14/07/2026 -- TRAVADA): Opcao 2 -- Intermediacao Automatica (chave PIX solta + repasse via Envio de Pix)
 
-- **Opcao 1 -- Split EfiBank com conta/subconta do organizador**: organizador precisa ter conta Efi OU nos criamos uma subconta Efi pra ele (API Abertura de Contas -- Efi faz o KYC). Split automatico (base pro organizador, taxa pro site), sem o site reter dinheiro. Mais correto; atrito = organizador ter/abrir conta Efi.
-- **Opcao 2 -- Intermediacao (Modelo A) com repasse via Envio de Pix**: aceita a chave PIX solta do organizador (o que o Robson queria). Site recebe tudo e reenvia base ao organizador via Pix, retem a taxa. Menor atrito, MAS site vira intermediador (risco fiscal/regulatorio + gestao de falhas de repasse).
-- **Opcao 3 -- Mercado Pago Connect / Asaas / Iugu**: organizador autoriza/abre conta no provedor (provedor faz KYC), split nativo. Sem risco de intermediacao; atrito = conta no provedor.
+O organizador informa apenas a **chave PIX** (sem precisar de conta Efi). Fluxo 100% automatico, sem clique manual:
+1. Jogador paga o `total` (base + taxa) -> cai na conta PIX do site (`chave = _options.PixKey`, o que ja acontece hoje).
+2. **Webhook** do EfiBank confirma o pagamento (webhook ja implementado no projeto).
+3. Sistema dispara automaticamente um **Envio de Pix** (API "Envio e Pagamento Pix" do EfiBank -- manda PIX para QUALQUER chave) no valor `base` para a chave do organizador; o site **retem** a `feeAmount`.
 
-**As Fases 2 e 4-8 do plano (FeeCalculator, registro, checkout, guarda-corpos, relatorio, testes) valem para qualquer opcao.** So a Fase 1 (recebedor) e a Fase 3 (split vs envio) mudam conforme a escolha.
+**Nao e split** -- sao duas operacoes (recebe + reenvia). Consequencia: o dinheiro passa pela conta do site por alguns segundos -> o site figura como **intermediador** (risco fiscal/regulatorio; confirmar nota fiscal da taxa com contador). Tecnicamente exige tratar **falha de repasse** (chave invalida, PIX recusado, saldo) com retry + alerta admin.
 
-**Compliance**: em qualquer caso (especialmente Opcao 2), confirmar com contador/juridico a responsabilidade e a emissao de nota da taxa de servico.
+**Plano ajustado (Opcao 2 automatica)**:
+- **Fase 1 (recebedor)**: `GroupPayoutAccount` guarda a **chave PIX do organizador** (tipo + valor), cadastro manual pelo admin do grupo. Sem conta/subconta/OAuth.
+- **Fase 3 (repasse)**: no handler do **webhook de confirmacao**, apos marcar o pagamento como pago, disparar **Envio de Pix** do `base` para a chave do organizador. Registrar estado do repasse (`PayoutStatus`: Pendente/Enviado/Falhou) + `EndToEndId`. **Retry** com backoff + **alerta admin** em falha persistente. Idempotencia (nao repassar duas vezes o mesmo pagamento).
+- **Fases 2, 4-8 (FeeCalculator, registro, checkout, guarda-corpos, relatorio, testes)**: inalteradas. Guarda-corpo extra: bloquear/avisar criacao de partida paga se o grupo nao tem chave PIX de repasse cadastrada. Testes cobrindo falha/retry do repasse.
+- **So EfiBank** cobra taxa+repasse por ora (tem Envio de Pix). AbacatePay/Appmax/BTC ficam sem taxa.
+
+**Pre-requisito do Robson**: conta EfiBank com **API Pix (envio) habilitada** + credenciais (ClientId/Secret/certificado PIX) fora do git. Confirmar limites de envio de Pix da conta.
+
+**Compliance**: confirmar com contador/juridico a responsabilidade de intermediacao + emissao de nota da taxa de servico.
 
 ---
 
