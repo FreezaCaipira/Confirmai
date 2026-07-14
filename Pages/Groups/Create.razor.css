@@ -5,6 +5,12 @@
     margin-right: auto;
 }
 
+::deep .create-back-row {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 0.75rem;
+}
+
 /* Info box */
 .create-group-info-box {
     display: flex;
