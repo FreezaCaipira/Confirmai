@@ -10,6 +10,10 @@ namespace Confirmai.Pages.Futsal.Schedule;
 
 public partial class Index : ComponentBase
 {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int? GroupId { get; set; }
+
     private List<MatchSchedule> schedules = new();
     private Dictionary<int, int> scheduleFutureCounts = new();
     private Dictionary<int, (DateTime StartsAt, int Confirmed)> scheduleNextEvents = new();
@@ -38,7 +42,7 @@ public partial class Index : ComponentBase
         schedules = await db.RachaSchedules
             .Include(s => s.Venue)
             .Include(s => s.Group)
-            .Where(s => s.CreatedByUserId == userId)
+            .Where(s => s.CreatedByUserId == userId && (GroupId == null || s.GroupId == GroupId.Value))
             .OrderByDescending(s => s.IsActive)
             .ThenBy(s => s.DayOfWeek)
             .ThenBy(s => s.TimeOfDay)

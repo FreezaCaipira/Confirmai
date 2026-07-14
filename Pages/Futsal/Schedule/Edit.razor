@@ -23,7 +23,7 @@
             <h1 class="create-event-title">
                 <i class="fas fa-sync-alt"></i> Editar Partida Semanal
             </h1>
-            <a href="/meus-eventos?esporte=futsal" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+            <a href="/grupo/@scheduleGroupId/partidas" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
         </div>
 
         @if (isLoading)
@@ -207,6 +207,7 @@
     private bool             notFound    = false;
     private bool             accessDenied = false;
     private string           saveError   = string.Empty;
+    private int              scheduleGroupId;
 
     // ── Options ───────────────────────────────────────────────────────────
 
@@ -269,6 +270,8 @@
             Price           = schedule.Price,
         };
 
+        scheduleGroupId = schedule.GroupId;
+
         venues = await db.Venues
             .Where(v => v.IsActive)
             .OrderBy(v => v.City)
@@ -307,7 +310,7 @@
             schedule.Price           = form.Price;
 
             await db.SaveChangesAsync();
-            NavigationManager.NavigateTo("/meus-eventos?esporte=futsal");
+            NavigationManager.NavigateTo($"/grupo/{schedule.GroupId}/partidas");
         }
         catch (Exception ex)
         {

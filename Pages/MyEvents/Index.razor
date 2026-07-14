@@ -43,12 +43,6 @@
                         Encerradas (@events.Count(e => !e.IsActive || e.StartsAt < DateTime.UtcNow))
                     </button>
                 </div>
-                @if (SelectedSport == Sport.Futsal)
-                {
-                    <a href="/futsal/schedule" class="my-events-create-btn my-events-create-btn--futsal">
-                        <i class="fas fa-sync-alt"></i> Partidas Semanais
-                    </a>
-                }
             </div>
 
             <AdminDataState IsLoading="isLoading"
