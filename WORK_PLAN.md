@@ -4,7 +4,7 @@
 > 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste
 > Ciclo 15 (testes + UX grupos + !important) e Ciclo 16 (mobile UX) -- CONCLUIDOS e revisados
 > Proximo: Ciclo 17 -- Login Google (OAuth, criar-ou-vincular) + email real/confirmacao + fix caracteres especiais + consolidar CSS do menu mobile
-> Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID + CSS Isolation Web/Mobile | C20 WhatsApp+baseline (POSTERGADO)
+> Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID (inclui fase CSS Web/Mobile) | C20 WhatsApp+baseline (POSTERGADO)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -1385,7 +1385,7 @@ entrar em grupo (invite code) → ver eventos → confirmar presenca → pagar (
 Foco: alvos de toque >=44px, sem scroll horizontal, formularios/modais utilizaveis em 375px/414px, header consistente.
 Detalhar em fases proprias quando iniciarmos o ciclo.
 
-## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID + CSS Isolation
+## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID (inclui fase CSS Web/Mobile)
 
 Refatoracao ampla aplicando TDD e SOLID (+ padroes pertinentes de Blazor Server: separacao de logica em services testaveis, `IDbContextFactory`, componentizacao, evitar logica no markup, gestao de circuito/estado).
 Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quando priorizado.
