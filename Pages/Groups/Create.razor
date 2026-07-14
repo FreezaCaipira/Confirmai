@@ -114,7 +114,7 @@
                         <label>Cidade <span class="required">*</span></label>
                         @if (form.StateCode == "EX" || string.IsNullOrEmpty(form.StateCode) || !citiesByState.ContainsKey(form.StateCode))
                         {
-                            <InputText class="input" @bind-Value="form.City" placeholder="Selecione a UF primeiro" disabled="@(string.IsNullOrEmpty(form.StateCode))" />
+                            <InputText class="input" @bind-Value="form.City" placeholder="Selecione a UF" disabled="@(string.IsNullOrEmpty(form.StateCode))" />
                         }
                         else
                         {
