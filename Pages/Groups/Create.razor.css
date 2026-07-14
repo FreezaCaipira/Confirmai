@@ -11,6 +11,12 @@
     margin-bottom: 0.75rem;
 }
 
+::deep .cancel-btn:hover {
+    background: var(--red-strong);
+    color: var(--white);
+    border-color: var(--red-strong);
+}
+
 /* Info box */
 .create-group-info-box {
     display: flex;
