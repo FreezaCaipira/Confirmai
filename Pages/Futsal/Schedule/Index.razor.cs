@@ -37,6 +37,7 @@ public partial class Index : ComponentBase
 
         schedules = await db.RachaSchedules
             .Include(s => s.Venue)
+            .Include(s => s.Group)
             .Where(s => s.CreatedByUserId == userId)
             .OrderByDescending(s => s.IsActive)
             .ThenBy(s => s.DayOfWeek)
