@@ -283,12 +283,20 @@
     text-shadow: 0 0 8px var(--shadow-accent-sm);
 }
 
+.payments-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-end;
+    margin-left: auto;
+    margin-right: 1.5rem;
+}
+
 .payments-user-meta {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
     align-items: center;
-    flex: 1;
 }
 
 .payments-badge {
@@ -669,6 +677,13 @@
     .payments-user-name {
         font-size: 0.9rem;
         min-width: auto;
+    }
+
+    .payments-user-info {
+        width: 100%;
+        align-items: flex-start;
+        margin-left: 0;
+        margin-right: 0;
     }
 
     .payments-user-meta {
