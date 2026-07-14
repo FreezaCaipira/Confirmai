@@ -60,7 +60,6 @@
                     </div>
                     <AuthorizeView>
                         <Authorized>
-                            <span class="oldsite-top-nav-user">@T["Layout.Hello"], @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? T["Layout.UserFallback"] : context.User.Identity.Name)!</span>
                             <a href="/grupos" class="oldsite-top-nav-link"><i class="fas fa-users" aria-hidden="true"></i> Grupos</a>
                         </Authorized>
                     </AuthorizeView>
@@ -97,6 +96,7 @@
                                     <img class="oldsite-profile-glyph" src="/images/icons/user-profile.svg" alt="" aria-hidden="true" />
                                     <span class="mobile-nav-text">@T["Nav.Profile"]</span>
                                 </a>
+                                <span class="oldsite-top-nav-user">@T["Layout.Hello"], @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? T["Layout.UserFallback"] : context.User.Identity.Name)!</span>
                             }
                             <a href="/Identity/Account/Logout" class="oldsite-top-nav-link oldsite-top-nav-logout">@T["Layout.Logout"]</a>
                         </Authorized>

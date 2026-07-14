@@ -97,27 +97,27 @@ else
                     <table class="events-table">
                         <thead>
                             <tr>
-                                <th>Data</th>
-                                <th>Jogadores</th>
-                                <th>Status</th>
+                                <th class="web-only">Data/Hora</th>
+                                <th class="web-only">Jogadores</th>
+                                <th class="web-only">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var ev in recentEvents)
                             {
                                 var href   = group.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
-                                var date   = ev.StartsAt.ToLocalTime().ToString("dd/MM/yyyy");
-                                var time   = ev.StartsAt.ToLocalTime().ToString("HH:mm");
+                                var date   = ev.StartsAt.ToString("dd/MM/yyyy");
+                                var time   = ev.StartsAt.ToString("HH:mm");
                                 var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
                                 <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
-                                    <td>
+                                    <td class="web-only">
                                         <span class="et-date">@date</span>
                                         <span class="et-time">@time</span>
                                     </td>
-                                    <td>
+                                    <td class="web-only">
                                         <span class="et-players @(isFull ? "et-players--full" : "")">@ev.Confirmations.Count / @ev.MaxPlayers</span>
                                     </td>
-                                    <td>
+                                    <td class="web-only">
                                         @if (!ev.IsActive)
                                         {
                                             <span class="player-tag player-tag--cancel">cancelado</span>
@@ -130,6 +130,34 @@ else
                                         {
                                             <span class="player-tag player-tag--open">aberto</span>
                                         }
+                                    </td>
+                                    <td class="mobile-only">
+                                        <div class="et-cell">
+                                            <div class="et-cell-header">
+                                                <div class="et-cell-right">
+                                                    <span class="et-date">@date</span>
+                                                    <span class="et-time">@time</span>
+                                                </div>
+                                            </div>
+                                            <div class="et-cell-meta">
+                                                <span class="et-players-mobile @(isFull ? "et-players--full" : "")">
+                                                    <i class="fas fa-users"></i> @ev.Confirmations.Count / @ev.MaxPlayers
+                                                </span>
+                                                @if (!ev.IsActive)
+                                                {
+                                                    <span class="player-tag player-tag--cancel">cancelado</span>
+                                                }
+                                                else if (isFull)
+                                                {
+                                                    <span class="player-tag player-tag--full">lotado</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="player-tag player-tag--open">aberto</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-chevron-right et-chevron-icon"></i>
                                     </td>
                                 </tr>
                             }

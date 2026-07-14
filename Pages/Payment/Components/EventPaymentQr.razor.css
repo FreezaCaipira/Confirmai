@@ -8,6 +8,7 @@
 
 .evpay-qr-image {
     width: 384px;
+    max-width: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 12px;
     overflow: hidden;
@@ -15,6 +16,7 @@
     padding: 8px;
     box-shadow: 0 4px 24px var(--shadow-lg);
     margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .evpay-qr-image :global(img) {
@@ -85,6 +87,17 @@
     text-align: left;
     user-select: all;
     cursor: text;
+}
+
+@media (max-width: 768px) {
+    .evpay-qr-image {
+        width: 100%;
+        min-width: 200px;
+    }
+
+    .evpay-action-btn {
+        min-height: 44px;
+    }
 }
 
 .evpay-action-btn {

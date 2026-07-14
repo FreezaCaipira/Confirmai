@@ -177,7 +177,7 @@ body .entity-shell-card.evpay-main {
 }
 
 /* Mobile adjustments for payment page */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     body .entity-shell-card.evpay-main {
         max-width: 100%;
         margin: 0;
@@ -1185,6 +1185,64 @@ body .entity-shell-card.evpay-main {
     color: var(--ci-text-subtle);
     font-size: 0.85rem;
     text-align: center;
+}
+
+.et-empty-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1rem;
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid var(--ci-border);
+    border-radius: 10px;
+}
+
+.et-empty-banner i {
+    font-size: 1.5rem;
+    color: var(--ci-accent);
+}
+
+.et-empty-text {
+    font-size: 0.9rem;
+    color: var(--ci-text);
+    font-weight: 600;
+}
+
+.et-empty-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.et-empty-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: var(--ci-accent-mid);
+    color: var(--ci-surface-light);
+    border: 1px solid var(--ci-accent);
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.et-empty-btn:hover {
+    background: var(--ci-accent);
+}
+
+.et-empty-btn--semanais {
+    background: var(--futsal-green-dark);
+    color: var(--futsal-green-pale);
+    border: 1.5px solid var(--green-strong);
+}
+
+.et-empty-btn--semanais:hover {
+    background: var(--green-strong);
 }
 
 .et-date {
@@ -2205,16 +2263,30 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .detail-events-tabs { flex-direction: column-reverse; width: 100%; gap: 0.8rem; }
     .detail-events-tabs-left { width: 100%; }
     .detail-events-tabs-right { width: 100%; justify-content: center; }
-    .detail-events-tab { flex: 1; justify-content: center; }
+    .detail-events-tab { flex: 1; justify-content: center; min-height: 44px; }
     .detail-events-create-btn { margin-left: 0; width: 100%; text-align: center; }
+    .groups-create-btn { min-height: 44px; }
     .pending-request-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
     .pending-request-checkbox { margin-right: 0; margin-bottom: 0.5rem; }
     .pending-request-actions { width: 100%; justify-content: flex-start; }
     .bulk-actions { width: 100%; justify-content: space-between; }
     .player-item { padding: 0.4rem 0.6rem; gap: 0.4rem; }
-    .player-slot-btn { font-size: 0.7rem; padding: 0.15rem 0.6rem; gap: 0.25rem; }
+    .player-slot-btn { font-size: 0.7rem; padding: 0.15rem 0.6rem; gap: 0.25rem; min-height: 44px; }
     .player-tag { font-size: 0.65rem; padding: 0.08rem 0.35rem; }
     .player-item .player-tag--cancel { gap: 0.35rem; }
+    .confirm-btn { min-height: 44px; }
+    .waitlist-cta { min-height: 44px; }
+    button.player-tag--cancel,
+    button.player-tag--admin-pay,
+    button.player-tag--admin-remove { min-height: 44px; }
+    button.player-tag--cancel-yes,
+    button.player-tag--cancel-no,
+    button.player-tag--admin-pay-yes,
+    button.player-tag--admin-pay-no,
+    button.player-tag--admin-remove-yes,
+    button.player-tag--admin-remove-no { min-height: 44px; min-width: 44px; }
+    .slot-ctrl-btn,
+    .add-slot-row { min-height: 44px; }
 }
 
 /* Mobile muito pequeno (<375px) */
