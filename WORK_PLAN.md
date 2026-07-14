@@ -1496,15 +1496,34 @@ Recomendacao: taxa **configuravel** (percentual + opcional fixo), arredondada a 
 
 **Atencao**: o proprio gateway ja cobra uma tarifa (ex: PIX ~0,99%). A taxa liquida do site = taxa cobrada - tarifa do gateway. Considerar no calculo do lucro real.
 
-### Escopo sugerido do Ciclo "Pagamento Real + Taxa" (a detalhar apos decisao do modelo)
-1. Config de taxa (`FeeOptions`: percentual, fixo, on-top vs embutida) + calculo em service testavel (TDD)
-2. Registrar a taxa por transacao (`PlatformFee` no `PaymentRecord` ou tabela `PlatformRevenue`)
-3. Exibir a taxa de forma transparente no checkout (jogador ve o breakdown)
-4. **[Modelo A]** fluxo de repasse ao organizador + conciliacao de saldo do site | **[Modelo B]** integrar split na API do gateway + onboarding de recebedor
-5. Relatorio admin de receita da plataforma (conecta com o "Baseline por gateway" postergado)
-6. Testes: calculo de taxa (arredondamento, on-top/embutida), registro por transacao, webhook confirmando valor liquido
+### DECISOES DO ROBSON (14/07/2026 -- TRAVADAS)
+- **Modelo B -- Split de pagamento** (cada um recebe direto; site recebe so a taxa; exige recebedor/KYC por organizador)
+- **Taxa por cima** (jogador paga 15,60; organizador recebe 15,00; site fica com 0,60)
+- **Percentual** (ex: 4%). Formula: `total = round(base * (1 + feePct))` a centavos; `feeAmount = total - base`; split envia `base` ao organizador e `feeAmount` ao site (deriva feeAmount do total arredondado p/ evitar divergencia de 1 centavo).
 
-**DECISAO NECESSARIA DO ROBSON antes de detalhar**: (a) Modelo A (intermediacao, mais rapido, com risco fiscal/repasse) ou Modelo B (split, mais correto, exige KYC dos organizadores)? (b) Taxa por cima (jogador paga 15,60) ou embutida (organizador absorve)? (c) Percentual, fixo, ou os dois?
+### Contexto tecnico do split (verificar na implementacao)
+- Gateways sao selecionados dinamicamente (`EventPaymentGatewayFactory` + toggle admin via `GatewayService`; default = primeiro habilitado). Ha 3 gateways PIX (EfiBank, AbacatePay, Appmax) + BTCPay (Bitcoin).
+- **EfiBank/Gerencianet**: tem "Split de Pagamento" para PIX -- confirmar na doc a estrutura exata (recebedores precisam de conta/identificacao no proprio EfiBank; validar se aceita split por chave PIX de terceiros ou exige conta interna).
+- **AbacatePay / Appmax**: verificar suporte a split na API antes de prometer. Se nao suportarem, ficam sem taxa (ou desabilitados para eventos com taxa).
+- **BTCPay (Bitcoin)**: sem split nativo -- decisao MVP: NAO cobrar taxa em pagamentos BTC (contabilizar manualmente depois, se preciso).
+- Hoje o `chave = _options.PixKey` e do site. No split, `base` vai pro recebedor do organizador e a taxa pro site -- inverte quem e o "dono" do dinheiro.
+
+### Escopo detalhado do Ciclo "Pagamento Real + Taxa (Split)"
+
+**Branch sugerida**: `feat/pagamento-real-split`. **TDD**: escrever teste antes de cada calculo/regra. 1 commit por fase, 1 PR no final.
+
+1. **Recebedor do organizador (KYC)**: entidade nova (ex: `GroupPayoutAccount`) vinculada ao grupo/organizador -- guarda os dados de recebedor exigidos pelo gateway (chave PIX do organizador / id de recebedor). Tela no perfil do grupo para o admin cadastrar. Migration.
+2. **Config + calculo de taxa**: `FeeOptions` (`PercentBps` inteiro p/ evitar float -- ex 400 = 4%, `Enabled`, gateways suportados) + `FeeCalculator` **puro e testavel** (TDD): dado `base` e `feePct`, retorna `(total, feeAmount)` por cima, arredondado a centavos.
+3. **Split na cobranca**: estender `IEventPaymentGateway.CreateChargeAsync` (e os gateways que suportam) para receber o recebedor do organizador + a taxa e montar o payload de split. EfiBank primeiro; AbacatePay/Appmax conforme suporte.
+4. **Registro por transacao**: campos `BaseAmount`, `FeeAmount`, `PayoutRecipient` no `PaymentRecord` (ou tabela `PlatformRevenue`). Webhook confirma o valor liquido.
+5. **Checkout transparente**: jogador ve o breakdown ("Valor: R$ 15,00 + Taxa de servico: R$ 0,60 = R$ 15,60"). Reutilizar string `PaymentDetails.Fee`.
+6. **Guarda-corpos**: grupo sem recebedor cadastrado -> bloquear/avisar na criacao de partida paga; gateway sem suporte a split -> nao aplicar taxa / esconder opcao.
+7. **Relatorio admin de receita** da plataforma (soma de `FeeAmount` por periodo/gateway) -- conecta com o "Baseline por gateway" postergado.
+8. **Testes**: `FeeCalculator` (arredondamento, 0%, valores quebrados), payload de split por gateway, registro por transacao, guarda-corpos (sem recebedor / gateway sem split), webhook confirmando liquido.
+
+**Pre-requisito do Robson**: credenciais reais do gateway escolhido (EfiBank recomendado por ter split PIX) + conta configurada para operar split. Guardadas fora do git (user-secrets em dev, env vars em prod).
+
+**Nota de risco**: mesmo no split, confirmar com contador a emissao de nota fiscal sobre a taxa de servico do site.
 
 ---
 
