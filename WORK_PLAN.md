@@ -1,10 +1,10 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/06/2026 | Base: `main` (pos-Ciclo 16) | Refatoracao CSS CONCLUIDA
-> 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste
-> Ciclo 15 (testes + UX grupos + !important) e Ciclo 16 (mobile UX) -- CONCLUIDOS e revisados
-> Proximo: Ciclo 17 -- Login Google (OAuth, criar-ou-vincular) + email real/confirmacao + fix caracteres especiais + consolidar CSS do menu mobile
-> Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID (inclui fase CSS Web/Mobile) | C20 WhatsApp+baseline (POSTERGADO)
+> Atualizado em 14/06/2026 | Base: `main` (pos-Ciclo 17) | Refatoracao CSS CONCLUIDA
+> 1.700/1.700 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste | 0 mojibake
+> Ciclo 15 (testes+UX+!important), Ciclo 16 (mobile UX) e Ciclo 17 (Login Google+email real+mojibake+menu mobile) -- CONCLUIDOS e revisados
+> Proximo: Ciclo 18 -- Mobile UX critico (fluxos principais dos stakeholders)
+> Futuros: C19 refatoracao TDD+SOLID (inclui fase CSS Web/Mobile) | C20 WhatsApp+baseline (POSTERGADO)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -502,6 +502,45 @@ Nota: as 6 tentativas falhas ja foram revertidas (nao ha seletores `payments-lin
 - Muitos commits de tentativa/erro nas cores dos botoes (regra 14): ef6c854, c0861de, 1aa0b94, 76d24fe, 2f803da... ~10 commits so ajustando o vermelho
 - 3 vars indefinidas reintroduzidas (regra 12 de novo)
 - 3 docs soltos (regra 20 de novo)
+
+---
+
+## Revisao Senior do Ciclo 17 (Login Google + Email Real + Mojibake + Menu Mobile)
+
+**Data**: 14/06/2026 | **Base auditada**: `main` (PR #54 `feat/ciclo17-google-login` + PR #55 `fix/ciclo17-test-feedback`)
+**Build**: 0 erros | **Testes**: 1.700/1.700 passando (+6 vs C16) | **Mojibake**: 0 remanescente
+
+### Veredicto: EXCELENTE -- todas as frentes planejadas entregues com qualidade de producao
+
+| Fase | Planejado | Entregue | Status |
+|------|-----------|----------|--------|
+| 1. Menu mobile CSS | Consolidar `oldsite-top-nav` em `site.css`, remover scoped duplicado | Regras mobile do nav removidas de `MainLayout.razor.css`; 2 blocos base colapsados em 1 | **OK** |
+| 2. Mojibake | Corrigir 4 arquivos | 0 ocorrencias de dupla-codificacao em todo o codigo | **Zerado** |
+| 3. Google OAuth backend | Pacote + `AddGoogle` guardado por config | `Microsoft.AspNetCore.Authentication.Google` 9.0.5 + `AddGoogle` so quando ClientId/Secret presentes | **OK** |
+| 4. OAuth criar-ou-vincular | Login direto se vinculado; senao busca por email, vincula ou cria | `ExternalLogin.cshtml.cs` implementa exatamente o fluxo, com audit trail em cada caminho | **OK** |
+| 5. Email real + confirmacao | `IEmailSender` real + `RequireConfirmedAccount` | `IdentityEmailSender` (SMTP real + fallback em disco p/ dev) + `RequireConfirmedEmail` gated em `emailEnabled` | **OK** |
+| 6. Testes | Cobrir fluxos de auth | +6 testes, suite 1.700 verde | **OK** |
+
+### Destaques de qualidade
+
+- **OAuth criar-ou-vincular** (`ExternalLogin.cshtml.cs`): fluxo correto e seguro -- `ExternalLoginSignInAsync` primeiro; se nao vinculado, busca `FindByEmailAsync` -> **vincula em conta existente sem duplicar** (`AddLoginAsync`) ou **cria com `EmailConfirmed=true`** + role `user`. Rate limiting (`auth`), `[AllowAnonymous]`, i18n e audit em todos os caminhos.
+- **Config defensiva**: botao Google so aparece quando o provider esta registrado (`ExternalLogins.Count > 0`); `AddGoogle` so registra com ClientId/Secret presentes. Sem credenciais no git -> compila e roda mesmo sem OAuth configurado.
+- **Email**: `RequireConfirmedEmail = securityPolicy.RequireConfirmedEmail && emailEnabled` -- confirmacao so e exigida quando o email esta realmente habilitado (nao trava dev/testes). `IdentityEmailSender` tem SMTP real + fallback que persiste o email em `wwwroot/uploads/dev-emails` para o dev ler o link de confirmacao localmente.
+- **Processo**: TODAS as mudancas extras (schedule/horario, goleiro, meus-eventos mobile, dropdown de cidades IBGE, upload, fluxo grupos<->eventos) sao requisitos levantados pelo Robson testando -> **legitimas pela regra 22, NAO scope creep**.
+
+### Correcao aplicada pelo Senior nesta PR (higiene CSS)
+
+- **1 var morta removida**: `--shadow-red-lg` (rgba(239,68,68,0.5)) -- adicionada por mim na PR #53 antecipando uso, mas nunca referenciada. `--shadow-red-md` e `--red-light` (irmas) estao em uso. Removida do `:root` de `site.css`.
+- Verificado: 0 hardcoded hex em scoped CSS, 0 var indefinida real (as `--identity-rhythm-*` sao definidas em `identity.css`; `--accent-preview`/`--item-accent-border` tem fallback).
+
+### Observacoes (nao-bloqueantes, para o Pleno)
+
+- **Breakpoint inconsistente 700px vs 768px**: o menu mobile e varios blocos ainda usam `@media (max-width: 700px)` enquanto o resto migrou para 768px. O Pleno ja documentou isso (regra 23 + fase CSS do C19) -- consolidar num unico breakpoint fica para o **Ciclo 19** (auditoria CSS Web/Mobile).
+- **49 warnings de build** (num build limpo `--no-incremental`): predominantemente nullable (CS86xx) no projeto de testes, pre-existentes; ~4 em codigo de app (`Login.cshtml`, `GroupDetailEvents.razor`, `GroupDetailPendingRequests.razor`, campos nao usados em `EventPayment.razor.cs`). Baixa prioridade -- limpar junto ao C19.
+
+### Proximo: Ciclo 18 -- Mobile UX critico
+
+Auditar e garantir os fluxos principais dos stakeholders 100% OK no mobile (375px/414px): entrar em grupo via convite -> ver eventos -> confirmar presenca -> pagar (Pix/BTC) -> ver comprovante. Toque >=44px, sem scroll horizontal, forms/modais usaveis. Detalhado abaixo no plano do Ciclo 18.
 
 ---
 
