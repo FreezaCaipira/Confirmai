@@ -49,6 +49,24 @@
     right: 0;
 }
 
+@media (max-width: 768px) {
+    .my-events-title-action-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .my-events-title {
+        text-align: center;
+        width: 100%;
+    }
+
+    .my-events-create-btn--futsal {
+        position: static;
+        align-self: center;
+    }
+}
+
 /* ── Action row (right-aligned) ──────────────────────────────── */
 .my-events-action-row {
     display: flex;
