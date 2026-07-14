@@ -5,6 +5,11 @@
     margin-bottom: 0.75rem;
 }
 
+::deep .sports-back-row .listing-back-btn {
+    margin-left: 0;
+    margin-right: auto;
+}
+
 /* ── Onboarding hint ───────────────────── */
 .onboarding-hint {
     max-width: 560px;
