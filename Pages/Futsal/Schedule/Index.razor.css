@@ -28,25 +28,24 @@
     margin-bottom: 0.75rem;
 }
 
-/* ── Title + action row ─────────────────────────────────────── */
-.schedule-title-action-row {
+/* ── Title row ──────────────────────────────────────────────── */
+.schedule-title-row {
     display: flex;
     align-items: center;
-    position: relative;
-    gap: 0.75rem;
+    justify-content: center;
     margin-bottom: 0.75rem;
-    flex-wrap: wrap;
 }
 
 .schedule-title {
-    flex: 1;
     text-align: center;
     margin: 0;
 }
 
-.schedule-create-btn {
-    position: absolute;
-    right: 0;
+/* ── Action row (right-aligned) ─────────────────────────────── */
+.schedule-action-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
 }
 
 /* ── Create button ──────────────────────────────────────────── */

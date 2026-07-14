@@ -23,26 +23,22 @@
             </a>
         </div>
 
-        <div class="schedule-title-action-row">
+        <div class="schedule-title-row">
             <h1 class="page-section-title schedule-title">Partidas Semanais</h1>
+        </div>
+
+        <div class="schedule-action-row">
             <a href="/futsal/create" class="schedule-create-btn">
                 <i class="fas fa-plus"></i> Nova Partida
             </a>
         </div>
 
-        @if (isLoading)
-        {
-            <p class="listing-state">Carregando suas recorrências…</p>
-        }
-        else if (!schedules.Any())
-        {
-            <div class="listing-state listing-empty">
-                <p>Nenhuma recorrência cadastrada.</p>
-                <p class="listing-empty-hint">Crie uma recorrência para gerar partidas automaticamente toda semana.</p>
-            </div>
-        }
-        else
-        {
+        <AdminDataState IsLoading="isLoading"
+                        IsEmpty="@(!isLoading && !schedules.Any())"
+                        LoadingText="Carregando suas partidas semanais…"
+                        EmptyText="Nenhuma partida semanal cadastrada."
+                        EmptyIcon="fas fa-calendar-times"
+                        EmptyHint="Crie uma partida semanal para gerar partidas automaticamente toda semana.">
             <div class="schedule-list">
                 @foreach (var s in schedules)
                 {
@@ -112,7 +108,7 @@
                     </div>
                 }
             </div>
-        }
+        </AdminDataState>
 
     </section>
 </div>
