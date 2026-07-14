@@ -82,12 +82,14 @@
                             <span class="nav-flex-spacer"></span>
 
                             <a href="/mailbox" class="oldsite-top-nav-link oldsite-top-nav-mailbox-icon" title="@T["Nav.Mailbox"]" aria-label="@T["Nav.Mailbox"]">
-                                <img class="oldsite-mailbox-glyph" src="/images/icons/mail-letter.svg" alt="" aria-hidden="true" />
+                                <span class="oldsite-mailbox-wrap">
+                                    <img class="oldsite-mailbox-glyph" src="/images/icons/mail-letter.svg" alt="" aria-hidden="true" />
+                                    @if (unreadMailboxCount > 0)
+                                    {
+                                        <span class="oldsite-top-nav-unread">@unreadMailboxCount</span>
+                                    }
+                                </span>
                                 <span class="mobile-nav-text">@T["Nav.Mailbox"]</span>
-                                @if (unreadMailboxCount > 0)
-                                {
-                                    <span class="oldsite-top-nav-unread">@unreadMailboxCount</span>
-                                }
                             </a>
                             @if (!string.IsNullOrWhiteSpace(currentUserId))
                             {

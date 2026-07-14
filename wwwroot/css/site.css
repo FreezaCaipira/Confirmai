@@ -3625,6 +3625,12 @@ body .oldsite-top-nav .oldsite-top-nav-mailbox-icon {
     border-right: 1px solid var(--ci-border);
 }
 
+body .oldsite-top-nav .oldsite-mailbox-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
 body .oldsite-top-nav .oldsite-mailbox-glyph {
     width: 20px;
     height: 15px;
@@ -3655,15 +3661,16 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
     border: none;
 }
 
-body .oldsite-top-nav .oldsite-top-nav-mailbox-icon .oldsite-top-nav-unread {
+body .oldsite-top-nav .oldsite-mailbox-wrap .oldsite-top-nav-unread {
     position: absolute;
-    top: -2px;
-    right: -2px;
+    top: -8px;
+    right: -8px;
 }
 
 body .oldsite-top-nav .oldsite-top-nav-user {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 28px;
     margin-left: 0;
     padding: 0.25rem 0.8rem;
