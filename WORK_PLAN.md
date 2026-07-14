@@ -1396,19 +1396,70 @@ Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quan
 
 **Branch sugerida**: `refactor/css-isolation`
 
-**Fases**:
-1. **Auditoria**: Mapear todos os arquivos CSS (globais e scoped), identificar conflitos de especificidade, overrides desnecessarios e regras de layout sem media query
-2. **Isolamento Web/Mobile**: Garantir que toda regra de layout use media queries apropriadas (`min-width: 769px` para desktop, `max-width: 768px` para mobile). Base mobile-first. Aplicar regra 23 em TODO o CSS existente
-3. **Consolidacao**: Eliminar CSS duplicado entre `site.css`, `events.css` e scoped `.razor.css`. Definir hierarquia clara: vars > global > scoped. Resolver fragmentacao (ex: `oldsite-top-nav` split entre global/scoped -- causa raiz do bug do Ciclo 16 Fase 15)
-4. **TDD Visual**: Criar testes visuais (Playwright ou similar) para desktop e mobile de cada pagina. Snapshot testing para detectar regressoes de layout
-5. **SOLID em CSS**: Single Responsibility por arquivo scoped, Open/Closed com vars e utility classes, sem overrides fragoris. Padronizar breakpoints (768px unico, eliminar 700px)
+**Metodologias CSS como norte** (equivalentes a SOLID/TDD para codigo funcional):
+
+1. **ITCSS (Inverted Triangle CSS)** -- hierarquia de especificidade em camadas:
+   - **Settings layer**: CSS custom properties (vars do `:root`) -- design tokens
+   - **Tools layer**: mixins/functions (nao aplicavel em CSS puro, mas conceitual)
+   - **Generic layer**: reset/normalize (ja em site.css)
+   - **Elements layer**: estilos de elementos base (body, a, input)
+   - **Objects layer**: classes utilitarias (.btn, .input, .form-group)
+   - **Components layer**: scoped .razor.css (estilos especificos de cada pagina)
+   - **Utilities layer**: overrides pontuais (.text-center, .mt-1)
+   - Regra: camada superior NUNCA pode depender de camada inferior
+
+2. **BEM (Block Element Modifier)** -- convencao de nomenclatura para scoped CSS:
+   - `.block` -- componente independente (ex: `.upload-section`)
+   - `.block__element` -- parte do bloco (ex: `.upload-section__preview`)
+   - `.block--modifier` -- variacao (ex: `.upload-section--compact`)
+   - Elimina ambiguidade de seletor e reduz conflitos de especificidade
+
+3. **Mobile-First obrigatorio** -- toda regra base serve mobile, desktop e enhancement:
+   - Base (sem media query) = mobile
+   - `@media (min-width: 769px)` = desktop enhancements
+   - `@media (max-width: 768px)` = apenas para overrides que diferem do base mobile
+   - NUNCA aplicar regra desktop no base (causa do bug recorrente)
+
+4. **CSS Layers (`@layer`)** -- isolamento explicito de cascade:
+   - `@layer reset, tokens, base, objects, components, utilities;`
+   - Garante que scoped CSS nao override global indevidamente
+   - Reduz necessidade de `!important` e especificidade alta
+
+5. **Design Tokens como single source of truth**:
+   - Toda cor, espacamento, border-radius, shadow, transition = var do `:root`
+   - NUNCA hardcodar valores em scoped CSS
+   - Vars semanticas > vars literais (ex: `--ci-accent` > `#4f9cf8`)
+   - Breakpoints como vars: `--bp-mobile: 768px` (quando CSS.supports)
+
+6. **Single Responsibility por arquivo scoped**:
+   - Cada `.razor.css` estiliza APENAS o componente da pagina
+   - NUNCA estilizar elementos de outras paginas via scoped
+   - `::deep` apenas para componentes filhos renderizados pelo Blazor
+   - Estilos compartilhados entre paginas = global (events.css/site.css)
+
+7. **Testes Visuais (TDD para CSS)**:
+   - Playwright: snapshot por pagina em 2 viewports (375px e 1280px)
+   - Testar: overflow horizontal, alinhamento, contraste, alvos de toque >=44px
+   - Rodar antes e apos cada fase para detectar regressoes
+   - CI gate: falhar se snapshot diff > threshold
+
+**Fases de Execucao**:
+1. **Auditoria**: Mapear todos os arquivos CSS (globais e scoped), identificar conflitos de especificidade, overrides desnecessarios, regras de layout sem media query, breakpoints inconsistentes (700px vs 768px), CSS duplicado entre arquivos
+2. **Isolamento Web/Mobile**: Aplicar mobile-first em TODO o CSS existente. Toda regra de layout sem media query deve ser analisada: se e desktop-only, envolver em `@media (min-width: 769px)`. Se e mobile-only, envolver em `@media (max-width: 768px)`. Se e neutro, manter como base. Regra 23 aplicada sistematicamente
+3. **Consolidacao ITCSS**: Organizar CSS global em camadas ITCSS. Eliminar duplicacao entre `site.css`, `events.css` e scoped `.razor.css`. Definir fronteira clara: global = objects + base, scoped = components. Resolver fragmentacao historica (ex: `oldsite-top-nav` split entre global/scoped -- causa raiz do bug do Ciclo 16 Fase 15)
+4. **BEM em scoped CSS**: Renomear classes scoped para convencao BEM onde fizer sentido. Eliminar seletores fragoris (`body .oldsite-top-nav > a` em scoped). Padronizar `::deep` apenas para filhos Blazor
+5. **Design Tokens**: Auditar todas as vars do `:root`, eliminar vars mortas, consolidar vars semanticas. Garantir 0 hardcoded hex/rgba em scoped. Padronizar breakpoints (768px unico)
+6. **TDD Visual**: Criar testes Playwright para desktop (1280px) e mobile (375px) de cada pagina. Snapshot testing para detectar regressoes de layout. Validar: sem overflow horizontal, alvos >=44px, contraste AA
+7. **CSS Layers (opcional)**: Se Suporte Blazor permitir, adicionar `@layer` para isolamento explicito de cascade. Reduzir `!important` restantes
 
 **Premissas**:
 - Nunca modificar testes existentes
 - Commits pequenos e frequentes (1 por fase)
 - Branch separada: `refactor/css-isolation`
-- Testar em ambas viewports (desktop e mobile 375px) apos cada mudanca
+- Testar em ambas viewports (desktop 1280px e mobile 375px) apos cada mudanca
 - `dotnet clean && dotnet build` + Ctrl+F5 apos mudancas CSS (regra 21)
+- 0 hardcoded hex/rgba em scoped CSS (regra 2)
+- 0 `!important` desnecessario (regra 1)
 
 ---
 
