@@ -49,7 +49,7 @@
                     <div class="schedule-card @(!s.IsActive ? "schedule-card--inactive" : "")">
                         <div class="schedule-card-body">
                             <div class="schedule-card-header">
-                                <span class="schedule-card-day">@dowLabel — @s.TimeOfDay.ToString("HH:mm")</span>
+                                <span class="schedule-card-day">@dowLabel @(nextInfo.StartsAt != default ? nextInfo.StartsAt.ToString("dd/MM") : "") — @s.TimeOfDay.ToString("HH:mm")</span>
                                 @if (!s.IsActive)
                                 {
                                     <span class="schedule-card-status schedule-card-status--inactive">Inativa</span>
@@ -74,7 +74,7 @@
                             @if (nextInfo.StartsAt != default)
                             {
                                 <p class="schedule-card-next">
-                                    Próxima: @nextInfo.StartsAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                    Próxima: @nextInfo.StartsAt.ToString("dd/MM/yyyy HH:mm")
                                     · @nextInfo.Confirmed confirmados
                                 </p>
                             }

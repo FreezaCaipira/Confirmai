@@ -2631,6 +2631,20 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
 }
 
+.groups-create-btn--semanais {
+    background: var(--futsal-green-dark);
+    color: var(--futsal-green-pale);
+    border: 1.5px solid var(--green-strong);
+    box-shadow: 0 6px 18px rgba(34, 197, 94, 0.25);
+}
+
+.groups-create-btn--semanais:hover {
+    background: var(--green-strong);
+    color: var(--green-soft);
+    border-color: var(--green-bright);
+    box-shadow: 0 8px 22px rgba(34, 197, 94, 0.32);
+}
+
 .groups-action-row {
     display: flex;
     gap: 0.6rem;
