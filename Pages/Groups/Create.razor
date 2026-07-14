@@ -77,7 +77,7 @@
                             <button class="upload-btn" type="button" @onclick="TriggerFileInput">
                                 <i class="fas fa-upload"></i> Selecionar imagem
                             </button>
-                            <InputFile id="logo-input" OnChange="OnLogoSelected" accept=".jpg,.jpeg,.png,.webp" class="input-file--hidden" />
+                            <InputFile id="logo-input" OnChange="OnLogoSelected" accept=".jpg,.jpeg,.png,.webp" class="input-file--hidden" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none;" />
                             @if (!string.IsNullOrWhiteSpace(logoFeedback))
                             {
                                 <p class="@(logoError ? "validation-message" : "upload-success")">@logoFeedback</p>
