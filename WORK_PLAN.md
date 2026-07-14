@@ -4,7 +4,7 @@
 > 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste
 > Ciclo 15 (testes + UX grupos + !important) e Ciclo 16 (mobile UX) -- CONCLUIDOS e revisados
 > Proximo: Ciclo 17 -- Login Google (OAuth, criar-ou-vincular) + email real/confirmacao + fix caracteres especiais + consolidar CSS do menu mobile
-> Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID | C20 WhatsApp+baseline (POSTERGADO)
+> Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID + CSS Isolation Web/Mobile | C20 WhatsApp+baseline (POSTERGADO)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -559,6 +559,8 @@ Todas as paginas agora usam `IDbContextFactory<AppDbContext>`. 0 paginas com `@i
 20. **NUNCA criar arquivos de docs separados** -- consolidar TUDO no WORK_PLAN.md. Nao criar arquivos em `docs/`, `.md` avulsos, etc.
 21. **Rebuild limpo antes de testar mudancas visuais** -- ao alterar CSS (especialmente scoped CSS), sempre fazer `dotnet clean && dotnet build` e testar com Ctrl+F5 (hard refresh). Hot-reload pode nao aplicar scoped CSS corretamente
 22. **Requisitos vindos dos testes do Robson sao legitimos** -- bugs/melhorias/requisitos que o Robson levanta testando o app NAO sao "scope creep" e devem entrar na "Fase padrao de melhorias UX" do ciclo. A regra 16 (separar features) so se aplica a adicoes que o proprio Pleno inventa sem pedido (ex: novos esportes). Documentar cada item vindo do Robson na fase de melhorias antes de implementar
+23. **ISOLAMENTO WEB/MOBILE EM CSS** -- NUNCA aplicar estilos de layout (width, max-width, padding, gap, font-size) sem media query de isolamento. Estilos desktop devem usar `@media (min-width: 769px)`. Estilos mobile devem usar `@media (max-width: 768px)`. O base (sem media query) deve ser mobile-first ou neutro. SEMPRE testar em ambas as viewports apos mudancas de layout. Bug recorrente: afinamento de width 57% aplicado sem media query quebrou o mobile (campos esmagados) -- corrigido envolvendo em `@media (min-width: 769px)`
+24. **Pasta default para prints**: `C:\Users\FreezaPC\Desktop\devin-prints` -- sempre procurar nesta pasta quando o usuario mencionar "ver print na pasta"
 
 ---
 
@@ -1383,10 +1385,30 @@ entrar em grupo (invite code) → ver eventos → confirmar presenca → pagar (
 Foco: alvos de toque >=44px, sem scroll horizontal, formularios/modais utilizaveis em 375px/414px, header consistente.
 Detalhar em fases proprias quando iniciarmos o ciclo.
 
-## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID
+## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID + CSS Isolation
 
 Refatoracao ampla aplicando TDD e SOLID (+ padroes pertinentes de Blazor Server: separacao de logica em services testaveis, `IDbContextFactory`, componentizacao, evitar logica no markup, gestao de circuito/estado).
 Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quando priorizado.
+
+### Fase CSS: Refatoracao de Boas Praticas e Isolamento Web/Mobile
+
+**Motivacao**: Bug recorrente onde afinamento de layout (width 57%) aplicado sem media query quebrou o mobile (campos esmagados). Necessario repassar TODO o CSS do projeto garantindo isolamento Web/Mobile e boas praticas.
+
+**Branch sugerida**: `refactor/css-isolation`
+
+**Fases**:
+1. **Auditoria**: Mapear todos os arquivos CSS (globais e scoped), identificar conflitos de especificidade, overrides desnecessarios e regras de layout sem media query
+2. **Isolamento Web/Mobile**: Garantir que toda regra de layout use media queries apropriadas (`min-width: 769px` para desktop, `max-width: 768px` para mobile). Base mobile-first. Aplicar regra 23 em TODO o CSS existente
+3. **Consolidacao**: Eliminar CSS duplicado entre `site.css`, `events.css` e scoped `.razor.css`. Definir hierarquia clara: vars > global > scoped. Resolver fragmentacao (ex: `oldsite-top-nav` split entre global/scoped -- causa raiz do bug do Ciclo 16 Fase 15)
+4. **TDD Visual**: Criar testes visuais (Playwright ou similar) para desktop e mobile de cada pagina. Snapshot testing para detectar regressoes de layout
+5. **SOLID em CSS**: Single Responsibility por arquivo scoped, Open/Closed com vars e utility classes, sem overrides fragoris. Padronizar breakpoints (768px unico, eliminar 700px)
+
+**Premissas**:
+- Nunca modificar testes existentes
+- Commits pequenos e frequentes (1 por fase)
+- Branch separada: `refactor/css-isolation`
+- Testar em ambas viewports (desktop e mobile 375px) apos cada mudanca
+- `dotnet clean && dotnet build` + Ctrl+F5 apos mudancas CSS (regra 21)
 
 ---
 
