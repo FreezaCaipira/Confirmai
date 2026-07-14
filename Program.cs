@@ -137,6 +137,7 @@ builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<GroupMetricsService>();
 builder.Services.AddScoped<WhatsAppNotificationService>();
 builder.Services.AddScoped<AdminSettingsService>();
+builder.Services.AddScoped<AdminRevenueReportService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();
 builder.Services.AddScoped<EventNotificationService>();
 builder.Services.AddScoped<AdminLogsQueryService>();

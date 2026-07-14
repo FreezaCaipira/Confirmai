@@ -1,0 +1,169 @@
+.admin-revenue-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.admin-revenue-filter-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.admin-revenue-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ci-text-muted);
+}
+
+.admin-revenue-input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text);
+    font-size: 0.9rem;
+}
+
+.admin-revenue-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--ci-accent);
+    color: var(--white);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: filter 0.15s;
+}
+
+.admin-revenue-btn:hover {
+    filter: brightness(1.1);
+}
+
+.admin-revenue-btn--secondary {
+    background: var(--slate-border-sm);
+    color: var(--ci-text);
+}
+
+.admin-revenue-summary {
+    margin-bottom: 2rem;
+}
+
+.admin-revenue-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ci-text);
+    margin: 0 0 1rem;
+}
+
+.admin-revenue-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.admin-revenue-card {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.admin-revenue-card--highlight {
+    border-color: var(--ci-accent);
+    background: rgba(59,130,246,0.08);
+}
+
+.admin-revenue-card--success {
+    border-color: var(--green-strong);
+    background: rgba(34,197,94,0.08);
+}
+
+.admin-revenue-card--warning {
+    border-color: var(--orange-soft);
+    background: rgba(249,115,22,0.08);
+}
+
+.admin-revenue-card--error {
+    border-color: var(--red-soft);
+    background: rgba(239,68,68,0.08);
+}
+
+.admin-revenue-card-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ci-text-muted);
+}
+
+.admin-revenue-card-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ci-text);
+}
+
+.admin-revenue-breakdown {
+    margin-bottom: 2rem;
+}
+
+.admin-revenue-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--ci-bg-card-deep);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.admin-revenue-table thead {
+    background: var(--ci-bg-deep);
+}
+
+.admin-revenue-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ci-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.admin-revenue-table td {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--ci-border);
+    font-size: 0.9rem;
+    color: var(--ci-text);
+}
+
+.admin-revenue-table tbody tr:hover {
+    background: rgba(59,130,246,0.04);
+}
+
+@media (max-width: 768px) {
+    .admin-revenue-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-revenue-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-revenue-table {
+        font-size: 0.8rem;
+    }
+
+    .admin-revenue-table th,
+    .admin-revenue-table td {
+        padding: 0.5rem 0.75rem;
+    }
+}
