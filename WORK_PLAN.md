@@ -3,8 +3,9 @@
 > Atualizado em 14/06/2026 | Base: `main` (pos-Ciclo 17) | Refatoracao CSS CONCLUIDA
 > 1.700/1.700 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste | 0 mojibake
 > Ciclo 15 (testes+UX+!important), Ciclo 16 (mobile UX) e Ciclo 17 (Login Google+email real+mojibake+menu mobile) -- CONCLUIDOS e revisados
-> Proximo: Ciclo 18 -- Mobile UX critico (fluxos principais dos stakeholders)
-> Futuros: C19 refatoracao TDD+SOLID (inclui fase CSS Web/Mobile) | C20 WhatsApp+baseline (POSTERGADO)
+> Proximo: **Pagamento Real + Taxa de Servico** (cobrar % do site sobre cada pagamento) -- ver "Analise: Pagamento Real + Taxa"
+> Depois: Refatoracao SOLID+TDD+CSS (inclui mobile UX critico + fase CSS Web/Mobile) | Efetivar Login Google (credenciais OAuth em prod)
+> Postergado: WhatsApp real + Baseline por gateway (aguardando ideias de outro dev)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -1464,6 +1465,46 @@ Antes/durante o Ciclo 17, para o login funcionar em prod e dev:
    - Prod: variaveis de ambiente `Authentication__Google__ClientId` / `Authentication__Google__ClientSecret`
 
 Para email real + confirmacao (Fase 5): fornecer credenciais do provedor de email (SMTP host/porta/usuario/senha OU API key de SendGrid/Mailgun), tambem guardadas fora do git (user-secrets em dev, env vars em prod).
+
+---
+
+## Analise: Pagamento Real + Taxa de Servico (PROXIMO CICLO)
+
+**Pergunta do Robson**: "cobrar uma taxa sobre cada pagamento -- ele paga 15,60 e 0,60 fica pro site. Existe como fazer?"
+
+**Resposta: SIM, e viavel.** Duas arquiteturas possiveis:
+
+### Modelo A -- Intermediacao (o que o codigo JA faz hoje)
+Hoje TODA cobranca usa a **chave PIX unica do site** (`chave = _options.PixKey` em `EfiBankPixService.CreateChargeAsync`). Ou seja, o site ja recebe 100% do dinheiro de todos os jogadores. Consequencia:
+- **Taxa = trivial de implementar**: o site cobra o valor cheio e simplesmente "guarda" a taxa; o restante e devido ao organizador.
+- **O que FALTA**: o **repasse ao organizador** (payout). Hoje nao existe fluxo de saque/repasse (confirmado: 0 services de payout/saque/carteira no codigo). O organizador nao tem como receber o dinheiro que esta na conta do site.
+- **Risco regulatorio**: reter dinheiro de terceiros torna o site um **intermediador de pagamento / subadquirente** -- implica responsabilidade fiscal (emissao de nota da taxa), possiveis limites de PIX, e obrigacao de repasse. Precisa validar com contador/juridico.
+
+### Modelo B -- Split de Pagamento (marketplace nativo)
+O gateway divide o valor no momento do pagamento: X vai direto pro organizador, Y (a taxa) vai pro site. Nenhum dinheiro de terceiro passa pela conta do site.
+- **EfiBank/Gerencianet**: suporta **Split de Pagamento** para PIX (requer cada organizador ter conta/recebedor cadastrado + KYC).
+- **AbacatePay / Appmax**: verificar suporte a split na API (varia por gateway).
+- **BTCPay (Bitcoin)**: NAO tem split nativo -- taxa em BTC teria que ser contabilizada manualmente ou via segunda saida.
+- **Vantagem**: sem risco de intermediacao; cada um recebe o seu. **Custo**: onboarding/KYC de cada organizador como recebedor.
+
+### Mecanica da taxa (independe do modelo)
+Duas formas de cobrar:
+1. **Por cima (repassada ao jogador)** -- jogador paga 15,60, dos quais 0,60 e a taxa. Organizador recebe 15,00. **(e o exemplo do Robson)**
+2. **Embutida (descontada do organizador)** -- jogador paga 15,00, site fica com 0,60, organizador recebe 14,40.
+
+Recomendacao: taxa **configuravel** (percentual + opcional fixo), arredondada a centavos, e **transparente** ao pagador ("taxa de servico: R$ 0,60"). Ja existe a string `PaymentDetails.Fee` = "Taxa de processamento" no i18n -- reutilizar.
+
+**Atencao**: o proprio gateway ja cobra uma tarifa (ex: PIX ~0,99%). A taxa liquida do site = taxa cobrada - tarifa do gateway. Considerar no calculo do lucro real.
+
+### Escopo sugerido do Ciclo "Pagamento Real + Taxa" (a detalhar apos decisao do modelo)
+1. Config de taxa (`FeeOptions`: percentual, fixo, on-top vs embutida) + calculo em service testavel (TDD)
+2. Registrar a taxa por transacao (`PlatformFee` no `PaymentRecord` ou tabela `PlatformRevenue`)
+3. Exibir a taxa de forma transparente no checkout (jogador ve o breakdown)
+4. **[Modelo A]** fluxo de repasse ao organizador + conciliacao de saldo do site | **[Modelo B]** integrar split na API do gateway + onboarding de recebedor
+5. Relatorio admin de receita da plataforma (conecta com o "Baseline por gateway" postergado)
+6. Testes: calculo de taxa (arredondamento, on-top/embutida), registro por transacao, webhook confirmando valor liquido
+
+**DECISAO NECESSARIA DO ROBSON antes de detalhar**: (a) Modelo A (intermediacao, mais rapido, com risco fiscal/repasse) ou Modelo B (split, mais correto, exige KYC dos organizadores)? (b) Taxa por cima (jogador paga 15,60) ou embutida (organizador absorve)? (c) Percentual, fixo, ou os dois?
 
 ---
 
