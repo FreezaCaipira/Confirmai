@@ -2194,7 +2194,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .detail-section-filters .input { flex: 1; min-width: 0; }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .form-row-2 { grid-template-columns: 1fr; }
     .form-row-3 { grid-template-columns: 1fr; }
     .detail-card { padding: 1rem 0.8rem; }
