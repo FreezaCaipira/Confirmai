@@ -1525,6 +1525,30 @@ Recomendacao: taxa **configuravel** (percentual + opcional fixo), arredondada a 
 
 **Nota de risco**: mesmo no split, confirmar com contador a emissao de nota fiscal sobre a taxa de servico do site.
 
+### Provedores de split/marketplace (avaliacao Senior -- 14/07/2026)
+
+O Robson pesquisou e uma IA sugeriu **Iugu, Mercado Pago ou PagSeguro** para o modelo marketplace (muitos vendedores, plataforma fica com comissao). **Concordo -- e a abordagem correta para escalar.** Motivo: provedores de marketplace/split resolvem o ponto mais dificil do Modelo B -- o **onboarding + KYC dos organizadores** e a **responsabilidade regulatoria** -- que com EfiBank ficaria por nossa conta.
+
+Como a arquitetura de gateway ja e plugavel (`IEventPaymentGateway` + `EventPaymentGatewayFactory`), adicionar um provedor de split e um novo gateway, sem reescrever o resto.
+
+Comparativo (verificar detalhes/precos atualizados na contratacao):
+
+| Provedor | Split nativo | Onboarding do organizador | PIX | Observacao |
+|----------|-------------|---------------------------|-----|------------|
+| **Mercado Pago** | Sim (`application_fee` + OAuth Connect) | **Organizador so faz login com a conta MP dele** -- MP cuida do KYC | Sim | Menor atrito; enorme adocao no BR; modelo "marketplace connect" |
+| **Iugu** | Sim (subcontas) | Criar subconta por organizador (KYC via API) | Sim | Focado em SaaS/marketplace; split flexivel |
+| **Asaas** | Sim (split + subconta/"wallet") | Subconta por organizador | Sim | Popular no BR para marketplace pequeno/medio; API simples |
+| **PagBank/PagSeguro** | Sim (split de recebedores) | Recebedores cadastrados | Sim | Grande, mas API de split mais burocratica |
+| **EfiBank (atual)** | Sim (split PIX) | **Por nossa conta** (mais manual) | Sim | Ja integrado, mas onboarding/compliance fica conosco |
+
+**Recomendacao Senior**: para marketplace escalavel, priorizar **Mercado Pago (modelo Connect/OAuth)** ou **Asaas/Iugu (subcontas)** em vez de estender o EfiBank. O MP tem o menor atrito de onboarding (organizador so autoriza a conta dele), o que e critico se voce quer muitos organizadores. A comissao entra como `application_fee` (taxa por cima, percentual -- exatamente o modelo escolhido).
+
+**Atencao a margem** (ponto levantado pela IA): a comissao do site tem que cobrir o custo do provedor. Ex.: se o MP cobra ~0,99% no PIX e voce cobra 4% por cima, sua margem liquida e ~3%. Ajustar o percentual para o custo do provedor nao "engolir" o lucro.
+
+**Impacto no plano acima**: se escolher um provedor Connect (MP), a **Fase 1 (recebedor/KYC)** muda de "cadastrar dados manualmente" para "fluxo OAuth de autorizacao da conta do organizador" -- mais simples e seguro. As demais fases (FeeCalculator, registro, checkout, relatorio, testes) permanecem.
+
+**DECISAO PENDENTE DO ROBSON**: qual provedor mirar? (Mercado Pago recomendado / Asaas / Iugu / PagBank / manter EfiBank). Isso define a Fase 1 e o pre-requisito de credenciais.
+
 ---
 
 ## Ciclo 18 (FUTURO) -- Mobile UX Critico: Fluxos Principais
