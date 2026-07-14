@@ -16,14 +16,14 @@ public sealed class PayoutService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly FeeCalculator _feeCalculator;
-    private readonly EfiBankPixPayoutService _payoutService;
+    private readonly IPixPayoutService _payoutService;
     private readonly FeeOptions _feeOptions;
     private readonly LogService _log;
 
     public PayoutService(
         IDbContextFactory<AppDbContext> dbFactory,
         IOptions<FeeOptions> feeOptions,
-        EfiBankPixPayoutService payoutService,
+        IPixPayoutService payoutService,
         LogService log)
     {
         _dbFactory = dbFactory;

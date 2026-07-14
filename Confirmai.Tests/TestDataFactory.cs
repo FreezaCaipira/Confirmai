@@ -1,4 +1,5 @@
 using Confirmai.Data;
+using Confirmai.Enums;
 using Confirmai.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,7 +57,7 @@ internal static class TestDataFactory
         var product = new Product
         {
             Name = "Produto teste",
-            Description = "Descri��o",
+            Description = "Descrição",
             Price = amount,
             UserId = sellerId
         };
@@ -80,9 +81,31 @@ internal static class TestDataFactory
         return payment;
     }
 
-    public static Group CreateGroup(string name)
+    public static Group CreateGroup(string name, bool enablePaymentGateways = false)
     {
-        return new Group { Name = name };
+        return new Group { Name = name, EnablePaymentGateways = enablePaymentGateways };
+    }
+
+    public static GroupPayoutAccount CreateGroupPayoutAccount(int groupId, string pixKey, PixKeyType keyType = PixKeyType.Email)
+    {
+        return new GroupPayoutAccount
+        {
+            GroupId = groupId,
+            PixKeyType = keyType,
+            PixKeyValue = pixKey,
+            IsActive = true
+        };
+    }
+
+    public static ApplicationUser CreateUserWithPixKey(string userId, string userName, string pixKey)
+    {
+        return new ApplicationUser
+        {
+            Id = userId,
+            UserName = userName,
+            FullName = userName,
+            PixKey = pixKey
+        };
     }
 
     public static Event CreateEvent(Group group, string dateStr, decimal price)

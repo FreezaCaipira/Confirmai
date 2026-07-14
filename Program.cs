@@ -127,7 +127,7 @@ builder.Services.AddScoped<PayoutService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<AbacatePayWebhookService>();
 builder.Services.AddScoped<EfiBankPixService>();
-builder.Services.AddScoped<EfiBankPixPayoutService>();
+builder.Services.AddScoped<IPixPayoutService, EfiBankPixPayoutService>();
 builder.Services.AddScoped<AppmaxPixService>();
 builder.Services.AddScoped<EfiBankWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();

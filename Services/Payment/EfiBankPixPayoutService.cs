@@ -11,11 +11,26 @@ using Microsoft.Extensions.Options;
 namespace Confirmai.Services.Payment;
 
 /// <summary>
+/// Interface for Pix payout services.
+/// </summary>
+public interface IPixPayoutService
+{
+    /// <summary>
+    /// Sends a Pix payout to the specified Pix key.
+    /// </summary>
+    /// <param name="amount">Amount to send (base amount without fee)</param>
+    /// <param name="pixKey">Recipient's Pix key</param>
+    /// <param name="description">Payment description</param>
+    /// <returns>EndToEndId for tracking the payout</returns>
+    Task<string> SendPayoutAsync(decimal amount, string pixKey, string description);
+}
+
+/// <summary>
 /// Sends Pix payouts via EfiBank "Envio e Pagamento Pix" API.
 /// Used to automatically transfer the base amount to the organizer's Pix key
 /// after receiving a payment (with fee retained by the platform).
 /// </summary>
-public sealed class EfiBankPixPayoutService
+public sealed class EfiBankPixPayoutService : IPixPayoutService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly EfiBankOptions _options;
