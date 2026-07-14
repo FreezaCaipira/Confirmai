@@ -29,21 +29,11 @@
 }
 
 .input-file--hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
-    overflow: hidden;
-    pointer-events: none;
+    display: none !important;
 }
 
 ::deep .input-file--hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
-    overflow: hidden;
-    pointer-events: none;
+    display: none !important;
 }
 
 .upload-preview {
@@ -88,23 +78,26 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    align-items: center;
 }
 
 .upload-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.64rem 1.25rem;
+    padding: 0.5rem 1rem;
     background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent) 100%);
     color: var(--ci-surface-light);
     border: 1px solid var(--ci-accent-light);
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 800;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.15s;
-    box-shadow: 0 4px 8px var(--accent-opacity-lg);
+    box-shadow: 0 2px 6px var(--accent-opacity-lg);
     text-shadow: 0 0 10px var(--accent-opacity-xl);
+    align-self: center;
+    user-select: none;
 }
 
 .upload-btn:hover {
@@ -112,7 +105,7 @@
     color: var(--white);
     border-color: var(--link-info);
     transform: translateY(-1px);
-    box-shadow: 0 6px 12px var(--accent-opacity-2xl);
+    box-shadow: 0 4px 10px var(--accent-opacity-2xl);
 }
 
 .upload-hint {
