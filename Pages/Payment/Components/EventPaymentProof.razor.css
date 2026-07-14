@@ -51,7 +51,7 @@
 }
 
 /* Mobile adjustments */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .evpay-proof {
         padding: 0.8rem;
     }
@@ -60,6 +60,7 @@
         width: 100%;
         padding: 0.55rem 0.8rem;
         box-sizing: border-box;
+        min-height: 44px;
     }
     
     .evpay-proof-btn span {
@@ -137,7 +138,7 @@
 }
 
 /* Mobile adjustments for input file */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .evpay-proof-input-hidden {
         display: none !important;
     }

@@ -3678,7 +3678,6 @@ body .oldsite-top-nav .oldsite-top-nav-user {
     border-bottom: 1px solid var(--ci-border);
     font-size: 0.8rem;
     text-shadow: none;
-    width: 100%;
     box-sizing: border-box;
 }
 
@@ -4292,6 +4291,10 @@ body .oldsite-footer {
 
     body .oldsite-top-nav .oldsite-top-nav-link:last-child {
         border-bottom: none;
+    }
+
+    body .oldsite-top-nav .oldsite-top-nav-user {
+        width: 100%;
     }
 
     body .oldsite-top-nav .nav-flex-spacer {

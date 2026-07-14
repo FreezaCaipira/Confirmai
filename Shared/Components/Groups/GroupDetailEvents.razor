@@ -21,8 +21,29 @@
         {
             <tr>
                 <td colspan="6" class="et-empty">
-                    <i class="fas fa-calendar-plus"></i>
-                    @(ShowPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida próxima.")
+                    @if (!ShowPastEvents && IsAdmin)
+                    {
+                        <div class="et-empty-banner">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="et-empty-text">Nenhuma partida agendada.</span>
+                            <div class="et-empty-actions">
+                                <a href="@NewEventHref" class="et-empty-btn">
+                                    <i class="fas fa-plus"></i> Criar partida
+                                </a>
+                                @if (Group?.Sport == Sport.Futsal)
+                                {
+                                    <a href="/futsal/schedule?groupId=@Group!.Id" class="et-empty-btn et-empty-btn--semanais">
+                                        <i class="fas fa-sync-alt"></i> Semanais
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <i class="fas fa-calendar-plus"></i>
+                        @(ShowPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida agendada.")
+                    }
                 </td>
             </tr>
         }
@@ -132,4 +153,6 @@
     [Parameter] public List<Event>               UpcomingEvents   { get; set; } = new();
     [Parameter] public bool                      ShowPastEvents   { get; set; }
     [Parameter] public Dictionary<int, int>      EventNumbers     { get; set; } = new();
+    [Parameter] public bool                      IsAdmin          { get; set; }
+    [Parameter] public string                    NewEventHref     { get; set; } = string.Empty;
 }

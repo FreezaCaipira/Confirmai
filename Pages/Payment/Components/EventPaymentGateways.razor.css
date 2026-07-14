@@ -110,3 +110,17 @@
     padding: 0.5rem 0.8rem;
     margin-bottom: 0.75rem;
 }
+
+@media (max-width: 768px) {
+    .evpay-method-option {
+        min-height: 44px;
+    }
+
+    .evpay-action-btn {
+        min-height: 44px;
+    }
+
+    .evpay-method-list {
+        flex-direction: column;
+    }
+}

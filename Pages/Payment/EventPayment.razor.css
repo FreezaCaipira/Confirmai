@@ -13,7 +13,7 @@
 }
 
 /* Mobile adjustments */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .entity-shell-grid {
         max-width: 100%;
         padding: 0;
@@ -31,6 +31,14 @@
     .evpay-admin-proof-img {
         max-width: 100%;
         height: auto;
+    }
+    
+    .evpay-admin-confirm-btn {
+        min-height: 44px;
+    }
+    
+    .evpay-action-btn {
+        min-height: 44px;
     }
 }
 
@@ -144,7 +152,7 @@
 }
 
 /* Mobile adjustments */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .evpay-admin-confirm-actions {
         flex-direction: column;
         width: 100%;
@@ -152,6 +160,7 @@
     
     .evpay-admin-confirm-btn {
         width: 100%;
+        min-height: 44px;
     }
 }
 

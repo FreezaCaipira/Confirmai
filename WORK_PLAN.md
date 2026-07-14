@@ -1649,6 +1649,126 @@ Foco: alvos de toque >=44px, sem scroll horizontal, formularios/modais utilizave
 
 **Nota**: breakpoint unico 768px NAO entra aqui -- vai para a fase Design Tokens do C19 (evita retrabalho).
 
+### Fases do Ciclo 18
+
+**Branch sugerida**: `fix/ciclo18-mobile-ux`
+
+#### Fase 1 -- Entrar em grupo via invite code (`/convite/{Code}`)
+
+**Arquivos**: `Pages/Groups/Join.razor`, `Pages/Groups/Join.razor.css` (se existir), `wwwroot/css/events.css`
+
+**Problemas identificados na auditoria**:
+- A tabela de partidas (`events-table`) na pagina de convite usa `.ToLocalTime()` nas linhas 109-110 -- mescla bug de fuso horario do C17
+- A tabela nao tem view mobile (sem `mobile-only` / `web-only` como em `GroupDetailEvents.razor`) -- em 375px a tabela vai estourar
+- Botao "Entrar no grupo" (`.confirm-btn`) -- verificar se padding da >=44px de altura em mobile
+- Botao "Entrar para participar" (login redirect) -- mesmo check
+
+**Acoes**:
+1. Remover `.ToLocalTime()` das linhas 109-110 (mesmo fix do C17)
+2. Adicionar view mobile para a tabela de partidas (card layout analogo ao `GroupDetailEvents.razor`)
+3. Garantir `.confirm-btn` com `min-height: 44px` em mobile (`@media max-width: 768px`)
+4. Verificar `detail-card` padding em 375px (atualmente `1.75rem 1.5rem` -- pode esmagar)
+
+#### Fase 2 -- Ver eventos/partidas do grupo (`/grupo/{id}/partidas`)
+
+**Arquivos**: `Pages/Groups/Partidas.razor`, `Shared/Components/Groups/GroupDetailEvents.razor`, `wwwroot/css/events.css`
+
+**Problemas identificados**:
+- `GroupDetailEvents.razor` ja tem web/mobile split -- bom
+- Tabs "Proximas/Realizadas" (`.detail-events-tab`) -- verificar toque >=44px em mobile
+- Botoes "Semanais" e "Nova partida" (`.groups-create-btn`) -- verificar toque e wrapping em 375px
+- Botao "Acessar" (`.event-access-btn`) -- so existe na view web (`web-only`); no mobile o card inteiro e clicavel (onclick na `<tr>`) -- confirmar que area de toque e adequada
+- `events-table` em mobile: checar overflow horizontal, `et-cell` padding
+
+**Acoes**:
+1. Garantir `.detail-events-tab` com `min-height: 44px` em mobile
+2. Garantir `.groups-create-btn` com `min-height: 44px` e flex-wrap em mobile
+3. Verificar `.et-cell` e `.mobile-only` em 375px (padding, font-size, overflow)
+4. Adicionar `box-sizing: border-box` defensivo se faltar
+
+#### Fase 3 -- Confirmar presenca (`/futsal/{id}`)
+
+**Arquivos**: `Pages/Futsal/Detail.razor`, `Pages/Futsal/Components/FutsalOutfieldGroup.razor`, `Pages/Futsal/Components/FutsalGoalkeeperGroup.razor`, `wwwroot/css/events.css`
+
+**Problemas identificados**:
+- Botao "Confirmar presenca" (`.player-slot-btn`) -- verificar altura em mobile
+- Botoes de acao do admin (`.player-tag--admin-pay`, `.player-tag--admin-remove`, etc.) -- sao `player-tag` que pode ser muito pequeno para toque
+- Botao "cancelar" (`.player-tag--cancel`) -- mesmo problema
+- Botoes de confirmacao sim/nao (`.player-tag--cancel-yes`, `.player-tag--cancel-no`, `.player-tag--admin-pay-yes`, `.player-tag--admin-remove-yes`) -- icones soltos, provavelmente <44px
+- Botao "Entrar na lista de espera" (`.waitlist-cta`) -- verificar
+- Slot controls admin (`.slot-ctrl-btn`, `.add-slot-row`) -- verificar
+- `.confirmed-inline-banner` com botoes de pagamento -- verificar wrapping
+
+**Acoes**:
+1. Garantir `.player-slot-btn` com `min-height: 44px` em mobile
+2. Aumentar area de toque dos `.player-tag` interativos (admin pay/remove/cancel) em mobile -- `min-height: 44px`, `min-width: 44px`, padding adequado
+3. Garantir `.waitlist-cta` com `min-height: 44px`
+4. Verificar `.slot-ctrl-btn` e `.add-slot-row` em mobile
+5. Verificar `.confirmed-inline-banner` wrapping em 375px (flex-wrap ja existe, mas confirmar)
+
+#### Fase 4 -- Pagar Pix/BTC (`/pagamento/evento/{id}`)
+
+**Arquivos**: `Pages/Payment/EventPayment.razor`, `Pages/Payment/Components/EventPaymentQr.razor`, `Pages/Payment/Components/EventPaymentGateways.razor`, `Pages/Payment/Components/EventPaymentPixAdmin.razor`, `Pages/Payment/Components/EventPaymentProof.razor`, `wwwroot/css/events.css`
+
+**Problemas identificados**:
+- QR code area (`.evpay-qr-image`) -- verificar se o QR e legivel em 375px (minimo ~200px)
+- Botao "Copiar codigo Pix" (`.evpay-action-btn--copy`) -- verificar toque
+- `evpay-brcode` (codigo copia e cola) -- texto longo, verificar overflow/word-break em mobile
+- Selecao de gateway (`.evpay-method-option`) -- verificar toque e layout em mobile
+- Botao "Gerar QR Code" (`.evpay-action-btn--pay`) -- verificar toque
+- Upload de comprovante (`.evpay-proof-btn`) -- label com InputFile, verificar toque
+- QR do Pix direto admin (`.evpay-admin-pix-qr`) -- mesmo check de legibilidade
+- Chave pix (`.evpay-admin-pix-code`) -- verificar overflow em mobile
+- `@media (max-width: 480px)` na linha 180 -- usar 768px (regra 23)
+- Admin review: botoes confirmar/cancelar (`.evpay-admin-confirm-btn`) -- verificar toque
+
+**Acoes**:
+1. Garantir QR code com `min-width: 200px` em mobile
+2. Garantir todos os botoes (`.evpay-action-btn`, `.evpay-method-option`, `.evpay-proof-btn`, `.evpay-admin-confirm-btn`) com `min-height: 44px` em mobile
+3. Adicionar `word-break: break-all` no `.evpay-brcode` e `.evpay-admin-pix-code` para mobile
+4. Mover `@media (max-width: 480px)` para `@media (max-width: 768px)` (regra 23)
+5. Verificar `.evpay-method-list` layout em 375px (flex-direction column?)
+
+#### Fase 5 -- Ver comprovante/recibo
+
+**Arquivos**: `Pages/Payment/EventPayment.razor` (admin view), `wwwroot/css/events.css`
+
+**Problemas identificados**:
+- Admin ve comprovante (`.evpay-admin-proof-img`) -- verificar se imagem e legivel em 375px
+- Botoes "Confirmar pagamento" / "Marcar como pago" (`.evpay-admin-confirm-btn`) -- verificar toque
+- Botoes sim/nao (`.evpay-admin-confirm-btn--yes`, `.evpay-admin-confirm-btn--no`) -- verificar toque e layout empilhado em mobile
+- `.evpay-admin-confirm-row` -- verificar wrapping
+
+**Acoes**:
+1. Garantir `.evpay-admin-proof-img` com `max-width: 100%` e `overflow-x: auto` se necessario
+2. Garantir botoes admin com `min-height: 44px` em mobile
+3. Garantir `.evpay-admin-confirm-actions` empilha verticalmente em 375px (`flex-direction: column` no mobile)
+
+#### Fase 6 -- Empty state de partidas em `/grupo/{id}/partidas`
+
+**Arquivos**: `Shared/Components/Groups/GroupDetailEvents.razor`, `wwwroot/css/events.css`
+
+**Problemas identificados**:
+- Empty state atual (linha 23-27) e minimal: so um icone + texto "Nenhuma partida proxima."
+- Senior pediu banner analogo ao onboarding de `/grupos`: "nenhuma partida -> crie a primeira"
+- So faz sentido para admin (quem pode criar partida)
+
+**Acoes**:
+1. Adicionar banner contextual no empty state quando `!ShowPastEvents` e admin: "Nenhuma partida agendada. Crie a primeira partida ou configure partidas semanais."
+2. Incluir botoes/links para "Nova partida" e "Semanais" (se futsal) no banner
+3. Para non-admin: manter texto simples "Nenhuma partida agendada."
+4. Estilizar banner analogo ao onboarding de `/grupos` (fundo sutil + icone info)
+
+#### Fase 7 -- Validacao final
+
+**Acoes**:
+1. `dotnet build` -- 0 erros
+2. `dotnet test --filter "FullyQualifiedName!~ProgramConfiguration&FullyQualifiedName!~AdminLogsQueryString"` -- 0 failed
+3. Testar manualmente em 375px (iPhone SE) e 414px (iPhone 12):
+   - Fluxo completo: convite -> ver partidas -> confirmar -> pagar -> ver comprovante
+   - Fluxo admin: criar partida -> ver confirmacoes -> marcar pago -> ver comprovante
+4. Verificar: sem scroll horizontal em todas as telas, alvos de toque >=44px, forms utilizaveis
+
 ## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID (inclui fase CSS Web/Mobile)
 
 Refatoracao ampla aplicando TDD e SOLID (+ padroes pertinentes de Blazor Server: separacao de logica em services testaveis, `IDbContextFactory`, componentizacao, evitar logica no markup, gestao de circuito/estado).
