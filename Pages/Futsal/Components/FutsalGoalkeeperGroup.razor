@@ -116,7 +116,7 @@
     [Parameter] public (int MinOutfield, int MinGoalkeepers) MinInfo { get; set; }
     [Parameter] public bool IsFullGk { get; set; }
 
-    [Parameter] public EventCallback OnConfirmAs { get; set; }
+    [Parameter] public EventCallback<FutsalPosition> OnConfirmAs { get; set; }
     [Parameter] public EventCallback<int?> OnConfirmRemoveIdChange { get; set; }
     [Parameter] public EventCallback<bool> OnConfirmCancelChange { get; set; }
     [Parameter] public EventCallback OnCancelConfirmation { get; set; }
@@ -125,7 +125,7 @@
     [Parameter] public EventCallback OnAdminRemoveGoalkeeperSlot { get; set; }
 
     private async Task HandleConfirmAs(FutsalPosition pos)
-        => await OnConfirmAs.InvokeAsync();
+        => await OnConfirmAs.InvokeAsync(pos);
 
     private async Task HandleConfirmRemoveIdChange(int? value)
         => await OnConfirmRemoveIdChange.InvokeAsync(value);

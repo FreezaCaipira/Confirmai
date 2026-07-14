@@ -33,12 +33,6 @@
             }
         }
     }
-    @if (CanEdit && !IsPastEvent)
-    {
-        <a class="detail-admin-btn" href="/futsal/@EventId/edit">
-            <i class="fas fa-pen"></i> Editar partida
-        </a>
-    }
 </div>
 
 @code {
@@ -62,7 +56,4 @@
 
     [Parameter]
     public int Lacking { get; set; }
-
-    [Parameter]
-    public bool CanEdit { get; set; }
 }
