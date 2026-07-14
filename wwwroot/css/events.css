@@ -2214,12 +2214,6 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     .player-item { padding: 0.4rem 0.6rem; gap: 0.4rem; }
     .player-slot-btn { font-size: 0.7rem; padding: 0.15rem 0.6rem; gap: 0.25rem; }
     .player-tag { font-size: 0.65rem; padding: 0.08rem 0.35rem; }
-    .player-item .player-tag--me { display: none; }
-    .player-item .player-tag--pay-pending { display: none; }
-    .player-item .player-tag--paid { display: none; }
-    .player-item .player-tag--no-pay { display: none; }
-    .player-item .player-tag--proof-pending { display: none; }
-    .player-item .player-tag--pay-btn { display: none; }
     .player-item .player-tag--cancel { gap: 0.35rem; }
 }
 
@@ -4827,4 +4821,10 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
         font-size: 0.8rem;
         padding: 0.38rem 0.8rem;
     }
+
+    .player-item .player-tag--me { display: none; }
+    .player-item .player-tag--pay-pending { display: none; }
+    .player-item .player-tag--paid { display: none; }
+    .player-item .player-tag--no-pay { display: none; }
+    .player-item .player-tag--proof-pending { display: none; }
 }
