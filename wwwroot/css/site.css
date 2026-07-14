@@ -3657,8 +3657,9 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
 
 body .oldsite-top-nav .oldsite-top-nav-mailbox-icon .oldsite-top-nav-unread {
     position: absolute;
-    top: 2px;
-    right: 2px;
+    top: 0;
+    right: 0;
+    transform: translate(40%, -40%);
 }
 
 body .oldsite-top-nav .oldsite-top-nav-user {

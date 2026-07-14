@@ -35,6 +35,7 @@
                 </a>
                 <button class="mobile-menu-toggle" @onclick="ToggleMobileMenu" aria-label="Toggle menu" aria-expanded="@isMobileMenuOpen">
                     <i class="fas fa-bars"></i>
+                    <span class="mobile-menu-label">Menu</span>
                 </button>
                 <nav class="oldsite-top-nav @(isMobileMenuOpen ? "mobile-menu-open" : "")" aria-label="Main menu">
                     <div class="nav-language-flags" role="group" aria-label="@T["Layout.Language"]">
@@ -59,6 +60,7 @@
                     </div>
                     <AuthorizeView>
                         <Authorized>
+                            <span class="oldsite-top-nav-user">@T["Layout.Hello"], @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? T["Layout.UserFallback"] : context.User.Identity.Name)!</span>
                             <a href="/grupos" class="oldsite-top-nav-link"><i class="fas fa-users" aria-hidden="true"></i> Grupos</a>
                         </Authorized>
                     </AuthorizeView>
@@ -94,7 +96,6 @@
                                     <span class="mobile-nav-text">@T["Nav.Profile"]</span>
                                 </a>
                             }
-                            <span class="oldsite-top-nav-user">@T["Layout.Hello"], @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? T["Layout.UserFallback"] : context.User.Identity.Name)!</span>
                             <a href="/Identity/Account/Logout" class="oldsite-top-nav-link oldsite-top-nav-logout">@T["Layout.Logout"]</a>
                         </Authorized>
                         <NotAuthorized>

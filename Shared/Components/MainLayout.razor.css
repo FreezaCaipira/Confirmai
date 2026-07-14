@@ -371,11 +371,19 @@ footer.oldsite-footer {
     cursor: pointer;
     font-size: 1.1rem;
     transition: background 0.2s, border-color 0.2s;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .mobile-menu-toggle:hover {
     background: var(--ci-bg-card);
     border-color: var(--ci-accent);
+}
+
+.mobile-menu-label {
+    display: none;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .mobile-nav-text {
@@ -387,6 +395,10 @@ footer.oldsite-footer {
         display: inline-flex;
         align-items: center;
         justify-content: center;
+    }
+
+    .mobile-menu-label {
+        display: inline;
     }
 
     .mobile-nav-text {
