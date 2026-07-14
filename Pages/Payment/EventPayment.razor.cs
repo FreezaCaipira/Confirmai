@@ -1,14 +1,17 @@
 using System.Globalization;
 using System.Security.Claims;
+using Confirmai.Configuration;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Factories;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Confirmai.Pages.Payment;
 
@@ -43,6 +46,8 @@ public partial class EventPayment : IAsyncDisposable
     private CancellationTokenSource? _copyBrCodeCts;
     private CancellationTokenSource? _copyAdminPixCts;
     private CancellationTokenSource? _uploadProofCts;
+
+    [Inject] private IOptions<FeeOptions> FeeOptions { get; set; } = default!;
 
     private Task? _copyBrCodeTask = null;
     private Task? _copyAdminPixTask = null;
@@ -121,7 +126,17 @@ public partial class EventPayment : IAsyncDisposable
                 return;
             }
 
-            var charge = await gateway.CreateChargeAsync(conf.Event.Price.Value, conf.Id);
+            // Calcular valor total com taxa se configurado
+            var chargeAmount = conf.Event.Price.Value;
+            if (FeeOptions.Value.IsConfigured && 
+                FeeOptions.Value.SupportedGateways.Contains(selectedGatewayName, StringComparer.OrdinalIgnoreCase))
+            {
+                var calculator = new FeeCalculator(FeeOptions.Value.PercentBps);
+                var result = calculator.Calculate(chargeAmount);
+                chargeAmount = result.TotalAmount;
+            }
+
+            var charge = await gateway.CreateChargeAsync(chargeAmount, conf.Id);
 
             // Persist txId + brCode so the page can reuse the charge if the user returns
             await using var db = await DbFactory.CreateDbContextAsync();
