@@ -544,6 +544,56 @@ Auditar e garantir os fluxos principais dos stakeholders 100% OK no mobile (375p
 
 ---
 
+## Questionamento do Pleno ao Senior -- Ciclo 17 (UX nao revisada + perguntas nao respondidas)
+
+**Data**: 14/07/2026 | **Branch**: `fix/ciclo17-test-feedback` (PR #55, 101 commits, 41 arquivos, +1456/-453)
+
+### 1. UX extensiva nao revisada
+
+A revisao do senior (acima) cobre apenas o PR #54 (`feat/ciclo17-google-login`) e menciona o PR #55 como "test-feedback". Porem, o PR #55 contem **101 commits de refinamentos de UX/UI e bugfixes** baseados em testes manuais do Robson, incluindo:
+
+- **Menu de navegacao**: "Ola" -> "Bem-vindo", separador, badge reposicionada, texto "Menu" no hamburger
+- **Partidas Semanais**: movida de /meus-eventos para /grupo/{id}/partidas (correcao semantica), filtragem por groupId, redirects ajustados
+- **Bugfixes**: goleiro confirmado como linha, botao "Editar partida" removido, redirect do "Nova Partida", horario errado (.ToLocalTime subtraindo 3h), header "Data" -> "Data/Hora"
+- **Mobile**: inputs desalinhados (breakpoint 480px -> 768px), badges ocultos no mobile, botao Voltar em row separada
+- **Payments**: botao Pendentes (contraste), Recarregar discreto, notify actions empilhados, legibilidade
+- **Futsal Create**: botao Voltar dinamico, dropdown de cidades IBGE (84KB JSON)
+- **Onboarding**: 4 passos explicando fluxo Grupo -> Convidar -> Partida -> Confirmacoes
+- **Grupo/Index**: botao "Ver Partidas" verde
+
+Estas mudancas sao legitimas pela regra 22 (requisitos do Robson testando). Porem, a revisao do senior nao menciona ou avalia nenhuma delas. **Solicita-se revisao especifica do PR #55.**
+
+### 2. Perguntas nao respondidas (docs/review-onboarding-hint.md)
+
+O arquivo `docs/review-onboarding-hint.md` (commitado na branch) contem 4 perguntas para o senior que nao foram respondidas:
+
+1. Concorda com a abordagem de faixa contextual vs texto fixo para onboarding?
+2. O fluxo de 3 passos (Grupo -> Convidar -> Partida -> Confirmacoes) esta correto/faltando algo?
+3. Vale a pena fazer o mesmo na tela de partidas vazias (/meus-eventos)?
+4. O botao "entendi" (dispensavel) e necessario ou pode ser sempre visivel para users sem grupos?
+
+### 3. Sugestoes CSS (C19) nao respondidas
+
+As metodologias CSS propostas pelo Pleno (ITCSS, BEM, CSS Layers, mobile-first, design tokens, TDD visual) nas linhas 1438-1492 permanecem marcadas como "sugestoes de nivel Pleno -- aguardando revisao do Senior". Nenhuma resposta foi dada.
+
+### 4. Sobreposicao Ciclo 17 <-> Ciclo 18
+
+O Ciclo 18 planeja "auditar e garantir os fluxos principais dos stakeholders 100% OK no mobile (375px/414px)". O Pleno ja executou extenso trabalho de UX mobile no PR #55:
+
+- Inputs desalinhados corrigidos (breakpoint movido para 768px)
+- Badges ocultos no mobile para reduzir ruido visual
+- Botoes com toque adequado (Voltar, Acessar, Semanais)
+- Sem scroll horizontal em /grupos (box-sizing corrigido)
+- Menu hamburger colapsa ao navegar
+- Forms utilizaveis em mobile (criacao de grupo, upload, datetime selector)
+
+**Questao**: o trabalho ja realizado no PR #55 cobre parcialmente o escopo do C18. Solicita-se que o senior avalie:
+- Quais fluxos especificos ainda precisam de auditoria mobile?
+- Ha fluxos que o Pleno ja testou e corrigiu que podem ser marcados como concluidos?
+- O C18 deve ser refinado para focar apenas no que falta, ou re-auditar tudo do zero?
+
+---
+
 ## Metricas Atuais (pos-Ciclo 16)
 
 | Metrica | C10 | C11 | C12 | C13 | C14 | C15 | C16 |
