@@ -3,8 +3,9 @@
 > Atualizado em 14/06/2026 | Base: `main` (pos-Ciclo 17) | Refatoracao CSS CONCLUIDA
 > 1.700/1.700 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste | 0 mojibake
 > Ciclo 15 (testes+UX+!important), Ciclo 16 (mobile UX) e Ciclo 17 (Login Google+email real+mojibake+menu mobile) -- CONCLUIDOS e revisados
-> Proximo: Ciclo 18 -- Mobile UX critico (fluxos principais dos stakeholders)
-> Futuros: C19 refatoracao TDD+SOLID (inclui fase CSS Web/Mobile) | C20 WhatsApp+baseline (POSTERGADO)
+> Proximo: **Pagamento Real + Taxa de Servico** (cobrar % do site sobre cada pagamento) -- ver "Analise: Pagamento Real + Taxa"
+> Depois: Refatoracao SOLID+TDD+CSS (inclui mobile UX critico + fase CSS Web/Mobile) | Efetivar Login Google (credenciais OAuth em prod)
+> Postergado: WhatsApp real + Baseline por gateway (aguardando ideias de outro dev)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -1515,6 +1516,116 @@ Antes/durante o Ciclo 17, para o login funcionar em prod e dev:
    - Prod: variaveis de ambiente `Authentication__Google__ClientId` / `Authentication__Google__ClientSecret`
 
 Para email real + confirmacao (Fase 5): fornecer credenciais do provedor de email (SMTP host/porta/usuario/senha OU API key de SendGrid/Mailgun), tambem guardadas fora do git (user-secrets em dev, env vars em prod).
+
+---
+
+## Analise: Pagamento Real + Taxa de Servico (PROXIMO CICLO)
+
+**Pergunta do Robson**: "cobrar uma taxa sobre cada pagamento -- ele paga 15,60 e 0,60 fica pro site. Existe como fazer?"
+
+**Resposta: SIM, e viavel.** Duas arquiteturas possiveis:
+
+### Modelo A -- Intermediacao (o que o codigo JA faz hoje)
+Hoje TODA cobranca usa a **chave PIX unica do site** (`chave = _options.PixKey` em `EfiBankPixService.CreateChargeAsync`). Ou seja, o site ja recebe 100% do dinheiro de todos os jogadores. Consequencia:
+- **Taxa = trivial de implementar**: o site cobra o valor cheio e simplesmente "guarda" a taxa; o restante e devido ao organizador.
+- **O que FALTA**: o **repasse ao organizador** (payout). Hoje nao existe fluxo de saque/repasse (confirmado: 0 services de payout/saque/carteira no codigo). O organizador nao tem como receber o dinheiro que esta na conta do site.
+- **Risco regulatorio**: reter dinheiro de terceiros torna o site um **intermediador de pagamento / subadquirente** -- implica responsabilidade fiscal (emissao de nota da taxa), possiveis limites de PIX, e obrigacao de repasse. Precisa validar com contador/juridico.
+
+### Modelo B -- Split de Pagamento (marketplace nativo)
+O gateway divide o valor no momento do pagamento: X vai direto pro organizador, Y (a taxa) vai pro site. Nenhum dinheiro de terceiro passa pela conta do site.
+- **EfiBank/Gerencianet**: suporta **Split de Pagamento** para PIX (requer cada organizador ter conta/recebedor cadastrado + KYC).
+- **AbacatePay / Appmax**: verificar suporte a split na API (varia por gateway).
+- **BTCPay (Bitcoin)**: NAO tem split nativo -- taxa em BTC teria que ser contabilizada manualmente ou via segunda saida.
+- **Vantagem**: sem risco de intermediacao; cada um recebe o seu. **Custo**: onboarding/KYC de cada organizador como recebedor.
+
+### Mecanica da taxa (independe do modelo)
+Duas formas de cobrar:
+1. **Por cima (repassada ao jogador)** -- jogador paga 15,60, dos quais 0,60 e a taxa. Organizador recebe 15,00. **(e o exemplo do Robson)**
+2. **Embutida (descontada do organizador)** -- jogador paga 15,00, site fica com 0,60, organizador recebe 14,40.
+
+Recomendacao: taxa **configuravel** (percentual + opcional fixo), arredondada a centavos, e **transparente** ao pagador ("taxa de servico: R$ 0,60"). Ja existe a string `PaymentDetails.Fee` = "Taxa de processamento" no i18n -- reutilizar.
+
+**Atencao**: o proprio gateway ja cobra uma tarifa (ex: PIX ~0,99%). A taxa liquida do site = taxa cobrada - tarifa do gateway. Considerar no calculo do lucro real.
+
+### DECISOES DO ROBSON (14/07/2026 -- TRAVADAS)
+- **Modelo B -- Split de pagamento** (cada um recebe direto; site recebe so a taxa; exige recebedor/KYC por organizador)
+- **Taxa por cima** (jogador paga 15,60; organizador recebe 15,00; site fica com 0,60)
+- **Percentual** (ex: 4%). Formula: `total = round(base * (1 + feePct))` a centavos; `feeAmount = total - base`; split envia `base` ao organizador e `feeAmount` ao site (deriva feeAmount do total arredondado p/ evitar divergencia de 1 centavo).
+
+### Contexto tecnico do split (verificar na implementacao)
+- Gateways sao selecionados dinamicamente (`EventPaymentGatewayFactory` + toggle admin via `GatewayService`; default = primeiro habilitado). Ha 3 gateways PIX (EfiBank, AbacatePay, Appmax) + BTCPay (Bitcoin).
+- **EfiBank/Gerencianet**: tem "Split de Pagamento" para PIX -- confirmar na doc a estrutura exata (recebedores precisam de conta/identificacao no proprio EfiBank; validar se aceita split por chave PIX de terceiros ou exige conta interna).
+- **AbacatePay / Appmax**: verificar suporte a split na API antes de prometer. Se nao suportarem, ficam sem taxa (ou desabilitados para eventos com taxa).
+- **BTCPay (Bitcoin)**: sem split nativo -- decisao MVP: NAO cobrar taxa em pagamentos BTC (contabilizar manualmente depois, se preciso).
+- Hoje o `chave = _options.PixKey` e do site. No split, `base` vai pro recebedor do organizador e a taxa pro site -- inverte quem e o "dono" do dinheiro.
+
+### Escopo detalhado do Ciclo "Pagamento Real + Taxa (Split)"
+
+**Branch sugerida**: `feat/pagamento-real-split`. **TDD**: escrever teste antes de cada calculo/regra. 1 commit por fase, 1 PR no final.
+
+1. **Recebedor do organizador (KYC)**: entidade nova (ex: `GroupPayoutAccount`) vinculada ao grupo/organizador -- guarda os dados de recebedor exigidos pelo gateway (chave PIX do organizador / id de recebedor). Tela no perfil do grupo para o admin cadastrar. Migration.
+2. **Config + calculo de taxa**: `FeeOptions` (`PercentBps` inteiro p/ evitar float -- ex 400 = 4%, `Enabled`, gateways suportados) + `FeeCalculator` **puro e testavel** (TDD): dado `base` e `feePct`, retorna `(total, feeAmount)` por cima, arredondado a centavos.
+3. **Split na cobranca**: estender `IEventPaymentGateway.CreateChargeAsync` (e os gateways que suportam) para receber o recebedor do organizador + a taxa e montar o payload de split. EfiBank primeiro; AbacatePay/Appmax conforme suporte.
+4. **Registro por transacao**: campos `BaseAmount`, `FeeAmount`, `PayoutRecipient` no `PaymentRecord` (ou tabela `PlatformRevenue`). Webhook confirma o valor liquido.
+5. **Checkout transparente**: jogador ve o breakdown ("Valor: R$ 15,00 + Taxa de servico: R$ 0,60 = R$ 15,60"). Reutilizar string `PaymentDetails.Fee`.
+6. **Guarda-corpos**: grupo sem recebedor cadastrado -> bloquear/avisar na criacao de partida paga; gateway sem suporte a split -> nao aplicar taxa / esconder opcao.
+7. **Relatorio admin de receita** da plataforma (soma de `FeeAmount` por periodo/gateway) -- conecta com o "Baseline por gateway" postergado.
+8. **Testes**: `FeeCalculator` (arredondamento, 0%, valores quebrados), payload de split por gateway, registro por transacao, guarda-corpos (sem recebedor / gateway sem split), webhook confirmando liquido.
+
+**Pre-requisito do Robson**: credenciais reais do provedor escolhido, fora do git. **ATENCAO**: a premissa "cadastrar so a chave PIX do organizador" NAO se confirmou na pesquisa -- ver "ACHADO DA PESQUISA" e "FORK REAL" abaixo. Decisao de provedor/modelo reaberta.
+
+**Nota de risco**: mesmo no split, confirmar com contador a emissao de nota fiscal sobre a taxa de servico do site.
+
+### Provedores de split/marketplace (avaliacao Senior -- 14/07/2026)
+
+O Robson pesquisou e uma IA sugeriu **Iugu, Mercado Pago ou PagSeguro** para o modelo marketplace (muitos vendedores, plataforma fica com comissao). **Concordo -- e a abordagem correta para escalar.** Motivo: provedores de marketplace/split resolvem o ponto mais dificil do Modelo B -- o **onboarding + KYC dos organizadores** e a **responsabilidade regulatoria** -- que com EfiBank ficaria por nossa conta.
+
+Como a arquitetura de gateway ja e plugavel (`IEventPaymentGateway` + `EventPaymentGatewayFactory`), adicionar um provedor de split e um novo gateway, sem reescrever o resto.
+
+Comparativo (verificar detalhes/precos atualizados na contratacao):
+
+| Provedor | Split nativo | Onboarding do organizador | PIX | Observacao |
+|----------|-------------|---------------------------|-----|------------|
+| **Mercado Pago** | Sim (`application_fee` + OAuth Connect) | **Organizador so faz login com a conta MP dele** -- MP cuida do KYC | Sim | Menor atrito; enorme adocao no BR; modelo "marketplace connect" |
+| **Iugu** | Sim (subcontas) | Criar subconta por organizador (KYC via API) | Sim | Focado em SaaS/marketplace; split flexivel |
+| **Asaas** | Sim (split + subconta/"wallet") | Subconta por organizador | Sim | Popular no BR para marketplace pequeno/medio; API simples |
+| **PagBank/PagSeguro** | Sim (split de recebedores) | Recebedores cadastrados | Sim | Grande, mas API de split mais burocratica |
+| **EfiBank (atual)** | Sim (split PIX) | **Por nossa conta** (mais manual) | Sim | Ja integrado, mas onboarding/compliance fica conosco |
+
+**Recomendacao Senior**: para marketplace escalavel, priorizar **Mercado Pago (modelo Connect/OAuth)** ou **Asaas/Iugu (subcontas)** em vez de estender o EfiBank. O MP tem o menor atrito de onboarding (organizador so autoriza a conta dele), o que e critico se voce quer muitos organizadores. A comissao entra como `application_fee` (taxa por cima, percentual -- exatamente o modelo escolhido).
+
+**Atencao a margem** (ponto levantado pela IA): a comissao do site tem que cobrir o custo do provedor. Ex.: se o MP cobra ~0,99% no PIX e voce cobra 4% por cima, sua margem liquida e ~3%. Ajustar o percentual para o custo do provedor nao "engolir" o lucro.
+
+**Impacto no plano acima**: se escolher um provedor Connect (MP), a **Fase 1 (recebedor/KYC)** muda de "cadastrar dados manualmente" para "fluxo OAuth de autorizacao da conta do organizador" -- mais simples e seguro. As demais fases (FeeCalculator, registro, checkout, relatorio, testes) permanecem.
+
+### ACHADO DA PESQUISA (14/07/2026 -- doc oficial EfiBank) -- premissa do "so a chave PIX" NAO se confirma
+
+Fonte: https://dev.efipay.com.br/docs/api-pix/split-de-pagamento-pix
+> "**O Split de pagamento Pix so pode ser realizado entre contas Efi**, com limite maximo de 20 contas para o repasse."
+> "No processo de split de pagamento, e essencial fornecer uma **conta digital EFI valida**. ... se nao possuir uma conta valida para os repasses, sera necessario **criar uma subconta**."
+
+**Conclusao**: o Split PIX do EfiBank NAO repassa para uma chave PIX de terceiro qualquer. O recebedor (organizador) **precisa ter uma conta Efi** (ou uma subconta criada por nos). Ou seja, a ideia de "so cadastrar a chave PIX do organizador, sem ele ter conta" **nao existe em produto de split** (nenhum provedor de split compliant repassa a chave solta -- MP/Asaas/Iugu tambem exigem conta/subconta, por causa de KYC).
+
+**O unico jeito de aceitar "so a chave PIX do organizador" e o Modelo A (intermediacao)**, NAO split: o site recebe 100% na sua conta e depois faz um **Envio de Pix** (API "Envio e Pagamento Pix" do EfiBank) para a chave do organizador, retendo a taxa. Simples tecnicamente, mas o site fica no fluxo do dinheiro (retem valor de terceiro) -> intermediacao, com risco fiscal/regulatorio.
+
+### DECISAO DO ROBSON (14/07/2026 -- TRAVADA): Opcao 2 -- Intermediacao Automatica (chave PIX solta + repasse via Envio de Pix)
+
+O organizador informa apenas a **chave PIX** (sem precisar de conta Efi). Fluxo 100% automatico, sem clique manual:
+1. Jogador paga o `total` (base + taxa) -> cai na conta PIX do site (`chave = _options.PixKey`, o que ja acontece hoje).
+2. **Webhook** do EfiBank confirma o pagamento (webhook ja implementado no projeto).
+3. Sistema dispara automaticamente um **Envio de Pix** (API "Envio e Pagamento Pix" do EfiBank -- manda PIX para QUALQUER chave) no valor `base` para a chave do organizador; o site **retem** a `feeAmount`.
+
+**Nao e split** -- sao duas operacoes (recebe + reenvia). Consequencia: o dinheiro passa pela conta do site por alguns segundos -> o site figura como **intermediador** (risco fiscal/regulatorio; confirmar nota fiscal da taxa com contador). Tecnicamente exige tratar **falha de repasse** (chave invalida, PIX recusado, saldo) com retry + alerta admin.
+
+**Plano ajustado (Opcao 2 automatica)**:
+- **Fase 1 (recebedor)**: `GroupPayoutAccount` guarda a **chave PIX do organizador** (tipo + valor), cadastro manual pelo admin do grupo. Sem conta/subconta/OAuth.
+- **Fase 3 (repasse)**: no handler do **webhook de confirmacao**, apos marcar o pagamento como pago, disparar **Envio de Pix** do `base` para a chave do organizador. Registrar estado do repasse (`PayoutStatus`: Pendente/Enviado/Falhou) + `EndToEndId`. **Retry** com backoff + **alerta admin** em falha persistente. Idempotencia (nao repassar duas vezes o mesmo pagamento).
+- **Fases 2, 4-8 (FeeCalculator, registro, checkout, guarda-corpos, relatorio, testes)**: inalteradas. Guarda-corpo extra: bloquear/avisar criacao de partida paga se o grupo nao tem chave PIX de repasse cadastrada. Testes cobrindo falha/retry do repasse.
+- **So EfiBank** cobra taxa+repasse por ora (tem Envio de Pix). AbacatePay/Appmax/BTC ficam sem taxa.
+
+**Pre-requisito do Robson**: conta EfiBank com **API Pix (envio) habilitada** + credenciais (ClientId/Secret/certificado PIX) fora do git. Confirmar limites de envio de Pix da conta.
+
+**Compliance**: confirmar com contador/juridico a responsabilidade de intermediacao + emissao de nota da taxa de servico.
 
 ---
 
