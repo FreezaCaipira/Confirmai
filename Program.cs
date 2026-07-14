@@ -126,6 +126,7 @@ builder.Services.AddScoped<Confirmai.Services.Payment.Shared.WebhookPaymentMarke
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<AbacatePayWebhookService>();
 builder.Services.AddScoped<EfiBankPixService>();
+builder.Services.AddScoped<EfiBankPixPayoutService>();
 builder.Services.AddScoped<AppmaxPixService>();
 builder.Services.AddScoped<EfiBankWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
