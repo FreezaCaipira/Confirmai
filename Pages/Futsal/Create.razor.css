@@ -1,5 +1,9 @@
 /* Shared form/detail styles live in wwwroot/css/events.css */
 
+.create-event-back-row {
+    margin-bottom: 0.75rem;
+}
+
 .create-event-title i { color: var(--green-bright); text-shadow: 0 0 15px var(--green-opacity-2xl); }
 
 /* ── Inline styles estáticos ───────────────── */

@@ -24,6 +24,11 @@
 
 <div class="create-event-page">
     <div class="create-event-card">
+        <div class="create-event-back-row">
+            <a href="@(preselectedGroup is not null ? $"/grupo/{preselectedGroup.Id}" : "/futsal")" class="detail-back-link">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
         <h1 class="create-event-title">
             <i class="fas fa-futbol"></i>
             @(preselectedGroup is not null
