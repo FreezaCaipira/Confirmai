@@ -85,6 +85,8 @@ public static class AuditEvents
     public const string GroupMemberRoleChangeDenied = "group.member.role.change.denied";
     public const string GroupFeatureToggled = "group.feature.toggled";
     public const string GroupPixReceiverChanged = "group.pix.receiver.changed";
+    public const string GroupPayoutAccountCreated = "group.payout.account.created";
+    public const string GroupPayoutAccountUpdated = "group.payout.account.updated";
 
     // -- Delinqu�ncia --
     public const string DelinquencyNotified = "delinquency.notified";

@@ -1,0 +1,156 @@
+.feat-payout-existing {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.feat-payout-info {
+    flex: 1;
+}
+
+.feat-payout-label {
+    font-size: 0.875rem;
+    color: var(--ci-text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.feat-payout-value {
+    font-size: 1rem;
+    color: var(--ci-text);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.feat-payout-beneficiary {
+    font-size: 0.875rem;
+    color: var(--ci-text-subtle);
+}
+
+.feat-payout-edit-btn {
+    padding: 0.5rem 1rem;
+    background: var(--ci-accent);
+    color: var(--ci-bg-deepest);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.feat-payout-edit-btn:hover {
+    background: var(--ci-accent-light);
+}
+
+.feat-payout-edit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.feat-payout-form {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.feat-payout-field {
+    margin-bottom: 1rem;
+}
+
+.feat-payout-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--ci-text);
+    margin-bottom: 0.5rem;
+}
+
+.feat-payout-select,
+.feat-payout-input {
+    width: 100%;
+    padding: 0.625rem;
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border-dim);
+    border-radius: 6px;
+    color: var(--ci-text);
+    font-size: 0.875rem;
+    box-sizing: border-box;
+}
+
+.feat-payout-select:focus,
+.feat-payout-input:focus {
+    outline: none;
+    border-color: var(--ci-accent);
+}
+
+.feat-payout-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.feat-payout-cancel-btn {
+    padding: 0.625rem 1.25rem;
+    background: transparent;
+    color: var(--ci-text-muted);
+    border: 1px solid var(--ci-border-dim);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.feat-payout-cancel-btn:hover {
+    background: var(--ci-bg-dark);
+    color: var(--ci-text);
+}
+
+.feat-payout-cancel-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.feat-payout-save-btn {
+    padding: 0.625rem 1.25rem;
+    background: var(--green);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.feat-payout-save-btn:hover {
+    background: var(--green-light);
+}
+
+.feat-payout-save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .feat-payout-existing {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .feat-payout-edit-btn {
+        width: 100%;
+    }
+
+    .feat-payout-actions {
+        flex-direction: column;
+    }
+
+    .feat-payout-cancel-btn,
+    .feat-payout-save-btn {
+        width: 100%;
+    }
+}
