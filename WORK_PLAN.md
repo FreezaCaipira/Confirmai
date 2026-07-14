@@ -594,6 +594,57 @@ O Ciclo 18 planeja "auditar e garantir os fluxos principais dos stakeholders 100
 
 ---
 
+## Respostas do Senior ao Questionamento do Ciclo 17
+
+**Data**: 14/07/2026 | Questionamento procedente -- a revisao anterior focou o PR #54 e tratou o PR #55 apenas como "test-feedback". Corrigido abaixo.
+
+### R1. Revisao especifica do PR #55 (UX -- 101 commits)
+
+Auditei os 101 commits do PR #55. **Veredicto: APROVADO.** Sao refinamentos legitimos vindos dos testes do Robson (regra 22), coerentes e sem regressao (build 0 erros, 1.700 testes verdes). Destaques por area:
+
+- **Navegacao/Menu**: "Ola" -> "Bem-vindo", separador, badge unread reposicionada sobre o icone da cartinha, texto "Menu" no hamburger. **OK** -- consistencia visual.
+- **Semantica (Partidas Semanais)**: mover de `/meus-eventos` para `/grupo/{id}/partidas` + filtrar por `groupId` + ajustar redirects. **OK e importante** -- corrige acoplamento semantico (partidas pertencem ao grupo, nao ao usuario global). Boa decisao.
+- **Bugfixes**: horario errado (`.ToLocalTime()` subtraindo 3h -- confirmei que foi removido de `GroupDetailEvents.razor` e `Schedule/`), header "Data" -> "Data/Hora", goleiro confirmado como linha, botao "Editar partida" removido do `DetailAdminPanel`, redirect do "Nova Partida" passando `groupId`. **OK** -- todos corrigem comportamento incorreto real.
+- **Mobile**: breakpoint de inputs 480px -> 768px (alinhamento), badges ocultos <=768px (reduz ruido), botao Voltar em row separada, `box-sizing`/`overflow` defensivo (sem scroll horizontal em `/grupos`). **OK** -- ver R4 sobre C18.
+- **Payments**: contraste do botao Pendentes, Recarregar discreto (icone only), notify actions empilhados, legibilidade. **OK.**
+- **Onboarding**: banner contextual em `/grupos` quando `groups.Count == 0`, 3 passos. **OK** -- ver R2.
+- **Dropdown cidades IBGE**: `cities.json` (84KB, gerado por `gen-cities.ps1`) lido do filesystem em Blazor Server. **OK** -- abordagem correta (nao HTTP self-call). Ressalva menor: 84KB carregado por request na criacao de grupo; se virar gargalo, cachear em memoria (`IMemoryCache`) no C19.
+
+**Ressalva de processo (nao bloqueia)**: PR #55 tem 101 commits com muitos "tentativa/erro" de cores/alinhamento (regra 14 -- preferir commits consolidados). Nao impacta o resultado, mas idealmente squashar refinamentos iterativos.
+
+### R2. Perguntas de onboarding (`docs/review-onboarding-hint.md`)
+
+1. **Faixa contextual vs texto fixo?** Concordo com faixa contextual (`groups.Count == 0`). Nao polui quem ja conhece o fluxo. Aprovado como implementado.
+2. **Fluxo de 3 passos correto?** Correto. A implementacao final ("Crie grupo e convide" -> "Crie partidas semanais/avulsas" -> "Membros pagam e confirmam") esta melhor que a proposta original porque explica o conceito de "grupo = turma/racha" antes dos passos. Aprovado.
+3. **Fazer o mesmo em `/meus-eventos` (partidas vazias)?** **Sim, mas no C18**, nao agora. Com a mudanca de partidas para `/grupo/{id}/partidas`, o empty state mais util e o da tela de partidas do grupo ("nenhuma partida ainda -> Crie a primeira"). Documentado como item do C18.
+4. **Botao "entendi" (dispensavel) necessario?** **Nao.** A escolha do Pleno (sempre visivel para quem nao tem grupo, sem dismiss) e a correta -- assim que o user cria/entra num grupo o banner some naturalmente. Evita complexidade de `localStorage`. Aprovado.
+
+### R3. Metodologias CSS do C19 (ITCSS/BEM/Layers/mobile-first/tokens/TDD visual)
+
+**Aprovadas como norte do C19**, com priorizacao (o C19 e grande -- nao fazer tudo de uma vez):
+- **Fazer primeiro (alto valor, baixo risco)**: (5) Design Tokens + (3) Mobile-first + breakpoint unico 768px + (6) Single Responsibility por scoped. Resolve o bug recorrente e a fragmentacao `oldsite-top-nav`.
+- **Fazer em seguida (valor medio)**: (2) BEM em scoped novos/refatorados -- NAO renomear tudo em massa (risco alto, pouco retorno); aplicar em componentes que ja forem tocados.
+- **Avaliar com cautela**: (1) ITCSS como organizacao mental do global (bom), mas sem reescrita grande; (4) `@layer` e (7) TDD visual Playwright sao **opcionais/experimentais** -- validar primeiro se o pipeline Blazor Server + CI suportam sem custo alto. Nao bloquear o C19 neles.
+- **Regra**: cada metodologia entra como fase testavel e reversivel, 1 por commit, sem tocar testes existentes.
+
+### R4. Sobreposicao C17 <-> C18 (mobile)
+
+O PR #55 de fato **adiantou parte do C18**. Ajuste o escopo do C18 para focar no que falta, sem re-auditar do zero:
+
+**Ja concluido no PR #55 (marcar como feito no C18)**: alinhamento de inputs (breakpoint 768px), reducao de ruido (badges ocultos mobile), sem scroll horizontal em `/grupos`, menu hamburger, forms de criacao de grupo/upload/datetime usaveis.
+
+**Ainda pendente para o C18 (foco)**: auditoria fim-a-fim dos **fluxos criticos** especificamente em 375px/414px que o PR #55 nao cobriu de forma sistematica:
+1. Entrar em grupo via invite code (tela de join + validacao mobile)
+2. Ver eventos/partidas do grupo (cards, badges, acoes)
+3. **Confirmar presenca** (linha/goleiro) -- toque >=44px nos botoes de acao
+4. **Pagar Pix/BTC** -- QR, upload de comprovante, selecao de metodo em 375px
+5. Ver comprovante/recibo
+6. Empty state de partidas em `/grupo/{id}/partidas` (item da R2.3)
+
+**Decisao**: C18 = auditoria dirigida desses 6 fluxos (nao re-auditar telas ja ajustadas). O breakpoint unico 768px sai do C18 e vai para a fase de Design Tokens do C19 (evita retrabalho).
+
+---
+
 ## Metricas Atuais (pos-Ciclo 16)
 
 | Metrica | C10 | C11 | C12 | C13 | C14 | C15 | C16 |
@@ -1472,7 +1523,20 @@ Para email real + confirmacao (Fase 5): fornecer credenciais do provedor de emai
 Auditar e garantir 100% no mobile os fluxos que os stakeholders mais usam:
 entrar em grupo (invite code) → ver eventos → confirmar presenca → pagar (Pix/BTC) → ver comprovante.
 Foco: alvos de toque >=44px, sem scroll horizontal, formularios/modais utilizaveis em 375px/414px, header consistente.
-Detalhar em fases proprias quando iniciarmos o ciclo.
+
+**Escopo REFINADO (ver "Respostas do Senior ao Questionamento do Ciclo 17 > R4")**: o PR #55 ja adiantou parte do mobile. NAO re-auditar do zero.
+
+**Ja concluido no PR #55 (nao refazer)**: alinhamento de inputs (breakpoint 768px), badges ocultos no mobile, sem scroll horizontal em `/grupos`, menu hamburger, forms de criacao de grupo/upload/datetime.
+
+**Fluxos criticos a auditar (foco do C18, 375px/414px)**:
+1. Entrar em grupo via invite code (tela de join + validacao)
+2. Ver eventos/partidas do grupo (cards, badges, acoes)
+3. Confirmar presenca (linha/goleiro) -- toque >=44px
+4. Pagar Pix/BTC (QR, upload comprovante, selecao de metodo)
+5. Ver comprovante/recibo
+6. Empty state de partidas em `/grupo/{id}/partidas` (banner "nenhuma partida -> crie a primeira", analogo ao onboarding de `/grupos`)
+
+**Nota**: breakpoint unico 768px NAO entra aqui -- vai para a fase Design Tokens do C19 (evita retrabalho).
 
 ## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID (inclui fase CSS Web/Mobile)
 
@@ -1485,7 +1549,7 @@ Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quan
 
 **Branch sugerida**: `refactor/css-isolation`
 
-**Metodologias CSS como norte (sugestoes de nivel Pleno -- aguardando revisao do Senior)** (equivalentes a SOLID/TDD para codigo funcional):
+**Metodologias CSS como norte (APROVADAS pelo Senior com priorizacao -- ver "Respostas do Senior ao Questionamento do Ciclo 17 > R3")** (equivalentes a SOLID/TDD para codigo funcional):
 
 1. **ITCSS (Inverted Triangle CSS)** -- hierarquia de especificidade em camadas:
    - **Settings layer**: CSS custom properties (vars do `:root`) -- design tokens
@@ -1532,7 +1596,7 @@ Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quan
    - Rodar antes e apos cada fase para detectar regressoes
    - CI gate: falhar se snapshot diff > threshold
 
-**Fases de Execucao (sugestoes de nivel Pleno -- aguardando revisao do Senior)**:
+**Fases de Execucao (APROVADAS pelo Senior -- priorizar Design Tokens + Mobile-first + Single Responsibility primeiro; `@layer` e TDD visual sao opcionais/experimentais, ver R3)**:
 1. **Auditoria**: Mapear todos os arquivos CSS (globais e scoped), identificar conflitos de especificidade, overrides desnecessarios, regras de layout sem media query, breakpoints inconsistentes (700px vs 768px), CSS duplicado entre arquivos
 2. **Isolamento Web/Mobile**: Aplicar mobile-first em TODO o CSS existente. Toda regra de layout sem media query deve ser analisada: se e desktop-only, envolver em `@media (min-width: 769px)`. Se e mobile-only, envolver em `@media (max-width: 768px)`. Se e neutro, manter como base. Regra 23 aplicada sistematicamente
 3. **Consolidacao ITCSS**: Organizar CSS global em camadas ITCSS. Eliminar duplicacao entre `site.css`, `events.css` e scoped `.razor.css`. Definir fronteira clara: global = objects + base, scoped = components. Resolver fragmentacao historica (ex: `oldsite-top-nav` split entre global/scoped -- causa raiz do bug do Ciclo 16 Fase 15)
