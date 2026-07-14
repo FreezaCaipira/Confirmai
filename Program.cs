@@ -229,6 +229,7 @@ builder.Services.Configure<BtcPayOptions>(builder.Configuration.GetSection("BtcP
 builder.Services.Configure<AbacatePayOptions>(builder.Configuration.GetSection(AbacatePayOptions.Section));
 builder.Services.Configure<EfiBankOptions>(builder.Configuration.GetSection(EfiBankOptions.Section));
 builder.Services.Configure<AppmaxOptions>(builder.Configuration.GetSection(AppmaxOptions.Section));
+builder.Services.Configure<FeeOptions>(builder.Configuration.GetSection(FeeOptions.Section));
 builder.Services.AddHttpClient("AbacatePay", (sp, client) =>
 {
     var opts = sp.GetRequiredService<IOptions<AbacatePayOptions>>().Value;
