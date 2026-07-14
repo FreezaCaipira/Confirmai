@@ -3657,9 +3657,8 @@ body .oldsite-top-nav .oldsite-top-nav-unread {
 
 body .oldsite-top-nav .oldsite-top-nav-mailbox-icon .oldsite-top-nav-unread {
     position: absolute;
-    top: 0;
-    right: 0;
-    transform: translate(40%, -40%);
+    top: -2px;
+    right: -2px;
 }
 
 body .oldsite-top-nav .oldsite-top-nav-user {
@@ -3670,8 +3669,11 @@ body .oldsite-top-nav .oldsite-top-nav-user {
     padding: 0.25rem 0.8rem;
     color: var(--ci-text-blue);
     border-right: none;
+    border-bottom: 1px solid var(--ci-border);
     font-size: 0.8rem;
     text-shadow: none;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 body .oldsite-top-nav .oldsite-top-nav-profile-link {
