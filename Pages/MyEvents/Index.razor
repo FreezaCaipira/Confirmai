@@ -30,12 +30,6 @@
 
             <div class="my-events-title-action-row">
                 <h1 class="page-section-title my-events-title">Minhas Partidas</h1>
-                @if (SelectedSport == Sport.Futsal)
-                {
-                    <a href="/futsal/schedule" class="my-events-create-btn my-events-create-btn--futsal">
-                        <i class="fas fa-sync-alt"></i> Recorrência semanal
-                    </a>
-                }
             </div>
 
             <div class="my-events-filter-row">
@@ -49,6 +43,12 @@
                         Encerradas (@events.Count(e => !e.IsActive || e.StartsAt < DateTime.UtcNow))
                     </button>
                 </div>
+                @if (SelectedSport == Sport.Futsal)
+                {
+                    <a href="/futsal/schedule" class="my-events-create-btn my-events-create-btn--futsal">
+                        <i class="fas fa-sync-alt"></i> Recorrência semanal
+                    </a>
+                }
             </div>
 
             <AdminDataState IsLoading="isLoading"

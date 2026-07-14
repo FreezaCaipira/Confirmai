@@ -28,43 +28,17 @@
     margin-bottom: 0.75rem;
 }
 
-/* ── Title + action row ─────────────────────────────────────── */
+/* ── Title row ─────────────────────────────────────────────── */
 .my-events-title-action-row {
     display: flex;
     align-items: center;
-    position: relative;
-    gap: 0.75rem;
+    justify-content: center;
     margin-bottom: 0.75rem;
-    flex-wrap: wrap;
 }
 
 .my-events-title {
-    flex: 1;
     text-align: center;
     margin: 0;
-}
-
-.my-events-create-btn--futsal {
-    position: absolute;
-    right: 0;
-}
-
-@media (max-width: 768px) {
-    .my-events-title-action-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-    }
-
-    .my-events-title {
-        text-align: center;
-        width: 100%;
-    }
-
-    .my-events-create-btn--futsal {
-        position: static;
-        align-self: center;
-    }
 }
 
 /* ── Action row (right-aligned) ──────────────────────────────── */
@@ -74,11 +48,11 @@
     margin-bottom: 0.75rem;
 }
 
-/* ── Filter row (tabs + create btns, right-aligned) ────────── */
+/* ── Filter row (tabs left, action btn right) ──────────────── */
 .my-events-filter-row {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 0.75rem;
     margin-bottom: 1rem;
     flex-wrap: wrap;
