@@ -10,12 +10,19 @@
 <div class="listing-page">
     <AuthorizeView>
         <Authorized>
-            <div class="create-poker-dropdown @(showTypeMenu ? "is-open" : "")">
-                <button class="btn-create-event btn-create-event--poker"
-                        @onclick="() => showTypeMenu = !showTypeMenu"
-                        @onfocusout="HandleMenuFocusOut">
-                    <i class="fas fa-plus"></i> Criar Evento <i class="fas fa-chevron-down dropdown-arrow"></i>
-                </button>
+            <div class="listing-page-actions">
+                <a href="/" class="listing-back-btn">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+                <a href="/meus-eventos?esporte=poker" class="my-events-link-btn">
+                    <i class="fas fa-calendar-alt"></i> Minhas Partidas
+                </a>
+                <div class="create-poker-dropdown @(showTypeMenu ? "is-open" : "")">
+                    <button class="btn-create-event btn-create-event--poker"
+                            @onclick="() => showTypeMenu = !showTypeMenu"
+                            @onfocusout="HandleMenuFocusOut">
+                        <i class="fas fa-plus"></i> Criar Evento <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </button>
                 @if (showTypeMenu)
                 {
                     <div class="create-poker-menu">
@@ -42,6 +49,7 @@
                         </a>
                     </div>
                 }
+            </div>
             </div>
         </Authorized>
     </AuthorizeView>

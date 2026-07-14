@@ -414,8 +414,11 @@ public partial class Detail
     }
 
     // Callback wrappers for child components
-    private async Task ConfirmAsCallback()
-        => await ConfirmPresence();
+    private async Task ConfirmAsCallback(FutsalPosition pos)
+    {
+        chosenPos = pos;
+        await ConfirmPresence();
+    }
 
     private Task ConfirmPayIdChangedCallback(int? value)
     { confirmPayId = value; return Task.CompletedTask; }

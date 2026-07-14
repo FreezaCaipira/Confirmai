@@ -24,7 +24,7 @@ internal static class CoreTexts
         ["Nav.Integration"] = "Integracao",
         ["Nav.Mailbox"] = "Caixa de Entrada",
         ["Nav.Profile"] = "Perfil",
-        ["Nav.Sports"] = "Eventos",
+        ["Nav.Sports"] = "Partidas",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Moeda ativa para exibicao de cotacao",
@@ -33,7 +33,7 @@ internal static class CoreTexts
         ["Layout.LanguagePtBr"] = "Portugues (Brasil)",
         ["Layout.LanguageEnUs"] = "Ingles (Estados Unidos)",
         ["Layout.LanguageEsEs"] = "Espanhol",
-        ["Layout.Hello"] = "Ola",
+        ["Layout.Hello"] = "Bem-vindo",
         ["Layout.UserFallback"] = "Usuario",
         ["Layout.Logout"] = "Sair",
         ["Layout.WelcomeVisitor"] = "Bem-vindo, visitante!",
@@ -134,7 +134,7 @@ internal static class CoreTexts
         ["Nav.About"] = "About",
         ["Nav.Contact"] = "Contact",
         ["Nav.Payments"] = "Payments",
-        ["Nav.Sports"] = "Events",
+        ["Nav.Sports"] = "Matches",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Active currency for quote display",
@@ -143,7 +143,7 @@ internal static class CoreTexts
         ["Layout.LanguagePtBr"] = "Portuguese (Brazil)",
         ["Layout.LanguageEnUs"] = "English (United States)",
         ["Layout.LanguageEsEs"] = "Spanish",
-        ["Layout.Hello"] = "Hello",
+        ["Layout.Hello"] = "Welcome",
         ["Layout.UserFallback"] = "User",
         ["Layout.Logout"] = "Logout",
         ["Layout.WelcomeVisitor"] = "Welcome, visitor!",
@@ -247,7 +247,7 @@ internal static class CoreTexts
         ["Nav.Integration"] = "Integracion",
         ["Nav.Mailbox"] = "Bandeja de entrada",
         ["Nav.Profile"] = "Perfil",
-        ["Nav.Sports"] = "Eventos",
+        ["Nav.Sports"] = "Partidos",
 
         // Layout
         ["Layout.HeaderQuoteTitle"] = "Moneda activa para mostrar cotizacion",
@@ -256,7 +256,7 @@ internal static class CoreTexts
         ["Layout.LanguagePtBr"] = "Portugues (Brasil)",
         ["Layout.LanguageEnUs"] = "Ingles (Estados Unidos)",
         ["Layout.LanguageEsEs"] = "Espanol",
-        ["Layout.Hello"] = "Hola",
+        ["Layout.Hello"] = "Bienvenido",
         ["Layout.UserFallback"] = "Usuario",
         ["Layout.Logout"] = "Cerrar sesion",
         ["Layout.WelcomeVisitor"] = "Bienvenido, visitante!",

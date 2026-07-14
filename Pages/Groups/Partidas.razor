@@ -100,6 +100,12 @@ else
                     <div class="detail-events-tabs-right">
                         @if (isAdmin)
                         {
+                            @if (group.Sport == Sport.Futsal)
+                            {
+                                <a href="/futsal/schedule?groupId=@group.Id" class="groups-create-btn groups-create-btn--semanais detail-events-create-btn">
+                                    <i class="fas fa-sync-alt"></i> Semanais
+                                </a>
+                            }
                             <a href="@newEventHref" class="groups-create-btn detail-events-create-btn">
                                 <i class="fas fa-plus"></i> Nova partida
                             </a>

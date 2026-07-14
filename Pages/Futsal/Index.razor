@@ -9,8 +9,16 @@
     <AuthorizeView>
         <Authorized>
             <div class="listing-page-actions">
-                <a href="/grupos/criar" class="btn-create-event">
-                    <i class="fas fa-plus"></i> Criar Grupo
+                <div class="listing-nav-group">
+                    <a href="/" class="listing-back-btn">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                    <a href="/grupos" class="btn-view-groups">
+                        <i class="fas fa-users"></i> Ver Grupos
+                    </a>
+                </div>
+                <a href="/meus-eventos?esporte=futsal" class="my-events-link-btn">
+                    <i class="fas fa-calendar-alt"></i> Minhas Partidas
                 </a>
             </div>
         </Authorized>

@@ -1,10 +1,18 @@
 /* -- Page wrapper (global in events.css) ------------------- */
 
+/* -- Listing page actions row ------------------ */
+.listing-page-actions {
+    max-width: 860px;
+    margin: 0 auto 0.25rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 0.6rem;
+}
+
 /* -- Criar Evento dropdown ----------------- */
 .create-poker-dropdown {
     position: relative;
-    max-width: 860px;
-    margin: 0 auto 0.25rem;
     text-align: right;
 }
 
@@ -20,18 +28,21 @@
     cursor: pointer;
     border: none;
     transition: background 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .btn-create-event--poker {
-    background: var(--poker-bg-dark);
-    color: var(--white);
-    border: 1px solid var(--poker-bg-deepest);
+    background: linear-gradient(180deg, var(--poker-accent) 0%, var(--poker-accent-deep) 50%, var(--poker-bg-dark) 100%);
+    color: var(--ci-bg-deepest);
+    border: 1px solid var(--poker-accent);
+    text-shadow: 0 0 10px rgba(167, 139, 250, 0.4);
 }
 
 .btn-create-event--poker:hover,
 .create-poker-dropdown.is-open .btn-create-event--poker {
-    background: var(--poker-bg-deepest);
-    box-shadow: 0 4px 14px rgba(109, 40, 217, 0.3);
+    background: linear-gradient(180deg, var(--poker-text) 0%, var(--poker-accent) 50%, var(--poker-accent-deep) 100%);
+    box-shadow: 0 4px 14px rgba(167, 139, 250, 0.4);
 }
 
 .dropdown-arrow {

@@ -22,6 +22,61 @@
     margin: 0;
 }
 
+/* ── Back row (only back button) ─────────────────────────────── */
+.my-events-back-row {
+    display: flex;
+    margin-bottom: 0.75rem;
+}
+
+/* ── Title row ─────────────────────────────────────────────── */
+.my-events-title-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.my-events-title {
+    text-align: center;
+    margin: 0;
+}
+
+/* ── Action row (right-aligned) ──────────────────────────────── */
+.my-events-action-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.75rem;
+}
+
+/* ── Filter row (tabs left, action btn right) ──────────────── */
+.my-events-filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .my-events-filter-row {
+        gap: 0.35rem;
+    }
+
+    .my-events-view-tabs {
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    .my-events-create-btn--futsal {
+        flex-shrink: 0;
+        font-size: 0.7rem;
+        padding: 0.3rem 0.55rem;
+        white-space: nowrap;
+    }
+}
+
 /* ── Header (updated for view tabs) ─────────────────────────── */
 .my-events-header {
     display: flex;
@@ -110,9 +165,9 @@
 .my-events-tab {
     padding: 0.3rem 0.75rem;
     border-radius: 20px;
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--ci-accent-mid);
     background: transparent;
-    color: var(--ci-text-subtle);
+    color: var(--ci-accent);
     font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
@@ -121,14 +176,15 @@
 }
 
 .my-events-tab:hover {
-    border-color: var(--ci-border-alt);
-    color: var(--ci-text-muted);
+    border-color: var(--ci-accent);
+    color: var(--ci-text-link);
 }
 
 .my-events-tab--active {
-    background: var(--ci-bg-card);
-    color: var(--ci-accent);
-    border-color: var(--ci-accent-mid);
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    color: var(--white);
+    border-color: var(--ci-accent);
+    box-shadow: 0 2px 8px rgba(79, 156, 248, 0.3);
 }
 
 .my-events-tab--futsal.my-events-tab--active {
@@ -141,6 +197,22 @@
     background: var(--poker-bg-deepest);
     border-color: var(--poker-bg-deepest);
     color: var(--poker-accent);
+}
+
+/* ── Event date row (venue + date in highlight) ──────────────── */
+.my-event-date-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.25rem;
+}
+
+.my-event-venue-date {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--ci-text-link-bright);
+    text-shadow: 0 1px 3px var(--shadow-lg);
 }
 
 /* ── Event list ──────────────────────────────────────────────── */
@@ -310,14 +382,14 @@
 
 .my-event-meta {
     margin: 0 0 0.18rem;
-    font-size: 0.8rem;
-    color: var(--ci-surface-light);
+    font-size: 0.78rem;
+    color: var(--ci-surface-muted);
     text-shadow: 0 1px 2px var(--shadow-md);
 }
 
 .my-event-location {
     margin: 0;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: var(--ci-surface-muted);
     text-shadow: 0 1px 2px var(--shadow-md);
     white-space: nowrap;
@@ -333,6 +405,8 @@
     flex-direction: column;
     gap: 0.35rem;
     flex-shrink: 0;
+    justify-content: center;
+    align-self: center;
 }
 
 .my-event-action-btn {
@@ -361,14 +435,15 @@
 }
 
 .my-event-action-btn--view {
-    background: var(--ci-bg-card);
+    background: transparent;
     color: var(--ci-accent);
-    border-color: var(--ci-border);
+    border-color: var(--ci-accent);
 }
 
 .my-event-action-btn--view:hover {
+    background: var(--ci-accent-mid);
+    color: var(--white);
     border-color: var(--ci-accent);
-    color: var(--link-info);
 }
 
 .my-event-action-btn--cancel {

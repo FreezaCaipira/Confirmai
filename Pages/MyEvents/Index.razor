@@ -16,160 +16,41 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject EventNotificationService NotificationService
 
-<PageTitle>Meus Eventos — Confirmai</PageTitle>
+<PageTitle>Minhas Partidas — Confirmai</PageTitle>
 
 <div class="events-page">
 
-    <section class="events-block" aria-label="Meus eventos criados">
+    <section class="events-block" aria-label="Minhas partidas">
 
-            <div class="my-events-header">
-                <h1 class="page-section-title">Meus Eventos</h1>
-                <div class="my-events-header-right">
-                    <div class="my-events-view-tabs">
-                        <button class="my-events-tab @(view == "events" ? "my-events-tab--active" : "")"
-                                @onclick='() => view = "events"'>
-                            Partidas (@events.Count)
-                        </button>
-                        <button class="my-events-tab @(view == "schedules" ? "my-events-tab--active" : "")"
-                                @onclick='() => view = "schedules"'>
-                            🔁 Recorrências (@schedules.Count)
-                        </button>
-                    </div>
-                    <div class="my-events-create-btns">
-                        <a href="/grupos" class="my-events-create-btn my-events-create-btn--groups">
-                            <i class="fas fa-users"></i> Ver Grupos
-                        </a>
-                        <a href="/futsal/create" class="my-events-create-btn my-events-create-btn--futsal">
-                            <i class="fas fa-futbol"></i> Nova Partida
-                        </a>
-                        <a href="/poker/create?tipo=torneio" class="my-events-create-btn my-events-create-btn--poker">
-                            <i class="fas fa-trophy"></i> Novo Torneio
-                        </a>
-                    </div>
+            <div class="my-events-back-row">
+                <a href="@(SelectedSport == Sport.Futsal ? "/futsal" : "/poker")" class="listing-back-btn">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+            </div>
+
+            <div class="my-events-title-action-row">
+                <h1 class="page-section-title my-events-title">Minhas Partidas</h1>
+            </div>
+
+            <div class="my-events-filter-row">
+                <div class="my-events-view-tabs">
+                    <button class="my-events-tab @(eventFilter == "upcoming" ? "my-events-tab--active" : "")"
+                            @onclick='() => eventFilter = "upcoming"'>
+                        Próximas (@events.Count(e => e.IsActive && e.StartsAt >= DateTime.UtcNow))
+                    </button>
+                    <button class="my-events-tab @(eventFilter == "finished" ? "my-events-tab--active" : "")"
+                            @onclick='() => eventFilter = "finished"'>
+                        Encerradas (@events.Count(e => !e.IsActive || e.StartsAt < DateTime.UtcNow))
+                    </button>
                 </div>
             </div>
 
-            @if (isLoading)
-            {
-                <p class="listing-state">Carregando seus eventos…</p>
-            }
-            else if (view == "schedules")
-            {
-                @* ── Recorrências ────────────────────────────────────────── *@
-                @if (!schedules.Any())
-                {
-                    <div class="listing-state listing-empty">
-                        <p>Nenhum agendamento recorrente.</p>
-                        <p class="listing-empty-hint">Crie uma partida recorrente em <a href="/futsal/create">Nova Partida</a>.</p>
-                    </div>
-                }
-                else
-                {
-                    @* Filtro por cidade (Gap A) *@
-                    @if (ScheduleCities.Count > 1)
-                    {
-                        <div class="my-events-sport-tabs my-events-sport-tabs--margin-bottom">
-                            <button class="my-events-tab @(scheduleCityFilter is null ? "my-events-tab--active" : "")"
-                                    @onclick="() => scheduleCityFilter = null">
-                                Todas
-                            </button>
-                            @foreach (var city in ScheduleCities)
-                            {
-                                <button class="my-events-tab @(scheduleCityFilter == city ? "my-events-tab--active" : "")"
-                                        @onclick="@(() => scheduleCityFilter = city)">
-                                    @city
-                                </button>
-                            }
-                        </div>
-                    }
-
-                    <div class="my-schedules-list">
-                        @foreach (var s in FilteredSchedules)
-                        {
-                            var futureCount = scheduleFutureCounts.GetValueOrDefault(s.Id, 0);
-                            <div class="my-schedule-card my-event-card--futsal @(!s.IsActive ? "my-schedule-card--inactive" : "")">
-                                <div class="my-event-card-overlay"></div>
-                                <div class="my-event-card-bg-icon">
-                                    <i class="fas fa-futbol"></i>
-                                </div>
-                                <div class="my-event-sport-badge my-event-sport-badge--futsal">⚽</div>
-
-                                <div class="my-event-body">
-                                    <div class="my-event-name-row">
-                                        <strong class="my-event-name">@s.Group.Name</strong>
-                                        <span class="my-event-status @(s.IsActive ? "my-event-status--active" : "my-event-status--cancelled")">
-                                            @(s.IsActive ? "Ativo" : "Pausado")
-                                        </span>
-                                    </div>
-                                    <p class="my-event-meta">
-                                        📅 @DayName(s.DayOfWeek) às @s.TimeOfDay.ToString("HH:mm")
-                                        &nbsp;·&nbsp;
-                                        👥 @s.MaxPlayers vagas@(s.MaxGoalkeepers.HasValue ? $" ({s.MaxGoalkeepers} GK)" : "")
-                                        &nbsp;·&nbsp;
-                                        R$ @s.Price.ToString("N2", PtBr)
-                                    </p>
-                                    @if (s.Venue is not null)
-                                    {
-                                        <p class="my-event-location">📍 @s.Venue.Name — @s.Venue.City</p>
-                                    }
-                                    @if (futureCount > 0)
-                                    {
-                                        <p class="my-schedule-future-count">🗓 @futureCount partida@(futureCount == 1 ? "" : "s") futuras geradas</p>
-                                    }
-                                    @if (scheduleNextEvents.TryGetValue(s.Id, out var nextEv))
-                                    {
-                                        <p class="my-schedule-next-event">
-                                            🔔 Próxima: @nextEv.StartsAt.ToLocalTime().ToString("ddd dd/MM HH:mm", PtBr)
-                                            &nbsp;·&nbsp; @nextEv.Confirmed/@s.MaxPlayers confirmados
-                                            &nbsp;<a href="/futsal/@nextEv.EventId">ver</a>
-                                        </p>
-                                    }
-                                </div>
-
-                                <div class="my-event-actions">
-                                    <a href="/futsal/schedule/@s.Id/edit" class="my-event-action-btn my-event-action-btn--view">Editar</a>
-                                    <button class="my-event-action-btn @(s.IsActive ? "my-event-action-btn--cancel" : "my-event-action-btn--view")"
-                                            disabled="@(togglingScheduleId == s.Id)"
-                                            @onclick="() => ToggleSchedule(s)">
-                                        @(togglingScheduleId == s.Id ? "…" : s.IsActive ? "Pausar" : "Retomar")
-                                    </button>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-            }
-            else if (!events.Any())
-            {
-                <div class="listing-state listing-empty">
-                    <p>Você ainda não criou nenhum evento.</p>
-                    <p class="listing-empty-hint">Use os botões acima para criar sua primeira partida ou torneio.</p>
-                </div>
-            }
-            else
-            {
-                <!-- Filtro de esporte -->
-                <div class="my-events-sport-tabs">
-                    <button class="my-events-tab @(sportFilter == null ? "my-events-tab--active" : "")"
-                            @onclick='() => sportFilter = null'>
-                        Todos (@events.Count)
-                    </button>
-                    @if (events.Any(e => e.Sport == Sport.Futsal))
-                    {
-                        <button class="my-events-tab my-events-tab--futsal @(sportFilter == Sport.Futsal ? "my-events-tab--active" : "")"
-                                @onclick='() => sportFilter = Sport.Futsal'>
-                            ⚽ Futsal (@events.Count(e => e.Sport == Sport.Futsal))
-                        </button>
-                    }
-                    @if (events.Any(e => e.Sport == Sport.Poker))
-                    {
-                        <button class="my-events-tab my-events-tab--poker @(sportFilter == Sport.Poker ? "my-events-tab--active" : "")"
-                                @onclick='() => sportFilter = Sport.Poker'>
-                            🃏 Poker (@events.Count(e => e.Sport == Sport.Poker))
-                        </button>
-                    }
-                </div>
-
+            <AdminDataState IsLoading="isLoading"
+                            IsEmpty="@(!isLoading && !FilteredEvents.Any())"
+                            LoadingText="Carregando seus eventos…"
+                            EmptyText="@($"Nenhuma partida {(eventFilter == "finished" ? "encerrada" : "próxima")}.")"
+                            EmptyIcon="fas fa-calendar-times"
+                            EmptyHint="@($"Use o botão acima para criar sua primeira partida{(SelectedSport == Sport.Poker ? " ou torneio" : "")}.")">
                 <div class="my-events-list">
                     @foreach (var ev in FilteredEvents)
                     {
@@ -187,8 +68,13 @@
                             </div>
 
                             <div class="my-event-body">
-                                <div class="my-event-name-row">
-                                    <strong class="my-event-name">@ev.Group.Name</strong>
+                                <div class="my-event-date-row">
+                                    <span class="my-event-venue-date">
+                                        @{
+                                            var venueName = ev.Venue?.Name ?? ev.LocalName ?? ev.Group.Name;
+                                        }
+                                        @venueName — @ev.StartsAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm", PtBr)
+                                    </span>
                                     @if (!ev.IsActive)
                                     {
                                         <span class="my-event-status my-event-status--cancelled">Cancelado</span>
@@ -196,10 +82,6 @@
                                     else if (isPast)
                                     {
                                         <span class="my-event-status my-event-status--past">Encerrado</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="my-event-status my-event-status--active">Ativo</span>
                                     }
                                     @if (!isFutsal && ev.PokerEventType.HasValue)
                                     {
@@ -209,8 +91,6 @@
                                     }
                                 </div>
                                 <p class="my-event-meta">
-                                    📅 @ev.StartsAt.ToLocalTime().ToString("ddd, dd/MM/yyyy 'às' HH:mm", PtBr)
-                                    &nbsp;·&nbsp;
                                     👥 @ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $"/{ev.MaxPlayers}" : "") confirmados
                                 </p>
                                 @if (!string.IsNullOrWhiteSpace(ev.Location))
@@ -221,21 +101,13 @@
 
                             <div class="my-event-actions">
                                 <a href="@detailUrl" class="my-event-action-btn my-event-action-btn--view">
-                                    Ver detalhes
+                                    Ver partida
                                 </a>
-                                @if (ev.IsActive && !isPast)
-                                {
-                                    <button class="my-event-action-btn my-event-action-btn--cancel"
-                                            disabled="@(cancellingId == ev.Id)"
-                                            @onclick="() => CancelEvent(ev)">
-                                        @(cancellingId == ev.Id ? "…" : "Cancelar")
-                                    </button>
-                                }
                             </div>
                         </div>
                     }
                 </div>
-            }
+            </AdminDataState>
 
     </section>
 

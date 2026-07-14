@@ -4,7 +4,7 @@
 > 1.694/1.694 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste
 > Ciclo 15 (testes + UX grupos + !important) e Ciclo 16 (mobile UX) -- CONCLUIDOS e revisados
 > Proximo: Ciclo 17 -- Login Google (OAuth, criar-ou-vincular) + email real/confirmacao + fix caracteres especiais + consolidar CSS do menu mobile
-> Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID | C20 WhatsApp+baseline (POSTERGADO)
+> Futuros: C18 mobile UX critico | C19 refatoracao TDD+SOLID (inclui fase CSS Web/Mobile) | C20 WhatsApp+baseline (POSTERGADO)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
@@ -559,6 +559,8 @@ Todas as paginas agora usam `IDbContextFactory<AppDbContext>`. 0 paginas com `@i
 20. **NUNCA criar arquivos de docs separados** -- consolidar TUDO no WORK_PLAN.md. Nao criar arquivos em `docs/`, `.md` avulsos, etc.
 21. **Rebuild limpo antes de testar mudancas visuais** -- ao alterar CSS (especialmente scoped CSS), sempre fazer `dotnet clean && dotnet build` e testar com Ctrl+F5 (hard refresh). Hot-reload pode nao aplicar scoped CSS corretamente
 22. **Requisitos vindos dos testes do Robson sao legitimos** -- bugs/melhorias/requisitos que o Robson levanta testando o app NAO sao "scope creep" e devem entrar na "Fase padrao de melhorias UX" do ciclo. A regra 16 (separar features) so se aplica a adicoes que o proprio Pleno inventa sem pedido (ex: novos esportes). Documentar cada item vindo do Robson na fase de melhorias antes de implementar
+23. **ISOLAMENTO WEB/MOBILE EM CSS** -- NUNCA aplicar estilos de layout (width, max-width, padding, gap, font-size) sem media query de isolamento. Estilos desktop devem usar `@media (min-width: 769px)`. Estilos mobile devem usar `@media (max-width: 768px)`. O base (sem media query) deve ser mobile-first ou neutro. SEMPRE testar em ambas as viewports apos mudancas de layout. Bug recorrente: afinamento de width 57% aplicado sem media query quebrou o mobile (campos esmagados) -- corrigido envolvendo em `@media (min-width: 769px)`
+24. **Pasta default para prints**: `C:\Users\FreezaPC\Desktop\devin-prints` -- sempre procurar nesta pasta quando o usuario mencionar "ver print na pasta"
 
 ---
 
@@ -1383,10 +1385,81 @@ entrar em grupo (invite code) → ver eventos → confirmar presenca → pagar (
 Foco: alvos de toque >=44px, sem scroll horizontal, formularios/modais utilizaveis em 375px/414px, header consistente.
 Detalhar em fases proprias quando iniciarmos o ciclo.
 
-## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID
+## Ciclo 19 (FUTURO) -- Refatoracao Completa: TDD + SOLID (inclui fase CSS Web/Mobile)
 
 Refatoracao ampla aplicando TDD e SOLID (+ padroes pertinentes de Blazor Server: separacao de logica em services testaveis, `IDbContextFactory`, componentizacao, evitar logica no markup, gestao de circuito/estado).
 Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quando priorizado.
+
+### Fase CSS: Refatoracao de Boas Praticas e Isolamento Web/Mobile
+
+**Motivacao**: Bug recorrente onde afinamento de layout (width 57%) aplicado sem media query quebrou o mobile (campos esmagados). Necessario repassar TODO o CSS do projeto garantindo isolamento Web/Mobile e boas praticas.
+
+**Branch sugerida**: `refactor/css-isolation`
+
+**Metodologias CSS como norte (sugestoes de nivel Pleno -- aguardando revisao do Senior)** (equivalentes a SOLID/TDD para codigo funcional):
+
+1. **ITCSS (Inverted Triangle CSS)** -- hierarquia de especificidade em camadas:
+   - **Settings layer**: CSS custom properties (vars do `:root`) -- design tokens
+   - **Tools layer**: mixins/functions (nao aplicavel em CSS puro, mas conceitual)
+   - **Generic layer**: reset/normalize (ja em site.css)
+   - **Elements layer**: estilos de elementos base (body, a, input)
+   - **Objects layer**: classes utilitarias (.btn, .input, .form-group)
+   - **Components layer**: scoped .razor.css (estilos especificos de cada pagina)
+   - **Utilities layer**: overrides pontuais (.text-center, .mt-1)
+   - Regra: camada superior NUNCA pode depender de camada inferior
+
+2. **BEM (Block Element Modifier)** -- convencao de nomenclatura para scoped CSS:
+   - `.block` -- componente independente (ex: `.upload-section`)
+   - `.block__element` -- parte do bloco (ex: `.upload-section__preview`)
+   - `.block--modifier` -- variacao (ex: `.upload-section--compact`)
+   - Elimina ambiguidade de seletor e reduz conflitos de especificidade
+
+3. **Mobile-First obrigatorio** -- toda regra base serve mobile, desktop e enhancement:
+   - Base (sem media query) = mobile
+   - `@media (min-width: 769px)` = desktop enhancements
+   - `@media (max-width: 768px)` = apenas para overrides que diferem do base mobile
+   - NUNCA aplicar regra desktop no base (causa do bug recorrente)
+
+4. **CSS Layers (`@layer`)** -- isolamento explicito de cascade:
+   - `@layer reset, tokens, base, objects, components, utilities;`
+   - Garante que scoped CSS nao override global indevidamente
+   - Reduz necessidade de `!important` e especificidade alta
+
+5. **Design Tokens como single source of truth**:
+   - Toda cor, espacamento, border-radius, shadow, transition = var do `:root`
+   - NUNCA hardcodar valores em scoped CSS
+   - Vars semanticas > vars literais (ex: `--ci-accent` > `#4f9cf8`)
+   - Breakpoints como vars: `--bp-mobile: 768px` (quando CSS.supports)
+
+6. **Single Responsibility por arquivo scoped**:
+   - Cada `.razor.css` estiliza APENAS o componente da pagina
+   - NUNCA estilizar elementos de outras paginas via scoped
+   - `::deep` apenas para componentes filhos renderizados pelo Blazor
+   - Estilos compartilhados entre paginas = global (events.css/site.css)
+
+7. **Testes Visuais (TDD para CSS)**:
+   - Playwright: snapshot por pagina em 2 viewports (375px e 1280px)
+   - Testar: overflow horizontal, alinhamento, contraste, alvos de toque >=44px
+   - Rodar antes e apos cada fase para detectar regressoes
+   - CI gate: falhar se snapshot diff > threshold
+
+**Fases de Execucao (sugestoes de nivel Pleno -- aguardando revisao do Senior)**:
+1. **Auditoria**: Mapear todos os arquivos CSS (globais e scoped), identificar conflitos de especificidade, overrides desnecessarios, regras de layout sem media query, breakpoints inconsistentes (700px vs 768px), CSS duplicado entre arquivos
+2. **Isolamento Web/Mobile**: Aplicar mobile-first em TODO o CSS existente. Toda regra de layout sem media query deve ser analisada: se e desktop-only, envolver em `@media (min-width: 769px)`. Se e mobile-only, envolver em `@media (max-width: 768px)`. Se e neutro, manter como base. Regra 23 aplicada sistematicamente
+3. **Consolidacao ITCSS**: Organizar CSS global em camadas ITCSS. Eliminar duplicacao entre `site.css`, `events.css` e scoped `.razor.css`. Definir fronteira clara: global = objects + base, scoped = components. Resolver fragmentacao historica (ex: `oldsite-top-nav` split entre global/scoped -- causa raiz do bug do Ciclo 16 Fase 15)
+4. **BEM em scoped CSS**: Renomear classes scoped para convencao BEM onde fizer sentido. Eliminar seletores fragoris (`body .oldsite-top-nav > a` em scoped). Padronizar `::deep` apenas para filhos Blazor
+5. **Design Tokens**: Auditar todas as vars do `:root`, eliminar vars mortas, consolidar vars semanticas. Garantir 0 hardcoded hex/rgba em scoped. Padronizar breakpoints (768px unico)
+6. **TDD Visual**: Criar testes Playwright para desktop (1280px) e mobile (375px) de cada pagina. Snapshot testing para detectar regressoes de layout. Validar: sem overflow horizontal, alvos >=44px, contraste AA
+7. **CSS Layers (opcional)**: Se Suporte Blazor permitir, adicionar `@layer` para isolamento explicito de cascade. Reduzir `!important` restantes
+
+**Premissas**:
+- Nunca modificar testes existentes
+- Commits pequenos e frequentes (1 por fase)
+- Branch separada: `refactor/css-isolation`
+- Testar em ambas viewports (desktop 1280px e mobile 375px) apos cada mudanca
+- `dotnet clean && dotnet build` + Ctrl+F5 apos mudancas CSS (regra 21)
+- 0 hardcoded hex/rgba em scoped CSS (regra 2)
+- 0 `!important` desnecessario (regra 1)
 
 ---
 

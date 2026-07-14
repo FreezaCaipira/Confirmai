@@ -5,30 +5,17 @@
     margin: 0 auto 1.5rem;
     display: flex;
     justify-content: flex-end;
+    gap: 0.6rem;
 }
 
-/* -- Criar Partida button ------------------ */
-.btn-create-event {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.38rem 0.95rem;
-    border-radius: 8px;
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
-    color: var(--ci-surface-light);
-    font-weight: 800;
-    font-size: 0.82rem;
-    text-decoration: none;
-    border: 1px solid var(--ci-accent-light);
-    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-    box-shadow: 0 2px 4px var(--accent-opacity-md);
-    text-shadow: 0 0 10px var(--accent-opacity-xl);
+.listing-nav-group {
+    display: flex;
+    gap: 0.6rem;
+    margin-right: auto;
 }
 
-.btn-create-event:hover {
-    background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
-    border-color: var(--link-info);
-    box-shadow: 0 4px 8px var(--accent-opacity-xl);
+.listing-nav-group .listing-back-btn {
+    margin-right: 0;
 }
 
 /* -- Event card base ----------------------- */
@@ -250,6 +237,7 @@
 
     .listing-page-actions {
         justify-content: center;
+        gap: 0.6rem;
     }
 }
 

@@ -10,6 +10,8 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
+@using System.IO
+@using System.Text.Json
 @using Microsoft.EntityFrameworkCore
 
 @inject IDbContextFactory<AppDbContext> DbFactory
@@ -23,6 +25,11 @@
 
 <div class="create-event-page">
     <div class="create-event-card">
+        <div class="create-back-row">
+            <a href="/grupos" class="listing-back-btn">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
         <h1 class="create-event-title">
             <i class="fas fa-users"></i> Novo Grupo
         </h1>
@@ -36,7 +43,7 @@
                 <span>Crie um grupo e convide jogadores para participarem das partidas!</span>
             </div>
 
-            <fieldset class="form-section">
+            <fieldset class="form-section form-section--narrow">
                 <legend>Identidade do Grupo</legend>
 
                 <div class="form-group">
@@ -72,10 +79,10 @@
                             }
                         </div>
                         <div class="upload-controls">
-                            <button class="upload-btn" type="button" @onclick="TriggerFileInput">
+                            <label class="upload-btn" for="logo-input">
                                 <i class="fas fa-upload"></i> Selecionar imagem
-                            </button>
-                            <InputFile id="logo-input" OnChange="OnLogoSelected" accept=".jpg,.jpeg,.png,.webp" class="input-file--hidden" />
+                            </label>
+                            <InputFile id="logo-input" OnChange="OnLogoSelected" accept=".jpg,.jpeg,.png,.webp" class="input-file--hidden" style="display:none;" />
                             @if (!string.IsNullOrWhiteSpace(logoFeedback))
                             {
                                 <p class="@(logoError ? "validation-message" : "upload-success")">@logoFeedback</p>
@@ -86,18 +93,13 @@
                 </div>
             </fieldset>
 
-            <fieldset class="form-section">
+            <fieldset class="form-section form-section--narrow">
                 <legend>Localização</legend>
 
                 <div class="form-row-2">
                     <div class="form-group">
-                        <label>Cidade <span class="required">*</span></label>
-                        <InputText class="input" @bind-Value="form.City" placeholder="São Paulo" />
-                        <ValidationMessage For="@(() => form.City)" class="validation-message" />
-                    </div>
-                    <div class="form-group">
                         <label>UF <span class="required">*</span></label>
-                        <InputSelect class="input" @bind-Value="form.StateCode">
+                        <InputSelect class="input" @bind-Value="form.StateCode" @bind-Value:after="OnStateChanged">
                             <option value="">— Selecione —</option>
                             <option value="EX">EX — Estrangeiro</option>
                             <option disabled>──────────────────</option>
@@ -107,6 +109,24 @@
                             }
                         </InputSelect>
                         <ValidationMessage For="@(() => form.StateCode)" class="validation-message" />
+                    </div>
+                    <div class="form-group">
+                        <label>Cidade <span class="required">*</span></label>
+                        @if (form.StateCode == "EX" || string.IsNullOrEmpty(form.StateCode) || !citiesByState.ContainsKey(form.StateCode))
+                        {
+                            <InputText class="input" @bind-Value="form.City" placeholder="Selecione a UF" disabled="@(string.IsNullOrEmpty(form.StateCode))" />
+                        }
+                        else
+                        {
+                            <InputSelect class="input" @bind-Value="form.City">
+                                <option value="">— Selecione —</option>
+                                @foreach (var city in citiesByState[form.StateCode])
+                                {
+                                    <option value="@city">@city</option>
+                                }
+                            </InputSelect>
+                        }
+                        <ValidationMessage For="@(() => form.City)" class="validation-message" />
                     </div>
                 </div>
             </fieldset>
@@ -152,6 +172,8 @@
     private bool            isSaving  = false;
     private string          saveError = string.Empty;
 
+    private Dictionary<string, string[]> citiesByState = new();
+
     private IBrowserFile?   logoFile = null;
     private string?         logoPreview = null;
     private string          logoFeedback = string.Empty;
@@ -160,6 +182,28 @@
     private static readonly string[] BrazilianStates =
         ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
          "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var path = Path.Combine(Env.WebRootPath, "data", "cities.json");
+            Console.WriteLine($"[CreateGroup] Loading cities from: {path}");
+            var json = await File.ReadAllTextAsync(path);
+            citiesByState = JsonSerializer.Deserialize<Dictionary<string, string[]>>(json) ?? new();
+            Console.WriteLine($"[CreateGroup] Loaded {citiesByState.Count} states, SP has {citiesByState.GetValueOrDefault("SP")?.Length ?? 0} cities");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[CreateGroup] Failed to load cities.json: {ex.Message}");
+            citiesByState = new();
+        }
+    }
+
+    private void OnStateChanged()
+    {
+        form.City = string.Empty;
+    }
 
     private async Task Save()
     {
@@ -243,11 +287,6 @@
             saveError = $"Erro ao criar grupo: {ex.Message}";
             isSaving  = false;
         }
-    }
-
-    private async Task TriggerFileInput()
-    {
-        await JS.InvokeVoidAsync("eval", "document.getElementById('logo-input').click()");
     }
 
     private async Task OnLogoSelected(InputFileChangeEventArgs e)

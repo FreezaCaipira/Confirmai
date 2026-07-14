@@ -40,7 +40,7 @@ public class UiTextServiceRefactoringTests : IDisposable
         Assert.Equal("Marketplace", ui.Get("Nav.Marketplace"));
 
         // Layout strings
-        Assert.Equal("Ola", ui.Get("Layout.Hello"));
+        Assert.Equal("Bem-vindo", ui.Get("Layout.Hello"));
         Assert.Equal("Sair", ui.Get("Layout.Logout"));
 
         // Common strings

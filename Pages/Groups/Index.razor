@@ -46,6 +46,31 @@
     else if (groups.Count == 0)
     {
         <section class="groups-block">
+            <div class="onboarding-hint">
+                <div class="onboarding-hint-header">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Como funciona</span>
+                </div>
+                <p class="onboarding-hint-intro">
+                    Cada grupo representa uma turma — o seu racha, pelada ou baba.
+                    Você pode ter vários grupos: um para o futebol de segunda, outro para o futebol de sábado, e por aí vai.
+                </p>
+                <div class="onboarding-steps">
+                    <div class="onboarding-step">
+                        <span class="onboarding-step-num">1</span>
+                        <span class="onboarding-step-text">Crie um grupo para cada racha e convide a turma</span>
+                    </div>
+                    <div class="onboarding-step">
+                        <span class="onboarding-step-num">2</span>
+                        <span class="onboarding-step-text">Crie partidas semanais ou avulsas para o grupo</span>
+                    </div>
+                    <div class="onboarding-step">
+                        <span class="onboarding-step-num">3</span>
+                        <span class="onboarding-step-text">Os membros efetuam pagamento e confirmam presença na partida</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="groups-block-header">
                 <h2 class="groups-title"><i class="fas fa-sign-in-alt"></i> Entrar em um grupo</h2>
                 <p class="groups-block-sub">Use um código de convite ou crie um novo grupo para começar.</p>
@@ -71,9 +96,14 @@
 
                 <div class="groups-entry-divider"><span>ou</span></div>
 
-                <a href="/grupos/criar" class="groups-create-btn">
-                    <i class="fas fa-plus"></i> Criar novo grupo
-                </a>
+                <div class="groups-action-row">
+                    <a href="/grupos/criar" class="groups-create-btn">
+                        <i class="fas fa-plus"></i> Criar novo grupo
+                    </a>
+                    <a href="/eventos" class="groups-view-events-btn">
+                        <i class="fas fa-calendar-alt"></i> Ver Partidas
+                    </a>
+                </div>
             </div>
         </section>
     }
@@ -211,9 +241,14 @@
 
                 <div class="groups-entry-divider"><span>ou</span></div>
 
-                <a href="/grupos/criar" class="groups-create-btn">
-                    <i class="fas fa-plus"></i> Criar novo grupo
-                </a>
+                <div class="groups-action-row">
+                    <a href="/grupos/criar" class="groups-create-btn">
+                        <i class="fas fa-plus"></i> Criar novo grupo
+                    </a>
+                    <a href="/eventos" class="groups-view-events-btn">
+                        <i class="fas fa-calendar-alt"></i> Ver Partidas
+                    </a>
+                </div>
             </div>
         </section>
     }
