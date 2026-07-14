@@ -1,6 +1,8 @@
-/* Layout overrides — afinar secoes em 25% (desktop only) */
+/* Layout overrides — afinar secoes (desktop only, mobile full width) */
 ::deep .form-section--narrow {
     width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 @media (min-width: 769px) {
@@ -8,6 +10,18 @@
         width: 57%;
         margin-left: auto;
         margin-right: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    ::deep .form-section--narrow {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    ::deep .form-row-2 {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
     }
 }
 
