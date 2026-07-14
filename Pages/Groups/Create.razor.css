@@ -1,8 +1,14 @@
-/* Layout overrides — afinar secoes em 25% */
+/* Layout overrides — afinar secoes em 25% (desktop only) */
 ::deep .form-section--narrow {
-    width: 57%;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+}
+
+@media (min-width: 769px) {
+    ::deep .form-section--narrow {
+        width: 57%;
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
 
 ::deep .create-back-row {
