@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Confirmai.Enums;
 
 namespace Confirmai.Models
 {
@@ -28,6 +29,38 @@ namespace Confirmai.Models
 
         /// <summary>Currency of the offer: BRL, USD or BTC</summary>
         public string? Currency { get; set; }
+
+        // ── Taxa de Serviço / Repasse ──────────────────────────────────────
+
+        /// <summary>Valor base sem taxa (para repasse ao organizador).</summary>
+        public decimal? BaseAmount { get; set; }
+
+        /// <summary>Taxa de serviço retida pela plataforma.</summary>
+        public decimal? FeeAmount { get; set; }
+
+        /// <summary>Estado do repasse ao organizador.</summary>
+        public PayoutStatus? PayoutStatus { get; set; }
+
+        /// <summary>EndToEndId do Pix de repasse (identificador único do banco).</summary>
+        [StringLength(140)]
+        public string? PayoutEndToEndId { get; set; }
+
+        /// <summary>Chave PIX do beneficiário (organizador).</summary>
+        [StringLength(140)]
+        public string? PayoutPixKey { get; set; }
+
+        /// <summary>Quando o repasse foi enviado.</summary>
+        public DateTime? PayoutSentAt { get; set; }
+
+        /// <summary>Quando o repasse foi confirmado pelo banco.</summary>
+        public DateTime? PayoutConfirmedAt { get; set; }
+
+        /// <summary>Mensagem de erro se o repasse falhou.</summary>
+        [StringLength(500)]
+        public string? PayoutErrorMessage { get; set; }
+
+        /// <summary>Número de tentativas de repasse (para retry).</summary>
+        public int PayoutRetryCount { get; set; } = 0;
     }
 }
 
