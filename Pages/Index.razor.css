@@ -1,6 +1,7 @@
 /* ── Back row ───────────────────── */
 .sports-back-row {
     display: flex;
+    justify-content: flex-start;
     margin-bottom: 0.75rem;
 }
 
