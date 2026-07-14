@@ -116,29 +116,25 @@
 }
 
 .payments-refresh-btn {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-accent-light);
-    color: var(--ci-surface-light);
-    font-size: 0.95rem;
-    font-weight: 800;
-    padding: 0.6rem 1.2rem;
+    background: transparent;
+    border: 1px solid var(--ci-border);
+    color: var(--ci-surface-muted);
+    font-size: 0.85rem;
+    padding: 0.4rem 0.55rem;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
     margin-left: auto;
     white-space: nowrap;
-    box-shadow: 0 2px 4px var(--shadow-accent-sm);
-    text-shadow: 0 0 10px var(--shadow-accent-lg);
 }
 
 .payments-refresh-btn:hover {
-    background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
-    border-color: var(--link-info);
-    color: var(--white);
-    box-shadow: 0 4px 8px var(--shadow-accent-lg);
+    border-color: var(--ci-accent);
+    color: var(--ci-accent);
+    background: var(--accent-opacity-xs);
 }
 
 .payments-refresh-btn:disabled {
@@ -238,7 +234,7 @@
     border: 2px solid var(--red-strong);
     border-radius: 8px;
     padding: 1rem 1.25rem;
-    padding-right: 3.5rem;
+    padding-right: 1.5rem;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -437,8 +433,9 @@
 
 .payments-notify-actions {
     display: flex;
-    gap: 0.5rem;
-    align-items: center;
+    flex-direction: column;
+    gap: 0.35rem;
+    align-items: stretch;
     margin-top: 0;
 }
 
@@ -651,11 +648,9 @@
     }
 
     .payments-refresh-btn {
-        width: 100%;
-        justify-content: center;
         margin-left: 0;
         font-size: 0.85rem;
-        padding: 0.5rem 0.3rem;
+        padding: 0.4rem 0.55rem;
     }
 
     .payments-user-list {
@@ -688,7 +683,8 @@
 
     .payments-notify-actions {
         width: 100%;
-        justify-content: flex-start;
+        flex-direction: column;
+        align-items: stretch;
         margin-top: 0.25rem;
     }
 
