@@ -51,19 +51,12 @@
                 </div>
             </div>
 
-            @if (isLoading)
-            {
-                <p class="listing-state">Carregando seus eventos…</p>
-            }
-            else if (!FilteredEvents.Any())
-            {
-                <div class="listing-state listing-empty">
-                    <p>Nenhuma partida @(eventFilter == "finished" ? "encerrada" : "próxima").</p>
-                    <p class="listing-empty-hint">Use o botão acima para criar sua primeira partida@(SelectedSport == Sport.Poker ? " ou torneio" : "").</p>
-                </div>
-            }
-            else
-            {
+            <AdminDataState IsLoading="isLoading"
+                            IsEmpty="@(!isLoading && !FilteredEvents.Any())"
+                            LoadingText="Carregando seus eventos…"
+                            EmptyText="@($"Nenhuma partida {(eventFilter == "finished" ? "encerrada" : "próxima")}.")"
+                            EmptyIcon="fas fa-calendar-times"
+                            EmptyHint="@($"Use o botão acima para criar sua primeira partida{(SelectedSport == Sport.Poker ? " ou torneio" : "")}.")">
                 <div class="my-events-list">
                     @foreach (var ev in FilteredEvents)
                     {
@@ -120,7 +113,7 @@
                         </div>
                     }
                 </div>
-            }
+            </AdminDataState>
 
     </section>
 
