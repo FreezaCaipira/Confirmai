@@ -1396,7 +1396,7 @@ Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quan
 
 **Branch sugerida**: `refactor/css-isolation`
 
-**Metodologias CSS como norte** (equivalentes a SOLID/TDD para codigo funcional):
+**Metodologias CSS como norte (sugestoes de nivel Pleno -- aguardando revisao do Senior)** (equivalentes a SOLID/TDD para codigo funcional):
 
 1. **ITCSS (Inverted Triangle CSS)** -- hierarquia de especificidade em camadas:
    - **Settings layer**: CSS custom properties (vars do `:root`) -- design tokens
@@ -1443,7 +1443,7 @@ Sera um ciclo grande — provavelmente subdividido. Detalhar escopo e ordem quan
    - Rodar antes e apos cada fase para detectar regressoes
    - CI gate: falhar se snapshot diff > threshold
 
-**Fases de Execucao**:
+**Fases de Execucao (sugestoes de nivel Pleno -- aguardando revisao do Senior)**:
 1. **Auditoria**: Mapear todos os arquivos CSS (globais e scoped), identificar conflitos de especificidade, overrides desnecessarios, regras de layout sem media query, breakpoints inconsistentes (700px vs 768px), CSS duplicado entre arquivos
 2. **Isolamento Web/Mobile**: Aplicar mobile-first em TODO o CSS existente. Toda regra de layout sem media query deve ser analisada: se e desktop-only, envolver em `@media (min-width: 769px)`. Se e mobile-only, envolver em `@media (max-width: 768px)`. Se e neutro, manter como base. Regra 23 aplicada sistematicamente
 3. **Consolidacao ITCSS**: Organizar CSS global em camadas ITCSS. Eliminar duplicacao entre `site.css`, `events.css` e scoped `.razor.css`. Definir fronteira clara: global = objects + base, scoped = components. Resolver fragmentacao historica (ex: `oldsite-top-nav` split entre global/scoped -- causa raiz do bug do Ciclo 16 Fase 15)
