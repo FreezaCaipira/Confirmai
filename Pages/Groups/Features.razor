@@ -61,14 +61,16 @@ else
 
             <header class="detail-header">
                 <div class="detail-header-top">
+                    <a href="/grupo/@group.Id" class="detail-back-link">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </div>
+                <div class="detail-header-content">
                     <span class="detail-sport-badge">
                         @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
                     </span>
-                    <a href="/grupo/@group.Id" class="detail-back-link">
-                        <i class="fas fa-arrow-left"></i> @group.Name
-                    </a>
+                    <h1 class="detail-title">Configurações do grupo</h1>
                 </div>
-                <h1 class="detail-title">Configurações do grupo</h1>
             </header>
 
             @* ── Funcionalidades ────────────────────────────────────── *@
