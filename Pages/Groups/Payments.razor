@@ -185,34 +185,32 @@ else
                         <li class="payments-user-item @(isSelected ? "payments-user-item--selected" : "")"
                             @onclick="() => SelectPaymentUser(userId)">
                             <span class="payments-user-name">@d.UserName</span>
-                            <div class="payments-user-info">
-                                <div class="payments-user-meta">
-                                    <span class="payments-badge payments-badge--games">@d.Entries.Count jogo@(d.Entries.Count != 1 ? "s" : "")</span>
-                                    <span class="payments-badge payments-badge--amount">R$ @d.TotalAmount.ToString("F2")</span>
-                                </div>
-                                <div class="payments-notify-actions" @onclick:stopPropagation="true">
-                                    @if (notifiedUserIds?.Contains(userId) == true)
-                                    {
-                                        <span class="payments-notified-badge"><i class="fas fa-check"></i> Notificado</span>
-                                    }
-                                    else if (notifyingUserId == userId)
-                                    {
-                                        <span class="payments-notifying"><i class="fas fa-spinner fa-spin"></i></span>
-                                    }
-                                    else
-                                    {
-                                        <button class="payments-notify-btn payments-notify-btn--email" type="button"
-                                                title="Enviar e-mail de cobrança"
-                                                @onclick="() => HandleNotifyDelinquencyAsync(d)">
-                                            <i class="fas fa-envelope"></i>
-                                        </button>
-                                        <button class="payments-notify-btn payments-notify-btn--whatsapp" type="button"
-                                                title="Cobrar via WhatsApp"
-                                                @onclick="() => OpenWhatsAppDelinquency(d)">
-                                            <i class="fab fa-whatsapp"></i>
-                                        </button>
-                                    }
-                                </div>
+                            <div class="payments-user-meta">
+                                <span class="payments-badge payments-badge--games">@d.Entries.Count jogo@(d.Entries.Count != 1 ? "s" : "")</span>
+                                <span class="payments-badge payments-badge--amount">R$ @d.TotalAmount.ToString("F2")</span>
+                            </div>
+                            <div class="payments-notify-actions" @onclick:stopPropagation="true">
+                                @if (notifiedUserIds?.Contains(userId) == true)
+                                {
+                                    <span class="payments-notified-badge"><i class="fas fa-check"></i> Notificado</span>
+                                }
+                                else if (notifyingUserId == userId)
+                                {
+                                    <span class="payments-notifying"><i class="fas fa-spinner fa-spin"></i></span>
+                                }
+                                else
+                                {
+                                    <button class="payments-notify-btn payments-notify-btn--email" type="button"
+                                            title="Enviar e-mail de cobrança"
+                                            @onclick="() => HandleNotifyDelinquencyAsync(d)">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                    <button class="payments-notify-btn payments-notify-btn--whatsapp" type="button"
+                                            title="Cobrar via WhatsApp"
+                                            @onclick="() => OpenWhatsAppDelinquency(d)">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </button>
+                                }
                             </div>
                             <i class="fas fa-chevron-@(isSelected ? "up" : "down") payments-chevron"></i>
                         </li>
