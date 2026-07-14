@@ -14,12 +14,14 @@ public sealed class WebhookPaymentMarker
     private readonly AppDbContext _db;
     private readonly LogService _log;
     private readonly PaymentEventBus _eventBus;
+    private readonly PayoutService? _payoutService;
 
-    public WebhookPaymentMarker(AppDbContext db, LogService log, PaymentEventBus eventBus)
+    public WebhookPaymentMarker(AppDbContext db, LogService log, PaymentEventBus eventBus, PayoutService? payoutService = null)
     {
         _db = db;
         _log = log;
         _eventBus = eventBus;
+        _payoutService = payoutService;
     }
 
     /// <summary>
@@ -68,6 +70,21 @@ public sealed class WebhookPaymentMarker
         await _log.LogAsync(
             $"{logPrefix}: pagamento txId={txId} confirmado via webhook. ConfirmationId={confirmation.Id}",
             source: "Webhook", level: "Info");
+
+        // Trigger payout if service is available
+        if (_payoutService is not null)
+        {
+            try
+            {
+                await _payoutService.ProcessPayoutAsync(confirmation.Id, txId);
+            }
+            catch (Exception ex)
+            {
+                await _log.LogAsync(
+                    $"{logPrefix}: erro ao processar payout. confirmationId={confirmation.Id}, error={ex.Message}",
+                    source: "Webhook", level: "Error");
+            }
+        }
 
         return true;
     }
