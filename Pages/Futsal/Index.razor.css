@@ -8,6 +8,16 @@
     gap: 0.6rem;
 }
 
+.listing-nav-group {
+    display: flex;
+    gap: 0.6rem;
+    margin-right: auto;
+}
+
+.listing-nav-group .listing-back-btn {
+    margin-right: 0;
+}
+
 /* -- Event card base ----------------------- */
 .event-card {
     position: relative;
