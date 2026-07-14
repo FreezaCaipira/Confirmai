@@ -2390,6 +2390,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     }
 
     .btn-create-event,
+    .btn-view-groups,
     .my-events-link-btn,
     .listing-back-btn {
         justify-content: center;
@@ -4682,6 +4683,7 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
 
 /* ── Listing action buttons (shared base) ─────────────────── */
 .btn-create-event,
+.btn-view-groups,
 .my-events-link-btn {
     display: inline-flex;
     align-items: center;
@@ -4753,8 +4755,23 @@ button.player-tag--admin-remove-no:hover { filter: brightness(1.3); }
     box-shadow: 0 4px 8px var(--blue300-opacity-xl);
 }
 
+/* ── Variant: Green (Ver Grupos) ──────────────────────────── */
+.btn-view-groups {
+    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-dark) 100%);
+    color: var(--ci-bg-deepest);
+    border: 1px solid var(--green-bright);
+    text-shadow: 0 0 10px var(--green-opacity-xl);
+}
+
+.btn-view-groups:hover {
+    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, var(--green-strong) 100%);
+    border-color: var(--green-soft);
+    box-shadow: 0 4px 8px var(--green-opacity-xl);
+}
+
 @media (max-width: 768px) {
     .btn-create-event,
+    .btn-view-groups,
     .my-events-link-btn {
         font-size: 0.8rem;
         padding: 0.38rem 0.8rem;
