@@ -79,10 +79,11 @@
 }
 
 .payments-tab--delinquent {
-    border-color: var(--red-soft);
-    background: linear-gradient(180deg, var(--red-light) 0%, var(--red-soft) 50%, var(--red-strong) 100%);
-    box-shadow: 0 4px 8px var(--shadow-red-sm), inset 0 0 0 1px var(--red-opacity-md);
-    text-shadow: 0 0 10px var(--shadow-red-lg);
+    border-color: var(--red-strong);
+    background: linear-gradient(180deg, var(--red-strong) 0%, var(--red-border) 100%);
+    color: var(--white);
+    box-shadow: 0 4px 8px var(--shadow-red-sm);
+    text-shadow: none;
 }
 
 .payments-tab--history {
