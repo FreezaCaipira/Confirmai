@@ -29,6 +29,12 @@
 
     <div class="sports-shell">
 
+    <div class="sports-back-row">
+        <a href="/grupos" class="listing-back-btn">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
     <div class="sports-tabs">
         <CitySelector
             SelectedCityKey="@SelectedCityKey"
@@ -342,10 +348,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Load city options
+        // Load city options from venues (quadras cadastradas)
         await using var db = await DbFactory.CreateDbContextAsync();
-        var rows = await db.Groups
-            .Where(g => g.IsActive)
+        var rows = await db.Venues
             .Select(g => new { g.City, g.StateCode })
             .Distinct()
             .OrderBy(c => c.City)
