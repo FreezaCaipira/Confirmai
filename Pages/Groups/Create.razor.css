@@ -1,6 +1,6 @@
 /* Layout overrides — afinar secoes em 25% */
 ::deep .form-section--narrow {
-    width: 65%;
+    width: 57%;
     margin-left: auto;
     margin-right: auto;
 }
