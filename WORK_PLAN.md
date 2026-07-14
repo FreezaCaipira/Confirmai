@@ -1521,7 +1521,7 @@ Recomendacao: taxa **configuravel** (percentual + opcional fixo), arredondada a 
 7. **Relatorio admin de receita** da plataforma (soma de `FeeAmount` por periodo/gateway) -- conecta com o "Baseline por gateway" postergado.
 8. **Testes**: `FeeCalculator` (arredondamento, 0%, valores quebrados), payload de split por gateway, registro por transacao, guarda-corpos (sem recebedor / gateway sem split), webhook confirmando liquido.
 
-**Pre-requisito do Robson**: credenciais reais do gateway escolhido (EfiBank recomendado por ter split PIX) + conta configurada para operar split. Guardadas fora do git (user-secrets em dev, env vars em prod).
+**Pre-requisito do Robson**: credenciais reais do EfiBank (ClientId/Secret/certificado PIX) + conta com **Split de Pagamento** habilitado. Guardadas fora do git (user-secrets em dev, env vars em prod). (Escolha de provedor travada = EfiBank -- ver "DECISAO DO ROBSON" abaixo.)
 
 **Nota de risco**: mesmo no split, confirmar com contador a emissao de nota fiscal sobre a taxa de servico do site.
 
@@ -1547,7 +1547,13 @@ Comparativo (verificar detalhes/precos atualizados na contratacao):
 
 **Impacto no plano acima**: se escolher um provedor Connect (MP), a **Fase 1 (recebedor/KYC)** muda de "cadastrar dados manualmente" para "fluxo OAuth de autorizacao da conta do organizador" -- mais simples e seguro. As demais fases (FeeCalculator, registro, checkout, relatorio, testes) permanecem.
 
-**DECISAO PENDENTE DO ROBSON**: qual provedor mirar? (Mercado Pago recomendado / Asaas / Iugu / PagBank / manter EfiBank). Isso define a Fase 1 e o pre-requisito de credenciais.
+**DECISAO DO ROBSON (14/07/2026 -- TRAVADA): EfiBank -- split por chave PIX.** O site cadastra a **chave PIX do organizador**; na cobranca o valor `base` vai direto pro PIX do organizador e a `feeAmount` fica na conta do site. O organizador NAO precisa criar conta em provedor -- so informar a chave PIX. **Trade-off aceito pelo Robson**: menor atrito pro organizador, mas o compliance/KYC e o risco regulatorio (repasse de dinheiro de terceiros, limites de PIX) ficam por conta do site.
+
+**Ajustes no plano acima dado a escolha EfiBank**:
+- **Fase 1 (recebedor)**: `GroupPayoutAccount` guarda a **chave PIX do organizador** (tipo de chave + valor) -- cadastro manual pelo admin do grupo, sem OAuth/subconta.
+- **Fase 3 (split)**: usar o **Split de Pagamento PIX do EfiBank/Gerencianet** -- confirmar na doc oficial a estrutura do payload (split por chave PIX de terceiro vs conta interna; se exigir conta interna, reavaliar). Focar so no gateway EfiBank; AbacatePay/Appmax/BTC ficam sem taxa por ora.
+- **Pre-requisito do Robson**: conta EfiBank com Split de Pagamento habilitado + credenciais reais (ClientId/Secret/certificado PIX) guardadas fora do git. **Validar antes**: se o EfiBank permite split para chave PIX de terceiros sem cadastro previo do recebedor; se sim, o modelo do Robson funciona direto; se exigir cadastro/conta, o atrito volta.
+- **Compliance**: confirmar com contador/juridico a responsabilidade de intermediacao (o site figura no fluxo do dinheiro) + emissao de nota da taxa de servico.
 
 ---
 
