@@ -1,13 +1,32 @@
 # Plano de Trabalho - Confirmai
 
-> Atualizado em 14/06/2026 | Base: `main` (pos-Ciclo 17) | Refatoracao CSS CONCLUIDA
+> Atualizado em 15/07/2026 | Base: `main` (pos-Ciclo 17) | Refatoracao CSS CONCLUIDA
 > 1.700/1.700 testes passando | 0 erros de build | 0 AppDbContext direto | 0 services sem teste | 0 mojibake
 > Ciclo 15 (testes+UX+!important), Ciclo 16 (mobile UX) e Ciclo 17 (Login Google+email real+mojibake+menu mobile) -- CONCLUIDOS e revisados
-> Proximo: **Pagamento Real + Taxa de Servico** (cobrar % do site sobre cada pagamento) -- ver "Analise: Pagamento Real + Taxa"
-> Depois: Refatoracao SOLID+TDD+CSS (inclui mobile UX critico + fase CSS Web/Mobile) | Efetivar Login Google (credenciais OAuth em prod)
-> Postergado: WhatsApp real + Baseline por gateway (aguardando ideias de outro dev)
+> Proximo: **Ciclo TDD + SOLID + CSS Refatoration** (detalhado pelo Senior) -- ver "Ciclo 18: TDD + SOLID + CSS Refatoration"
+> Postergado: Pagamento Real + Taxa de Servico (implementado, aguardando review Senior quando tokens resetarem) | WhatsApp real + Baseline por gateway (aguardando ideias de outro dev)
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
+
+## Padrão de Referência de PRs (NOVO)
+
+Para manter rastreamento claro do desenvolvimento e permitir revisões posteriores, todos os PRs devem ser documentados no WORK_PLAN.md com:
+
+- **Número do PR** (ex: #56)
+- **Título do PR** (ex: feat(pagamento): Sistema de pagamento com taxas fixas)
+- **Link do PR** (ex: https://github.com/FreezaCaipira/Confirmai/pull/56)
+
+**Formato de documentação:**
+```markdown
+### Ciclo X (Nome do Ciclo)
+- PR #[numero]: [Título do PR] - [Link]
+```
+
+**Benefícios:**
+- Breadcrumb completo do desenvolvimento
+- Identificação clara de PRs não revisados pelo Senior
+- Suporte a desenvolvimento em paralelo (múltiplos PRs)
+- Liberdade para desenvolvimento a nível Pleno com revisões posteriores
 
 ---
 
@@ -643,6 +662,49 @@ O PR #55 de fato **adiantou parte do C18**. Ajuste o escopo do C18 para focar no
 6. Empty state de partidas em `/grupo/{id}/partidas` (item da R2.3)
 
 **Decisao**: C18 = auditoria dirigida desses 6 fluxos (nao re-auditar telas ja ajustadas). O breakpoint unico 768px sai do C18 e vai para a fase de Design Tokens do C19 (evita retrabalho).
+
+---
+
+## Ciclo 18: TDD + SOLID + CSS Refatoration (PROXIMO CICLO)
+
+**Motivo**: O ciclo de Pagamento Real + Taxa de Servico foi implementado (branch `feat/pagamento-real-split`, PR pendente) mas sera revisado pelo Senior posteriormente quando os tokens semanais resetarem, por questao de limitacao de tokens.
+
+**Foco deste ciclo**: Refatoracao TDD + SOLID + CSS, aplicando disciplinas de qualidade em TODO o codigo, incluindo o que foi desenvolvido no ciclo de pagamento.
+
+**Observacao**: O Pleno ja aplicara TDD e SOLID no desenvolvimento do ciclo de pagamento (conforme solicitado). O Senior revisara tudo (pagamento + refatoracao) quando os tokens resetarem.
+
+**Detalhamento do ciclo a ser fornecido pelo Senior**:
+- Metodologia TDD a ser aplicada
+- Principios SOLID a serem seguidos
+- Fases de refatoracao CSS (isolamento Web/Mobile, design tokens, etc.)
+- Critérios de aceitação
+- Métricas a serem atingidas
+
+---
+
+## Ciclo Pagamento Real + Taxa de Servico (PENDENTE DE REVIEW)
+
+**Status**: Implementado, aguardando criação oficial do PR e review do Senior quando tokens resetarem.
+
+**Branch**: `feat/pagamento-real-split`
+
+**Link para criar PR**: https://github.com/FreezaCaipira/Confirmai/pull/new/feat/pagamento-real-split
+
+**Título do PR**: feat(pagamento): Sistema de pagamento com taxas fixas e repasse automático
+
+**Resumo das alterações**:
+- 32 arquivos alterados: +5491 linhas, -10 linhas
+- 10 commits organizados por fases de implementação
+- Taxas fixas: R$ 0,50 (app) + R$ 0,25 (gateway)
+- Sistema de repasse automático via PayoutService
+- Conta de repasse para grupos (GroupPayoutAccount)
+- Relatório de receita para admin
+- Configuração de produção (webhook, certificado, variáveis de ambiente)
+
+**Configuração de produção**:
+- Certificado de produção EfiBank carregado no EasyPanel
+- Variáveis de ambiente configuradas
+- Webhook URL: `https://confirmai-app-confirmai.m2gpju.easypanel.host/api/webhooks/efibank/pix`
 
 ---
 
