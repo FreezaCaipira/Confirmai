@@ -20,6 +20,12 @@ public class EfiBankOptions
     public string? CertificatePassword { get; set; }
 
     /// <summary>
+    /// Base64-encoded .p12 certificate content (alternative to CertificatePath).
+    /// Use this when file system access is limited.
+    /// </summary>
+    public string? CertificateBase64 { get; set; }
+
+    /// <summary>
     /// Your Pix key registered at Efí Bank (CPF, CNPJ, e-mail, telefone or EVP/random key).
     /// This is the recipient key for all event charges.
     /// </summary>
@@ -61,6 +67,6 @@ public class EfiBankOptions
     public bool IsEnabled =>
         !string.IsNullOrWhiteSpace(ClientId) &&
         !string.IsNullOrWhiteSpace(ClientSecret) &&
-        !string.IsNullOrWhiteSpace(CertificatePath) &&
+        (!string.IsNullOrWhiteSpace(CertificatePath) || !string.IsNullOrWhiteSpace(CertificateBase64)) &&
         !string.IsNullOrWhiteSpace(PixKey);
 }

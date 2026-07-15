@@ -269,15 +269,13 @@ public sealed class EfiBankPixService
     {
         var handler = new HttpClientHandler();
 
+        // Try loading from file first
         if (!string.IsNullOrWhiteSpace(_options.CertificatePath) &&
             File.Exists(_options.CertificatePath))
         {
             var fileInfo = new FileInfo(_options.CertificatePath);
             _logger.LogInformation("EfiBank: arquivo de certificado encontrado — Path={Path}, Size={Size} bytes", _options.CertificatePath, fileInfo.Length);
 
-            // UserKeySet + PersistKeySet + Exportable: persists the private key in the current
-            // user's key store so Windows SChannel can access it during mTLS handshake.
-            // MachineKeySet would require admin rights and fails with SEC_E_UNKNOWN_CREDENTIALS.
             var password = _options.CertificatePassword ?? string.Empty;
             try
             {
@@ -289,20 +287,51 @@ public sealed class EfiBankPixService
                     X509KeyStorageFlags.Exportable);
 
                 handler.ClientCertificates.Add(cert);
-                _logger.LogInformation("EfiBank: certificado carregado — Subject={Subject}, HasPrivateKey={HasKey}, NotBefore={NotBefore}, NotAfter={NotAfter}",
+                _logger.LogInformation("EfiBank: certificado carregado (arquivo) — Subject={Subject}, HasPrivateKey={HasKey}, NotBefore={NotBefore}, NotAfter={NotAfter}",
                     cert.Subject, cert.HasPrivateKey, cert.NotBefore, cert.NotAfter);
+                return handler;
             }
             catch (System.Security.Cryptography.CryptographicException ex)
             {
-                _logger.LogError(ex, "EfiBank: falha ao carregar certificado — Path={Path}, Size={Size} bytes, PasswordSet={PasswordSet}",
+                _logger.LogError(ex, "EfiBank: falha ao carregar certificado (arquivo) — Path={Path}, Size={Size} bytes, PasswordSet={PasswordSet}",
                     _options.CertificatePath, fileInfo.Length, !string.IsNullOrWhiteSpace(password));
                 throw;
             }
         }
-        else
+
+        // Try loading from base64
+        if (!string.IsNullOrWhiteSpace(_options.CertificateBase64))
         {
-            _logger.LogWarning("EfiBank: certificado não encontrado em '{Path}'", _options.CertificatePath);
+            _logger.LogInformation("EfiBank: tentando carregar certificado de base64 — Length={Length} chars", _options.CertificateBase64.Length);
+
+            try
+            {
+                var certBytes = Convert.FromBase64String(_options.CertificateBase64);
+                _logger.LogInformation("EfiBank: base64 decodificado — Size={Size} bytes", certBytes.Length);
+
+                var password = _options.CertificatePassword ?? string.Empty;
+                var cert = X509CertificateLoader.LoadPkcs12(
+                    certBytes,
+                    password,
+                    X509KeyStorageFlags.UserKeySet  |
+                    X509KeyStorageFlags.PersistKeySet |
+                    X509KeyStorageFlags.Exportable);
+
+                handler.ClientCertificates.Add(cert);
+                _logger.LogInformation("EfiBank: certificado carregado (base64) — Subject={Subject}, HasPrivateKey={HasKey}, NotBefore={NotBefore}, NotAfter={NotAfter}",
+                    cert.Subject, cert.HasPrivateKey, cert.NotBefore, cert.NotAfter);
+                return handler;
+            }
+            catch (System.Security.Cryptography.CryptographicException ex)
+            {
+                _logger.LogError(ex, "EfiBank: falha ao carregar certificado (base64) — Length={Length} chars, PasswordSet={PasswordSet}",
+                    _options.CertificateBase64.Length, !string.IsNullOrWhiteSpace(_options.CertificatePassword));
+                throw;
+            }
         }
+
+        _logger.LogWarning("EfiBank: certificado não encontrado — Path={Path}, Base64Set={Base64Set}",
+            _options.CertificatePath, !string.IsNullOrWhiteSpace(_options.CertificateBase64));
 
         return handler;
     }
