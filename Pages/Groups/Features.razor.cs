@@ -388,6 +388,8 @@ public partial class Features
                     PixKeyType = formData.PixKeyType,
                     PixKeyValue = formData.PixKeyValue,
                     BeneficiaryName = formData.BeneficiaryName,
+                    BeneficiaryCpf = formData.BeneficiaryCpf,
+                    BankAccountNumber = formData.BankAccountNumber,
                     CreatedByUserId = currentUserId,
                     IsActive = true
                 };
@@ -423,6 +425,8 @@ public partial class Features
                 dbAccount.PixKeyType = formData.PixKeyType;
                 dbAccount.PixKeyValue = formData.PixKeyValue;
                 dbAccount.BeneficiaryName = formData.BeneficiaryName;
+                dbAccount.BeneficiaryCpf = formData.BeneficiaryCpf;
+                dbAccount.BankAccountNumber = formData.BankAccountNumber;
                 await db.SaveChangesAsync();
                 payoutAccount = dbAccount;
                 

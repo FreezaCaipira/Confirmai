@@ -64,6 +64,24 @@
                        disabled="@IsSaving" />
             </div>
 
+            <div class="feat-payout-field">
+                <label class="feat-payout-label" for="beneficiary-cpf">CPF do beneficiário:</label>
+                <input id="beneficiary-cpf"
+                       class="feat-payout-input"
+                       @bind="FormData.BeneficiaryCpf"
+                       placeholder="000.000.000-00"
+                       disabled="@IsSaving" />
+            </div>
+
+            <div class="feat-payout-field">
+                <label class="feat-payout-label" for="bank-account-number">Número da conta bancária:</label>
+                <input id="bank-account-number"
+                       class="feat-payout-input"
+                       @bind="FormData.BankAccountNumber"
+                       placeholder="Número da conta (sem dígito)"
+                       disabled="@IsSaving" />
+            </div>
+
             <div class="feat-payout-actions">
                 @if (ExistingAccount != null)
                 {
@@ -118,7 +136,9 @@
             {
                 PixKeyType = ExistingAccount.PixKeyType,
                 PixKeyValue = ExistingAccount.PixKeyValue,
-                BeneficiaryName = ExistingAccount.BeneficiaryName
+                BeneficiaryName = ExistingAccount.BeneficiaryName,
+                BeneficiaryCpf = ExistingAccount.BeneficiaryCpf,
+                BankAccountNumber = ExistingAccount.BankAccountNumber
             };
         }
     }
@@ -130,7 +150,9 @@
         {
             PixKeyType = ExistingAccount!.PixKeyType,
             PixKeyValue = ExistingAccount.PixKeyValue,
-            BeneficiaryName = ExistingAccount.BeneficiaryName
+            BeneficiaryName = ExistingAccount.BeneficiaryName,
+            BeneficiaryCpf = ExistingAccount.BeneficiaryCpf,
+            BankAccountNumber = ExistingAccount.BankAccountNumber
         };
     }
 
@@ -152,6 +174,20 @@
         if (string.IsNullOrWhiteSpace(FormData.BeneficiaryName))
         {
             Message = "O nome do beneficiário é obrigatório.";
+            IsError = true;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(FormData.BeneficiaryCpf))
+        {
+            Message = "O CPF do beneficiário é obrigatório.";
+            IsError = true;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(FormData.BankAccountNumber))
+        {
+            Message = "O número da conta é obrigatório.";
             IsError = true;
             return;
         }

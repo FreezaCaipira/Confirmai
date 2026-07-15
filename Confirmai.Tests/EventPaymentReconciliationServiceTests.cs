@@ -244,7 +244,7 @@ public class EventPaymentReconciliationServiceTests
         public string DisplayName { get; }
         public bool IsAvailable => true;
 
-        public Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId)
+        public Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null, decimal serviceFeePercentage = 0)
             => Task.FromResult(new EventPaymentChargeResult("fake-charge", "fake-brcode"));
 
         public Task<bool> IsChargePaidAsync(string chargeId)

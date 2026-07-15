@@ -174,21 +174,24 @@
                         OnSelectGateway="@SelectGatewayCallback"
                         OnGenerateCharge="@GeneratePixChargeCallback" />
 
-                    <EventPaymentPixAdmin
-                        GroupAdminPixKey="@GetGroupAdminPixKey(ev.Group)"
-                        GroupName="@ev.Group.Name"
-                        GroupCity="@ev.Group.City"
-                        Price="@(ev.Price!.Value)"
-                        CopiedAdminPix="@copiedAdminPix"
-                        PixQrPayload="@BuildPixStaticPayload(GetGroupAdminPixKey(ev.Group)!, ev.Group.Name, ev.Group.City, ev.Price!.Value)"
-                        OnCopyAdminPixKey="@CopyAdminPixKeyCallback" />
+                    @if (FeeOptions.Value.ShowDirectPixToOrganizer)
+                    {
+                        <EventPaymentPixAdmin
+                            GroupAdminPixKey="@GetGroupAdminPixKey(ev.Group)"
+                            GroupName="@ev.Group.Name"
+                            GroupCity="@ev.Group.City"
+                            Price="@(ev.Price!.Value)"
+                            CopiedAdminPix="@copiedAdminPix"
+                            PixQrPayload="@BuildPixStaticPayload(GetGroupAdminPixKey(ev.Group)!, ev.Group.Name, ev.Group.City, ev.Price!.Value)"
+                            OnCopyAdminPixKey="@CopyAdminPixKeyCallback" />
 
-                    <EventPaymentProof
-                        Confirmation="@conf"
-                        UploadingProof="@uploadingProof"
-                        ProofError="@proofError"
-                        ProofSuccessMessage="@proofSuccessMessage"
-                        OnProofUpload="@UploadProofCallback" />
+                        <EventPaymentProof
+                            Confirmation="@conf"
+                            UploadingProof="@uploadingProof"
+                            ProofError="@proofError"
+                            ProofSuccessMessage="@proofSuccessMessage"
+                            OnProofUpload="@UploadProofCallback" />
+                    }
                 }
             }
 

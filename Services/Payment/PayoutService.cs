@@ -90,13 +90,14 @@ public sealed class PayoutService
             return;
         }
 
-        // Calcular taxa
-        var calculation = _feeCalculator.Calculate(amount.Value);
-        var baseAmount = calculation.BaseAmount;
-        var feeAmount = calculation.FeeAmount;
+        // Calcular taxa usando valores fixos
+        var totalFee = _feeOptions.AppFeeFixed + _feeOptions.GatewayFeeFixed;
+        var baseAmount = amount.Value;
+        var feeAmount = totalFee;
+        var totalAmount = baseAmount + totalFee;
 
         await _log.LogAsync(
-            $"Payout: calculando taxa. base={baseAmount}, fee={feeAmount}, total={calculation.TotalAmount}, confirmationId={confirmationId}.",
+            $"Payout: calculando taxa. base={baseAmount}, appFee={_feeOptions.AppFeeFixed}, gatewayFee={_feeOptions.GatewayFeeFixed}, totalFee={totalFee}, total={totalAmount}, confirmationId={confirmationId}.",
             source: "Payout", level: "Info");
 
         // Buscar ou criar PaymentRecord
@@ -108,7 +109,7 @@ public sealed class PayoutService
             paymentRecord = new PaymentRecord
             {
                 PaymentId = txId,
-                Amount = calculation.TotalAmount,
+                Amount = totalAmount,
                 IsPaid = true,
                 PaidAt = DateTime.UtcNow,
                 CreatedAt = DateTime.UtcNow,

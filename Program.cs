@@ -122,7 +122,12 @@ builder.Services.AddScoped<AdminConfirmationService>();
 builder.Services.AddScoped<DelinquencyService>();
 builder.Services.AddScoped<PixProofUploadService>();
 builder.Services.AddScoped<AppInitializationService>();
-builder.Services.AddScoped<Confirmai.Services.Payment.Shared.WebhookPaymentMarker>();
+builder.Services.AddScoped<Confirmai.Services.Payment.Shared.WebhookPaymentMarker>(sp => 
+    new Confirmai.Services.Payment.Shared.WebhookPaymentMarker(
+        sp.GetRequiredService<AppDbContext>(),
+        sp.GetRequiredService<LogService>(),
+        sp.GetRequiredService<PaymentEventBus>(),
+        sp.GetService<PayoutService>()));
 builder.Services.AddScoped<PayoutService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<AbacatePayWebhookService>();
@@ -550,7 +555,7 @@ app.MapPost("/api/abacatepay/webhook", async (HttpContext context, AbacatePayWeb
     return await webhookService.HandleAsync(context);
 }).RequireRateLimiting("webhook");
 
-app.MapPost("/api/efibank/webhook", async (HttpContext context, EfiBankWebhookService webhookService) =>
+app.MapPost("/api/webhooks/efibank/pix", async (HttpContext context, EfiBankWebhookService webhookService) =>
 {
     return await webhookService.HandleAsync(context);
 }).RequireRateLimiting("webhook");

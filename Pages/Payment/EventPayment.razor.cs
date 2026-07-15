@@ -152,15 +152,26 @@ public partial class EventPayment : IAsyncDisposable
 
             // Calcular valor total com taxa se configurado
             var chargeAmount = conf.Event.Price.Value;
+            decimal serviceFeePercentage = 0;
+            GroupPayoutAccount? payoutAccount = null;
+
             if (FeeOptions.Value.IsConfigured && 
                 FeeOptions.Value.SupportedGateways.Contains(selectedGatewayName, StringComparer.OrdinalIgnoreCase))
             {
-                var calculator = new FeeCalculator(FeeOptions.Value.PercentBps);
-                var result = calculator.Calculate(chargeAmount);
-                chargeAmount = result.TotalAmount;
+                // Use fixed fees instead of percentage
+                chargeAmount = chargeAmount + FeeOptions.Value.AppFeeFixed + FeeOptions.Value.GatewayFeeFixed;
+                
+                // Calculate percentage for legacy compatibility (total fee / amount)
+                var totalFee = FeeOptions.Value.AppFeeFixed + FeeOptions.Value.GatewayFeeFixed;
+                serviceFeePercentage = totalFee > 0 ? (totalFee / chargeAmount) * 100 : 0;
+
+                // Get payout account for split
+                await using var payoutDb = await DbFactory.CreateDbContextAsync();
+                payoutAccount = await payoutDb.GroupPayoutAccounts
+                    .FirstOrDefaultAsync(pa => pa.GroupId == conf.Event.GroupId && pa.IsActive);
             }
 
-            var charge = await gateway.CreateChargeAsync(chargeAmount, conf.Id);
+            var charge = await gateway.CreateChargeAsync(chargeAmount, conf.Id, payoutAccount, serviceFeePercentage);
 
             // Persist txId + brCode so the page can reuse the charge if the user returns
             await using var db = await DbFactory.CreateDbContextAsync();

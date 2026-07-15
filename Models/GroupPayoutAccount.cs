@@ -29,6 +29,16 @@ namespace Confirmai.Models
         [StringLength(200)]
         public string BeneficiaryName { get; set; } = string.Empty;
 
+        /// <summary>CPF do beneficiário (obrigatório para split Pix EfiBank).</summary>
+        [Required]
+        [StringLength(11)]
+        public string BeneficiaryCpf { get; set; } = string.Empty;
+
+        /// <summary>Número da conta bancária (obrigatório para split Pix EfiBank).</summary>
+        [Required]
+        [StringLength(20)]
+        public string BankAccountNumber { get; set; } = string.Empty;
+
         /// <summary>Quando a conta foi cadastrada.</summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

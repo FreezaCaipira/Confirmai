@@ -1,5 +1,6 @@
 using Confirmai.Services.Interfaces;
 using Confirmai.Services.Payment;
+using Confirmai.Models;
 
 namespace Confirmai.Services.EventPayments;
 
@@ -16,7 +17,7 @@ public sealed class AbacatePayEventPaymentGateway : IEventPaymentGateway
     public string DisplayName => "Pix · AbacatePay";
     public bool IsAvailable => _abacatePay.IsEnabled;
 
-    public async Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId)
+    public async Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null, decimal serviceFeePercentage = 0)
     {
         var orderId = $"event-confirmation-{confirmationId}";
         var (brCode, chargeId) = await _abacatePay.GenerateAddressAsync(amount, orderId);

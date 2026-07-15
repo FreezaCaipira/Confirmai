@@ -57,8 +57,12 @@
                     <span class="evpay-fee-value">R$ @Price.ToString("N2", PtBr)</span>
                 </div>
                 <div class="evpay-fee-row">
-                    <span class="evpay-fee-label">Taxa de serviço (@(FeeOptions.Value.PercentBps / 100m)%):</span>
-                    <span class="evpay-fee-value">R$ @FeeAmount.ToString("N2", PtBr)</span>
+                    <span class="evpay-fee-label">Taxa do app:</span>
+                    <span class="evpay-fee-value">R$ @AppFeeAmount.ToString("N2", PtBr)</span>
+                </div>
+                <div class="evpay-fee-row">
+                    <span class="evpay-fee-label">Taxa do gateway:</span>
+                    <span class="evpay-fee-value">R$ @GatewayFeeAmount.ToString("N2", PtBr)</span>
                 </div>
                 <div class="evpay-fee-row evpay-fee-row--total">
                     <span class="evpay-fee-label">Total a pagar:</span>
@@ -111,16 +115,27 @@ else
         !string.IsNullOrWhiteSpace(SelectedGatewayName) &&
         FeeOptions.Value.SupportedGateways.Contains(SelectedGatewayName, StringComparer.OrdinalIgnoreCase);
 
-    private decimal FeeAmount
+    private decimal AppFeeAmount
     {
         get
         {
             if (!FeeOptions.Value.IsConfigured || !SelectedGatewaySupportsFee)
                 return 0m;
             
-            var calculator = new Services.Payment.FeeCalculator(FeeOptions.Value.PercentBps);
-            var result = calculator.Calculate(Price);
-            return result.FeeAmount;
+            // 0.50 for app (fixed amount)
+            return 0.50m;
+        }
+    }
+
+    private decimal GatewayFeeAmount
+    {
+        get
+        {
+            if (!FeeOptions.Value.IsConfigured || !SelectedGatewaySupportsFee)
+                return 0m;
+            
+            // 0.25 for gateway (fixed amount)
+            return 0.25m;
         }
     }
 
@@ -131,9 +146,8 @@ else
             if (!FeeOptions.Value.IsConfigured || !SelectedGatewaySupportsFee)
                 return Price;
             
-            var calculator = new Services.Payment.FeeCalculator(FeeOptions.Value.PercentBps);
-            var result = calculator.Calculate(Price);
-            return result.TotalAmount;
+            // Fixed fees: 0.50 app + 0.25 gateway
+            return Price + AppFeeAmount + GatewayFeeAmount;
         }
     }
 
