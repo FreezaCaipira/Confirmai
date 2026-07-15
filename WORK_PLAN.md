@@ -673,12 +673,49 @@ O PR #55 de fato **adiantou parte do C18**. Ajuste o escopo do C18 para focar no
 
 **Observacao**: O Pleno ja aplicara TDD e SOLID no desenvolvimento do ciclo de pagamento (conforme solicitado). O Senior revisara tudo (pagamento + refatoracao) quando os tokens resetarem.
 
-**Detalhamento do ciclo a ser fornecido pelo Senior**:
-- Metodologia TDD a ser aplicada
-- Principios SOLID a serem seguidos
-- Fases de refatoracao CSS (isolamento Web/Mobile, design tokens, etc.)
-- Critérios de aceitação
-- Métricas a serem atingidas
+### Detalhamento do Senior -- Como o Pleno deve agir neste ciclo
+
+**Regra de ouro**: refatoracao NAO muda comportamento. Antes de refatorar qualquer coisa, tem que existir teste verde cobrindo o comportamento atual. Se nao existe, o Pleno **escreve o teste primeiro** (caracterizacao), ve passar, e so entao refatora. Nada de "refatorar e torcer".
+
+**Branch**: `refactor/ciclo18-tdd-solid-css`. **1 commit por passo pequeno e reversivel**, 1 PR no final. NUNCA misturar refatoracao estrutural com mudanca de comportamento no mesmo commit.
+
+#### Bloco A -- TDD (disciplina em todo o ciclo)
+1. Para cada area a mexer: rodar `dotnet test` e garantir baseline verde (1.700+). Anotar o numero.
+2. **Red-Green-Refactor**: novo comportamento -> teste que falha -> codigo minimo pra passar -> refatorar com teste verde.
+3. **Characterization tests** antes de refatorar codigo legado sem cobertura: capturam o que o codigo FAZ hoje (mesmo que imperfeito), pra detectar regressao.
+4. Testes devem ser de **comportamento** (entrada->saida, efeitos observaveis), nao de implementacao. Nao testar detalhes privados.
+5. Ao final de cada fase: suite verde + contagem de testes >= baseline. Zero teste ignorado/comentado pra "passar".
+
+#### Bloco B -- SOLID (aplicar onde ha dor, nao dogmaticamente)
+- **SRP**: quebrar componentes/services que fazem coisas demais. Alvo prioritario: qualquer page/service com muita logica no code-behind ou no markup. Extrair logica de negocio pra services testaveis.
+- **OCP/DIP**: depender de interfaces (ja existe padrao: `IEventPaymentGateway`, `IDbContextFactory`). Novos pontos de extensao via interface + DI, nao `if/switch` de tipo concreto.
+- **LSP/ISP**: interfaces pequenas e coesas; nao forcar implementacoes a metodos que nao usam.
+- **Blazor especifico**: usar `IDbContextFactory` (nunca `AppDbContext` injetado direto -- metrica ja e 0, manter), minimizar logica em markup, componentizar blocos repetidos, cuidar de `StateHasChanged`/lifecycle e estado de circuito. Extrair chamadas de dados pra services.
+- **Restricao**: refatoracao SOLID e **incremental e local**. Nao reescrever modulos inteiros de uma vez. Cada extracao coberta por teste antes e depois.
+
+#### Bloco C -- Refatoracao CSS (seguir a ordem ja aprovada em R3 -- ver "Respostas do Senior ao Questionamento do Ciclo 17")
+Prioridade (fazer nesta ordem, cada fase reversivel):
+1. **Inventario/auditoria**: mapear CSS global vs scoped, conflitos de especificidade, duplicacao, breakpoints inconsistentes (700 vs 768).
+2. **Design Tokens**: toda cor/spacing/shadow/radius = var do `:root`. Zero hardcoded hex em scoped (manter metrica 0). Remover vars mortas/indefinidas.
+3. **Mobile-first + breakpoint unico 768px**: base = mobile; `@media (min-width:769px)` para desktop. Padronizar o breakpoint.
+4. **Single Responsibility por `.razor.css`**: cada scoped estiliza so o seu componente; compartilhado vai pro global. Resolver fragmentacao tipo `oldsite-top-nav`.
+5. **BEM apenas em scoped novo/refatorado** (nao renomear tudo em massa).
+6. **Opcionais/experimentais** (so se sobrar folga e sem risco): `@layer` num spike pequeno; TDD visual Playwright nos fluxos criticos. Nao bloquear o ciclo nisso.
+
+#### Criterios de aceitacao (o Senior vai cobrar na review)
+- Suite de testes verde, contagem >= baseline; nenhum teste desabilitado.
+- 0 erros de build; warnings nullable nao aumentam (idealmente reduzem).
+- 0 hardcoded hex em scoped; 0 var CSS indefinida; 0 var morta.
+- 0 `AppDbContext` direto em componentes (manter).
+- Sem regressao visual/funcional nos fluxos principais.
+- Commits pequenos, 1 responsabilidade cada; refatoracao separada de mudanca de comportamento.
+- Encoding UTF-8 em todos os CSS (regra 18/19).
+
+#### O que NAO fazer
+- Nao refatorar sem teste cobrindo antes.
+- Nao renomear classes CSS em massa sem beneficio concreto.
+- Nao reescrever modulo inteiro num commit gigante.
+- Nao mexer no comportamento a pretexto de "limpar".
 
 ---
 
