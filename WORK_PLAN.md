@@ -837,6 +837,7 @@ Todas as paginas agora usam `IDbContextFactory<AppDbContext>`. 0 paginas com `@i
 13. **NUNCA adicionar var ao `:root` sem uso imediato** -- so adicionar vars que serao usadas no mesmo commit
 14. **Commits limpos** -- 1 commit por fase, sem commits de tentativa/erro/reversao. Testar ANTES de commitar
 15. **NUNCA remover var do `:root` sem verificar uso em TODOS os arquivos** -- usar `grep -rn 'var(--nome)' Pages/ Shared/ wwwroot/css/` antes de remover. Se tem uso, NAO remover
+16. **Mudanças apenas em documentação vão direto para main** -- arquivos .md, README, etc. podem ser commitados e pushados diretamente para main sem criar branch separada
 16. **Separar CSS refactoring de features UX** -- nao misturar os dois no mesmo ciclo/PR
 17. **Cobrir TODOS os arquivos ao converter rgba** -- grep global para cada padrao, converter todos de uma vez
 18. **NUNCA salvar CSS com encoding diferente de UTF-8** -- verificar encoding antes de commitar. Se o editor corromper acentos em comentarios, reverter a linha com `git checkout -- arquivo` antes de commitar
