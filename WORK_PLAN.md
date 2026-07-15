@@ -708,6 +708,88 @@ O PR #55 de fato **adiantou parte do C18**. Ajuste o escopo do C18 para focar no
 
 ---
 
+## Troubleshooting: Certificado EfiBank em Produção (15/07/2026)
+
+**Problema Original:**
+- Erro ao tentar gerar cobrança Pix em produção: `System.Security.Cryptography.CryptographicException: ASN1 corrupted data.`
+- O certificado não estava sendo carregado corretamente pelo EasyPanel
+
+**Tentativas de Solução:**
+
+1. **File Mount (arquivo único)**
+   - Tentativa: Upload do arquivo via EasyPanel File Mount em `/app/certs/efibank.p12`
+   - Problema: Arquivo corrompido (tamanho diferente: 3544 bytes vs 2657 bytes original)
+   - Resultado: Falha - EasyPanel corrompeu o arquivo binário durante upload
+
+2. **File Mount (pasta com estrutura JSON)**
+   - Tentativa: Upload de pasta `/app/certs` com estrutura JSON contendo o arquivo
+   - Problema: EasyPanel não conseguiu processar a estrutura corretamente
+   - Resultado: Falha - Arquivo não foi criado
+
+3. **Terminal SSH**
+   - Tentativa: Acesso via SSH para criar arquivo manualmente
+   - Problema: Permissões insuficientes para criar arquivos em `/app/certs`
+   - Resultado: Falha - Sem permissão de escrita
+
+4. **FileBrowser**
+   - Tentativa: Instalação e uso do FileBrowser do EasyPanel
+   - Problema: FileBrowser acessava sistema de arquivos diferente do container Confirmai
+   - Resultado: Falha - Pasta `/app` não visível no FileBrowser
+
+5. **Caminho alternativo (/tmp/)**
+   - Tentativa: Upload via FileBrowser em `/tmp/efibank.p12`
+   - Problema: Container Confirmai não conseguia acessar `/tmp/` do host
+   - Resultado: Falha - Arquivo não encontrado pelo container
+
+**Solução Final: Certificado via Base64**
+
+Implementação de suporte a certificado via variável de ambiente em base64:
+
+- **Arquivos modificados:**
+  - `Configuration/EfiBankOptions.cs`: Adicionada propriedade `CertificateBase64`
+  - `Services/Payment/EfiBankPixService.cs`: Modificado `CreateProductionHandler()` para tentar carregar de base64 se arquivo falhar
+
+- **Lógica de fallback:**
+  1. Tenta carregar de arquivo (`CertificatePath`)
+  2. Se falhar, tenta carregar de base64 (`CertificateBase64`)
+  3. Logging detalhado para diagnóstico de ambos os métodos
+
+- **Configuração:**
+  - Variável de ambiente: `EfiBank__CertificateBase64`
+  - Valor: Conteúdo base64 do arquivo .p12 (3544 caracteres)
+  - Vantagem: Evita completamente problemas de sistema de arquivos
+
+**Lições Aprendidas:**
+
+1. **EasyPanel File Mount não é confiável para arquivos binários**
+   - Corrompeu o certificado .p12 durante upload
+   - Tamanho do arquivo mudou de 2657 para 3544 bytes
+
+2. **Isolamento de containers**
+   - FileBrowser acessa sistema de arquivos do host, não do container específico
+   - Diretórios como `/app` do container não são visíveis externamente
+   - Permissões são restritas por segurança
+
+3. **Base64 como alternativa robusta**
+   - Variáveis de ambiente são mais confiáveis que file mounts
+   - Evita problemas de permissão e isolamento de containers
+   - Fácil de configurar e debugar
+
+4. **Logging é essencial**
+   - Logging detalhado permitiu identificar o problema rapidamente
+   - Mostrou tamanho do arquivo, existência e detalhes do erro criptográfico
+
+**Ferramentas Usadas:**
+- EasyPanel (File Mount, Environment Variables, FileBrowser)
+- SSH (Termius)
+- Git (versionamento e deploy)
+- Base64 (codificação/decodificação)
+- Serilog (logging detalhado)
+
+**Status:** Solução implementada e aguardando teste em produção com variável `EfiBank__CertificateBase64`.
+
+---
+
 ## Metricas Atuais (pos-Ciclo 16)
 
 | Metrica | C10 | C11 | C12 | C13 | C14 | C15 | C16 |
