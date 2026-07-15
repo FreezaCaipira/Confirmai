@@ -1,5 +1,6 @@
 using Confirmai.Services.Interfaces;
 using Confirmai.Services.Payment;
+using Confirmai.Models;
 
 namespace Confirmai.Services.EventPayments;
 
@@ -16,7 +17,7 @@ public sealed class AppmaxEventPaymentGateway : IEventPaymentGateway
     public string DisplayName => "Pix · Appmax";
     public bool IsAvailable => _appmax.IsEnabled;
 
-    public async Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId)
+    public async Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null, decimal serviceFeePercentage = 0)
     {
         var (chargeId, brCode) = await _appmax.CreateChargeAsync(amount, confirmationId);
         return new EventPaymentChargeResult(chargeId, brCode);

@@ -1,6 +1,8 @@
 @using Confirmai.Enums
 @using Confirmai.Models
+@using Confirmai.Configuration
 @using System.Globalization
+@using Microsoft.Extensions.Options
 
 <div class="evpay-summary-card">
     <div class="evpay-summary-row">
@@ -23,12 +25,28 @@
     <div class="evpay-summary-divider"></div>
     <div class="evpay-summary-row evpay-summary-row--total">
         <span class="evpay-summary-label">Valor a pagar</span>
-        <span class="evpay-summary-amount">R$ @(Confirmation?.Event?.Price?.ToString("N2", PtBr) ?? "0,00")</span>
+        <span class="evpay-summary-amount">R$ @GetTotalAmount().ToString("N2", PtBr)</span>
     </div>
 </div>
 
 @code {
     [Parameter] public EventConfirmation? Confirmation { get; set; }
     
+    [Inject] private IOptions<FeeOptions> FeeOptions { get; set; } = default!;
+    
     private CultureInfo PtBr { get; } = new CultureInfo("pt-BR");
+
+    private decimal GetTotalAmount()
+    {
+        if (Confirmation?.Event?.Price is null)
+            return 0m;
+        
+        var basePrice = Confirmation.Event.Price.Value;
+        
+        if (!FeeOptions.Value.IsConfigured)
+            return basePrice;
+        
+        // Use fixed fees
+        return basePrice + FeeOptions.Value.AppFeeFixed + FeeOptions.Value.GatewayFeeFixed;
+    }
 }

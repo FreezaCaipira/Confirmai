@@ -111,6 +111,16 @@ else
                 IsError="@pixError"
                 OnSavePixReceiver="@SavePixReceiverCallback" />
 
+            <hr class="detail-divider">
+
+            @* ── Chave PIX de Repasse (Taxa de Serviço) ─────────────── *@
+            <PayoutAccountEditor
+                ExistingAccount="@payoutAccount"
+                IsSaving="@isSavingPayout"
+                Message="@payoutMessage"
+                IsError="@payoutError"
+                OnSave="@SavePayoutAccountCallback" />
+
         </div>
     </div>
 }

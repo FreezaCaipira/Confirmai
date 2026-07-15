@@ -21,6 +21,7 @@ namespace Confirmai.Data
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
         public DbSet<GroupJoinRequest> GroupJoinRequests { get; set; }
+        public DbSet<GroupPayoutAccount> GroupPayoutAccounts { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventConfirmation> EventConfirmations { get; set; }
         public DbSet<WaitingList> WaitingLists { get; set; }
@@ -339,6 +340,24 @@ namespace Confirmai.Data
                 .HasOne(g => g.PixReceiverUser)
                 .WithMany()
                 .HasForeignKey(g => g.PixReceiverUserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // GroupPayoutAccount — one per group (enforced via unique index)
+            modelBuilder.Entity<GroupPayoutAccount>()
+                .HasIndex(gpa => gpa.GroupId)
+                .IsUnique();
+
+            modelBuilder.Entity<GroupPayoutAccount>()
+                .HasOne(gpa => gpa.Group)
+                .WithMany()
+                .HasForeignKey(gpa => gpa.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GroupPayoutAccount>()
+                .HasOne(gpa => gpa.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(gpa => gpa.CreatedByUserId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 

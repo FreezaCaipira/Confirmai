@@ -1,0 +1,164 @@
+@page "/admin/revenue"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Services.Admin
+@using Confirmai.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using System.Globalization
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject AdminRevenueReportService RevenueReportService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Relatório de Receita — Confirmai</PageTitle>
+
+<div class="entity-shell admin-page">
+    <section class="entity-shell-grid" aria-label="Relatório de Receita">
+        <article class="entity-shell-card entity-shell-main">
+            <h1 class="page-section-title">Relatório de Receita</h1>
+
+            <div class="admin-revenue-filters">
+                <div class="admin-revenue-filter-row">
+                    <label class="admin-revenue-label">Data Início:</label>
+                    <input type="date" class="admin-revenue-input" @bind="startDate" />
+                </div>
+                <div class="admin-revenue-filter-row">
+                    <label class="admin-revenue-label">Data Fim:</label>
+                    <input type="date" class="admin-revenue-input" @bind="endDate" />
+                </div>
+                <button class="admin-revenue-btn" @onclick="LoadReportAsync">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+                <button class="admin-revenue-btn admin-revenue-btn--secondary" @onclick="ClearFilters">
+                    <i class="fas fa-times"></i> Limpar
+                </button>
+            </div>
+
+            @if (isLoading)
+            {
+                <p class="listing-state">Carregando…</p>
+            }
+            else if (summary is not null)
+            {
+                <div class="admin-revenue-summary">
+                    <h2 class="admin-revenue-section-title">Resumo Geral</h2>
+                    <div class="admin-revenue-grid">
+                        <div class="admin-revenue-card">
+                            <span class="admin-revenue-card-label">Transações</span>
+                            <span class="admin-revenue-card-value">@summary.TotalTransactions</span>
+                        </div>
+                        <div class="admin-revenue-card admin-revenue-card--highlight">
+                            <span class="admin-revenue-card-label">Taxas Coletadas</span>
+                            <span class="admin-revenue-card-value">R$ @summary.TotalFeesCollected.ToString("N2", PtBr)</span>
+                        </div>
+                        <div class="admin-revenue-card">
+                            <span class="admin-revenue-card-label">Valor Base</span>
+                            <span class="admin-revenue-card-value">R$ @summary.TotalBaseAmount.ToString("N2", PtBr)</span>
+                        </div>
+                    </div>
+                    <div class="admin-revenue-grid">
+                        <div class="admin-revenue-card admin-revenue-card--success">
+                            <span class="admin-revenue-card-label">Repasses Enviados</span>
+                            <span class="admin-revenue-card-value">@summary.TotalPayoutsSent</span>
+                        </div>
+                        <div class="admin-revenue-card admin-revenue-card--success">
+                            <span class="admin-revenue-card-label">Repasses Confirmados</span>
+                            <span class="admin-revenue-card-value">@summary.TotalPayoutsConfirmed</span>
+                        </div>
+                        <div class="admin-revenue-card admin-revenue-card--warning">
+                            <span class="admin-revenue-card-label">Repasses Pendentes</span>
+                            <span class="admin-revenue-card-value">@summary.TotalPayoutsPending</span>
+                        </div>
+                        <div class="admin-revenue-card admin-revenue-card--error">
+                            <span class="admin-revenue-card-label">Repasses Falhados</span>
+                            <span class="admin-revenue-card-value">@summary.TotalPayoutsFailed</span>
+                        </div>
+                    </div>
+                </div>
+
+                @if (groupBreakdown.Any())
+                {
+                    <div class="admin-revenue-breakdown">
+                        <h2 class="admin-revenue-section-title">Por Grupo</h2>
+                        <table class="admin-revenue-table">
+                            <thead>
+                                <tr>
+                                    <th>Grupo</th>
+                                    <th>Transações</th>
+                                    <th>Taxas</th>
+                                    <th>Valor Base</th>
+                                    <th>Enviados</th>
+                                    <th>Confirmados</th>
+                                    <th>Pendentes</th>
+                                    <th>Falhados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var group in groupBreakdown)
+                                {
+                                    <tr>
+                                        <td>@group.GroupName</td>
+                                        <td>@group.TotalTransactions</td>
+                                        <td>R$ @group.TotalFeesCollected.ToString("N2", PtBr)</td>
+                                        <td>R$ @group.TotalBaseAmount.ToString("N2", PtBr)</td>
+                                        <td>@group.TotalPayoutsSent</td>
+                                        <td>@group.TotalPayoutsConfirmed</td>
+                                        <td>@group.TotalPayoutsPending</td>
+                                        <td>@group.TotalPayoutsFailed</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="listing-state">Nenhum dado encontrado para o período.</p>
+                }
+            }
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="Ações Adicionais">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+    </section>
+</div>
+
+@code {
+    private DateTime? startDate;
+    private DateTime? endDate;
+    private bool isLoading = false;
+    private RevenueSummary? summary;
+    private List<GroupRevenueBreakdown> groupBreakdown = new();
+    private CultureInfo PtBr { get; } = new CultureInfo("pt-BR");
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Default to last 30 days
+        endDate = DateTime.UtcNow;
+        startDate = DateTime.UtcNow.AddDays(-30);
+        await LoadReportAsync();
+    }
+
+    private async Task LoadReportAsync()
+    {
+        isLoading = true;
+        try
+        {
+            summary = await RevenueReportService.GetRevenueSummaryAsync(startDate, endDate);
+            groupBreakdown = await RevenueReportService.GetRevenueByGroupAsync(startDate, endDate);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ClearFilters()
+    {
+        startDate = null;
+        endDate = null;
+    }
+}

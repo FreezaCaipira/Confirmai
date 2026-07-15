@@ -1,14 +1,17 @@
 using System.Globalization;
 using System.Security.Claims;
+using Confirmai.Configuration;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Factories;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Confirmai.Pages.Payment;
 
@@ -43,6 +46,8 @@ public partial class EventPayment : IAsyncDisposable
     private CancellationTokenSource? _copyBrCodeCts;
     private CancellationTokenSource? _copyAdminPixCts;
     private CancellationTokenSource? _uploadProofCts;
+
+    [Inject] private IOptions<FeeOptions> FeeOptions { get; set; } = default!;
 
     private Task? _copyBrCodeTask = null;
     private Task? _copyAdminPixTask = null;
@@ -108,6 +113,30 @@ public partial class EventPayment : IAsyncDisposable
             payState = PayState.Idle;
             return;
         }
+
+        // Guarda-corpo: verificar se taxa está configurada e gateway suportado
+        if (FeeOptions.Value.IsConfigured)
+        {
+            if (!FeeOptions.Value.SupportedGateways.Contains(selectedGatewayName, StringComparer.OrdinalIgnoreCase))
+            {
+                errorMsg = "O gateway selecionado não suporta cobrança de taxa. Entre em contato com o administrador.";
+                payState = PayState.Idle;
+                return;
+            }
+
+            // Verificar se o grupo tem GroupPayoutAccount configurado
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var payoutAccount = await db.GroupPayoutAccounts
+                .FirstOrDefaultAsync(gpa => gpa.GroupId == conf.Event.GroupId && gpa.IsActive);
+            
+            if (payoutAccount is null)
+            {
+                errorMsg = "O organizador não configurou a chave PIX para repasse. Entre em contato com o administrador.";
+                payState = PayState.Idle;
+                return;
+            }
+        }
+
         payState = PayState.Generating;
         errorMsg = string.Empty;
 
@@ -121,7 +150,28 @@ public partial class EventPayment : IAsyncDisposable
                 return;
             }
 
-            var charge = await gateway.CreateChargeAsync(conf.Event.Price.Value, conf.Id);
+            // Calcular valor total com taxa se configurado
+            var chargeAmount = conf.Event.Price.Value;
+            decimal serviceFeePercentage = 0;
+            GroupPayoutAccount? payoutAccount = null;
+
+            if (FeeOptions.Value.IsConfigured && 
+                FeeOptions.Value.SupportedGateways.Contains(selectedGatewayName, StringComparer.OrdinalIgnoreCase))
+            {
+                // Use fixed fees instead of percentage
+                chargeAmount = chargeAmount + FeeOptions.Value.AppFeeFixed + FeeOptions.Value.GatewayFeeFixed;
+                
+                // Calculate percentage for legacy compatibility (total fee / amount)
+                var totalFee = FeeOptions.Value.AppFeeFixed + FeeOptions.Value.GatewayFeeFixed;
+                serviceFeePercentage = totalFee > 0 ? (totalFee / chargeAmount) * 100 : 0;
+
+                // Get payout account for split
+                await using var payoutDb = await DbFactory.CreateDbContextAsync();
+                payoutAccount = await payoutDb.GroupPayoutAccounts
+                    .FirstOrDefaultAsync(pa => pa.GroupId == conf.Event.GroupId && pa.IsActive);
+            }
+
+            var charge = await gateway.CreateChargeAsync(chargeAmount, conf.Id, payoutAccount, serviceFeePercentage);
 
             // Persist txId + brCode so the page can reuse the charge if the user returns
             await using var db = await DbFactory.CreateDbContextAsync();

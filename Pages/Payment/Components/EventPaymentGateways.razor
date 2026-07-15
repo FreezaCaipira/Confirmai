@@ -1,5 +1,7 @@
 @using Confirmai.Models
+@using Confirmai.Configuration
 @using System.Globalization
+@using Microsoft.Extensions.Options
 
 @if (GroupGatewaysEnabled)
 {
@@ -47,6 +49,28 @@
     }
     else
     {
+        @if (FeeOptions.Value.IsConfigured && SelectedGatewaySupportsFee)
+        {
+            <div class="evpay-fee-breakdown">
+                <div class="evpay-fee-row">
+                    <span class="evpay-fee-label">Valor da partida:</span>
+                    <span class="evpay-fee-value">R$ @Price.ToString("N2", PtBr)</span>
+                </div>
+                <div class="evpay-fee-row">
+                    <span class="evpay-fee-label">Taxa do app:</span>
+                    <span class="evpay-fee-value">R$ @AppFeeAmount.ToString("N2", PtBr)</span>
+                </div>
+                <div class="evpay-fee-row">
+                    <span class="evpay-fee-label">Taxa do gateway:</span>
+                    <span class="evpay-fee-value">R$ @GatewayFeeAmount.ToString("N2", PtBr)</span>
+                </div>
+                <div class="evpay-fee-row evpay-fee-row--total">
+                    <span class="evpay-fee-label">Total a pagar:</span>
+                    <span class="evpay-fee-value">R$ @TotalAmount.ToString("N2", PtBr)</span>
+                </div>
+            </div>
+        }
+
         <button class="evpay-action-btn evpay-action-btn--pay"
                 disabled="@(IsGenerating)"
                 @onclick="HandleGenerateCharge">
@@ -57,7 +81,7 @@
             else
             {
                 <i class="fas fa-qrcode"></i>
-                <span>Gerar QR Code (@SelectedGatewayDisplayName) — R$ @Price.ToString("N2", PtBr)</span>
+                <span>Gerar QR Code (@SelectedGatewayDisplayName) — R$ @TotalAmount.ToString("N2", PtBr)</span>
             }
         </button>
     }
@@ -82,8 +106,50 @@ else
     
     [Parameter] public EventCallback<string> OnSelectGateway { get; set; }
     [Parameter] public EventCallback OnGenerateCharge { get; set; }
+
+    [Inject] private IOptions<FeeOptions> FeeOptions { get; set; } = default!;
     
     private CultureInfo PtBr { get; } = new CultureInfo("pt-BR");
+
+    private bool SelectedGatewaySupportsFee =>
+        !string.IsNullOrWhiteSpace(SelectedGatewayName) &&
+        FeeOptions.Value.SupportedGateways.Contains(SelectedGatewayName, StringComparer.OrdinalIgnoreCase);
+
+    private decimal AppFeeAmount
+    {
+        get
+        {
+            if (!FeeOptions.Value.IsConfigured || !SelectedGatewaySupportsFee)
+                return 0m;
+            
+            // 0.50 for app (fixed amount)
+            return 0.50m;
+        }
+    }
+
+    private decimal GatewayFeeAmount
+    {
+        get
+        {
+            if (!FeeOptions.Value.IsConfigured || !SelectedGatewaySupportsFee)
+                return 0m;
+            
+            // 0.25 for gateway (fixed amount)
+            return 0.25m;
+        }
+    }
+
+    private decimal TotalAmount
+    {
+        get
+        {
+            if (!FeeOptions.Value.IsConfigured || !SelectedGatewaySupportsFee)
+                return Price;
+            
+            // Fixed fees: 0.50 app + 0.25 gateway
+            return Price + AppFeeAmount + GatewayFeeAmount;
+        }
+    }
 
     private async Task HandleSelectGateway(string gatewayName)
         => await OnSelectGateway.InvokeAsync(gatewayName);

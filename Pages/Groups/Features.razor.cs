@@ -40,6 +40,12 @@ public partial class Features
     private bool    pixError           = false;
     private string  selectedPixReceiverId = string.Empty;
 
+    // Payout account
+    private bool    isSavingPayout     = false;
+    private string  payoutMessage      = string.Empty;
+    private bool    payoutError        = false;
+    private GroupPayoutAccount? payoutAccount = null;
+
     protected override async Task OnInitializedAsync()
     {
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -64,6 +70,11 @@ public partial class Features
         availableGatewayOptions = (await EventGatewayFactory.GetAvailableAsync()).ToList();
         selectedPixReceiverId = group?.PixReceiverUserId ?? string.Empty;
         confirmPromoteMemberId = null;
+        
+        // Load payout account
+        payoutAccount = await db.GroupPayoutAccounts
+            .FirstOrDefaultAsync(gpa => gpa.GroupId == Id && gpa.IsActive);
+        
         isLoading = false;
     }
 
@@ -357,4 +368,98 @@ public partial class Features
         selectedPixReceiverId = selectedId;
         await SavePixReceiver();
     }
+
+    private async Task SavePayoutAccount(GroupPayoutAccount formData)
+    {
+        if (group is null) return;
+        isSavingPayout = true;
+        payoutMessage = string.Empty;
+        payoutError = false;
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            
+            if (payoutAccount is null)
+            {
+                // Create new payout account
+                var newAccount = new GroupPayoutAccount
+                {
+                    GroupId = group.Id,
+                    PixKeyType = formData.PixKeyType,
+                    PixKeyValue = formData.PixKeyValue,
+                    BeneficiaryName = formData.BeneficiaryName,
+                    BeneficiaryCpf = formData.BeneficiaryCpf,
+                    BankAccountNumber = formData.BankAccountNumber,
+                    CreatedByUserId = currentUserId,
+                    IsActive = true
+                };
+                db.GroupPayoutAccounts.Add(newAccount);
+                await db.SaveChangesAsync();
+                payoutAccount = newAccount;
+                
+                await LogService.AuditAsync(
+                    AuditEvents.GroupPayoutAccountCreated,
+                    AuditEntities.Group,
+                    group.Id.ToString(),
+                    $"Conta de repasse criada para o grupo: chave {formData.PixKeyType} - {formData.PixKeyValue}",
+                    currentUserId,
+                    source: "GroupFeatures",
+                    metadata: new
+                    {
+                        GroupId = group.Id,
+                        GroupName = group.Name,
+                        PixKeyType = formData.PixKeyType.ToString(),
+                        PixKeyValue = formData.PixKeyValue,
+                        BeneficiaryName = formData.BeneficiaryName,
+                        CreatedByUserId = currentUserId,
+                        CreatedAtUtc = DateTime.UtcNow,
+                    });
+            }
+            else
+            {
+                // Update existing payout account
+                var dbAccount = await db.GroupPayoutAccounts.FindAsync(payoutAccount.Id);
+                if (dbAccount is null) return;
+                
+                var previousKey = dbAccount.PixKeyValue;
+                dbAccount.PixKeyType = formData.PixKeyType;
+                dbAccount.PixKeyValue = formData.PixKeyValue;
+                dbAccount.BeneficiaryName = formData.BeneficiaryName;
+                dbAccount.BeneficiaryCpf = formData.BeneficiaryCpf;
+                dbAccount.BankAccountNumber = formData.BankAccountNumber;
+                await db.SaveChangesAsync();
+                payoutAccount = dbAccount;
+                
+                await LogService.AuditAsync(
+                    AuditEvents.GroupPayoutAccountUpdated,
+                    AuditEntities.Group,
+                    group.Id.ToString(),
+                    $"Conta de repasse atualizada: chave alterada de {previousKey} para {formData.PixKeyValue}",
+                    currentUserId,
+                    source: "GroupFeatures",
+                    metadata: new
+                    {
+                        GroupId = group.Id,
+                        GroupName = group.Name,
+                        PreviousPixKey = previousKey,
+                        CurrentPixKey = formData.PixKeyValue,
+                        PixKeyType = formData.PixKeyType.ToString(),
+                        BeneficiaryName = formData.BeneficiaryName,
+                        UpdatedByUserId = currentUserId,
+                        UpdatedAtUtc = DateTime.UtcNow,
+                    });
+            }
+            
+            payoutMessage = "Chave PIX de repasse salva com sucesso.";
+        }
+        catch
+        {
+            payoutMessage = "Erro ao salvar. Tente novamente.";
+            payoutError = true;
+        }
+        finally { isSavingPayout = false; }
+    }
+
+    private async Task SavePayoutAccountCallback(GroupPayoutAccount formData)
+        => await SavePayoutAccount(formData);
 }

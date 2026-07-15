@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json.Serialization;
 using Confirmai.Configuration;
+using Confirmai.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -52,10 +53,38 @@ public sealed class EfiBankPixService
     public bool IsEnabled => _options.IsEnabled;
 
     /// <summary>
+    /// Creates a Pix payment split configuration for automatic payout to organizer.
+    /// NOTE: Split Pix requires EfiBank accounts for all participants. 
+    /// This method is currently disabled as most organizers don't have EfiBank accounts.
+    /// Manual payout via PayoutService is used instead.
+    /// </summary>
+    public async Task<string> CreateSplitAsync(GroupPayoutAccount payoutAccount, decimal serviceFeePercentage)
+    {
+        // Split Pix requires EfiBank accounts - not available for most organizers
+        // Using manual payout via PayoutService instead
+        throw new NotImplementedException("Split Pix requires EfiBank accounts. Use PayoutService for manual payout.");
+    }
+
+    /// <summary>
+    /// Links a Pix charge to a payment split configuration.
+    /// NOTE: Split Pix requires EfiBank accounts for all participants.
+    /// This method is currently disabled as most organizers don't have EfiBank accounts.
+    /// Manual payout via PayoutService is used instead.
+    /// </summary>
+    public async Task LinkChargeToSplitAsync(string txId, string splitId)
+    {
+        // Split Pix requires EfiBank accounts - not available for most organizers
+        // Using manual payout via PayoutService instead
+        throw new NotImplementedException("Split Pix requires EfiBank accounts. Use PayoutService for manual payout.");
+    }
+
+    /// <summary>
     /// Creates a Pix charge (Cob) and returns (txId, pixCopiaECola).
     /// txId is stored in EventConfirmation.PixTxId so the webhook can resolve it.
+    /// NOTE: Split Pix is disabled as it requires EfiBank accounts for all participants.
+    /// Manual payout via PayoutService is used instead.
     /// </summary>
-    public async Task<(string TxId, string BrCode)> CreateChargeAsync(decimal amount, int confirmationId)
+    public async Task<(string TxId, string BrCode)> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null, decimal serviceFeePercentage = 0)
     {
         if (!_options.IsEnabled)
             throw new InvalidOperationException(
@@ -71,6 +100,7 @@ public sealed class EfiBankPixService
         amount = GetEffectiveAmount(amount, _options.Sandbox);
 
         var amountStr = amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+        
         var body = new
         {
             calendario        = new { expiracao = _options.PixExpiresInSeconds },
@@ -80,6 +110,14 @@ public sealed class EfiBankPixService
         };
 
         var response = await http.PutAsJsonAsync($"/v2/cob/{txId}", body);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            _logger.LogError("EfiBank: falha ao criar cobrança. Status={Status}, Body={Body}",
+                response.StatusCode, errorBody);
+        }
+
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<EfiBankCobResponse>();
@@ -179,6 +217,9 @@ public sealed class EfiBankPixService
         var credentials = Convert.ToBase64String(
             Encoding.UTF8.GetBytes($"{_options.ClientId}:{_options.ClientSecret}"));
 
+        _logger.LogInformation("EfiBank: tentando obter token OAuth. URL={Url}, ClientId={ClientId}",
+            _options.BaseUrl + "/oauth/token", _options.ClientId);
+
         var request = new HttpRequestMessage(HttpMethod.Post, "/oauth/token")
         {
             Content = new StringContent(
@@ -190,6 +231,16 @@ public sealed class EfiBankPixService
         try
         {
             var response = await http.SendAsync(request);
+            
+            _logger.LogInformation("EfiBank: resposta OAuth. Status={Status}", response.StatusCode);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                _logger.LogError("EfiBank: falha OAuth. Status={Status}, Body={Body}", 
+                    response.StatusCode, errorBody);
+            }
+
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadFromJsonAsync<EfiBankTokenResponse>();
@@ -233,8 +284,8 @@ public sealed class EfiBankPixService
                 X509KeyStorageFlags.Exportable);
 
             handler.ClientCertificates.Add(cert);
-            _logger.LogDebug("EfiBank: certificado carregado — Subject={Subject}, HasPrivateKey={HasKey}",
-                cert.Subject, cert.HasPrivateKey);
+            _logger.LogInformation("EfiBank: certificado carregado — Subject={Subject}, HasPrivateKey={HasKey}, NotBefore={NotBefore}, NotAfter={NotAfter}",
+                cert.Subject, cert.HasPrivateKey, cert.NotBefore, cert.NotAfter);
         }
         else
         {
@@ -274,3 +325,6 @@ internal sealed record EfiBankCobResponse(
     [property: JsonPropertyName("txid")]          string? TxId,
     [property: JsonPropertyName("status")]        string? Status,
     [property: JsonPropertyName("pixCopiaECola")] string? PixCopiaECola);
+
+internal sealed record EfiBankSplitResponse(
+    [property: JsonPropertyName("id")] string Id);

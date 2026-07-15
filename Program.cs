@@ -122,10 +122,17 @@ builder.Services.AddScoped<AdminConfirmationService>();
 builder.Services.AddScoped<DelinquencyService>();
 builder.Services.AddScoped<PixProofUploadService>();
 builder.Services.AddScoped<AppInitializationService>();
-builder.Services.AddScoped<Confirmai.Services.Payment.Shared.WebhookPaymentMarker>();
+builder.Services.AddScoped<Confirmai.Services.Payment.Shared.WebhookPaymentMarker>(sp => 
+    new Confirmai.Services.Payment.Shared.WebhookPaymentMarker(
+        sp.GetRequiredService<AppDbContext>(),
+        sp.GetRequiredService<LogService>(),
+        sp.GetRequiredService<PaymentEventBus>(),
+        sp.GetService<PayoutService>()));
+builder.Services.AddScoped<PayoutService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<AbacatePayWebhookService>();
 builder.Services.AddScoped<EfiBankPixService>();
+builder.Services.AddScoped<IPixPayoutService, EfiBankPixPayoutService>();
 builder.Services.AddScoped<AppmaxPixService>();
 builder.Services.AddScoped<EfiBankWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
@@ -135,6 +142,7 @@ builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<GroupMetricsService>();
 builder.Services.AddScoped<WhatsAppNotificationService>();
 builder.Services.AddScoped<AdminSettingsService>();
+builder.Services.AddScoped<AdminRevenueReportService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();
 builder.Services.AddScoped<EventNotificationService>();
 builder.Services.AddScoped<AdminLogsQueryService>();
@@ -229,6 +237,7 @@ builder.Services.Configure<BtcPayOptions>(builder.Configuration.GetSection("BtcP
 builder.Services.Configure<AbacatePayOptions>(builder.Configuration.GetSection(AbacatePayOptions.Section));
 builder.Services.Configure<EfiBankOptions>(builder.Configuration.GetSection(EfiBankOptions.Section));
 builder.Services.Configure<AppmaxOptions>(builder.Configuration.GetSection(AppmaxOptions.Section));
+builder.Services.Configure<FeeOptions>(builder.Configuration.GetSection(FeeOptions.Section));
 builder.Services.AddHttpClient("AbacatePay", (sp, client) =>
 {
     var opts = sp.GetRequiredService<IOptions<AbacatePayOptions>>().Value;
@@ -546,7 +555,7 @@ app.MapPost("/api/abacatepay/webhook", async (HttpContext context, AbacatePayWeb
     return await webhookService.HandleAsync(context);
 }).RequireRateLimiting("webhook");
 
-app.MapPost("/api/efibank/webhook", async (HttpContext context, EfiBankWebhookService webhookService) =>
+app.MapPost("/api/webhooks/efibank/pix", async (HttpContext context, EfiBankWebhookService webhookService) =>
 {
     return await webhookService.HandleAsync(context);
 }).RequireRateLimiting("webhook");

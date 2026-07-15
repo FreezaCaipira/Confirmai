@@ -111,6 +111,45 @@
     margin-bottom: 0.75rem;
 }
 
+.evpay-fee-breakdown {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.evpay-fee-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+}
+
+.evpay-fee-row--total {
+    border-top: 1px solid var(--ci-border);
+    margin-top: 0.4rem;
+    padding-top: 0.6rem;
+    font-weight: 700;
+}
+
+.evpay-fee-label {
+    font-size: 0.85rem;
+    color: var(--ci-text-muted);
+}
+
+.evpay-fee-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ci-text);
+}
+
+.evpay-fee-row--total .evpay-fee-label,
+.evpay-fee-row--total .evpay-fee-value {
+    color: var(--ci-text);
+    font-size: 0.95rem;
+}
+
 @media (max-width: 768px) {
     .evpay-method-option {
         min-height: 44px;

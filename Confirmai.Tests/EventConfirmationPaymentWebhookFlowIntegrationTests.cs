@@ -110,9 +110,9 @@ public class EventConfirmationPaymentWebhookFlowIntegrationTests : IClassFixture
 
         if (string.IsNullOrWhiteSpace(options.WebhookSecret))
         {
-            return "/api/efibank/webhook";
+            return "/api/webhooks/efibank/pix";
         }
 
-        return $"/api/efibank/webhook?webhookSecret={Uri.EscapeDataString(options.WebhookSecret)}";
+        return $"/api/webhooks/efibank/pix?webhookSecret={Uri.EscapeDataString(options.WebhookSecret)}";
     }
 }
