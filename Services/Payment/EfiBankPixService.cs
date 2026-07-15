@@ -272,20 +272,32 @@ public sealed class EfiBankPixService
         if (!string.IsNullOrWhiteSpace(_options.CertificatePath) &&
             File.Exists(_options.CertificatePath))
         {
+            var fileInfo = new FileInfo(_options.CertificatePath);
+            _logger.LogInformation("EfiBank: arquivo de certificado encontrado — Path={Path}, Size={Size} bytes", _options.CertificatePath, fileInfo.Length);
+
             // UserKeySet + PersistKeySet + Exportable: persists the private key in the current
             // user's key store so Windows SChannel can access it during mTLS handshake.
             // MachineKeySet would require admin rights and fails with SEC_E_UNKNOWN_CREDENTIALS.
             var password = _options.CertificatePassword ?? string.Empty;
-            var cert = X509CertificateLoader.LoadPkcs12FromFile(
-                _options.CertificatePath,
-                password,
-                X509KeyStorageFlags.UserKeySet  |
-                X509KeyStorageFlags.PersistKeySet |
-                X509KeyStorageFlags.Exportable);
+            try
+            {
+                var cert = X509CertificateLoader.LoadPkcs12FromFile(
+                    _options.CertificatePath,
+                    password,
+                    X509KeyStorageFlags.UserKeySet  |
+                    X509KeyStorageFlags.PersistKeySet |
+                    X509KeyStorageFlags.Exportable);
 
-            handler.ClientCertificates.Add(cert);
-            _logger.LogInformation("EfiBank: certificado carregado — Subject={Subject}, HasPrivateKey={HasKey}, NotBefore={NotBefore}, NotAfter={NotAfter}",
-                cert.Subject, cert.HasPrivateKey, cert.NotBefore, cert.NotAfter);
+                handler.ClientCertificates.Add(cert);
+                _logger.LogInformation("EfiBank: certificado carregado — Subject={Subject}, HasPrivateKey={HasKey}, NotBefore={NotBefore}, NotAfter={NotAfter}",
+                    cert.Subject, cert.HasPrivateKey, cert.NotBefore, cert.NotAfter);
+            }
+            catch (System.Security.Cryptography.CryptographicException ex)
+            {
+                _logger.LogError(ex, "EfiBank: falha ao carregar certificado — Path={Path}, Size={Size} bytes, PasswordSet={PasswordSet}",
+                    _options.CertificatePath, fileInfo.Length, !string.IsNullOrWhiteSpace(password));
+                throw;
+            }
         }
         else
         {
