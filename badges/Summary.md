@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 07/15/2026 - 06:09:54 |
-| Coverage date: | 07/15/2026 - 06:09:49 |
+| Generated on: | 07/15/2026 - 06:27:03 |
+| Coverage date: | 07/15/2026 - 06:26:57 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 435 |
 | Files: | 492 |
-| **Line coverage:** | 91.2% (116049 of 127109) |
-| Covered lines: | 116049 |
-| Uncovered lines: | 11060 |
-| Coverable lines: | 127109 |
-| Total lines: | 157547 |
+| **Line coverage:** | 91.2% (116050 of 127116) |
+| Covered lines: | 116050 |
+| Uncovered lines: | 11066 |
+| Coverable lines: | 127116 |
+| Total lines: | 157559 |
 | **Branch coverage:** | 29.6% (2390 of 8073) |
 | Covered branches: | 2390 |
 | Total branches: | 8073 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 223_29393280202 |
+| Tag: | 224_29394096041 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **116049** | **11060** | **127109** | **165922** | **91.2%** | **2390** | **8073** | **29.6%** |
+| **Confirmai** | **116050** | **11066** | **127116** | **165970** | **91.2%** | **2390** | **8073** | **29.6%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 24 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -377,13 +377,13 @@
 | Confirmai.Services.Payment.AppmaxPixService | 48 | 221 | 269 | 438 | 17.8% | 48 | 122 | 39.3% |
 | Confirmai.Services.Payment.BtcPayServerPaymentService | 42 | 0 | 42 | 82 | 100% | 13 | 18 | 72.2% |
 | Confirmai.Services.Payment.BtcPayWebhookService | 138 | 15 | 153 | 353 | 90.1% | 66 | 76 | 86.8% |
-| Confirmai.Services.Payment.EfiBankCobResponse | 3 | 1 | 4 | 330 | 75% | 0 | 0 |  |
+| Confirmai.Services.Payment.EfiBankCobResponse | 3 | 1 | 4 | 342 | 75% | 0 | 0 |  |
 | Confirmai.Services.Payment.EfiBankPayoutResponse | 0 | 2 | 2 | 223 | 0% | 0 | 0 |  |
 | Confirmai.Services.Payment.EfiBankPixPayoutService | 13 | 90 | 103 | 223 | 12.6% | 0 | 34 | 0% |
-| Confirmai.Services.Payment.EfiBankPixService | 87 | 52 | 139 | 330 | 62.5% | 25 | 48 | 52% |
+| Confirmai.Services.Payment.EfiBankPixService | 87 | 59 | 146 | 342 | 59.5% | 25 | 48 | 52% |
 | Confirmai.Services.Payment.EfiBankPixWebhookEntry | 3 | 1 | 4 | 127 | 75% | 0 | 0 |  |
-| Confirmai.Services.Payment.EfiBankSplitResponse | 0 | 2 | 2 | 330 | 0% | 0 | 0 |  |
-| Confirmai.Services.Payment.EfiBankTokenResponse | 3 | 0 | 3 | 330 | 100% | 0 | 0 |  |
+| Confirmai.Services.Payment.EfiBankSplitResponse | 0 | 2 | 2 | 342 | 0% | 0 | 0 |  |
+| Confirmai.Services.Payment.EfiBankTokenResponse | 3 | 0 | 3 | 342 | 100% | 0 | 0 |  |
 | Confirmai.Services.Payment.EfiBankWebhookPayload | 2 | 0 | 2 | 127 | 100% | 0 | 0 |  |
 | Confirmai.Services.Payment.EfiBankWebhookService | 52 | 0 | 52 | 127 | 100% | 27 | 32 | 84.3% |
 | Confirmai.Services.Payment.EventPaymentReconcileResult | 7 | 0 | 7 | 294 | 100% | 0 | 0 |  |
@@ -458,7 +458,7 @@
 | Confirmai.Shared.Helpers.EventAccess | 6 | 0 | 6 | 31 | 100% | 14 | 14 | 100% |
 | Confirmai.Shared.Helpers.EventMinimums | 22 | 0 | 22 | 49 | 100% | 6 | 6 | 100% |
 | Confirmai.Shared.IbgeMunicipio | 0 | 1 | 1 | 29 | 0% | 0 | 0 |  |
-| Confirmai.Shared.MainLayout | 108 | 38 | 146 | 384 | 73.9% | 49 | 72 | 68% |
+| Confirmai.Shared.MainLayout | 109 | 37 | 146 | 384 | 74.6% | 49 | 72 | 68% |
 | Confirmai.Shared.RouteNotAuthorized | 8 | 0 | 8 | 30 | 100% | 5 | 6 | 83.3% |
 | Program | 405 | 137 | 542 | 703 | 74.7% | 54 | 88 | 61.3% |
 | System.Text.RegularExpressions.Generated | 258 | 32 | 290 | 816 | 88.9% | 121 | 150 | 80.6% |
