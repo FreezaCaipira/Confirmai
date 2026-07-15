@@ -786,7 +786,7 @@ Implementação de suporte a certificado via variável de ambiente em base64:
 - Base64 (codificação/decodificação)
 - Serilog (logging detalhado)
 
-**Status:** Solução implementada e aguardando teste em produção com variável `EfiBank__CertificateBase64`.
+**Status:** Solução implementada e aguardando análise do Senior para definir próximo passo.
 
 ---
 
