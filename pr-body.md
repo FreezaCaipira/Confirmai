@@ -43,4 +43,4 @@ Implementar sistema de pagamento com taxas fixas e repasse automático via Pix p
 ## Configuração necessária em produção
 - Variáveis de ambiente no EasyPanel configuradas
 - Certificado de produção EfiBank carregado
-- Webhook URL: `https://confirmai-app-confirmai.m2gpju.easypanel.host/api/webhooks/efibank/pix`
+- Webhook URL: `https://confirmai.m2gpju.easypanel.host/api/webhooks/efibank/pix`

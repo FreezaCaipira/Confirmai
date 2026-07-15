@@ -704,7 +704,7 @@ O PR #55 de fato **adiantou parte do C18**. Ajuste o escopo do C18 para focar no
 **Configuração de produção**:
 - Certificado de produção EfiBank carregado no EasyPanel
 - Variáveis de ambiente configuradas
-- Webhook URL: `https://confirmai-app-confirmai.m2gpju.easypanel.host/api/webhooks/efibank/pix`
+- Webhook URL: `https://confirmai.m2gpju.easypanel.host/api/webhooks/efibank/pix`
 
 ---
 
