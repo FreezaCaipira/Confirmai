@@ -719,9 +719,35 @@ Prioridade (fazer nesta ordem, cada fase reversivel):
 
 ---
 
-## Ciclo Pagamento Real + Taxa de Servico (PENDENTE DE REVIEW)
+## Review Senior -- Ciclo Pagamento Real + Taxa de Servico (analisado)
 
-**Status**: Implementado, aguardando criação oficial do PR e review do Senior quando tokens resetarem.
+**Status**: Implementado (PR #60 mergeado) e revisado pelo Senior. Build OK, testes unitarios novos (FeeCalculatorTests, PayoutServiceTests) verdes. As 24 falhas locais sao apenas `ProgramConfigurationTests` que precisam de Postgres (ambiente sem DB) -- nao sao regressao; passam no CI.
+
+**Veredito**: arquitetura correta e todas as 8 fases entregues (GroupPayoutAccount, FeeOptions, PayoutStatus/EndToEndId, EfiBankPixPayoutService, integracao no webhook, checkout transparente, guarda-corpos, relatorio admin). Idempotencia do **webhook** esta correta (curto-circuito em `PaymentStatus == Paid`, evita repasse duplicado no fluxo normal -- `WebhookPaymentMarker.cs:48-49`). Porem ha **pontos que o Pleno precisa corrigir antes de prod** (financeiro, alto risco):
+
+### BLOQUEADORES / correcoes para o Pleno
+
+1. **DECISAO TRAVADA (Robson, 17/07/2026) -- taxa FIXA** R$0,50 (app) + R$0,25 (gateway), por cima. RESOLVIDO nesta PR de review: removido o `FeeCalculator` percentual (codigo morto) + `FeeCalculatorTests`, removido o campo `_feeCalculator` de `PayoutService` e o `PercentBps` de `FeeOptions`; testes do `PayoutService` migrados para taxas fixas. O modelo percentual fica descartado.
+
+2. **Falha de repasse NUNCA e retentada (plano pedia retry+backoff+alerta admin)**: em `PayoutService.cs:155-165`, ao falhar o Envio de Pix, marca `PayoutStatus.Failed` e incrementa `PayoutRetryCount`, mas **nada reprocessa**. Como o webhook idempotente so chama o payout na 1a transicao para Paid, webhooks repetidos nao retentam. Resultado: jogador pagou, site reteve tudo, organizador nao recebeu, sem retry nem alerta. Falta job de retry (backoff) + alerta admin em falha persistente.
+
+3. **Sem guarda-corpo efetivo no checkout sem chave de repasse**: se `Fee.IsConfigured` e o grupo **nao tem `GroupPayoutAccount` ativa**, o checkout ainda cobra base+taxa (`EventPayment.razor.cs:174`) e o `PayoutService` depois **pula** o repasse (`PayoutService.cs:76-82`). Dinheiro do organizador fica retido no site. Deve **bloquear a cobranca** (ou exigir cadastro da chave) antes de gerar o QR.
+
+4. **Payload do Envio de Pix EfiBank a validar (critico p/ prod)**: `EfiBankPixPayoutService.cs:90-102` monta `PUT /v2/gn/pix/{txId}` com `{ valor, chave, infoPagador:{nome,cpf:"00000000000"} }`. Nao bate com o schema documentado do "Envio de Pix" da Efi (usa `pagador`/`favorecido`); o CPF placeholder `00000000000` provavelmente e rejeitado. Validar contra doc/homologacao antes de prod, senao todo repasse falha.
+
+5. **Idempotencia do envio**: cada `SendPayoutAsync` gera `txId` aleatorio (`GenerateTxId()`). Se o payout for chamado 2x pro mesmo pagamento, gera 2 envios (duplo repasse). Usar chave de idempotencia deterministica (derivada do `confirmationId`/`PaymentId`) como `{txId}` do PUT.
+
+### Nao-bloqueantes (higiene)
+
+6. **Hardcode no breakdown da taxa** -- RESOLVIDO nesta PR: `EventPaymentGateways.razor` agora le `FeeOptions.AppFeeFixed/GatewayFeeFixed` em vez de `0.50m`/`0.25m` hardcoded.
+7. **`pr-body.md`** foi commitado na raiz (viola regra 20 de doc centralizada) -- removido nesta PR de review.
+8. **`serviceFeePercentage`** em `EventPayment.razor.cs:166` e calculado sobre o total (base+taxa), nao sobre a base -- so "legacy compatibility", mas confuso; remover se a taxa e fixa.
+
+---
+
+## Ciclo Pagamento Real + Taxa de Servico (implementado)
+
+**Status**: Implementado (PR #60 mergeado). Revisado -- ver "Review Senior" acima.
 
 **Branch**: `feat/pagamento-real-split`
 

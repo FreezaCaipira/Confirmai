@@ -121,9 +121,8 @@ else
         {
             if (!FeeOptions.Value.IsConfigured || !SelectedGatewaySupportsFee)
                 return 0m;
-            
-            // 0.50 for app (fixed amount)
-            return 0.50m;
+
+            return FeeOptions.Value.AppFeeFixed;
         }
     }
 
@@ -133,9 +132,8 @@ else
         {
             if (!FeeOptions.Value.IsConfigured || !SelectedGatewaySupportsFee)
                 return 0m;
-            
-            // 0.25 for gateway (fixed amount)
-            return 0.25m;
+
+            return FeeOptions.Value.GatewayFeeFixed;
         }
     }
 
@@ -145,8 +143,7 @@ else
         {
             if (!FeeOptions.Value.IsConfigured || !SelectedGatewaySupportsFee)
                 return Price;
-            
-            // Fixed fees: 0.50 app + 0.25 gateway
+
             return Price + AppFeeAmount + GatewayFeeAmount;
         }
     }
