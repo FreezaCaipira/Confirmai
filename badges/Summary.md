@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 07/15/2026 - 08:27:57 |
-| Coverage date: | 07/15/2026 - 08:27:52 |
+| Generated on: | 07/20/2026 - 03:11:31 |
+| Coverage date: | 07/20/2026 - 03:11:26 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
-| Classes: | 435 |
-| Files: | 492 |
-| **Line coverage:** | 91.2% (116050 of 127138) |
-| Covered lines: | 116050 |
-| Uncovered lines: | 11088 |
-| Coverable lines: | 127138 |
-| Total lines: | 157594 |
-| **Branch coverage:** | 29.6% (2392 of 8079) |
-| Covered branches: | 2392 |
-| Total branches: | 8079 |
+| Classes: | 433 |
+| Files: | 491 |
+| **Line coverage:** | 91.2% (116018 of 127104) |
+| Covered lines: | 116018 |
+| Uncovered lines: | 11086 |
+| Coverable lines: | 127104 |
+| Total lines: | 157511 |
+| **Branch coverage:** | 29.5% (2382 of 8069) |
+| Covered branches: | 2382 |
+| Total branches: | 8069 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 231_29400699686 |
+| Tag: | 234_29711439860 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **116050** | **11088** | **127138** | **166092** | **91.2%** | **2392** | **8079** | **29.6%** |
+| **Confirmai** | **116018** | **11086** | **127104** | **165938** | **91.2%** | **2382** | **8069** | **29.5%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 24 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -63,7 +63,7 @@
 | Confirmai.Configuration.AppmaxOptions | 13 | 0 | 13 | 42 | 100% | 10 | 10 | 100% |
 | Confirmai.Configuration.EfiBankOptions | 18 | 0 | 18 | 72 | 100% | 10 | 10 | 100% |
 | Confirmai.Configuration.EmailOptions | 8 | 0 | 8 | 14 | 100% | 0 | 0 |  |
-| Confirmai.Configuration.FeeOptions | 7 | 0 | 7 | 37 | 100% | 6 | 6 | 100% |
+| Confirmai.Configuration.FeeOptions | 6 | 0 | 6 | 30 | 100% | 3 | 4 | 75% |
 | Confirmai.Configuration.OtelOptions | 13 | 0 | 13 | 78 | 100% | 6 | 6 | 100% |
 | Confirmai.Configuration.SecurityPolicyDefaults | 23 | 0 | 23 | 48 | 100% | 2 | 2 | 100% |
 | Confirmai.Configuration.SecurityPolicySnapshot | 11 | 0 | 11 | 48 | 100% | 0 | 0 |  |
@@ -266,7 +266,7 @@
 | Confirmai.Pages.MyConfirmations.Index | 0 | 2 | 2 | 9 | 0% | 0 | 0 |  |
 | Confirmai.Pages.MyEvents.Index | 0 | 138 | 138 | 308 | 0% | 0 | 97 | 0% |
 | Confirmai.Pages.Pages__Host | 2 | 0 | 2 | 225 | 100% | 5 | 6 | 83.3% |
-| Confirmai.Pages.Payment.Components.EventPaymentGateways | 0 | 43 | 43 | 159 | 0% | 0 | 32 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentGateways | 0 | 43 | 43 | 156 | 0% | 0 | 32 | 0% |
 | Confirmai.Pages.Payment.Components.EventPaymentHeader | 0 | 8 | 8 | 29 | 0% | 0 | 4 | 0% |
 | Confirmai.Pages.Payment.Components.EventPaymentPixAdmin | 0 | 13 | 13 | 49 | 0% | 0 | 6 | 0% |
 | Confirmai.Pages.Payment.Components.EventPaymentProof | 0 | 14 | 14 | 66 | 0% | 0 | 12 | 0% |
@@ -390,15 +390,13 @@
 | Confirmai.Services.Payment.EventPaymentReconciliationService | 136 | 44 | 180 | 294 | 75.5% | 33 | 48 | 68.7% |
 | Confirmai.Services.Payment.EventPaymentReconciliationSweepResult | 6 | 0 | 6 | 294 | 100% | 0 | 0 |  |
 | Confirmai.Services.Payment.EventPaymentReconciliationWorker | 9 | 21 | 30 | 66 | 30% | 1 | 6 | 16.6% |
-| Confirmai.Services.Payment.FeeCalculationResult | 4 | 0 | 4 | 71 | 100% | 0 | 0 |  |
-| Confirmai.Services.Payment.FeeCalculator | 27 | 1 | 28 | 71 | 96.4% | 7 | 8 | 87.5% |
 | Confirmai.Services.Payment.GatewayService | 47 | 0 | 47 | 86 | 100% | 14 | 14 | 100% |
 | Confirmai.Services.Payment.LimitedStream | 33 | 1 | 34 | 353 | 97% | 3 | 6 | 50% |
 | Confirmai.Services.Payment.PaymentConfirmationService | 46 | 3 | 49 | 96 | 93.8% | 21 | 26 | 80.7% |
 | Confirmai.Services.Payment.PaymentDomainMetrics | 40 | 0 | 40 | 101 | 100% | 24 | 24 | 100% |
 | Confirmai.Services.Payment.PaymentEventBus | 2 | 0 | 2 | 11 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Payment.PaymentInitializationService | 24 | 18 | 42 | 114 | 57.1% | 27 | 40 | 67.5% |
-| Confirmai.Services.Payment.PayoutService | 39 | 58 | 97 | 167 | 40.2% | 11 | 18 | 61.1% |
+| Confirmai.Services.Payment.PayoutService | 38 | 58 | 96 | 165 | 39.5% | 11 | 18 | 61.1% |
 | Confirmai.Services.Payment.PendingWebhooksAlertService | 38 | 4 | 42 | 90 | 90.4% | 5 | 6 | 83.3% |
 | Confirmai.Services.Payment.PixProofUploadResult | 3 | 0 | 3 | 118 | 100% | 0 | 0 |  |
 | Confirmai.Services.Payment.PixProofUploadService | 43 | 15 | 58 | 118 | 74.1% | 14 | 14 | 100% |
@@ -458,7 +456,7 @@
 | Confirmai.Shared.Helpers.EventAccess | 6 | 0 | 6 | 31 | 100% | 14 | 14 | 100% |
 | Confirmai.Shared.Helpers.EventMinimums | 22 | 0 | 22 | 49 | 100% | 6 | 6 | 100% |
 | Confirmai.Shared.IbgeMunicipio | 0 | 1 | 1 | 29 | 0% | 0 | 0 |  |
-| Confirmai.Shared.MainLayout | 108 | 38 | 146 | 384 | 73.9% | 49 | 72 | 68% |
+| Confirmai.Shared.MainLayout | 109 | 37 | 146 | 384 | 74.6% | 49 | 72 | 68% |
 | Confirmai.Shared.RouteNotAuthorized | 8 | 0 | 8 | 30 | 100% | 5 | 6 | 83.3% |
 | Program | 405 | 137 | 542 | 703 | 74.7% | 54 | 88 | 61.3% |
 | System.Text.RegularExpressions.Generated | 258 | 32 | 290 | 816 | 88.9% | 121 | 150 | 80.6% |
