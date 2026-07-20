@@ -15,7 +15,6 @@ namespace Confirmai.Services.Payment;
 public sealed class PayoutService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
-    private readonly FeeCalculator _feeCalculator;
     private readonly IPixPayoutService _payoutService;
     private readonly FeeOptions _feeOptions;
     private readonly LogService _log;
@@ -30,7 +29,6 @@ public sealed class PayoutService
         _feeOptions = feeOptions.Value;
         _payoutService = payoutService;
         _log = log;
-        _feeCalculator = new FeeCalculator(_feeOptions.PercentBps);
     }
 
     /// <summary>

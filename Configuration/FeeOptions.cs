@@ -4,13 +4,6 @@ public class FeeOptions
 {
     public const string Section = "Fee";
 
-    /// <summary>
-    /// Taxa de serviço em basis points (bps). 100 bps = 1%. Ex: 400 = 4%.
-    /// Usar inteiro para evitar problemas de precisão com float.
-    /// DEPRECATED: Use AppFeeFixed and GatewayFeeFixed instead.
-    /// </summary>
-    public int PercentBps { get; set; } = 0;
-
     /// <summary>Taxa fixa do app em reais.</summary>
     public decimal AppFeeFixed { get; set; } = 0;
 
@@ -33,5 +26,5 @@ public class FeeOptions
     public bool ShowDirectPixToOrganizer { get; set; } = true;
 
     /// <summary>True quando a taxa está configurada e habilitada.</summary>
-    public bool IsConfigured => Enabled && (AppFeeFixed > 0 || GatewayFeeFixed > 0 || PercentBps > 0);
+    public bool IsConfigured => Enabled && (AppFeeFixed > 0 || GatewayFeeFixed > 0);
 }

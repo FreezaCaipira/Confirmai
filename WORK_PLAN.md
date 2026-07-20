@@ -727,7 +727,7 @@ Prioridade (fazer nesta ordem, cada fase reversivel):
 
 ### BLOQUEADORES / correcoes para o Pleno
 
-1. **DECISAO DIVERGENTE -- taxa fixa vs percentual (aguardando Robson)**: o plano travado era **percentual 4% por cima**, mas foi implementada **taxa FIXA** R$0,50 (app) + R$0,25 (gateway). Consequencia: `FeeCalculator` (percentual) virou **codigo morto** -- instanciado em `PayoutService.cs:33` mas nunca usado; `FeeCalculatorTests` testa classe fora de uso. Definir com o Robson: manter fixa (remover/ajustar FeeCalculator + `PercentBps`) ou voltar pra percentual.
+1. **DECISAO TRAVADA (Robson, 17/07/2026) -- taxa FIXA** R$0,50 (app) + R$0,25 (gateway), por cima. RESOLVIDO nesta PR de review: removido o `FeeCalculator` percentual (codigo morto) + `FeeCalculatorTests`, removido o campo `_feeCalculator` de `PayoutService` e o `PercentBps` de `FeeOptions`; testes do `PayoutService` migrados para taxas fixas. O modelo percentual fica descartado.
 
 2. **Falha de repasse NUNCA e retentada (plano pedia retry+backoff+alerta admin)**: em `PayoutService.cs:155-165`, ao falhar o Envio de Pix, marca `PayoutStatus.Failed` e incrementa `PayoutRetryCount`, mas **nada reprocessa**. Como o webhook idempotente so chama o payout na 1a transicao para Paid, webhooks repetidos nao retentam. Resultado: jogador pagou, site reteve tudo, organizador nao recebeu, sem retry nem alerta. Falta job de retry (backoff) + alerta admin em falha persistente.
 
@@ -739,7 +739,7 @@ Prioridade (fazer nesta ordem, cada fase reversivel):
 
 ### Nao-bloqueantes (higiene)
 
-6. **Hardcode no breakdown da taxa**: `EventPaymentGateways.razor:126,138,149` usa `0.50m`/`0.25m` hardcoded em vez de `FeeOptions.AppFeeFixed/GatewayFeeFixed`. Se o admin mudar a config, a UI mostra valor errado (a cobranca real usa a config). Ler da config.
+6. **Hardcode no breakdown da taxa** -- RESOLVIDO nesta PR: `EventPaymentGateways.razor` agora le `FeeOptions.AppFeeFixed/GatewayFeeFixed` em vez de `0.50m`/`0.25m` hardcoded.
 7. **`pr-body.md`** foi commitado na raiz (viola regra 20 de doc centralizada) -- removido nesta PR de review.
 8. **`serviceFeePercentage`** em `EventPayment.razor.cs:166` e calculado sobre o total (base+taxa), nao sobre a base -- so "legacy compatibility", mas confuso; remover se a taxa e fixa.
 

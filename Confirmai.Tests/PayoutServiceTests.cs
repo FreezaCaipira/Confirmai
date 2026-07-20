@@ -44,7 +44,8 @@ public class PayoutServiceTests
         var feeOptions = new FeeOptions
         {
             Enabled = true,
-            PercentBps = 400,
+            AppFeeFixed = 0.50m,
+            GatewayFeeFixed = 0.25m,
             SupportedGateways = new[] { "EfiBank" }
         };
 
@@ -101,7 +102,8 @@ public class PayoutServiceTests
         var feeOptions = new FeeOptions
         {
             Enabled = true,
-            PercentBps = 400,
+            AppFeeFixed = 0.50m,
+            GatewayFeeFixed = 0.25m,
             SupportedGateways = new[] { "EfiBank" }
         };
 
@@ -158,7 +160,8 @@ public class PayoutServiceTests
         var feeOptions = new FeeOptions
         {
             Enabled = false,
-            PercentBps = 400,
+            AppFeeFixed = 0.50m,
+            GatewayFeeFixed = 0.25m,
             SupportedGateways = new[] { "EfiBank" }
         };
 
