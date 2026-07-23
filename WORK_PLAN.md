@@ -750,6 +750,7 @@ A partir do Ciclo 18, TDD + SOLID sao regras permanentes de desenvolvimento, nao
 - **Unicode escapes em testes**: usar `\u00E7` etc. em string literals para evitar problemas de encoding
 - **@inject via .razor**: quando `[Inject]` no `.razor.cs` nao e reconhecido pelo compilador Blazor, usar `@inject` no `.razor`
 - **BEM em novos componentes**: `block__element--modifier` (ver css-audit.md Fase 7)
+- **PR body como documentacao**: todo PR deve incluir body descritivo com resumo, metricas, criterios de aceitacao e notas para o revisor. PR sem body nao e aceito. O body serve como documentacao permanente do que foi feito e por que.
 
 ---
 
