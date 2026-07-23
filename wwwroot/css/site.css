@@ -812,7 +812,7 @@ body::before {
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .sidebar {
         width: 100%;
         height: auto;
@@ -1732,7 +1732,7 @@ textarea:focus-visible {
     100% { transform: rotate(360deg); }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .product-table,
     .log-table,
     .payments-table {
@@ -2348,7 +2348,7 @@ textarea:focus-visible {
 
 
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
     .server-auction-visuals {
         grid-template-columns: 72px 64px minmax(100px, 1fr);
     }
@@ -2594,7 +2594,7 @@ textarea:focus-visible {
     opacity: 0.75;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .breadcrumb-nav {
         margin: 0.5rem 0 0.6rem 0;
     }
@@ -2669,7 +2669,7 @@ textarea:focus-visible {
     cursor: not-allowed;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
     .filter-bar.admin-filter-card input,
     .filter-bar.admin-filter-card select {
         flex: 1 1 100%;
@@ -2748,7 +2748,7 @@ textarea:focus-visible {
     gap: 0.55rem;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .delivery-agent-form-grid {
         grid-template-columns: 1fr;
     }
@@ -3389,7 +3389,7 @@ footer {
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .layout-news-ticker {
         display: none;
     }
@@ -4164,7 +4164,7 @@ body .oldsite-main-content .server-offer-create-card .form-group > label {
 }
 
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
     .server-item-summary-body {
         grid-template-columns: 1fr;
     }
@@ -4217,7 +4217,7 @@ body .oldsite-footer {
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     body .oldsite-frame {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -4641,7 +4641,7 @@ body .oldsite-main-content .servers-list-market .world-select-manage {
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     body .oldsite-main-content .world-select-grid {
         grid-template-columns: minmax(0, 1fr);
     }

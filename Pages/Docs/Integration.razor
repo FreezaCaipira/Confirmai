@@ -1,10 +1,9 @@
-﻿@page "/docs/integration"
+@page "/docs/integration"
 
 @attribute [Authorize(Policy = "ServerAdmin")]
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
-@inject IJSRuntime JS
 
 <PageTitle>Integração via API — Confirmai</PageTitle>
 
@@ -281,19 +280,3 @@
         </article>
     </section>
 </div>
-
-@code {
-    private async Task CopyCode(string elementId)
-    {
-        try
-        {
-            await JS.InvokeVoidAsync("navigator.clipboard.writeText",
-                await JS.InvokeAsync<string>("eval",
-                    $"document.getElementById('{elementId}').innerText"));
-        }
-        catch
-        {
-            // clipboard blocked — silent fail
-        }
-    }
-}

@@ -1,4 +1,4 @@
-﻿@page "/admin/payments"
+@page "/admin/payments"
 
 @attribute [Authorize(Roles = "admin")]
 @implements IAsyncDisposable
@@ -25,6 +25,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject LogService LogService
 @inject UiTextService T
+@inject ReconciliationSeverityEvaluator SeverityEvaluator
 
 <div class="entity-shell admin-page admin-payments-shell">
 

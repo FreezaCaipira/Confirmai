@@ -717,6 +717,41 @@ Prioridade (fazer nesta ordem, cada fase reversivel):
 - Nao reescrever modulo inteiro num commit gigante.
 - Nao mexer no comportamento a pretexto de "limpar".
 
+### Formalizacao: TDD + SOLID como regra going forward (Ciclo 18 -- executado)
+
+**Data**: 22/07/2026
+
+A partir do Ciclo 18, TDD + SOLID sao regras permanentes de desenvolvimento, nao apenas deste ciclo. O seguinte foi estabelecido e executado:
+
+#### TDD -- Regras permanentes
+1. **Baseline verde obrigatorio**: antes de qualquer mudanca, `dotnet test` deve passar. Anotar contagem.
+2. **Characterization tests antes de refatorar**: codigo legado sem cobertura recebe characterization test primeiro (captura comportamento atual), depois refatora com teste verde.
+3. **Red-Green-Refactor**: novo comportamento -> teste que falha -> codigo minimo -> refatorar.
+4. **Testes de comportamento, nao de implementacao**: entrada->saida, efeitos observaveis. Reflexao para metodos privados e aceitavel em characterization tests de legacy, mas novos testes devem cobrir a API publica.
+5. **Zero teste ignorado/comentado pra "passar"**.
+
+#### SOLID -- Regras permanentes
+1. **SRP**: code-behinds nao contem logica de negocio. Extrair para services testaveis. Alvo: qualquer metodo com logica de negocio em `.razor.cs` e candidato a extracao.
+2. **DIP**: depender de interfaces via DI. Novos pontos de extensao via interface + DI.
+3. **Extracao incremental**: cada extracao coberta por teste antes e depois. Nao reescrever modulos inteiros.
+4. **Padrao de extracao**: criar service + testes (TDD) -> substituir no code-behind -> build + suite verde.
+
+#### Metricas do Ciclo 18 (executado)
+- **Baseline**: 1799 testes
+- **Final**: 1876 testes (+77)
+- **Characterization tests (reflection)**: 54 (AdminPayments 30, EventPayment 16, Profile 8)
+- **Services extraidos**: 3 (EventPaymentChargeCalculator, ReconciliationSeverityEvaluator, PixStaticPayloadGenerator)
+- **Service unit tests**: 41 (8 + 17 + 16)
+- **CSS audit**: 25 arquivos vazios removidos, fragmentacao auditada, BEM formalizado
+- **Build**: 0 erros, 0 hardcoded hex em scoped
+
+#### Ferramentas e padroes estabelecidos
+- **Reflection para characterization tests**: `BindingFlags.NonPublic | BindingFlags.Static` para metodos privados estaticos em code-behinds Blazor
+- **Unicode escapes em testes**: usar `\u00E7` etc. em string literals para evitar problemas de encoding
+- **@inject via .razor**: quando `[Inject]` no `.razor.cs` nao e reconhecido pelo compilador Blazor, usar `@inject` no `.razor`
+- **BEM em novos componentes**: `block__element--modifier` (ver css-audit.md Fase 7)
+- **PR body como documentacao**: todo PR deve incluir body descritivo com resumo, metricas, criterios de aceitacao e notas para o revisor. PR sem body nao e aceito. O body serve como documentacao permanente do que foi feito e por que.
+
 ---
 
 ## Review Senior -- Ciclo Pagamento Real + Taxa de Servico (analisado)

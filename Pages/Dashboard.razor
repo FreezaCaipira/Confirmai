@@ -3,17 +3,5 @@
 @attribute [Authorize]
 
 @using Microsoft.AspNetCore.Authorization
-@inject NavigationManager Navigation
-@inject UiTextService T
 
 <PageTitle>@T["Common.Redirecting"]</PageTitle>
-
-@code {
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Navigation.NavigateTo("/eventos", replace: true);
-        }
-    }
-}

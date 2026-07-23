@@ -102,6 +102,17 @@ public sealed class PayoutService
         var paymentRecord = await db.Payments
             .FirstOrDefaultAsync(p => p.PaymentId == txId);
 
+        // Idempotência: se o repasse já foi enviado ou confirmado, não reprocessar
+        if (paymentRecord is not null &&
+            (paymentRecord.PayoutStatus == PayoutStatus.Sent ||
+             paymentRecord.PayoutStatus == PayoutStatus.Confirmed))
+        {
+            await _log.LogAsync(
+                $"Payout: repasse já enviado (status={paymentRecord.PayoutStatus}). Skipping confirmationId={confirmationId}.",
+                source: "Payout", level: "Debug");
+            return;
+        }
+
         if (paymentRecord is null)
         {
             paymentRecord = new PaymentRecord
@@ -135,10 +146,12 @@ public sealed class PayoutService
                 $"Payout: enviando Pix. amount={baseAmount}, pixKey={payoutAccount.PixKeyValue}, confirmationId={confirmationId}.",
                 source: "Payout", level: "Info");
 
+            var idempotencyKey = $"payout-{confirmation.Id}-{txId}";
             var endToEndId = await _payoutService.SendPayoutAsync(
                 baseAmount,
                 payoutAccount.PixKeyValue,
-                $"Repasse Confirmai - Evento {confirmation.Event.Id}");
+                $"Repasse Confirmai - Evento {confirmation.Event.Id}",
+                idempotencyKey);
 
             // Atualizar PaymentRecord com sucesso
             paymentRecord.PayoutStatus = PayoutStatus.Sent;
@@ -160,6 +173,99 @@ public sealed class PayoutService
             await _log.LogAsync(
                 $"Payout: falha ao enviar Pix. error={ex.Message}, confirmationId={confirmationId}.",
                 source: "Payout", level: "Error");
+        }
+    }
+
+    /// <summary>
+    /// Retries failed payouts with exponential backoff.
+    /// Called by PayoutRetryService (IHostedService) on a timer.
+    /// </summary>
+    public async Task RetryFailedPayoutsAsync()
+    {
+        if (!_feeOptions.IsConfigured)
+            return;
+
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        const int maxRetries = 5;
+        var now = DateTime.UtcNow;
+
+        var failedPayouts = await db.Payments
+            .Where(p => p.PayoutStatus == PayoutStatus.Failed
+                     || p.PayoutStatus == PayoutStatus.Retrying)
+            .ToListAsync();
+
+        foreach (var record in failedPayouts)
+        {
+            if (record.PayoutRetryCount >= maxRetries)
+            {
+                record.PayoutStatus = PayoutStatus.Failed;
+                await _log.LogAsync(
+                    $"Payout: MÁXIMO de retentativas atingido ({maxRetries}). " +
+                    $"PaymentId={record.PaymentId}, retryCount={record.PayoutRetryCount}. " +
+                    $"REPASSE MANUAL NECESSÁRIO — valor base={record.BaseAmount}, pixKey={record.PayoutPixKey}.",
+                    source: "Payout", level: "Error");
+                await db.SaveChangesAsync();
+                continue;
+            }
+
+            var backoffMinutes = 5 * Math.Pow(2, record.PayoutRetryCount);
+            var lastAttempt = record.PayoutSentAt ?? record.CreatedAt;
+            var nextRetryAt = lastAttempt.AddMinutes(backoffMinutes);
+
+            if (now < nextRetryAt)
+                continue;
+
+            var confirmation = await db.EventConfirmations
+                .Include(c => c.Event).ThenInclude(e => e.Group)
+                .FirstOrDefaultAsync(c => c.PixTxId == record.PaymentId);
+
+            if (confirmation is null)
+            {
+                await _log.LogAsync(
+                    $"Payout: EventConfirmation não encontrado para retry. PaymentId={record.PaymentId}.",
+                    source: "Payout", level: "Warning");
+                continue;
+            }
+
+            record.PayoutStatus = PayoutStatus.Retrying;
+            await db.SaveChangesAsync();
+
+            await _log.LogAsync(
+                $"Payout: retentativa {record.PayoutRetryCount + 1}/{maxRetries}. " +
+                $"confirmationId={confirmation.Id}, backoff={backoffMinutes:F0}min.",
+                source: "Payout", level: "Info");
+
+            try
+            {
+                var idempotencyKey = $"payout-{confirmation.Id}-{record.PaymentId}";
+                var endToEndId = await _payoutService.SendPayoutAsync(
+                    record.BaseAmount ?? 0,
+                    record.PayoutPixKey ?? string.Empty,
+                    $"Repasse Confirmai - Evento {confirmation.Event.Id}",
+                    idempotencyKey);
+
+                record.PayoutStatus = PayoutStatus.Sent;
+                record.PayoutEndToEndId = endToEndId;
+                record.PayoutSentAt = DateTime.UtcNow;
+                record.PayoutErrorMessage = null;
+                await db.SaveChangesAsync();
+
+                await _log.LogAsync(
+                    $"Payout: retry bem-sucedido. endToEndId={endToEndId}, confirmationId={confirmation.Id}.",
+                    source: "Payout", level: "Info");
+            }
+            catch (Exception ex)
+            {
+                record.PayoutStatus = PayoutStatus.Failed;
+                record.PayoutErrorMessage = ex.Message;
+                record.PayoutRetryCount++;
+                await db.SaveChangesAsync();
+
+                await _log.LogAsync(
+                    $"Payout: retry falhou. error={ex.Message}, retryCount={record.PayoutRetryCount}/{maxRetries}.",
+                    source: "Payout", level: "Error");
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/admin/parchment-lab"
+@page "/admin/parchment-lab"
 
 @attribute [Authorize(Roles = "admin")]
 
@@ -60,7 +60,3 @@
         <button class="back-btn" @onclick='() => Navigation.NavigateTo("/admin")'>Voltar</button>
     </section>
 </div>
-
-@code {
-    [Inject] public NavigationManager Navigation { get; set; } = default!;
-}

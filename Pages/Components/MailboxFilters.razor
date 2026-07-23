@@ -27,32 +27,3 @@
         <button class="mk-btn mk-btn-secondary" type="button" @onclick="HandleResetFilters">@T["Mailbox.FilterClear"]</button>
     </div>
 </section>
-
-@inject UiTextService T
-
-@code {
-    [Parameter]
-    public string SearchTerm { get; set; } = string.Empty;
-
-    [Parameter]
-    public int PageSize { get; set; } = 20;
-
-    [Parameter]
-    public bool InboxUnreadOnly { get; set; }
-
-    [Parameter]
-    public EventCallback OnApplyFilters { get; set; }
-
-    [Parameter]
-    public EventCallback OnResetFilters { get; set; }
-
-    private async Task HandleApplyFilters()
-    {
-        await OnApplyFilters.InvokeAsync();
-    }
-
-    private async Task HandleResetFilters()
-    {
-        await OnResetFilters.InvokeAsync();
-    }
-}

@@ -1,15 +1,10 @@
-﻿@attribute [Authorize]
+@attribute [Authorize]
 
 @using Confirmai.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Confirmai.Shared.Helpers
 
-@inject IDbContextFactory<AppDbContext> DbFactory
-@inject NavigationManager Navigation
-@inject BitcoinQuoteService BitcoinQuoteService
-@inject CurrencyPreferenceService CurrencyPreferenceService
-@inject UiTextService T
 
 <div class="entity-shell parchment-b">
 
@@ -87,34 +82,3 @@
         </article>
     </section>
 </div>
-
-@code {
-    [Parameter] public int PaymentId { get; set; }
-    public PaymentRecord? payment;
-    private decimal? btcUsdRate;
-    private decimal? btcBrlRate;
-
-    private bool IsPixPayment => string.Equals(payment?.PaymentMethod, "Pix", StringComparison.OrdinalIgnoreCase);
-    private string AddressLabel => IsPixPayment ? T["PaymentBuy.PixCodeLabel"] : T["Common.Address"];
-
-    protected override async Task OnInitializedAsync()
-    {
-        var quote = await BitcoinQuoteService.GetQuoteAsync();
-        btcUsdRate = quote?.btc_usd;
-        btcBrlRate = quote?.btc_brl;
-
-        await using var db = await DbFactory.CreateDbContextAsync();
-        payment = await db.Payments
-            .Include(p => p.Product)
-            .ThenInclude(product => product!.User)
-            .FirstOrDefaultAsync(p => p.Id == PaymentId);
-    }
-
-    void GoBack() => Navigation.NavigateTo("/payments");
-
-    private MarkupString FormatBtcWithUsd(decimal amount)
-    {
-        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
-    }
-}
-

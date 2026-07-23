@@ -151,20 +151,14 @@ public partial class EventPayment : IAsyncDisposable
             }
 
             // Calcular valor total com taxa se configurado
-            var chargeAmount = conf.Event.Price.Value;
-            decimal serviceFeePercentage = 0;
+            var feeCalc = ChargeCalculator.Calculate(conf.Event.Price.Value, selectedGatewayName);
+            var chargeAmount = feeCalc.ChargeAmount;
+            var serviceFeePercentage = feeCalc.ServiceFeePercentage;
             GroupPayoutAccount? payoutAccount = null;
 
             if (FeeOptions.Value.IsConfigured && 
                 FeeOptions.Value.SupportedGateways.Contains(selectedGatewayName, StringComparer.OrdinalIgnoreCase))
             {
-                // Use fixed fees instead of percentage
-                chargeAmount = chargeAmount + FeeOptions.Value.AppFeeFixed + FeeOptions.Value.GatewayFeeFixed;
-                
-                // Calculate percentage for legacy compatibility (total fee / amount)
-                var totalFee = FeeOptions.Value.AppFeeFixed + FeeOptions.Value.GatewayFeeFixed;
-                serviceFeePercentage = totalFee > 0 ? (totalFee / chargeAmount) * 100 : 0;
-
                 // Get payout account for split
                 await using var payoutDb = await DbFactory.CreateDbContextAsync();
                 payoutAccount = await payoutDb.GroupPayoutAccounts
@@ -293,23 +287,7 @@ public partial class EventPayment : IAsyncDisposable
     /// Falls back to the first admin that has a PixKey configured.
     /// </summary>
     private static string? GetGroupAdminPixKey(Group group)
-    {
-        // Prefer the explicitly chosen receiver
-        if (!string.IsNullOrWhiteSpace(group.PixReceiverUserId))
-        {
-            var chosen = group.Members
-                .FirstOrDefault(m => m.UserId == group.PixReceiverUserId);
-            if (!string.IsNullOrWhiteSpace(chosen?.User?.PixKey))
-                return chosen.User.PixKey;
-        }
-
-        // Fallback: first admin with a Pix key
-        return group.Members
-            .Where(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey))
-            .OrderBy(m => m.CreatedAt)
-            .Select(m => m.User!.PixKey)
-            .FirstOrDefault();
-    }
+        => PixStaticPayloadGenerator.GetGroupAdminPixKey(group);
 
     private async Task CopyAdminPixKey(string key)
     {
@@ -402,35 +380,8 @@ public partial class EventPayment : IAsyncDisposable
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
     }
 
-    /// <summary>Generates a Pix static BR Code (EMVco) payload for direct transfer QR codes.</summary>
     private static string BuildPixStaticPayload(string pixKey, string groupName, string? city, decimal amount)
-    {
-        static string F(string tag, string v) => $"{tag}{v.Length:D2}{v}";
-
-        var name    = groupName.Length > 25 ? groupName[..25] : groupName;
-        var cityStr = string.IsNullOrWhiteSpace(city) ? "Brasil" : (city.Length > 15 ? city[..15] : city);
-        var amtStr  = amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-
-        var mai  = F("0014", "br.gov.bcb.pix") + F("01", pixKey);
-        var body = "000201"
-            + F("26", mai)
-            + "52040000"
-            + "5303986"
-            + F("54", amtStr)
-            + "5802BR"
-            + F("59", name)
-            + F("60", cityStr)
-            + "6304";
-
-        ushort crc = 0xFFFF;
-        foreach (char c in body)
-        {
-            crc ^= (ushort)(c << 8);
-            for (int i = 0; i < 8; i++)
-                crc = (crc & 0x8000) != 0 ? (ushort)((crc << 1) ^ 0x1021) : (ushort)(crc << 1);
-        }
-        return body + crc.ToString("X4");
-    }
+        => PixStaticPayloadGenerator.Build(pixKey, groupName, city, amount);
 
     private IReadOnlyList<EventPaymentGatewayOption> GetComingSoonGateways()
     {

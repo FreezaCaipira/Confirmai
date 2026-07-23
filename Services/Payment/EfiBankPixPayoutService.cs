@@ -21,8 +21,9 @@ public interface IPixPayoutService
     /// <param name="amount">Amount to send (base amount without fee)</param>
     /// <param name="pixKey">Recipient's Pix key</param>
     /// <param name="description">Payment description</param>
+    /// <param name="idempotencyKey">Deterministic key to prevent duplicate payouts (derived from confirmationId + txId)</param>
     /// <returns>EndToEndId for tracking the payout</returns>
-    Task<string> SendPayoutAsync(decimal amount, string pixKey, string description);
+    Task<string> SendPayoutAsync(decimal amount, string pixKey, string description, string idempotencyKey);
 }
 
 /// <summary>
@@ -66,10 +67,11 @@ public sealed class EfiBankPixPayoutService : IPixPayoutService
     /// Sends a Pix payout to the specified Pix key.
     /// </summary>
     /// <param name="amount">Amount to send (base amount without fee)</param>
-    /// <param name="pixKey">Recipient's Pix key</param>
+    /// <param name="pixKey">Recipient's Pix key (organizer)</param>
     /// <param name="description">Payment description</param>
+    /// <param name="idempotencyKey">Deterministic key to prevent duplicate payouts (derived from confirmationId + txId)</param>
     /// <returns>EndToEndId for tracking the payout</returns>
-    public async Task<string> SendPayoutAsync(decimal amount, string pixKey, string description)
+    public async Task<string> SendPayoutAsync(decimal amount, string pixKey, string description, string idempotencyKey)
     {
         if (!_options.IsEnabled)
             throw new InvalidOperationException(
@@ -81,22 +83,27 @@ public sealed class EfiBankPixPayoutService : IPixPayoutService
         if (string.IsNullOrWhiteSpace(pixKey))
             throw new ArgumentException("Pix key is required", nameof(pixKey));
 
+        if (string.IsNullOrWhiteSpace(idempotencyKey))
+            throw new ArgumentException("Idempotency key is required", nameof(idempotencyKey));
+
         var token = await GetAccessTokenAsync();
         using var http = CreateHttpClient(token);
 
         var amountStr = amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-        var txId = GenerateTxId();
+        var txId = GenerateTxId(idempotencyKey);
 
         var body = new
         {
             valor = amountStr,
-            chave = pixKey,
-            infoPagador = new
+            pagador = new
             {
-                nome = "Confirmai Plataforma",
-                cpf = "00000000000" // CPF placeholder para identificação da plataforma
+                chave = _options.PixKey,
+                infoPagador = description ?? "Repasse Confirmai"
             },
-            solicitacaoPagador = description ?? "Repasse Confirmai"
+            favorecido = new
+            {
+                chave = pixKey
+            }
         };
 
         var response = await http.PutAsJsonAsync($"/v2/gn/pix/{txId}", body);
@@ -113,14 +120,15 @@ public sealed class EfiBankPixPayoutService : IPixPayoutService
 
         var result = await response.Content.ReadFromJsonAsync<EfiBankPayoutResponse>();
 
-        if (result?.EndToEndId is null)
-            throw new InvalidOperationException("EfiBank não retornou endToEndId na resposta.");
+        var endToEndId = result?.EndToEndId;
+        if (string.IsNullOrWhiteSpace(endToEndId))
+            throw new InvalidOperationException("EfiBank não retornou e2eId na resposta.");
 
         _logger.LogInformation(
-            "EfiBank Pix enviado: endToEndId={EndToEndId}, amount={Amount}, pixKey={PixKey}",
-            result.EndToEndId, amount, pixKey);
+            "EfiBank Pix enviado: endToEndId={EndToEndId}, amount={Amount}, pixKey={PixKey}, txId={TxId}",
+            endToEndId, amount, pixKey, txId);
 
-        return result.EndToEndId;
+        return endToEndId;
     }
 
     // ── Private helpers (reused from EfiBankPixService) ─────────────────────
@@ -175,6 +183,7 @@ public sealed class EfiBankPixPayoutService : IPixPayoutService
     {
         var handler = new HttpClientHandler();
 
+        // Try loading from file first
         if (!string.IsNullOrWhiteSpace(_options.CertificatePath) &&
             File.Exists(_options.CertificatePath))
         {
@@ -187,13 +196,40 @@ public sealed class EfiBankPixPayoutService : IPixPayoutService
                 X509KeyStorageFlags.Exportable);
 
             handler.ClientCertificates.Add(cert);
-            _logger.LogDebug("EfiBank: certificado carregado — Subject={Subject}, HasPrivateKey={HasKey}",
+            _logger.LogDebug("EfiBank: certificado carregado (arquivo) — Subject={Subject}, HasPrivateKey={HasKey}",
                 cert.Subject, cert.HasPrivateKey);
+            return handler;
         }
-        else
+
+        // Try loading from base64
+        if (!string.IsNullOrWhiteSpace(_options.CertificateBase64))
         {
-            _logger.LogWarning("EfiBank: certificado não encontrado em '{Path}'", _options.CertificatePath);
+            try
+            {
+                var certBytes = Convert.FromBase64String(_options.CertificateBase64);
+                var password = _options.CertificatePassword ?? string.Empty;
+                var cert = X509CertificateLoader.LoadPkcs12(
+                    certBytes,
+                    password,
+                    X509KeyStorageFlags.UserKeySet |
+                    X509KeyStorageFlags.PersistKeySet |
+                    X509KeyStorageFlags.Exportable);
+
+                handler.ClientCertificates.Add(cert);
+                _logger.LogDebug("EfiBank: certificado carregado (base64) — Subject={Subject}, HasPrivateKey={HasKey}",
+                    cert.Subject, cert.HasPrivateKey);
+                return handler;
+            }
+            catch (System.Security.Cryptography.CryptographicException ex)
+            {
+                _logger.LogError(ex, "EfiBank: falha ao carregar certificado (base64) — Length={Length} chars",
+                    _options.CertificateBase64.Length);
+                throw;
+            }
         }
+
+        _logger.LogWarning("EfiBank: certificado não encontrado — Path={Path}, Base64Set={Base64Set}",
+            _options.CertificatePath, !string.IsNullOrWhiteSpace(_options.CertificateBase64));
 
         return handler;
     }
@@ -213,11 +249,22 @@ public sealed class EfiBankPixPayoutService : IPixPayoutService
         return http;
     }
 
-    private static string GenerateTxId() =>
-        Convert.ToHexString(RandomNumberGenerator.GetBytes(16));
+    /// <summary>
+    /// Generates a deterministic 32-char hex txId from the idempotency key.
+    /// This ensures the same payout is never sent twice (EfiBank recognizes duplicate idEnvio).
+    /// </summary>
+    private static string GenerateTxId(string idempotencyKey)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(idempotencyKey));
+        return Convert.ToHexString(hash[..16]); // 32 hex chars, within EfiBank's 26-35 char limit
+    }
 }
 
 // ── Internal DTOs ─────────────────────────────────────────────────────────────
 
 internal sealed record EfiBankPayoutResponse(
-    [property: JsonPropertyName("endToEndId")] string EndToEndId);
+    [property: JsonPropertyName("e2eId")] string? E2eId,
+    [property: JsonPropertyName("endToEndId")] string? EndToEndIdLegacy)
+{
+    public string? EndToEndId => E2eId ?? EndToEndIdLegacy;
+}

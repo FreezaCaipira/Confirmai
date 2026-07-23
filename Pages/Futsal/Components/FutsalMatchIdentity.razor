@@ -32,25 +32,3 @@
         <small class="form-hint">Opcional — aparece nos cards para identificar o estilo da região.</small>
     </div>
 </fieldset>
-
-@code {
-    [Parameter]
-    public Create.CreateMatchForm Form { get; set; } = new();
-
-    [Parameter]
-    public string SubFormat { get; set; } = "futsal";
-
-    [Parameter]
-    public Group? PreselectedGroup { get; set; }
-
-    [Parameter]
-    public EventCallback<string> OnSubFormatChanged { get; set; }
-
-    private async Task HandleSubFormatChanged(ChangeEventArgs e)
-    {
-        var newFormat = e.Value?.ToString() ?? "futsal";
-        await OnSubFormatChanged.InvokeAsync(newFormat);
-    }
-}
-
-

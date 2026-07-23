@@ -60,36 +60,3 @@
         </div>
     }
 </article>
-
-@inject UiTextService T
-
-@code {
-    [Parameter]
-    public ConversationContactView? SelectedContact { get; set; }
-
-    [Parameter]
-    public List<ConversationMessageView> ConversationMessages { get; set; } = new();
-
-    [Parameter]
-    public string ComposerBody { get; set; } = string.Empty;
-
-    [Parameter]
-    public string? ComposerInfoMessage { get; set; }
-
-    [Parameter]
-    public bool IsThreadLoading { get; set; }
-
-    [Parameter]
-    public bool IsSendingReply { get; set; }
-
-    [Parameter]
-    public ElementReference ThreadStreamRef { get; set; }
-
-    [Parameter]
-    public EventCallback<string> OnSendReply { get; set; }
-
-    private async Task HandleSendReply()
-    {
-        await OnSendReply.InvokeAsync(ComposerBody);
-    }
-}
