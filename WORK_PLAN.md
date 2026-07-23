@@ -780,6 +780,38 @@ A partir do Ciclo 18, TDD + SOLID sao regras permanentes de desenvolvimento, nao
 
 ---
 
+## Review Senior -- Ciclo 18 (TDD + SOLID + CSS + correcao dos 4 bloqueadores) -- ANALISADO
+
+**Data**: 14/06/2026 (Senior). **PR revisado**: #63 (`refactor/ciclo18-tdd-solid-css`, mergeado na main). Build OK. Testes: **1889 passando** / 1913 (as 24 falhas sao apenas `ProgramConfigurationTests` que precisam de Postgres -- ambiente sem DB, nao sao regressao; passam no CI).
+
+**Veredito: EXCELENTE.** O Pleno entregou a refatoracao TDD+SOLID+CSS **e**, no mesmo ciclo, **corrigiu os 4 bloqueadores financeiros** que eu havia levantado na review do ciclo de pagamento. Todos verificados:
+
+1. **Retry de repasse -- RESOLVIDO.** Novo `PayoutRetryService` (`IHostedService`, timer a cada 5min via `IServiceScopeFactory`) + `PayoutService.RetryFailedPayoutsAsync()`: busca `Failed`/`Retrying`, aplica **backoff exponencial** (`5 * 2^retryCount` min), teto de **5 tentativas** e, ao esgotar, loga em nivel `Error` "REPASSE MANUAL NECESSARIO" com valor base e chave PIX (alerta admin). Registrado no DI (`Program.cs:166 AddHostedService<PayoutRetryService>`). Ref: `PayoutService.cs:183-270`, `PayoutRetryService.cs`.
+
+2. **Guarda-corpo no checkout -- RESOLVIDO.** A logica de checkout foi extraida para `EventPaymentService` (SRP) e agora, quando `Fee.IsConfigured` e o grupo **nao tem `GroupPayoutAccount` ativa**, retorna erro e **nao gera a cobranca** ("O organizador nao configurou a chave PIX para repasse..."). Ref: `EventPaymentService.cs:143-154`.
+
+3. **Payload do Envio de Pix EfiBank -- CORRIGIDO (validar homologacao).** O corpo agora usa o schema correto `{ valor, pagador:{ chave, infoPagador }, favorecido:{ chave } }` e o **CPF placeholder foi removido**. A resposta trata `e2eId`/`endToEndId`. Estruturalmente correto; **o Pleno/usuario ainda deve validar em homologacao Efi** (credenciais + certificado) antes de prod. Ref: `EfiBankPixPayoutService.cs:95-131`.
+
+4. **Idempotencia do envio -- RESOLVIDO.** `SendPayoutAsync` passou a receber `idempotencyKey` deterministica (`payout-{confirmationId}-{txId}`) e o `txId` do PUT vira `SHA256(idempotencyKey)[..16]` (32 hex, determinstico) -- Efi reconhece `idEnvio` duplicado. Alem disso `ProcessPayoutAsync` faz curto-circuito se `PayoutStatus == Sent|Confirmed`. Ref: `EfiBankPixPayoutService.cs:256-260`, `PayoutService.cs:106-114,149`.
+
+### TDD + SOLID + CSS (o ciclo em si)
+- **SOLID**: 3 services testaveis extraidos de code-behinds (`EventPaymentChargeCalculator`, `ReconciliationSeverityEvaluator`, `PixStaticPayloadGenerator`) + varios `.razor` decompostos em `.razor.cs`. Alem dos services de pagamento (`EventPaymentService`, `AdminPaymentsQueryService`, `AdminPaymentsSummaryService`).
+- **TDD**: +77 testes (54 characterization + 41 unit). Baseline 1799 -> 1876 (metrica do Pleno; local 1889 verdes com os testes de env excluidos).
+- **CSS**: breakpoints padronizados em 768px, 25 `.razor.css` vazios removidos, BEM formalizado, 0 hex hardcoded em scoped.
+- **Regra permanente**: TDD+SOLID formalizados como regra going forward. Aprovado.
+
+### Correcoes de higiene aplicadas nesta PR de review
+- **Docs soltos na raiz removidos (regra 20)**: `pr-body.md` (voltou no #63), `REFACTORING_PROGRESS.md`, `css-audit.md`. O conteudo de valor (metricas, BEM) ja esta consolidado neste WORK_PLAN.
+- **Ajuste da "regra de PR body"**: manter body descritivo e obrigatorio -- **mas na descricao do PR no GitHub**, nao como arquivo commitado na raiz. Arquivo `.md` de PR body no repo viola a regra 20.
+
+### Pendencias reais antes de prod (nao-codigo)
+- Validar o Envio de Pix em **homologacao Efi** (credenciais/certificado fora do git) -- unico item tecnico que resta confirmar.
+- Confirmar com contador a nota fiscal sobre a taxa de servico (site no fluxo do dinheiro).
+
+**Conclusao**: o ciclo de pagamento esta **tecnicamente pronto para teste em homologacao**. Nao ha mais bloqueadores de codigo.
+
+---
+
 ## Ciclo Pagamento Real + Taxa de Servico (implementado)
 
 **Status**: Implementado (PR #60 mergeado). Revisado -- ver "Review Senior" acima.
