@@ -193,6 +193,9 @@ public class PayoutServiceTests
         var (db, dbFactory) = TestDataFactory.CreateDbContextWithFactory();
 
         var group = TestDataFactory.CreateGroup("Test Group", enablePaymentGateways: true);
+        db.Groups.Add(group);
+        await db.SaveChangesAsync();
+
         var payoutAccount = TestDataFactory.CreateGroupPayoutAccount(group.Id, "organizador@email.com");
         var user = TestDataFactory.CreateUserWithPixKey("user1", "Test User", "user@email.com");
         var evt = TestDataFactory.CreateEvent(group, "2024-01-01 10:00", 50m);
@@ -208,7 +211,6 @@ public class PayoutServiceTests
             PixTxId = "tx123"
         };
 
-        db.Groups.Add(group);
         db.GroupPayoutAccounts.Add(payoutAccount);
         db.Users.Add(user);
         db.Events.Add(evt);
@@ -328,6 +330,9 @@ public class PayoutServiceTests
         var (db, dbFactory) = TestDataFactory.CreateDbContextWithFactory();
 
         var group = TestDataFactory.CreateGroup("Test Group", enablePaymentGateways: true);
+        db.Groups.Add(group);
+        await db.SaveChangesAsync();
+
         var payoutAccount = TestDataFactory.CreateGroupPayoutAccount(group.Id, "organizador@email.com");
         var user = TestDataFactory.CreateUserWithPixKey("user1", "Test User", "user@email.com");
         var evt = TestDataFactory.CreateEvent(group, "2024-01-01 10:00", 50m);
@@ -343,7 +348,6 @@ public class PayoutServiceTests
             PixTxId = "tx123"
         };
 
-        db.Groups.Add(group);
         db.GroupPayoutAccounts.Add(payoutAccount);
         db.Users.Add(user);
         db.Events.Add(evt);
