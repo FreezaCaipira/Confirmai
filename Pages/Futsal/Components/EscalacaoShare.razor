@@ -7,20 +7,3 @@
         <i class="fab fa-whatsapp"></i> Compartilhar no WhatsApp
     </button>
 </div>
-
-@code {
-    [Parameter]
-    public bool Copied { get; set; }
-
-    [Parameter]
-    public EventCallback OnCopyToClipboard { get; set; }
-
-    [Parameter]
-    public EventCallback OnShareOnWhatsApp { get; set; }
-
-    private async Task HandleCopyToClipboard()
-        => await OnCopyToClipboard.InvokeAsync();
-
-    private async Task HandleShareOnWhatsApp()
-        => await OnShareOnWhatsApp.InvokeAsync();
-}

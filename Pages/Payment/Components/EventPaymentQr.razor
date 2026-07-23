@@ -21,13 +21,3 @@
         @(Copied ? "Copiado!" : "Copiar código Pix")
     </button>
 </div>
-
-@code {
-    [Parameter] public string? BrCode { get; set; }
-    [Parameter] public bool Copied { get; set; }
-    
-    [Parameter] public EventCallback OnCopyBrCode { get; set; }
-
-    private async Task HandleCopyBrCode()
-        => await OnCopyBrCode.InvokeAsync();
-}

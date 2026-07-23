@@ -1,7 +1,5 @@
 @page "/about"
 
-@inject NavigationManager Navigation
-@inject UiTextService T
 
 <PageTitle>@T["Common.Redirecting"]</PageTitle>
 
@@ -12,13 +10,3 @@
         </article>
     </section>
 </div>
-
-@code {
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Navigation.NavigateTo("/servers", replace: true);
-        }
-    }
-}

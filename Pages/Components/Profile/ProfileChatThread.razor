@@ -14,15 +14,3 @@ else
         </article>
     }
 }
-
-@code {
-    [Parameter]
-    public List<ProfileChatMessageView> ChatMessages { get; set; } = new();
-
-    public sealed class ProfileChatMessageView
-    {
-        public string Body { get; init; } = string.Empty;
-        public bool IsIncoming { get; init; }
-        public DateTime CreatedAt { get; init; }
-    }
-}

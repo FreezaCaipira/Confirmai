@@ -20,14 +20,3 @@
         Revezar jogadores de linha no gol
     </label>
 </fieldset>
-
-@code {
-    [Parameter]
-    public Create.CreateMatchForm Form { get; set; } = new();
-
-    [Parameter]
-    public EventCallback OnRotateInGoalChanged { get; set; }
-
-    private async Task HandleRotateInGoalChanged()
-        => await OnRotateInGoalChanged.InvokeAsync();
-}

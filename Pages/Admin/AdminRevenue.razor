@@ -8,9 +8,6 @@
 @using Microsoft.EntityFrameworkCore
 @using System.Globalization
 
-@inject IDbContextFactory<AppDbContext> DbFactory
-@inject AdminRevenueReportService RevenueReportService
-@inject NavigationManager NavigationManager
 
 <PageTitle>Relatório de Receita — Confirmai</PageTitle>
 
@@ -125,40 +122,3 @@
         <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
     </section>
 </div>
-
-@code {
-    private DateTime? startDate;
-    private DateTime? endDate;
-    private bool isLoading = false;
-    private RevenueSummary? summary;
-    private List<GroupRevenueBreakdown> groupBreakdown = new();
-    private CultureInfo PtBr { get; } = new CultureInfo("pt-BR");
-
-    protected override async Task OnInitializedAsync()
-    {
-        // Default to last 30 days
-        endDate = DateTime.UtcNow;
-        startDate = DateTime.UtcNow.AddDays(-30);
-        await LoadReportAsync();
-    }
-
-    private async Task LoadReportAsync()
-    {
-        isLoading = true;
-        try
-        {
-            summary = await RevenueReportService.GetRevenueSummaryAsync(startDate, endDate);
-            groupBreakdown = await RevenueReportService.GetRevenueByGroupAsync(startDate, endDate);
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private void ClearFilters()
-    {
-        startDate = null;
-        endDate = null;
-    }
-}

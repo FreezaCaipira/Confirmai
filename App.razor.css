@@ -1,6 +1,6 @@
 .not-found-card {
     margin: 3rem auto;
-    max-width: 480px;
+    max-width: 768px;
     background: var(--ci-bg-card);
     color: var(--ci-text);
     border: 1px solid var(--ci-border-alt);

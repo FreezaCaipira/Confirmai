@@ -1,6 +1,5 @@
 @page "/products"
 
-@inject NavigationManager Navigation
 
 <PageTitle>Redirecionando...</PageTitle>
 
@@ -11,13 +10,3 @@
         </article>
     </section>
 </div>
-
-@code {
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Navigation.NavigateTo("/servers", replace: true);
-        }
-    }
-}

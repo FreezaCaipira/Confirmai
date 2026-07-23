@@ -1,4 +1,4 @@
-﻿@page "/admin/audit/{EntityType}/{EntityId}"
+@page "/admin/audit/{EntityType}/{EntityId}"
 
 @attribute [Authorize(Roles = "admin")]
 
@@ -7,11 +7,6 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
 
-@inject AdminLogsQueryService AdminLogsQueryService
-@inject AdminLogsExportService AdminLogsExportService
-@inject NavigationManager NavigationManager
-@inject IJSRuntime JS
-@inject UiTextService T
 
 <div class="entity-shell admin-page admin-audit-timeline-shell">
 
@@ -106,47 +101,3 @@
         <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/logs")'>@T["AdminAuditTimeline.BackToLogs"]</button>
     </section>
 </div>
-
-@code {
-    [Parameter] public string EntityType { get; set; } = string.Empty;
-    [Parameter] public string EntityId { get; set; } = string.Empty;
-
-    private List<AppLog> entries = new();
-    private bool isLoading = true;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        isLoading = true;
-        entries = new();
-
-        if (!string.IsNullOrWhiteSpace(EntityType) && !string.IsNullOrWhiteSpace(EntityId))
-        {
-            entries = await AdminLogsQueryService.GetEntityTimelineAsync(EntityType, EntityId);
-        }
-
-        isLoading = false;
-    }
-
-    private async Task ExportCsvAsync()
-    {
-        if (!entries.Any()) return;
-        var csv = AdminLogsExportService.BuildTimelineCsv(entries);
-        var fileName = AdminLogsExportService.BuildTimelineFileName(EntityType, EntityId, "csv");
-        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
-    }
-
-    private async Task ExportJsonAsync()
-    {
-        if (!entries.Any()) return;
-        var json = AdminLogsExportService.BuildTimelineJson(entries);
-        var fileName = AdminLogsExportService.BuildTimelineFileName(EntityType, EntityId, "json");
-        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, json, "application/json;charset=utf-8;");
-    }
-
-    private static string GetLevelBadgeClass(string? level) => (level?.Trim().ToLowerInvariant()) switch
-    {
-        "warning" => "log-level-warning",
-        "error" or "bug" or "critical" or "fatal" => "log-level-error",
-        _ => "log-level-info"
-    };
-}

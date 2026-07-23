@@ -695,30 +695,15 @@ public partial class AdminPayments : IAsyncDisposable
 
     private void UpdateSeverity()
     {
-        var isCritical = reconciliationStalePending >= 10 || pendingTrendDelta24h >= 10 || reconciliationPendingWithChargeId >= 25;
-        var isWarning = reconciliationStalePending >= 3 || pendingTrendDelta24h >= pendingTrendWarningThreshold || reconciliationPendingWithChargeId >= 10;
+        var result = SeverityEvaluator.Evaluate(
+            reconciliationStalePending,
+            pendingTrendDelta24h,
+            reconciliationPendingWithChargeId,
+            pendingTrendWarningThreshold,
+            pendingTrendCriticalThreshold);
 
-        if (pendingTrendDelta24h >= pendingTrendCriticalThreshold)
-        {
-            isCritical = true;
-        }
-
-        if (isCritical)
-        {
-            reconciliationSeverityLabel = "Crítico";
-            reconciliationSeverityClass = "admin-payments-severity-pill--critical";
-            return;
-        }
-
-        if (isWarning)
-        {
-            reconciliationSeverityLabel = "Atenção";
-            reconciliationSeverityClass = "admin-payments-severity-pill--warning";
-            return;
-        }
-
-        reconciliationSeverityLabel = "OK";
-        reconciliationSeverityClass = "admin-payments-severity-pill--ok";
+        reconciliationSeverityLabel = result.Label;
+        reconciliationSeverityClass = result.CssClass;
     }
 
     private decimal GetPendingHeightPercent(SweepHistoryItem item)
