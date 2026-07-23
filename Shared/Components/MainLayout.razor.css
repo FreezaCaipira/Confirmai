@@ -274,7 +274,7 @@ footer.oldsite-footer {
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .sidebar {
         width: 100%;
         height: auto;
@@ -390,7 +390,7 @@ footer.oldsite-footer {
     display: none;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .mobile-menu-toggle {
         display: inline-flex;
         align-items: center;
