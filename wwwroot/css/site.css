@@ -1,15 +1,15 @@
-/* ================================================================
-   CONFIRMAI — GLOBAL STYLESHEET
+﻿/* ================================================================
+   CONFIRMAI â€” GLOBAL STYLESHEET
 
    Sections:
-   ┬╖ Design Tokens   (CSS custom properties)
-   ┬╖ Base            (html, body)
-   ┬╖ Layout Shell    (.main, .sidebar, responsive breakpoints)
-   ┬╖ Animations & Utilities
-   ┬╖ Table System
-   ┬╖ Button System
-   ┬╖ Entity Shell System
-   ┬╖ Page Layouts
+   â”¬â•– Design Tokens   (CSS custom properties)
+   â”¬â•– Base            (html, body)
+   â”¬â•– Layout Shell    (.main, .sidebar, responsive breakpoints)
+   â”¬â•– Animations & Utilities
+   â”¬â•– Table System
+   â”¬â•– Button System
+   â”¬â•– Entity Shell System
+   â”¬â•– Page Layouts
 
    Convention:
    - This file: design tokens, layout shell, truly global systems
@@ -86,7 +86,7 @@
     /* -- Typography (aliased to CI font) -- */
     --font-display: var(--ci-font);
 
-    /* ── Confirmai dark navy tokens (use these for all new code) ── */
+    /* â”€â”€ Confirmai dark navy tokens (use these for all new code) â”€â”€ */
     --ci-bg:           #090f18;
     --ci-bg-card:      #111927;
     --ci-bg-card-deep: #0d1825;
@@ -106,7 +106,7 @@
     --ci-text-info-strong: #b7dbff;
     --ci-font:         -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 
-    /* ── Aliases for component CSS (mapped to Confirmai tokens) ── */
+    /* â”€â”€ Aliases for component CSS (mapped to Confirmai tokens) â”€â”€ */
     --bg-surface:      var(--ci-bg-card);
     --bg-deep:         var(--ci-bg-card-deep);
     --border-color:    var(--ci-border);
@@ -114,7 +114,7 @@
     --text-muted:      var(--ci-text-muted);
     --accent-gold:     var(--gold);
 
-    /* ── Status/feedback extras ── */
+    /* â”€â”€ Status/feedback extras â”€â”€ */
     --green-bright:    #4ade80;   /* success badges, confirmations */
     --green-soft:      #86efac;   /* success highlights */
     --red-soft:        #f87171;   /* error text, danger highlights */
@@ -123,24 +123,24 @@
     --red-text-light:  #fca5a5;   /* received tab text */
     --amber:           #fbbf24;   /* poker/alert accent */
 
-    /* ── Cool surfaces extras ── */
+    /* â”€â”€ Cool surfaces extras â”€â”€ */
     --ci-surface-muted:  #cbd5e1; /* disabled text, placeholders */
     --ci-surface-light:  #e0f2fe; /* info highlights, badges */
     --ci-border-soft:    #1b3868; /* alternate border shade */
 
-    /* ── Poker/violet theme ── */
+    /* â”€â”€ Poker/violet theme â”€â”€ */
     --poker-accent:      #a78bfa; /* poker badges, headers */
     --poker-accent-deep: #7c3aed; /* poker backgrounds */
     --poker-text:        #c4b5fd; /* poker text */
 
-    /* ── Link extras ── */
+    /* â”€â”€ Link extras â”€â”€ */
     --link-info:         #93c5fd; /* collision links, info links */
 
-    /* ── Neutral ── */
+    /* â”€â”€ Neutral â”€â”€ */
     --text-muted-gray:   #888;    /* secondary text, timestamps */
     --slate-muted:       #94a3b8; /* tertiary text */
 
-    /* ── Ciclo 6 — Novas vars ── */
+    /* â”€â”€ Ciclo 6 â€” Novas vars â”€â”€ */
 
     /* Futsal theme */
     --futsal-green-dark:   #14532d;
@@ -195,7 +195,7 @@
     --slate-light:         #e2e8f0;
     --slate-mid:           #64748b;
 
-    /* ── Ciclo 6 — Shadow/Opacity vars ── */
+    /* â”€â”€ Ciclo 6 â€” Shadow/Opacity vars â”€â”€ */
     
     /* Black opacity shadows */
     --shadow-md:           rgba(0, 0, 0, 0.3);
@@ -264,7 +264,7 @@
     /* Red-dark opacity */
     --red-dark-md:         rgba(183, 28, 28, 0.3);
 
-    /* ── Fix Senior — vars inventadas pelo Pleno sem definir ── */
+    /* â”€â”€ Fix Senior â€” vars inventadas pelo Pleno sem definir â”€â”€ */
 
     /* Basics */
     --white:               #ffffff;
@@ -307,7 +307,7 @@
     --slate-pale:          #e2e8f0;
     --slate-warm:          #78716c;
 
-    /* ── Ciclo 9 Fase 1 — novas vars rgba ── */
+    /* â”€â”€ Ciclo 9 Fase 1 â€” novas vars rgba â”€â”€ */
 
     /* Accent subtle (blue-400 low opacity) */
     --accent-opacity-xs:   rgba(79, 156, 248, 0.1);
@@ -320,7 +320,7 @@
     /* Black heavy */
     --shadow-3xl:          rgba(0, 0, 0, 0.7);
 
-    /* Blue-300 (96,165,250) — cor diferente de accent (79,156,248) */
+    /* Blue-300 (96,165,250) â€” cor diferente de accent (79,156,248) */
     --blue300-opacity-xs:  rgba(96, 165, 250, 0.1);
     --blue300-opacity-sm:  rgba(96, 165, 250, 0.2);
 
@@ -331,7 +331,7 @@
     /* Amber opacity (251,191,36) */
     --amber-opacity-sm:    rgba(251, 191, 36, 0.3);
 
-    /* == Ciclo 11 — novas vars rgba == */
+    /* == Ciclo 11 â€” novas vars rgba == */
 
     /* Blue-300 mid opacity (96,165,250) */
     --blue300-opacity-md:  rgba(96, 165, 250, 0.3);
@@ -871,7 +871,7 @@ body::before {
     }
 }
 
-/* Celulares médios (375px - 480px) - iPhone 12/13 Pro, Android grandes */
+/* Celulares mÃ©dios (375px - 480px) - iPhone 12/13 Pro, Android grandes */
 @media (max-width: 480px) {
     .sidebar {
         padding: 0.2rem 0;
@@ -1387,7 +1387,7 @@ textarea:focus-visible {
     color: var(--bg-night);
 }
 
-/* history-btn: teal/cyan — distinct from gold details-btn */
+/* history-btn: teal/cyan â€” distinct from gold details-btn */
 .history-btn {
     background: var(--ci-accent);
     color: var(--white);
@@ -1653,13 +1653,6 @@ textarea:focus-visible {
     border: 1px solid var(--ci-border-dim);
 }
 
-.log-source-badge.admin-orders-review {
-    background: var(--ci-accent-dark);
-    color: var(--ci-text-link);
-    border-color: var(--ci-accent-mid);
-    font-weight: 700;
-}
-
 /* .edit-btn / .danger styles unified in BUTTON SYSTEM section above */
 
 .loading-spinner {
@@ -1680,47 +1673,12 @@ textarea:focus-visible {
 }
 
 .loading-spinner::before {
-    content: "ΓÅ│ ";
+    content: "Î“Ã…â”‚ ";
 }
 
 @keyframes loadingPulse {
     0%, 100% { opacity: 0.7; }
     50% { opacity: 1; }
-}
-
-/* Admin empty state */
-.admin-empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2.5rem 1.5rem;
-    margin: 1rem 0;
-    border: 1px dashed var(--ci-border);
-    border-radius: 10px;
-    background: var(--ci-bg-card);
-    text-align: center;
-}
-
-.admin-empty-state-icon {
-    font-size: 2.6rem;
-    color: var(--ci-text-muted);
-    margin-bottom: 0.8rem;
-    opacity: 0.7;
-}
-
-.admin-empty-state-text {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--ci-text);
-    margin: 0;
-}
-
-.admin-empty-state-hint {
-    font-size: 0.85rem;
-    font-weight: 400;
-    color: var(--ci-text-muted);
-    margin: 0.4rem 0 0;
 }
 
 .spinning {
@@ -1782,7 +1740,7 @@ textarea:focus-visible {
 .gateway-select {
     background: var(--bg-slate);
     color: var(--text-light);
-    border: 1px solid var(--gold);      /* Laranja padr├úo */
+    border: 1px solid var(--gold);      /* Laranja padrâ”œÃºo */
     border-radius: 6px;
     padding: 0.5rem 1.2rem;
     font-size: 1.08rem;
@@ -1824,18 +1782,6 @@ textarea:focus-visible {
 }
 
 .action-btn.icon-only i {
-    font-size: 0.96rem;
-}
-
-.admin-page .action-btn.icon-only {
-    width: 2.2rem;
-    height: 2.2rem;
-    padding: 0;
-    justify-content: center;
-    margin-right: 0.25rem;
-}
-
-.admin-page .action-btn.icon-only i {
     font-size: 0.96rem;
 }
 
@@ -1895,48 +1841,6 @@ textarea:focus-visible {
     background: var(--ci-bg-input);
     color: var(--ci-text);
     border: 1px solid var(--ci-border);
-}
-
-/* Admin-page filter-bar compact sizing */
-.entity-shell.admin-page .filter-bar {
-    margin-bottom: 0.85rem;
-    padding: 0.74rem 0.8rem;
-}
-
-.entity-shell.admin-page .filter-bar input,
-.entity-shell.admin-page .filter-bar select,
-.entity-shell.admin-page .filter-bar input[type="date"] {
-    min-height: 2.15rem;
-    font-size: 0.92rem;
-}
-
-.entity-shell.admin-page .filter-bar button {
-    min-height: 2.1rem;
-    font-size: 0.9rem;
-}
-
-/* Shared filter sizing baseline (Admin Users + Payments History) */
-.entity-shell.admin-page .filter-bar.admin-filter-card {
-    gap: 0.55rem;
-    align-items: center;
-}
-
-.entity-shell.admin-page .filter-bar.admin-filter-card input,
-.entity-shell.admin-page .filter-bar.admin-filter-card select,
-.entity-shell.admin-page .filter-bar.admin-filter-card input[type="date"] {
-    min-height: 2.35rem;
-    height: 2.35rem;
-    padding: 0.4rem 0.55rem;
-    box-sizing: border-box;
-}
-
-.entity-shell.admin-page .filter-bar.admin-filter-card button {
-    min-height: 2.35rem;
-    height: 2.35rem;
-    min-width: 86px;
-    padding: 0.4rem 0.75rem;
-    box-sizing: border-box;
-    justify-self: start;
 }
 
 .entity-shell.parchment-a .product-table,
@@ -2068,96 +1972,6 @@ textarea:focus-visible {
 .entity-shell.parchment-a .servers-actions-row .save-btn:hover {
     background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
     color: var(--ci-text);
-}
-
-/* Performance mode for admin pages: reduce expensive parchment layers and motion. */
-.main-content > .entity-shell.admin-page {
-    animation: none;
-}
-.entity-shell.admin-page .entity-shell-card {
-    box-shadow: var(--shadow-md);
-}
-.entity-shell.admin-page .entity-shell-card::before,
-.entity-shell.admin-page .entity-shell-card::after,
-.entity-shell.admin-page .entity-shell-hero::after {
-    content: none;
-}
-.entity-shell.admin-page .admin-nav a,
-.entity-shell.admin-page .admin-kpi-card,
-.entity-shell.admin-page .action-btn,
-.entity-shell.admin-page button {
-    transition: none;
-}
-.entity-shell.admin-page .admin-nav a:hover,
-.entity-shell.admin-page .admin-kpi-card:hover {
-    transform: none;
-    filter: none;
-}
-.entity-shell.parchment-a.admin-page .payments-table th,
-.entity-shell.parchment-a.admin-page .log-table th {
-    font-size: 0.9rem;
-    letter-spacing: 0.01em;
-    padding: 0.68rem 0.66rem;
-}
-
-.entity-shell.parchment-a.admin-page .product-table td,
-.entity-shell.parchment-a.admin-page .payments-table td,
-.entity-shell.parchment-a.admin-page .log-table td {
-    font-size: 0.92rem;
-    line-height: 1.4;
-    padding: 0.62rem 0.66rem;
-}
-
-.entity-shell.parchment-a.admin-page .pagination {
-    margin-top: 0.86rem;
-}
-
-.entity-shell.parchment-a.admin-page .pagination .pagination-info {
-    color: var(--ci-text-muted);
-    font-weight: 700;
-}
-
-/* Restored-filters notice */
-.orders-review-restored-notice {
-    margin: 0.65rem 0 1rem;
-    padding: 0.6rem 0.85rem;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-}
-
-.orders-review-restored-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.25rem;
-    line-height: 1;
-    padding: 0.15rem 0.35rem;
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-
-.orders-review-restored-close:hover {
-    background: rgba(0, 0, 0, 0.08);
-}
-
-.entity-shell.parchment-a.admin-page .orders-review-restored-notice {
-    background: var(--ci-bg-card);
-    border-left: 3px solid var(--ci-border);
-    color: var(--ci-text);
-}
-
-.entity-shell.parchment-a.admin-page .orders-review-restored-close {
-    color: var(--ci-text-muted);
-}
-
-.entity-shell.parchment-a.admin-page .orders-review-restored-close:hover {
-    color: var(--ci-text);
-    background: var(--shadow-md);
 }
 
 .entity-shell-footer .action-row {
@@ -2853,7 +2667,7 @@ textarea:focus-visible {
     padding-right: 0;
 }
 
-/* Payment details card — shared base for order modals */
+/* Payment details card â€” shared base for order modals */
 .payment-details-card {
     min-width: 0;
     max-width: 100%;
@@ -3077,7 +2891,7 @@ input:checked + .slider {
 input:checked + .slider:before {
     transform: translateX(20px);
 }
-/* Global Fansite Skin — overridden to CI dark navy */
+/* Global Fansite Skin â€” overridden to CI dark navy */
 body {
     background: var(--ci-bg-card);
     background-attachment: fixed;
@@ -5282,7 +5096,7 @@ body .admin-items-page .pagination button:disabled {
     opacity: 0.85;
 }
 
-/* Mailbox pagination — dark navy theme */
+/* Mailbox pagination â€” dark navy theme */
 body .mailbox-page .mailbox-pagination .mk-btn {
     border: 1px solid var(--ci-border);
     border-radius: 3px;
@@ -5309,13 +5123,13 @@ body .mailbox-page .mailbox-pagination .mk-btn:disabled {
 
 
 /* ================================================================
-   CONFIRMAI THEME — Modern shell overrides
+   CONFIRMAI THEME â€” Modern shell overrides
    Replaces all Tibia brown/medieval visuals with a clean dark UI.
    These rules override the oldsite-* block above using higher
    specificity or source-order precedence.
    ================================================================ */
 
-/* ── Page background ──────────────────────────────────────────── */
+/* â”€â”€ Page background â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 html,
 body {
     background: var(--ci-bg-card);
@@ -5332,7 +5146,7 @@ body .oldsite-page {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
-/* ── Header wrap ──────────────────────────────────────────────── */
+/* â”€â”€ Header wrap â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .oldsite-logo-wrap {
     padding: 1.15rem 0 0.85rem;
     border: none;
@@ -5371,7 +5185,7 @@ body .oldsite-tagline {
     letter-spacing: 0;
 }
 
-/* ── Player line ──────────────────────────────────────────────── */
+/* â”€â”€ Player line â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .oldsite-playerline {
     color: var(--ci-text-subtle);
     font-size: 0.78rem;
@@ -5389,7 +5203,7 @@ body .oldsite-online-dot {
     border-right: 1px solid var(--ci-border-dim);
 }
 
-/* ── News ticker ──────────────────────────────────────────────── */
+/* â”€â”€ News ticker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .layout-news-ticker {
     background: var(--ci-bg-card);
     border: 1px solid var(--ci-border);
@@ -5406,7 +5220,7 @@ body .oldsite-online-dot {
     text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
-/* ── Right column widgets ─────────────────────────────────────── */
+/* â”€â”€ Right column widgets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .oldsite-right-column {
     display: grid;
     gap: 0.5rem;
@@ -5448,7 +5262,7 @@ body .oldsite-widget ol {
     text-shadow: 0 0 6px var(--accent-opacity-md);
 }
 
-/* ── Footer ───────────────────────────────────────────────────── */
+/* â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .oldsite-footer {
     background: var(--ci-bg);
     border: none;
@@ -5456,7 +5270,7 @@ body .oldsite-footer {
     color: var(--ci-text-muted);
 }
 
-/* ── Breadcrumb ───────────────────────────────────────────────── */
+/* â”€â”€ Breadcrumb â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .breadcrumb-nav {
     color: var(--ci-text-subtle);
     font-family: inherit;
@@ -5484,7 +5298,7 @@ body .oldsite-footer {
     color: var(--ci-text-subtle);
 }
 
-/* ── Sidebar widget links ─────────────────────────────────────── */
+/* â”€â”€ Sidebar widget links â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 /* Nuke ALL amber ol/li rules from the legacy Tibia blocks */
 body .oldsite-widget ol,
 body .oldsite-widget ol li {
@@ -5524,12 +5338,12 @@ body .oldsite-widget ol li a:hover {
     color: var(--ci-text-blue);
 }
 
-/* ── Blue accent tokens ───────────────────────────────────────── */
+/* â”€â”€ Blue accent tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 /*   --ci-accent      : vivid blue (hover glow, active elements)  */
 /*   --ci-accent-dim  : muted blue border at rest                 */
 /*   --ci-accent-glow : box-shadow rgba                           */
 
-/* ── Main content wrapper (.main-content) ─────────────────────── */
+/* â”€â”€ Main content wrapper (.main-content) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .main-content,
 body .main-content.main-content-route-padded {
     background: var(--ci-bg-card);
@@ -5550,7 +5364,7 @@ body .main-content::before {
     display: none;
 }
 
-/* ── Main content card (entity-shell-card) ────────────────────── */
+/* â”€â”€ Main content card (entity-shell-card) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .oldsite-main-content .entity-shell-card,
 body .entity-shell-card {
     background: var(--ci-bg-card);
@@ -5581,7 +5395,7 @@ body .entity-shell.parchment-b .entity-shell-card {
     box-shadow: none;
 }
 
-/* ── Page section title on dark cards ────────────────────────── */
+/* â”€â”€ Page section title on dark cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .entity-shell-card .page-section-title,
 body .entity-shell .page-section-title {
     color: var(--ci-text);
@@ -5589,14 +5403,14 @@ body .entity-shell .page-section-title {
     text-align: left;
 }
 
-/* ── Outer entity-shell wrapper ΓåÆ dark theme ─────────────────── */
+/* â”€â”€ Outer entity-shell wrapper Î“Ã¥Ã† dark theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .main-content .entity-shell {
     background: transparent;
     border: none;
     box-shadow: none;
 }
 
-/* ── Parchment-a filter bar ΓåÆ dark theme ─────────────────────── */
+/* â”€â”€ Parchment-a filter bar Î“Ã¥Ã† dark theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .entity-shell.parchment-a .filter-bar {
     background: var(--ci-bg-card-deep);
     border: 1px solid var(--ci-border);
@@ -5632,7 +5446,7 @@ body .entity-shell.parchment-a .filter-bar button:hover {
     background: var(--accent-opacity-xs);
 }
 
-/* ── Parchment-a table ΓåÆ dark theme ──────────────────────────── */
+/* â”€â”€ Parchment-a table Î“Ã¥Ã† dark theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .entity-shell.parchment-a .product-table {
     background: transparent;
     border: 1px solid var(--ci-border-soft);
@@ -5661,7 +5475,7 @@ body .entity-shell.parchment-a .product-table tr:hover td {
     background: var(--ci-accent-opacity-lg);
 }
 
-/* ── Parchment-a status badges ΓåÆ dark theme ───────────────────── */
+/* â”€â”€ Parchment-a status badges Î“Ã¥Ã† dark theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .entity-shell.parchment-a .order-status-badge.pago {
     background: var(--green-dark);
     color: var(--green-bright);
@@ -5676,12 +5490,12 @@ body .entity-shell.parchment-a .order-status-badge.aguardandopagamento {
     text-shadow: none;
 }
 
-/* ── Widget blue accent ───────────────────────────────────────── */
+/* â”€â”€ Widget blue accent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .oldsite-widget {
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* ── Active flag border ───────────────────────────────────────── */
+/* â”€â”€ Active flag border â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .nav-language-flags .language-flag-card.active {
     opacity: 1;
     border-radius: 3px;
@@ -5701,7 +5515,7 @@ body .oldsite-widget:hover {
     box-shadow: 0 0 0 1px var(--ci-accent-opacity-sm), 0 4px 16px rgba(26, 90, 176, 0.1);
 }
 
-/* ── Header bottom line accent ───────────────────────────────── */
+/* â”€â”€ Header bottom line accent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .oldsite-logo-wrap,
 body .oldsite-header {
     border-bottom-color: var(--ci-border-dim);
@@ -5713,14 +5527,14 @@ body .oldsite-top-nav a:focus {
     background: rgba(21, 61, 90, 0.16);
 }
 
-/* ── Ticker label accent ──────────────────────────────────────── */
+/* â”€â”€ Ticker label accent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .layout-news-ticker strong {
     color: var(--ci-accent);
     background: rgba(21, 61, 90, 0.2);
     border-color: rgba(21, 61, 90, 0.35);
 }
 
-/* ── Content headings — metallic navy tint ────────────────────── */
+/* â”€â”€ Content headings â€” metallic navy tint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body .oldsite-main-content h1,
 body .oldsite-main-content h2 {
     color: var(--ci-text-blue);
@@ -5732,13 +5546,13 @@ body .oldsite-main-content h3 {
     text-shadow: none;
 }
 
-/* ── Breadcrumb metallic ──────────────────────────────────────── */
+/* â”€â”€ Breadcrumb metallic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .breadcrumb-nav a:hover {
     color: var(--ci-text-link-bright);
 }
 
 /* ================================================================
-   CONFIRMAI FINAL CLEANUP — amber remnants from border-image
+   CONFIRMAI FINAL CLEANUP â€” amber remnants from border-image
    border-image: none only resets border-image-source. The other
    sub-properties (slice/width/outset) can keep their values and
    render if border-width > 0 (e.g. from border-bottom).
@@ -5773,1324 +5587,3 @@ body .oldsite-page {
     background-color: transparent;
 }
 
-/* ================================================================
-   ADMIN THEME — .entity-shell.admin-page
-   Clean cascade — no !important.
-   parchment-a is not used on admin pages, so no specificity wars.
-   Outer wrapper uses .main-content qualifier to beat base shell rule.
-   ================================================================ */
-
-/* Outer wrapper — beats .main-content .entity-shell (0,2,1) */
-.main-content .entity-shell.admin-page {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-}
-
-/* Page card */
-.entity-shell.admin-page .entity-shell-card {
-    border: 1px solid var(--ci-accent-mid);
-    border-top: 2px solid var(--ci-accent);
-    box-shadow: 0 0 0 1px var(--ci-accent-opacity-sm);
-}
-
-.entity-shell.admin-page .page-section-title {
-    color: var(--ci-text-blue);
-    text-shadow: none;
-}
-
-.entity-shell.admin-page .admin-welcome {
-    color: var(--ci-text-subtle);
-    font-size: 0.9rem;
-    font-weight: 400;
-}
-
-/* Quick-nav */
-.entity-shell.admin-page .admin-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin: 0.75rem 0 1.1rem;
-}
-
-.entity-shell.admin-page .admin-nav a {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    border-radius: 6px;
-    box-shadow: none;
-    color: var(--ci-accent);
-    font-size: 0.82rem;
-    font-weight: 600;
-    letter-spacing: 0;
-    padding: 0.32rem 0.75rem;
-    text-decoration: none;
-    text-shadow: none;
-    text-transform: none;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-.entity-shell.admin-page .admin-nav a:hover {
-    background: rgba(21, 61, 90, 0.25);
-    border-color: var(--ci-accent-mid);
-    color: var(--ci-text-blue);
-    filter: none;
-    transform: none;
-}
-
-/* KPI grid */
-.entity-shell.admin-page .admin-kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 0.6rem;
-    margin: 0 0 1rem;
-}
-
-.entity-shell.admin-page .admin-kpi-card,
-.entity-shell.admin-page .admin-kpi-grid > a {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    border-top: 2px solid var(--ci-border-dim);
-    border-radius: 8px;
-    box-shadow: none;
-    color: var(--ci-text);
-    display: block;
-    padding: 0.75rem 1rem;
-    text-decoration: none;
-    transition: border-color 0.2s ease, border-top-color 0.2s ease;
-}
-
-.entity-shell.admin-page .admin-kpi-card:hover,
-.entity-shell.admin-page .admin-kpi-grid > a:hover {
-    border-color: var(--ci-accent-mid);
-    border-top-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 1px var(--ci-accent-opacity-md);
-    filter: none;
-    transform: none;
-}
-
-.entity-shell.admin-page .admin-kpi-label {
-    color: var(--ci-text-subtle);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    margin: 0 0 0.3rem;
-    text-transform: uppercase;
-}
-
-.entity-shell.admin-page .admin-kpi-value {
-    color: var(--ci-text-blue);
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin: 0;
-    text-shadow: none;
-}
-
-/* Settings cards */
-.entity-shell.admin-page .admin-settings-card {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    border-radius: 8px;
-    box-shadow: none;
-    color: var(--ci-text-blue);
-    margin: 0.55rem 0;
-    padding: 0.75rem 1rem;
-    text-shadow: 0 0 6px var(--accent-opacity-md);
-}
-
-.entity-shell.admin-page .admin-settings-card b,
-.entity-shell.admin-page .admin-settings-card strong,
-.entity-shell.admin-page .admin-settings-card label {
-    color: var(--ci-text-blue);
-}
-
-.entity-shell.admin-page .admin-settings-card a {
-    color: var(--ci-accent);
-}
-
-/* Inputs & selects */
-.entity-shell.admin-page .fiat-select,
-.entity-shell.admin-page .fee-input,
-.entity-shell.admin-page select,
-.entity-shell.admin-page input[type="text"],
-.entity-shell.admin-page input[type="number"],
-.entity-shell.admin-page input[type="date"],
-.entity-shell.admin-page input[type="email"],
-.entity-shell.admin-page input[type="search"],
-.entity-shell.admin-page input[type="password"] {
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border);
-    border-radius: 6px;
-    color: var(--ci-text);
-}
-
-.entity-shell.admin-page .fiat-select:focus,
-.entity-shell.admin-page .fee-input:focus,
-.entity-shell.admin-page select:focus,
-.entity-shell.admin-page input:focus {
-    border-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 2px var(--ci-accent-opacity-lg);
-    outline: none;
-}
-
-/* Filter bars — colors */
-.entity-shell.admin-page .filter-bar,
-.entity-shell.admin-page .filter-bar.admin-filter-card,
-.entity-shell.admin-page .logs-main-filter-bar,
-.entity-shell.admin-page .logs-quick-range-bar,
-.entity-shell.admin-page .logs-audit-filter-bar {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    box-shadow: none;
-}
-
-.entity-shell.admin-page .filter-bar input,
-.entity-shell.admin-page .filter-bar select,
-.entity-shell.admin-page .filter-bar input[type="date"],
-.entity-shell.admin-page .logs-main-filter-bar input,
-.entity-shell.admin-page .logs-main-filter-bar select {
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border);
-    color: var(--ci-text);
-}
-
-.entity-shell.admin-page .filter-bar input::placeholder,
-.entity-shell.admin-page .filter-bar textarea::placeholder,
-.entity-shell.admin-page .logs-main-filter-bar input::placeholder {
-    color: var(--ci-text-subtle);
-}
-
-.entity-shell.admin-page .filter-bar button,
-.entity-shell.admin-page .filter-bar.admin-filter-card button {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-border-dim);
-    color: var(--ci-text-blue);
-    font-weight: 600;
-    box-shadow: none;
-}
-
-.entity-shell.admin-page .filter-bar button:hover,
-.entity-shell.admin-page .filter-bar.admin-filter-card button:hover {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-dark) 100%);
-}
-
-.entity-shell.admin-page .filter-bar button:disabled,
-.entity-shell.admin-page .filter-bar.admin-filter-card button:disabled {
-    background: var(--ci-bg-card-deep);
-    border-color: var(--ci-border-soft);
-    color: var(--slate-dark);
-    cursor: not-allowed;
-}
-
-.entity-shell.admin-page .filter-bar .success-btn {
-    background: var(--green-strong);
-    border: 1px solid var(--green-dark);
-    color: var(--ci-text);
-}
-
-.entity-shell.admin-page .filter-bar .success-btn:hover {
-    background: var(--green-bright);
-}
-
-/* Action buttons */
-.entity-shell.admin-page .details-btn,
-.entity-shell.admin-page .edit-btn,
-.entity-shell.admin-page .back-btn,
-.entity-shell.admin-page .view-btn {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-border-dim);
-    box-shadow: none;
-    color: var(--ci-text-blue);
-}
-
-.entity-shell.admin-page .details-btn:hover,
-.entity-shell.admin-page .edit-btn:hover,
-.entity-shell.admin-page .back-btn:hover,
-.entity-shell.admin-page .view-btn:hover {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-dark) 100%);
-}
-
-.entity-shell.admin-page .warning-btn {
-    background: var(--ci-accent-dark);
-    border: 1px solid var(--ci-border-dim);
-    box-shadow: none;
-    color: var(--ci-text);
-}
-
-.entity-shell.admin-page .danger,
-.entity-shell.admin-page .danger-btn {
-    background: linear-gradient(180deg, rgba(248, 113, 113, 0.45) 0%, rgba(220, 80, 80, 0.55) 100%);
-    border: 1px solid rgba(248, 113, 113, 0.35);
-    box-shadow: 0 2px 6px var(--shadow-sm), inset 0 1px 0 var(--white-opacity-xs);
-    color: var(--ci-text);
-}
-
-.entity-shell.admin-page .danger:hover,
-.entity-shell.admin-page .danger-btn:hover {
-    background: linear-gradient(180deg, rgba(248, 113, 113, 0.6) 0%, rgba(220, 80, 80, 0.7) 100%);
-    border-color: var(--red-soft-opacity-md);
-}
-
-/* History button — ensure legibility with distinct teal/cyan */
-.entity-shell.admin-page .history-btn {
-    background: linear-gradient(180deg, rgba(20, 184, 166, 0.8) 0%, rgba(13, 148, 136, 0.9) 100%);
-    border: 1px solid rgba(45, 212, 191, 0.4);
-    color: #e0f7f4;
-    box-shadow: 0 2px 6px var(--shadow-sm), inset 0 1px 0 var(--white-opacity-sm);
-}
-
-.entity-shell.admin-page .history-btn:hover {
-    background: linear-gradient(180deg, rgba(20, 184, 166, 1) 0%, rgba(13, 148, 136, 1) 100%);
-    color: var(--white);
-}
-
-/* Success button — metallic green */
-.entity-shell.admin-page .success-btn {
-    background: linear-gradient(180deg, rgba(74, 222, 128, 0.7) 0%, rgba(34, 197, 94, 0.85) 100%);
-    border: 1px solid var(--green-opacity-2xl);
-    color: #ecfdf5;
-    box-shadow: 0 2px 6px var(--shadow-sm), inset 0 1px 0 var(--white-opacity-sm);
-}
-
-.entity-shell.admin-page .success-btn:hover {
-    background: linear-gradient(180deg, rgba(74, 222, 128, 0.9) 0%, rgba(34, 197, 94, 1) 100%);
-}
-
-/* Warning button — metallic amber */
-.entity-shell.admin-page .warning-btn {
-    background: linear-gradient(180deg, rgba(251, 191, 36, 0.7) 0%, rgba(217, 160, 20, 0.85) 100%);
-    border: 1px solid rgba(251, 191, 36, 0.4);
-    color: var(--amber-lightest);
-    box-shadow: 0 2px 6px var(--shadow-md), inset 0 1px 0 var(--accent-opacity-sm);
-}
-
-.entity-shell.admin-page .warning-btn:hover {
-    background: linear-gradient(180deg, var(--amber-opacity-2xl) 0%, rgba(217, 160, 20, 1) 100%);
-}
-
-/* Users table container — dark theme */
-.admin-users-shell .users-table-container {
-    max-height: 600px;
-    overflow-y: auto;
-    border: 1px solid var(--ci-border);
-    border-radius: 8px;
-    background: var(--ci-bg-card-deep);
-    box-shadow: 0 2px 8px var(--shadow-xs);
-}
-
-/* Users pagination */
-.admin-users-pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-top: 1rem;
-    padding: 0.5rem 0;
-}
-
-.admin-users-pagination button {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-border-dim);
-    color: var(--ci-text-blue);
-    padding: 0.4rem 1rem;
-    border-radius: 6px;
-    font-size: 0.88rem;
-    cursor: pointer;
-}
-
-.admin-users-pagination button:hover:not(:disabled) {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-dark) 100%);
-}
-
-.admin-users-pagination button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.admin-users-pagination .pagination-info {
-    color: var(--ci-text-blue);
-    font-size: 0.88rem;
-    font-weight: 600;
-}
-
-/* Tables */
-.entity-shell.admin-page table,
-.entity-shell.admin-page .payments-table,
-.entity-shell.admin-page .log-table,
-.entity-shell.admin-page .product-table {
-    background: transparent;
-    border: 1px solid var(--ci-border);
-    border-radius: 6px;
-}
-
-.entity-shell.admin-page table th,
-.entity-shell.admin-page .payments-table th,
-.entity-shell.admin-page .log-table th,
-.entity-shell.admin-page .product-table th {
-    background: var(--ci-bg-alt);
-    border-bottom: 1px solid var(--ci-border-dim);
-    color: var(--ci-accent);
-    text-shadow: none;
-}
-
-.entity-shell.admin-page table td,
-.entity-shell.admin-page .payments-table td,
-.entity-shell.admin-page .log-table td,
-.entity-shell.admin-page .product-table td {
-    background: var(--ci-accent-opacity-sm);
-    border-bottom: 1px solid var(--ci-border-dim);
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--accent-opacity-md);
-}
-
-.entity-shell.admin-page table tr:nth-child(even) td,
-.entity-shell.admin-page .payments-table tr:nth-child(even) td,
-.entity-shell.admin-page .log-table tr:nth-child(even) td,
-.entity-shell.admin-page .product-table tr:nth-child(even) td {
-    background: var(--ci-bg-card-deep);
-}
-
-.entity-shell.admin-page table tr:hover td,
-.entity-shell.admin-page .payments-table tr:hover td,
-.entity-shell.admin-page .log-table tr:hover td,
-.entity-shell.admin-page .product-table tr:hover td {
-    background: rgba(26, 90, 176, 0.32);
-    filter: none;
-}
-
-.entity-shell.admin-page table td a {
-    color: var(--ci-accent);
-}
-
-.entity-shell.admin-page table td strong,
-.entity-shell.admin-page table td b {
-    color: var(--ci-text-blue);
-}
-
-/* Pagination */
-.entity-shell.admin-page .pagination button {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-border-dim);
-    box-shadow: none;
-    color: var(--ci-text-blue);
-}
-
-.entity-shell.admin-page .pagination button:hover {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-dark) 100%);
-}
-
-.entity-shell.admin-page .pagination button:disabled {
-    background: var(--ci-bg-card-deep);
-    border-color: var(--ci-border-soft);
-    color: var(--slate-dark);
-    opacity: 1;
-}
-
-.entity-shell.admin-page .pagination .pagination-info,
-.entity-shell.admin-page .pagination-info {
-    color: var(--ci-text-subtle);
-    font-weight: 600;
-    text-shadow: none;
-}
-
-/* Text helpers */
-.entity-shell.admin-page .text-muted {
-    color: var(--ci-text-subtle);
-}
-
-.entity-shell.admin-page .label {
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--accent-opacity-md);
-}
-
-.entity-shell.admin-page .operation-fee-message.ok {
-    color: var(--green-bright);
-}
-
-.entity-shell.admin-page .operation-fee-message.error {
-    color: var(--red-soft);
-}
-
-/* Logs */
-.entity-shell.admin-page .logs-filter-group-label {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: none;
-    color: var(--ci-text-blue);
-    text-shadow: none;
-}
-
-.entity-shell.admin-page .logs-total-count,
-.entity-shell.admin-page .orders-review-sort-summary {
-    color: var(--ci-text-subtle);
-    text-shadow: none;
-}
-
-/* Orders-review notice */
-.entity-shell.admin-page .orders-review-restored-notice {
-    background: var(--ci-bg-card-deep);
-    border-left-color: var(--ci-accent-mid);
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--accent-opacity-md);
-}
-
-.entity-shell.admin-page .orders-review-restored-close {
-    color: var(--ci-text-subtle);
-}
-
-/* Entity shell footer */
-.entity-shell.admin-page .entity-shell-footer {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    box-shadow: none;
-}
-
-/* Payment details card (orders review modal) */
-.entity-shell.admin-page .payment-details-card {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    box-shadow: none;
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--accent-opacity-md);
-}
-
-.entity-shell.admin-page .payment-details-card .label {
-    border-right-color: var(--ci-border);
-    color: var(--ci-accent);
-}
-
-/* APV card (product/user view) */
-.entity-shell.admin-page .apv-card {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    box-shadow: none;
-}
-
-.entity-shell.admin-page .apv-title {
-    background: var(--ci-bg-alt);
-    border-bottom: 1px solid var(--ci-border-dim);
-    color: var(--ci-accent);
-    text-shadow: none;
-}
-
-.entity-shell.admin-page .apv-dl {
-    border-color: var(--ci-accent-mid);
-}
-
-.entity-shell.admin-page .apv-row:nth-child(odd) {
-    background: rgba(255, 255, 255, 0.025);
-}
-
-.entity-shell.admin-page .apv-row:nth-child(even) {
-    background: transparent;
-}
-
-.entity-shell.admin-page .apv-row dt,
-.entity-shell.admin-page .apv-row dd {
-    border-right-color: var(--ci-border);
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--accent-opacity-md);
-}
-
-.entity-shell.admin-page .apv-row dt {
-    color: var(--ci-accent);
-}
-
-.entity-shell.admin-page .apv-mono {
-    color: var(--ci-text-blue);
-}
-
-.entity-shell.admin-page .apv-btn-back {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    color: var(--ci-text);
-    text-shadow: none;
-}
-
-.entity-shell.admin-page .apv-btn-edit {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-border-dim);
-    color: var(--ci-text-blue);
-}
-
-/* Admin user view profile panels */
-.entity-shell.admin-page .admin-profile-panel-card {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    box-shadow: none;
-}
-
-.entity-shell.admin-page .admin-profile-panel-card h3 {
-    background: var(--ci-bg-alt);
-    border-bottom: 1px solid var(--ci-border-dim);
-    border-radius: 7px 7px 0 0;
-    color: var(--ci-accent);
-    text-shadow: none;
-}
-
-.entity-shell.admin-page .admin-profile-info-list dt {
-    color: var(--ci-accent);
-}
-
-.entity-shell.admin-page .admin-profile-info-list dd {
-    color: var(--ci-text-blue);
-}
-
-.entity-shell.admin-page .admin-profile-governance-copy {
-    color: var(--ci-text-subtle);
-}
-
-.entity-shell.admin-page .admin-user-stats-grid .admin-kpi-card {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    border-top: 2px solid var(--ci-border-dim);
-    box-shadow: none;
-}
-
-/* Form pages */
-.entity-shell.admin-page .form-group label {
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--accent-opacity-md);
-}
-
-.entity-shell.admin-page .form-group .input,
-.entity-shell.admin-page .form-group input.input,
-.entity-shell.admin-page .form-group textarea.input,
-.entity-shell.admin-page .form-group select.input {
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border);
-    color: var(--ci-text);
-}
-
-.entity-shell.admin-page .form-group .input:focus,
-.entity-shell.admin-page .form-group input.input:focus,
-.entity-shell.admin-page .form-group textarea.input:focus,
-.entity-shell.admin-page .form-group select.input:focus {
-    border-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 2px var(--ci-accent-opacity-lg);
-    outline: none;
-}
-
-.entity-shell.admin-page .product-attr-labels {
-    color: var(--ci-text-subtle);
-}
-
-.entity-shell.admin-page .accent-color-meta strong {
-    color: var(--ci-text-blue);
-}
-
-.entity-shell.admin-page .accent-color-meta small {
-    color: var(--ci-text-subtle);
-}
-
-.entity-shell.admin-page .save-btn {
-    background: var(--green-strong);
-    border: 1px solid var(--green-dark);
-    box-shadow: none;
-    color: var(--ci-text);
-}
-
-.entity-shell.admin-page .save-btn:hover {
-    background: var(--green-bright);
-}
-
-.entity-shell.admin-page .cancel-btn {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    box-shadow: none;
-    color: var(--ci-text);
-    text-shadow: none;
-}
-
-.entity-shell.admin-page .cancel-btn:hover {
-    border-color: var(--ci-accent-mid);
-    color: var(--ci-text-blue);
-}
-
-/* Validation */
-.entity-shell.admin-page .validation-errors,
-.entity-shell.admin-page .validation-message {
-    color: var(--red-soft);
-}
-
-/* Security boolean badges */
-.entity-shell.admin-page .security-boolean-badge.on {
-    background: var(--green-dark);
-    border-color: var(--green-strong);
-    color: var(--green-bright);
-}
-
-.entity-shell.admin-page .security-boolean-badge.off {
-    background: var(--red-dark);
-    border-color: var(--red-strong);
-    color: var(--red-soft);
-}
-
-/* Security page */
-.entity-shell.admin-page .admin-settings-card.security-settings-card {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-}
-
-.entity-shell.admin-page .security-panel {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    box-shadow: none;
-}
-
-.entity-shell.admin-page .security-header h3 {
-    background: var(--ci-bg-card-deep);
-    border-bottom: 1px solid var(--ci-border);
-    color: var(--ci-text-blue);
-    text-shadow: none;
-}
-
-.entity-shell.admin-page .security-header p,
-.entity-shell.admin-page .security-label,
-.entity-shell.admin-page .security-baseline-group h5 {
-    color: var(--ci-text-subtle);
-}
-
-.entity-shell.admin-page .security-panel h4,
-.entity-shell.admin-page .security-value,
-.entity-shell.admin-page .security-toggle {
-    color: var(--ci-text-blue);
-}
-
-.entity-shell.admin-page .security-input-grid label {
-    color: var(--ci-text-subtle);
-}
-
-.entity-shell.admin-page .security-input-grid input,
-.entity-shell.admin-page .security-input-grid select {
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border);
-    color: var(--ci-text);
-}
-
-.entity-shell.admin-page .security-baseline-row {
-    border-bottom: 1px dashed var(--ci-border);
-}
-
-.entity-shell.admin-page .security-baseline-group {
-    border-top: 1px solid var(--ci-border);
-}
-
-.entity-shell.admin-page .security-env-pill {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-border-dim);
-    color: var(--ci-text-blue);
-}
-
-.entity-shell.admin-page .security-toggle input[type="checkbox"] {
-    accent-color: var(--ci-accent);
-}
-
-/* ================================================================
-   CONFIRMAI CLEANUP — Remove remaining old-project remnants from
-   user-facing parchment-a pages (payments, etc.)
-   ================================================================ */
-
-/* ── Table row base: kill var(--bg-slate) = #23272b bleed ──────── */
-body .entity-shell.parchment-a .product-table tr,
-body .entity-shell.parchment-a .payments-table tr,
-body .entity-shell.parchment-a .log-table tr {
-    background: transparent;
-}
-
-/* ── Pagination buttons: replace orange Tibia gradient ──────────── */
-body .entity-shell.parchment-a .pagination button {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    border-radius: 6px;
-    box-shadow: none;
-    color: var(--ci-accent);
-    font-weight: 700;
-}
-
-body .entity-shell.parchment-a .pagination button:hover:not(:disabled) {
-    background: var(--accent-opacity-xs);
-    border-color: var(--ci-accent);
-    color: var(--ci-text-blue);
-    filter: none;
-}
-
-body .entity-shell.parchment-a .pagination button:disabled {
-    background: var(--ci-bg-card-deep);
-    border-color: var(--ci-border);
-    box-shadow: none;
-    color: var(--ci-text-subtle);
-    opacity: 0.6;
-}
-
-body .entity-shell.parchment-a .pagination .pagination-info,
-body .entity-shell.parchment-a .pagination-info {
-    color: var(--ci-text-subtle);
-    font-weight: 700;
-}
-
-/* ── Empty state: replace parchment/brown with dark theme ──────── */
-body .admin-empty-state {
-    background: var(--ci-bg-card-deep);
-    border: 1px dashed var(--ci-border);
-}
-
-body .admin-empty-state-icon {
-    color: var(--ci-accent);
-}
-
-body .admin-empty-state-text {
-    color: var(--slate-pale);
-}
-
-body .admin-empty-state-hint {
-    color: var(--ci-text-subtle);
-}
-
-/* ── entity-muted remnants: --brown-text (#6b4726) on dark bg ──── */
-body .entity-shell-card p,
-body .entity-shell-card li {
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--accent-opacity-md);
-}
-
-body .entity-shell-subtitle {
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--accent-opacity-md);
-}
-
-/* ── Google Maps Places Autocomplete dropdown ───────────────────── */
-.pac-container {
-    z-index: 9999 !important;
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 8px 24px var(--shadow-xl);
-    font-family: inherit;
-}
-.pac-item {
-    padding: 0.45rem 0.75rem;
-    border-top: 1px solid var(--ci-border);
-    color: var(--ci-surface-muted);
-    cursor: pointer;
-    font-size: 0.875rem;
-}
-.pac-item:hover, .pac-item-selected { background: var(--ci-bg-card); }
-.pac-item-query { color: var(--slate-pale); font-weight: 600; }
-.pac-matched { color: var(--ci-accent); }
-.pac-icon { display: none; }
-
-/* ── Identity / Bootstrap form-control dark theme ───────────────── */
-.form-control {
-    background-color: var(--ci-bg-input);
-    color: var(--ci-text-blue);
-    border: 1px solid var(--ci-border);
-    border-radius: 6px;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-}
-.form-control:hover {
-    border-color: var(--ci-border-dim);
-    background-color: var(--ci-bg-input);
-}
-.form-control:focus {
-    background-color: var(--ci-bg-input);
-    color: var(--ci-text-blue);
-    border-color: var(--ci-accent);
-    box-shadow: 0 0 0 3px rgba(26, 82, 152, 0.25);
-    outline: none;
-}
-.form-control::placeholder {
-    color: var(--ci-text-subtle);
-    opacity: 1;
-}
-
-/* ── Shared Hero Component (About/Contact pages) ───────────────────── */
-.content-hero {
-    position: relative;
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
-    border-radius: 18px;
-    padding: 1.35rem 1.35rem 1.2rem;
-    box-shadow: var(--shadow-lg);
-}
-
-.content-hero::before {
-    content: none;
-}
-
-.content-hero::after {
-    content: none;
-}
-
-/* ── Parchment Card Utility ───────────────────────────────────────── */
-.parchment-card {
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-border);
-    border-radius: 14px;
-    padding: 1rem 1rem 0.95rem;
-}
-
-.parchment-card-light {
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-border);
-    border-radius: 12px;
-}
-
-/* ── Autofill + hist├│rico do Chrome: neutraliza fundo e cor ───────── */
-.form-control:-webkit-autofill,
-.form-control:-webkit-autofill:hover,
-.form-control:-webkit-autofill:focus,
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:autofill,
-input:autofill:hover,
-input:autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px var(--ci-bg-card) inset !important;
-    box-shadow: 0 0 0 1000px var(--ci-bg-card) inset !important;
-    -webkit-text-fill-color: var(--ci-text) !important;
-    color: var(--ci-text) !important;
-    caret-color: var(--ci-text);
-    border-color: var(--ci-border);
-    outline: none !important;
-    transition: background-color 5000s ease-in-out 0s;
-}
-
-/* ================================================================
-   ADMIN PAYMENTS — moved from AdminPayments.razor.css to global
-   because Blazor CSS isolation prevents parent scoped styles
-   from reaching child components (AdminPaymentsTable, Filters,
-   AdvancedToolsModal, SummaryPanel).
-   ================================================================ */
-
-.admin-payments-shell .admin-payments-reconcile-bar {
-    margin-bottom: 0.75rem;
-    align-items: flex-end;
-}
-
-.admin-payments-shell .admin-payments-summary-card {
-    margin-bottom: 0.9rem;
-    padding: 1rem;
-    border-radius: 14px;
-    border: 1px solid rgba(130, 170, 205, 0.4);
-    background: linear-gradient(180deg, var(--ci-bg) 0%, var(--ci-bg-deepest) 100%);
-    box-shadow: 0 12px 32px var(--shadow-2xl), 0 6px 16px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-sm);
-}
-
-.admin-payments-shell .admin-payments-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.75rem;
-}
-
-.admin-payments-shell .admin-payments-summary-item {
-    padding: 0.85rem 0.95rem;
-    border-radius: 12px;
-    background: var(--ci-bg);
-    border: 1px solid var(--ci-border);
-    box-shadow: 0 2px 4px var(--shadow-md);
-}
-
-.admin-payments-shell .admin-payments-summary-label {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--ci-surface-muted);
-    margin-bottom: 0.2rem;
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
-}
-
-.admin-payments-shell .admin-payments-summary-value {
-    font-size: 1.35rem;
-    color: var(--ci-surface-light);
-    font-weight: 800;
-    text-shadow: 0 0 15px var(--shadow-accent-lg), 0 2px 4px var(--text-shadow-sm);
-}
-
-.admin-payments-shell .admin-payments-summary-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-top: 0.9rem;
-    flex-wrap: wrap;
-}
-
-.admin-payments-shell .admin-payments-summary-hint {
-    color: var(--ci-surface-muted);
-    font-size: 0.8rem;
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
-}
-
-.admin-payments-shell .admin-payments-auto-refresh-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    color: var(--ci-surface-light);
-    font-size: 0.8rem;
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
-}
-
-.admin-payments-shell .admin-payments-auto-refresh-toggle input {
-    accent-color: var(--ci-accent);
-}
-
-.admin-payments-shell .admin-payments-auto-refresh-pill {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.76rem;
-    font-weight: 700;
-    padding: 0.28rem 0.52rem;
-    border-radius: 999px;
-    border: 1px solid transparent;
-}
-
-.admin-payments-shell .admin-payments-auto-refresh-pill--paused {
-    color: var(--amber-light);
-    background: linear-gradient(180deg, var(--amber) 0%, var(--amber-dark) 50%, var(--amber-mid) 100%);
-    border-color: var(--amber-light);
-    box-shadow: 0 2px 4px var(--amber-opacity-sm);
-}
-
-.admin-payments-shell .admin-payments-severity-pill {
-    font-size: 0.78rem;
-    font-weight: 700;
-    padding: 0.32rem 0.58rem;
-    border-radius: 999px;
-    border: 1px solid transparent;
-}
-
-.admin-payments-shell .admin-payments-severity-pill--ok {
-    color: var(--green-soft);
-    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
-    border-color: var(--green-soft);
-    box-shadow: 0 2px 4px var(--shadow-green-sm);
-}
-
-.admin-payments-shell .admin-payments-severity-pill--warning {
-    color: var(--parchment-cream);
-    background: linear-gradient(180deg, var(--amber) 0%, var(--amber-dark) 50%, var(--amber-mid) 100%);
-    border-color: var(--amber-light);
-    box-shadow: 0 2px 4px var(--amber-opacity-sm);
-}
-
-.admin-payments-shell .admin-payments-severity-pill--critical {
-    color: var(--red-lightest);
-    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
-    border-color: var(--red-pale);
-    box-shadow: 0 2px 4px var(--shadow-red-sm);
-}
-
-.admin-payments-shell .admin-payments-summary-meta {
-    margin-top: 0.85rem;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
-}
-
-.admin-payments-shell .admin-payments-summary-meta span {
-    color: var(--ci-text-blue);
-    font-size: 0.8rem;
-}
-
-.admin-payments-shell .admin-payments-summary-link {
-    color: rgba(147, 197, 253, 0.95);
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-}
-
-.admin-payments-shell .admin-payments-summary-link:hover {
-    color: rgba(191, 219, 254, 1);
-}
-
-.admin-payments-shell .admin-payments-summary-age {
-    color: var(--ci-text-link);
-    font-weight: 600;
-}
-
-.admin-payments-shell .admin-payments-summary-age-hint {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1rem;
-    height: 1rem;
-    margin-left: 0.35rem;
-    border-radius: 999px;
-    border: 1px solid rgba(148, 163, 184, 0.7);
-    color: rgba(226, 232, 240, 0.92);
-    background: rgba(15, 23, 42, 0.55);
-    font-size: 0.68rem;
-    font-weight: 800;
-    line-height: 1;
-    cursor: help;
-}
-
-.admin-payments-shell .admin-payments-summary-age--warning {
-    color: var(--amber-warm);
-}
-
-.admin-payments-shell .admin-payments-trend--warning {
-    color: var(--amber-warm);
-    font-weight: 700;
-}
-
-.admin-payments-shell .admin-payments-sweep-history {
-    margin-top: 0.85rem;
-    border: 1px solid rgba(130, 170, 205, 0.16);
-    border-radius: 10px;
-    padding: 0.65rem 0.8rem;
-    background: var(--white-opacity-2xs);
-}
-
-.admin-payments-shell .admin-payments-sweep-history-title {
-    display: block;
-    color: var(--ci-text-blue);
-    font-size: 0.82rem;
-    font-weight: 700;
-    margin-bottom: 0.38rem;
-}
-
-.admin-payments-shell .admin-payments-sweep-history ul {
-    margin: 0;
-    padding-left: 1rem;
-}
-
-.admin-payments-shell .admin-payments-sparkline {
-    margin-bottom: 0.55rem;
-    height: 48px;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    align-items: end;
-    gap: 0.35rem;
-}
-
-.admin-payments-shell .admin-payments-sparkline-point {
-    border-radius: 4px 4px 2px 2px;
-    background: linear-gradient(180deg, rgba(96, 165, 250, 0.95) 0%, rgba(59, 130, 246, 0.55) 100%);
-    border: 1px solid rgba(147, 197, 253, 0.42);
-    min-height: 6px;
-}
-
-.admin-payments-shell .admin-payments-sweep-history li {
-    color: var(--ci-text-subtle);
-    font-size: 0.78rem;
-    margin: 0.15rem 0;
-}
-
-.admin-payments-shell .admin-payments-gateway-telemetry {
-    margin-top: 0.85rem;
-    border: 1px solid rgba(130, 170, 205, 0.16);
-    border-radius: 10px;
-    padding: 0.65rem 0.8rem;
-    background: var(--white-opacity-2xs);
-}
-
-.admin-payments-shell .admin-payments-gateway-telemetry-title {
-    display: block;
-    color: var(--ci-text-blue);
-    font-size: 0.82rem;
-    font-weight: 700;
-    margin-bottom: 0.38rem;
-}
-
-.admin-payments-shell .admin-payments-gateway-telemetry-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.78rem;
-}
-
-.admin-payments-shell .admin-payments-gateway-telemetry-table th,
-.admin-payments-shell .admin-payments-gateway-telemetry-table td {
-    padding: 0.4rem 0.35rem;
-    text-align: left;
-    border-bottom: 1px solid rgba(130, 170, 205, 0.14);
-    color: var(--ci-text-blue);
-}
-
-.admin-payments-shell .admin-payments-gateway-severity {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.73rem;
-    font-weight: 700;
-    padding: 0.22rem 0.5rem;
-    border-radius: 999px;
-    border: 1px solid transparent;
-}
-
-.admin-payments-shell .admin-payments-gateway-severity--ok {
-    color: var(--futsal-green-pale);
-    background: var(--green-opacity-sm);
-    border-color: rgba(74, 222, 128, 0.34);
-}
-
-.admin-payments-shell .admin-payments-gateway-severity--warning {
-    color: var(--amber-warm);
-    background: var(--amber-opacity-xs);
-    border-color: rgba(251, 191, 36, 0.34);
-}
-
-.admin-payments-shell .admin-payments-gateway-severity--critical {
-    color: var(--red-pale);
-    background: rgba(248, 113, 113, 0.12);
-    border-color: rgba(248, 113, 113, 0.42);
-}
-
-.admin-payments-shell .admin-payments-reconcile-input-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    min-width: 300px;
-    flex: 1;
-}
-
-.admin-payments-shell .admin-payments-reconcile-label {
-    font-size: 0.75rem;
-    color: var(--ci-text-muted);
-}
-
-.admin-payments-shell .admin-payments-reconcile-result--error {
-    border-color: var(--red-soft-opacity-md);
-    color: var(--red-pale);
-}
-
-.admin-payments-shell .admin-payments-reconcile-result--ok {
-    border-color: var(--green-opacity-2xl);
-    color: var(--green-soft);
-}
-
-.admin-payments-shell .admin-payments-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    background: rgba(2, 8, 18, 0.72);
-    z-index: 20000;
-}
-
-.admin-payments-shell .admin-payments-modal-backdrop--open {
-    display: flex;
-}
-
-.admin-payments-shell .admin-payments-modal {
-    width: min(980px, 100%);
-    max-height: calc(100vh - 2rem);
-    overflow: auto;
-    position: relative;
-    z-index: 20001;
-    border-radius: 14px;
-    border: 1px solid rgba(130, 170, 205, 0.28);
-    background: linear-gradient(180deg, rgba(10, 24, 41, 0.98) 0%, rgba(7, 17, 31, 0.99) 100%);
-    box-shadow: 0 24px 38px rgba(0, 0, 0, 0.38);
-    padding: 1rem;
-}
-
-.admin-payments-shell .admin-payments-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-}
-
-.admin-payments-shell .admin-payments-modal-header h2 {
-    margin: 0;
-    font-size: 1rem;
-    color: var(--ci-text-info-strong);
-}
-
-.admin-payments-shell .admin-payments-tools-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-}
-
-.admin-payments-shell .admin-payments-tools-section {
-    border: 1px solid rgba(130, 170, 205, 0.2);
-    border-radius: 12px;
-    padding: 0.7rem 0.8rem;
-    background: var(--white-opacity-2xs);
-}
-
-.admin-payments-shell .admin-payments-tools-section h3 {
-    margin: 0;
-    font-size: 0.9rem;
-    color: var(--ci-text-blue);
-}
-
-.admin-payments-shell .admin-payments-tools-description {
-    margin: 0.25rem 0 0.6rem;
-    font-size: 0.78rem;
-    color: var(--ci-text-muted);
-}
-
-.admin-payments-shell .admin-payments-reconcile-bar--modal {
-    margin-bottom: 0;
-}
-
-/* AdminPayments responsive overrides */
-@media (max-width: 1024px) {
-    .admin-payments-shell .filter-bar.admin-filter-card {
-        gap: 0.45rem;
-    }
-
-    .admin-payments-shell .filter-bar.admin-filter-card input,
-    .admin-payments-shell .filter-bar.admin-filter-card select {
-        flex: 1 1 calc(50% - 0.45rem);
-    }
-
-    .admin-payments-shell .admin-payments-reconcile-input-wrap {
-        min-width: 100%;
-    }
-
-    .admin-payments-shell .admin-payments-modal {
-        width: 100%;
-        max-height: calc(100vh - 1rem);
-        padding: 0.85rem;
-    }
-
-    .admin-payments-shell .admin-payments-modal-header {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        padding-bottom: 0.45rem;
-        margin-bottom: 0.55rem;
-        background: linear-gradient(180deg, rgba(10, 24, 41, 1) 0%, rgba(10, 24, 41, 0.92) 100%);
-    }
-
-    .admin-payments-shell .admin-payments-reconcile-bar--modal {
-        align-items: stretch;
-    }
-
-    .admin-payments-shell .admin-payments-reconcile-bar--modal > input,
-    .admin-payments-shell .admin-payments-reconcile-bar--modal > select,
-    .admin-payments-shell .admin-payments-reconcile-bar--modal > button {
-        width: 100%;
-    }
-
-    .admin-payments-shell .admin-payments-summary-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .admin-payments-shell .admin-payments-gateway-telemetry-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-}
-
-@media (max-width: 768px) {
-    .admin-payments-shell .payments-table td:before {
-        min-width: 80px;
-        flex-shrink: 0;
-    }
-
-    .admin-payments-shell .payments-table td {
-        flex-wrap: wrap;
-        gap: 0.2rem;
-    }
-
-    .admin-payments-shell .admin-payments-summary-grid {
-        grid-template-columns: 1fr;
-    }
-}

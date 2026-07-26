@@ -1,0 +1,1514 @@
+/* ================================================================
+   admin.css — Admin-page specific styles extracted from site.css
+   Loaded after site.css so CSS variables are available.
+   ================================================================ */
+
+/* Admin orders-review badge */
+.log-source-badge.admin-orders-review {
+    background: var(--ci-accent-dark);
+    color: var(--ci-text-link);
+    border-color: var(--ci-accent-mid);
+    font-weight: 700;
+}
+
+/* Admin empty state */
+.admin-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+    margin: 1rem 0;
+    border: 1px dashed var(--ci-border);
+    border-radius: 10px;
+    background: var(--ci-bg-card);
+    text-align: center;
+}
+
+.admin-empty-state-icon {
+    font-size: 2.6rem;
+    color: var(--ci-text-muted);
+    margin-bottom: 0.8rem;
+    opacity: 0.7;
+}
+
+.admin-empty-state-text {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ci-text);
+    margin: 0;
+}
+
+.admin-empty-state-hint {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--ci-text-muted);
+    margin: 0.4rem 0 0;
+}
+
+/* Admin-page icon-only action buttons */
+.admin-page .action-btn.icon-only {
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+    justify-content: center;
+    margin-right: 0.25rem;
+}
+
+.admin-page .action-btn.icon-only i {
+    font-size: 0.96rem;
+}
+
+/* Admin-page filter-bar compact sizing */
+.entity-shell.admin-page .filter-bar {
+    margin-bottom: 0.85rem;
+    padding: 0.74rem 0.8rem;
+}
+
+.entity-shell.admin-page .filter-bar input,
+.entity-shell.admin-page .filter-bar select,
+.entity-shell.admin-page .filter-bar input[type="date"] {
+    min-height: 2.15rem;
+    font-size: 0.92rem;
+}
+
+.entity-shell.admin-page .filter-bar button {
+    min-height: 2.1rem;
+    font-size: 0.9rem;
+}
+
+/* Shared filter sizing baseline (Admin Users + Payments History) */
+.entity-shell.admin-page .filter-bar.admin-filter-card {
+    gap: 0.55rem;
+    align-items: center;
+}
+
+.entity-shell.admin-page .filter-bar.admin-filter-card input,
+.entity-shell.admin-page .filter-bar.admin-filter-card select,
+.entity-shell.admin-page .filter-bar.admin-filter-card input[type="date"] {
+    min-height: 2.35rem;
+    height: 2.35rem;
+    padding: 0.4rem 0.55rem;
+    box-sizing: border-box;
+}
+
+.entity-shell.admin-page .filter-bar.admin-filter-card button {
+    min-height: 2.35rem;
+    height: 2.35rem;
+    min-width: 86px;
+    padding: 0.4rem 0.75rem;
+    box-sizing: border-box;
+    justify-self: start;
+}
+
+/* Performance mode for admin pages: reduce expensive parchment layers and motion. */
+.main-content > .entity-shell.admin-page {
+    animation: none;
+}
+.entity-shell.admin-page .entity-shell-card {
+    box-shadow: var(--shadow-md);
+}
+.entity-shell.admin-page .entity-shell-card::before,
+.entity-shell.admin-page .entity-shell-card::after,
+.entity-shell.admin-page .entity-shell-hero::after {
+    content: none;
+}
+.entity-shell.admin-page .admin-nav a,
+.entity-shell.admin-page .admin-kpi-card,
+.entity-shell.admin-page .action-btn,
+.entity-shell.admin-page button {
+    transition: none;
+}
+.entity-shell.admin-page .admin-nav a:hover,
+.entity-shell.admin-page .admin-kpi-card:hover {
+    transform: none;
+    filter: none;
+}
+.entity-shell.parchment-a.admin-page .payments-table th,
+.entity-shell.parchment-a.admin-page .log-table th {
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    padding: 0.68rem 0.66rem;
+}
+
+.entity-shell.parchment-a.admin-page .product-table td,
+.entity-shell.parchment-a.admin-page .payments-table td,
+.entity-shell.parchment-a.admin-page .log-table td {
+    font-size: 0.92rem;
+    line-height: 1.4;
+    padding: 0.62rem 0.66rem;
+}
+
+.entity-shell.parchment-a.admin-page .pagination {
+    margin-top: 0.86rem;
+}
+
+.entity-shell.parchment-a.admin-page .pagination .pagination-info {
+    color: var(--ci-text-muted);
+    font-weight: 700;
+}
+
+/* Restored-filters notice */
+.orders-review-restored-notice {
+    margin: 0.65rem 0 1rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.orders-review-restored-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.orders-review-restored-close:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.entity-shell.parchment-a.admin-page .orders-review-restored-notice {
+    background: var(--ci-bg-card);
+    border-left: 3px solid var(--ci-border);
+    color: var(--ci-text);
+}
+
+.entity-shell.parchment-a.admin-page .orders-review-restored-close {
+    color: var(--ci-text-muted);
+}
+
+.entity-shell.parchment-a.admin-page .orders-review-restored-close:hover {
+    color: var(--ci-text);
+    background: var(--shadow-md);
+}
+
+/* ================================================================
+   ADMIN THEME â€” .entity-shell.admin-page
+   Clean cascade â€” no !important.
+   parchment-a is not used on admin pages, so no specificity wars.
+   Outer wrapper uses .main-content qualifier to beat base shell rule.
+   ================================================================ */
+
+/* Outer wrapper â€” beats .main-content .entity-shell (0,2,1) */
+.main-content .entity-shell.admin-page {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* Page card */
+.entity-shell.admin-page .entity-shell-card {
+    border: 1px solid var(--ci-accent-mid);
+    border-top: 2px solid var(--ci-accent);
+    box-shadow: 0 0 0 1px var(--ci-accent-opacity-sm);
+}
+
+.entity-shell.admin-page .page-section-title {
+    color: var(--ci-text-blue);
+    text-shadow: none;
+}
+
+.entity-shell.admin-page .admin-welcome {
+    color: var(--ci-text-subtle);
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+/* Quick-nav */
+.entity-shell.admin-page .admin-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.75rem 0 1.1rem;
+}
+
+.entity-shell.admin-page .admin-nav a {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    box-shadow: none;
+    color: var(--ci-accent);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    padding: 0.32rem 0.75rem;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.entity-shell.admin-page .admin-nav a:hover {
+    background: rgba(21, 61, 90, 0.25);
+    border-color: var(--ci-accent-mid);
+    color: var(--ci-text-blue);
+    filter: none;
+    transform: none;
+}
+
+/* KPI grid */
+.entity-shell.admin-page .admin-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.6rem;
+    margin: 0 0 1rem;
+}
+
+.entity-shell.admin-page .admin-kpi-card,
+.entity-shell.admin-page .admin-kpi-grid > a {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-top: 2px solid var(--ci-border-dim);
+    border-radius: 8px;
+    box-shadow: none;
+    color: var(--ci-text);
+    display: block;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    transition: border-color 0.2s ease, border-top-color 0.2s ease;
+}
+
+.entity-shell.admin-page .admin-kpi-card:hover,
+.entity-shell.admin-page .admin-kpi-grid > a:hover {
+    border-color: var(--ci-accent-mid);
+    border-top-color: var(--ci-accent-mid);
+    box-shadow: 0 0 0 1px var(--ci-accent-opacity-md);
+    filter: none;
+    transform: none;
+}
+
+.entity-shell.admin-page .admin-kpi-label {
+    color: var(--ci-text-subtle);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.3rem;
+    text-transform: uppercase;
+}
+
+.entity-shell.admin-page .admin-kpi-value {
+    color: var(--ci-text-blue);
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    text-shadow: none;
+}
+
+/* Settings cards */
+.entity-shell.admin-page .admin-settings-card {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    box-shadow: none;
+    color: var(--ci-text-blue);
+    margin: 0.55rem 0;
+    padding: 0.75rem 1rem;
+    text-shadow: 0 0 6px var(--accent-opacity-md);
+}
+
+.entity-shell.admin-page .admin-settings-card b,
+.entity-shell.admin-page .admin-settings-card strong,
+.entity-shell.admin-page .admin-settings-card label {
+    color: var(--ci-text-blue);
+}
+
+.entity-shell.admin-page .admin-settings-card a {
+    color: var(--ci-accent);
+}
+
+/* Inputs & selects */
+.entity-shell.admin-page .fiat-select,
+.entity-shell.admin-page .fee-input,
+.entity-shell.admin-page select,
+.entity-shell.admin-page input[type="text"],
+.entity-shell.admin-page input[type="number"],
+.entity-shell.admin-page input[type="date"],
+.entity-shell.admin-page input[type="email"],
+.entity-shell.admin-page input[type="search"],
+.entity-shell.admin-page input[type="password"] {
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    color: var(--ci-text);
+}
+
+.entity-shell.admin-page .fiat-select:focus,
+.entity-shell.admin-page .fee-input:focus,
+.entity-shell.admin-page select:focus,
+.entity-shell.admin-page input:focus {
+    border-color: var(--ci-accent-mid);
+    box-shadow: 0 0 0 2px var(--ci-accent-opacity-lg);
+    outline: none;
+}
+
+/* Filter bars â€” colors */
+.entity-shell.admin-page .filter-bar,
+.entity-shell.admin-page .filter-bar.admin-filter-card,
+.entity-shell.admin-page .logs-main-filter-bar,
+.entity-shell.admin-page .logs-quick-range-bar,
+.entity-shell.admin-page .logs-audit-filter-bar {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    box-shadow: none;
+}
+
+.entity-shell.admin-page .filter-bar input,
+.entity-shell.admin-page .filter-bar select,
+.entity-shell.admin-page .filter-bar input[type="date"],
+.entity-shell.admin-page .logs-main-filter-bar input,
+.entity-shell.admin-page .logs-main-filter-bar select {
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    color: var(--ci-text);
+}
+
+.entity-shell.admin-page .filter-bar input::placeholder,
+.entity-shell.admin-page .filter-bar textarea::placeholder,
+.entity-shell.admin-page .logs-main-filter-bar input::placeholder {
+    color: var(--ci-text-subtle);
+}
+
+.entity-shell.admin-page .filter-bar button,
+.entity-shell.admin-page .filter-bar.admin-filter-card button {
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 1px solid var(--ci-border-dim);
+    color: var(--ci-text-blue);
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.entity-shell.admin-page .filter-bar button:hover,
+.entity-shell.admin-page .filter-bar.admin-filter-card button:hover {
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-dark) 100%);
+}
+
+.entity-shell.admin-page .filter-bar button:disabled,
+.entity-shell.admin-page .filter-bar.admin-filter-card button:disabled {
+    background: var(--ci-bg-card-deep);
+    border-color: var(--ci-border-soft);
+    color: var(--slate-dark);
+    cursor: not-allowed;
+}
+
+.entity-shell.admin-page .filter-bar .success-btn {
+    background: var(--green-strong);
+    border: 1px solid var(--green-dark);
+    color: var(--ci-text);
+}
+
+.entity-shell.admin-page .filter-bar .success-btn:hover {
+    background: var(--green-bright);
+}
+
+/* Action buttons */
+.entity-shell.admin-page .details-btn,
+.entity-shell.admin-page .edit-btn,
+.entity-shell.admin-page .back-btn,
+.entity-shell.admin-page .view-btn {
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 1px solid var(--ci-border-dim);
+    box-shadow: none;
+    color: var(--ci-text-blue);
+}
+
+.entity-shell.admin-page .details-btn:hover,
+.entity-shell.admin-page .edit-btn:hover,
+.entity-shell.admin-page .back-btn:hover,
+.entity-shell.admin-page .view-btn:hover {
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-dark) 100%);
+}
+
+.entity-shell.admin-page .warning-btn {
+    background: var(--ci-accent-dark);
+    border: 1px solid var(--ci-border-dim);
+    box-shadow: none;
+    color: var(--ci-text);
+}
+
+.entity-shell.admin-page .danger,
+.entity-shell.admin-page .danger-btn {
+    background: linear-gradient(180deg, rgba(248, 113, 113, 0.45) 0%, rgba(220, 80, 80, 0.55) 100%);
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    box-shadow: 0 2px 6px var(--shadow-sm), inset 0 1px 0 var(--white-opacity-xs);
+    color: var(--ci-text);
+}
+
+.entity-shell.admin-page .danger:hover,
+.entity-shell.admin-page .danger-btn:hover {
+    background: linear-gradient(180deg, rgba(248, 113, 113, 0.6) 0%, rgba(220, 80, 80, 0.7) 100%);
+    border-color: var(--red-soft-opacity-md);
+}
+
+/* History button â€” ensure legibility with distinct teal/cyan */
+.entity-shell.admin-page .history-btn {
+    background: linear-gradient(180deg, rgba(20, 184, 166, 0.8) 0%, rgba(13, 148, 136, 0.9) 100%);
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    color: #e0f7f4;
+    box-shadow: 0 2px 6px var(--shadow-sm), inset 0 1px 0 var(--white-opacity-sm);
+}
+
+.entity-shell.admin-page .history-btn:hover {
+    background: linear-gradient(180deg, rgba(20, 184, 166, 1) 0%, rgba(13, 148, 136, 1) 100%);
+    color: var(--white);
+}
+
+/* Success button â€” metallic green */
+.entity-shell.admin-page .success-btn {
+    background: linear-gradient(180deg, rgba(74, 222, 128, 0.7) 0%, rgba(34, 197, 94, 0.85) 100%);
+    border: 1px solid var(--green-opacity-2xl);
+    color: #ecfdf5;
+    box-shadow: 0 2px 6px var(--shadow-sm), inset 0 1px 0 var(--white-opacity-sm);
+}
+
+.entity-shell.admin-page .success-btn:hover {
+    background: linear-gradient(180deg, rgba(74, 222, 128, 0.9) 0%, rgba(34, 197, 94, 1) 100%);
+}
+
+/* Warning button â€” metallic amber */
+.entity-shell.admin-page .warning-btn {
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.7) 0%, rgba(217, 160, 20, 0.85) 100%);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    color: var(--amber-lightest);
+    box-shadow: 0 2px 6px var(--shadow-md), inset 0 1px 0 var(--accent-opacity-sm);
+}
+
+.entity-shell.admin-page .warning-btn:hover {
+    background: linear-gradient(180deg, var(--amber-opacity-2xl) 0%, rgba(217, 160, 20, 1) 100%);
+}
+
+/* Users table container â€” dark theme */
+.admin-users-shell .users-table-container {
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    background: var(--ci-bg-card-deep);
+    box-shadow: 0 2px 8px var(--shadow-xs);
+}
+
+/* Users pagination */
+.admin-users-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.5rem 0;
+}
+
+.admin-users-pagination button {
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 1px solid var(--ci-border-dim);
+    color: var(--ci-text-blue);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    cursor: pointer;
+}
+
+.admin-users-pagination button:hover:not(:disabled) {
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-dark) 100%);
+}
+
+.admin-users-pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.admin-users-pagination .pagination-info {
+    color: var(--ci-text-blue);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+/* Tables */
+.entity-shell.admin-page table,
+.entity-shell.admin-page .payments-table,
+.entity-shell.admin-page .log-table,
+.entity-shell.admin-page .product-table {
+    background: transparent;
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+}
+
+.entity-shell.admin-page table th,
+.entity-shell.admin-page .payments-table th,
+.entity-shell.admin-page .log-table th,
+.entity-shell.admin-page .product-table th {
+    background: var(--ci-bg-alt);
+    border-bottom: 1px solid var(--ci-border-dim);
+    color: var(--ci-accent);
+    text-shadow: none;
+}
+
+.entity-shell.admin-page table td,
+.entity-shell.admin-page .payments-table td,
+.entity-shell.admin-page .log-table td,
+.entity-shell.admin-page .product-table td {
+    background: var(--ci-accent-opacity-sm);
+    border-bottom: 1px solid var(--ci-border-dim);
+    color: var(--ci-text-blue);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
+}
+
+.entity-shell.admin-page table tr:nth-child(even) td,
+.entity-shell.admin-page .payments-table tr:nth-child(even) td,
+.entity-shell.admin-page .log-table tr:nth-child(even) td,
+.entity-shell.admin-page .product-table tr:nth-child(even) td {
+    background: var(--ci-bg-card-deep);
+}
+
+.entity-shell.admin-page table tr:hover td,
+.entity-shell.admin-page .payments-table tr:hover td,
+.entity-shell.admin-page .log-table tr:hover td,
+.entity-shell.admin-page .product-table tr:hover td {
+    background: rgba(26, 90, 176, 0.32);
+    filter: none;
+}
+
+.entity-shell.admin-page table td a {
+    color: var(--ci-accent);
+}
+
+.entity-shell.admin-page table td strong,
+.entity-shell.admin-page table td b {
+    color: var(--ci-text-blue);
+}
+
+/* Pagination */
+.entity-shell.admin-page .pagination button {
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 1px solid var(--ci-border-dim);
+    box-shadow: none;
+    color: var(--ci-text-blue);
+}
+
+.entity-shell.admin-page .pagination button:hover {
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-dark) 100%);
+}
+
+.entity-shell.admin-page .pagination button:disabled {
+    background: var(--ci-bg-card-deep);
+    border-color: var(--ci-border-soft);
+    color: var(--slate-dark);
+    opacity: 1;
+}
+
+.entity-shell.admin-page .pagination .pagination-info,
+.entity-shell.admin-page .pagination-info {
+    color: var(--ci-text-subtle);
+    font-weight: 600;
+    text-shadow: none;
+}
+
+/* Text helpers */
+.entity-shell.admin-page .text-muted {
+    color: var(--ci-text-subtle);
+}
+
+.entity-shell.admin-page .label {
+    color: var(--ci-text-blue);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
+}
+
+.entity-shell.admin-page .operation-fee-message.ok {
+    color: var(--green-bright);
+}
+
+.entity-shell.admin-page .operation-fee-message.error {
+    color: var(--red-soft);
+}
+
+/* Logs */
+.entity-shell.admin-page .logs-filter-group-label {
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: none;
+    color: var(--ci-text-blue);
+    text-shadow: none;
+}
+
+.entity-shell.admin-page .logs-total-count,
+.entity-shell.admin-page .orders-review-sort-summary {
+    color: var(--ci-text-subtle);
+    text-shadow: none;
+}
+
+/* Orders-review notice */
+.entity-shell.admin-page .orders-review-restored-notice {
+    background: var(--ci-bg-card-deep);
+    border-left-color: var(--ci-accent-mid);
+    color: var(--ci-text-blue);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
+}
+
+.entity-shell.admin-page .orders-review-restored-close {
+    color: var(--ci-text-subtle);
+}
+
+/* Entity shell footer */
+.entity-shell.admin-page .entity-shell-footer {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    box-shadow: none;
+}
+
+/* Payment details card (orders review modal) */
+.entity-shell.admin-page .payment-details-card {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    box-shadow: none;
+    color: var(--ci-text-blue);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
+}
+
+.entity-shell.admin-page .payment-details-card .label {
+    border-right-color: var(--ci-border);
+    color: var(--ci-accent);
+}
+
+/* APV card (product/user view) */
+.entity-shell.admin-page .apv-card {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    box-shadow: none;
+}
+
+.entity-shell.admin-page .apv-title {
+    background: var(--ci-bg-alt);
+    border-bottom: 1px solid var(--ci-border-dim);
+    color: var(--ci-accent);
+    text-shadow: none;
+}
+
+.entity-shell.admin-page .apv-dl {
+    border-color: var(--ci-accent-mid);
+}
+
+.entity-shell.admin-page .apv-row:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.entity-shell.admin-page .apv-row:nth-child(even) {
+    background: transparent;
+}
+
+.entity-shell.admin-page .apv-row dt,
+.entity-shell.admin-page .apv-row dd {
+    border-right-color: var(--ci-border);
+    color: var(--ci-text-blue);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
+}
+
+.entity-shell.admin-page .apv-row dt {
+    color: var(--ci-accent);
+}
+
+.entity-shell.admin-page .apv-mono {
+    color: var(--ci-text-blue);
+}
+
+.entity-shell.admin-page .apv-btn-back {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    color: var(--ci-text);
+    text-shadow: none;
+}
+
+.entity-shell.admin-page .apv-btn-edit {
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 1px solid var(--ci-border-dim);
+    color: var(--ci-text-blue);
+}
+
+/* Admin user view profile panels */
+.entity-shell.admin-page .admin-profile-panel-card {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    box-shadow: none;
+}
+
+.entity-shell.admin-page .admin-profile-panel-card h3 {
+    background: var(--ci-bg-alt);
+    border-bottom: 1px solid var(--ci-border-dim);
+    border-radius: 7px 7px 0 0;
+    color: var(--ci-accent);
+    text-shadow: none;
+}
+
+.entity-shell.admin-page .admin-profile-info-list dt {
+    color: var(--ci-accent);
+}
+
+.entity-shell.admin-page .admin-profile-info-list dd {
+    color: var(--ci-text-blue);
+}
+
+.entity-shell.admin-page .admin-profile-governance-copy {
+    color: var(--ci-text-subtle);
+}
+
+.entity-shell.admin-page .admin-user-stats-grid .admin-kpi-card {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-top: 2px solid var(--ci-border-dim);
+    box-shadow: none;
+}
+
+/* Form pages */
+.entity-shell.admin-page .form-group label {
+    color: var(--ci-text-blue);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
+}
+
+.entity-shell.admin-page .form-group .input,
+.entity-shell.admin-page .form-group input.input,
+.entity-shell.admin-page .form-group textarea.input,
+.entity-shell.admin-page .form-group select.input {
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    color: var(--ci-text);
+}
+
+.entity-shell.admin-page .form-group .input:focus,
+.entity-shell.admin-page .form-group input.input:focus,
+.entity-shell.admin-page .form-group textarea.input:focus,
+.entity-shell.admin-page .form-group select.input:focus {
+    border-color: var(--ci-accent-mid);
+    box-shadow: 0 0 0 2px var(--ci-accent-opacity-lg);
+    outline: none;
+}
+
+.entity-shell.admin-page .product-attr-labels {
+    color: var(--ci-text-subtle);
+}
+
+.entity-shell.admin-page .accent-color-meta strong {
+    color: var(--ci-text-blue);
+}
+
+.entity-shell.admin-page .accent-color-meta small {
+    color: var(--ci-text-subtle);
+}
+
+.entity-shell.admin-page .save-btn {
+    background: var(--green-strong);
+    border: 1px solid var(--green-dark);
+    box-shadow: none;
+    color: var(--ci-text);
+}
+
+.entity-shell.admin-page .save-btn:hover {
+    background: var(--green-bright);
+}
+
+.entity-shell.admin-page .cancel-btn {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    box-shadow: none;
+    color: var(--ci-text);
+    text-shadow: none;
+}
+
+.entity-shell.admin-page .cancel-btn:hover {
+    border-color: var(--ci-accent-mid);
+    color: var(--ci-text-blue);
+}
+
+/* Validation */
+.entity-shell.admin-page .validation-errors,
+.entity-shell.admin-page .validation-message {
+    color: var(--red-soft);
+}
+
+/* Security boolean badges */
+.entity-shell.admin-page .security-boolean-badge.on {
+    background: var(--green-dark);
+    border-color: var(--green-strong);
+    color: var(--green-bright);
+}
+
+.entity-shell.admin-page .security-boolean-badge.off {
+    background: var(--red-dark);
+    border-color: var(--red-strong);
+    color: var(--red-soft);
+}
+
+/* Security page */
+.entity-shell.admin-page .admin-settings-card.security-settings-card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.entity-shell.admin-page .security-panel {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    box-shadow: none;
+}
+
+.entity-shell.admin-page .security-header h3 {
+    background: var(--ci-bg-card-deep);
+    border-bottom: 1px solid var(--ci-border);
+    color: var(--ci-text-blue);
+    text-shadow: none;
+}
+
+.entity-shell.admin-page .security-header p,
+.entity-shell.admin-page .security-label,
+.entity-shell.admin-page .security-baseline-group h5 {
+    color: var(--ci-text-subtle);
+}
+
+.entity-shell.admin-page .security-panel h4,
+.entity-shell.admin-page .security-value,
+.entity-shell.admin-page .security-toggle {
+    color: var(--ci-text-blue);
+}
+
+.entity-shell.admin-page .security-input-grid label {
+    color: var(--ci-text-subtle);
+}
+
+.entity-shell.admin-page .security-input-grid input,
+.entity-shell.admin-page .security-input-grid select {
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    color: var(--ci-text);
+}
+
+.entity-shell.admin-page .security-baseline-row {
+    border-bottom: 1px dashed var(--ci-border);
+}
+
+.entity-shell.admin-page .security-baseline-group {
+    border-top: 1px solid var(--ci-border);
+}
+
+.entity-shell.admin-page .security-env-pill {
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
+    border: 1px solid var(--ci-border-dim);
+    color: var(--ci-text-blue);
+}
+
+.entity-shell.admin-page .security-toggle input[type="checkbox"] {
+    accent-color: var(--ci-accent);
+}
+
+/* ================================================================
+   CONFIRMAI CLEANUP â€” Remove remaining old-project remnants from
+   user-facing parchment-a pages (payments, etc.)
+   ================================================================ */
+
+/* â”€â”€ Table row base: kill var(--bg-slate) = #23272b bleed â”€â”€â”€â”€â”€â”€â”€â”€ */
+body .entity-shell.parchment-a .product-table tr,
+body .entity-shell.parchment-a .payments-table tr,
+body .entity-shell.parchment-a .log-table tr {
+    background: transparent;
+}
+
+/* â”€â”€ Pagination buttons: replace orange Tibia gradient â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+body .entity-shell.parchment-a .pagination button {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    box-shadow: none;
+    color: var(--ci-accent);
+    font-weight: 700;
+}
+
+body .entity-shell.parchment-a .pagination button:hover:not(:disabled) {
+    background: var(--accent-opacity-xs);
+    border-color: var(--ci-accent);
+    color: var(--ci-text-blue);
+    filter: none;
+}
+
+body .entity-shell.parchment-a .pagination button:disabled {
+    background: var(--ci-bg-card-deep);
+    border-color: var(--ci-border);
+    box-shadow: none;
+    color: var(--ci-text-subtle);
+    opacity: 0.6;
+}
+
+body .entity-shell.parchment-a .pagination .pagination-info,
+body .entity-shell.parchment-a .pagination-info {
+    color: var(--ci-text-subtle);
+    font-weight: 700;
+}
+
+/* â”€â”€ Empty state: replace parchment/brown with dark theme â”€â”€â”€â”€â”€â”€â”€â”€ */
+body .admin-empty-state {
+    background: var(--ci-bg-card-deep);
+    border: 1px dashed var(--ci-border);
+}
+
+body .admin-empty-state-icon {
+    color: var(--ci-accent);
+}
+
+body .admin-empty-state-text {
+    color: var(--slate-pale);
+}
+
+body .admin-empty-state-hint {
+    color: var(--ci-text-subtle);
+}
+
+/* â”€â”€ entity-muted remnants: --brown-text (#6b4726) on dark bg â”€â”€â”€â”€ */
+body .entity-shell-card p,
+body .entity-shell-card li {
+    color: var(--ci-text-blue);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
+}
+
+body .entity-shell-subtitle {
+    color: var(--ci-text-blue);
+    text-shadow: 0 0 6px var(--accent-opacity-md);
+}
+
+/* â”€â”€ Google Maps Places Autocomplete dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.pac-container {
+    z-index: 9999 !important;
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 8px 24px var(--shadow-xl);
+    font-family: inherit;
+}
+.pac-item {
+    padding: 0.45rem 0.75rem;
+    border-top: 1px solid var(--ci-border);
+    color: var(--ci-surface-muted);
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+.pac-item:hover, .pac-item-selected { background: var(--ci-bg-card); }
+.pac-item-query { color: var(--slate-pale); font-weight: 600; }
+.pac-matched { color: var(--ci-accent); }
+.pac-icon { display: none; }
+
+/* â”€â”€ Identity / Bootstrap form-control dark theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.form-control {
+    background-color: var(--ci-bg-input);
+    color: var(--ci-text-blue);
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.form-control:hover {
+    border-color: var(--ci-border-dim);
+    background-color: var(--ci-bg-input);
+}
+.form-control:focus {
+    background-color: var(--ci-bg-input);
+    color: var(--ci-text-blue);
+    border-color: var(--ci-accent);
+    box-shadow: 0 0 0 3px rgba(26, 82, 152, 0.25);
+    outline: none;
+}
+.form-control::placeholder {
+    color: var(--ci-text-subtle);
+    opacity: 1;
+}
+
+/* â”€â”€ Shared Hero Component (About/Contact pages) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.content-hero {
+    position: relative;
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border);
+    border-radius: 18px;
+    padding: 1.35rem 1.35rem 1.2rem;
+    box-shadow: var(--shadow-lg);
+}
+
+.content-hero::before {
+    content: none;
+}
+
+.content-hero::after {
+    content: none;
+}
+
+/* â”€â”€ Parchment Card Utility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.parchment-card {
+    background: var(--ci-bg-card);
+    border: 1px solid var(--ci-border);
+    border-radius: 14px;
+    padding: 1rem 1rem 0.95rem;
+}
+
+.parchment-card-light {
+    background: var(--ci-bg-card);
+    border: 1px solid var(--ci-border);
+    border-radius: 12px;
+}
+
+/* â”€â”€ Autofill + histâ”œâ”‚rico do Chrome: neutraliza fundo e cor â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:autofill,
+input:autofill:hover,
+input:autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--ci-bg-card) inset !important;
+    box-shadow: 0 0 0 1000px var(--ci-bg-card) inset !important;
+    -webkit-text-fill-color: var(--ci-text) !important;
+    color: var(--ci-text) !important;
+    caret-color: var(--ci-text);
+    border-color: var(--ci-border);
+    outline: none !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ================================================================
+   ADMIN PAYMENTS â€” moved from AdminPayments.razor.css to global
+   because Blazor CSS isolation prevents parent scoped styles
+   from reaching child components (AdminPaymentsTable, Filters,
+   AdvancedToolsModal, SummaryPanel).
+   ================================================================ */
+
+.admin-payments-shell .admin-payments-reconcile-bar {
+    margin-bottom: 0.75rem;
+    align-items: flex-end;
+}
+
+.admin-payments-shell .admin-payments-summary-card {
+    margin-bottom: 0.9rem;
+    padding: 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(130, 170, 205, 0.4);
+    background: linear-gradient(180deg, var(--ci-bg) 0%, var(--ci-bg-deepest) 100%);
+    box-shadow: 0 12px 32px var(--shadow-2xl), 0 6px 16px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-sm);
+}
+
+.admin-payments-shell .admin-payments-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.admin-payments-shell .admin-payments-summary-item {
+    padding: 0.85rem 0.95rem;
+    border-radius: 12px;
+    background: var(--ci-bg);
+    border: 1px solid var(--ci-border);
+    box-shadow: 0 2px 4px var(--shadow-md);
+}
+
+.admin-payments-shell .admin-payments-summary-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--ci-surface-muted);
+    margin-bottom: 0.2rem;
+    text-shadow: 0 1px 2px var(--text-shadow-sm);
+}
+
+.admin-payments-shell .admin-payments-summary-value {
+    font-size: 1.35rem;
+    color: var(--ci-surface-light);
+    font-weight: 800;
+    text-shadow: 0 0 15px var(--shadow-accent-lg), 0 2px 4px var(--text-shadow-sm);
+}
+
+.admin-payments-shell .admin-payments-summary-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.admin-payments-shell .admin-payments-summary-hint {
+    color: var(--ci-surface-muted);
+    font-size: 0.8rem;
+    text-shadow: 0 1px 2px var(--text-shadow-sm);
+}
+
+.admin-payments-shell .admin-payments-auto-refresh-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--ci-surface-light);
+    font-size: 0.8rem;
+    text-shadow: 0 1px 2px var(--text-shadow-sm);
+}
+
+.admin-payments-shell .admin-payments-auto-refresh-toggle input {
+    accent-color: var(--ci-accent);
+}
+
+.admin-payments-shell .admin-payments-auto-refresh-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.28rem 0.52rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+}
+
+.admin-payments-shell .admin-payments-auto-refresh-pill--paused {
+    color: var(--amber-light);
+    background: linear-gradient(180deg, var(--amber) 0%, var(--amber-dark) 50%, var(--amber-mid) 100%);
+    border-color: var(--amber-light);
+    box-shadow: 0 2px 4px var(--amber-opacity-sm);
+}
+
+.admin-payments-shell .admin-payments-severity-pill {
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.32rem 0.58rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+}
+
+.admin-payments-shell .admin-payments-severity-pill--ok {
+    color: var(--green-soft);
+    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
+    border-color: var(--green-soft);
+    box-shadow: 0 2px 4px var(--shadow-green-sm);
+}
+
+.admin-payments-shell .admin-payments-severity-pill--warning {
+    color: var(--parchment-cream);
+    background: linear-gradient(180deg, var(--amber) 0%, var(--amber-dark) 50%, var(--amber-mid) 100%);
+    border-color: var(--amber-light);
+    box-shadow: 0 2px 4px var(--amber-opacity-sm);
+}
+
+.admin-payments-shell .admin-payments-severity-pill--critical {
+    color: var(--red-lightest);
+    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
+    border-color: var(--red-pale);
+    box-shadow: 0 2px 4px var(--shadow-red-sm);
+}
+
+.admin-payments-shell .admin-payments-summary-meta {
+    margin-top: 0.85rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+}
+
+.admin-payments-shell .admin-payments-summary-meta span {
+    color: var(--ci-text-blue);
+    font-size: 0.8rem;
+}
+
+.admin-payments-shell .admin-payments-summary-link {
+    color: rgba(147, 197, 253, 0.95);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.admin-payments-shell .admin-payments-summary-link:hover {
+    color: rgba(191, 219, 254, 1);
+}
+
+.admin-payments-shell .admin-payments-summary-age {
+    color: var(--ci-text-link);
+    font-weight: 600;
+}
+
+.admin-payments-shell .admin-payments-summary-age-hint {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin-left: 0.35rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    color: rgba(226, 232, 240, 0.92);
+    background: rgba(15, 23, 42, 0.55);
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1;
+    cursor: help;
+}
+
+.admin-payments-shell .admin-payments-summary-age--warning {
+    color: var(--amber-warm);
+}
+
+.admin-payments-shell .admin-payments-trend--warning {
+    color: var(--amber-warm);
+    font-weight: 700;
+}
+
+.admin-payments-shell .admin-payments-sweep-history {
+    margin-top: 0.85rem;
+    border: 1px solid rgba(130, 170, 205, 0.16);
+    border-radius: 10px;
+    padding: 0.65rem 0.8rem;
+    background: var(--white-opacity-2xs);
+}
+
+.admin-payments-shell .admin-payments-sweep-history-title {
+    display: block;
+    color: var(--ci-text-blue);
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 0.38rem;
+}
+
+.admin-payments-shell .admin-payments-sweep-history ul {
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.admin-payments-shell .admin-payments-sparkline {
+    margin-bottom: 0.55rem;
+    height: 48px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: end;
+    gap: 0.35rem;
+}
+
+.admin-payments-shell .admin-payments-sparkline-point {
+    border-radius: 4px 4px 2px 2px;
+    background: linear-gradient(180deg, rgba(96, 165, 250, 0.95) 0%, rgba(59, 130, 246, 0.55) 100%);
+    border: 1px solid rgba(147, 197, 253, 0.42);
+    min-height: 6px;
+}
+
+.admin-payments-shell .admin-payments-sweep-history li {
+    color: var(--ci-text-subtle);
+    font-size: 0.78rem;
+    margin: 0.15rem 0;
+}
+
+.admin-payments-shell .admin-payments-gateway-telemetry {
+    margin-top: 0.85rem;
+    border: 1px solid rgba(130, 170, 205, 0.16);
+    border-radius: 10px;
+    padding: 0.65rem 0.8rem;
+    background: var(--white-opacity-2xs);
+}
+
+.admin-payments-shell .admin-payments-gateway-telemetry-title {
+    display: block;
+    color: var(--ci-text-blue);
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 0.38rem;
+}
+
+.admin-payments-shell .admin-payments-gateway-telemetry-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+
+.admin-payments-shell .admin-payments-gateway-telemetry-table th,
+.admin-payments-shell .admin-payments-gateway-telemetry-table td {
+    padding: 0.4rem 0.35rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(130, 170, 205, 0.14);
+    color: var(--ci-text-blue);
+}
+
+.admin-payments-shell .admin-payments-gateway-severity {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.73rem;
+    font-weight: 700;
+    padding: 0.22rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+}
+
+.admin-payments-shell .admin-payments-gateway-severity--ok {
+    color: var(--futsal-green-pale);
+    background: var(--green-opacity-sm);
+    border-color: rgba(74, 222, 128, 0.34);
+}
+
+.admin-payments-shell .admin-payments-gateway-severity--warning {
+    color: var(--amber-warm);
+    background: var(--amber-opacity-xs);
+    border-color: rgba(251, 191, 36, 0.34);
+}
+
+.admin-payments-shell .admin-payments-gateway-severity--critical {
+    color: var(--red-pale);
+    background: rgba(248, 113, 113, 0.12);
+    border-color: rgba(248, 113, 113, 0.42);
+}
+
+.admin-payments-shell .admin-payments-reconcile-input-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 300px;
+    flex: 1;
+}
+
+.admin-payments-shell .admin-payments-reconcile-label {
+    font-size: 0.75rem;
+    color: var(--ci-text-muted);
+}
+
+.admin-payments-shell .admin-payments-reconcile-result--error {
+    border-color: var(--red-soft-opacity-md);
+    color: var(--red-pale);
+}
+
+.admin-payments-shell .admin-payments-reconcile-result--ok {
+    border-color: var(--green-opacity-2xl);
+    color: var(--green-soft);
+}
+
+.admin-payments-shell .admin-payments-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(2, 8, 18, 0.72);
+    z-index: 20000;
+}
+
+.admin-payments-shell .admin-payments-modal-backdrop--open {
+    display: flex;
+}
+
+.admin-payments-shell .admin-payments-modal {
+    width: min(980px, 100%);
+    max-height: calc(100vh - 2rem);
+    overflow: auto;
+    position: relative;
+    z-index: 20001;
+    border-radius: 14px;
+    border: 1px solid rgba(130, 170, 205, 0.28);
+    background: linear-gradient(180deg, rgba(10, 24, 41, 0.98) 0%, rgba(7, 17, 31, 0.99) 100%);
+    box-shadow: 0 24px 38px rgba(0, 0, 0, 0.38);
+    padding: 1rem;
+}
+
+.admin-payments-shell .admin-payments-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.admin-payments-shell .admin-payments-modal-header h2 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--ci-text-info-strong);
+}
+
+.admin-payments-shell .admin-payments-tools-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.admin-payments-shell .admin-payments-tools-section {
+    border: 1px solid rgba(130, 170, 205, 0.2);
+    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+    background: var(--white-opacity-2xs);
+}
+
+.admin-payments-shell .admin-payments-tools-section h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ci-text-blue);
+}
+
+.admin-payments-shell .admin-payments-tools-description {
+    margin: 0.25rem 0 0.6rem;
+    font-size: 0.78rem;
+    color: var(--ci-text-muted);
+}
+
+.admin-payments-shell .admin-payments-reconcile-bar--modal {
+    margin-bottom: 0;
+}
+
+/* AdminPayments responsive overrides */
+@media (max-width: 1024px) {
+    .admin-payments-shell .filter-bar.admin-filter-card {
+        gap: 0.45rem;
+    }
+
+    .admin-payments-shell .filter-bar.admin-filter-card input,
+    .admin-payments-shell .filter-bar.admin-filter-card select {
+        flex: 1 1 calc(50% - 0.45rem);
+    }
+
+    .admin-payments-shell .admin-payments-reconcile-input-wrap {
+        min-width: 100%;
+    }
+
+    .admin-payments-shell .admin-payments-modal {
+        width: 100%;
+        max-height: calc(100vh - 1rem);
+        padding: 0.85rem;
+    }
+
+    .admin-payments-shell .admin-payments-modal-header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding-bottom: 0.45rem;
+        margin-bottom: 0.55rem;
+        background: linear-gradient(180deg, rgba(10, 24, 41, 1) 0%, rgba(10, 24, 41, 0.92) 100%);
+    }
+
+    .admin-payments-shell .admin-payments-reconcile-bar--modal {
+        align-items: stretch;
+    }
+
+    .admin-payments-shell .admin-payments-reconcile-bar--modal > input,
+    .admin-payments-shell .admin-payments-reconcile-bar--modal > select,
+    .admin-payments-shell .admin-payments-reconcile-bar--modal > button {
+        width: 100%;
+    }
+
+    .admin-payments-shell .admin-payments-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-payments-shell .admin-payments-gateway-telemetry-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-payments-shell .payments-table td:before {
+        min-width: 80px;
+        flex-shrink: 0;
+    }
+
+    .admin-payments-shell .payments-table td {
+        flex-wrap: wrap;
+        gap: 0.2rem;
+    }
+
+    .admin-payments-shell .admin-payments-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
