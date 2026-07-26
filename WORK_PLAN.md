@@ -839,6 +839,49 @@ O que **nao e necessario** em maquinas de apoio:
 
 ---
 
+## Review Senior -- Ciclo 19 (Polimento UX mobile + toggles + gateways default) -- ANALISADO
+
+**Data**: 14/06/2026 (Senior). **PR revisado**: #65 (`review/senior-overview`, mergeado na main). Build OK. Testes: **1889 passando** / 1913 (as 24 falhas sao apenas `ProgramConfigurationTests` sem Postgres -- ambiente, nao regressao).
+
+**Veredito: BOM no UX, mas 1 RISCO DE PRODUCAO que exige decisao antes de deploy.**
+
+### RISCO ALTO (decisao do Robson antes de deploy) -- default de gateways
+A migration `20260725191038_EnablePaymentGatewaysDefaultTrue` faz `UPDATE "Groups" SET "EnablePaymentGateways"=true WHERE ...=false` -- ou seja, **liga gateways para TODOS os grupos existentes** e muda o default do modelo para `true` (`Group.cs`). Combinando com:
+- `Fee.Enabled=true` + guarda-corpo do checkout (`EventPaymentService.cs:143-154`): se o grupo **nao tem `GroupPayoutAccount` ativa**, a geracao de cobranca e **bloqueada** ("O organizador nao configurou a chave PIX para repasse");
+- `Fee.ShowDirectPixToOrganizer=false` (appsettings.json e Production): **sem fallback de Pix direto** quando gateways estao ligados.
+
+**Consequencia em prod**: no deploy, todo grupo existente que **ainda nao cadastrou chave PIX de repasse** deixa de conseguir receber pagamento -- o jogador so ve o gateway EfiBank e a cobranca falha. **Recuperavel** pelo admin do grupo (cadastrar a chave PIX **ou** desligar gateways -> volta ao Pix direto manual), mas quebra silenciosa ate essa acao.
+
+**Opcoes (o Robson escolhe)**:
+1. **Nao auto-ligar grupos existentes**: remover o `UPDATE` da migration -- default `true` vale so para **grupos novos**; existentes seguem como estao. (mais seguro)
+2. **Manter flip + `ShowDirectPixToOrganizer=true`**: grupos sem chave caem no Pix direto em vez de bloquear.
+3. **Manter como esta + acao operacional**: avisar todos os organizadores para cadastrarem a chave PIX antes do deploy. (so viavel com poucos grupos conhecidos)
+
+### BOM (aprovado)
+- **UX mobile "Voce"**: badge compacto substituindo o nome/email em telas <=768px, em 9 componentes; regra `:has()` que oculta tags durante confirmacao ficou **dentro** da media query (corrige o vazamento pro desktop). Correto.
+- **Toggles**: novo `EnableBestPlayerVoting` + logica de dependencia (`Features.razor.cs`) -- ao desligar gateways, ranking pos-partida e votacao sao desligados juntos ("incentivo" ao fluxo com taxa). Bem implementado, com audit trail (`AuditEvents.GroupFeatureToggled`) e migrations corretas.
+- **Venue Edit**: hint/placeholder do Google Maps condicionais a `hasMapsApiKey`. Correto.
+- **Limpeza**: removidos usuarios fake hardcoded (`gm@teste.com`, `gm2@teste.com`) do `AppInitializationService`. Bom.
+- **Simulacao de dados**: inserida **via SQL direto no Postgres**, nao no codigo -- nao polui o repo. OK.
+
+### Correcoes de higiene aplicadas nesta PR de review
+- **Doc solto removido (regra 20)**: `docs/SENIOR_REVIEW_CICLO19.md` -- conteudo (progresso + pedido de overview + 7 decisoes) consolidado aqui.
+- **Nota**: `appsettings.Development.json` commita credencial de admin de dev (`admin@confirmai.app` / `Admin123!Aa`). Aceitavel por ser **so ambiente Development** e documentado, mas confirmar que em prod o `SyncPassword=false` e o AdminSeed vem por env var (esta assim). Nao commitar credencial em `appsettings.json`/`Production.json`.
+- **Gap de TDD**: a nova feature `EnableBestPlayerVoting` e a mudanca de default de gateways entraram **sem testes novos** (contraria a regra permanente do proprio Ciclo 18). Pedir ao Pleno: teste do toggle (liga/desliga + cascata que desliga ranking/votacao) e teste do guarda-corpo com gateways ligados sem payout account.
+
+### Respostas do Senior as 7 decisoes pendentes do doc do Pleno
+1. **Modularizar `events.css` (~5.000 linhas)**: SIM, mas **incremental** e so no ciclo de CSS -- extrair por dominio (`futsal.css`, `poker.css`, `admin.css`) com characterization visual, uma extracao por commit. Nao fazer num commit gigante.
+2. **Cache distribuido (Redis)**: NAO agora. So justifica com multi-instancia ou gargalo medido. Prematuro.
+3. **Cobertura 9,9% -> 15%+**: SIM, focar nos 5 services sem cobertura + o gap de TDD acima. Meta por ciclo, nao de uma vez.
+4. **WhatsApp real**: manter **postergado** (decisao do Robson -- aguardando ideias do amigo dev).
+5. **E2E mobile (Playwright viewport)**: adiar; primeiro estabilizar o pagamento em homologacao. Vale como experimento depois.
+6. **Consolidar 4 gateways**: NAO consolidar codigo (a factory ja e plugavel). So EfiBank cobra taxa/repassa hoje; os outros ficam sem taxa. Reavaliar quando houver volume real.
+7. **Indices PostgreSQL em `EventConfirmations(EventId, UserId)`**: SIM, baixo custo e alto retorno -- criar via migration dedicada. Bom candidato pro proximo ciclo.
+
+**Conclusao**: ciclo de UX aprovado. **Bloqueio para deploy**: resolver a decisao do default de gateways (risco acima) antes de subir para prod, senao grupos existentes sem chave PIX ficam sem receber pagamento.
+
+---
+
 ## Review Senior -- Ciclo Pagamento Real + Taxa de Servico (analisado)
 
 **Status**: Implementado (PR #60 mergeado) e revisado pelo Senior. Build OK, testes unitarios novos (FeeCalculatorTests, PayoutServiceTests) verdes. As 24 falhas locais sao apenas `ProgramConfigurationTests` que precisam de Postgres (ambiente sem DB) -- nao sao regressao; passam no CI.
