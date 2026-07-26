@@ -39,7 +39,7 @@ public class ExternalLoginModelTests
             Array.Empty<IPasswordValidator<ApplicationUser>>(),
             new Mock<ILookupNormalizer>().Object,
             new IdentityErrorDescriber(),
-            null,
+            null!,
             NullLogger<UserManager<ApplicationUser>>.Instance);
 
         signInManager = new Mock<SignInManager<ApplicationUser>>(

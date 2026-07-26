@@ -80,7 +80,7 @@ public class SerilogExtensionsTests
             ServiceName = "test-service",
             ServiceVersion = "1.0.0",
             Environment = "test",
-            Headers = null
+            Headers = null!
         };
         
         var result = config.WriteSerilogOtlpSinkIfEnabled(options);

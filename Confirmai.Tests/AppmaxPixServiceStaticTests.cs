@@ -17,7 +17,7 @@ public class AppmaxPixServiceStaticTests
         // Act
         var method = typeof(AppmaxPixService).GetMethod("NormalizePhone", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = method?.Invoke(null, new object[] { input }) as string;
+        var result = method?.Invoke(null, new object?[] { input }) as string;
 
         // Assert
         Assert.Equal(expected, result);
@@ -33,7 +33,7 @@ public class AppmaxPixServiceStaticTests
         // Act
         var method = typeof(AppmaxPixService).GetMethod("NormalizePhone", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = method?.Invoke(null, new object[] { input }) as string;
+        var result = method?.Invoke(null, new object?[] { input }) as string;
 
         // Assert
         Assert.Null(result);

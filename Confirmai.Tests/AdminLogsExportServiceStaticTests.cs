@@ -94,7 +94,7 @@ public class AdminLogsExportServiceStaticTests
         // Act
         var method = typeof(AdminLogsExportService).GetMethod("EscapeCsv", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = method?.Invoke(null, new object[] { null }) as string;
+        var result = method?.Invoke(null, new object?[] { null }) as string;
 
         // Assert
         Assert.Equal("\"\"", result);

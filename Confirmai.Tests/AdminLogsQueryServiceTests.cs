@@ -439,6 +439,6 @@ public class AdminLogsQueryServiceTests
         // Assert
         Assert.Single(result);
         Assert.NotNull(result[0].User);
-        Assert.Equal("user-1", result[0].User.Id);
+        Assert.Equal("user-1", result[0].User!.Id);
     }
 }

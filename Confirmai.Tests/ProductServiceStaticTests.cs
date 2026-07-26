@@ -61,7 +61,7 @@ public class ProductServiceStaticTests
         // Act
         var method = typeof(ProductService).GetMethod("NormalizeAccentColor", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = method?.Invoke(null, new object[] { input }) as string;
+        var result = method?.Invoke(null, new object?[] { input }) as string;
 
         // Assert
         Assert.Equal(expected, result);
@@ -81,7 +81,7 @@ public class ProductServiceStaticTests
         // Act
         var method = typeof(ProductService).GetMethod("NormalizeAccentColor", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = method?.Invoke(null, new object[] { input }) as string;
+        var result = method?.Invoke(null, new object?[] { input }) as string;
 
         // Assert
         Assert.Null(result);
