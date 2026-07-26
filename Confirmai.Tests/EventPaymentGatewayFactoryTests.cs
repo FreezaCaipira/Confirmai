@@ -13,7 +13,7 @@ public class EventPaymentGatewayFactoryTests
         public string DisplayName { get; init; } = "";
         public bool IsAvailable { get; init; }
 
-        public Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null, decimal serviceFeePercentage = 0)
+        public Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null)
             => Task.FromResult(new EventPaymentChargeResult($"charge-{Name}", "brcode"));
 
         public Task<bool> IsChargePaidAsync(string chargeId) => Task.FromResult(false);

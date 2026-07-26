@@ -1,12 +1,10 @@
 using System.Globalization;
 using System.Security.Claims;
-using Confirmai.Data;
-using Confirmai.Models;
 using Confirmai.Pages.Components;
+using Confirmai.Services.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages;
@@ -68,99 +66,16 @@ public partial class Mailbox
 
     private async Task LoadMessagesAsync()
     {
-        await using var db = await DbFactory.CreateDbContextAsync();
+        var result = await MailboxQueryService.LoadConversationsAsync(
+            currentUserId, searchTerm, inboxUnreadOnly,
+            showArchivedConversations, conversationPage, pageSize);
 
-        var normalizedSearch = string.IsNullOrWhiteSpace(searchTerm)
-            ? null
-            : searchTerm.Trim().ToLower();
+        conversationContacts = result.Contacts;
+        conversationTotal = result.TotalConversations;
+        activeConversationTotal = result.ActiveConversationTotal;
+        archivedConversationTotal = result.ArchivedConversationTotal;
 
-        var allRows = await db.UserMailboxMessages
-            .AsNoTracking()
-            .Include(m => m.SenderUser)
-            .Include(m => m.RecipientUser)
-            .Where(m => m.RecipientUserId == currentUserId || m.SenderUserId == currentUserId)
-            .OrderByDescending(m => m.CreatedAt)
-            .ToListAsync();
-
-        IEnumerable<UserMailboxMessage> candidateRows = allRows;
-
-        if (inboxUnreadOnly)
-        {
-            candidateRows = candidateRows.Where(m => m.RecipientUserId == currentUserId && !m.IsRead);
-        }
-
-        if (!string.IsNullOrWhiteSpace(normalizedSearch))
-        {
-            candidateRows = candidateRows.Where(m =>
-                !string.IsNullOrWhiteSpace(m.Body) && m.Body.ToLower().Contains(normalizedSearch));
-        }
-
-        var candidateMessages = candidateRows
-            .Select(m => new MailboxMessageView
-            {
-                Id = m.Id,
-                Subject = m.Subject ?? string.Empty,
-                Body = m.Body,
-                SenderUserId = m.SenderUserId,
-                SenderName = m.SenderUserId == null
-                    ? "Confirmai"
-                    : (m.SenderUser == null
-                        ? (m.SenderDisplayName ?? "(conta excluída)")
-                        : (string.IsNullOrWhiteSpace(m.SenderUser.UserName) ? m.SenderDisplayName ?? m.SenderUserId : m.SenderUser.UserName!)),
-                RecipientUserId = m.RecipientUserId,
-                RecipientName = m.RecipientUser == null
-                    ? (m.RecipientDisplayName ?? "(conta excluída)")
-                    : (string.IsNullOrWhiteSpace(m.RecipientUser.UserName) ? m.RecipientDisplayName ?? m.RecipientUserId : m.RecipientUser.UserName!),
-                IsArchivedBySender = m.IsArchivedBySender,
-                IsArchivedByRecipient = m.IsArchivedByRecipient,
-                IsRead = m.IsRead,
-                CreatedAt = m.CreatedAt
-            })
-            .ToList();
-
-        (activeConversationTotal, archivedConversationTotal) = CountConversationFolders(candidateMessages);
-
-        var allMessages = showArchivedConversations
-            ? candidateMessages.Where(m =>
-                (m.RecipientUserId == currentUserId && m.IsArchivedByRecipient)
-                || (m.SenderUserId == currentUserId && m.IsArchivedBySender))
-            : candidateMessages.Where(m =>
-                (m.RecipientUserId == currentUserId && !m.IsArchivedByRecipient)
-                || (m.SenderUserId == currentUserId && !m.IsArchivedBySender));
-
-        var groupedContacts = allMessages
-            .GroupBy(BuildConversationKey)
-            .Select(g =>
-            {
-                var latest = g.OrderByDescending(x => x.CreatedAt).First();
-                var contactId = latest.SenderUserId == currentUserId ? latest.RecipientUserId : (latest.SenderUserId ?? "SYSTEM");
-                var contactName = latest.SenderUserId == currentUserId ? latest.RecipientName : latest.SenderName;
-                var title = string.IsNullOrWhiteSpace(contactName) ? contactId : contactName;
-
-                return new ConversationContactView
-                {
-                    ConversationKey = g.Key,
-                    ConversationTitle = title,
-                    ContactUserId = contactId,
-                    ContactName = string.IsNullOrWhiteSpace(contactName) ? contactId : contactName,
-                    LastBody = latest.Body,
-                    LastCreatedAt = latest.CreatedAt,
-                    UnreadCount = g.Count(x => x.RecipientUserId == currentUserId && !x.IsRead),
-                    HasUnread = g.Any(x => x.RecipientUserId == currentUserId && !x.IsRead)
-                };
-            })
-            .OrderByDescending(c => c.LastCreatedAt)
-            .ToList();
-
-        conversationTotal = groupedContacts.Count;
         EnsureValidPageBounds();
-
-        var skip = (Math.Max(1, conversationPage) - 1) * pageSize;
-        conversationContacts = groupedContacts
-            .Skip(skip)
-            .Take(pageSize)
-            .ToList();
-
         EnsureConversationSelection();
         await LoadThreadForSelectedMessageAsync();
     }
@@ -220,12 +135,6 @@ public partial class Mailbox
     {
         selectedConversationKey = conversationKey;
         await LoadThreadForSelectedMessageAsync();
-    }
-
-    private string BuildConversationKey(MailboxMessageView message)
-    {
-        var contactUserId = message.SenderUserId == currentUserId ? message.RecipientUserId : (message.SenderUserId ?? "SYSTEM");
-        return $"contact:{contactUserId}";
     }
 
     private string BuildSnippet(string body)
@@ -342,52 +251,20 @@ public partial class Mailbox
         composerInfoMessage = null;
 
         isThreadLoading = true;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var threadQuery = db.UserMailboxMessages
-            .AsNoTracking()
-            .Include(m => m.SenderUser)
-            .Where(m => m.RecipientUserId == currentUserId || m.SenderUserId == currentUserId);
 
-        var contactId = selected.ContactUserId;
-        if (string.IsNullOrWhiteSpace(contactId))
+        if (string.IsNullOrWhiteSpace(selected.ContactUserId))
         {
             conversationMessages.Clear();
             isThreadLoading = false;
             return;
         }
 
-        if (contactId == "SYSTEM")
+        if (selected.ContactUserId == "SYSTEM")
         {
             composerRecipientUserId = string.Empty;
-            threadQuery = threadQuery.Where(m => m.SenderUserId == null && m.RecipientUserId == currentUserId);
-        }
-        else
-        {
-            threadQuery = threadQuery.Where(m =>
-                (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
-                || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
         }
 
-        conversationMessages = await threadQuery
-            .OrderBy(m => m.CreatedAt)
-            .Take(120)
-            .Select(m => new ConversationMessageView
-            {
-                Id = m.Id,
-                Body = m.Body,
-                SenderUserId = m.SenderUserId,
-                AuthorName = m.SenderUserId == currentUserId
-                    ? "Voce"
-                    : (m.SenderUserId == null
-                        ? "Confirmai"
-                        : (m.SenderUser == null
-                            ? (m.SenderDisplayName ?? "(conta excluída)")
-                            : (string.IsNullOrWhiteSpace(m.SenderUser.UserName) ? m.SenderDisplayName ?? m.SenderUserId : m.SenderUser.UserName!))),
-                IsIncoming = m.SenderUserId != currentUserId,
-                IsRead = m.IsRead,
-                CreatedAt = m.CreatedAt
-            })
-            .ToListAsync();
+        conversationMessages = await MailboxQueryService.LoadThreadAsync(currentUserId, selected.ContactUserId);
 
         if (requestVersion != threadLoadVersion || !string.Equals(requestedConversationKey, selectedConversationKey, StringComparison.Ordinal))
         {
@@ -411,30 +288,7 @@ public partial class Mailbox
             return;
         }
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-        IQueryable<UserMailboxMessage> unreadQuery = db.UserMailboxMessages
-            .Where(m => m.RecipientUserId == currentUserId && !m.IsRead);
-
-        if (selected.ContactUserId == "SYSTEM")
-            unreadQuery = unreadQuery.Where(m => m.SenderUserId == null);
-        else
-            unreadQuery = unreadQuery.Where(m => m.SenderUserId == selected.ContactUserId);
-
-        var unreadMessages = await unreadQuery.ToListAsync();
-
-        if (!unreadMessages.Any())
-        {
-            return;
-        }
-
-        var now = DateTime.UtcNow;
-        foreach (var message in unreadMessages)
-        {
-            message.IsRead = true;
-            message.ReadAt = now;
-        }
-
-        await db.SaveChangesAsync();
+        await MailboxQueryService.MarkConversationAsReadAsync(currentUserId, selected.ContactUserId);
         selectedConversationKey = conversationKey;
         await LoadMessagesAsync();
     }
@@ -465,7 +319,6 @@ public partial class Mailbox
 
         isSendingReply = true;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
         if (string.IsNullOrWhiteSpace(composerRecipientUserId))
         {
             composerInfoMessage = "Selecione uma conversa antes de enviar.";
@@ -473,20 +326,8 @@ public partial class Mailbox
             return;
         }
 
-        var senderUser = await db.Users.FindAsync(currentUserId) as ApplicationUser;
-        db.UserMailboxMessages.Add(new UserMailboxMessage
-        {
-            SenderUserId = currentUserId,
-            SenderDisplayName = senderUser?.UserName,
-            RecipientUserId = composerRecipientUserId,
-            RecipientDisplayName = selected.ContactName,
-            Subject = "Chat pelo perfil",
-            Body = normalizedBody,
-            IsRead = false,
-            CreatedAt = DateTime.UtcNow
-        });
-
-        await db.SaveChangesAsync();
+        await MailboxQueryService.SendQuickReplyAsync(
+            currentUserId, composerRecipientUserId, selected.ContactName, normalizedBody);
 
         composerBody = string.Empty;
         composerInfoMessage = "Mensagem enviada.";
@@ -513,64 +354,10 @@ public partial class Mailbox
             return;
         }
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        IQueryable<UserMailboxMessage> query = db.UserMailboxMessages
-            .Where(m => m.RecipientUserId == currentUserId || m.SenderUserId == currentUserId);
-
-        var contactId = selected.ContactUserId;
-        if (contactId == "SYSTEM")
-            query = query.Where(m => m.SenderUserId == null && m.RecipientUserId == currentUserId);
-        else
-            query = query.Where(m =>
-                (m.SenderUserId == currentUserId && m.RecipientUserId == contactId)
-                || (m.SenderUserId == contactId && m.RecipientUserId == currentUserId));
-
-        var rows = await query.ToListAsync();
-        if (rows.Count == 0)
-        {
-            return;
-        }
-
-        var now = DateTime.UtcNow;
-        foreach (var row in rows)
-        {
-            if (row.SenderUserId == currentUserId)
-            {
-                row.IsArchivedBySender = archive;
-                row.ArchivedBySenderAt = archive ? now : null;
-            }
-
-            if (row.RecipientUserId == currentUserId)
-            {
-                row.IsArchivedByRecipient = archive;
-                row.ArchivedByRecipientAt = archive ? now : null;
-            }
-        }
-
-        await db.SaveChangesAsync();
+        await MailboxQueryService.SetConversationArchivedAsync(currentUserId, selected.ContactUserId, archive);
 
         selectedConversationKey = null;
         await LoadMessagesAsync();
-    }
-
-    private (int Active, int Archived) CountConversationFolders(IEnumerable<MailboxMessageView> projected)
-    {
-        var active = projected
-            .Where(m =>
-                (m.SenderUserId == currentUserId && !m.IsArchivedBySender)
-                || (m.RecipientUserId == currentUserId && !m.IsArchivedByRecipient))
-            .GroupBy(BuildConversationKey)
-            .Count();
-
-        var archived = projected
-            .Where(m =>
-                (m.SenderUserId == currentUserId && m.IsArchivedBySender)
-                || (m.RecipientUserId == currentUserId && m.IsArchivedByRecipient))
-            .GroupBy(BuildConversationKey)
-            .Count();
-
-        return (active, archived);
     }
 
     private async Task SendReplyCallback(string body)
@@ -597,18 +384,4 @@ public partial class Mailbox
     private async Task NextPageCallback()
         => await NextConversationPageAsync();
 
-    private sealed class MailboxMessageView
-    {
-        public int Id { get; init; }
-        public string Subject { get; init; } = string.Empty;
-        public string Body { get; init; } = string.Empty;
-        public string? SenderUserId { get; init; }
-        public string SenderName { get; init; } = string.Empty;
-        public string RecipientUserId { get; init; } = string.Empty;
-        public string RecipientName { get; init; } = string.Empty;
-        public bool IsArchivedBySender { get; init; }
-        public bool IsArchivedByRecipient { get; init; }
-        public bool IsRead { get; init; }
-        public DateTime CreatedAt { get; init; }
-    }
 }

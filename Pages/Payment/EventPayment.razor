@@ -3,25 +3,21 @@
 @attribute [Authorize]
 @implements IAsyncDisposable
 
-@using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Pages.Payment.Components
 @using Confirmai.Services.Admin
+@using Confirmai.Services.Payment
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.EntityFrameworkCore
 @using System.Globalization
 @using System.Security.Claims
 
-@inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
-@inject EventPaymentGatewayFactory EventGatewayFactory
 @inject PixProofUploadService PixProofUploadService
 @inject AdminConfirmationService AdminConfirmationService
 @inject ILogger<EventPayment> _logger
-@inject EventPaymentChargeCalculator ChargeCalculator
 
 <PageTitle>Pagamento — Confirmai</PageTitle>
 

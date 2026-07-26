@@ -1,4 +1,4 @@
-using Confirmai.Pages.Admin;
+using Confirmai.Services.Admin;
 using Microsoft.AspNetCore.Components;
 
 namespace Confirmai.Pages.Admin.Components;
@@ -36,8 +36,8 @@ public partial class AdminPaymentsSummaryPanel
     [Parameter] public string LastManualSweepDetails { get; set; } = string.Empty;
 
     // Collections (simplified for component interface)
-    [Parameter] public List<AdminPayments.GatewayTelemetryItem>? GatewayTelemetry { get; set; }
-    [Parameter] public List<AdminPayments.SweepHistoryItem>? SweepHistory { get; set; }
+    [Parameter] public List<GatewayTelemetryItem>? GatewayTelemetry { get; set; }
+    [Parameter] public List<SweepHistoryItem>? SweepHistory { get; set; }
 
     // Result messages
     [Parameter] public string SweepResultMessage { get; set; } = string.Empty;
@@ -51,7 +51,7 @@ public partial class AdminPaymentsSummaryPanel
     [Parameter] public EventCallback OnOpenAdvancedTools { get; set; }
     [Parameter] public EventCallback OnDismissSweepMessage { get; set; }
 
-    private int GetPendingHeightPercent(AdminPayments.SweepHistoryItem item)
+    private int GetPendingHeightPercent(SweepHistoryItem item)
     {
         int max = 50;
         var height = Math.Max(12m, ((decimal)item.StillPending / max) * 100m);

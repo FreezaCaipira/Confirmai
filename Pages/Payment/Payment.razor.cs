@@ -1,24 +1,14 @@
-using System.Globalization;
-using System.Text;
 using Confirmai.Configuration;
-using Confirmai.Data;
 using Confirmai.Models;
-using Confirmai.Pages.Payment;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
-using Confirmai.Services.Crypto;
-using Confirmai.Services.Interfaces;
 using Confirmai.Services.Payment;
-using Confirmai.Services.User;
-using Confirmai.Services.Utility;
 using Confirmai.Shared.Components;
 using Confirmai.Shared.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 
@@ -26,7 +16,8 @@ namespace Confirmai.Pages.Payment;
 
 public partial class Payment : IAsyncDisposable
 {
-    [Inject] private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
+    [Inject] private PaymentInitializationService InitService { get; set; } = default!;
+    [Inject] private PaymentCommandService PaymentCommands { get; set; } = default!;
 
     [Parameter] public int ProductId { get; set; }
     public Confirmai.Models.Product? product;
@@ -72,60 +63,32 @@ public partial class Payment : IAsyncDisposable
     protected override async Task OnInitializedAsync()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        var query = QueryHelpers.ParseQuery(uri.Query);
-        if (query.TryGetValue("qty", out var queryQty) && int.TryParse(queryQty.LastOrDefault(), out var parsedQty) && parsedQty > 0)
-        {
-            selectedPurchaseQuantity = parsedQty;
-        }
+        var (qty, maxQty, unitPrice, currency) = InitService.ParseQueryParameters(uri);
 
-        if (query.TryGetValue("maxQty", out var queryMaxQty) && int.TryParse(queryMaxQty.LastOrDefault(), out var parsedMaxQty) && parsedMaxQty > 0)
-        {
-            maxPurchaseQuantity = parsedMaxQty;
-        }
-
-        if (query.TryGetValue("unitPrice", out var queryUnitPrice)
-            && decimal.TryParse(queryUnitPrice.LastOrDefault(), NumberStyles.Number, CultureInfo.InvariantCulture, out var parsedUnitPrice)
-            && parsedUnitPrice > 0m)
-        {
-            selectedOfferUnitPrice = parsedUnitPrice;
-        }
-
-        if (query.TryGetValue("currency", out var queryCurrency))
-        {
-            var c = queryCurrency.LastOrDefault()?.ToUpperInvariant();
-            if (c == "BRL" || c == "USD" || c == "BTC")
-                offerCurrency = c;
-        }
-
-        selectedPurchaseQuantity = Math.Clamp(selectedPurchaseQuantity, 1, Math.Max(1, maxPurchaseQuantity));
+        selectedPurchaseQuantity = Math.Clamp(qty, 1, Math.Max(1, maxQty));
+        maxPurchaseQuantity = maxQty;
+        selectedOfferUnitPrice = unitPrice;
+        offerCurrency = currency;
 
         isLoading = true;
-        var quote = await BitcoinQuoteService.GetQuoteAsync();
-        btcUsdRate = quote?.btc_usd;
-        btcBrlRate = quote?.btc_brl;
+        var (btcUsd, btcBrl) = await InitService.FetchBitcoinRatesAsync();
+        btcUsdRate = btcUsd;
+        btcBrlRate = btcBrl;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-        product = await db.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == ProductId);
+        product = await InitService.LoadProductAsync(ProductId);
         isLoading = false;
 
-        if (query.TryGetValue("sellerId", out var querySellerIdVal))
-        {
-            var sellerIdStr = querySellerIdVal.LastOrDefault();
-            if (!string.IsNullOrWhiteSpace(sellerIdStr))
-                sellerUser = await db.Users.FirstOrDefaultAsync(u => u.Id == sellerIdStr);
-        }
-        sellerUser ??= product?.User;
+        sellerUser = await InitService.ResolveSeller(uri, product);
 
         if (product != null)
         {
-            var unitPrice = selectedOfferUnitPrice ?? product.Price;
-            Amount = unitPrice * selectedPurchaseQuantity;
+            var unitPriceAmount = selectedOfferUnitPrice ?? product.Price;
+            Amount = InitService.CalculateTotalAmount(unitPriceAmount, selectedPurchaseQuantity);
         }
 
-        ActiveGateways = (await GatewayService.GetAllAsync()).Where(g => g.Enabled).ToList();
-        SelectedMethod = ActiveGateways.Any(g => g.Name == "Pix")
-            ? "Pix"
-            : ActiveGateways.FirstOrDefault()?.Name ?? "";
+        var (gateways, defaultMethod) = await InitService.SetupPaymentGatewaysAsync();
+        ActiveGateways = gateways;
+        SelectedMethod = defaultMethod;
 
         await OnSelectedMethodChangedAsync(false);
 
@@ -177,7 +140,6 @@ public partial class Payment : IAsyncDisposable
 
     private async Task GenerateAddress()
     {
-        // Validate the seller's offer is still available before hitting the payment gateway.
         if (!await ValidateOfferBeforePaymentAsync())
         {
             return;
@@ -191,12 +153,7 @@ public partial class Payment : IAsyncDisposable
 
         if (Amount < MinBtcAmount)
         {
-            await LogService.LogAsync(
-                message: $"Tentativa de pagamento abaixo do mínimo: {Amount} BTC.",
-                source: "Payment",
-                level: "Warning",
-                userId: sellerUser?.Id
-            );
+            await PaymentCommands.LogWarningAsync($"Tentativa de pagamento abaixo do m\u00EDnimo: {Amount} BTC.", sellerUser?.Id);
             NotifyUser(string.Format(T["PaymentBuy.MinAmountWarning"], FormatBtcWithUsdText(MinBtcAmount)), "warning");
             return;
         }
@@ -204,65 +161,32 @@ public partial class Payment : IAsyncDisposable
         try
         {
             isLoading = true;
-            IBitcoinPaymentService? service = PaymentFactory.GetService(SelectedMethod);
-            string? privateKey = null;
-
-            if (SelectedMethod == "Testnet")
-            {
-                var (address, paymentId, privKey) = await ((TestnetBitcoinPaymentService)service)
-                    .GenerateAddressWithKeyAsync(Amount, orderId: $"order-{ProductId}-{Guid.NewGuid()}");
-                Address = address;
-                PaymentId = paymentId;
-                privateKey = privKey;
-            }
-            else
-            {
-                var (address, paymentId) = await service.GenerateAddressAsync(Amount, $"order-{ProductId}-{Guid.NewGuid()}");
-                Address = address;
-                PaymentId = paymentId;
-            }
-            IsPaid = false;
 
             AuthenticationState? authState = await AuthProvider.GetAuthenticationStateAsync();
             string? userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            paymentRecord = new PaymentRecord
+            var result = await PaymentCommands.GenerateBtcAddressAsync(
+                ProductId, Amount, SelectedMethod, sellerUser?.Id, userId, offerCurrency);
+
+            if (result == null)
             {
-                ProductId = ProductId,
-                UserId = userId,
-                SellerId = sellerUser?.Id,
-                Currency = offerCurrency,
-                Address = Address,
-                PaymentId = PaymentId,
-                Amount = Amount,
-                IsPaid = false,
-                CreatedAt = DateTime.UtcNow,
-                PaymentMethod = SelectedMethod,
-                PrivateKey = privateKey,
-            };
+                NotifyUser(string.Format(T["PaymentBuy.GenerateError"], "Falha ao gerar endere\u00E7o."), "error");
+                return;
+            }
 
-            await using var db = await DbFactory.CreateDbContextAsync();
-            db.Payments.Add(paymentRecord);
-            await db.SaveChangesAsync();
+            Address = result.Address;
+            PaymentId = result.PaymentId;
+            IsPaid = false;
+            paymentRecord = result.PaymentRecord;
 
-            await LogService.LogAsync(
-                $"Endereço/invoice gerado para produto {ProductId} via {SelectedMethod}.",
-                source: "Payment",
-                level: "Info",
-                userId: userId
-            );
+            await PaymentCommands.SavePaymentRecordAsync(paymentRecord);
+            await PaymentCommands.LogAsync($"Endere\u00E7o/invoice gerado para produto {ProductId} via {SelectedMethod}.", userId);
 
             NotifyUser(T["PaymentBuy.Generated"], "success");
         }
         catch (Exception ex)
         {
-            await LogService.LogAsync(
-                "Erro ao gerar endereço/invoice.",
-                source: "Payment",
-                level: "Error",
-                userId: sellerUser?.Id,
-                ex: ex
-            );
+            await PaymentCommands.LogAsync("Erro ao gerar endere\u00E7o/invoice.", sellerUser?.Id, ex);
             NotifyUser(string.Format(T["PaymentBuy.GenerateError"], ex.Message), "error");
         }
         finally
@@ -298,16 +222,14 @@ public partial class Payment : IAsyncDisposable
 
         try
         {
-            var normalizedAddress = Address.Trim();
-            await using var db = await DbFactory.CreateDbContextAsync();
-            PaymentRecord? payment = await db.Payments.FirstOrDefaultAsync(p => p.Address == normalizedAddress);
+            var payment = await PaymentCommands.FindPaymentByAddressAsync(Address);
             if (payment == null)
             {
                 NotifyUser(T["PaymentBuy.NotFoundByAddress"], "error");
                 return;
             }
 
-            (bool Confirmed, bool AlreadyPaid, decimal ReceivedAmount) result = await PaymentConfirmationService.ConfirmAsync(payment);
+            var result = await PaymentCommands.ConfirmPaymentAsync(payment);
 
             if (result.AlreadyPaid)
             {
@@ -328,12 +250,7 @@ public partial class Payment : IAsyncDisposable
         }
         catch (Exception ex)
         {
-            await LogService.LogAsync(
-                "Erro ao verificar pagamento.",
-                source: "Payment",
-                level: "Error",
-                ex: ex
-            );
+            await PaymentCommands.LogAsync("Erro ao verificar pagamento.", null, ex);
             NotifyUser(T["PaymentBuy.CheckError"], "error");
         }
     }
@@ -447,72 +364,41 @@ public partial class Payment : IAsyncDisposable
             isLoading = true;
             pixSellerKeyNotice = null;
 
-            if (AbacatePayOpts.Value.IsEnabled)
-            {
-                // External Pix gateway: AbacatePay Transparent Checkout
-                var orderId = $"order-{ProductId}-{Guid.NewGuid():N}";
-                var pixService = PaymentFactory.GetService("Pix");
-                var (address, paymentId) = await pixService.GenerateAddressAsync(Amount, orderId);
-                Address = address;
-                PaymentId = paymentId;
-            }
-            else
-            {
-                // Fallback: static EMVCo Pix payload (requires manual seller confirmation)
-                var recipientPixKey = await ResolvePixRecipientKeyAsync();
-                if (string.IsNullOrWhiteSpace(recipientPixKey))
-                    return;
-
-                var merchantName = PixPayloadBuilder.SanitizePixText(product?.User?.FullName ?? product?.User?.UserName ?? "OTSERV MARKET", 25);
-                var merchantCity = PixPayloadBuilder.SanitizePixText("SAO PAULO", 15);
-                var txId = PixPayloadBuilder.BuildPixTxId(ProductId);
-                Address = PixPayloadBuilder.BuildPixPayload(recipientPixKey, Amount, merchantName, merchantCity, txId);
-                PaymentId = $"pix-{Guid.NewGuid():N}";
-            }
-
-            IsPaid = false;
-
             AuthenticationState? authState = await AuthProvider.GetAuthenticationStateAsync();
             string? userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            paymentRecord = new PaymentRecord
+            var result = await PaymentCommands.GeneratePixPaymentAsync(
+                ProductId, Amount, SelectedMethod, sellerUser?.Id, userId, offerCurrency,
+                AbacatePayOpts.Value.IsEnabled, product, UseSiteIntermediary);
+
+            if (result == null)
             {
-                ProductId = ProductId,
-                UserId = userId,
-                SellerId = sellerUser?.Id,
-                Currency = offerCurrency,
-                Address = Address,
-                PaymentId = PaymentId,
-                Amount = Amount,
-                IsPaid = false,
-                CreatedAt = DateTime.UtcNow,
-                PaymentMethod = SelectedMethod,
-                PrivateKey = null,
-            };
+                if (!UseSiteIntermediary && string.IsNullOrWhiteSpace(await ResolvePixRecipientKeyForNoticeAsync()))
+                {
+                    pixSellerKeyNotice = "O vendedor nao possui chave PIX cadastrada no perfil. Escolha intermedio do ADM do site ou use outra forma de pagamento.";
+                }
+                else
+                {
+                    NotifyUser("Nao foi possivel gerar o pagamento PIX.", "error");
+                }
+                return;
+            }
 
-            await using var pixDb = await DbFactory.CreateDbContextAsync();
-            pixDb.Payments.Add(paymentRecord);
-            await pixDb.SaveChangesAsync();
+            Address = result.Address;
+            PaymentId = result.PaymentId;
+            IsPaid = false;
+            paymentRecord = result.PaymentRecord;
 
-            await LogService.LogAsync(
+            await PaymentCommands.SavePaymentRecordAsync(paymentRecord);
+            await PaymentCommands.LogAsync(
                 $"QR PIX gerado para produto {ProductId} via {(AbacatePayOpts.Value.IsEnabled ? "AbacatePay" : "payload estatico")}.",
-                source: "Payment",
-                level: "Info",
-                userId: userId
-            );
+                userId);
 
             NotifyUser("Pagamento PIX gerado. Escaneie o QR code ou copie o codigo PIX.", "success");
         }
         catch (Exception ex)
         {
-            await LogService.LogAsync(
-                "Erro ao gerar pagamento PIX.",
-                source: "Payment",
-                level: "Error",
-                userId: sellerUser?.Id,
-                ex: ex
-            );
-
+            await PaymentCommands.LogAsync("Erro ao gerar pagamento PIX.", sellerUser?.Id, ex);
             NotifyUser($"Erro ao gerar pagamento PIX: {ex.Message}", "error");
         }
         finally
@@ -521,41 +407,19 @@ public partial class Payment : IAsyncDisposable
         }
     }
 
-    private async Task<string?> ResolvePixRecipientKeyAsync()
+    private async Task<string?> ResolvePixRecipientKeyForNoticeAsync()
     {
         if (UseSiteIntermediary)
         {
             var sitePixKey = await AdminSettingsService.GetSiteIntermediaryPixKeyAsync();
-            if (string.IsNullOrWhiteSpace(sitePixKey))
-            {
-                NotifyUser("O intermedio do site esta ativo, mas o admin ainda nao cadastrou a chave PIX no painel admin.", "warning");
-                return null;
-            }
-
-            return sitePixKey.Trim();
+            return string.IsNullOrWhiteSpace(sitePixKey) ? null : sitePixKey.Trim();
         }
 
         var sellerUserId = sellerUser?.Id;
         if (string.IsNullOrWhiteSpace(sellerUserId))
-        {
-            NotifyUser("Nao foi possivel identificar o vendedor para gerar o PIX.", "error");
             return null;
-        }
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var sellerPixKey = await db.Users
-            .AsNoTracking()
-            .Where(u => u.Id == sellerUserId)
-            .Select(u => u.PixKey)
-            .FirstOrDefaultAsync();
-
-        if (string.IsNullOrWhiteSpace(sellerPixKey))
-        {
-            pixSellerKeyNotice = "O vendedor nao possui chave PIX cadastrada no perfil. Escolha intermedio do ADM do site ou use outra forma de pagamento.";
-            return null;
-        }
-
-        return sellerPixKey.Trim();
+        return null;
     }
 
     private Task<bool> ValidateOfferBeforePaymentAsync() => Task.FromResult(true);

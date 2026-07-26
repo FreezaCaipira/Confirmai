@@ -3,23 +3,20 @@
 @attribute [AllowAnonymous]
 
 @using System.Security.Claims
-@using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Shared.Helpers
 @using Confirmai.Shared.Components.Futsal
 @using Confirmai.Pages.Futsal.Components
+@using Confirmai.Services.Admin
+@using Confirmai.Services.Futsal
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
 
-@inject IDbContextFactory<AppDbContext> DbFactory
-@inject LogService                     LogService
 @inject AdminConfirmationService AdminConfirmationService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
-@inject Confirmai.Services.Events.EventNotificationService NotificationService
 @inject IConfiguration Config
 @inject IJSRuntime JS
 

@@ -4,10 +4,12 @@
 
 @using Confirmai.Data
 @using Confirmai.Pages.Components
+@using Confirmai.Services.Utility
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
 
 @inject IDbContextFactory<AppDbContext> DbFactory
+@inject MailboxQueryService MailboxQueryService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 @inject IJSRuntime JS

@@ -2,14 +2,12 @@ using Confirmai.Models;
 using Confirmai.Enums;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 using Confirmai.Shared.Helpers;
-using Confirmai.Data;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -52,21 +50,12 @@ public partial class AdminPayments : IAsyncDisposable
     private readonly List<SweepHistoryItem> automaticSweepHistory = new();
     private bool isAutoRefreshEnabled = true;
     private bool isSummaryRefreshing;
-    private DateTime? lastSummaryRefreshAt;
-    private string lastSummaryRefreshLabel = "Ainda não atualizado.";
-    private string lastSummaryAgeLabel = "n/d";
-    private string lastSummaryAgeClass = string.Empty;
     private bool isAutoRefreshPausedByVisibility;
     private string lastAutoRefreshPauseLabel = "Nenhuma pausa registrada.";
-    private DateTime? summaryStalenessStartedAt;
-    private bool summaryStalenessIncidentLogged;
     private CancellationTokenSource? summaryRefreshCts;
     private Task? summaryRefreshTask;
     private CancellationTokenSource? summaryAgeCts;
     private Task? summaryAgeTask;
-    private const int SummaryRefreshSeconds = 30;
-    private const int SummaryStalenessWarningSeconds = SummaryRefreshSeconds * 2;
-    private const int SummaryStalenessAuditSeconds = 5 * 60;
     private int pendingTrendWarningThreshold = AdminSettingsService.DefaultReconciliationWarningThreshold;
     private int pendingTrendCriticalThreshold = AdminSettingsService.DefaultReconciliationCriticalThreshold;
 
@@ -91,6 +80,7 @@ public partial class AdminPayments : IAsyncDisposable
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IJSRuntime JS { get; set; } = default!;
+    [Inject] public SummaryAgeTracker SummaryAgeTracker { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -121,7 +111,7 @@ public partial class AdminPayments : IAsyncDisposable
         {
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(SummaryRefreshSeconds), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(SummaryAgeTracker.RefreshIntervalSeconds), cancellationToken);
 
                 if (!isAutoRefreshEnabled)
                 {
@@ -177,8 +167,10 @@ public partial class AdminPayments : IAsyncDisposable
 
                 await InvokeAsync(async () =>
                 {
-                    UpdateLastSummaryAgeLabel();
-                    await TryWriteStalenessIncidentAuditAsync();
+                    SummaryAgeTracker.UpdateAgeLabel();
+                    var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+                    var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+                    await SummaryAgeTracker.TryWriteStalenessAuditAsync(actorUserId, isAutoRefreshEnabled, isAutoRefreshPausedByVisibility);
                 });
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -215,32 +207,16 @@ public partial class AdminPayments : IAsyncDisposable
 
     private async Task LoadPaymentsCountAsync()
     {
-        await using var db = await DbFactory.CreateDbContextAsync();
+        var result = await AdminPaymentsQueryService.GetPaymentsPageAsync(
+            filterUserId, filterMinAmount, filterMaxAmount, filterStatus, filterDate,
+            currentPage, PageSize);
 
-        var query = db.Payments.AsNoTracking().AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(filterUserId))
-            query = query.Where(p => (p.User != null && p.User.UserName != null && p.User.UserName.Contains(filterUserId)) || (p.UserId != null && p.UserId.Contains(filterUserId)));
-        if (filterMinAmount.HasValue)
-            query = query.Where(p => p.Amount >= filterMinAmount.Value);
-        if (filterMaxAmount.HasValue)
-            query = query.Where(p => p.Amount <= filterMaxAmount.Value);
-        if (!string.IsNullOrWhiteSpace(filterStatus))
-            query = filterStatus == "paid" ? query.Where(p => p.IsPaid) : query.Where(p => !p.IsPaid);
-        if (filterDate.HasValue)
-            query = query.Where(p => p.CreatedAt.Date == filterDate.Value.Date);
-
-        totalCount = await query.CountAsync();
-        totalPages = Math.Max(1, (int)Math.Ceiling((double)totalCount / PageSize));
+        totalCount = result.TotalCount;
+        totalPages = result.TotalPages;
         if (currentPage > totalPages)
             currentPage = totalPages;
 
-        currentPagePayments = await query
-            .OrderByDescending(p => p.CreatedAt)
-            .Include(p => p.User)
-            .Skip((currentPage - 1) * PageSize)
-            .Take(PageSize)
-            .ToListAsync();
+        currentPagePayments = result.Payments;
     }
 
     private async Task GoToPrevPage()
@@ -416,161 +392,33 @@ public partial class AdminPayments : IAsyncDisposable
 
     private async Task LoadOperationalSummaryAsync()
     {
-        await using var db = await DbFactory.CreateDbContextAsync();
+        var summary = await AdminPaymentsSummaryService.LoadSummaryAsync();
 
-        var thresholds = await AdminSettingsService.GetReconciliationSeverityThresholdsAsync();
-        pendingTrendWarningThreshold = thresholds.warningThreshold;
-        pendingTrendCriticalThreshold = thresholds.criticalThreshold;
+        pendingTrendWarningThreshold = summary.WarningThreshold;
+        pendingTrendCriticalThreshold = summary.CriticalThreshold;
 
-        var staleCutoff = DateTime.UtcNow.AddMinutes(-30);
-        var todayUtc = DateTime.UtcNow.Date;
+        reconciliationPendingWithChargeId = summary.PendingWithChargeId;
+        reconciliationPendingWithoutChargeId = summary.PendingWithoutChargeId;
+        reconciliationStalePending = summary.StalePending;
+        reconciliationPaidToday = summary.PaidToday;
 
-        reconciliationPendingWithChargeId = await db.EventConfirmations.CountAsync(c => c.PaymentStatus == EventConfirmationPaymentStatus.Pending && c.PixTxId != null);
-        reconciliationPendingWithoutChargeId = await db.EventConfirmations.CountAsync(c => c.PaymentStatus == EventConfirmationPaymentStatus.Pending && c.PixTxId == null);
-        reconciliationStalePending = await db.EventConfirmations.CountAsync(c => c.PaymentStatus == EventConfirmationPaymentStatus.Pending && c.PixTxId != null && c.ConfirmedAt <= staleCutoff);
-        reconciliationPaidToday = await db.Logs.CountAsync(l => l.EventType == AuditEvents.PaymentConfirmed && l.Timestamp >= todayUtc);
-
-        var pendingByGateway = await db.EventConfirmations
-            .AsNoTracking()
-            .Where(c => c.PaymentStatus == EventConfirmationPaymentStatus.Pending && c.PixTxId != null && c.PaymentGatewayName != null)
-            .GroupBy(c => c.PaymentGatewayName!)
-            .Select(g => new { Gateway = g.Key, Count = g.Count() })
-            .OrderByDescending(x => x.Count)
-            .ThenBy(x => x.Gateway)
-            .ToListAsync();
-
-        pendingByGatewayLabel = pendingByGateway.Count == 0
-            ? "Sem pendências com gateway identificado."
-            : string.Join(" • ", pendingByGateway.Select(x => $"{x.Gateway}: {x.Count}"));
-
-        var paidByGateway = await db.EventConfirmations
-            .AsNoTracking()
-            .Where(c => c.PaymentStatus == EventConfirmationPaymentStatus.Paid && c.PaymentGatewayName != null)
-            .GroupBy(c => c.PaymentGatewayName!)
-            .Select(g => new { Gateway = g.Key, Count = g.Count() })
-            .OrderByDescending(x => x.Count)
-            .ThenBy(x => x.Gateway)
-            .ToListAsync();
-
-        paidByGatewayLabel = paidByGateway.Count == 0
-            ? "Sem confirmações pagas com gateway identificado."
-            : string.Join(" • ", paidByGateway.Select(x => $"{x.Gateway}: {x.Count}"));
-
-        var gatewayTelemetryRaw = await db.EventConfirmations
-            .AsNoTracking()
-            .Where(c => c.PaymentGatewayName != null)
-            .GroupBy(c => c.PaymentGatewayName!)
-            .Select(g => new
-            {
-                Gateway = g.Key,
-                Pending = g.Count(c => c.PaymentStatus == EventConfirmationPaymentStatus.Pending),
-                StalePending = g.Count(c => c.PaymentStatus == EventConfirmationPaymentStatus.Pending && c.PixTxId != null && c.ConfirmedAt <= staleCutoff),
-                PaidTotal = g.Count(c => c.PaymentStatus == EventConfirmationPaymentStatus.Paid)
-            })
-            .OrderByDescending(x => x.Pending)
-            .ThenBy(x => x.Gateway)
-            .ToListAsync();
+        pendingByGatewayLabel = summary.PendingByGatewayLabel;
+        paidByGatewayLabel = summary.PaidByGatewayLabel;
 
         gatewayTelemetry.Clear();
-        var totalPendingAcrossGateways = gatewayTelemetryRaw.Sum(x => x.Pending);
+        gatewayTelemetry.AddRange(summary.GatewayTelemetry);
 
-        foreach (var item in gatewayTelemetryRaw)
-        {
-            var share = totalPendingAcrossGateways == 0
-                ? 0m
-                : Math.Round((decimal)item.Pending * 100m / totalPendingAcrossGateways, 1, MidpointRounding.AwayFromZero);
+        lastAutomaticSweepLabel = summary.LastAutomaticSweepLabel;
+        lastAutomaticSweepDetails = summary.LastAutomaticSweepDetails;
+        lastManualSweepLabel = summary.LastManualSweepLabel;
+        lastManualSweepDetails = summary.LastManualSweepDetails;
 
-            var (severityLabel, severityClass) = GetGatewaySeverity(item.Pending, item.StalePending);
-
-            gatewayTelemetry.Add(new GatewayTelemetryItem(
-                item.Gateway,
-                item.Pending,
-                item.StalePending,
-                item.PaidTotal,
-                $"{share:N1}%",
-                severityLabel,
-                severityClass));
-        }
-
-        var latestAutomaticSweepCandidates = await db.Logs
-            .AsNoTracking()
-            .Where(l =>
-                l.EventType == AuditEvents.PaymentReconciliationSweep &&
-                l.MetadataJson != null)
-            .OrderByDescending(l => l.Timestamp)
-            .Take(200)
-            .ToListAsync();
-
-        var latestAutomaticSweep = latestAutomaticSweepCandidates
-            .FirstOrDefault(l => HasSweepOrigin(l.MetadataJson, "worker.reconciliation"));
-
-        if (latestAutomaticSweep is null)
-        {
-            lastAutomaticSweepLabel = "Sem varredura automática registrada.";
-            lastAutomaticSweepDetails = string.Empty;
-        }
-        else
-        {
-            lastAutomaticSweepLabel = latestAutomaticSweep.Timestamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
-            lastAutomaticSweepDetails = BuildSweepDetails(latestAutomaticSweep.MetadataJson);
-        }
-
-        var latestManualSweep = latestAutomaticSweepCandidates
-            .FirstOrDefault(l => HasSweepOrigin(l.MetadataJson, "admin.sweep"));
-
-        if (latestManualSweep is null)
-        {
-            lastManualSweepLabel = "Sem varredura manual registrada.";
-            lastManualSweepDetails = string.Empty;
-        }
-        else
-        {
-            lastManualSweepLabel = latestManualSweep.Timestamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
-            lastManualSweepDetails = BuildSweepDetails(latestManualSweep.MetadataJson);
-        }
-
-        var latestWorkerSweep = latestAutomaticSweep;
-
-        if (latestWorkerSweep is null)
-        {
-            pendingTrend24hLabel = "Sem dados suficientes para tendência.";
-            isPendingTrendWarning = false;
-            pendingTrendDelta24h = 0;
-        }
-        else
-        {
-            var cutoff24h = DateTime.UtcNow.AddHours(-24);
-            var baselineWorkerSweep = latestAutomaticSweepCandidates
-                .Where(l => l.Timestamp >= cutoff24h && HasSweepOrigin(l.MetadataJson, "worker.reconciliation"))
-                .OrderBy(l => l.Timestamp)
-                .FirstOrDefault();
-
-            var latestPending = GetSweepMetric(latestWorkerSweep.MetadataJson, "stillPending");
-            var baselinePending = baselineWorkerSweep is null
-                ? (int?)null
-                : GetSweepMetric(baselineWorkerSweep.MetadataJson, "stillPending");
-
-            pendingTrend24hLabel = BuildPendingTrendLabel(latestPending, baselinePending, out var pendingDelta);
-            pendingTrendDelta24h = pendingDelta;
-            isPendingTrendWarning = pendingDelta >= pendingTrendWarningThreshold;
-        }
-
-        var latestAutomaticSweeps = latestAutomaticSweepCandidates
-            .Where(l => HasSweepOrigin(l.MetadataJson, "worker.reconciliation"))
-            .OrderByDescending(l => l.Timestamp)
-            .Take(5)
-            .ToList();
+        pendingTrend24hLabel = summary.PendingTrend24hLabel;
+        isPendingTrendWarning = summary.IsPendingTrendWarning;
+        pendingTrendDelta24h = summary.PendingTrendDelta24h;
 
         automaticSweepHistory.Clear();
-        foreach (var log in latestAutomaticSweeps)
-        {
-            automaticSweepHistory.Add(new SweepHistoryItem(
-                log.Timestamp.ToLocalTime().ToString("dd/MM HH:mm"),
-                GetSweepMetric(log.MetadataJson, "considered") ?? 0,
-                GetSweepMetric(log.MetadataJson, "updated") ?? 0,
-                GetSweepMetric(log.MetadataJson, "stillPending") ?? 0,
-                GetSweepMetric(log.MetadataJson, "notFound") ?? 0));
-        }
+        automaticSweepHistory.AddRange(summary.AutomaticSweepHistory);
 
         UpdateSeverity();
     }
@@ -589,9 +437,7 @@ public partial class AdminPayments : IAsyncDisposable
             if (includePaymentsTable)
                 await LoadPaymentsCountAsync();
 
-            lastSummaryRefreshAt = DateTime.UtcNow;
-            lastSummaryRefreshLabel = lastSummaryRefreshAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
-            UpdateLastSummaryAgeLabel();
+            SummaryAgeTracker.MarkRefreshed();
         }
         finally
         {
@@ -616,83 +462,6 @@ public partial class AdminPayments : IAsyncDisposable
         }
     }
 
-    private void UpdateLastSummaryAgeLabel()
-    {
-        if (!lastSummaryRefreshAt.HasValue)
-        {
-            lastSummaryAgeLabel = "n/d";
-            lastSummaryAgeClass = string.Empty;
-            summaryStalenessStartedAt = null;
-            summaryStalenessIncidentLogged = false;
-            return;
-        }
-
-        var elapsed = DateTime.UtcNow - lastSummaryRefreshAt.Value;
-        if (elapsed < TimeSpan.Zero)
-            elapsed = TimeSpan.Zero;
-
-        if (elapsed.TotalHours >= 1)
-        {
-            lastSummaryAgeLabel = $"{(int)elapsed.TotalHours}h {elapsed.Minutes:D2}m {elapsed.Seconds:D2}s";
-        }
-        else if (elapsed.TotalMinutes >= 1)
-        {
-            lastSummaryAgeLabel = $"{(int)elapsed.TotalMinutes}m {elapsed.Seconds:D2}s";
-        }
-        else
-        {
-            lastSummaryAgeLabel = $"{elapsed.Seconds}s";
-        }
-
-        var isWarning = elapsed.TotalSeconds >= SummaryStalenessWarningSeconds;
-        lastSummaryAgeClass = isWarning
-            ? "admin-payments-summary-age admin-payments-summary-age--warning"
-            : "admin-payments-summary-age";
-
-        if (isWarning)
-        {
-            summaryStalenessStartedAt ??= DateTime.UtcNow;
-            return;
-        }
-
-        summaryStalenessStartedAt = null;
-        summaryStalenessIncidentLogged = false;
-    }
-
-    private async Task TryWriteStalenessIncidentAuditAsync()
-    {
-        if (summaryStalenessIncidentLogged || !summaryStalenessStartedAt.HasValue)
-            return;
-
-        var elapsedSinceStaleness = DateTime.UtcNow - summaryStalenessStartedAt.Value;
-        if (elapsedSinceStaleness.TotalSeconds < SummaryStalenessAuditSeconds)
-            return;
-
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var actorUserId = authState.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-
-        await LogService.AuditAsync(
-            eventType: AuditEvents.PaymentReconciliationPanelStale,
-            entityType: AuditEntities.Payment,
-            entityId: null,
-            message: "Painel de reconciliação permaneceu sem atualização efetiva por mais de 5 minutos.",
-            actorUserId: actorUserId,
-            source: AdminAuditSources.Payments,
-            level: "Warning",
-            metadata: new
-            {
-                origin = "admin.payments.panel",
-                staleForSeconds = (int)Math.Round(elapsedSinceStaleness.TotalSeconds, MidpointRounding.AwayFromZero),
-                staleAuditThresholdSeconds = SummaryStalenessAuditSeconds,
-                warningThresholdSeconds = SummaryStalenessWarningSeconds,
-                autoRefreshEnabled = isAutoRefreshEnabled,
-                pausedByVisibility = isAutoRefreshPausedByVisibility,
-                lastSummaryRefreshAtUtc = lastSummaryRefreshAt
-            });
-
-        summaryStalenessIncidentLogged = true;
-    }
-
     private void UpdateSeverity()
     {
         var result = SeverityEvaluator.Evaluate(
@@ -712,127 +481,6 @@ public partial class AdminPayments : IAsyncDisposable
         var relative = (decimal)item.StillPending / maxPending;
         var height = Math.Max(12m, relative * 100m);
         return Math.Round(height, 2, MidpointRounding.AwayFromZero);
-    }
-
-    public sealed record SweepHistoryItem(
-        string TimestampLabel,
-        int Considered,
-        int Updated,
-        int StillPending,
-        int NotFound);
-
-    public sealed record GatewayTelemetryItem(
-        string Gateway,
-        int Pending,
-        int StalePending,
-        int PaidTotal,
-        string PendingShareLabel,
-        string SeverityLabel,
-        string SeverityClass);
-
-    private static (string Label, string CssClass) GetGatewaySeverity(int pending, int stalePending)
-    {
-        if (stalePending >= 3 || pending >= 10)
-            return ("Crítico", "admin-payments-gateway-severity--critical");
-
-        if (stalePending >= 1 || pending >= 5)
-            return ("Atenção", "admin-payments-gateway-severity--warning");
-
-        return ("OK", "admin-payments-gateway-severity--ok");
-    }
-
-    private static string BuildPendingTrendLabel(int? latestPending, int? baselinePending, out int pendingDelta)
-    {
-        pendingDelta = 0;
-
-        if (!latestPending.HasValue)
-            return "Sem dados suficientes para tendência.";
-
-        if (!baselinePending.HasValue)
-            return $"Atual: {latestPending.Value} pendente(s); sem baseline de 24h.";
-
-        var delta = latestPending.Value - baselinePending.Value;
-        pendingDelta = delta;
-
-        if (delta > 0)
-            return $"Subindo (+{delta}) nas últimas 24h.";
-
-        if (delta < 0)
-            return $"Caindo ({delta}) nas últimas 24h.";
-
-        return "Estável (sem variação nas últimas 24h).";
-    }
-
-    private static int? GetSweepMetric(string? metadataJson, string propertyName)
-    {
-        if (string.IsNullOrWhiteSpace(metadataJson))
-            return null;
-
-        try
-        {
-            using var document = JsonDocument.Parse(metadataJson);
-            if (!document.RootElement.TryGetProperty(propertyName, out var property))
-                return null;
-
-            return property.ValueKind == JsonValueKind.Number
-                ? property.GetInt32()
-                : null;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private static bool HasSweepOrigin(string? metadataJson, string expectedOrigin)
-    {
-        if (string.IsNullOrWhiteSpace(metadataJson))
-            return false;
-
-        try
-        {
-            using var document = JsonDocument.Parse(metadataJson);
-            if (!document.RootElement.TryGetProperty("origin", out var originProperty))
-                return false;
-
-            var origin = originProperty.GetString();
-            return string.Equals(origin, expectedOrigin, StringComparison.OrdinalIgnoreCase);
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private static string BuildSweepDetails(string? metadataJson)
-    {
-        if (string.IsNullOrWhiteSpace(metadataJson))
-            return string.Empty;
-
-        try
-        {
-            using var document = JsonDocument.Parse(metadataJson);
-            var root = document.RootElement;
-
-            var considered = root.TryGetProperty("considered", out var consideredProp)
-                ? consideredProp.GetInt32()
-                : 0;
-            var updated = root.TryGetProperty("updated", out var updatedProp)
-                ? updatedProp.GetInt32()
-                : 0;
-            var stillPending = root.TryGetProperty("stillPending", out var pendingProp)
-                ? pendingProp.GetInt32()
-                : 0;
-            var notFound = root.TryGetProperty("notFound", out var notFoundProp)
-                ? notFoundProp.GetInt32()
-                : 0;
-
-            return $"Considerados={considered}, Atualizados={updated}, Pendentes={stillPending}, Não encontrados={notFound}";
-        }
-        catch
-        {
-            return string.Empty;
-        }
     }
 
     private static string BuildStalenessLogsHref()
@@ -878,35 +526,7 @@ public partial class AdminPayments : IAsyncDisposable
 
     private async Task ExportReconciliationCsvAsync()
     {
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        var rawRows = await db.EventConfirmations
-            .AsNoTracking()
-            .Where(c => c.PixTxId != null || c.PaymentStatus != EventConfirmationPaymentStatus.Pending)
-            .OrderByDescending(c => c.ConfirmedAt)
-            .Select(c => new
-            {
-                c.Id,
-                c.EventId,
-                c.UserId,
-                c.ConfirmedAt,
-                c.PaymentStatus,
-                c.PixTxId,
-                c.PaymentGatewayName
-            })
-            .ToListAsync();
-
-        var rows = rawRows.Select(c => new EventConfirmationReconciliationExportRow(
-            c.Id,
-            c.EventId,
-            c.UserId,
-            c.ConfirmedAt,
-            c.PaymentStatus.ToString(),
-            c.PixTxId,
-            c.PaymentGatewayName));
-
-        var csv = AdminLogsExportService.BuildEventConfirmationReconciliationCsv(rows);
-        var fileName = AdminLogsExportService.BuildEventConfirmationReconciliationFileName();
+        var (csv, fileName) = await AdminPaymentsQueryService.BuildReconciliationExportAsync();
         await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
     }
 

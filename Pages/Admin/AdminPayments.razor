@@ -12,6 +12,7 @@
 @using Confirmai.Shared.Helpers
 @using Confirmai.Data
 @using Confirmai.Services
+@using Confirmai.Services.Admin
 @using Microsoft.AspNetCore.Components.Web
 
 @inject IDbContextFactory<AppDbContext> DbFactory
@@ -19,6 +20,8 @@
 @inject CurrencyPreferenceService CurrencyPreferenceService
 @inject AdminSettingsService AdminSettingsService
 @inject AdminPaymentsFilterStateService AdminPaymentsFilterStateService
+@inject AdminPaymentsQueryService AdminPaymentsQueryService
+@inject AdminPaymentsSummaryService AdminPaymentsSummaryService
 @inject EventPaymentReconciliationService EventPaymentReconciliationService
 @inject EventConfirmationPaymentStatusService EventConfirmationPaymentStatusService
 @inject AdminLogsExportService AdminLogsExportService
@@ -48,9 +51,9 @@
                 IsPendingTrendWarning="@isPendingTrendWarning"
                 PendingByGatewayLabel="@pendingByGatewayLabel"
                 PaidByGatewayLabel="@paidByGatewayLabel"
-                LastRefreshLabel="@lastSummaryRefreshLabel"
-                LastRefreshAgeLabel="@lastSummaryAgeLabel"
-                LastRefreshAgeClass="@lastSummaryAgeClass"
+                LastRefreshLabel="@SummaryAgeTracker.LastRefreshLabel"
+                LastRefreshAgeLabel="@SummaryAgeTracker.AgeLabel"
+                LastRefreshAgeClass="@SummaryAgeTracker.AgeClass"
                 LastAutoRefreshPauseLabel="@lastAutoRefreshPauseLabel"
                 LastAutomaticSweepLabel="@lastAutomaticSweepLabel"
                 LastAutomaticSweepDetails="@lastAutomaticSweepDetails"
