@@ -17,13 +17,13 @@ namespace Confirmai.Services.Payment
     /// </summary>
     public class PaymentInitializationService
     {
-        private readonly AppDbContext _db;
+        private readonly IDbContextFactory<AppDbContext> _dbFactory;
         private readonly BitcoinQuoteService _bitCoinQuoteService;
         private readonly GatewayService _gatewayService;
 
-        public PaymentInitializationService(AppDbContext db, BitcoinQuoteService bitCoinQuoteService, GatewayService gatewayService)
+        public PaymentInitializationService(IDbContextFactory<AppDbContext> dbFactory, BitcoinQuoteService bitCoinQuoteService, GatewayService gatewayService)
         {
-            _db = db;
+            _dbFactory = dbFactory;
             _bitCoinQuoteService = bitCoinQuoteService;
             _gatewayService = gatewayService;
         }
@@ -81,7 +81,8 @@ namespace Confirmai.Services.Payment
                 var sellerIdStr = querySellerIdVal.LastOrDefault();
                 if (!string.IsNullOrWhiteSpace(sellerIdStr))
                 {
-                    var seller = await _db.Users.FirstOrDefaultAsync(u => u.Id == sellerIdStr);
+                    await using var db = await _dbFactory.CreateDbContextAsync();
+                    var seller = await db.Users.FirstOrDefaultAsync(u => u.Id == sellerIdStr);
                     if (seller != null)
                         return seller;
                 }
@@ -109,6 +110,12 @@ namespace Confirmai.Services.Payment
         public decimal CalculateTotalAmount(decimal unitPrice, int quantity)
         {
             return unitPrice * quantity;
+        }
+
+        public async Task<Product?> LoadProductAsync(int productId)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+            return await db.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == productId);
         }
     }
 }

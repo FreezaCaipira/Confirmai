@@ -20,7 +20,7 @@ public class PaymentInitializationServiceTests
 
         var bitcoinQuoteService = new BitcoinQuoteService(httpFactory, configuration, null, logger);
         var gatewayService = new GatewayService(dbFactory);
-        var service = new PaymentInitializationService(db, bitcoinQuoteService, gatewayService);
+        var service = new PaymentInitializationService(dbFactory, bitcoinQuoteService, gatewayService);
 
         var uri = new Uri("https://example.com/payment");
         var result = service.ParseQueryParameters(uri);
@@ -41,7 +41,7 @@ public class PaymentInitializationServiceTests
 
         var bitcoinQuoteService = new BitcoinQuoteService(httpFactory, configuration, null, logger);
         var gatewayService = new GatewayService(dbFactory);
-        var service = new PaymentInitializationService(db, bitcoinQuoteService, gatewayService);
+        var service = new PaymentInitializationService(dbFactory, bitcoinQuoteService, gatewayService);
 
         var uri = new Uri("https://example.com/payment?qty=5&maxQty=10&unitPrice=100.50&currency=BRL");
         var result = service.ParseQueryParameters(uri);
@@ -62,7 +62,7 @@ public class PaymentInitializationServiceTests
 
         var bitcoinQuoteService = new BitcoinQuoteService(httpFactory, configuration, null, logger);
         var gatewayService = new GatewayService(dbFactory);
-        var service = new PaymentInitializationService(db, bitcoinQuoteService, gatewayService);
+        var service = new PaymentInitializationService(dbFactory, bitcoinQuoteService, gatewayService);
 
         var uri = new Uri("https://example.com/payment?currency=EUR");
         var result = service.ParseQueryParameters(uri);
@@ -80,7 +80,7 @@ public class PaymentInitializationServiceTests
 
         var bitcoinQuoteService = new BitcoinQuoteService(httpFactory, configuration, null, logger);
         var gatewayService = new GatewayService(dbFactory);
-        var service = new PaymentInitializationService(db, bitcoinQuoteService, gatewayService);
+        var service = new PaymentInitializationService(dbFactory, bitcoinQuoteService, gatewayService);
 
         var result = service.CalculateTotalAmount(100m, 5);
 

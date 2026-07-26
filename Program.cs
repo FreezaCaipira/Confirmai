@@ -124,6 +124,8 @@ builder.Services.AddScoped<AdminConfirmationService>();
     builder.Services.AddScoped<AdminPaymentsQueryService>();
     builder.Services.AddScoped<AdminPaymentsSummaryService>();
 builder.Services.AddScoped<Confirmai.Services.Utility.MailboxQueryService>();
+builder.Services.AddScoped<Confirmai.Services.Payment.PaymentInitializationService>();
+builder.Services.AddScoped<Confirmai.Services.Payment.PaymentCommandService>();
 builder.Services.AddScoped<ReconciliationSeverityEvaluator>();
 builder.Services.AddScoped<DelinquencyService>();
 builder.Services.AddScoped<PixProofUploadService>();

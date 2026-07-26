@@ -5,24 +5,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using Confirmai.Shared
 @using Confirmai.Models
-@using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.JSInterop
-@using System.Globalization
-@using Confirmai.Pages.Payment
+@using Confirmai.Services.Payment
 @using Microsoft.Extensions.Options
 @using Confirmai.Configuration
-@using System.Text
 
-@inject BitcoinPaymentFactory PaymentFactory
 @inject AuthenticationStateProvider AuthProvider
-@inject LogService LogService
 @inject NavigationManager NavigationManager
-@inject GatewayService GatewayService
-@inject PaymentConfirmationService PaymentConfirmationService
-@inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
-@inject LanguagePreferenceService LanguagePreferenceService
 @inject AdminSettingsService AdminSettingsService
 @inject UiTextService T
 @inject IJSRuntime JS
