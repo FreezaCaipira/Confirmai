@@ -28,7 +28,7 @@ public class BtcPayWebhookServiceStaticTests
     {
         var method = typeof(BtcPayWebhookService).GetMethod("IsValidWebhookSecret",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = (bool?)method?.Invoke(null, new object[] { null, "secret123" });
+        var result = (bool?)method?.Invoke(null, new object?[] { null, "secret123" });
         Assert.False(result);
     }
 
@@ -37,7 +37,7 @@ public class BtcPayWebhookServiceStaticTests
     {
         var method = typeof(BtcPayWebhookService).GetMethod("IsValidWebhookSecret",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = (bool?)method?.Invoke(null, new object[] { "secret123", null });
+        var result = (bool?)method?.Invoke(null, new object?[] { "secret123", null });
         Assert.False(result);
     }
 

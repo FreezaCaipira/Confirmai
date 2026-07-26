@@ -36,7 +36,7 @@ public class AdminSettingsServiceStaticTests
         
         // Assert
         var exception = Assert.Throws<System.Reflection.TargetInvocationException>(() => 
-            method?.Invoke(null, new object[] { user }));
+            method?.Invoke(null, new object?[] { user }));
         Assert.IsType<UnauthorizedAccessException>(exception.InnerException);
     }
 
@@ -52,7 +52,7 @@ public class AdminSettingsServiceStaticTests
         
         // Assert
         var exception = Assert.Throws<System.Reflection.TargetInvocationException>(() => 
-            method?.Invoke(null, new object[] { user }));
+            method?.Invoke(null, new object?[] { user }));
         Assert.IsType<UnauthorizedAccessException>(exception.InnerException);
     }
 
@@ -72,7 +72,7 @@ public class AdminSettingsServiceStaticTests
         
         // Assert
         var exception = Assert.Throws<System.Reflection.TargetInvocationException>(() => 
-            method?.Invoke(null, new object[] { user }));
+            method?.Invoke(null, new object?[] { user }));
         Assert.IsType<UnauthorizedAccessException>(exception.InnerException);
     }
 
@@ -91,7 +91,7 @@ public class AdminSettingsServiceStaticTests
         
         // Assert
         var exception = Assert.Throws<System.Reflection.TargetInvocationException>(() => 
-            method?.Invoke(null, new object[] { user }));
+            method?.Invoke(null, new object?[] { user }));
         Assert.IsType<UnauthorizedAccessException>(exception.InnerException);
     }
 }

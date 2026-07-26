@@ -152,6 +152,38 @@ public class EfiBankOptionsTests
     }
 
     [Fact]
+    public void IsEnabled_WhenValuesArePlaceholders_ReturnsFalse()
+    {
+        // Arrange — repository placeholders must not count as configured
+        var options = new EfiBankOptions
+        {
+            ClientId = "__SET_VIA_USER_SECRETS__",
+            ClientSecret = "__SET_VIA_USER_SECRETS__",
+            CertificatePath = "__SET_VIA_USER_SECRETS__",
+            PixKey = "__SET_VIA_USER_SECRETS__"
+        };
+
+        // Act & Assert
+        Assert.False(options.IsEnabled);
+    }
+
+    [Fact]
+    public void IsEnabled_WhenCertificateBase64Provided_ReturnsTrue()
+    {
+        // Arrange — base64 cert is a valid alternative to a file path
+        var options = new EfiBankOptions
+        {
+            ClientId = "client-id",
+            ClientSecret = "client-secret",
+            CertificateBase64 = "MIIExamplebase64",
+            PixKey = "pix-key"
+        };
+
+        // Act & Assert
+        Assert.True(options.IsEnabled);
+    }
+
+    [Fact]
     public void CanSetAllProperties()
     {
         // Arrange

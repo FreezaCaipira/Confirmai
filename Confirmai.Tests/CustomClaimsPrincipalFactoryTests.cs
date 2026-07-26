@@ -16,12 +16,12 @@ public class CustomClaimsPrincipalFactoryTests
         var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
         var userManagerMock = new Mock<UserManager<ApplicationUser>>(
             userStoreMock.Object,
-            null, null, null, null, null, null, null, null);
+            null!, null!, null!, null!, null!, null!, null!, null!);
         
         var roleStoreMock = new Mock<IRoleStore<IdentityRole>>();
         var roleManagerMock = new Mock<RoleManager<IdentityRole>>(
             roleStoreMock.Object,
-            null, null, null, null);
+            null!, null!, null!, null!);
         
         var optionsMock = new Mock<IOptions<IdentityOptions>>();
         optionsMock.Setup(x => x.Value).Returns(new IdentityOptions());

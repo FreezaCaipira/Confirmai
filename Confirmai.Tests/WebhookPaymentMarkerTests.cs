@@ -41,7 +41,7 @@ public class WebhookPaymentMarkerTests
             .BuildServiceProvider();
 
         var logger = serviceProvider.GetService<ILogger<LogService>>();
-        var logService = new LogService(dbFactory, logger);
+        var logService = new LogService(dbFactory, logger!);
         var eventBus = new PaymentEventBus();
         var marker = new WebhookPaymentMarker(db, logService, eventBus);
 
@@ -67,7 +67,7 @@ public class WebhookPaymentMarkerTests
             .BuildServiceProvider();
 
         var logger = serviceProvider.GetService<ILogger<LogService>>();
-        var logService = new LogService(dbFactory, logger);
+        var logService = new LogService(dbFactory, logger!);
         var eventBus = new PaymentEventBus();
         var marker = new WebhookPaymentMarker(db, logService, eventBus);
 
@@ -107,7 +107,7 @@ public class WebhookPaymentMarkerTests
             .BuildServiceProvider();
 
         var logger = serviceProvider.GetService<ILogger<LogService>>();
-        var logService = new LogService(dbFactory, logger);
+        var logService = new LogService(dbFactory, logger!);
         var eventBus = new PaymentEventBus();
         var marker = new WebhookPaymentMarker(db, logService, eventBus);
 
@@ -147,7 +147,7 @@ public class WebhookPaymentMarkerTests
             .BuildServiceProvider();
 
         var logger = serviceProvider.GetService<ILogger<LogService>>();
-        var logService = new LogService(dbFactory, logger);
+        var logService = new LogService(dbFactory, logger!);
         var eventBus = new PaymentEventBus();
         var marker = new WebhookPaymentMarker(db, logService, eventBus);
 
@@ -174,7 +174,7 @@ public class WebhookPaymentMarkerTests
             .BuildServiceProvider();
 
         var logger = serviceProvider.GetService<ILogger<LogService>>();
-        var logService = new LogService(dbFactory, logger);
+        var logService = new LogService(dbFactory, logger!);
         var eventBus = new PaymentEventBus();
         var marker = new WebhookPaymentMarker(db, logService, eventBus);
 
@@ -198,7 +198,7 @@ public class WebhookPaymentMarkerTests
             .BuildServiceProvider();
 
         var logger = serviceProvider.GetService<ILogger<LogService>>();
-        var logService = new LogService(dbFactory, logger);
+        var logService = new LogService(dbFactory, logger!);
         var eventBus = new PaymentEventBus();
         var marker = new WebhookPaymentMarker(db, logService, eventBus);
 
@@ -220,7 +220,7 @@ public class WebhookPaymentMarkerTests
             .BuildServiceProvider();
 
         var logger = serviceProvider.GetService<ILogger<LogService>>();
-        var logService = new LogService(dbFactory, logger);
+        var logService = new LogService(dbFactory, logger!);
         var eventBus = new PaymentEventBus();
         var marker = new WebhookPaymentMarker(db, logService, eventBus);
 

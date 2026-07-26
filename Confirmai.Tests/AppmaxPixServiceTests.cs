@@ -16,7 +16,7 @@ public class AppmaxPixServiceTests
         // Use reflection to call private static method
         var method = typeof(AppmaxPixService).GetMethod("NormalizePhone", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = method?.Invoke(null, new object[] { input }) as string;
+        var result = method?.Invoke(null, new object?[] { input }) as string;
         
         Assert.Equal(expected, result);
     }
@@ -30,7 +30,7 @@ public class AppmaxPixServiceTests
     {
         var method = typeof(AppmaxPixService).GetMethod("NormalizePhone", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = method?.Invoke(null, new object[] { input }) as string;
+        var result = method?.Invoke(null, new object?[] { input }) as string;
         
         Assert.Null(result);
     }
@@ -154,7 +154,7 @@ public class AppmaxPixServiceTests
         var json = JsonDocument.Parse(@"{""data"":{""customer"":{""id"":123}}}");
         var method = typeof(AppmaxPixService).GetMethod("TryResolvePath", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var parameters = new object[] { json.RootElement, "data.customer.id", null };
+        var parameters = new object?[] { json.RootElement, "data.customer.id", null };
         method?.Invoke(null, parameters);
         var result = parameters[2] as JsonElement?;
         
@@ -168,7 +168,7 @@ public class AppmaxPixServiceTests
         var json = JsonDocument.Parse(@"{""data"":{""name"":""test""}}");
         var method = typeof(AppmaxPixService).GetMethod("TryResolvePath",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var parameters = new object[] { json.RootElement, "data.nonexistent", null };
+        var parameters = new object?[] { json.RootElement, "data.nonexistent", null };
         var result = method?.Invoke(null, parameters) as bool?;
 
         Assert.False(result);
@@ -225,7 +225,7 @@ public class AppmaxPixServiceTests
     {
         var method = typeof(AppmaxPixService).GetMethod("NormalizePhone",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        var result = method?.Invoke(null, new object[] { input }) as string;
+        var result = method?.Invoke(null, new object?[] { input }) as string;
 
         Assert.Equal(expected, result);
     }

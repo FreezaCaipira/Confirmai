@@ -31,6 +31,7 @@ public class GroupMetricsService
         await using var db = _dbFactory.CreateDbContext();
 
         var group = await db.Groups
+            .AsNoTracking()
             .Include(g => g.Members)
             .Include(g => g.Events)
             .AsSplitQuery()

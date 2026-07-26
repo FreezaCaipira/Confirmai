@@ -125,7 +125,7 @@ public class EventAccessTests
     [Fact]
     public void IsAdmin_ReturnsFalse_WhenGroupIsNull()
     {
-        var ev = new Event { CreatedByUserId = "user-1", Group = null };
+        var ev = new Event { CreatedByUserId = "user-1", Group = null! };
         var result = EventAccess.IsAdmin(ev, "user-2");
         
         Assert.False(result);

@@ -164,7 +164,7 @@ public class DebounceDispatcherTests
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
             ?? throw new InvalidOperationException("TryCancelAndDispose method not found.");
 
-        method.Invoke(null, new object[] { null });
+        method.Invoke(null, new object?[] { null });
 
         Assert.True(true); // If no exception is thrown, the test passes
     }

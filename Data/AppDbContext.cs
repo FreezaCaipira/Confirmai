@@ -37,16 +37,16 @@ namespace Confirmai.Data
 
         public override int SaveChanges()
         {
-            EnsureGroupInviteCodesAsync(CancellationToken.None).GetAwaiter().GetResult();
-            ValidateEventCollisionsAsync(CancellationToken.None).GetAwaiter().GetResult();
+            EnsureGroupInviteCodes();
+            ValidateEventCollisions();
             SynchronizeEventConfirmationPaymentState();
             return base.SaveChanges();
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            EnsureGroupInviteCodesAsync(CancellationToken.None).GetAwaiter().GetResult();
-            ValidateEventCollisionsAsync(CancellationToken.None).GetAwaiter().GetResult();
+            EnsureGroupInviteCodes();
+            ValidateEventCollisions();
             SynchronizeEventConfirmationPaymentState();
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
@@ -174,6 +174,82 @@ namespace Confirmai.Data
                       && e.StartsAt == candidate.StartsAt
                       && (candidate.EventId <= 0 || e.Id != candidate.EventId),
                     cancellationToken);
+
+                if (hasCollisionInDb)
+                    throw new InvalidOperationException("Já existe uma partida nesse grupo na mesma data e hora.");
+            }
+        }
+
+        // Synchronous counterparts used by the sync SaveChanges overrides so we
+        // never block on async I/O (GetAwaiter().GetResult()), which risks
+        // thread-pool starvation/deadlocks under Blazor Server.
+        private void EnsureGroupInviteCodes()
+        {
+            var groupsWithoutCode = ChangeTracker.Entries<Group>()
+                .Where(e => e.State == EntityState.Added && string.IsNullOrWhiteSpace(e.Entity.InviteCode))
+                .ToList();
+
+            if (groupsWithoutCode.Count == 0)
+                return;
+
+            foreach (var entry in groupsWithoutCode)
+            {
+                entry.Entity.InviteCode = GenerateUniqueInviteCode();
+            }
+        }
+
+        private string GenerateUniqueInviteCode()
+        {
+            const int maxAttempts = 20;
+
+            for (var i = 0; i < maxAttempts; i++)
+            {
+                var code = Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
+
+                var duplicateInTracker = ChangeTracker.Entries<Group>()
+                    .Where(e => e.State != EntityState.Deleted)
+                    .Any(e => string.Equals(e.Entity.InviteCode, code, StringComparison.OrdinalIgnoreCase));
+
+                if (duplicateInTracker)
+                    continue;
+
+                var duplicateInDb = Groups.Any(g => g.InviteCode == code);
+                if (!duplicateInDb)
+                    return code;
+            }
+
+            throw new InvalidOperationException("Não foi possível gerar um código de convite único para o grupo.");
+        }
+
+        private void ValidateEventCollisions()
+        {
+            var candidates = ChangeTracker.Entries<Event>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified)
+                .Select(e => new
+                {
+                    Entry = e,
+                    EventId = e.Entity.Id,
+                    GroupId = e.Entity.GroupId,
+                    StartsAt = e.Entity.StartsAt,
+                })
+                .ToList();
+
+            if (candidates.Count == 0)
+                return;
+
+            var pendingCollision = candidates
+                .GroupBy(c => new { c.GroupId, c.StartsAt })
+                .Any(g => g.Count() > 1);
+
+            if (pendingCollision)
+                throw new InvalidOperationException("Já existe uma partida nesse grupo na mesma data e hora.");
+
+            foreach (var candidate in candidates)
+            {
+                var hasCollisionInDb = Events.Any(
+                    e => e.GroupId == candidate.GroupId
+                      && e.StartsAt == candidate.StartsAt
+                      && (candidate.EventId <= 0 || e.Id != candidate.EventId));
 
                 if (hasCollisionInDb)
                     throw new InvalidOperationException("Já existe uma partida nesse grupo na mesma data e hora.");

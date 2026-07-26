@@ -41,7 +41,7 @@ public class EventPaymentReconcileResultTests
             false,
             false,
             false,
-            null,
+            null!,
             null,
             null);
 

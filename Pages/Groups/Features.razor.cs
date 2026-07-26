@@ -5,6 +5,7 @@ using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Core;
 using Confirmai.Services.Factories;
+using Confirmai.Services.Groups;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -179,25 +180,12 @@ public partial class Features
             if (dbGroup is null) return;
 
             var previous = dbGroup.EnablePaymentGateways;
-            dbGroup.EnablePaymentGateways = !group.EnablePaymentGateways;
-
-            // When gateways are disabled, also disable post-match ranking and best player voting (penalty for direct payment)
-            if (!dbGroup.EnablePaymentGateways)
-            {
-                if (dbGroup.EnablePostMatchRanking)
-                {
-                    dbGroup.EnablePostMatchRanking = false;
-                    group.EnablePostMatchRanking = false;
-                }
-                if (dbGroup.EnableBestPlayerVoting)
-                {
-                    dbGroup.EnableBestPlayerVoting = false;
-                    group.EnableBestPlayerVoting = false;
-                }
-            }
+            GroupFeatureRules.ApplyPaymentGatewaysToggle(dbGroup, !group.EnablePaymentGateways);
 
             await db.SaveChangesAsync();
             group.EnablePaymentGateways = dbGroup.EnablePaymentGateways;
+            group.EnablePostMatchRanking = dbGroup.EnablePostMatchRanking;
+            group.EnableBestPlayerVoting = dbGroup.EnableBestPlayerVoting;
 
             await LogService.AuditAsync(
                 AuditEvents.GroupFeatureToggled,
