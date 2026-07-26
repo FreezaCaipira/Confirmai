@@ -2,8 +2,8 @@
 
 |||
 |:---|:---|
-| Generated on: | 07/26/2026 - 00:46:53 |
-| Coverage date: | 07/26/2026 - 00:46:48 |
+| Generated on: | 07/26/2026 - 01:16:11 |
+| Coverage date: | 07/26/2026 - 01:16:04 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 451 |
@@ -13,11 +13,11 @@
 | Uncovered lines: | 11155 |
 | Coverable lines: | 130957 |
 | Total lines: | 162370 |
-| **Branch coverage:** | 31.5% (2614 of 8297) |
-| Covered branches: | 2614 |
+| **Branch coverage:** | 31.4% (2612 of 8297) |
+| Covered branches: | 2612 |
 | Total branches: | 8297 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 241_30181671137 |
+| Tag: | 244_30182515613 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **119802** | **11155** | **130957** | **172920** | **91.4%** | **2614** | **8297** | **31.5%** |
+| **Confirmai** | **119802** | **11155** | **130957** | **172920** | **91.4%** | **2612** | **8297** | **31.4%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 24 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -263,7 +263,7 @@
 | Confirmai.Pages.Groups.Partidas | 0 | 59 | 59 | 206 | 0% | 0 | 44 | 0% |
 | Confirmai.Pages.Groups.Payments | 0 | 266 | 266 | 580 | 0% | 0 | 172 | 0% |
 | Confirmai.Pages.Groups.Ranking | 0 | 108 | 108 | 267 | 0% | 0 | 52 | 0% |
-| Confirmai.Pages.Index | 77 | 73 | 150 | 430 | 51.3% | 18 | 72 | 25% |
+| Confirmai.Pages.Index | 77 | 73 | 150 | 430 | 51.3% | 16 | 72 | 22.2% |
 | Confirmai.Pages.Mailbox | 0 | 358 | 358 | 680 | 0% | 0 | 164 | 0% |
 | Confirmai.Pages.MyConfirmations.Index | 0 | 3 | 3 | 13 | 0% | 0 | 0 |  |
 | Confirmai.Pages.MyEvents.Index | 0 | 138 | 138 | 308 | 0% | 0 | 97 | 0% |
