@@ -1,11 +1,9 @@
 using System.Globalization;
-using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Admin;
@@ -383,32 +381,7 @@ public partial class AdminLogs : IDisposable
 
     private async Task<(List<AdminLogExportRow> Rows, bool Truncated)> BuildExportRowsAsync()
     {
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        var rows = await AdminLogFiltering.Apply(db.Logs.AsNoTracking(), BuildPrimaryFilterCriteria())
-            .OrderByDescending(l => l.Timestamp)
-            .Select(l => new AdminLogExportRow(
-                l.Timestamp,
-                l.Level,
-                l.Source,
-                l.UserId,
-                l.User != null ? l.User.UserName : null,
-                l.Message,
-                l.Exception,
-                l.EventType,
-                l.EntityType,
-                l.EntityId,
-                l.MetadataJson))
-            .Take(ExportMaxRows + 1)
-            .ToListAsync();
-
-        var truncated = rows.Count > ExportMaxRows;
-        if (truncated)
-        {
-            rows = rows.Take(ExportMaxRows).ToList();
-        }
-
-        return (rows, truncated);
+        return await AdminLogsQueryService.GetExportRowsAsync(BuildPrimaryFilterCriteria(), ExportMaxRows);
     }
 
     private async Task LoadFilterStateFromStorageAsync()

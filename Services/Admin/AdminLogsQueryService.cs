@@ -93,6 +93,38 @@ public class AdminLogsQueryService
             .OrderBy(l => l.Timestamp)
             .ToListAsync();
     }
+
+    public async Task<(List<AdminLogExportRow> Rows, bool Truncated)> GetExportRowsAsync(
+        AdminLogFilterCriteria criteria,
+        int maxRows)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        var rows = await AdminLogFiltering.Apply(db.Logs.AsNoTracking(), criteria)
+            .OrderByDescending(l => l.Timestamp)
+            .Select(l => new AdminLogExportRow(
+                l.Timestamp,
+                l.Level,
+                l.Source,
+                l.UserId,
+                l.User != null ? l.User.UserName : null,
+                l.Message,
+                l.Exception,
+                l.EventType,
+                l.EntityType,
+                l.EntityId,
+                l.MetadataJson))
+            .Take(maxRows + 1)
+            .ToListAsync();
+
+        var truncated = rows.Count > maxRows;
+        if (truncated)
+        {
+            rows = rows.Take(maxRows).ToList();
+        }
+
+        return (rows, truncated);
+    }
 }
 
 
