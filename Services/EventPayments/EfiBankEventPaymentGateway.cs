@@ -17,9 +17,9 @@ public sealed class EfiBankEventPaymentGateway : IEventPaymentGateway
     public string DisplayName => "Pix · EfiBank";
     public bool IsAvailable => _efiBank.IsEnabled;
 
-    public async Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null, decimal serviceFeePercentage = 0)
+    public async Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null)
     {
-        var (txId, brCode) = await _efiBank.CreateChargeAsync(amount, confirmationId, payoutAccount, serviceFeePercentage);
+        var (txId, brCode) = await _efiBank.CreateChargeAsync(amount, confirmationId, payoutAccount);
         return new EventPaymentChargeResult(txId, brCode);
     }
 

@@ -15,17 +15,15 @@ public class EventPaymentChargeCalculator
     public EventPaymentFeeCalculation Calculate(decimal basePrice, string gatewayName)
     {
         if (!_feeOptions.IsConfigured)
-            return new EventPaymentFeeCalculation(basePrice, 0m);
+            return new EventPaymentFeeCalculation(basePrice);
 
         if (!_feeOptions.SupportedGateways.Contains(gatewayName, StringComparer.OrdinalIgnoreCase))
-            return new EventPaymentFeeCalculation(basePrice, 0m);
+            return new EventPaymentFeeCalculation(basePrice);
 
         var chargeAmount = basePrice + _feeOptions.AppFeeFixed + _feeOptions.GatewayFeeFixed;
-        var totalFee = _feeOptions.AppFeeFixed + _feeOptions.GatewayFeeFixed;
-        var serviceFeePercentage = totalFee > 0 ? (totalFee / chargeAmount) * 100 : 0m;
 
-        return new EventPaymentFeeCalculation(chargeAmount, serviceFeePercentage);
+        return new EventPaymentFeeCalculation(chargeAmount);
     }
 }
 
-public record EventPaymentFeeCalculation(decimal ChargeAmount, decimal ServiceFeePercentage);
+public record EventPaymentFeeCalculation(decimal ChargeAmount);

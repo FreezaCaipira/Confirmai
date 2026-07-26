@@ -10,6 +10,6 @@ public interface IEventPaymentGateway
     string DisplayName { get; }
     bool IsAvailable { get; }
 
-    Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null, decimal serviceFeePercentage = 0);
+    Task<EventPaymentChargeResult> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null);
     Task<bool> IsChargePaidAsync(string chargeId);
 }

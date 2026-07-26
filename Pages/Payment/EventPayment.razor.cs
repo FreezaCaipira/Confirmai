@@ -151,7 +151,6 @@ public partial class EventPayment : IAsyncDisposable
             // Calcular valor total com taxa se configurado
             var feeCalc = ChargeCalculator.Calculate(conf.Event.Price.Value, selectedGatewayName);
             var chargeAmount = feeCalc.ChargeAmount;
-            var serviceFeePercentage = feeCalc.ServiceFeePercentage;
             GroupPayoutAccount? payoutAccount = null;
 
             if (FeeOptions.Value.IsConfigured && 
@@ -163,7 +162,7 @@ public partial class EventPayment : IAsyncDisposable
                     .FirstOrDefaultAsync(pa => pa.GroupId == conf.Event.GroupId && pa.IsActive);
             }
 
-            var charge = await gateway.CreateChargeAsync(chargeAmount, conf.Id, payoutAccount, serviceFeePercentage);
+            var charge = await gateway.CreateChargeAsync(chargeAmount, conf.Id, payoutAccount);
 
             // Persist txId + brCode so the page can reuse the charge if the user returns
             await using var db = await DbFactory.CreateDbContextAsync();

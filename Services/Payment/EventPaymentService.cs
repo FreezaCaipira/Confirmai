@@ -162,21 +162,18 @@ public sealed class EventPaymentService
         }
 
         var chargeAmount = conf.Event.Price.Value;
-        decimal serviceFeePercentage = 0;
         GroupPayoutAccount? payoutAccount = null;
 
         if (_feeOptions.IsConfigured &&
             _feeOptions.SupportedGateways.Contains(selectedGatewayName, StringComparer.OrdinalIgnoreCase))
         {
             chargeAmount = chargeAmount + _feeOptions.AppFeeFixed + _feeOptions.GatewayFeeFixed;
-            var totalFee = _feeOptions.AppFeeFixed + _feeOptions.GatewayFeeFixed;
-            serviceFeePercentage = totalFee > 0 ? (totalFee / chargeAmount) * 100 : 0;
 
             payoutAccount = await db.GroupPayoutAccounts
                 .FirstOrDefaultAsync(pa => pa.GroupId == conf.Event.GroupId && pa.IsActive);
         }
 
-        var charge = await gateway.CreateChargeAsync(chargeAmount, conf.Id, payoutAccount, serviceFeePercentage);
+        var charge = await gateway.CreateChargeAsync(chargeAmount, conf.Id, payoutAccount);
 
         var entity = await db.EventConfirmations.FindAsync(conf.Id);
         if (entity is not null)

@@ -23,7 +23,6 @@ public class EventPaymentChargeCalculatorTests
         var result = calculator.Calculate(basePrice: 25.00m, gatewayName: "EfiBank");
 
         Assert.Equal(25.00m, result.ChargeAmount);
-        Assert.Equal(0m, result.ServiceFeePercentage);
     }
 
     [Fact]
@@ -41,7 +40,6 @@ public class EventPaymentChargeCalculatorTests
         var result = calculator.Calculate(basePrice: 25.00m, gatewayName: "AbacatePay");
 
         Assert.Equal(25.00m, result.ChargeAmount);
-        Assert.Equal(0m, result.ServiceFeePercentage);
     }
 
     [Fact]
@@ -62,26 +60,7 @@ public class EventPaymentChargeCalculatorTests
     }
 
     [Fact]
-    public void Calculate_FeeConfigured_SupportedGateway_ComputesPercentage()
-    {
-        var feeOptions = new FeeOptions
-        {
-            Enabled = true,
-            AppFeeFixed = 1.00m,
-            GatewayFeeFixed = 0.50m,
-            SupportedGateways = ["EfiBank"]
-        };
-        var calculator = CreateCalculator(feeOptions);
-
-        var result = calculator.Calculate(basePrice: 25.00m, gatewayName: "EfiBank");
-
-        var totalFee = 1.50m;
-        var expectedPercentage = (totalFee / 26.50m) * 100;
-        Assert.Equal(expectedPercentage, result.ServiceFeePercentage);
-    }
-
-    [Fact]
-    public void Calculate_FeeConfigured_ZeroFees_ReturnsBasePriceZeroPercentage()
+    public void Calculate_FeeConfigured_ZeroFees_ReturnsBasePrice()
     {
         var feeOptions = new FeeOptions
         {
@@ -95,7 +74,6 @@ public class EventPaymentChargeCalculatorTests
         var result = calculator.Calculate(basePrice: 25.00m, gatewayName: "EfiBank");
 
         Assert.Equal(25.00m, result.ChargeAmount);
-        Assert.Equal(0m, result.ServiceFeePercentage);
     }
 
     [Fact]
@@ -130,7 +108,6 @@ public class EventPaymentChargeCalculatorTests
         var result = calculator.Calculate(basePrice: 25.00m, gatewayName: "EfiBank");
 
         Assert.Equal(25.00m, result.ChargeAmount);
-        Assert.Equal(0m, result.ServiceFeePercentage);
     }
 
     [Fact]

@@ -53,38 +53,12 @@ public sealed class EfiBankPixService
     public bool IsEnabled => _options.IsEnabled;
 
     /// <summary>
-    /// Creates a Pix payment split configuration for automatic payout to organizer.
-    /// NOTE: Split Pix requires EfiBank accounts for all participants. 
-    /// This method is currently disabled as most organizers don't have EfiBank accounts.
-    /// Manual payout via PayoutService is used instead.
-    /// </summary>
-    public Task<string> CreateSplitAsync(GroupPayoutAccount payoutAccount, decimal serviceFeePercentage)
-    {
-        // Split Pix requires EfiBank accounts - not available for most organizers
-        // Using manual payout via PayoutService instead
-        throw new NotImplementedException("Split Pix requires EfiBank accounts. Use PayoutService for manual payout.");
-    }
-
-    /// <summary>
-    /// Links a Pix charge to a payment split configuration.
-    /// NOTE: Split Pix requires EfiBank accounts for all participants.
-    /// This method is currently disabled as most organizers don't have EfiBank accounts.
-    /// Manual payout via PayoutService is used instead.
-    /// </summary>
-    public Task LinkChargeToSplitAsync(string txId, string splitId)
-    {
-        // Split Pix requires EfiBank accounts - not available for most organizers
-        // Using manual payout via PayoutService instead
-        throw new NotImplementedException("Split Pix requires EfiBank accounts. Use PayoutService for manual payout.");
-    }
-
-    /// <summary>
     /// Creates a Pix charge (Cob) and returns (txId, pixCopiaECola).
     /// txId is stored in EventConfirmation.PixTxId so the webhook can resolve it.
     /// NOTE: Split Pix is disabled as it requires EfiBank accounts for all participants.
     /// Manual payout via PayoutService is used instead.
     /// </summary>
-    public async Task<(string TxId, string BrCode)> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null, decimal serviceFeePercentage = 0)
+    public async Task<(string TxId, string BrCode)> CreateChargeAsync(decimal amount, int confirmationId, GroupPayoutAccount? payoutAccount = null)
     {
         if (!_options.IsEnabled)
             throw new InvalidOperationException(
