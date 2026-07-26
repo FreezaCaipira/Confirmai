@@ -8,6 +8,36 @@
 
 Este documento e o unico plano de trabalho ativo. Ele e atualizado a cada ciclo pelo Senior e executado pelo Pleno.
 
+---
+
+## VARREDURA SENIOR COMPLETA (14/06/2026) -- backlog priorizado P0-P3
+
+Auditoria dos 12 eixos pedidos pelo Robson sobre a `main` (HEAD `9edd89b`). Panorama: 665 arquivos `.cs`, 144 `.razor` (99 com code-behind), 97 services, 88 migrations, 218 arquivos de teste, 102 CSS. Build do app **0 warnings**; **1889** testes verdes / 1913 (24 falhas sao `ProgramConfigurationTests` sem Postgres -- ambiente, nao regressao).
+
+**Pontos fortes ja consolidados (creditos ao Pleno)**: webhooks autenticados (AbacatePay HMAC+secret timing-safe, BTCPay secret timing-safe, EfiBank mTLS por client-cert); authz admin completa (17/17 paginas guardadas + teste de convencao `AdminAuthorizationConventionsTests`); 66 `HasIndex` incluindo `EventConfirmations(EventId, UserId)` e `PixTxId` (**a "decisao #7" do Pleno ja esta feita**); `IDbContextFactory` 100%; CSP com nonce por request + `X-Frame-Options`/`nosniff`/HSTS; payout com retry/backoff/idempotencia deterministica; `async void`=0; `StateHasChanged`=16 (baixo).
+
+### P0 -- CRITICO (fazer ja, antes de qualquer deploy)
+1. **SECRET REAL COMMITADO** -- `appsettings.json:22-23` tem `EfiBank:ClientId` e `EfiBank:ClientSecret` em texto puro (`Client_Id_11a0...`, `Client_Secret_10e8...`), diferente de todos os outros provedores que usam `__SET_VIA_USER_SECRETS__`. Mesmo sendo homologacao (`Sandbox:true`), esta versionado no git. **Acao**: (a) **rotacionar** o ClientSecret no painel Efi; (b) trocar por `__SET_VIA_USER_SECRETS__` no `appsettings.json`; (c) injetar via User Secrets (dev) / env var no EasyPanel (prod); (d) considerar limpar do historico do git se o secret rotacionado nao bastar. O `CertificatePassword` vazio tambem deve vir de secret.
+
+### P1 -- ALTO (proximo ciclo)
+2. **Path de certificado hardcoded** -- `appsettings.json:24` `CertificatePath: C:\FreezaSSD\...p12` e especifico de maquina. Mover para env var (`EfiBank:CertificatePath` / `CertificateBase64` ja suportado no service) e deixar placeholder no repo.
+3. **Cobertura de testes baixa + gap de TDD** -- ~9,9% (metrica do Pleno). Features recentes (`EnableBestPlayerVoting`, default de gateways) entraram sem teste, contra a regra do Ciclo 18. **Acao**: teste do toggle e cascata (desligar gateways -> desliga ranking/votacao) e do guarda-corpo do checkout; meta de cobertura crescente por ciclo focando services sem teste.
+4. **Monolitos CSS** -- `site.css` (7.096 linhas) e `events.css` (5.013). Modularizar por dominio (`futsal.css`, `poker.css`, `admin.css`) **incremental** (1 extracao por commit, com verificacao visual). So no ciclo de CSS.
+
+### P2 -- MEDIO
+5. **Sync-over-async no `AppDbContext`** -- `SaveChanges()`/`SaveChanges(bool)` (`AppDbContext.cs:38-52`) chamam `EnsureGroupInviteCodesAsync(...).GetAwaiter().GetResult()` e `ValidateEventCollisionsAsync(...).GetAwaiter().GetResult()`. Em Blazor Server isso arrisca thread-pool starvation/deadlock sob carga. **Acao**: garantir que os callers usem `SaveChangesAsync` (o override async ja e correto) e, idealmente, tornar o `SaveChanges` sincrono um caminho sem I/O async (ou lancar se usado).
+6. **Code-behinds grandes (SRP)** -- `AdminPayments.razor.cs` (1.046), `Mailbox.razor.cs` (614), `Payment.razor.cs` (562), `Features.razor.cs` (528), `EventPayment.razor.cs` (476), `Escalacao.razor.cs` (471). Continuar a extracao de services testaveis iniciada no Ciclo 18.
+7. **`AsNoTracking` subutilizado** -- ~37 usos em 165 queries. Aplicar em paginas read-only (listagens/detalhes que nao salvam) para reduzir overhead de tracking.
+8. **mTLS do webhook Efi e opcional** -- so valida client-cert se `WebhookClientCertSubject` estiver setado. Confirmar que esta configurado em prod, senao o webhook Pix fica so com secret de query-string.
+
+### P3 -- BAIXO (higiene)
+9. **68 warnings de nullable no projeto de testes** (CS8625/8604/8601/8602) -- app tem 0. Limpar junto ao ciclo de testes.
+10. **`serviceFeePercentage`** (`EventPaymentService`) e derivado do total, nao da base -- so "legacy compat" com taxa fixa; remover para reduzir confusao.
+11. **29 `!important`** (auditados como majoritariamente legitimos em ciclos anteriores) e **7 `catch {}`** (clipboard/JS dispose, benignos) -- revisar caso a caso quando tocar nos arquivos.
+12. **Cache distribuido (Redis)** -- NAO agora; so justifica com multi-instancia ou gargalo medido.
+
+**Sequencia recomendada de ciclos**: (1) P0 secret Efi -> (2) Ciclo Testes+TDD gap (P1.3) -> (3) Ciclo CSS modular (P1.4 + P3.11) -> (4) Ciclo SOLID code-behinds (P2.6) + `SaveChanges` (P2.5) -> (5) higiene (P2.7, P3). Login Google em prod e mobile UX continuam no roadmap conforme prioridade do Robson.
+
 ## Padrão de Referência de PRs (NOVO)
 
 Para manter rastreamento claro do desenvolvimento e permitir revisões posteriores, todos os PRs devem ser documentados no WORK_PLAN.md com:
