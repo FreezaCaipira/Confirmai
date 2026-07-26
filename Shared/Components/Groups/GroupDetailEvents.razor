@@ -26,23 +26,14 @@
                         <div class="et-empty-banner">
                             <i class="fas fa-calendar-plus"></i>
                             <span class="et-empty-text">Nenhuma partida agendada.</span>
-                            <div class="et-empty-actions">
-                                <a href="@NewEventHref" class="et-empty-btn">
-                                    <i class="fas fa-plus"></i> Criar partida
-                                </a>
-                                @if (Group?.Sport == Sport.Futsal)
-                                {
-                                    <a href="/futsal/schedule?groupId=@Group!.Id" class="et-empty-btn et-empty-btn--semanais">
-                                        <i class="fas fa-sync-alt"></i> Semanais
-                                    </a>
-                                }
-                            </div>
                         </div>
                     }
                     else
                     {
-                        <i class="fas fa-calendar-plus"></i>
-                        @(ShowPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida agendada.")
+                        <div class="et-empty-banner">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="et-empty-text">@(ShowPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida agendada.")</span>
+                        </div>
                     }
                 </td>
             </tr>
@@ -52,7 +43,7 @@
             var nextUpcomingEventId = UpcomingEvents.FirstOrDefault()?.Id;
             @foreach (var ev in DisplayedEvents)
             {
-                var href   = Group.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
+                var href   = Group!.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
                 var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
                 var isNextUpcoming = !ShowPastEvents && nextUpcomingEventId.HasValue && ev.Id == nextUpcomingEventId.Value;
                 var eventNum = EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0;

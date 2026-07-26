@@ -28,6 +28,11 @@
     background: rgba(10, 36, 22, 0.55);
 }
 
+.feature-card--disabled {
+    opacity: 0.55;
+    filter: grayscale(0.4);
+}
+
 .feature-card-info {
     display: flex;
     align-items: flex-start;

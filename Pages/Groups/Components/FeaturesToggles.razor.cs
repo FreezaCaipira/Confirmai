@@ -26,10 +26,16 @@ public partial class FeaturesToggles
     public EventCallback OnTogglePostMatchRanking { get; set; }
 
     [Parameter]
+    public EventCallback OnToggleBestPlayerVoting { get; set; }
+
+    [Parameter]
     public EventCallback OnTogglePaymentGateways { get; set; }
 
     private async Task HandleTogglePostMatchRanking()
         => await OnTogglePostMatchRanking.InvokeAsync();
+
+    private async Task HandleToggleBestPlayerVoting()
+        => await OnToggleBestPlayerVoting.InvokeAsync();
 
     private async Task HandleTogglePaymentGateways()
         => await OnTogglePaymentGateways.InvokeAsync();

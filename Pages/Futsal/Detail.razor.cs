@@ -100,7 +100,7 @@ public partial class Detail
         }
 
         detailMvpVotes = new();
-        if (ev is not null && ev.Group.EnablePostMatchRanking)
+        if (ev is not null && ev.Group.EnableBestPlayerVoting)
         {
             var evEndsAt = ev.StartsAt.AddMinutes(ev.DurationMinutes ?? 120);
             if (evEndsAt < DateTime.UtcNow)

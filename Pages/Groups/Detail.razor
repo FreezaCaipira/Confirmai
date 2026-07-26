@@ -118,9 +118,9 @@ else
                     </div>
                     <hr class="invite-row-divider" />
                     <div class="invite-block-actions">
-                        <button class="detail-admin-btn detail-admin-btn--invite invite-block-btn" type="button"
+                        <button class="detail-admin-btn detail-admin-btn--whatsapp invite-block-btn" type="button"
                                 @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
-                            <i class="fas fa-link"></i> Convidar
+                            <i class="fab fa-whatsapp"></i> Convidar
                         </button>
                         <a class="detail-admin-btn invite-block-btn invite-block-btn--settings" href="/grupo/@group.Id/configuracoes">
                             <i class="fas fa-cog"></i> Configurações
@@ -195,8 +195,8 @@ else
                     OnToggleSelection="((int id, bool sel) args) => ToggleRequestSelection(args.id, args.sel)" />
             }
 
-            @* ── Aviso: nenhum admin tem Pix (apenas para admins) ─────── *@
-            @if (isAdmin && group is not null && !group.Members.Any(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey)))
+            @* ── Aviso: nenhum admin tem Pix (apenas para admins, apenas Pix direto) ── *@
+            @if (isAdmin && group is not null && !group.EnablePaymentGateways && !group.Members.Any(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey)))
             {
                 <hr class="detail-divider">
                 <div class="detail-pix-notice">

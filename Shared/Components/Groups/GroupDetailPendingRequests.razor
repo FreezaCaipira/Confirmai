@@ -8,7 +8,7 @@
         <h2 class="detail-section-title">
             <i class="fas fa-user-clock"></i> Solicitações pendentes (@PendingCount)
         </h2>
-        <select class="input input--sm input--width-auto" value="@RequestSortOrder" @onchange="(e) => RequestSortOrderChanged.InvokeAsync((string)e.Value)">
+        <select class="input input--sm input--width-auto" value="@RequestSortOrder" @onchange="(e) => RequestSortOrderChanged.InvokeAsync((string?)e.Value ?? string.Empty)">
             <option value="newest">Mais recentes</option>
             <option value="oldest">Mais antigas</option>
             <option value="name">Nome A-Z</option>

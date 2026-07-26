@@ -58,6 +58,18 @@ public partial class PayoutAccountEditor
         FormData = new();
     }
 
+    private void FillTestData()
+    {
+        FormData = new GroupPayoutAccount
+        {
+            PixKeyType = PixKeyType.Cpf,
+            PixKeyValue = "12345678901",
+            BeneficiaryName = "Organizador Teste",
+            BeneficiaryCpf = "12345678901",
+            BankAccountNumber = "123456"
+        };
+    }
+
     private async Task HandleSave()
     {
         if (string.IsNullOrWhiteSpace(FormData.PixKeyValue))

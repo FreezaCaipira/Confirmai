@@ -41,6 +41,7 @@
 else if (group is null || !isMember)
 {
     <div class="detail-not-found">
+        <i class="fas fa-lock detail-not-found-icon"></i>
         <h2>Acesso não autorizado.</h2>
         <a href="/">← Voltar</a>
     </div>
@@ -48,6 +49,7 @@ else if (group is null || !isMember)
 else if (!group.EnablePostMatchRanking)
 {
     <div class="detail-not-found">
+        <i class="fas fa-toggle-off detail-not-found-icon"></i>
         <h2>Funcionalidade não habilitada.</h2>
         <a href="/grupo/@group.Id">← Voltar ao grupo</a>
     </div>

@@ -3675,7 +3675,7 @@ body .oldsite-top-nav .oldsite-top-nav-user {
     padding: 0.25rem 0.8rem;
     color: var(--ci-text-blue);
     border-right: none;
-    border-bottom: 1px solid var(--ci-border);
+    border-bottom: none;
     font-size: 0.8rem;
     text-shadow: none;
     box-sizing: border-box;

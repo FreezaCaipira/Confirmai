@@ -188,7 +188,7 @@ else
                                 <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "") @(detailMvpRevealed && c.UserId == detailMvpUserId ? "player-item--mvp" : "")">
                                     <span class="player-num">@outIdx</span>
                                     <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
-                                    @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">você</span> }
+                                    @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">Você</span> }
                                     @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
                                     @if (ev.Price.HasValue)
                                     {
