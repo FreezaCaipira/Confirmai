@@ -1,20 +1,22 @@
 using System.Security.Claims;
-using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Shared.Helpers;
 using Confirmai.Services;
+using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
+using Confirmai.Services.Futsal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Futsal;
 
 public partial class Detail
 {
+    [Inject] private EventDetailService EventDetailSvc { get; set; } = default!;
+
     [Parameter] public int Id { get; set; }
 
     private Event?      ev             = null;
@@ -73,44 +75,13 @@ public partial class Detail
     private async Task LoadEvent()
     {
         isLoading = true;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        ev = await db.Events
-            .Include(e => e.Group)
-                .ThenInclude(g => g.Members)
-            .Include(e => e.Venue)
-            .Include(e => e.Confirmations)
-                .ThenInclude(c => c.User)
-            .Include(e => e.WaitingList)
-                .ThenInclude(w => w.User)
-            .AsSplitQuery()
-            .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
-        if (ev?.CreatedByUserId is not null)
-            creatorUser = await db.Users.FindAsync(ev.CreatedByUserId) as ApplicationUser;
-        userWaitlistEntry = currentUserId is not null
-            ? ev?.WaitingList.FirstOrDefault(w => w.UserId == currentUserId)
-            : null;
-
-        userJoinRequest = null;
-        if (currentUserId is not null && ev is not null)
-        {
-            userJoinRequest = await db.GroupJoinRequests
-                .Where(r => r.GroupId == ev.GroupId && r.UserId == currentUserId)
-                .OrderByDescending(r => r.RequestedAt)
-                .FirstOrDefaultAsync();
-        }
-
-        detailMvpVotes = new();
-        if (ev is not null && ev.Group.EnableBestPlayerVoting)
-        {
-            var evEndsAt = ev.StartsAt.AddMinutes(ev.DurationMinutes ?? 120);
-            if (evEndsAt < DateTime.UtcNow)
-                detailMvpVotes = await db.PostMatchVotes.Where(v => v.EventId == ev.Id).ToListAsync();
-        }
-
-        if (ev is not null)
-            eventNumber = 1 + await db.Events
-                .CountAsync(e => e.GroupId == ev.GroupId && e.StartsAt < ev.StartsAt);
-
+        var result = await EventDetailSvc.LoadAsync(Id, currentUserId);
+        ev = result.Event;
+        creatorUser = result.CreatorUser;
+        userWaitlistEntry = result.UserWaitlistEntry;
+        userJoinRequest = result.UserJoinRequest;
+        detailMvpVotes = result.MvpVotes;
+        eventNumber = result.EventNumber;
         isLoading = false;
     }
 
@@ -124,24 +95,7 @@ public partial class Detail
 
         try
         {
-            await using var db = await DbFactory.CreateDbContextAsync();
-
-            var alreadyPending = await db.GroupJoinRequests
-                .AnyAsync(r => r.GroupId == ev.GroupId && r.UserId == currentUserId && r.Status == JoinRequestStatus.Pending);
-
-            if (!alreadyPending)
-            {
-                db.GroupJoinRequests.Add(new GroupJoinRequest
-                {
-                    GroupId = ev.GroupId,
-                    UserId = currentUserId,
-                    RequestedAt = DateTime.UtcNow,
-                    Status = JoinRequestStatus.Pending,
-                });
-
-                await db.SaveChangesAsync();
-            }
-
+            await EventDetailSvc.RequestToJoinAsync(ev.GroupId, currentUserId);
             await LoadEvent();
         }
         catch
@@ -163,14 +117,7 @@ public partial class Detail
 
         try
         {
-            await using var db = await DbFactory.CreateDbContextAsync();
-            var req = await db.GroupJoinRequests.FindAsync(userJoinRequest.Id);
-            if (req is not null && req.Status == JoinRequestStatus.Pending)
-            {
-                db.GroupJoinRequests.Remove(req);
-                await db.SaveChangesAsync();
-            }
-
+            await EventDetailSvc.CancelJoinRequestAsync(userJoinRequest.Id);
             await LoadEvent();
         }
         catch
@@ -196,59 +143,12 @@ public partial class Detail
         if (currentUserId is null || ev is null) return;
         actionError = string.Empty;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        // Avoid double-confirm
-        var existing = await db.EventConfirmations
-            .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
-        if (existing is not null) { actionError = "Você já está confirmado."; return; }
-
-        // Avoid duplicate waitlist entry
-        var existingWait = await db.WaitingLists
-            .FirstOrDefaultAsync(w => w.EventId == Id && w.UserId == currentUserId);
-        if (existingWait is not null) { actionError = "Você já está na lista de espera."; return; }
-
-        // Re-check slot availability at DB level (not stale UI state)
-        var eventEntity = await db.Events
-            .Include(e => e.Confirmations)
-            .FirstOrDefaultAsync(e => e.Id == Id);
-        if (eventEntity is null) return;
-
-        bool isGk       = chosenPos == FutsalPosition.Goalkeeper;
-        int  currentGk  = eventEntity.Confirmations.Count(c => c.Position == FutsalPosition.Goalkeeper);
-        int  currentOut = eventEntity.Confirmations.Count(c => c.Position != FutsalPosition.Goalkeeper);
-        int  maxOutfield = eventEntity.MaxGoalkeepers.HasValue
-            ? eventEntity.MaxPlayers - eventEntity.MaxGoalkeepers.Value
-            : eventEntity.MaxPlayers;
-
-        bool slotFull = isGk
-            ? (eventEntity.MaxGoalkeepers > 0 && currentGk >= eventEntity.MaxGoalkeepers.Value)
-            : (maxOutfield > 0 && currentOut >= maxOutfield);
-
-        if (slotFull)
+        var result = await EventDetailSvc.ConfirmPresenceAsync(Id, currentUserId, chosenPos);
+        if (!result.Success)
         {
-            var wCount = await db.WaitingLists.CountAsync(w => w.EventId == Id);
-            db.WaitingLists.Add(new WaitingList
-            {
-                EventId         = Id,
-                UserId          = currentUserId,
-                Position        = wCount + 1,
-                DesiredPosition = eventEntity.MaxGoalkeepers > 0 ? chosenPos : null,
-                JoinedAt        = DateTime.UtcNow,
-            });
+            actionError = result.Error ?? "Erro ao confirmar presença.";
+            return;
         }
-        else
-        {
-            db.EventConfirmations.Add(new EventConfirmation
-            {
-                EventId     = Id,
-                UserId      = currentUserId,
-                Position    = eventEntity.MaxGoalkeepers > 0 ? chosenPos : FutsalPosition.Outfield,
-                ConfirmedAt = DateTime.UtcNow,
-            });
-        }
-
-        await db.SaveChangesAsync();
         await LoadEvent();
     }
 
@@ -257,16 +157,7 @@ public partial class Detail
         if (currentUserId is null) return;
         actionError = string.Empty;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var conf = await db.EventConfirmations
-            .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
-        if (conf is not null)
-        {
-            var position = conf.Position ?? FutsalPosition.Outfield;
-            db.EventConfirmations.Remove(conf);
-            await db.SaveChangesAsync();
-            await PromoteFromWaitlistAsync(db, position);
-        }
+        await EventDetailSvc.CancelConfirmationAsync(Id, currentUserId);
         confirmCancel = false;
         await LoadEvent();
     }
@@ -274,40 +165,9 @@ public partial class Detail
     private async Task LeaveWaitlist()
     {
         if (currentUserId is null) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var entry = await db.WaitingLists
-            .FirstOrDefaultAsync(w => w.EventId == Id && w.UserId == currentUserId);
-        if (entry is not null)
-        {
-            db.WaitingLists.Remove(entry);
-            await db.SaveChangesAsync();
-        }
+        await EventDetailSvc.LeaveWaitlistAsync(Id, currentUserId);
         confirmLeaveWaitlist = false;
         await LoadEvent();
-    }
-
-    /// <summary>Promove o primeiro da lista de espera para a posição liberada.</summary>
-    private async Task PromoteFromWaitlistAsync(AppDbContext db, FutsalPosition position)
-    {
-        var next = await db.WaitingLists
-            .Where(w => w.EventId == Id &&
-                        (w.DesiredPosition == null || w.DesiredPosition == position))
-            .OrderBy(w => w.Position)
-            .ThenBy(w => w.JoinedAt)
-            .FirstOrDefaultAsync();
-        if (next is null) return;
-
-        db.EventConfirmations.Add(new EventConfirmation
-        {
-            EventId     = Id,
-            UserId      = next.UserId,
-            Position    = position,
-            ConfirmedAt = DateTime.UtcNow,
-        });
-        db.WaitingLists.Remove(next);
-        await db.SaveChangesAsync();
-
-        _ = Task.Run(() => NotificationService.NotifyWaitlistPromotedAsync(Id, next.UserId));
     }
 
     private async Task AdminTogglePaid(int confirmationId)
@@ -324,16 +184,7 @@ public partial class Detail
     private async Task AdminRemoveConfirmation(int confirmationId)
     {
         if (!IsGroupAdmin()) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var conf = await db.EventConfirmations.FindAsync(confirmationId);
-        if (conf is null) return;
-        var position = conf.Position ?? FutsalPosition.Outfield;
-        var targetUserId = conf.UserId;
-        db.EventConfirmations.Remove(conf);
-        await db.SaveChangesAsync();
-        await PromoteFromWaitlistAsync(db, position);
-        await LogService.AuditAsync(AuditEvents.EventConfirmationRemoved, AuditEntities.EventConfirmation, confirmationId.ToString(),
-            $"Admin removeu jogador {targetUserId} da confirmação #{confirmationId} (evento #{ev?.Id})", currentUserId, "EventAdmin");
+        await EventDetailSvc.AdminRemoveConfirmationAsync(confirmationId, currentUserId, ev?.Id);
         confirmRemoveId = null;
         await LoadEvent();
     }
@@ -341,28 +192,14 @@ public partial class Detail
     private async Task AdminRemoveFromWaitlist(int waitlistId)
     {
         if (!IsGroupAdmin()) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var entry = await db.WaitingLists.FindAsync(waitlistId);
-        if (entry is not null)
-        {
-            var wlUserId = entry.UserId;
-            db.WaitingLists.Remove(entry);
-            await db.SaveChangesAsync();
-            await LogService.AuditAsync(AuditEvents.EventWaitlistRemoved, AuditEntities.EventConfirmation, waitlistId.ToString(),
-                $"Admin removeu jogador {wlUserId} da lista de espera (evento #{ev?.Id})", currentUserId, "EventAdmin");
-        }
+        await EventDetailSvc.AdminRemoveFromWaitlistAsync(waitlistId, currentUserId, ev?.Id);
         await LoadEvent();
     }
 
     private async Task AdminAddOutfieldSlot()
     {
         if (!IsGroupAdmin() || ev is null) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var evt = await db.Events.FindAsync(ev.Id);
-        if (evt is null) return;
-        evt.MaxPlayers += 1;
-        await db.SaveChangesAsync();
-        await PromoteFromWaitlistAsync(db, FutsalPosition.Outfield);
+        await EventDetailSvc.AdminAddOutfieldSlotAsync(ev.Id);
         await LoadEvent();
     }
 
@@ -373,23 +210,14 @@ public partial class Detail
         var currentMaxOut = ev.MaxGoalkeepers.HasValue ? ev.MaxPlayers - ev.MaxGoalkeepers.Value : ev.MaxPlayers;
         var currentConfOut = ev.Confirmations.Count(c => c.Position != FutsalPosition.Goalkeeper);
         if (currentMaxOut <= minInfo.MinOutfield || currentMaxOut <= currentConfOut) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var evt = await db.Events.FindAsync(ev.Id);
-        if (evt is null) return;
-        evt.MaxPlayers -= 1;
-        await db.SaveChangesAsync();
+        await EventDetailSvc.AdminRemoveOutfieldSlotAsync(ev.Id);
         await LoadEvent();
     }
 
     private async Task AdminAddGoalkeeperSlot()
     {
         if (!IsGroupAdmin() || ev is null) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var evt = await db.Events.FindAsync(ev.Id);
-        if (evt is null) return;
-        evt.MaxGoalkeepers = (evt.MaxGoalkeepers ?? 0) + 1;
-        await db.SaveChangesAsync();
-        await PromoteFromWaitlistAsync(db, FutsalPosition.Goalkeeper);
+        await EventDetailSvc.AdminAddGoalkeeperSlotAsync(ev.Id);
         await LoadEvent();
     }
 
@@ -400,11 +228,7 @@ public partial class Detail
         var currentGk = ev.MaxGoalkeepers ?? 0;
         var currentConfGk = ev.Confirmations.Count(c => c.Position == FutsalPosition.Goalkeeper);
         if (currentGk <= minInfo.MinGoalkeepers || currentGk <= currentConfGk) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var evt = await db.Events.FindAsync(ev.Id);
-        if (evt is null) return;
-        evt.MaxGoalkeepers = currentGk - 1;
-        await db.SaveChangesAsync();
+        await EventDetailSvc.AdminRemoveGoalkeeperSlotAsync(ev.Id, currentGk - 1);
         await LoadEvent();
     }
 
