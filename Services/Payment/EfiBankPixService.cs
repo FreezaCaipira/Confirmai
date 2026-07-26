@@ -58,7 +58,7 @@ public sealed class EfiBankPixService
     /// This method is currently disabled as most organizers don't have EfiBank accounts.
     /// Manual payout via PayoutService is used instead.
     /// </summary>
-    public async Task<string> CreateSplitAsync(GroupPayoutAccount payoutAccount, decimal serviceFeePercentage)
+    public Task<string> CreateSplitAsync(GroupPayoutAccount payoutAccount, decimal serviceFeePercentage)
     {
         // Split Pix requires EfiBank accounts - not available for most organizers
         // Using manual payout via PayoutService instead
@@ -71,7 +71,7 @@ public sealed class EfiBankPixService
     /// This method is currently disabled as most organizers don't have EfiBank accounts.
     /// Manual payout via PayoutService is used instead.
     /// </summary>
-    public async Task LinkChargeToSplitAsync(string txId, string splitId)
+    public Task LinkChargeToSplitAsync(string txId, string splitId)
     {
         // Split Pix requires EfiBank accounts - not available for most organizers
         // Using manual payout via PayoutService instead

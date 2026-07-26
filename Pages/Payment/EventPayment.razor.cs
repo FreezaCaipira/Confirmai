@@ -45,13 +45,11 @@ public partial class EventPayment : IAsyncDisposable
     private CancellationTokenSource? _pollCts;
     private CancellationTokenSource? _copyBrCodeCts;
     private CancellationTokenSource? _copyAdminPixCts;
-    private CancellationTokenSource? _uploadProofCts;
 
     [Inject] private IOptions<FeeOptions> FeeOptions { get; set; } = default!;
 
     private Task? _copyBrCodeTask = null;
     private Task? _copyAdminPixTask = null;
-    private Task? _uploadProofTask;
 
     protected override async Task OnInitializedAsync()
     {
@@ -405,7 +403,6 @@ public partial class EventPayment : IAsyncDisposable
         _pollCts?.Cancel();
         _copyBrCodeCts?.Cancel();
         _copyAdminPixCts?.Cancel();
-        _uploadProofCts?.Cancel();
 
         // Await running tasks to ensure cancellation is processed
         if (_copyBrCodeTask is not null)
@@ -420,17 +417,10 @@ public partial class EventPayment : IAsyncDisposable
             catch (OperationCanceledException) { }
         }
 
-        if (_uploadProofTask is not null)
-        {
-            try { await _uploadProofTask; }
-            catch (OperationCanceledException) { }
-        }
-
         // Dispose all CancellationTokenSource instances
         _pollCts?.Dispose();
         _copyBrCodeCts?.Dispose();
         _copyAdminPixCts?.Dispose();
-        _uploadProofCts?.Dispose();
     }
 
     private async Task AdminMarkPaid()

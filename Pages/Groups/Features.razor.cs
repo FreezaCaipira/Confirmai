@@ -122,6 +122,50 @@ public partial class Features
         finally { isSaving = false; }
     }
 
+    private async Task ToggleBestPlayerVoting()
+    {
+        if (group is null) return;
+        isSaving    = true;
+        saveMessage = string.Empty;
+        saveError   = false;
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var dbGroup = await db.Groups.FindAsync(group.Id);
+            if (dbGroup is null) return;
+            var previous = dbGroup.EnableBestPlayerVoting;
+            dbGroup.EnableBestPlayerVoting = !group.EnableBestPlayerVoting;
+            await db.SaveChangesAsync();
+            group.EnableBestPlayerVoting = dbGroup.EnableBestPlayerVoting;
+
+            await LogService.AuditAsync(
+                AuditEvents.GroupFeatureToggled,
+                AuditEntities.Group,
+                dbGroup.Id.ToString(),
+                $"Configuração do grupo alterada: votação melhor da partida {(dbGroup.EnableBestPlayerVoting ? "ativada" : "desativada")}",
+                currentUserId,
+                source: "GroupFeatures",
+                metadata: new
+                {
+                    Feature = "EnableBestPlayerVoting",
+                    Previous = previous,
+                    Current = dbGroup.EnableBestPlayerVoting,
+                    ChangedByUserId = currentUserId,
+                    ChangedAtUtc = DateTime.UtcNow,
+                });
+
+            saveMessage = dbGroup.EnableBestPlayerVoting
+                ? "Votação melhor da partida ativada."
+                : "Votação melhor da partida desativada.";
+        }
+        catch
+        {
+            saveMessage = "Erro ao salvar. Tente novamente.";
+            saveError   = true;
+        }
+        finally { isSaving = false; }
+    }
+
     private async Task TogglePaymentGateways()
     {
         if (group is null) return;
@@ -136,6 +180,22 @@ public partial class Features
 
             var previous = dbGroup.EnablePaymentGateways;
             dbGroup.EnablePaymentGateways = !group.EnablePaymentGateways;
+
+            // When gateways are disabled, also disable post-match ranking and best player voting (penalty for direct payment)
+            if (!dbGroup.EnablePaymentGateways)
+            {
+                if (dbGroup.EnablePostMatchRanking)
+                {
+                    dbGroup.EnablePostMatchRanking = false;
+                    group.EnablePostMatchRanking = false;
+                }
+                if (dbGroup.EnableBestPlayerVoting)
+                {
+                    dbGroup.EnableBestPlayerVoting = false;
+                    group.EnableBestPlayerVoting = false;
+                }
+            }
+
             await db.SaveChangesAsync();
             group.EnablePaymentGateways = dbGroup.EnablePaymentGateways;
 
@@ -143,7 +203,7 @@ public partial class Features
                 AuditEvents.GroupFeatureToggled,
                 AuditEntities.Group,
                 dbGroup.Id.ToString(),
-                $"Configuração do grupo alterada: gateways de pagamento {(dbGroup.EnablePaymentGateways ? "ativado" : "desativado")}",
+                $"Configuração do grupo alterada: gateways de pagamento {(dbGroup.EnablePaymentGateways ? "ativado" : "desativado")}{(!dbGroup.EnablePaymentGateways ? " (funcionalidades adicionais desativadas automaticamente)" : "")}",
                 currentUserId,
                 source: "GroupFeatures",
                 metadata: new
@@ -157,7 +217,7 @@ public partial class Features
 
             saveMessage = dbGroup.EnablePaymentGateways
                 ? "Gateways de pagamento ativados para este grupo."
-                : "Gateways de pagamento desativados. Fluxo padrão com Pix direto mantido.";
+                : "Gateways de pagamento desativados. Pagamento via Pix direto do organizador. Funcionalidades adicionais (ranking e votação) desativadas.";
         }
         catch
         {
@@ -350,6 +410,9 @@ public partial class Features
     // Callback wrappers for child components
     private async Task TogglePostMatchRankingCallback()
         => await TogglePostMatchRanking();
+
+    private async Task ToggleBestPlayerVotingCallback()
+        => await ToggleBestPlayerVoting();
 
     private async Task TogglePaymentGatewaysCallback()
         => await TogglePaymentGateways();

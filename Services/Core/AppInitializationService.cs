@@ -165,9 +165,6 @@ public class AppInitializationService
 
         var defaultPassword = _configuration["SeedTestUsers:Password"] ?? "Test@12345";
 
-        await EnsureFakeTestUserAccessAsync("gm@teste.com", defaultPassword);
-        await EnsureFakeTestUserAccessAsync("gm2@teste.com", defaultPassword);
-
         var seedUsers = new[]
         {
             new SeedUserSpec("admin.teste@otserv.local", "Admin Sistema Teste", true),
@@ -194,82 +191,6 @@ public class AppInitializationService
         {
             await EnsureSeedUserAsync(spec, defaultPassword);
         }
-    }
-
-    private async Task EnsureFakeTestUserAccessAsync(string email, string password)
-    {
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-        {
-            return;
-        }
-
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user == null)
-        {
-            user = new ApplicationUser
-            {
-                UserName = email,
-                Email = email,
-                EmailConfirmed = true,
-                FullName = "GM Teste"
-            };
-
-            var createResult = await _userManager.CreateAsync(user, password);
-            if (!createResult.Succeeded)
-            {
-                var createErrors = string.Join("; ", createResult.Errors.Select(e => e.Description));
-                _logger.LogWarning("Falha ao criar usuário fake de teste {Email}: {Errors}", email, createErrors);
-                return;
-            }
-
-            if (!await _userManager.IsInRoleAsync(user, "user"))
-            {
-                await _userManager.AddToRoleAsync(user, "user");
-            }
-
-            _logger.LogInformation("Usuário fake de teste criado com e-mail confirmado: {Email}", email);
-            return;
-        }
-
-        var requiresUpdate = false;
-        if (!user.EmailConfirmed)
-        {
-            user.EmailConfirmed = true;
-            requiresUpdate = true;
-        }
-
-        if (requiresUpdate)
-        {
-            var updateResult = await _userManager.UpdateAsync(user);
-
-            if (!updateResult.Succeeded)
-            {
-                var updateErrors = string.Join("; ", updateResult.Errors.Select(e => e.Description));
-                _logger.LogWarning("Falha ao confirmar e-mail fake do usuário {Email}: {Errors}", email, updateErrors);
-                return;
-            }
-        }
-
-        if (!await _userManager.IsInRoleAsync(user, "user"))
-        {
-            await _userManager.AddToRoleAsync(user, "user");
-        }
-
-        var hasExpectedPassword = await _userManager.CheckPasswordAsync(user, password);
-        if (!hasExpectedPassword)
-        {
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var resetResult = await _userManager.ResetPasswordAsync(user, resetToken, password);
-
-            if (!resetResult.Succeeded)
-            {
-                var resetErrors = string.Join("; ", resetResult.Errors.Select(e => e.Description));
-                _logger.LogWarning("Falha ao sincronizar senha fake do usuário {Email}: {Errors}", email, resetErrors);
-                return;
-            }
-        }
-
-        _logger.LogInformation("Acesso fake do usuário de teste sincronizado: {Email}", email);
     }
 
     private async Task<ApplicationUser?> EnsureSeedUserAsync(SeedUserSpec spec, string password)

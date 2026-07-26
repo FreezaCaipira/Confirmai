@@ -3,39 +3,21 @@
 
 <section class="detail-section features-section">
     <h2 class="detail-section-title">
-        <i class="fas fa-sliders-h"></i> Funcionalidades
+        <i class="fas fa-credit-card"></i> Pagamentos
     </h2>
-    <p class="features-section-sub">Ative ou desative funcionalidades opcionais para este grupo.</p>
+    <p class="features-section-sub">Escolha como os jogadores pagam as partidas deste grupo.</p>
 
     <div class="features-list">
-        <div class="feature-card @(Group!.EnablePostMatchRanking ? "feature-card--on" : "")">
-            <div class="feature-card-info">
-                <span class="feature-card-icon"><i class="fas fa-trophy"></i></span>
-                <div class="feature-card-text">
-                    <strong class="feature-card-title">Ranking pós-partida</strong>
-                    <p class="feature-card-desc">
-                        Exibe um ranking de participações e desempenho dos membros,
-                        com visões mensal e anual, na página do grupo.
-                    </p>
-                </div>
-            </div>
-            <label class="feature-toggle" title="@(Group!.EnablePostMatchRanking ? "Desativar" : "Ativar")">
-                <input type="checkbox"
-                       checked="@Group!.EnablePostMatchRanking"
-                       disabled="@IsSaving"
-                       @onchange="() => HandleTogglePostMatchRanking()" />
-                <span class="feature-toggle-track"></span>
-            </label>
-        </div>
-
         <div class="feature-card @(Group!.EnablePaymentGateways ? "feature-card--on" : "")">
             <div class="feature-card-info">
-                <span class="feature-card-icon"><i class="fas fa-credit-card"></i></span>
+                <span class="feature-card-icon"><i class="fas fa-exchange-alt"></i></span>
                 <div class="feature-card-text">
-                    <strong class="feature-card-title">Gateways de pagamento</strong>
+                    <strong class="feature-card-title">Intermédio do site (Gateways de pagamento)</strong>
                     <p class="feature-card-desc">
-                        Quando ativado, a tela de pagamento mostra opções de gateway
-                        (EfiBank, Abacate e futuras integrações) além do Pix direto do organizador.
+                        Quando ativado, o pagamento das partidas é processado via gateways
+                        (EfiBank, Abacate e futuras integrações) com repasse automático ao organizador.
+                        Desativar significa pagamento via Pix direto ao organizador, mas
+                        funcionalidades adicionais como ranking e votação do melhor da partida ficam indisponíveis.
                     </p>
                     @if (AvailableGatewayOptions.Count == 0)
                     {
@@ -68,4 +50,65 @@
             @SaveMessage
         </p>
     }
+</section>
+
+<section class="detail-section features-section">
+    <h2 class="detail-section-title">
+        <i class="fas fa-sliders-h"></i> Funcionalidades adicionais
+    </h2>
+    <p class="features-section-sub">Ative ou desative funcionalidades opcionais para este grupo.</p>
+
+    <div class="features-list">
+        <div class="feature-card @(Group!.EnablePostMatchRanking ? "feature-card--on" : "") @(Group!.EnablePaymentGateways ? "" : "feature-card--disabled")">
+            <div class="feature-card-info">
+                <span class="feature-card-icon"><i class="fas fa-trophy"></i></span>
+                <div class="feature-card-text">
+                    <strong class="feature-card-title">Ranking pós-partida</strong>
+                    <p class="feature-card-desc">
+                        Exibe um ranking de participações e desempenho dos membros,
+                        com visões mensal e anual, na página do grupo.
+                    </p>
+                    @if (!Group!.EnablePaymentGateways)
+                    {
+                        <p class="feat-gateway-note">
+                            Requer intermédio do site (gateways) ativado.
+                        </p>
+                    }
+                </div>
+            </div>
+            <label class="feature-toggle" title="@(Group!.EnablePostMatchRanking ? "Desativar" : "Ativar")">
+                <input type="checkbox"
+                       checked="@Group!.EnablePostMatchRanking"
+                       disabled="@(IsSaving || !Group!.EnablePaymentGateways)"
+                       @onchange="() => HandleTogglePostMatchRanking()" />
+                <span class="feature-toggle-track"></span>
+            </label>
+        </div>
+
+        <div class="feature-card @(Group!.EnableBestPlayerVoting ? "feature-card--on" : "") @(Group!.EnablePaymentGateways ? "" : "feature-card--disabled")">
+            <div class="feature-card-info">
+                <span class="feature-card-icon"><i class="fas fa-medal"></i></span>
+                <div class="feature-card-text">
+                    <strong class="feature-card-title">Votação melhor da partida</strong>
+                    <p class="feature-card-desc">
+                        Permite que os membros votem no melhor jogador da partida
+                        após o encerramento do evento.
+                    </p>
+                    @if (!Group!.EnablePaymentGateways)
+                    {
+                        <p class="feat-gateway-note">
+                            Requer intermédio do site (gateways) ativado.
+                        </p>
+                    }
+                </div>
+            </div>
+            <label class="feature-toggle" title="@(Group!.EnableBestPlayerVoting ? "Desativar" : "Ativar")">
+                <input type="checkbox"
+                       checked="@Group!.EnableBestPlayerVoting"
+                       disabled="@(IsSaving || !Group!.EnablePaymentGateways)"
+                       @onchange="() => HandleToggleBestPlayerVoting()" />
+                <span class="feature-toggle-track"></span>
+            </label>
+        </div>
+    </div>
 </section>

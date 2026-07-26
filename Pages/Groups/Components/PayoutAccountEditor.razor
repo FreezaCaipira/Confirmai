@@ -83,6 +83,11 @@
             </div>
 
             <div class="feat-payout-actions">
+                <button class="feat-payout-test-btn" type="button"
+                        disabled="@IsSaving"
+                        @onclick="FillTestData">
+                    <i class="fas fa-flask"></i> Dados de teste
+                </button>
                 @if (ExistingAccount != null)
                 {
                     <button class="feat-payout-cancel-btn" type="button"

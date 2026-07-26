@@ -33,6 +33,7 @@ public class GroupMetricsService
         var group = await db.Groups
             .Include(g => g.Members)
             .Include(g => g.Events)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(g => g.Id == groupId);
 
         if (group == null)

@@ -26,7 +26,7 @@
                     <span class="feat-member-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
                     @if (isAdminM) { <span class="player-tag player-tag--admin">admin</span> }
                     @if (m.UserId == CreatedByUserId) { <span class="player-tag">criador</span> }
-                    @if (isSelf)   { <span class="player-tag player-tag--me">você</span> }
+                    @if (isSelf)   { <span class="player-tag player-tag--me">Você</span> }
                 </div>
                 @if (!isSelf && CanManageAdminRoles)
                 {

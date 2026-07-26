@@ -46,6 +46,7 @@
 else if (group is null || !isAdmin)
 {
     <div class="detail-not-found">
+        <i class="fas fa-lock detail-not-found-icon"></i>
         <h2>Acesso não autorizado.</h2>
         <a href="/">← Voltar</a>
     </div>
@@ -73,7 +74,7 @@ else
                 </div>
             </header>
 
-            @* ── Funcionalidades ────────────────────────────────────── *@
+            @* ── Pagamentos & Funcionalidades ─────────────────────────── *@
             <FeaturesToggles
                 Group="@group"
                 IsSaving="@isSaving"
@@ -81,7 +82,31 @@ else
                 SaveError="@saveError"
                 AvailableGatewayOptions="@availableGatewayOptions"
                 OnTogglePostMatchRanking="@TogglePostMatchRankingCallback"
+                OnToggleBestPlayerVoting="@ToggleBestPlayerVotingCallback"
                 OnTogglePaymentGateways="@TogglePaymentGatewaysCallback" />
+
+            <hr class="detail-divider">
+
+            @* ── Configuração de Pagamento (condicional) ──────────────── *@
+            @if (group.EnablePaymentGateways)
+            {
+                <PayoutAccountEditor
+                    ExistingAccount="@payoutAccount"
+                    IsSaving="@isSavingPayout"
+                    Message="@payoutMessage"
+                    IsError="@payoutError"
+                    OnSave="@SavePayoutAccountCallback" />
+            }
+            else
+            {
+                <PixReceiverSelector
+                    PixAdmins="@pixAdmins"
+                    SelectedPixReceiverId="@selectedPixReceiverId"
+                    IsSaving="@isSavingPix"
+                    Message="@pixMessage"
+                    IsError="@pixError"
+                    OnSavePixReceiver="@SavePixReceiverCallback" />
+            }
 
             <hr class="detail-divider">
 
@@ -99,27 +124,6 @@ else
                 OnSetMemberRole="@SetMemberRoleCallback"
                 OnInitiatePromote="@InitiatePromoteCallback"
                 OnCancelPromote="@CancelPromoteCallback" />
-
-            <hr class="detail-divider">
-
-            @* ── Pix do Organizador ─────────────────────────────────── *@
-            <PixReceiverSelector
-                PixAdmins="@pixAdmins"
-                SelectedPixReceiverId="@selectedPixReceiverId"
-                IsSaving="@isSavingPix"
-                Message="@pixMessage"
-                IsError="@pixError"
-                OnSavePixReceiver="@SavePixReceiverCallback" />
-
-            <hr class="detail-divider">
-
-            @* ── Chave PIX de Repasse (Taxa de Serviço) ─────────────── *@
-            <PayoutAccountEditor
-                ExistingAccount="@payoutAccount"
-                IsSaving="@isSavingPayout"
-                Message="@payoutMessage"
-                IsError="@payoutError"
-                OnSave="@SavePayoutAccountCallback" />
 
         </div>
     </div>

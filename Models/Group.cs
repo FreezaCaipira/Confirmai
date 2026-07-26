@@ -40,13 +40,17 @@ namespace Confirmai.Models
         /// <summary>Habilita o ranking pós-partida (mensal/anual) para o grupo.</summary>
         public bool EnablePostMatchRanking { get; set; } = false;
 
+        /// <summary>Habilita a votação de melhor da partida após o encerramento do evento.</summary>
+        public bool EnableBestPlayerVoting { get; set; } = false;
+
         /// <summary>
         /// Habilita gateways de pagamento de terceiros (EfiBank, Abacate etc.)
-        /// para os pagamentos das partidas do grupo.
-        /// Quando falso, o fluxo padrão é Pix direto do organizador com
-        /// confirmação manual e envio de comprovante.
+        /// para os pagamentos das partidas do grupo (intermédio do site).
+        /// Ativo por padrão. Quando desativado, o fluxo passa a ser Pix direto
+        /// do organizador com confirmação manual e envio de comprovante,
+        /// e funcionalidades adicionais (ranking pós-partida e votação do melhor) são desabilitadas.
         /// </summary>
-        public bool EnablePaymentGateways { get; set; } = false;
+        public bool EnablePaymentGateways { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

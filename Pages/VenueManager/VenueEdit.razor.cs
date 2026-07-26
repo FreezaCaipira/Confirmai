@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using System.Security.Claims;
 using Confirmai.Data;
 using Confirmai.Enums;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace Confirmai.Pages.VenueManager;
 
@@ -20,16 +20,15 @@ public partial class VenueEdit : IAsyncDisposable
     private bool             isSaving        = false;
     private bool             accessDenied    = false;
     private string           saveError       = string.Empty;
-    private List<string>     cityOptions     = new();
+    private Dictionary<string, string[]> citiesByState = new();
 
     private static readonly string[] BrazilianStates =
         ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
          "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 
-    private record IbgeMunicipio(string Nome);
-
     private DotNetObjectReference<VenueEdit>? _objRef;
     private bool _acInit = false;
+    private bool hasMapsApiKey = false;
 
     private bool IsNew => Id == 0;
 
@@ -39,23 +38,22 @@ public partial class VenueEdit : IAsyncDisposable
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
     [Inject] private IConfiguration Config { get; set; } = default!;
-    [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = default!;
+    [Inject] private IWebHostEnvironment Env { get; set; } = default!;
 
-    private async Task LoadCitiesAsync()
+    private void OnStateChanged()
     {
-        if (string.IsNullOrWhiteSpace(model.StateCode)) return;
-        try
-        {
-            var http   = HttpClientFactory.CreateClient();
-            var result = await http.GetFromJsonAsync<IbgeMunicipio[]>(
-                $"https://servicodados.ibge.gov.br/api/v1/localidades/estados/{model.StateCode}/municipios?orderBy=nome");
-            cityOptions = result?.Select(m => m.Nome).ToList() ?? new();
-        }
-        catch { cityOptions = new(); }
+        model.City = string.Empty;
     }
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            var path = Path.Combine(Env.WebRootPath, "data", "cities.json");
+            var json = await File.ReadAllTextAsync(path);
+            citiesByState = JsonSerializer.Deserialize<Dictionary<string, string[]>>(json) ?? new();
+        }
+        catch { citiesByState = new(); }
         if (!IsNew)
         {
             var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -82,7 +80,6 @@ public partial class VenueEdit : IAsyncDisposable
             model = found;
         }
 
-        await LoadCitiesAsync();
         isLoading = false;
     }
 
@@ -92,7 +89,8 @@ public partial class VenueEdit : IAsyncDisposable
         {
             _acInit = true;
             var apiKey = Config["Google:MapsApiKey"];
-            if (!string.IsNullOrWhiteSpace(apiKey) && !apiKey.Contains("SET_VIA"))
+            hasMapsApiKey = !string.IsNullOrWhiteSpace(apiKey) && !apiKey.Contains("SET_VIA");
+            if (hasMapsApiKey)
             {
                 _objRef ??= DotNetObjectReference.Create(this);
                 await JS.InvokeVoidAsync("venueAutocomplete.init", apiKey, _objRef, "venue-name-input");
@@ -107,7 +105,6 @@ public partial class VenueEdit : IAsyncDisposable
         model.Address   = street;
         model.City      = city;
         model.StateCode = state.Length > 2 ? state[..2] : state.ToUpperInvariant();
-        await LoadCitiesAsync();
         await InvokeAsync(StateHasChanged);
     }
 

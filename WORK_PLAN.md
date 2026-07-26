@@ -750,7 +750,92 @@ A partir do Ciclo 18, TDD + SOLID sao regras permanentes de desenvolvimento, nao
 - **Unicode escapes em testes**: usar `\u00E7` etc. em string literals para evitar problemas de encoding
 - **@inject via .razor**: quando `[Inject]` no `.razor.cs` nao e reconhecido pelo compilador Blazor, usar `@inject` no `.razor`
 - **BEM em novos componentes**: `block__element--modifier` (ver css-audit.md Fase 7)
-- **PR body como documentacao**: todo PR deve incluir body descritivo com resumo, metricas, criterios de aceitacao e notas para o revisor. PR sem body nao e aceito. O body serve como documentacao permanente do que foi feito e por que.
+- **PR body como documentacao**: todo PR deve incluir body descritivo com resumo, metricas, criterios de aceitacao e notas para o revisor. PR sem body nao e aceito. O body serve como documentacao permanente do que foi feito e por que. O body vai na descricao do PR no GitHub, nao como arquivo commitado no repo.
+- **Politica de versionamento .NET**: ver secao "Politica de Versionamento .NET" abaixo.
+
+---
+
+## Politica de Versionamento .NET (regra permanente -- estabelecida Ciclo 18)
+
+**Data**: 23/07/2026
+
+### STS vs LTS
+- **LTS (Long Term Support)**: 36 meses de suporte (ex: .NET 8, .NET 10, .NET 12). **Preferir em producao.**
+- **STS (Standard Term Support)**: 18 meses de suporte (ex: .NET 9, .NET 11). Usar apenas se uma feature critica for necessaria e nao estiver em LTS.
+- Site de referencia: https://dotnet.microsoft.com/platform/support/policy/dotnet-core
+
+### Regras
+1. **Producao roda em LTS**: projetos em producao devem rodar em versao LTS. STS apenas para experimentacao ou necessidade critica.
+2. **Janela de migracao**: planejar migracao **6 meses antes** do fim do suporte da versao atual.
+   - .NET 9 (STS): suporte ate maio/2026 -> migrar ate dezembro/2025 (ou antes)
+   - .NET 10 (LTS): lancamento nov/2025, suporte ate nov/2028
+   - **Estrategia atual**: migrar de .NET 9 STS para .NET 10 LTS quando lancar (nov/2025).
+3. **`global.json`**: sempre fixar a versao do SDK para build reproduzivel. Atualizar junto com a migracao.
+4. **CI primeiro**: migracao comeca pelo CI -- garantir que o pipeline passa na nova versao antes de tocar no codigo.
+5. **Dependencias**: verificar compatibilidade de todos os NuGets (EF Core, Moq, xUnit, etc.) antes de migrar. Rodar `dotnet list package --outdated`.
+6. **TDD protege**: a suite de testes e a rede de segurança -- se passar na nova versao, a migracao e segura. Se falhar, investigar breaking changes e corrigir.
+7. **Ciclo de migracao**: quando uma nova LTS lancar, criar um ciclo dedicado:
+   - Atualizar `global.json` -> nova versao
+   - Atualizar `TargetFramework` nos `.csproj` -> `netXX.0`
+   - Rodar `dotnet test` -- se verde, migracao pronta
+   - Se vermelho, investigar breaking changes e corrigir
+   - Commit unico: `chore: migrar .NET X -> .NET Y (LTS)`
+
+---
+
+## Setup de Ambiente de Desenvolvimento (regra permanente -- estabelecida Ciclo 18)
+
+**Data**: 23/07/2026
+
+### Multi-machine development
+O projeto pode ser desenvolvido em maquinas diferentes (PC principal, notebook de viagem). O Setup de deploy para producao (Easy Panel, Docker, certificados, secrets de prod) fica apenas no PC principal. As maquinas de apoio devem conseguir:
+
+1. **Desenvolver normalmente** -- build, run, debug
+2. **Testar localmente** -- `dotnet test`, `dotnet build`, Postgres local
+3. **Subir para main** -- commits, push, PRs
+
+O que **nao e necessario** em maquinas de apoio:
+- Easy Panel / deploy pipeline
+- Certificados de producao (EfiBank homologacao)
+- Secrets de producao (API keys reais, webhook secrets)
+- Docker (se Postgres nativo estiver instalado)
+
+### Requisitos minimos para desenvolver
+1. **.NET SDK** -- versao conforme `global.json` (atualmente 9.0.100+)
+2. **PostgreSQL** -- instalado localmente (versao 16+)
+   - Usuario: `freeza`
+   - Senha: via User Secrets (nao commitada)
+   - Banco: `Confirmai`
+3. **User Secrets** -- configurados via `dotnet user-secrets`:
+   - `ConnectionStrings:DefaultConnection` -- obrigatorio
+   - Demais secrets (EfiBank, AbacatePay, etc.) -- opcionais em dev (app usa valores default/sandbox do `appsettings.json`)
+4. **EF Migrations** -- `dotnet ef database update` para criar o schema
+
+### Padrao de secrets em dev
+- **User Secrets** e a fonte de truth para dev local (nao commitado, nao no appsettings.json)
+- **Easy Panel** e a fonte de truth para prod (environment variables no container)
+- **appsettings.json** contem apenas valores nao-sensiveis e placeholders `__SET_VIA_USER_SECRETS__`
+- Nunca commitar senhas, API keys ou certificados no repo
+
+### Procedimento de setup em nova maquina
+1. Instalar .NET SDK (versao do `global.json`)
+2. Instalar PostgreSQL 16+
+3. Criar usuario `freeza` e banco `Confirmai`
+4. `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=Confirmai;Username=freeza;Password=..." --project .\Confirmai.csproj`
+5. `dotnet ef database update --project .\Confirmai.csproj`
+6. `dotnet build` -- deve passar com 0 erros
+7. `dotnet test` -- deve passar (exceto ProgramConfigurationTests se sem Postgres rodando)
+8. `./dev.ps1` -- app deve iniciar
+
+### Super user de dev (padronizado)
+- **Credenciais de dev** (idênticas em qualquer maquina):
+  - Email: `admin@confirmai.app`
+  - Senha: `Admin123!Aa`
+  - Role: `admin`
+- **Fonte**: `appsettings.Development.json` (commitado no repo, so vale em ambiente Development)
+- **User Secrets** nao sao mais necessarios para AdminSeed em dev -- o `appsettings.Development.json` ja tem os valores
+- **Prod**: o Easy Panel injeta `AdminSeed:Email`, `AdminSeed:Password` e `AdminSeed:FullName` via environment variables, sobrescrevendo o `appsettings.json` (que tem placeholders `__SET_VIA_USER_SECRETS__`)
+- **SyncPassword**: em Development, a senha do admin e sincronizada a cada startup (garante consistencia). Em prod, `SyncPassword` deve ser `false` ou nao configurado.
 
 ---
 
