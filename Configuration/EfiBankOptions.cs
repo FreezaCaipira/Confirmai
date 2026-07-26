@@ -65,8 +65,16 @@ public class EfiBankOptions
 
     /// <summary>True when all required fields are configured.</summary>
     public bool IsEnabled =>
-        !string.IsNullOrWhiteSpace(ClientId) &&
-        !string.IsNullOrWhiteSpace(ClientSecret) &&
-        (!string.IsNullOrWhiteSpace(CertificatePath) || !string.IsNullOrWhiteSpace(CertificateBase64)) &&
-        !string.IsNullOrWhiteSpace(PixKey);
+        IsSet(ClientId) &&
+        IsSet(ClientSecret) &&
+        (IsSet(CertificatePath) || IsSet(CertificateBase64)) &&
+        IsSet(PixKey);
+
+    /// <summary>
+    /// A value is considered set only when it is non-empty and not one of the
+    /// repository placeholders (e.g. "__SET_VIA_USER_SECRETS__"). This prevents
+    /// the gateway from registering with placeholder credentials.
+    /// </summary>
+    private static bool IsSet(string? value)
+        => !string.IsNullOrWhiteSpace(value) && !value.Contains("SET_VIA", StringComparison.Ordinal);
 }
