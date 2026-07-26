@@ -1,20 +1,20 @@
 using System.Security.Claims;
 using System.Text;
-using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Pages.Components;
 using Confirmai.Pages.Futsal.Components;
-using Confirmai.Shared.Helpers;
+using Confirmai.Services.Futsal;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Futsal;
 
 public partial class Escalacao : IAsyncDisposable
 {
+    [Inject] private EscalacaoService EscalacaoSvc { get; set; } = default!;
+
     [Parameter] public int Id { get; set; }
 
     private Event?   ev        = null;
@@ -103,43 +103,22 @@ public partial class Escalacao : IAsyncDisposable
     private async Task LoadEvent()
     {
         isLoading = true;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        ev = await db.Events
-            .Include(e => e.Group)
-                .ThenInclude(g => g.Members)
-            .Include(e => e.Confirmations)
-                .ThenInclude(c => c.User)
-            .AsSplitQuery()
-            .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
-        isAdmin = EventAccess.IsAdmin(ev, currentUserId);
+        var result = await EscalacaoSvc.LoadAsync(Id, currentUserId);
+
+        ev = result.Event;
+        isAdmin = result.IsAdmin;
+        isPastEvent = result.IsPastEvent;
+        isMember = result.IsMember;
+        allVotes = result.AllVotes;
+        myVote = result.MyVote;
+        scoreRegisteredByName = result.ScoreRegisteredByName;
+        teamAName = result.TeamAName;
+        teamBName = result.TeamBName;
 
         if (ev is not null)
         {
-            isPastEvent = ev.StartsAt.AddMinutes(ev.DurationMinutes ?? 120) < DateTime.UtcNow;
-            isMember    = currentUserId is not null &&
-                          ev.Group.Members.Any(m => m.UserId == currentUserId);
-
-            allVotes = await db.PostMatchVotes
-                .Where(v => v.EventId == Id)
-                .ToListAsync();
-            myVote = currentUserId is not null
-                ? allVotes.FirstOrDefault(v => v.VoterUserId == currentUserId)
-                : null;
-
             scoreInputA = ev.ScoreTeamA;
             scoreInputB = ev.ScoreTeamB;
-
-            if (ev.ScoreRegisteredByUserId is not null)
-            {
-                var registrant = await db.Users
-                    .Where(u => u.Id == ev.ScoreRegisteredByUserId)
-                    .Select(u => u.FullName ?? u.Email)
-                    .FirstOrDefaultAsync();
-                scoreRegisteredByName = registrant;
-            }
-
-            teamAName = ev.TeamAName ?? "Time A";
-            teamBName = ev.TeamBName ?? "Time B";
         }
 
         isLoading = false;
@@ -148,16 +127,11 @@ public partial class Escalacao : IAsyncDisposable
     private async Task SaveTeamNames()
     {
         if (ev is null) return;
+        await EscalacaoSvc.SaveTeamNamesAsync(Id, teamAName, teamBName);
         var nameA = string.IsNullOrWhiteSpace(teamAName) ? "Time A" : teamAName.Trim();
         var nameB = string.IsNullOrWhiteSpace(teamBName) ? "Time B" : teamBName.Trim();
         teamAName = nameA;
         teamBName = nameB;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var dbEv = await db.Events.FindAsync(Id);
-        if (dbEv is null) return;
-        dbEv.TeamAName = nameA == "Time A" ? null : nameA;
-        dbEv.TeamBName = nameB == "Time B" ? null : nameB;
-        await db.SaveChangesAsync();
     }
 
     private async Task HandleTeamNamesChanged((string TeamA, string TeamB) names)
@@ -242,28 +216,12 @@ public partial class Escalacao : IAsyncDisposable
         isSaving    = true;
         actionError = null;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-
         var userIdToTeam = new Dictionary<string, int?>();
         foreach (var s in teamA)    userIdToTeam[s.UserId] = 0;
         foreach (var s in teamB)    userIdToTeam[s.UserId] = 1;
         foreach (var s in reservas) userIdToTeam[s.UserId] = null;
 
-        var confs = await db.EventConfirmations
-            .Where(c => c.EventId == Id)
-            .ToListAsync();
-
-        foreach (var c in confs)
-        {
-            if (userIdToTeam.TryGetValue(c.UserId, out var teamId))
-                c.TeamId = teamId;
-        }
-
-        var dbEv = await db.Events.FindAsync(Id);
-        if (dbEv is not null)
-            dbEv.LineupConfirmedAt = DateTime.UtcNow;
-
-        await db.SaveChangesAsync();
+        await EscalacaoSvc.ConfirmLineupAsync(Id, userIdToTeam);
         showConfirmModal = false;
         isSaving         = false;
         await LoadEvent();
@@ -277,24 +235,7 @@ public partial class Escalacao : IAsyncDisposable
         voteError = null;
         isSaving  = true;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var existing = await db.PostMatchVotes
-            .FirstOrDefaultAsync(v => v.EventId == Id && v.VoterUserId == currentUserId);
-        if (existing is not null)
-        {
-            existing.VotedForUserId = votedForUserId;
-            existing.VotedAt        = DateTime.UtcNow;
-        }
-        else
-        {
-            db.PostMatchVotes.Add(new PostMatchVote
-            {
-                EventId        = Id,
-                VoterUserId    = currentUserId,
-                VotedForUserId = votedForUserId,
-            });
-        }
-        await db.SaveChangesAsync();
+        await EscalacaoSvc.CastVoteAsync(Id, currentUserId, votedForUserId);
         isEditingVote = false;
         isSaving      = false;
         await LoadEvent();
@@ -306,16 +247,7 @@ public partial class Escalacao : IAsyncDisposable
         scoreError = null;
         isSaving   = true;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var dbEv = await db.Events.FindAsync(Id);
-        if (dbEv is not null)
-        {
-            dbEv.ScoreTeamA              = scoreInputA;
-            dbEv.ScoreTeamB              = scoreInputB;
-            dbEv.ScoreRegisteredByUserId = currentUserId;
-            dbEv.ScoreRegisteredAt       = DateTime.UtcNow;
-            await db.SaveChangesAsync();
-        }
+        await EscalacaoSvc.SaveScoreAsync(Id, scoreInputA.Value, scoreInputB.Value, currentUserId);
         editingScore = false;
         isSaving     = false;
         await LoadEvent();
@@ -328,19 +260,7 @@ public partial class Escalacao : IAsyncDisposable
         if (ev is null) return;
         isSaving = true;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        var confs = await db.EventConfirmations
-            .Where(c => c.EventId == Id)
-            .ToListAsync();
-        foreach (var c in confs)
-            c.TeamId = null;
-
-        var dbEv = await db.Events.FindAsync(Id);
-        if (dbEv is not null)
-            dbEv.LineupConfirmedAt = null;
-
-        await db.SaveChangesAsync();
+        await EscalacaoSvc.ResetLineupAsync(Id);
         showResetModal = false;
         isSaving       = false;
         await LoadEvent();

@@ -2,17 +2,15 @@
 
 @using System.Security.Claims
 @using System.Text
-@using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Pages.Components
 @using Confirmai.Pages.Futsal.Components
+@using Confirmai.Services.Futsal
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
 @implements IAsyncDisposable
 
-@inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS

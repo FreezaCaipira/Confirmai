@@ -127,6 +127,7 @@ builder.Services.AddScoped<Confirmai.Services.Utility.MailboxQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentInitializationService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentCommandService>();
 builder.Services.AddScoped<Confirmai.Services.Groups.GroupFeaturesService>();
+builder.Services.AddScoped<Confirmai.Services.Futsal.EscalacaoService>();
 builder.Services.AddScoped<ReconciliationSeverityEvaluator>();
 builder.Services.AddScoped<DelinquencyService>();
 builder.Services.AddScoped<PixProofUploadService>();
