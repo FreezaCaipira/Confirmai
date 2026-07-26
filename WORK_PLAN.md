@@ -53,6 +53,61 @@ PENDENTE do Robson (ciclo posterior): **P0.1 rotacao do ClientSecret Efi** + rec
 
 ---
 
+## Ciclo 21 (Pleno) -- Fechar toda a refatoracao restante (code-behinds + CSS + higiene)
+
+**Objetivo**: concluir a divida tecnica de refatoracao aberta na varredura Senior. Ciclo MAIOR, mas executado em **incrementos pequenos (1 assunto por commit/PR)**. Regra de ouro do Ciclo 18 continua valendo: **teste de caracterizacao ANTES de refatorar**, comportamento identico, `IDbContextFactory` (nunca `AppDbContext` direto), 0 warning no app, suite verde. **Nenhuma mudanca de regra de negocio.**
+
+Meta de saida do ciclo:
+- **nenhum** code-behind `.razor.cs` acima de ~250 LOC (hoje ha 16 acima de 250; ver lista);
+- `site.css` e `events.css` reduzidos a um "core" pequeno (layout/base/vars), com os dominios em arquivos dedicados;
+- breakpoint padronizado em **768px**;
+- projeto de testes com **0 warning de analisador**.
+
+### Fase 1 -- Finalizar extracao de code-behinds (P2.6)
+
+Estado atual (`.razor.cs` > 300 LOC): `AdminPayments` 666, `AdminLogs` 529, `Payment` 426, `Escalacao` 391, `Mailbox` 387, `Groups/Detail` 380, `EventPayment` 372, `Futsal/Create` 329, `Groups/Payments` 311. (Total > 250 LOC: 16 arquivos.)
+
+Procedimento por arquivo (o mesmo do Ciclo 20, que funcionou):
+1. Teste de caracterizacao dos fluxos publicos ANTES.
+2. Mover a logica de dominio/consulta/acao para um service testavel via DI + `IDbContextFactory`; o code-behind fica so com estado de UI + orquestracao.
+3. Reusar services ja existentes quando houver (ex.: `AdminPaymentsQueryService`/`AdminPaymentsSummaryService`, `EventPaymentService`) em vez de criar novos.
+4. Build 0 warnings + suite verde; 1 PR por arquivo (ou extracao coesa).
+
+Ordem sugerida: `AdminPayments` (terminar -- extrair as acoes restantes que ainda vivem no code-behind), depois `AdminLogs`, `Payment`, `Groups/Detail`, `Groups/Payments`, `Futsal/Create`, e o restante da lista dos 16 ate todos ficarem < ~250 LOC.
+
+Criterio de aceitacao Fase 1: 0 code-behind > ~250 LOC; cada service extraido com teste unitario; 0 `AppDbContext` direto novo; 0 sync-over-async.
+
+### Fase 2 -- Modularizar o resto do CSS por dominio (P1.4 + P3.11)
+
+Estado atual: `site.css` 5.589 linhas, `events.css` 3.679 (`admin`/`escalacao`/`payments`/`marketplace` ja extraidos). Continuar a mesma tecnica **incremental** (1 dominio por commit, so mover regras -- nao reescrever -- e verificacao visual em 375/768/desktop antes do proximo).
+
+Mapa de extracao sugerido (a partir dos comentarios de secao ja existentes):
+- de `site.css`: `buttons.css` (BUTTON SYSTEM / variants / size-shape), `forms.css` (form surfaces/cards/filter-bar), `oldsite.css` (oldsite-page layout, header emblems, language flags, world selection), `marketplace.css` (final market polish -- consolidar com o `marketplace.css` existente, sem duplicar), `entity-shell.css` (entity-shell base) e manter em `site.css` so `:root`/vars + base global + acessibilidade.
+- de `events.css`: `event-detail.css` (detail shell/header/info chips/quorum/sections/players list/zebra/slots), `event-admin.css` (admin bar, toggles pago/pendente, add/remove vaga, confirmacoes inline), `events-table.css` (events table group join/detail + visibility classes), mantendo em `events.css` so loading/skeleton + base.
+
+Regras:
+1. So mover; nao alterar valores. Confirmar `<link>` no `Pages/_Host.cshtml` a cada arquivo novo.
+2. Padronizar breakpoint **768px** nos blocos tocados (ha 1 ocorrencia de `700px` restante + historicos).
+3. Refino dos poucos `!important` (site.css=4, events.css=2) so DEPOIS, caso a caso, no arquivo ja modularizado.
+4. Corrigir de passagem o mojibake nos comentarios de secao do CSS (ex.: `â€”`) dos blocos que forem movidos -- so nos comentarios, nao mexe em regra.
+
+Criterio de aceitacao Fase 2: `site.css`/`events.css` reduzidos ao core; 0 duplicacao de regra entre core e novos arquivos (somas de linhas batem); nenhuma regressao visual nos 3 breakpoints; breakpoint unico 768px nos blocos tocados.
+
+### Fase 3 -- Higiene final (P3.9 residual + P3.11)
+
+- Zerar os ~7 warnings de analisador do projeto de testes (xUnit1012/1026/2000, BL0005, CA2022) -- ajustes pontuais, sem mascarar falha real.
+- Revisar os `catch {}` e `!important` remanescentes caso a caso quando tocar nos arquivos.
+
+Criterio de aceitacao Fase 3: `dotnet build` do projeto de testes com 0 warning.
+
+### O que NAO fazer
+- Nao mexer em regra de negocio de pagamento/payout/escalacao -- so mover/extrair.
+- Nao introduzir Redis (P3.12) nem novas features.
+- Nao tocar na rotacao do secret Efi (pendencia do Robson).
+- Nao fazer big-bang: tudo incremental, 1 assunto por commit; parar e pedir review se algum passo exigir mudar comportamento.
+
+---
+
 ## Review Senior do Ciclo 20 (PR #71) -- APROVADO
 
 Auditoria da PR #71 (`refactor/ciclo20-tdd-solid-css`, ja na `main`). Build do app **0 warnings**; **1952** testes verdes (+57 novos) / 1976 -- as 24 falhas continuam sendo `ProgramConfigurationTests` sem Postgres (ambiente, nao regressao). Os 3 blocos do plano foram entregues sem mudanca de regra de negocio.
