@@ -25,6 +25,7 @@ public sealed class AdminRevenueReportService
         await using var db = await _dbFactory.CreateDbContextAsync();
 
         var query = db.Payments
+            .AsNoTracking()
             .Where(p => p.FeeAmount.HasValue && p.FeeAmount > 0);
 
         if (startDate.HasValue)
@@ -57,6 +58,7 @@ public sealed class AdminRevenueReportService
         await using var db = await _dbFactory.CreateDbContextAsync();
 
         var query = db.Payments
+            .AsNoTracking()
             .Include(p => p.Product)
             .Where(p => p.FeeAmount.HasValue && p.FeeAmount > 0);
 
