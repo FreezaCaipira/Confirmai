@@ -53,7 +53,32 @@ PENDENTE do Robson (ciclo posterior): **P0.1 rotacao do ClientSecret Efi** + rec
 
 ---
 
-## Ciclo 20 (Pleno) -- Refatoracao SOLID + CSS modular + limpeza de legado
+## Review Senior do Ciclo 20 (PR #71) -- APROVADO
+
+Auditoria da PR #71 (`refactor/ciclo20-tdd-solid-css`, ja na `main`). Build do app **0 warnings**; **1952** testes verdes (+57 novos) / 1976 -- as 24 falhas continuam sendo `ProgramConfigurationTests` sem Postgres (ambiente, nao regressao). Os 3 blocos do plano foram entregues sem mudanca de regra de negocio.
+
+**Bloco A (code-behinds / SRP)** -- 7 code-behinds reduzidos extraindo logica para services testaveis via `IDbContextFactory` + DI (todos registrados em `Program.cs:126-132`):
+- `AdminPayments.razor.cs` 1046 -> 666 (extraiu `SummaryAgeTracker` e usa `AdminPaymentsQueryService`/`AdminPaymentsSummaryService`);
+- `Features.razor.cs` 528 -> 247 (`GroupFeaturesService`, reusa `GroupFeatureRules` do #69 -- cascata preservada);
+- `Mailbox.razor.cs` 614 -> 387 (`MailboxQueryService`); `Payment.razor.cs` 562 -> 426 (`PaymentInitializationService`+`PaymentCommandService`); `EventPayment.razor.cs` 476 -> 372 (`EventPaymentService`); `Escalacao.razor.cs` 471 -> 391 (`EscalacaoService`); `Detail.razor.cs` -> 279 (`EventDetailService`); `AdminLogs` (`BuildExportRowsAsync` -> `AdminLogsQueryService`).
+- Novos services com teste unitario: `EscalacaoServiceTests`, `EventDetailServiceTests`, `GroupFeaturesServiceTests`, `MailboxQueryServiceTests`, `PaymentCommandServiceTests`.
+
+**Bloco B (CSS modular)** -- extracao sem duplicacao e com `<link>` registrado em `Pages/_Host.cshtml:33-35`:
+- `admin.css` (1514) extraido de `site.css` (7096 -> 5589);
+- `escalacao.css` (797) + `payments.css` (537) extraidos de `events.css` (5013 -> 3679).
+- Somas batem (mover, nao reescrever): 1514 = delta site; 797+537 = 1334 = delta events.
+
+**Bloco C (`serviceFeePercentage` legacy)** -- removido de ponta a ponta: parametro fora de `IEventPaymentGateway.CreateChargeAsync` + 3 gateways + `EfiBankPixService` (incl. stubs `CreateSplitAsync`/`LinkChargeToSplitAsync` que so lancavam `NotImplementedException`), `record EventPaymentFeeCalculation(ChargeAmount)`, `EventPaymentService`. O valor cobrado nao muda (o percentual era derivado e nunca usado no corpo das chamadas) -- coberto por `EventPaymentChargeCalculatorTests`.
+
+**Observacoes nao-bloqueantes (proximo ciclo)**:
+- `AdminPayments.razor.cs` ainda em 666 LOC -- reducao boa, mas acima do alvo ~250; continuar a extracao das acoes restantes num proximo passo.
+- Projeto de testes ainda tem ~7 warnings de analisador (xUnit1012/1026/2000, BL0005, CA2022) -- pre-existentes, nao introduzidos aqui; limpar em ciclo de higiene.
+
+**Pendente do Robson (inalterado)**: rotacao do ClientSecret Efi no painel + reconfigurar credenciais via user-secrets/env (adiado -- sem acesso ao painel em viagem).
+
+---
+
+## Ciclo 20 (Pleno) -- Refatoracao SOLID + CSS modular + limpeza de legado [EXECUTADO -- ver review acima]
 
 **Objetivo**: continuar os itens P1-P3 da varredura que ficaram para ciclo dedicado. Regra de ouro do Ciclo 18 continua valendo: **teste de caracterizacao ANTES de refatorar**, comportamento identico, mudancas incrementais (1 assunto por commit). Nenhuma mudanca de regra de negocio.
 
