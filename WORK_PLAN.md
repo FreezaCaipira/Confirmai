@@ -38,6 +38,75 @@ Auditoria dos 12 eixos pedidos pelo Robson sobre a `main` (HEAD `9edd89b`). Pano
 
 **Sequencia recomendada de ciclos**: (1) P0 secret Efi -> (2) Ciclo Testes+TDD gap (P1.3) -> (3) Ciclo CSS modular (P1.4 + P3.11) -> (4) Ciclo SOLID code-behinds (P2.6) + `SaveChanges` (P2.5) -> (5) higiene (P2.7, P3). Login Google em prod e mobile UX continuam no roadmap conforme prioridade do Robson.
 
+### Status da varredura (atualizado)
+
+Itens ja RESOLVIDOS pelo Senior nas PRs #68 (doc) e #69 (codigo):
+
+- **P0.1 (parcial)** -- credenciais Efi removidas do `appsettings.json` (viraram `__SET_VIA_USER_SECRETS__`); `EfiBankOptions.IsEnabled` passa a ignorar placeholders. **Pendente do Robson**: rotacionar o ClientSecret no painel Efi (adiado -- sem acesso ao painel em viagem; fica pro ciclo posterior).
+- **P1.2** -- cert path hardcoded trocado por placeholder no `appsettings.json`.
+- **P1.3 (parcial)** -- cascata do toggle de gateways extraida para `GroupFeatureRules` + 4 testes; guarda-corpo do checkout ja tinha teste. **Restante**: teste do toggle `EnableBestPlayerVoting` isolado (ver ciclo abaixo).
+- **P2.5** -- sync-over-async eliminado no `AppDbContext.SaveChanges` (helpers sincronos dedicados).
+- **P2.7 (parcial)** -- `AsNoTracking` aplicado em `GroupMetricsService` e `AdminRevenueReportService`. **Restante**: demais paginas/servicos read-only.
+- **P3.9** -- 68 warnings de nullable nos testes zerados.
+
+PENDENTE do Robson (ciclo posterior): **P0.1 rotacao do ClientSecret Efi** + reconfigurar credenciais reais via user-secrets (dev) / env no EasyPanel (prod).
+
+---
+
+## Ciclo 20 (Pleno) -- Refatoracao SOLID + CSS modular + limpeza de legado
+
+**Objetivo**: continuar os itens P1-P3 da varredura que ficaram para ciclo dedicado. Regra de ouro do Ciclo 18 continua valendo: **teste de caracterizacao ANTES de refatorar**, comportamento identico, mudancas incrementais (1 assunto por commit). Nenhuma mudanca de regra de negocio.
+
+### Bloco A -- Refatoracao dos code-behinds grandes (P2.6, SRP)
+
+Alvos por tamanho (LOC): `AdminPayments.razor.cs` (1.046), `Mailbox.razor.cs` (614), `Payment.razor.cs` (562), `Features.razor.cs` (528, ja parcialmente reduzido pela extracao de `GroupFeatureRules`), `EventPayment.razor.cs` (476), `Escalacao.razor.cs` (471).
+
+Procedimento por arquivo:
+1. Escrever/rodar testes de caracterizacao cobrindo os fluxos publicos do code-behind (o que ele carrega, salva, valida) ANTES de mexer.
+2. Extrair a logica que NAO e de UI para um service testavel (padrao ja usado: `GroupFeatureRules`, `GroupMetricsService`, `EventPaymentService`). O code-behind deve ficar so com estado de UI + orquestracao de chamadas ao service.
+3. Injetar o service via DI (`builder.Services.AddScoped<...>`), nunca instanciar `AppDbContext` direto -- usar `IDbContextFactory`.
+4. Rodar build (0 warnings) + toda a suite; comportamento deve permanecer identico.
+5. **Prioridade**: comecar pelo `AdminPayments.razor.cs` (maior e com mais logica de query/acao) -- extrair query/filtros/acoes para services (`AdminPaymentsQueryService`/`AdminPaymentsSummaryService` ja existem; mover o resto pra la). 1 PR por arquivo (ou por extracao coesa) para facilitar review.
+
+Criterios de aceitacao do Bloco A:
+- cada code-behind refatorado perde a logica de dominio (fica < ~250 LOC quando viavel);
+- services extraidos tem teste unitario;
+- 0 uso novo de `AppDbContext` direto; 0 sync-over-async;
+- suite verde, 0 warning no app.
+
+### Bloco B -- Modularizacao CSS incremental (P1.4 + P3.11)
+
+Alvos: `wwwroot/css/site.css` (7.096 linhas) e `wwwroot/css/events.css` (5.013).
+
+Procedimento (MUITO incremental, para nao quebrar layout):
+1. Mapear blocos por dominio dentro do arquivo monolitico (ex.: futsal, poker, grupos, admin, pagamento, componentes comuns).
+2. Extrair **um dominio por commit** para um arquivo dedicado (ex.: `css/futsal.css`), registrar no carregamento e **verificar visualmente** (o proprio Pleno abrindo as telas afetadas em 375px/768px/desktop) antes do proximo.
+3. Nao mudar valores/regras na extracao -- so mover. Refino de `!important` (29 ocorrencias) e feito DEPOIS, caso a caso, so nos arquivos ja modularizados.
+4. Padronizar breakpoint unico em **768px** (ha inconsistencia historica 700 vs 768) conforme R3 -- mas so nos blocos que estiver tocando.
+
+Criterios de aceitacao do Bloco B:
+- nenhum arquivo novo introduz regressao visual (checagem nos 3 breakpoints);
+- `site.css`/`events.css` reduzidos a medida que dominios saem;
+- sem duplicacao de regra entre monolito e novo arquivo.
+
+### Bloco C -- Remocao do `serviceFeePercentage` legacy (P3.10)
+
+Contexto: a taxa e FIXA (R$0,50 + R$0,25). `serviceFeePercentage` sobrou como parametro derivado do total em `IEventPaymentGateway.CreateChargeAsync` e implementacoes (`EfiBank`/`Abacate`/`Appmax`), alem de `EventPaymentService`/`EventPaymentChargeCalculator`.
+
+Procedimento (cuidado -- interface publica de gateway):
+1. Confirmar por testes que o valor cobrado depende SO da taxa fixa (ja coberto por `EventPaymentChargeCalculatorTests`).
+2. Remover o parametro/propriedade `serviceFeePercentage` da interface `IEventPaymentGateway` e propagar a remocao nas 3 implementacoes + chamadas.
+3. Ajustar/limpar os testes que passam o parametro.
+4. build 0 warnings + suite verde.
+
+Criterio de aceitacao do Bloco C: `serviceFeePercentage` nao existe mais no codigo (0 ocorrencias) e o valor cobrado permanece identico nos testes.
+
+### O que NAO fazer neste ciclo
+- Nao mexer em regra de negocio de pagamento/payout (so mover/extrair codigo).
+- Nao introduzir Redis (P3.12 -- so quando houver multi-instancia/gargalo medido).
+- Nao tocar na rotacao do secret Efi (pendencia do Robson).
+- Nao fazer big-bang: refatoracao e CSS sao incrementais, 1 assunto por commit/PR.
+
 ## Padrão de Referência de PRs (NOVO)
 
 Para manter rastreamento claro do desenvolvimento e permitir revisões posteriores, todos os PRs devem ser documentados no WORK_PLAN.md com:
