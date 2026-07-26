@@ -7,6 +7,7 @@ using Confirmai.Shared.Helpers;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -49,21 +50,12 @@ public partial class AdminPayments : IAsyncDisposable
     private readonly List<SweepHistoryItem> automaticSweepHistory = new();
     private bool isAutoRefreshEnabled = true;
     private bool isSummaryRefreshing;
-    private DateTime? lastSummaryRefreshAt;
-    private string lastSummaryRefreshLabel = "Ainda não atualizado.";
-    private string lastSummaryAgeLabel = "n/d";
-    private string lastSummaryAgeClass = string.Empty;
     private bool isAutoRefreshPausedByVisibility;
     private string lastAutoRefreshPauseLabel = "Nenhuma pausa registrada.";
-    private DateTime? summaryStalenessStartedAt;
-    private bool summaryStalenessIncidentLogged;
     private CancellationTokenSource? summaryRefreshCts;
     private Task? summaryRefreshTask;
     private CancellationTokenSource? summaryAgeCts;
     private Task? summaryAgeTask;
-    private const int SummaryRefreshSeconds = 30;
-    private const int SummaryStalenessWarningSeconds = SummaryRefreshSeconds * 2;
-    private const int SummaryStalenessAuditSeconds = 5 * 60;
     private int pendingTrendWarningThreshold = AdminSettingsService.DefaultReconciliationWarningThreshold;
     private int pendingTrendCriticalThreshold = AdminSettingsService.DefaultReconciliationCriticalThreshold;
 
@@ -88,6 +80,7 @@ public partial class AdminPayments : IAsyncDisposable
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IJSRuntime JS { get; set; } = default!;
+    [Inject] public SummaryAgeTracker SummaryAgeTracker { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -118,7 +111,7 @@ public partial class AdminPayments : IAsyncDisposable
         {
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(SummaryRefreshSeconds), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(SummaryAgeTracker.RefreshIntervalSeconds), cancellationToken);
 
                 if (!isAutoRefreshEnabled)
                 {
@@ -174,8 +167,10 @@ public partial class AdminPayments : IAsyncDisposable
 
                 await InvokeAsync(async () =>
                 {
-                    UpdateLastSummaryAgeLabel();
-                    await TryWriteStalenessIncidentAuditAsync();
+                    SummaryAgeTracker.UpdateAgeLabel();
+                    var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+                    var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+                    await SummaryAgeTracker.TryWriteStalenessAuditAsync(actorUserId, isAutoRefreshEnabled, isAutoRefreshPausedByVisibility);
                 });
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -442,9 +437,7 @@ public partial class AdminPayments : IAsyncDisposable
             if (includePaymentsTable)
                 await LoadPaymentsCountAsync();
 
-            lastSummaryRefreshAt = DateTime.UtcNow;
-            lastSummaryRefreshLabel = lastSummaryRefreshAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
-            UpdateLastSummaryAgeLabel();
+            SummaryAgeTracker.MarkRefreshed();
         }
         finally
         {
@@ -467,83 +460,6 @@ public partial class AdminPayments : IAsyncDisposable
         {
             return true;
         }
-    }
-
-    private void UpdateLastSummaryAgeLabel()
-    {
-        if (!lastSummaryRefreshAt.HasValue)
-        {
-            lastSummaryAgeLabel = "n/d";
-            lastSummaryAgeClass = string.Empty;
-            summaryStalenessStartedAt = null;
-            summaryStalenessIncidentLogged = false;
-            return;
-        }
-
-        var elapsed = DateTime.UtcNow - lastSummaryRefreshAt.Value;
-        if (elapsed < TimeSpan.Zero)
-            elapsed = TimeSpan.Zero;
-
-        if (elapsed.TotalHours >= 1)
-        {
-            lastSummaryAgeLabel = $"{(int)elapsed.TotalHours}h {elapsed.Minutes:D2}m {elapsed.Seconds:D2}s";
-        }
-        else if (elapsed.TotalMinutes >= 1)
-        {
-            lastSummaryAgeLabel = $"{(int)elapsed.TotalMinutes}m {elapsed.Seconds:D2}s";
-        }
-        else
-        {
-            lastSummaryAgeLabel = $"{elapsed.Seconds}s";
-        }
-
-        var isWarning = elapsed.TotalSeconds >= SummaryStalenessWarningSeconds;
-        lastSummaryAgeClass = isWarning
-            ? "admin-payments-summary-age admin-payments-summary-age--warning"
-            : "admin-payments-summary-age";
-
-        if (isWarning)
-        {
-            summaryStalenessStartedAt ??= DateTime.UtcNow;
-            return;
-        }
-
-        summaryStalenessStartedAt = null;
-        summaryStalenessIncidentLogged = false;
-    }
-
-    private async Task TryWriteStalenessIncidentAuditAsync()
-    {
-        if (summaryStalenessIncidentLogged || !summaryStalenessStartedAt.HasValue)
-            return;
-
-        var elapsedSinceStaleness = DateTime.UtcNow - summaryStalenessStartedAt.Value;
-        if (elapsedSinceStaleness.TotalSeconds < SummaryStalenessAuditSeconds)
-            return;
-
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var actorUserId = authState.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-
-        await LogService.AuditAsync(
-            eventType: AuditEvents.PaymentReconciliationPanelStale,
-            entityType: AuditEntities.Payment,
-            entityId: null,
-            message: "Painel de reconciliação permaneceu sem atualização efetiva por mais de 5 minutos.",
-            actorUserId: actorUserId,
-            source: AdminAuditSources.Payments,
-            level: "Warning",
-            metadata: new
-            {
-                origin = "admin.payments.panel",
-                staleForSeconds = (int)Math.Round(elapsedSinceStaleness.TotalSeconds, MidpointRounding.AwayFromZero),
-                staleAuditThresholdSeconds = SummaryStalenessAuditSeconds,
-                warningThresholdSeconds = SummaryStalenessWarningSeconds,
-                autoRefreshEnabled = isAutoRefreshEnabled,
-                pausedByVisibility = isAutoRefreshPausedByVisibility,
-                lastSummaryRefreshAtUtc = lastSummaryRefreshAt
-            });
-
-        summaryStalenessIncidentLogged = true;
     }
 
     private void UpdateSeverity()
