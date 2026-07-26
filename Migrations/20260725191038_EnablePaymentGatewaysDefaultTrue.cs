@@ -10,7 +10,10 @@ namespace Confirmai.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("UPDATE \"Groups\" SET \"EnablePaymentGateways\" = true WHERE \"EnablePaymentGateways\" = false;");
+            // Default true applies only to NEW groups. Existing groups keep their
+            // current value on purpose: flipping them on would break payment for any
+            // group without a configured Pix payout key (fee is enabled + checkout
+            // blocks charges without a GroupPayoutAccount). Decision: Robson, opcao 1.
             migrationBuilder.Sql("ALTER TABLE \"Groups\" ALTER COLUMN \"EnablePaymentGateways\" SET DEFAULT true;");
         }
 
