@@ -1,12 +1,9 @@
 using System.Security.Claims;
-using System.Text;
 using Confirmai.Enums;
 using Confirmai.Models;
-using Confirmai.Pages.Components;
 using Confirmai.Pages.Futsal.Components;
 using Confirmai.Services.Futsal;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Futsal;
@@ -17,38 +14,34 @@ public partial class Escalacao : IAsyncDisposable
 
     [Parameter] public int Id { get; set; }
 
-    private Event?   ev        = null;
-    private bool     isLoading = true;
-    private string?  currentUserId;
-    private bool     isAdmin;
-
-    private List<PlayerSlot> teamA    = new();
-    private List<PlayerSlot> teamB    = new();
+    private Event? ev;
+    private bool isLoading = true;
+    private string? currentUserId;
+    private bool isAdmin;
+    private List<PlayerSlot> teamA = new();
+    private List<PlayerSlot> teamB = new();
     private List<PlayerSlot> reservas = new();
-
-    private bool    showConfirmModal = false;
-    private bool    showResetModal   = false;
-    private bool    isSaving         = false;
-    private bool    copied           = false;
+    private bool showConfirmModal;
+    private bool showResetModal;
+    private bool isSaving;
+    private bool copied;
     private string? actionError;
-
     private CancellationTokenSource? _copyCts;
-    private Task? _copyTask = null;
+    private Task? _copyTask;
 
-    // ── Post-match state ─────────────────────────────────────────────────────
     private bool isPastEvent;
     private bool isMember;
     private List<PostMatchVote> allVotes = new();
-    private PostMatchVote?       myVote;
-    private int?   scoreInputA;
-    private int?   scoreInputB;
-    private bool   editingScore = false;
+    private PostMatchVote? myVote;
+    private int? scoreInputA;
+    private int? scoreInputB;
+    private bool editingScore;
     private string? scoreError;
     private string? voteError;
     private string? scoreRegisteredByName;
-    private bool   isEditingVote = false;
-    private string  teamAName     = "Time A";
-    private string  teamBName     = "Time B";
+    private bool isEditingVote;
+    private string teamAName = "Time A";
+    private string teamBName = "Time B";
 
     private bool TeamsAreBalanced =>
         Math.Abs(teamA.Count(s => !s.IsGoalkeeper) - teamB.Count(s => !s.IsGoalkeeper)) <= 1;
@@ -62,43 +55,16 @@ public partial class Escalacao : IAsyncDisposable
             Randomize();
     }
 
-    // ── Component Callback Wrappers ──────────────────────────────────────
-
-    private async Task SaveTeamNamesCallback()
-        => await SaveTeamNames();
-
+    private async Task SaveTeamNamesCallback() => await SaveTeamNames();
     private Task MovePlayerCallback((PlayerSlot Slot, bool ToTeamB) args)
     { MovePlayer(args.Slot, args.ToTeamB); return Task.CompletedTask; }
-
-    private async Task RandomizeCallback()
-    {
-        Randomize();
-        await Task.CompletedTask;
-    }
-
-    private async Task ShowConfirmModalChangedCallback(bool value)
-    {
-        showConfirmModal = value;
-        await Task.CompletedTask;
-    }
-
-    private async Task ConfirmarEscalacaoCallback()
-        => await ConfirmarEscalacao();
-
-    private async Task EditingScoreChangedCallback(bool value)
-    {
-        editingScore = value;
-        await Task.CompletedTask;
-    }
-
-    private async Task SaveScoreCallback()
-        => await SaveScore();
-
-    private async Task CopyToClipboardCallback()
-        => await CopyToClipboard();
-
-    private async Task ShareOnWhatsAppCallback()
-        => await ShareOnWhatsApp();
+    private Task RandomizeCallback() { Randomize(); return Task.CompletedTask; }
+    private Task ShowConfirmModalChangedCallback(bool value) { showConfirmModal = value; return Task.CompletedTask; }
+    private async Task ConfirmarEscalacaoCallback() => await ConfirmarEscalacao();
+    private Task EditingScoreChangedCallback(bool value) { editingScore = value; return Task.CompletedTask; }
+    private async Task SaveScoreCallback() => await SaveScore();
+    private async Task CopyToClipboardCallback() => await CopyToClipboard();
+    private async Task ShareOnWhatsAppCallback() => await ShareOnWhatsApp();
 
     private async Task LoadEvent()
     {
@@ -128,10 +94,8 @@ public partial class Escalacao : IAsyncDisposable
     {
         if (ev is null) return;
         await EscalacaoSvc.SaveTeamNamesAsync(Id, teamAName, teamBName);
-        var nameA = string.IsNullOrWhiteSpace(teamAName) ? "Time A" : teamAName.Trim();
-        var nameB = string.IsNullOrWhiteSpace(teamBName) ? "Time B" : teamBName.Trim();
-        teamAName = nameA;
-        teamBName = nameB;
+        teamAName = string.IsNullOrWhiteSpace(teamAName) ? "Time A" : teamAName.Trim();
+        teamBName = string.IsNullOrWhiteSpace(teamBName) ? "Time B" : teamBName.Trim();
     }
 
     private async Task HandleTeamNamesChanged((string TeamA, string TeamB) names)
@@ -141,11 +105,11 @@ public partial class Escalacao : IAsyncDisposable
         await SaveTeamNames();
     }
 
-    private async Task HandleEditingVoteChanged(bool isEditing)
+    private Task HandleEditingVoteChanged(bool isEditing)
     {
         isEditingVote = isEditing;
         StateHasChanged();
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
     private void Randomize()
@@ -171,13 +135,11 @@ public partial class Escalacao : IAsyncDisposable
 
         for (int i = 0; i < outfield.Count; i++)
         {
-            var p    = outfield[i];
-            var slot = new PlayerSlot(p.UserId, p.User.FullName ?? p.User.Email!, false);
+            var slot = new PlayerSlot(outfield[i].UserId, outfield[i].User.FullName ?? outfield[i].User.Email!, false);
             if (i % 2 == 0) teamA.Add(slot);
             else             teamB.Add(slot);
         }
 
-        // Se número ímpar de linha: o último (que foi para teamA) vira reserva
         if (outfield.Count % 2 != 0 && teamA.Count > 0)
         {
             var last = teamA.Last(s => !s.IsGoalkeeper);
@@ -213,7 +175,7 @@ public partial class Escalacao : IAsyncDisposable
     private async Task ConfirmarEscalacao()
     {
         if (ev is null) return;
-        isSaving    = true;
+        isSaving = true;
         actionError = null;
 
         var userIdToTeam = new Dictionary<string, int?>();
@@ -223,21 +185,18 @@ public partial class Escalacao : IAsyncDisposable
 
         await EscalacaoSvc.ConfirmLineupAsync(Id, userIdToTeam);
         showConfirmModal = false;
-        isSaving         = false;
+        isSaving = false;
         await LoadEvent();
     }
-
-    // ── Post-match methods ───────────────────────────────────────────────────
 
     private async Task CastVote(string votedForUserId)
     {
         if (currentUserId is null || votedForUserId == currentUserId) return;
         voteError = null;
-        isSaving  = true;
-
+        isSaving = true;
         await EscalacaoSvc.CastVoteAsync(Id, currentUserId, votedForUserId);
         isEditingVote = false;
-        isSaving      = false;
+        isSaving = false;
         await LoadEvent();
     }
 
@@ -245,24 +204,20 @@ public partial class Escalacao : IAsyncDisposable
     {
         if (scoreInputA is null || scoreInputB is null) return;
         scoreError = null;
-        isSaving   = true;
-
+        isSaving = true;
         await EscalacaoSvc.SaveScoreAsync(Id, scoreInputA.Value, scoreInputB.Value, currentUserId);
         editingScore = false;
-        isSaving     = false;
+        isSaving = false;
         await LoadEvent();
     }
-
-    // ── Escalação methods ────────────────────────────────────────────────────
 
     private async Task ResetarEscalacao()
     {
         if (ev is null) return;
         isSaving = true;
-
         await EscalacaoSvc.ResetLineupAsync(Id);
         showResetModal = false;
-        isSaving       = false;
+        isSaving = false;
         await LoadEvent();
         Randomize();
     }
@@ -271,20 +226,15 @@ public partial class Escalacao : IAsyncDisposable
     {
         var text = BuildShareText();
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
-
         _copyCts?.Cancel();
         _copyCts = new CancellationTokenSource();
         var ct = _copyCts.Token;
-
         try
         {
             copied = true;
             StateHasChanged();
             await Task.Delay(2000, ct);
-            if (!ct.IsCancellationRequested)
-            {
-                copied = false;
-            }
+            if (!ct.IsCancellationRequested) copied = false;
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -298,94 +248,17 @@ public partial class Escalacao : IAsyncDisposable
         await JS.InvokeVoidAsync("open", url, "_blank", "noopener,noreferrer");
     }
 
-    private string BuildWhatsAppText()
-    {
-        if (ev is null) return string.Empty;
-
-        var sb = new StringBuilder();
-        var teamAConfs   = ev.Confirmations.Where(c => c.TeamId == 0).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
-        var teamBConfs   = ev.Confirmations.Where(c => c.TeamId == 1).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
-        var reservaConfs = ev.Confirmations.Where(c => c.TeamId == null).OrderBy(c => c.ConfirmedAt).ToList();
-
-        sb.AppendLine($"*Escalação — {ev.Group.Name}*");
-        sb.AppendLine(ev.StartsAt.ToString("dd/MM/yyyy HH:mm"));
-        sb.AppendLine();
-
-        sb.AppendLine("*TIME A*");
-        foreach (var c in teamAConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
-            sb.AppendLine($"(Goleiro) {c.User.FullName ?? c.User.Email}");
-        int i = 1;
-        foreach (var c in teamAConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
-            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
-        sb.AppendLine();
-
-        sb.AppendLine("*TIME B*");
-        foreach (var c in teamBConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
-            sb.AppendLine($"(Goleiro) {c.User.FullName ?? c.User.Email}");
-        i = 1;
-        foreach (var c in teamBConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
-            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
-
-        if (reservaConfs.Any())
-        {
-            sb.AppendLine();
-            sb.AppendLine("*Reservas*");
-            foreach (var c in reservaConfs)
-                sb.AppendLine($"- {c.User.FullName ?? c.User.Email}");
-        }
-
-        return sb.ToString().TrimEnd();
-    }
-
-    private string BuildShareText()
-    {
-        if (ev is null) return string.Empty;
-
-        var sb   = new StringBuilder();
-        var teamAConfs   = ev.Confirmations.Where(c => c.TeamId == 0).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
-        var teamBConfs   = ev.Confirmations.Where(c => c.TeamId == 1).OrderBy(c => c.Position).ThenBy(c => c.ConfirmedAt).ToList();
-        var reservaConfs = ev.Confirmations.Where(c => c.TeamId == null).OrderBy(c => c.ConfirmedAt).ToList();
-
-        sb.AppendLine($"⚽ *Escalação — {ev.Group.Name}*");
-        sb.AppendLine($"📅 {ev.StartsAt.ToString("dd/MM/yyyy HH:mm")}");
-        sb.AppendLine();
-
-        sb.AppendLine("*🟡 TIME A*");
-        foreach (var c in teamAConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
-            sb.AppendLine($"🧤 {c.User.FullName ?? c.User.Email}");
-        int i = 1;
-        foreach (var c in teamAConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
-            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
-        sb.AppendLine();
-
-        sb.AppendLine("*🔵 TIME B*");
-        foreach (var c in teamBConfs.Where(c => c.Position == FutsalPosition.Goalkeeper))
-            sb.AppendLine($"🧤 {c.User.FullName ?? c.User.Email}");
-        i = 1;
-        foreach (var c in teamBConfs.Where(c => c.Position != FutsalPosition.Goalkeeper))
-            sb.AppendLine($"{i++}. {c.User.FullName ?? c.User.Email}");
-
-        if (reservaConfs.Any())
-        {
-            sb.AppendLine();
-            sb.AppendLine("🔄 *Reserva*");
-            foreach (var c in reservaConfs)
-                sb.AppendLine($"• {c.User.FullName ?? c.User.Email}");
-        }
-
-        return sb.ToString().TrimEnd();
-    }
+    private string BuildWhatsAppText() => ev is null ? string.Empty : EscalacaoTextFormatter.BuildWhatsAppText(ev);
+    private string BuildShareText() => ev is null ? string.Empty : EscalacaoTextFormatter.BuildShareText(ev);
 
     public async ValueTask DisposeAsync()
     {
         _copyCts?.Cancel();
-
         if (_copyTask is not null)
         {
             try { await _copyTask; }
             catch (OperationCanceledException) { }
         }
-
         _copyCts?.Dispose();
     }
 }
