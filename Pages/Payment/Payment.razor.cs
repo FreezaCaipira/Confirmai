@@ -133,8 +133,10 @@ public partial class Payment : IAsyncDisposable
 
             if (result == null || result.Error != null)
             {
-                var msg = result?.Error ?? "Falha ao gerar endereco.";
-                NotifyUser(string.Format(T["PaymentBuy.GenerateError"], msg), "error");
+                if (result?.Error != null)
+                    NotifyUser(string.Format(T["PaymentBuy.GenerateError"], result.Error), "error");
+                else
+                    NotifyUser(string.Format(T["PaymentBuy.GenerateError"], "Falha ao gerar endereco."), "error");
                 return;
             }
 
@@ -160,7 +162,7 @@ public partial class Payment : IAsyncDisposable
                 ProductId, Amount, SelectedMethod, sellerUser?.Id, offerCurrency,
                 UseSiteIntermediary, product);
 
-            if (result == null)
+            if (result == null || (result.Error == null && result.SellerKeyNotice == null))
             {
                 NotifyUser("Nao foi possivel gerar o pagamento PIX.", "error");
                 return;
@@ -201,7 +203,7 @@ public partial class Payment : IAsyncDisposable
             T["PaymentBuy.Confirmed"],
             T["PaymentBuy.CheckError"],
             "A confirmacao automatica para PIX nao esta disponivel. Aguarde a validacao manual.",
-            FormatBtcWithUsdText);
+            amt => FormatBtcWithUsdText(amt));
 
         if (result.IsPaid)
             IsPaid = true;

@@ -1,10 +1,7 @@
-using System.Globalization;
 using System.Security.Claims;
 using Confirmai.Pages.Components;
 using Confirmai.Services.Utility;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages;
@@ -55,11 +52,7 @@ public partial class Mailbox
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!shouldAutoScrollThread)
-        {
-            return;
-        }
-
+        if (!shouldAutoScrollThread) return;
         shouldAutoScrollThread = false;
         await JS.InvokeVoidAsync("ConfirmaiMailbox.scrollThreadToBottom", threadStreamRef);
     }
@@ -80,11 +73,7 @@ public partial class Mailbox
         await LoadThreadForSelectedMessageAsync();
     }
 
-    private async Task ApplyFiltersAsync()
-    {
-        conversationPage = 1;
-        await LoadMessagesAsync();
-    }
+    private async Task ApplyFiltersAsync() { conversationPage = 1; await LoadMessagesAsync(); }
 
     private async Task ResetFiltersAsync()
     {
@@ -98,11 +87,7 @@ public partial class Mailbox
 
     private async Task SwitchConversationFolderAsync(bool archived)
     {
-        if (showArchivedConversations == archived)
-        {
-            return;
-        }
-
+        if (showArchivedConversations == archived) return;
         showArchivedConversations = archived;
         conversationPage = 1;
         selectedConversationKey = null;
@@ -111,22 +96,14 @@ public partial class Mailbox
 
     private async Task PreviousConversationPageAsync()
     {
-        if (conversationPage <= 1)
-        {
-            return;
-        }
-
+        if (conversationPage <= 1) return;
         conversationPage--;
         await LoadMessagesAsync();
     }
 
     private async Task NextConversationPageAsync()
     {
-        if (conversationPage >= TotalPages(conversationTotal))
-        {
-            return;
-        }
-
+        if (conversationPage >= MailboxFormatter.TotalPages(conversationTotal, pageSize)) return;
         conversationPage++;
         await LoadMessagesAsync();
     }
@@ -137,86 +114,19 @@ public partial class Mailbox
         await LoadThreadForSelectedMessageAsync();
     }
 
-    private string BuildSnippet(string body)
-    {
-        if (string.IsNullOrWhiteSpace(body))
-        {
-            return T["Mailbox.NoContent"];
-        }
+    private string BuildSnippet(string body) =>
+        MailboxFormatter.BuildSnippet(body, T["Mailbox.NoContent"]);
 
-        var trimmed = body.Trim();
-        return trimmed.Length <= 96
-            ? trimmed
-            : $"{trimmed[..96]}...";
-    }
+    private string BuildAvatarInitials(string name) =>
+        MailboxFormatter.BuildAvatarInitials(name);
 
-    private string BuildAvatarInitials(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return "?";
-        }
-
-        var parts = name
-            .Trim()
-            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        if (parts.Length == 1)
-        {
-            return parts[0].Length >= 2
-                ? parts[0][..2].ToUpperInvariant()
-                : parts[0][..1].ToUpperInvariant();
-        }
-
-        return string.Concat(parts[0][0], parts[^1][0]).ToUpperInvariant();
-    }
-
-    private string FormatRelativeTime(DateTime utcDate)
-    {
-        var now = DateTime.UtcNow;
-        var delta = now - utcDate;
-        if (delta.TotalMinutes < 1)
-        {
-            return T["Mailbox.Now"];
-        }
-
-        if (delta.TotalMinutes < 60)
-        {
-            return $"{Math.Max(1, (int)Math.Floor(delta.TotalMinutes))}m";
-        }
-
-        var localDate = utcDate.ToLocalTime();
-        var today = DateTime.Now.Date;
-        if (localDate.Date == today)
-        {
-            return $"{localDate:HH:mm}";
-        }
-
-        if (localDate.Date == today.AddDays(-1))
-        {
-            return T["Mailbox.Yesterday"];
-        }
-
-        return localDate.ToString("dd/MM", CultureInfo.InvariantCulture);
-    }
-
-    private int TotalPages(int total)
-    {
-        if (total <= 0)
-        {
-            return 1;
-        }
-
-        return (int)Math.Ceiling(total / (double)pageSize);
-    }
+    private string FormatRelativeTime(DateTime utcDate) =>
+        MailboxFormatter.FormatRelativeTime(utcDate, T["Mailbox.Now"], T["Mailbox.Yesterday"]);
 
     private void EnsureValidPageBounds()
     {
-        var maxPage = TotalPages(conversationTotal);
-        if (conversationPage > maxPage)
-        {
-            conversationPage = maxPage;
-        }
+        var maxPage = MailboxFormatter.TotalPages(conversationTotal, pageSize);
+        if (conversationPage > maxPage) conversationPage = maxPage;
     }
 
     private void EnsureConversationSelection()
@@ -227,7 +137,8 @@ public partial class Mailbox
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(selectedConversationKey) || !conversationContacts.Any(c => string.Equals(c.ConversationKey, selectedConversationKey, StringComparison.Ordinal)))
+        if (string.IsNullOrWhiteSpace(selectedConversationKey) ||
+            !conversationContacts.Any(c => string.Equals(c.ConversationKey, selectedConversationKey, StringComparison.Ordinal)))
         {
             selectedConversationKey = conversationContacts[0].ConversationKey;
         }
@@ -249,7 +160,6 @@ public partial class Mailbox
 
         composerRecipientUserId = selected.ContactUserId;
         composerInfoMessage = null;
-
         isThreadLoading = true;
 
         if (string.IsNullOrWhiteSpace(selected.ContactUserId))
@@ -260,16 +170,13 @@ public partial class Mailbox
         }
 
         if (selected.ContactUserId == "SYSTEM")
-        {
             composerRecipientUserId = string.Empty;
-        }
 
         conversationMessages = await MailboxQueryService.LoadThreadAsync(currentUserId, selected.ContactUserId);
 
-        if (requestVersion != threadLoadVersion || !string.Equals(requestedConversationKey, selectedConversationKey, StringComparison.Ordinal))
-        {
+        if (requestVersion != threadLoadVersion ||
+            !string.Equals(requestedConversationKey, selectedConversationKey, StringComparison.Ordinal))
             return;
-        }
 
         isThreadLoading = false;
         shouldAutoScrollThread = true;
@@ -277,16 +184,9 @@ public partial class Mailbox
 
     private async Task MarkConversationAsReadAsync(string conversationKey)
     {
-        if (string.IsNullOrWhiteSpace(conversationKey))
-        {
-            return;
-        }
-
+        if (string.IsNullOrWhiteSpace(conversationKey)) return;
         var selected = conversationContacts.FirstOrDefault(c => string.Equals(c.ConversationKey, conversationKey, StringComparison.Ordinal));
-        if (selected == null)
-        {
-            return;
-        }
+        if (selected == null) return;
 
         await MailboxQueryService.MarkConversationAsReadAsync(currentUserId, selected.ContactUserId);
         selectedConversationKey = conversationKey;
@@ -296,26 +196,12 @@ public partial class Mailbox
     private async Task SendQuickReplyAsync()
     {
         composerInfoMessage = null;
-
         var selected = SelectedContact;
-        if (selected == null)
-        {
-            composerInfoMessage = "Selecione uma conversa antes de enviar.";
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(composerBody))
-        {
-            composerInfoMessage = "Digite uma mensagem para enviar.";
-            return;
-        }
+        if (selected == null) { composerInfoMessage = "Selecione uma conversa antes de enviar."; return; }
+        if (string.IsNullOrWhiteSpace(composerBody)) { composerInfoMessage = "Digite uma mensagem para enviar."; return; }
 
         var normalizedBody = composerBody.Trim();
-        if (string.IsNullOrWhiteSpace(normalizedBody))
-        {
-            composerInfoMessage = "Digite uma mensagem para enviar.";
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(normalizedBody)) { composerInfoMessage = "Digite uma mensagem para enviar."; return; }
 
         isSendingReply = true;
 
@@ -343,45 +229,20 @@ public partial class Mailbox
 
     private async Task SetConversationArchivedAsync(string conversationKey, bool archive)
     {
-        if (string.IsNullOrWhiteSpace(conversationKey))
-        {
-            return;
-        }
-
+        if (string.IsNullOrWhiteSpace(conversationKey)) return;
         var selected = conversationContacts.FirstOrDefault(c => string.Equals(c.ConversationKey, conversationKey, StringComparison.Ordinal));
-        if (selected == null)
-        {
-            return;
-        }
+        if (selected == null) return;
 
         await MailboxQueryService.SetConversationArchivedAsync(currentUserId, selected.ContactUserId, archive);
-
         selectedConversationKey = null;
         await LoadMessagesAsync();
     }
 
-    private async Task SendReplyCallback(string body)
-    {
-        composerBody = body;
-        await SendQuickReplyAsync();
-    }
-
-    private async Task SelectConversationCallback(string conversationKey)
-        => await SelectConversationAsync(conversationKey);
-
-    private async Task MarkAsReadCallback(string conversationKey)
-        => await MarkConversationAsReadAsync(conversationKey);
-
-    private async Task ArchiveCallback(string conversationKey)
-        => await SetConversationArchivedAsync(conversationKey, !showArchivedConversations);
-
-    private async Task SwitchFolderCallback(bool showArchived)
-        => await SwitchConversationFolderAsync(showArchived);
-
-    private async Task PreviousPageCallback()
-        => await PreviousConversationPageAsync();
-
-    private async Task NextPageCallback()
-        => await NextConversationPageAsync();
-
+    private async Task SendReplyCallback(string body) { composerBody = body; await SendQuickReplyAsync(); }
+    private async Task SelectConversationCallback(string key) => await SelectConversationAsync(key);
+    private async Task MarkAsReadCallback(string key) => await MarkConversationAsReadAsync(key);
+    private async Task ArchiveCallback(string key) => await SetConversationArchivedAsync(key, !showArchivedConversations);
+    private async Task SwitchFolderCallback(bool showArchived) => await SwitchConversationFolderAsync(showArchived);
+    private async Task PreviousPageCallback() => await PreviousConversationPageAsync();
+    private async Task NextPageCallback() => await NextConversationPageAsync();
 }
