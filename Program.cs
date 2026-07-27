@@ -133,6 +133,8 @@ builder.Services.AddScoped<AdminConfirmationService>();
     builder.Services.AddScoped<Confirmai.Services.Futsal.FutsalCreateService>();
     builder.Services.AddScoped<Confirmai.Services.Poker.PokerCreateService>();
     builder.Services.AddScoped<Confirmai.Services.Admin.ReconciliationHealthService>();
+    builder.Services.AddScoped<Confirmai.Services.User.ProfileService>();
+    builder.Services.AddScoped<Confirmai.Services.Admin.AdminUsersQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Utility.MailboxQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentInitializationService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentCommandService>();
