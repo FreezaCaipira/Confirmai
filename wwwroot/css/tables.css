@@ -1,0 +1,28 @@
+/* ================================================================
+   tables.css -- Table system extracted from site.css
+   Loaded after site.css so CSS variables are available.
+   ================================================================
+
+/* ================================================================
+   TABLE SYSTEM
+   ================================================================ */
+.payments-table {
+    width: 100%;
+    background: var(--bg-slate);
+    color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow-xl);
+    margin-top: 2rem;
+    border-collapse: collapse;
+}
+
+.payments-table th, .payments-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--ci-border);
+}
+
+.payments-table th {
+    color: var(--gold);
+    font-size: 1.1rem;
+}
+
