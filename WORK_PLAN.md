@@ -53,7 +53,21 @@ PENDENTE do Robson (ciclo posterior): **P0.1 rotacao do ClientSecret Efi** + rec
 
 ---
 
-## Ciclo 22 (Pleno) -- Cobrir com testes os services extraidos (fechar divida de cobertura)
+## Review Senior do Ciclo 22 (PR #77) -- APROVADO
+
+Auditoria da PR #77 (`test/ciclo22-service-tests`, ja na `main`). Ciclo de testes entregue: **12/12** services/formatters alvo agora tem arquivo de teste dedicado, com casos significativos (feliz + ramos), nao smoke test. **+174 testes** (1950 -> 2124 verdes); as 24 falhas seguem `ProgramConfigurationTests` sem Postgres (ambiente). **0 diff de codigo de producao** (verificado: so arquivos em `Confirmai.Tests/` mudaram) -- respeitou a regra "ciclo so de testes".
+
+Cobertura por alvo: `GroupDetailService` 23, `MailboxFormatter` 28, `SummaryAgeTracker` 18, `EscalacaoTextFormatter` 17, `AdminPaymentsCommandService` 15, `GroupPaymentsService` 14, `PokerCreateService` 12, `FutsalCreateService` 11, `AdminLogsExportCommandService` 10, `ReconciliationHealthService` 10, `AdminUsersQueryService` 9, `ProfileService` 7. Padrao correto: DB in-memory via `TestDbContextFactory` + Moq so onde necessario (UserManager/auth/JS).
+
+**Correcao do Senior nesta review**: o `ProfileServiceTests` reintroduziu **7 warnings CS8625** (nulls do construtor de `UserManager`), violando a meta "0 warning". Corrigido com `null!` (padrao ja usado no projeto). Projeto de testes volta a **0 warning**.
+
+**Pendente do Robson (inalterado)**: rotacao do ClientSecret Efi no painel + reconfigurar credenciais via user-secrets/env (adiado -- sem acesso ao painel em viagem).
+
+Com isso, a divida de refatoracao dos Ciclos 20/21 esta **fechada** (code-behinds < 250 LOC, CSS modular, services extraidos e agora cobertos por teste).
+
+---
+
+## Ciclo 22 (Pleno) -- Cobrir com testes os services extraidos (fechar divida de cobertura) [EXECUTADO -- ver review acima]
 
 **Objetivo**: fechar a ressalva do Ciclo 21 -- os services extraidos nos Ciclos 20/21 nao ganharam teste. Este ciclo e SO de testes: **nenhuma mudanca de codigo de producao** (se um service estiver dificil de testar, isso e sinal de refactor -- registrar e trazer pro Senior, nao mudar comportamento as escondidas). Regra de ouro do TDD segue: teste de caracterizacao que fixa o comportamento ATUAL.
 

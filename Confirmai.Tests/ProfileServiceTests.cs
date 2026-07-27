@@ -19,8 +19,8 @@ public class ProfileServiceTests
         userStoreMock.Setup(x => x.FindByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string id, CancellationToken _) => new ApplicationUser { Id = id, UserName = id });
         var userManager = new UserManager<ApplicationUser>(
-            userStoreMock.Object, null, new PasswordHasher<ApplicationUser>(),
-            null, null, null, null, null, null);
+            userStoreMock.Object, null!, new PasswordHasher<ApplicationUser>(),
+            null!, null!, null!, null!, null!, null!);
         var envMock = new Mock<IWebHostEnvironment>();
         envMock.Setup(x => x.WebRootPath).Returns(Path.GetTempPath());
         var svc = new ProfileService(factory, userManager, envMock.Object);
