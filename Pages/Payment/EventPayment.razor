@@ -4,6 +4,7 @@
 @implements IAsyncDisposable
 
 @using Confirmai.Enums
+@using Confirmai.Configuration
 @using Confirmai.Models
 @using Confirmai.Pages.Payment.Components
 @using Confirmai.Services.Admin
@@ -18,6 +19,7 @@
 @inject PixProofUploadService PixProofUploadService
 @inject AdminConfirmationService AdminConfirmationService
 @inject ILogger<EventPayment> _logger
+@inject Microsoft.Extensions.Options.IOptions<Confirmai.Configuration.FeeOptions> FeeOptions
 
 <PageTitle>Pagamento — Confirmai</PageTitle>
 
