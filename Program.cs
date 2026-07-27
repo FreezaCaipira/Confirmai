@@ -129,6 +129,7 @@ builder.Services.AddScoped<AdminConfirmationService>();
     builder.Services.AddScoped<AdminLogsFilterOrchestrator>();
     builder.Services.AddScoped<PaymentPageOrchestrator>();
     builder.Services.AddScoped<GroupDetailService>();
+    builder.Services.AddScoped<GroupPaymentsService>();
 builder.Services.AddScoped<Confirmai.Services.Utility.MailboxQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentInitializationService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentCommandService>();

@@ -1,13 +1,7 @@
-using System.Security.Claims;
-using Confirmai.Data;
-using Confirmai.Enums;
 using Confirmai.Models;
-using Confirmai.Services;
 using Confirmai.Services.Admin;
-using Confirmai.Services.Core;
+using Confirmai.Services.Groups;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Groups;
@@ -15,26 +9,26 @@ namespace Confirmai.Pages.Groups;
 public partial class Payments
 {
     [Parameter] public int Id { get; set; }
+    [Inject] private GroupPaymentsService GroupPayments { get; set; } = default!;
 
     public record HistoryEntry(DateTime EventDate, decimal EventPrice, string AdminName, string EventHref, bool HasProof, int? ConfirmationId);
     public record HistoryGroup(string UserName, List<HistoryEntry> Entries, decimal TotalAmount);
 
-    private Group?                    group            = null;
-    private bool                      isLoading        = true;
-    private bool                      isAdmin          = false;
-    private string?                   currentUserId    = null;
-
-    private bool                      isLoadingPayments = false;
-    private List<UserDelinquency>     delinquencyList   = new();
-    private List<PaymentHistoryEntry> paymentHistory    = new();
-    private List<PendingProofEntry>   pendingProofList  = new();
-    private string                    paymentTab        = "delinquent";
-    private string?                   selectedPaymentUserId = null;
-    private int?                      markingPaidId     = null;
-    private string?                   notifyingUserId   = null;
-    private HashSet<string>           notifiedUserIds   = new();
-    private int?                      viewingProofConfirmationId = null;
-    private string                    historyFilterUserId = "";
+    private Group? group;
+    private bool isLoading = true;
+    private bool isAdmin;
+    private string? currentUserId;
+    private bool isLoadingPayments;
+    private List<UserDelinquency> delinquencyList = new();
+    private List<PaymentHistoryEntry> paymentHistory = new();
+    private List<PendingProofEntry> pendingProofList = new();
+    private string paymentTab = "delinquent";
+    private string? selectedPaymentUserId;
+    private int? markingPaidId;
+    private string? notifyingUserId;
+    private HashSet<string> notifiedUserIds = new();
+    private int? viewingProofConfirmationId;
+    private string historyFilterUserId = "";
 
     private List<PaymentHistoryEntry>? filteredHistory =>
         string.IsNullOrEmpty(historyFilterUserId)
@@ -46,45 +40,20 @@ public partial class Payments
             .GroupBy(h => h.UserName)
             .Select(g => new HistoryGroup(
                 g.Key,
-                g.Select(h => new HistoryEntry(
-                    h.EventDate,
-                    h.EventPrice,
-                    h.AdminName,
-                    h.EventHref,
-                    h.HasProof,
-                    h.ConfirmationId
-                )).ToList(),
-                g.Sum(h => h.EventPrice)
-            ))
+                g.Select(h => new HistoryEntry(h.EventDate, h.EventPrice, h.AdminName, h.EventHref, h.HasProof, h.ConfirmationId)).ToList(),
+                g.Sum(h => h.EventPrice)))
             .OrderByDescending(g => g.TotalAmount)
             .ToList();
 
     protected override async Task OnInitializedAsync()
     {
-        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-        currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        group = await db.Groups
-            .Include(g => g.Members)
-            .FirstOrDefaultAsync(g => g.Id == Id);
-
-        if (group is null)
+        currentUserId = await GroupPayments.GetCurrentUserIdAsync();
+        (group, isAdmin) = await GroupPayments.LoadGroupAndCheckAdminAsync(Id, currentUserId);
+        if (group is null || !isAdmin)
         {
             isLoading = false;
             return;
         }
-
-        isAdmin = currentUserId is not null &&
-                  group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
-
-        if (!isAdmin)
-        {
-            isLoading = false;
-            return;
-        }
-
         await LoadPaymentsData();
         isLoading = false;
     }
@@ -105,109 +74,10 @@ public partial class Payments
     private async Task LoadPaymentsData()
     {
         if (group is null) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        var nowUtc = DateTime.UtcNow;
-        var memberIds = group.Members.Select(m => m.UserId).ToHashSet();
-
-        var unpaidConfirmations = await db.EventConfirmations
-            .Where(c =>
-                c.Event.GroupId == Id &&
-                c.Event.StartsAt < nowUtc &&
-                c.Event.Price != null &&
-                c.Event.Price > 0 &&
-                !c.HasPaid &&
-                c.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
-                c.Position != FutsalPosition.Goalkeeper &&
-                memberIds.Contains(c.UserId))
-            .Include(c => c.Event)
-            .Include(c => c.User)
-            .OrderBy(c => c.Event.StartsAt)
-            .Select(c => new {
-                c.Id,
-                c.UserId,
-                c.EventId,
-                c.Event,
-                c.User,
-                c.PaymentGatewayName,
-                c.Position,
-                HasProof = c.PixProofUploadedAt != null,
-            })
-            .ToListAsync();
-
-        var sport = group.Sport;
-        delinquencyList = unpaidConfirmations
-            .GroupBy(c => c.UserId)
-            .Select(g =>
-            {
-                var user     = g.First().User;
-                var userName = user?.FullName ?? user?.UserName ?? "Jogador";
-                var entries  = g.Select(c =>
-                {
-                    var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
-                    return new DelinquencyEntry(c.Id, c.EventId, c.Event.StartsAt, c.Event.Price!.Value, href, c.HasProof);
-                }).ToList();
-                return new UserDelinquency(g.Key, userName, entries);
-            })
-            .OrderByDescending(d => d.TotalAmount)
-            .ToList();
-
-        var manualPaid = await db.EventConfirmations
-            .Where(c =>
-                c.Event.GroupId == Id &&
-                c.HasPaid &&
-                c.MarkedPaidByUserId != null &&
-                memberIds.Contains(c.UserId))
-            .Include(c => c.Event)
-            .Include(c => c.User)
-            .OrderByDescending(c => c.MarkedPaidAt)
-            .Take(50)
-            .ToListAsync();
-
-        var adminIds  = manualPaid.Select(c => c.MarkedPaidByUserId!).Distinct().ToList();
-        var adminUsers = await db.Users
-            .Where(u => adminIds.Contains(u.Id))
-            .Select(u => new { u.Id, Name = u.FullName ?? u.UserName ?? u.Email })
-            .ToListAsync();
-        var adminMap = adminUsers.ToDictionary(u => u.Id, u => u.Name ?? "Admin");
-
-        paymentHistory = manualPaid.Select(c =>
-        {
-            var href      = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
-            var userName  = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
-            var adminName = adminMap.TryGetValue(c.MarkedPaidByUserId!, out var n) ? n : "Admin";
-            return new PaymentHistoryEntry(userName, c.Event.StartsAt, c.Event.Price ?? 0, href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
-        }).ToList();
-
-        var pendingProofs = await db.EventConfirmations
-            .Where(c =>
-                c.Event.GroupId == Id &&
-                c.PixProofUploadedAt != null &&
-                !c.HasPaid &&
-                c.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
-                c.Position != FutsalPosition.Goalkeeper &&
-                memberIds.Contains(c.UserId))
-            .Include(c => c.Event)
-            .Include(c => c.User)
-            .OrderByDescending(c => c.PixProofUploadedAt)
-            .ToListAsync();
-
-        pendingProofList = pendingProofs.Select(c =>
-        {
-            var href      = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
-            var userName  = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
-            var eventName = c.Event?.Location ?? "Partida";
-            return new PendingProofEntry(
-                c.Id,
-                c.UserId,
-                userName,
-                c.EventId,
-                eventName,
-                c.Event!.StartsAt,
-                c.Event.Price ?? 0,
-                href,
-                c.PixProofUploadedAt!.Value);
-        }).ToList();
+        var data = await GroupPayments.LoadPaymentsDataAsync(Id, group);
+        delinquencyList = data.DelinquencyList;
+        paymentHistory = data.PaymentHistory;
+        pendingProofList = data.PendingProofList;
     }
 
     private void SelectPaymentUser(string userId)
@@ -219,18 +89,14 @@ public partial class Payments
     {
         var confirmed = await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja confirmar este pagamento?");
         if (confirmed)
-        {
             await AdminMarkPaid(args.ConfirmationId, args.UserId);
-        }
     }
 
     private async Task HandleNotifyDelinquencyAsync(UserDelinquency delinquency)
     {
-        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Deseja notificar {delinquency.UserName} sobre os pagamentos em aberto? Uma mensagem será enviada pelo sistema interno.");
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Deseja notificar {delinquency.UserName} sobre os pagamentos em aberto? Uma mensagem sera enviada pelo sistema interno.");
         if (confirmed)
-        {
             await AdminNotifyDelinquency(delinquency);
-        }
     }
 
     private Task HandleViewProof(int confirmationId)
@@ -242,22 +108,7 @@ public partial class Payments
     private async Task AdminMarkPaid(int confirmationId, string userId)
     {
         markingPaidId = confirmationId;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var conf = await db.EventConfirmations.FindAsync(confirmationId);
-        if (conf is not null && !conf.HasPaid && conf.PaymentGatewayName == null)
-        {
-            conf.PaymentStatus      = EventConfirmationPaymentStatus.Paid;
-            conf.HasPaid            = true;
-            conf.MarkedPaidByUserId = currentUserId;
-            conf.MarkedPaidAt       = DateTime.UtcNow;
-            await db.SaveChangesAsync();
-            await LogService.AuditAsync(
-                AuditEvents.EventConfirmationPaidManual,
-                AuditEntities.EventConfirmation,
-                confirmationId.ToString(),
-                $"Admin marcou confirmação #{confirmationId} do jogador {userId} como paga manualmente (grupo #{Id})",
-                currentUserId, "GroupAdmin");
-        }
+        await GroupPayments.MarkPaidAsync(confirmationId, userId, currentUserId, Id);
         markingPaidId = null;
         await LoadPaymentsData();
         if (!delinquencyList.Any(d => d.UserId == userId))
@@ -268,24 +119,7 @@ public partial class Payments
     {
         if (currentUserId is null || group is null) return;
         notifyingUserId = d.UserId;
-
-        var entries = d.Entries
-            .Select(e => (e.EventDate, e.EventPrice))
-            .ToList();
-
-        await NotificationService.NotifyDelinquencyAsync(
-            adminUserId:  currentUserId,
-            targetUserId: d.UserId,
-            groupName:    group.Name,
-            entries:      entries);
-
-        await LogService.AuditAsync(
-            AuditEvents.DelinquencyNotified,
-            AuditEntities.Group,
-            Id.ToString(),
-            $"Admin notificou jogador {d.UserId} ({d.UserName}) sobre {d.Entries.Count} partida(s) em aberto — R$ {d.TotalAmount:F2} (grupo #{Id})",
-            currentUserId, "GroupAdmin");
-
+        await GroupPayments.NotifyDelinquencyAsync(d, currentUserId, group.Name, Id);
         notifyingUserId = null;
         notifiedUserIds.Add(d.UserId);
     }
@@ -293,14 +127,12 @@ public partial class Payments
     private async Task OpenWhatsAppDelinquency(UserDelinquency delinquency)
     {
         if (group is null) return;
-        var lines   = string.Join("%0A", delinquency.Entries.Select(e =>
-            $"• {e.EventDate.ToLocalTime():dd/MM/yyyy} — R$ {e.EventPrice:F2}"));
-        var count   = delinquency.Entries.Count;
-        var total   = delinquency.TotalAmount.ToString("F2");
-        var plural  = count != 1 ? "s" : "";
-        var msg     = Uri.EscapeDataString(
-            $"Olá, {delinquency.UserName}! 👋\n\n" +
-            $"Você tem {count} partida{plural} sem pagamento em \"{group.Name}\":\n\n" +
+        var count = delinquency.Entries.Count;
+        var total = delinquency.TotalAmount.ToString("F2");
+        var plural = count != 1 ? "s" : "";
+        var msg = Uri.EscapeDataString(
+            $"Ola, {delinquency.UserName}! 👋\n\n" +
+            $"Voce tem {count} partida{plural} sem pagamento em \"{group.Name}\":\n\n" +
             string.Join("\n", delinquency.Entries.Select(e =>
                 $"• {e.EventDate.ToLocalTime():dd/MM/yyyy} — R$ {e.EventPrice:F2}")) +
             $"\n\nTotal: R$ {total}\n\n" +
