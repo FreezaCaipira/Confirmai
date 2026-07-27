@@ -1,7 +1,5 @@
 using Confirmai.Models;
-using Confirmai.Enums;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 using Microsoft.JSInterop;
 using Confirmai.Shared.Helpers;
 using Confirmai.Services;
@@ -81,6 +79,7 @@ public partial class AdminPayments : IAsyncDisposable
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IJSRuntime JS { get; set; } = default!;
     [Inject] public SummaryAgeTracker SummaryAgeTracker { get; set; } = default!;
+    [Inject] public AdminPaymentsCommandService CommandService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -168,9 +167,7 @@ public partial class AdminPayments : IAsyncDisposable
                 await InvokeAsync(async () =>
                 {
                     SummaryAgeTracker.UpdateAgeLabel();
-                    var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-                    var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-                    await SummaryAgeTracker.TryWriteStalenessAuditAsync(actorUserId, isAutoRefreshEnabled, isAutoRefreshPausedByVisibility);
+                    await SummaryAgeTracker.TryWriteStalenessAuditAsync(isAutoRefreshEnabled, isAutoRefreshPausedByVisibility);
                 });
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -313,40 +310,22 @@ public partial class AdminPayments : IAsyncDisposable
 
     private async Task ReconcileChargeAsync()
     {
-        var chargeId = reconcileChargeId?.Trim();
-        if (string.IsNullOrWhiteSpace(chargeId))
-        {
-            reconcileResultIsError = true;
-            reconcileResultMessage = "Informe um chargeId/txId para revalidar.";
-            return;
-        }
-
         isReconciling = true;
         reconcileResultMessage = string.Empty;
         reconcileResultConfirmationId = null;
 
         try
         {
-            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-            var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-
-            var result = await EventPaymentReconciliationService.ReconcileByChargeIdAsync(chargeId, actorUserId);
-            reconcileResultIsError = !result.Found || !result.IsPaid;
+            var result = await CommandService.ReconcileChargeAsync(reconcileChargeId);
+            reconcileResultIsError = result.IsError;
             reconcileResultMessage = result.Message;
             reconcileResultConfirmationId = result.ConfirmationId;
 
             if (result.ConfirmationId.HasValue)
-            {
                 timelineConfirmationId = result.ConfirmationId.Value;
-            }
 
             await LoadOperationalSummaryAsync();
             await LoadPaymentsCountAsync();
-        }
-        catch (Exception ex)
-        {
-            reconcileResultIsError = true;
-            reconcileResultMessage = $"Erro ao revalidar cobrança: {ex.Message}";
         }
         finally
         {
@@ -495,22 +474,12 @@ public partial class AdminPayments : IAsyncDisposable
 
         try
         {
-            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-            var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-
-            var result = await EventPaymentReconciliationService.ReconcilePendingConfirmationsAsync(50, actorUserId);
-            sweepResultIsError = result.StillPending > 0 || result.NotFound > 0;
-            sweepResultMessage = result.Considered == 0
-                ? "Nenhuma confirmação pendente para revalidar agora."
-                : $"Varredura concluída: {result.Updated} atualizada(s), {result.StillPending} pendente(s), {result.NotFound} não encontrada(s).";
+            var result = await CommandService.RunSweepAsync();
+            sweepResultIsError = result.IsError;
+            sweepResultMessage = result.Message;
 
             await LoadOperationalSummaryAsync();
             await LoadPaymentsCountAsync();
-        }
-        catch (Exception ex)
-        {
-            sweepResultIsError = true;
-            sweepResultMessage = $"Erro ao varrer pendências: {ex.Message}";
         }
         finally
         {
@@ -526,55 +495,29 @@ public partial class AdminPayments : IAsyncDisposable
 
     private async Task ExportReconciliationCsvAsync()
     {
-        var (csv, fileName) = await AdminPaymentsQueryService.BuildReconciliationExportAsync();
-        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
+        await CommandService.ExportReconciliationCsvAsync();
     }
 
     private async Task ApplyStatusTransitionAsync()
     {
-        if (!statusTransitionConfirmationId.HasValue || statusTransitionConfirmationId.Value <= 0)
-        {
-            statusTransitionResultIsError = true;
-            statusTransitionResultMessage = "Informe um ConfirmationId válido.";
-            return;
-        }
-
-        if (!Enum.TryParse<EventConfirmationPaymentStatus>(statusTransitionTarget, ignoreCase: true, out var targetStatus))
-        {
-            statusTransitionResultIsError = true;
-            statusTransitionResultMessage = "Selecione um status alvo válido.";
-            return;
-        }
-
         isStatusTransitioning = true;
         statusTransitionResultMessage = string.Empty;
 
         try
         {
-            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-            var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+            var result = await CommandService.ApplyStatusTransitionAsync(
+                statusTransitionConfirmationId,
+                statusTransitionTarget,
+                statusTransitionReason);
 
-            var result = await EventConfirmationPaymentStatusService.TransitionStatusAsync(
-                confirmationId: statusTransitionConfirmationId.Value,
-                targetStatus: targetStatus,
-                actorUserId: actorUserId,
-                reason: statusTransitionReason);
-
-            statusTransitionResultIsError = !result.Found || !result.Updated;
+            statusTransitionResultIsError = result.IsError;
             statusTransitionResultMessage = result.Message;
 
             if (result.ConfirmationId.HasValue)
-            {
                 timelineConfirmationId = result.ConfirmationId.Value;
-            }
 
             await LoadOperationalSummaryAsync();
             await LoadPaymentsCountAsync();
-        }
-        catch (Exception ex)
-        {
-            statusTransitionResultIsError = true;
-            statusTransitionResultMessage = $"Erro ao aplicar transição de status: {ex.Message}";
         }
         finally
         {

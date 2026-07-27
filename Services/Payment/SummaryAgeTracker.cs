@@ -1,12 +1,15 @@
+using System.Security.Claims;
 using Confirmai.Enums;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Confirmai.Services.Payment;
 
 public sealed class SummaryAgeTracker
 {
     private readonly LogService _logService;
+    private readonly AuthenticationStateProvider _authStateProvider;
     private DateTime? _lastRefreshAt;
     private DateTime? _stalenessStartedAt;
     private bool _stalenessIncidentLogged;
@@ -19,9 +22,10 @@ public sealed class SummaryAgeTracker
     public const int WarningThresholdSeconds = RefreshIntervalSeconds * 2;
     public const int AuditThresholdSeconds = 5 * 60;
 
-    public SummaryAgeTracker(LogService logService)
+    public SummaryAgeTracker(LogService logService, AuthenticationStateProvider authStateProvider)
     {
         _logService = logService;
+        _authStateProvider = authStateProvider;
     }
 
     public void MarkRefreshed()
@@ -74,7 +78,7 @@ public sealed class SummaryAgeTracker
         _stalenessIncidentLogged = false;
     }
 
-    public async Task TryWriteStalenessAuditAsync(string actorUserId, bool autoRefreshEnabled, bool pausedByVisibility)
+    public async Task TryWriteStalenessAuditAsync(bool autoRefreshEnabled, bool pausedByVisibility)
     {
         if (_stalenessIncidentLogged || !_stalenessStartedAt.HasValue)
             return;
@@ -82,6 +86,9 @@ public sealed class SummaryAgeTracker
         var elapsedSinceStaleness = DateTime.UtcNow - _stalenessStartedAt.Value;
         if (elapsedSinceStaleness.TotalSeconds < AuditThresholdSeconds)
             return;
+
+        var authState = await _authStateProvider.GetAuthenticationStateAsync();
+        var actorUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         await _logService.AuditAsync(
             eventType: AuditEvents.PaymentReconciliationPanelStale,
