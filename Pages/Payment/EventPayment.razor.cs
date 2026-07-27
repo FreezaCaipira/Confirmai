@@ -37,10 +37,8 @@ public partial class EventPayment : IAsyncDisposable
     private string proofSuccessMessage = string.Empty;
 
     private CancellationTokenSource? _pollCts;
-    private CancellationTokenSource? _copyBrCodeCts;
-    private CancellationTokenSource? _copyAdminPixCts;
-    private Task? _copyBrCodeTask;
-    private Task? _copyAdminPixTask;
+    private CancellationTokenSource? _copyCts;
+    private Task? _copyTask;
 
     [Inject] private EventPaymentService EventPaymentSvc { get; set; } = default!;
 
@@ -130,22 +128,21 @@ public partial class EventPayment : IAsyncDisposable
         catch (TaskCanceledException) { }
     }
 
-    private async Task CopyBrCode()
+    private async Task RunCopyTimerAsync(Func<bool> getFlag, Action<bool> setFlag)
     {
-        _copyBrCodeCts?.Cancel();
-        _copyBrCodeCts = new CancellationTokenSource();
-        var ct = _copyBrCodeCts.Token;
-        try { copied = true; StateHasChanged(); await Task.Delay(2000, ct); if (!ct.IsCancellationRequested) copied = false; }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested) { copied = false; }
+        _copyCts?.Cancel();
+        _copyCts = new CancellationTokenSource();
+        var ct = _copyCts.Token;
+        try { setFlag(true); StateHasChanged(); await Task.Delay(2000, ct); if (!ct.IsCancellationRequested) setFlag(false); }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { setFlag(false); }
     }
+
+    private Task CopyBrCode() => RunCopyTimerAsync(() => copied, v => copied = v);
 
     private async Task CopyAdminPixKey(string key)
     {
-        _copyAdminPixCts?.Cancel();
-        _copyAdminPixCts = new CancellationTokenSource();
-        var ct = _copyAdminPixCts.Token;
-        try { copiedAdminPix = true; StateHasChanged(); await Task.Delay(2000, ct); if (!ct.IsCancellationRequested) copiedAdminPix = false; }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested) { copiedAdminPix = false; }
+        if (string.IsNullOrWhiteSpace(key)) return;
+        await RunCopyTimerAsync(() => copiedAdminPix, v => copiedAdminPix = v);
     }
 
     private void SelectGateway(string gatewayName) => selectedGatewayName = gatewayName;
@@ -157,12 +154,9 @@ public partial class EventPayment : IAsyncDisposable
     private static string BuildPixStaticPayload(string pixKey, string groupName, string? city, decimal amount)
         => EventPaymentService.BuildPixStaticPayload(pixKey, groupName, city, amount);
 
-    private IReadOnlyList<EventPaymentGatewayOption> GetComingSoonGateways()
-    {
-        if (availableGateways.Count == 0) return comingSoonGateways;
-        var availableNames = availableGateways.Select(g => g.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        return comingSoonGateways.Where(g => !availableNames.Contains(g.Name)).ToList();
-    }
+    private IReadOnlyList<EventPaymentGatewayOption> GetComingSoonGateways() =>
+        availableGateways.Count == 0 ? comingSoonGateways
+        : comingSoonGateways.Where(g => !availableGateways.Any(a => string.Equals(a.Name, g.Name, StringComparison.OrdinalIgnoreCase))).ToList();
 
     private async Task UploadProof(InputFileChangeEventArgs e)
     {
@@ -216,54 +210,28 @@ public partial class EventPayment : IAsyncDisposable
     private async Task AdminMarkPaid()
     {
         if (conf is null) return;
-        adminMarkPaidLoading = true;
-        adminMarkPaidError = false;
-        StateHasChanged();
+        adminMarkPaidLoading = true; adminMarkPaidError = false; StateHasChanged();
         try
         {
             var result = await AdminConfirmationService.TogglePaidAsync(conf.Id, userId);
-            if (result.Found && result.Updated)
-            {
-                conf.HasPaid = true;
-                conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
-                payState = PayState.Paid;
-            }
-            else
-            {
-                adminMarkPaidError = true;
-            }
+            if (result.Found && result.Updated) { conf.HasPaid = true; conf.PaymentStatus = EventConfirmationPaymentStatus.Paid; payState = PayState.Paid; }
+            else adminMarkPaidError = true;
         }
-        catch
-        {
-            adminMarkPaidError = true;
-        }
-        finally
-        {
-            adminMarkPaidLoading = false;
-        }
+        catch { adminMarkPaidError = true; }
+        finally { adminMarkPaidLoading = false; }
     }
 
+    // Callback wrappers
     private async Task CopyBrCodeCallback() => await CopyBrCode();
-    private Task SelectGatewayCallback(string gatewayName) { SelectGateway(gatewayName); return Task.CompletedTask; }
+    private Task SelectGatewayCallback(string n) { SelectGateway(n); return Task.CompletedTask; }
     private async Task GeneratePixChargeCallback() => await GeneratePixCharge();
-    private async Task CopyAdminPixKeyCallback()
-    {
-        if (conf is null) return;
-        var key = GetGroupAdminPixKey(conf.Event.Group);
-        if (!string.IsNullOrWhiteSpace(key))
-            await CopyAdminPixKey(key);
-    }
+    private async Task CopyAdminPixKeyCallback() { if (conf is not null) await CopyAdminPixKey(GetGroupAdminPixKey(conf.Event.Group)); }
     private async Task UploadProofCallback(InputFileChangeEventArgs e) => await UploadProof(e);
 
     public async ValueTask DisposeAsync()
     {
-        _pollCts?.Cancel();
-        _copyBrCodeCts?.Cancel();
-        _copyAdminPixCts?.Cancel();
-        if (_copyBrCodeTask is not null) { try { await _copyBrCodeTask; } catch (OperationCanceledException) { } }
-        if (_copyAdminPixTask is not null) { try { await _copyAdminPixTask; } catch (OperationCanceledException) { } }
-        _pollCts?.Dispose();
-        _copyBrCodeCts?.Dispose();
-        _copyAdminPixCts?.Dispose();
+        _pollCts?.Cancel(); _copyCts?.Cancel();
+        if (_copyTask is not null) { try { await _copyTask; } catch (OperationCanceledException) { } }
+        _pollCts?.Dispose(); _copyCts?.Dispose();
     }
 }

@@ -55,13 +55,13 @@ public partial class Escalacao : IAsyncDisposable
             Randomize();
     }
 
+    // Callback wrappers
     private async Task SaveTeamNamesCallback() => await SaveTeamNames();
-    private Task MovePlayerCallback((PlayerSlot Slot, bool ToTeamB) args)
-    { MovePlayer(args.Slot, args.ToTeamB); return Task.CompletedTask; }
+    private Task MovePlayerCallback((PlayerSlot Slot, bool ToTeamB) a) { MovePlayer(a.Slot, a.ToTeamB); return Task.CompletedTask; }
     private Task RandomizeCallback() { Randomize(); return Task.CompletedTask; }
-    private Task ShowConfirmModalChangedCallback(bool value) { showConfirmModal = value; return Task.CompletedTask; }
+    private Task ShowConfirmModalChangedCallback(bool v) { showConfirmModal = v; return Task.CompletedTask; }
     private async Task ConfirmarEscalacaoCallback() => await ConfirmarEscalacao();
-    private Task EditingScoreChangedCallback(bool value) { editingScore = value; return Task.CompletedTask; }
+    private Task EditingScoreChangedCallback(bool v) { editingScore = v; return Task.CompletedTask; }
     private async Task SaveScoreCallback() => await SaveScore();
     private async Task CopyToClipboardCallback() => await CopyToClipboard();
     private async Task ShareOnWhatsAppCallback() => await ShareOnWhatsApp();
@@ -224,22 +224,11 @@ public partial class Escalacao : IAsyncDisposable
 
     private async Task CopyToClipboard()
     {
-        var text = BuildShareText();
-        await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
-        _copyCts?.Cancel();
-        _copyCts = new CancellationTokenSource();
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", BuildShareText());
+        _copyCts?.Cancel(); _copyCts = new CancellationTokenSource();
         var ct = _copyCts.Token;
-        try
-        {
-            copied = true;
-            StateHasChanged();
-            await Task.Delay(2000, ct);
-            if (!ct.IsCancellationRequested) copied = false;
-        }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            copied = false;
-        }
+        try { copied = true; StateHasChanged(); await Task.Delay(2000, ct); if (!ct.IsCancellationRequested) copied = false; }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { copied = false; }
     }
 
     private async Task ShareOnWhatsApp()
@@ -254,11 +243,7 @@ public partial class Escalacao : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         _copyCts?.Cancel();
-        if (_copyTask is not null)
-        {
-            try { await _copyTask; }
-            catch (OperationCanceledException) { }
-        }
+        if (_copyTask is not null) { try { await _copyTask; } catch (OperationCanceledException) { } }
         _copyCts?.Dispose();
     }
 }

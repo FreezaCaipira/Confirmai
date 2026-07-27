@@ -105,13 +105,10 @@ public partial class Payment : IAsyncDisposable
         _copyCts?.Dispose();
     }
 
+    // Callback wrappers
     private async Task GenerateAddressCallback() => await GenerateAddress();
     private async Task CheckPaymentCallback() => await OnCheckPaymentClick();
-    private async Task MethodChangedCallback(string method)
-    {
-        SelectedMethod = method;
-        await OnSelectedMethodChangedAsync(true);
-    }
+    private async Task MethodChangedCallback(string method) { SelectedMethod = method; await OnSelectedMethodChangedAsync(true); }
     private async Task IntermediaryChangedCallback() => await OnUseSiteIntermediaryChangedAsync();
     private async Task CopyAddressCallback() => await CopyAddress();
 
@@ -215,85 +212,34 @@ public partial class Payment : IAsyncDisposable
 
     private async Task OnSelectedMethodChangedAsync(bool persistPreference)
     {
-        if (!string.Equals(SelectedMethod, "Pix", StringComparison.OrdinalIgnoreCase))
-        {
-            pixCurrencyNotice = null;
-            pixSellerKeyNotice = null;
-            return;
-        }
-
-        if (string.Equals(CurrencyPreferenceService.SelectedFiatCurrency, "BRL", StringComparison.OrdinalIgnoreCase))
-        {
-            pixCurrencyNotice = null;
-            return;
-        }
-
+        if (!string.Equals(SelectedMethod, "Pix", StringComparison.OrdinalIgnoreCase)) { pixCurrencyNotice = null; pixSellerKeyNotice = null; return; }
+        if (string.Equals(CurrencyPreferenceService.SelectedFiatCurrency, "BRL", StringComparison.OrdinalIgnoreCase)) { pixCurrencyNotice = null; return; }
         CurrencyPreferenceService.SetCurrency("BRL");
-        if (persistPreference)
-            await JS.InvokeVoidAsync("localStorage.setItem", "Confirmai.fiatCurrency", CurrencyPreferenceService.SelectedFiatCurrency);
+        if (persistPreference) await JS.InvokeVoidAsync("localStorage.setItem", "Confirmai.fiatCurrency", CurrencyPreferenceService.SelectedFiatCurrency);
         pixCurrencyNotice = "PIX funciona apenas com BRL. A cotacao foi alterada automaticamente para BRL.";
     }
 
-    private Task OnUseSiteIntermediaryChangedAsync()
-    {
-        pixSellerKeyNotice = null;
-        return Task.CompletedTask;
-    }
+    private Task OnUseSiteIntermediaryChangedAsync() { pixSellerKeyNotice = null; return Task.CompletedTask; }
 
-    private void NotifyUser(string message, string type)
-    {
-        feedbackMessage = message;
-        feedbackType = type;
-        ToastRef?.Show(message, type);
-    }
+    private void NotifyUser(string message, string type) { feedbackMessage = message; feedbackType = type; ToastRef?.Show(message, type); }
 
     private async Task CopyAddress()
     {
         if (string.IsNullOrEmpty(Address)) return;
-
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", Address);
-        _copyCts?.Cancel();
-        _copyCts = new CancellationTokenSource();
+        _copyCts?.Cancel(); _copyCts = new CancellationTokenSource();
         var ct = _copyCts.Token;
-
-        try
-        {
-            copyIcon = "fas fa-check";
-            StateHasChanged();
-            await Task.Delay(1500, ct);
-            if (!ct.IsCancellationRequested)
-                copyIcon = "fas fa-copy";
-        }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            copyIcon = "fas fa-copy";
-        }
+        try { copyIcon = "fas fa-check"; StateHasChanged(); await Task.Delay(1500, ct); if (!ct.IsCancellationRequested) copyIcon = "fas fa-copy"; }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { copyIcon = "fas fa-copy"; }
     }
 
-    private string BuildSellerProfileUrl(string sellerUserId)
-    {
-        var safeUserId = Uri.EscapeDataString(sellerUserId ?? string.Empty);
-        var currentRelativePath = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        return $"/profile/{safeUserId}?returnUrl={Uri.EscapeDataString(currentRelativePath)}";
-    }
+    private string BuildSellerProfileUrl(string sellerUserId) =>
+        $"/profile/{Uri.EscapeDataString(sellerUserId ?? string.Empty)}?returnUrl={Uri.EscapeDataString("/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri))}";
 
-    private string FormatOfferPrice(decimal amount)
-    {
-        return offerCurrency switch
-        {
-            "BRL" => $"R$ {amount:N2}",
-            "USD" => $"$ {amount:N2}",
-            _ => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency)
-        };
-    }
+    private string FormatOfferPrice(decimal amount) => offerCurrency switch { "BRL" => $"R$ {amount:N2}", "USD" => $"$ {amount:N2}", _ => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency) };
 
     private decimal GetUnitPriceAmount() => selectedOfferUnitPrice ?? product?.Price ?? 0m;
-
-    private MarkupString FormatBtcWithUsdMarkup(decimal amount)
-        => BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
-
-    private string FormatBtcWithUsdText(decimal amount)
-        => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
-
+    private MarkupString FormatBtcWithUsdMarkup(decimal amount) => BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    private string FormatBtcWithUsdText(decimal amount) => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     private Task<bool> ValidateOfferBeforePaymentAsync() => Task.FromResult(true);
 }
