@@ -29,29 +29,13 @@ public partial class AdminPayments : IAsyncDisposable
     private bool showRestoredFiltersNotice;
     private decimal? btcUsdRate;
     private decimal? btcBrlRate;
-    private int reconciliationPendingWithChargeId;
-    private int reconciliationPendingWithoutChargeId;
-    private int reconciliationStalePending;
-    private int reconciliationPaidToday;
-    private string lastAutomaticSweepLabel = "Sem varredura automática registrada.";
-    private string lastAutomaticSweepDetails = string.Empty;
-    private string lastManualSweepLabel = "Sem varredura manual registrada.";
-    private string lastManualSweepDetails = string.Empty;
-    private string pendingTrend24hLabel = "Sem dados suficientes para tendência.";
-    private bool isPendingTrendWarning;
-    private string pendingByGatewayLabel = "Sem pendências com gateway identificado.";
-    private string paidByGatewayLabel = "Sem confirmações pagas com gateway identificado.";
-    private readonly List<GatewayTelemetryItem> gatewayTelemetry = new();
+    private AdminPaymentsSummaryResult summary = new();
     private string reconciliationSeverityLabel = "OK";
     private string reconciliationSeverityClass = "admin-payments-severity-pill--ok";
-    private int pendingTrendDelta24h;
-    private readonly List<SweepHistoryItem> automaticSweepHistory = new();
     private bool isAutoRefreshEnabled = true;
     private bool isSummaryRefreshing;
     private bool isAutoRefreshPausedByVisibility;
     private string lastAutoRefreshPauseLabel = "Nenhuma pausa registrada.";
-    private int pendingTrendWarningThreshold = AdminSettingsService.DefaultReconciliationWarningThreshold;
-    private int pendingTrendCriticalThreshold = AdminSettingsService.DefaultReconciliationCriticalThreshold;
 
     private string reconcileChargeId = string.Empty;
     private bool isReconciling;
@@ -320,34 +304,7 @@ public partial class AdminPayments : IAsyncDisposable
 
     private async Task LoadOperationalSummaryAsync()
     {
-        var summary = await AdminPaymentsSummaryService.LoadSummaryAsync();
-
-        pendingTrendWarningThreshold = summary.WarningThreshold;
-        pendingTrendCriticalThreshold = summary.CriticalThreshold;
-
-        reconciliationPendingWithChargeId = summary.PendingWithChargeId;
-        reconciliationPendingWithoutChargeId = summary.PendingWithoutChargeId;
-        reconciliationStalePending = summary.StalePending;
-        reconciliationPaidToday = summary.PaidToday;
-
-        pendingByGatewayLabel = summary.PendingByGatewayLabel;
-        paidByGatewayLabel = summary.PaidByGatewayLabel;
-
-        gatewayTelemetry.Clear();
-        gatewayTelemetry.AddRange(summary.GatewayTelemetry);
-
-        lastAutomaticSweepLabel = summary.LastAutomaticSweepLabel;
-        lastAutomaticSweepDetails = summary.LastAutomaticSweepDetails;
-        lastManualSweepLabel = summary.LastManualSweepLabel;
-        lastManualSweepDetails = summary.LastManualSweepDetails;
-
-        pendingTrend24hLabel = summary.PendingTrend24hLabel;
-        isPendingTrendWarning = summary.IsPendingTrendWarning;
-        pendingTrendDelta24h = summary.PendingTrendDelta24h;
-
-        automaticSweepHistory.Clear();
-        automaticSweepHistory.AddRange(summary.AutomaticSweepHistory);
-
+        summary = await AdminPaymentsSummaryService.LoadSummaryAsync();
         UpdateSeverity();
     }
 
@@ -393,11 +350,11 @@ public partial class AdminPayments : IAsyncDisposable
     private void UpdateSeverity()
     {
         var result = SeverityEvaluator.Evaluate(
-            reconciliationStalePending,
-            pendingTrendDelta24h,
-            reconciliationPendingWithChargeId,
-            pendingTrendWarningThreshold,
-            pendingTrendCriticalThreshold);
+            summary.StalePending,
+            summary.PendingTrendDelta24h,
+            summary.PendingWithChargeId,
+            summary.WarningThreshold,
+            summary.CriticalThreshold);
 
         reconciliationSeverityLabel = result.Label;
         reconciliationSeverityClass = result.CssClass;
@@ -405,7 +362,7 @@ public partial class AdminPayments : IAsyncDisposable
 
     private decimal GetPendingHeightPercent(SweepHistoryItem item)
     {
-        var maxPending = Math.Max(1, automaticSweepHistory.Max(x => x.StillPending));
+        var maxPending = Math.Max(1, summary.AutomaticSweepHistory.Max(x => x.StillPending));
         var relative = (decimal)item.StillPending / maxPending;
         var height = Math.Max(12m, relative * 100m);
         return Math.Round(height, 2, MidpointRounding.AwayFromZero);
