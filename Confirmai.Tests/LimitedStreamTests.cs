@@ -148,7 +148,7 @@ public class LimitedStreamTests
         var innerStream = new MemoryStream(data);
         var limitedStream = new LimitedStream(innerStream, maxBytes: 100);
         var buffer = new byte[10];
-        limitedStream.Read(buffer, 0, 3);
+        var bytesRead = limitedStream.Read(buffer, 0, 3);
 
         // Act & Assert
         Assert.Equal(3, limitedStream.Position);

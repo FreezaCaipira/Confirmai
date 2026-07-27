@@ -3,11 +3,11 @@ using Confirmai.Data;
 using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Core;
+using Confirmai.Services.Payment;
 using Confirmai.Shared;
 using Confirmai.Shared.Components;
 using Confirmai.Shared.Helpers;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 
@@ -39,18 +39,18 @@ public partial class PaymentsHistory : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
-                var quote = await BitcoinQuoteService.GetQuoteAsync();
-                btcUsdRate = quote?.btc_usd;
-                btcBrlRate = quote?.btc_brl;
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
 
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         var userId = authState.User.FindFirst("sub")?.Value
-          ?? authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            ?? authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         await using var db = await DbFactory.CreateDbContextAsync();
 
         payments = await db.Payments
-                        .Include(p => p.Product)
+            .Include(p => p.Product)
             .Where(p => p.UserId == userId)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
@@ -58,16 +58,11 @@ public partial class PaymentsHistory : IAsyncDisposable
         receivedPayments = await db.Payments
             .Include(p => p.Product)
             .Include(p => p.User)
-            .Where(p => p.SellerId == userId
-                || (p.SellerId == null && p.Product != null && p.Product.UserId == userId))
+            .Where(p => p.SellerId == userId || (p.SellerId == null && p.Product != null && p.Product.UserId == userId))
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
 
-        var productIds = payments
-            .Select(p => p.ProductId)
-            .Distinct()
-            .ToList();
-
+        var productIds = payments.Select(p => p.ProductId).Distinct().ToList();
         productNamesById = await db.Products
             .AsNoTracking()
             .Where(p => productIds.Contains(p.Id))
@@ -75,7 +70,6 @@ public partial class PaymentsHistory : IAsyncDisposable
             .ToDictionaryAsync(p => p.Id, p => p.Name ?? string.Empty);
 
         ApplyFilters();
-
         currentUserId = userId;
         PaymentEventBus.OnPaymentConfirmed += OnPaymentConfirmed;
     }
@@ -83,16 +77,12 @@ public partial class PaymentsHistory : IAsyncDisposable
     private void OnPaymentConfirmed(string userId, string paymentId)
     {
         if (userId != currentUserId) return;
-
         var payment = payments?.FirstOrDefault(p => p.PaymentId == paymentId);
         if (payment != null && !payment.IsPaid)
         {
             payment.IsPaid = true;
             payment.PaidAt = DateTime.UtcNow;
-            InvokeAsync(() =>
-            {
-                ToastRef?.Show(string.Format(T["PaymentHistory.ConfirmedToast"], paymentId), "success");
-            });
+            InvokeAsync(() => ToastRef?.Show(string.Format(T["PaymentHistory.ConfirmedToast"], paymentId), "success"));
         }
     }
 
@@ -102,11 +92,7 @@ public partial class PaymentsHistory : IAsyncDisposable
         return ValueTask.CompletedTask;
     }
 
-    private void SwitchTab(string tab)
-    {
-        activeTab = tab;
-        ClearFilters();
-    }
+    private void SwitchTab(string tab) { activeTab = tab; ClearFilters(); }
 
     private void ApplyFilters()
     {
@@ -116,21 +102,16 @@ public partial class PaymentsHistory : IAsyncDisposable
             .Where(p =>
                 (!filterMinAmount.HasValue || p.Amount >= filterMinAmount.Value) &&
                 (!filterMaxAmount.HasValue || p.Amount <= filterMaxAmount.Value) &&
-                (string.IsNullOrWhiteSpace(filterStatus) ||
-                    (filterStatus == "paid" && p.IsPaid) ||
-                    (filterStatus == "pending" && !p.IsPaid)) &&
+                (string.IsNullOrWhiteSpace(filterStatus) || (filterStatus == "paid" && p.IsPaid) || (filterStatus == "pending" && !p.IsPaid)) &&
                 (string.IsNullOrWhiteSpace(filterGateway) || (p.PaymentMethod?.Contains(filterGateway, StringComparison.OrdinalIgnoreCase) ?? false)) &&
-                (!filterDate.HasValue || p.CreatedAt.Date == filterDate.Value.Date)
-            )
+                (!filterDate.HasValue || p.CreatedAt.Date == filterDate.Value.Date))
             .ToList();
     }
 
     private void ClearFilters()
     {
-        filterMinAmount = null;
-        filterMaxAmount = null;
-        filterStatus = "";
-        filterGateway = "";
+        filterMinAmount = filterMaxAmount = null;
+        filterStatus = filterGateway = "";
         filterDate = null;
         ApplyFilters();
     }
@@ -144,14 +125,7 @@ public partial class PaymentsHistory : IAsyncDisposable
             db.Payments.Remove(payment);
             await db.SaveChangesAsync();
             payments?.Remove(payment);
-
-            await LogService.LogAsync(
-                $"Pagamento cancelado (ID: {paymentId}) para produto {payment.ProductId}.",
-                source: "Payment",
-                level: "Warning",
-                userId: payment.UserId
-            );
-
+            await LogService.LogAsync($"Pagamento cancelado (ID: {paymentId}) para produto {payment.ProductId}.", source: "Payment", level: "Warning", userId: payment.UserId);
             ApplyFilters();
             ToastRef?.Show(T["PaymentHistory.CanceledToast"], "info");
         }
@@ -163,131 +137,34 @@ public partial class PaymentsHistory : IAsyncDisposable
         await CancelPayment(paymentId);
     }
 
-    private void NextPage()
+    private void NextPage() { if (CanGoToNextPage) currentPage++; }
+    private void PrevPage() { if (CanGoToPreviousPage) currentPage--; }
+
+    private MarkupString FormatBtcWithUsd(decimal amount) =>
+        BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+
+    private string FormatPaymentAmount(decimal amount, string? currency) => currency switch
     {
-        if (CanGoToNextPage)
-            currentPage++;
-    }
+        "BRL" => $"R$ {amount:N2}",
+        "USD" => $"$ {amount:N2}",
+        _ => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency)
+    };
 
-    private void PrevPage()
-    {
-        if (CanGoToPreviousPage)
-            currentPage--;
-    }
-
-    private MarkupString FormatBtcWithUsd(decimal amount)
-    {
-        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
-    }
-
-    private string FormatPaymentAmount(decimal amount, string? currency)
-    {
-        return currency switch
-        {
-            "BRL" => $"R$ {amount:N2}",
-            "USD" => $"$ {amount:N2}",
-            _ => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency)
-        };
-    }
-
-    private string GetProductDisplayName(PaymentRecord payment)
-    {
-        if (payment.Product is { Name: { Length: > 0 } productName })
-        {
-            return productName;
-        }
-
-        if (productNamesById.TryGetValue(payment.ProductId, out var mappedName)
-            && !string.IsNullOrWhiteSpace(mappedName))
-        {
-            return mappedName;
-        }
-
-        return T["PaymentHistory.UnknownProduct"];
-    }
+    private string GetProductDisplayName(PaymentRecord payment) =>
+        payment.Product is { Name: { Length: > 0 } productName } ? productName
+        : (productNamesById.TryGetValue(payment.ProductId, out var mappedName) && !string.IsNullOrWhiteSpace(mappedName) ? mappedName : T["PaymentHistory.UnknownProduct"]);
 
     private async Task ExportToCsv()
     {
         if (filteredPayments == null || !filteredPayments.Any()) return;
-
-        var csv = new System.Text.StringBuilder();
-        csv.AppendLine("Data,Produto,Valor,Status,Gateway");
-
-        foreach (var p in filteredPayments)
-        {
-            var status = p.IsPaid ? T["Common.Paid"] : T["Common.Pending"];
-            var product = GetProductDisplayName(p);
-            var amount = FormatPaymentAmount(p.Amount, p.Currency);
-            var date = p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
-            var gateway = p.PaymentMethod ?? "-";
-
-            csv.AppendLine($"\"{date}\",\"{product}\",\"{amount}\",\"{status}\",\"{gateway}\"");
-        }
-
-        var fileName = $"pagamentos_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, csv.ToString(), "text/csv");
+        var csv = PaymentsHistoryExportHelper.BuildCsv(filteredPayments, GetProductDisplayName, p => FormatPaymentAmount(p.Amount, p.Currency), T);
+        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", $"pagamentos_{DateTime.Now:yyyyMMdd_HHmmss}.csv", csv, "text/csv");
     }
 
     private async Task ExportToPdf()
     {
         if (filteredPayments == null || !filteredPayments.Any()) return;
-
-        var html = $@"
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset='utf-8'>
-    <style>
-        body {{ font-family: Arial, sans-serif; padding: 20px; }}
-        h1 {{ color: #333; }}
-        table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
-        th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-        th {{ background-color: #f4f4f4; }}
-        .paid {{ color: green; font-weight: bold; }}
-        .pending {{ color: orange; font-weight: bold; }}
-    </style>
-</head>
-<body>
-    <h1>Histórico de Pagamentos</h1>
-    <p>Gerado em: {DateTime.Now:dd/MM/yyyy HH:mm}</p>
-    <table>
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Produto</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Gateway</th>
-            </tr>
-        </thead>
-        <tbody>";
-
-        foreach (var p in filteredPayments)
-        {
-            var status = p.IsPaid ? T["Common.Paid"] : T["Common.Pending"];
-            var statusClass = p.IsPaid ? "paid" : "pending";
-            var product = GetProductDisplayName(p);
-            var amount = FormatPaymentAmount(p.Amount, p.Currency);
-            var date = p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
-            var gateway = p.PaymentMethod ?? "-";
-
-            html += $@"
-            <tr>
-                <td>{date}</td>
-                <td>{product}</td>
-                <td>{amount}</td>
-                <td class='{statusClass}'>{status}</td>
-                <td>{gateway}</td>
-            </tr>";
-        }
-
-        html += @"
-        </tbody>
-    </table>
-</body>
-</html>";
-
-        var fileName = $"pagamentos_{DateTime.Now:yyyyMMdd_HHmmss}.html";
-        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, html, "text/html");
+        var html = PaymentsHistoryExportHelper.BuildHtml(filteredPayments, GetProductDisplayName, p => FormatPaymentAmount(p.Amount, p.Currency), T);
+        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", $"pagamentos_{DateTime.Now:yyyyMMdd_HHmmss}.html", html, "text/html");
     }
 }

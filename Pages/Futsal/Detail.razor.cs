@@ -4,11 +4,8 @@ using Confirmai.Models;
 using Confirmai.Shared.Helpers;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
-using Confirmai.Services.Core;
 using Confirmai.Services.Futsal;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Futsal;
@@ -19,23 +16,23 @@ public partial class Detail
 
     [Parameter] public int Id { get; set; }
 
-    private Event?      ev             = null;
-    private bool        isLoading         = true;
-    private string?     currentUserId     = null;
-    private ApplicationUser? creatorUser   = null;
-    private FutsalPosition chosenPos      = FutsalPosition.Outfield;
-    private string      actionError       = string.Empty;
-    private bool        isSystemAdmin     = false;
-    private int?        confirmRemoveId      = null;
-    private int?        confirmPayId         = null;
-    private int         eventNumber          = 0;
-    private bool        confirmCancel        = false;
-    private WaitingList? userWaitlistEntry   = null;
-    private bool        confirmLeaveWaitlist = false;
-    private GroupJoinRequest? userJoinRequest = null;
-    private bool        requestingJoin      = false;
-    private bool        cancellingJoin      = false;
-    private string      joinRequestError    = string.Empty;
+    private Event? ev;
+    private bool isLoading = true;
+    private string? currentUserId;
+    private ApplicationUser? creatorUser;
+    private FutsalPosition chosenPos = FutsalPosition.Outfield;
+    private string actionError = string.Empty;
+    private bool isSystemAdmin;
+    private int? confirmRemoveId;
+    private int? confirmPayId;
+    private int eventNumber;
+    private bool confirmCancel;
+    private WaitingList? userWaitlistEntry;
+    private bool confirmLeaveWaitlist;
+    private GroupJoinRequest? userJoinRequest;
+    private bool requestingJoin;
+    private bool cancellingJoin;
+    private string joinRequestError = string.Empty;
     private List<PostMatchVote> detailMvpVotes = new();
 
     protected override async Task OnInitializedAsync()
@@ -49,27 +46,12 @@ public partial class Detail
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender || ev is null) return;
-        var mapsKey    = Config["Google:MapsApiKey"];
-        var hasMapsKey = !string.IsNullOrWhiteSpace(mapsKey) && !mapsKey!.Contains("SET_VIA");
-        if (!hasMapsKey) return;
-        var mapWrapId = $"map-wrap-{ev.Id}";
-        var mapFbId   = $"map-fallback-{ev.Id}";
-        try
-        {
-            await JS.InvokeVoidAsync("ConfirmaiSetupMapFallback", mapWrapId, mapFbId);
-        }
-        catch (JSDisconnectedException)
-        {
-            // Blazor circuit was disconnected during render — safely ignore
-        }
-        catch (OperationCanceledException)
-        {
-            // User navigated away before render completed — safely ignore
-        }
-        catch (Exception)
-        {
-            // Function may not be available in certain prerender scenarios — safely ignore
-        }
+        var mapsKey = Config["Google:MapsApiKey"];
+        if (string.IsNullOrWhiteSpace(mapsKey) || mapsKey.Contains("SET_VIA")) return;
+        try { await JS.InvokeVoidAsync("ConfirmaiSetupMapFallback", $"map-wrap-{ev.Id}", $"map-fallback-{ev.Id}"); }
+        catch (JSDisconnectedException) { }
+        catch (OperationCanceledException) { }
+        catch (Exception) { }
     }
 
     private async Task LoadEvent()
@@ -87,68 +69,34 @@ public partial class Detail
 
     private async Task RequestToJoinAsync()
     {
-        if (currentUserId is null || ev is null)
-            return;
-
+        if (currentUserId is null || ev is null) return;
         requestingJoin = true;
         joinRequestError = string.Empty;
-
-        try
-        {
-            await EventDetailSvc.RequestToJoinAsync(ev.GroupId, currentUserId);
-            await LoadEvent();
-        }
-        catch
-        {
-            joinRequestError = "Não foi possível enviar a solicitação agora. Tente novamente em instantes.";
-        }
-        finally
-        {
-            requestingJoin = false;
-        }
+        try { await EventDetailSvc.RequestToJoinAsync(ev.GroupId, currentUserId); await LoadEvent(); }
+        catch { joinRequestError = "Nao foi possivel enviar a solicitacao agora."; }
+        finally { requestingJoin = false; }
     }
 
     private async Task CancelJoinRequestAsync()
     {
         if (currentUserId is null || ev is null || userJoinRequest is null) return;
-
         cancellingJoin = true;
         joinRequestError = string.Empty;
-
-        try
-        {
-            await EventDetailSvc.CancelJoinRequestAsync(userJoinRequest.Id);
-            await LoadEvent();
-        }
-        catch
-        {
-            joinRequestError = "Não foi possível cancelar a solicitação agora. Tente novamente em instantes.";
-        }
-        finally
-        {
-            cancellingJoin = false;
-        }
+        try { await EventDetailSvc.CancelJoinRequestAsync(userJoinRequest.Id); await LoadEvent(); }
+        catch { joinRequestError = "Nao foi possivel cancelar a solicitacao."; }
+        finally { cancellingJoin = false; }
     }
 
     private bool IsGroupAdmin() => EventAccess.IsAdmin(ev, currentUserId);
 
-    private async Task ConfirmAs(FutsalPosition pos)
-    {
-        chosenPos = pos;
-        await ConfirmPresence();
-    }
+    private async Task ConfirmAs(FutsalPosition pos) { chosenPos = pos; await ConfirmPresence(); }
 
     private async Task ConfirmPresence()
     {
         if (currentUserId is null || ev is null) return;
         actionError = string.Empty;
-
         var result = await EventDetailSvc.ConfirmPresenceAsync(Id, currentUserId, chosenPos);
-        if (!result.Success)
-        {
-            actionError = result.Error ?? "Erro ao confirmar presença.";
-            return;
-        }
+        if (!result.Success) { actionError = result.Error ?? "Erro ao confirmar presenca."; return; }
         await LoadEvent();
     }
 
@@ -156,7 +104,6 @@ public partial class Detail
     {
         if (currentUserId is null) return;
         actionError = string.Empty;
-
         await EventDetailSvc.CancelConfirmationAsync(Id, currentUserId);
         confirmCancel = false;
         await LoadEvent();
@@ -174,11 +121,7 @@ public partial class Detail
     {
         if (!IsGroupAdmin()) return;
         var result = await AdminConfirmationService.TogglePaidAsync(confirmationId, currentUserId!);
-        if (result.Found && result.Updated)
-        {
-            confirmPayId = null;
-            await LoadEvent();
-        }
+        if (result.Found && result.Updated) { confirmPayId = null; await LoadEvent(); }
     }
 
     private async Task AdminRemoveConfirmation(int confirmationId)
@@ -232,48 +175,20 @@ public partial class Detail
         await LoadEvent();
     }
 
-    private void NavigateToPaymentsModal(int confirmationId)
-    {
+    private void NavigateToPaymentsModal(int confirmationId) =>
         NavigationManager.NavigateTo($"/pagamento/evento/{confirmationId}");
-    }
 
     // Callback wrappers for child components
-    private async Task ConfirmAsCallback(FutsalPosition pos)
-    {
-        chosenPos = pos;
-        await ConfirmPresence();
-    }
-
-    private Task ConfirmPayIdChangedCallback(int? value)
-    { confirmPayId = value; return Task.CompletedTask; }
-
-    private Task ConfirmRemoveIdChangedCallback(int? value)
-    { confirmRemoveId = value; return Task.CompletedTask; }
-
-    private Task ConfirmCancelChangedCallback(bool value)
-    { confirmCancel = value; return Task.CompletedTask; }
-
-    private async Task CancelConfirmationCallback()
-        => await CancelConfirmation();
-
-    private async Task AdminTogglePaidCallback(int confirmationId)
-        => await AdminTogglePaid(confirmationId);
-
-    private async Task AdminRemoveConfirmationCallback(int confirmationId)
-        => await AdminRemoveConfirmation(confirmationId);
-
-    private async Task AdminAddOutfieldSlotCallback()
-        => await AdminAddOutfieldSlot();
-
-    private async Task AdminRemoveOutfieldSlotCallback()
-        => await AdminRemoveOutfieldSlot();
-
-    private async Task AdminAddGoalkeeperSlotCallback()
-        => await AdminAddGoalkeeperSlot();
-
-    private async Task AdminRemoveGoalkeeperSlotCallback()
-        => await AdminRemoveGoalkeeperSlot();
-
-    private Task NavigateToPaymentsModalCallback(int confirmationId)
-    { NavigateToPaymentsModal(confirmationId); return Task.CompletedTask; }
+    private async Task ConfirmAsCallback(FutsalPosition pos) { chosenPos = pos; await ConfirmPresence(); }
+    private Task ConfirmPayIdChangedCallback(int? value) { confirmPayId = value; return Task.CompletedTask; }
+    private Task ConfirmRemoveIdChangedCallback(int? value) { confirmRemoveId = value; return Task.CompletedTask; }
+    private Task ConfirmCancelChangedCallback(bool value) { confirmCancel = value; return Task.CompletedTask; }
+    private async Task CancelConfirmationCallback() => await CancelConfirmation();
+    private async Task AdminTogglePaidCallback(int confirmationId) => await AdminTogglePaid(confirmationId);
+    private async Task AdminRemoveConfirmationCallback(int confirmationId) => await AdminRemoveConfirmation(confirmationId);
+    private async Task AdminAddOutfieldSlotCallback() => await AdminAddOutfieldSlot();
+    private async Task AdminRemoveOutfieldSlotCallback() => await AdminRemoveOutfieldSlot();
+    private async Task AdminAddGoalkeeperSlotCallback() => await AdminAddGoalkeeperSlot();
+    private async Task AdminRemoveGoalkeeperSlotCallback() => await AdminRemoveGoalkeeperSlot();
+    private Task NavigateToPaymentsModalCallback(int confirmationId) { NavigateToPaymentsModal(confirmationId); return Task.CompletedTask; }
 }

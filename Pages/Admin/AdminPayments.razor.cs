@@ -1,7 +1,5 @@
 using Confirmai.Models;
-using Confirmai.Enums;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 using Microsoft.JSInterop;
 using Confirmai.Shared.Helpers;
 using Confirmai.Services;
@@ -31,33 +29,13 @@ public partial class AdminPayments : IAsyncDisposable
     private bool showRestoredFiltersNotice;
     private decimal? btcUsdRate;
     private decimal? btcBrlRate;
-    private int reconciliationPendingWithChargeId;
-    private int reconciliationPendingWithoutChargeId;
-    private int reconciliationStalePending;
-    private int reconciliationPaidToday;
-    private string lastAutomaticSweepLabel = "Sem varredura automática registrada.";
-    private string lastAutomaticSweepDetails = string.Empty;
-    private string lastManualSweepLabel = "Sem varredura manual registrada.";
-    private string lastManualSweepDetails = string.Empty;
-    private string pendingTrend24hLabel = "Sem dados suficientes para tendência.";
-    private bool isPendingTrendWarning;
-    private string pendingByGatewayLabel = "Sem pendências com gateway identificado.";
-    private string paidByGatewayLabel = "Sem confirmações pagas com gateway identificado.";
-    private readonly List<GatewayTelemetryItem> gatewayTelemetry = new();
+    private AdminPaymentsSummaryResult summary = new();
     private string reconciliationSeverityLabel = "OK";
     private string reconciliationSeverityClass = "admin-payments-severity-pill--ok";
-    private int pendingTrendDelta24h;
-    private readonly List<SweepHistoryItem> automaticSweepHistory = new();
     private bool isAutoRefreshEnabled = true;
     private bool isSummaryRefreshing;
     private bool isAutoRefreshPausedByVisibility;
     private string lastAutoRefreshPauseLabel = "Nenhuma pausa registrada.";
-    private CancellationTokenSource? summaryRefreshCts;
-    private Task? summaryRefreshTask;
-    private CancellationTokenSource? summaryAgeCts;
-    private Task? summaryAgeTask;
-    private int pendingTrendWarningThreshold = AdminSettingsService.DefaultReconciliationWarningThreshold;
-    private int pendingTrendCriticalThreshold = AdminSettingsService.DefaultReconciliationCriticalThreshold;
 
     private string reconcileChargeId = string.Empty;
     private bool isReconciling;
@@ -81,6 +59,9 @@ public partial class AdminPayments : IAsyncDisposable
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IJSRuntime JS { get; set; } = default!;
     [Inject] public SummaryAgeTracker SummaryAgeTracker { get; set; } = default!;
+    [Inject] public AdminPaymentsCommandService CommandService { get; set; } = default!;
+    [Inject] public AsyncLoopRunner RefreshLoop { get; set; } = default!;
+    [Inject] public AsyncLoopRunner AgeLoop { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,95 +70,21 @@ public partial class AdminPayments : IAsyncDisposable
         btcBrlRate = quote?.btc_brl;
         await RefreshOperationalPanelAsync(includePaymentsTable: false);
         await LoadPaymentsCountAsync();
-        StartSummaryRefreshLoop();
-        StartSummaryAgeLoop();
+        StartLoops();
     }
 
-    private void StartSummaryRefreshLoop()
+    private void StartLoops()
     {
-        summaryRefreshCts = new CancellationTokenSource();
-        summaryRefreshTask = RunSummaryRefreshLoopAsync(summaryRefreshCts.Token);
-    }
-
-    private void StartSummaryAgeLoop()
-    {
-        summaryAgeCts = new CancellationTokenSource();
-        summaryAgeTask = RunSummaryAgeLoopAsync(summaryAgeCts.Token);
-    }
-
-    private async Task RunSummaryRefreshLoopAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
+        RefreshLoop.Start(TimeSpan.FromSeconds(SummaryAgeTracker.RefreshIntervalSeconds), async _ =>
         {
-            try
-            {
-                await Task.Delay(TimeSpan.FromSeconds(SummaryAgeTracker.RefreshIntervalSeconds), cancellationToken);
+            if (!isAutoRefreshEnabled) { if (isAutoRefreshPausedByVisibility) await InvokeAsync(() => isAutoRefreshPausedByVisibility = false); return; }
+            if (!await IsDocumentVisibleAsync()) { await InvokeAsync(() => { isAutoRefreshPausedByVisibility = true; lastAutoRefreshPauseLabel = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"); }); return; }
+            if (isAutoRefreshPausedByVisibility) await InvokeAsync(() => isAutoRefreshPausedByVisibility = false);
+            await InvokeAsync(async () => await RefreshOperationalPanelAsync(includePaymentsTable: false));
+        });
 
-                if (!isAutoRefreshEnabled)
-                {
-                    if (isAutoRefreshPausedByVisibility)
-                    {
-                        await InvokeAsync(() =>
-                        {
-                            isAutoRefreshPausedByVisibility = false;
-                        });
-                    }
-
-                    continue;
-                }
-
-                if (!await IsDocumentVisibleAsync())
-                {
-                    await InvokeAsync(() =>
-                    {
-                        isAutoRefreshPausedByVisibility = true;
-                        lastAutoRefreshPauseLabel = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                    });
-
-                    continue;
-                }
-
-                if (isAutoRefreshPausedByVisibility)
-                {
-                    await InvokeAsync(() =>
-                    {
-                        isAutoRefreshPausedByVisibility = false;
-                    });
-                }
-
-                await InvokeAsync(async () =>
-                {
-                    await RefreshOperationalPanelAsync(includePaymentsTable: false);
-                });
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                break;
-            }
-        }
-    }
-
-    private async Task RunSummaryAgeLoopAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            try
-            {
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-
-                await InvokeAsync(async () =>
-                {
-                    SummaryAgeTracker.UpdateAgeLabel();
-                    var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-                    var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-                    await SummaryAgeTracker.TryWriteStalenessAuditAsync(actorUserId, isAutoRefreshEnabled, isAutoRefreshPausedByVisibility);
-                });
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                break;
-            }
-        }
+        AgeLoop.Start(TimeSpan.FromSeconds(1), async _ =>
+            await InvokeAsync(async () => { SummaryAgeTracker.UpdateAgeLabel(); await SummaryAgeTracker.TryWriteStalenessAuditAsync(isAutoRefreshEnabled, isAutoRefreshPausedByVisibility); }));
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -185,20 +92,10 @@ public partial class AdminPayments : IAsyncDisposable
         if (shouldActivateAdvancedToolsModalA11y && isAdvancedToolsModalOpen)
         {
             shouldActivateAdvancedToolsModalA11y = false;
-
-            try
-            {
-                await JS.InvokeVoidAsync("ConfirmaiModal.open", "#admin-payments-advanced-modal");
-                isAdvancedToolsModalA11yActive = true;
-            }
-            catch
-            {
-                // No-op: modal a11y integration should not break page behavior.
-            }
+            try { await JS.InvokeVoidAsync("ConfirmaiModal.open", "#admin-payments-advanced-modal"); isAdvancedToolsModalA11yActive = true; } catch { }
         }
 
         if (!firstRender || filtersLoaded) return;
-
         await LoadFilterStateFromStorageAsync();
         currentPage = 1;
         await LoadPaymentsCountAsync();
@@ -207,460 +104,135 @@ public partial class AdminPayments : IAsyncDisposable
 
     private async Task LoadPaymentsCountAsync()
     {
-        var result = await AdminPaymentsQueryService.GetPaymentsPageAsync(
-            filterUserId, filterMinAmount, filterMaxAmount, filterStatus, filterDate,
-            currentPage, PageSize);
-
-        totalCount = result.TotalCount;
-        totalPages = result.TotalPages;
-        if (currentPage > totalPages)
-            currentPage = totalPages;
-
+        var result = await AdminPaymentsQueryService.GetPaymentsPageAsync(filterUserId, filterMinAmount, filterMaxAmount, filterStatus, filterDate, currentPage, PageSize);
+        totalCount = result.TotalCount; totalPages = result.TotalPages;
+        if (currentPage > totalPages) currentPage = totalPages;
         currentPagePayments = result.Payments;
     }
 
-    private async Task GoToPrevPage()
-    {
-        if (currentPage > 1)
-        {
-            currentPage--;
-            await LoadPaymentsCountAsync();
-        }
-    }
-
-    private async Task GoToNextPage()
-    {
-        if (currentPage < totalPages)
-        {
-            currentPage++;
-            await LoadPaymentsCountAsync();
-        }
-    }
+    private async Task GoToPrevPage() { if (currentPage > 1) { currentPage--; await LoadPaymentsCountAsync(); } }
+    private async Task GoToNextPage() { if (currentPage < totalPages) { currentPage++; await LoadPaymentsCountAsync(); } }
 
     private void ViewPayment(int id) => NavigationManager.NavigateTo($"/payments/view/{id}");
 
-    private async Task ApplyFiltersAndPersist()
-    {
-        showRestoredFiltersNotice = false;
-        currentPage = 1;
-        await LoadPaymentsCountAsync();
-        await PersistFilterStateAsync();
-    }
+    private async Task ApplyFiltersAndPersist() { showRestoredFiltersNotice = false; currentPage = 1; await LoadPaymentsCountAsync(); await PersistFilterStateAsync(); }
 
     private async Task ClearFilters()
     {
-        filterUserId = "";
-        filterMinAmount = null;
-        filterMaxAmount = null;
-        filterStatus = "";
-        filterDate = null;
-        showRestoredFiltersNotice = false;
-        currentPage = 1;
-        await LoadPaymentsCountAsync();
-        await PersistFilterStateAsync();
+        filterUserId = ""; filterMinAmount = null; filterMaxAmount = null; filterStatus = ""; filterDate = null;
+        showRestoredFiltersNotice = false; currentPage = 1;
+        await LoadPaymentsCountAsync(); await PersistFilterStateAsync();
     }
 
     private async Task LoadFilterStateFromStorageAsync()
     {
         var state = await AdminPaymentsFilterStateService.LoadAsync();
-
-        filterUserId = state.UserId;
-        filterMinAmount = state.MinAmount;
-        filterMaxAmount = state.MaxAmount;
-        filterStatus = state.Status;
-        filterDate = state.Date;
-
-        showRestoredFiltersNotice =
-            !string.IsNullOrWhiteSpace(filterUserId)
-            || filterMinAmount.HasValue
-            || filterMaxAmount.HasValue
-            || !string.IsNullOrWhiteSpace(filterStatus)
-            || filterDate.HasValue;
+        filterUserId = state.UserId; filterMinAmount = state.MinAmount; filterMaxAmount = state.MaxAmount;
+        filterStatus = state.Status; filterDate = state.Date;
+        showRestoredFiltersNotice = !string.IsNullOrWhiteSpace(filterUserId) || filterMinAmount.HasValue || filterMaxAmount.HasValue || !string.IsNullOrWhiteSpace(filterStatus) || filterDate.HasValue;
     }
 
-    private async Task PersistFilterStateAsync()
-    {
-        await AdminPaymentsFilterStateService.SaveAsync(new AdminPaymentsFilterState
-        {
-            UserId = filterUserId,
-            ProductId = string.Empty,
-            MinAmount = filterMinAmount,
-            MaxAmount = filterMaxAmount,
-            Status = filterStatus,
-            Date = filterDate
-        });
-    }
+    private async Task PersistFilterStateAsync() =>
+        await AdminPaymentsFilterStateService.SaveAsync(new AdminPaymentsFilterState { UserId = filterUserId, ProductId = string.Empty, MinAmount = filterMinAmount, MaxAmount = filterMaxAmount, Status = filterStatus, Date = filterDate });
 
-    private void DismissRestoredNotice()
-    {
-        showRestoredFiltersNotice = false;
-    }
+    private void DismissRestoredNotice() => showRestoredFiltersNotice = false;
 
-    private async Task HandleFiltersApplied((string UserId, decimal? MinAmount, decimal? MaxAmount, string Status, DateTime? Date) filters)
+    private async Task HandleFiltersApplied((string UserId, decimal? MinAmount, decimal? MaxAmount, string Status, DateTime? Date) f)
     {
-        filterUserId = filters.UserId;
-        filterMinAmount = filters.MinAmount;
-        filterMaxAmount = filters.MaxAmount;
-        filterStatus = filters.Status;
-        filterDate = filters.Date;
+        filterUserId = f.UserId; filterMinAmount = f.MinAmount; filterMaxAmount = f.MaxAmount; filterStatus = f.Status; filterDate = f.Date;
         await ApplyFiltersAndPersist();
     }
 
-    private MarkupString FormatBtcWithUsd(decimal amount)
-    {
-        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
-    }
+    private MarkupString FormatBtcWithUsd(decimal amount) =>
+        BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
 
     private async Task ReconcileChargeAsync()
     {
-        var chargeId = reconcileChargeId?.Trim();
-        if (string.IsNullOrWhiteSpace(chargeId))
-        {
-            reconcileResultIsError = true;
-            reconcileResultMessage = "Informe um chargeId/txId para revalidar.";
-            return;
-        }
-
-        isReconciling = true;
-        reconcileResultMessage = string.Empty;
-        reconcileResultConfirmationId = null;
-
+        isReconciling = true; reconcileResultMessage = string.Empty; reconcileResultConfirmationId = null;
         try
         {
-            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-            var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-
-            var result = await EventPaymentReconciliationService.ReconcileByChargeIdAsync(chargeId, actorUserId);
-            reconcileResultIsError = !result.Found || !result.IsPaid;
-            reconcileResultMessage = result.Message;
-            reconcileResultConfirmationId = result.ConfirmationId;
-
-            if (result.ConfirmationId.HasValue)
-            {
-                timelineConfirmationId = result.ConfirmationId.Value;
-            }
-
-            await LoadOperationalSummaryAsync();
-            await LoadPaymentsCountAsync();
+            var result = await CommandService.ReconcileChargeAsync(reconcileChargeId);
+            reconcileResultIsError = result.IsError; reconcileResultMessage = result.Message; reconcileResultConfirmationId = result.ConfirmationId;
+            if (result.ConfirmationId.HasValue) timelineConfirmationId = result.ConfirmationId.Value;
+            await LoadOperationalSummaryAsync(); await LoadPaymentsCountAsync();
         }
-        catch (Exception ex)
-        {
-            reconcileResultIsError = true;
-            reconcileResultMessage = $"Erro ao revalidar cobrança: {ex.Message}";
-        }
-        finally
-        {
-            isReconciling = false;
-        }
+        finally { isReconciling = false; }
     }
 
-    private void OpenAdvancedToolsModal()
-    {
-        isAdvancedToolsModalOpen = true;
-        shouldActivateAdvancedToolsModalA11y = true;
-    }
+    private void OpenAdvancedToolsModal() { isAdvancedToolsModalOpen = true; shouldActivateAdvancedToolsModalA11y = true; }
 
     private async Task CloseAdvancedToolsModalAsync()
     {
-        isAdvancedToolsModalOpen = false;
-        shouldActivateAdvancedToolsModalA11y = false;
-
-        if (!isAdvancedToolsModalA11yActive)
-            return;
-
-        try
-        {
-            await JS.InvokeVoidAsync("ConfirmaiModal.close");
-        }
-        catch
-        {
-            // Ignore JS interop errors during teardown.
-        }
-        finally
-        {
-            isAdvancedToolsModalA11yActive = false;
-        }
+        isAdvancedToolsModalOpen = false; shouldActivateAdvancedToolsModalA11y = false;
+        if (!isAdvancedToolsModalA11yActive) return;
+        try { await JS.InvokeVoidAsync("ConfirmaiModal.close"); } catch { } finally { isAdvancedToolsModalA11yActive = false; }
     }
 
-    private void HandleAdvancedToolsKeyDown(KeyboardEventArgs args)
-    {
-        if (string.Equals(args.Key, "Escape", StringComparison.OrdinalIgnoreCase))
-        {
-            _ = CloseAdvancedToolsModalAsync();
-        }
-    }
+    private void HandleAdvancedToolsKeyDown(KeyboardEventArgs args) { if (string.Equals(args.Key, "Escape", StringComparison.OrdinalIgnoreCase)) _ = CloseAdvancedToolsModalAsync(); }
 
-    private async Task LoadOperationalSummaryAsync()
-    {
-        var summary = await AdminPaymentsSummaryService.LoadSummaryAsync();
-
-        pendingTrendWarningThreshold = summary.WarningThreshold;
-        pendingTrendCriticalThreshold = summary.CriticalThreshold;
-
-        reconciliationPendingWithChargeId = summary.PendingWithChargeId;
-        reconciliationPendingWithoutChargeId = summary.PendingWithoutChargeId;
-        reconciliationStalePending = summary.StalePending;
-        reconciliationPaidToday = summary.PaidToday;
-
-        pendingByGatewayLabel = summary.PendingByGatewayLabel;
-        paidByGatewayLabel = summary.PaidByGatewayLabel;
-
-        gatewayTelemetry.Clear();
-        gatewayTelemetry.AddRange(summary.GatewayTelemetry);
-
-        lastAutomaticSweepLabel = summary.LastAutomaticSweepLabel;
-        lastAutomaticSweepDetails = summary.LastAutomaticSweepDetails;
-        lastManualSweepLabel = summary.LastManualSweepLabel;
-        lastManualSweepDetails = summary.LastManualSweepDetails;
-
-        pendingTrend24hLabel = summary.PendingTrend24hLabel;
-        isPendingTrendWarning = summary.IsPendingTrendWarning;
-        pendingTrendDelta24h = summary.PendingTrendDelta24h;
-
-        automaticSweepHistory.Clear();
-        automaticSweepHistory.AddRange(summary.AutomaticSweepHistory);
-
-        UpdateSeverity();
-    }
+    private async Task LoadOperationalSummaryAsync() { summary = await AdminPaymentsSummaryService.LoadSummaryAsync(); UpdateSeverity(); }
 
     private async Task RefreshOperationalPanelAsync(bool includePaymentsTable)
     {
-        if (isSummaryRefreshing)
-            return;
-
+        if (isSummaryRefreshing) return;
         isSummaryRefreshing = true;
-
-        try
-        {
-            await LoadOperationalSummaryAsync();
-
-            if (includePaymentsTable)
-                await LoadPaymentsCountAsync();
-
-            SummaryAgeTracker.MarkRefreshed();
-        }
-        finally
-        {
-            isSummaryRefreshing = false;
-        }
+        try { await LoadOperationalSummaryAsync(); if (includePaymentsTable) await LoadPaymentsCountAsync(); SummaryAgeTracker.MarkRefreshed(); }
+        finally { isSummaryRefreshing = false; }
     }
 
-    private async Task RefreshSummaryNowAsync()
-    {
-        await RefreshOperationalPanelAsync(includePaymentsTable: true);
-    }
+    private async Task RefreshSummaryNowAsync() => await RefreshOperationalPanelAsync(includePaymentsTable: true);
 
-    private async Task<bool> IsDocumentVisibleAsync()
-    {
-        try
-        {
-            return await JS.InvokeAsync<bool>("ConfirmaiIsDocumentVisible");
-        }
-        catch
-        {
-            return true;
-        }
-    }
+    private async Task<bool> IsDocumentVisibleAsync() { try { return await JS.InvokeAsync<bool>("ConfirmaiIsDocumentVisible"); } catch { return true; } }
 
     private void UpdateSeverity()
     {
-        var result = SeverityEvaluator.Evaluate(
-            reconciliationStalePending,
-            pendingTrendDelta24h,
-            reconciliationPendingWithChargeId,
-            pendingTrendWarningThreshold,
-            pendingTrendCriticalThreshold);
-
-        reconciliationSeverityLabel = result.Label;
-        reconciliationSeverityClass = result.CssClass;
+        var result = SeverityEvaluator.Evaluate(summary.StalePending, summary.PendingTrendDelta24h, summary.PendingWithChargeId, summary.WarningThreshold, summary.CriticalThreshold);
+        reconciliationSeverityLabel = result.Label; reconciliationSeverityClass = result.CssClass;
     }
 
     private decimal GetPendingHeightPercent(SweepHistoryItem item)
     {
-        var maxPending = Math.Max(1, automaticSweepHistory.Max(x => x.StillPending));
-        var relative = (decimal)item.StillPending / maxPending;
-        var height = Math.Max(12m, relative * 100m);
-        return Math.Round(height, 2, MidpointRounding.AwayFromZero);
+        var maxPending = Math.Max(1, summary.AutomaticSweepHistory.Max(x => x.StillPending));
+        return Math.Round(Math.Max(12m, (decimal)item.StillPending / maxPending * 100m), 2, MidpointRounding.AwayFromZero);
     }
 
-    private static string BuildStalenessLogsHref()
-    {
-        return AdminLogsDeepLinkBuilder.BuildPaymentPanelStaleLink(DateTime.Today);
-    }
+    private static string BuildStalenessLogsHref() => AdminLogsDeepLinkBuilder.BuildPaymentPanelStaleLink(DateTime.Today);
 
     private async Task RunSweepNowAsync()
     {
-        isRunningSweep = true;
-        sweepResultMessage = string.Empty;
-
+        isRunningSweep = true; sweepResultMessage = string.Empty;
         try
         {
-            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-            var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-
-            var result = await EventPaymentReconciliationService.ReconcilePendingConfirmationsAsync(50, actorUserId);
-            sweepResultIsError = result.StillPending > 0 || result.NotFound > 0;
-            sweepResultMessage = result.Considered == 0
-                ? "Nenhuma confirmação pendente para revalidar agora."
-                : $"Varredura concluída: {result.Updated} atualizada(s), {result.StillPending} pendente(s), {result.NotFound} não encontrada(s).";
-
-            await LoadOperationalSummaryAsync();
-            await LoadPaymentsCountAsync();
+            var result = await CommandService.RunSweepAsync();
+            sweepResultIsError = result.IsError; sweepResultMessage = result.Message;
+            await LoadOperationalSummaryAsync(); await LoadPaymentsCountAsync();
         }
-        catch (Exception ex)
-        {
-            sweepResultIsError = true;
-            sweepResultMessage = $"Erro ao varrer pendências: {ex.Message}";
-        }
-        finally
-        {
-            isRunningSweep = false;
-        }
+        finally { isRunningSweep = false; }
     }
 
-    private void DismissReconcileMessage()
-    {
-        reconcileResultMessage = string.Empty;
-        reconcileResultConfirmationId = null;
-    }
-
-    private async Task ExportReconciliationCsvAsync()
-    {
-        var (csv, fileName) = await AdminPaymentsQueryService.BuildReconciliationExportAsync();
-        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
-    }
+    private void DismissReconcileMessage() { reconcileResultMessage = string.Empty; reconcileResultConfirmationId = null; }
+    private async Task ExportReconciliationCsvAsync() => await CommandService.ExportReconciliationCsvAsync();
 
     private async Task ApplyStatusTransitionAsync()
     {
-        if (!statusTransitionConfirmationId.HasValue || statusTransitionConfirmationId.Value <= 0)
-        {
-            statusTransitionResultIsError = true;
-            statusTransitionResultMessage = "Informe um ConfirmationId válido.";
-            return;
-        }
-
-        if (!Enum.TryParse<EventConfirmationPaymentStatus>(statusTransitionTarget, ignoreCase: true, out var targetStatus))
-        {
-            statusTransitionResultIsError = true;
-            statusTransitionResultMessage = "Selecione um status alvo válido.";
-            return;
-        }
-
-        isStatusTransitioning = true;
-        statusTransitionResultMessage = string.Empty;
-
+        isStatusTransitioning = true; statusTransitionResultMessage = string.Empty;
         try
         {
-            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-            var actorUserId = auth.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-
-            var result = await EventConfirmationPaymentStatusService.TransitionStatusAsync(
-                confirmationId: statusTransitionConfirmationId.Value,
-                targetStatus: targetStatus,
-                actorUserId: actorUserId,
-                reason: statusTransitionReason);
-
-            statusTransitionResultIsError = !result.Found || !result.Updated;
-            statusTransitionResultMessage = result.Message;
-
-            if (result.ConfirmationId.HasValue)
-            {
-                timelineConfirmationId = result.ConfirmationId.Value;
-            }
-
-            await LoadOperationalSummaryAsync();
-            await LoadPaymentsCountAsync();
+            var result = await CommandService.ApplyStatusTransitionAsync(statusTransitionConfirmationId, statusTransitionTarget, statusTransitionReason);
+            statusTransitionResultIsError = result.IsError; statusTransitionResultMessage = result.Message;
+            if (result.ConfirmationId.HasValue) timelineConfirmationId = result.ConfirmationId.Value;
+            await LoadOperationalSummaryAsync(); await LoadPaymentsCountAsync();
         }
-        catch (Exception ex)
-        {
-            statusTransitionResultIsError = true;
-            statusTransitionResultMessage = $"Erro ao aplicar transição de status: {ex.Message}";
-        }
-        finally
-        {
-            isStatusTransitioning = false;
-        }
+        finally { isStatusTransitioning = false; }
     }
 
-    private void OpenConfirmationTimeline()
-    {
-        if (timelineConfirmationId is null || timelineConfirmationId <= 0)
-            return;
-
-        NavigationManager.NavigateTo(BuildConfirmationTimelineHref(timelineConfirmationId.Value));
-    }
-
-    private static string BuildConfirmationTimelineHref(int confirmationId)
-    {
-        return $"/admin/audit/Payment/{confirmationId}";
-    }
-
-    private void DismissSweepMessage()
-    {
-        sweepResultMessage = string.Empty;
-    }
-
-    private void DismissStatusTransitionMessage()
-    {
-        statusTransitionResultMessage = string.Empty;
-    }
+    private void OpenConfirmationTimeline() { if (timelineConfirmationId is null || timelineConfirmationId <= 0) return; NavigationManager.NavigateTo($"/admin/audit/Payment/{timelineConfirmationId.Value}"); }
+    private void DismissSweepMessage() => sweepResultMessage = string.Empty;
+    private void DismissStatusTransitionMessage() => statusTransitionResultMessage = string.Empty;
 
     public async ValueTask DisposeAsync()
     {
-        if (isAdvancedToolsModalA11yActive)
-        {
-            try
-            {
-                await JS.InvokeVoidAsync("ConfirmaiModal.close");
-            }
-            catch
-            {
-                // Ignore JS interop errors during component disposal.
-            }
-            finally
-            {
-                isAdvancedToolsModalA11yActive = false;
-            }
-        }
-
-        if (summaryAgeCts is not null)
-        {
-            summaryAgeCts.Cancel();
-
-            if (summaryAgeTask is not null)
-            {
-                try
-                {
-                    await summaryAgeTask;
-                }
-                catch (OperationCanceledException)
-                {
-                    // Expected when disposing.
-                }
-            }
-
-            summaryAgeCts.Dispose();
-            summaryAgeCts = null;
-        }
-
-        if (summaryRefreshCts is not null)
-        {
-            summaryRefreshCts.Cancel();
-
-            if (summaryRefreshTask is not null)
-            {
-                try
-                {
-                    await summaryRefreshTask;
-                }
-                catch (OperationCanceledException)
-                {
-                    // Expected when disposing.
-                }
-            }
-
-            summaryRefreshCts.Dispose();
-            summaryRefreshCts = null;
-        }
+        if (isAdvancedToolsModalA11yActive) { try { await JS.InvokeVoidAsync("ConfirmaiModal.close"); } catch { } finally { isAdvancedToolsModalA11yActive = false; } }
+        await RefreshLoop.DisposeAsync(); await AgeLoop.DisposeAsync();
     }
 }

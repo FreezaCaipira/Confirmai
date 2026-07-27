@@ -13,6 +13,8 @@
 @inject AdminLogsQueryService AdminLogsQueryService
 @inject AdminLogsExportService AdminLogsExportService
 @inject AdminLogsFilterStateService AdminLogsFilterStateService
+@inject AdminLogsFilterOrchestrator Filters
+@inject AdminLogsExportCommandService ExportService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject UiTextService T
@@ -23,15 +25,15 @@
         <article class="entity-shell-card entity-shell-main">
             <h1 class="page-section-title">@T["AdminLogs.Title"]</h1>
             <AdminLogsFilterBar
-                FilterGlobalSearch="@filterGlobalSearch"
-                FilterUserId="@filterUserId"
-                FilterSource="@filterSource"
-                FilterMessage="@filterMessage"
-                FilterLevel="@filterLevel"
-                FilterStartDate="@filterStartDate"
-                FilterEndDate="@filterEndDate"
-                FilterEventType="@filterEventType"
-                FilterEntityType="@filterEntityType"
+                FilterGlobalSearch="@Filters.GlobalSearch"
+                FilterUserId="@Filters.UserId"
+                FilterSource="@Filters.Source"
+                FilterMessage="@Filters.Message"
+                FilterLevel="@Filters.Level"
+                FilterStartDate="@Filters.StartDate"
+                FilterEndDate="@Filters.EndDate"
+                FilterEventType="@Filters.EventType"
+                FilterEntityType="@Filters.EntityType"
                 TotalLogs="@totalLogs"
                 HasInvalidDateRange="@HasInvalidDateRange"
                 OnGlobalSearchInput="@HandleGlobalSearchInput"
@@ -49,8 +51,8 @@
             }
 
             <AdminLogsQuickFilters
-                SelectedQuickRangePreset="@selectedQuickRangePreset.ToString()"
-                SelectedAuditQuickFilter="@selectedAuditQuickFilter.ToString()"
+                SelectedQuickRangePreset="@Filters.QuickRangePreset.ToString()"
+                SelectedAuditQuickFilter="@Filters.AuditQuickFilter.ToString()"
                 AuditCountAll="@auditCountAll"
                 AuditCountSecurityPolicy="@auditCountSecurityPolicy"
                 AuditCountPaymentPanelStale="@auditCountPaymentPanelStale"
@@ -70,7 +72,7 @@
                 </div>
             }
 
-            @if (showRestoredFiltersNotice)
+            @if (Filters.ShowRestoredNotice)
             {
                 <div class="orders-review-restored-notice">
                     <span>@T["AdminLogs.RestoredFilters"]</span>
@@ -92,8 +94,8 @@
                 Logs="@currentPageLogs"
                 CurrentPage="@currentPage"
                 TotalPages="@totalPages"
-                CurrentSortColumn="@currentSortColumn.ToString()"
-                SortAscending="@sortAscending"
+                CurrentSortColumn="@Filters.SortColumn.ToString()"
+                SortAscending="@Filters.SortAscending"
                 OnSort="@HandleSortAsync"
                 OnPrevPage="@GoToPrevPage"
                 OnNextPage="@GoToNextPage" />

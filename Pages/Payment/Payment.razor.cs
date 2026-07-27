@@ -1,15 +1,11 @@
 using Confirmai.Configuration;
 using Confirmai.Models;
 using Confirmai.Services;
-using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 using Confirmai.Services.Payment;
 using Confirmai.Shared.Components;
 using Confirmai.Shared.Helpers;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Payment;
@@ -18,6 +14,7 @@ public partial class Payment : IAsyncDisposable
 {
     [Inject] private PaymentInitializationService InitService { get; set; } = default!;
     [Inject] private PaymentCommandService PaymentCommands { get; set; } = default!;
+    [Inject] private PaymentPageOrchestrator Orchestrator { get; set; } = default!;
 
     [Parameter] public int ProductId { get; set; }
     public Confirmai.Models.Product? product;
@@ -40,25 +37,21 @@ public partial class Payment : IAsyncDisposable
     private int selectedPurchaseQuantity = 1;
     private int maxPurchaseQuantity = 1;
     private decimal? selectedOfferUnitPrice;
-    private string offerCurrency = "BTC"; // BRL, USD or BTC
+    private string offerCurrency = "BTC";
     private string? pixCurrencyNotice;
     private CancellationTokenSource? _copyCts;
     private Task? _copyTask = null;
     private string? pixSellerKeyNotice;
-
     private PaymentRecord? paymentRecord;
+    private List<GatewayInfo> ActiveGateways = new();
 
     private bool IsPixCurrentPayment =>
         string.Equals(paymentRecord?.PaymentMethod ?? SelectedMethod, "Pix", StringComparison.OrdinalIgnoreCase);
 
     public string QRCodeValue =>
-        IsPixCurrentPayment
-            ? Address
-            : Address.StartsWith("lnbc")
-            ? Address
-            : $"bitcoin:{Address}?amount={Amount}";
-
-    private List<GatewayInfo> ActiveGateways = new();
+        IsPixCurrentPayment ? Address
+        : Address.StartsWith("lnbc") ? Address
+        : $"bitcoin:{Address}?amount={Amount}";
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,59 +84,37 @@ public partial class Payment : IAsyncDisposable
         SelectedMethod = defaultMethod;
 
         await OnSelectedMethodChangedAsync(false);
-
         PaymentEventBus.OnPaymentConfirmed += OnPaymentConfirmed;
     }
 
     private void OnPaymentConfirmed(string userId, string paymentId)
     {
         if (paymentId != this.PaymentId) return;
-
-        InvokeAsync(async () =>
-        {
-            await CheckPayment();
-        });
+        InvokeAsync(async () => await CheckPayment());
     }
 
     public async ValueTask DisposeAsync()
     {
         PaymentEventBus.OnPaymentConfirmed -= OnPaymentConfirmed;
-
         _copyCts?.Cancel();
-
         if (_copyTask is not null)
         {
             try { await _copyTask; }
             catch (OperationCanceledException) { }
         }
-
         _copyCts?.Dispose();
     }
 
-    private async Task GenerateAddressCallback()
-        => await GenerateAddress();
-
-    private async Task CheckPaymentCallback()
-        => await OnCheckPaymentClick();
-
-    private async Task MethodChangedCallback(string method)
-    {
-        SelectedMethod = method;
-        await OnSelectedMethodChangedAsync(true);
-    }
-
-    private async Task IntermediaryChangedCallback()
-        => await OnUseSiteIntermediaryChangedAsync();
-
-    private async Task CopyAddressCallback()
-        => await CopyAddress();
+    // Callback wrappers
+    private async Task GenerateAddressCallback() => await GenerateAddress();
+    private async Task CheckPaymentCallback() => await OnCheckPaymentClick();
+    private async Task MethodChangedCallback(string method) { SelectedMethod = method; await OnSelectedMethodChangedAsync(true); }
+    private async Task IntermediaryChangedCallback() => await OnUseSiteIntermediaryChangedAsync();
+    private async Task CopyAddressCallback() => await CopyAddress();
 
     private async Task GenerateAddress()
     {
-        if (!await ValidateOfferBeforePaymentAsync())
-        {
-            return;
-        }
+        if (!await ValidateOfferBeforePaymentAsync()) return;
 
         if (string.Equals(SelectedMethod, "Pix", StringComparison.OrdinalIgnoreCase))
         {
@@ -151,26 +122,18 @@ public partial class Payment : IAsyncDisposable
             return;
         }
 
-        if (Amount < MinBtcAmount)
-        {
-            await PaymentCommands.LogWarningAsync($"Tentativa de pagamento abaixo do m\u00EDnimo: {Amount} BTC.", sellerUser?.Id);
-            NotifyUser(string.Format(T["PaymentBuy.MinAmountWarning"], FormatBtcWithUsdText(MinBtcAmount)), "warning");
-            return;
-        }
-
+        isLoading = true;
         try
         {
-            isLoading = true;
+            var result = await Orchestrator.GenerateBtcAddressAsync(
+                ProductId, Amount, SelectedMethod, sellerUser?.Id, offerCurrency, MinBtcAmount);
 
-            AuthenticationState? authState = await AuthProvider.GetAuthenticationStateAsync();
-            string? userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-            var result = await PaymentCommands.GenerateBtcAddressAsync(
-                ProductId, Amount, SelectedMethod, sellerUser?.Id, userId, offerCurrency);
-
-            if (result == null)
+            if (result == null || result.Error != null)
             {
-                NotifyUser(string.Format(T["PaymentBuy.GenerateError"], "Falha ao gerar endere\u00E7o."), "error");
+                if (result?.Error != null)
+                    NotifyUser(string.Format(T["PaymentBuy.GenerateError"], result.Error), "error");
+                else
+                    NotifyUser(string.Format(T["PaymentBuy.GenerateError"], "Falha ao gerar endereco."), "error");
                 return;
             }
 
@@ -178,209 +141,39 @@ public partial class Payment : IAsyncDisposable
             PaymentId = result.PaymentId;
             IsPaid = false;
             paymentRecord = result.PaymentRecord;
-
-            await PaymentCommands.SavePaymentRecordAsync(paymentRecord);
-            await PaymentCommands.LogAsync($"Endere\u00E7o/invoice gerado para produto {ProductId} via {SelectedMethod}.", userId);
-
             NotifyUser(T["PaymentBuy.Generated"], "success");
-        }
-        catch (Exception ex)
-        {
-            await PaymentCommands.LogAsync("Erro ao gerar endere\u00E7o/invoice.", sellerUser?.Id, ex);
-            NotifyUser(string.Format(T["PaymentBuy.GenerateError"], ex.Message), "error");
         }
         finally
         {
             isLoading = false;
         }
-    }
-
-    private async Task OnCheckPaymentClick()
-    {
-        await CheckPayment();
-    }
-
-    private async Task CheckPayment()
-    {
-        if (IsPixCurrentPayment && !AbacatePayOpts.Value.IsEnabled)
-        {
-            NotifyUser("A confirmacao automatica para PIX nao esta disponivel. Aguarde a validacao manual.", "info");
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(Address))
-        {
-            NotifyUser(T["PaymentBuy.NotFoundByAddress"], "error");
-            return;
-        }
-
-        if (IsPaid)
-        {
-            NotifyUser(T["PaymentBuy.AlreadyConfirmed"], "success");
-            return;
-        }
-
-        try
-        {
-            var payment = await PaymentCommands.FindPaymentByAddressAsync(Address);
-            if (payment == null)
-            {
-                NotifyUser(T["PaymentBuy.NotFoundByAddress"], "error");
-                return;
-            }
-
-            var result = await PaymentCommands.ConfirmPaymentAsync(payment);
-
-            if (result.AlreadyPaid)
-            {
-                IsPaid = true;
-                NotifyUser(T["PaymentBuy.AlreadyConfirmed"], "success");
-                return;
-            }
-
-            if (result.Confirmed)
-            {
-                IsPaid = true;
-                NotifyUser(T["PaymentBuy.Confirmed"], "success");
-            }
-            else
-            {
-                NotifyUser(string.Format(T["PaymentBuy.NotReceived"], FormatBtcWithUsdText(result.ReceivedAmount), FormatBtcWithUsdText(Amount)), "warning");
-            }
-        }
-        catch (Exception ex)
-        {
-            await PaymentCommands.LogAsync("Erro ao verificar pagamento.", null, ex);
-            NotifyUser(T["PaymentBuy.CheckError"], "error");
-        }
-    }
-
-    private async Task OnSelectedMethodChangedAsync()
-    {
-        await OnSelectedMethodChangedAsync(true);
-    }
-
-    private async Task OnSelectedMethodChangedAsync(bool persistPreference)
-    {
-        if (!string.Equals(SelectedMethod, "Pix", StringComparison.OrdinalIgnoreCase))
-        {
-            pixCurrencyNotice = null;
-            pixSellerKeyNotice = null;
-            return;
-        }
-
-        if (string.Equals(CurrencyPreferenceService.SelectedFiatCurrency, "BRL", StringComparison.OrdinalIgnoreCase))
-        {
-            pixCurrencyNotice = null;
-            return;
-        }
-
-        CurrencyPreferenceService.SetCurrency("BRL");
-        if (persistPreference)
-        {
-            await JS.InvokeVoidAsync("localStorage.setItem", "Confirmai.fiatCurrency", CurrencyPreferenceService.SelectedFiatCurrency);
-        }
-        pixCurrencyNotice = "PIX funciona apenas com BRL. A cotacao foi alterada automaticamente para BRL.";
-    }
-
-    private Task OnUseSiteIntermediaryChangedAsync()
-    {
-        pixSellerKeyNotice = null;
-        return Task.CompletedTask;
-    }
-
-    private void NotifyUser(string message, string type)
-    {
-        feedbackMessage = message;
-        feedbackType = type;
-        ToastRef?.Show(message, type);
-    }
-
-    private async Task CopyAddress()
-    {
-        if (!string.IsNullOrEmpty(Address))
-        {
-            await JS.InvokeVoidAsync("navigator.clipboard.writeText", Address);
-
-            _copyCts?.Cancel();
-            _copyCts = new CancellationTokenSource();
-            var ct = _copyCts.Token;
-
-            try
-            {
-                copyIcon = "fas fa-check";
-                StateHasChanged();
-                await Task.Delay(1500, ct);
-                if (!ct.IsCancellationRequested)
-                {
-                    copyIcon = "fas fa-copy";
-                }
-            }
-            catch (OperationCanceledException) when (ct.IsCancellationRequested)
-            {
-                copyIcon = "fas fa-copy";
-            }
-        }
-    }
-
-    private string BuildSellerProfileUrl(string sellerUserId)
-    {
-        var safeUserId = Uri.EscapeDataString(sellerUserId ?? string.Empty);
-        var currentRelativePath = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-
-        var profileUrl = $"/profile/{safeUserId}?returnUrl={Uri.EscapeDataString(currentRelativePath)}";
-        return profileUrl;
-    }
-
-    private string FormatOfferPrice(decimal amount)
-    {
-        return offerCurrency switch
-        {
-            "BRL" => $"R$ {amount:N2}",
-            "USD" => $"$ {amount:N2}",
-            _ => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency)
-        };
-    }
-
-    private decimal GetUnitPriceAmount()
-    {
-        return selectedOfferUnitPrice ?? product?.Price ?? 0m;
-    }
-
-    private MarkupString FormatBtcWithUsdMarkup(decimal amount)
-    {
-        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
-    }
-
-    private string FormatBtcWithUsdText(decimal amount)
-    {
-        return BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 
     private async Task GeneratePixPaymentAsync()
     {
+        isLoading = true;
+        pixSellerKeyNotice = null;
         try
         {
-            isLoading = true;
-            pixSellerKeyNotice = null;
+            var result = await Orchestrator.GeneratePixPaymentAsync(
+                ProductId, Amount, SelectedMethod, sellerUser?.Id, offerCurrency,
+                UseSiteIntermediary, product);
 
-            AuthenticationState? authState = await AuthProvider.GetAuthenticationStateAsync();
-            string? userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-            var result = await PaymentCommands.GeneratePixPaymentAsync(
-                ProductId, Amount, SelectedMethod, sellerUser?.Id, userId, offerCurrency,
-                AbacatePayOpts.Value.IsEnabled, product, UseSiteIntermediary);
-
-            if (result == null)
+            if (result == null || (result.Error == null && result.SellerKeyNotice == null))
             {
-                if (!UseSiteIntermediary && string.IsNullOrWhiteSpace(await ResolvePixRecipientKeyForNoticeAsync()))
-                {
-                    pixSellerKeyNotice = "O vendedor nao possui chave PIX cadastrada no perfil. Escolha intermedio do ADM do site ou use outra forma de pagamento.";
-                }
-                else
-                {
-                    NotifyUser("Nao foi possivel gerar o pagamento PIX.", "error");
-                }
+                NotifyUser("Nao foi possivel gerar o pagamento PIX.", "error");
+                return;
+            }
+
+            if (result.SellerKeyNotice != null)
+            {
+                pixSellerKeyNotice = result.SellerKeyNotice;
+                return;
+            }
+
+            if (result.Error != null)
+            {
+                NotifyUser($"Erro ao gerar pagamento PIX: {result.Error}", "error");
                 return;
             }
 
@@ -388,18 +181,7 @@ public partial class Payment : IAsyncDisposable
             PaymentId = result.PaymentId;
             IsPaid = false;
             paymentRecord = result.PaymentRecord;
-
-            await PaymentCommands.SavePaymentRecordAsync(paymentRecord);
-            await PaymentCommands.LogAsync(
-                $"QR PIX gerado para produto {ProductId} via {(AbacatePayOpts.Value.IsEnabled ? "AbacatePay" : "payload estatico")}.",
-                userId);
-
             NotifyUser("Pagamento PIX gerado. Escaneie o QR code ou copie o codigo PIX.", "success");
-        }
-        catch (Exception ex)
-        {
-            await PaymentCommands.LogAsync("Erro ao gerar pagamento PIX.", sellerUser?.Id, ex);
-            NotifyUser($"Erro ao gerar pagamento PIX: {ex.Message}", "error");
         }
         finally
         {
@@ -407,20 +189,57 @@ public partial class Payment : IAsyncDisposable
         }
     }
 
-    private async Task<string?> ResolvePixRecipientKeyForNoticeAsync()
+    private async Task OnCheckPaymentClick() => await CheckPayment();
+
+    private async Task CheckPayment()
     {
-        if (UseSiteIntermediary)
-        {
-            var sitePixKey = await AdminSettingsService.GetSiteIntermediaryPixKeyAsync();
-            return string.IsNullOrWhiteSpace(sitePixKey) ? null : sitePixKey.Trim();
-        }
+        var result = await Orchestrator.CheckPaymentAsync(
+            Address, IsPaid, IsPixCurrentPayment,
+            T["PaymentBuy.NotFoundByAddress"],
+            T["PaymentBuy.AlreadyConfirmed"],
+            T["PaymentBuy.Confirmed"],
+            T["PaymentBuy.CheckError"],
+            "A confirmacao automatica para PIX nao esta disponivel. Aguarde a validacao manual.",
+            amt => FormatBtcWithUsdText(amt));
 
-        var sellerUserId = sellerUser?.Id;
-        if (string.IsNullOrWhiteSpace(sellerUserId))
-            return null;
+        if (result.IsPaid)
+            IsPaid = true;
 
-        return null;
+        NotifyUser(result.Message ?? string.Empty, result.MessageType);
     }
 
+    private async Task OnSelectedMethodChangedAsync() => await OnSelectedMethodChangedAsync(true);
+
+    private async Task OnSelectedMethodChangedAsync(bool persistPreference)
+    {
+        if (!string.Equals(SelectedMethod, "Pix", StringComparison.OrdinalIgnoreCase)) { pixCurrencyNotice = null; pixSellerKeyNotice = null; return; }
+        if (string.Equals(CurrencyPreferenceService.SelectedFiatCurrency, "BRL", StringComparison.OrdinalIgnoreCase)) { pixCurrencyNotice = null; return; }
+        CurrencyPreferenceService.SetCurrency("BRL");
+        if (persistPreference) await JS.InvokeVoidAsync("localStorage.setItem", "Confirmai.fiatCurrency", CurrencyPreferenceService.SelectedFiatCurrency);
+        pixCurrencyNotice = "PIX funciona apenas com BRL. A cotacao foi alterada automaticamente para BRL.";
+    }
+
+    private Task OnUseSiteIntermediaryChangedAsync() { pixSellerKeyNotice = null; return Task.CompletedTask; }
+
+    private void NotifyUser(string message, string type) { feedbackMessage = message; feedbackType = type; ToastRef?.Show(message, type); }
+
+    private async Task CopyAddress()
+    {
+        if (string.IsNullOrEmpty(Address)) return;
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", Address);
+        _copyCts?.Cancel(); _copyCts = new CancellationTokenSource();
+        var ct = _copyCts.Token;
+        try { copyIcon = "fas fa-check"; StateHasChanged(); await Task.Delay(1500, ct); if (!ct.IsCancellationRequested) copyIcon = "fas fa-copy"; }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { copyIcon = "fas fa-copy"; }
+    }
+
+    private string BuildSellerProfileUrl(string sellerUserId) =>
+        $"/profile/{Uri.EscapeDataString(sellerUserId ?? string.Empty)}?returnUrl={Uri.EscapeDataString("/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri))}";
+
+    private string FormatOfferPrice(decimal amount) => offerCurrency switch { "BRL" => $"R$ {amount:N2}", "USD" => $"$ {amount:N2}", _ => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency) };
+
+    private decimal GetUnitPriceAmount() => selectedOfferUnitPrice ?? product?.Price ?? 0m;
+    private MarkupString FormatBtcWithUsdMarkup(decimal amount) => BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    private string FormatBtcWithUsdText(decimal amount) => BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     private Task<bool> ValidateOfferBeforePaymentAsync() => Task.FromResult(true);
 }

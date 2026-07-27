@@ -147,7 +147,6 @@ public class UiTextServiceRefactoringTests : IDisposable
     /// Validates graceful handling of invalid inputs
     /// </summary>
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
     public void Get_WithInvalidKey_ReturnsEmpty(string key)

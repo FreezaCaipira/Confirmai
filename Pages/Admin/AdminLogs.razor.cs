@@ -1,4 +1,3 @@
-using System.Globalization;
 using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
@@ -10,7 +9,6 @@ namespace Confirmai.Pages.Admin;
 
 public partial class AdminLogs : IDisposable
 {
-    private List<AppLog> logs = new();
     private List<AppLog> currentPageLogs = new();
     private int totalLogs;
     private int currentPage = 1;
@@ -21,45 +19,27 @@ public partial class AdminLogs : IDisposable
     private const int PageSize = 20;
     private const int ExportMaxRows = 10000;
     private bool filtersLoaded;
-    private bool showRestoredFiltersNotice;
     private string? exportNotice;
     private readonly SemaphoreSlim loadLogsLock = new(1, 1);
     private bool isDisposed;
-
-    private string filterGlobalSearch = "";
-    private string filterUserId = "";
-    private string filterSource = "";
-    private string filterMessage = "";
-    private string filterLevel = "";
-    private DateTime? filterStartDate;
-    private DateTime? filterEndDate;
-    private string filterEventType = "";
-    private string filterEntityType = "";
     private readonly DebounceDispatcher globalSearchDebouncer = new();
 
-    private AdminLogsQuickRangePreset selectedQuickRangePreset = AdminLogsQuickRangePreset.None;
-    private AdminLogsAuditQuickFilter selectedAuditQuickFilter = AdminLogsAuditQuickFilter.All;
-    private AdminLogSortColumn currentSortColumn = AdminLogSortColumn.Timestamp;
-    private bool sortAscending;
-
-    private bool HasInvalidDateRange => filterStartDate.HasValue && filterEndDate.HasValue && filterStartDate.Value.Date > filterEndDate.Value.Date;
-    private bool HasDateRangeFilter => filterStartDate.HasValue || filterEndDate.HasValue;
+    private bool HasInvalidDateRange => Filters.HasInvalidDateRange;
+    private bool HasDateRangeFilter => Filters.HasDateRangeFilter;
     private string ActivePeriodSummary => BuildActivePeriodSummary();
 
     protected override async Task OnInitializedAsync()
     {
-        ApplyQueryOverridesToCurrentFilters();
+        Filters.ApplyQueryOverridesToCurrentFilters();
         await LoadCountsAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender || filtersLoaded)
-        {
             return;
-        }
 
-        await LoadFilterStateFromStorageAsync();
+        await Filters.LoadFromStorageAsync();
         currentPage = 1;
         await LoadCountsAsync();
         filtersLoaded = true;
@@ -70,23 +50,17 @@ public partial class AdminLogs : IDisposable
         await loadLogsLock.WaitAsync();
         try
         {
-            if (isDisposed)
-            {
-                return;
-            }
+            if (isDisposed) return;
 
             var data = await AdminLogsQueryService.GetPageDataAsync(
-                primaryCriteria: BuildPrimaryFilterCriteria(),
-                auditCountsCriteria: BuildAuditCountsFilterCriteria(),
-                sortColumn: currentSortColumn,
-                sortAscending: sortAscending,
+                primaryCriteria: Filters.BuildPrimaryFilterCriteria(),
+                auditCountsCriteria: Filters.BuildAuditCountsFilterCriteria(),
+                sortColumn: Filters.SortColumn,
+                sortAscending: Filters.SortAscending,
                 requestedPage: currentPage,
                 pageSize: PageSize);
 
-            if (isDisposed)
-            {
-                return;
-            }
+            if (isDisposed) return;
 
             totalLogs = data.TotalLogs;
             totalPages = Math.Max(1, (int)Math.Ceiling((double)totalLogs / PageSize));
@@ -122,403 +96,124 @@ public partial class AdminLogs : IDisposable
         }
     }
 
-    private AdminLogFilterCriteria BuildPrimaryFilterCriteria()
+    private async Task ApplyFilters()
     {
-        return new AdminLogFilterCriteria
-        {
-            GlobalTerm = filterGlobalSearch,
-            UserId = filterUserId,
-            Source = filterSource,
-            Message = filterMessage,
-            Level = filterLevel,
-            StartDate = filterStartDate,
-            EndDate = filterEndDate,
-            EventType = filterEventType,
-            EntityType = filterEntityType
-        };
-    }
-
-    private AdminLogFilterCriteria BuildAuditCountsFilterCriteria()
-    {
-        return new AdminLogFilterCriteria
-        {
-            GlobalTerm = filterGlobalSearch,
-            UserId = filterUserId,
-            Message = filterMessage,
-            StartDate = filterStartDate,
-            EndDate = filterEndDate
-        };
-    }
-
-    private Task ApplyFilters()
-        => ApplyFiltersCore(preserveSelectedQuickRangePreset: false, preserveSelectedAuditQuickFilter: false);
-
-    private async Task ApplyFiltersCore(bool preserveSelectedQuickRangePreset, bool preserveSelectedAuditQuickFilter)
-    {
-        if (HasInvalidDateRange)
-        {
-            return;
-        }
-
-        if (!preserveSelectedQuickRangePreset)
-        {
-            SyncSelectedQuickRangePreset();
-        }
-
-        if (!preserveSelectedAuditQuickFilter)
-        {
-            SyncSelectedAuditQuickFilter();
-        }
-
-        showRestoredFiltersNotice = false;
+        if (HasInvalidDateRange) return;
+        Filters.SyncQuickRangePreset();
+        Filters.SyncAuditQuickFilter();
+        Filters.ShowRestoredNotice = false;
         currentPage = 1;
-        await PersistFilterStateAsync();
+        await Filters.PersistAsync();
         await LoadCountsAsync();
     }
 
     private async Task OnGlobalSearchInput(ChangeEventArgs args)
     {
-        filterGlobalSearch = args.Value?.ToString() ?? string.Empty;
+        Filters.GlobalSearch = args.Value?.ToString() ?? string.Empty;
         await globalSearchDebouncer.DebounceAsync(TimeSpan.FromMilliseconds(350), ApplyFilters);
     }
 
     private async Task HandleGlobalSearchInput()
     {
-        // Called by FilterBar component - just trigger the debounced search
-        // The actual filter update is handled by component binding
         await globalSearchDebouncer.DebounceAsync(TimeSpan.FromMilliseconds(350), ApplyFilters);
     }
 
     private async Task SetTodayRangeAsync()
     {
-        var today = DateTime.Today;
-        selectedQuickRangePreset = AdminLogsQuickRangePreset.Today;
-        filterStartDate = today;
-        filterEndDate = today;
-        await ApplyFiltersCore(true, false);
+        Filters.SetTodayRange();
+        await ApplyFiltersCore(preserveQuickRange: true, preserveAudit: false);
     }
 
     private async Task SetLastDaysRangeAsync(int days)
     {
-        if (days < 1)
-        {
-            return;
-        }
-
-        selectedQuickRangePreset = days == 7 ? AdminLogsQuickRangePreset.Last7Days : AdminLogsQuickRangePreset.Last30Days;
-        filterEndDate = DateTime.Today;
-        filterStartDate = filterEndDate.Value.AddDays(-(days - 1));
-        await ApplyFiltersCore(true, false);
+        Filters.SetLastDaysRange(days);
+        await ApplyFiltersCore(preserveQuickRange: true, preserveAudit: false);
     }
 
     private async Task SetCurrentMonthRangeAsync()
     {
-        var today = DateTime.Today;
-        selectedQuickRangePreset = AdminLogsQuickRangePreset.CurrentMonth;
-        filterStartDate = new DateTime(today.Year, today.Month, 1);
-        filterEndDate = filterStartDate.Value.AddMonths(1).AddDays(-1);
-        await ApplyFiltersCore(true, false);
+        Filters.SetCurrentMonthRange();
+        await ApplyFiltersCore(preserveQuickRange: true, preserveAudit: false);
     }
 
     private async Task ClearDateRangeAsync()
     {
-        selectedQuickRangePreset = AdminLogsQuickRangePreset.None;
-        filterStartDate = null;
-        filterEndDate = null;
-        await ApplyFiltersCore(true, false);
+        Filters.ClearDateRange();
+        await ApplyFiltersCore(preserveQuickRange: true, preserveAudit: false);
     }
 
     private async Task SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter filter)
     {
-        selectedAuditQuickFilter = filter;
-
-        switch (filter)
-        {
-            case AdminLogsAuditQuickFilter.SecurityPolicy:
-                filterSource = AdminAuditSources.SecurityPolicy;
-                filterLevel = string.Empty;
-                filterEventType = string.Empty;
-                break;
-            case AdminLogsAuditQuickFilter.PaymentPanelStale:
-                filterSource = string.Empty;
-                filterLevel = string.Empty;
-                filterEventType = AuditEvents.PaymentReconciliationPanelStale;
-                break;
-            default:
-                filterSource = string.Empty;
-                filterLevel = string.Empty;
-                filterEventType = string.Empty;
-                break;
-        }
-
-        await ApplyFiltersCore(false, true);
+        Filters.SetAuditQuickFilter(filter);
+        await ApplyFiltersCore(preserveQuickRange: false, preserveAudit: true);
     }
 
-    private async Task ApplySortAsync(AdminLogSortColumn column)
+    private async Task ApplyFiltersCore(bool preserveQuickRange, bool preserveAudit)
     {
-        if (currentSortColumn == column)
-        {
-            sortAscending = !sortAscending;
-        }
-        else
-        {
-            currentSortColumn = column;
-            sortAscending = true;
-        }
-
-        await PersistFilterStateAsync();
-    }
-
-    private string SortIndicator(AdminLogSortColumn column)
-    {
-        if (currentSortColumn != column)
-        {
-            return "⇅";
-        }
-
-        return sortAscending ? "↑" : "↓";
+        if (HasInvalidDateRange) return;
+        if (!preserveQuickRange) Filters.SyncQuickRangePreset();
+        if (!preserveAudit) Filters.SyncAuditQuickFilter();
+        Filters.ShowRestoredNotice = false;
+        currentPage = 1;
+        await Filters.PersistAsync();
+        await LoadCountsAsync();
     }
 
     private async Task HandleSortAsync(string columnString)
     {
         if (Enum.TryParse<AdminLogSortColumn>(columnString, out var column))
         {
-            await ApplySortAsync(column);
+            Filters.ToggleSort(column);
+            await Filters.PersistAsync();
             await LoadCountsAsync();
         }
     }
 
-    private string QuickRangeButtonClass(AdminLogsQuickRangePreset preset)
-        => selectedQuickRangePreset == preset ? "quick-range-btn active" : "quick-range-btn";
-
-    private string AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter filter)
-        => selectedAuditQuickFilter == filter ? "quick-range-btn active" : "quick-range-btn";
-
-    private void SyncSelectedQuickRangePreset()
-    {
-        selectedQuickRangePreset = InferQuickRangePresetFromDates();
-    }
-
-    private void SyncSelectedAuditQuickFilter()
-    {
-        selectedAuditQuickFilter = InferAuditQuickFilter();
-    }
-
-    private AdminLogsQuickRangePreset InferQuickRangePresetFromDates()
-    {
-        return AdminLogsFilterInference.InferQuickRangePreset(filterStartDate, filterEndDate, DateTime.Today);
-    }
-
-    private AdminLogsAuditQuickFilter InferAuditQuickFilter()
-    {
-        return AdminLogsFilterInference.InferAuditQuickFilter(filterSource, filterLevel, filterEventType);
-    }
+    private string SortIndicator(AdminLogSortColumn column) => Filters.SortIndicator(column);
+    private string QuickRangeButtonClass(AdminLogsQuickRangePreset preset) => Filters.QuickRangeButtonClass(preset);
+    private string AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter filter) => Filters.AuditQuickFilterButtonClass(filter);
 
     private async Task ClearFilters()
     {
-        filterGlobalSearch = "";
-        filterUserId = "";
-        filterSource = "";
-        filterMessage = "";
-        filterLevel = "";
-        filterEventType = "";
-        filterEntityType = "";
-        selectedAuditQuickFilter = AdminLogsAuditQuickFilter.All;
-        selectedQuickRangePreset = AdminLogsQuickRangePreset.None;
-        filterStartDate = null;
-        filterEndDate = null;
-        showRestoredFiltersNotice = false;
+        Filters.ClearAll();
         currentPage = 1;
-        await PersistFilterStateAsync();
-        await ApplyFiltersCore(true, true);
+        await Filters.PersistAsync();
+        await ApplyFiltersCore(preserveQuickRange: true, preserveAudit: true);
     }
 
     private async Task ExportCsvAsync()
     {
-        if (HasInvalidDateRange)
-        {
-            return;
-        }
-
-        var export = await BuildExportRowsAsync();
-        if (export.Rows.Count == 0)
-        {
-            exportNotice = null;
-            return;
-        }
-
-        var csv = AdminLogsExportService.BuildCsv(export.Rows);
-        var fileName = AdminLogsExportService.BuildExportFileName("csv", filterLevel, filterSource, filterStartDate, filterEndDate, export.Truncated);
-        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
-
-        exportNotice = export.Truncated
-            ? string.Format(T["AdminLogs.ExportTruncated"], ExportMaxRows)
-            : null;
+        if (HasInvalidDateRange) return;
+        exportNotice = await ExportService.ExportCsvAsync(
+            Filters.BuildPrimaryFilterCriteria(), ExportMaxRows,
+            Filters.Level, Filters.Source, Filters.StartDate, Filters.EndDate,
+            T["AdminLogs.ExportTruncated"]);
     }
 
     private async Task ExportJsonAsync()
     {
-        if (HasInvalidDateRange)
-        {
-            return;
-        }
-
-        var export = await BuildExportRowsAsync();
-        if (export.Rows.Count == 0)
-        {
-            exportNotice = null;
-            return;
-        }
-
-        var json = AdminLogsExportService.BuildJson(export.Rows);
-        var fileName = AdminLogsExportService.BuildExportFileName("json", filterLevel, filterSource, filterStartDate, filterEndDate, export.Truncated);
-        await JS.InvokeVoidAsync("ConfirmaiDownloadFile", fileName, json, "application/json;charset=utf-8;");
-
-        exportNotice = export.Truncated
-            ? string.Format(T["AdminLogs.ExportTruncated"], ExportMaxRows)
-            : null;
+        if (HasInvalidDateRange) return;
+        exportNotice = await ExportService.ExportJsonAsync(
+            Filters.BuildPrimaryFilterCriteria(), ExportMaxRows,
+            Filters.Level, Filters.Source, Filters.StartDate, Filters.EndDate,
+            T["AdminLogs.ExportTruncated"]);
     }
 
-    private async Task<(List<AdminLogExportRow> Rows, bool Truncated)> BuildExportRowsAsync()
-    {
-        return await AdminLogsQueryService.GetExportRowsAsync(BuildPrimaryFilterCriteria(), ExportMaxRows);
-    }
-
-    private async Task LoadFilterStateFromStorageAsync()
-    {
-        var storedState = await AdminLogsFilterStateService.LoadAsync();
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        var queryOverrides = AdminLogsQueryOverridesParser.Parse(uri);
-        var effectiveState = AdminLogsFilterStateMerger.ApplyQueryOverrides(storedState, queryOverrides);
-
-        filterGlobalSearch = effectiveState.GlobalSearch;
-        filterUserId = effectiveState.UserId;
-        filterSource = effectiveState.Source;
-        filterMessage = effectiveState.Message;
-        filterLevel = effectiveState.Level;
-        filterStartDate = effectiveState.StartDate;
-        filterEndDate = effectiveState.EndDate;
-        filterEventType = effectiveState.EventType;
-        filterEntityType = effectiveState.EntityType;
-
-        selectedQuickRangePreset = effectiveState.QuickRangePreset ?? InferQuickRangePresetFromDates();
-        selectedAuditQuickFilter = effectiveState.AuditQuickFilter ?? InferAuditQuickFilter();
-
-        if (effectiveState.SortColumn.HasValue)
-        {
-            currentSortColumn = effectiveState.SortColumn.Value;
-        }
-
-        if (effectiveState.SortAscending.HasValue)
-        {
-            sortAscending = effectiveState.SortAscending.Value;
-        }
-
-        if (queryOverrides.HasAny)
-        {
-            selectedQuickRangePreset = InferQuickRangePresetFromDates();
-            selectedAuditQuickFilter = InferAuditQuickFilter();
-            showRestoredFiltersNotice = false;
-            return;
-        }
-
-        showRestoredFiltersNotice = AdminLogsFilterStateRules.ShouldShowRestoredNotice(storedState);
-    }
-
-    private void ApplyQueryOverridesToCurrentFilters()
-    {
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        var queryOverrides = AdminLogsQueryOverridesParser.Parse(uri);
-
-        if (!queryOverrides.HasAny)
-        {
-            return;
-        }
-
-        var currentState = new AdminLogsFilterState
-        {
-            GlobalSearch = filterGlobalSearch,
-            UserId = filterUserId,
-            Source = filterSource,
-            Message = filterMessage,
-            Level = filterLevel,
-            StartDate = filterStartDate,
-            EndDate = filterEndDate,
-            EventType = filterEventType,
-            EntityType = filterEntityType,
-            QuickRangePreset = selectedQuickRangePreset,
-            AuditQuickFilter = selectedAuditQuickFilter,
-            SortColumn = currentSortColumn,
-            SortAscending = sortAscending
-        };
-
-        var effectiveState = AdminLogsFilterStateMerger.ApplyQueryOverrides(currentState, queryOverrides);
-
-        filterGlobalSearch = effectiveState.GlobalSearch;
-        filterUserId = effectiveState.UserId;
-        filterSource = effectiveState.Source;
-        filterMessage = effectiveState.Message;
-        filterLevel = effectiveState.Level;
-        filterStartDate = effectiveState.StartDate;
-        filterEndDate = effectiveState.EndDate;
-        filterEventType = effectiveState.EventType;
-        filterEntityType = effectiveState.EntityType;
-        selectedQuickRangePreset = InferQuickRangePresetFromDates();
-        selectedAuditQuickFilter = InferAuditQuickFilter();
-    }
-
-    private async Task PersistFilterStateAsync()
-    {
-        await AdminLogsFilterStateService.SaveAsync(new AdminLogsFilterState
-        {
-            GlobalSearch = filterGlobalSearch,
-            UserId = filterUserId,
-            Source = filterSource,
-            Message = filterMessage,
-            Level = filterLevel,
-            StartDate = filterStartDate,
-            EndDate = filterEndDate,
-            EventType = filterEventType,
-            EntityType = filterEntityType,
-            QuickRangePreset = selectedQuickRangePreset,
-            AuditQuickFilter = selectedAuditQuickFilter,
-            SortColumn = currentSortColumn,
-            SortAscending = sortAscending
-        });
-    }
-
-    private void DismissRestoredNotice()
-    {
-        showRestoredFiltersNotice = false;
-    }
-
-    private void DismissExportNotice()
-    {
-        exportNotice = null;
-    }
+    private void DismissRestoredNotice() => Filters.ShowRestoredNotice = false;
+    private void DismissExportNotice() => exportNotice = null;
 
     private string BuildActivePeriodSummary()
     {
-        if (filterStartDate.HasValue && filterEndDate.HasValue)
-        {
-            return string.Format(T["AdminLogs.PeriodRange"], filterStartDate.Value.ToString("dd/MM/yyyy"), filterEndDate.Value.ToString("dd/MM/yyyy"));
-        }
-
-        if (filterStartDate.HasValue)
-        {
-            return string.Format(T["AdminLogs.PeriodFrom"], filterStartDate.Value.ToString("dd/MM/yyyy"));
-        }
-
-        if (filterEndDate.HasValue)
-        {
-            return string.Format(T["AdminLogs.PeriodUntil"], filterEndDate.Value.ToString("dd/MM/yyyy"));
-        }
-
+        if (Filters.StartDate.HasValue && Filters.EndDate.HasValue)
+            return string.Format(T["AdminLogs.PeriodRange"], Filters.StartDate.Value.ToString("dd/MM/yyyy"), Filters.EndDate.Value.ToString("dd/MM/yyyy"));
+        if (Filters.StartDate.HasValue)
+            return string.Format(T["AdminLogs.PeriodFrom"], Filters.StartDate.Value.ToString("dd/MM/yyyy"));
+        if (Filters.EndDate.HasValue)
+            return string.Format(T["AdminLogs.PeriodUntil"], Filters.EndDate.Value.ToString("dd/MM/yyyy"));
         return T["AdminLogs.PeriodNone"];
     }
 
-    private static string SourceBadgeClass(string source)
-        => "log-source-badge";
+    private static string SourceBadgeClass(string source) => "log-source-badge";
 
     public void Dispose()
     {

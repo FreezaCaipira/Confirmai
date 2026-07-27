@@ -49,7 +49,6 @@ public sealed class PaymentCommandService
         string currency)
     {
         IBitcoinPaymentService? service = _paymentFactory.GetService(selectedMethod);
-        string? privateKey = null;
 
         if (selectedMethod == "Testnet")
         {

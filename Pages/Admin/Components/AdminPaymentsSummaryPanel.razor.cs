@@ -36,8 +36,8 @@ public partial class AdminPaymentsSummaryPanel
     [Parameter] public string LastManualSweepDetails { get; set; } = string.Empty;
 
     // Collections (simplified for component interface)
-    [Parameter] public List<GatewayTelemetryItem>? GatewayTelemetry { get; set; }
-    [Parameter] public List<SweepHistoryItem>? SweepHistory { get; set; }
+    [Parameter] public IReadOnlyList<GatewayTelemetryItem>? GatewayTelemetry { get; set; }
+    [Parameter] public IReadOnlyList<SweepHistoryItem>? SweepHistory { get; set; }
 
     // Result messages
     [Parameter] public string SweepResultMessage { get; set; } = string.Empty;
