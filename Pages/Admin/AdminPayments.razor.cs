@@ -50,10 +50,6 @@ public partial class AdminPayments : IAsyncDisposable
     private bool isSummaryRefreshing;
     private bool isAutoRefreshPausedByVisibility;
     private string lastAutoRefreshPauseLabel = "Nenhuma pausa registrada.";
-    private CancellationTokenSource? summaryRefreshCts;
-    private Task? summaryRefreshTask;
-    private CancellationTokenSource? summaryAgeCts;
-    private Task? summaryAgeTask;
     private int pendingTrendWarningThreshold = AdminSettingsService.DefaultReconciliationWarningThreshold;
     private int pendingTrendCriticalThreshold = AdminSettingsService.DefaultReconciliationCriticalThreshold;
 
@@ -80,6 +76,8 @@ public partial class AdminPayments : IAsyncDisposable
     [Inject] public IJSRuntime JS { get; set; } = default!;
     [Inject] public SummaryAgeTracker SummaryAgeTracker { get; set; } = default!;
     [Inject] public AdminPaymentsCommandService CommandService { get; set; } = default!;
+    [Inject] public AsyncLoopRunner RefreshLoop { get; set; } = default!;
+    [Inject] public AsyncLoopRunner AgeLoop { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -88,93 +86,44 @@ public partial class AdminPayments : IAsyncDisposable
         btcBrlRate = quote?.btc_brl;
         await RefreshOperationalPanelAsync(includePaymentsTable: false);
         await LoadPaymentsCountAsync();
-        StartSummaryRefreshLoop();
-        StartSummaryAgeLoop();
+        StartLoops();
     }
 
-    private void StartSummaryRefreshLoop()
+    private void StartLoops()
     {
-        summaryRefreshCts = new CancellationTokenSource();
-        summaryRefreshTask = RunSummaryRefreshLoopAsync(summaryRefreshCts.Token);
-    }
-
-    private void StartSummaryAgeLoop()
-    {
-        summaryAgeCts = new CancellationTokenSource();
-        summaryAgeTask = RunSummaryAgeLoopAsync(summaryAgeCts.Token);
-    }
-
-    private async Task RunSummaryRefreshLoopAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
+        RefreshLoop.Start(TimeSpan.FromSeconds(SummaryAgeTracker.RefreshIntervalSeconds), async _ =>
         {
-            try
+            if (!isAutoRefreshEnabled)
             {
-                await Task.Delay(TimeSpan.FromSeconds(SummaryAgeTracker.RefreshIntervalSeconds), cancellationToken);
-
-                if (!isAutoRefreshEnabled)
-                {
-                    if (isAutoRefreshPausedByVisibility)
-                    {
-                        await InvokeAsync(() =>
-                        {
-                            isAutoRefreshPausedByVisibility = false;
-                        });
-                    }
-
-                    continue;
-                }
-
-                if (!await IsDocumentVisibleAsync())
-                {
-                    await InvokeAsync(() =>
-                    {
-                        isAutoRefreshPausedByVisibility = true;
-                        lastAutoRefreshPauseLabel = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                    });
-
-                    continue;
-                }
-
                 if (isAutoRefreshPausedByVisibility)
-                {
-                    await InvokeAsync(() =>
-                    {
-                        isAutoRefreshPausedByVisibility = false;
-                    });
-                }
-
-                await InvokeAsync(async () =>
-                {
-                    await RefreshOperationalPanelAsync(includePaymentsTable: false);
-                });
+                    await InvokeAsync(() => isAutoRefreshPausedByVisibility = false);
+                return;
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+
+            if (!await IsDocumentVisibleAsync())
             {
-                break;
+                await InvokeAsync(() =>
+                {
+                    isAutoRefreshPausedByVisibility = true;
+                    lastAutoRefreshPauseLabel = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                });
+                return;
             }
-        }
-    }
 
-    private async Task RunSummaryAgeLoopAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
+            if (isAutoRefreshPausedByVisibility)
+                await InvokeAsync(() => isAutoRefreshPausedByVisibility = false);
+
+            await InvokeAsync(async () => await RefreshOperationalPanelAsync(includePaymentsTable: false));
+        });
+
+        AgeLoop.Start(TimeSpan.FromSeconds(1), async _ =>
         {
-            try
+            await InvokeAsync(async () =>
             {
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-
-                await InvokeAsync(async () =>
-                {
-                    SummaryAgeTracker.UpdateAgeLabel();
-                    await SummaryAgeTracker.TryWriteStalenessAuditAsync(isAutoRefreshEnabled, isAutoRefreshPausedByVisibility);
-                });
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                break;
-            }
-        }
+                SummaryAgeTracker.UpdateAgeLabel();
+                await SummaryAgeTracker.TryWriteStalenessAuditAsync(isAutoRefreshEnabled, isAutoRefreshPausedByVisibility);
+            });
+        });
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -558,7 +507,6 @@ public partial class AdminPayments : IAsyncDisposable
             }
             catch
             {
-                // Ignore JS interop errors during component disposal.
             }
             finally
             {
@@ -566,44 +514,7 @@ public partial class AdminPayments : IAsyncDisposable
             }
         }
 
-        if (summaryAgeCts is not null)
-        {
-            summaryAgeCts.Cancel();
-
-            if (summaryAgeTask is not null)
-            {
-                try
-                {
-                    await summaryAgeTask;
-                }
-                catch (OperationCanceledException)
-                {
-                    // Expected when disposing.
-                }
-            }
-
-            summaryAgeCts.Dispose();
-            summaryAgeCts = null;
-        }
-
-        if (summaryRefreshCts is not null)
-        {
-            summaryRefreshCts.Cancel();
-
-            if (summaryRefreshTask is not null)
-            {
-                try
-                {
-                    await summaryRefreshTask;
-                }
-                catch (OperationCanceledException)
-                {
-                    // Expected when disposing.
-                }
-            }
-
-            summaryRefreshCts.Dispose();
-            summaryRefreshCts = null;
-        }
+        await RefreshLoop.DisposeAsync();
+        await AgeLoop.DisposeAsync();
     }
 }
