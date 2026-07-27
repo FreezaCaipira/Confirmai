@@ -131,6 +131,7 @@ builder.Services.AddScoped<AdminConfirmationService>();
     builder.Services.AddScoped<GroupDetailService>();
     builder.Services.AddScoped<GroupPaymentsService>();
     builder.Services.AddScoped<Confirmai.Services.Futsal.FutsalCreateService>();
+    builder.Services.AddScoped<Confirmai.Services.Poker.PokerCreateService>();
 builder.Services.AddScoped<Confirmai.Services.Utility.MailboxQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentInitializationService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentCommandService>();
