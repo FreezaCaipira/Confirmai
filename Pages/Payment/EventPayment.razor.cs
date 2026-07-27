@@ -38,7 +38,6 @@ public partial class EventPayment : IAsyncDisposable
 
     private CancellationTokenSource? _pollCts;
     private CancellationTokenSource? _copyCts;
-    private Task? _copyTask;
 
     [Inject] private EventPaymentService EventPaymentSvc { get; set; } = default!;
 
@@ -225,13 +224,13 @@ public partial class EventPayment : IAsyncDisposable
     private async Task CopyBrCodeCallback() => await CopyBrCode();
     private Task SelectGatewayCallback(string n) { SelectGateway(n); return Task.CompletedTask; }
     private async Task GeneratePixChargeCallback() => await GeneratePixCharge();
-    private async Task CopyAdminPixKeyCallback() { if (conf is not null) await CopyAdminPixKey(GetGroupAdminPixKey(conf.Event.Group)); }
+    private async Task CopyAdminPixKeyCallback() { if (conf is not null) { var key = GetGroupAdminPixKey(conf.Event.Group); if (!string.IsNullOrWhiteSpace(key)) await CopyAdminPixKey(key); } }
     private async Task UploadProofCallback(InputFileChangeEventArgs e) => await UploadProof(e);
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         _pollCts?.Cancel(); _copyCts?.Cancel();
-        if (_copyTask is not null) { try { await _copyTask; } catch (OperationCanceledException) { } }
         _pollCts?.Dispose(); _copyCts?.Dispose();
+        return ValueTask.CompletedTask;
     }
 }

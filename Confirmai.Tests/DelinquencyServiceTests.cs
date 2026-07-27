@@ -56,7 +56,7 @@ public class DelinquencyServiceTests
         // Assert
         Assert.Single(result);
         Assert.Single(result[0].Entries);
-        Assert.Equal(FutsalPosition.Outfield.ToString(), nameof(FutsalPosition.Outfield));
+        Assert.Equal(nameof(FutsalPosition.Outfield), FutsalPosition.Outfield.ToString());
     }
 
     [Fact]

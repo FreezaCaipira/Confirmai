@@ -205,7 +205,7 @@ public partial class Payment : IAsyncDisposable
         if (result.IsPaid)
             IsPaid = true;
 
-        NotifyUser(result.Message, result.MessageType);
+        NotifyUser(result.Message ?? string.Empty, result.MessageType);
     }
 
     private async Task OnSelectedMethodChangedAsync() => await OnSelectedMethodChangedAsync(true);

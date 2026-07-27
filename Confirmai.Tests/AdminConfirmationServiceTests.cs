@@ -296,10 +296,8 @@ public class AdminConfirmationServiceTests
         Assert.False(result.Updated);
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    public async Task TogglePaidAsync_WithMultipleConfirmations_UpdatesOnlyTarget(string? ignored)
+    [Fact]
+    public async Task TogglePaidAsync_WithMultipleConfirmations_UpdatesOnlyTarget()
     {
         // Arrange - verify isolation: only update the targeted confirmation
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();

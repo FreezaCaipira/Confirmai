@@ -27,7 +27,6 @@ public partial class Escalacao : IAsyncDisposable
     private bool copied;
     private string? actionError;
     private CancellationTokenSource? _copyCts;
-    private Task? _copyTask;
 
     private bool isPastEvent;
     private bool isMember;
@@ -240,10 +239,10 @@ public partial class Escalacao : IAsyncDisposable
     private string BuildWhatsAppText() => ev is null ? string.Empty : EscalacaoTextFormatter.BuildWhatsAppText(ev);
     private string BuildShareText() => ev is null ? string.Empty : EscalacaoTextFormatter.BuildShareText(ev);
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         _copyCts?.Cancel();
-        if (_copyTask is not null) { try { await _copyTask; } catch (OperationCanceledException) { } }
         _copyCts?.Dispose();
+        return ValueTask.CompletedTask;
     }
 }

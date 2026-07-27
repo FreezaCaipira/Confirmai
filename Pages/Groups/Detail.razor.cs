@@ -29,8 +29,6 @@ public partial class Detail : IAsyncDisposable
 
     private CancellationTokenSource? _copyInviteCts;
     private CancellationTokenSource? _copyCodeCts;
-    private Task? _copyInviteTask;
-    private Task? _copyCodeTask;
 
     private IEnumerable<GroupJoinRequest> sortedPendingRequests => requestSortOrder switch
     {
@@ -129,7 +127,7 @@ public partial class Detail : IAsyncDisposable
         var (success, error) = await GroupService.JoinWithCodeAsync(group.Id, currentUserId, typed);
         if (!success)
         {
-            codeError = error;
+            codeError = error ?? string.Empty;
             return;
         }
         await LoadGroup();
@@ -189,21 +187,12 @@ public partial class Detail : IAsyncDisposable
         else selectedRequestIds.Remove(requestId);
     }
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         _copyInviteCts?.Cancel();
         _copyCodeCts?.Cancel();
-        if (_copyInviteTask is not null)
-        {
-            try { await _copyInviteTask; }
-            catch (OperationCanceledException) { }
-        }
-        if (_copyCodeTask is not null)
-        {
-            try { await _copyCodeTask; }
-            catch (OperationCanceledException) { }
-        }
         _copyInviteCts?.Dispose();
         _copyCodeCts?.Dispose();
+        return ValueTask.CompletedTask;
     }
 }
