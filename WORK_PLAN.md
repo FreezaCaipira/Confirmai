@@ -71,6 +71,41 @@ Auditoria da PR #74 (`refactor/ciclo21-codebehinds-css-higiene`, ja na `main`). 
 
 ---
 
+## Ciclo 22 (Pleno) -- Cobrir com testes os services extraidos (fechar divida de cobertura)
+
+**Objetivo**: fechar a ressalva do Ciclo 21 -- os services extraidos nos Ciclos 20/21 nao ganharam teste. Este ciclo e SO de testes: **nenhuma mudanca de codigo de producao** (se um service estiver dificil de testar, isso e sinal de refactor -- registrar e trazer pro Senior, nao mudar comportamento as escondidas). Regra de ouro do TDD segue: teste de caracterizacao que fixa o comportamento ATUAL.
+
+### Services/formatters SEM teste (alvo do ciclo)
+
+Com DB (usar `TestDbContextFactory.CreateInMemoryFactory` + `IDbContextFactory`, padrao ja usado em `GroupFeaturesServiceTests`):
+- `GroupDetailService`, `GroupPaymentsService`, `FutsalCreateService`, `PokerCreateService`, `ProfileService`, `AdminUsersQueryService`, `ReconciliationHealthService`.
+
+Com dependencias externas (mockar via Moq -- gateway/JS/auth), sem DB ou com DB in-memory:
+- `AdminPaymentsCommandService` (delega a reconciliation/status/query -- mockar essas deps e assertar orquestracao/mensagens de retorno), `AdminLogsExportCommandService`.
+
+Puros (teste unitario simples, sem DB nem mock):
+- `EscalacaoTextFormatter`, `MailboxFormatter`, `SummaryAgeTracker`.
+
+### Procedimento por service
+1. Criar `Confirmai.Tests/<Service>Tests.cs` seguindo o padrao de `GroupFeaturesServiceTests` (helper `Setup()` com `TestDbContextFactory.CreateInMemoryFactory($"prefix-{Guid.NewGuid()}")`, seed via `factory.CreateDbContext()`).
+2. Cobrir os caminhos publicos: caso feliz + principais ramos (nao encontrado, vazio, permissao/guarda, erro esperado). Formatters: cobrir formatacao de cada caso/edge (nulo, vazio, plural/singular, datas).
+3. Assertar o **comportamento atual** (caracterizacao) -- se algo parecer bug, NAO "consertar" aqui; registrar como achado pro Senior.
+4. Build 0 warnings + suite verde a cada arquivo; commits pequenos (1 service por commit, ou agrupamento coeso).
+
+### Meta de saida
+- Os 12 tipos acima com arquivo de teste dedicado e casos significativos (feliz + ramos), nao so smoke test.
+- Contagem total de testes sobe de forma relevante (referencia: hoje 1974; cada service deve somar varios testes).
+- 0 warning de analisador nos testes novos (seguir o padrao ja limpo do projeto).
+- Build do app inalterado (0 diffs em codigo de producao).
+
+### O que NAO fazer
+- Nao alterar codigo de producao (nem "pequenos ajustes") -- ciclo e so de teste.
+- Nao mascarar comportamento: se um teste revela bug, deixa o teste refletir o real e abre achado; nao adapta o teste pra passar escondendo problema.
+- Nao mockar o que da pra testar de verdade com DB in-memory (preferir integracao leve via `TestDbContextFactory`).
+- Nao tocar na rotacao do secret Efi (pendencia do Robson).
+
+---
+
 ## Ciclo 21 (Pleno) -- Fechar toda a refatoracao restante (code-behinds + CSS + higiene) [EXECUTADO -- ver review acima]
 
 **Objetivo**: concluir a divida tecnica de refatoracao aberta na varredura Senior. Ciclo MAIOR, mas executado em **incrementos pequenos (1 assunto por commit/PR)**. Regra de ouro do Ciclo 18 continua valendo: **teste de caracterizacao ANTES de refatorar**, comportamento identico, `IDbContextFactory` (nunca `AppDbContext` direto), 0 warning no app, suite verde. **Nenhuma mudanca de regra de negocio.**
