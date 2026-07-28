@@ -189,9 +189,23 @@ Puros (teste unitario simples, sem DB nem mock):
 
 ---
 
+## Review Senior do Ciclo 21 (PR #74) -- APROVADO com 1 ressalva de processo
+
+Auditoria da PR #74 (`refactor/ciclo21-codebehinds-css-higiene`, ja na `main`). Build do app **0 warnings**; build do projeto de testes **0 warnings**; **1950** testes verdes / 1974 -- as 24 falhas continuam sendo `ProgramConfigurationTests` sem Postgres (ambiente, nao regressao). As 3 fases foram entregues, sem mudanca de regra de negocio.
+
+**Fase 1 (code-behinds / SRP) -- META ATINGIDA**: **0 code-behind `.razor.cs` acima de 250 LOC** (era 16). Novos services extraidos e **todos registrados em DI** (`Program.cs`): `AdminPaymentsCommandService`, `AdminLogsExportCommandService`, `AdminUsersQueryService`, `ReconciliationHealthService`, `GroupDetailService`, `GroupPaymentsService`, `FutsalCreateService`, `PokerCreateService`, `ProfileService` + formatters (`EscalacaoTextFormatter`, `MailboxFormatter`). Verificado: **0 uso de `AppDbContext` direto** nos services novos (usam `IDbContextFactory` ou delegam a services que ja o usam).
+
+**Fase 2 (CSS modular) -- META ATINGIDA**: `site.css` 5.589 -> 1.615 e `events.css` 3.679 -> 1.639. Dominios extraidos: `buttons.css`, `entity-shell.css`, `event-detail.css`, `events-table.css`, `event-listing.css`, `event-create.css`, `identity.css`, `tables.css` (+ `admin`/`escalacao`/`payments`/`marketplace` dos ciclos anteriores). Todos com `<link>` em `Pages/_Host.cshtml`; `site.css` tem preload+stylesheet (intencional). Sem duplicacao de regra base (os `.entity-shell` que restam em `site.css` sao overrides `body`-prefixed de maior especificidade, nao a base).
+
+**Fase 3 (higiene) -- META ATINGIDA**: projeto de testes agora com **0 warning** de analisador (xUnit1012/1026/2000, BL0005, CA2022 zerados) + warnings CS do app zerados.
+
+**RESSALVA (processo, nao-bloqueante)**: a Fase 1 pedia **teste unitario por service extraido**, mas o ciclo **nao adicionou nenhum arquivo de teste novo** para os ~11 services/formatters extraidos (total de testes caiu 1976 -> 1974). A extracao foi "mover codigo" (baixo risco, suite existente cobre o comportamento via os fluxos originais), entao nao ha regressao -- mas a divida de cobertura desses services segue aberta. **Fechada no Ciclo 22** (ver review acima).
+
+**Observacao menor**: comentario em `_Host.cshtml` ainda diz "site.css ~125 KB" (desatualizado apos a modularizacao) -- ajustar quando tocar no arquivo.
+
 ---
 
-## Ciclo 21 (Pleno) -- Fechar toda a refatoracao restante (code-behinds + CSS + higiene)
+## Ciclo 21 (Pleno) -- Fechar toda a refatoracao restante (code-behinds + CSS + higiene) [EXECUTADO -- ver review acima]
 
 **Objetivo**: concluir a divida tecnica de refatoracao aberta na varredura Senior. Ciclo MAIOR, mas executado em **incrementos pequenos (1 assunto por commit/PR)**. Regra de ouro do Ciclo 18 continua valendo: **teste de caracterizacao ANTES de refatorar**, comportamento identico, `IDbContextFactory` (nunca `AppDbContext` direto), 0 warning no app, suite verde. **Nenhuma mudanca de regra de negocio.**
 
