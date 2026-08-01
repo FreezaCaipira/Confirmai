@@ -47,8 +47,8 @@
 else if (group is null)
 {
     <div class="detail-not-found">
-        <h2>Grupo não encontrado.</h2>
-        <a href="/">← Voltar</a>
+        <h2>@Ui["Groups.NotFound"]</h2>
+        <a href="/">← @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -65,15 +65,15 @@ else
             <header class="detail-header">
                 <div class="detail-header-top">
                     <a href="/grupo/@group.Id" class="detail-back-link">
-                        <i class="fas fa-arrow-left"></i> Voltar
+                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
                     </a>
                     <a href="/grupos" class="detail-back-link detail-back-link--groups">
-                        <i class="fas fa-layer-group"></i> Grupos
+                        <i class="fas fa-layer-group"></i> @Ui["Groups.Title"]
                     </a>
                 </div>
                 <div class="detail-header-title-row">
                     <span class="detail-header-subtitle">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker") — Partidas <span class="detail-events-year">@eventsYear</span>
+                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker") — @Ui["Groups.Partidas"] <span class="detail-events-year">@eventsYear</span>
                     </span>
                 </div>
                 <h1 class="detail-title">@group.Name</h1>
@@ -92,12 +92,12 @@ else
                         <button class="detail-events-tab @(!showPastEvents ? "active" : string.Empty)"
                                 type="button"
                                 @onclick="() => showPastEvents = false">
-                            <i class="fas fa-bolt"></i> Próximas (@upcomingEvents.Count)
+                            <i class="fas fa-bolt"></i> @Ui["Groups.Proximas"] (@upcomingEvents.Count)
                         </button>
                         <button class="detail-events-tab @(showPastEvents ? "active" : string.Empty)"
                                 type="button"
                                 @onclick="() => showPastEvents = true">
-                            <i class="fas fa-history"></i> Realizadas (@pastEvents.Count)
+                            <i class="fas fa-history"></i> @Ui["Groups.Realizadas"] (@pastEvents.Count)
                         </button>
                     </div>
                     <div class="detail-events-tabs-right">
@@ -106,11 +106,11 @@ else
                             @if (group.Sport == Sport.Futsal)
                             {
                                 <a href="/futsal/schedule?groupId=@group.Id" class="groups-create-btn groups-create-btn--semanais detail-events-create-btn">
-                                    <i class="fas fa-sync-alt"></i> Semanais
+                                    <i class="fas fa-sync-alt"></i> @Ui["Groups.Semanais"]
                                 </a>
                             }
                             <a href="@newEventHref" class="groups-create-btn detail-events-create-btn">
-                                <i class="fas fa-plus"></i> Nova partida
+                                <i class="fas fa-plus"></i> @Ui["Groups.NovaPartida"]
                             </a>
                         }
                     </div>

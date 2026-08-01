@@ -1,31 +1,33 @@
 @using Confirmai.Models
+@using Confirmai.Services.Core
+@inject UiTextService Ui
 
 <section class="detail-section features-section">
     <h2 class="detail-section-title">
-        <i class="fas fa-qrcode"></i> Pix do Organizador
+        <i class="fas fa-qrcode"></i> @Ui["Payment.PixOrganizer"]
     </h2>
     <p class="features-section-sub">
-        Selecione qual admin recebe os pagamentos das partidas.
-        A chave Pix do admin selecionado será exibida aos jogadores na página de pagamento.
+        @Ui["Payment.SelectReceiver"]
+        @Ui["Payment.SelectReceiverSub"]
     </p>
 
     @if (PixAdmins.Count == 0)
     {
         <div class="feat-pix-warning">
             <i class="fas fa-exclamation-triangle"></i>
-            Nenhum admin do grupo tem Chave Pix cadastrada no perfil.
-            <a href="/profile/@CurrentUserId" class="feat-pix-profile-link">Configure a sua Chave Pix →</a>
+            @Ui["Payment.NoPixAdmin"]
+            <a href="/profile/@CurrentUserId" class="feat-pix-profile-link">@Ui["Payment.ConfigurePix"]</a>
         </div>
     }
     else
     {
         <div class="feat-pix-form">
-            <label class="feat-pix-label" for="pix-receiver-select">Admin que recebe:</label>
+            <label class="feat-pix-label" for="pix-receiver-select">@Ui["Payment.AdminReceives"]</label>
             <select id="pix-receiver-select"
                     class="feat-pix-select"
                     @bind="localSelectedId"
                     disabled="@IsSaving">
-                <option value="">— Automático (primeiro admin com Pix) —</option>
+                <option value="">@Ui["Payment.AutoReceiver"]</option>
                 @foreach (var a in PixAdmins)
                 {
                     <option value="@a.UserId">@(a.User?.FullName ?? a.User?.UserName) — @a.User?.PixKey</option>
@@ -34,7 +36,7 @@
             <button class="feat-pix-save-btn" type="button"
                     disabled="@IsSaving"
                     @onclick="HandleSavePixReceiver">
-                <i class="fas fa-save"></i> @(IsSaving ? "Salvando…" : "Salvar")
+                <i class="fas fa-save"></i> @(IsSaving ? Ui["Payment.Saving"] : Ui["Payment.Save"])
             </button>
         </div>
     }

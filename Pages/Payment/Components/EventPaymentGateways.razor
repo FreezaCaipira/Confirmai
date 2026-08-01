@@ -1,7 +1,9 @@
 @using Confirmai.Models
 @using Confirmai.Configuration
+@using Confirmai.Services.Core
 @using System.Globalization
 @using Microsoft.Extensions.Options
+@inject UiTextService Ui
 
 @if (GroupGatewaysEnabled)
 {
@@ -90,6 +92,6 @@ else
 {
     <p class="evpay-disclaimer">
         <i class="fas fa-info-circle"></i>
-        Este grupo utiliza o fluxo padrão: Pix direto para o organizador com envio de comprovante.
+        @Ui["Payment.ManualFlow"]
     </p>
 }

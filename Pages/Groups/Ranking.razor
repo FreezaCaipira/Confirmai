@@ -10,6 +10,9 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
+@using Confirmai.Services.Core
+
+@inject Confirmai.Services.Core.UiTextService Ui
 
 
 <PageTitle>Ranking — @(group?.Name ?? "Grupo") · Confirmai</PageTitle>
@@ -62,10 +65,10 @@ else
             <header class="detail-header">
                 <div class="detail-header-top">
                     <a href="/grupo/@group.Id" class="detail-back-link">
-                        <i class="fas fa-arrow-left"></i> Voltar
+                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
                     </a>
                     <a href="/grupos" class="detail-back-link detail-back-link--groups">
-                        <i class="fas fa-layer-group"></i> Grupos
+                        <i class="fas fa-layer-group"></i> @Ui["Groups.Title"]
                     </a>
                 </div>
                 <div class="detail-header-badge">
