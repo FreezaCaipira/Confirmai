@@ -91,7 +91,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 - **Login Google (criar-ou-vincular): implementado.** Login externo ja vinculado entra direto; email existente vincula (`AddLoginAsync`); email novo cria conta com `EmailConfirmed=true`. Email real (SMTP + fallback) e confirmacao por link implementados. (Depende do Robson gerar as credenciais OAuth em prod -- ver secao Google OAuth.)
 - **Seguranca**: webhooks autenticados (AbacatePay HMAC timing-safe, BTCPay secret timing-safe, EfiBank mTLS por client-cert configuravel); authz admin 17/17 paginas + teste de convencao; CSP com nonce + X-Frame-Options/nosniff/HSTS; credenciais Efi removidas do `appsettings.json` (placeholders `__SET_VIA_USER_SECRETS__`; `IsEnabled` ignora placeholders).
 - **Migration de gateways**: default `EnablePaymentGateways=true` so para grupos NOVOS (o `UPDATE` que ligava grupos existentes foi removido -- evita quebra silenciosa no deploy).
-- **Estrategia de pagamento V1 vs V2 (decisao Robson, Ciclo 23)**: o **V1 (go-live) usa o fluxo MANUAL** -- jogador paga na chave Pix de um admin do grupo, envia comprovante, organizador confirma. O **Pix automatico** (gateway + `PayoutService`/`EfiBankPixPayoutService` + taxa) fica como **V2**, atras do toggle `EnablePaymentGateways`, **codigo preservado** (nada removido). O Ciclo 23 vai (a confirmar) inverter o default para manual em grupos novos. Motivo: simplicidade para lancar logo; a complexidade do Pix automatico + rotacao/homologacao Efi vira desenvolvimento V2.
+- **Estrategia de pagamento V1 vs V2 (decisao Robson, Ciclo 23)**: o **V1 (go-live) usa o fluxo MANUAL** -- jogador paga na chave Pix de um admin do grupo, envia comprovante, organizador confirma. O **Pix automatico** (gateway + `PayoutService`/`EfiBankPixPayoutService` + taxa) fica como **V2**, atras do toggle `EnablePaymentGateways`, **codigo preservado** (nada removido). O Ciclo 23 vai inverter o default para manual em grupos novos (**Robson confirmou** o flip). Motivo: simplicidade para lancar logo; a complexidade do Pix automatico + rotacao/homologacao Efi vira desenvolvimento V2.
 
 ---
 
@@ -147,7 +147,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 **Objetivo**: (1) melhorar a navegacao entre Grupos <-> Partidas e os estados vazios; (2) consolidar o **fluxo de pagamento manual** (comprovante + confirmacao do organizador) como o **default do V1**, deixando o Pix automatico (gateway/payout) como **V2** atras de toggle -- sem remover codigo; (3) corrigir o link Pix quebrado que cai em 404; (4) auditar e padronizar a i18n ate aqui e firmar a nova regra de pipeline.
 
-> **DECISAO DE NEGOCIO (Robson) a confirmar antes da Fase 2**: tornar o fluxo manual o default significa `Group.EnablePaymentGateways = false` por padrao para **grupos novos** (hoje o default e `true`, migration `EnablePaymentGatewaysDefaultTrue`). Isso **inverte** a decisao anterior (Ciclo 19). Grupos existentes NAO devem ser alterados pela migration (manter a licao do Ciclo 19). O Senior vai confirmar o flip com o Robson; ate la, a Fase 2 foca no fix do link e em garantir que o caminho manual esteja completo.
+> **DECISAO DE NEGOCIO (Robson) -- CONFIRMADA**: o fluxo manual e o default do V1. `Group.EnablePaymentGateways = false` por padrao para **grupos novos** (inverte a decisao do Ciclo 19, que tinha default `true`). Grupos existentes NAO devem ser alterados pela migration (mantem a licao do Ciclo 19: sem `UPDATE`). Robson confirmou o flip -- a Fase 2.3 esta liberada.
 
 ### Fase 1 -- Navegacao Grupos <-> Partidas (itens 1 e 2 do Robson)
 1. **Botao "Grupos" na row do "Voltar" (item 1)**: em `Pages/Groups/Partidas.razor`, dentro de `<div class="detail-header-top">` (hoje so tem o `<a ... detail-back-link>Voltar</a>`), adicionar um link para `/grupos` na **mesma row**. Aplicar o mesmo padrao onde fizer sentido (telas com a mesma `detail-header-top`: Ranking, Payments, Features) para consistencia.
@@ -160,7 +160,7 @@ Contexto: o app tem dois caminhos de pagamento -- **manual** (`EnablePaymentGate
 1. **Fix do link quebrado (bug real -- causa do 404)**: em `Pages/Groups/Components/PixReceiverSelector.razor:17`, o link "Configure a sua Chave Pix" aponta para `/perfil`, que **nao existe** (a rota real e `/profile/{Id}`) -> cai no `App.NotFound` (`App.NotFound.Title`). Corrigir para navegar a pagina de perfil correta (`/profile/{userId}` do admin logado). Escrever teste que garanta que o destino e uma rota valida.
    - *Criterio*: clicar em "Configure a sua Chave Pix" leva ao perfil, nunca ao 404.
 2. **Garantir o caminho manual completo e claro**: revisar o fluxo manual ponta a ponta (cadastrar Pix no perfil -> selecionar admin recebedor em Configuracoes -> jogador ve chave/QR e envia comprovante -> organizador confirma em `/grupo/{id}/pagamentos`). Corrigir textos/estados confusos. Sem inventar feature nova.
-3. **Default manual para grupos novos** (SOMENTE apos confirmacao do Senior -- ver DECISAO acima): mudar o default de `EnablePaymentGateways` para `false` em `AppDbContext`/modelo + nova migration que **so** altera o default (sem `UPDATE` em grupos existentes). Teste de caracterizacao do comportamento.
+3. **Default manual para grupos novos** (CONFIRMADO pelo Robson -- liberado): mudar o default de `EnablePaymentGateways` para `false` em `AppDbContext`/modelo + nova migration que **so** altera o default (sem `UPDATE` em grupos existentes). Teste de caracterizacao do comportamento.
    - *Criterio*: grupo novo nasce em modo manual; grupo existente inalterado.
 4. **NAO remover** o codigo do Pix automatico (gateway, `PayoutService`, `EfiBankPixPayoutService`, webhook, retry). Ele permanece funcional atras do toggle e documentado como **V2**. Registrar no WORK_PLAN que o Pix automatico e V2.
    - *Criterio*: nenhum arquivo de pagamento automatico deletado; suite de pagamento continua verde.
@@ -175,7 +175,7 @@ Contexto: o app tem dois caminhos de pagamento -- **manual** (`EnablePaymentGate
 ### O que NAO fazer
 - Nao remover o codigo de pagamento automatico/gateway/payout (e V2, fica atras do toggle).
 - Nao alterar grupos existentes via migration (licao do Ciclo 19). Novo default vale so para grupos novos.
-- Nao inverter o default de gateways ANTES da confirmacao do Senior (Fase 2.3 depende disso).
+- Na migration da Fase 2.3, NAO incluir `UPDATE` que altere grupos existentes (so mudar o default do schema).
 - Nao mudar regra de negocio de cobranca/valor/taxa. Nao abrir ciclo dedicado de "Mobile UX" agora (item 4): as telas ja estao sendo revisadas de UX incrementalmente; mobile UX critico permanece no roadmap.
 - Nao traduzir EN-US/ES-ES agora (baseline PT-BR basta); so garantir que as chaves existam.
 
