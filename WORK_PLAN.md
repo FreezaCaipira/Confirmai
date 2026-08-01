@@ -38,7 +38,8 @@ Esta secao complementa a "Regras para o Pleno (OBRIGATORIO)" (detalhada mais aba
 - **Incremental**: 1 assunto por commit; sem big-bang. Se um passo exige mudar regra de negocio, PARE e registre um achado para o Senior (nao mude comportamento as escondidas).
 - **Preservar comportamento** em refactor: o valor cobrado, o payout, a escalacao etc. nao mudam. Interfaces publicas so mudam com plano explicito.
 - **CSS**: mobile-first, breakpoint unico **768px** (`@media (max-width:768px)` mobile, `@media (min-width:769px)` desktop), usar **CSS vars** (nunca hex/rgba hardcoded em scoped CSS), sem `!important` novo, modular por dominio. Ver regras 1-2, 18-23 e "CSS Vars Permitidas".
-- **Qualidade minima por incremento**: `dotnet build` 0 warning + suite verde (filtrando os testes ambientais de Postgres). Sem `Console.Write`/debug commitado.
+- **i18n sempre (nova regra -- ver regra 25)**: toda string visivel ao usuario passa pelo `UiTextService`/`@Ui[...]` (chave por dominio). Proibido texto hardcoded em markup `.razor` ou em mensagens de retorno de service. i18n faz parte do "done" do incremento, junto com o TDD.
+- **Qualidade minima por incremento**: `dotnet build` 0 warning + suite verde (filtrando os testes ambientais de Postgres). Sem `Console.Write`/debug commitado. Sem string de UI hardcoded nova.
 
 ### Como agir (fluxo de trabalho)
 - **1 branch por ciclo, 1 PR por ciclo** (excecao: mudancas so-de-doc `.md` podem ir direto pra main -- regra 16). Nunca push direto na `main` para codigo.
@@ -90,6 +91,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 - **Login Google (criar-ou-vincular): implementado.** Login externo ja vinculado entra direto; email existente vincula (`AddLoginAsync`); email novo cria conta com `EmailConfirmed=true`. Email real (SMTP + fallback) e confirmacao por link implementados. (Depende do Robson gerar as credenciais OAuth em prod -- ver secao Google OAuth.)
 - **Seguranca**: webhooks autenticados (AbacatePay HMAC timing-safe, BTCPay secret timing-safe, EfiBank mTLS por client-cert configuravel); authz admin 17/17 paginas + teste de convencao; CSP com nonce + X-Frame-Options/nosniff/HSTS; credenciais Efi removidas do `appsettings.json` (placeholders `__SET_VIA_USER_SECRETS__`; `IsEnabled` ignora placeholders).
 - **Migration de gateways**: default `EnablePaymentGateways=true` so para grupos NOVOS (o `UPDATE` que ligava grupos existentes foi removido -- evita quebra silenciosa no deploy).
+- **Estrategia de pagamento V1 vs V2 (decisao Robson, Ciclo 23)**: o **V1 (go-live) usa o fluxo MANUAL** -- jogador paga na chave Pix de um admin do grupo, envia comprovante, organizador confirma. O **Pix automatico** (gateway + `PayoutService`/`EfiBankPixPayoutService` + taxa) fica como **V2**, atras do toggle `EnablePaymentGateways`, **codigo preservado** (nada removido). O Ciclo 23 vai (a confirmar) inverter o default para manual em grupos novos. Motivo: simplicidade para lancar logo; a complexidade do Pix automatico + rotacao/homologacao Efi vira desenvolvimento V2.
 
 ---
 
@@ -129,12 +131,65 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 | 20 | SOLID + CSS modular + remover legacy | 7 code-behinds reduzidos (`AdminPayments` 1046->666 etc.), `admin/escalacao/payments.css` extraidos, `serviceFeePercentage` removido. | #70 (plano), #71 (impl), #72 (review) | APROVADO |
 | 21 | Fechar refatoracao (code-behinds + CSS + higiene) | 0 code-behind > 250 LOC; `site.css`/`events.css` ao core; 0 warning de analisador nos testes. Ressalva: services extraidos sem teste. | #73 (plano), #74 (impl), #75 (review) | APROVADO c/ 1 ressalva |
 | 22 | Cobrir services extraidos com teste | 12/12 services/formatters com teste dedicado (+174 testes; 1950->2124). 0 diff de producao. Senior corrigiu 7 warnings CS8625 em `ProfileServiceTests`. | #76 (plano), #77 (impl), #78 (review) | APROVADO |
+| 23 | UX navegacao + Pagamento V1 manual + i18n | Requisitos de teste do Robson: botao Grupos na row do Voltar (Partidas), card "Como funciona" + botao em estados vazios, fix do link Pix quebrado (`/perfil`->404), fluxo **manual** como default (Pix automatico -> V2), auditoria+regra de i18n. | #<plano> | PLANEJADO |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
 ---
 
 # Detalhes dos Ciclos Recentes (planos + reviews na integra)
+
+---
+
+## Ciclo 23 (Pleno) -- UX de navegacao + Pagamento V1 (fluxo manual como default) + i18n [PLANEJADO]
+
+**Origem**: requisitos levantados pelo Robson testando o app + retorno do Pleno (regra 22 -- requisitos de teste sao legitimos e entram no plano). Este ciclo destrava o **go-live V1**: pagamento simples (manual) por padrao, navegacao mais fluida e i18n auditada.
+
+**Objetivo**: (1) melhorar a navegacao entre Grupos <-> Partidas e os estados vazios; (2) consolidar o **fluxo de pagamento manual** (comprovante + confirmacao do organizador) como o **default do V1**, deixando o Pix automatico (gateway/payout) como **V2** atras de toggle -- sem remover codigo; (3) corrigir o link Pix quebrado que cai em 404; (4) auditar e padronizar a i18n ate aqui e firmar a nova regra de pipeline.
+
+> **DECISAO DE NEGOCIO (Robson) a confirmar antes da Fase 2**: tornar o fluxo manual o default significa `Group.EnablePaymentGateways = false` por padrao para **grupos novos** (hoje o default e `true`, migration `EnablePaymentGatewaysDefaultTrue`). Isso **inverte** a decisao anterior (Ciclo 19). Grupos existentes NAO devem ser alterados pela migration (manter a licao do Ciclo 19). O Senior vai confirmar o flip com o Robson; ate la, a Fase 2 foca no fix do link e em garantir que o caminho manual esteja completo.
+
+### Fase 1 -- Navegacao Grupos <-> Partidas (itens 1 e 2 do Robson)
+1. **Botao "Grupos" na row do "Voltar" (item 1)**: em `Pages/Groups/Partidas.razor`, dentro de `<div class="detail-header-top">` (hoje so tem o `<a ... detail-back-link>Voltar</a>`), adicionar um link para `/grupos` na **mesma row**. Aplicar o mesmo padrao onde fizer sentido (telas com a mesma `detail-header-top`: Ranking, Payments, Features) para consistencia.
+   - *Criterio*: na tela de Partidas, o usuario ve "Voltar" e "Grupos" na mesma linha; ambos navegam corretamente; layout mobile (<=768px) nao quebra.
+2. **Estado vazio replicado + botao (item 2)**: hoje o card "Como funciona" (onboarding-hint com os 3 passos) existe SO em `Pages/Groups/Index.razor` (bloco `groups.Count == 0`). Extrair esse card para um **componente compartilhado** (ex.: `Shared/Components/Groups/NoGroupsHint.razor` ou similar) e reutiliza-lo nas demais telas principais quando o usuario **ainda nao tem grupos** (ex.: `/eventos`, `/meus-eventos`, telas de partidas sem contexto de grupo), sempre com um **botao "Acessar grupos"** (`/grupos`) no final do card.
+   - *Criterio*: componente unico (sem duplicar markup); aparece nas telas-alvo quando o usuario nao tem grupo; botao leva a `/grupos`. Sem regressao para quem ja tem grupos.
+
+### Fase 2 -- Pagamento V1: fluxo manual como default (item 6)
+Contexto: o app tem dois caminhos de pagamento -- **manual** (`EnablePaymentGateways=false`: `PixReceiverSelector`, jogador paga na chave Pix de um admin e envia comprovante, organizador confirma) e **automatico/gateway** (`EnablePaymentGateways=true`: `PayoutAccountEditor` + gateway + payout). O Robson quer o **manual como default no V1**; o automatico vira **V2**.
+1. **Fix do link quebrado (bug real -- causa do 404)**: em `Pages/Groups/Components/PixReceiverSelector.razor:17`, o link "Configure a sua Chave Pix" aponta para `/perfil`, que **nao existe** (a rota real e `/profile/{Id}`) -> cai no `App.NotFound` (`App.NotFound.Title`). Corrigir para navegar a pagina de perfil correta (`/profile/{userId}` do admin logado). Escrever teste que garanta que o destino e uma rota valida.
+   - *Criterio*: clicar em "Configure a sua Chave Pix" leva ao perfil, nunca ao 404.
+2. **Garantir o caminho manual completo e claro**: revisar o fluxo manual ponta a ponta (cadastrar Pix no perfil -> selecionar admin recebedor em Configuracoes -> jogador ve chave/QR e envia comprovante -> organizador confirma em `/grupo/{id}/pagamentos`). Corrigir textos/estados confusos. Sem inventar feature nova.
+3. **Default manual para grupos novos** (SOMENTE apos confirmacao do Senior -- ver DECISAO acima): mudar o default de `EnablePaymentGateways` para `false` em `AppDbContext`/modelo + nova migration que **so** altera o default (sem `UPDATE` em grupos existentes). Teste de caracterizacao do comportamento.
+   - *Criterio*: grupo novo nasce em modo manual; grupo existente inalterado.
+4. **NAO remover** o codigo do Pix automatico (gateway, `PayoutService`, `EfiBankPixPayoutService`, webhook, retry). Ele permanece funcional atras do toggle e documentado como **V2**. Registrar no WORK_PLAN que o Pix automatico e V2.
+   - *Criterio*: nenhum arquivo de pagamento automatico deletado; suite de pagamento continua verde.
+
+### Fase 3 -- i18n: auditoria + regra de pipeline (item 3)
+1. **Auditar cobertura atual**: a i18n usa o `UiTextService` (facade em `Services/Core/UiTextService.cs`, textos por dominio em `Services/Core/UiText/*`), baseline PT-BR; **nao ha .resx**. Levantar as strings **hardcoded** em `.razor` (ha varias: "Grupo nao encontrado.", "Voltar", "Partidas", titulos, `placeholder`, `title`, `PageTitle` etc.) e migra-las para chaves do `UiTextService` por dominio. Priorizar as telas dos fluxos principais mobile (grupos, partidas, pagamento, comprovante, estados vazios) -- nao precisa varrer 100% do app neste ciclo, mas fechar os fluxos principais.
+   - *Criterio*: nas telas dos fluxos principais, 0 string de UI hardcoded; tudo via `@Ui[...]`. PT-BR completo para as chaves novas.
+2. **Firmar a regra no pipeline**: a **regra 25** (i18n obrigatorio, junto ao TDD) ja foi adicionada. O Pleno deve segui-la em todo incremento deste ciclo (as strings novas das Fases 1 e 2 ja nascem via `UiTextService`).
+   - *Criterio*: nenhuma string nova hardcoded introduzida pelas Fases 1/2.
+3. (Opcional, se sobrar espaco) Adicionar um teste de convencao simples que falhe se aparecer texto hardcoded obvio nas telas-alvo (ex.: varredura por literais em `.razor` dos fluxos principais). Nao bloqueante.
+
+### O que NAO fazer
+- Nao remover o codigo de pagamento automatico/gateway/payout (e V2, fica atras do toggle).
+- Nao alterar grupos existentes via migration (licao do Ciclo 19). Novo default vale so para grupos novos.
+- Nao inverter o default de gateways ANTES da confirmacao do Senior (Fase 2.3 depende disso).
+- Nao mudar regra de negocio de cobranca/valor/taxa. Nao abrir ciclo dedicado de "Mobile UX" agora (item 4): as telas ja estao sendo revisadas de UX incrementalmente; mobile UX critico permanece no roadmap.
+- Nao traduzir EN-US/ES-ES agora (baseline PT-BR basta); so garantir que as chaves existam.
+
+### Meta de saida
+- Navegacao: botao Grupos na tela de Partidas + card de estado-vazio reutilizavel com botao em >=2 telas alem de `/grupos`.
+- Pagamento: link Pix nunca cai em 404; fluxo manual completo; (se confirmado) default manual para grupos novos, automatico intacto como V2.
+- i18n: fluxos principais sem string hardcoded; regra 25 em vigor; +testes das mudancas (TDD).
+- `dotnet build` 0 warning; suite verde (as 24 falhas ambientais de Postgres sao esperadas).
+
+### Alvos concretos
+- `Pages/Groups/Partidas.razor` (header row), `Pages/Groups/Index.razor` (card onboarding-hint a extrair), telas-alvo do estado vazio (`Pages/Index.razor` `/eventos`, `Pages/MyEvents/Index.razor`).
+- `Pages/Groups/Components/PixReceiverSelector.razor:17` (link `/perfil` -> `/profile/{id}`).
+- `Data/AppDbContext.cs` + nova migration (default `EnablePaymentGateways`, se confirmado).
+- `Services/Core/UiTextService.cs` + `Services/Core/UiText/*` (chaves i18n).
 
 ---
 
@@ -617,6 +672,7 @@ Implementação de suporte a certificado via variável de ambiente em base64:
 22. **Requisitos vindos dos testes do Robson sao legitimos** -- bugs/melhorias/requisitos que o Robson levanta testando o app NAO sao "scope creep" e devem entrar na "Fase padrao de melhorias UX" do ciclo. A regra 16 (separar features) so se aplica a adicoes que o proprio Pleno inventa sem pedido (ex: novos esportes). Documentar cada item vindo do Robson na fase de melhorias antes de implementar
 23. **ISOLAMENTO WEB/MOBILE EM CSS** -- NUNCA aplicar estilos de layout (width, max-width, padding, gap, font-size) sem media query de isolamento. Estilos desktop devem usar `@media (min-width: 769px)`. Estilos mobile devem usar `@media (max-width: 768px)`. O base (sem media query) deve ser mobile-first ou neutro. SEMPRE testar em ambas as viewports apos mudancas de layout. Bug recorrente: afinamento de width 57% aplicado sem media query quebrou o mobile (campos esmagados) -- corrigido envolvendo em `@media (min-width: 769px)`
 24. **Pasta default para prints**: `C:\Users\FreezaPC\Desktop\devin-prints` -- sempre procurar nesta pasta quando o usuario mencionar "ver print na pasta"
+25. **i18n obrigatorio (pipeline, junto ao TDD)**: nenhuma string visivel ao usuario pode ser hardcoded em `.razor` (markup, `PageTitle`, atributos `title`/`placeholder`/`alt`) nem em mensagens de retorno de service. Tudo passa pelo `UiTextService` (facade em `Services/Core/UiTextService.cs`, textos por dominio em `Services/Core/UiText/*`) via `@Ui["Dominio.Chave"]` no markup ou `_ui.Get("...")` no service. Ao criar/editar UI: (a) adicionar a chave no dominio correto; (b) preencher PT-BR (baseline); EN-US/ES-ES podem seguir em fase posterior mas a chave ja deve existir. Novas features nao entram sem i18n.
 
 ---
 
