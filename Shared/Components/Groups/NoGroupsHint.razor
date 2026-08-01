@@ -1,0 +1,34 @@
+<div class="onboarding-hint">
+    <div class="onboarding-hint-header">
+        <i class="fas fa-info-circle"></i>
+        <span>Como funciona</span>
+    </div>
+    <p class="onboarding-hint-intro">
+        Cada grupo representa uma turma — o seu racha, pelada ou baba.
+        Você pode ter vários grupos: um para o futebol de segunda, outro para o futebol de sábado, e por aí vai.
+    </p>
+    <div class="onboarding-steps">
+        <div class="onboarding-step">
+            <span class="onboarding-step-num">1</span>
+            <span class="onboarding-step-text">Crie um grupo para cada racha e convide a turma</span>
+        </div>
+        <div class="onboarding-step">
+            <span class="onboarding-step-num">2</span>
+            <span class="onboarding-step-text">Crie partidas semanais ou avulsas para o grupo</span>
+        </div>
+        <div class="onboarding-step">
+            <span class="onboarding-step-num">3</span>
+            <span class="onboarding-step-text">Os membros efetuam pagamento e confirmam presença na partida</span>
+        </div>
+    </div>
+    @if (ShowGroupsButton)
+    {
+        <a href="/grupos" class="onboarding-hint-cta">
+            <i class="fas fa-layer-group"></i> Acessar grupos
+        </a>
+    }
+</div>
+
+@code {
+    [Parameter] public bool ShowGroupsButton { get; set; }
+}

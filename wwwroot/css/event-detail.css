@@ -110,6 +110,17 @@ body .entity-shell-card.evpay-main {
     box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
 }
 
+.detail-back-link--groups {
+    background: var(--ci-surface-light);
+    border-color: var(--ci-border);
+    color: var(--ci-text-blue);
+}
+.detail-back-link--groups:hover {
+    background: var(--ci-surface-light);
+    color: var(--ci-accent);
+    box-shadow: 0 4px 14px rgba(34, 109, 196, 0.18);
+}
+
 .detail-sport-badge {
     font-size: 0.78rem;
     font-weight: 700;
