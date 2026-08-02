@@ -112,6 +112,31 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 - Pen-test financeiro, revisao de CSP, metricas SignalR, alertas operacionais -- antes de producao.
 - Redis: so quando houver multi-instancia ou gargalo medido (nao agora).
 
+### Aparato Geral do Senior (pos-Ciclo 23) -- backlog priorizado para o Ciclo 24
+
+Varredura Senior focada em melhorias/adicoes, **separando codigo (Pleno/Senior) das pendencias do Robson**. Base: `main` @ `cb6c89a`.
+
+**P1 -- alto valor para o go-live V1 (fluxo manual como default):**
+- **i18n ainda incompleto (regra 25)**: ~185 strings acentuadas hardcoded em `Pages/**/*.razor` contra apenas ~35 usos de `@Ui[...]` -> i18n esta em ~15-20%. Continuar a migracao priorizando os fluxos mobile principais restantes: `Pages/Payment/EventPayment.razor` (+ componentes), `Pages/Groups/Detail.razor`, `Pages/Groups/Payments.razor`, `Pages/MyEvents/Index.razor`. Meta incremental por tela; PT-BR baseline. Alvo: derrubar os 185 para <50 no fim do ciclo.
+- **UX do pagamento V1 quando gateways OFF (default agora)**: em `Pages/Payment/EventPayment.razor:164-193`, com `!groupGatewaysEnabled` ainda renderiza o seletor `EventPaymentGateways` ACIMA do Pix manual -- no V1 manual isso confunde. Esconder o bloco de gateways quando desabilitado e exibir so `EventPaymentPixAdmin` + `EventPaymentProof`. + teste.
+- **Cobertura do fluxo manual V1 ponta a ponta**: e o fluxo do dinheiro no V1. Teste de integracao do caminho manual: exibicao da chave/QR do organizador, upload de comprovante (`PixProofUploadService`), e confirmacao do organizador em `/grupo/{id}/pagamentos` (`AdminMarkPaid`). Caracterizar estados (sem comprovante / comprovante enviado / confirmado).
+
+**P2 -- qualidade / observabilidade / UX:**
+- **`catch {}` que engolem tudo**: `Pages/Admin/Admin.razor.cs:125,127`, `Pages/Groups/Detail.razor.cs:61,82` e os `catch { }` de modal JS em `Pages/Admin/AdminPayments.razor.cs:95,168,235` -> logar via `ILogger` em vez de silenciar. **Manter** os `JSDisconnectedException`/`OperationCanceledException`/`TaskCanceledException` no dispose/navegacao (esses sao aceitaveis).
+- **Estados vazios padronizados**: reaproveitar o padrao do `NoGroupsHint` para os vazios de `Pages/MyEvents/Index.razor` (o plano do C23 citou `/meus-eventos` e ficou de fora), pagamentos e ranking -- sempre com CTA.
+- **Consistencia de idioma no `UiTextService`**: ha chaves ja em ES/EN misturadas com PT-BR (ex.: `AuthTexts.cs:232`, `UtilityTexts.cs:333-334,484-486` em espanhol) -> hoje o baseline esta inconsistente. Decidir: (a) manter so PT-BR e normalizar as chaves espanholas para PT, ou (b) assumir multi-idioma de verdade e completar. Recomendo (a) para o V1.
+
+**P3 -- higiene / futuro:**
+- **Teste de convencao anti-hardcode i18n** nas telas-alvo (proposto no C23, nao feito): falhar se aparecer literal acentuado em `.razor` dos fluxos principais.
+- **WhatsApp** (`Services/Events/EventNotificationService.cs:194` TODO) -- POSTERGADO.
+- E2E mobile (Playwright 375/768/desktop) dos fluxos principais -- quando priorizado.
+
+**Pendencias do Robson (fora do codigo) -- NAO sao do proximo ciclo de codigo:**
+- Rotacionar ClientSecret Efi + reconfigurar credenciais (so afeta o **V2**).
+- Validar Envio de Pix Efi em homologacao + limites (V2). Nota fiscal da taxa com contador (V2).
+- Gerar OAuth Google prod + SMTP/provedor de email prod.
+- Confirmar `SyncPassword=false` e mTLS do webhook Efi em prod.
+
 ---
 
 ## Linha do Tempo dos Ciclos (todolist / historico condensado)
