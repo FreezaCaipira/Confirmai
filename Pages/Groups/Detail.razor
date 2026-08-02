@@ -18,8 +18,9 @@
 @inject NavigationManager              NavigationManager
 @inject IConfiguration                 Config
 @inject IJSRuntime                     JS
+@inject Confirmai.Services.Core.UiTextService Ui
 
-<PageTitle>@(group?.Name ?? "Grupo") · Confirmai</PageTitle>
+<PageTitle>@(group?.Name ?? @Ui["Group.PageTitle"]) · Confirmai</PageTitle>
 
 @if (isLoading)
 {
@@ -53,8 +54,8 @@
 else if (group is null)
 {
     <div class="detail-not-found">
-        <h2>Grupo não encontrado.</h2>
-        <a href="/">← Voltar</a>
+        <h2>@Ui["Group.NotFound"]</h2>
+        <a href="/">← @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -72,12 +73,12 @@ else
             <header class="detail-header">
                 <div class="detail-header-top">
                     <a href="/grupos" class="detail-back-link">
-                        <i class="fas fa-arrow-left"></i> Voltar
+                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
                     </a>
                 </div>
                 <div class="detail-header-content">
                     <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
                     </span>
                     <h1 class="detail-title">@group.Name</h1>
                     @if (!string.IsNullOrWhiteSpace(group.City))
@@ -90,7 +91,7 @@ else
                 </div>
                 @if (!group.IsActive)
                 {
-                    <div class="cancelled-banner"><i class="fas fa-ban"></i> Grupo inativo.</div>
+                    <div class="cancelled-banner"><i class="fas fa-ban"></i> @Ui["Group.Inactive"]</div>
                 }
             </header>
 
@@ -100,30 +101,30 @@ else
                 <div class="invite-block">
                     @{ var inviteUrl = $"{baseUrl}/convite/{group.InviteCode}"; }
                     <div class="invite-row">
-                        <span class="invite-label"><i class="fas fa-link"></i> Link de convite:</span>
+                        <span class="invite-label"><i class="fas fa-link"></i> @Ui["Group.InviteLink"]</span>
                         <code class="invite-code-display" id="invite-url-text">@inviteUrl</code>
                         <button class="invite-copy-btn" type="button"
                                 @onclick="() => CopyInviteLink(inviteUrl)">
-                            <i class="fas fa-copy"></i> @(copiedInvite ? "Copiado!" : "Copiar")
+                            <i class="fas fa-copy"></i> @(copiedInvite ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
                         </button>
                     </div>
                     <hr class="invite-row-divider" />
                     <div class="invite-row">
-                        <span class="invite-label"><i class="fas fa-key"></i> Código:</span>
+                        <span class="invite-label"><i class="fas fa-key"></i> @Ui["Group.Code"]</span>
                         <code class="invite-code-display invite-code-only">@group.InviteCode</code>
                         <button class="invite-copy-btn" type="button"
                                 @onclick="() => CopyCode(group.InviteCode!)">
-                            <i class="fas fa-copy"></i> @(copiedCode ? "Copiado!" : "Copiar")
+                            <i class="fas fa-copy"></i> @(copiedCode ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
                         </button>
                     </div>
                     <hr class="invite-row-divider" />
                     <div class="invite-block-actions">
                         <button class="detail-admin-btn detail-admin-btn--whatsapp invite-block-btn" type="button"
                                 @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
-                            <i class="fab fa-whatsapp"></i> Convidar
+                            <i class="fab fa-whatsapp"></i> @Ui["Group.Invite"]
                         </button>
                         <a class="detail-admin-btn invite-block-btn invite-block-btn--settings" href="/grupo/@group.Id/configuracoes">
-                            <i class="fas fa-cog"></i> Configurações
+                            <i class="fas fa-cog"></i> @Ui["Group.Settings"]
                         </a>
                     </div>
                 </div>
@@ -137,7 +138,7 @@ else
                 <section class="detail-section">
                     <div class="detail-section-header">
                         <h2 class="detail-section-title">
-                            <i class="fas fa-chart-line"></i> Métricas
+                            <i class="fas fa-chart-line"></i> @Ui["Group.Metrics"]
                         </h2>
                     </div>
                     <GroupMetrics GroupId="@group.Id" />
@@ -149,22 +150,22 @@ else
             <section class="detail-section">
                 <div class="detail-section-header">
                     <h2 class="detail-section-title">
-                        <i class="fas fa-users"></i> Membros (@group.Members.Count)
+                        <i class="fas fa-users"></i> @Ui["Group.Members"] (@group.Members.Count)
                     </h2>
                     <div class="detail-section-actions">
                         <a class="detail-admin-btn detail-admin-btn--partidas" href="/grupo/@group.Id/partidas">
-                            <i class="fas fa-calendar-alt"></i> Partidas
+                            <i class="fas fa-calendar-alt"></i> @Ui["Group.PartidasLink"]
                         </a>
                         @if (isMember && group.EnablePostMatchRanking)
                         {
                             <a class="detail-admin-btn detail-admin-btn--ranking" href="/grupo/@group.Id/ranking">
-                                <i class="fas fa-trophy"></i> Ranking
+                                <i class="fas fa-trophy"></i> @Ui["Group.RankingLink"]
                             </a>
                         }
                         @if (isAdmin)
                         {
                             <a class="detail-admin-btn detail-admin-btn--pagamentos" href="/grupo/@group.Id/pagamentos">
-                                <i class="fas fa-money-bill-wave"></i> Pagamentos
+                                <i class="fas fa-money-bill-wave"></i> @Ui["Group.PaymentsLink"]
                             </a>
                         }
                     </div>
@@ -202,9 +203,9 @@ else
                 <div class="detail-pix-notice">
                     <span class="detail-pix-notice-icon"><i class="fas fa-exclamation-triangle"></i></span>
                     <div class="detail-pix-notice-body">
-                        <strong>Pix do organizador não configurado</strong>
-                        <p>Nenhum administrador do grupo possui chave Pix cadastrada. Os participantes não terão opção de pagamento manual por Pix.</p>
-                        <a href="/grupo/@group.Id/configuracoes" class="detail-pix-notice-link">Configurar agora →</a>
+                        <strong>@Ui["Group.PixNotConfigured"]</strong>
+                        <p>@Ui["Group.PixNotConfiguredDesc"]</p>
+                        <a href="/grupo/@group.Id/configuracoes" class="detail-pix-notice-link">@Ui["Group.ConfigureNow"]</a>
                     </div>
                 </div>
             }
@@ -218,30 +219,30 @@ else
                     {
                         <p class="join-request-pending">
                             <i class="fas fa-hourglass-half"></i>
-                            Solicitação enviada — aguardando aprovação do administrador.
+                            @Ui["Group.JoinRequestSent"]
                         </p>
                         <button class="cancel-join-btn" type="button" @onclick="CancelJoinRequest" disabled="@cancellingJoin">
                             <i class="fas fa-times"></i>
-                            @(cancellingJoin ? "Cancelando…" : "Cancelar solicitação")
+                            @(cancellingJoin ? @Ui["Group.CancellingJoin"] : @Ui["Group.CancelJoinRequest"])
                         </button>
                     }
                     else if (userJoinRequest?.Status == JoinRequestStatus.Rejected)
                     {
                         <p class="join-request-pending join-request-pending--rejected">
                             <i class="fas fa-times-circle"></i>
-                            Sua solicitação foi recusada.
+                            @Ui["Group.JoinRequestRejected"]
                         </p>
                     }
                     else
                     {
                         <p class="join-request-info">
                             <i class="fas fa-info-circle"></i>
-                            Você não é membro deste grupo. Solicite entrada ou peça o código de convite ao organizador.
+                            @Ui["Group.NotMemberInfo"]
                         </p>
                         <button class="confirm-btn" type="button" @onclick="RequestToJoin"
                                 disabled="@requestingJoin">
                             <i class="fas fa-user-plus"></i>
-                            @(requestingJoin ? "Enviando…" : "Solicitar entrada")
+                            @(requestingJoin ? @Ui["Group.SendingJoin"] : @Ui["Group.RequestJoin"])
                         </button>
                     }
                 </div>

@@ -15,7 +15,7 @@
 @inject NavigationManager              NavigationManager
 @inject Confirmai.Services.Core.UiTextService Ui
 
-<PageTitle>Configurações — @(group?.Name ?? "Grupo") · Confirmai</PageTitle>
+<PageTitle>@Ui.Get("Group.ConfigPageTitle", group?.Name ?? @Ui["Group.PageTitle"]) · Confirmai</PageTitle>
 
 @if (isLoading)
 {
@@ -44,8 +44,8 @@ else if (group is null || !isAdmin)
 {
     <div class="detail-not-found">
         <i class="fas fa-lock detail-not-found-icon"></i>
-        <h2>Acesso não autorizado.</h2>
-        <a href="/">← Voltar</a>
+        <h2>@Ui["Group.NotAuthorized"]</h2>
+        <a href="/">← @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -68,9 +68,9 @@ else
                 </div>
                 <div class="detail-header-content">
                     <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
                     </span>
-                    <h1 class="detail-title">Configurações do grupo</h1>
+                    <h1 class="detail-title">@Ui["Group.ConfigTitle"]</h1>
                 </div>
             </header>
 

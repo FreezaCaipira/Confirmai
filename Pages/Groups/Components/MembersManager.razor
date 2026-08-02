@@ -1,16 +1,18 @@
 @using Confirmai.Models
 @using Confirmai.Enums
+@using Confirmai.Services.Core
+@inject UiTextService Ui
 
 <section class="detail-section features-section">
     <h2 class="detail-section-title">
-        <i class="fas fa-user-shield"></i> Membros &amp; Permissões
+        <i class="fas fa-user-shield"></i> @Ui["Group.MembersPermissions"]
     </h2>
-    <p class="features-section-sub">Promova membros a admin ou remova permissões de admin.</p>
+    <p class="features-section-sub">@Ui["Group.MembersPermissionsSub"]</p>
     @if (!CanManageAdminRoles)
     {
         <p class="feat-role-note">
             <i class="fas fa-lock"></i>
-            Apenas o criador do grupo pode adicionar ou remover administradores.
+            @Ui["Group.OnlyCreatorCanManage"]
         </p>
     }
 
@@ -23,10 +25,10 @@
             var isConfirmingPromote = ConfirmPromoteMemberId == m.Id;
             <li class="feat-member-item">
                 <div class="feat-member-info">
-                    <span class="feat-member-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
-                    @if (isAdminM) { <span class="player-tag player-tag--admin">admin</span> }
-                    @if (m.UserId == CreatedByUserId) { <span class="player-tag">criador</span> }
-                    @if (isSelf)   { <span class="player-tag player-tag--me">Você</span> }
+                    <span class="feat-member-name">@(m.User?.FullName ?? m.User?.UserName ?? @Ui["Group.Member"])</span>
+                    @if (isAdminM) { <span class="player-tag player-tag--admin">@Ui["Group.Admin"]</span> }
+                    @if (m.UserId == CreatedByUserId) { <span class="player-tag">@Ui["Group.Creator"]</span> }
+                    @if (isSelf)   { <span class="player-tag player-tag--me">@Ui["Group.You"]</span> }
                 </div>
                 @if (!isSelf && CanManageAdminRoles)
                 {
@@ -35,9 +37,9 @@
                         <button class="feat-role-btn feat-role-btn--demote"
                                 type="button"
                                 disabled="@(IsSavingRole || onlyAdmin)"
-                                title="@(onlyAdmin ? "O grupo deve ter pelo menos um admin" : "Remover permissão de admin")"
+                                title="@(onlyAdmin ? @Ui["Group.MustHaveOneAdmin"] : @Ui["Group.RemoveAdminTitle"])"
                                 @onclick="() => HandleSetMemberRole(m.Id, GroupMemberRole.Member)">
-                            <i class="fas fa-user-minus"></i> Remover admin
+                            <i class="fas fa-user-minus"></i> @Ui["Group.RemoveAdmin"]
                         </button>
                     }
                     else
@@ -45,7 +47,7 @@
                         @if (isConfirmingPromote)
                         {
                             <div class="feat-role-confirm">
-                                <span class="feat-role-confirm-text">tornar admin?</span>
+                                <span class="feat-role-confirm-text">@Ui["Group.MakeAdminConfirm"]</span>
                                 <button class="feat-role-btn feat-role-btn--confirm-yes"
                                         type="button"
                                         disabled="@IsSavingRole"
@@ -65,9 +67,9 @@
                             <button class="feat-role-btn feat-role-btn--promote"
                                     type="button"
                                     disabled="@IsSavingRole"
-                                    title="Promover a admin"
+                                    title="@Ui["Group.PromoteToAdmin"]"
                                     @onclick="() => HandleInitiatePromote(m.Id)">
-                                <i class="fas fa-user-shield"></i> Tornar admin
+                                <i class="fas fa-user-shield"></i> @Ui["Group.MakeAdmin"]
                             </button>
                         }
                     }

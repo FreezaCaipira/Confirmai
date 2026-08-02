@@ -92,6 +92,7 @@ public sealed class UiTextService
             MergeDomain(ptBr, enUs, esEs, UtilityTexts.GetAllTexts());
             MergeDomain(ptBr, enUs, esEs, FutsalTexts.GetAllTexts());
             MergeDomain(ptBr, enUs, esEs, PokerTexts.GetAllTexts());
+            MergeDomain(ptBr, enUs, esEs, GroupTexts.GetAllTexts());
 
             // Create immutable cache
             _textByLanguageCache = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.OrdinalIgnoreCase)

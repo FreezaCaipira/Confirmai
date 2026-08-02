@@ -1,29 +1,30 @@
 @using Confirmai.Models
 @using Confirmai.Enums
+@using Confirmai.Services.Core
+@inject UiTextService Ui
 
 <section class="detail-section features-section">
     <h2 class="detail-section-title">
-        <i class="fas fa-qrcode"></i> Chave PIX de Repasse (Taxa de Serviço)
+        <i class="fas fa-qrcode"></i> @Ui["Group.PayoutTitle"]
     </h2>
     <p class="features-section-sub">
-        Configure a chave PIX do organizador para receber o valor das partidas (após dedução da taxa de serviço).
-        Esta chave será usada para envio automático via API quando pagamentos são confirmados.
+        @Ui["Group.PayoutSub"]
     </p>
 
     @if (ExistingAccount != null)
     {
         <div class="feat-payout-existing">
             <div class="feat-payout-info">
-                <div class="feat-payout-label">Chave cadastrada:</div>
+                <div class="feat-payout-label">@Ui["Group.PayoutRegistered"]</div>
                 <div class="feat-payout-value">@ExistingAccount.PixKeyValue (@GetPixKeyTypeLabel(ExistingAccount.PixKeyType))</div>
-                <div class="feat-payout-beneficiary">Beneficiário: @ExistingAccount.BeneficiaryName</div>
+                <div class="feat-payout-beneficiary">@Ui.Get("Group.PayoutBeneficiary", ExistingAccount.BeneficiaryName)</div>
             </div>
             @if (!IsEditing)
             {
                 <button class="feat-payout-edit-btn" type="button"
                         disabled="@IsSaving"
                         @onclick="HandleEdit">
-                    <i class="fas fa-edit"></i> Editar
+                    <i class="fas fa-edit"></i> @Ui["Common.Edit"]
                 </button>
             }
         </div>
@@ -33,7 +34,7 @@
     {
         <div class="feat-payout-form">
             <div class="feat-payout-field">
-                <label class="feat-payout-label" for="pix-key-type">Tipo de chave:</label>
+                <label class="feat-payout-label" for="pix-key-type">@Ui["Group.PixKeyType"]</label>
                 <select id="pix-key-type"
                         class="feat-payout-select"
                         @bind="FormData.PixKeyType"
@@ -47,25 +48,25 @@
             </div>
 
             <div class="feat-payout-field">
-                <label class="feat-payout-label" for="pix-key-value">Chave PIX:</label>
+                <label class="feat-payout-label" for="pix-key-value">@Ui["Group.PixKey"]</label>
                 <input id="pix-key-value"
                        class="feat-payout-input"
                        @bind="FormData.PixKeyValue"
-                       placeholder="Digite a chave PIX"
+                       placeholder="@Ui["Group.PixKeyPlaceholder"]"
                        disabled="@IsSaving" />
             </div>
 
             <div class="feat-payout-field">
-                <label class="feat-payout-label" for="beneficiary-name">Nome do beneficiário:</label>
+                <label class="feat-payout-label" for="beneficiary-name">@Ui["Group.BeneficiaryName"]</label>
                 <input id="beneficiary-name"
                        class="feat-payout-input"
                        @bind="FormData.BeneficiaryName"
-                       placeholder="Nome completo ou razão social"
+                       placeholder="@Ui["Group.BeneficiaryNamePlaceholder"]"
                        disabled="@IsSaving" />
             </div>
 
             <div class="feat-payout-field">
-                <label class="feat-payout-label" for="beneficiary-cpf">CPF do beneficiário:</label>
+                <label class="feat-payout-label" for="beneficiary-cpf">@Ui["Group.BeneficiaryCpf"]</label>
                 <input id="beneficiary-cpf"
                        class="feat-payout-input"
                        @bind="FormData.BeneficiaryCpf"
@@ -74,11 +75,11 @@
             </div>
 
             <div class="feat-payout-field">
-                <label class="feat-payout-label" for="bank-account-number">Número da conta bancária:</label>
+                <label class="feat-payout-label" for="bank-account-number">@Ui["Group.BankAccountNumber"]</label>
                 <input id="bank-account-number"
                        class="feat-payout-input"
                        @bind="FormData.BankAccountNumber"
-                       placeholder="Número da conta (sem dígito)"
+                       placeholder="@Ui["Group.BankAccountPlaceholder"]"
                        disabled="@IsSaving" />
             </div>
 
@@ -86,20 +87,20 @@
                 <button class="feat-payout-test-btn" type="button"
                         disabled="@IsSaving"
                         @onclick="FillTestData">
-                    <i class="fas fa-flask"></i> Dados de teste
+                    <i class="fas fa-flask"></i> @Ui["Group.TestData"]
                 </button>
                 @if (ExistingAccount != null)
                 {
                     <button class="feat-payout-cancel-btn" type="button"
                             disabled="@IsSaving"
                             @onclick="HandleCancel">
-                        <i class="fas fa-times"></i> Cancelar
+                        <i class="fas fa-times"></i> @Ui["Common.Cancel"]
                     </button>
                 }
                 <button class="feat-payout-save-btn" type="button"
                         disabled="@IsSaving"
                         @onclick="HandleSave">
-                    <i class="fas fa-save"></i> @(IsSaving ? "Salvando…" : "Salvar")
+                    <i class="fas fa-save"></i> @(IsSaving ? @Ui["Group.PayoutSaving"] : @Ui["Common.Save"])
                 </button>
             </div>
         </div>
