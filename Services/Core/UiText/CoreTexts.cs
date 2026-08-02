@@ -117,6 +117,43 @@ internal static class CoreTexts
         ["Error.NotFound"] = "Pagina nao encontrada",
         ["Error.AccessDenied"] = "Acesso negado",
         ["Error.InternalServer"] = "Erro interno do servidor",
+
+        // Groups
+        ["Groups.Title"] = "Grupos",
+        ["Groups.NotFound"] = "Grupo não encontrado.",
+        ["Groups.Partidas"] = "Partidas",
+        ["Groups.Proximas"] = "Próximas",
+        ["Groups.Realizadas"] = "Realizadas",
+        ["Groups.Semanais"] = "Semanais",
+        ["Groups.NovaPartida"] = "Nova partida",
+        ["Groups.MyGroups"] = "Meus grupos",
+        ["Groups.JoinGroup"] = "Entrar em um grupo",
+        ["Groups.JoinOther"] = "Entrar em outro grupo",
+        ["Groups.JoinCode"] = "Entrar com código de convite",
+        ["Groups.CreateNew"] = "Criar novo grupo",
+        ["Groups.ViewMatches"] = "Ver Partidas",
+        ["Groups.Or"] = "ou",
+        ["Groups.Enter"] = "Entrar",
+
+        // Onboarding hint
+        ["Onboarding.Title"] = "Como funciona",
+        ["Onboarding.Intro"] = "Cada grupo representa uma turma — o seu racha, pelada ou baba. Você pode ter vários grupos: um para o futebol de segunda, outro para o futebol de sábado, e por aí vai.",
+        ["Onboarding.Step1"] = "Crie um grupo para cada racha e convide a turma",
+        ["Onboarding.Step2"] = "Crie partidas semanais ou avulsas para o grupo",
+        ["Onboarding.Step3"] = "Os membros efetuam pagamento e confirmam presença na partida",
+        ["Onboarding.AccessGroups"] = "Acessar grupos",
+
+        // Payment
+        ["Payment.PixOrganizer"] = "Pix do Organizador",
+        ["Payment.SelectReceiver"] = "Selecione qual admin recebe os pagamentos das partidas.",
+        ["Payment.SelectReceiverSub"] = "A chave Pix do admin selecionado será exibida aos jogadores na página de pagamento.",
+        ["Payment.NoPixAdmin"] = "Nenhum admin do grupo tem Chave Pix cadastrada no perfil.",
+        ["Payment.ConfigurePix"] = "Configure a sua Chave Pix →",
+        ["Payment.AdminReceives"] = "Admin que recebe:",
+        ["Payment.AutoReceiver"] = "— Automático (primeiro admin com Pix) —",
+        ["Payment.Save"] = "Salvar",
+        ["Payment.Saving"] = "Salvando…",
+        ["Payment.ManualFlow"] = "Este grupo utiliza o fluxo padrão: Pix direto para o organizador com envio de comprovante.",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
@@ -227,6 +264,43 @@ internal static class CoreTexts
         ["Error.NotFound"] = "Page not found",
         ["Error.AccessDenied"] = "Access denied",
         ["Error.InternalServer"] = "Internal server error",
+
+        // Groups
+        ["Groups.Title"] = "Groups",
+        ["Groups.NotFound"] = "Group not found.",
+        ["Groups.Partidas"] = "Matches",
+        ["Groups.Proximas"] = "Upcoming",
+        ["Groups.Realizadas"] = "Completed",
+        ["Groups.Semanais"] = "Weekly",
+        ["Groups.NovaPartida"] = "New match",
+        ["Groups.MyGroups"] = "My groups",
+        ["Groups.JoinGroup"] = "Join a group",
+        ["Groups.JoinOther"] = "Join another group",
+        ["Groups.JoinCode"] = "Join with invite code",
+        ["Groups.CreateNew"] = "Create new group",
+        ["Groups.ViewMatches"] = "View Matches",
+        ["Groups.Or"] = "or",
+        ["Groups.Enter"] = "Enter",
+
+        // Onboarding hint
+        ["Onboarding.Title"] = "How it works",
+        ["Onboarding.Intro"] = "Each group represents your crew — your pickup game, match or kickabout. You can have multiple groups: one for Monday football, another for Saturday football, and so on.",
+        ["Onboarding.Step1"] = "Create a group for each pickup game and invite your crew",
+        ["Onboarding.Step2"] = "Create weekly or one-off matches for the group",
+        ["Onboarding.Step3"] = "Members pay and confirm their presence for the match",
+        ["Onboarding.AccessGroups"] = "Access groups",
+
+        // Payment
+        ["Payment.PixOrganizer"] = "Organizer Pix",
+        ["Payment.SelectReceiver"] = "Select which admin receives match payments.",
+        ["Payment.SelectReceiverSub"] = "The selected admin's Pix key will be shown to players on the payment page.",
+        ["Payment.NoPixAdmin"] = "No group admin has a Pix key registered in their profile.",
+        ["Payment.ConfigurePix"] = "Configure your Pix Key →",
+        ["Payment.AdminReceives"] = "Receiving admin:",
+        ["Payment.AutoReceiver"] = "— Automatic (first admin with Pix) —",
+        ["Payment.Save"] = "Save",
+        ["Payment.Saving"] = "Saving…",
+        ["Payment.ManualFlow"] = "This group uses the standard flow: direct Pix to the organizer with proof upload.",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
@@ -340,6 +414,43 @@ internal static class CoreTexts
         ["Error.NotFound"] = "Pagina no encontrada",
         ["Error.AccessDenied"] = "Acceso denegado",
         ["Error.InternalServer"] = "Error interno del servidor",
+
+        // Groups
+        ["Groups.Title"] = "Grupos",
+        ["Groups.NotFound"] = "Grupo no encontrado.",
+        ["Groups.Partidas"] = "Partidos",
+        ["Groups.Proximas"] = "Proximos",
+        ["Groups.Realizadas"] = "Realizados",
+        ["Groups.Semanais"] = "Semanales",
+        ["Groups.NovaPartida"] = "Nuevo partido",
+        ["Groups.MyGroups"] = "Mis grupos",
+        ["Groups.JoinGroup"] = "Unirse a un grupo",
+        ["Groups.JoinOther"] = "Unirse a otro grupo",
+        ["Groups.JoinCode"] = "Unirse con codigo de invitacion",
+        ["Groups.CreateNew"] = "Crear nuevo grupo",
+        ["Groups.ViewMatches"] = "Ver Partidos",
+        ["Groups.Or"] = "o",
+        ["Groups.Enter"] = "Entrar",
+
+        // Onboarding hint
+        ["Onboarding.Title"] = "Como funciona",
+        ["Onboarding.Intro"] = "Cada grupo representa tu equipo — tu partido, pachanga o partido informal. Puedes tener varios grupos: uno para el futbol del lunes, otro para el del sabado, y asi sucesivamente.",
+        ["Onboarding.Step1"] = "Crea un grupo para cada partido e invita a tu equipo",
+        ["Onboarding.Step2"] = "Crea partidos semanales o puntuales para el grupo",
+        ["Onboarding.Step3"] = "Los miembros pagan y confirman su presencia para el partido",
+        ["Onboarding.AccessGroups"] = "Acceder a grupos",
+
+        // Payment
+        ["Payment.PixOrganizer"] = "Pix del Organizador",
+        ["Payment.SelectReceiver"] = "Selecciona que admin recibe los pagos de los partidos.",
+        ["Payment.SelectReceiverSub"] = "La clave Pix del admin seleccionado se mostrara a los jugadores en la pagina de pago.",
+        ["Payment.NoPixAdmin"] = "Ningun admin del grupo tiene clave Pix registrada en su perfil.",
+        ["Payment.ConfigurePix"] = "Configura tu clave Pix →",
+        ["Payment.AdminReceives"] = "Admin que recibe:",
+        ["Payment.AutoReceiver"] = "— Automatico (primer admin con Pix) —",
+        ["Payment.Save"] = "Guardar",
+        ["Payment.Saving"] = "Guardando…",
+        ["Payment.ManualFlow"] = "Este grupo usa el flujo estandar: Pix directo al organizador con envio de comprobante.",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

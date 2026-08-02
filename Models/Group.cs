@@ -46,11 +46,10 @@ namespace Confirmai.Models
         /// <summary>
         /// Habilita gateways de pagamento de terceiros (EfiBank, Abacate etc.)
         /// para os pagamentos das partidas do grupo (intermédio do site).
-        /// Ativo por padrão. Quando desativado, o fluxo passa a ser Pix direto
-        /// do organizador com confirmação manual e envio de comprovante,
-        /// e funcionalidades adicionais (ranking pós-partida e votação do melhor) são desabilitadas.
+        /// Desativado por padrão (V1: fluxo manual). Quando ativado, o fluxo passa a usar
+        /// gateways com Pix automático e payout (V2).
         /// </summary>
-        public bool EnablePaymentGateways { get; set; } = true;
+        public bool EnablePaymentGateways { get; set; } = false;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

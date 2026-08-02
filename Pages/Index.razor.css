@@ -2,14 +2,47 @@
 .sports-back-row {
     display: flex;
     justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
     align-self: flex-start;
     width: 100%;
     margin-bottom: 0.75rem;
 }
 
-::deep .sports-back-row .listing-back-btn {
-    margin-left: 0;
-    margin-right: auto;
+::deep .detail-back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
+    border: 1px solid var(--ci-accent);
+    border-radius: 10px;
+    color: var(--ci-surface-light);
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 0.45rem 0.85rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+::deep .detail-back-link:hover {
+    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
+}
+
+::deep .detail-back-link--groups {
+    background: var(--ci-surface-light);
+    border-color: var(--ci-border);
+    color: var(--ci-text-blue);
+}
+
+::deep .detail-back-link--groups:hover {
+    background: var(--ci-surface-light);
+    color: var(--ci-accent);
+    box-shadow: 0 4px 14px rgba(34, 109, 196, 0.18);
 }
 
 /* ── Onboarding hint ───────────────────── */

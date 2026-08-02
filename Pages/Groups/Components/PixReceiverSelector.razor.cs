@@ -21,6 +21,9 @@ public partial class PixReceiverSelector
     public bool IsError { get; set; }
 
     [Parameter]
+    public string CurrentUserId { get; set; } = string.Empty;
+
+    [Parameter]
     public EventCallback<string> OnSavePixReceiver { get; set; }
 
     private string localSelectedId = string.Empty;

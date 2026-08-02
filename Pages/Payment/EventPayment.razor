@@ -173,7 +173,7 @@
                         OnSelectGateway="@SelectGatewayCallback"
                         OnGenerateCharge="@GeneratePixChargeCallback" />
 
-                    @if (FeeOptions.Value.ShowDirectPixToOrganizer)
+                    @if (FeeOptions.Value.ShowDirectPixToOrganizer || !groupGatewaysEnabled)
                     {
                         <EventPaymentPixAdmin
                             GroupAdminPixKey="@GetGroupAdminPixKey(ev.Group)"

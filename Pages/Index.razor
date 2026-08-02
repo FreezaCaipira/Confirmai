@@ -13,6 +13,7 @@
 @using Confirmai.Models
 @using Confirmai.Shared
 @using Confirmai.Shared.Components
+@using Confirmai.Shared.Components.Groups
 @using Microsoft.JSInterop
 
 
@@ -24,10 +25,18 @@
     <div class="sports-shell">
 
     <div class="sports-back-row">
-        <a href="/grupos" class="listing-back-btn">
-            <i class="fas fa-arrow-left"></i> Voltar
+        <a href="/grupos" class="detail-back-link">
+            <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
+        </a>
+        <a href="/grupos" class="detail-back-link detail-back-link--groups">
+            <i class="fas fa-layer-group"></i> @Ui["Groups.Title"]
         </a>
     </div>
+
+    @if (!string.IsNullOrWhiteSpace(userId) && userGroupCount == 0)
+    {
+        <NoGroupsHint ShowGroupsButton="true" />
+    }
 
     <div class="sports-tabs">
         <CitySelector
@@ -60,30 +69,7 @@
                     }
                     else if (!upcoming.Any() && !past.Any() && !cancelled.Any())
                     {
-                        <div class="onboarding-hint">
-                            <div class="onboarding-hint-header">
-                                <i class="fas fa-info-circle"></i>
-                                <span>Como funciona</span>
-                            </div>
-                            <p class="onboarding-hint-intro">
-                                Cada grupo representa uma turma — o seu racha, pelada ou baba.
-                                Você pode ter vários grupos: um para o futebol de segunda, outro para o futebol de sábado, e por aí vai.
-                            </p>
-                            <div class="onboarding-steps">
-                                <div class="onboarding-step">
-                                    <span class="onboarding-step-num">1</span>
-                                    <span class="onboarding-step-text">Crie um grupo para cada racha e convide a turma</span>
-                                </div>
-                                <div class="onboarding-step">
-                                    <span class="onboarding-step-num">2</span>
-                                    <span class="onboarding-step-text">Crie partidas semanais ou avulsas para o grupo</span>
-                                </div>
-                                <div class="onboarding-step">
-                                    <span class="onboarding-step-num">3</span>
-                                    <span class="onboarding-step-text">Os membros efetuam pagamento e confirmam presença na partida</span>
-                                </div>
-                            </div>
-                        </div>
+                        <NoGroupsHint ShowGroupsButton="true" />
                         <EmptyState Message="@Ui["Index.NoConfirmations"]" Actions="EmptyStateActions" />
                     }
                     else
