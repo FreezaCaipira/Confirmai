@@ -12,6 +12,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject Confirmai.Services.Events.EventNotificationService NotificationService
+@inject Confirmai.Services.Core.UiTextService Ui
 
 <PageTitle>@(PageTitle()) · Confirmai</PageTitle>
 
@@ -65,8 +66,8 @@
 else if (ev is null)
 {
     <div class="detail-not-found">
-        <h2>Evento não encontrado.</h2>
-        <a href="/poker">← Voltar</a>
+        <h2>@Ui["Poker.EventNotFound"]</h2>
+        <a href="/poker">← @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -83,7 +84,7 @@ else
             @* ── Header ──────────────────────────────────────────────── *@
             <header class="detail-header detail-header--poker">
                 <div class="detail-header-top">
-                    <a href="/grupo/@ev.GroupId" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+                    <a href="/grupo/@ev.GroupId" class="detail-back-link"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
                 </div>
                 <div class="detail-header-badge">
                     <div class="detail-poker-badge-row">
@@ -106,7 +107,7 @@ else
                     </h1>
                     <p class="detail-group-ref">
                         <i class="fas fa-users"></i>
-                        Abrir grupo: <a class="detail-group-link" href="/grupo/@ev.GroupId">@ev.Group.Name</a>
+                        @Ui["Poker.OpenGroup"] <a class="detail-group-link" href="/grupo/@ev.GroupId">@ev.Group.Name</a>
                     </p>
                     @if (!string.IsNullOrWhiteSpace(ev.PokerHouseName) && isUnlocked)
                     {
@@ -133,7 +134,7 @@ else
             {
                 <div class="detail-admin-bar">
                     <a class="detail-admin-btn detail-admin-btn--poker" href="/poker/@ev.Id/edit">
-                        <i class="fas fa-pen"></i> Editar evento
+                        <i class="fas fa-pen"></i> @Ui["Poker.EditEvent"]
                     </a>
                     @if (ev.IsActive)
                     {
@@ -141,17 +142,17 @@ else
                         {
                             <button class="detail-admin-btn detail-admin-btn--danger" type="button"
                                     @onclick="() => showCancelConfirm = true">
-                                <i class="fas fa-ban"></i> Cancelar evento
+                                <i class="fas fa-ban"></i> @Ui["Poker.CancelEvent"]
                             </button>
                         }
                         else
                         {
                             <div class="cancel-confirm-block">
-                                <span>Tem certeza? Esta ação não pode ser desfeita.</span>
+                                <span>@Ui["Poker.CancelConfirm"]</span>
                                 <button class="detail-admin-btn" type="button"
-                                        @onclick="() => showCancelConfirm = false">Não</button>
+                                        @onclick="() => showCancelConfirm = false">@Ui["Futsal.No"]</button>
                                 <button class="detail-admin-btn detail-admin-btn--danger" type="button"
-                                        @onclick="CancelEvent">Sim, cancelar</button>
+                                        @onclick="CancelEvent">@Ui["Futsal.SimCancelar"]</button>
                             </div>
                         }
                     }
@@ -161,7 +162,7 @@ else
             @if (!ev.IsActive)
             {
                 <div class="cancelled-banner">
-                    <i class="fas fa-ban"></i> Este evento foi cancelado.
+                    <i class="fas fa-ban"></i> @Ui["Poker.EventCancelled"]
                 </div>
             }
 
@@ -190,8 +191,7 @@ else
                 <div class="homegame-lock-block">
                     <div class="homegame-lock-icon"><i class="fas fa-lock"></i></div>
                     <p class="homegame-lock-text">
-                        Os detalhes deste Home Game são privados.<br />
-                        Digite o código de acesso para ver mais informações.
+                        @Ui["Poker.HomeGameLockText"]
                     </p>
                     <div class="homegame-code-row">
                         <input type="text"
@@ -201,11 +201,11 @@ else
                                @bind="codeInput"
                                @bind:event="oninput"
                                @onkeydown="HandleCodeKeyDown" />
-                        <button class="homegame-enter-btn" @onclick="TryUnlock">Entrar</button>
+                        <button class="homegame-enter-btn" @onclick="TryUnlock">@Ui["Poker.HomeGameEnter"]</button>
                     </div>
                     @if (codeWrong)
                     {
-                        <p class="homegame-code-error">Código incorreto. Verifique com o organizador.</p>
+                        <p class="homegame-code-error">@Ui["Poker.HomeGameCodeWrong"]</p>
                     }
                 </div>
             }
@@ -221,7 +221,7 @@ else
             {
                 <section class="detail-section">
                     <h2 class="detail-section-title">
-                        Inscritos (@ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $" / {ev.MaxPlayers}" : ""))
+                        @Ui["Poker.Inscritos"] (@ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $" / {ev.MaxPlayers}" : ""))
                     </h2>
                     <ol class="players-list">
                         @{
@@ -232,9 +232,9 @@ else
                                 bool isWaitlist = ev.MaxPlayers > 0 && pIdx > ev.MaxPlayers;
                                 <li class="player-item @(isWaitlist ? "player-item--waitlist" : "") @(c.UserId == currentUserId ? "player-item--me" : "")">
                                     <span class="player-num">@pIdx</span>
-                                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
-                                    @if (isWaitlist) { <span class="player-tag">fila</span> }
-                                    @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">Você</span> }
+                                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? @Ui["Poker.Player"])</span>
+                                    @if (isWaitlist) { <span class="player-tag">@Ui["Poker.Waitlist"]</span> }
+                                    @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">@Ui["Poker.You"]</span> }
                                 </li>
                             }
                         }
@@ -248,21 +248,21 @@ else
                 <div class="detail-action">
                     @if (!ev.IsActive)
                     {
-                        <p class="cancelled-notice">Este evento foi cancelado.</p>
+                        <p class="cancelled-notice">@Ui["Poker.EventCancelled"]</p>
                     }
                     else if (currentUserId is null)
                     {
                         <a href="/Identity/Account/Login?ReturnUrl=@Uri.EscapeDataString(NavigationManager.Uri)"
                            class="confirm-btn confirm-btn--poker">
-                            Entrar para participar
+                            @Ui["Poker.EnterToParticipate"]
                         </a>
                     }
                     else if (userConf is not null)
                     {
                         <div class="confirmed-block">
-                            <p class="confirmed-label confirmed-label--poker">✅ Você está inscrito neste evento.</p>
+                            <p class="confirmed-label confirmed-label--poker">@Ui["Poker.YouAreInscribed"]</p>
                             <button class="cancel-confirm-btn" @onclick="CancelConfirmation">
-                                Cancelar inscrição
+                                @Ui["Poker.CancelInscription"]
                             </button>
                         </div>
                     }
@@ -272,29 +272,29 @@ else
                         {
                             <div class="private-group-notice">
                                 <i class="fas fa-hourglass-half"></i>
-                                <span>Solicitação enviada — aguardando aprovação do administrador do grupo.</span>
+                                <span>@Ui["Poker.JoinRequestSent"]</span>
                             </div>
                             <button class="cancel-join-btn" type="button" @onclick="CancelJoinRequestAsync" disabled="@cancellingJoin">
                                 <i class="fas fa-times"></i>
-                                @(cancellingJoin ? "Cancelando…" : "Cancelar solicitação")
+                                @(cancellingJoin ? @Ui["Poker.CancellingJoin"] : @Ui["Poker.CancelJoinRequest"])
                             </button>
                         }
                         else if (userJoinRequest?.Status == JoinRequestStatus.Rejected)
                         {
                             <div class="private-group-notice">
                                 <i class="fas fa-times-circle"></i>
-                                <span>Sua solicitação de entrada foi recusada.</span>
+                                <span>@Ui["Poker.JoinRequestRejected"]</span>
                             </div>
                         }
                         else
                         {
                             <div class="private-group-notice">
                                 <i class="fas fa-lock"></i>
-                                <span>Este grupo é privado. Solicite entrada para o administrador.</span>
+                                <span>@Ui["Poker.PrivateGroup"]</span>
                             </div>
                             <button class="confirm-btn confirm-btn--poker" type="button" @onclick="RequestToJoinAsync" disabled="@requestingJoin">
                                 <i class="fas fa-user-plus"></i>
-                                @(requestingJoin ? "Enviando..." : "Solicitar entrada")
+                                @(requestingJoin ? @Ui["Poker.SendingJoin"] : @Ui["Poker.RequestJoin"])
                             </button>
                         }
 
@@ -307,7 +307,7 @@ else
                     {
                         var isFull = ev.MaxPlayers > 0 && ev.Confirmations.Count >= ev.MaxPlayers;
                         <button class="confirm-btn confirm-btn--poker confirm-btn--full-width" @onclick="ConfirmPresence">
-                            @(isFull ? "Entrar na fila" : "Confirmar presença") ✓
+                            @(isFull ? @Ui["Poker.JoinQueue"] : @Ui["Poker.ConfirmPresence"]) ✓
                         </button>
                     }
 
@@ -319,7 +319,7 @@ else
             }
 
             <div class="detail-back">
-                <a href="/poker">← Voltar à lista</a>
+                <a href="/poker">@Ui["Poker.BackToList"]</a>
             </div>
         </div>
     </div>
