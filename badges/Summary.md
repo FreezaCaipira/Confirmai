@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 08/02/2026 - 12:41:08 |
-| Coverage date: | 08/02/2026 - 12:41:02 |
+| Generated on: | 08/02/2026 - 12:51:12 |
+| Coverage date: | 08/02/2026 - 12:51:05 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 500 |
 | Files: | 601 |
-| **Line coverage:** | 91.6% (121430 of 132475) |
-| Covered lines: | 121430 |
-| Uncovered lines: | 11045 |
+| **Line coverage:** | 91.6% (121435 of 132475) |
+| Covered lines: | 121435 |
+| Uncovered lines: | 11040 |
 | Coverable lines: | 132475 |
 | Total lines: | 163740 |
-| **Branch coverage:** | 37.5% (3091 of 8225) |
-| Covered branches: | 3091 |
+| **Branch coverage:** | 37.5% (3092 of 8225) |
+| Covered branches: | 3092 |
 | Total branches: | 8225 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 281_30748234881 |
+| Tag: | 283_30748582447 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **121430** | **11045** | **132475** | **178843** | **91.6%** | **3091** | **8225** | **37.5%** |
+| **Confirmai** | **121435** | **11040** | **132475** | **178843** | **91.6%** | **3092** | **8225** | **37.5%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 24 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -382,7 +382,7 @@
 | Confirmai.Services.Events.EventConfirmationPaymentTransitionResult | 7 | 0 | 7 | 136 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.EventNotificationSchedulerService | 36 | 19 | 55 | 129 | 65.4% | 5 | 10 | 50% |
 | Confirmai.Services.Events.EventNotificationService | 153 | 22 | 175 | 307 | 87.4% | 60 | 76 | 78.9% |
-| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
+| Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
@@ -523,7 +523,7 @@
 | Confirmai.Shared.Helpers.EventAccess | 6 | 0 | 6 | 31 | 100% | 14 | 14 | 100% |
 | Confirmai.Shared.Helpers.EventMinimums | 22 | 0 | 22 | 49 | 100% | 6 | 6 | 100% |
 | Confirmai.Shared.IbgeMunicipio | 0 | 1 | 1 | 29 | 0% | 0 | 0 |  |
-| Confirmai.Shared.MainLayout | 108 | 38 | 146 | 384 | 73.9% | 49 | 72 | 68% |
+| Confirmai.Shared.MainLayout | 109 | 37 | 146 | 384 | 74.6% | 49 | 72 | 68% |
 | Confirmai.Shared.RouteNotAuthorized | 8 | 0 | 8 | 30 | 100% | 5 | 6 | 83.3% |
 | Program | 430 | 137 | 567 | 728 | 75.8% | 54 | 88 | 61.3% |
 | System.Text.RegularExpressions.Generated | 258 | 32 | 290 | 816 | 88.9% | 121 | 150 | 80.6% |
