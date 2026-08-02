@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 08/02/2026 - 12:51:12 |
-| Coverage date: | 08/02/2026 - 12:51:05 |
+| Generated on: | 08/02/2026 - 14:15:27 |
+| Coverage date: | 08/02/2026 - 14:15:23 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 500 |
-| Files: | 601 |
-| **Line coverage:** | 91.6% (121435 of 132475) |
-| Covered lines: | 121435 |
-| Uncovered lines: | 11040 |
-| Coverable lines: | 132475 |
-| Total lines: | 163740 |
-| **Branch coverage:** | 37.5% (3092 of 8225) |
-| Covered branches: | 3092 |
-| Total branches: | 8225 |
+| Files: | 602 |
+| **Line coverage:** | 91.6% (121487 of 132573) |
+| Covered lines: | 121487 |
+| Uncovered lines: | 11086 |
+| Coverable lines: | 132573 |
+| Total lines: | 163840 |
+| **Branch coverage:** | 37.5% (3093 of 8227) |
+| Covered branches: | 3093 |
+| Total branches: | 8227 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 283_30748582447 |
+| Tag: | 286_30751600912 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **121435** | **11040** | **132475** | **178843** | **91.6%** | **3092** | **8225** | **37.5%** |
+| **Confirmai** | **121487** | **11086** | **132573** | **178943** | **91.6%** | **3093** | **8227** | **37.5%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 24 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 42 | 0% | 0 | 4 | 0% |
@@ -270,14 +270,14 @@
 | Confirmai.Pages.MyConfirmations.Index | 0 | 3 | 3 | 13 | 0% | 0 | 0 |  |
 | Confirmai.Pages.MyEvents.Index | 0 | 138 | 138 | 308 | 0% | 0 | 97 | 0% |
 | Confirmai.Pages.Pages__Host | 2 | 0 | 2 | 235 | 100% | 5 | 6 | 83.3% |
-| Confirmai.Pages.Payment.Components.EventPaymentGateways | 0 | 44 | 44 | 166 | 0% | 0 | 32 | 0% |
-| Confirmai.Pages.Payment.Components.EventPaymentHeader | 0 | 8 | 8 | 34 | 0% | 0 | 4 | 0% |
-| Confirmai.Pages.Payment.Components.EventPaymentPixAdmin | 0 | 13 | 13 | 54 | 0% | 0 | 6 | 0% |
-| Confirmai.Pages.Payment.Components.EventPaymentProof | 0 | 14 | 14 | 72 | 0% | 0 | 12 | 0% |
-| Confirmai.Pages.Payment.Components.EventPaymentQr | 0 | 6 | 6 | 37 | 0% | 0 | 4 | 0% |
-| Confirmai.Pages.Payment.Components.EventPaymentStatus | 0 | 1 | 1 | 8 | 0% | 0 | 0 |  |
-| Confirmai.Pages.Payment.Components.EventPaymentSummary | 0 | 12 | 12 | 61 | 0% | 0 | 24 | 0% |
-| Confirmai.Pages.Payment.EventPayment | 2 | 151 | 153 | 436 | 1.3% | 0 | 132 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentGateways | 0 | 51 | 51 | 166 | 0% | 0 | 32 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentHeader | 0 | 9 | 9 | 37 | 0% | 0 | 4 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentPixAdmin | 0 | 15 | 15 | 56 | 0% | 0 | 6 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentProof | 0 | 20 | 20 | 75 | 0% | 0 | 12 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentQr | 0 | 8 | 8 | 40 | 0% | 0 | 4 | 0% |
+| Confirmai.Pages.Payment.Components.EventPaymentStatus | 0 | 4 | 4 | 22 | 0% | 0 | 0 |  |
+| Confirmai.Pages.Payment.Components.EventPaymentSummary | 0 | 17 | 17 | 64 | 0% | 0 | 24 | 0% |
+| Confirmai.Pages.Payment.EventPayment | 4 | 167 | 171 | 454 | 2.3% | 2 | 134 | 1.4% |
 | Confirmai.Pages.Payment.Payment | 0 | 141 | 141 | 321 | 0% | 0 | 80 | 0% |
 | Confirmai.Pages.Payment.PaymentCheckoutPanel | 0 | 62 | 62 | 232 | 0% | 0 | 32 | 0% |
 | Confirmai.Pages.Payment.PaymentDetails | 0 | 44 | 44 | 131 | 0% | 0 | 34 | 0% |
@@ -366,7 +366,7 @@
 | Confirmai.Services.Core.UiText.AuthTexts | 231 | 0 | 231 | 246 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.BaseTexts | 14 | 0 | 14 | 61 | 100% | 15 | 16 | 93.7% |
 | Confirmai.Services.Core.UiText.CoreTexts | 447 | 0 | 447 | 466 | 100% | 0 | 0 |  |
-| Confirmai.Services.Core.UiText.PaymentTexts | 427 | 0 | 427 | 447 | 100% | 0 | 0 |  |
+| Confirmai.Services.Core.UiText.PaymentTexts | 481 | 0 | 481 | 501 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.ServerTexts | 342 | 0 | 342 | 362 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.UtilityTexts | 483 | 0 | 483 | 498 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiTextService | 79 | 12 | 91 | 319 | 86.8% | 59 | 70 | 84.2% |
@@ -382,7 +382,7 @@
 | Confirmai.Services.Events.EventConfirmationPaymentTransitionResult | 7 | 0 | 7 | 136 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.EventNotificationSchedulerService | 36 | 19 | 55 | 129 | 65.4% | 5 | 10 | 50% |
 | Confirmai.Services.Events.EventNotificationService | 153 | 22 | 175 | 307 | 87.4% | 60 | 76 | 78.9% |
-| Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
+| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
