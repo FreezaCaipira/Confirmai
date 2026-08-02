@@ -112,6 +112,31 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 - Pen-test financeiro, revisao de CSP, metricas SignalR, alertas operacionais -- antes de producao.
 - Redis: so quando houver multi-instancia ou gargalo medido (nao agora).
 
+### Aparato Geral do Senior (pos-Ciclo 23) -- backlog priorizado para o Ciclo 24
+
+Varredura Senior focada em melhorias/adicoes, **separando codigo (Pleno/Senior) das pendencias do Robson**. Base: `main` @ `cb6c89a`.
+
+**P1 -- alto valor para o go-live V1 (fluxo manual como default):**
+- **i18n ainda incompleto (regra 25)**: ~185 strings acentuadas hardcoded em `Pages/**/*.razor` contra apenas ~35 usos de `@Ui[...]` -> i18n esta em ~15-20%. Continuar a migracao priorizando os fluxos mobile principais restantes: `Pages/Payment/EventPayment.razor` (+ componentes), `Pages/Groups/Detail.razor`, `Pages/Groups/Payments.razor`, `Pages/MyEvents/Index.razor`. Meta incremental por tela; PT-BR baseline. Alvo: derrubar os 185 para <50 no fim do ciclo.
+- **UX do pagamento V1 quando gateways OFF (default agora)**: em `Pages/Payment/EventPayment.razor:164-193`, com `!groupGatewaysEnabled` ainda renderiza o seletor `EventPaymentGateways` ACIMA do Pix manual -- no V1 manual isso confunde. Esconder o bloco de gateways quando desabilitado e exibir so `EventPaymentPixAdmin` + `EventPaymentProof`. + teste.
+- **Cobertura do fluxo manual V1 ponta a ponta**: e o fluxo do dinheiro no V1. Teste de integracao do caminho manual: exibicao da chave/QR do organizador, upload de comprovante (`PixProofUploadService`), e confirmacao do organizador em `/grupo/{id}/pagamentos` (`AdminMarkPaid`). Caracterizar estados (sem comprovante / comprovante enviado / confirmado).
+
+**P2 -- qualidade / observabilidade / UX:**
+- **`catch {}` que engolem tudo**: `Pages/Admin/Admin.razor.cs:125,127`, `Pages/Groups/Detail.razor.cs:61,82` e os `catch { }` de modal JS em `Pages/Admin/AdminPayments.razor.cs:95,168,235` -> logar via `ILogger` em vez de silenciar. **Manter** os `JSDisconnectedException`/`OperationCanceledException`/`TaskCanceledException` no dispose/navegacao (esses sao aceitaveis).
+- **Estados vazios padronizados**: reaproveitar o padrao do `NoGroupsHint` para os vazios de `Pages/MyEvents/Index.razor` (o plano do C23 citou `/meus-eventos` e ficou de fora), pagamentos e ranking -- sempre com CTA.
+- **Consistencia de idioma no `UiTextService`**: ha chaves ja em ES/EN misturadas com PT-BR (ex.: `AuthTexts.cs:232`, `UtilityTexts.cs:333-334,484-486` em espanhol) -> hoje o baseline esta inconsistente. Decidir: (a) manter so PT-BR e normalizar as chaves espanholas para PT, ou (b) assumir multi-idioma de verdade e completar. Recomendo (a) para o V1.
+
+**P3 -- higiene / futuro:**
+- **Teste de convencao anti-hardcode i18n** nas telas-alvo (proposto no C23, nao feito): falhar se aparecer literal acentuado em `.razor` dos fluxos principais.
+- **WhatsApp** (`Services/Events/EventNotificationService.cs:194` TODO) -- POSTERGADO.
+- E2E mobile (Playwright 375/768/desktop) dos fluxos principais -- quando priorizado.
+
+**Pendencias do Robson (fora do codigo) -- NAO sao do proximo ciclo de codigo:**
+- Rotacionar ClientSecret Efi + reconfigurar credenciais (so afeta o **V2**).
+- Validar Envio de Pix Efi em homologacao + limites (V2). Nota fiscal da taxa com contador (V2).
+- Gerar OAuth Google prod + SMTP/provedor de email prod.
+- Confirmar `SyncPassword=false` e mTLS do webhook Efi em prod.
+
 ---
 
 ## Linha do Tempo dos Ciclos (todolist / historico condensado)
@@ -131,9 +156,9 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 | 20 | SOLID + CSS modular + remover legacy | 7 code-behinds reduzidos (`AdminPayments` 1046->666 etc.), `admin/escalacao/payments.css` extraidos, `serviceFeePercentage` removido. | #70 (plano), #71 (impl), #72 (review) | APROVADO |
 | 21 | Fechar refatoracao (code-behinds + CSS + higiene) | 0 code-behind > 250 LOC; `site.css`/`events.css` ao core; 0 warning de analisador nos testes. Ressalva: services extraidos sem teste. | #73 (plano), #74 (impl), #75 (review) | APROVADO c/ 1 ressalva |
 | 22 | Cobrir services extraidos com teste | 12/12 services/formatters com teste dedicado (+174 testes; 1950->2124). 0 diff de producao. Senior corrigiu 7 warnings CS8625 em `ProfileServiceTests`. | #76 (plano), #77 (impl), #78 (review) | APROVADO |
-| 23 | UX navegacao + Pagamento V1 manual + i18n | Requisitos de teste do Robson: botao Grupos na row do Voltar (Partidas), card "Como funciona" + botao em estados vazios, fix do link Pix quebrado (`/perfil`->404), fluxo **manual** como default (Pix automatico -> V2), auditoria+regra de i18n. | #<plano> | PLANEJADO |
+| 23 | UX navegacao + Pagamento V1 manual + i18n | Botao Grupos na row do Voltar (Partidas/Features), `NoGroupsHint` reutilizavel nos estados vazios (+botao), fix do link Pix (`/perfil`->`/profile/{id}`), default `EnablePaymentGateways=false` p/ grupos novos (migration so-default, sem UPDATE), i18n dos fluxos principais via `UiTextService` + regra 25. Senior fechou a ressalva na #81 (+3 testes). | #79 (plano), #80 (impl), #81 (review + testes) | APROVADO |
 
-| 24 | Pagamento V1 usavel + i18n do pagamento + cobertura do fluxo manual | (P1 do aparato) Esconder seletor de gateways quando OFF em `EventPayment.razor`; migrar strings dos fluxos de pagamento para `UiTextService`; testes de integracao do fluxo manual ponta a ponta (chave/QR -> comprovante -> confirmacao). | #<plano C24> | PLANEJADO |
+| 24 | Pagamento V1 usavel + i18n do pagamento + cobertura do fluxo manual | (P1 do aparato) Esconder seletor de gateways quando OFF em `EventPayment.razor`; migrar strings dos fluxos de pagamento para `UiTextService`; testes de integracao do fluxo manual ponta a ponta (chave/QR -> comprovante -> confirmacao). | #83 (plano) | PLANEJADO |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -186,7 +211,22 @@ E o caminho do dinheiro do V1 -- precisa de teste. Alvos: `PixProofUploadService
 
 ---
 
-## Ciclo 23 (Pleno) -- UX de navegacao + Pagamento V1 (fluxo manual como default) + i18n [PLANEJADO]
+## Review Senior do Ciclo 23 (PR #80) -- APROVADO (ressalva de testes fechada pelo Senior na #81)
+
+- **PR/branch**: #80 (`refactor/ciclo23-ux-nav-pagamento-i18n`), ja na `main` (merge `cb6c89a`). Review nesta PR #81.
+- **Build**: `dotnet build` **0 warning / 0 error**. **Testes**: PR #80 nao adicionou testes (2124/2148); apos os +3 testes que o Senior adicionou nesta PR -> **2127/2151** (24 falhas ambientais de Postgres, nao regressao).
+- **Por fase**:
+  - **Fase 1 (navegacao) -- ATINGIDA**: botao "Grupos" (`/grupos`) na mesma `detail-header-top` do "Voltar" em `Partidas.razor` e `Features.razor` (classe `detail-back-link--groups`). Card "Como funciona" extraido para componente compartilhado `Shared/Components/Groups/NoGroupsHint.razor` (param `ShowGroupsButton` + CTA "Acessar grupos"), reutilizado em `Groups/Index` (sem botao, ja e a tela de grupos) e em `Pages/Index.razor` (`/eventos`, com botao, em 2 pontos). Sem duplicacao de markup.
+  - **Fase 2 (pagamento V1 manual) -- ATINGIDA**: (a) **bug do 404 corrigido** -- `PixReceiverSelector` agora aponta para `/profile/{CurrentUserId}` (parametro novo, cabeado em `Features.razor`) em vez de `/perfil` inexistente; (b) **default invertido** -- `Group.EnablePaymentGateways = false` + migration `20260801030000_DefaultEnablePaymentGatewaysFalse` que so faz `ALTER COLUMN ... SET DEFAULT false` (**sem `UPDATE`** -> grupos existentes inalterados, respeita a licao do Ciclo 19); snapshot regenerado; (c) **codigo do Pix automatico preservado** (gateway/`PayoutService`/`EfiBankPixPayoutService`/webhook/retry intactos) -- V2 atras do toggle.
+  - **Fase 3 (i18n) -- ATINGIDA**: strings dos fluxos principais migradas para `UiTextService` (dominios `Groups`/`Onboarding`/`Payment` em `Services/Core/UiText/CoreTexts.cs`, ~40 chaves PT-BR). Regra 25 em vigor; strings novas das Fases 1/2 ja nasceram via `@Ui[...]`.
+- **Ressalva (RESOLVIDA pelo Senior nesta PR)**: o plano pedia teste do fix do link e do novo default e o Pleno nao adicionou nenhum. O **Senior fechou a divida aqui** com `Confirmai.Tests/Ciclo23FollowUpTests.cs` (+3 testes): `NewGroup_StartsInManualPaymentMode_ByDefault`, `NewGroup_ManualDefault_DoesNotEnableGatewayOnlyFeatures` (caracteriza o V1 manual no modelo) e `ProfilePage_ExposesProfileIdRoute_SoPixReceiverLinkIsValid` (guarda a rota `/profile/{Id}` alvo do link corrigido, via reflection do `RouteAttribute`). Suite 2124->2127.
+- **Higiene (corrigido nesta review)**: a PR #80 commitou por engano um artefato de teste manual `wwwroot/uploads/groups/0f48c3cf-...png` (nao referenciado no codigo) -- **removido** nesta PR de review.
+- **Pendencias do Robson (inalteradas)**: rotacionar ClientSecret Efi + reconfigurar credenciais (adiado, viagem); validar Envio de Pix Efi em homologacao; nota fiscal da taxa com contador; OAuth Google prod + SMTP; `SyncPassword=false`/mTLS webhook em prod. (Obs.: com o V1 manual, o Envio de Pix Efi so bloqueia o V2.)
+- **Proximo ciclo (sugestao)**: ciclo de testes cobrindo o default flip + `CurrentUserId`, e continuar a i18n nas demais telas (baseline PT-BR ok; EN/ES depois).
+
+---
+
+## Ciclo 23 (Pleno) -- UX de navegacao + Pagamento V1 (fluxo manual como default) + i18n [EXECUTADO -- ver review acima]
 
 **Origem**: requisitos levantados pelo Robson testando o app + retorno do Pleno (regra 22 -- requisitos de teste sao legitimos e entram no plano). Este ciclo destrava o **go-live V1**: pagamento simples (manual) por padrao, navegacao mais fluida e i18n auditada.
 
