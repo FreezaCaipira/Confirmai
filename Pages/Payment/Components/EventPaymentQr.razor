@@ -1,4 +1,7 @@
 @using System.Globalization
+@using Confirmai.Services.Core
+
+@inject UiTextService Ui
 
 <div class="evpay-qr-section">
     <div class="evpay-qr-image">
@@ -7,17 +10,17 @@
 
     <div class="evpay-awaiting">
         <span class="evpay-awaiting-dot"></span>
-        Aguardando pagamento…
+        @Ui["Payment.AwaitingPayment"]
     </div>
 
     <div class="evpay-brcode-wrap">
-        <span class="evpay-brcode-label">Pix Copia e Cola</span>
+        <span class="evpay-brcode-label">@Ui["Payment.PixCopyPaste"]</span>
         <p class="evpay-brcode">@BrCode</p>
     </div>
 
     <button class="evpay-action-btn evpay-action-btn--copy"
             @onclick="HandleCopyBrCode">
         <i class="@(Copied ? "fas fa-check" : "fas fa-copy")"></i>
-        @(Copied ? "Copiado!" : "Copiar código Pix")
+        @(Copied ? Ui["Payment.Copied"] : Ui["Payment.CopyPixCode"])
     </button>
 </div>

@@ -8,6 +8,7 @@
 @using Confirmai.Models
 @using Confirmai.Pages.Payment.Components
 @using Confirmai.Services.Admin
+@using Confirmai.Services.Core
 @using Confirmai.Services.Payment
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
@@ -18,10 +19,11 @@
 @inject NavigationManager NavigationManager
 @inject PixProofUploadService PixProofUploadService
 @inject AdminConfirmationService AdminConfirmationService
+@inject UiTextService Ui
 @inject ILogger<EventPayment> _logger
 @inject Microsoft.Extensions.Options.IOptions<Confirmai.Configuration.FeeOptions> FeeOptions
 
-<PageTitle>Pagamento — Confirmai</PageTitle>
+<PageTitle>@Ui["Payment.PageTitle"] — Confirmai</PageTitle>
 
 <div class="entity-shell">
     <section class="entity-shell-grid" aria-label="Pagamento de partida">
@@ -29,13 +31,13 @@
 
             @if (isLoading)
             {
-                <p class="listing-state">Carregando…</p>
+                <p class="listing-state">@Ui["Payment.Loading"]</p>
             }
             else if (conf is null)
             {
                 <div class="evpay-not-found">
-                    <p>Confirmação não encontrada.</p>
-                    <a href="/" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+                    <p>@Ui["Payment.ConfirmationNotFound"]</p>
+                    <a href="/" class="detail-back-link"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
                 </div>
             }
             else
@@ -60,12 +62,12 @@
                         <div class="evpay-status evpay-status--paid">
                             <i class="fas fa-check-circle"></i>
                             <div>
-                                <strong>Pagamento confirmado</strong>
-                                <p>Pagamento de @(conf.User?.FullName ?? conf.User?.UserName ?? "Jogador") foi confirmado.</p>
+                                <strong>@Ui["Payment.Confirmed"]</strong>
+                                <p>@string.Format(Ui["Payment.ConfirmedFor"], conf.User?.FullName ?? conf.User?.UserName ?? Ui["Payment.Player"])</p>
                             </div>
                         </div>
                         <a href="@backUrl" class="evpay-action-btn evpay-action-btn--back">
-                            <i class="fas fa-arrow-left"></i> Voltar para a partida
+                            <i class="fas fa-arrow-left"></i> @Ui["Payment.BackToMatch"]
                         </a>
                     }
                     else
@@ -78,22 +80,22 @@
                     <div class="evpay-admin-review">
                         <div class="evpay-admin-review-header">
                             <i class="fas fa-user-shield"></i>
-                            <span>Revisão de pagamento — @(conf.User?.FullName ?? conf.User?.UserName ?? "Jogador")</span>
+                            <span>@string.Format(Ui["Payment.AdminReview"], conf.User?.FullName ?? conf.User?.UserName ?? Ui["Payment.Player"])</span>
                         </div>
                         @if (conf.PixProofUploadedAt.HasValue)
                         {
                             <div class="evpay-admin-proof">
-                                <p class="evpay-admin-proof-label">Comprovante enviado em @conf.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</p>
-                                <img src="/api/pix-proof/@conf.Id" class="evpay-admin-proof-img" alt="Comprovante Pix" />
+                                <p class="evpay-admin-proof-label">@string.Format(Ui["Payment.ProofSentAt"], conf.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm"))</p>
+                                <img src="/api/pix-proof/@conf.Id" class="evpay-admin-proof-img" alt="@Ui["Payment.ProofAlt"]" />
                             </div>
                             @if (adminMarkPaidError)
                             {
-                                <p class="evpay-admin-error">Erro ao confirmar pagamento. Tente novamente.</p>
+                                <p class="evpay-admin-error">@Ui["Payment.ErrorConfirm"]</p>
                             }
                             @if (adminConfirmPay)
                             {
                                 <div class="evpay-admin-confirm-row">
-                                    <span class="evpay-admin-confirm-label">Confirmar pagamento de @(conf.User?.FullName ?? conf.User?.UserName ?? "Jogador")?</span>
+                                    <span class="evpay-admin-confirm-label">@string.Format(Ui["Payment.ConfirmPaymentFor"], conf.User?.FullName ?? conf.User?.UserName ?? Ui["Payment.Player"])</span>
                                     <div class="evpay-admin-confirm-actions">
                                         <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--yes" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
                                             @if (adminMarkPaidLoading)
@@ -102,11 +104,11 @@
                                             }
                                             else
                                             {
-                                                <i class="fas fa-check"></i> <span>Sim, confirmar</span>
+                                                <i class="fas fa-check"></i> <span>@Ui["Payment.YesConfirm"]</span>
                                             }
                                         </button>
                                         <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--no" type="button" @onclick="() => adminConfirmPay = false">
-                                            <i class="fas fa-times"></i> <span>Cancelar</span>
+                                            <i class="fas fa-times"></i> <span>@Ui["Common.Cancel"]</span>
                                         </button>
                                     </div>
                                 </div>
@@ -114,17 +116,17 @@
                             else
                             {
                                 <button class="evpay-admin-confirm-btn" type="button" @onclick="() => adminConfirmPay = true">
-                                    <i class="fas fa-check"></i> <span>Confirmar pagamento</span>
+                                    <i class="fas fa-check"></i> <span>@Ui["Payment.ConfirmPayment"]</span>
                                 </button>
                             }
                         }
                         else
                         {
-                            <p class="evpay-admin-no-proof">O jogador ainda não enviou comprovante.</p>
+                            <p class="evpay-admin-no-proof">@Ui["Payment.NoProofSent"]</p>
                             @if (adminConfirmPay)
                             {
                                 <div class="evpay-admin-confirm-row">
-                                    <span class="evpay-admin-confirm-label">Marcar @(conf.User?.FullName ?? conf.User?.UserName ?? "Jogador") como pago?</span>
+                                    <span class="evpay-admin-confirm-label">@string.Format(Ui["Payment.MarkAsPaidFor"], conf.User?.FullName ?? conf.User?.UserName ?? Ui["Payment.Player"])</span>
                                     <div class="evpay-admin-confirm-actions">
                                         <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--yes" type="button" disabled="@adminMarkPaidLoading" @onclick="AdminMarkPaid">
                                             @if (adminMarkPaidLoading)
@@ -133,11 +135,11 @@
                                             }
                                             else
                                             {
-                                                <i class="fas fa-check"></i> <span>Sim, confirmar</span>
+                                                <i class="fas fa-check"></i> <span>@Ui["Payment.YesConfirm"]</span>
                                             }
                                         </button>
                                         <button class="evpay-admin-confirm-btn evpay-admin-confirm-btn--no" type="button" @onclick="() => adminConfirmPay = false">
-                                            <i class="fas fa-times"></i> <span>Cancelar</span>
+                                            <i class="fas fa-times"></i> <span>@Ui["Common.Cancel"]</span>
                                         </button>
                                     </div>
                                 </div>
@@ -145,11 +147,11 @@
                             else
                             {
                                 <button class="evpay-admin-confirm-btn" type="button" @onclick="() => adminConfirmPay = true">
-                                    <i class="fas fa-check"></i> <span>Marcar como pago</span>
+                                    <i class="fas fa-check"></i> <span>@Ui["Payment.MarkAsPaid"]</span>
                                 </button>
                             }
                         }
-                        <a href="@backUrl" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar para a partida</a>
+                        <a href="@backUrl" class="detail-back-link"><i class="fas fa-arrow-left"></i> @Ui["Payment.BackToMatch"]</a>
                     </div>
                 }
                 else if (payState == PayState.AwaitingPayment)
@@ -161,19 +163,22 @@
                 }
                 else
                 {
-                    <EventPaymentGateways
-                        AvailableGateways="@availableGateways"
-                        ComingSoonGateways="@GetComingSoonGateways()"
-                        SelectedGatewayName="@selectedGatewayName"
-                        GroupGatewaysEnabled="@groupGatewaysEnabled"
-                        IsGenerating="@(payState == PayState.Generating)"
-                        ErrorMsg="@errorMsg"
-                        Price="@(ev.Price!.Value)"
-                        SelectedGatewayDisplayName="@GetSelectedGatewayDisplayName()"
-                        OnSelectGateway="@SelectGatewayCallback"
-                        OnGenerateCharge="@GeneratePixChargeCallback" />
+                    @if (ShouldShowGateways)
+                    {
+                        <EventPaymentGateways
+                            AvailableGateways="@availableGateways"
+                            ComingSoonGateways="@GetComingSoonGateways()"
+                            SelectedGatewayName="@selectedGatewayName"
+                            GroupGatewaysEnabled="@groupGatewaysEnabled"
+                            IsGenerating="@(payState == PayState.Generating)"
+                            ErrorMsg="@errorMsg"
+                            Price="@(ev.Price!.Value)"
+                            SelectedGatewayDisplayName="@GetSelectedGatewayDisplayName()"
+                            OnSelectGateway="@SelectGatewayCallback"
+                            OnGenerateCharge="@GeneratePixChargeCallback" />
+                    }
 
-                    @if (FeeOptions.Value.ShowDirectPixToOrganizer || !groupGatewaysEnabled)
+                    @if (ShouldShowManualPix)
                     {
                         <EventPaymentPixAdmin
                             GroupAdminPixKey="@GetGroupAdminPixKey(ev.Group)"

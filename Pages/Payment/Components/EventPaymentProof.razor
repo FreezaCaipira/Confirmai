@@ -1,25 +1,28 @@
 @using Confirmai.Models
+@using Confirmai.Services.Core
+
+@inject UiTextService Ui
 
 <div class="evpay-proof">
     <div class="evpay-proof-header">
         <i class="fas fa-camera"></i>
-        <span>Comprovante de pagamento</span>
+        <span>@Ui["Payment.ProofTitle"]</span>
     </div>
     @if (Confirmation?.PixProofUploadedAt.HasValue ?? false)
     {
         <div class="evpay-proof-sent">
             <i class="fas fa-check-circle evpay-proof-sent-icon"></i>
-            <span>Comprovante enviado em @Confirmation.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</span>
+            <span>@string.Format(Ui["Payment.ProofSentAtShort"], Confirmation.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm"))</span>
         </div>
-        <img src="/api/pix-proof/@Confirmation.Id" class="evpay-proof-thumb" alt="Comprovante Pix" />
+        <img src="/api/pix-proof/@Confirmation.Id" class="evpay-proof-thumb" alt="@Ui["Payment.ProofAlt"]" />
         <label class="evpay-proof-btn evpay-proof-btn--update">
             @if (UploadingProof)
             {
-                <i class="fas fa-spinner fa-spin"></i> <span>Enviando…</span>
+                <i class="fas fa-spinner fa-spin"></i> <span>@Ui["Payment.Sending"]</span>
             }
             else
             {
-                <i class="fas fa-sync-alt"></i> <span>Atualizar comprovante</span>
+                <i class="fas fa-sync-alt"></i> <span>@Ui["Payment.UpdateProof"]</span>
             }
             <InputFile OnChange="HandleProofUpload" accept="image/jpeg,image/png,image/webp" class="evpay-proof-input-hidden" disabled="@UploadingProof" />
         </label>
@@ -27,16 +30,16 @@
     else
     {
         <p class="evpay-proof-hint">
-            Após fazer o Pix, envie o comprovante para o organizador confirmar seu pagamento.
+            @Ui["Payment.ProofHint"]
         </p>
         <label class="evpay-proof-btn">
             @if (UploadingProof)
             {
-                <i class="fas fa-spinner fa-spin"></i> <span>Enviando…</span>
+                <i class="fas fa-spinner fa-spin"></i> <span>@Ui["Payment.Sending"]</span>
             }
             else
             {
-                <i class="fas fa-upload"></i> <span>Enviar comprovante</span>
+                <i class="fas fa-upload"></i> <span>@Ui["Payment.SendProof"]</span>
             }
             <InputFile OnChange="HandleProofUpload" accept="image/jpeg,image/png,image/webp" class="evpay-proof-input-hidden" disabled="@UploadingProof" />
         </label>

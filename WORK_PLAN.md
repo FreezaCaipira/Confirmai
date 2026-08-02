@@ -761,6 +761,8 @@ Implementação de suporte a certificado via variável de ambiente em base64:
 
 26. **Auditoria/logs como regra no fluxo de desenvolvimento**: alem de TDD, boas praticas de CSS e documentacao, todo incremento deve incluir verificacao de auditoria -- logs relevantes (Serilog) em fluxos criticos, telemetria quando aplicavel, e verificacao de que mudancas de UI/CSS sao confirmadas visualmente (print ou inspecao no browser) antes do commit. O Pleno deve registrar na descricao do PR quais telas foram verificadas visualmente e como. "Nao mudou nada" sem evidencia nao e aceitavel -- se o estilo nao apareceu, investigar causa raiz (cache, ordem de CSS, scoped vs global) antes de commitar.
 
+27. **Entrega do PR ao final do ciclo**: ao concluir um ciclo e fazer push da branch, o Pleno deve responder ao Senior (no chat/IDE) com 3 itens: (a) **title** do PR (titulo conciso, prefixo `feat(cicloN)` ou `refactor(cicloN)`); (b) **body** do PR (resumo do que foi feito por fase, contagem de testes antes/depois, desvios do plano, arquivos modificados); (c) **link de criacao do PR** (URL `https://github.com/.../pull/new/<branch>` gerada pelo `git push`). O Pleno nao deve considerar o ciclo "entregue" ate esses 3 itens estarem apresentados.
+
 ---
 
 ---

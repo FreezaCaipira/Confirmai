@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Admin;
+using Confirmai.Services.Core;
 using Confirmai.Services.Factories;
 using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
@@ -27,6 +28,18 @@ public partial class EventPayment : IAsyncDisposable
     private bool adminMarkPaidLoading;
     private bool adminMarkPaidError;
     private bool adminConfirmPay;
+
+    /// <summary>
+    /// When gateways are enabled (V2), show the gateway selector.
+    /// When disabled (V1 manual), hide it entirely.
+    /// </summary>
+    internal bool ShouldShowGateways => groupGatewaysEnabled;
+
+    /// <summary>
+    /// Show manual Pix (direct to organizer) + proof upload when gateways are off (V1),
+    /// or when ShowDirectPixToOrganizer is explicitly enabled alongside gateways (V2).
+    /// </summary>
+    internal bool ShouldShowManualPix => !groupGatewaysEnabled || FeeOptions.Value.ShowDirectPixToOrganizer;
 
     private PayState payState = PayState.Idle;
     private string? brCode;
@@ -98,7 +111,7 @@ public partial class EventPayment : IAsyncDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "EventPayment: falha ao gerar cobranca. ConfirmationId={Id}", conf?.Id);
-            errorMsg = "Nao foi possivel gerar o QR Code. Tente novamente em instantes.";
+            errorMsg = Ui.Get("Payment.GenerateQrError");
             payState = PayState.Idle;
         }
     }
@@ -180,7 +193,7 @@ public partial class EventPayment : IAsyncDisposable
                 conf.PixProofImageData = bytes;
                 conf.PixProofContentType = file.ContentType;
                 conf.PixProofUploadedAt = result.UploadedAt;
-                proofSuccessMessage = "Comprovante enviado com sucesso! Redirecionando...";
+                proofSuccessMessage = Ui.Get("Payment.ProofSuccess");
                 StateHasChanged();
                 await Task.Delay(1500);
                 var backUrl = conf.Event.Sport == Sport.Futsal ? $"/futsal/{conf.Event.Id}" : $"/poker/{conf.Event.Id}";
@@ -193,12 +206,12 @@ public partial class EventPayment : IAsyncDisposable
         }
         catch (IOException)
         {
-            proofError = "Arquivo muito grande ou invalido. Maximo 5 MB.";
+            proofError = Ui.Get("Payment.ProofTooLarge");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "UploadProof: falha ao salvar comprovante. ConfirmationId={Id}", conf.Id);
-            proofError = "Erro ao enviar o comprovante. Tente novamente.";
+            proofError = Ui.Get("Payment.ProofError");
         }
         finally
         {
