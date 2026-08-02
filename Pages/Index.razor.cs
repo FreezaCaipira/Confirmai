@@ -113,6 +113,7 @@ public partial class Index
     private List<EventConfirmation> allCancelled = new();
     private bool confLoaded, confLoading;
     private string userId = string.Empty;
+    private int userGroupCount;
     private Sport? filterSport;
     private string filterPeriod = "all";
 
@@ -161,6 +162,12 @@ public partial class Index
 
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
         userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            userGroupCount = await db.GroupMembers
+                .CountAsync(m => m.UserId == userId);
+        }
 
         if (activeTab == TabMyGames && !confLoaded)
             await LoadConfirmationsAsync();

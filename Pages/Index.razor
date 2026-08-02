@@ -33,6 +33,11 @@
         </a>
     </div>
 
+    @if (!string.IsNullOrWhiteSpace(userId) && userGroupCount == 0)
+    {
+        <NoGroupsHint ShowGroupsButton="true" />
+    }
+
     <div class="sports-tabs">
         <CitySelector
             SelectedCityKey="@SelectedCityKey"
