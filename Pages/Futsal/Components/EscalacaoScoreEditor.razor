@@ -1,10 +1,12 @@
+@inject Confirmai.Services.Core.UiTextService Ui
+
 <div class="esc-score-section">
     <div class="esc-section-header">
-        <h3 class="esc-section-title"><i class="fas fa-futbol"></i> Placar</h3>
+        <h3 class="esc-section-title"><i class="fas fa-futbol"></i> @Ui["Futsal.Score"]</h3>
         @if (ScoreTeamA is not null && ScoreTeamB is not null && !EditingScore)
         {
             <button class="esc-btn esc-btn--danger-ghost esc-btn--sm" @onclick="() => HandleEditingScore(true)">
-                <i class="fas fa-edit"></i> Editar
+                <i class="fas fa-edit"></i> @Ui["Common.Edit"]
             </button>
         }
     </div>
@@ -21,24 +23,24 @@
 
         @if (ScoreTeamA > ScoreTeamB)
         {
-            <p class="esc-score-winner esc-score-winner--a">🏆 @TeamAName venceu!</p>
+            <p class="esc-score-winner esc-score-winner--a">@Ui.Get("Futsal.TeamWon", TeamAName)</p>
         }
         else if (ScoreTeamB > ScoreTeamA)
         {
-            <p class="esc-score-winner esc-score-winner--b">🏆 @TeamBName venceu!</p>
+            <p class="esc-score-winner esc-score-winner--b">@Ui.Get("Futsal.TeamWon", TeamBName)</p>
         }
         else
         {
-            <p class="esc-score-winner esc-score-winner--draw">🤝 Empate</p>
+            <p class="esc-score-winner esc-score-winner--draw">@Ui["Futsal.Draw"]</p>
         }
 
         @if (ScoreRegisteredByName is not null)
         {
             <p class="esc-score-registered-by">
-                <i class="fas fa-user-check"></i> Registrado por <strong>@ScoreRegisteredByName</strong>
+                <i class="fas fa-user-check"></i> @Ui.Get("Futsal.RegisteredBy", ScoreRegisteredByName)
                 @if (ScoreRegisteredAt is not null)
                 {
-                    <span class="esc-score-registered-when">em @ScoreRegisteredAt.Value.ToLocalTime().ToString("dd/MM HH:mm")</span>
+                    <span class="esc-score-registered-when">@Ui.Get("Futsal.RegisteredAt", ScoreRegisteredAt.Value.ToLocalTime().ToString("dd/MM HH:mm"))</span>
                 }
             </p>
         }
@@ -60,12 +62,12 @@
         }
         <div class="esc-score-actions">
             <button class="esc-btn esc-btn--primary esc-btn--sm" @onclick="HandleSaveScore" disabled="@IsSaving">
-                <i class="fas fa-check"></i> @(IsSaving ? "Salvando…" : "Confirmar placar")
+                <i class="fas fa-check"></i> @(IsSaving ? @Ui["Futsal.Saving"] : @Ui["Futsal.ConfirmScore"])
             </button>
         </div>
     }
     else
     {
-        <p class="esc-hint"><i class="fas fa-clock"></i> Placar ainda não registrado.</p>
+        <p class="esc-hint"><i class="fas fa-clock"></i> @Ui["Futsal.ScoreNotRegistered"]</p>
     }
 </div>

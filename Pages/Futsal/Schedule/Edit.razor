@@ -11,41 +11,43 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
 
+@inject Confirmai.Services.Core.UiTextService Ui
 
-<PageTitle>Editar Partida Semanal · Confirmai</PageTitle>
+
+<PageTitle>@Ui["Futsal.ScheduleEditPageTitle"]</PageTitle>
 
 <div class="create-event-page">
     <div class="create-event-card">
         <div class="create-event-card-top">
             <h1 class="create-event-title">
-                <i class="fas fa-sync-alt"></i> Editar Partida Semanal
+                <i class="fas fa-sync-alt"></i> @Ui["Futsal.EditMatch"] @Ui["Futsal.WeeklyMatches"]
             </h1>
-            <a href="/grupo/@scheduleGroupId/partidas" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+            <a href="/grupo/@scheduleGroupId/partidas" class="detail-back-link"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
         </div>
 
         @if (isLoading)
         {
-            <div class="loading-spinner">Carregando...</div>
+            <div class="loading-spinner">@Ui["Common.Loading"]</div>
         }
         else if (notFound)
         {
             <div class="detail-not-found">
-                <h2>Agendamento não encontrado.</h2>
-                <a href="/meus-eventos?esporte=futsal">← Voltar</a>
+                <h2>@Ui["Futsal.ScheduleNotFound"]</h2>
+                <a href="/meus-eventos?esporte=futsal">← @Ui["Common.Back"]</a>
             </div>
         }
         else if (accessDenied)
         {
             <div class="detail-not-found">
-                <h2>Acesso negado.</h2>
-                <p>Apenas o criador pode editar este agendamento.</p>
-                <a href="/meus-eventos?esporte=futsal">← Voltar</a>
+                <h2>@Ui["Futsal.AccessDenied"]</h2>
+                <p>@Ui["Futsal.OnlyCreatorCanEditSchedule"]</p>
+                <a href="/meus-eventos?esporte=futsal">← @Ui["Common.Back"]</a>
             </div>
         }
         else
         {
             <p class="form-hint form-hint--margin-bottom">
-                ⚠️ Alterações aqui <strong>não afetam</strong> partidas já geradas — apenas as próximas ocorrências.
+                @Ui["Futsal.ScheduleWarning"]
             </p>
 
             <EditForm Model="form" OnValidSubmit="Save">
@@ -54,24 +56,24 @@
 
                 @* ── Nome / Apelido ────────────────────────────────────────── *@
                 <fieldset class="form-section">
-                    <legend>Identificação</legend>
+                    <legend>@Ui["Futsal.Identification"]</legend>
 
                     <div class="form-group">
-                        <label>Como vocês chamam o jogo?</label>
+                        <label>@Ui["Futsal.LocalNameLabel"]</label>
                         <InputText class="input" @bind-Value="form.LocalName"
                                    placeholder='racha, pelada, baba, rachão…' maxlength="60"
                                    autocomplete="off" />
-                        <small class="form-hint">Opcional — aparece nos cards para identificar o estilo da região.</small>
+                        <small class="form-hint">@Ui["Futsal.LocalNameHint"]</small>
                     </div>
                 </fieldset>
 
                 @* ── Dia / Hora / Duração ─────────────────────────────────── *@
                 <fieldset class="form-section">
-                    <legend>Horário</legend>
+                    <legend>@Ui["Futsal.Schedule"]</legend>
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Dia da semana <span class="required">*</span></label>
+                            <label>@Ui["Futsal.DayOfWeek"] <span class="required">*</span></label>
                             <InputSelect class="input" @bind-Value="form.DayOfWeek">
                                 @foreach (var (dow, label) in WeekdayOptions)
                                 {
@@ -80,7 +82,7 @@
                             </InputSelect>
                         </div>
                         <div class="form-group">
-                            <label>Hora de início <span class="required">*</span></label>
+                            <label>@Ui["Futsal.StartTime"] <span class="required">*</span></label>
                             <input type="time" class="input"
                                    value="@form.TimeOfDay.ToString("HH:mm")"
                                    @onchange="OnTimeChange" />
@@ -88,7 +90,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Duração <span class="required">*</span></label>
+                        <label>@Ui["Futsal.Duration"] <span class="required">*</span></label>
                         <InputSelect class="input" @bind-Value="form.DurationMinutes">
                             @foreach (var (min, label) in DurationOptions)
                             {
@@ -100,12 +102,12 @@
 
                 @* ── Local ────────────────────────────────────────────────── *@
                 <fieldset class="form-section">
-                    <legend>Local</legend>
+                    <legend>@Ui["Futsal.Venue"]</legend>
 
                     <div class="form-group">
-                        <label>Quadra / Society / Campo <span class="required">*</span></label>
+                        <label>@Ui["Futsal.VenueField"] <span class="required">*</span></label>
                         <InputSelect class="input" @bind-Value="form.VenueId">
-                            <option value="0">— selecione —</option>
+                            <option value="0">@Ui["Futsal.VenueSelectShort"]</option>
                             @foreach (var v in venues)
                             {
                                 <option value="@v.Id">@v.Name — @v.City/@v.StateCode</option>
@@ -117,34 +119,34 @@
 
                 @* ── Vagas ────────────────────────────────────────────────── *@
                 <fieldset class="form-section">
-                    <legend>Vagas</legend>
+                    <legend>@Ui["Futsal.Slots"]</legend>
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Vagas totais (linha + goleiros) <span class="required">*</span></label>
+                            <label>@Ui["Futsal.TotalSlots"] <span class="required">*</span></label>
                             <InputNumber class="input" @bind-Value="form.MaxPlayers" min="1" max="100" />
                             <ValidationMessage For="@(() => form.MaxPlayers)" class="validation-message" />
                         </div>
                         <div class="form-group">
-                            <label>Goleiros</label>
+                            <label>@Ui["Futsal.Goalkeepers"]</label>
                             <InputNumber class="input" @bind-Value="form.MaxGoalkeepers" min="0" max="10" />
-                            <small class="form-hint">0 = sem reserva de goleiro.</small>
+                            <small class="form-hint">@Ui["Futsal.NoGkHint"]</small>
                         </div>
                     </div>
                 </fieldset>
 
                 @* ── Valor ────────────────────────────────────────────────── *@
                 <fieldset class="form-section">
-                    <legend>Valor</legend>
+                    <legend>@Ui["Futsal.Price"]</legend>
 
                     <div class="form-group">
-                        <label>Valor por jogador (R$) <span class="required">*</span></label>
+                        <label>@Ui["Futsal.PricePerPlayer"] <span class="required">*</span></label>
                         <div class="input-prefix-wrap">
                             <span class="input-prefix">R$</span>
                             <InputNumber class="input" @bind-Value="form.Price" min="0" step="0.50" />
                         </div>
                         <ValidationMessage For="@(() => form.Price)" class="validation-message" />
-                        <small class="form-hint">Use 0 para partidas sem cobrança.</small>
+                        <small class="form-hint">@Ui["Futsal.PriceHint"]</small>
                     </div>
                 </fieldset>
 
@@ -156,10 +158,10 @@
                 <div class="form-actions">
                     <button class="cancel-btn" type="button"
                             @onclick='() => NavigationManager.NavigateTo("/meus-eventos?esporte=futsal")'>
-                        Cancelar
+                        @Ui["Common.Cancel"]
                     </button>
                     <button class="save-btn" type="submit" disabled="@isSaving">
-                        @(isSaving ? "Salvando…" : "Salvar Alterações")
+                        @(isSaving ? @Ui["Futsal.Saving"] : @Ui["Futsal.SaveChanges"])
                     </button>
                 </div>
             </EditForm>

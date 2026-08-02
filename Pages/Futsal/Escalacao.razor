@@ -14,18 +14,19 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject Confirmai.Services.Core.UiTextService Ui
 
-<PageTitle>@(isPastEvent ? "Pós-Partida" : "Escalação") · Confirmai</PageTitle>
+<PageTitle>@(isPastEvent ? Ui["Futsal.PostMatchPageTitle"] : Ui["Futsal.EscalacaoPageTitle"]) · Confirmai</PageTitle>
 
 @if (isLoading)
 {
-    <div class="esc-loading">Carregando…</div>
+    <div class="esc-loading">@Ui["Common.Loading"]</div>
 }
 else if (ev is null)
 {
     <div class="esc-not-found">
-        <h2>Partida não encontrada.</h2>
-        <a href="/futsal">← Voltar</a>
+        <h2>@Ui["Futsal.MatchNotFound"]</h2>
+        <a href="/futsal">← @Ui["Common.Back"]</a>
     </div>
 }
 else if (!isPastEvent && ev.LineupConfirmedAt is null && !isAdmin)
@@ -34,9 +35,9 @@ else if (!isPastEvent && ev.LineupConfirmedAt is null && !isAdmin)
         <div class="esc-card esc-card--gate">
             <div class="esc-gate">
                 <div class="esc-gate-icon"><i class="fas fa-lock"></i></div>
-                <h2 class="esc-gate-title">Escalação não disponível</h2>
-                <p class="esc-gate-msg">A escalação ainda não foi montada pelo organizador.</p>
-                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar à partida</a>
+                <h2 class="esc-gate-title">@Ui["Futsal.EscalacaoNotAvailable"]</h2>
+                <p class="esc-gate-msg">@Ui["Futsal.EscalacaoNotMounted"]</p>
+                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> @Ui["Futsal.BackToMatch"]</a>
             </div>
         </div>
     </div>
@@ -47,9 +48,9 @@ else if (isPastEvent && !isMember && !isAdmin)
         <div class="esc-card esc-card--gate">
             <div class="esc-gate">
                 <div class="esc-gate-icon esc-gate-icon--past"><i class="fas fa-flag-checkered"></i></div>
-                <h2 class="esc-gate-title">Pós-Partida</h2>
-                <p class="esc-gate-msg">Apenas membros do grupo podem ver o resumo e votar no destaque.</p>
-                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar à partida</a>
+                <h2 class="esc-gate-title">@Ui["Futsal.PostMatchPageTitle"]</h2>
+                <p class="esc-gate-msg">@Ui["Futsal.PostMatchOnlyMembers"]</p>
+                <a class="esc-gate-back" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> @Ui["Futsal.BackToMatch"]</a>
             </div>
         </div>
     </div>
@@ -63,18 +64,18 @@ else
                     <h1 class="esc-title">
                         @if (isPastEvent)
                         {
-                            <span><i class="fas fa-flag-checkered"></i> Pós-Partida</span>
+                            <span><i class="fas fa-flag-checkered"></i> @Ui["Futsal.PostMatchPageTitle"]</span>
                         }
                         else if (ev.LineupConfirmedAt is null)
                         {
-                            <span>Montar Escalação</span>
+                            <span>@Ui["Futsal.MontarEscalacao"]</span>
                         }
                         else
                         {
-                            <span>Escalação</span>
+                            <span>@Ui["Futsal.EscalacaoPageTitle"]</span>
                         }
                     </h1>
-                    <a class="detail-back-link" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> Voltar à partida</a>
+                    <a class="detail-back-link" href="/futsal/@ev.Id"><i class="fas fa-arrow-left"></i> @Ui["Futsal.BackToMatch"]</a>
                 </div>
                 <p class="esc-date">
                     <i class="fas fa-calendar-alt"></i>
@@ -89,7 +90,7 @@ else
                 {
                     <div class="esc-confirmed-badge">
                         <i class="fas fa-check-circle"></i>
-                        Escalação confirmada em @ev.LineupConfirmedAt.Value.ToLocalTime().ToString("dd/MM HH:mm")
+                        @Ui.Get("Futsal.EscalacaoConfirmedAt", ev.LineupConfirmedAt.Value.ToLocalTime().ToString("dd/MM HH:mm"))
                     </div>
                 }
 
@@ -151,7 +152,7 @@ else
                     {
                         <div class="esc-reset-zone">
                             <button class="esc-btn esc-btn--danger-ghost" @onclick="() => showResetModal = true">
-                                <i class="fas fa-undo"></i> Resetar escalação
+                                <i class="fas fa-undo"></i> @Ui["Futsal.ResetEscalacao"]
                             </button>
                         </div>
                     }
@@ -159,11 +160,11 @@ else
                     {
                         <div class="esc-modal-overlay">
                             <div class="esc-modal">
-                                <p>Tem certeza? A escalação será desfeita e os jogadores voltarão a não ter time atribuído.</p>
+                                <p>@Ui["Futsal.ResetConfirm"]</p>
                                 <div class="esc-modal-actions">
-                                    <button class="esc-btn esc-btn--secondary" @onclick="() => showResetModal = false" disabled="@isSaving">Cancelar</button>
+                                    <button class="esc-btn esc-btn--secondary" @onclick="() => showResetModal = false" disabled="@isSaving">@Ui["Common.Cancel"]</button>
                                     <button class="esc-btn esc-btn--danger" @onclick="ResetarEscalacao" disabled="@isSaving">
-                                        @(isSaving ? "Resetando…" : "Sim, resetar")
+                                        @(isSaving ? @Ui["Futsal.Resetting"] : @Ui["Futsal.SimResetar"])
                                     </button>
                                 </div>
                             </div>

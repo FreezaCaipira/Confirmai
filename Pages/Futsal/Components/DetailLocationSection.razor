@@ -1,10 +1,11 @@
 @using Confirmai.Models
 @using Microsoft.Extensions.Configuration
+@inject Confirmai.Services.Core.UiTextService Ui
 
 <hr class="detail-divider">
 <section class="detail-section">
     <h2 class="detail-section-title">
-        <i class="fas fa-map-marker-alt"></i> Localização
+        <i class="fas fa-map-marker-alt"></i> @Ui["Futsal.Location"]
     </h2>
 
     @* Placeholder — always rendered, visible by default *@
@@ -30,7 +31,7 @@
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
                 allowfullscreen
-                title="Localização da quadra">
+                title="@Ui["Futsal.LocationIframeTitle"]">
             </iframe>
         </div>
     }
@@ -39,7 +40,7 @@
        href="@MapsSearchUrl"
        target="_blank"
        rel="noopener noreferrer">
-        <i class="fas fa-external-link-alt"></i> Abrir no Google Maps
+        <i class="fas fa-external-link-alt"></i> @Ui["Futsal.OpenInMaps"]
     </a>
 </section>
 <hr class="detail-divider">

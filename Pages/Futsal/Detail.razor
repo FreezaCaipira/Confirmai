@@ -19,8 +19,9 @@
 @inject NavigationManager NavigationManager
 @inject IConfiguration Config
 @inject IJSRuntime JS
+@inject Confirmai.Services.Core.UiTextService Ui
 
-<PageTitle>@(ev?.Group?.Name ?? "Partida") · Confirmai</PageTitle>
+<PageTitle>@(ev?.Group?.Name ?? Ui["Futsal.PageTitle"]) · Confirmai</PageTitle>
 
 @if (isLoading)
 {
@@ -31,8 +32,8 @@
 else if (ev is null)
 {
     <div class="detail-not-found">
-        <h2>Partida não encontrada.</h2>
-        <a href="/futsal">← Voltar</a>
+        <h2>@Ui["Futsal.MatchNotFound"]</h2>
+        <a href="/futsal">← @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -60,7 +61,7 @@ else
             @if (!ev.IsActive)
             {
                 <div class="cancelled-banner">
-                    <i class="fas fa-ban"></i> Esta partida foi cancelada.
+                    <i class="fas fa-ban"></i> @Ui["Futsal.MatchCancelled"]
                 </div>
             }
 
@@ -184,9 +185,9 @@ else
                                 bool isRotation = outIdx > baseOut;
                                 <li class="player-item @(isRotation ? "player-item--rotation" : "") @(c.UserId == currentUserId ? "player-item--me" : "") @(detailMvpRevealed && c.UserId == detailMvpUserId ? "player-item--mvp" : "")">
                                     <span class="player-num">@outIdx</span>
-                                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Jogador")</span>
-                                    @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">Você</span> }
-                                    @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
+                                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? @Ui["Futsal.Player"])</span>
+                                    @if (c.UserId == currentUserId) { <span class="player-tag player-tag--me">@Ui["Futsal.You"]</span> }
+                                    @if (detailMvpRevealed && c.UserId == detailMvpUserId) { <span class="player-tag player-tag--mvp">@Ui["Futsal.Mvp"]</span> }
                                     @if (ev.Price.HasValue)
                                     {
                                         @if (isAdmin)
@@ -196,7 +197,7 @@ else
                                             {
                                                 @if (confirmPayId == c.Id)
                                                 {
-                                                    <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? "desmarcar?" : "marcar pago?")</span>
+                                                    <span class="player-tag player-tag--pay-confirm">@(c.HasPaid ? @Ui["Futsal.UnmarkPaid"] : @Ui["Futsal.MarkPaid"])</span>
                                                     <button class="player-tag player-tag--admin-pay-yes" type="button" @onclick="() => AdminTogglePaid(c.Id)">
                                                         <i class="fas fa-check"></i>
                                                     </button>
@@ -209,37 +210,37 @@ else
                                                     @if (c.HasPaid)
                                                     {
                                                         <button class="player-tag player-tag--admin-pay player-tag--paid" @onclick="() => confirmPayId = c.Id">
-                                                            <i class="fas fa-check"></i> pago
+                                                            <i class="fas fa-check"></i> @Ui["Futsal.Paid"]
                                                         </button>
                                                     }
                                                     else if (c.PixProofUploadedAt.HasValue)
                                                     {
-                                                        <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal(c.Id)" title="Comprovante enviado - clique para gerenciar">
-                                                            <i class="fas fa-image"></i> 📎 comprovante
+                                                        <button class="player-tag player-tag--admin-pay player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal(c.Id)" title="@Ui["Futsal.ProofTitle"]">
+                                                            <i class="fas fa-image"></i> @Ui["Futsal.Proof"]
                                                         </button>
                                                     }
                                                     else
                                                     {
                                                         <button class="player-tag player-tag--admin-pay player-tag--pay-pending" @onclick="() => confirmPayId = c.Id">
-                                                            <i class="fas fa-exclamation-triangle"></i> pendente
+                                                            <i class="fas fa-exclamation-triangle"></i> @Ui["Futsal.Pending"]
                                                         </button>
                                                         <button class="player-tag player-tag--admin-pay player-tag--pay-btn" @onclick="() => confirmPayId = c.Id" type="button">
-                                                            <i class="fas fa-check"></i> pagar
+                                                            <i class="fas fa-check"></i> @Ui["Futsal.Pay"]
                                                         </button>
                                                     }
                                                 }
                                             }
                                             else
                                             {
-                                                <span class="player-tag player-tag--paid" title="Pago via gateway — não pode ser desfeito pelo admin">
-                                                    <i class="fas fa-check"></i> pago
+                                                <span class="player-tag player-tag--paid" title="@Ui["Futsal.GatewayPaidTitle"]">
+                                                    <i class="fas fa-check"></i> @Ui["Futsal.Paid"]
                                                 </span>
                                             }
                                             @if (!isPastEvent && c.UserId != currentUserId && c.PaymentGatewayName == null)
                                             {
                                                 @if (confirmRemoveId == c.Id)
                                                 {
-                                                    <span class="player-tag player-tag--remove-confirm">remover?</span>
+                                                    <span class="player-tag player-tag--remove-confirm">@Ui["Futsal.RemoveConfirm"]</span>
                                                     <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => AdminRemoveConfirmation(c.Id)">
                                                         <i class="fas fa-check"></i>
                                                     </button>
@@ -250,7 +251,7 @@ else
                                                 else
                                                 {
                                                     <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => confirmRemoveId = c.Id">
-                                                        <i class="fas fa-user-times"></i> remover
+                                                        <i class="fas fa-user-times"></i> @Ui["Futsal.Remove"]
                                                     </button>
                                                 }
                                             }
@@ -260,41 +261,41 @@ else
                                             @if (c.HasPaid)
                                             {
                                                 <span class="player-tag player-tag--paid">
-                                                    <i class="fas fa-check"></i> pago
+                                                    <i class="fas fa-check"></i> @Ui["Futsal.Paid"]
                                                 </span>
                                             }
                                             else if (c.PixProofUploadedAt.HasValue && (c.UserId == currentUserId || isAdmin))
                                             {
                                                 @if (isAdmin)
                                                 {
-                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal(c.Id)" title="Comprovante enviado - clique para gerenciar">
-                                                        <i class="fas fa-image"></i> 📎 comprovante
+                                                    <button class="player-tag player-tag--proof-pending" @onclick="() => NavigateToPaymentsModal(c.Id)" title="@Ui["Futsal.ProofTitle"]">
+                                                        <i class="fas fa-image"></i> @Ui["Futsal.Proof"]
                                                     </button>
                                                 }
                                                 else
                                                 {
-                                                    <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--proof-pending player-tag--pay-link" title="Comprovante enviado - clique para gerenciar">
-                                                        <i class="fas fa-image"></i> 📎 comprovante
+                                                    <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--proof-pending player-tag--pay-link" title="@Ui["Futsal.ProofTitle"]">
+                                                        <i class="fas fa-image"></i> @Ui["Futsal.Proof"]
                                                     </a>
                                                 }
                                             }
                                             else if (c.UserId == currentUserId)
                                             {
                                                 <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-pending player-tag--pay-link">
-                                                    <i class="fas fa-exclamation-triangle"></i> pendente
+                                                    <i class="fas fa-exclamation-triangle"></i> @Ui["Futsal.Pending"]
                                                 </a>
                                                 @if (isAdmin)
                                                 {
                                                     @if (currentUserId == ev?.Group?.PixReceiverUserId)
                                                     {
                                                         <span class="player-tag player-tag--receiver-badge">
-                                                            <i class="fas fa-wallet"></i> recebedor
+                                                            <i class="fas fa-wallet"></i> @Ui["Futsal.Receiver"]
                                                         </span>
                                                     }
                                                     else
                                                     {
                                                         <a href="/pagamento/evento/@c.Id" class="player-tag player-tag--pay-btn player-tag--pay-link">
-                                                            <i class="fas fa-check"></i> pagar
+                                                            <i class="fas fa-check"></i> @Ui["Futsal.Pay"]
                                                         </a>
                                                     }
                                                 }
@@ -302,7 +303,7 @@ else
                                             else
                                             {
                                                 <span class="player-tag player-tag--pay-pending">
-                                                    <i class="fas fa-exclamation-triangle"></i> pendente
+                                                    <i class="fas fa-exclamation-triangle"></i> @Ui["Futsal.Pending"]
                                                 </span>
                                             }
                                         }
@@ -311,7 +312,7 @@ else
                                     {
                                         @if (confirmCancel)
                                         {
-                                            <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
+                                            <span class="player-tag player-tag--cancel-confirm">@Ui["Futsal.CancelSignupConfirm"]</span>
                                             <button class="player-tag player-tag--cancel-yes" type="button" @onclick="CancelConfirmation">
                                                 <i class="fas fa-check"></i>
                                             </button>
@@ -322,7 +323,7 @@ else
                                         else
                                         {
                                             <button class="player-tag player-tag--cancel" type="button" @onclick="() => confirmCancel = true">
-                                                <i class="fas fa-user-times"></i> cancelar
+                                                <i class="fas fa-user-times"></i> @Ui["Futsal.Cancel"]
                                             </button>
                                         }
                                     }
@@ -336,7 +337,7 @@ else
                                 {
                                     <li class="player-item @(slotIsRotation ? "player-item--rotation" : "") player-item--slot">
                                         <span class="player-num">@i</span>
-                                        <button class="player-slot-btn" @onclick="() => ConfirmAs(FutsalPosition.Outfield)"><i class="fas fa-plus"></i> Confirmar presença</button>
+                                        <button class="player-slot-btn" @onclick="() => ConfirmAs(FutsalPosition.Outfield)"><i class="fas fa-plus"></i> @Ui["Futsal.ConfirmPresence"]</button>
                                     </li>
                                 }
                                 else
@@ -349,7 +350,7 @@ else
                     @if (isFullOut && canConfirm)
                     {
                         <button class="waitlist-cta" @onclick="() => ConfirmAs(FutsalPosition.Outfield)">
-                            <i class="fas fa-clock"></i> Entrar na lista de espera
+                            <i class="fas fa-clock"></i> @Ui["Futsal.Waitlist"]
                         </button>
                     }
                     @if (isAdmin && ev.IsActive && !isPastEvent)
@@ -358,10 +359,10 @@ else
                             <button class="slot-ctrl-btn slot-ctrl-btn--remove"
                                     disabled="@(maxOut <= minInfo.MinOutfield || maxOut <= confirmedOut)"
                                     @onclick="AdminRemoveOutfieldSlot">
-                                <i class="fas fa-minus"></i> Remover vaga
+                                <i class="fas fa-minus"></i> @Ui["Futsal.RemoveSlot"]
                             </button>
                             <button class="add-slot-row" @onclick="AdminAddOutfieldSlot">
-                                <i class="fas fa-plus"></i> Adicionar vaga
+                                <i class="fas fa-plus"></i> @Ui["Futsal.AddSlot"]
                             </button>
                         </div>
                     }
@@ -385,17 +386,17 @@ else
             {
                 <div class="confirmed-inline-banner">
                     <i class="fas fa-check-circle"></i>
-                    <span class="confirmed-inline-label">Confirmado para jogar na <strong>@(userConf.Position == FutsalPosition.Goalkeeper ? "GOL" : "LINHA")</strong></span>
+                    <span class="confirmed-inline-label">@Ui["Futsal.ConfirmedToPlay"] <strong>@(userConf.Position == FutsalPosition.Goalkeeper ? Ui["Futsal.Gol"] : Ui["Futsal.Linha"])</strong></span>
                     @if (userConf.Position != FutsalPosition.Goalkeeper && ev.Price.HasValue)
                     {
                         @if (userConf.HasPaid)
                         {
-                            <span class="payment-done-label"><i class="fas fa-check-circle"></i> Pago R$ @ev.Price.Value.ToString("N2")</span>
+                            <span class="payment-done-label"><i class="fas fa-check-circle"></i> @Ui.Get("Futsal.PaidAmount", ev.Price.Value.ToString("N2"))</span>
                         }
                         else
                         {
                             <a href="/pagamento/evento/@userConf.Id" class="pay-btn pay-btn--sm">
-                                Pagar R$ @ev.Price.Value.ToString("N2")
+                                @Ui.Get("Futsal.PayAmount", ev.Price.Value.ToString("N2"))
                             </a>
                         }
                     }
@@ -408,13 +409,13 @@ else
                 <div class="detail-action">
                     @if (!ev.IsActive)
                     {
-                        <p class="cancelled-notice">Esta partida foi cancelada.</p>
+                        <p class="cancelled-notice">@Ui["Futsal.MatchCancelled"]</p>
                     }
                     else if (currentUserId is null)
                     {
                         <a href="/Identity/Account/Login?ReturnUrl=@Uri.EscapeDataString(NavigationManager.Uri)"
                            class="confirm-btn">
-                            Entrar para confirmar presença
+                            @Ui["Futsal.EnterToConfirm"]
                         </a>
                     }
                     @if (!string.IsNullOrWhiteSpace(actionError))
@@ -431,29 +432,29 @@ else
                     {
                         <div class="private-group-notice">
                             <i class="fas fa-hourglass-half"></i>
-                            <span>Solicitação enviada — aguardando aprovação do administrador do grupo.</span>
+                            <span>@Ui["Futsal.JoinRequestSent"]</span>
                         </div>
                         <button class="cancel-join-btn" type="button" @onclick="CancelJoinRequestAsync" disabled="@cancellingJoin">
                             <i class="fas fa-times"></i>
-                            @(cancellingJoin ? "Cancelando…" : "Cancelar solicitação")
+                            @(cancellingJoin ? @Ui["Futsal.CancellingJoin"] : @Ui["Futsal.CancelJoinRequest"])
                         </button>
                     }
                     else if (userJoinRequest?.Status == JoinRequestStatus.Rejected)
                     {
                         <div class="private-group-notice">
                             <i class="fas fa-times-circle"></i>
-                            <span>Sua solicitação de entrada foi recusada.</span>
+                            <span>@Ui["Futsal.JoinRequestRejected"]</span>
                         </div>
                     }
                     else
                     {
                         <div class="private-group-notice">
                             <i class="fas fa-lock"></i>
-                            <span>Este grupo é privado. Solicite entrada para o administrador.</span>
+                            <span>@Ui["Futsal.PrivateGroup"]</span>
                         </div>
                         <button class="confirm-btn" type="button" @onclick="RequestToJoinAsync" disabled="@requestingJoin">
                             <i class="fas fa-user-plus"></i>
-                            @(requestingJoin ? "Enviando..." : "Solicitar entrada")
+                            @(requestingJoin ? @Ui["Futsal.SendingJoin"] : @Ui["Futsal.RequestJoin"])
                         </button>
                     }
 

@@ -1,10 +1,11 @@
 @using Confirmai.Models
 @using Confirmai.Enums
 @using Confirmai.Shared.Helpers
+@inject Confirmai.Services.Core.UiTextService Ui
 
 <div class="players-group players-group--gk">
     <div class="players-group-header">
-        <span class="players-label"><i class="fas fa-hand-paper"></i> Goleiros</span>
+        <span class="players-label"><i class="fas fa-hand-paper"></i> @Ui["Futsal.Goalkeepers"]</span>
         <span class="players-count @(IsFullGk ? "is-full" : "")">
             @ConfirmedGk / @Event?.MaxGoalkeepers
         </span>
@@ -17,17 +18,17 @@
                 gkIdx++;
                 <li class="player-item @(c.UserId == CurrentUserId ? "player-item--me" : "") @(DetailMvpRevealed && c.UserId == DetailMvpUserId ? "player-item--mvp" : "")">
                     <span class="player-num">@gkIdx</span>
-                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? "Goleiro")</span>
-                    @if (c.UserId == CurrentUserId) { <span class="player-tag player-tag--me">Você</span> }
-                    @if (DetailMvpRevealed && c.UserId == DetailMvpUserId) { <span class="player-tag player-tag--mvp">⭐ Destaque</span> }
+                    <span class="player-name">@(c.User?.FullName ?? c.User?.UserName ?? @Ui["Futsal.Goalkeeper"])</span>
+                    @if (c.UserId == CurrentUserId) { <span class="player-tag player-tag--me">@Ui["Futsal.You"]</span> }
+                    @if (DetailMvpRevealed && c.UserId == DetailMvpUserId) { <span class="player-tag player-tag--mvp">@Ui["Futsal.Mvp"]</span> }
                     <span class="player-tag player-tag--no-pay">
-                        <i class="fas fa-check-circle"></i> não paga
+                        <i class="fas fa-check-circle"></i> @Ui["Futsal.NoPay"]
                     </span>
                     @if (Event!.IsActive && !IsPastEvent && c.UserId == CurrentUserId && !c.HasPaid)
                     {
                         @if (ConfirmCancel)
                         {
-                            <span class="player-tag player-tag--cancel-confirm">cancelar inscrição?</span>
+                            <span class="player-tag player-tag--cancel-confirm">@Ui["Futsal.CancelSignupConfirm"]</span>
                             <button class="player-tag player-tag--cancel-yes" type="button" @onclick="HandleCancelConfirmation">
                                 <i class="fas fa-check"></i>
                             </button>
@@ -38,7 +39,7 @@
                         else
                         {
                             <button class="player-tag player-tag--cancel" type="button" @onclick="() => HandleConfirmCancelChange(true)">
-                                <i class="fas fa-user-times"></i> cancelar
+                                <i class="fas fa-user-times"></i> @Ui["Futsal.Cancel"]
                             </button>
                         }
                     }
@@ -46,7 +47,7 @@
                     {
                         @if (ConfirmRemoveId == c.Id)
                         {
-                            <span class="player-tag player-tag--remove-confirm">remover?</span>
+                            <span class="player-tag player-tag--remove-confirm">@Ui["Futsal.RemoveConfirm"]</span>
                             <button class="player-tag player-tag--admin-remove-yes" type="button" @onclick="() => HandleAdminRemoveConfirmation(c.Id)">
                                 <i class="fas fa-check"></i>
                             </button>
@@ -57,7 +58,7 @@
                         else
                         {
                             <button class="player-tag player-tag--admin-remove" type="button" @onclick="() => HandleConfirmRemoveIdChange(c.Id)">
-                                <i class="fas fa-user-times"></i> remover
+                                <i class="fas fa-user-times"></i> @Ui["Futsal.Remove"]
                             </button>
                         }
                     }
@@ -70,7 +71,7 @@
                 {
                     <li class="player-item player-item--slot">
                         <span class="player-num">@i</span>
-                        <button class="player-slot-btn player-slot-btn--gk" @onclick="() => HandleConfirmAs(FutsalPosition.Goalkeeper)"><i class="fas fa-plus"></i> Confirmar presença</button>
+                        <button class="player-slot-btn player-slot-btn--gk" @onclick="() => HandleConfirmAs(FutsalPosition.Goalkeeper)"><i class="fas fa-plus"></i> @Ui["Futsal.ConfirmPresence"]</button>
                     </li>
                 }
                 else
@@ -83,7 +84,7 @@
     @if (IsFullGk && CanConfirm)
     {
         <button class="waitlist-cta waitlist-cta--gk" @onclick="() => HandleConfirmAs(FutsalPosition.Goalkeeper)">
-            <i class="fas fa-clock"></i> Entrar na lista de espera de goleiros
+            <i class="fas fa-clock"></i> @Ui["Futsal.WaitlistGk"]
         </button>
     }
     @if (IsAdmin && Event!.IsActive && !IsPastEvent)
@@ -92,10 +93,10 @@
             <button class="slot-ctrl-btn slot-ctrl-btn--remove"
                     disabled="@(Event!.MaxGoalkeepers!.Value <= MinInfo.MinGoalkeepers || Event!.MaxGoalkeepers!.Value <= ConfirmedGk)"
                     @onclick="HandleAdminRemoveGoalkeeperSlot">
-                <i class="fas fa-minus"></i> Remover vaga de goleiro
+                <i class="fas fa-minus"></i> @Ui["Futsal.RemoveSlotGk"]
             </button>
             <button class="add-slot-row add-slot-row--gk" @onclick="HandleAdminAddGoalkeeperSlot">
-                <i class="fas fa-plus"></i> Adicionar vaga de goleiro
+                <i class="fas fa-plus"></i> @Ui["Futsal.AddSlotGk"]
             </button>
         </div>
     }
