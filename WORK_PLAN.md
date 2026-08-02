@@ -158,7 +158,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 | 22 | Cobrir services extraidos com teste | 12/12 services/formatters com teste dedicado (+174 testes; 1950->2124). 0 diff de producao. Senior corrigiu 7 warnings CS8625 em `ProfileServiceTests`. | #76 (plano), #77 (impl), #78 (review) | APROVADO |
 | 23 | UX navegacao + Pagamento V1 manual + i18n | Botao Grupos na row do Voltar (Partidas/Features), `NoGroupsHint` reutilizavel nos estados vazios (+botao), fix do link Pix (`/perfil`->`/profile/{id}`), default `EnablePaymentGateways=false` p/ grupos novos (migration so-default, sem UPDATE), i18n dos fluxos principais via `UiTextService` + regra 25. Senior fechou a ressalva na #81 (+3 testes). | #79 (plano), #80 (impl), #81 (review + testes) | APROVADO |
 
-| 24 | Pagamento V1 usavel + i18n do pagamento + cobertura do fluxo manual | (P1 do aparato) Esconder seletor de gateways quando OFF em `EventPayment.razor`; migrar strings dos fluxos de pagamento para `UiTextService`; testes de integracao do fluxo manual ponta a ponta (chave/QR -> comprovante -> confirmacao). | #83 (plano) | PLANEJADO |
+| 24 | Pagamento V1 usavel + i18n do pagamento + cobertura do fluxo manual | Seletor de gateways escondido quando OFF (`ShouldShowGateways`/`ShouldShowManualPix` extraidos e testados); i18n do fluxo de pagamento migrada (`PaymentTexts`); +6 testes de logica do ramo (fluxo manual ponta a ponta ja coberto por `PixManualPaymentFlowTests`). 2127->2133. | #83 (plano), #84 (impl), #85 (review) | APROVADO |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -168,7 +168,21 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 ---
 
-## Ciclo 24 (Pleno) -- Pagamento V1 usavel (gateways OFF) + i18n do pagamento + cobertura do fluxo manual [PLANEJADO]
+## Review Senior do Ciclo 24 (PR #84) -- APROVADO
+
+- **PR/branch**: #84 (`refactor/ciclo24-pagamento-v1-usavel-i18n`), ja na `main` (merge `79033dc`). Review nesta PR #85.
+- **Build**: `dotnet build` **0 warning / 0 error**. **Testes**: **2133 passed / 2157** (+6 vs #81); as 24 falhas sao `ProgramConfigurationTests` sem Postgres (ambiente, nao regressao).
+- **Por fase**:
+  - **Fase 1 (UX pagamento OFF) -- ATINGIDA**: em `EventPayment.razor`, o seletor `<EventPaymentGateways>` agora so renderiza sob `@if (ShouldShowGateways)`; o Pix manual + comprovante sob `@if (ShouldShowManualPix)`. A decisao foi extraida para 2 propriedades `internal` testaveis em `EventPayment.razor.cs`: `ShouldShowGateways => groupGatewaysEnabled` e `ShouldShowManualPix => !groupGatewaysEnabled || FeeOptions.Value.ShowDirectPixToOrganizer`. Em grupo manual (default V1) o jogador ve **so** o Pix direto + upload de comprovante. V2 (gateways ON) inalterado; **nada removido**.
+  - **Fase 2 (i18n do pagamento) -- ATINGIDA**: `EventPayment.razor` + os componentes de `Pages/Payment/Components/*` migrados para `@Ui["Payment.*"]`/`Ui.Get(...)`, com `string.Format` nas chaves com placeholder (data/nome). Chaves novas em `Services/Core/UiText/PaymentTexts.cs` (PT-BR baseline; algumas ja com EN/ES). Restou 1 string hardcoded em `Pages/Payment/PaymentCheckoutPanel.razor` -- **fora do escopo** deste ciclo (nao e o fluxo de partida), fica no backlog P1 de i18n.
+  - **Fase 3 (cobertura) -- ATINGIDA**: `Confirmai.Tests/Ciclo24PaymentUiLogicTests.cs` (+6 testes) cobre a matriz de `ShouldShowGateways`/`ShouldShowManualPix` (OFF esconde gateway + mostra manual; ON mostra gateway; `ShowDirectPixToOrganizer` combina). O **caminho do dinheiro** (upload -> confirmacao do organizador, pending, toggle-back, replaced proof, coexistencia) **ja estava coberto** por `PixManualPaymentFlowTests.cs` + `PixProofUploadServiceTests.cs` + `AdminConfirmationServiceTests.cs` (pre-existentes) -- por isso o Pleno nao duplicou e focou os testes novos na logica nova.
+- **Observacoes (nao-bloqueantes)**: (a) o teste instancia a pagina via `RuntimeHelpers.GetUninitializedObject` + backing-field `<FeeOptions>k__BackingField` -- funciona mas e fragil (quebra se a prop virar campo); aceitavel sem bUnit. (b) o teste redeclara um `OptionsWrapper<T>` interno, que ja existe em `Microsoft.Extensions.Options` -- cosmetico. Nenhum dos dois bloqueia.
+- **Pendencias do Robson (inalteradas)**: rotacao do ClientSecret Efi + credenciais (so V2); homologacao Efi + limites (V2); nota fiscal da taxa (V2); OAuth Google prod + SMTP; `SyncPassword=false`/mTLS webhook em prod.
+- **Proximo (backlog P1 restante)**: continuar i18n das demais telas (Detail, Payments, MyEvents, PaymentCheckoutPanel), esconder gateway tambem onde aplicavel, e o P2 (catch{} logando, estados vazios padronizados, consistencia de idioma no `UiTextService`).
+
+---
+
+## Ciclo 24 (Pleno) -- Pagamento V1 usavel (gateways OFF) + i18n do pagamento + cobertura do fluxo manual [EXECUTADO -- ver review acima]
 
 **Objetivo**: fechar o P1 do "Aparato Geral do Senior" para o V1 ficar pronto para uso real. Hoje o default e **manual** (`EnablePaymentGateways=false`, decidido no Ciclo 23), mas a tela de pagamento ainda mostra UI de gateway e boa parte das strings do fluxo esta hardcoded. Este ciclo deixa o caminho do dinheiro do V1 limpo, traduzido e coberto por teste.
 
