@@ -131,7 +131,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 | 20 | SOLID + CSS modular + remover legacy | 7 code-behinds reduzidos (`AdminPayments` 1046->666 etc.), `admin/escalacao/payments.css` extraidos, `serviceFeePercentage` removido. | #70 (plano), #71 (impl), #72 (review) | APROVADO |
 | 21 | Fechar refatoracao (code-behinds + CSS + higiene) | 0 code-behind > 250 LOC; `site.css`/`events.css` ao core; 0 warning de analisador nos testes. Ressalva: services extraidos sem teste. | #73 (plano), #74 (impl), #75 (review) | APROVADO c/ 1 ressalva |
 | 22 | Cobrir services extraidos com teste | 12/12 services/formatters com teste dedicado (+174 testes; 1950->2124). 0 diff de producao. Senior corrigiu 7 warnings CS8625 em `ProfileServiceTests`. | #76 (plano), #77 (impl), #78 (review) | APROVADO |
-| 23 | UX navegacao + Pagamento V1 manual + i18n | Requisitos de teste do Robson: botao Grupos na row do Voltar (Partidas), card "Como funciona" + botao em estados vazios, fix do link Pix quebrado (`/perfil`->404), fluxo **manual** como default (Pix automatico -> V2), auditoria+regra de i18n. | #<plano> | PLANEJADO |
+| 23 | UX navegacao + Pagamento V1 manual + i18n | Botao Grupos na row do Voltar (Partidas/Features), `NoGroupsHint` reutilizavel nos estados vazios (+botao), fix do link Pix (`/perfil`->`/profile/{id}`), default `EnablePaymentGateways=false` p/ grupos novos (migration so-default, sem UPDATE), i18n dos fluxos principais via `UiTextService` + regra 25. | #79 (plano), #80 (impl), #81 (review) | APROVADO c/ 1 ressalva (0 testes novos) |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -141,7 +141,22 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 ---
 
-## Ciclo 23 (Pleno) -- UX de navegacao + Pagamento V1 (fluxo manual como default) + i18n [PLANEJADO]
+## Review Senior do Ciclo 23 (PR #80) -- APROVADO com 1 ressalva (0 testes novos)
+
+- **PR/branch**: #80 (`refactor/ciclo23-ux-nav-pagamento-i18n`), ja na `main` (merge `cb6c89a`). Review nesta PR #81.
+- **Build**: `dotnet build` **0 warning / 0 error**. **Testes**: **2124 passed / 2148** (as 24 falhas sao os `ProgramConfigurationTests` sem Postgres local -- ambiente, nao regressao). Contagem igual ao Ciclo 22 -> **nenhum teste novo** (ver ressalva).
+- **Por fase**:
+  - **Fase 1 (navegacao) -- ATINGIDA**: botao "Grupos" (`/grupos`) na mesma `detail-header-top` do "Voltar" em `Partidas.razor` e `Features.razor` (classe `detail-back-link--groups`). Card "Como funciona" extraido para componente compartilhado `Shared/Components/Groups/NoGroupsHint.razor` (param `ShowGroupsButton` + CTA "Acessar grupos"), reutilizado em `Groups/Index` (sem botao, ja e a tela de grupos) e em `Pages/Index.razor` (`/eventos`, com botao, em 2 pontos). Sem duplicacao de markup.
+  - **Fase 2 (pagamento V1 manual) -- ATINGIDA**: (a) **bug do 404 corrigido** -- `PixReceiverSelector` agora aponta para `/profile/{CurrentUserId}` (parametro novo, cabeado em `Features.razor`) em vez de `/perfil` inexistente; (b) **default invertido** -- `Group.EnablePaymentGateways = false` + migration `20260801030000_DefaultEnablePaymentGatewaysFalse` que so faz `ALTER COLUMN ... SET DEFAULT false` (**sem `UPDATE`** -> grupos existentes inalterados, respeita a licao do Ciclo 19); snapshot regenerado; (c) **codigo do Pix automatico preservado** (gateway/`PayoutService`/`EfiBankPixPayoutService`/webhook/retry intactos) -- V2 atras do toggle.
+  - **Fase 3 (i18n) -- ATINGIDA**: strings dos fluxos principais migradas para `UiTextService` (dominios `Groups`/`Onboarding`/`Payment` em `Services/Core/UiText/CoreTexts.cs`, ~40 chaves PT-BR). Regra 25 em vigor; strings novas das Fases 1/2 ja nasceram via `@Ui[...]`.
+- **Ressalva (NAO bloqueante)**: o plano pedia teste do fix do link (rota valida) e teste de caracterizacao do novo default. **Nenhum teste novo foi adicionado** (2124->2124). E a mesma divida de processo do Ciclo 21 -- as mudancas sao verificaveis e sem regressao, mas a cobertura do default flip e do wiring do `CurrentUserId` fica em aberto. Sugiro cobrir no proximo ciclo de testes.
+- **Higiene (corrigido nesta review)**: a PR #80 commitou por engano um artefato de teste manual `wwwroot/uploads/groups/0f48c3cf-...png` (nao referenciado no codigo) -- **removido** nesta PR de review.
+- **Pendencias do Robson (inalteradas)**: rotacionar ClientSecret Efi + reconfigurar credenciais (adiado, viagem); validar Envio de Pix Efi em homologacao; nota fiscal da taxa com contador; OAuth Google prod + SMTP; `SyncPassword=false`/mTLS webhook em prod. (Obs.: com o V1 manual, o Envio de Pix Efi so bloqueia o V2.)
+- **Proximo ciclo (sugestao)**: ciclo de testes cobrindo o default flip + `CurrentUserId`, e continuar a i18n nas demais telas (baseline PT-BR ok; EN/ES depois).
+
+---
+
+## Ciclo 23 (Pleno) -- UX de navegacao + Pagamento V1 (fluxo manual como default) + i18n [EXECUTADO -- ver review acima]
 
 **Origem**: requisitos levantados pelo Robson testando o app + retorno do Pleno (regra 22 -- requisitos de teste sao legitimos e entram no plano). Este ciclo destrava o **go-live V1**: pagamento simples (manual) por padrao, navegacao mais fluida e i18n auditada.
 
