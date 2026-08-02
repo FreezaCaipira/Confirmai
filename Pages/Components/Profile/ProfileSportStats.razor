@@ -1,14 +1,16 @@
 @using Confirmai.Enums
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 <div class="profile-sport-card">
     <div class="profile-sport-tabs" role="tablist">
         <button class="profile-sport-tab @(ActiveSport == Sport.Futsal ? "active" : string.Empty)"
                 role="tab" type="button" @onclick='() => HandleSetSport(Sport.Futsal)'>
-            ⚽ Futsal
+            @T["Profile.SportFutsal"]
         </button>
         <button class="profile-sport-tab @(ActiveSport == Sport.Poker ? "active" : string.Empty)"
                 role="tab" type="button" @onclick='() => HandleSetSport(Sport.Poker)'>
-            🃏 Poker
+            @T["Profile.SportPoker"]
         </button>
     </div>
 
@@ -17,15 +19,15 @@
         <div class="profile-sport-stats" role="tabpanel">
             <div class="profile-stat-item">
                 <span class="profile-stat-number">@FutsalTotal</span>
-                <span class="profile-stat-label">Partidas</span>
+                <span class="profile-stat-label">@T["Profile.StatMatches"]</span>
             </div>
             <div class="profile-stat-item">
                 <span class="profile-stat-number">@FutsalOutfieldTotal</span>
-                <span class="profile-stat-label">Jogador de linha</span>
+                <span class="profile-stat-label">@T["Profile.StatOutfield"]</span>
             </div>
             <div class="profile-stat-item">
                 <span class="profile-stat-number">@FutsalGoalkeeperTotal</span>
-                <span class="profile-stat-label">Goleiro</span>
+                <span class="profile-stat-label">@T["Profile.StatGoalkeeper"]</span>
             </div>
         </div>
     }
@@ -34,7 +36,7 @@
         <div class="profile-sport-stats" role="tabpanel">
             <div class="profile-stat-item">
                 <span class="profile-stat-number">@PokerTotal</span>
-                <span class="profile-stat-label">Sessões</span>
+                <span class="profile-stat-label">@T["Profile.StatSessions"]</span>
             </div>
         </div>
     }

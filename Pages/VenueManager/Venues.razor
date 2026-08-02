@@ -11,29 +11,29 @@
 @using System.Security.Claims
 
 
-<PageTitle>Minhas Quadras — Confirmai</PageTitle>
+<PageTitle>@T["VenueManager.Title"] — Confirmai</PageTitle>
 
 <div class="entity-shell admin-page">
 
-    <section class="entity-shell-grid" aria-label="Gerenciamento de quadras">
+    <section class="entity-shell-grid" aria-label="@T["VenueManager.Aria"]">
         <article class="entity-shell-card entity-shell-main">
             <div class="page-section-header">
-                <h1 class="page-section-title">Minhas Quadras</h1>
+                <h1 class="page-section-title">@T["VenueManager.Title"]</h1>
                 <button class="success-btn" type="button"
                         @onclick='() => NavigationManager.NavigateTo("/venue-manager/venues/edit/0")'>
-                    <i class="fas fa-plus"></i> Nova Quadra
+                    <i class="fas fa-plus"></i> @T["VenueManager.AddNew"]
                 </button>
             </div>
 
             @if (isLoading)
             {
-                <p class="listing-state">Carregando…</p>
+                <p class="listing-state">@T["VenueManager.Loading"]</p>
             }
             else if (!venues.Any())
             {
                 <div class="listing-state listing-empty">
-                    <p>Você ainda não cadastrou nenhuma quadra.</p>
-                    <p class="listing-empty-hint">Use o botão "Nova Quadra" para começar.</p>
+                    <p>@T["VenueManager.Empty"]</p>
+                    <p class="listing-empty-hint">@T["VenueManager.EmptyHint"]</p>
                 </div>
             }
             else
@@ -41,44 +41,44 @@
                 <table class="product-table">
                     <thead>
                         <tr>
-                            <th>Nome</th>
-                            <th>Tipo</th>
-                            <th>Cidade / UF</th>
-                            <th>Status</th>
-                            <th>Ações</th>
+                            <th>@T["VenueManager.ColName"]</th>
+                            <th>@T["VenueManager.ColType"]</th>
+                            <th>@T["VenueManager.ColCity"]</th>
+                            <th>@T["VenueManager.ColStatus"]</th>
+                            <th>@T["VenueManager.ColActions"]</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var v in venues)
                         {
                             <tr>
-                                <td data-label="Nome">@v.Name</td>
-                                <td data-label="Tipo">
+                                <td data-label="@T["VenueManager.ColName"]">@v.Name</td>
+                                <td data-label="@T["VenueManager.ColType"]">
                                     <span class="venue-type-badge venue-type-@v.Type.ToString().ToLower()">
                                         @VenueTypeLabel(v.Type)
                                     </span>
                                 </td>
-                                <td data-label="Cidade / UF">@v.City — @v.StateCode</td>
-                                <td data-label="Status">
+                                <td data-label="@T["VenueManager.ColCity"]">@v.City — @v.StateCode</td>
+                                <td data-label="@T["VenueManager.ColStatus"]">
                                     @if (v.IsActive)
                                     {
-                                        <span class="entity-shell-chip ok">Ativa</span>
+                                        <span class="entity-shell-chip ok">@T["VenueManager.StatusActive"]</span>
                                     }
                                     else
                                     {
-                                        <span class="entity-shell-chip warn">Inativa</span>
+                                        <span class="entity-shell-chip warn">@T["VenueManager.StatusInactive"]</span>
                                     }
                                 </td>
-                                <td data-label="Ações">
+                                <td data-label="@T["VenueManager.ColActions"]">
                                     @if (confirmDeleteId == v.Id)
                                     {
                                         <div class="admin-actions-row">
-                                            <span class="admin-delete-prompt">Remover?</span>
-                                            <button class="danger-btn action-btn icon-only" title="Confirmar remoção"
+                                            <span class="admin-delete-prompt">@T["VenueManager.ConfirmDelete"]</span>
+                                            <button class="danger-btn action-btn icon-only" title="@T["Common.Confirm"]"
                                                     @onclick='() => DeleteVenue(v.Id)'>
                                                 <i class="fas fa-check"></i>
                                             </button>
-                                            <button class="cancel-btn action-btn icon-only" title="Cancelar"
+                                            <button class="cancel-btn action-btn icon-only" title="@T["Common.Cancel"]"
                                                     @onclick='() => confirmDeleteId = null'>
                                                 <i class="fas fa-times"></i>
                                             </button>
@@ -89,12 +89,12 @@
                                         <div class="admin-actions-row">
                                             <button class="edit-btn action-btn icon-only"
                                                     @onclick='() => NavigationManager.NavigateTo($"/venue-manager/venues/edit/{v.Id}")'
-                                                    title="Editar" aria-label="Editar">
+                                                    title="@T["VenueManager.Edit"]" aria-label="@T["VenueManager.Edit"]">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </button>
                                             <button class="danger-btn action-btn icon-only"
                                                     @onclick='() => { confirmDeleteId = v.Id; deleteError = string.Empty; }'
-                                                    title="Remover" aria-label="Remover">
+                                                    title="@T["VenueManager.Delete"]" aria-label="@T["VenueManager.Delete"]">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>

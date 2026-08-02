@@ -1,18 +1,21 @@
+@using Confirmai.Services.Core
+@inject UiTextService T
+
 @if (!string.IsNullOrWhiteSpace(Feedback))
 {
     <p class="profile-feedback" role="status">@Feedback</p>
 }
 
 <textarea class="mk-input profile-chat-textarea" rows="3" maxlength="4000"
-          placeholder="Digite sua mensagem..." @bind="localMessageBody"></textarea>
+          placeholder="@T["Profile.ChatPlaceholder"]" @bind="localMessageBody"></textarea>
 
 <div class="profile-chat-actions">
     <button class="mk-btn mk-btn-primary" type="button"
             @onclick="HandleSendMessage" disabled="@IsSending">
-        @(IsSending ? "Enviando..." : "Enviar")
+        @(IsSending ? T["Profile.Sending"] : T["Profile.Send"])
     </button>
     @if (ShowRefreshButton)
     {
-        <button class="mk-btn" type="button" @onclick="HandleRefreshChat">Atualizar</button>
+        <button class="mk-btn" type="button" @onclick="HandleRefreshChat">@T["Profile.Refresh"]</button>
     }
 </div>

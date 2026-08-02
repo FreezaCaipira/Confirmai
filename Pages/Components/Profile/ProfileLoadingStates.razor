@@ -1,11 +1,14 @@
+@using Confirmai.Services.Core
+@inject UiTextService T
+
 @if (IsLoading)
 {
-    <div class="loading-spinner">Carregando...</div>
+    <div class="loading-spinner">@T["Profile.LoadingShort"]</div>
 }
 else if (UserNotFound)
 {
     <div class="detail-not-found">
-        <h2>Perfil não encontrado.</h2>
-        <a href="/">← Início</a>
+        <h2>@T["Profile.NotFoundShort"]</h2>
+        <a href="/">@T["Profile.Home"]</a>
     </div>
 }

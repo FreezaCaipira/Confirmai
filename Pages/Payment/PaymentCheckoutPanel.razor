@@ -24,8 +24,8 @@
                         <span class="tibia-pay-switch-lever" aria-hidden="true"></span>
                         <span class="tibia-pay-switch-text">
                             @(UseSiteIntermediary
-                                ? "Com intermedio do ADM do site"
-                                : "Sem intermedio do ADM do site")
+                                ? T["PaymentBuy.WithIntermediary"]
+                                : T["PaymentBuy.WithoutIntermediary"])
                         </span>
                     </label>
                 </div>
@@ -33,12 +33,12 @@
                 {
                     <div class="tibia-pay-no-intermediary-warning">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <span>Sem intermediação, o pagamento vai diretamente ao vendedor. Só prossiga se você <strong>confia totalmente no vendedor</strong>. O site não poderá mediar disputas nesta transação.</span>
+                        <span>@((MarkupString)T["PaymentBuy.NoIntermediaryWarning"])</span>
                     </div>
                 }
 
                 <div class="tibia-pay-field">
-                    <label class="tibia-pay-label" for="payment-method">Forma de pagamento:</label>
+                    <label class="tibia-pay-label" for="payment-method">@T["PaymentBuy.PaymentMethod"]</label>
                     <select id="payment-method" class="tibia-pay-select" @bind="SelectedMethod" @bind:after="HandleMethodChanged" aria-label="@T["PaymentBuy.SelectGateway"]">
                         @foreach (var gateway in ActiveGateways)
                         {
@@ -74,7 +74,7 @@
                 <div class="tibia-pay-label">@(IsPixCurrentPayment ? T["PaymentBuy.PixCodeLabel"] : T["PaymentBuy.InvoiceAddress"])</div>
                 <div class="tibia-pay-address-wrap">
                     <div class="tibia-pay-address">@Address</div>
-                    <button class="tibia-pay-copy-btn" @onclick="HandleCopyAddress" title="Copiar" aria-label="Copiar codigo">
+                    <button class="tibia-pay-copy-btn" @onclick="HandleCopyAddress" title="@T["PaymentBuy.Copy"]" aria-label="@T["PaymentBuy.CopyCode"]">
                         <i class="@CopyIcon"></i>
                     </button>
                 </div>
@@ -93,7 +93,7 @@
                     else
                     {
                         <div class="tibia-pay-waiting-message" role="status" aria-live="polite">
-                            <span class="tibia-pay-waiting-title">@(IsPixCurrentPayment && !AbacatePayIsEnabled ? "Aguardando confirmacao manual do pagamento PIX." : T["PaymentBuy.Waiting"])</span>
+                            <span class="tibia-pay-waiting-title">@(IsPixCurrentPayment && !AbacatePayIsEnabled ? T["PaymentBuy.WaitingManualPix"] : T["PaymentBuy.Waiting"])</span>
                         </div>
                         @if (!IsPixCurrentPayment || AbacatePayIsEnabled)
                         {

@@ -1,6 +1,6 @@
 @using Confirmai.Data
 
-<section class="mailbox-filters" aria-label="Filtros da caixa postal">
+<section class="mailbox-filters" aria-label="@T["Mailbox.FiltersAria"]">
     <div class="mailbox-filter-field">
         <label for="mailbox-search">@T["Mailbox.FilterSearch"]</label>
         <input id="mailbox-search" class="mailbox-search mk-input" @bind="SearchTerm" @bind:event="oninput" />

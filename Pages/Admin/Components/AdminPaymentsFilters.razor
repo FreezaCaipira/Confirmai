@@ -1,23 +1,25 @@
 @using Confirmai.Services
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 <div class="filter-bar admin-filter-card">
-    <input type="text" placeholder="User ID" @bind="filterUserId" @bind:event="oninput" />
-    <input type="number" placeholder="Min amount" @bind="filterMinAmount" min="0" />
-    <input type="number" placeholder="Max amount" @bind="filterMaxAmount" min="0" />
+    <input type="text" placeholder="@T["AdminPayments.FilterUserId"]" @bind="filterUserId" @bind:event="oninput" />
+    <input type="number" placeholder="@T["AdminPayments.Filter.Min"]" @bind="filterMinAmount" min="0" />
+    <input type="number" placeholder="@T["AdminPayments.Filter.Max"]" @bind="filterMaxAmount" min="0" />
     <select @bind="filterStatus">
-        <option value="">All statuses</option>
-        <option value="paid">Paid</option>
-        <option value="pending">Pending</option>
+        <option value="">@T["AdminPayments.Filter.AllStatuses"]</option>
+        <option value="paid">@T["AdminPayments.StatusPaid"]</option>
+        <option value="pending">@T["AdminPayments.StatusPending"]</option>
     </select>
     <input type="date" @bind="filterDate" />
-    <button type="button" @onclick="ApplyFilters">Filter</button>
-    <button type="button" @onclick="ClearFilters">Clear</button>
+    <button type="button" @onclick="ApplyFilters">@T["AdminPayments.FilterButton"]</button>
+    <button type="button" @onclick="ClearFilters">@T["AdminPayments.ClearButton"]</button>
 </div>
 
 @if (ShowRestoredNotice)
 {
     <div class="orders-review-restored-notice">
-        <span>Previous filters have been restored.</span>
+        <span>@T["AdminPayments.RestoredFilters"]</span>
         <button type="button" class="orders-review-restored-close" @onclick="DismissNotice" aria-label="Close">&times;—</button>
     </div>
 }

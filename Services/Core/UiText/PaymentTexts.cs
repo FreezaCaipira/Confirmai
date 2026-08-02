@@ -206,6 +206,54 @@ internal static class PaymentTexts
         ["Payment.SummaryGoalkeeper"] = "Goleiro",
         ["Payment.SummaryOutfield"] = "Linha",
         ["Payment.SummaryAmount"] = "Valor a pagar",
+
+        // PaymentBuy checkout panel
+        ["PaymentBuy.GeneratePayment"] = "Gerar pagamento",
+        ["PaymentBuy.NoMethod"] = "Nenhum método de pagamento disponível",
+        ["PaymentBuy.NoMethodHint"] = "Tente novamente em instantes ou contate o suporte.",
+        ["PaymentBuy.WithIntermediary"] = "Com intermédio do ADM do site",
+        ["PaymentBuy.WithoutIntermediary"] = "Sem intermédio do ADM do site",
+        ["PaymentBuy.NoIntermediaryWarning"] = "Sem intermediação, o pagamento vai diretamente ao vendedor. Só prossiga se você <strong>confia totalmente no vendedor</strong>. O site não poderá mediar disputas nesta transação.",
+        ["PaymentBuy.PaymentMethod"] = "Forma de pagamento:",
+        ["PaymentBuy.SelectGateway"] = "Selecionar gateway",
+        ["PaymentBuy.GenerateAddress"] = "Gerar endereço de pagamento",
+        ["PaymentBuy.PixCodeLabel"] = "Código Pix",
+        ["PaymentBuy.InvoiceAddress"] = "Endereço da fatura",
+        ["PaymentBuy.Copy"] = "Copiar",
+        ["PaymentBuy.CopyCode"] = "Copiar código",
+        ["PaymentBuy.PaidReceived"] = "Pago recebido",
+        ["PaymentBuy.Waiting"] = "Aguardando pagamento…",
+        ["PaymentBuy.WaitingManualPix"] = "Aguardando confirmação manual do pagamento PIX.",
+        ["PaymentBuy.Check"] = "Verificar pagamento",
+        ["PaymentBuy.PrivateKey"] = "Chave privada",
+        ["PaymentBuy.PrivateKeyWarning"] = "Guarde esta chave em local seguro. Ela não será exibida novamente.",
+        ["PaymentBuy.LoadingProduct"] = "Carregando produto…",
+
+        // Payment product summary
+        ["PaymentProductSummary.Title"] = "Resumo da oferta",
+        ["PaymentProductSummary.ItemAria"] = "Resumo do item",
+        ["PaymentProductSummary.ImageAlt"] = "Imagem do produto",
+        ["PaymentProductSummary.Item"] = "Item",
+        ["PaymentProductSummary.Name"] = "Nome",
+        ["PaymentProductSummary.Quantity"] = "Quantidade",
+        ["PaymentProductSummary.UnitPrice"] = "Valor unitário",
+        ["PaymentProductSummary.TotalPrice"] = "Valor total",
+        ["PaymentProductSummary.Seller"] = "Vendedor:",
+
+        // Payment view extra
+        ["PaymentView.Rechecking"] = "Reconfirmando...",
+        ["PaymentView.CheckingGateways"] = "Consultando gateways para confirmar o pagamento...",
+        ["PaymentView.Aria"] = "Visualizar pagamento",
+        ["PaymentView.Checkout"] = "Checkout",
+        ["PaymentView.OpenCheckout"] = "Abrir checkout no {0}",
+        ["PaymentView.QrHint"] = "Escaneie o QR Code no site do {0} para concluir o pagamento.",
+        ["PaymentDetails.Aria"] = "Detalhes do pagamento",
+        ["PaymentDetails.PaymentId"] = "ID do pagamento",
+        ["PaymentDetails.PaidAt"] = "Pago em",
+
+        // Payment history export
+        ["PaymentHistory.ExportCsv"] = "Exportar CSV",
+        ["PaymentHistory.ExportPdf"] = "Exportar PDF",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
@@ -351,6 +399,54 @@ internal static class PaymentTexts
         ["Marketplace.MyListings"] = "My listings",
         ["Marketplace.MyPurchases"] = "My purchases",
         ["Marketplace.MySales"] = "My sales",
+
+        // PaymentBuy checkout panel
+        ["PaymentBuy.GeneratePayment"] = "Generate payment",
+        ["PaymentBuy.NoMethod"] = "No payment method available",
+        ["PaymentBuy.NoMethodHint"] = "Try again in a moment or contact support.",
+        ["PaymentBuy.WithIntermediary"] = "With site admin intermediary",
+        ["PaymentBuy.WithoutIntermediary"] = "Without site admin intermediary",
+        ["PaymentBuy.NoIntermediaryWarning"] = "Without intermediation, payment goes directly to the seller. Only proceed if you <strong>fully trust the seller</strong>. The site cannot mediate disputes for this transaction.",
+        ["PaymentBuy.PaymentMethod"] = "Payment method:",
+        ["PaymentBuy.SelectGateway"] = "Select gateway",
+        ["PaymentBuy.GenerateAddress"] = "Generate payment address",
+        ["PaymentBuy.PixCodeLabel"] = "Pix code",
+        ["PaymentBuy.InvoiceAddress"] = "Invoice address",
+        ["PaymentBuy.Copy"] = "Copy",
+        ["PaymentBuy.CopyCode"] = "Copy code",
+        ["PaymentBuy.PaidReceived"] = "Payment received",
+        ["PaymentBuy.Waiting"] = "Waiting for payment…",
+        ["PaymentBuy.WaitingManualPix"] = "Waiting for manual confirmation of PIX payment.",
+        ["PaymentBuy.Check"] = "Check payment",
+        ["PaymentBuy.PrivateKey"] = "Private key",
+        ["PaymentBuy.PrivateKeyWarning"] = "Keep this key in a safe place. It will not be shown again.",
+        ["PaymentBuy.LoadingProduct"] = "Loading product…",
+
+        // Payment product summary
+        ["PaymentProductSummary.Title"] = "Offer summary",
+        ["PaymentProductSummary.ItemAria"] = "Item summary",
+        ["PaymentProductSummary.ImageAlt"] = "Product image",
+        ["PaymentProductSummary.Item"] = "Item",
+        ["PaymentProductSummary.Name"] = "Name",
+        ["PaymentProductSummary.Quantity"] = "Quantity",
+        ["PaymentProductSummary.UnitPrice"] = "Unit price",
+        ["PaymentProductSummary.TotalPrice"] = "Total price",
+        ["PaymentProductSummary.Seller"] = "Seller:",
+
+        // Payment view extra
+        ["PaymentView.Rechecking"] = "Rechecking...",
+        ["PaymentView.CheckingGateways"] = "Querying gateways to confirm payment...",
+        ["PaymentView.Aria"] = "View payment",
+        ["PaymentView.Checkout"] = "Checkout",
+        ["PaymentView.OpenCheckout"] = "Open checkout on {0}",
+        ["PaymentView.QrHint"] = "Scan the QR Code on the {0} website to complete the payment.",
+        ["PaymentDetails.Aria"] = "Payment details",
+        ["PaymentDetails.PaymentId"] = "Payment ID",
+        ["PaymentDetails.PaidAt"] = "Paid at",
+
+        // Payment history export
+        ["PaymentHistory.ExportCsv"] = "Export CSV",
+        ["PaymentHistory.ExportPdf"] = "Export PDF",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
@@ -486,6 +582,54 @@ internal static class PaymentTexts
         ["Marketplace.MyListings"] = "Mis anuncios",
         ["Marketplace.MyPurchases"] = "Mis compras",
         ["Marketplace.MySales"] = "Mis ventas",
+
+        // PaymentBuy checkout panel
+        ["PaymentBuy.GeneratePayment"] = "Generar pago",
+        ["PaymentBuy.NoMethod"] = "Ningun metodo de pago disponible",
+        ["PaymentBuy.NoMethodHint"] = "Intente nuevamente en un momento o contacte soporte.",
+        ["PaymentBuy.WithIntermediary"] = "Con intermediacion del ADM del sitio",
+        ["PaymentBuy.WithoutIntermediary"] = "Sin intermediacion del ADM del sitio",
+        ["PaymentBuy.NoIntermediaryWarning"] = "Sin intermediacion, el pago va directamente al vendedor. Solo continue si <strong>confia totalmente en el vendedor</strong>. El sitio no podra mediar disputas en esta transaccion.",
+        ["PaymentBuy.PaymentMethod"] = "Forma de pago:",
+        ["PaymentBuy.SelectGateway"] = "Seleccionar gateway",
+        ["PaymentBuy.GenerateAddress"] = "Generar direccion de pago",
+        ["PaymentBuy.PixCodeLabel"] = "Codigo Pix",
+        ["PaymentBuy.InvoiceAddress"] = "Direccion de factura",
+        ["PaymentBuy.Copy"] = "Copiar",
+        ["PaymentBuy.CopyCode"] = "Copiar codigo",
+        ["PaymentBuy.PaidReceived"] = "Pago recibido",
+        ["PaymentBuy.Waiting"] = "Esperando pago…",
+        ["PaymentBuy.WaitingManualPix"] = "Esperando confirmacion manual del pago PIX.",
+        ["PaymentBuy.Check"] = "Verificar pago",
+        ["PaymentBuy.PrivateKey"] = "Clave privada",
+        ["PaymentBuy.PrivateKeyWarning"] = "Guarde esta clave en un lugar seguro. No se mostrara nuevamente.",
+        ["PaymentBuy.LoadingProduct"] = "Cargando producto…",
+
+        // Payment product summary
+        ["PaymentProductSummary.Title"] = "Resumen de oferta",
+        ["PaymentProductSummary.ItemAria"] = "Resumen del item",
+        ["PaymentProductSummary.ImageAlt"] = "Imagen del producto",
+        ["PaymentProductSummary.Item"] = "Item",
+        ["PaymentProductSummary.Name"] = "Nombre",
+        ["PaymentProductSummary.Quantity"] = "Cantidad",
+        ["PaymentProductSummary.UnitPrice"] = "Precio unitario",
+        ["PaymentProductSummary.TotalPrice"] = "Precio total",
+        ["PaymentProductSummary.Seller"] = "Vendedor:",
+
+        // Payment view extra
+        ["PaymentView.Rechecking"] = "Reconfirmando...",
+        ["PaymentView.CheckingGateways"] = "Consultando gateways para confirmar el pago...",
+        ["PaymentView.Aria"] = "Ver pago",
+        ["PaymentView.Checkout"] = "Checkout",
+        ["PaymentView.OpenCheckout"] = "Abrir checkout en {0}",
+        ["PaymentView.QrHint"] = "Escanee el codigo QR en el sitio de {0} para completar el pago.",
+        ["PaymentDetails.Aria"] = "Detalles del pago",
+        ["PaymentDetails.PaymentId"] = "ID del pago",
+        ["PaymentDetails.PaidAt"] = "Pagado en",
+
+        // Payment history export
+        ["PaymentHistory.ExportCsv"] = "Exportar CSV",
+        ["PaymentHistory.ExportPdf"] = "Exportar PDF",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

@@ -45,13 +45,13 @@
             Cities="@Cities" />
     </div>
 
-    <section class="sports-grid" aria-label="Esportes disponíveis">
+    <section class="sports-grid" aria-label="@Ui["Index.SportsAvailable"]">
         <SportCard Sport="Sport.Futsal" Href="@FutsalHref" Description="@Ui["Index.FutsalCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@futsalMatchCount" />
         <SportCard Sport="Sport.Poker" Href="@PokerHref" Description="@Ui["Index.PokerCardDesc"]" CtaText="@Ui["Index.ViewTournaments"]" MatchCount="@pokerMatchCount" ComingSoon="true" />
-        <SportCard Sport="Sport.Volleyball" Href="@VolleyballHref" Description="Partidas de vôlei" CtaText="Ver partidas →" MatchCount="@volleyballMatchCount" ComingSoon="true" />
-        <SportCard Sport="Sport.BeachTennis" Href="@BeachTennisHref" Description="Partidas de beach tennis" CtaText="Ver partidas →" MatchCount="@beachTennisMatchCount" ComingSoon="true" />
-        <SportCard Sport="Sport.Footvolley" Href="@FootvolleyHref" Description="Partidas de futevôlei" CtaText="Ver partidas →" MatchCount="@footvolleyMatchCount" ComingSoon="true" />
-        <SportCard Sport="Sport.Chess" Href="@ChessHref" Description="Partidas de xadrez" CtaText="Ver partidas →" MatchCount="@chessMatchCount" ComingSoon="true" />
+        <SportCard Sport="Sport.Volleyball" Href="@VolleyballHref" Description="@Ui["Index.VolleyballCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@volleyballMatchCount" ComingSoon="true" />
+        <SportCard Sport="Sport.BeachTennis" Href="@BeachTennisHref" Description="@Ui["Index.BeachTennisCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@beachTennisMatchCount" ComingSoon="true" />
+        <SportCard Sport="Sport.Footvolley" Href="@FootvolleyHref" Description="@Ui["Index.FootvolleyCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@footvolleyMatchCount" ComingSoon="true" />
+        <SportCard Sport="Sport.Chess" Href="@ChessHref" Description="@Ui["Index.ChessCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@chessMatchCount" ComingSoon="true" />
     </section>
 
     @if (activeTab == TabMyGames)
@@ -76,18 +76,18 @@
                     {
                         <div class="my-conf-filters">
                             <select class="my-conf-filter" @bind="filterSport">
-                                <option value="">Todos os esportes</option>
-                                <option value="Futsal">⚽ Futsal</option>
-                                <option value="Poker">🃏 Poker</option>
-                                <option value="Volleyball">🏐 Vôlei</option>
-                                <option value="BeachTennis">🎾 Beach Tennis</option>
-                                <option value="Footvolley">🏖️ Futevôlei</option>
-                                <option value="Chess">♟️ Xadrez</option>
+                                <option value="">@Ui["Index.FilterAllSports"]</option>
+                                <option value="Futsal">@Ui["Index.SportFutsal"]</option>
+                                <option value="Poker">@Ui["Index.SportPoker"]</option>
+                                <option value="Volleyball">@Ui["Index.SportVolleyball"]</option>
+                                <option value="BeachTennis">@Ui["Index.SportBeachTennis"]</option>
+                                <option value="Footvolley">@Ui["Index.SportFootvolley"]</option>
+                                <option value="Chess">@Ui["Index.SportChess"]</option>
                             </select>
                             <select class="my-conf-filter" @bind="filterPeriod">
-                                <option value="all">Todos os períodos</option>
-                                <option value="7days">Últimos 7 dias</option>
-                                <option value="30days">Últimos 30 dias</option>
+                                <option value="all">@Ui["Index.FilterAllPeriods"]</option>
+                                <option value="7days">@Ui["Index.FilterLast7Days"]</option>
+                                <option value="30days">@Ui["Index.FilterLast30Days"]</option>
                             </select>
                         </div>
 

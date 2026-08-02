@@ -1,40 +1,42 @@
 @using Confirmai.Models
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 <section class="tibia-pay-card tibia-pay-card-product">
     <div class="tibia-pay-card-head">
-        <h2>Resumo da oferta</h2>
+        <h2>@T["PaymentProductSummary.Title"]</h2>
     </div>
     <div class="tibia-pay-card-body">
         <article class="tibia-pay-item-card">
-            <div class="tibia-pay-item-subcard" role="group" aria-label="Resumo do item">
+            <div class="tibia-pay-item-subcard" role="group" aria-label="@T["PaymentProductSummary.ItemAria"]">
                 <div class="tibia-pay-item-media">
                     <div class="tibia-pay-product-image">
                         @if (Product != null && !string.IsNullOrEmpty(Product.ImagePath))
                         {
-                            <img src="@Product.ImagePath" alt="Product image" />
+                            <img src="@Product.ImagePath" alt="@T["PaymentProductSummary.ImageAlt"]" />
                         }
                     </div>
                 </div>
                 @if (Product != null)
                 {
                     <div class="tibia-pay-item-row">
-                        <span class="tibia-pay-label">Item</span>
+                        <span class="tibia-pay-label">@T["PaymentProductSummary.Item"]</span>
                         <span class="tibia-pay-value"><b>@Product.Name</b></span>
                     </div>
                     <div class="tibia-pay-item-row">
-                        <span class="tibia-pay-label">Nome</span>
+                        <span class="tibia-pay-label">@T["PaymentProductSummary.Name"]</span>
                         <span class="tibia-pay-value">@Product.Name</span>
                     </div>
                     <div class="tibia-pay-item-row">
-                        <span class="tibia-pay-label">Quantidade</span>
+                        <span class="tibia-pay-label">@T["PaymentProductSummary.Quantity"]</span>
                         <span class="tibia-pay-value"><b>@SelectedQuantity</b></span>
                     </div>
                     <div class="tibia-pay-item-row tibia-pay-item-row-price">
-                        <span class="tibia-pay-label">Valor unitario</span>
+                        <span class="tibia-pay-label">@T["PaymentProductSummary.UnitPrice"]</span>
                         <span class="tibia-pay-value tibia-pay-value-price">@FormatOfferPrice(GetUnitPriceAmount())</span>
                     </div>
                     <div class="tibia-pay-item-row tibia-pay-item-row-price tibia-pay-item-row-total">
-                        <span class="tibia-pay-label">Valor total</span>
+                        <span class="tibia-pay-label">@T["PaymentProductSummary.TotalPrice"]</span>
                         <span class="tibia-pay-value tibia-pay-value-price tibia-pay-value-total">@FormatOfferPrice(TotalAmount)</span>
                     </div>
                 }
@@ -42,7 +44,7 @@
 
             <div class="tibia-pay-seller-highlight">
                 <div class="tibia-pay-seller-inline">
-                    <span class="tibia-pay-label">Common.Seller:</span>
+                    <span class="tibia-pay-label">@T["PaymentProductSummary.Seller"]</span>
                     <span class="tibia-pay-seller-link-wrap">
                         @if (SellerUser != null)
                         {

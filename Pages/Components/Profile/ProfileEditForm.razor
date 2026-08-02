@@ -1,23 +1,25 @@
 @using Confirmai.Models
 @using System.ComponentModel.DataAnnotations
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 <details class="profile-edit-details">
-    <summary class="profile-edit-summary">Editar perfil</summary>
+    <summary class="profile-edit-summary">@T["Profile.EditProfile"]</summary>
     <div class="profile-edit-form">
         <EditForm Model="EditModel" OnValidSubmit="HandleSaveProfile">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <div class="profile-edit-grid">
                 <div class="form-group">
-                    <label>Instagram</label>
+                    <label>@T["Profile.Instagram"]</label>
                     <InputText class="input" @bind-Value="EditModel.InstagramHandle" />
                 </div>
                 <div class="form-group">
-                    <label>Discord</label>
+                    <label>@T["Profile.Discord"]</label>
                     <InputText class="input" @bind-Value="EditModel.DiscordHandle" />
                 </div>
                 <div class="form-group">
-                    <label>PIX</label>
+                    <label>@T["Profile.Pix"]</label>
                     <InputText class="input" @bind-Value="EditModel.PixKey" />
                 </div>
             </div>
@@ -27,7 +29,7 @@
             }
             <div class="profile-edit-actions">
                 <button class="mk-btn mk-btn-primary" type="submit" disabled="@IsSaving">
-                    @(IsSaving ? "Salvando..." : "Salvar")
+                    @(IsSaving ? T["Profile.Saving"] : T["Profile.Save"])
                 </button>
             </div>
         </EditForm>

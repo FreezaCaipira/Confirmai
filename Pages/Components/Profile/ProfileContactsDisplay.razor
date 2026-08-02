@@ -1,4 +1,6 @@
 @using Confirmai.Models
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 @if (User is not null && (!string.IsNullOrWhiteSpace(User.InstagramHandle)
      || !string.IsNullOrWhiteSpace(User.DiscordHandle)
@@ -8,21 +10,21 @@
         @if (!string.IsNullOrWhiteSpace(User.InstagramHandle))
         {
             <div class="profile-contact-row">
-                <span class="profile-contact-label">Instagram</span>
+                <span class="profile-contact-label">@T["Profile.Instagram"]</span>
                 <span class="profile-contact-value">@User.InstagramHandle</span>
             </div>
         }
         @if (!string.IsNullOrWhiteSpace(User.DiscordHandle))
         {
             <div class="profile-contact-row">
-                <span class="profile-contact-label">Discord</span>
+                <span class="profile-contact-label">@T["Profile.Discord"]</span>
                 <span class="profile-contact-value">@User.DiscordHandle</span>
             </div>
         }
         @if (!string.IsNullOrWhiteSpace(User.PixKey))
         {
             <div class="profile-contact-row">
-                <span class="profile-contact-label">PIX</span>
+                <span class="profile-contact-label">@T["Profile.Pix"]</span>
                 <span class="profile-contact-value">@User.PixKey</span>
             </div>
         }

@@ -2,7 +2,7 @@
 @using System.Globalization
 
 <aside class="mailbox-list-pane">
-    <div class="mailbox-folder-tabs" aria-label="Lista de conversas">
+    <div class="mailbox-folder-tabs" aria-label="@T["Mailbox.ConversationListAria"]">
         <button class="mailbox-folder-tab @(ShowArchived ? string.Empty : "active")" type="button" @onclick="@(() => HandleSwitchFolder(false))">@T["Mailbox.TabActive"] (@ActiveConversationTotal)</button>
         <button class="mailbox-folder-tab @(ShowArchived ? "active" : string.Empty)" type="button" @onclick="@(() => HandleSwitchFolder(true))">@T["Mailbox.TabArchived"] (@ArchivedConversationTotal)</button>
     </div>
@@ -62,7 +62,7 @@
 
         <div class="mailbox-pagination">
             <button class="mk-btn mk-btn-secondary" type="button" disabled="@(CurrentPage <= 1)" @onclick="HandlePreviousPage">@T["Mailbox.PrevPage"]</button>
-            <span>Página @CurrentPage de @TotalPages(ConversationTotal)</span>
+            <span>@string.Format(T["Mailbox.PageInfo"], CurrentPage, TotalPages(ConversationTotal))</span>
             <button class="mk-btn mk-btn-secondary" type="button" disabled="@(CurrentPage >= TotalPages(ConversationTotal))" @onclick="HandleNextPage">@T["Mailbox.NextPage"]</button>
         </div>
     }

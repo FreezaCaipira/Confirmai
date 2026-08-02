@@ -1,8 +1,10 @@
 @using System.Globalization
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 @if (!ChatMessages.Any())
 {
-    <div class="profile-chat-empty">Sem mensagens ainda.</div>
+    <div class="profile-chat-empty">@T["Profile.NoMessages"]</div>
 }
 else
 {

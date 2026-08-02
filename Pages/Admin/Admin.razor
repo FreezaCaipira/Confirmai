@@ -33,16 +33,16 @@
             <nav class="admin-nav">
                 <a href="/admin/users">@T["Admin.Nav.Users"]</a>
                 <a href="/admin/payments">@T["Admin.Nav.Payments"]</a>
-                <a href="/admin/revenue">Receita</a>
+                <a href="/admin/revenue">@T["AdminDashboard.Revenue"]</a>
                 <a href="/admin/gateways">@T["Admin.Nav.Gateways"]</a>
                 <a href="/admin/logs">@T["Admin.Nav.Logs"]</a>
                 <a href="/admin/security">@T["Admin.Nav.Security"]</a>
-                <a href="/admin/venues">Quadras</a>
+                <a href="/admin/venues">@T["AdminDashboard.Venues"]</a>
             </nav>
 
             @if (isLoading)
             {
-                <div class="loading-spinner">Carregando painel...</div>
+                <div class="loading-spinner">@T["AdminDashboard.LoadingPanel"]</div>
             }
             else
             {
@@ -55,26 +55,26 @@
 
             <div class="admin-settings-card admin-reconciliation-health-card">
                 <div class="admin-reconciliation-health-head">
-                    <span><b>Saúde da reconciliação</b></span>
-                    <a class="details-btn" href="/admin/payments">Abrir pagamentos</a>
+                    <span><b>@T["AdminDashboard.ReconciliationHealth"]</b></span>
+                    <a class="details-btn" href="/admin/payments">@T["AdminDashboard.OpenPayments"]</a>
                 </div>
                 <div class="admin-reconciliation-health-grid">
-                    <span>Última atualização do bloco: @adminLastHealthRefreshLabel</span>
-                    <span>Pendentes com chargeId: @adminPendingWithChargeId</span>
-                    <span>Pendentes antigos (+30 min): @adminStalePending</span>
-                    <span>Última varredura automática: @adminLastAutoSweepLabel</span>
-                    <span class="@(adminPendingTrendWarning ? "admin-reconciliation-trend-warning" : string.Empty)">Tendência 24h: @adminPendingTrendLabel</span>
+                    <span>@T["AdminDashboard.LastBlockUpdate"] @adminLastHealthRefreshLabel</span>
+                    <span>@T["AdminDashboard.PendingWithChargeId"] @adminPendingWithChargeId</span>
+                    <span>@T["AdminDashboard.StalePending"] @adminStalePending</span>
+                    <span>@T["AdminDashboard.LastAutoSweep"] @adminLastAutoSweepLabel</span>
+                    <span class="@(adminPendingTrendWarning ? "admin-reconciliation-trend-warning" : string.Empty)">@T["AdminDashboard.Trend24h"] @adminPendingTrendLabel</span>
                 </div>
                 <div class="admin-reconciliation-thresholds">
                     <label>
-                        Limiar atenção (+24h)
+                        @T["AdminDashboard.WarningThreshold"]
                         <input class="fee-input" type="number" min="1" max="200" @bind="adminWarningThreshold" />
                     </label>
                     <label>
-                        Limiar crítico (+24h)
+                        @T["AdminDashboard.CriticalThreshold"]
                         <input class="fee-input" type="number" min="1" max="200" @bind="adminCriticalThreshold" />
                     </label>
-                    <button class="details-btn" @onclick="SaveReconciliationThresholdsAsync">Salvar limiares</button>
+                    <button class="details-btn" @onclick="SaveReconciliationThresholdsAsync">@T["AdminDashboard.SaveThresholds"]</button>
                     @if (!string.IsNullOrWhiteSpace(reconciliationThresholdMessage))
                     {
                         <span class="operation-fee-message @(reconciliationThresholdSaved ? "ok" : "error")">@reconciliationThresholdMessage</span>
@@ -131,14 +131,14 @@
             </div>
 
             <div class="admin-settings-card operation-fee-card">
-                <label for="site-pix-key"><b>Chave PIX do intermedio do site</b></label>
+                <label for="site-pix-key"><b>@T["AdminDashboard.SitePixKeyLabel"]</b></label>
                 <input id="site-pix-key"
                        class="fee-input"
                        type="text"
                        maxlength="160"
-                       placeholder="Ex: email, telefone, cpf/cnpj ou chave aleatoria"
+                       placeholder="@T["AdminDashboard.SitePixKeyPlaceholder"]"
                        @bind="siteIntermediaryPixKey" />
-                <button class="details-btn" @onclick="SaveSitePixKeyAsync">Salvar chave PIX</button>
+                <button class="details-btn" @onclick="SaveSitePixKeyAsync">@T["AdminDashboard.SavePixKey"]</button>
                 @if (!string.IsNullOrWhiteSpace(sitePixMessage))
                 {
                     <span class="operation-fee-message @(sitePixSaved ? "ok" : "error")">@sitePixMessage</span>

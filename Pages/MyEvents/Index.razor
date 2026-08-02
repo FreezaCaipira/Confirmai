@@ -15,42 +15,43 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject EventNotificationService NotificationService
+@inject UiTextService T
 
-<PageTitle>Minhas Partidas — Confirmai</PageTitle>
+<PageTitle>@T["MyEvents.Title"] — Confirmai</PageTitle>
 
 <div class="events-page">
 
-    <section class="events-block" aria-label="Minhas partidas">
+    <section class="events-block" aria-label="@T["MyEvents.Aria"]">
 
             <div class="my-events-back-row">
                 <a href="@(SelectedSport == Sport.Futsal ? "/futsal" : "/poker")" class="listing-back-btn">
-                    <i class="fas fa-arrow-left"></i> Voltar
+                    <i class="fas fa-arrow-left"></i> @T["Common.Back"]
                 </a>
             </div>
 
             <div class="my-events-title-action-row">
-                <h1 class="page-section-title my-events-title">Minhas Partidas</h1>
+                <h1 class="page-section-title my-events-title">@T["MyEvents.Title"]</h1>
             </div>
 
             <div class="my-events-filter-row">
                 <div class="my-events-view-tabs">
                     <button class="my-events-tab @(eventFilter == "upcoming" ? "my-events-tab--active" : "")"
                             @onclick='() => eventFilter = "upcoming"'>
-                        Próximas (@events.Count(e => e.IsActive && e.StartsAt >= DateTime.UtcNow))
+                        @T["MyEvents.TabUpcoming"] (@events.Count(e => e.IsActive && e.StartsAt >= DateTime.UtcNow))
                     </button>
                     <button class="my-events-tab @(eventFilter == "finished" ? "my-events-tab--active" : "")"
                             @onclick='() => eventFilter = "finished"'>
-                        Encerradas (@events.Count(e => !e.IsActive || e.StartsAt < DateTime.UtcNow))
+                        @T["MyEvents.TabPast"] (@events.Count(e => !e.IsActive || e.StartsAt < DateTime.UtcNow))
                     </button>
                 </div>
             </div>
 
             <AdminDataState IsLoading="isLoading"
                             IsEmpty="@(!isLoading && !FilteredEvents.Any())"
-                            LoadingText="Carregando seus eventos…"
-                            EmptyText="@($"Nenhuma partida {(eventFilter == "finished" ? "encerrada" : "próxima")}.")"
+                            LoadingText="@T["MyEvents.Loading"]"
+                            EmptyText="@(eventFilter == "finished" ? T["MyEvents.EmptyPast"] : T["MyEvents.EmptyUpcoming"])"
                             EmptyIcon="fas fa-calendar-times"
-                            EmptyHint="@($"Use o botão acima para criar sua primeira partida{(SelectedSport == Sport.Poker ? " ou torneio" : "")}.")">
+                            EmptyHint="@(SelectedSport == Sport.Poker ? T["MyEvents.EmptyHintPoker"] : T["MyEvents.EmptyHint"])">
                 <div class="my-events-list">
                     @foreach (var ev in FilteredEvents)
                     {
@@ -77,11 +78,11 @@
                                     </span>
                                     @if (!ev.IsActive)
                                     {
-                                        <span class="my-event-status my-event-status--cancelled">Cancelado</span>
+                                        <span class="my-event-status my-event-status--cancelled">@T["MyEvents.StatusCancelled"]</span>
                                     }
                                     else if (isPast)
                                     {
-                                        <span class="my-event-status my-event-status--past">Encerrado</span>
+                                        <span class="my-event-status my-event-status--past">@T["MyEvents.StatusPast"]</span>
                                     }
                                     @if (!isFutsal && ev.PokerEventType.HasValue)
                                     {
@@ -91,7 +92,7 @@
                                     }
                                 </div>
                                 <p class="my-event-meta">
-                                    👥 @ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $"/{ev.MaxPlayers}" : "") confirmados
+                                    👥 @ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $"/{ev.MaxPlayers}" : "") @T["Index.ConfirmedCount"]
                                 </p>
                                 @if (!string.IsNullOrWhiteSpace(ev.Location))
                                 {
@@ -101,7 +102,7 @@
 
                             <div class="my-event-actions">
                                 <a href="@detailUrl" class="my-event-action-btn my-event-action-btn--view">
-                                    Ver partida
+                                    @T["Groups.ViewMatches"]
                                 </a>
                             </div>
                         </div>

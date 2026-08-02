@@ -20,6 +20,7 @@ public partial class Venues
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private LogService LogService { get; set; } = default!;
+    [Inject] private UiTextService T { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

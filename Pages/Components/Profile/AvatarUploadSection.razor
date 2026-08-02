@@ -1,22 +1,24 @@
 @using Confirmai.Models
 @using Microsoft.AspNetCore.Components.Forms
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 <details class="profile-edit-details">
-    <summary class="profile-edit-summary">Trocar avatar</summary>
+    <summary class="profile-edit-summary">@T["Profile.ChangeAvatar"]</summary>
     <div class="profile-avatar-edit">
         @if (!string.IsNullOrWhiteSpace(CurrentAvatarPath))
         {
-            <img class="profile-avatar-preview" src="@CurrentAvatarPath" alt="Seu avatar" />
+            <img class="profile-avatar-preview" src="@CurrentAvatarPath" alt="@T["Profile.YourAvatar"]" />
         }
         <div class="profile-avatar-upload">
             <InputFile id="avatar-input" OnChange="HandleAvatarSelected" accept=".jpg,.jpeg,.png" class="profile-avatar-input" style="display:none" />
-            <label for="avatar-input" class="mk-btn">Escolher imagem</label>
-            <span class="profile-avatar-hint">PNG ou JPG · máx. 2 MB</span>
+            <label for="avatar-input" class="mk-btn">@T["Profile.ChooseImage"]</label>
+            <span class="profile-avatar-hint">@T["Profile.AvatarHint"]</span>
         </div>
         @if (SelectedFile != null)
         {
             <button class="mk-btn mk-btn-primary" type="button" @onclick="HandleSaveAvatar" disabled="@IsSaving">
-                @(IsSaving ? "Salvando..." : "Salvar avatar")
+                @(IsSaving ? T["Profile.Saving"] : T["Profile.SaveAvatar"])
             </button>
         }
         @if (!string.IsNullOrWhiteSpace(Feedback))

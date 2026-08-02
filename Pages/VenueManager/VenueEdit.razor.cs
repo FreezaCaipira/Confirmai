@@ -39,6 +39,7 @@ public partial class VenueEdit : IAsyncDisposable
     [Inject] private IJSRuntime JS { get; set; } = default!;
     [Inject] private IConfiguration Config { get; set; } = default!;
     [Inject] private IWebHostEnvironment Env { get; set; } = default!;
+    [Inject] private UiTextService T { get; set; } = default!;
 
     private void OnStateChanged()
     {
