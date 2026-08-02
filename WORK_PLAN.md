@@ -158,11 +158,56 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 | 22 | Cobrir services extraidos com teste | 12/12 services/formatters com teste dedicado (+174 testes; 1950->2124). 0 diff de producao. Senior corrigiu 7 warnings CS8625 em `ProfileServiceTests`. | #76 (plano), #77 (impl), #78 (review) | APROVADO |
 | 23 | UX navegacao + Pagamento V1 manual + i18n | Botao Grupos na row do Voltar (Partidas/Features), `NoGroupsHint` reutilizavel nos estados vazios (+botao), fix do link Pix (`/perfil`->`/profile/{id}`), default `EnablePaymentGateways=false` p/ grupos novos (migration so-default, sem UPDATE), i18n dos fluxos principais via `UiTextService` + regra 25. Senior fechou a ressalva na #81 (+3 testes). | #79 (plano), #80 (impl), #81 (review + testes) | APROVADO |
 
+| 24 | Pagamento V1 usavel + i18n do pagamento + cobertura do fluxo manual | (P1 do aparato) Esconder seletor de gateways quando OFF em `EventPayment.razor`; migrar strings dos fluxos de pagamento para `UiTextService`; testes de integracao do fluxo manual ponta a ponta (chave/QR -> comprovante -> confirmacao). | #83 (plano) | PLANEJADO |
+
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
 ---
 
 # Detalhes dos Ciclos Recentes (planos + reviews na integra)
+
+---
+
+## Ciclo 24 (Pleno) -- Pagamento V1 usavel (gateways OFF) + i18n do pagamento + cobertura do fluxo manual [PLANEJADO]
+
+**Objetivo**: fechar o P1 do "Aparato Geral do Senior" para o V1 ficar pronto para uso real. Hoje o default e **manual** (`EnablePaymentGateways=false`, decidido no Ciclo 23), mas a tela de pagamento ainda mostra UI de gateway e boa parte das strings do fluxo esta hardcoded. Este ciclo deixa o caminho do dinheiro do V1 limpo, traduzido e coberto por teste.
+
+**Regra de ouro (lembrete)**: TDD (teste antes/junto), SOLID, `IDbContextFactory`, incremental (1 assunto por commit), i18n obrigatoria (regra 25), CSS mobile-first 768px, **sem mudar regra de negocio** sem autorizacao. Build 0 warning + suite verde (24 falhas ambientais de Postgres sao esperadas).
+
+### Fase 1 -- UX do pagamento V1 quando gateways estao OFF
+
+Arquivo-alvo: `Pages/Payment/EventPayment.razor` (+ `EventPayment.razor.cs`, ja tem `groupGatewaysEnabled`).
+
+- Hoje, no ramo do jogador (`else` ~linha 162), sempre renderiza `<EventPaymentGateways>` e, **abaixo**, quando `ShowDirectPixToOrganizer || !groupGatewaysEnabled`, renderiza `<EventPaymentPixAdmin>` + `<EventPaymentProof>`. Resultado: com o **default manual (OFF)** o jogador ve o seletor de gateways (vazio/"nenhum gateway disponivel") **acima** do Pix manual -> confuso.
+- **Tarefa**: quando `!groupGatewaysEnabled` (e sem `ShowDirectPixToOrganizer` forcando o contrario), **nao renderizar** `<EventPaymentGateways>`; mostrar direto **so** o Pix do organizador (`EventPaymentPixAdmin`) + envio de comprovante (`EventPaymentProof`), com um cabecalho claro ("Pague via Pix e envie o comprovante"). Quando `groupGatewaysEnabled` (V2), manter o comportamento atual.
+- **Nao** remover nenhum componente nem o caminho V2. So condicionar a renderizacao.
+- **Aceitacao**: em grupo manual (OFF), a tela do jogador nao mostra seletor de gateway; mostra chave/QR + upload de comprovante. Layout mobile intacto (768px). Teste de logica do ramo (ver Fase 3).
+
+### Fase 2 -- i18n dos fluxos de pagamento (regra 25)
+
+Arquivos-alvo: `Pages/Payment/EventPayment.razor` e componentes em `Pages/Payment/Components/*` (`EventPaymentPixAdmin`, `EventPaymentProof`, `EventPaymentGateways`, `EventPaymentQr`, `EventPaymentStatus`). Dominio: `Services/Core/UiText/PaymentTexts.cs`.
+
+- Migrar as strings hardcoded do fluxo para `@Ui["Payment.*"]` (ex.: "Pagamento confirmado", "Revisao de pagamento", "Comprovante enviado em {0}", "O jogador ainda nao enviou comprovante", "Confirmar pagamento", "Marcar como pago", "Sim, confirmar", "Cancelar", "Voltar para a partida"). Onde houver interpolacao (data/nome), usar chave com placeholder e formatar no code-behind/`_ui.Get(...)`.
+- Adicionar as chaves em `PaymentTexts.cs` com **PT-BR** (baseline). EN/ES podem ficar para depois, mas a chave ja deve existir. **Nao** deixar string nova hardcoded.
+- **Aceitacao**: os `.razor` do fluxo de pagamento sem literal acentuado visivel ao usuario; contagem de `@Ui[...]` sobe; build 0 warning.
+
+### Fase 3 -- Cobertura do fluxo manual V1 ponta a ponta (TDD)
+
+E o caminho do dinheiro do V1 -- precisa de teste. Alvos: `PixProofUploadService` (upload de comprovante), `EventPaymentService`/comando de confirmacao usado por `AdminMarkPaid`, e o estado do `EventConfirmation` (`PixProofUploadedAt`, `PaymentStatus`).
+
+- Teste 1 (upload): `PixProofUploadService.UploadProofAsync` grava o comprovante e seta `PixProofUploadedAt`; rejeita content-type/arquivo invalido (caracterizar o comportamento atual, sem mudar regra).
+- Teste 2 (confirmacao do organizador): a partir de uma confirmacao com comprovante enviado, a acao de marcar como pago move `PaymentStatus` para `Paid` (e o que `AdminMarkPaid` chama). Caracterizar tambem o caso "sem comprovante" (admin ainda pode marcar).
+- Teste 3 (ramo de UI da Fase 1): extrair a decisao "mostrar seletor de gateway?" para um metodo/propriedade testavel (ex.: em `EventPayment.razor.cs` ou um pequeno helper) e testar: `groupGatewaysEnabled=false` -> nao mostra gateways; `true` -> mostra. (Sem bUnit no projeto; testar a logica, nao o render.)
+- Usar DB in-memory via `TestDbContextFactory` (padrao dos Ciclos 20-22) + Moq so onde necessario.
+- **Aceitacao**: arquivo(s) de teste dedicado(s), casos feliz + ramos, 0 diff de regra de negocio, suite verde.
+
+### O que NAO fazer neste ciclo
+- Nao mexer no fluxo automatico V2 (gateway/`PayoutService`/`EfiBankPixPayoutService`/webhook/retry) alem de condicionar a renderizacao.
+- Nao completar EN/ES (so criar chaves PT-BR).
+- Nao migrar i18n de telas fora do fluxo de pagamento (fica para ciclos seguintes do P1).
+- Nao adicionar bUnit nem E2E agora.
+
+> **Nota**: a review do Ciclo 23 e o backlog "Aparato Geral" estao nas PRs #81 e #82 (abertas quando este plano foi escrito). Este plano executa o item **P1** do aparato.
 
 ---
 
