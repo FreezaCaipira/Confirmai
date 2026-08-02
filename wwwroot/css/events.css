@@ -1543,6 +1543,25 @@
     box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
 }
 
+.sports-back-row--multi {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.listing-back-btn--groups {
+    background: var(--ci-surface-light);
+    border-color: var(--ci-border);
+    color: var(--ci-text-blue);
+    margin-right: 0;
+}
+
+.listing-back-btn--groups:hover {
+    background: var(--ci-surface-light);
+    color: var(--ci-accent);
+    box-shadow: 0 4px 14px rgba(34, 109, 196, 0.18);
+}
+
 /* â”€â”€ Variant: Gold (Criar Grupo / Criar Evento) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn-create-event {
     background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
