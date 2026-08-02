@@ -184,6 +184,9 @@ internal static class CoreTexts
         ["Nav.About"] = "About",
         ["Nav.Contact"] = "Contact",
         ["Nav.Payments"] = "Payments",
+        ["Nav.Integration"] = "Integration",
+        ["Nav.Mailbox"] = "Inbox",
+        ["Nav.Profile"] = "Profile",
         ["Nav.Sports"] = "Matches",
 
         // Layout
