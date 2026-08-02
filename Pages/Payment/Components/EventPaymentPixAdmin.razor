@@ -1,15 +1,17 @@
 @using System.Globalization
+@using Confirmai.Services.Core
+
+@inject UiTextService Ui
 
 <div class="evpay-admin-pix">
     <div class="evpay-admin-pix-header">
         <i class="fas fa-hand-holding-usd"></i>
-        <span>Pix direto ao organizador</span>
+        <span>@Ui["Payment.PixDirectToOrganizer"]</span>
     </div>
     @if (!string.IsNullOrWhiteSpace(GroupAdminPixKey))
     {
         <p class="evpay-admin-pix-hint">
-            Escaneie o QR Code ou copie a chave e transfira R$ @Price.ToString("N2", PtBr) diretamente.
-            O organizador confirmará o recebimento.
+            @string.Format(Ui["Payment.PixHint"], Price.ToString("N2", PtBr))
         </p>
         <div class="evpay-admin-pix-qr">
             <QRCode Value="@PixQrPayload" />
@@ -19,7 +21,7 @@
             <button type="button" class="evpay-admin-pix-copy"
                     @onclick="HandleCopyAdminPixKey">
                 <i class="fas @(CopiedAdminPix ? "fa-check" : "fa-copy")"></i>
-                @(CopiedAdminPix ? "Copiado!" : "Copiar")
+                @(CopiedAdminPix ? Ui["Payment.Copied"] : Ui["Payment.Copy"])
             </button>
         </div>
     }
@@ -27,7 +29,7 @@
     {
         <p class="evpay-admin-pix-no-key">
             <i class="fas fa-exclamation-circle"></i>
-            O organizador ainda não cadastrou uma chave Pix. Entre em contato diretamente para combinar o pagamento.
+            @Ui["Payment.NoPixKey"]
         </p>
     }
 </div>

@@ -1,11 +1,14 @@
 @using Confirmai.Enums
 @using Confirmai.Models
+@using Confirmai.Services.Core
 @using System.Globalization
+
+@inject UiTextService Ui
 
 <div class="evpay-header">
     <div class="evpay-header-top">
         <a href="@BackUrl" class="detail-back-link">
-            <i class="fas fa-arrow-left"></i> Voltar
+            <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
         </a>
     </div>
     <div class="evpay-header-badge">

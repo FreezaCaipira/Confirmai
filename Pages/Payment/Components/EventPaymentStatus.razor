@@ -1,10 +1,14 @@
+@using Confirmai.Services.Core
+
+@inject UiTextService Ui
+
 <div class="evpay-status evpay-status--paid">
     <i class="fas fa-check-circle"></i>
     <div>
-        <strong>Pagamento confirmado</strong>
-        <p>Sua participação está garantida. Boa partida!</p>
+        <strong>@Ui["Payment.PaymentConfirmed"]</strong>
+        <p>@Ui["Payment.ParticipationGuaranteed"]</p>
     </div>
 </div>
 <a href="@BackUrl" class="evpay-action-btn evpay-action-btn--back">
-    <i class="fas fa-arrow-left"></i> Voltar para a partida
+    <i class="fas fa-arrow-left"></i> @Ui["Payment.BackToMatch"]
 </a>

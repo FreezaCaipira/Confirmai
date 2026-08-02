@@ -1,30 +1,33 @@
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Configuration
+@using Confirmai.Services.Core
 @using System.Globalization
 @using Microsoft.Extensions.Options
 
+@inject UiTextService Ui
+
 <div class="evpay-summary-card">
     <div class="evpay-summary-row">
-        <span class="evpay-summary-label">Jogador</span>
+        <span class="evpay-summary-label">@Ui["Payment.SummaryPlayer"]</span>
         <span class="evpay-summary-value">@(Confirmation?.User?.FullName ?? Confirmation?.User?.UserName ?? "—")</span>
     </div>
     <div class="evpay-summary-row">
-        <span class="evpay-summary-label">Posição</span>
+        <span class="evpay-summary-label">@Ui["Payment.SummaryPosition"]</span>
         <span class="evpay-summary-value">
             @if (Confirmation?.Position == FutsalPosition.Goalkeeper)
             {
-                <span><i class="fas fa-hand-paper"></i> Goleiro</span>
+                <span><i class="fas fa-hand-paper"></i> @Ui["Payment.SummaryGoalkeeper"]</span>
             }
             else
             {
-                <span>⚽ Linha</span>
+                <span>⚽ @Ui["Payment.SummaryOutfield"]</span>
             }
         </span>
     </div>
     <div class="evpay-summary-divider"></div>
     <div class="evpay-summary-row evpay-summary-row--total">
-        <span class="evpay-summary-label">Valor a pagar</span>
+        <span class="evpay-summary-label">@Ui["Payment.SummaryAmount"]</span>
         <span class="evpay-summary-amount">R$ @GetTotalAmount().ToString("N2", PtBr)</span>
     </div>
 </div>

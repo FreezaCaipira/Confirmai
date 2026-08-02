@@ -8,7 +8,7 @@
 @if (GroupGatewaysEnabled)
 {
     <div class="evpay-methods">
-        <h2 class="evpay-methods-title">Forma de pagamento</h2>
+        <h2 class="evpay-methods-title">@Ui["Payment.PaymentMethods"]</h2>
         <div class="evpay-method-list">
             @foreach (var gateway in AvailableGateways)
             {
@@ -28,10 +28,10 @@
                         class="evpay-method-option evpay-method-option--disabled"
                         disabled
                         aria-disabled="true"
-                        title="Integração em breve">
+                        title="@Ui["Payment.ComingSoon"]">
                     <span class="evpay-method-icon">🧾</span>
                     <span class="evpay-method-name">@gateway.DisplayName</span>
-                    <span class="evpay-method-badge evpay-method-badge--soon">em breve</span>
+                    <span class="evpay-method-badge evpay-method-badge--soon">@Ui["Payment.ComingSoon"]</span>
                 </button>
             }
         </div>
@@ -55,19 +55,19 @@
         {
             <div class="evpay-fee-breakdown">
                 <div class="evpay-fee-row">
-                    <span class="evpay-fee-label">Valor da partida:</span>
+                    <span class="evpay-fee-label">@Ui["Payment.MatchValue"]</span>
                     <span class="evpay-fee-value">R$ @Price.ToString("N2", PtBr)</span>
                 </div>
                 <div class="evpay-fee-row">
-                    <span class="evpay-fee-label">Taxa do app:</span>
+                    <span class="evpay-fee-label">@Ui["Payment.AppFee"]</span>
                     <span class="evpay-fee-value">R$ @AppFeeAmount.ToString("N2", PtBr)</span>
                 </div>
                 <div class="evpay-fee-row">
-                    <span class="evpay-fee-label">Taxa do gateway:</span>
+                    <span class="evpay-fee-label">@Ui["Payment.GatewayFee"]</span>
                     <span class="evpay-fee-value">R$ @GatewayFeeAmount.ToString("N2", PtBr)</span>
                 </div>
                 <div class="evpay-fee-row evpay-fee-row--total">
-                    <span class="evpay-fee-label">Total a pagar:</span>
+                    <span class="evpay-fee-label">@Ui["Payment.TotalToPay"]</span>
                     <span class="evpay-fee-value">R$ @TotalAmount.ToString("N2", PtBr)</span>
                 </div>
             </div>
@@ -78,12 +78,12 @@
                 @onclick="HandleGenerateCharge">
             @if (IsGenerating)
             {
-                <span>Gerando QR Code…</span>
+                <span>@Ui["Payment.GeneratingQr"]</span>
             }
             else
             {
                 <i class="fas fa-qrcode"></i>
-                <span>Gerar QR Code (@SelectedGatewayDisplayName) — R$ @TotalAmount.ToString("N2", PtBr)</span>
+                <span>@string.Format(Ui["Payment.GenerateQrWithGateway"], SelectedGatewayDisplayName, TotalAmount.ToString("N2", PtBr))</span>
             }
         </button>
     }
