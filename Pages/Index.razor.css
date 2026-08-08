@@ -33,18 +33,6 @@
     box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
 }
 
-::deep .detail-back-link--groups {
-    background: var(--ci-surface-light);
-    border-color: var(--ci-border);
-    color: var(--ci-text-blue);
-}
-
-::deep .detail-back-link--groups:hover {
-    background: var(--ci-surface-light);
-    color: var(--ci-accent);
-    box-shadow: 0 4px 14px rgba(34, 109, 196, 0.18);
-}
-
 /* ── Onboarding hint ───────────────────── */
 .onboarding-hint {
     max-width: 560px;

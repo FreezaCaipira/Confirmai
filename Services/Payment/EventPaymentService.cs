@@ -237,6 +237,9 @@ public sealed class EventPaymentService
 
     public static string BuildPixStaticPayload(string pixKey, string groupName, string? city, decimal amount)
     {
+        if (string.IsNullOrWhiteSpace(pixKey))
+            return string.Empty;
+
         static string F(string tag, string v) => $"{tag}{v.Length:D2}{v}";
 
         var name = groupName.Length > 25 ? groupName[..25] : groupName;
