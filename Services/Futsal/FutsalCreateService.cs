@@ -118,6 +118,20 @@ public sealed class FutsalCreateService
             });
         }
 
+        // V1 manual flow: admin must have a Pix key to create a priced match
+        if (form.Price > 0 && !group.EnablePaymentGateways)
+        {
+            var admin = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (admin is null || string.IsNullOrWhiteSpace(admin.PixKey))
+            {
+                return new FutsalCreateResult(
+                    false,
+                    "Configure sua chave Pix no perfil antes de criar uma partida com preço.",
+                    "/profile/" + userId + "?intent=pix",
+                    null);
+            }
+        }
+
         var collision = await _collisionService.FindGroupTimeCollisionAsync(group.Id, startsAt);
         if (collision is not null)
         {
