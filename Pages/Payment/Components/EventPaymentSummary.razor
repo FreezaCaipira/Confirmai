@@ -26,6 +26,17 @@
         </span>
     </div>
     <div class="evpay-summary-divider"></div>
+    @if (ShowFeeBreakdown)
+    {
+        <div class="evpay-summary-row">
+            <span class="evpay-summary-label">@Ui["Payment.SummaryMatchPrice"]</span>
+            <span class="evpay-summary-value">R$ @BasePrice.ToString("N2", PtBr)</span>
+        </div>
+        <div class="evpay-summary-row">
+            <span class="evpay-summary-label">@Ui["Payment.SummaryPlatformFee"]</span>
+            <span class="evpay-summary-value">R$ @ManualFee.ToString("N2", PtBr)</span>
+        </div>
+    }
     <div class="evpay-summary-row evpay-summary-row--total">
         <span class="evpay-summary-label">@Ui["Payment.SummaryAmount"]</span>
         <span class="evpay-summary-amount">R$ @GetTotalAmount().ToString("N2", PtBr)</span>
