@@ -162,7 +162,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 25 | i18n completo (zerar debito tecnico) | ~450 strings migradas em ~70 arquivos `.razor` (Futsal/Poker/Groups/Admin/Payment/Venue/Profile/Docs); 4 dominios novos (`FutsalTexts`, `PokerTexts`, `GroupTexts`, `UtilityTexts`) + `AdminTexts`/`CoreTexts`/`PaymentTexts` estendidos, PT-BR/EN-US/ES-ES; +32 testes de completude/paridade de chaves; extras: fix NullRef em `BuildPixStaticPayload`, aviso "Pix nao configurado", padronizacao `btn-view-groups`, cascata CSS `detail-admin-btn`, remocao de debug write em teste. 2133->2165. | #86 (plano+impl), #87 (review) | APROVADO c/ ressalvas |
 
-| 26 | Taxa acumulada p/ repasse manual + UX Profile + privacidade do Pix + fechar i18n | Planejado: Fase 0 privacidade (Pix exposto no perfil publico), Fase 1 UX Profile, Fase 2 ledger da taxa R$ 0,75 (futsal/manual), Fase 3 painel do organizador + registro de repasse, Fase 4 taxa discriminada ao jogador (`Partida + Taxa = Total`), Fase 5 Pix como pre-requisito, Fase 6 fechar i18n + teste anti-hardcode. | #87 (plano) | PLANEJADO |
+| 26 | Taxa acumulada p/ repasse manual + UX Profile + privacidade do Pix + fechar i18n | Planejado: Fase 0 privacidade (Pix exposto no perfil publico), Fase 1 UX Profile, Fase 2 ledger da taxa R$ 0,75 (futsal/manual), Fase 3 repasse com comprovante (organizador envia, admin do sistema confirma -- espelho do fluxo do jogador), Fase 4 taxa discriminada ao jogador (`Partida + Taxa = Total`), Fase 5 Pix como pre-requisito, Fase 6 fechar i18n + teste anti-hardcode. | #87 (plano) | PLANEJADO |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -183,7 +183,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 1. **Taxa da plataforma no V1 manual = R$ 0,75 fixo por confirmacao paga**, apenas em partidas de **futebol/futsal** (`Sport.Futsal`). Racional do Robson: o jogador de linha paga R$ 10-15, entao R$ 0,75 e irrisorio.
 2. **O sistema NAO intermedia o dinheiro**: soma o devido e **mostra no painel do organizador/manager do grupo**, que faz o **repasse manual** a plataforma. Motivacao: menos complexidade de integracao bancaria e menos exposicao de receita.
 3. **Transparencia com o usuario**: *"podemos detalhar a taxa sim, prezemos por transparencia com o user"* -- a taxa aparece **discriminada** na tela de pagamento (`Partida + Taxa = Total`), nao embutida no preco (Fase 4).
-4. **Os dois lados do repasse**: o **admin do sistema** ve os grupos com repasses realizados e pendentes e **da a baixa**; o **organizador** ve as taxas **por partida** (pagas/pendentes) e o **somatorio a pagar**, em modo leitura (Fase 3).
+4. **Os dois lados do repasse, espelhando o fluxo que ja existe**: assim como *o jogador envia comprovante e o organizador confirma o recebimento*, agora **o organizador faz o Pix, envia o comprovante, e o admin do sistema confirma o recebimento** daquele grupo. Mesmo padrao mental, mesma UI, mesmo codigo (Fase 3). O organizador ve as taxas **por partida** (pagas/pendentes) e o **somatorio a pagar**; o admin do sistema ve os grupos com repasses pendentes/realizados.
 5. **UX do Profile**: o Robson reportou "tela poluida visualmente, opcoes pouco claras, pouco intuitivo". Escopo aberto para reorganizacao (ver Fase 1).
 
 ### Fase 0 -- PRIVACIDADE: nao expor chave Pix no perfil publico (P0, fazer primeiro)
@@ -223,24 +223,60 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 - Novo `Services/Payment/PlatformFeeLedgerService.cs`:
   - `StampFeeOnPaidAsync(confirmationId)` -- chamado quando o organizador confirma o pagamento (`AdminConfirmationService`) e quando o gateway confirma; **so** carimba se `Event.Group.Sport == Sport.Futsal`, se o grupo esta em modo manual (`!EnablePaymentGateways`) e se `PlatformFeeAmount` ainda e null (**idempotente**).
   - `GetGroupBalanceAsync(groupId)` -> `(decimal Accrued, decimal Settled, decimal Due)`.
-- Novo `Models/PlatformFeeSettlement.cs` (`Id`, `GroupId`, `Amount`, `SettledAt`, `RegisteredByUserId`, `Note`) -- registro de repasse **recebido**, criado **so pelo admin do sistema** (nao pelo organizador; senao o proprio devedor daria baixa na propria divida).
+- Novo `Models/PlatformFeeSettlement.cs` -- **lote de repasse** com comprovante e status (`EmAnalise`/`Pago`/`Rejeitado`); enviado pelo organizador, confirmado pelo admin do sistema. Estrutura completa e regras na **Fase 3**.
 - Migration: **so adicionar coluna/tabela**, sem `UPDATE` em dados existentes (licao do Ciclo 19).
-- **Testes obrigatorios**: carimbo idempotente; nao carimba poker; nao carimba grupo com gateway ligado; nao carimba confirmacao pendente; `Due = Accrued - Settled`; toggle-back de pago->pendente **nao** apaga o carimbo (a taxa foi devida no momento do pagamento) -- se o Pleno discordar, documentar antes de mudar.
+- **Testes obrigatorios**: carimbo idempotente; nao carimba poker; nao carimba grupo com gateway ligado; nao carimba confirmacao pendente; `Due = Accrued - Settled` (contando so lote `Pago`); toggle-back de pago->pendente **nao** apaga o carimbo (a taxa foi devida no momento do pagamento) -- se o Pleno discordar, documentar antes de mudar.
 
-### Fase 3 -- Os dois lados do repasse (decisao do Robson: organizador ve, admin do sistema da baixa)
+### Fase 3 -- Repasse com comprovante: **mesmo fluxo do pagamento da partida, um nivel acima**
 
-**Regra fundamental** (o Robson pediu "pagas e pendentes" dos dois lados): no fluxo manual o sistema **nao observa** a transferencia acontecer -- nao existe webhook, extrato nem conciliacao. Portanto **"repasse pago" significa exatamente "o admin do sistema deu baixa"**, e nada mais. O organizador **le** o status; **nao** o altera. Se o organizador pudesse marcar como pago, o proprio devedor estaria quitando a divida.
+**Decisao do Robson**: *"da mesma forma que o jogador envia um comprovante e o organizador confirma o recebimento, facamos o mesmo: o organizador faz o pix e envia o comprovante, o admin por sua vez confirma o recebimento do organizador daquele grupo"*. O fluxo passa a ser **o mesmo padrao em dois niveis**:
+
+```
+Nivel 1 (ja existe):  jogador      --paga--> organizador   --envia comprovante--> organizador confirma
+Nivel 2 (Ciclo 26):   organizador  --paga--> plataforma    --envia comprovante--> admin do sistema confirma
+```
+
+**Por que isso e bom**: reaproveita o modelo mental do usuario, a UI e o codigo. `PixProofUploadService` (validacao MIME jpeg/png/webp + limite de 5 MB + persistencia em coluna `byte[]`) e `AdminConfirmationService` ja fazem exatamente isso no nivel 1. **Nao inventar um segundo mecanismo de upload** -- generalizar/espelhar o existente, mantendo os mesmos limites e a mesma validacao.
+
+**Criticas do Senior que entram como regra do desenho** (o Robson pediu criticas):
+
+1. **O comprovante e o gatilho, nao a baixa.** Enviar comprovante move o repasse para `EmAnalise`; **so a confirmacao do admin do sistema** move para `Pago`. Assim o organizador ganha uma **acao** (declarar que pagou) sem ganhar o **poder** de quitar a propria divida. No fluxo manual o sistema nao observa a transferencia -- nao ha webhook nem extrato --, entao "pago" so pode significar "o admin do sistema confirmou".
+2. **O repasse e por valor, nao por partida.** O organizador manda **um Pix so** cobrindo varias partidas. O comprovante, portanto, se anexa a um **lote de repasse**, nao a uma partida. Exigir um comprovante por partida seria inviavel na pratica.
+3. **Baixa FIFO.** Um lote de R$ 15,00 quita as partidas pendentes mais antigas ate esgotar o valor; partida parcialmente coberta continua `Pendente` ate ser totalmente coberta; sobra vira credito abatido no proximo lote. E o que mantem a lista por partida coerente com o saldo.
+4. **Rejeicao tem que existir.** Comprovante ilegivel/errado precisa de um caminho de volta (`Rejeitado` + motivo), senao o repasse fica preso em `EmAnalise` para sempre.
+
+**Modelo** -- `Models/PlatformFeeSettlement.cs` passa a ser o **lote de repasse** e nao so o registro de baixa:
+
+```csharp
+public int      Id;
+public int      GroupId;
+public decimal  Amount;                 // valor declarado pelo organizador
+public string   SubmittedByUserId;      // organizador que enviou
+public DateTime SubmittedAt;
+public byte[]?  ProofImageData;         // mesmo padrao de EventConfirmation.PixProofImageData
+public string?  ProofContentType;
+public PlatformFeeSettlementStatus Status;   // EmAnalise | Pago | Rejeitado
+public string?  ReviewedByUserId;       // admin do sistema
+public DateTime? ReviewedAt;
+public string?  ReviewNote;             // motivo da rejeicao / observacao
+```
+
+So lote com `Status == Pago` abate saldo (`Settled`). `EmAnalise` aparece nas duas telas como "aguardando confirmacao", **sem** reduzir o devido.
 
 **Lado do organizador** -- `Pages/Groups/Payments.razor` (tela de admin do grupo, hoje com abas `delinquent`/`history`): **nova aba "Taxa da plataforma"** com:
-- **linha por partida**: data, nome da partida, nº de pagantes, taxa da partida (`pagantes x 0,75`) e **status do repasse** (`Pago` / `Pendente`);
-- **somatorio do que falta repassar** em destaque (o "total a pagar"), mais acumulado e ja repassado;
-- **chave Pix da plataforma** para o repasse, vinda de config (**nao hardcoded**);
-- **somente leitura** -- sem botao de "marcar como pago".
+- **linha por partida**: data, nome da partida, nº de pagantes, taxa da partida (`pagantes x 0,75`) e **status** (`Pago` / `Pendente`);
+- **somatorio a repassar** em destaque, mais acumulado, em analise e ja repassado;
+- **chave Pix da plataforma** vinda de config (**nao hardcoded**) + QR, espelhando o card que o jogador ve;
+- **acao "Enviar comprovante do repasse"**: valor + imagem, criando o lote em `EmAnalise` -- espelho exato do `EventPaymentProof`;
+- historico dos lotes enviados com status e, se rejeitado, o motivo;
+- **sem** botao de "marcar como pago".
 - Exibir a aba **apenas** em grupo `Sport.Futsal` em modo manual (nos demais o saldo e sempre zero e a aba so polui).
 
-**Lado do admin do sistema** -- `Pages/Admin/AdminRevenue.razor` (ja existe): lista de **grupos com taxa acumulada**, separando **quitado** de **pendente**, com o total devido por grupo, e a acao de **registrar repasse recebido** (cria `PlatformFeeSettlement`).
+**Lado do admin do sistema** -- `Pages/Admin/AdminRevenue.razor` (ja existe): grupos com taxa acumulada separando **pendente**, **em analise** e **quitado**; fila de lotes aguardando confirmacao com **visualizacao do comprovante**; acoes **Confirmar recebimento** e **Rejeitar (com motivo)** -- espelho do que o organizador faz no nivel 1.
 
-**Como "pago por partida" se resolve sem virar contabilidade**: o repasse e por **valor**, nao por partida (o organizador manda um Pix so). Entao a baixa deve ser **FIFO**: um `PlatformFeeSettlement` de R$ 15,00 quita as partidas mais antigas ate esgotar o valor; a partida parcialmente coberta aparece como `Pendente` ate ser totalmente coberta. Isso mantem a lista por partida coerente com o saldo, sem exigir que o organizador pague partida a partida. **Testar explicitamente**: baixa parcial, baixa exata, baixa maior que o devido (sobra vira credito abatido no proximo).
+**Servir a imagem do comprovante**: `Program.cs` ja expoe `GET /api/pix-proof/{id}` autorizado ao pagador ou admin do grupo. Criar o analogo `GET /api/fee-settlement-proof/{id}`, autorizado **ao organizador do grupo dono do lote ou ao admin do sistema** -- seguindo o mesmo padrao de `Results.Unauthorized/NotFound/Forbid`. **Nao** deixar a imagem publica.
+
+**Testes obrigatorios**: organizador **nao** consegue mover para `Pago`; comprovante em `EmAnalise` nao abate saldo; confirmacao abate FIFO (parcial, exata e maior que o devido); rejeicao devolve o saldo e preserva o motivo; upload rejeita MIME invalido e > 5 MB (mesmos limites do nivel 1); autorizacao do endpoint da imagem (terceiro recebe `Forbid`).
 
 - i18n de todos os textos novos (`GroupTexts` / `AdminTexts`).
 
