@@ -162,7 +162,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 25 | i18n completo (zerar debito tecnico) | ~450 strings migradas em ~70 arquivos `.razor` (Futsal/Poker/Groups/Admin/Payment/Venue/Profile/Docs); 4 dominios novos (`FutsalTexts`, `PokerTexts`, `GroupTexts`, `UtilityTexts`) + `AdminTexts`/`CoreTexts`/`PaymentTexts` estendidos, PT-BR/EN-US/ES-ES; +32 testes de completude/paridade de chaves; extras: fix NullRef em `BuildPixStaticPayload`, aviso "Pix nao configurado", padronizacao `btn-view-groups`, cascata CSS `detail-admin-btn`, remocao de debug write em teste. 2133->2165. | #86 (plano+impl), #87 (review) | APROVADO c/ ressalvas |
 
-| 26 | Taxa acumulada p/ repasse manual + UX Profile + privacidade do Pix + fechar i18n | Planejado: Fase 0 privacidade (Pix exposto no perfil publico), Fase 1 UX Profile, Fase 2 ledger da taxa R$ 0,75 (futsal/manual), Fase 3 painel do organizador + registro de repasse, Fase 4 exibicao da taxa ao jogador (aguarda OK do Robson), Fase 5 Pix como pre-requisito, Fase 6 fechar i18n + teste anti-hardcode. | #87 (plano) | PLANEJADO |
+| 26 | Taxa acumulada p/ repasse manual + UX Profile + privacidade do Pix + fechar i18n | Planejado: Fase 0 privacidade (Pix exposto no perfil publico), Fase 1 UX Profile, Fase 2 ledger da taxa R$ 0,75 (futsal/manual), Fase 3 painel do organizador + registro de repasse, Fase 4 taxa discriminada ao jogador (`Partida + Taxa = Total`), Fase 5 Pix como pre-requisito, Fase 6 fechar i18n + teste anti-hardcode. | #87 (plano) | PLANEJADO |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -182,7 +182,9 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 1. **Taxa da plataforma no V1 manual = R$ 0,75 fixo por confirmacao paga**, apenas em partidas de **futebol/futsal** (`Sport.Futsal`). Racional do Robson: o jogador de linha paga R$ 10-15, entao R$ 0,75 e irrisorio.
 2. **O sistema NAO intermedia o dinheiro**: soma o devido e **mostra no painel do organizador/manager do grupo**, que faz o **repasse manual** a plataforma. Motivacao: menos complexidade de integracao bancaria e menos exposicao de receita.
-3. **UX do Profile**: o Robson reportou "tela poluida visualmente, opcoes pouco claras, pouco intuitivo". Escopo aberto para reorganizacao (ver Fase 1).
+3. **Transparencia com o usuario**: *"podemos detalhar a taxa sim, prezemos por transparencia com o user"* -- a taxa aparece **discriminada** na tela de pagamento (`Partida + Taxa = Total`), nao embutida no preco (Fase 4).
+4. **Os dois lados do repasse**: o **admin do sistema** ve os grupos com repasses realizados e pendentes e **da a baixa**; o **organizador** ve as taxas **por partida** (pagas/pendentes) e o **somatorio a pagar**, em modo leitura (Fase 3).
+5. **UX do Profile**: o Robson reportou "tela poluida visualmente, opcoes pouco claras, pouco intuitivo". Escopo aberto para reorganizacao (ver Fase 1).
 
 ### Fase 0 -- PRIVACIDADE: nao expor chave Pix no perfil publico (P0, fazer primeiro)
 
@@ -225,16 +227,32 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 - Migration: **so adicionar coluna/tabela**, sem `UPDATE` em dados existentes (licao do Ciclo 19).
 - **Testes obrigatorios**: carimbo idempotente; nao carimba poker; nao carimba grupo com gateway ligado; nao carimba confirmacao pendente; `Due = Accrued - Settled`; toggle-back de pago->pendente **nao** apaga o carimbo (a taxa foi devida no momento do pagamento) -- se o Pleno discordar, documentar antes de mudar.
 
-### Fase 3 -- Painel do organizador: quanto ele deve a plataforma
+### Fase 3 -- Os dois lados do repasse (decisao do Robson: organizador ve, admin do sistema da baixa)
 
-- `Pages/Groups/Payments.razor` (ja e tela de admin do grupo, com abas `delinquent`/`history`): **nova aba "Taxa da plataforma"** exibindo **acumulado**, **ja repassado** e **saldo a repassar**, com a lista por partida (data, nº de pagantes, taxa da partida) e a chave Pix da plataforma para o repasse (via config, nao hardcoded).
-- Mostrar a aba **apenas** em grupo `Sport.Futsal` em modo manual (nos demais o saldo e sempre zero e a aba so polui).
-- Tela do **admin do sistema** (`Pages/Admin/AdminRevenue.razor`, que ja existe): saldo por grupo + acao de **registrar repasse recebido** (cria `PlatformFeeSettlement`).
+**Regra fundamental** (o Robson pediu "pagas e pendentes" dos dois lados): no fluxo manual o sistema **nao observa** a transferencia acontecer -- nao existe webhook, extrato nem conciliacao. Portanto **"repasse pago" significa exatamente "o admin do sistema deu baixa"**, e nada mais. O organizador **le** o status; **nao** o altera. Se o organizador pudesse marcar como pago, o proprio devedor estaria quitando a divida.
+
+**Lado do organizador** -- `Pages/Groups/Payments.razor` (tela de admin do grupo, hoje com abas `delinquent`/`history`): **nova aba "Taxa da plataforma"** com:
+- **linha por partida**: data, nome da partida, nº de pagantes, taxa da partida (`pagantes x 0,75`) e **status do repasse** (`Pago` / `Pendente`);
+- **somatorio do que falta repassar** em destaque (o "total a pagar"), mais acumulado e ja repassado;
+- **chave Pix da plataforma** para o repasse, vinda de config (**nao hardcoded**);
+- **somente leitura** -- sem botao de "marcar como pago".
+- Exibir a aba **apenas** em grupo `Sport.Futsal` em modo manual (nos demais o saldo e sempre zero e a aba so polui).
+
+**Lado do admin do sistema** -- `Pages/Admin/AdminRevenue.razor` (ja existe): lista de **grupos com taxa acumulada**, separando **quitado** de **pendente**, com o total devido por grupo, e a acao de **registrar repasse recebido** (cria `PlatformFeeSettlement`).
+
+**Como "pago por partida" se resolve sem virar contabilidade**: o repasse e por **valor**, nao por partida (o organizador manda um Pix so). Entao a baixa deve ser **FIFO**: um `PlatformFeeSettlement` de R$ 15,00 quita as partidas mais antigas ate esgotar o valor; a partida parcialmente coberta aparece como `Pendente` ate ser totalmente coberta. Isso mantem a lista por partida coerente com o saldo, sem exigir que o organizador pague partida a partida. **Testar explicitamente**: baixa parcial, baixa exata, baixa maior que o devido (sobra vira credito abatido no proximo).
+
 - i18n de todos os textos novos (`GroupTexts` / `AdminTexts`).
 
-### Fase 4 -- Cobranca ao jogador: R$ 0,75 por cima (CONFIRMAR COM O ROBSON ANTES DE CODAR)
+### Fase 4 -- Cobranca ao jogador: R$ 0,75 por cima, **detalhada** (CONFIRMADO pelo Robson)
 
-(Depende da Fase 3.) Coerente com a decisao ja registrada do V2 ("taxa por cima do valor da partida") e com o racional do Robson ("0,75 aparenta ser irrisorio **para os usuarios**" -> o usuario ve), a tela de pagamento no modo manual deve mostrar `R$ 15,00 + R$ 0,75 = R$ 15,75` e o QR/valor sugerido ja com a taxa. **Porem**: como o jogador paga direto no Pix do organizador, esses R$ 0,75 chegam **na conta do organizador**, e e ele quem repassa. Se o Robson preferir que o jogador **nao** veja a taxa (organizador absorve), muda so a exibicao -- o ledger da Fase 1 fica igual. **O Pleno so executa esta fase apos confirmacao explicita registrada aqui.**
+**Decisao do Robson**: *"podemos detalhar a taxa sim, prezemos por transparencia com o user"*. Fase **liberada**.
+
+- A tela de pagamento no modo manual mostra a composicao **discriminada**: `Partida R$ 15,00` + `Taxa da plataforma R$ 0,75` = **`Total R$ 15,75`**. Nada de embutir a taxa silenciosamente no preco.
+- O **QR/payload Pix e o valor sugerido** usam o **total** (R$ 15,75) -- senao o organizador recebe a menos e paga a taxa do proprio bolso.
+- Reaproveitar o padrao ja existente em `EventPaymentSummary` (que ja discrimina base + taxa no V2); a diferenca e a origem do valor (`ManualPlatformFeeFixed` em vez de `AppFeeFixed + GatewayFeeFixed`).
+- **Consequencia a explicitar na UI do organizador**: esses R$ 0,75 caem **na conta dele**; e por isso que ele deve o repasse. O texto da aba "Taxa da plataforma" deve deixar isso claro ("voce recebeu a taxa junto com o valor da partida; repasse o total abaixo").
+- So aplicar em `Sport.Futsal` + modo manual + preco > 0 (coerente com a Fase 2). Partida gratuita nao gera taxa.
 
 ### Fase 5 -- Pix do admin como pre-requisito (pedido do Pleno, aprovado)
 
