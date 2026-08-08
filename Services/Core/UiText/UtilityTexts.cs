@@ -195,8 +195,10 @@ internal static class UtilityTexts
         ["Profile.StatOutfield"] = "Jogador de linha",
         ["Profile.StatGoalkeeper"] = "Goleiro",
         ["Profile.StatSessions"] = "Sessões",
-
-        // MyEvents
+        ["Profile.MyData"] = "Meus dados",
+        ["Profile.PixReceiverTitle"] = "Recebimento (Pix)",
+        ["Profile.PixReceiverHint"] = "Chave usada para receber os pagamentos das partidas do seu grupo.",
+        ["Profile.PixNotConfigured"] = "Chave Pix não configurada.",
         ["MyEvents.Title"] = "Meus Eventos",
         ["MyEvents.Aria"] = "Meus eventos",
         ["MyEvents.SectionTitle"] = "Eventos que você confirmou",
@@ -592,6 +594,10 @@ internal static class UtilityTexts
         ["Profile.StatOutfield"] = "Outfield player",
         ["Profile.StatGoalkeeper"] = "Goalkeeper",
         ["Profile.StatSessions"] = "Sessions",
+        ["Profile.MyData"] = "My data",
+        ["Profile.PixReceiverTitle"] = "Receiving (Pix)",
+        ["Profile.PixReceiverHint"] = "Key used to receive payments for your group matches.",
+        ["Profile.PixNotConfigured"] = "Pix key not configured.",
 
         // MyEvents
         ["MyEvents.Title"] = "My Events",
@@ -989,6 +995,10 @@ internal static class UtilityTexts
         ["Profile.StatOutfield"] = "Jugador de campo",
         ["Profile.StatGoalkeeper"] = "Portero",
         ["Profile.StatSessions"] = "Sesiones",
+        ["Profile.MyData"] = "Mis datos",
+        ["Profile.PixReceiverTitle"] = "Recepción (Pix)",
+        ["Profile.PixReceiverHint"] = "Clave usada para recibir los pagos de los partidos de tu grupo.",
+        ["Profile.PixNotConfigured"] = "Clave Pix no configurada.",
 
         // MyEvents
         ["MyEvents.Title"] = "Mis Eventos",

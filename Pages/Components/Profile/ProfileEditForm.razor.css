@@ -1,38 +1,18 @@
-.profile-edit-details {
-    border-top: 2px solid;
-    border-image: linear-gradient(to right, var(--ci-accent), var(--ci-accent-light), var(--ci-accent)) 1;
-    margin-bottom: 0.5rem;
+.profile-edit-section {
+    padding: 0;
 }
 
-.profile-edit-summary {
+.profile-edit-heading {
+    margin: 0;
     padding: 0.56rem 1.1rem;
     font-size: 0.85rem;
     font-weight: 800;
     color: var(--ci-surface-light);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    cursor: pointer;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    user-select: none;
+    border-bottom: 2px solid;
+    border-image: linear-gradient(to right, var(--ci-accent), var(--ci-accent-light), var(--ci-accent)) 1;
     text-shadow: 0 0 10px var(--accent-opacity-xl);
-}
-
-.profile-edit-summary::before {
-    content: "▸";
-    font-size: 0.75rem;
-    transition: transform 0.15s ease;
-}
-
-.profile-edit-details[open] > .profile-edit-summary::before {
-    transform: rotate(90deg);
-}
-
-.profile-edit-summary:hover {
-    background: var(--accent-opacity-2xs);
-    box-shadow: inset 0 0 0 1px var(--accent-opacity-sm);
 }
 
 .profile-edit-form {
@@ -158,7 +138,7 @@
 
 /* Mobile responsiveness */
 @media (max-width: 640px) {
-    .profile-edit-summary {
+    .profile-edit-heading {
         padding: 0.5rem 0.9rem;
         font-size: 0.8rem;
     }
@@ -198,7 +178,7 @@
 
 /* Mobile muito pequeno (<375px) */
 @media (max-width: 375px) {
-    .profile-edit-summary {
+    .profile-edit-heading {
         padding: 0.45rem 0.75rem;
         font-size: 0.75rem;
     }

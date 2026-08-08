@@ -1,19 +1,40 @@
 @using System.Globalization
 @using Confirmai.Models
 @using Confirmai.Services.Core
+@using Microsoft.AspNetCore.Components.Forms
 @inject UiTextService T
 
 @if (User is not null)
 {
     <div class="profile-card">
         <header class="profile-card-header">
-            @if (!string.IsNullOrWhiteSpace(User.AvatarPath))
+            @if (IsOwnProfile)
             {
-                <img class="profile-avatar-img" src="@User.AvatarPath" alt="@string.Format(T["Profile.AvatarAlt"], DisplayName)" />
+                <div class="profile-avatar-wrapper">
+                    @if (!string.IsNullOrWhiteSpace(CurrentAvatarPath))
+                    {
+                        <img class="profile-avatar-img" src="@CurrentAvatarPath" alt="@string.Format(T["Profile.AvatarAlt"], DisplayName)" />
+                    }
+                    else
+                    {
+                        <div class="profile-avatar-initials" aria-hidden="true">@AvatarInitial</div>
+                    }
+                    <InputFile id="profile-avatar-input" OnChange="HandleAvatarSelected" accept=".jpg,.jpeg,.png" class="profile-avatar-input" style="display:none" />
+                    <label for="profile-avatar-input" class="profile-avatar-overlay" title="@T["Profile.ChangeAvatar"]">
+                        <span class="profile-avatar-overlay-text">@T["Profile.ChangeAvatar"]</span>
+                    </label>
+                </div>
             }
             else
             {
-                <div class="profile-avatar-initials" aria-hidden="true">@AvatarInitial</div>
+                @if (!string.IsNullOrWhiteSpace(User.AvatarPath))
+                {
+                    <img class="profile-avatar-img" src="@User.AvatarPath" alt="@string.Format(T["Profile.AvatarAlt"], DisplayName)" />
+                }
+                else
+                {
+                    <div class="profile-avatar-initials" aria-hidden="true">@AvatarInitial</div>
+                }
             }
             <div class="profile-identity">
                 <h1 class="profile-name">@DisplayName</h1>
@@ -23,5 +44,20 @@
                 }
             </div>
         </header>
+        @if (IsOwnProfile)
+        {
+            <div class="profile-avatar-actions">
+                @if (SelectedFile != null)
+                {
+                    <button class="mk-btn mk-btn-primary profile-avatar-save-btn" type="button" @onclick="HandleSaveAvatar" disabled="@IsSavingAvatar">
+                        @(IsSavingAvatar ? T["Profile.Saving"] : T["Profile.SaveAvatar"])
+                    </button>
+                }
+                @if (!string.IsNullOrWhiteSpace(AvatarFeedback))
+                {
+                    <p class="profile-feedback" role="status">@AvatarFeedback</p>
+                }
+            </div>
+        }
     </div>
 }
