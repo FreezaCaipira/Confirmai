@@ -22,7 +22,7 @@
 
         @* ── Card geral ──────────────────────────────────────────────────── *@
         <ProfileHeaderCard User="@user" />
-        <ProfileContactsDisplay User="@user" />
+        <ProfileContactsDisplay User="@user" IsOwnProfile="@isOwnProfile" />
 
         @if (isOwnProfile)
         {

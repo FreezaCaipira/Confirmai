@@ -4,7 +4,7 @@
 
 @if (User is not null && (!string.IsNullOrWhiteSpace(User.InstagramHandle)
      || !string.IsNullOrWhiteSpace(User.DiscordHandle)
-     || !string.IsNullOrWhiteSpace(User.PixKey)))
+     || (IsOwnProfile && !string.IsNullOrWhiteSpace(User.PixKey))))
 {
     <section class="profile-contacts-section">
         @if (!string.IsNullOrWhiteSpace(User.InstagramHandle))
@@ -21,7 +21,7 @@
                 <span class="profile-contact-value">@User.DiscordHandle</span>
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(User.PixKey))
+        @if (ProfilePixVisibility.ShouldShowPix(IsOwnProfile, !string.IsNullOrWhiteSpace(User.PixKey)))
         {
             <div class="profile-contact-row">
                 <span class="profile-contact-label">@T["Profile.Pix"]</span>
