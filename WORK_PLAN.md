@@ -160,7 +160,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 24 | Pagamento V1 usavel + i18n do pagamento + cobertura do fluxo manual | Seletor de gateways escondido quando OFF (`ShouldShowGateways`/`ShouldShowManualPix` extraidos e testados); i18n do fluxo de pagamento migrada (`PaymentTexts`); +6 testes de logica do ramo (fluxo manual ponta a ponta ja coberto por `PixManualPaymentFlowTests`). 2127->2133. | #83 (plano), #84 (impl), #85 (review) | APROVADO |
 
-| 25 | i18n completo (zerar debito tecnico) | Migracao de ~450 strings hardcoded em ~55 arquivos .razor para `@Ui[...]` + teste de convencao anti-hardcode. | #86 (plano+impl) | EM EXECUCAO |
+| 25 | i18n completo (zerar debito tecnico) | ~450 strings migradas em ~70 arquivos `.razor` (Futsal/Poker/Groups/Admin/Payment/Venue/Profile/Docs); 4 dominios novos (`FutsalTexts`, `PokerTexts`, `GroupTexts`, `UtilityTexts`) + `AdminTexts`/`CoreTexts`/`PaymentTexts` estendidos, PT-BR/EN-US/ES-ES; +32 testes de completude/paridade de chaves; extras: fix NullRef em `BuildPixStaticPayload`, aviso "Pix nao configurado", padronizacao `btn-view-groups`, cascata CSS `detail-admin-btn`, remocao de debug write em teste. 2133->2165. | #86 (plano+impl), #87 (review) | APROVADO c/ ressalvas |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -170,7 +170,33 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 ---
 
-## Ciclo 25 (Pleno) -- i18n completo: zerar debito tecnico de strings hardcoded [EM EXECUCAO]
+## Review Senior do Ciclo 25 (PR #86) -- APROVADO com ressalvas
+
+- **PR/branch**: #86 (`refactor/ciclo25-i18n-completo`), **ja mergeada na `main`** (merge `3e31964`). Review nesta PR #87.
+- **Build**: `dotnet build --no-incremental` na `main` veio com **2 warnings CS8602** (`Pages/Groups/Detail.razor` 158 e 167) -- **regressao** da meta "0 warning". **Corrigido nesta PR de review** (causa: o novo `@if (isAdmin && group is not null && ...)` dentro do bloco `else` onde `group` ja e nao-nulo quebrou a analise de fluxo do compilador; removida a checagem redundante). Apos o fix: **0 warning / 0 error**.
+- **Testes**: **2165 passed / 2189** (2133 -> 2165, **+32**). As 24 falhas sao `ProgramConfigurationTests` tentando conectar em `127.0.0.1:5432` sem Postgres local -- **ambiente, nao regressao** (recorrente desde o Ciclo 18).
+- **Por fase**:
+  - **Fases 1-5 (i18n) -- ATINGIDAS**. Varredura de literais acentuados visiveis em `Pages/**/*.razor` caiu de ~450 para **8 ocorrencias**: `PayoutAccountEditor.razor:46` ("Chave Aleatoria"), `AdminUserView.razor:78` ("Papeis & Permissoes"), `Poker/Create.razor:84,91` e `Poker/Edit.razor:82` (placeholders de endereco/cidade), `Poker/Index.razor:108` ("Late Reg ate"), `Users.razor:5` ("Usuarios"), `Components/EscalacaoVoting.razor:80` ("Voce"). Dominios novos (`FutsalTexts`, `PokerTexts`, `GroupTexts`, `UtilityTexts`) com PT-BR/EN-US/ES-ES preenchidos -- o Pleno foi **alem** do pedido (o plano exigia so PT-BR baseline).
+  - **Fase 6 (teste de convencao) -- PARCIAL**: o plano pedia um **teste anti-hardcode** (falhar se aparecer literal acentuado em `.razor`). O Pleno entregou `Ciclo25I18nCompletenessTests.cs` (+32), que valida **paridade de chaves entre idiomas**, valores nao-vazios, existencia das chaves da Fase 5 e EN != PT. E util e complementar, mas **nao guarda contra novo hardcode** -- o objetivo real da fase. Fica para o Ciclo 26 (baixo custo agora que so restam 8 ocorrencias em `Pages`).
+- **Extras fora do escopo declarado** (o plano dizia "nao mudar layout/CSS"): padronizacao do botao `btn-view-groups` em 6 telas + `NoGroupsHint`, movimentacao de `detail-admin-btn--whatsapp/--invite/--settings` de `events.css` para `event-detail.css` (ordem de cascata), reposicionamento do card "Pix nao configurado", remocao de botoes "Voltar" redundantes na tela de pagamento. **Aceitos**: sao correcoes de UX levantadas pelo Robson nos testes (regra 22) e vieram documentadas no PR. Sem impacto em regra de negocio.
+- **Bug fix legitimo**: `EventPaymentService.BuildPixStaticPayload` ganhou guard para `pixKey` nulo/vazio (retorna `string.Empty`) e o `!` null-forgiving saiu da chamada em `EventPayment.razor`. O componente `EventPaymentPixAdmin` ja tratava a ausencia de chave (`Payment.NoPixKey`), entao o efeito e so eliminar o NullRef.
+- **Higiene**: removido `File.WriteAllText(@"C:\temp\grupos_debug.html")` que estava em `GroupsIntegrationTests` -- bom achado; era um caminho Windows que quebraria o CI Linux.
+- **Os 7 testes de integracao** que o Pleno reportou como falhando (assertavam strings PT hardcoded) **ja foram corrigidos** no commit `dc0fc82` da propria PR. Suite verde. Nada pendente aqui.
+- **Ressalvas (nao bloqueantes)**:
+  1. 2 warnings CS8602 introduzidos (corrigidos pelo Senior nesta PR) -- a regra "build 0 warning" precisa ser verificada com `--no-incremental`, senao o build incremental esconde warnings.
+  2. Teste de convencao anti-hardcode nao entregue (Fase 6 parcial).
+  3. 8 literais residuais em `Pages` + 16 em `Shared/Components/**` (`Shared` nunca esteve no escopo do plano; entra no Ciclo 26).
+
+### Respostas do Senior aos 4 pontos levantados pelo Pleno na PR #86
+
+1. **UX da tela de Profile** -- aceito como fase do **Ciclo 26**, mas precisa de escopo concreto antes de virar plano: o Robson vai listar o que incomoda na tela (o que ele viu testando). Sem lista, o Pleno **nao deve** redesenhar por conta propria (regra 16). Enquanto isso, o Senior levanta o obvio: `/profile/{Id}` acumula perfil + edicao + chat + stats numa unica tela, e e o destino do link "Configurar Pix" -- ou seja, o organizador cai numa tela longa so pra cadastrar a chave. Sugestao: **secao Pix com ancora propria** (`/profile/{id}#pix`) ou um caminho dedicado de configuracao de recebimento.
+2. **Repasse manual ao organizador + cobrar taxa e mostrar acumulado** -- **precisa de decisao do Robson antes de virar plano** (muda regra de negocio e modelo financeiro). Contexto factual: hoje a taxa e **fixa em reais**, nao percentual: `Fee:AppFeeFixed = R$ 0,50` + `Fee:GatewayFeeFixed = R$ 0,25` = **R$ 0,75 por confirmacao** (o Pleno escreveu "0,75%", que e outra coisa -- **nao implementar como percentual**). No V1 manual o dinheiro vai **direto** do jogador para o Pix do organizador: a plataforma **nao passa pelo fluxo**, entao a taxa nao pode ser retida -- ela viraria um **saldo devedor do organizador para a plataforma** (cobranca posterior). Isso e um subsistema novo (ledger de taxa a receber, fechamento, cobranca, inadimplencia). **Nao entra no Ciclo 26**; o caminho natural continua sendo o V2 automatico, onde a retencao acontece no split. Se o Robson quiser mesmo cobrar no V1 manual, o passo minimo e apenas **exibir o acumulado devido** (leitura, sem cobranca) numa tela de admin -- e isso precisa de aprovacao explicita.
+3. **Pix do admin como pre-requisito** -- **de acordo, e ja comecou**: o proprio Ciclo 25 adicionou o aviso "Pix nao configurado" em `Groups/Detail.razor` para admin quando o grupo esta em modo manual e nenhum admin tem `PixKey`. O que falta (Ciclo 26): (a) mesmo aviso/bloqueio ao **criar partida com preco** em grupo manual sem Pix -- hoje o jogador chega na tela de pagamento e ve "chave nao cadastrada", ou seja, o erro aparece tarde, do lado errado; (b) teste cobrindo a regra. **Nao** bloquear a criacao do grupo (so a cobranca depende do Pix).
+4. **7 testes de integracao com string PT hardcoded** -- ja resolvido pelo proprio Pleno em `dc0fc82`; suite verde (2165). Licao para o pipeline: quando uma tela migra para i18n, os testes que assertam texto devem passar a assertar pela **chave via `UiTextService`**, nunca pelo literal.
+
+---
+
+## Ciclo 25 (Pleno) -- i18n completo: zerar debito tecnico de strings hardcoded [EXECUTADO -- ver review acima]
 
 **Objetivo**: migrar TODAS as strings hardcoded restantes em `Pages/**/*.razor` para `@Ui["Dominio.Chave"]` (regra 25), zerando o debito tecnico de i18n para que daqui pra frente a regra 25 seja apenas manutencao natural. Adicionar teste de convencao anti-hardcode (P3) para guardar o progresso.
 

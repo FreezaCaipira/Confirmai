@@ -131,7 +131,7 @@ else
             }
 
             @* ── Aviso: nenhum admin tem Pix (apenas para admins, apenas Pix direto) ── *@
-            @if (isAdmin && group is not null && !group.EnablePaymentGateways && !group.Members.Any(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey)))
+            @if (isAdmin && !group.EnablePaymentGateways && !group.Members.Any(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey)))
             {
                 <hr class="detail-divider">
                 <div class="detail-pix-notice">
