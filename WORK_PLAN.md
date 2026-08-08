@@ -160,7 +160,9 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 24 | Pagamento V1 usavel + i18n do pagamento + cobertura do fluxo manual | Seletor de gateways escondido quando OFF (`ShouldShowGateways`/`ShouldShowManualPix` extraidos e testados); i18n do fluxo de pagamento migrada (`PaymentTexts`); +6 testes de logica do ramo (fluxo manual ponta a ponta ja coberto por `PixManualPaymentFlowTests`). 2127->2133. | #83 (plano), #84 (impl), #85 (review) | APROVADO |
 
-| 25 | i18n completo (zerar debito tecnico) | Migracao de ~450 strings hardcoded em ~55 arquivos .razor para `@Ui[...]` + teste de convencao anti-hardcode. | #86 (plano+impl) | EM EXECUCAO |
+| 25 | i18n completo (zerar debito tecnico) | ~450 strings migradas em ~70 arquivos `.razor` (Futsal/Poker/Groups/Admin/Payment/Venue/Profile/Docs); 4 dominios novos (`FutsalTexts`, `PokerTexts`, `GroupTexts`, `UtilityTexts`) + `AdminTexts`/`CoreTexts`/`PaymentTexts` estendidos, PT-BR/EN-US/ES-ES; +32 testes de completude/paridade de chaves; extras: fix NullRef em `BuildPixStaticPayload`, aviso "Pix nao configurado", padronizacao `btn-view-groups`, cascata CSS `detail-admin-btn`, remocao de debug write em teste. 2133->2165. | #86 (plano+impl), #87 (review) | APROVADO c/ ressalvas |
+
+| 26 | Taxa acumulada p/ repasse manual + UX Profile + privacidade do Pix + fechar i18n | Planejado: Fase 0 privacidade (Pix exposto no perfil publico), Fase 1 UX Profile, Fase 2 ledger da taxa R$ 0,75 (futsal/manual), Fase 3 repasse com comprovante (organizador envia, admin do sistema confirma -- espelho do fluxo do jogador), Fase 4 taxa discriminada ao jogador (`Partida + Taxa = Total`), Fase 5 Pix como pre-requisito, Fase 6 fechar i18n + teste anti-hardcode. | #87 (plano) | PLANEJADO |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -170,7 +172,174 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 ---
 
-## Ciclo 25 (Pleno) -- i18n completo: zerar debito tecnico de strings hardcoded [EM EXECUCAO]
+## Ciclo 26 (Pleno) -- Taxa acumulada p/ repasse manual + UX do Profile + privacidade da chave Pix + fechar i18n [PLANEJADO]
+
+**Origem**: decisoes do Robson (mensagem pos-review do C25) + pontos que o Pleno levantou na PR #86 + ressalvas da review do C25.
+
+**Regra de ouro**: TDD (teste antes), SOLID, i18n (regra 25) em tudo que for texto novo, build `--no-incremental` **0 warning**, suite verde. 1 commit por fase. **Nao** mexer no fluxo do dinheiro do V1 manual (o jogador continua pagando direto no Pix do organizador).
+
+### Decisoes do Robson ja travadas (nao reabrir)
+
+1. **Taxa da plataforma no V1 manual = R$ 0,75 fixo por confirmacao paga**, apenas em partidas de **futebol/futsal** (`Sport.Futsal`). Racional do Robson: o jogador de linha paga R$ 10-15, entao R$ 0,75 e irrisorio.
+2. **O sistema NAO intermedia o dinheiro**: soma o devido e **mostra no painel do organizador/manager do grupo**, que faz o **repasse manual** a plataforma. Motivacao: menos complexidade de integracao bancaria e menos exposicao de receita.
+3. **Transparencia com o usuario**: *"podemos detalhar a taxa sim, prezemos por transparencia com o user"* -- a taxa aparece **discriminada** na tela de pagamento (`Partida + Taxa = Total`), nao embutida no preco (Fase 4).
+4. **Os dois lados do repasse, espelhando o fluxo que ja existe**: assim como *o jogador envia comprovante e o organizador confirma o recebimento*, agora **o organizador faz o Pix, envia o comprovante, e o admin do sistema confirma o recebimento** daquele grupo. Mesmo padrao mental, mesma UI, mesmo codigo (Fase 3). O organizador ve as taxas **por partida** (pagas/pendentes) e o **somatorio a pagar**; o admin do sistema ve os grupos com repasses pendentes/realizados.
+5. **UX do Profile**: o Robson reportou "tela poluida visualmente, opcoes pouco claras, pouco intuitivo". Escopo aberto para reorganizacao (ver Fase 1).
+
+### Fase 0 -- PRIVACIDADE: nao expor chave Pix no perfil publico (P0, fazer primeiro)
+
+**Bug encontrado pelo Senior auditando a tela**: `Pages/Components/Profile/ProfileContactsDisplay.razor` renderiza `User.PixKey` para **qualquer visitante** do perfil -- o componente nao recebe nem consulta `isOwnProfile`. Ou seja, a chave Pix de qualquer usuario e visivel na rota publica `/profile/{Id}`. Instagram/Discord sao contatos sociais (ok expor); **chave Pix nao e**. Expor a chave do organizador na **tela de pagamento** para quem vai pagar continua correto -- o problema e o perfil.
+
+- Adicionar `[Parameter] public bool IsOwnProfile { get; set; }` ao componente e so renderizar a linha de Pix quando `IsOwnProfile` for true; passar `IsOwnProfile="@isOwnProfile"` em `Pages/Profile.razor`.
+- **Teste primeiro**: renderizar/asserir que a chave nao aparece para visitante e aparece para o dono (pode ser teste do componente via parametro, sem bUnit -- se nao der, testar o predicado extraido).
+
+### Fase 1 -- UX do Profile: menos cards, opcoes claras
+
+**Diagnostico do Senior** (auditando `Pages/Profile.razor` + `Pages/Components/Profile/*`), casando com o "poluida e pouco intuitiva" do Robson:
+
+1. **Ate 5 blocos empilhados** no proprio perfil: `ProfileHeaderCard`, `ProfileContactsDisplay`, `ProfileEditForm`, `AvatarUploadSection`, `ProfileSportStats` -- cada um com moldura propria. E scroll longo sem hierarquia.
+2. **Conteudo duplicado**: `ProfileContactsDisplay` mostra Instagram/Discord/Pix em modo leitura e logo abaixo o `ProfileEditForm` mostra os **mesmos 3 campos** em modo edicao. O dono ve tudo duas vezes.
+3. **Edicao escondida**: o form vive dentro de `<details><summary>Editar perfil</summary>` -- colapsado, sem indicacao de que ha algo dentro. E a principal razao de "opcoes pouco claras".
+4. **Avatar separado do avatar**: `AvatarUploadSection` e um card proprio, longe do avatar exibido no header.
+5. **Pix sem contexto**: a chave Pix aparece como se fosse um contato social (ao lado de Instagram/Discord), quando na verdade e **configuracao de recebimento** -- e e o destino do link "Configure a sua Chave Pix" vindo do grupo. Quem chega por esse link cai no topo de uma tela longa e nao sabe onde clicar.
+6. **Deep link morto**: `Pages/Profile.razor.cs:84` faz `_ = query.TryGetValue("intent", out _);` -- le o parametro `intent` e **descarta**. A intencao de "vim aqui pra configurar o Pix" existe no codigo, mas nao faz nada.
+
+**Alvo**:
+
+- **Fundir** header + avatar num unico card de identidade (avatar clicavel/hover abre o upload para o dono).
+- **Um card "Meus dados"** para o dono, com os campos **sempre visiveis** (sem `<details>`), substituindo a dupla leitura+edicao. Visitante continua vendo so a leitura (Instagram/Discord; Pix nunca -- Fase 0).
+- **Separar "Recebimento (Pix)"** num bloco proprio, com rotulo explicando para que serve ("usada para receber os pagamentos das partidas do seu grupo").
+- **Fazer o `intent` funcionar**: `/profile/{id}?intent=pix` (ou ancora `#pix`) rola ate o bloco de Pix e o destaca; atualizar o link em `PixReceiverSelector.razor` para usar isso.
+- Manter `ProfileSportStats` como esta (as abas Futsal/Poker funcionam bem).
+- Mobile-first, breakpoint 768px, CSS em `Pages/Profile.razor.css` / arquivo de dominio -- **sem `!important`**.
+- **Verificacao visual obrigatoria** (regra 26): 375px e desktop, dono e visitante, registrar no PR.
+
+### Fase 2 -- Ledger da taxa da plataforma (R$ 0,75, futsal, fluxo manual)
+
+**Modelo (snapshot, nao calculo derivado)**: gravar o valor da taxa **no momento em que a confirmacao vira paga**, para que mudanca futura de tarifa nao reescreva o passado.
+
+- `Models/EventConfirmation.cs`: nova coluna `public decimal? PlatformFeeAmount { get; set; }` (null = confirmacao anterior ao ciclo / nao aplicavel).
+- `Configuration/FeeOptions.cs`: nova opcao `public decimal ManualPlatformFeeFixed { get; set; } = 0;` e `appsettings.json` -> `"ManualPlatformFeeFixed": 0.75`. **Nao reutilizar** `AppFeeFixed`/`GatewayFeeFixed`: aqueles sao a matematica do V2 com gateway (0,50 + 0,25) e ja aparecem no `EventPaymentChargeCalculator`/`PayoutService`. Misturar os dois quebra o V2.
+- Novo `Services/Payment/PlatformFeeLedgerService.cs`:
+  - `StampFeeOnPaidAsync(confirmationId)` -- chamado quando o organizador confirma o pagamento (`AdminConfirmationService`) e quando o gateway confirma; **so** carimba se `Event.Group.Sport == Sport.Futsal`, se o grupo esta em modo manual (`!EnablePaymentGateways`) e se `PlatformFeeAmount` ainda e null (**idempotente**).
+  - `GetGroupBalanceAsync(groupId)` -> `(decimal Accrued, decimal Settled, decimal Due)`.
+- Novo `Models/PlatformFeeSettlement.cs` -- **lote de repasse** com comprovante e status (`EmAnalise`/`Pago`/`Rejeitado`); enviado pelo organizador, confirmado pelo admin do sistema. Estrutura completa e regras na **Fase 3**.
+- Migration: **so adicionar coluna/tabela**, sem `UPDATE` em dados existentes (licao do Ciclo 19).
+- **Testes obrigatorios**: carimbo idempotente; nao carimba poker; nao carimba grupo com gateway ligado; nao carimba confirmacao pendente; `Due = Accrued - Settled` (contando so lote `Pago`); toggle-back de pago->pendente **nao** apaga o carimbo (a taxa foi devida no momento do pagamento) -- se o Pleno discordar, documentar antes de mudar.
+
+### Fase 3 -- Repasse com comprovante: **mesmo fluxo do pagamento da partida, um nivel acima**
+
+**Decisao do Robson**: *"da mesma forma que o jogador envia um comprovante e o organizador confirma o recebimento, facamos o mesmo: o organizador faz o pix e envia o comprovante, o admin por sua vez confirma o recebimento do organizador daquele grupo"*. O fluxo passa a ser **o mesmo padrao em dois niveis**:
+
+```
+Nivel 1 (ja existe):  jogador      --paga--> organizador   --envia comprovante--> organizador confirma
+Nivel 2 (Ciclo 26):   organizador  --paga--> plataforma    --envia comprovante--> admin do sistema confirma
+```
+
+**Por que isso e bom**: reaproveita o modelo mental do usuario, a UI e o codigo. `PixProofUploadService` (validacao MIME jpeg/png/webp + limite de 5 MB + persistencia em coluna `byte[]`) e `AdminConfirmationService` ja fazem exatamente isso no nivel 1. **Nao inventar um segundo mecanismo de upload** -- generalizar/espelhar o existente, mantendo os mesmos limites e a mesma validacao.
+
+**Criticas do Senior que entram como regra do desenho** (o Robson pediu criticas):
+
+1. **O comprovante e o gatilho, nao a baixa.** Enviar comprovante move o repasse para `EmAnalise`; **so a confirmacao do admin do sistema** move para `Pago`. Assim o organizador ganha uma **acao** (declarar que pagou) sem ganhar o **poder** de quitar a propria divida. No fluxo manual o sistema nao observa a transferencia -- nao ha webhook nem extrato --, entao "pago" so pode significar "o admin do sistema confirmou".
+2. **O repasse e por valor, nao por partida.** O organizador manda **um Pix so** cobrindo varias partidas. O comprovante, portanto, se anexa a um **lote de repasse**, nao a uma partida. Exigir um comprovante por partida seria inviavel na pratica.
+3. **Baixa FIFO.** Um lote de R$ 15,00 quita as partidas pendentes mais antigas ate esgotar o valor; partida parcialmente coberta continua `Pendente` ate ser totalmente coberta; sobra vira credito abatido no proximo lote. E o que mantem a lista por partida coerente com o saldo.
+4. **Rejeicao tem que existir.** Comprovante ilegivel/errado precisa de um caminho de volta (`Rejeitado` + motivo), senao o repasse fica preso em `EmAnalise` para sempre.
+
+**Modelo** -- `Models/PlatformFeeSettlement.cs` passa a ser o **lote de repasse** e nao so o registro de baixa:
+
+```csharp
+public int      Id;
+public int      GroupId;
+public decimal  Amount;                 // valor declarado pelo organizador
+public string   SubmittedByUserId;      // organizador que enviou
+public DateTime SubmittedAt;
+public byte[]?  ProofImageData;         // mesmo padrao de EventConfirmation.PixProofImageData
+public string?  ProofContentType;
+public PlatformFeeSettlementStatus Status;   // EmAnalise | Pago | Rejeitado
+public string?  ReviewedByUserId;       // admin do sistema
+public DateTime? ReviewedAt;
+public string?  ReviewNote;             // motivo da rejeicao / observacao
+```
+
+So lote com `Status == Pago` abate saldo (`Settled`). `EmAnalise` aparece nas duas telas como "aguardando confirmacao", **sem** reduzir o devido.
+
+**Lado do organizador** -- `Pages/Groups/Payments.razor` (tela de admin do grupo, hoje com abas `delinquent`/`history`): **nova aba "Taxa da plataforma"** com:
+- **linha por partida**: data, nome da partida, nº de pagantes, taxa da partida (`pagantes x 0,75`) e **status** (`Pago` / `Pendente`);
+- **somatorio a repassar** em destaque, mais acumulado, em analise e ja repassado;
+- **chave Pix da plataforma** vinda de config (**nao hardcoded**) + QR, espelhando o card que o jogador ve;
+- **acao "Enviar comprovante do repasse"**: valor + imagem, criando o lote em `EmAnalise` -- espelho exato do `EventPaymentProof`;
+- historico dos lotes enviados com status e, se rejeitado, o motivo;
+- **sem** botao de "marcar como pago".
+- Exibir a aba **apenas** em grupo `Sport.Futsal` em modo manual (nos demais o saldo e sempre zero e a aba so polui).
+
+**Lado do admin do sistema** -- `Pages/Admin/AdminRevenue.razor` (ja existe): grupos com taxa acumulada separando **pendente**, **em analise** e **quitado**; fila de lotes aguardando confirmacao com **visualizacao do comprovante**; acoes **Confirmar recebimento** e **Rejeitar (com motivo)** -- espelho do que o organizador faz no nivel 1.
+
+**Servir a imagem do comprovante**: `Program.cs` ja expoe `GET /api/pix-proof/{id}` autorizado ao pagador ou admin do grupo. Criar o analogo `GET /api/fee-settlement-proof/{id}`, autorizado **ao organizador do grupo dono do lote ou ao admin do sistema** -- seguindo o mesmo padrao de `Results.Unauthorized/NotFound/Forbid`. **Nao** deixar a imagem publica.
+
+**Testes obrigatorios**: organizador **nao** consegue mover para `Pago`; comprovante em `EmAnalise` nao abate saldo; confirmacao abate FIFO (parcial, exata e maior que o devido); rejeicao devolve o saldo e preserva o motivo; upload rejeita MIME invalido e > 5 MB (mesmos limites do nivel 1); autorizacao do endpoint da imagem (terceiro recebe `Forbid`).
+
+- i18n de todos os textos novos (`GroupTexts` / `AdminTexts`).
+
+### Fase 4 -- Cobranca ao jogador: R$ 0,75 por cima, **detalhada** (CONFIRMADO pelo Robson)
+
+**Decisao do Robson**: *"podemos detalhar a taxa sim, prezemos por transparencia com o user"*. Fase **liberada**.
+
+- A tela de pagamento no modo manual mostra a composicao **discriminada**: `Partida R$ 15,00` + `Taxa da plataforma R$ 0,75` = **`Total R$ 15,75`**. Nada de embutir a taxa silenciosamente no preco.
+- O **QR/payload Pix e o valor sugerido** usam o **total** (R$ 15,75) -- senao o organizador recebe a menos e paga a taxa do proprio bolso.
+- Reaproveitar o padrao ja existente em `EventPaymentSummary` (que ja discrimina base + taxa no V2); a diferenca e a origem do valor (`ManualPlatformFeeFixed` em vez de `AppFeeFixed + GatewayFeeFixed`).
+- **Consequencia a explicitar na UI do organizador**: esses R$ 0,75 caem **na conta dele**; e por isso que ele deve o repasse. O texto da aba "Taxa da plataforma" deve deixar isso claro ("voce recebeu a taxa junto com o valor da partida; repasse o total abaixo").
+- So aplicar em `Sport.Futsal` + modo manual + preco > 0 (coerente com a Fase 2). Partida gratuita nao gera taxa.
+
+### Fase 5 -- Pix do admin como pre-requisito (pedido do Pleno, aprovado)
+
+Hoje o erro aparece tarde e do lado errado: o jogador chega em `/pagamento/evento/{id}` e ve "chave nao cadastrada". O Ciclo 25 ja adicionou o aviso em `Groups/Detail.razor`.
+- Ao **criar/editar partida com preco > 0** em grupo manual sem nenhum admin com `PixKey`: bloquear o submit com mensagem clara + link direto para a configuracao de Pix.
+- **Nao** bloquear a criacao do grupo nem partida gratuita.
+- Teste da regra (service, nao UI).
+
+### Fase 6 -- Fechar o i18n (ressalvas da review do C25)
+
+1. **Teste de convencao anti-hardcode** (era a Fase 6 do C25, entregue so parcialmente): falha se aparecer literal acentuado visivel em `.razor` sob `Pages/**`. Comecar com allowlist dos residuais conhecidos e ir esvaziando -- assim o teste entra verde e trava regressao.
+2. Migrar os **8 residuais** em `Pages`: `Groups/Components/PayoutAccountEditor.razor:46`, `Admin/AdminUserView.razor:78`, `Poker/Create.razor:84,91`, `Poker/Edit.razor:82`, `Poker/Index.razor:108`, `Users.razor:5`, `Components/EscalacaoVoting.razor:80`.
+3. Migrar os **16 literais em `Shared/Components/**`** (`GroupDetailMembers`, `RankingTable`, `GroupMetrics`, `PaginationControls`, `PokerDetailInfo`, `UserSummaryCard`, `FutsalWaitlist`, `MainLayout`) -- `Shared` nunca esteve no escopo do C25.
+4. Migrar as **6 strings hardcoded em `Pages/Profile.razor.cs`** (linhas ~90, 91, 99, 108, 117): mensagens de feedback ainda em PT literal, violando a regra 25 (mensagem de retorno tambem passa pelo `UiTextService`).
+
+### O que NAO fazer
+- Nao implementar cobranca automatica, split, boleto ou integracao bancaria -- o repasse e **manual** por decisao do Robson.
+- Nao permitir que o **organizador** de baixa no proprio saldo devedor.
+- Nao mexer no `EventPaymentChargeCalculator`/`PayoutService` (matematica do V2).
+- Nao redesenhar o Profile inteiro do zero nem trocar de framework de UI -- reorganizar o que existe (Fase 1).
+- Nao completar EN/ES manualmente onde nao houver chave; PT-BR e o baseline.
+
+---
+
+## Review Senior do Ciclo 25 (PR #86) -- APROVADO com ressalvas
+
+- **PR/branch**: #86 (`refactor/ciclo25-i18n-completo`), **ja mergeada na `main`** (merge `3e31964`). Review nesta PR #87.
+- **Build**: `dotnet build --no-incremental` na `main` veio com **2 warnings CS8602** (`Pages/Groups/Detail.razor` 158 e 167) -- **regressao** da meta "0 warning". **Corrigido nesta PR de review** (causa: o novo `@if (isAdmin && group is not null && ...)` dentro do bloco `else` onde `group` ja e nao-nulo quebrou a analise de fluxo do compilador; removida a checagem redundante). Apos o fix: **0 warning / 0 error**.
+- **Testes**: **2165 passed / 2189** (2133 -> 2165, **+32**). As 24 falhas sao `ProgramConfigurationTests` tentando conectar em `127.0.0.1:5432` sem Postgres local -- **ambiente, nao regressao** (recorrente desde o Ciclo 18).
+- **Por fase**:
+  - **Fases 1-5 (i18n) -- ATINGIDAS**. Varredura de literais acentuados visiveis em `Pages/**/*.razor` caiu de ~450 para **8 ocorrencias**: `PayoutAccountEditor.razor:46` ("Chave Aleatoria"), `AdminUserView.razor:78` ("Papeis & Permissoes"), `Poker/Create.razor:84,91` e `Poker/Edit.razor:82` (placeholders de endereco/cidade), `Poker/Index.razor:108` ("Late Reg ate"), `Users.razor:5` ("Usuarios"), `Components/EscalacaoVoting.razor:80` ("Voce"). Dominios novos (`FutsalTexts`, `PokerTexts`, `GroupTexts`, `UtilityTexts`) com PT-BR/EN-US/ES-ES preenchidos -- o Pleno foi **alem** do pedido (o plano exigia so PT-BR baseline).
+  - **Fase 6 (teste de convencao) -- PARCIAL**: o plano pedia um **teste anti-hardcode** (falhar se aparecer literal acentuado em `.razor`). O Pleno entregou `Ciclo25I18nCompletenessTests.cs` (+32), que valida **paridade de chaves entre idiomas**, valores nao-vazios, existencia das chaves da Fase 5 e EN != PT. E util e complementar, mas **nao guarda contra novo hardcode** -- o objetivo real da fase. Fica para o Ciclo 26 (baixo custo agora que so restam 8 ocorrencias em `Pages`).
+- **Extras fora do escopo declarado** (o plano dizia "nao mudar layout/CSS"): padronizacao do botao `btn-view-groups` em 6 telas + `NoGroupsHint`, movimentacao de `detail-admin-btn--whatsapp/--invite/--settings` de `events.css` para `event-detail.css` (ordem de cascata), reposicionamento do card "Pix nao configurado", remocao de botoes "Voltar" redundantes na tela de pagamento. **Aceitos**: sao correcoes de UX levantadas pelo Robson nos testes (regra 22) e vieram documentadas no PR. Sem impacto em regra de negocio.
+- **Bug fix legitimo**: `EventPaymentService.BuildPixStaticPayload` ganhou guard para `pixKey` nulo/vazio (retorna `string.Empty`) e o `!` null-forgiving saiu da chamada em `EventPayment.razor`. O componente `EventPaymentPixAdmin` ja tratava a ausencia de chave (`Payment.NoPixKey`), entao o efeito e so eliminar o NullRef.
+- **Higiene**: removido `File.WriteAllText(@"C:\temp\grupos_debug.html")` que estava em `GroupsIntegrationTests` -- bom achado; era um caminho Windows que quebraria o CI Linux.
+- **Os 7 testes de integracao** que o Pleno reportou como falhando (assertavam strings PT hardcoded) **ja foram corrigidos** no commit `dc0fc82` da propria PR. Suite verde. Nada pendente aqui.
+- **Ressalvas (nao bloqueantes)**:
+  1. 2 warnings CS8602 introduzidos (corrigidos pelo Senior nesta PR) -- a regra "build 0 warning" precisa ser verificada com `--no-incremental`, senao o build incremental esconde warnings.
+  2. Teste de convencao anti-hardcode nao entregue (Fase 6 parcial).
+  3. 8 literais residuais em `Pages` + 16 em `Shared/Components/**` (`Shared` nunca esteve no escopo do plano; entra no Ciclo 26).
+
+### Respostas do Senior aos 4 pontos levantados pelo Pleno na PR #86
+
+1. **UX da tela de Profile** -- aceito como fase do **Ciclo 26**, mas precisa de escopo concreto antes de virar plano: o Robson vai listar o que incomoda na tela (o que ele viu testando). Sem lista, o Pleno **nao deve** redesenhar por conta propria (regra 16). Enquanto isso, o Senior levanta o obvio: `/profile/{Id}` acumula perfil + edicao + chat + stats numa unica tela, e e o destino do link "Configurar Pix" -- ou seja, o organizador cai numa tela longa so pra cadastrar a chave. Sugestao: **secao Pix com ancora propria** (`/profile/{id}#pix`) ou um caminho dedicado de configuracao de recebimento.
+2. **Repasse manual ao organizador + cobrar taxa e mostrar acumulado** -- **precisa de decisao do Robson antes de virar plano** (muda regra de negocio e modelo financeiro). Contexto factual: hoje a taxa e **fixa em reais**, nao percentual: `Fee:AppFeeFixed = R$ 0,50` + `Fee:GatewayFeeFixed = R$ 0,25` = **R$ 0,75 por confirmacao** (o Pleno escreveu "0,75%", que e outra coisa -- **nao implementar como percentual**). No V1 manual o dinheiro vai **direto** do jogador para o Pix do organizador: a plataforma **nao passa pelo fluxo**, entao a taxa nao pode ser retida -- ela viraria um **saldo devedor do organizador para a plataforma** (cobranca posterior). Isso e um subsistema novo (ledger de taxa a receber, fechamento, cobranca, inadimplencia). **Nao entra no Ciclo 26**; o caminho natural continua sendo o V2 automatico, onde a retencao acontece no split. Se o Robson quiser mesmo cobrar no V1 manual, o passo minimo e apenas **exibir o acumulado devido** (leitura, sem cobranca) numa tela de admin -- e isso precisa de aprovacao explicita.
+3. **Pix do admin como pre-requisito** -- **de acordo, e ja comecou**: o proprio Ciclo 25 adicionou o aviso "Pix nao configurado" em `Groups/Detail.razor` para admin quando o grupo esta em modo manual e nenhum admin tem `PixKey`. O que falta (Ciclo 26): (a) mesmo aviso/bloqueio ao **criar partida com preco** em grupo manual sem Pix -- hoje o jogador chega na tela de pagamento e ve "chave nao cadastrada", ou seja, o erro aparece tarde, do lado errado; (b) teste cobrindo a regra. **Nao** bloquear a criacao do grupo (so a cobranca depende do Pix).
+4. **7 testes de integracao com string PT hardcoded** -- ja resolvido pelo proprio Pleno em `dc0fc82`; suite verde (2165). Licao para o pipeline: quando uma tela migra para i18n, os testes que assertam texto devem passar a assertar pela **chave via `UiTextService`**, nunca pelo literal.
+
+---
+
+## Ciclo 25 (Pleno) -- i18n completo: zerar debito tecnico de strings hardcoded [EXECUTADO -- ver review acima]
 
 **Objetivo**: migrar TODAS as strings hardcoded restantes em `Pages/**/*.razor` para `@Ui["Dominio.Chave"]` (regra 25), zerando o debito tecnico de i18n para que daqui pra frente a regra 25 seja apenas manutencao natural. Adicionar teste de convencao anti-hardcode (P3) para guardar o progresso.
 
