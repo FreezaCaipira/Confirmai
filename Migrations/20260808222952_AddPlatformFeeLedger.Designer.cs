@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Confirmai.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260808212739_AddPlatformFeeLedger")]
+    [Migration("20260808222952_AddPlatformFeeLedger")]
     partial class AddPlatformFeeLedger
     {
         /// <inheritdoc />
