@@ -160,11 +160,50 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 24 | Pagamento V1 usavel + i18n do pagamento + cobertura do fluxo manual | Seletor de gateways escondido quando OFF (`ShouldShowGateways`/`ShouldShowManualPix` extraidos e testados); i18n do fluxo de pagamento migrada (`PaymentTexts`); +6 testes de logica do ramo (fluxo manual ponta a ponta ja coberto por `PixManualPaymentFlowTests`). 2127->2133. | #83 (plano), #84 (impl), #85 (review) | APROVADO |
 
+| 25 | i18n completo (zerar debito tecnico) | Migracao de ~450 strings hardcoded em ~55 arquivos .razor para `@Ui[...]` + teste de convencao anti-hardcode. | #86 (plano+impl) | EM EXECUCAO |
+
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
 ---
 
 # Detalhes dos Ciclos Recentes (planos + reviews na integra)
+
+---
+
+## Ciclo 25 (Pleno) -- i18n completo: zerar debito tecnico de strings hardcoded [EM EXECUCAO]
+
+**Objetivo**: migrar TODAS as strings hardcoded restantes em `Pages/**/*.razor` para `@Ui["Dominio.Chave"]` (regra 25), zerando o debito tecnico de i18n para que daqui pra frente a regra 25 seja apenas manutencao natural. Adicionar teste de convencao anti-hardcode (P3) para guardar o progresso.
+
+**Regra de ouro**: PT-BR baseline em todos os dominios. Nao mudar regra de negocio. Build 0 warning + suite verde. 1 commit por fase.
+
+### Fase 1 -- i18n Futsal (maior volume)
+Arquivos: `Pages/Futsal/Detail.razor`, `Create.razor`, `Edit.razor`, `Escalacao.razor`, `Schedule/Edit.razor`, `Schedule/Index.razor`, `Components/EditEventForm.razor`, `Components/EscalacaoControls.razor`, `Components/FutsalMatchIdentity.razor`, `Components/FutsalGoalkeeperGroup.razor`, `Components/FutsalOutfieldGroup.razor`, `Components/DetailAdminPanel.razor`, `Components/DetailLocationSection.razor`, `Components/DetailQuorumBar.razor`, `Components/DateTimeSelector.razor`, `Components/EscalacaoShare.razor`, `Components/EscalacaoScoreEditor.razor`, `Components/PriceInput.razor`.
+Dominio: `FutsalTexts.cs` (novo) + `CoreTexts.cs` (existentes).
+
+### Fase 2 -- i18n Poker
+Arquivos: `Pages/Poker/Detail.razor`, `Create.razor`, `Edit.razor`, `Index.razor`.
+Dominio: `PokerTexts.cs` (novo) + `CoreTexts.cs`.
+
+### Fase 3 -- i18n Groups
+Arquivos: `Pages/Groups/Detail.razor`, `Create.razor`, `Index.razor`, `Join.razor`, `Features.razor`, `Payments.razor`, `Ranking.razor`, `Components/FeaturesToggles.razor`, `Components/PayoutAccountEditor.razor`, `Components/MembersManager.razor`.
+Dominio: `GroupTexts.cs` (novo) + `CoreTexts.cs`.
+
+### Fase 4 -- i18n Admin
+Arquivos: `Pages/Admin/Admin.razor`, `AdminRevenue.razor`, `AdminVenues.razor`, `AdminVenueEdit.razor`, `AdminUserView.razor`, `Components/AdminPaymentsSummaryPanel.razor`, `Components/AdminPaymentsAdvancedToolsModal.razor`.
+Dominio: `AdminTexts.cs` (existente, estender).
+
+### Fase 5 -- i18n Demais
+Arquivos: `Pages/Payment/PaymentCheckoutPanel.razor`, `Pages/MyEvents/Index.razor`, `Pages/VenueManager/Venues.razor`, `Pages/VenueManager/VenueEdit.razor`, `Pages/Profile.razor`, `Pages/Components/Profile/*`, `Pages/Components/EscalacaoVoting.razor`, `Pages/Components/MailboxConversationList.razor`, `Pages/Docs/Integration.razor`, `Pages/Users.razor`, `Pages/Dashboard.razor`.
+Dominio: estender dominios existentes + `VenueTexts.cs` (novo) se necessario.
+
+### Fase 6 -- Teste de convencao anti-hardcode i18n
+Criar teste que falha se aparecer literal acentuado (PT-BR) em `.razor` dos fluxos principais. Guarda o progresso dos ciclos 24-25.
+
+### O que NAO fazer
+- Nao completar EN/ES (so PT-BR baseline).
+- Nao mudar regra de negocio nem layout/CSS.
+- Nao adicionar bUnit nem E2E.
+- Nao remover codigo existente (so substituir strings).
 
 ---
 

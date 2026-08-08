@@ -61,24 +61,6 @@
     line-height: 1.35;
 }
 
-.onboarding-hint-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+::deep .btn-view-groups {
     margin-top: 1rem;
-    padding: 0.55rem 1.1rem;
-    border-radius: 10px;
-    background: var(--ci-accent);
-    color: var(--white);
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.onboarding-hint-cta:hover {
-    background: var(--ci-accent-mid);
-    color: var(--white);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(34, 109, 196, 0.28);
 }

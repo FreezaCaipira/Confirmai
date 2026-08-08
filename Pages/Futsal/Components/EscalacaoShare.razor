@@ -1,9 +1,11 @@
+@inject Confirmai.Services.Core.UiTextService Ui
+
 <div class="esc-share-bar">
     <button class="esc-btn esc-btn--secondary" @onclick="HandleCopyToClipboard">
         <i class="fas @(Copied ? "fa-check" : "fa-copy")"></i>
-        @(Copied ? "Copiado!" : "Copiar escalação")
+        @(Copied ? @Ui["Futsal.Copied"] : @Ui["Futsal.CopyEscalacao"])
     </button>
     <button class="esc-btn esc-btn--whatsapp" @onclick="HandleShareOnWhatsApp">
-        <i class="fab fa-whatsapp"></i> Compartilhar no WhatsApp
+        <i class="fab fa-whatsapp"></i> @Ui["Futsal.ShareWhatsApp"]
     </button>
 </div>

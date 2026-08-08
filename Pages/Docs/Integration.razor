@@ -5,55 +5,51 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
 
-<PageTitle>Integração via API — Confirmai</PageTitle>
+<PageTitle>@T["Docs.Integration.PageTitle"] — Confirmai</PageTitle>
 
 <div class="entity-shell parchment-a integration-shell">
 
     <div class="page-title-bar integration-title-bar">
-        <h1 class="page-title-bar-title">Integração do Servidor via API</h1>
-        <p class="page-title-bar-subtitle">Conecte seu servidor OpenTibia ao marketplace em poucos minutos</p>
+        <h1 class="page-title-bar-title">@T["Docs.Integration.MainTitle"]</h1>
+        <p class="page-title-bar-subtitle">@T["Docs.Integration.Subtitle"]</p>
     </div>
 
-    <section class="entity-shell-grid" aria-label="Documentação de integração">
+    <section class="entity-shell-grid" aria-label="@T["Docs.Integration.Aria"]">
         <article class="entity-shell-card entity-shell-main integration-article">
 
             <!-- Visão geral -->
             <div class="integration-intro">
                 <p>
-                    A API de integração permite comunicação bidirecional entre seu servidor Tibia e o Confirmai.
-                    O servidor consulta trades pendentes, confirma entregas e sincroniza inventários.
-                    Compatível com <strong>Canary</strong>, <strong>TFS 1.x</strong> e qualquer engine que suporte HTTP.
+                    @((MarkupString)T["Docs.Integration.Intro"])
                 </p>
                 <div class="integration-badges">
-                    <span class="int-badge int-badge-auth">Autenticação por API Key</span>
-                    <span class="int-badge int-badge-secure">HTTPS obrigatório</span>
-                    <span class="int-badge int-badge-rate">Rate limiting ativo</span>
+                    <span class="int-badge int-badge-auth">@T["Docs.Integration.BadgeAuth"]</span>
+                    <span class="int-badge int-badge-secure">@T["Docs.Integration.BadgeSecure"]</span>
+                    <span class="int-badge int-badge-rate">@T["Docs.Integration.BadgeRate"]</span>
                 </div>
             </div>
 
             <hr class="integration-divider" />
 
             <!-- Passo a passo -->
-            <h2 class="integration-section-title">Como integrar</h2>
+            <h2 class="integration-section-title">@T["Docs.Integration.HowToIntegrate"]</h2>
 
             <!-- Passo 1 -->
             <div class="integration-step">
                 <div class="integration-step-number">1</div>
                 <div class="integration-step-body">
-                    <h3 class="integration-step-title">Cadastre seu servidor e obtenha a API Key</h3>
+                    <h3 class="integration-step-title">@T["Docs.Integration.Step1Title"]</h3>
                     <p>
-                        Para solicitar a integração do seu servidor, abra um chamado com um administrador
-                        ou entre em contato pelo Discord/e-mail informado no rodapé. O administrador irá:
+                        @T["Docs.Integration.Step1Desc"]
                     </p>
                     <ol class="integration-substeps">
-                        <li>Aprovar seu servidor no painel (caso ainda esteja pendente)</li>
-                        <li>Gerar uma <strong>API Key</strong> exclusiva para o seu servidor</li>
-                        <li>Enviar a chave para você — <strong>guarde-a em local seguro</strong>, ela aparece apenas uma vez</li>
+                        <li>@T["Docs.Integration.Step1Sub1"]</li>
+                        <li>@((MarkupString)T["Docs.Integration.Step1Sub2"])</li>
+                        <li>@((MarkupString)T["Docs.Integration.Step1Sub3"])</li>
                     </ol>
                     <div class="integration-tip">
                         <span class="int-tip-icon">💡</span>
-                        A chave começa com <code>osm_</code> seguida de 32 caracteres aleatórios.
-                        Ela nunca é armazenada em texto puro no servidor — apenas o hash fica salvo.
+                        @((MarkupString)T["Docs.Integration.Step1Tip"])
                     </div>
                 </div>
             </div>
@@ -62,21 +58,19 @@
             <div class="integration-step">
                 <div class="integration-step-number">2</div>
                 <div class="integration-step-body">
-                    <h3 class="integration-step-title">Baixe o snippet Lua para sua engine</h3>
-                    <p>Escolha o arquivo correspondente à engine do seu servidor:</p>
+                    <h3 class="integration-step-title">@T["Docs.Integration.Step2Title"]</h3>
+                    <p>@T["Docs.Integration.Step2Desc"]</p>
                     <div class="integration-download-row">
                         <a href="/downloads/market_integration.lua" download class="int-download-btn">
-                            ⬇ Canary / OTCv8
+                            @T["Docs.Integration.Step2DownloadCanary"]
                         </a>
                         <a href="/downloads/tfs-Confirmai.lua" download class="int-download-btn">
-                            ⬇ TFS 1.x (LuaSocket)
+                            @T["Docs.Integration.Step2DownloadTfs"]
                         </a>
                     </div>
                     <div class="integration-tip">
                         <span class="int-tip-icon">⚠️</span>
-                        O snippet para TFS requer <strong>LuaSocket</strong> instalado no servidor.
-                        Se sua engine não suporta HTTP nativo, veja a seção
-                        <a href="#sem-http">"Servidor sem HTTP nativo"</a> abaixo.
+                        @((MarkupString)T["Docs.Integration.Step2Tip"])
                     </div>
                 </div>
             </div>
@@ -85,10 +79,9 @@
             <div class="integration-step">
                 <div class="integration-step-number">3</div>
                 <div class="integration-step-body">
-                    <h3 class="integration-step-title">Configure a API Key no snippet</h3>
+                    <h3 class="integration-step-title">@T["Docs.Integration.Step3Title"]</h3>
                     <p>
-                        Abra o arquivo baixado e substitua <code>osm_YOUR_KEY_HERE</code> pela sua chave real.
-                        O bloco de configuração fica no topo do arquivo:
+                        @((MarkupString)T["Docs.Integration.Step3Desc"])
                     </p>
                     <pre class="integration-code"><code>local OsmConfig = &#x7B;
     baseUrl = "https://Confirmai.com",
@@ -96,8 +89,7 @@
 &#x7D;</code></pre>
                     <div class="integration-tip int-tip-danger">
                         <span class="int-tip-icon">🔒</span>
-                        Nunca compartilhe ou exponha sua API Key publicamente.
-                        Se a chave vazar, solicite revogação imediata ao administrador.
+                        @T["Docs.Integration.Step3Tip"]
                     </div>
                 </div>
             </div>
@@ -106,18 +98,17 @@
             <div class="integration-step">
                 <div class="integration-step-number">4</div>
                 <div class="integration-step-body">
-                    <h3 class="integration-step-title">Ative o script no servidor</h3>
+                    <h3 class="integration-step-title">@T["Docs.Integration.Step4Title"]</h3>
 
                     <div class="integration-tab-group">
                         <div class="integration-tab-label"><strong>Canary</strong></div>
                         <div class="integration-tab-content">
-                            <p>Coloque o arquivo em <code>data/scripts/</code> — o Canary carrega automaticamente todos os .lua desse diretório.</p>
+                            <p>@((MarkupString)T["Docs.Integration.Step4Canary"])</p>
                         </div>
                         <div class="integration-tab-label"><strong>TFS 1.x</strong></div>
                         <div class="integration-tab-content">
                             <p>
-                                Coloque o arquivo em <code>data/lib/</code> e adicione ao final de
-                                <code>data/lib/core.lua</code> (ou <code>data/global.lua</code>):
+                                @((MarkupString)T["Docs.Integration.Step4Tfs"])
                             </p>
                             <pre class="integration-code"><code>dofile("data/lib/tfs-Confirmai.lua")</code></pre>
                         </div>
@@ -129,18 +120,18 @@
             <div class="integration-step">
                 <div class="integration-step-number">5</div>
                 <div class="integration-step-body">
-                    <h3 class="integration-step-title">Teste a conexão</h3>
+                    <h3 class="integration-step-title">@T["Docs.Integration.Step5Title"]</h3>
                     <p>
-                        Reinicie o servidor. Nos logs você deve ver:
+                        @T["Docs.Integration.Step5Desc"]
                     </p>
                     <pre class="integration-code"><code>[Confirmai] Conexao OK — &#x7B;"status":"ok","serverName":"Seu Servidor",...&#x7D;</code></pre>
-                    <p>Você também pode testar manualmente via cURL ou browser:</p>
+                    <p>@T["Docs.Integration.Step5ManualTest"]</p>
                     <div class="integration-curl-wrap">
                         <pre class="integration-code" id="curl-ping"><code>curl -H "X-Api-Key: osm_SuaChaveAqui" \
      https://Confirmai.com/api/v1/server/ping</code></pre>
-                        <button class="int-copy-btn" @onclick='() => CopyCode("curl-ping")'>Copiar</button>
+                        <button class="int-copy-btn" @onclick='() => CopyCode("curl-ping")'>@T["Docs.Integration.Step5Copy"]</button>
                     </div>
-                    <p>Resposta esperada (HTTP 200):</p>
+                    <p>@T["Docs.Integration.Step5Expected"]</p>
                     <pre class="integration-code"><code>&#x7B;
   "status": "ok",
   "serverId": 42,
@@ -153,46 +144,45 @@
             <hr class="integration-divider" />
 
             <!-- Referência de endpoints -->
-            <h2 class="integration-section-title">Referência de endpoints</h2>
+            <h2 class="integration-section-title">@T["Docs.Integration.EndpointsTitle"]</h2>
             <p class="integration-endpoints-intro">
-                Todos os endpoints requerem o header <code>X-Api-Key: osm_SuaChave</code>.
-                URL base: <code>https://Confirmai.com/api/v1/server</code>
+                @((MarkupString)T["Docs.Integration.EndpointsIntro"])
             </p>
 
             <div class="integration-table-wrap">
                 <table class="integration-table">
                     <thead>
                         <tr>
-                            <th>Método</th>
-                            <th>Endpoint</th>
-                            <th>Descrição</th>
+                            <th>@T["Docs.Integration.ColMethod"]</th>
+                            <th>@T["Docs.Integration.ColEndpoint"]</th>
+                            <th>@T["Docs.Integration.ColDescription"]</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><span class="http-method http-get">GET</span></td>
                             <td><code>/ping</code></td>
-                            <td>Verifica conectividade e validade da API key</td>
+                            <td>@T["Docs.Integration.EpPing"]</td>
                         </tr>
                         <tr>
                             <td><span class="http-method http-get">GET</span></td>
                             <td><code>/trades/pending</code></td>
-                            <td>Lista pedidos aguardando entrega in-game</td>
+                            <td>@T["Docs.Integration.EpTradesPending"]</td>
                         </tr>
                         <tr>
                             <td><span class="http-method http-post">POST</span></td>
                             <td><code>/trades/confirm</code></td>
-                            <td>Marca um pedido como entregue ao jogador</td>
+                            <td>@T["Docs.Integration.EpTradesConfirm"]</td>
                         </tr>
                         <tr>
                             <td><span class="http-method http-post">POST</span></td>
                             <td><code>/inventory/report</code></td>
-                            <td>Reporta inventário atual de um jogador</td>
+                            <td>@T["Docs.Integration.EpInventoryReport"]</td>
                         </tr>
                         <tr>
                             <td><span class="http-method http-get">GET</span></td>
                             <td><code>/offers?itemKey=</code></td>
-                            <td>Busca ofertas ativas para um item específico</td>
+                            <td>@T["Docs.Integration.EpOffers"]</td>
                         </tr>
                     </tbody>
                 </table>
@@ -201,65 +191,59 @@
             <hr class="integration-divider" />
 
             <!-- Sem HTTP -->
-            <h2 class="integration-section-title" id="sem-http">Servidor sem HTTP nativo</h2>
+            <h2 class="integration-section-title" id="sem-http">@T["Docs.Integration.NoHttpTitle"]</h2>
             <p>
-                Se sua engine não suporta chamadas HTTP diretamente no Lua (ex.: TFS sem LuaSocket),
-                existem duas alternativas:
+                @T["Docs.Integration.NoHttpDesc"]
             </p>
             <div class="integration-alt-cards">
                 <div class="integration-alt-card">
-                    <h4>Opção A — Script externo (Python/Node)</h4>
+                    <h4>@T["Docs.Integration.NoHttpOptA"]</h4>
                     <p>
-                        Rode um script externo no mesmo servidor que consulta a API do Confirmai e
-                        grava os resultados em um banco local (SQLite/MySQL). Seu script Lua lê esse banco
-                        via <code>db.query()</code>.
+                        @((MarkupString)T["Docs.Integration.NoHttpOptADesc"])
                     </p>
                 </div>
                 <div class="integration-alt-card">
-                    <h4>Opção B — Polling via webhook reverso</h4>
+                    <h4>@T["Docs.Integration.NoHttpOptB"]</h4>
                     <p>
-                        Configure uma URL de callback no painel do servidor. O Confirmai fará um
-                        POST para essa URL quando houver novos pedidos, e seu servidor pode processar
-                        via script HTTP externo ou proxy.
+                        @T["Docs.Integration.NoHttpOptBDesc"]
                     </p>
                 </div>
             </div>
             <p>
-                Se precisar de ajuda para configurar uma dessas alternativas, entre em contato com
-                o suporte — estamos disponíveis para ajudar na adaptação.
+                @T["Docs.Integration.NoHttpHelp"]
             </p>
 
             <hr class="integration-divider" />
 
             <!-- Segurança -->
-            <h2 class="integration-section-title">Segurança</h2>
+            <h2 class="integration-section-title">@T["Docs.Integration.SecurityTitle"]</h2>
             <div class="integration-security-grid">
                 <div class="integration-security-item">
                     <span class="int-sec-icon">🔑</span>
                     <div>
-                        <strong>Chave única por servidor</strong>
-                        <p>Cada servidor recebe uma chave exclusiva. Uma chave comprometida não afeta outros servidores.</p>
+                        <strong>@T["Docs.Integration.SecKeyUnique"]</strong>
+                        <p>@T["Docs.Integration.SecKeyUniqueDesc"]</p>
                     </div>
                 </div>
                 <div class="integration-security-item">
                     <span class="int-sec-icon">🛡️</span>
                     <div>
-                        <strong>Hash no banco</strong>
-                        <p>A raw key é exibida apenas uma vez. O banco armazena somente o hash — nem o admin tem acesso à chave original.</p>
+                        <strong>@T["Docs.Integration.SecHashDb"]</strong>
+                        <p>@T["Docs.Integration.SecHashDbDesc"]</p>
                     </div>
                 </div>
                 <div class="integration-security-item">
                     <span class="int-sec-icon">⏱️</span>
                     <div>
-                        <strong>Rate limiting</strong>
-                        <p>Os endpoints têm limite de requisições por minuto para proteger contra abuso e força bruta.</p>
+                        <strong>@T["Docs.Integration.SecRateLimit"]</strong>
+                        <p>@T["Docs.Integration.SecRateLimitDesc"]</p>
                     </div>
                 </div>
                 <div class="integration-security-item">
                     <span class="int-sec-icon">🚫</span>
                     <div>
-                        <strong>Permissões isoladas</strong>
-                        <p>A API key dá acesso somente ao servidor cadastrado. Não é possível acessar dados de outros servidores ou o painel admin.</p>
+                        <strong>@T["Docs.Integration.SecPerms"]</strong>
+                        <p>@T["Docs.Integration.SecPermsDesc"]</p>
                     </div>
                 </div>
             </div>
@@ -268,13 +252,11 @@
 
             <!-- Precisa de ajuda -->
             <div class="integration-help-box">
-                <h3>Precisa de ajuda?</h3>
+                <h3>@T["Docs.Integration.HelpTitle"]</h3>
                 <p>
-                    Se tiver dúvidas sobre a integração, entre em contato com o suporte.
-                    Também estamos disponíveis para ajudar a adaptar o snippet para engines menos comuns
-                    (OpenTibia 7.4, YurOT, RealOT, etc.).
+                    @T["Docs.Integration.HelpDesc"]
                 </p>
-                <a href="/servers/admin-request" class="int-help-cta">Solicitar novo servidor</a>
+                <a href="/servers/admin-request" class="int-help-cta">@T["Docs.Integration.HelpCta"]</a>
             </div>
 
         </article>

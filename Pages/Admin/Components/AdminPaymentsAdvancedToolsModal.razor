@@ -1,4 +1,6 @@
 @using Confirmai.Services
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 <div class="admin-payments-modal-backdrop @(IsOpen ? "admin-payments-modal-backdrop--open" : "")"
      @onclick="OnClose"
@@ -11,22 +13,22 @@
          @onkeydown="HandleKeyDown"
          @onclick:stopPropagation="true">
         <div class="admin-payments-modal-header">
-            <h2 id="admin-payments-tools-title">Ferramentas avançadas</h2>
+            <h2 id="admin-payments-tools-title">@T["AdminPayments.AdvancedTools"]</h2>
             <button type="button" class="orders-review-restored-close" @onclick="OnClose" aria-label="Close">&times;—</button>
         </div>
 
         <div class="admin-payments-tools-grid">
-            <section class="admin-payments-tools-section" aria-label="Reconciliação manual">
-                <h3>Reconciliação manual</h3>
-                <p class="admin-payments-tools-description">Use para revalidar um cobrança específica via chargeId/txId.</p>
+            <section class="admin-payments-tools-section" aria-label="@T["AdminPayments.ManualReconciliation"]">
+                <h3>@T["AdminPayments.ManualReconciliation"]</h3>
+                <p class="admin-payments-tools-description">@T["AdminPayments.ManualReconciliationHint"]</p>
 
                 <div class="filter-bar admin-filter-card admin-payments-reconcile-bar admin-payments-reconcile-bar--modal">
                     <div class="admin-payments-reconcile-input-wrap">
-                        <label class="admin-payments-reconcile-label">Reconciliação por chargeId/txId</label>
-                        <input type="text" placeholder="Ex.: 7E9B... or charge_xxx" @bind="reconcileChargeId" @bind:event="oninput" />
+                        <label class="admin-payments-reconcile-label">@T["AdminPayments.ReconcileByChargeId"]</label>
+                        <input type="text" placeholder="@T["AdminPayments.ReconcilePlaceholder"]" @bind="reconcileChargeId" @bind:event="oninput" />
                     </div>
                     <button type="button" disabled="@IsReconciling" @onclick="ReconcileCharge">
-                        @(IsReconciling ? "Revalidando..." : "Revalidar cobrança")
+                        @(IsReconciling ? @T["AdminPayments.Revalidating"] : @T["AdminPayments.RevalidateCharge"])
                     </button>
                 </div>
 
@@ -36,47 +38,47 @@
                         <span>@ReconcileResultMessage</span>
                         @if (ReconcileResultConfirmationId.HasValue)
                         {
-                            <a class="details-btn" href="@BuildConfirmationTimelineHref(ReconcileResultConfirmationId.Value)">Abrir timeline da confirmação</a>
+                            <a class="details-btn" href="@BuildConfirmationTimelineHref(ReconcileResultConfirmationId.Value)">@T["AdminPayments.OpenConfirmationTimeline"]</a>
                         }
                         <button type="button" class="orders-review-restored-close" @onclick="DismissReconcileMessage" aria-label="Close">&times;—</button>
                     </div>
                 }
             </section>
 
-            <section class="admin-payments-tools-section" aria-label="Timeline por confirmação">
-                <h3>Timeline por confirmação</h3>
-                <p class="admin-payments-tools-description">Acesso direto ao histórico auditável de uma confirmação.</p>
+            <section class="admin-payments-tools-section" aria-label="@T["AdminPayments.TimelineByConfirmation"]">
+                <h3>@T["AdminPayments.TimelineByConfirmation"]</h3>
+                <p class="admin-payments-tools-description">@T["AdminPayments.TimelineByConfirmationHint"]</p>
 
                 <div class="filter-bar admin-filter-card admin-payments-reconcile-bar admin-payments-reconcile-bar--modal">
                     <div class="admin-payments-reconcile-input-wrap">
-                        <label class="admin-payments-reconcile-label">Timeline por confirmação</label>
-                        <input type="number" min="1" placeholder="Ex.: 123" @bind="timelineConfirmationId" />
+                        <label class="admin-payments-reconcile-label">@T["AdminPayments.TimelineByConfirmation"]</label>
+                        <input type="number" min="1" placeholder="@T["AdminPayments.ConfirmationIdPlaceholder"]" @bind="timelineConfirmationId" />
                     </div>
                     <button type="button" @onclick="OpenConfirmationTimeline" disabled="@(timelineConfirmationId is null || timelineConfirmationId <= 0)">
-                        Abrir timeline
+                        @T["AdminPayments.OpenTimeline"]
                     </button>
                 </div>
             </section>
 
-            <section class="admin-payments-tools-section" aria-label="Transição de status">
-                <h3>Transição de status</h3>
-                <p class="admin-payments-tools-description">Aplique mudanças controladas de status (cancelamento/reembolso).</p>
+            <section class="admin-payments-tools-section" aria-label="@T["AdminPayments.StatusTransition"]">
+                <h3>@T["AdminPayments.StatusTransition"]</h3>
+                <p class="admin-payments-tools-description">@T["AdminPayments.StatusTransitionHint"]</p>
 
                 <div class="filter-bar admin-filter-card admin-payments-reconcile-bar admin-payments-reconcile-bar--modal">
                     <div class="admin-payments-reconcile-input-wrap">
-                        <label class="admin-payments-reconcile-label">Transição de status (cancelamento/reembolso)</label>
+                        <label class="admin-payments-reconcile-label">@T["AdminPayments.StatusTransitionLabel"]</label>
                         <input type="number" min="1" placeholder="ConfirmationId" @bind="StatusTransitionConfirmationId" />
                     </div>
                     <select @bind="statusTransitionTarget">
-                        <option value="">Status alvo</option>
+                        <option value="">@T["AdminPayments.TargetStatus"]</option>
                         <option value="Pending">Pending</option>
                         <option value="Paid">Paid</option>
                         <option value="Failed">Failed</option>
                         <option value="Refunded">Refunded</option>
                     </select>
-                    <input type="text" placeholder="Motivo (opcional)" @bind="statusTransitionReason" />
+                    <input type="text" placeholder="@T["AdminPayments.ReasonPlaceholder"]" @bind="statusTransitionReason" />
                     <button type="button" @onclick="ApplyStatusTransition" disabled="@IsStatusTransitioning">
-                        @(IsStatusTransitioning ? "Aplicando..." : "Aplicar status")
+                        @(IsStatusTransitioning ? @T["AdminPayments.Applying"] : @T["AdminPayments.ApplyStatus"])
                     </button>
                 </div>
 
@@ -86,7 +88,7 @@
                         <span>@StatusTransitionResultMessage</span>
                         @if (StatusTransitionConfirmationId.HasValue && StatusTransitionConfirmationId.Value > 0)
                         {
-                            <a class="details-btn" href="@BuildConfirmationTimelineHref(StatusTransitionConfirmationId.Value)">Ver timeline</a>
+                            <a class="details-btn" href="@BuildConfirmationTimelineHref(StatusTransitionConfirmationId.Value)">@T["AdminPayments.ViewTimeline"]</a>
                         }
                         <button type="button" class="orders-review-restored-close" @onclick="DismissStatusTransitionMessage" aria-label="Close">&times;—</button>
                     </div>

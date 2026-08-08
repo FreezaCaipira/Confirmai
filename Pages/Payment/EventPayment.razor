@@ -26,7 +26,7 @@
 <PageTitle>@Ui["Payment.PageTitle"] — Confirmai</PageTitle>
 
 <div class="entity-shell">
-    <section class="entity-shell-grid" aria-label="Pagamento de partida">
+    <section class="entity-shell-grid" aria-label="@Ui["Payment.PageTitle"]">
         <article class="entity-shell-card entity-shell-main evpay-main">
 
             @if (isLoading)
@@ -66,9 +66,6 @@
                                 <p>@string.Format(Ui["Payment.ConfirmedFor"], conf.User?.FullName ?? conf.User?.UserName ?? Ui["Payment.Player"])</p>
                             </div>
                         </div>
-                        <a href="@backUrl" class="evpay-action-btn evpay-action-btn--back">
-                            <i class="fas fa-arrow-left"></i> @Ui["Payment.BackToMatch"]
-                        </a>
                     }
                     else
                     {
@@ -151,7 +148,6 @@
                                 </button>
                             }
                         }
-                        <a href="@backUrl" class="detail-back-link"><i class="fas fa-arrow-left"></i> @Ui["Payment.BackToMatch"]</a>
                     </div>
                 }
                 else if (payState == PayState.AwaitingPayment)
@@ -186,7 +182,7 @@
                             GroupCity="@ev.Group.City"
                             Price="@(ev.Price!.Value)"
                             CopiedAdminPix="@copiedAdminPix"
-                            PixQrPayload="@BuildPixStaticPayload(GetGroupAdminPixKey(ev.Group)!, ev.Group.Name, ev.Group.City, ev.Price!.Value)"
+                            PixQrPayload="@BuildPixStaticPayload(GetGroupAdminPixKey(ev.Group) ?? "", ev.Group.Name, ev.Group.City, ev.Price!.Value)"
                             OnCopyAdminPixKey="@CopyAdminPixKeyCallback" />
 
                         <EventPaymentProof

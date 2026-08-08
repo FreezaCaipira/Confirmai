@@ -44,7 +44,7 @@
                                             @if (isCheckingPayment)
                                             {
                                                 <span class="oi oi-reload spinning" aria-hidden="true"></span>
-                                                <span>Reconfirmando...</span>
+                                                <span>@T["PaymentView.Rechecking"]</span>
                                             }
                                             else
                                             {
@@ -60,7 +60,7 @@
                                 @if (isCheckingPayment)
                                 {
                                     <div class="view-pay-checking" role="status" aria-live="polite">
-                                        Consultando gateways para confirmar o pagamento...
+                                        @T["PaymentView.CheckingGateways"]
                                     </div>
                                 }
                             }

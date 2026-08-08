@@ -18,27 +18,28 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject Confirmai.Services.Events.EventCollisionService EventCollisionService
 @inject LogService LogService
+@inject Confirmai.Services.Core.UiTextService Ui
 
 
-<PageTitle>Criar Partida · Futsal · Confirmai</PageTitle>
+<PageTitle>@Ui["Futsal.CreatePageTitle"]</PageTitle>
 
 <div class="create-event-page">
     <div class="create-event-card">
         <div class="create-event-back-row">
             <a href="@(preselectedGroup is not null ? $"/grupo/{preselectedGroup.Id}" : "/futsal")" class="detail-back-link">
-                <i class="fas fa-arrow-left"></i> Voltar
+                <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
             </a>
         </div>
         <h1 class="create-event-title">
             <i class="fas fa-futbol"></i>
             @(preselectedGroup is not null
-                ? $"Nova Partida — {preselectedGroup.Name}"
-                : "Nova Partida de Futsal")
+                ? Ui.Get("Futsal.NewMatchGroup", preselectedGroup.Name)
+                : Ui["Futsal.NewMatchFutsal"])
         </h1>
 
         @if (isLoading)
         {
-            <div class="loading-spinner">Carregando...</div>
+            <div class="loading-spinner">@Ui["Common.Loading"]</div>
         }
         else
         {
@@ -94,10 +95,10 @@
                 <div class="form-actions">
                     <button class="cancel-btn" type="button"
                             @onclick='() => NavigationManager.NavigateTo(preselectedGroup is not null ? $"/grupo/{preselectedGroup.Id}" : "/grupos")'>
-                        Cancelar
+                        @Ui["Common.Cancel"]
                     </button>
                     <button class="save-btn" type="submit" disabled="@(isSaving || !venues.Any())">
-                        @(isSaving ? "Criando…" : "Criar Partida")
+                        @(isSaving ? @Ui["Futsal.Creating"] : @Ui["Futsal.CreateMatch"])
                     </button>
                 </div>
 

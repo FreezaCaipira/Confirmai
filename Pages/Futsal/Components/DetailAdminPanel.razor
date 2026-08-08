@@ -1,16 +1,18 @@
+@inject Confirmai.Services.Core.UiTextService Ui
+
 <div class="detail-admin-bar detail-admin-bar--footer">
     @if (LineupConfirmedAt is not null)
     {
         @if (IsPastEvent)
         {
             <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@EventId/escalacao">
-                <i class="fas fa-flag-checkered"></i> Pós-Partida
+                <i class="fas fa-flag-checkered"></i> @Ui["Futsal.PostMatchPageTitle"]
             </a>
         }
         else
         {
             <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@EventId/escalacao">
-                <i class="fas fa-clipboard-list"></i> Ver Escalação
+                <i class="fas fa-clipboard-list"></i> @Ui["Futsal.VerEscalacao"]
             </a>
         }
     }
@@ -21,14 +23,14 @@
             @if (HasQuorum)
             {
                 <a class="detail-admin-btn detail-admin-btn--lineup" href="/futsal/@EventId/escalacao">
-                    <i class="fas fa-list-ol"></i> Montar Escalação
+                    <i class="fas fa-list-ol"></i> @Ui["Futsal.MontarEscalacao"]
                 </a>
             }
             else
             {
                 <span class="detail-admin-btn detail-admin-btn--lineup detail-admin-btn--disabled"
-                      title="Faltam @Lacking jogador@(Lacking == 1 ? string.Empty : "es") para atingir o mínimo necessário">
-                    <i class="fas fa-lock"></i> Montar Escalação
+                      title="@Ui.Get("Futsal.LackingPlayers", Lacking)">
+                    <i class="fas fa-lock"></i> @Ui["Futsal.MontarEscalacao"]
                 </span>
             }
         }

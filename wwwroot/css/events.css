@@ -458,35 +458,6 @@
     flex-wrap: wrap;
 }
 
-.invite-block-btn {
-    align-self: auto;
-    margin-top: 0;
-}
-
-.invite-block-btn--settings {
-    background: rgba(30, 41, 59, 0.7);
-    border-color: rgba(148, 163, 184, 0.45);
-    color: var(--ci-surface-muted);
-}
-
-.invite-block-btn--settings:hover {
-    background: rgba(51, 65, 85, 0.85);
-    border-color: rgba(148, 163, 184, 0.6);
-    color: var(--slate-light);
-}
-
-.detail-admin-btn--whatsapp {
-    background: linear-gradient(180deg, #25D366 0%, #1da851 100%);
-    border-color: rgba(37, 211, 102, 0.5);
-    color: #fff;
-}
-
-.detail-admin-btn--whatsapp:hover {
-    background: linear-gradient(180deg, #2ee67a 0%, #22c95e 100%);
-    border-color: rgba(37, 211, 102, 0.7);
-    color: #fff;
-}
-
 /* -- Invite modal -------------------------------------------------- */
 .invite-modal-backdrop {
     position: fixed;
@@ -623,22 +594,6 @@
 .invite-modal-group-link:hover {
     color: var(--link-info);
     text-decoration: underline;
-}
-
-/* "Convidar" button variant in admin bar */
-.detail-admin-btn--invite {
-    background: var(--ci-bg-dark);
-    border-color: var(--ci-accent-mid);
-    color: var(--ci-surface-light);
-    font-weight: 700;
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
-}
-
-.detail-admin-btn--invite:hover {
-    border-color: var(--ci-text-link);
-    color: var(--white);
-    background: var(--ci-accent-mid);
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.32);
 }
 
 /* Private group notice (event is private, user is not a member) */

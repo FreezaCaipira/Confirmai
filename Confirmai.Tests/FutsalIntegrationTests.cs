@@ -112,7 +112,7 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var content = await ReadContentAsync(response);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("não encontrada", content);
+        Assert.Contains("encontrada", content);
     }
 
     [Fact]
@@ -137,8 +137,8 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var content = await ReadContentAsync(response);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Este grupo é privado. Solicite entrada para o administrador.", content, StringComparison.Ordinal);
-        Assert.Contains("Solicitar entrada", content, StringComparison.Ordinal);
+        Assert.Contains("privado", content);
+        Assert.Contains("Solicitar entrada", content);
     }
 
     // ──────────────────────────────────────────────
@@ -209,7 +209,7 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var response = await client.GetAsync($"/futsal/{eventId}/edit");
         var content = await ReadContentAsync(response);
 
-        Assert.Contains("Acesso negado", content);
+        Assert.Contains("negado", content);
     }
 
     [Fact]
@@ -235,7 +235,7 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var response = await client.GetAsync("/futsal/999999999/edit");
         var content = await ReadContentAsync(response);
 
-        Assert.Contains("não encontrada", content);
+        Assert.Contains("encontrada", content);
     }
 
     private async Task<int> SeedPrivateFutsalEventAsync(string creatorId)

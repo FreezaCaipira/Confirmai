@@ -9,9 +9,11 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
+@using Confirmai.Services.Core
+@inject UiTextService Ui
 
 
-<PageTitle>@(group?.Name ?? "Convite") · Confirmai</PageTitle>
+<PageTitle>@(group?.Name ?? @Ui["Group.InvitePageTitle"]) · Confirmai</PageTitle>
 
 @if (isLoading)
 {
@@ -32,8 +34,8 @@
 else if (group is null)
 {
     <div class="detail-not-found">
-        <h2>Convite inválido ou expirado.</h2>
-        <a href="/">← Voltar ao início</a>
+        <h2>@Ui["Group.InvalidInvite"]</h2>
+        <a href="/">@Ui["Group.BackToStart"]</a>
     </div>
 }
 else
@@ -44,10 +46,10 @@ else
             <header class="detail-header">
                 <div class="detail-header-top">
                     <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
                     </span>
                     <a class="detail-back-link" href="/">
-                        <i class="fas fa-arrow-left"></i> Início
+                        <i class="fas fa-arrow-left"></i> @Ui["Group.Home"]
                     </a>
                 </div>
                 <h1 class="detail-title">@group.Name</h1>
@@ -65,7 +67,7 @@ else
             {
                 <section class="detail-section detail-section--spaced">
                     <h2 class="detail-section-title">
-                        <i class="fas fa-users"></i> Membros (@group.Members.Count)
+                        <i class="fas fa-users"></i> @Ui["Group.Members"] (@group.Members.Count)
                     </h2>
                     <ul class="players-list">
                         @foreach (var m in group.Members
@@ -73,10 +75,10 @@ else
                             .ThenBy(m => m.CreatedAt))
                         {
                             <li class="player-item">
-                                <span class="player-name">@(m.User?.FullName ?? m.User?.UserName ?? "Membro")</span>
+                                <span class="player-name">@(m.User?.FullName ?? m.User?.UserName ?? @Ui["Group.Member"])</span>
                                 @if (m.Role == GroupMemberRole.Admin)
                                 {
-                                    <span class="player-tag player-tag--admin">admin</span>
+                                    <span class="player-tag player-tag--admin">@Ui["Group.Admin"]</span>
                                 }
                             </li>
                         }
@@ -89,14 +91,14 @@ else
             {
                 <section class="detail-section detail-section--spaced">
                     <h2 class="detail-section-title">
-                        <i class="fas fa-calendar-alt"></i> Partidas (@recentEvents.Count)
+                        <i class="fas fa-calendar-alt"></i> @Ui["Group.PartidasLink"] (@recentEvents.Count)
                     </h2>
                     <table class="events-table">
                         <thead>
                             <tr>
-                                <th class="web-only">Data/Hora</th>
-                                <th class="web-only">Jogadores</th>
-                                <th class="web-only">Status</th>
+                                <th class="web-only">@Ui["Group.DateTimeHeader"]</th>
+                                <th class="web-only">@Ui["Group.PlayersHeader"]</th>
+                                <th class="web-only">@Ui["Group.StatusHeader"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -117,15 +119,15 @@ else
                                     <td class="web-only">
                                         @if (!ev.IsActive)
                                         {
-                                            <span class="player-tag player-tag--cancel">cancelado</span>
+                                            <span class="player-tag player-tag--cancel">@Ui["Group.Cancelled"]</span>
                                         }
                                         else if (isFull)
                                         {
-                                            <span class="player-tag player-tag--full">lotado</span>
+                                            <span class="player-tag player-tag--full">@Ui["Group.Full"]</span>
                                         }
                                         else
                                         {
-                                            <span class="player-tag player-tag--open">aberto</span>
+                                            <span class="player-tag player-tag--open">@Ui["Group.Open"]</span>
                                         }
                                     </td>
                                     <td class="mobile-only">
@@ -142,15 +144,15 @@ else
                                                 </span>
                                                 @if (!ev.IsActive)
                                                 {
-                                                    <span class="player-tag player-tag--cancel">cancelado</span>
+                                                    <span class="player-tag player-tag--cancel">@Ui["Group.Cancelled"]</span>
                                                 }
                                                 else if (isFull)
                                                 {
-                                                    <span class="player-tag player-tag--full">lotado</span>
+                                                    <span class="player-tag player-tag--full">@Ui["Group.Full"]</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="player-tag player-tag--open">aberto</span>
+                                                    <span class="player-tag player-tag--open">@Ui["Group.Open"]</span>
                                                 }
                                             </div>
                                         </div>
@@ -168,27 +170,27 @@ else
                 {
                     <a href="/Identity/Account/Login?ReturnUrl=@Uri.EscapeDataString(NavigationManager.Uri)"
                        class="confirm-btn">
-                        <i class="fas fa-sign-in-alt"></i> Entrar para participar do grupo
+                        <i class="fas fa-sign-in-alt"></i> @Ui["Group.EnterToJoin"]
                     </a>
                 }
                 else if (alreadyMember)
                 {
                     <div class="confirmed-inline-banner">
                         <i class="fas fa-check-circle"></i>
-                        <span>Você já é membro deste grupo.</span>
+                        <span>@Ui["Group.AlreadyMember"]</span>
                     </div>
                     <a href="/grupo/@group.Id" class="confirm-btn confirm-btn--mt">
-                        Ver grupo
+                        @Ui["Group.ViewGroup"]
                     </a>
                 }
                 else if (joined)
                 {
                     <div class="confirmed-inline-banner">
                         <i class="fas fa-check-circle"></i>
-                        <span>Você entrou no grupo <strong>@group.Name</strong>!</span>
+                        <span>@Ui.Get("Group.JoinedGroup", group.Name)</span>
                     </div>
                     <a href="/grupo/@group.Id" class="confirm-btn confirm-btn--mt">
-                        Ver grupo
+                        @Ui["Group.ViewGroup"]
                     </a>
                 }
                 else
@@ -198,7 +200,7 @@ else
                         <p class="detail-error">@actionError</p>
                     }
                     <button class="confirm-btn" type="button" @onclick="JoinGroup">
-                        <i class="fas fa-user-plus"></i> Entrar no grupo
+                        <i class="fas fa-user-plus"></i> @Ui["Group.JoinGroupBtn"]
                     </button>
                 }
             </div>

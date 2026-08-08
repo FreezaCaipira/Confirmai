@@ -5,23 +5,25 @@
 @using System.Security.Claims
 @implements IAsyncDisposable
 
-<PageTitle>Poker · Confirmai</PageTitle>
+@inject Confirmai.Services.Core.UiTextService Ui
+
+<PageTitle>@Ui["Poker.PageTitle"] · Confirmai</PageTitle>
 
 <div class="listing-page">
     <AuthorizeView>
         <Authorized>
             <div class="listing-page-actions">
                 <a href="/" class="listing-back-btn">
-                    <i class="fas fa-arrow-left"></i> Voltar
+                    <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
                 </a>
                 <a href="/meus-eventos?esporte=poker" class="my-events-link-btn">
-                    <i class="fas fa-calendar-alt"></i> Minhas Partidas
+                    <i class="fas fa-calendar-alt"></i> @Ui["Poker.MyMatches"]
                 </a>
                 <div class="create-poker-dropdown @(showTypeMenu ? "is-open" : "")">
                     <button class="btn-create-event btn-create-event--poker"
                             @onclick="() => showTypeMenu = !showTypeMenu"
                             @onfocusout="HandleMenuFocusOut">
-                        <i class="fas fa-plus"></i> Criar Evento <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        <i class="fas fa-plus"></i> @Ui["Poker.CreateEvent"] <i class="fas fa-chevron-down dropdown-arrow"></i>
                     </button>
                 @if (showTypeMenu)
                 {
@@ -29,22 +31,22 @@
                         <a class="create-poker-menu-item" href="/poker/create?tipo=torneio">
                             <i class="fas fa-trophy"></i>
                             <span>
-                                <strong>Torneio</strong>
-                                <small>Buy-in, rebuy, GTD, late reg…</small>
+                                <strong>@Ui["Poker.Tournament"]</strong>
+                                <small>@Ui["Poker.TournamentDesc"]</small>
                             </span>
                         </a>
                         <a class="create-poker-menu-item" href="/poker/create?tipo=cashgame">
                             <i class="fas fa-coins"></i>
                             <span>
-                                <strong>Cash Game</strong>
-                                <small>Stack mín/máx, modalidade, incluso…</small>
+                                <strong>@Ui["Poker.CashGame"]</strong>
+                                <small>@Ui["Poker.CashGameDesc"]</small>
                             </span>
                         </a>
                         <a class="create-poker-menu-item" href="/poker/create?tipo=homegame">
                             <i class="fas fa-home"></i>
                             <span>
-                                <strong>Home Game</strong>
-                                <small>Acesso por código privado</small>
+                                <strong>@Ui["Poker.HomeGame"]</strong>
+                                <small>@Ui["Poker.HomeGameDesc"]</small>
                             </span>
                         </a>
                     </div>
@@ -76,7 +78,7 @@
                         <span class="poker-type-badge poker-type-badge--@typeLabel.Item1">@typeLabel.Item2</span>
                         @if (isUserConfirmed)
                         {
-                            <span class="meta-chip meta-chip--confirmed"><i class="fas fa-check" aria-hidden="true"></i> Confirmado</span>
+                            <span class="meta-chip meta-chip--confirmed"><i class="fas fa-check" aria-hidden="true"></i> @Ui["Poker.Confirmed"]</span>
                         }
                     </div>
                     @if (!isHomeGame)
@@ -114,12 +116,12 @@
                     else
                     {
                         <p class="event-location event-location--locked">
-                            <i class="fas fa-lock"></i> Detalhes disponíveis com código de acesso
+                            <i class="fas fa-lock"></i> @Ui["Poker.HomeGameDetailsLocked"]
                         </p>
                         <p class="event-location">@ev.Group.City — @ev.Group.StateCode</p>
                     }
                 </div>
-                <a href="/poker/@ev.Id" class="event-action">@(isHomeGame ? "Acessar →" : "Confirmar →")</a>
+                <a href="/poker/@ev.Id" class="event-action">@(isHomeGame ? @Ui["Poker.HomeGameAccess"] : @Ui["Poker.HomeGameConfirm"])</a>
             </article>
         </EventCard>
     </EventListingShell>

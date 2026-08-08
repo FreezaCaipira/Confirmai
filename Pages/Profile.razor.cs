@@ -37,6 +37,7 @@ public partial class Profile
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private ProfileService ProfileSvc { get; set; } = default!;
+    [Inject] private UiTextService T { get; set; } = default!;
 
     private string DisplayName => user?.FullName?.Trim() is { Length: > 0 } name ? name : user?.UserName ?? "—";
     private string AvatarInitial => DisplayName.Length > 0 ? DisplayName[0].ToString().ToUpperInvariant() : "?";

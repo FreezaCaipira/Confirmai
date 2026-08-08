@@ -12,35 +12,37 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
 
+@inject Confirmai.Services.Core.UiTextService Ui
 
-<PageTitle>Editar Partida · Futsal · Confirmai</PageTitle>
+
+<PageTitle>@Ui["Futsal.EditPageTitle"]</PageTitle>
 
 <div class="create-event-page">
     <div class="create-event-card">
         <div class="create-event-card-top">
             <h1 class="create-event-title">
-                <i class="fas fa-futbol"></i> Editar Partida
+                <i class="fas fa-futbol"></i> @Ui["Futsal.EditMatch"]
             </h1>
-            <a href="/futsal/@Id" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+            <a href="/futsal/@Id" class="detail-back-link"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
         </div>
 
         @if (isLoading)
         {
-            <div class="loading-spinner">Carregando...</div>
+            <div class="loading-spinner">@Ui["Common.Loading"]</div>
         }
         else if (notFound)
         {
             <div class="detail-not-found">
-                <h2>Partida não encontrada.</h2>
-                <a href="/futsal">← Voltar</a>
+                <h2>@Ui["Futsal.MatchNotFound"]</h2>
+                <a href="/futsal">← @Ui["Common.Back"]</a>
             </div>
         }
         else if (accessDenied)
         {
             <div class="detail-not-found">
-                <h2>Acesso negado.</h2>
-                <p>Apenas o organizador pode editar esta partida.</p>
-                <a href="/futsal/@Id">← Voltar</a>
+                <h2>@Ui["Futsal.AccessDenied"]</h2>
+                <p>@Ui["Futsal.OnlyOrganizerCanEdit"]</p>
+                <a href="/futsal/@Id">← @Ui["Common.Back"]</a>
             </div>
         }
         else

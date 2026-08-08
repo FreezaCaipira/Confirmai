@@ -22,7 +22,7 @@
 @inject LogService                     LogService
 @inject UiTextService                  Ui
 
-<PageTitle>Pagamentos — @(group?.Name ?? "Grupo") · Confirmai</PageTitle>
+<PageTitle>@Ui.Get("Group.PaymentsPageTitle", group?.Name ?? @Ui["Group.PageTitle"]) · Confirmai</PageTitle>
 
 @if (isLoading)
 {
@@ -52,8 +52,8 @@ else if (group is null || !isAdmin)
 {
     <div class="detail-not-found">
         <i class="fas fa-lock detail-not-found-icon"></i>
-        <h2>Acesso não autorizado.</h2>
-        <a href="/grupo/@Id">← Voltar</a>
+        <h2>@Ui["Group.NotAuthorized"]</h2>
+        <a href="/grupo/@Id">← @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -66,16 +66,16 @@ else
                     <a href="/grupo/@Id" class="detail-back-link">
                         <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
                     </a>
-                    <a href="/grupos" class="detail-back-link detail-back-link--groups">
+                    <a href="/grupos" class="btn-view-groups">
                         <i class="fas fa-layer-group"></i> @Ui["Groups.Title"]
                     </a>
                 </div>
                 <div class="detail-header-badge">
                     <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? "⚽ Futsal" : "🃏 Poker")
+                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
                     </span>
                 </div>
-                <h1 class="detail-title payments-title"><i class="fas fa-money-bill-wave"></i> Pagamentos</h1>
+                <h1 class="detail-title payments-title"><i class="fas fa-money-bill-wave"></i> @Ui["Group.PaymentsTitle"]</h1>
             </header>
 
             @* ── Tabs ──────────────────────────────────────────────── *@
@@ -83,7 +83,7 @@ else
                 <button class="payments-tab @(paymentTab == "delinquent" ? "payments-tab--active payments-tab--delinquent" : "")"
                         type="button"
                         @onclick="@(() => HandleTabChange("delinquent"))">
-                    <i class="fas fa-exclamation-triangle"></i> Pendentes
+                    <i class="fas fa-exclamation-triangle"></i> @Ui["Group.PaymentsPending"]
                     @if (delinquencyList?.Count > 0)
                     {
                         <span class="payments-tab-count payments-tab-count--delinquent">@delinquencyList.Count</span>
@@ -92,26 +92,26 @@ else
                 <button class="payments-tab @(paymentTab == "history" ? "payments-tab--active payments-tab--history" : "")"
                         type="button"
                         @onclick="@(() => HandleTabChange("history"))">
-                    <i class="fas fa-history"></i> Histórico
+                    <i class="fas fa-history"></i> @Ui["Group.PaymentsHistory"]
                     @if (paymentHistory?.Count > 0)
                     {
                         <span class="payments-tab-count payments-tab-count--history">@paymentHistory.Count</span>
                     }
                 </button>
-                <button class="payments-refresh-btn" type="button" @onclick="RefreshPayments" title="Recarregar lista">
+                <button class="payments-refresh-btn" type="button" @onclick="RefreshPayments" title="@Ui["Group.PaymentsRefresh"]">
                     <i class="fas @(isLoadingPayments ? "fa-spinner fa-spin" : "fa-sync-alt")"></i>
                 </button>
             </div>
 
             @if (isLoadingPayments)
             {
-                <div class="payments-loading"><i class="fas fa-spinner fa-spin"></i> Carregando…</div>
+                <div class="payments-loading"><i class="fas fa-spinner fa-spin"></i> @Ui["Group.PaymentsLoading"]</div>
             }
             else if (paymentTab == "history")
             {
                 <div class="payments-history-filters">
                     <select @bind="historyFilterUserId">
-                        <option value="">Todos os participantes</option>
+                        <option value="">@Ui["Group.AllParticipants"]</option>
                         @foreach (var userName in paymentHistory?.Select(h => h.UserName).Distinct().OrderBy(n => n) ?? Enumerable.Empty<string>())
                         {
                             <option value="@userName">@userName</option>
@@ -122,7 +122,7 @@ else
                 {
                     <div class="payments-empty">
                         <i class="fas fa-history"></i>
-                        <span>Nenhum pagamento manual registrado ainda.</span>
+                        <span>@Ui["Group.NoManualPayments"]</span>
                     </div>
                 }
                 else
@@ -136,7 +136,7 @@ else
                                 @onclick="() => SelectPaymentUser(userName)">
                                 <span class="payments-user-name">@group.UserName</span>
                                 <div class="payments-user-meta">
-                                    <span class="payments-badge payments-badge--games">@group.Entries.Count pagamento@(group.Entries.Count != 1 ? "s" : "")</span>
+                                    <span class="payments-badge payments-badge--games">@group.Entries.Count @Ui["Group.Payment" + (group.Entries.Count != 1 ? "Plural" : "Singular")]</span>
                                     <span class="payments-badge payments-badge--amount payments-badge--amount--history">R$ @group.TotalAmount.ToString("F2")</span>
                                 </div>
                                 <i class="fas fa-chevron-@(isSelected ? "up" : "down") payments-chevron"></i>
@@ -156,10 +156,10 @@ else
                                                     <button class="payments-view-proof-btn" type="button"
                                                             disabled="@(entry.HasProof && entry.ConfirmationId.HasValue ? null : true)"
                                                             @onclick="@(e => entry.HasProof && entry.ConfirmationId.HasValue ? HandleViewProof(entry.ConfirmationId.Value) : System.Threading.Tasks.Task.CompletedTask)"
-                                                            title="Ver comprovante">
+                                                            title="@Ui["Group.ViewProof"]">
                                                         <i class="fas fa-camera"></i>
                                                     </button>
-                                                    <a class="payments-entry-link" href="@entry.EventHref" title="Ver partida">
+                                                    <a class="payments-entry-link" href="@entry.EventHref" title="@Ui["Group.ViewMatch"]">
                                                         <i class="fas fa-external-link-alt"></i>
                                                     </a>
                                                 </div>
@@ -176,7 +176,7 @@ else
             {
                 <div class="payments-empty">
                     <i class="fas fa-check-circle"></i>
-                    <span>Nenhum jogador inadimplente. Tudo em dia!</span>
+                    <span>@Ui["Group.NoDelinquent"]</span>
                 </div>
             }
             else
@@ -190,13 +190,13 @@ else
                             @onclick="() => SelectPaymentUser(userId)">
                             <span class="payments-user-name">@d.UserName</span>
                             <div class="payments-user-meta">
-                                <span class="payments-badge payments-badge--games">@d.Entries.Count jogo@(d.Entries.Count != 1 ? "s" : "")</span>
+                                <span class="payments-badge payments-badge--games">@d.Entries.Count @Ui["Group.Game" + (d.Entries.Count != 1 ? "Plural" : "Singular")]</span>
                                 <span class="payments-badge payments-badge--amount">R$ @d.TotalAmount.ToString("F2")</span>
                             </div>
                             <div class="payments-notify-actions" @onclick:stopPropagation="true">
                                 @if (notifiedUserIds?.Contains(userId) == true)
                                 {
-                                    <span class="payments-notified-badge"><i class="fas fa-check"></i> Notificado</span>
+                                    <span class="payments-notified-badge"><i class="fas fa-check"></i> @Ui["Group.Notified"]</span>
                                 }
                                 else if (notifyingUserId == userId)
                                 {
@@ -205,12 +205,12 @@ else
                                 else
                                 {
                                     <button class="payments-notify-btn payments-notify-btn--email" type="button"
-                                            title="Enviar e-mail de cobrança"
+                                            title="@Ui["Group.NotifyEmail"]"
                                             @onclick="() => HandleNotifyDelinquencyAsync(d)">
                                         <i class="fas fa-envelope"></i>
                                     </button>
                                     <button class="payments-notify-btn payments-notify-btn--whatsapp" type="button"
-                                            title="Cobrar via WhatsApp"
+                                            title="@Ui["Group.NotifyWhatsApp"]"
                                             @onclick="() => OpenWhatsAppDelinquency(d)">
                                         <i class="fab fa-whatsapp"></i>
                                     </button>
@@ -223,7 +223,7 @@ else
                         {
                             <li class="payments-detail-panel">
                                 <div class="payments-detail-summary">
-                                    <span class="payments-summary-label">Partidas pendentes</span>
+                                    <span class="payments-summary-label">@Ui["Group.PendingMatches"]</span>
                                     <span class="payments-summary-total">R$ @d.TotalAmount.ToString("F2")</span>
                                 </div>
                                 <ul class="payments-detail-list">
@@ -236,10 +236,10 @@ else
                                                 <button class="payments-view-proof-btn" type="button"
                                                         disabled="@(entry.HasProof ? null : true)"
                                                         @onclick="@(e => entry.HasProof ? HandleViewProof(entry.ConfirmationId) : System.Threading.Tasks.Task.CompletedTask)"
-                                                        title="Ver comprovante">
+                                                        title="@Ui["Group.ViewProof"]">
                                                     <i class="fas fa-camera"></i>
                                                 </button>
-                                                <a class="payments-entry-link" href="@entry.EventHref" title="Ver partida">
+                                                <a class="payments-entry-link" href="@entry.EventHref" title="@Ui["Group.ViewMatch"]">
                                                     <i class="fas fa-external-link-alt"></i>
                                                 </a>
                                             </div>
@@ -264,7 +264,7 @@ else
                 </button>
                 <img src="/api/pix-proof/@viewingProofConfirmationId"
                      class="payment-proof-img"
-                     alt="Comprovante Pix" />
+                     alt="@Ui["Group.ProofAlt"]" />
             </div>
         </div>
     }

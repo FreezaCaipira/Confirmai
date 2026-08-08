@@ -209,9 +209,6 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         
-        // Save HTML to file for debugging
-        System.IO.File.WriteAllText(@"C:\temp\grupos_debug.html", html);
-        
         // Verify groups are being displayed
         var hasGroupCard = html.Contains("group-card");
         Assert.True(hasGroupCard, "HTML should contain group cards");

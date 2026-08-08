@@ -1,19 +1,20 @@
 @using Confirmai.Models
+@inject Confirmai.Services.Core.UiTextService Ui
 
 <div class="quorum-bar @(IsPastEvent ? "quorum-bar--past" : (HasQuorum ? "quorum-bar--ok" : "quorum-bar--warn"))">
     @if (IsPastEvent)
     {
         <i class="fas fa-flag-checkered"></i>
-        <span>Partida encerrada</span>
+        <span>@Ui["Futsal.MatchEnded"]</span>
     }
     else if (HasQuorum)
     {
         <i class="fas fa-check-circle"></i>
-        <span>Quantidade mínima de jogadores atingida</span>
+        <span>@Ui["Futsal.QuorumReached"]</span>
     }
     else
     {
         <i class="fas fa-exclamation-triangle"></i>
-        <span>Quantidade mínima de jogadores é: <strong>@MinOutfield</strong> de linha + <strong>@MinGoalkeepers</strong> goleiro@(MinGoalkeepers == 1 ? string.Empty : "s")</span>
+        <span>@Ui.Get("Futsal.QuorumNeeded", MinOutfield, MinGoalkeepers)</span>
     }
 </div>

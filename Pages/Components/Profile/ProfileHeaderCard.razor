@@ -1,5 +1,7 @@
 @using System.Globalization
 @using Confirmai.Models
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 @if (User is not null)
 {
@@ -7,7 +9,7 @@
         <header class="profile-card-header">
             @if (!string.IsNullOrWhiteSpace(User.AvatarPath))
             {
-                <img class="profile-avatar-img" src="@User.AvatarPath" alt="Avatar de @DisplayName" />
+                <img class="profile-avatar-img" src="@User.AvatarPath" alt="@string.Format(T["Profile.AvatarAlt"], DisplayName)" />
             }
             else
             {
@@ -17,7 +19,7 @@
                 <h1 class="profile-name">@DisplayName</h1>
                 @if (User.MemberSince.HasValue)
                 {
-                    <p class="profile-since">Membro desde @User.MemberSince.Value.ToString("MM/yyyy", CultureInfo.InvariantCulture)</p>
+                    <p class="profile-since">@string.Format(T["Profile.MemberSince"], User.MemberSince.Value.ToString("MM/yyyy", CultureInfo.InvariantCulture))</p>
                 }
             </div>
         </header>

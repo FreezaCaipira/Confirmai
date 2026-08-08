@@ -1,13 +1,14 @@
 @using Confirmai.Models
 @using Confirmai.Pages.Futsal
+@inject Confirmai.Services.Core.UiTextService Ui
 
 <fieldset class="form-section">
-    <legend>Identidade da Partida</legend>
+    <legend>@Ui["Futsal.Identity"]</legend>
 
     @if (PreselectedGroup is null)
     {
         <div class="form-group">
-            <label>Nome da partida <span class="required">*</span></label>
+            <label>@Ui["Futsal.MatchName"] <span class="required">*</span></label>
             <InputText class="input" @bind-Value="@Form.GroupName"
                        placeholder='Ex: "Rachão da Galera do Zé", "Pelada de Quinta"'
                        autocomplete="off" />
@@ -16,19 +17,19 @@
     }
 
     <div class="form-group">
-        <label>Modalidade <span class="required">*</span></label>
+        <label>@Ui["Futsal.Modality"] <span class="required">*</span></label>
         <select class="input" value="@SubFormat" @onchange="HandleSubFormatChanged">
-            <option value="futsal">Futsal</option>
-            <option value="society">Fut7 / Society</option>
-            <option value="campo">Campo</option>
+            <option value="futsal">@Ui["Futsal.ModalityFutsal"]</option>
+            <option value="society">@Ui["Futsal.ModalitySociety"]</option>
+            <option value="campo">@Ui["Futsal.ModalityCampo"]</option>
         </select>
     </div>
 
     <div class="form-group">
-        <label>Como vocês chamam o jogo na sua região?</label>
+        <label>@Ui["Futsal.LocalNameLabel"]</label>
         <InputText class="input" @bind-Value="@Form.LocalName"
                    placeholder='racha, pelada, baba, rachão…' maxlength="60"
                    autocomplete="off" />
-        <small class="form-hint">Opcional — aparece nos cards para identificar o estilo da região.</small>
+        <small class="form-hint">@Ui["Futsal.LocalNameHint"]</small>
     </div>
 </fieldset>

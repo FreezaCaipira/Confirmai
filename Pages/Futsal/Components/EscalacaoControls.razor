@@ -1,26 +1,28 @@
+@inject Confirmai.Services.Core.UiTextService Ui
+
 <div class="esc-draft-actions">
     <button class="esc-btn esc-btn--shuffle" @onclick="HandleRandomize">
-        <i class="fas fa-dice fa-lg"></i> Embaralhar jogadores de linha
+        <i class="fas fa-dice fa-lg"></i> @Ui["Futsal.ShufflePlayers"]
     </button>
     <button class="esc-btn esc-btn--primary" @onclick="() => HandleShowConfirmModal(true)" disabled="@(!TeamsAreBalanced)">
-        <i class="fas fa-check"></i> Confirmar escalação
+        <i class="fas fa-check"></i> @Ui["Futsal.ConfirmEscalacao"]
     </button>
 </div>
 
 @if (!TeamsAreBalanced)
 {
-    <p class="esc-balance-hint"><i class="fas fa-exclamation-triangle"></i> Times desiguais — iguale os jogadores de linha para confirmar.</p>
+    <p class="esc-balance-hint"><i class="fas fa-exclamation-triangle"></i> @Ui["Futsal.TeamsUnbalanced"]</p>
 }
 
 @if (ShowConfirmModal)
 {
     <div class="esc-modal-overlay">
         <div class="esc-modal">
-            <p>Confirmar esta escalação? Os times ficarão visíveis para todos os confirmados.</p>
+            <p>@Ui["Futsal.ConfirmEscalacaoModal"]</p>
             <div class="esc-modal-actions">
-                <button class="esc-btn esc-btn--secondary" @onclick="() => HandleShowConfirmModal(false)" disabled="@IsSaving">Cancelar</button>
+                <button class="esc-btn esc-btn--secondary" @onclick="() => HandleShowConfirmModal(false)" disabled="@IsSaving">@Ui["Common.Cancel"]</button>
                 <button class="esc-btn esc-btn--primary" @onclick="HandleConfirmar" disabled="@IsSaving">
-                    @(IsSaving ? "Salvando…" : "Sim, confirmar")
+                    @(IsSaving ? @Ui["Futsal.Saving"] : @Ui["Futsal.SimConfirmar"])
                 </button>
             </div>
         </div>

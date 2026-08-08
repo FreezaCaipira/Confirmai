@@ -1,10 +1,12 @@
 @using Confirmai.Data
 @using Confirmai.Models
 @using Microsoft.AspNetCore.Components
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 @if (TotalItems == 0)
 {
-    <AdminDataState IsLoading="false" IsEmpty="true" LoadingText="Loading payments..." EmptyText="No payments found" EmptyIcon="fas fa-money-bill-wave" EmptyHint="No payments match your current filters.">
+    <AdminDataState IsLoading="false" IsEmpty="true" LoadingText="@T["AdminPayments.Loading"]" EmptyText="@T["AdminPayments.Empty"]" EmptyIcon="fas fa-money-bill-wave" EmptyHint="@T["AdminPayments.EmptyHint"]">
     </AdminDataState>
 }
 else
@@ -13,12 +15,12 @@ else
         <table class="payments-table align-right">
             <thead>
                 <tr>
-                    <th>User</th>
-                    <th>Gateway</th>
-                    <th>Value</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Actions</th>
+                    <th>@T["AdminPayments.User"]</th>
+                    <th>@T["AdminPayments.Gateway"]</th>
+                    <th>@T["AdminPayments.Value"]</th>
+                    <th>@T["AdminPayments.Status"]</th>
+                    <th>@T["AdminPayments.Date"]</th>
+                    <th>@T["AdminPayments.Actions"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,17 +44,17 @@ else
                         <td data-label="Status">
                             @if (p.IsPaid)
                             {
-                                <span class="order-status-badge pago">Paid</span>
+                                <span class="order-status-badge pago">@T["AdminPayments.StatusPaid"]</span>
                             }
                             else
                             {
-                                <span class="order-status-badge aguardandopagamento">Pending</span>
+                                <span class="order-status-badge aguardandopagamento">@T["AdminPayments.StatusPending"]</span>
                             }
                         </td>
                         <td data-label="Date">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                         <td data-label="Actions">
                             <div class="admin-actions-row">
-                                <button class="details-btn action-btn icon-only" @onclick="() => OnViewPayment.InvokeAsync(p.Id)" title="Details" aria-label="Details">
+                                <button class="details-btn action-btn icon-only" @onclick="() => OnViewPayment.InvokeAsync(p.Id)" title="@T["AdminPayments.Details"]" aria-label="@T["AdminPayments.Details"]">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -66,9 +68,9 @@ else
     @if (TotalPages > 1)
     {
         <div class="pagination admin-users-pagination">
-            <button type="button" @onclick="PrevPage" disabled="@(CurrentPage <= 1)">Prev</button>
-            <span class="pagination-info">Page @CurrentPage of @TotalPages</span>
-            <button type="button" @onclick="NextPage" disabled="@(CurrentPage >= TotalPages)">Next</button>
+            <button type="button" @onclick="PrevPage" disabled="@(CurrentPage <= 1)">@T["AdminPayments.Prev"]</button>
+            <span class="pagination-info">@T.Get("AdminPayments.PageInfo", CurrentPage, TotalPages)</span>
+            <button type="button" @onclick="NextPage" disabled="@(CurrentPage >= TotalPages)">@T["AdminPayments.Next"]</button>
         </div>
     }
 }

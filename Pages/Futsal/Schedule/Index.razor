@@ -11,34 +11,35 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject Confirmai.Services.Core.UiTextService Ui
 
-<PageTitle>Partidas Semanais — Confirmai</PageTitle>
+<PageTitle>@Ui["Futsal.ScheduleIndexPageTitle"]</PageTitle>
 
 <div class="schedule-page">
     <section class="schedule-block" aria-label="Recorrências semanais">
 
         <div class="schedule-back-row">
             <a href="@(GroupId.HasValue ? $"/grupo/{GroupId}/partidas" : "/meus-eventos?esporte=futsal")" class="listing-back-btn">
-                <i class="fas fa-arrow-left"></i> Voltar
+                <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
             </a>
         </div>
 
         <div class="schedule-title-row">
-            <h1 class="page-section-title schedule-title">Partidas Semanais</h1>
+            <h1 class="page-section-title schedule-title">@Ui["Futsal.WeeklyMatches"]</h1>
         </div>
 
         <div class="schedule-action-row">
             <a href="@(GroupId.HasValue ? $"/futsal/create?groupId={GroupId}" : (schedules.Count > 0 ? $"/futsal/create?groupId={schedules[0].GroupId}" : "/grupos"))" class="schedule-create-btn">
-                <i class="fas fa-plus"></i> Nova Partida
+                <i class="fas fa-plus"></i> @Ui["Futsal.NewMatch"]
             </a>
         </div>
 
         <AdminDataState IsLoading="isLoading"
                         IsEmpty="@(!isLoading && !schedules.Any())"
-                        LoadingText="Carregando suas partidas semanais…"
-                        EmptyText="Nenhuma partida semanal cadastrada."
+                        LoadingText="@Ui["Futsal.LoadingWeekly"]"
+                        EmptyText="@Ui["Futsal.NoWeeklyMatches"]"
                         EmptyIcon="fas fa-calendar-times"
-                        EmptyHint="Crie uma partida semanal para gerar partidas automaticamente toda semana.">
+                        EmptyHint="@Ui["Futsal.NoWeeklyHint"]">
             <div class="schedule-list">
                 @foreach (var s in schedules)
                 {
@@ -52,15 +53,15 @@
                                 <span class="schedule-card-day">@dowLabel @(nextInfo.StartsAt != default ? nextInfo.StartsAt.ToString("dd/MM") : "") — @s.TimeOfDay.ToString("HH:mm")</span>
                                 @if (!s.IsActive)
                                 {
-                                    <span class="schedule-card-status schedule-card-status--inactive">Inativa</span>
+                                    <span class="schedule-card-status schedule-card-status--inactive">@Ui["Futsal.Inactive"]</span>
                                 }
                             </div>
                             <p class="schedule-card-venue">📍 @(s.Venue?.Name ?? "—") — @(s.Venue?.City ?? "")</p>
                             <p class="schedule-card-meta">
-                                👥 @s.MaxPlayers jogadores
+                                👥 @s.MaxPlayers @Ui["Futsal.Players"]
                                 @if (s.MaxGoalkeepers > 0)
                                 {
-                                    <span> · 🧤 @s.MaxGoalkeepers goleiros</span>
+                                    <span> · 🧤 @s.MaxGoalkeepers @Ui["Futsal.GoalkeepersShort"]</span>
                                 }
                                 @if (s.Price > 0)
                                 {
@@ -74,13 +75,13 @@
                             @if (nextInfo.StartsAt != default)
                             {
                                 <p class="schedule-card-next">
-                                    Próxima: @nextInfo.StartsAt.ToString("dd/MM/yyyy HH:mm")
-                                    · @nextInfo.Confirmed confirmados
+                                    @Ui.Get("Futsal.Next", nextInfo.StartsAt.ToString("dd/MM/yyyy HH:mm"))
+                                    · @nextInfo.Confirmed @Ui["Futsal.ConfirmedCount"]
                                 </p>
                             }
                             else if (s.IsActive)
                             {
-                                <p class="schedule-card-next schedule-card-next--none">Nenhuma partida futura gerada.</p>
+                                <p class="schedule-card-next schedule-card-next--none">@Ui["Futsal.NoFutureMatch"]</p>
                             }
                         </div>
 
@@ -88,12 +89,12 @@
                             @if (s.IsActive)
                             {
                                 <a href="/futsal/schedule/@s.Id/edit" class="schedule-card-btn schedule-card-btn--edit">
-                                    <i class="fas fa-pen"></i> Editar
+                                    <i class="fas fa-pen"></i> @Ui["Common.Edit"]
                                 </a>
                                 <button class="schedule-card-btn schedule-card-btn--toggle"
                                         disabled="@(togglingId == s.Id)"
                                         @onclick="() => ToggleSchedule(s)">
-                                    @(togglingId == s.Id ? "…" : "Desativar")
+                                    @(togglingId == s.Id ? "…" : @Ui["Futsal.Deactivate"])
                                 </button>
                             }
                             else
@@ -101,7 +102,7 @@
                                 <button class="schedule-card-btn schedule-card-btn--toggle"
                                         disabled="@(togglingId == s.Id)"
                                         @onclick="() => ToggleSchedule(s)">
-                                    @(togglingId == s.Id ? "…" : "Reativar")
+                                    @(togglingId == s.Id ? "…" : @Ui["Futsal.Reactivate"])
                                 </button>
                             }
                         </div>

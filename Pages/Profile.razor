@@ -10,7 +10,7 @@
 @using Confirmai.Pages.Components.Profile
 
 
-<PageTitle>@(loading ? "Perfil" : DisplayName) · Confirmai</PageTitle>
+<PageTitle>@(loading ? T["Profile.Loading"] : DisplayName) · Confirmai</PageTitle>
 
 <ProfileLoadingStates
     IsLoading="@loading"
@@ -54,8 +54,8 @@
         @if (!isOwnProfile && isAuthenticated)
         {
             <div class="profile-card profile-message-card">
-                <h3 class="profile-message-title">Mensagem</h3>
-                <div class="profile-chat-thread" aria-label="Histórico do chat">
+                <h3 class="profile-message-title">@T["Profile.ChatTitle"]</h3>
+                <div class="profile-chat-thread" aria-label="@T["Profile.ChatAria"]">
                     <ProfileChatThread ChatMessages="@chatMessages" />
                 </div>
 

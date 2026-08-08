@@ -38,10 +38,10 @@
                 <button @onclick="ApplyFilters">@T["Common.Filter"]</button>
                 <button @onclick="ClearFilters">@T["Common.Clear"]</button>
                 <div class="export-actions">
-                    <button class="export-btn" @onclick="ExportToCsv" title="Exportar CSV">
+                    <button class="export-btn" @onclick="ExportToCsv" title="@T["PaymentHistory.ExportCsv"]">
                         <i class="fas fa-file-csv"></i> CSV
                     </button>
-                    <button class="export-btn" @onclick="ExportToPdf" title="Exportar PDF">
+                    <button class="export-btn" @onclick="ExportToPdf" title="@T["PaymentHistory.ExportPdf"]">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>

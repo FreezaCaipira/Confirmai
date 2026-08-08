@@ -11,15 +11,16 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject Confirmai.Services.Events.EventCollisionService EventCollisionService
+@inject Confirmai.Services.Core.UiTextService Ui
 
-<PageTitle>Criar Evento · Poker · Confirmai</PageTitle>
+<PageTitle>@Ui["Poker.CreatePageTitle"]</PageTitle>
 
 <div class="create-event-page">
     <div class="create-event-card">
         @if (preselectedGroup is not null)
         {
             <p class="form-hint form-hint--margin-bottom">
-                <i class="fas fa-users"></i> Evento para o grupo <strong>@preselectedGroup.Name</strong>
+                <i class="fas fa-users"></i> @Ui["Poker.EventForGroup"] <strong>@preselectedGroup.Name</strong>
             </p>
         }
 
@@ -27,25 +28,25 @@
         <div class="poker-type-selector">
             <button class="poker-type-tab @(form.EventType == PokerEventType.Tournament ? "is-active is-active--tourney" : "")"
                     type="button" @onclick='() => form.EventType = PokerEventType.Tournament'>
-                <i class="fas fa-trophy"></i> Torneio
+                <i class="fas fa-trophy"></i> @Ui["Poker.Tournament"]
             </button>
             <button class="poker-type-tab @(form.EventType == PokerEventType.CashGame ? "is-active is-active--cash" : "")"
                     type="button" @onclick='() => form.EventType = PokerEventType.CashGame'>
-                <i class="fas fa-coins"></i> Cash Game
+                <i class="fas fa-coins"></i> @Ui["Poker.CashGame"]
             </button>
             <button class="poker-type-tab @(form.EventType == PokerEventType.HomeGame ? "is-active is-active--home" : "")"
                     type="button" @onclick='() => form.EventType = PokerEventType.HomeGame'>
-                <i class="fas fa-home"></i> Home Game
+                <i class="fas fa-home"></i> @Ui["Poker.HomeGame"]
             </button>
         </div>
 
         <h1 class="create-event-title">
             @(form.EventType switch
             {
-                PokerEventType.Tournament => "🏆 Novo Torneio",
-                PokerEventType.CashGame   => "💰 Novo Cash Game",
-                PokerEventType.HomeGame   => "🏠 Novo Home Game",
-                _                         => "Novo Evento"
+                PokerEventType.Tournament => @Ui["Poker.NewTournament"],
+                PokerEventType.CashGame   => @Ui["Poker.NewCashGame"],
+                PokerEventType.HomeGame   => @Ui["Poker.NewHomeGame"],
+                _                         => @Ui["Poker.NewEvent"]
             })
         </h1>
 
@@ -55,10 +56,10 @@
 
             @* ── Identidade ──────────────────────────────────────────────── *@
             <fieldset class="form-section">
-                <legend>Identidade</legend>
+                <legend>@Ui["Poker.Identity"]</legend>
 
                 <div class="form-group">
-                    <label>Nome do evento <span class="required">*</span></label>
+                    <label>@Ui["Poker.EventName"] <span class="required">*</span></label>
                     <InputText class="input" @bind-Value="form.Name"
                                placeholder='@(form.EventType == PokerEventType.Tournament
                                     ? "Ex: \"Deep Stack Terça\", \"Sunday Main Event\""
@@ -69,7 +70,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>@(form.EventType == PokerEventType.HomeGame ? "Sua casa / local" : "Casa de Poker") <span class="required">*</span></label>
+                    <label>@(form.EventType == PokerEventType.HomeGame ? @Ui["Poker.YourHome"] : @Ui["Poker.PokerHouse"]) <span class="required">*</span></label>
                     <InputText class="input" @bind-Value="form.PokerHouseName"
                                placeholder='@(form.EventType == PokerEventType.HomeGame ? "Ex: \"Casa do João\"" : "Ex: \"Casino XYZ\", \"Club Poker SP\"")' />
                     <ValidationMessage For="@(() => form.PokerHouseName)" class="validation-message" />
@@ -78,7 +79,7 @@
                 @if (form.EventType != PokerEventType.HomeGame)
                 {
                     <div class="form-group">
-                        <label>Endereço</label>
+                        <label>@Ui["Poker.Address"]</label>
                         <InputText class="input" @bind-Value="form.Address"
                                    placeholder="Rua, número, bairro — Cidade/UF" />
                     </div>
@@ -86,15 +87,15 @@
 
                 <div class="form-row-2">
                     <div class="form-group">
-                        <label>Cidade <span class="required">*</span></label>
+                        <label>@Ui["Poker.City"] <span class="required">*</span></label>
                         <InputText class="input" @bind-Value="form.City" placeholder="São Paulo" />
                         <ValidationMessage For="@(() => form.City)" class="validation-message" />
                     </div>
                     <div class="form-group">
-                        <label>UF <span class="required">*</span></label>
+                        <label>@Ui["Poker.UF"] <span class="required">*</span></label>
                         <InputSelect class="input" @bind-Value="form.StateCode">
-                            <option value="">— Selecione —</option>
-                            <option value="EX">EX — Estrangeiro</option>
+                            <option value="">@Ui["Poker.SelectUF"]</option>
+                            <option value="EX">@Ui["Poker.ForeignUF"]</option>
                             <option disabled>──────────────────</option>
                             @foreach (var uf in BrazilianStates)
                             {
@@ -108,16 +109,16 @@
 
             @* ── Data e hora ─────────────────────────────────────────────── *@
             <fieldset class="form-section">
-                <legend>Data &amp; Horário</legend>
+                <legend>@Ui["Poker.DateTime"]</legend>
 
                 <div class="form-row-2">
                     <div class="form-group">
-                        <label>Data <span class="required">*</span></label>
+                        <label>@Ui["Poker.Date"] <span class="required">*</span></label>
                         <InputDate class="input" @bind-Value="form.Date" />
                         <ValidationMessage For="@(() => form.Date)" class="validation-message" />
                     </div>
                         <div class="form-group">
-                        <label>Hora de início <span class="required">*</span></label>
+                        <label>@Ui["Poker.StartTime"] <span class="required">*</span></label>
                         <input type="time" class="input"
                                value="@form.Time.ToString("HH:mm")"
                                @onchange="OnTimeChange" />
@@ -128,15 +129,15 @@
                 {
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Late Registration — data</label>
+                            <label>@Ui["Poker.LateRegDate"]</label>
                             <InputDate class="input" @bind-Value="form.LateRegDate" />
                         </div>
                         <div class="form-group">
-                            <label>Late Registration — hora</label>
+                            <label>@Ui["Poker.LateRegTime"]</label>
                             <input type="time" class="input"
                                    value="@(form.LateRegTime?.ToString(@"hh\:mm") ?? "")"
                                    @onchange="e => { if (TimeOnly.TryParse(e.Value?.ToString(), out var t)) form.LateRegTime = t; }" />
-                            <small class="form-hint">Deixe em branco se não houver.</small>
+                            <small class="form-hint">@Ui["Poker.LateRegHint"]</small>
                         </div>
                     </div>
                 }
@@ -146,7 +147,7 @@
             @if (form.EventType != PokerEventType.HomeGame)
             {
                 <fieldset class="form-section">
-                    <legend>Modalidade</legend>
+                    <legend>@Ui["Poker.Modality"]</legend>
 
                     <div class="modality-grid">
                         @foreach (var m in AvailableModalities(form.EventType))
@@ -166,35 +167,35 @@
             @if (form.EventType == PokerEventType.Tournament)
             {
                 <fieldset class="form-section">
-                    <legend>Estrutura do Torneio</legend>
+                    <legend>@Ui["Poker.TournamentStructure"]</legend>
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Fichas iniciais <span class="required">*</span></label>
+                            <label>@Ui["Poker.StartingStack"] <span class="required">*</span></label>
                             <InputNumber class="input" @bind-Value="form.StartingStack" min="1000" step="500" />
                             <ValidationMessage For="@(() => form.StartingStack)" class="validation-message" />
                         </div>
                         <div class="form-group">
-                            <label>Blind inicial (em BBs) <span class="required">*</span></label>
+                            <label>@Ui["Poker.InitialBlindBB"] <span class="required">*</span></label>
                             <InputNumber class="input" @bind-Value="form.InitialBlindBB" min="1" />
-                            <small class="form-hint">Quantas fichas = 1 BB no nível inicial.</small>
+                            <small class="form-hint">@Ui["Poker.InitialBlindHint"]</small>
                             <ValidationMessage For="@(() => form.InitialBlindBB)" class="validation-message" />
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Nº máximo de jogadores</label>
+                        <label>@Ui["Poker.MaxPlayers"]</label>
                         <InputNumber class="input" @bind-Value="form.MaxPlayers" min="0" />
-                        <small class="form-hint">Use 0 para ilimitado.</small>
+                        <small class="form-hint">@Ui["Poker.MaxPlayersHint"]</small>
                     </div>
                 </fieldset>
 
                 <fieldset class="form-section">
-                    <legend>Preços</legend>
+                    <legend>@Ui["Poker.Prices"]</legend>
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Buy-in (R$) <span class="required">*</span></label>
+                            <label>@Ui["Poker.BuyIn"] <span class="required">*</span></label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">R$</span>
                                 <InputNumber class="input" @bind-Value="form.BuyInAmount" min="0" step="5" />
@@ -202,7 +203,7 @@
                             <ValidationMessage For="@(() => form.BuyInAmount)" class="validation-message" />
                         </div>
                         <div class="form-group">
-                            <label>GTD — Premiação garantida (R$)</label>
+                            <label>@Ui["Poker.GTD"]</label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">R$</span>
                                 <InputNumber class="input" @bind-Value="form.GTD" min="0" step="100" />
@@ -212,32 +213,32 @@
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Rebuy (R$)</label>
+                            <label>@Ui["Poker.Rebuy"]</label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">R$</span>
                                 <InputNumber class="input" @bind-Value="form.RebuyAmount" min="0" step="5" />
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Rebuy duplo (R$)</label>
+                            <label>@Ui["Poker.RebuyDouble"]</label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">R$</span>
                                 <InputNumber class="input" @bind-Value="form.RebuyDoubleAmount" min="0" step="5" />
                             </div>
-                            <small class="form-hint">Pode ser menor que rebuy×2.</small>
+                            <small class="form-hint">@Ui["Poker.RebuyDoubleHint"]</small>
                         </div>
                     </div>
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Add-on (R$)</label>
+                            <label>@Ui["Poker.Addon"]</label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">R$</span>
                                 <InputNumber class="input" @bind-Value="form.AddonAmount" min="0" step="5" />
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Add-on duplo (R$)</label>
+                            <label>@Ui["Poker.AddonDouble"]</label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">R$</span>
                                 <InputNumber class="input" @bind-Value="form.AddonDoubleAmount" min="0" step="5" />
@@ -251,11 +252,11 @@
             @if (form.EventType == PokerEventType.CashGame)
             {
                 <fieldset class="form-section">
-                    <legend>Stacks</legend>
+                    <legend>@Ui["Poker.Stacks"]</legend>
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label>Stack mínimo (R$) <span class="required">*</span></label>
+                            <label>@Ui["Poker.StackMin"] <span class="required">*</span></label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">R$</span>
                                 <InputNumber class="input" @bind-Value="form.CashMinBuyIn" min="0" step="50" />
@@ -263,7 +264,7 @@
                             <ValidationMessage For="@(() => form.CashMinBuyIn)" class="validation-message" />
                         </div>
                         <div class="form-group">
-                            <label>Stack máximo (R$) <span class="required">*</span></label>
+                            <label>@Ui["Poker.StackMax"] <span class="required">*</span></label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">R$</span>
                                 <InputNumber class="input" @bind-Value="form.CashMaxBuyIn" min="0" step="50" />
@@ -273,10 +274,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label>O que está incluso para os jogadores?</label>
+                        <label>@Ui["Poker.CashIncludes"]</label>
                         <InputText class="input" @bind-Value="form.CashIncludes"
                                    placeholder='Ex: "janta, cerveja e refri", "snacks e água"' maxlength="300" />
-                        <small class="form-hint">Opcional — ex: janta inclusa, bebidas, etc.</small>
+                        <small class="form-hint">@Ui["Poker.CashIncludesHint"]</small>
                     </div>
                 </fieldset>
             }
@@ -287,8 +288,8 @@
                 <div class="homegame-notice">
                     <i class="fas fa-key"></i>
                     <div>
-                        <strong>Código de acesso</strong>
-                        <p>Um código privado será gerado automaticamente ao criar o evento. Compartilhe com seus convidados — apenas quem tiver o código verá os detalhes do home game.</p>
+                        <strong>@Ui["Poker.HomeGameAccessCode"]</strong>
+                        <p>@Ui["Poker.HomeGameNoticeText"]</p>
                     </div>
                 </div>
             }
@@ -306,10 +307,10 @@
             <div class="form-actions">
                 <button class="cancel-btn" type="button"
                         @onclick='() => NavigationManager.NavigateTo(preselectedGroup is not null ? $"/grupo/{preselectedGroup.Id}" : "/grupos")'>
-                    Cancelar
+                    @Ui["Common.Cancel"]
                 </button>
                 <button class="save-btn save-btn--poker" type="submit" disabled="@isSaving">
-                    @(isSaving ? "Criando…" : $"Criar {EventTypeLabel(form.EventType)}")
+                    @(isSaving ? @Ui["Poker.Creating"] : Ui.Get("Poker.CreateButton", EventTypeLabel(form.EventType)))
                 </button>
             </div>
 

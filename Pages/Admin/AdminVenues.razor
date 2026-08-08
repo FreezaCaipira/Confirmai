@@ -8,53 +8,55 @@
 @using Confirmai.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using Confirmai.Services.Core
+@inject UiTextService T
 
 
 <div class="entity-shell admin-page admin-venues-page">
 
-    <PageTitle>Quadras / Venues — Confirmai</PageTitle>
+    <PageTitle>@T["AdminVenues.PageTitle"]</PageTitle>
 
-    <section class="entity-shell-grid" aria-label="Gerenciamento de quadras">
+    <section class="entity-shell-grid" aria-label="@T["AdminVenues.Aria"]">
         <article class="entity-shell-card entity-shell-main">
-            <h1 class="page-section-title">Quadras &amp; Venues</h1>
+            <h1 class="page-section-title">@T["AdminVenues.Title"]</h1>
 
             <div class="filter-bar admin-filter-card">
-                <input type="text" placeholder="Filtrar por nome…"
+                <input type="text" placeholder="@T["AdminVenues.FilterName"]"
                        @bind="filterName" @bind:event="oninput" @bind:after="ApplyFilter" />
                 <select @bind="filterType" @bind:after="ApplyFilter">
-                    <option value="">Todos os tipos</option>
+                    <option value="">@T["AdminVenues.AllTypes"]</option>
                     @foreach (var t in Enum.GetValues<VenueType>())
                     {
                         <option value="@((int)t)">@VenueTypeLabel(t)</option>
                     }
                 </select>
                 <select @bind="filterState" @bind:after="ApplyFilter">
-                    <option value="">Todos os estados</option>
-                    <option value="active">Ativas</option>
-                    <option value="inactive">Inativas</option>
+                    <option value="">@T["AdminVenues.AllStates"]</option>
+                    <option value="active">@T["AdminVenues.Active"]</option>
+                    <option value="inactive">@T["AdminVenues.Inactive"]</option>
                 </select>
                 <div class="filter-action-buttons">
-                    <button type="button" @onclick="ClearFilters">Limpar</button>
+                    <button type="button" @onclick="ClearFilters">@T["AdminVenues.Clear"]</button>
                     <button type="button" class="success-btn" @onclick='() => NavigationManager.NavigateTo("/admin/venues/edit/0")'>
-                        <i class="fas fa-plus"></i> Nova Quadra
+                        <i class="fas fa-plus"></i> @T["AdminVenues.NewVenue"]
                     </button>
                 </div>
             </div>
 
             <AdminDataState IsLoading="@isLoading"
                             IsEmpty="@(!filtered.Any())"
-                            LoadingText="Carregando quadras…"
-                            EmptyText="Nenhuma quadra encontrada."
+                            LoadingText="@T["AdminVenues.Loading"]"
+                            EmptyText="@T["AdminVenues.Empty"]"
                             EmptyIcon="fas fa-map-marker-alt"
-                            EmptyHint="Cadastre quadras para vinculá-las aos rachas.">
+                            EmptyHint="@T["AdminVenues.EmptyHint"]">
                 <table class="product-table">
                     <thead>
                         <tr>
-                            <th>Nome</th>
-                            <th>Tipo</th>
-                            <th>Cidade / UF</th>
-                            <th>Status</th>
-                            <th>Ações</th>
+                            <th>@T["AdminVenues.Name"]</th>
+                            <th>@T["AdminVenues.Type"]</th>
+                            <th>@T["AdminVenues.CityUF"]</th>
+                            <th>@T["AdminVenues.Status"]</th>
+                            <th>@T["AdminVenues.Actions"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,23 +73,23 @@
                                 <td data-label="Status">
                                     @if (v.IsActive)
                                     {
-                                        <span class="order-status-badge pago">Ativa</span>
+                                        <span class="order-status-badge pago">@T["AdminVenues.ActiveBadge"]</span>
                                     }
                                     else
                                     {
-                                        <span class="order-status-badge cancelado">Inativa</span>
+                                        <span class="order-status-badge cancelado">@T["AdminVenues.InactiveBadge"]</span>
                                     }
                                 </td>
                                 <td data-label="Ações">
                                     @if (confirmDeleteId == v.Id)
                                     {
                                         <div class="admin-actions-row admin-actions-row--compact">
-                                            <span class="admin-delete-prompt">Remover?</span>
-                                            <button class="danger-btn action-btn icon-only" title="Confirmar"
+                                            <span class="admin-delete-prompt">@T["AdminVenues.Remove"]</span>
+                                            <button class="danger-btn action-btn icon-only" title="@T["Common.Confirm"]"
                                                     @onclick='() => DeleteVenue(v.Id)'>
                                                 <i class="fas fa-check"></i>
                                             </button>
-                                            <button class="cancel-btn action-btn icon-only" title="Cancelar"
+                                            <button class="cancel-btn action-btn icon-only" title="@T["Common.Cancel"]"
                                                     @onclick='() => confirmDeleteId = null'>
                                                 <i class="fas fa-times"></i>
                                             </button>
@@ -98,18 +100,18 @@
                                         <div class="admin-actions-row">
                                             <button class="edit-btn action-btn icon-only"
                                                     @onclick='() => NavigationManager.NavigateTo($"/admin/venues/edit/{v.Id}")'
-                                                    title="Editar" aria-label="Editar">
+                                                    title="@T["AdminVenues.Edit"]" aria-label="@T["AdminVenues.Edit"]">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </button>
                                             <button class="danger action-btn icon-only"
                                                     @onclick="() => ToggleActive(v)"
-                                                    title="@(v.IsActive ? "Desativar" : "Ativar")"
-                                                    aria-label="@(v.IsActive ? "Desativar" : "Ativar")">
+                                                    title="@(v.IsActive ? @T["AdminVenues.Deactivate"] : @T["AdminVenues.Activate"])"
+                                                    aria-label="@(v.IsActive ? @T["AdminVenues.Deactivate"] : @T["AdminVenues.Activate"])">
                                                 <i class="fas @(v.IsActive ? "fa-ban" : "fa-check")"></i>
                                             </button>
                                             <button class="danger-btn action-btn icon-only"
                                                     @onclick='() => { confirmDeleteId = v.Id; deleteError = string.Empty; }'
-                                                    title="Remover" aria-label="Remover">
+                                                    title="@T["AdminVenues.RemoveAction"]" aria-label="@T["AdminVenues.RemoveAction"]">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -121,9 +123,9 @@
                 </table>
 
                 <div class="pagination">
-                    <button type="button" @onclick="PrevPage" disabled="@(currentPage <= 1)">Anterior</button>
-                    <span class="pagination-info">Página @currentPage de @TotalPages</span>
-                    <button type="button" @onclick="NextPage" disabled="@(currentPage >= TotalPages)">Próxima</button>
+                    <button type="button" @onclick="PrevPage" disabled="@(currentPage <= 1)">@T["AdminVenues.Previous"]</button>
+                    <span class="pagination-info">@T.Get("AdminVenues.PageInfo", currentPage, TotalPages)</span>
+                    <button type="button" @onclick="NextPage" disabled="@(currentPage >= TotalPages)">@T["AdminVenues.Next"]</button>
                 </div>
             </AdminDataState>
 
@@ -134,8 +136,8 @@
         </article>
     </section>
 
-    <section class="entity-shell-footer" aria-label="Ações extras">
-        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["AdminVenues.Back"]</button>
     </section>
 
 </div>
