@@ -60,6 +60,12 @@ namespace Confirmai.Models
         /// <summary>UTC timestamp when the payer last uploaded a proof image.</summary>
         public DateTime? PixProofUploadedAt { get; set; }
 
+        /// <summary>
+        /// Snapshot of the platform fee (R$) stamped when this confirmation was marked as paid.
+        /// Null = confirmation prior to the fee ledger cycle or not applicable (non-futsal / gateway mode).
+        /// </summary>
+        public decimal? PlatformFeeAmount { get; set; }
+
         public bool IsPaymentPending => PaymentStatus == EventConfirmationPaymentStatus.Pending;
         public bool IsPaymentPaid => PaymentStatus == EventConfirmationPaymentStatus.Paid;
     }

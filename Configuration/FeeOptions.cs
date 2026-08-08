@@ -25,6 +25,13 @@ public class FeeOptions
     /// </summary>
     public bool ShowDirectPixToOrganizer { get; set; } = true;
 
+    /// <summary>
+    /// Taxa fixa da plataforma no fluxo MANUAL (V1), em reais.
+    /// Aplicada apenas em partidas de futsal com preço > 0 em grupos sem gateway.
+    /// Não confundir com AppFeeFixed/GatewayFeeFixed (matemática do V2 com gateway).
+    /// </summary>
+    public decimal ManualPlatformFeeFixed { get; set; } = 0;
+
     /// <summary>True quando a taxa está configurada e habilitada.</summary>
     public bool IsConfigured => Enabled && (AppFeeFixed > 0 || GatewayFeeFixed > 0);
 }

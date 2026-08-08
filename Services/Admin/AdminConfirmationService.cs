@@ -3,6 +3,7 @@ using Confirmai.Enums;
 using Confirmai.Models;
 using Microsoft.EntityFrameworkCore;
 using Confirmai.Services.Core;
+using Confirmai.Services.Payment;
 
 namespace Confirmai.Services.Admin;
 
@@ -13,13 +14,16 @@ public class AdminConfirmationService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly LogService? _logService;
+    private readonly PlatformFeeLedgerService? _feeLedger;
 
     public AdminConfirmationService(
         IDbContextFactory<AppDbContext> dbFactory,
-        LogService? logService = null)
+        LogService? logService = null,
+        PlatformFeeLedgerService? feeLedger = null)
     {
         _dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
         _logService = logService;
+        _feeLedger = feeLedger;
     }
 
     /// <summary>
@@ -66,6 +70,13 @@ public class AdminConfirmationService
         }
 
         await db.SaveChangesAsync();
+
+        // Stamp platform fee on the confirmation (V1 manual flow, futsal only)
+        if (conf.HasPaid && _feeLedger is not null)
+        {
+            try { await _feeLedger.StampFeeOnPaidAsync(confirmationId); }
+            catch { /* non-critical: fee stamping is best-effort */ }
+        }
 
         // Audit
         if (_logService != null)
