@@ -124,6 +124,7 @@ builder.Services.AddScoped<AdminConfirmationService>();
     builder.Services.AddScoped<PlatformFeeLedgerService>();
     builder.Services.AddScoped<PlatformFeeSettlementService>();
     builder.Services.AddScoped<PlatformFeeSettlementQueryService>();
+    builder.Services.AddScoped<PlatformFeeSettlementProofAuthorizer>();
     builder.Services.AddScoped<AdminPaymentsQueryService>();
     builder.Services.AddScoped<AdminPaymentsSummaryService>();
     builder.Services.AddScoped<AdminPaymentsCommandService>();
@@ -616,6 +617,29 @@ app.MapGet("/api/pix-proof/{id:int}", async (
 
     var contentType = conf.PixProofContentType ?? "image/jpeg";
     return Results.File(conf.PixProofImageData, contentType);
+}).RequireAuthorization();
+
+// Serve platform fee settlement proof images — only to the group admin who
+// submitted the settlement or a system admin. Mirrors /api/pix-proof/{id}.
+app.MapGet("/api/fee-settlement-proof/{id:int}", async (
+    int id,
+    HttpContext ctx,
+    UserManager<ApplicationUser> userManager,
+    PlatformFeeSettlementProofAuthorizer authorizer) =>
+{
+    var user = await userManager.GetUserAsync(ctx.User);
+    if (user is null) return Results.Unauthorized();
+
+    try
+    {
+        var proof = await authorizer.GetProofForUserAsync(id, user.Id);
+        if (proof is null) return Results.NotFound();
+        return Results.File(proof.Value.Data, proof.Value.ContentType);
+    }
+    catch (UnauthorizedAccessException)
+    {
+        return Results.Forbid();
+    }
 }).RequireAuthorization();
 
 using (var scope = app.Services.CreateScope())
