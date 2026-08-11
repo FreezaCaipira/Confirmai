@@ -16,13 +16,16 @@ public class PlatformFeeSettlementQueryService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly IOptions<FeeOptions> _feeOptions;
+    private readonly PlatformFeeLedgerService _ledger;
 
     public PlatformFeeSettlementQueryService(
         IDbContextFactory<AppDbContext> dbFactory,
-        IOptions<FeeOptions> feeOptions)
+        IOptions<FeeOptions> feeOptions,
+        PlatformFeeLedgerService ledger)
     {
         _dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
         _feeOptions = feeOptions ?? throw new ArgumentNullException(nameof(feeOptions));
+        _ledger = ledger ?? throw new ArgumentNullException(nameof(ledger));
     }
 
     /// <summary>
@@ -68,8 +71,11 @@ public class PlatformFeeSettlementQueryService
         var settled = settlements.Where(s => s.Status == PlatformFeeSettlementStatus.Pago).Sum(s => s.Amount);
         var inAnalysis = settlements.Where(s => s.Status == PlatformFeeSettlementStatus.EmAnalise).Sum(s => s.Amount);
 
-        // Status por partida: na Fase A todas com taxa stamped e due > 0 ficam Pendente.
-        // A baixa FIFO (Fase D) refina este status por partida.
+        // Status por partida via baixa FIFO (Fase D): lotes Pago em ordem de
+        // SubmittedAt cobrem as partidas mais antigas primeiro.
+        var fifoBreakdown = await _ledger.GetGroupFeeBreakdownByMatchAsync(groupId);
+        var statusByEvent = fifoBreakdown.ToDictionary(m => m.EventId, m => m.Status);
+
         var matches = matchRows
             .Select(m => new PlatformFeeMatch(
                 m.EventId,
@@ -77,7 +83,7 @@ public class PlatformFeeSettlementQueryService
                 m.Location,
                 m.PaidPlayers,
                 m.FeeAmount,
-                PlatformFeeMatchStatus.Pendente))
+                statusByEvent.TryGetValue(m.EventId, out var st) ? st : PlatformFeeMatchStatus.Pendente))
             .ToList();
 
         var opts = _feeOptions.Value;

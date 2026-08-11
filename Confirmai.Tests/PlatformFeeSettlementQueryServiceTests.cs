@@ -26,7 +26,8 @@ public class PlatformFeeSettlementQueryServiceTests
         decimal manualFee = 0.75m)
     {
         var options = Options.Create(TestFeeOptions(manualFee));
-        return new PlatformFeeSettlementQueryService(ctx.factory, options);
+        var ledger = new PlatformFeeLedgerService(ctx.factory, options);
+        return new PlatformFeeSettlementQueryService(ctx.factory, options, ledger);
     }
 
     private static async Task<(Group group, Event evt, ApplicationUser user, EventConfirmation conf)> SeedPaidFutsalMatchAsync(
@@ -254,7 +255,8 @@ public class PlatformFeeSettlementQueryServiceTests
         var (group, _, _, _) = await SeedPaidFutsalMatchAsync(ctx.db);
 
         var options = Options.Create(new FeeOptions { Enabled = true, ManualPlatformFeeFixed = 0.75m });
-        var service = new PlatformFeeSettlementQueryService(ctx.factory, options);
+        var ledger = new PlatformFeeLedgerService(ctx.factory, options);
+        var service = new PlatformFeeSettlementQueryService(ctx.factory, options, ledger);
         var overview = await service.GetGroupFeeOverviewAsync(group.Id);
 
         Assert.Equal(string.Empty, overview.PlatformPixKey);

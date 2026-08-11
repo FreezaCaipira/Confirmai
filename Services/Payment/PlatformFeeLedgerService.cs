@@ -76,4 +76,73 @@ public class PlatformFeeLedgerService
 
         return (accrued, settled, accrued - settled);
     }
+
+    /// <summary>
+    /// Projects the per-match fee status using FIFO settlement allocation.
+    /// Paid settlements (in SubmittedAt order) cover the oldest matches first;
+    /// a partially covered match stays Pendente; surplus becomes credit for
+    /// the next match. Rejected/EmAnalise settlements do not abate anything.
+    /// </summary>
+    public async Task<IReadOnlyList<PlatformFeeMatchStatusProjection>> GetGroupFeeBreakdownByMatchAsync(int groupId)
+    {
+        await using var db = _dbFactory.CreateDbContext();
+
+        // Matches (events) with accrued fee, oldest first.
+        var matches = await db.EventConfirmations
+            .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount.HasValue)
+            .Include(c => c.Event)
+            .GroupBy(c => new { c.Event!.Id, c.Event.StartsAt, c.Event.Location })
+            .Select(g => new
+            {
+                EventId = g.Key.Id,
+                StartsAt = g.Key.StartsAt,
+                Location = g.Key.Location,
+                FeeAmount = g.Sum(c => c.PlatformFeeAmount!.Value),
+                PaidPlayers = g.Count()
+            })
+            .OrderBy(m => m.StartsAt)
+            .ToListAsync();
+
+        if (matches.Count == 0)
+            return Array.Empty<PlatformFeeMatchStatusProjection>();
+
+        // Paid settlements in FIFO order (oldest first).
+        var paidSettlements = await db.PlatformFeeSettlements
+            .Where(s => s.GroupId == groupId && s.Status == PlatformFeeSettlementStatus.Pago)
+            .OrderBy(s => s.SubmittedAt)
+            .Select(s => s.Amount)
+            .ToListAsync();
+
+        // Allocate settlement pool across matches in order.
+        var pool = paidSettlements.Sum();
+        var result = new List<PlatformFeeMatchStatusProjection>(matches.Count);
+        foreach (var m in matches)
+        {
+            var status = PlatformFeeMatchStatus.Pendente;
+            if (pool >= m.FeeAmount && m.FeeAmount > 0)
+            {
+                status = PlatformFeeMatchStatus.Pago;
+                pool -= m.FeeAmount;
+            }
+            // Partial coverage (pool < FeeAmount) leaves the match Pendente,
+            // and the pool is consumed (set to 0) so subsequent matches stay Pendente.
+            else if (pool > 0 && pool < m.FeeAmount)
+            {
+                pool = 0;
+            }
+            result.Add(new PlatformFeeMatchStatusProjection(
+                m.EventId, m.StartsAt, m.Location, m.PaidPlayers, m.FeeAmount, status));
+        }
+
+        return result;
+    }
 }
+
+/// <summary>Per-match fee status after FIFO settlement allocation (Fase D).</summary>
+public record PlatformFeeMatchStatusProjection(
+    int EventId,
+    DateTime StartsAt,
+    string Location,
+    int PaidPlayers,
+    decimal FeeAmount,
+    PlatformFeeMatchStatus Status);
