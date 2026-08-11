@@ -1,6 +1,7 @@
 @using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
+@inject UiTextService Ui
 
 @if (IsPastEvent && Event.Group.EnableBestPlayerVoting && (IsMember || IsAdmin))
 {
@@ -77,7 +78,7 @@
                         title="@(isMe ? "Você não pode votar em si mesmo" : $"Votar em {p.User?.FullName ?? p.User?.Email}")">
                         <span class="esc-vote-team-badge @(p.TeamId == 0 ? "esc-vote-team-badge--a" : "esc-vote-team-badge--b")">@(p.TeamId == 0 ? "A" : "B")</span>
                         <span class="esc-vote-name">@(p.User?.FullName ?? p.User?.Email)</span>
-                        @if (isMe)     { <span class="player-tag player-tag--me">Você</span> }
+                        @if (isMe)     { <span class="player-tag player-tag--me">@Ui["Group.You"]</span> }
                         @if (isMyPick) { <span class="esc-vote-current-tag"><i class="fas fa-check"></i></span> }
                     </li>
                 }

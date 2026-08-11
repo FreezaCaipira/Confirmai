@@ -148,6 +148,7 @@ internal static class GroupTexts
         ["Group.BankAccountPlaceholder"] = "Número da conta (sem dígito)",
         ["Group.TestData"] = "Dados de teste",
         ["Group.PayoutSaving"] = "Salvando…",
+        ["Group.PixKeyRandom"] = "Chave Aleatória",
 
         // Payments page
         ["Group.PaymentsTitle"] = "Pagamentos",

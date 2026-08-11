@@ -81,14 +81,14 @@
                     <div class="form-group">
                         <label>@Ui["Poker.Address"]</label>
                         <InputText class="input" @bind-Value="form.Address"
-                                   placeholder="Rua, número, bairro — Cidade/UF" />
+                                   placeholder="@Ui["Poker.AddressPlaceholder"]" />
                     </div>
                 }
 
                 <div class="form-row-2">
                     <div class="form-group">
                         <label>@Ui["Poker.City"] <span class="required">*</span></label>
-                        <InputText class="input" @bind-Value="form.City" placeholder="São Paulo" />
+                        <InputText class="input" @bind-Value="form.City" placeholder="@Ui["Poker.CityPlaceholder"]" />
                         <ValidationMessage For="@(() => form.City)" class="validation-message" />
                     </div>
                     <div class="form-group">

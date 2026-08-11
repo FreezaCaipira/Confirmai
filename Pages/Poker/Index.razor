@@ -105,7 +105,7 @@
                             }
                             @if (ev.LateRegEndsAt.HasValue && ev.LateRegEndsAt > DateTime.UtcNow)
                             {
-                                <span class="meta-chip meta-chip--latereg">Late Reg até @ev.LateRegEndsAt.Value.ToLocalTime().ToString("HH:mm")</span>
+                                <span class="meta-chip meta-chip--latereg">@Ui.Get("Poker.LateRegUntil", ev.LateRegEndsAt.Value.ToLocalTime().ToString("HH:mm"))</span>
                             }
                             @if (ev.MaxPlayers > 0)
                             {

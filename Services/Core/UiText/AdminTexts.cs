@@ -302,6 +302,7 @@ internal static class AdminTexts
         ["AdminUserView.Governance"] = "Governanca",
         ["AdminUserView.GovernanceHint"] = "Esta visualizacao permite inspecao de dados para revisao administrativa e fluxo de suporte.",
         ["AdminUserView.AdminScope"] = "Escopo administrativo",
+        ["AdminUserView.RolesPermissions"] = "Papéis & Permissões",
 
         ["AdminProductView.Kicker"] = "Painel administrativo",
         ["AdminProductView.Title"] = "Detalhes do Produto",
@@ -842,6 +843,7 @@ internal static class AdminTexts
         ["AdminUserView.Governance"] = "Governance",
         ["AdminUserView.GovernanceHint"] = "This view allows data inspection for administrative review and support flow.",
         ["AdminUserView.AdminScope"] = "Administrative scope",
+        ["AdminUserView.RolesPermissions"] = "Roles & Permissions",
 
         ["AdminProductView.Kicker"] = "Administrative panel",
         ["AdminProductView.Title"] = "Product Details",
@@ -1382,6 +1384,7 @@ internal static class AdminTexts
         ["AdminUserView.Governance"] = "Gobernanza",
         ["AdminUserView.GovernanceHint"] = "Esta vista permite inspeccion de datos para revision administrativa y flujo de soporte.",
         ["AdminUserView.AdminScope"] = "Ambito administrativo",
+        ["AdminUserView.RolesPermissions"] = "Roles & Permisos",
 
         ["AdminProductView.Kicker"] = "Panel administrativo",
         ["AdminProductView.Title"] = "Detalles del Producto",
