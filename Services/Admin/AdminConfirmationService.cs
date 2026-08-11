@@ -2,6 +2,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Confirmai.Services.Core;
 using Confirmai.Services.Payment;
 
@@ -15,15 +16,18 @@ public class AdminConfirmationService
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly LogService? _logService;
     private readonly PlatformFeeLedgerService? _feeLedger;
+    private readonly ILogger<AdminConfirmationService>? _logger;
 
     public AdminConfirmationService(
         IDbContextFactory<AppDbContext> dbFactory,
         LogService? logService = null,
-        PlatformFeeLedgerService? feeLedger = null)
+        PlatformFeeLedgerService? feeLedger = null,
+        ILogger<AdminConfirmationService>? logger = null)
     {
         _dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
         _logService = logService;
         _feeLedger = feeLedger;
+        _logger = logger;
     }
 
     /// <summary>
@@ -74,8 +78,16 @@ public class AdminConfirmationService
         // Stamp platform fee on the confirmation (V1 manual flow, futsal only)
         if (conf.HasPaid && _feeLedger is not null)
         {
-            try { await _feeLedger.StampFeeOnPaidAsync(confirmationId); }
-            catch { /* non-critical: fee stamping is best-effort */ }
+            try
+            {
+                await _feeLedger.StampFeeOnPaidAsync(confirmationId);
+            }
+            catch (Exception ex)
+            {
+                // Non-blocking for the admin, but never silent: an unstamped fee is revenue lost.
+                _logger?.LogError(ex,
+                    "Falha ao carimbar a taxa da plataforma na confirmacao {ConfirmationId}", confirmationId);
+            }
         }
 
         // Audit

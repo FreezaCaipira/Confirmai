@@ -1,4 +1,5 @@
 using Confirmai.Data;
+using Confirmai.Enums;
 using Confirmai.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -76,6 +77,21 @@ public class PlatformFeeSettlementService
         {
             await using var db = _factory.CreateDbContext();
 
+            // Only a group admin (the organizer who owes the fee) may declare a transfer.
+            var isGroupAdmin = await db.GroupMembers.AsNoTracking().AnyAsync(m =>
+                m.GroupId == groupId &&
+                m.UserId == submittedByUserId &&
+                m.Role == GroupMemberRole.Admin);
+
+            if (!isGroupAdmin)
+            {
+                return new PlatformFeeSettlementResult
+                {
+                    Success = false,
+                    Message = "Apenas um administrador do grupo pode enviar o repasse."
+                };
+            }
+
             var settlement = new PlatformFeeSettlement
             {
                 GroupId = groupId,
@@ -119,6 +135,16 @@ public class PlatformFeeSettlementService
     {
         await using var db = _factory.CreateDbContext();
 
+        // Only a system admin may settle the debt — never the organizer who owes it.
+        if (!await IsSystemAdminAsync(db, reviewerUserId))
+        {
+            return new PlatformFeeSettlementResult
+            {
+                Success = false,
+                Message = "Apenas o administrador do sistema pode confirmar o recebimento do repasse."
+            };
+        }
+
         var settlement = await db.PlatformFeeSettlements
             .AsTracking()
             .FirstOrDefaultAsync(s => s.Id == settlementId);
@@ -156,6 +182,21 @@ public class PlatformFeeSettlementService
             Message = approved ? "Repasse aprovado." : "Repasse rejeitado.",
             SettlementId = settlement.Id
         };
+    }
+
+    private static async Task<bool> IsSystemAdminAsync(AppDbContext db, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId)) return false;
+
+        var adminRoleIds = await db.Roles.AsNoTracking()
+            .Where(r => r.Name == "admin")
+            .Select(r => r.Id)
+            .ToListAsync();
+
+        if (adminRoleIds.Count == 0) return false;
+
+        return await db.UserRoles.AsNoTracking()
+            .AnyAsync(ur => ur.UserId == userId && adminRoleIds.Contains(ur.RoleId));
     }
 }
 

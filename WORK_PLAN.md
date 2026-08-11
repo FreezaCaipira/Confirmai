@@ -162,7 +162,9 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 25 | i18n completo (zerar debito tecnico) | ~450 strings migradas em ~70 arquivos `.razor` (Futsal/Poker/Groups/Admin/Payment/Venue/Profile/Docs); 4 dominios novos (`FutsalTexts`, `PokerTexts`, `GroupTexts`, `UtilityTexts`) + `AdminTexts`/`CoreTexts`/`PaymentTexts` estendidos, PT-BR/EN-US/ES-ES; +32 testes de completude/paridade de chaves; extras: fix NullRef em `BuildPixStaticPayload`, aviso "Pix nao configurado", padronizacao `btn-view-groups`, cascata CSS `detail-admin-btn`, remocao de debug write em teste. 2133->2165. | #86 (plano+impl), #87 (review) | APROVADO c/ ressalvas |
 
-| 26 | Taxa acumulada p/ repasse manual + UX Profile + privacidade do Pix + fechar i18n | Planejado: Fase 0 privacidade (Pix exposto no perfil publico), Fase 1 UX Profile, Fase 2 ledger da taxa R$ 0,75 (futsal/manual), Fase 3 repasse com comprovante (organizador envia, admin do sistema confirma -- espelho do fluxo do jogador), Fase 4 taxa discriminada ao jogador (`Partida + Taxa = Total`), Fase 5 Pix como pre-requisito, Fase 6 fechar i18n + teste anti-hardcode. | #87 (plano) | PLANEJADO |
+| 26 | Taxa acumulada p/ repasse manual + UX Profile + privacidade do Pix + fechar i18n | Fases 0/1/2/4/5 entregues (privacidade do Pix, UX do Profile + deep link `?intent=pix`, `PlatformFeeAmount` + `PlatformFeeLedgerService` + migration, breakdown `Partida + Taxa = Total`, Pix como pre-requisito no `FutsalCreateService`); Fase 3 so **backend** (services sem UI/endpoint/FIFO); Fase 6 **nao entregue** (so paridade de chaves de novo). 2165->2223. Senior corrigiu 3 itens (QR cobrando valor errado, autorizacao ausente, `catch{}` mudo). | #88 (impl), #89 (review) | APROVADO PARCIAL -- Fase 3 incompleta, Fase 6 nao entregue |
+
+| 27 | Fechar a Fase 3 (UI do repasse) + Fase 6 (anti-hardcode) | Planejado -- ver secao do Ciclo 27 abaixo. | -- | PLANEJADO |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -172,7 +174,104 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 ---
 
-## Ciclo 26 (Pleno) -- Taxa acumulada p/ repasse manual + UX do Profile + privacidade da chave Pix + fechar i18n [PLANEJADO]
+## Review Senior do Ciclo 26 (PR #88, mergeada na `main`) -- APROVADO PARCIAL
+
+**Escopo revisado**: commits `c5d81ae`..`fdbdd87` (8 commits, 39 arquivos, +3567/-66), mergeados via `ac277aa`.
+
+**Build**: `dotnet build --no-incremental` -> **0 warning / 0 error**.
+**Testes**: **2223 verdes** (era 2165, +58), 24 falhas = `ProgramConfigurationTests` sem PostgreSQL em `127.0.0.1:5432` -- **ambientais**, mesmas de sempre, nao ha regressao.
+
+### Resultado por fase
+
+| Fase | Veredito | Observacao |
+|---|---|---|
+| 0 -- Privacidade do Pix | **OK** | `ProfilePixVisibility.ShouldShowPix(isOwnProfile, hasPixKey)` + `IsOwnProfile` no `ProfileContactsDisplay`; guarda tambem a condicao da `<section>` (nao renderiza card vazio p/ visitante). 4 testes. |
+| 1 -- UX do Profile | **OK** | Avatar fundido no `ProfileHeaderCard` (o `AvatarUploadSection` solto sumiu), `ProfileEditForm` fora do `<details>`, bloco proprio "Recebimento (Pix)" com ancora `#pix`, e o `?intent=pix` -- que antes era lido e **descartado** -- agora destaca e rola ate o bloco. 4 chaves i18n em PT/EN/ES. |
+| 2 -- Ledger da taxa | **OK** | `EventConfirmation.PlatformFeeAmount` (snapshot), `ManualPlatformFeeFixed = 0.75` separado de `AppFeeFixed`/`GatewayFeeFixed` (como o plano exigia), `PlatformFeeLedgerService` com `StampFeeOnPaidAsync` idempotente + `GetGroupBalanceAsync`, migration **so aditiva** (sem `UPDATE` -- licao do C19 respeitada). 10 testes cobrindo poker, gateway ligado, pendente, idempotencia e toggle-back. |
+| 3 -- Repasse com comprovante | **INCOMPLETA** | Entregou **so o backend**. Ver abaixo. |
+| 4 -- Taxa discriminada | **OK com bug corrigido pelo Senior** | Ver abaixo. |
+| 5 -- Pix como pre-requisito | **OK** | `FutsalCreateService.SaveAsync` bloqueia partida com preco em grupo manual sem Pix e devolve link `?intent=pix` (fecha o ciclo com a Fase 1). 4 testes. |
+| 6 -- Anti-hardcode i18n | **NAO ENTREGUE** | Ver abaixo. |
+
+### Correcoes aplicadas pelo Senior nesta review (PR #89)
+
+**1. P0 -- o QR cobrava um valor diferente do que a tela mostrava.** A Fase 4 passou a exibir `Partida 15,00 + Taxa 0,75 = Total 15,75` no resumo, mas o `EventPaymentPixAdmin` continuou recebendo `ev.Price!.Value`: tanto o `Price` exibido quanto o `BuildPixStaticPayload(...)` do QR usavam **o preco base**. Resultado pratico: a tela promete R$ 15,75, o QR cobra R$ 15,00, o organizador **nao recebe a taxa** e mesmo assim fica devendo o repasse -- a taxa sairia do bolso dele. Alem disso a mesma condicao (`!gateways && futsal && preco>0 && fee>0`) estava escrita **inline no markup**, sem teste.
+   - Extrai `Services/Payment/ManualPlatformFee.cs` (`Applies` / `TotalToPay`), e agora **resumo, valor exibido e payload do QR usam a mesma fonte**. 8 testes novos, incluindo um que confere o campo `54` do BR Code (`540515.75`).
+
+**2. P0 -- `PlatformFeeSettlementService` sem nenhuma autorizacao.** `SubmitSettlementAsync` aceitava qualquer `submittedByUserId` para qualquer `groupId`, e `ReviewSettlementAsync` aceitava **qualquer** `reviewerUserId` -- inclusive o proprio organizador aprovando o proprio repasse, que e exatamente a regra central do plano ("o devedor nao quita a propria divida"). Como ainda nao ha UI, ninguem exercitou o furo; mas a regra tem que morar no service, nao na ausencia de tela.
+   - Submit exige `GroupMemberRole.Admin` **naquele grupo**; review exige a role `admin` do sistema (via `db.UserRoles`/`db.Roles`, mesmo criterio do resto do app). +3 testes (`NonAdminMember_IsRejected`, `AdminOfAnotherGroup_IsRejected`, `Organizer_CannotSettleOwnDebt`) e os testes existentes foram corrigidos para semear a autorizacao -- eles estavam **validando o comportamento inseguro**.
+
+**3. P1 -- `catch { }` mudo no caminho do dinheiro.** O `AdminConfirmationService` chamava `StampFeeOnPaidAsync` dentro de `try { } catch { /* best-effort */ }`. Se o carimbo falhar, a taxa daquela confirmacao **nunca mais e cobrada** e nao sobra nem log. Trocado por `LogError`. (E o item P2 "catch{} que engolem excecao" do meu aparato -- aqui aplicado a receita.)
+
+**4. Higiene** -- removido `progress-ciclo26.md` da raiz. O `WORK_PLAN.md` e a fonte unica; docs soltos ja foram removidos nos Ciclos 12/13 e nao devem voltar.
+
+### Ressalvas que ficam para o Ciclo 27
+
+**Fase 3 entregue pela metade.** `PlatformFeeSettlementService` e `PlatformFeeSettlement` existem, estao registrados no DI e tem 8 testes -- mas **nenhuma tela os chama** (`grep` confirma: as unicas referencias fora dos testes sao as duas linhas de `AddScoped` no `Program.cs`). Faltam:
+- a aba "Taxa da plataforma" em `Pages/Groups/Payments.razor` (lista por partida, somatorio a repassar, Pix da plataforma, envio do comprovante);
+- a fila de revisao em `Pages/Admin/AdminRevenue.razor` (confirmar/rejeitar com visualizacao do comprovante);
+- o endpoint `GET /api/fee-settlement-proof/{id}` autorizado (o plano pedia explicitamente, espelhando `/api/pix-proof/{id}`);
+- a **baixa FIFO** por partida -- hoje `GetGroupBalanceAsync` so devolve o agregado, entao nao da para dizer quais partidas um repasse quitou, que era o "pagas e pendentes por partida" que o Robson pediu.
+Na pratica: **a feature ainda nao existe para o usuario**. O saldo acumula e ninguem consegue ver nem quitar.
+
+**Fase 6 nao entregue -- segunda vez.** O plano pedia um **teste de convencao anti-hardcode** varrendo os `.razor`. O Ciclo 25 entregou paridade de chaves em vez disso; o Ciclo 26 entregou **paridade de chaves de novo** (`I18nKeyParityTests`), que e util mas responde outra pergunta: garante que EN/ES acompanham o PT-BR, e **nao** que a UI parou de ter string crua. Prova: os 8 literais que a review do C25 listou continuam **todos** no lugar (`"Chave Aleatória"`, `"Papéis & Permissões"`, `"Late Reg até ..."`, `"Usuários"`, `"Você"`, placeholders do Poker). Pior: o teste tem `if (enUs.Count == 0) return;` -- os dominios stub (`FutsalTexts`, `GroupTexts`, `PokerTexts`) **desligam o teste sozinhos**, entao ele passa sem verificar nada justamente onde falta traducao.
+
+**Menores** (nao bloqueiam, entram no C27):
+- `Profile.razor.cs` usa `JS.InvokeVoidAsync("eval", "...")` para rolar ate a ancora. Funciona, mas `eval` e um cheiro ruim e quebra sob CSP -- deve virar uma funcao nomeada no `site.js`.
+- O `_highlightPix = false` acontece em `OnAfterRenderAsync` sem `StateHasChanged`, entao o destaque so some no proximo render espontaneo.
+- Strings PT cruas nos servicos novos (`PlatformFeeSettlementService`, mensagem de erro do `FutsalCreateService`) -- a regra 25 tambem vale para mensagem de retorno de service.
+- `Program.cs` linhas 124-125 com indentacao fora do padrao do bloco.
+- `Profile.razor.cs` ainda tem as 5 mensagens hardcoded que a review do C25 apontou.
+
+---
+
+## Ciclo 27 (Pleno) -- Fechar a Fase 3 (o repasse precisa existir na tela) + Fase 6 de verdade [PLANEJADO]
+
+**Regra de ouro**: TDD, SOLID, i18n (regra 25) inclusive em mensagens de service, build `--no-incremental` 0 warning, suite verde, 1 commit por fase. **Nao** reabrir decisoes ja travadas no Ciclo 26.
+
+### Fase A -- UI do repasse, lado do organizador (prioridade 1)
+
+Aba "Taxa da plataforma" em `Pages/Groups/Payments.razor`, visivel **so** em grupo `Sport.Futsal` em modo manual:
+- lista **por partida**: data, nome, n. de pagantes, taxa da partida, status (`Pago` / `Pendente`);
+- somatorio **a repassar** em destaque + acumulado + em analise + ja repassado;
+- chave Pix da plataforma via **config** (nao hardcoded) + QR, espelhando o card que o jogador ve;
+- acao "Enviar comprovante do repasse" (valor + imagem) -> `SubmitSettlementAsync`, criando lote `EmAnalise`;
+- historico dos lotes com status e motivo da rejeicao;
+- **sem** botao de marcar como pago.
+
+### Fase B -- UI do repasse, lado do admin do sistema
+
+Em `Pages/Admin/AdminRevenue.razor`: grupos com saldo separando **pendente / em analise / quitado**; fila de lotes com **visualizacao do comprovante**; acoes **Confirmar recebimento** e **Rejeitar (com motivo)** -> `ReviewSettlementAsync`.
+
+### Fase C -- Endpoint da imagem do comprovante
+
+`GET /api/fee-settlement-proof/{id}` espelhando `/api/pix-proof/{id}`: autorizado **ao admin do grupo dono do lote ou ao admin do sistema**; `Unauthorized` sem login, `NotFound` sem imagem, `Forbid` para terceiro. **Teste de autorizacao obrigatorio** (o endpoint serve documento financeiro).
+
+### Fase D -- Baixa FIFO por partida
+
+`PlatformFeeLedgerService` passa a projetar o status **por partida**: os lotes `Pago`, em ordem de `SubmittedAt`, cobrem as partidas mais antigas ate esgotar o valor; partida parcialmente coberta continua `Pendente`; sobra vira credito para o proximo. Testes: baixa parcial, exata, maior que o devido, e lote rejeitado nao abate nada.
+
+### Fase E -- Fase 6 pela terceira vez: teste anti-hardcode DE VERDADE
+
+Nao e paridade de chaves. E um **teste de convencao** que varre os arquivos `.razor` do repo e falha quando encontra texto visivel cru:
+- varrer `Pages/**` e `Shared/**` procurando literais com acento/palavra em PT em conteudo de elemento e nos atributos `title`, `placeholder`, `alt`, `aria-label`, e em `<PageTitle>`;
+- **allowlist explicita e curta** para os casos legitimos (nomes proprios, "Confirmai", simbolos) -- allowlist no arquivo de teste, comentada, nao um `return` que desliga o teste;
+- o teste **deve estar vermelho** antes da migracao e verde depois: migrar os 8 residuais de `Pages` (`PayoutAccountEditor` "Chave Aleatória", `AdminUserView` "Papéis & Permissões", `Poker/Create` e `Poker/Edit` placeholders, `Poker/Index` "Late Reg até", `Users.razor` "Usuários", `EscalacaoVoting` "Você" + o `title` do voto) e os 16 de `Shared/Components/**`;
+- remover o `if (enUs.Count == 0) return;` do `I18nKeyParityTests`: ou o dominio stub e preenchido, ou o `[Theory]` recebe um `Skip` explicito com o motivo -- teste que se auto-desliga em silencio nao vale como cobertura.
+
+### Fase F -- Limpeza da divida do C26
+
+- `eval` -> funcao nomeada em `site.js`; `StateHasChanged` apos limpar `_highlightPix`.
+- Mensagens de service via `UiTextService` (`PlatformFeeSettlementService`, `FutsalCreateService`) e as 5 mensagens hardcoded de `Profile.razor.cs`.
+- Indentacao das linhas 124-125 do `Program.cs`.
+
+### O que NAO fazer
+
+Nao mexer no fluxo do dinheiro do jogador (V1 manual continua Pix direto ao organizador); nao remover o codigo do V2; nao permitir que o organizador aprove o proprio lote; nao trocar framework de UI; nao usar `!important`; nao criar doc solto na raiz.
+
+---
+
+## Ciclo 26 (Pleno) -- Taxa acumulada p/ repasse manual + UX do Profile + privacidade da chave Pix + fechar i18n [EXECUTADO -- ver review acima]
 
 **Origem**: decisoes do Robson (mensagem pos-review do C25) + pontos que o Pleno levantou na PR #86 + ressalvas da review do C25.
 
