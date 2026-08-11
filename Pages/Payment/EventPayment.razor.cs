@@ -41,6 +41,24 @@ public partial class EventPayment : IAsyncDisposable
     /// </summary>
     internal bool ShouldShowManualPix => !groupGatewaysEnabled || FeeOptions.Value.ShowDirectPixToOrganizer;
 
+    /// <summary>
+    /// True when the fixed platform fee is charged on top of the match price (V1 manual, futsal).
+    /// </summary>
+    internal bool ManualFeeApplies => ManualPlatformFee.Applies(
+        groupGatewaysEnabled,
+        conf?.Event?.Sport == Sport.Futsal,
+        conf?.Event?.Price ?? 0m,
+        FeeOptions.Value.ManualPlatformFeeFixed);
+
+    /// <summary>
+    /// Amount the player must transfer. Must match the value encoded in the Pix QR payload.
+    /// </summary>
+    internal decimal ManualAmountToPay => ManualPlatformFee.TotalToPay(
+        groupGatewaysEnabled,
+        conf?.Event?.Sport == Sport.Futsal,
+        conf?.Event?.Price ?? 0m,
+        FeeOptions.Value.ManualPlatformFeeFixed);
+
     private PayState payState = PayState.Idle;
     private string? brCode;
     private bool copied;

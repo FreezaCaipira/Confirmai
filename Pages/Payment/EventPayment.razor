@@ -54,7 +54,7 @@
 
                 <EventPaymentSummary
                     Confirmation="@conf"
-                    ShowFeeBreakdown="@(!groupGatewaysEnabled && isFutsal && ev.Price.GetValueOrDefault() > 0 && FeeOptions.Value.ManualPlatformFeeFixed > 0)" />
+                    ShowFeeBreakdown="@ManualFeeApplies" />
 
                 @if (conf.PaymentStatus == EventConfirmationPaymentStatus.Paid || payState == PayState.Paid)
                 {
@@ -181,9 +181,9 @@
                             GroupAdminPixKey="@GetGroupAdminPixKey(ev.Group)"
                             GroupName="@ev.Group.Name"
                             GroupCity="@ev.Group.City"
-                            Price="@(ev.Price!.Value)"
+                            Price="@ManualAmountToPay"
                             CopiedAdminPix="@copiedAdminPix"
-                            PixQrPayload="@BuildPixStaticPayload(GetGroupAdminPixKey(ev.Group) ?? "", ev.Group.Name, ev.Group.City, ev.Price!.Value)"
+                            PixQrPayload="@BuildPixStaticPayload(GetGroupAdminPixKey(ev.Group) ?? "", ev.Group.Name, ev.Group.City, ManualAmountToPay)"
                             OnCopyAdminPixKey="@CopyAdminPixKeyCallback" />
 
                         <EventPaymentProof
