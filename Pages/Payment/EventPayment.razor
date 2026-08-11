@@ -52,8 +52,9 @@
                     IsFutsal="@isFutsal"
                     BackUrl="@backUrl" />
 
-                <EventPaymentSummary 
-                    Confirmation="@conf" />
+                <EventPaymentSummary
+                    Confirmation="@conf"
+                    ShowFeeBreakdown="@(!groupGatewaysEnabled && isFutsal && ev.Price.GetValueOrDefault() > 0 && FeeOptions.Value.ManualPlatformFeeFixed > 0)" />
 
                 @if (conf.PaymentStatus == EventConfirmationPaymentStatus.Paid || payState == PayState.Paid)
                 {

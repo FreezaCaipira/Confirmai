@@ -7,8 +7,10 @@ using Confirmai.Services.User;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.JSInterop;
 
 namespace Confirmai.Pages;
 
@@ -28,6 +30,7 @@ public partial class Profile
     private IBrowserFile? avatarFile;
     private string? avatarFeedback;
     private bool isSavingAvatar;
+    private bool _highlightPix;
     private List<ProfileChatThread.ProfileChatMessageView> chatMessages = new();
 
     private Sport activeSport = Sport.Futsal;
@@ -38,6 +41,7 @@ public partial class Profile
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private ProfileService ProfileSvc { get; set; } = default!;
     [Inject] private UiTextService T { get; set; } = default!;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
 
     private string DisplayName => user?.FullName?.Trim() is { Length: > 0 } name ? name : user?.UserName ?? "—";
     private string AvatarInitial => DisplayName.Length > 0 ? DisplayName[0].ToString().ToUpperInvariant() : "?";
@@ -81,7 +85,10 @@ public partial class Profile
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var query = QueryHelpers.ParseQuery(uri.Query);
-        _ = query.TryGetValue("intent", out _);
+        if (query.TryGetValue("intent", out var intent) && string.Equals(intent.ToString(), "pix", StringComparison.OrdinalIgnoreCase))
+        {
+            _highlightPix = true;
+        }
     }
 
     private async Task SendMailboxMessageAsync(string body)
@@ -151,4 +158,18 @@ public partial class Profile
     private Task SetSportCallback(Sport sport) { SetSport(sport); return Task.CompletedTask; }
     private async Task SendMailboxMessageCallback(string body) => await SendMailboxMessageAsync(body);
     private async Task RefreshChatCallback() => await RefreshChatAsync();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_highlightPix && !loading && user is not null)
+        {
+            _highlightPix = false;
+            try
+            {
+                await JS.InvokeVoidAsync("eval", "document.getElementById('pix')?.scrollIntoView({behavior:'smooth',block:'center'})");
+            }
+            catch (JSDisconnectedException) { }
+            catch (OperationCanceledException) { }
+        }
+    }
 }

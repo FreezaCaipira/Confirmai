@@ -206,8 +206,8 @@ internal static class PaymentTexts
         ["Payment.SummaryGoalkeeper"] = "Goleiro",
         ["Payment.SummaryOutfield"] = "Linha",
         ["Payment.SummaryAmount"] = "Valor a pagar",
-
-        // PaymentBuy checkout panel
+        ["Payment.SummaryMatchPrice"] = "Partida",
+        ["Payment.SummaryPlatformFee"] = "Taxa da plataforma",
         ["PaymentBuy.GeneratePayment"] = "Gerar pagamento",
         ["PaymentBuy.NoMethod"] = "Nenhum método de pagamento disponível",
         ["PaymentBuy.NoMethodHint"] = "Tente novamente em instantes ou contate o suporte.",
@@ -455,6 +455,8 @@ internal static class PaymentTexts
         ["Payment.SummaryGoalkeeper"] = "Goalkeeper",
         ["Payment.SummaryOutfield"] = "Outfield",
         ["Payment.SummaryAmount"] = "Amount to pay",
+        ["Payment.SummaryMatchPrice"] = "Match",
+        ["Payment.SummaryPlatformFee"] = "Platform fee",
 
         // PaymentBuy checkout panel
         ["PaymentBuy.GeneratePayment"] = "Generate payment",
@@ -704,6 +706,8 @@ internal static class PaymentTexts
         ["Payment.SummaryGoalkeeper"] = "Portero",
         ["Payment.SummaryOutfield"] = "Campo",
         ["Payment.SummaryAmount"] = "Monto a pagar",
+        ["Payment.SummaryMatchPrice"] = "Partido",
+        ["Payment.SummaryPlatformFee"] = "Tasa de la plataforma",
 
         // PaymentBuy checkout panel
         ["PaymentBuy.GeneratePayment"] = "Generar pago",

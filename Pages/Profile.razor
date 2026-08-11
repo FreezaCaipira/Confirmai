@@ -20,25 +20,36 @@
 {
     <div class="entity-shell profile-page">
 
-        @* ── Card geral ──────────────────────────────────────────────────── *@
-        <ProfileHeaderCard User="@user" />
-        <ProfileContactsDisplay User="@user" />
+        @* ── Card de identidade (header + avatar unificados) ─────────────── *@
+        <ProfileHeaderCard User="@user" IsOwnProfile="@isOwnProfile"
+            CurrentAvatarPath="@user?.AvatarPath"
+            SelectedFile="@avatarFile"
+            IsSavingAvatar="@isSavingAvatar"
+            AvatarFeedback="@avatarFeedback"
+            OnAvatarSelected="@AvatarSelectedCallback"
+            OnSaveAvatar="@SaveAvatarCallback" />
+
+        @* ── Contatos sociais (visitante e dono) ─────────────────────────── *@
+        <ProfileContactsDisplay User="@user" IsOwnProfile="@isOwnProfile" />
 
         @if (isOwnProfile)
         {
+            @* ── Meus dados (edicao sempre visivel, sem details) ───────────── *@
             <ProfileEditForm
                 EditModel="@profileEditModel"
                 IsSaving="@isSavingProfile"
                 SaveFeedback="@profileSaveFeedback"
                 OnSaveProfile="@SaveOwnProfileCallback" />
 
-            <AvatarUploadSection
-                CurrentAvatarPath="@user?.AvatarPath"
-                SelectedFile="@avatarFile"
-                IsSaving="@isSavingAvatar"
-                Feedback="@avatarFeedback"
-                OnAvatarSelected="@AvatarSelectedCallback"
-                OnSaveAvatar="@SaveAvatarCallback" />
+            @* ── Recebimento (Pix) — bloco proprio com ancora ─────────────── *@
+            <section id="pix" class="profile-card profile-pix-section @(_highlightPix ? "profile-pix-section--highlight" : "")">
+                <h3 class="profile-pix-title">@T["Profile.PixReceiverTitle"]</h3>
+                <p class="profile-pix-hint">@T["Profile.PixReceiverHint"]</p>
+                <div class="profile-pix-row">
+                    <span class="profile-contact-label">@T["Profile.Pix"]</span>
+                    <span class="profile-contact-value">@(string.IsNullOrWhiteSpace(user!.PixKey) ? T["Profile.PixNotConfigured"] : user!.PixKey)</span>
+                </div>
+            </section>
         }
 
         @* ── Card de esportes ─────────────────────────────────────────────── *@

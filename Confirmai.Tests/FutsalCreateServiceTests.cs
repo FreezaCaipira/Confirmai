@@ -33,7 +33,7 @@ public class FutsalCreateServiceTests
     private static async Task SeedVenueAndGroupAsync(IDbContextFactory<AppDbContext> factory, string userId)
     {
         await using var db = factory.CreateDbContext();
-        db.Users.Add(new ApplicationUser { Id = userId, UserName = "Admin" });
+        db.Users.Add(new ApplicationUser { Id = userId, UserName = "Admin", PixKey = "admin@pix" });
         db.Venues.Add(new Venue { Id = 1, Name = "Quadra Test", City = "SP", StateCode = "SP", Address = "Rua 1", IsActive = true });
         var group = new Group { Id = 1, Name = "Grupo Test", Sport = Sport.Futsal, CreatedByUserId = userId, InviteCode = "ABC123" };
         db.Groups.Add(group);
@@ -141,7 +141,7 @@ public class FutsalCreateServiceTests
     {
         var (factory, svc) = Setup("admin-1");
         await using var db = factory.CreateDbContext();
-        db.Users.Add(new ApplicationUser { Id = "admin-1", UserName = "Admin" });
+        db.Users.Add(new ApplicationUser { Id = "admin-1", UserName = "Admin", PixKey = "admin@pix" });
         var venue = new Venue { Id = 1, Name = "Quadra", City = "SP", StateCode = "SP", Address = "Rua 1", IsActive = true };
         db.Venues.Add(venue);
         await db.SaveChangesAsync();

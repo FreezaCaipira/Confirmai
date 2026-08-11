@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Confirmai.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260801030000_DefaultEnablePaymentGatewaysFalse")]
-    partial class DefaultEnablePaymentGatewaysFalse
+    [Migration("20260808222952_AddPlatformFeeLedger")]
+    partial class AddPlatformFeeLedger
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -428,6 +428,9 @@ namespace Confirmai.Migrations
                         .HasMaxLength(35)
                         .HasColumnType("character varying(35)");
 
+                    b.Property<decimal?>("PlatformFeeAmount")
+                        .HasColumnType("numeric");
+
                     b.Property<int?>("Position")
                         .HasColumnType("integer");
 
@@ -817,6 +820,58 @@ namespace Confirmai.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("Confirmai.Models.PlatformFeeSettlement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ProofContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("ProofImageData")
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ReviewNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReviewedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SubmittedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("SubmittedByUserId");
+
+                    b.ToTable("PlatformFeeSettlements");
                 });
 
             modelBuilder.Entity("Confirmai.Models.PostMatchVote", b =>
@@ -1452,6 +1507,25 @@ namespace Confirmai.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Confirmai.Models.PlatformFeeSettlement", b =>
+                {
+                    b.HasOne("Confirmai.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Confirmai.Models.ApplicationUser", "SubmittedByUser")
+                        .WithMany()
+                        .HasForeignKey("SubmittedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("SubmittedByUser");
+                });
+
             modelBuilder.Entity("Confirmai.Models.PostMatchVote", b =>
                 {
                     b.HasOne("Confirmai.Models.Event", "Event")
@@ -1618,4 +1692,3 @@ namespace Confirmai.Migrations
         }
     }
 }
-

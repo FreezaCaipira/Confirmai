@@ -28,6 +28,7 @@ namespace Confirmai.Data
         public DbSet<Venue> Venues { get; set; }
         public DbSet<MatchSchedule> RachaSchedules { get; set; }
         public DbSet<PostMatchVote> PostMatchVotes { get; set; }
+        public DbSet<PlatformFeeSettlement> PlatformFeeSettlements { get; set; }
 
         // Server integration
         public DbSet<ServerApiKey> ServerApiKeys { get; set; }

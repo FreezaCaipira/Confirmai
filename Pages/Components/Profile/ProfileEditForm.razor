@@ -3,8 +3,8 @@
 @using Confirmai.Services.Core
 @inject UiTextService T
 
-<details class="profile-edit-details">
-    <summary class="profile-edit-summary">@T["Profile.EditProfile"]</summary>
+<section class="profile-card profile-edit-section">
+    <h3 class="profile-edit-heading">@T["Profile.MyData"]</h3>
     <div class="profile-edit-form">
         <EditForm Model="EditModel" OnValidSubmit="HandleSaveProfile">
             <DataAnnotationsValidator />
@@ -18,10 +18,6 @@
                     <label>@T["Profile.Discord"]</label>
                     <InputText class="input" @bind-Value="EditModel.DiscordHandle" />
                 </div>
-                <div class="form-group">
-                    <label>@T["Profile.Pix"]</label>
-                    <InputText class="input" @bind-Value="EditModel.PixKey" />
-                </div>
             </div>
             @if (!string.IsNullOrWhiteSpace(SaveFeedback))
             {
@@ -34,4 +30,4 @@
             </div>
         </EditForm>
     </div>
-</details>
+</section>
