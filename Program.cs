@@ -123,6 +123,7 @@ builder.Services.AddScoped<EventConfirmationPaymentStatusService>();
 builder.Services.AddScoped<AdminConfirmationService>();
     builder.Services.AddScoped<PlatformFeeLedgerService>();
     builder.Services.AddScoped<PlatformFeeSettlementService>();
+    builder.Services.AddScoped<PlatformFeeSettlementQueryService>();
     builder.Services.AddScoped<AdminPaymentsQueryService>();
     builder.Services.AddScoped<AdminPaymentsSummaryService>();
     builder.Services.AddScoped<AdminPaymentsCommandService>();

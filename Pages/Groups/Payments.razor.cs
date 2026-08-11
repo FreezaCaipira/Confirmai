@@ -1,7 +1,11 @@
+using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Admin;
+using Confirmai.Services.Core;
 using Confirmai.Services.Groups;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Groups;
@@ -10,6 +14,8 @@ public partial class Payments
 {
     [Parameter] public int Id { get; set; }
     [Inject] private GroupPaymentsService GroupPayments { get; set; } = default!;
+    [Inject] private PlatformFeeSettlementQueryService FeeQuery { get; set; } = default!;
+    [Inject] private PlatformFeeSettlementService FeeSettlement { get; set; } = default!;
 
     public record HistoryEntry(DateTime EventDate, decimal EventPrice, string AdminName, string EventHref, bool HasProof, int? ConfirmationId);
     public record HistoryGroup(string UserName, List<HistoryEntry> Entries, decimal TotalAmount);
@@ -29,6 +35,34 @@ public partial class Payments
     private HashSet<string> notifiedUserIds = new();
     private int? viewingProofConfirmationId;
     private string historyFilterUserId = "";
+
+    // ── Platform fee settlement (Fase A do Ciclo 27) ──────────────────────
+    private PlatformFeeOverview? feeOverview;
+    private bool isLoadingFee;
+    private decimal settlementAmount;
+    private string settlementError = string.Empty;
+    private string settlementSuccess = string.Empty;
+    private bool isSubmittingSettlement;
+    private int? viewingSettlementProofId;
+
+    /// <summary>True when the platform fee tab should be offered (futsal, manual mode).</summary>
+    private bool ShouldShowPlatformFeeTab =>
+        group is not null && group.Sport == Sport.Futsal && !group.EnablePaymentGateways;
+
+    /// <summary>Pix BR Code payload for the platform key, charging the due amount.</summary>
+    private string? PlatformFeePixPayload
+    {
+        get
+        {
+            if (feeOverview is null || string.IsNullOrWhiteSpace(feeOverview.PlatformPixKey))
+                return string.Empty;
+            return EventPaymentService.BuildPixStaticPayload(
+                feeOverview.PlatformPixKey,
+                "Confirmai",
+                feeOverview.PlatformPixCity,
+                feeOverview.Due);
+        }
+    }
 
     private List<PaymentHistoryEntry>? filteredHistory =>
         string.IsNullOrEmpty(historyFilterUserId)
@@ -62,6 +96,8 @@ public partial class Payments
     {
         paymentTab = tab;
         selectedPaymentUserId = null;
+        if (tab == "platformfee" && feeOverview is null)
+            _ = LoadFeeOverviewAsync();
     }
 
     private async Task RefreshPayments()
@@ -139,5 +175,85 @@ public partial class Payments
             $"Quando puder, regularize no Confirmai 🙏");
         var url = $"https://wa.me/?text={msg}";
         await JS.InvokeVoidAsync("open", url, "_blank", "noopener,noreferrer");
+    }
+
+    // ── Platform fee settlement (Fase A do Ciclo 27) ──────────────────────
+
+    private async Task LoadFeeOverviewAsync()
+    {
+        isLoadingFee = true;
+        try
+        {
+            feeOverview = await FeeQuery.GetGroupFeeOverviewAsync(Id);
+        }
+        finally
+        {
+            isLoadingFee = false;
+        }
+    }
+
+    private async Task RefreshFeeOverview()
+    {
+        isLoadingFee = true;
+        try
+        {
+            feeOverview = await FeeQuery.GetGroupFeeOverviewAsync(Id);
+        }
+        finally
+        {
+            isLoadingFee = false;
+        }
+    }
+
+    private async Task SubmitSettlementAsync(InputFileChangeEventArgs e)
+    {
+        if (currentUserId is null || group is null || feeOverview is null) return;
+
+        const long MaxBytes = 5 * 1024 * 1024;
+        var file = e.File;
+        if (file is null) return;
+
+        settlementError = string.Empty;
+        settlementSuccess = string.Empty;
+        isSubmittingSettlement = true;
+
+        try
+        {
+            using var ms = new MemoryStream();
+            await file.OpenReadStream(MaxBytes).CopyToAsync(ms);
+            var bytes = ms.ToArray();
+
+            var result = await FeeSettlement.SubmitSettlementAsync(
+                group.Id, currentUserId, settlementAmount, bytes, file.ContentType);
+
+            if (result.Success)
+            {
+                settlementSuccess = Ui["Group.PlatformFeeSubmitSuccess"];
+                settlementAmount = 0m;
+                await RefreshFeeOverview();
+            }
+            else
+            {
+                settlementError = result.Message;
+            }
+        }
+        catch (IOException)
+        {
+            settlementError = Ui["Group.PlatformFeeSubmitError"];
+        }
+        catch (Exception)
+        {
+            settlementError = Ui["Group.PlatformFeeSubmitError"];
+        }
+        finally
+        {
+            isSubmittingSettlement = false;
+        }
+    }
+
+    private Task ViewSettlementProof(int settlementId)
+    {
+        viewingSettlementProofId = settlementId;
+        return Task.CompletedTask;
     }
 }

@@ -106,7 +106,7 @@
 .payments-tab-count--delinquent {
     background: var(--white);
     color: var(--red-border);
-    box-shadow: 0 2px 4px var(--shadow-red-md);
+    box-shadow: 0 2px 4px var(--shadow-red-sm);
 }
 
 .payments-tab-count--history {
@@ -746,3 +746,265 @@
 }
 
 
+
+/* ------------------------------------------------------------ */
+/* Platform Fee Settlement Tab (Fase A do Ciclo 27) */
+/* ------------------------------------------------------------ */
+
+.payments-tab--platformfee {
+    border-color: var(--gold);
+    background: var(--gold-deep);
+    box-shadow: 0 4px 8px var(--shadow-accent-sm), inset 0 0 0 1px var(--accent-opacity-sm);
+    text-shadow: 0 0 10px var(--shadow-accent-lg);
+}
+
+.platform-fee-section {
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.platform-fee-section-title {
+    color: var(--gold-light);
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0 0 0.75rem 0;
+    text-shadow: 0 0 12px var(--shadow-accent-sm);
+}
+
+.platform-fee-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.platform-fee-summary-card {
+    background: var(--ci-bg-card);
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    box-shadow: 0 2px 6px var(--shadow-md);
+}
+
+.platform-fee-summary-label {
+    color: var(--ci-text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.platform-fee-summary-value {
+    color: var(--ci-text);
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.platform-fee-summary-card--highlight {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, var(--gold-deep) 0%, var(--ci-bg-card) 100%);
+    box-shadow: 0 4px 12px var(--shadow-accent-sm);
+}
+
+.platform-fee-summary-card--highlight .platform-fee-summary-value {
+    color: var(--gold-light);
+}
+
+.platform-fee-summary-card--warning {
+    border-color: var(--amber);
+}
+
+.platform-fee-summary-card--warning .platform-fee-summary-value {
+    color: var(--amber-light);
+}
+
+.platform-fee-summary-card--success {
+    border-color: var(--green-strong);
+}
+
+.platform-fee-summary-card--success .platform-fee-summary-value {
+    color: var(--green-light);
+}
+
+.platform-fee-pix-card {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border-soft);
+    border-radius: 8px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 2px 8px var(--shadow-md);
+}
+
+.platform-fee-pix-title {
+    color: var(--gold-light);
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.platform-fee-pix-hint {
+    color: var(--ci-text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+    margin: 0;
+    max-width: 480px;
+}
+
+.platform-fee-pix-qr {
+    background: var(--white);
+    padding: 0.75rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px var(--shadow-lg);
+}
+
+.platform-fee-pix-key {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+}
+
+.platform-fee-pix-code {
+    color: var(--ci-text-blue);
+    font-family: monospace;
+    font-size: 0.9rem;
+    word-break: break-all;
+}
+
+.platform-fee-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.platform-fee-table thead th {
+    color: var(--ci-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--ci-border);
+    text-align: left;
+}
+
+.platform-fee-table tbody td {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--ci-border-dim);
+    color: var(--ci-text);
+}
+
+.platform-fee-table tbody tr:hover {
+    background: var(--ci-bg-card);
+}
+
+.platform-fee-status {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+.platform-fee-status--pending {
+    background: var(--amber-strong);
+    color: var(--white);
+}
+
+.platform-fee-status--paid {
+    background: var(--green-strong);
+    color: var(--white);
+}
+
+.platform-fee-status--rejected {
+    background: var(--red-strong);
+    color: var(--white);
+}
+
+.platform-fee-submit-card {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border-soft);
+    border-radius: 8px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    box-shadow: 0 2px 8px var(--shadow-md);
+}
+
+.platform-fee-label {
+    color: var(--ci-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.platform-fee-input {
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    color: var(--ci-text);
+    font-size: 1rem;
+    max-width: 240px;
+}
+
+.platform-fee-input:focus {
+    border-color: var(--ci-accent);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--shadow-accent-sm);
+}
+
+.platform-fee-success {
+    color: var(--green-light);
+    background: var(--green-dark);
+    border: 1px solid var(--green-strong);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.platform-fee-error {
+    color: var(--red-text-light);
+    background: var(--red-bg-dark);
+    border: 1px solid var(--red-strong);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .platform-fee-section {
+        padding: 1rem 0.8rem;
+    }
+
+    .platform-fee-summary-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .platform-fee-table {
+        font-size: 0.8rem;
+    }
+
+    .platform-fee-table thead th,
+    .platform-fee-table tbody td {
+        padding: 0.4rem 0.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .platform-fee-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
