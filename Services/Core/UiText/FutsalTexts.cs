@@ -176,6 +176,7 @@ internal static class FutsalTexts
         ["Futsal.Identification"] = "Identificação",
         ["Futsal.Schedule"] = "Horário",
         ["Futsal.DayOfWeek"] = "Dia da semana",
+        ["Futsal.Create.PixRequired"] = "Configure sua chave Pix no perfil antes de criar uma partida com preço.",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>

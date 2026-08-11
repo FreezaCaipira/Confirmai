@@ -94,8 +94,8 @@ public partial class Profile
     private async Task SendMailboxMessageAsync(string body)
     {
         if (!isAuthenticated || string.IsNullOrWhiteSpace(currentUserId) || user == null) return;
-        if (isOwnProfile) { messageFeedback = "Nao e possivel enviar mensagem para o proprio perfil."; return; }
-        if (string.IsNullOrWhiteSpace(body)) { messageFeedback = "Escreva uma mensagem antes de enviar."; return; }
+        if (isOwnProfile) { messageFeedback = T["Profile.MessageSelfError"]; return; }
+        if (string.IsNullOrWhiteSpace(body)) { messageFeedback = T["Profile.MessageEmptyError"]; return; }
 
         isSendingMessage = true;
         messageFeedback = null;
@@ -103,7 +103,7 @@ public partial class Profile
         {
             await ProfileSvc.SendMessageAsync(currentUserId, Id, body);
             messageBody = string.Empty;
-            messageFeedback = "Mensagem enviada.";
+            messageFeedback = T["Profile.MessageSent"];
             await LoadChatMessagesAsync();
         }
         finally { isSendingMessage = false; }
@@ -112,7 +112,7 @@ public partial class Profile
     private async Task SaveOwnProfileAsync()
     {
         if (user == null || !isOwnProfile || !string.Equals(user.Id, currentUserId, StringComparison.Ordinal))
-        { profileSaveFeedback = "Nao foi possivel salvar."; return; }
+        { profileSaveFeedback = T["Profile.SaveError"]; return; }
 
         isSavingProfile = true;
         profileSaveFeedback = null;
@@ -121,7 +121,7 @@ public partial class Profile
         user.PixKey = NormalizeOptional(profileEditModel.PixKey);
         var result = await UserManager.UpdateAsync(user);
         isSavingProfile = false;
-        profileSaveFeedback = result.Succeeded ? "Dados atualizados." : "Erro ao salvar.";
+        profileSaveFeedback = result.Succeeded ? T["Profile.SaveSuccess"] : T["Profile.SaveGenericError"];
     }
 
     private static string? NormalizeOptional(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
@@ -164,9 +164,10 @@ public partial class Profile
         if (_highlightPix && !loading && user is not null)
         {
             _highlightPix = false;
+            StateHasChanged();
             try
             {
-                await JS.InvokeVoidAsync("eval", "document.getElementById('pix')?.scrollIntoView({behavior:'smooth',block:'center'})");
+                await JS.InvokeVoidAsync("ConfirmaiScrollToElement", "pix");
             }
             catch (JSDisconnectedException) { }
             catch (OperationCanceledException) { }

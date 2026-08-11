@@ -1,6 +1,7 @@
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -15,15 +16,18 @@ public class PlatformFeeSettlementService
 {
     private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly ILogger<PlatformFeeSettlementService> _logger;
+    private readonly UiTextService _ui;
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
     private static readonly string[] AllowedMimeTypes = { "image/jpeg", "image/png", "image/webp" };
 
     public PlatformFeeSettlementService(
         IDbContextFactory<AppDbContext> factory,
-        ILogger<PlatformFeeSettlementService> logger)
+        ILogger<PlatformFeeSettlementService> logger,
+        UiTextService ui)
     {
         _factory = factory;
         _logger = logger;
+        _ui = ui;
     }
 
     /// <summary>
@@ -42,7 +46,7 @@ public class PlatformFeeSettlementService
             return new PlatformFeeSettlementResult
             {
                 Success = false,
-                Message = "Apenas imagens JPG, PNG ou WebP são aceitas."
+                Message = _ui["Payment.Settlement.InvalidImageType"]
             };
         }
 
@@ -60,7 +64,7 @@ public class PlatformFeeSettlementService
             return new PlatformFeeSettlementResult
             {
                 Success = false,
-                Message = $"Arquivo muito grande. Máximo {MaxFileSizeBytes / (1024 * 1024)} MB."
+                Message = _ui.Get("Payment.Settlement.FileTooLarge", MaxFileSizeBytes / (1024 * 1024))
             };
         }
 
@@ -109,7 +113,7 @@ public class PlatformFeeSettlementService
             return new PlatformFeeSettlementResult
             {
                 Success = true,
-                Message = "Repasse enviado com sucesso. Aguardando revisão.",
+                Message = _ui["Payment.Settlement.SubmitSuccess"],
                 SettlementId = settlement.Id
             };
         }
@@ -154,7 +158,7 @@ public class PlatformFeeSettlementService
             return new PlatformFeeSettlementResult
             {
                 Success = false,
-                Message = "Repasse não encontrado."
+                Message = _ui["Payment.Settlement.NotFound"]
             };
         }
 
@@ -163,7 +167,7 @@ public class PlatformFeeSettlementService
             return new PlatformFeeSettlementResult
             {
                 Success = false,
-                Message = "Este repasse já foi revisado."
+                Message = _ui["Payment.Settlement.AlreadyReviewed"]
             };
         }
 

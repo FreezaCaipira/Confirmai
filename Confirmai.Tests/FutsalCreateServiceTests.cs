@@ -4,6 +4,7 @@ using Confirmai.Models;
 using Confirmai.Services.Core;
 using Confirmai.Services.Events;
 using Confirmai.Services.Futsal;
+using Confirmai.Services.User;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -26,7 +27,7 @@ public class FutsalCreateServiceTests
         authMock
             .Setup(x => x.GetAuthenticationStateAsync())
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(identity)));
-        var svc = new FutsalCreateService(factory, authMock.Object, collisionService, logService);
+        var svc = new FutsalCreateService(factory, authMock.Object, collisionService, logService, new UiTextService(new LanguagePreferenceService()));
         return (factory, svc);
     }
 

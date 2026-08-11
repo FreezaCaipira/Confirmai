@@ -4,6 +4,7 @@ using Confirmai.Models;
 using Confirmai.Services.Core;
 using Confirmai.Services.Events;
 using Confirmai.Services.Futsal;
+using Confirmai.Services.User;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -42,7 +43,7 @@ public class FutsalCreatePixPrerequisiteTests
         var authProvider = CreateAuthProvider(userId);
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var collisionService = new EventCollisionService(factory);
-        return new FutsalCreateService(factory, authProvider, collisionService, logService);
+        return new FutsalCreateService(factory, authProvider, collisionService, logService, new UiTextService(new LanguagePreferenceService()));
     }
 
     [Fact]
