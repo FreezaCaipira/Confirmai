@@ -290,4 +290,141 @@ public class PlatformFeeSettlementQueryServiceTests
         Assert.Equal(0.75m, overview.Accrued); // only groupA's fee
         Assert.Single(overview.Matches);
     }
+
+    // ── GetReviewQueueAsync (Fase B) ───────────────────────────────────────
+
+    [Fact]
+    public async Task GetReviewQueueAsync_NoSettlements_ReturnsEmpty()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var service = CreateService(ctx);
+        var queue = await service.GetReviewQueueAsync();
+
+        Assert.Empty(queue.Groups);
+        Assert.Empty(queue.PendingSettlements);
+    }
+
+    [Fact]
+    public async Task GetReviewQueueAsync_ReturnsGroupsWithAccruedAndSettled()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, _, user, _) = await SeedPaidFutsalMatchAsync(ctx.db);
+
+        ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
+        {
+            GroupId = group.Id, Amount = 0.50m, SubmittedByUserId = user.Id,
+            Status = PlatformFeeSettlementStatus.Pago
+        });
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx);
+        var queue = await service.GetReviewQueueAsync();
+
+        Assert.Single(queue.Groups);
+        var g = queue.Groups[0];
+        Assert.Equal(group.Id, g.GroupId);
+        Assert.Equal("Racha", g.GroupName);
+        Assert.Equal(0.75m, g.Accrued);
+        Assert.Equal(0.50m, g.Settled);
+        Assert.Equal(0.25m, g.Due);
+        Assert.Equal(0m, g.InAnalysis);
+    }
+
+    [Fact]
+    public async Task GetReviewQueueAsync_PendingSettlementsOrderedBySubmittedAtDesc()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, _, user, _) = await SeedPaidFutsalMatchAsync(ctx.db);
+
+        ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
+        {
+            GroupId = group.Id, Amount = 0.75m, SubmittedByUserId = user.Id,
+            SubmittedAt = new DateTime(2026, 1, 1), Status = PlatformFeeSettlementStatus.EmAnalise
+        });
+        ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
+        {
+            GroupId = group.Id, Amount = 0.75m, SubmittedByUserId = user.Id,
+            SubmittedAt = new DateTime(2026, 8, 1), Status = PlatformFeeSettlementStatus.EmAnalise
+        });
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx);
+        var queue = await service.GetReviewQueueAsync();
+
+        Assert.Equal(2, queue.PendingSettlements.Count);
+        Assert.Equal(new DateTime(2026, 8, 1), queue.PendingSettlements[0].SubmittedAt);
+        Assert.Equal(new DateTime(2026, 1, 1), queue.PendingSettlements[1].SubmittedAt);
+    }
+
+    [Fact]
+    public async Task GetReviewQueueAsync_PendingSettlementsOnlyEmAnalise()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, _, user, _) = await SeedPaidFutsalMatchAsync(ctx.db);
+
+        ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
+        {
+            GroupId = group.Id, Amount = 0.75m, SubmittedByUserId = user.Id,
+            Status = PlatformFeeSettlementStatus.EmAnalise
+        });
+        ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
+        {
+            GroupId = group.Id, Amount = 0.75m, SubmittedByUserId = user.Id,
+            Status = PlatformFeeSettlementStatus.Pago
+        });
+        ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
+        {
+            GroupId = group.Id, Amount = 0.75m, SubmittedByUserId = user.Id,
+            Status = PlatformFeeSettlementStatus.Rejeitado
+        });
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx);
+        var queue = await service.GetReviewQueueAsync();
+
+        Assert.Single(queue.PendingSettlements);
+        Assert.Equal(0.75m, queue.Groups[0].InAnalysis);
+    }
+
+    [Fact]
+    public async Task GetReviewQueueAsync_GroupsWithInAnalysisFirst()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (groupA, _, userA, _) = await SeedPaidFutsalMatchAsync(ctx.db);
+
+        var groupB = TestDataFactory.CreateGroup("Outro", enablePaymentGateways: false);
+        groupB.Sport = Sport.Futsal;
+        ctx.db.Groups.Add(groupB);
+        await ctx.db.SaveChangesAsync();
+
+        var evtB = TestDataFactory.CreateEvent(groupB, "2026-08-10", 15m);
+        ctx.db.Events.Add(evtB);
+        await ctx.db.SaveChangesAsync();
+        var uB = TestDataFactory.CreateUserWithPixKey("ub", "JB", "kb");
+        ctx.db.Users.Add(uB);
+        await ctx.db.SaveChangesAsync();
+        var cB = TestDataFactory.CreateEventConfirmation(evtB, uB);
+        cB.PaymentStatus = EventConfirmationPaymentStatus.Paid; cB.HasPaid = true; cB.PlatformFeeAmount = 0.75m;
+        ctx.db.EventConfirmations.Add(cB);
+        await ctx.db.SaveChangesAsync();
+
+        // groupA has EmAnalise; groupB has only Pago
+        ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
+        {
+            GroupId = groupA.Id, Amount = 0.75m, SubmittedByUserId = userA.Id,
+            Status = PlatformFeeSettlementStatus.EmAnalise
+        });
+        ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
+        {
+            GroupId = groupB.Id, Amount = 0.75m, SubmittedByUserId = uB.Id,
+            Status = PlatformFeeSettlementStatus.Pago
+        });
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx);
+        var queue = await service.GetReviewQueueAsync();
+
+        Assert.Equal(groupA.Id, queue.Groups[0].GroupId); // InAnalysis first
+        Assert.Equal(groupB.Id, queue.Groups[1].GroupId);
+    }
 }

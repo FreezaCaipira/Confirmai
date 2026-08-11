@@ -4,6 +4,7 @@
 
 @using Confirmai.Services.Admin
 @using Confirmai.Data
+@using Confirmai.Services.Payment
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using System.Globalization
@@ -117,6 +118,131 @@
                     <p class="listing-state">@T["AdminRevenue.NoData"]</p>
                 }
             }
+
+            @* ── Platform fee settlement review queue (Fase B do Ciclo 27) ── *@
+            <div class="admin-revenue-settlement-queue">
+                <h2 class="admin-revenue-section-title">@T["AdminRevenue.SettlementQueue"]</h2>
+
+                @if (!string.IsNullOrWhiteSpace(reviewMessage))
+                {
+                    <p class="admin-revenue-settlement-message">@reviewMessage</p>
+                }
+
+                @if (isLoadingQueue)
+                {
+                    <p class="listing-state">@T["AdminRevenue.Loading"]</p>
+                }
+                else if (reviewQueue is null || (reviewQueue.Groups.Count == 0 && reviewQueue.PendingSettlements.Count == 0))
+                {
+                    <p class="listing-state">@T["AdminRevenue.SettlementEmpty"]</p>
+                }
+                else
+                {
+                    @if (reviewQueue.Groups.Any())
+                    {
+                        <h3 class="admin-revenue-section-subtitle">@T["AdminRevenue.SettlementGroups"]</h3>
+                        <table class="admin-revenue-table">
+                            <thead>
+                                <tr>
+                                    <th>@T["AdminRevenue.SettlementGroup"]</th>
+                                    <th>@T["AdminRevenue.SettlementAccrued"]</th>
+                                    <th>@T["AdminRevenue.SettlementSettled"]</th>
+                                    <th>@T["AdminRevenue.SettlementDue"]</th>
+                                    <th>@T["AdminRevenue.SettlementInAnalysis"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var g in reviewQueue.Groups)
+                                {
+                                    <tr>
+                                        <td>@g.GroupName</td>
+                                        <td>R$ @g.Accrued.ToString("N2", PtBr)</td>
+                                        <td>R$ @g.Settled.ToString("N2", PtBr)</td>
+                                        <td>R$ @g.Due.ToString("N2", PtBr)</td>
+                                        <td>R$ @g.InAnalysis.ToString("N2", PtBr)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+
+                    @if (reviewQueue.PendingSettlements.Any())
+                    {
+                        <h3 class="admin-revenue-section-subtitle">@T["AdminRevenue.SettlementPending"]</h3>
+                        <table class="admin-revenue-table">
+                            <thead>
+                                <tr>
+                                    <th>@T["AdminRevenue.SettlementGroup"]</th>
+                                    <th>@T["AdminRevenue.SettlementSubmittedAt"]</th>
+                                    <th>@T["AdminRevenue.SettlementAmount"]</th>
+                                    <th>@T["AdminRevenue.SettlementProof"]</th>
+                                    <th>@T["AdminRevenue.SettlementConfirm"]</th>
+                                    <th>@T["AdminRevenue.SettlementReject"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var s in reviewQueue.PendingSettlements)
+                                {
+                                    <tr>
+                                        <td>@s.GroupName</td>
+                                        <td>@T.FormatDateTime(s.SubmittedAt.ToLocalTime(), "DateDefault")</td>
+                                        <td>R$ @s.Amount.ToString("N2", PtBr)</td>
+                                        <td>
+                                            @if (s.HasProof)
+                                            {
+                                                <button class="admin-revenue-proof-btn" type="button"
+                                                        @onclick="() => ViewSettlementProofAsync(s.Id)"
+                                                        title="@T["AdminRevenue.SettlementProof"]">
+                                                    <i class="fas fa-camera"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span>—</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <button class="admin-revenue-btn admin-revenue-btn--success" type="button"
+                                                    disabled="@(reviewingSettlementId == s.Id)"
+                                                    @onclick="() => ConfirmSettlementAsync(s.Id)">
+                                                @if (reviewingSettlementId == s.Id)
+                                                {
+                                                    <i class="fas fa-spinner fa-spin"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-check"></i>
+                                                }
+                                                @T["AdminRevenue.SettlementConfirm"]
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <div class="admin-revenue-reject-cell">
+                                                <input type="text" class="admin-revenue-input"
+                                                       placeholder="@T["AdminRevenue.SettlementRejectPlaceholder"]"
+                                                       @bind="rejectReason" />
+                                                <button class="admin-revenue-btn admin-revenue-btn--danger" type="button"
+                                                        disabled="@(rejectingSettlementId == s.Id)"
+                                                        @onclick="() => RejectSettlementAsync(s.Id)">
+                                                    @if (rejectingSettlementId == s.Id)
+                                                    {
+                                                        <i class="fas fa-spinner fa-spin"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fas fa-times"></i>
+                                                    }
+                                                    @T["AdminRevenue.SettlementReject"]
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                }
+            </div>
         </article>
     </section>
 
@@ -124,3 +250,17 @@
         <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["AdminRevenue.Back"]</button>
     </section>
 </div>
+
+@if (viewingProofSettlementId.HasValue)
+{
+    <div class="payment-proof-viewer" @onclick="() => viewingProofSettlementId = null">
+        <div class="payment-proof-viewer-content" @onclick:stopPropagation="true">
+            <button class="payment-proof-viewer-close" type="button" @onclick="() => viewingProofSettlementId = null">
+                <i class="fas fa-times"></i>
+            </button>
+            <img src="/api/fee-settlement-proof/@viewingProofSettlementId"
+                 class="payment-proof-img"
+                 alt="@T["AdminRevenue.SettlementProofAlt"]" />
+        </div>
+    </div>
+}

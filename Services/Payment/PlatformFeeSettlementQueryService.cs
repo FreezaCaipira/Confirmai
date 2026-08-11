@@ -101,6 +101,95 @@ public class PlatformFeeSettlementQueryService
         public int PaidPlayers { get; set; }
         public decimal FeeAmount { get; set; }
     }
+
+    /// <summary>
+    /// Returns the settlement review queue for the system admin:
+    /// groups with accrued fee (pendente/em analise/quitado) and the
+    /// settlements awaiting review (EmAnalise), newest first.
+    /// </summary>
+    public async Task<PlatformFeeReviewQueue> GetReviewQueueAsync()
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        var groupRows = await db.PlatformFeeSettlements
+            .GroupBy(s => s.GroupId)
+            .Select(g => new
+            {
+                GroupId = g.Key,
+                Settled = g.Where(s => s.Status == PlatformFeeSettlementStatus.Pago).Sum(s => s.Amount),
+                InAnalysis = g.Where(s => s.Status == PlatformFeeSettlementStatus.EmAnalise).Sum(s => s.Amount),
+                Rejected = g.Where(s => s.Status == PlatformFeeSettlementStatus.Rejeitado).Sum(s => s.Amount)
+            })
+            .ToListAsync();
+
+        var groupIds = groupRows.Select(g => g.GroupId).ToList();
+        var groupNames = await db.Groups
+            .Where(gr => groupIds.Contains(gr.Id))
+            .Select(gr => new { gr.Id, gr.Name })
+            .ToDictionaryAsync(gr => gr.Id, gr => gr.Name);
+
+        var accruedByGroup = await db.EventConfirmations
+            .Where(c => c.PlatformFeeAmount.HasValue && groupIds.Contains(c.Event!.GroupId))
+            .GroupBy(c => c.Event!.GroupId)
+            .Select(g => new { GroupId = g.Key, Accrued = g.Sum(c => c.PlatformFeeAmount!.Value) })
+            .ToDictionaryAsync(g => g.GroupId, g => g.Accrued);
+
+        var groups = groupRows
+            .Select(g =>
+            {
+                accruedByGroup.TryGetValue(g.GroupId, out var accrued);
+                groupNames.TryGetValue(g.GroupId, out var name);
+                return new PlatformFeeGroupReview(
+                    g.GroupId,
+                    name ?? $"Grupo #{g.GroupId}",
+                    accrued,
+                    g.Settled,
+                    accrued - g.Settled,
+                    g.InAnalysis);
+            })
+            .OrderByDescending(g => g.InAnalysis)
+            .ThenByDescending(g => g.Due)
+            .ToList();
+
+        var pendingSettlements = await db.PlatformFeeSettlements
+            .Where(s => s.Status == PlatformFeeSettlementStatus.EmAnalise)
+            .OrderByDescending(s => s.SubmittedAt)
+            .Select(s => new PlatformFeeReviewSettlementRow
+            {
+                Id = s.Id,
+                GroupId = s.GroupId,
+                Amount = s.Amount,
+                SubmittedAt = s.SubmittedAt,
+                HasProof = s.ProofImageData != null && s.ProofImageData.Length > 0
+            })
+            .ToListAsync();
+
+        var pendingGroupNames = await db.Groups
+            .Where(gr => pendingSettlements.Select(s => s.GroupId).Distinct().Contains(gr.Id))
+            .Select(gr => new { gr.Id, gr.Name })
+            .ToDictionaryAsync(gr => gr.Id, gr => gr.Name);
+
+        var pending = pendingSettlements
+            .Select(s => new PlatformFeeReviewSettlement(
+                s.Id,
+                s.GroupId,
+                pendingGroupNames.TryGetValue(s.GroupId, out var n) ? n : $"Grupo #{s.GroupId}",
+                s.Amount,
+                s.SubmittedAt,
+                s.HasProof))
+            .ToList();
+
+        return new PlatformFeeReviewQueue(groups, pending);
+    }
+
+    private sealed class PlatformFeeReviewSettlementRow
+    {
+        public int Id { get; set; }
+        public int GroupId { get; set; }
+        public decimal Amount { get; set; }
+        public DateTime SubmittedAt { get; set; }
+        public bool HasProof { get; set; }
+    }
 }
 
 /// <summary>Snapshot of the platform fee state of a group for the UI.</summary>
@@ -137,4 +226,27 @@ public record PlatformFeeSettlementRow(
     DateTime SubmittedAt,
     DateTime? ReviewedAt,
     string? ReviewNote,
+    bool HasProof);
+
+/// <summary>Review queue for the system admin (Fase B).</summary>
+public record PlatformFeeReviewQueue(
+    IReadOnlyList<PlatformFeeGroupReview> Groups,
+    IReadOnlyList<PlatformFeeReviewSettlement> PendingSettlements);
+
+/// <summary>Group balance summary for the admin review queue.</summary>
+public record PlatformFeeGroupReview(
+    int GroupId,
+    string GroupName,
+    decimal Accrued,
+    decimal Settled,
+    decimal Due,
+    decimal InAnalysis);
+
+/// <summary>A settlement awaiting review, for the admin queue.</summary>
+public record PlatformFeeReviewSettlement(
+    int Id,
+    int GroupId,
+    string GroupName,
+    decimal Amount,
+    DateTime SubmittedAt,
     bool HasProof);
