@@ -749,6 +749,105 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
     });
 }
 
+// ── TEMPORARY: Seed test data for platform fee settlement UI (Ciclo 27) ──
+// Remove after testing. GET /api/seed-fee-test?groupId=1
+app.MapGet("/api/seed-fee-test", async (
+    HttpContext ctx,
+    IDbContextFactory<AppDbContext> dbFactory,
+    IOptions<FeeOptions> feeOpts) =>
+{
+    var groupIdStr = ctx.Request.Query["groupId"];
+    if (!int.TryParse(groupIdStr, out int groupId) || groupId <= 0)
+        return Results.BadRequest("Missing or invalid groupId");
+
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var fee = feeOpts.Value.ManualPlatformFeeFixed;
+    if (fee <= 0) return Results.BadRequest("ManualPlatformFeeFixed is 0");
+
+    // 1. Stamp PlatformFeeAmount on paid confirmations in this group's futsal events
+    var paidConfs = await db.EventConfirmations
+        .Include(c => c.Event)
+        .Where(c => c.Event!.GroupId == groupId
+            && c.PaymentStatus == EventConfirmationPaymentStatus.Paid
+            && c.PlatformFeeAmount == null
+            && c.Event.Price > 0)
+        .ToListAsync();
+
+    foreach (var c in paidConfs)
+        c.PlatformFeeAmount = fee;
+
+    var stamped = paidConfs.Count;
+    await db.SaveChangesAsync();
+
+    // 2. Find the group admin to use as SubmittedByUserId
+    var admin = await db.GroupMembers
+        .Where(m => m.GroupId == groupId && m.Role == GroupMemberRole.Admin)
+        .Select(m => m.UserId)
+        .FirstOrDefaultAsync();
+
+    if (admin is null) return Results.BadRequest("No group admin found");
+
+    // 3. Create test settlements with different statuses
+    var existingSettlements = await db.PlatformFeeSettlements
+        .Where(s => s.GroupId == groupId)
+        .CountAsync();
+
+    if (existingSettlements == 0)
+    {
+        db.PlatformFeeSettlements.AddRange(
+            new PlatformFeeSettlement
+            {
+                GroupId = groupId,
+                Amount = 3.00m,
+                SubmittedByUserId = admin,
+                SubmittedAt = DateTime.UtcNow.AddDays(-10),
+                Status = PlatformFeeSettlementStatus.Pago,
+                ReviewedByUserId = admin,
+                ReviewedAt = DateTime.UtcNow.AddDays(-9),
+                ReviewNote = "Repasse confirmado"
+            },
+            new PlatformFeeSettlement
+            {
+                GroupId = groupId,
+                Amount = 1.50m,
+                SubmittedByUserId = admin,
+                SubmittedAt = DateTime.UtcNow.AddDays(-3),
+                Status = PlatformFeeSettlementStatus.EmAnalise
+            },
+            new PlatformFeeSettlement
+            {
+                GroupId = groupId,
+                Amount = 0.75m,
+                SubmittedByUserId = admin,
+                SubmittedAt = DateTime.UtcNow.AddDays(-5),
+                Status = PlatformFeeSettlementStatus.Rejeitado,
+                ReviewedByUserId = admin,
+                ReviewedAt = DateTime.UtcNow.AddDays(-4),
+                ReviewNote = "Comprovante ilegivel"
+            }
+        );
+        await db.SaveChangesAsync();
+    }
+
+    var totalAccrued = await db.EventConfirmations
+        .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount.HasValue)
+        .SumAsync(c => c.PlatformFeeAmount!.Value);
+
+    var settlementCount = await db.PlatformFeeSettlements
+        .Where(s => s.GroupId == groupId)
+        .CountAsync();
+
+    return Results.Ok(new
+    {
+        groupId,
+        feePerPlayer = fee,
+        confirmationsStamped = stamped,
+        totalAccrued,
+        settlementsCreated = settlementCount,
+        message = "Seed complete. Visit /grupo/1/pagamentos and click the % tab."
+    });
+});
+
 app.Run();
 
 public partial class Program { }

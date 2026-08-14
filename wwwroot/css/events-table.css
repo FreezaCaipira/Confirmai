@@ -309,6 +309,11 @@
     gap: 0.35rem;
 }
 
+/* Status column: minimal spacing between badges (e.g. "aberto" + "próxima") */
+.et-status-col .event-next-badge {
+    margin-left: 0.3rem;
+}
+
 .event-next-badge {
     display: inline-flex;
     align-items: center;

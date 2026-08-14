@@ -38,7 +38,8 @@ public class PlatformFeeSettlementService
         string submittedByUserId,
         decimal amount,
         byte[] fileBytes,
-        string mimeType)
+        string mimeType,
+        IReadOnlyCollection<int>? selectedEventIds = null)
     {
         if (string.IsNullOrWhiteSpace(mimeType) ||
             !AllowedMimeTypes.Contains(mimeType, StringComparer.OrdinalIgnoreCase))
@@ -104,7 +105,10 @@ public class PlatformFeeSettlementService
                 SubmittedAt = DateTime.UtcNow,
                 ProofImageData = fileBytes,
                 ProofContentType = mimeType,
-                Status = PlatformFeeSettlementStatus.EmAnalise
+                Status = PlatformFeeSettlementStatus.EmAnalise,
+                SelectedEventIds = selectedEventIds is not null && selectedEventIds.Count > 0
+                    ? string.Join(",", selectedEventIds)
+                    : null
             };
 
             db.PlatformFeeSettlements.Add(settlement);

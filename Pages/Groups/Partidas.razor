@@ -91,7 +91,7 @@ else
                     <div class="detail-events-tabs-left">
                         <button class="detail-events-tab @(!showPastEvents ? "active" : string.Empty)"
                                 type="button"
-                                @onclick="() => showPastEvents = false">
+                                @onclick="() => { showPastEvents = false; showAllUpcoming = false; }">
                             <i class="fas fa-bolt"></i> @Ui["Groups.Proximas"] (@upcomingEvents.Count)
                         </button>
                         <button class="detail-events-tab @(showPastEvents ? "active" : string.Empty)"
@@ -123,6 +123,22 @@ else
                     EventNumbers="@eventNumbers"
                     IsAdmin="@isAdmin"
                     NewEventHref="@newEventHref" />
+                @if (hasMoreUpcoming || (!showPastEvents && showAllUpcoming && upcomingEvents.Count > UpcomingPreviewCount))
+                {
+                    <div class="events-expand-row">
+                        <button class="events-expand-btn" type="button" @onclick="ToggleUpcomingExpansion">
+                            @if (showAllUpcoming)
+                            {
+                                <i class="fas fa-chevron-up"></i> @Ui["Groups.VerMenos"]
+                            }
+                            else
+                            {
+                                <i class="fas fa-chevron-down"></i>
+                                <span>@Ui["Groups.VerMais"] (@(upcomingEvents.Count - UpcomingPreviewCount))</span>
+                            }
+                        </button>
+                    </div>
+                }
             </section>
 
         </div>

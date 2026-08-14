@@ -393,6 +393,10 @@ else
                         {
                             <span class="payment-done-label"><i class="fas fa-check-circle"></i> @Ui.Get("Futsal.PaidAmount", ev.Price.Value.ToString("N2"))</span>
                         }
+                        else if (userConf.PixProofUploadedAt.HasValue)
+                        {
+                            <span class="payment-done-label"><i class="fas fa-check-circle"></i> @Ui["Futsal.ProofSent"]</span>
+                        }
                         else
                         {
                             <a href="/pagamento/evento/@userConf.Id" class="pay-btn pay-btn--sm">

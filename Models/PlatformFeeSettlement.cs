@@ -42,6 +42,14 @@ public class PlatformFeeSettlement
     /// <summary>Motivo da rejeicao ou observacao do admin.</summary>
     [StringLength(500)]
     public string? ReviewNote { get; set; }
+
+    /// <summary>
+    /// Comma-separated list of EventIds selected by the organizer when submitting
+    /// this settlement. When the settlement is approved (Pago), these matches are
+    /// considered covered by this settlement.
+    /// </summary>
+    [StringLength(1000)]
+    public string? SelectedEventIds { get; set; }
 }
 
 public enum PlatformFeeSettlementStatus

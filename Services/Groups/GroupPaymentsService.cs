@@ -142,7 +142,7 @@ public sealed class GroupPaymentsService
             var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
             var userName = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
             var eventName = c.Event?.Location ?? "Partida";
-            return new PendingProofEntry(c.Id, c.UserId, userName, c.EventId, eventName, c.Event!.StartsAt, c.Event.Price ?? 0, href, c.PixProofUploadedAt!.Value);
+            return new PendingProofEntry(c.Id, c.UserId, userName, c.EventId, eventName, group.Name, c.Event!.StartsAt, c.Event.Price ?? 0, href, c.PixProofUploadedAt!.Value);
         }).ToList();
 
         return new GroupPaymentsData(delinquencyList, paymentHistory, pendingProofList);
@@ -185,6 +185,29 @@ public sealed class GroupPaymentsService
             AuditEntities.Group,
             groupId.ToString(),
             $"Admin notificou jogador {d.UserId} ({d.UserName}) sobre {d.Entries.Count} partida(s) em aberto - R$ {d.TotalAmount:F2} (grupo #{groupId})",
+            currentUserId, "GroupAdmin");
+    }
+
+    /// <summary>
+    /// Rejects a player's uploaded Pix proof: clears the proof image and timestamp,
+    /// keeping the confirmation (player stays confirmed but unpaid).
+    /// </summary>
+    public async Task RejectProofAsync(int confirmationId, string? currentUserId, int groupId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        var conf = await db.EventConfirmations.FindAsync(confirmationId);
+        if (conf is null || conf.PixProofUploadedAt is null) return;
+
+        conf.PixProofImageData = null;
+        conf.PixProofContentType = null;
+        conf.PixProofUploadedAt = null;
+        await db.SaveChangesAsync();
+
+        await _logService.AuditAsync(
+            AuditEvents.EventConfirmationProofRejected,
+            AuditEntities.EventConfirmation,
+            confirmationId.ToString(),
+            $"Admin rejeitou comprovante da confirmacao #{confirmationId} (grupo #{groupId})",
             currentUserId, "GroupAdmin");
     }
 }

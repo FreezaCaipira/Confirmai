@@ -39,12 +39,14 @@ public class PlatformFeeSettlementQueryService
         var matchRows = await db.EventConfirmations
             .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount.HasValue)
             .Include(c => c.Event)
-            .GroupBy(c => new { c.Event!.Id, c.Event.StartsAt, c.Event.Location })
+                .ThenInclude(e => e!.Group)
+            .GroupBy(c => new { c.Event!.Id, c.Event.StartsAt, c.Event.Location, GroupName = c.Event.Group!.Name })
             .Select(g => new PlatformFeeMatchRow
             {
                 EventId = g.Key.Id,
                 StartsAt = g.Key.StartsAt,
                 Location = g.Key.Location,
+                GroupName = g.Key.GroupName,
                 PaidPlayers = g.Count(),
                 FeeAmount = g.Sum(c => c.PlatformFeeAmount!.Value)
             })
@@ -81,10 +83,16 @@ public class PlatformFeeSettlementQueryService
                 m.EventId,
                 m.StartsAt,
                 m.Location,
+                m.GroupName,
                 m.PaidPlayers,
                 m.FeeAmount,
                 statusByEvent.TryGetValue(m.EventId, out var st) ? st : PlatformFeeMatchStatus.Pendente))
             .ToList();
+
+        // Due = sum of fees from matches still Pendente (not covered by an approved settlement).
+        var due = matches
+            .Where(m => m.Status == PlatformFeeMatchStatus.Pendente)
+            .Sum(m => m.FeeAmount);
 
         var opts = _feeOptions.Value;
 
@@ -92,7 +100,7 @@ public class PlatformFeeSettlementQueryService
             matches,
             accrued,
             settled,
-            accrued - settled,
+            due,
             inAnalysis,
             settlements,
             opts.PlatformPixKey ?? string.Empty,
@@ -104,6 +112,7 @@ public class PlatformFeeSettlementQueryService
         public int EventId { get; set; }
         public DateTime StartsAt { get; set; }
         public string Location { get; set; } = string.Empty;
+        public string GroupName { get; set; } = string.Empty;
         public int PaidPlayers { get; set; }
         public decimal FeeAmount { get; set; }
     }
@@ -145,12 +154,15 @@ public class PlatformFeeSettlementQueryService
             {
                 accruedByGroup.TryGetValue(g.GroupId, out var accrued);
                 groupNames.TryGetValue(g.GroupId, out var name);
+                // Due = accrued - settled, but never negative (overpayment is credit, not negative debt).
+                var due = accrued - g.Settled;
+                if (due < 0) due = 0;
                 return new PlatformFeeGroupReview(
                     g.GroupId,
                     name ?? $"Grupo #{g.GroupId}",
                     accrued,
                     g.Settled,
-                    accrued - g.Settled,
+                    due,
                     g.InAnalysis);
             })
             .OrderByDescending(g => g.InAnalysis)
@@ -214,6 +226,7 @@ public record PlatformFeeMatch(
     int EventId,
     DateTime StartsAt,
     string Location,
+    string GroupName,
     int PaidPlayers,
     decimal FeeAmount,
     PlatformFeeMatchStatus Status);

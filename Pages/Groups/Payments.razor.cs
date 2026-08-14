@@ -28,13 +28,14 @@ public partial class Payments
     private List<UserDelinquency> delinquencyList = new();
     private List<PaymentHistoryEntry> paymentHistory = new();
     private List<PendingProofEntry> pendingProofList = new();
-    private string paymentTab = "delinquent";
+    private string paymentTab = "proofs";
     private string? selectedPaymentUserId;
     private int? markingPaidId;
     private string? notifyingUserId;
     private HashSet<string> notifiedUserIds = new();
     private int? viewingProofConfirmationId;
     private string historyFilterUserId = "";
+    private int? rejectingProofId;
 
     // ── Platform fee settlement (Fase A do Ciclo 27) ──────────────────────
     private PlatformFeeOverview? feeOverview;
@@ -44,6 +45,59 @@ public partial class Payments
     private string settlementSuccess = string.Empty;
     private bool isSubmittingSettlement;
     private int? viewingSettlementProofId;
+    private const int FeeMatchesPreviewCount = 4;
+    private bool showAllFeeMatches;
+    private HashSet<int> selectedFeeEventIds = new();
+    private IBrowserFile? selectedProofFile;
+    private bool showSettlementConfirmModal;
+
+    /// <summary>Matches pending settlement (only those with Pendente status are selectable).</summary>
+    private IReadOnlyList<PlatformFeeMatch> pendingFeeMatches =>
+        feeOverview is null
+            ? new List<PlatformFeeMatch>()
+            : feeOverview.Matches.Where(m => m.Status == PlatformFeeMatchStatus.Pendente).ToList();
+
+    /// <summary>Matches already settled (shown but not selectable).</summary>
+    private IReadOnlyList<PlatformFeeMatch> settledFeeMatches =>
+        feeOverview is null
+            ? new List<PlatformFeeMatch>()
+            : feeOverview.Matches.Where(m => m.Status == PlatformFeeMatchStatus.Pago).ToList();
+
+    private IReadOnlyList<PlatformFeeMatch> displayedFeeMatches =>
+        feeOverview is null
+            ? new List<PlatformFeeMatch>()
+            : showAllFeeMatches
+                ? feeOverview.Matches
+                : feeOverview.Matches.Take(FeeMatchesPreviewCount).ToList();
+
+    /// <summary>Sum of fees for the currently selected pending matches.</summary>
+    private decimal SelectedFeeAmount =>
+        feeOverview is null
+            ? 0m
+            : feeOverview.Matches
+                .Where(m => selectedFeeEventIds.Contains(m.EventId))
+                .Sum(m => m.FeeAmount);
+
+    private void ToggleFeeMatchSelection(int eventId)
+    {
+        if (!selectedFeeEventIds.Remove(eventId))
+            selectedFeeEventIds.Add(eventId);
+    }
+
+    private void SelectAllPendingFeeMatches()
+    {
+        selectedFeeEventIds = pendingFeeMatches.Select(m => m.EventId).ToHashSet();
+    }
+
+    private void ClearFeeSelection()
+    {
+        selectedFeeEventIds.Clear();
+    }
+
+    private void ToggleFeeMatchesExpansion()
+    {
+        showAllFeeMatches = !showAllFeeMatches;
+    }
 
     /// <summary>True when the platform fee tab should be offered (futsal, manual mode).</summary>
     private bool ShouldShowPlatformFeeTab =>
@@ -92,12 +146,14 @@ public partial class Payments
         isLoading = false;
     }
 
-    private void HandleTabChange(string tab)
+    private async Task HandleTabChange(string tab)
     {
         paymentTab = tab;
         selectedPaymentUserId = null;
+        showAllFeeMatches = false;
+        selectedFeeEventIds.Clear();
         if (tab == "platformfee" && feeOverview is null)
-            _ = LoadFeeOverviewAsync();
+            await LoadFeeOverviewAsync();
     }
 
     private async Task RefreshPayments()
@@ -149,6 +205,23 @@ public partial class Payments
         await LoadPaymentsData();
         if (!delinquencyList.Any(d => d.UserId == userId))
             selectedPaymentUserId = null;
+    }
+
+    private async Task HandleAcceptProofAsync(PendingProofEntry proof)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", Ui["Group.PaymentsProofAcceptConfirm"]);
+        if (!confirmed) return;
+        await AdminMarkPaid(proof.ConfirmationId, proof.UserId);
+    }
+
+    private async Task HandleRejectProofAsync(PendingProofEntry proof)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", Ui["Group.PaymentsProofRejectConfirm"]);
+        if (!confirmed) return;
+        rejectingProofId = proof.ConfirmationId;
+        await GroupPayments.RejectProofAsync(proof.ConfirmationId, currentUserId, Id);
+        rejectingProofId = null;
+        await LoadPaymentsData();
     }
 
     private async Task AdminNotifyDelinquency(UserDelinquency d)
@@ -205,13 +278,35 @@ public partial class Payments
         }
     }
 
-    private async Task SubmitSettlementAsync(InputFileChangeEventArgs e)
+    private void HandleProofFileSelected(InputFileChangeEventArgs e)
     {
-        if (currentUserId is null || group is null || feeOverview is null) return;
+        selectedProofFile = e.File;
+        settlementError = string.Empty;
+        settlementSuccess = string.Empty;
+    }
+
+    private void ShowSettlementConfirmModal()
+    {
+        if (selectedFeeEventIds.Count == 0)
+        {
+            settlementError = Ui["Group.PlatformFeeSelectMatches"];
+            return;
+        }
+        if (selectedProofFile is null) return;
+        showSettlementConfirmModal = true;
+    }
+
+    private void CancelSettlementConfirm()
+    {
+        showSettlementConfirmModal = false;
+    }
+
+    private async Task ConfirmSettlementSubmit()
+    {
+        if (currentUserId is null || group is null || feeOverview is null || selectedProofFile is null) return;
 
         const long MaxBytes = 5 * 1024 * 1024;
-        var file = e.File;
-        if (file is null) return;
+        var file = selectedProofFile;
 
         settlementError = string.Empty;
         settlementSuccess = string.Empty;
@@ -224,26 +319,32 @@ public partial class Payments
             var bytes = ms.ToArray();
 
             var result = await FeeSettlement.SubmitSettlementAsync(
-                group.Id, currentUserId, settlementAmount, bytes, file.ContentType);
+                group.Id, currentUserId, SelectedFeeAmount, bytes, file.ContentType,
+                selectedFeeEventIds.ToList());
 
             if (result.Success)
             {
                 settlementSuccess = Ui["Group.PlatformFeeSubmitSuccess"];
-                settlementAmount = 0m;
+                selectedFeeEventIds.Clear();
+                selectedProofFile = null;
+                showSettlementConfirmModal = false;
                 await RefreshFeeOverview();
             }
             else
             {
                 settlementError = result.Message;
+                showSettlementConfirmModal = false;
             }
         }
         catch (IOException)
         {
             settlementError = Ui["Group.PlatformFeeSubmitError"];
+            showSettlementConfirmModal = false;
         }
         catch (Exception)
         {
             settlementError = Ui["Group.PlatformFeeSubmitError"];
+            showSettlementConfirmModal = false;
         }
         finally
         {

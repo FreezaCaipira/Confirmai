@@ -81,6 +81,15 @@ else
 
             @* ── Tabs ──────────────────────────────────────────────── *@
             <div class="payments-tabs">
+                <button class="payments-tab @(paymentTab == "proofs" ? "payments-tab--active payments-tab--proofs" : "")"
+                        type="button"
+                        @onclick="@(() => HandleTabChange("proofs"))">
+                    <i class="fas fa-camera"></i> @Ui["Group.PaymentsProofs"]
+                    @if (pendingProofList?.Count > 0)
+                    {
+                        <span class="payments-tab-count payments-tab-count--delinquent">@pendingProofList.Count</span>
+                    }
+                </button>
                 <button class="payments-tab @(paymentTab == "delinquent" ? "payments-tab--active payments-tab--delinquent" : "")"
                         type="button"
                         @onclick="@(() => HandleTabChange("delinquent"))">
@@ -111,9 +120,6 @@ else
                         }
                     </button>
                 }
-                <button class="payments-refresh-btn" type="button" @onclick="RefreshPayments" title="@Ui["Group.PaymentsRefresh"]">
-                    <i class="fas @(isLoadingPayments ? "fa-spinner fa-spin" : "fa-sync-alt")"></i>
-                </button>
             </div>
 
             @if (isLoadingPayments)
@@ -122,6 +128,11 @@ else
             }
             else if (paymentTab == "history")
             {
+                <div class="payments-tab-refresh">
+                    <button class="payments-refresh-btn payments-refresh-btn--visible" type="button" @onclick="RefreshPayments" title="@Ui["Group.PaymentsRefresh"]">
+                        <i class="fas fa-sync-alt"></i> @Ui["Group.PaymentsRefresh"]
+                    </button>
+                </div>
                 <div class="payments-history-filters">
                     <select @bind="historyFilterUserId">
                         <option value="">@Ui["Group.AllParticipants"]</option>
@@ -185,15 +196,343 @@ else
                     </ul>
                 }
             }
-            else if (delinquencyList?.Count == 0)
+            else if (paymentTab == "proofs")
             {
-                <div class="payments-empty">
-                    <i class="fas fa-check-circle"></i>
-                    <span>@Ui["Group.NoDelinquent"]</span>
+                <div class="payments-tab-refresh">
+                    <button class="payments-refresh-btn payments-refresh-btn--visible" type="button" @onclick="RefreshPayments" title="@Ui["Group.PaymentsRefresh"]">
+                        <i class="fas fa-sync-alt"></i> @Ui["Group.PaymentsRefresh"]
+                    </button>
                 </div>
+                @if (pendingProofList?.Count == 0)
+                {
+                    <div class="payments-empty">
+                        <i class="fas fa-check-circle"></i>
+                        <span>@Ui["Group.PaymentsProofsEmpty"]</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="proofs-review-list">
+                        @foreach (var proof in pendingProofList ?? new())
+                        {
+                            <div class="proof-review-card">
+                                <div class="proof-review-image">
+                                    <img src="/api/pix-proof/@proof.ConfirmationId"
+                                         class="proof-review-img"
+                                         alt="@Ui["Group.ProofAlt"]"
+                                         @onclick="() => HandleViewProof(proof.ConfirmationId)"
+                                         title="@Ui["Group.ViewProof"]" />
+                                </div>
+                                <div class="proof-review-details">
+                                    <div class="proof-review-row">
+                                        <span class="proof-review-label">@Ui["Group.PaymentsProofPlayer"]</span>
+                                        <span class="proof-review-value proof-review-value--player">@proof.UserName</span>
+                                    </div>
+                                    <div class="proof-review-row">
+                                        <span class="proof-review-label">@Ui["Group.PaymentsProofMatch"]</span>
+                                        <a href="@proof.EventHref" class="proof-review-link">#@proof.EventId — @proof.GroupName</a>
+                                    </div>
+                                    <div class="proof-review-row">
+                                        <span class="proof-review-label">@Ui["Group.PaymentsProofDate"]</span>
+                                        <span class="proof-review-value">@Ui.FormatDateTime(proof.EventDate.ToLocalTime(), "DateTimeDefault")</span>
+                                    </div>
+                                    <div class="proof-review-row">
+                                        <span class="proof-review-label">@Ui["Group.PaymentsProofAmount"]</span>
+                                        <span class="proof-review-value proof-review-value--amount">R$ @proof.EventPrice.ToString("F2")</span>
+                                    </div>
+                                    <div class="proof-review-row">
+                                        <span class="proof-review-label">@Ui["Group.PaymentsProofUploadedAt"]</span>
+                                        <span class="proof-review-value">@Ui.FormatDateTime(proof.ProofUploadedAt.ToLocalTime(), "DateDefault")</span>
+                                    </div>
+                                </div>
+                                <div class="proof-review-actions">
+                                    @if (markingPaidId == proof.ConfirmationId)
+                                    {
+                                        <span class="proof-review-status"><i class="fas fa-spinner fa-spin"></i> @Ui["Group.PaymentsProofAccepting"]</span>
+                                    }
+                                    else if (rejectingProofId == proof.ConfirmationId)
+                                    {
+                                        <span class="proof-review-status"><i class="fas fa-spinner fa-spin"></i> @Ui["Group.PaymentsProofRejecting"]</span>
+                                    }
+                                    else
+                                    {
+                                        <button class="proof-review-btn proof-review-btn--accept" type="button"
+                                                @onclick="() => HandleAcceptProofAsync(proof)">
+                                            <i class="fas fa-check"></i> @Ui["Group.PaymentsProofAccept"]
+                                        </button>
+                                        <button class="proof-review-btn proof-review-btn--reject" type="button"
+                                                @onclick="() => HandleRejectProofAsync(proof)">
+                                            <i class="fas fa-times"></i> @Ui["Group.PaymentsProofReject"]
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else if (paymentTab == "platformfee")
+            {
+                @if (isLoadingFee)
+                {
+                    <div class="payments-loading"><i class="fas fa-spinner fa-spin"></i> @Ui["Group.PaymentsLoading"]</div>
+                }
+                else if (feeOverview is null)
+                {
+                    <div class="payments-empty">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>@Ui["Group.PlatformFeeMatchesEmpty"]</span>
+                    </div>
+                }
+                else
+                {
+                    <section class="platform-fee-section">
+                        <div class="platform-fee-section-header">
+                            <h2 class="platform-fee-section-title">@Ui["Group.PlatformFeeSummary"]</h2>
+                            <button class="platform-fee-refresh-btn" type="button" @onclick="RefreshFeeOverview" title="@Ui["Group.PaymentsRefresh"]">
+                                <i class="fas @(isLoadingFee ? "fa-spinner fa-spin" : "fa-sync-alt")"></i>
+                            </button>
+                        </div>
+                        <div class="platform-fee-summary-grid">
+                            <div class="platform-fee-summary-card platform-fee-summary-card--highlight">
+                                <span class="platform-fee-summary-label">@Ui["Group.PlatformFeeToSettle"]</span>
+                                <span class="platform-fee-summary-value">R$ @feeOverview.Due.ToString("F2")</span>
+                            </div>
+                            <div class="platform-fee-summary-card">
+                                <span class="platform-fee-summary-label">@Ui["Group.PlatformFeeAccrued"]</span>
+                                <span class="platform-fee-summary-value">R$ @feeOverview.Accrued.ToString("F2")</span>
+                            </div>
+                            <div class="platform-fee-summary-card platform-fee-summary-card--warning">
+                                <span class="platform-fee-summary-label">@Ui["Group.PlatformFeeInAnalysis"]</span>
+                                <span class="platform-fee-summary-value">R$ @feeOverview.InAnalysis.ToString("F2")</span>
+                            </div>
+                            <div class="platform-fee-summary-card platform-fee-summary-card--success">
+                                <span class="platform-fee-summary-label">@Ui["Group.PlatformFeeSettled"]</span>
+                                <span class="platform-fee-summary-value">R$ @feeOverview.Settled.ToString("F2")</span>
+                            </div>
+                        </div>
+
+                        <hr class="platform-fee-divider" />
+
+                        <h3 class="platform-fee-section-title platform-fee-section-title--center platform-fee-matches-title">@Ui["Group.PlatformFeeMatches"]</h3>
+                        <div class="platform-fee-info-card">
+                            <i class="fas fa-info-circle"></i>
+                            <span>@Ui["Group.PlatformFeeMatchesHint"]</span>
+                        </div>
+                        @if (feeOverview.Matches.Count == 0)
+                        {
+                            <div class="payments-empty">
+                                <i class="fas fa-check-circle"></i>
+                                <span>@Ui["Group.PlatformFeeMatchesEmpty"]</span>
+                            </div>
+                        }
+                        else
+                        {
+                            @if (pendingFeeMatches.Count > 0)
+                            {
+                                <div class="platform-fee-select-actions">
+                                    <button class="platform-fee-select-btn" type="button" @onclick="SelectAllPendingFeeMatches">
+                                        <i class="fas fa-check-double"></i> @Ui["Group.PlatformFeeSelectAll"]
+                                    </button>
+                                    <button class="platform-fee-select-btn platform-fee-select-btn--clear" type="button" @onclick="ClearFeeSelection">
+                                        <i class="fas fa-times"></i> @Ui["Group.PlatformFeeClearSelection"]
+                                    </button>
+                                </div>
+                            }
+                            <table class="platform-fee-table">
+                                <thead>
+                                    <tr>
+                                        <th class="platform-fee-table-check"></th>
+                                        <th>@Ui["Group.PlatformFeeMatchDate"]</th>
+                                        <th>@Ui["Group.PlatformFeeMatchName"]</th>
+                                        <th>@Ui["Group.PlatformFeeMatchPlayers"]</th>
+                                        <th>@Ui["Group.PlatformFeeMatchFee"]</th>
+                                        <th>@Ui["Group.PlatformFeeMatchStatus"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var m in displayedFeeMatches)
+                                    {
+                                        var isPending = m.Status == PlatformFeeMatchStatus.Pendente;
+                                        var isChecked = selectedFeeEventIds.Contains(m.EventId);
+                                        <tr class="@(isChecked ? "platform-fee-row--selected" : "")">
+                                            <td class="platform-fee-table-check">
+                                                @if (isPending)
+                                                {
+                                                    <input type="checkbox" checked="@isChecked" @onchange="@(e => ToggleFeeMatchSelection(m.EventId))" />
+                                                }
+                                            </td>
+                                            <td>@Ui.FormatDateTime(m.StartsAt.ToLocalTime(), "DateDefault")</td>
+                                            <td>#@m.EventId — @m.GroupName</td>
+                                            <td>@m.PaidPlayers</td>
+                                            <td>R$ @m.FeeAmount.ToString("F2")</td>
+                                            <td>
+                                                <span class="platform-fee-status platform-fee-status--@(m.Status == PlatformFeeMatchStatus.Pago ? "paid" : "pending")">
+                                                    @(m.Status == PlatformFeeMatchStatus.Pago ? Ui["Group.PlatformFeeStatusPaid"] : Ui["Group.PlatformFeeStatusPending"])
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                @if (feeOverview.Matches.Count > FeeMatchesPreviewCount)
+                                {
+                                    <tfoot class="platform-fee-toggle-row">
+                                        <tr>
+                                            <td colspan="6">
+                                                <button class="platform-fee-toggle-btn" type="button" @onclick="ToggleFeeMatchesExpansion">
+                                                    @(showAllFeeMatches ? Ui["Groups.VerMenos"] : Ui["Groups.VerMais"])
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr class="platform-fee-table-total">
+                                            <td></td>
+                                            <td colspan="3">@Ui["Group.PlatformFeeMatchTotal"]</td>
+                                            <td>R$ @feeOverview.Matches.Sum(m => m.FeeAmount).ToString("F2")</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                }
+                                else
+                                {
+                                    <tfoot>
+                                        <tr class="platform-fee-table-total">
+                                            <td></td>
+                                            <td colspan="3">@Ui["Group.PlatformFeeMatchTotal"]</td>
+                                            <td>R$ @feeOverview.Matches.Sum(m => m.FeeAmount).ToString("F2")</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                }
+                            </table>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(feeOverview.PlatformPixKey) && feeOverview.Due > 0 && pendingFeeMatches.Count > 0)
+                        {
+                            <div class="platform-fee-pix-card">
+                                <h3 class="platform-fee-pix-title">@Ui["Group.PlatformFeePlatformPix"]</h3>
+                                <p class="platform-fee-pix-hint">@Ui["Group.PlatformFeePlatformPixHint"]</p>
+                                <div class="platform-fee-pix-qr">
+                                    <QRCode Value="@PlatformFeePixPayload" />
+                                </div>
+                                <div class="platform-fee-pix-key">
+                                    <code class="platform-fee-pix-code">@feeOverview.PlatformPixKey</code>
+                                </div>
+
+                                <div class="platform-fee-submit-card">
+                                    <h3 class="platform-fee-section-title platform-fee-section-title--center">@Ui["Group.PlatformFeeSubmit"]</h3>
+                                        @if (!string.IsNullOrWhiteSpace(settlementSuccess))
+                                        {
+                                            <p class="platform-fee-success"><i class="fas fa-check-circle"></i> @settlementSuccess</p>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(settlementError))
+                                        {
+                                            <p class="platform-fee-error"><i class="fas fa-exclamation-circle"></i> @settlementError</p>
+                                        }
+                                        <div class="platform-fee-selected-amount">
+                                            <span class="platform-fee-label">@Ui["Group.PlatformFeeSelectedAmount"]</span>
+                                            <span class="platform-fee-selected-value">R$ @SelectedFeeAmount.ToString("F2")</span>
+                                        </div>
+                                        <label class="platform-fee-proof-btn">
+                                            @if (isSubmittingSettlement)
+                                            {
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                            }
+                                            else if (selectedProofFile is not null)
+                                            {
+                                                <i class="fas fa-check-circle"></i> <span>@selectedProofFile.Name</span>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-upload"></i> <span>@Ui["Group.PlatformFeeSubmitProof"]</span>
+                                            }
+                                            <InputFile OnChange="HandleProofFileSelected" accept="image/jpeg,image/png,image/webp" class="platform-fee-proof-input-hidden" disabled="@isSubmittingSettlement" />
+                                        </label>
+                                        <button class="platform-fee-send-btn" type="button"
+                                                disabled="@(selectedProofFile is null || selectedFeeEventIds.Count == 0 || isSubmittingSettlement)"
+                                                @onclick="ShowSettlementConfirmModal">
+                                            <i class="fas fa-paper-plane"></i> @Ui["Group.PlatformFeeSend"]
+                                        </button>
+                                </div>
+                            </div>
+                        }
+                        else if (string.IsNullOrWhiteSpace(feeOverview.PlatformPixKey) && feeOverview.Due > 0)
+                        {
+                            <div class="payments-empty">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>@Ui["Group.PlatformFeeNoPixConfigured"]</span>
+                            </div>
+                        }
+
+                        <hr class="platform-fee-divider" />
+
+                        <h3 class="platform-fee-section-title platform-fee-section-title--center platform-fee-matches-title">@Ui["Group.PlatformFeeHistory"]</h3>
+                        @if (feeOverview.Settlements.Count == 0)
+                        {
+                            <div class="payments-empty">
+                                <i class="fas fa-history"></i>
+                                <span>@Ui["Group.PlatformFeeHistoryEmpty"]</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <table class="platform-fee-table">
+                                <thead>
+                                    <tr>
+                                        <th>@Ui["Group.PlatformFeeHistoryDate"]</th>
+                                        <th>@Ui["Group.PlatformFeeHistoryAmount"]</th>
+                                        <th>@Ui["Group.PlatformFeeHistoryStatus"]</th>
+                                        <th>@Ui["Group.PlatformFeeHistoryReviewedAt"]</th>
+                                        <th>@Ui["Group.PlatformFeeHistoryNote"]</th>
+                                        <th>@Ui["Group.PlatformFeeHistoryProof"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var s in feeOverview.Settlements)
+                                    {
+                                        <tr>
+                                            <td>@Ui.FormatDateTime(s.SubmittedAt.ToLocalTime(), "DateDefault")</td>
+                                            <td>R$ @s.Amount.ToString("F2")</td>
+                                            <td>
+                                                <span class="platform-fee-status platform-fee-status--@(s.Status == PlatformFeeSettlementStatus.Pago ? "paid" : s.Status == PlatformFeeSettlementStatus.Rejeitado ? "rejected" : "pending")">
+                                                    @(s.Status == PlatformFeeSettlementStatus.Pago ? Ui["Group.PlatformFeeStatusPaid"] : s.Status == PlatformFeeSettlementStatus.Rejeitado ? Ui["Group.PlatformFeeHistoryNote"] : Ui["Group.PlatformFeeStatusPending"])
+                                                </span>
+                                            </td>
+                                            <td>@(s.ReviewedAt.HasValue ? Ui.FormatDateTime(s.ReviewedAt.Value.ToLocalTime(), "DateDefault") : "—")</td>
+                                            <td>@(string.IsNullOrWhiteSpace(s.ReviewNote) ? "—" : s.ReviewNote)</td>
+                                            <td>
+                                                @if (s.HasProof)
+                                                {
+                                                    <button class="payments-view-proof-btn" type="button"
+                                                            @onclick="() => ViewSettlementProof(s.Id)"
+                                                            title="@Ui["Group.PlatformFeeHistoryProof"]">
+                                                        <i class="fas fa-camera"></i>
+                                                    </button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </section>
+                }
             }
             else
             {
+                <div class="payments-tab-refresh">
+                    <button class="payments-refresh-btn payments-refresh-btn--visible" type="button" @onclick="RefreshPayments" title="@Ui["Group.PaymentsRefresh"]">
+                        <i class="fas fa-sync-alt"></i> @Ui["Group.PaymentsRefresh"]
+                    </button>
+                </div>
+                @if (delinquencyList?.Count == 0)
+                {
+                    <div class="payments-empty">
+                        <i class="fas fa-check-circle"></i>
+                        <span>@Ui["Group.NoDelinquent"]</span>
+                    </div>
+                }
+                else
+                {
                 <ul class="payments-user-list">
                     @foreach (var d in delinquencyList ?? new())
                     {
@@ -263,176 +602,6 @@ else
                         }
                     }
                 </ul>
-            }
-            else if (paymentTab == "platformfee")
-            {
-                @if (isLoadingFee)
-                {
-                    <div class="payments-loading"><i class="fas fa-spinner fa-spin"></i> @Ui["Group.PaymentsLoading"]</div>
-                }
-                else if (feeOverview is null)
-                {
-                    <div class="payments-empty">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span>@Ui["Group.PlatformFeeMatchesEmpty"]</span>
-                    </div>
-                }
-                else
-                {
-                    <section class="platform-fee-section">
-                        <h2 class="platform-fee-section-title">@Ui["Group.PlatformFeeSummary"]</h2>
-                        <div class="platform-fee-summary-grid">
-                            <div class="platform-fee-summary-card platform-fee-summary-card--highlight">
-                                <span class="platform-fee-summary-label">@Ui["Group.PlatformFeeToSettle"]</span>
-                                <span class="platform-fee-summary-value">R$ @feeOverview.Due.ToString("F2")</span>
-                            </div>
-                            <div class="platform-fee-summary-card">
-                                <span class="platform-fee-summary-label">@Ui["Group.PlatformFeeAccrued"]</span>
-                                <span class="platform-fee-summary-value">R$ @feeOverview.Accrued.ToString("F2")</span>
-                            </div>
-                            <div class="platform-fee-summary-card platform-fee-summary-card--warning">
-                                <span class="platform-fee-summary-label">@Ui["Group.PlatformFeeInAnalysis"]</span>
-                                <span class="platform-fee-summary-value">R$ @feeOverview.InAnalysis.ToString("F2")</span>
-                            </div>
-                            <div class="platform-fee-summary-card platform-fee-summary-card--success">
-                                <span class="platform-fee-summary-label">@Ui["Group.PlatformFeeSettled"]</span>
-                                <span class="platform-fee-summary-value">R$ @feeOverview.Settled.ToString("F2")</span>
-                            </div>
-                        </div>
-
-                        @if (!string.IsNullOrWhiteSpace(feeOverview.PlatformPixKey))
-                        {
-                            <div class="platform-fee-pix-card">
-                                <h3 class="platform-fee-pix-title">@Ui["Group.PlatformFeePlatformPix"]</h3>
-                                <p class="platform-fee-pix-hint">@Ui["Group.PlatformFeePlatformPixHint"]</p>
-                                <div class="platform-fee-pix-qr">
-                                    <QRCode Value="@PlatformFeePixPayload" />
-                                </div>
-                                <div class="platform-fee-pix-key">
-                                    <code class="platform-fee-pix-code">@feeOverview.PlatformPixKey</code>
-                                </div>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="payments-empty">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <span>@Ui["Group.PlatformFeeNoPixConfigured"]</span>
-                            </div>
-                        }
-
-                        <h3 class="platform-fee-section-title">@Ui["Group.PlatformFeeMatches"]</h3>
-                        @if (feeOverview.Matches.Count == 0)
-                        {
-                            <div class="payments-empty">
-                                <i class="fas fa-check-circle"></i>
-                                <span>@Ui["Group.PlatformFeeMatchesEmpty"]</span>
-                            </div>
-                        }
-                        else
-                        {
-                            <table class="platform-fee-table">
-                                <thead>
-                                    <tr>
-                                        <th>@Ui["Group.PlatformFeeMatchDate"]</th>
-                                        <th>@Ui["Group.PlatformFeeMatchName"]</th>
-                                        <th>@Ui["Group.PlatformFeeMatchPlayers"]</th>
-                                        <th>@Ui["Group.PlatformFeeMatchFee"]</th>
-                                        <th>@Ui["Group.PlatformFeeMatchStatus"]</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var m in feeOverview.Matches)
-                                    {
-                                        <tr>
-                                            <td>@Ui.FormatDateTime(m.StartsAt.ToLocalTime(), "DateDefault")</td>
-                                            <td>@(string.IsNullOrWhiteSpace(m.Location) ? Ui["Group.PlatformFeeMatchName"] : m.Location)</td>
-                                            <td>@m.PaidPlayers</td>
-                                            <td>R$ @m.FeeAmount.ToString("F2")</td>
-                                            <td>
-                                                <span class="platform-fee-status platform-fee-status--@(m.Status == PlatformFeeMatchStatus.Pago ? "paid" : "pending")">
-                                                    @(m.Status == PlatformFeeMatchStatus.Pago ? Ui["Group.PlatformFeeStatusPaid"] : Ui["Group.PlatformFeeStatusPending"])
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-
-                        @if (!string.IsNullOrWhiteSpace(feeOverview.PlatformPixKey) && feeOverview.Due > 0)
-                        {
-                            <div class="platform-fee-submit-card">
-                                <h3 class="platform-fee-section-title">@Ui["Group.PlatformFeeSubmit"]</h3>
-                                @if (!string.IsNullOrWhiteSpace(settlementSuccess))
-                                {
-                                    <p class="platform-fee-success"><i class="fas fa-check-circle"></i> @settlementSuccess</p>
-                                }
-                                @if (!string.IsNullOrWhiteSpace(settlementError))
-                                {
-                                    <p class="platform-fee-error"><i class="fas fa-exclamation-circle"></i> @settlementError</p>
-                                }
-                                <label class="platform-fee-label">@Ui["Group.PlatformFeeSubmitAmount"]</label>
-                                <input type="number" class="platform-fee-input" step="0.01" min="0.01" @bind="settlementAmount" />
-                                <label class="platform-fee-label">@Ui["Group.PlatformFeeSubmitProof"]</label>
-                                <InputFile OnChange="SubmitSettlementAsync" accept="image/jpeg,image/png,image/webp" />
-                                @if (isSubmittingSettlement)
-                                {
-                                    <p class="payments-loading"><i class="fas fa-spinner fa-spin"></i> @Ui["Group.PlatformFeeSubmitting"]</p>
-                                }
-                            </div>
-                        }
-
-                        <h3 class="platform-fee-section-title">@Ui["Group.PlatformFeeHistory"]</h3>
-                        @if (feeOverview.Settlements.Count == 0)
-                        {
-                            <div class="payments-empty">
-                                <i class="fas fa-history"></i>
-                                <span>@Ui["Group.PlatformFeeHistoryEmpty"]</span>
-                            </div>
-                        }
-                        else
-                        {
-                            <table class="platform-fee-table">
-                                <thead>
-                                    <tr>
-                                        <th>@Ui["Group.PlatformFeeHistoryDate"]</th>
-                                        <th>@Ui["Group.PlatformFeeHistoryAmount"]</th>
-                                        <th>@Ui["Group.PlatformFeeHistoryStatus"]</th>
-                                        <th>@Ui["Group.PlatformFeeHistoryReviewedAt"]</th>
-                                        <th>@Ui["Group.PlatformFeeHistoryNote"]</th>
-                                        <th>@Ui["Group.PlatformFeeHistoryProof"]</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var s in feeOverview.Settlements)
-                                    {
-                                        <tr>
-                                            <td>@Ui.FormatDateTime(s.SubmittedAt.ToLocalTime(), "DateDefault")</td>
-                                            <td>R$ @s.Amount.ToString("F2")</td>
-                                            <td>
-                                                <span class="platform-fee-status platform-fee-status--@(s.Status == PlatformFeeSettlementStatus.Pago ? "paid" : s.Status == PlatformFeeSettlementStatus.Rejeitado ? "rejected" : "pending")">
-                                                    @(s.Status == PlatformFeeSettlementStatus.Pago ? Ui["Group.PlatformFeeStatusPaid"] : s.Status == PlatformFeeSettlementStatus.Rejeitado ? Ui["Group.PlatformFeeHistoryNote"] : Ui["Group.PlatformFeeStatusPending"])
-                                                </span>
-                                            </td>
-                                            <td>@(s.ReviewedAt.HasValue ? Ui.FormatDateTime(s.ReviewedAt.Value.ToLocalTime(), "DateDefault") : "—")</td>
-                                            <td>@(string.IsNullOrWhiteSpace(s.ReviewNote) ? "—" : s.ReviewNote)</td>
-                                            <td>
-                                                @if (s.HasProof)
-                                                {
-                                                    <button class="payments-view-proof-btn" type="button"
-                                                            @onclick="() => ViewSettlementProof(s.Id)"
-                                                            title="@Ui["Group.PlatformFeeHistoryProof"]">
-                                                        <i class="fas fa-camera"></i>
-                                                    </button>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                    </section>
                 }
             }
 
@@ -463,6 +632,49 @@ else
                 <img src="/api/fee-settlement-proof/@viewingSettlementProofId"
                      class="payment-proof-img"
                      alt="@Ui["Group.PlatformFeeProofAlt"]" />
+            </div>
+        </div>
+    }
+
+    @if (showSettlementConfirmModal)
+    {
+        <div class="payment-overlay" @onclick="CancelSettlementConfirm">
+            <div class="payment-modal payment-modal--confirm" @onclick:stopPropagation="true">
+                <div class="payment-modal-header">
+                    <h2 class="payment-modal-title"><i class="fas fa-paper-plane"></i> @Ui["Group.PlatformFeeConfirmTitle"]</h2>
+                    <button class="payment-close-btn" type="button" @onclick="CancelSettlementConfirm">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="payment-modal-body">
+                    <p class="payment-confirm-text">
+                        @string.Format(Ui["Group.PlatformFeeConfirmMessage"],
+                            $"R$ {SelectedFeeAmount:F2}",
+                            selectedFeeEventIds.Count)
+                    </p>
+                    @if (selectedProofFile is not null)
+                    {
+                        <p class="payment-confirm-file"><i class="fas fa-paperclip"></i> @selectedProofFile.Name</p>
+                    }
+                </div>
+                <div class="payment-modal-footer">
+                    <button class="payment-modal-btn payment-modal-btn--cancel" type="button" @onclick="CancelSettlementConfirm">
+                        <i class="fas fa-times"></i> @Ui["Common.Cancel"]
+                    </button>
+                    <button class="payment-modal-btn payment-modal-btn--confirm" type="button"
+                            disabled="@isSubmittingSettlement"
+                            @onclick="ConfirmSettlementSubmit">
+                        @if (isSubmittingSettlement)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-check"></i>
+                        }
+                        @Ui["Group.PlatformFeeConfirmSend"]
+                    </button>
+                </div>
             </div>
         </div>
     }

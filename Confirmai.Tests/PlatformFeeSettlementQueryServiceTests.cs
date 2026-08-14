@@ -190,14 +190,15 @@ public class PlatformFeeSettlementQueryServiceTests
     public async Task GetGroupFeeOverviewAsync_WithPaidSettlement_ReturnsSettledAndReducesDue()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();
-        var (group, _, user, _) = await SeedPaidFutsalMatchAsync(ctx.db);
+        var (group, evt, user, _) = await SeedPaidFutsalMatchAsync(ctx.db);
 
         ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
         {
             GroupId = group.Id,
             Amount = 0.75m,
             SubmittedByUserId = user.Id,
-            Status = PlatformFeeSettlementStatus.Pago
+            Status = PlatformFeeSettlementStatus.Pago,
+            SelectedEventIds = evt.Id.ToString()
         });
         await ctx.db.SaveChangesAsync();
 

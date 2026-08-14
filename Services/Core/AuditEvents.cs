@@ -74,6 +74,7 @@ public static class AuditEvents
     public const string EventConfirmationRemoved       = "event.confirmation.removed";
     public const string EventConfirmationPaidManual    = "event.confirmation.paid.manual";    // admin marcou pago manualmente
     public const string EventConfirmationUnpaidManual  = "event.confirmation.unpaid.manual";  // admin desconfirmou pagamento manual
+    public const string EventConfirmationProofRejected = "event.confirmation.proof.rejected"; // admin rejeitou comprovante pix
     public const string EventWaitlistRemoved           = "event.waitlist.removed";
 
     // -- Group --

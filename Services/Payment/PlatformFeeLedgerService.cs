@@ -106,30 +106,30 @@ public class PlatformFeeLedgerService
         if (matches.Count == 0)
             return Array.Empty<PlatformFeeMatchStatusProjection>();
 
-        // Paid settlements in FIFO order (oldest first).
-        var paidSettlements = await db.PlatformFeeSettlements
-            .Where(s => s.GroupId == groupId && s.Status == PlatformFeeSettlementStatus.Pago)
-            .OrderBy(s => s.SubmittedAt)
-            .Select(s => s.Amount)
+        // Collect all event IDs covered by approved settlements (explicit selection).
+        var paidSettlementEventIds = await db.PlatformFeeSettlements
+            .Where(s => s.GroupId == groupId
+                && s.Status == PlatformFeeSettlementStatus.Pago
+                && s.SelectedEventIds != null)
+            .Select(s => s.SelectedEventIds!)
             .ToListAsync();
 
-        // Allocate settlement pool across matches in order.
-        var pool = paidSettlements.Sum();
+        var coveredEventIds = new HashSet<int>();
+        foreach (var csv in paidSettlementEventIds)
+        {
+            foreach (var idStr in csv.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (int.TryParse(idStr.Trim(), out var id))
+                    coveredEventIds.Add(id);
+            }
+        }
+
         var result = new List<PlatformFeeMatchStatusProjection>(matches.Count);
         foreach (var m in matches)
         {
-            var status = PlatformFeeMatchStatus.Pendente;
-            if (pool >= m.FeeAmount && m.FeeAmount > 0)
-            {
-                status = PlatformFeeMatchStatus.Pago;
-                pool -= m.FeeAmount;
-            }
-            // Partial coverage (pool < FeeAmount) leaves the match Pendente,
-            // and the pool is consumed (set to 0) so subsequent matches stay Pendente.
-            else if (pool > 0 && pool < m.FeeAmount)
-            {
-                pool = 0;
-            }
+            var status = coveredEventIds.Contains(m.EventId)
+                ? PlatformFeeMatchStatus.Pago
+                : PlatformFeeMatchStatus.Pendente;
             result.Add(new PlatformFeeMatchStatusProjection(
                 m.EventId, m.StartsAt, m.Location, m.PaidPlayers, m.FeeAmount, status));
         }

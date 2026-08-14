@@ -48,6 +48,7 @@ internal static class FutsalTexts
         ["Futsal.UnmarkPaid"] = "desmarcar?",
         ["Futsal.Proof"] = "📎 comprovante",
         ["Futsal.ProofTitle"] = "Comprovante enviado - clique para gerenciar",
+        ["Futsal.ProofSent"] = "Comprovante enviado",
         ["Futsal.NoProofTitle"] = "Sem comprovante - clique para marcar pago",
         ["Futsal.GatewayPaidTitle"] = "Pago via gateway — não pode ser desfeito pelo admin",
         ["Futsal.Receiver"] = "recebedor",

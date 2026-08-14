@@ -59,7 +59,9 @@ public class PlatformFeeFifoBreakdownTests
         return (group, events);
     }
 
-    private static async Task AddPaidSettlementAsync(AppDbContext db, int groupId, string userId, decimal amount, DateTime submittedAt)
+    private static async Task AddPaidSettlementAsync(
+        AppDbContext db, int groupId, string userId, decimal amount, DateTime submittedAt,
+        int[]? selectedEventIds = null)
     {
         db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
         {
@@ -67,7 +69,10 @@ public class PlatformFeeFifoBreakdownTests
             Amount = amount,
             SubmittedByUserId = userId,
             SubmittedAt = submittedAt,
-            Status = PlatformFeeSettlementStatus.Pago
+            Status = PlatformFeeSettlementStatus.Pago,
+            SelectedEventIds = selectedEventIds is not null && selectedEventIds.Length > 0
+                ? string.Join(",", selectedEventIds)
+                : null
         });
         await db.SaveChangesAsync();
     }
@@ -87,52 +92,35 @@ public class PlatformFeeFifoBreakdownTests
     }
 
     [Fact]
-    public async Task GetGroupFeeBreakdownByMatchAsync_ExactSettlement_MarksOldestAsPaid()
+    public async Task GetGroupFeeBreakdownByMatchAsync_SettlementSelectsFirst_MarksFirstPaid()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();
         var (group, events) = await SeedMatchesAsync(ctx.db, matchCount: 3);
         var user = TestDataFactory.CreateUserWithPixKey("org", "Org", "pix@org");
         ctx.db.Users.Add(user);
         await ctx.db.SaveChangesAsync();
-        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 0.75m, new DateTime(2026, 8, 1));
+        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 0.75m, new DateTime(2026, 8, 1),
+            selectedEventIds: new[] { events[0].Id });
 
         var service = CreateService(ctx);
         var breakdown = await service.GetGroupFeeBreakdownByMatchAsync(group.Id);
 
         Assert.Equal(3, breakdown.Count);
-        Assert.Equal(PlatformFeeMatchStatus.Pago, breakdown[0].Status); // oldest
+        Assert.Equal(PlatformFeeMatchStatus.Pago, breakdown[0].Status);
         Assert.Equal(PlatformFeeMatchStatus.Pendente, breakdown[1].Status);
         Assert.Equal(PlatformFeeMatchStatus.Pendente, breakdown[2].Status);
     }
 
     [Fact]
-    public async Task GetGroupFeeBreakdownByMatchAsync_PartialSettlement_KeepsMatchPending()
+    public async Task GetGroupFeeBreakdownByMatchAsync_SettlementSelectsTwo_MarksBothPaid()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();
-        var (group, _) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 1.00m);
+        var (group, events) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 0.75m);
         var user = TestDataFactory.CreateUserWithPixKey("org", "Org", "pix@org");
         ctx.db.Users.Add(user);
         await ctx.db.SaveChangesAsync();
-        // 1.00 per match, settle 0.50 -> first match partially covered, stays Pending
-        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 0.50m, new DateTime(2026, 8, 1));
-
-        var service = CreateService(ctx);
-        var breakdown = await service.GetGroupFeeBreakdownByMatchAsync(group.Id);
-
-        Assert.Equal(3, breakdown.Count);
-        Assert.All(breakdown, m => Assert.Equal(PlatformFeeMatchStatus.Pendente, m.Status));
-    }
-
-    [Fact]
-    public async Task GetGroupFeeBreakdownByMatchAsync_SettlementCoversTwoMatches_MarksBothPaid()
-    {
-        var ctx = TestDataFactory.CreateDbContextWithFactory();
-        var (group, _) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 0.75m);
-        var user = TestDataFactory.CreateUserWithPixKey("org", "Org", "pix@org");
-        ctx.db.Users.Add(user);
-        await ctx.db.SaveChangesAsync();
-        // 0.75 * 2 = 1.50 -> covers first two matches exactly
-        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 1.50m, new DateTime(2026, 8, 1));
+        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 1.50m, new DateTime(2026, 8, 1),
+            selectedEventIds: new[] { events[0].Id, events[1].Id });
 
         var service = CreateService(ctx);
         var breakdown = await service.GetGroupFeeBreakdownByMatchAsync(group.Id);
@@ -144,15 +132,15 @@ public class PlatformFeeFifoBreakdownTests
     }
 
     [Fact]
-    public async Task GetGroupFeeBreakdownByMatchAsync_SettlementLargerThanDue_MarksAllPaid()
+    public async Task GetGroupFeeBreakdownByMatchAsync_SettlementSelectsAll_MarksAllPaid()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();
-        var (group, _) = await SeedMatchesAsync(ctx.db, matchCount: 2, feePerMatch: 0.75m);
+        var (group, events) = await SeedMatchesAsync(ctx.db, matchCount: 2, feePerMatch: 0.75m);
         var user = TestDataFactory.CreateUserWithPixKey("org", "Org", "pix@org");
         ctx.db.Users.Add(user);
         await ctx.db.SaveChangesAsync();
-        // 1.50 due, settle 5.00 -> all paid, surplus is credit for next
-        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 5.00m, new DateTime(2026, 8, 1));
+        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 1.50m, new DateTime(2026, 8, 1),
+            selectedEventIds: new[] { events[0].Id, events[1].Id });
 
         var service = CreateService(ctx);
         var breakdown = await service.GetGroupFeeBreakdownByMatchAsync(group.Id);
@@ -165,7 +153,7 @@ public class PlatformFeeFifoBreakdownTests
     public async Task GetGroupFeeBreakdownByMatchAsync_RejectedSettlement_DoesNotAbateAnything()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();
-        var (group, _) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 0.75m);
+        var (group, events) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 0.75m);
         var user = TestDataFactory.CreateUserWithPixKey("org", "Org", "pix@org");
         ctx.db.Users.Add(user);
         await ctx.db.SaveChangesAsync();
@@ -173,7 +161,8 @@ public class PlatformFeeFifoBreakdownTests
         ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
         {
             GroupId = group.Id, Amount = 2.25m, SubmittedByUserId = user.Id,
-            SubmittedAt = new DateTime(2026, 8, 1), Status = PlatformFeeSettlementStatus.Rejeitado
+            SubmittedAt = new DateTime(2026, 8, 1), Status = PlatformFeeSettlementStatus.Rejeitado,
+            SelectedEventIds = string.Join(",", events.Select(e => e.Id))
         });
         await ctx.db.SaveChangesAsync();
 
@@ -188,7 +177,7 @@ public class PlatformFeeFifoBreakdownTests
     public async Task GetGroupFeeBreakdownByMatchAsync_EmAnaliseSettlement_DoesNotAbateAnything()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();
-        var (group, _) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 0.75m);
+        var (group, events) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 0.75m);
         var user = TestDataFactory.CreateUserWithPixKey("org", "Org", "pix@org");
         ctx.db.Users.Add(user);
         await ctx.db.SaveChangesAsync();
@@ -196,7 +185,8 @@ public class PlatformFeeFifoBreakdownTests
         ctx.db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
         {
             GroupId = group.Id, Amount = 2.25m, SubmittedByUserId = user.Id,
-            SubmittedAt = new DateTime(2026, 8, 1), Status = PlatformFeeSettlementStatus.EmAnalise
+            SubmittedAt = new DateTime(2026, 8, 1), Status = PlatformFeeSettlementStatus.EmAnalise,
+            SelectedEventIds = string.Join(",", events.Select(e => e.Id))
         });
         await ctx.db.SaveChangesAsync();
 
@@ -208,17 +198,19 @@ public class PlatformFeeFifoBreakdownTests
     }
 
     [Fact]
-    public async Task GetGroupFeeBreakdownByMatchAsync_MultiplePaidSettlements_AppliedInFifoOrder()
+    public async Task GetGroupFeeBreakdownByMatchAsync_MultiplePaidSettlements_SelectDifferentMatches()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();
-        var (group, _) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 0.75m);
+        var (group, events) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 0.75m);
         var user = TestDataFactory.CreateUserWithPixKey("org", "Org", "pix@org");
         ctx.db.Users.Add(user);
         await ctx.db.SaveChangesAsync();
 
-        // Older settlement covers match 1; newer settlement covers match 2
-        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 0.75m, new DateTime(2026, 8, 1));
-        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 0.75m, new DateTime(2026, 8, 15));
+        // First settlement covers match 1; second settlement covers match 2
+        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 0.75m, new DateTime(2026, 8, 1),
+            selectedEventIds: new[] { events[0].Id });
+        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 0.75m, new DateTime(2026, 8, 15),
+            selectedEventIds: new[] { events[1].Id });
 
         var service = CreateService(ctx);
         var breakdown = await service.GetGroupFeeBreakdownByMatchAsync(group.Id);
@@ -230,23 +222,21 @@ public class PlatformFeeFifoBreakdownTests
     }
 
     [Fact]
-    public async Task GetGroupFeeBreakdownByMatchAsync_SettlementCoversOneAndHalf_MarksFirstPaidSecondPending()
+    public async Task GetGroupFeeBreakdownByMatchAsync_PaidSettlementWithoutSelection_LeavesAllPending()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();
-        var (group, _) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 1.00m);
+        var (group, _) = await SeedMatchesAsync(ctx.db, matchCount: 3, feePerMatch: 0.75m);
         var user = TestDataFactory.CreateUserWithPixKey("org", "Org", "pix@org");
         ctx.db.Users.Add(user);
         await ctx.db.SaveChangesAsync();
-        // 1.00 per match, settle 1.50 -> first match paid, second half-covered (pending)
-        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 1.50m, new DateTime(2026, 8, 1));
+        // Legacy settlement without SelectedEventIds -> no matches covered
+        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 2.25m, new DateTime(2026, 8, 1));
 
         var service = CreateService(ctx);
         var breakdown = await service.GetGroupFeeBreakdownByMatchAsync(group.Id);
 
         Assert.Equal(3, breakdown.Count);
-        Assert.Equal(PlatformFeeMatchStatus.Pago, breakdown[0].Status);
-        Assert.Equal(PlatformFeeMatchStatus.Pendente, breakdown[1].Status);
-        Assert.Equal(PlatformFeeMatchStatus.Pendente, breakdown[2].Status);
+        Assert.All(breakdown, m => Assert.Equal(PlatformFeeMatchStatus.Pendente, m.Status));
     }
 
     [Fact]
