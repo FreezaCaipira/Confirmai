@@ -78,10 +78,9 @@ public class PlatformFeeLedgerService
     }
 
     /// <summary>
-    /// Projects the per-match fee status using FIFO settlement allocation.
-    /// Paid settlements (in SubmittedAt order) cover the oldest matches first;
-    /// a partially covered match stays Pendente; surplus becomes credit for
-    /// the next match. Rejected/EmAnalise settlements do not abate anything.
+    /// Projects the per-match fee status from the explicit match selection of
+    /// each settlement: a match is Pago only when an approved settlement lists
+    /// its event id. Rejected/EmAnalise settlements do not abate anything.
     /// </summary>
     public async Task<IReadOnlyList<PlatformFeeMatchStatusProjection>> GetGroupFeeBreakdownByMatchAsync(int groupId)
     {

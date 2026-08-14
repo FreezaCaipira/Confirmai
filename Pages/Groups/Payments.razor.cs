@@ -40,7 +40,6 @@ public partial class Payments
     // ── Platform fee settlement (Fase A do Ciclo 27) ──────────────────────
     private PlatformFeeOverview? feeOverview;
     private bool isLoadingFee;
-    private decimal settlementAmount;
     private string settlementError = string.Empty;
     private string settlementSuccess = string.Empty;
     private bool isSubmittingSettlement;
