@@ -106,7 +106,7 @@
 .payments-tab-count--delinquent {
     background: var(--white);
     color: var(--red-border);
-    box-shadow: 0 2px 4px var(--shadow-red-md);
+    box-shadow: 0 2px 4px var(--shadow-red-sm);
 }
 
 .payments-tab-count--history {
@@ -746,3 +746,882 @@
 }
 
 
+
+/* ------------------------------------------------------------ */
+/* Platform Fee Settlement Tab (Fase A do Ciclo 27) */
+/* ------------------------------------------------------------ */
+
+.payments-tab--platformfee {
+    border-color: var(--gold);
+    background: var(--gold-deep);
+    box-shadow: 0 4px 8px var(--shadow-accent-sm), inset 0 0 0 1px var(--accent-opacity-sm);
+    text-shadow: 0 0 10px var(--shadow-accent-lg);
+}
+
+.platform-fee-section {
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.platform-fee-section-title {
+    color: var(--ci-accent-light);
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0 0 0.75rem 0;
+    text-shadow: 0 0 12px var(--shadow-accent-sm);
+}
+
+.platform-fee-divider {
+    border: none;
+    border-top: 1px solid var(--ci-border);
+    margin: 1.5rem 0;
+    width: 100%;
+}
+
+.platform-fee-section-title--center {
+    text-align: center;
+}
+
+.platform-fee-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.platform-fee-refresh-btn {
+    background: transparent;
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    color: var(--ci-accent-light);
+    font-size: 0.85rem;
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+}
+
+.platform-fee-refresh-btn:hover {
+    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
+    border-color: var(--ci-accent);
+}
+
+.payments-tab-refresh {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.75rem;
+}
+
+.payments-refresh-btn--visible {
+    background: transparent;
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    color: var(--ci-accent-light);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.payments-refresh-btn--visible:hover {
+    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
+    border-color: var(--ci-accent);
+}
+
+.platform-fee-matches-title {
+    margin-top: 2.5rem;
+}
+
+.platform-fee-info-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border-soft);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    margin: 0 0 0.75rem 0;
+    font-size: 0.82rem;
+    color: var(--ci-text-muted);
+    line-height: 1.4;
+}
+
+.platform-fee-info-card i {
+    color: var(--ci-accent-light);
+    flex-shrink: 0;
+}
+
+.platform-fee-toggle-btn {
+    display: inline-block;
+    width: auto;
+    margin: 0.25rem 0;
+    padding: 0.4rem 1rem;
+    background: transparent;
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    color: var(--ci-accent-light);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.platform-fee-toggle-row td {
+    text-align: center;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid var(--ci-border);
+}
+
+.platform-fee-toggle-btn:hover {
+    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
+    border-color: var(--ci-accent);
+}
+
+.platform-fee-table-total td {
+    font-weight: 800;
+    border-top: 2px solid var(--ci-border);
+    color: var(--ci-text);
+    padding-top: 0.6rem;
+}
+
+.platform-fee-table-check {
+    width: 36px;
+    text-align: center;
+}
+
+.platform-fee-table-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--ci-accent);
+}
+
+.platform-fee-row--selected {
+    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
+}
+
+.platform-fee-select-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.platform-fee-select-btn {
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ci-accent-light);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.platform-fee-select-btn:hover {
+    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
+    border-color: var(--ci-accent);
+}
+
+.platform-fee-select-btn--clear {
+    color: var(--red-light, #fca5a5);
+    border-color: var(--red-strong, #b91c1c);
+}
+
+.platform-fee-select-btn--clear:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.platform-fee-selected-amount {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-accent);
+    border-radius: 6px;
+}
+
+.platform-fee-selected-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--white);
+}
+
+.platform-fee-proof-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    background: var(--ci-bg-input);
+    border: 1.5px dashed var(--ci-accent);
+    color: var(--ci-accent-light);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    line-height: 1.4;
+    flex-wrap: wrap;
+}
+
+.platform-fee-proof-btn span {
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.platform-fee-proof-btn:hover {
+    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
+    border-color: var(--ci-accent-light);
+    color: var(--ci-text);
+}
+
+.platform-fee-proof-input-hidden {
+    display: none;
+}
+
+.platform-fee-send-btn {
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--ci-accent);
+    color: var(--white);
+}
+
+.platform-fee-send-btn:hover:not(:disabled) {
+    filter: brightness(1.15);
+}
+
+.platform-fee-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Confirmation modal ── */
+.payment-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.payment-modal {
+    background: var(--ci-bg-alt);
+    border: 1px solid var(--ci-border);
+    border-radius: 12px;
+    max-width: 950px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.payment-modal--confirm {
+    max-width: 440px;
+    width: 90%;
+}
+
+.payment-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--ci-border);
+}
+
+.payment-modal-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--ci-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.payment-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--ci-text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.payment-close-btn:hover {
+    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
+    color: var(--ci-text);
+}
+
+.payment-modal-body {
+    padding: 1.25rem;
+}
+
+.payment-confirm-text {
+    font-size: 0.95rem;
+    color: var(--ci-text);
+    line-height: 1.6;
+    margin: 0 0 0.75rem 0;
+}
+
+.payment-confirm-file {
+    font-size: 0.85rem;
+    color: var(--ci-text-muted);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.payment-modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0 1.25rem 1.25rem;
+    justify-content: flex-end;
+}
+
+.payment-modal-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.payment-modal-btn--cancel {
+    background: transparent;
+    border: 1px solid var(--ci-border);
+    color: var(--ci-text-muted);
+}
+
+.payment-modal-btn--cancel:hover {
+    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
+    color: var(--ci-text);
+}
+
+.payment-modal-btn--confirm {
+    background: var(--ci-accent);
+    color: var(--white);
+}
+
+.payment-modal-btn--confirm:hover:not(:disabled) {
+    filter: brightness(1.15);
+}
+
+.payment-modal-btn--confirm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.platform-fee-amount-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.platform-fee-amount-row .platform-fee-input {
+    flex: 1;
+}
+
+.platform-fee-fill-btn {
+    flex-shrink: 0;
+    border: 1px solid var(--ci-accent);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ci-accent-light);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.platform-fee-fill-btn:hover {
+    background: var(--ci-accent);
+    color: var(--ci-surface-light, #fff);
+}
+
+.platform-fee-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.platform-fee-summary-card {
+    background: var(--ci-bg-card);
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    box-shadow: 0 2px 6px var(--shadow-md);
+}
+
+.platform-fee-summary-label {
+    color: var(--ci-text);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.platform-fee-summary-value {
+    color: var(--white);
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.platform-fee-summary-card--highlight {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, var(--gold-deep) 0%, var(--ci-bg-card) 100%);
+    box-shadow: 0 4px 12px var(--shadow-accent-sm);
+}
+
+.platform-fee-summary-card--highlight .platform-fee-summary-label {
+    color: var(--white);
+}
+
+.platform-fee-summary-card--highlight .platform-fee-summary-value {
+    color: var(--white);
+}
+
+.platform-fee-summary-card--warning {
+    border-color: var(--amber);
+}
+
+.platform-fee-summary-card--warning .platform-fee-summary-value {
+    color: var(--amber-light);
+}
+
+.platform-fee-summary-card--success {
+    border-color: var(--green-strong);
+}
+
+.platform-fee-summary-card--success .platform-fee-summary-value {
+    color: var(--green-light);
+}
+
+.platform-fee-pix-card {
+    background: var(--ci-bg-card-deep);
+    border: 1px solid var(--ci-border-soft);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 2px 8px var(--shadow-md);
+}
+
+.platform-fee-pix-title {
+    color: var(--gold-light);
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.platform-fee-pix-hint {
+    color: var(--ci-text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+    margin: 0;
+    max-width: 480px;
+}
+
+.platform-fee-pix-qr {
+    display: flex;
+    justify-content: center;
+    margin: 0.75rem auto;
+    width: 260px;
+    height: 260px;
+    background: var(--white);
+    padding: 5px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px var(--shadow-lg);
+    overflow: hidden;
+}
+
+.platform-fee-pix-qr :global(.qr-code-image) {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
+    .platform-fee-pix-qr {
+        width: 100%;
+        max-width: 260px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+    }
+}
+
+.platform-fee-pix-key {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+}
+
+.platform-fee-pix-code {
+    color: var(--ci-text-blue);
+    font-family: monospace;
+    font-size: 0.9rem;
+    word-break: break-all;
+}
+
+.platform-fee-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.platform-fee-table thead th {
+    color: var(--ci-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--ci-border);
+    text-align: left;
+}
+
+.platform-fee-table tbody td {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--ci-border-dim);
+    color: var(--ci-text);
+}
+
+.platform-fee-table tbody tr:hover {
+    background: var(--ci-bg-card);
+}
+
+.platform-fee-status {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+.platform-fee-status--pending {
+    background: var(--amber-strong);
+    color: var(--white);
+}
+
+.platform-fee-status--paid {
+    background: var(--green-strong);
+    color: var(--white);
+}
+
+.platform-fee-status--rejected {
+    background: var(--red-strong);
+    color: var(--white);
+}
+
+.platform-fee-submit-card {
+    background: var(--ci-bg-card);
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    box-shadow: 0 2px 8px var(--shadow-md);
+    width: 100%;
+    max-width: 360px;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+.platform-fee-label {
+    color: var(--ci-text);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.platform-fee-input {
+    background: var(--ci-bg-input);
+    border: 1px solid var(--ci-border);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    color: var(--ci-text);
+    font-size: 1rem;
+    max-width: 240px;
+}
+
+.platform-fee-input:focus {
+    border-color: var(--ci-accent);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--shadow-accent-sm);
+}
+
+.platform-fee-success {
+    color: var(--green-light);
+    background: var(--green-dark);
+    border: 1px solid var(--green-strong);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.platform-fee-error {
+    color: var(--red-text-light);
+    background: var(--red-bg-dark);
+    border: 1px solid var(--red-strong);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .platform-fee-section {
+        padding: 1rem 0.8rem;
+    }
+
+    .platform-fee-summary-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .platform-fee-table {
+        font-size: 0.8rem;
+    }
+
+    .platform-fee-table thead th,
+    .platform-fee-table tbody td {
+        padding: 0.4rem 0.3rem;
+    }
+
+    .platform-fee-pix-card {
+        padding: 0.75rem;
+    }
+
+    .platform-fee-submit-card {
+        padding: 0.75rem;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .platform-fee-amount-row {
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .platform-fee-fill-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .platform-fee-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* -- Proof review tab -- */
+.proofs-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.proof-review-card {
+    display: grid;
+    grid-template-columns: 140px 1fr auto;
+    gap: 1.25rem;
+    align-items: start;
+    background: var(--ci-bg-card);
+    border: 1px solid var(--ci-border);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px var(--shadow-md);
+}
+
+.proof-review-image {
+    cursor: pointer;
+}
+
+.proof-review-img {
+    width: 100%;
+    max-width: 140px;
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid var(--ci-border);
+    object-fit: cover;
+    transition: filter 0.2s;
+}
+
+.proof-review-img:hover {
+    filter: brightness(1.1);
+}
+
+.proof-review-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.proof-review-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.proof-review-label {
+    font-size: 0.75rem;
+    color: var(--slate-muted);
+    min-width: 90px;
+    flex-shrink: 0;
+}
+
+.proof-review-value {
+    font-size: 0.9rem;
+    color: var(--ci-text);
+}
+
+.proof-review-value--player {
+    font-weight: 700;
+}
+
+.proof-review-value--amount {
+    font-weight: 700;
+    color: var(--green-soft, #4ade80);
+}
+
+.proof-review-link {
+    color: var(--ci-accent-light);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.proof-review-link:hover {
+    text-decoration: underline;
+}
+
+.proof-review-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+    min-width: 120px;
+}
+
+.proof-review-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.proof-review-btn--accept {
+    background: #15803d;
+    color: #fff;
+}
+
+.proof-review-btn--accept:hover {
+    filter: brightness(1.15);
+}
+
+.proof-review-btn--reject {
+    background: #b91c1c;
+    color: #fff;
+}
+
+.proof-review-btn--reject:hover {
+    filter: brightness(1.15);
+}
+
+.proof-review-status {
+    font-size: 0.85rem;
+    color: var(--slate-muted);
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* Tab styling for proofs tab */
+.payments-tab--proofs.payments-tab--active {
+    border-bottom-color: var(--ci-accent);
+    color: var(--ci-accent-light);
+}
+
+@media (max-width: 768px) {
+    .proof-review-card {
+        grid-template-columns: 1fr;
+    }
+
+    .proof-review-image {
+        text-align: center;
+    }
+
+    .proof-review-img {
+        max-width: 200px;
+    }
+
+    .proof-review-actions {
+        flex-direction: row;
+        justify-content: center;
+    }
+}

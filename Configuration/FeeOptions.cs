@@ -32,6 +32,16 @@ public class FeeOptions
     /// </summary>
     public decimal ManualPlatformFeeFixed { get; set; } = 0;
 
+    /// <summary>
+    /// Chave Pix da plataforma para recebimento do repasse da taxa (fluxo manual V1).
+    /// O organizador transfere para esta chave e anexa o comprovante.
+    /// Vazia quando não configurada — a UI mostra aviso.
+    /// </summary>
+    public string PlatformPixKey { get; set; } = string.Empty;
+
+    /// <summary>Cidade da plataforma para o payload Pix estático (campo 60 do BR Code).</summary>
+    public string? PlatformPixCity { get; set; }
+
     /// <summary>True quando a taxa está configurada e habilitada.</summary>
     public bool IsConfigured => Enabled && (AppFeeFixed > 0 || GatewayFeeFixed > 0);
 }

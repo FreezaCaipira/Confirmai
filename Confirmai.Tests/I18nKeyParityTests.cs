@@ -5,22 +5,33 @@ namespace Confirmai.Tests;
 
 /// <summary>
 /// Anti-hardcode test: ensures every i18n key in PtBr exists in EnUs and EsEs
-/// (and vice versa) across all text provider classes.
-/// Fase 6, Ciclo 26.
+/// (and vice versa) across all text provider classes that have full i18n.
+/// Fase 6, Ciclo 26. Fase E, Ciclo 27: removed the silent `if (enUs.Count == 0) return;`
+/// — PT-BR-only domains are excluded from the data source explicitly (V1 decision,
+/// WORK_PLAN.md line 127: "Recomendo (a) para o V1" — PT-BR only for V1).
 /// </summary>
 public class I18nKeyParityTests
 {
+    /// <summary>
+    /// Providers with full PT-BR/EN-US/ES-ES translations. The three V1 PT-BR-only
+    /// stubs (FutsalTexts, GroupTexts, PokerTexts) are deliberately excluded —
+    /// they have no EN/ES to compare against. A silent `return` that disabled the
+    /// test for them was removed; the exclusion is now explicit in the data.
+    /// </summary>
     public static IEnumerable<object[]> TextProviders => new[]
     {
         new object[] { "AdminTexts", AdminTexts.PtBr, AdminTexts.EnUs, AdminTexts.EsEs },
         new object[] { "AuthTexts", AuthTexts.PtBr, AuthTexts.EnUs, AuthTexts.EsEs },
         new object[] { "CoreTexts", CoreTexts.PtBr, CoreTexts.EnUs, CoreTexts.EsEs },
-        new object[] { "FutsalTexts", FutsalTexts.PtBr, FutsalTexts.EnUs, FutsalTexts.EsEs },
-        new object[] { "GroupTexts", GroupTexts.PtBr, GroupTexts.EnUs, GroupTexts.EsEs },
         new object[] { "PaymentTexts", PaymentTexts.PtBr, PaymentTexts.EnUs, PaymentTexts.EsEs },
-        new object[] { "PokerTexts", PokerTexts.PtBr, PokerTexts.EnUs, PokerTexts.EsEs },
         new object[] { "ServerTexts", ServerTexts.PtBr, ServerTexts.EnUs, ServerTexts.EsEs },
         new object[] { "UtilityTexts", UtilityTexts.PtBr, UtilityTexts.EnUs, UtilityTexts.EsEs },
+    };
+
+    /// <summary>PT-BR-only providers (V1 decision). Documented here so the exclusion is visible.</summary>
+    public static IReadOnlyList<string> PtBrOnlyProviders { get; } = new[]
+    {
+        "FutsalTexts", "GroupTexts", "PokerTexts"
     };
 
     [Theory]
@@ -30,9 +41,6 @@ public class I18nKeyParityTests
         IReadOnlyDictionary<string, string> enUs,
         IReadOnlyDictionary<string, string> _)
     {
-        // Skip stubs (PT-BR baseline only, EN/ES to be completed later)
-        if (enUs.Count == 0) return;
-
         var ptKeys = ptBr.Keys.ToHashSet();
         var enKeys = enUs.Keys.ToHashSet();
         var missingInEn = ptKeys.Except(enKeys).ToList();
@@ -51,9 +59,6 @@ public class I18nKeyParityTests
         IReadOnlyDictionary<string, string> _,
         IReadOnlyDictionary<string, string> esEs)
     {
-        // Skip stubs (PT-BR baseline only, EN/ES to be completed later)
-        if (esEs.Count == 0) return;
-
         var ptKeys = ptBr.Keys.ToHashSet();
         var esKeys = esEs.Keys.ToHashSet();
         var missingInEs = ptKeys.Except(esKeys).ToList();
@@ -75,16 +80,10 @@ public class I18nKeyParityTests
         var emptyPt = ptBr.Where(kv => string.IsNullOrWhiteSpace(kv.Value)).Select(kv => kv.Key).ToList();
         Assert.True(emptyPt.Count == 0, $"{name}: empty values in PtBr: {string.Join(", ", emptyPt)}");
 
-        if (enUs.Count > 0)
-        {
-            var emptyEn = enUs.Where(kv => string.IsNullOrWhiteSpace(kv.Value)).Select(kv => kv.Key).ToList();
-            Assert.True(emptyEn.Count == 0, $"{name}: empty values in EnUs: {string.Join(", ", emptyEn)}");
-        }
+        var emptyEn = enUs.Where(kv => string.IsNullOrWhiteSpace(kv.Value)).Select(kv => kv.Key).ToList();
+        Assert.True(emptyEn.Count == 0, $"{name}: empty values in EnUs: {string.Join(", ", emptyEn)}");
 
-        if (esEs.Count > 0)
-        {
-            var emptyEs = esEs.Where(kv => string.IsNullOrWhiteSpace(kv.Value)).Select(kv => kv.Key).ToList();
-            Assert.True(emptyEs.Count == 0, $"{name}: empty values in EsEs: {string.Join(", ", emptyEs)}");
-        }
+        var emptyEs = esEs.Where(kv => string.IsNullOrWhiteSpace(kv.Value)).Select(kv => kv.Key).ToList();
+        Assert.True(emptyEs.Count == 0, $"{name}: empty values in EsEs: {string.Join(", ", emptyEs)}");
     }
 }

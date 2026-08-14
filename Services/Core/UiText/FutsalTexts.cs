@@ -48,6 +48,7 @@ internal static class FutsalTexts
         ["Futsal.UnmarkPaid"] = "desmarcar?",
         ["Futsal.Proof"] = "📎 comprovante",
         ["Futsal.ProofTitle"] = "Comprovante enviado - clique para gerenciar",
+        ["Futsal.ProofSent"] = "Comprovante enviado",
         ["Futsal.NoProofTitle"] = "Sem comprovante - clique para marcar pago",
         ["Futsal.GatewayPaidTitle"] = "Pago via gateway — não pode ser desfeito pelo admin",
         ["Futsal.Receiver"] = "recebedor",
@@ -176,6 +177,7 @@ internal static class FutsalTexts
         ["Futsal.Identification"] = "Identificação",
         ["Futsal.Schedule"] = "Horário",
         ["Futsal.DayOfWeek"] = "Dia da semana",
+        ["Futsal.Create.PixRequired"] = "Configure sua chave Pix no perfil antes de criar uma partida com preço.",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>

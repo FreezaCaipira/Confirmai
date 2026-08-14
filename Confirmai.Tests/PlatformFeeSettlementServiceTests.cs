@@ -1,7 +1,9 @@
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Core;
 using Confirmai.Services.Payment;
+using Confirmai.Services.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -12,7 +14,7 @@ namespace Confirmai.Tests;
 public class PlatformFeeSettlementServiceTests
 {
     private static PlatformFeeSettlementService CreateService(IDbContextFactory<AppDbContext> factory)
-        => new(factory, NullLogger<PlatformFeeSettlementService>.Instance);
+        => new(factory, NullLogger<PlatformFeeSettlementService>.Instance, new UiTextService(new LanguagePreferenceService()));
 
     private static byte[] FakeImage(int size = 1024) =>
         Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();

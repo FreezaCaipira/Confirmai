@@ -27,17 +27,20 @@ public sealed class FutsalCreateService
     private readonly AuthenticationStateProvider _authStateProvider;
     private readonly EventCollisionService _collisionService;
     private readonly LogService _logService;
+    private readonly UiTextService _ui;
 
     public FutsalCreateService(
         IDbContextFactory<AppDbContext> dbFactory,
         AuthenticationStateProvider authStateProvider,
         EventCollisionService collisionService,
-        LogService logService)
+        LogService logService,
+        UiTextService ui)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
         _collisionService = collisionService;
         _logService = logService;
+        _ui = ui;
     }
 
     public async Task<string?> GetCurrentUserIdAsync()
@@ -126,7 +129,7 @@ public sealed class FutsalCreateService
             {
                 return new FutsalCreateResult(
                     false,
-                    "Configure sua chave Pix no perfil antes de criar uma partida com preço.",
+                    _ui["Futsal.Create.PixRequired"],
                     "/profile/" + userId + "?intent=pix",
                     null);
             }

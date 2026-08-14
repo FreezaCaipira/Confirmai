@@ -254,6 +254,13 @@ internal static class PaymentTexts
         // Payment history export
         ["PaymentHistory.ExportCsv"] = "Exportar CSV",
         ["PaymentHistory.ExportPdf"] = "Exportar PDF",
+
+        // Platform fee settlement service messages (Fase F do Ciclo 27)
+        ["Payment.Settlement.InvalidImageType"] = "Apenas imagens JPG, PNG ou WebP são aceitas.",
+        ["Payment.Settlement.FileTooLarge"] = "Arquivo muito grande. Máximo {0} MB.",
+        ["Payment.Settlement.SubmitSuccess"] = "Repasse enviado com sucesso. Aguardando revisão.",
+        ["Payment.Settlement.NotFound"] = "Repasse não encontrado.",
+        ["Payment.Settlement.AlreadyReviewed"] = "Este repasse já foi revisado.",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
@@ -505,6 +512,13 @@ internal static class PaymentTexts
         // Payment history export
         ["PaymentHistory.ExportCsv"] = "Export CSV",
         ["PaymentHistory.ExportPdf"] = "Export PDF",
+
+        // Platform fee settlement service messages (Fase F do Ciclo 27)
+        ["Payment.Settlement.InvalidImageType"] = "Only JPG, PNG or WebP images are accepted.",
+        ["Payment.Settlement.FileTooLarge"] = "File too large. Maximum {0} MB.",
+        ["Payment.Settlement.SubmitSuccess"] = "Settlement sent successfully. Awaiting review.",
+        ["Payment.Settlement.NotFound"] = "Settlement not found.",
+        ["Payment.Settlement.AlreadyReviewed"] = "This settlement has already been reviewed.",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
@@ -756,6 +770,13 @@ internal static class PaymentTexts
         // Payment history export
         ["PaymentHistory.ExportCsv"] = "Exportar CSV",
         ["PaymentHistory.ExportPdf"] = "Exportar PDF",
+
+        // Platform fee settlement service messages (Fase F do Ciclo 27)
+        ["Payment.Settlement.InvalidImageType"] = "Solo se aceptan imagenes JPG, PNG o WebP.",
+        ["Payment.Settlement.FileTooLarge"] = "Archivo demasiado grande. Maximo {0} MB.",
+        ["Payment.Settlement.SubmitSuccess"] = "Liquidacion enviada con exito. Esperando revision.",
+        ["Payment.Settlement.NotFound"] = "Liquidacion no encontrada.",
+        ["Payment.Settlement.AlreadyReviewed"] = "Esta liquidacion ya fue revisada.",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

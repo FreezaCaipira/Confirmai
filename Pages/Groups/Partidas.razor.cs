@@ -14,17 +14,26 @@ public partial class Partidas
 {
     [Parameter] public int Id { get; set; }
 
+    private const int UpcomingPreviewCount = 5;
+
     private Group?                    group            = null;
     private bool                      isLoading        = true;
     private string?                   currentUserId    = null;
     private bool                      showPastEvents   = false;
+    private bool                      showAllUpcoming  = false;
 
     private List<Event> recentEvents   = new();
     private List<Event> upcomingEvents = new();
     private List<Event> pastEvents     = new();
     private Dictionary<int, int> eventNumbers = new();
 
-    private List<Event> displayedEvents => showPastEvents ? pastEvents : upcomingEvents;
+    private List<Event> displayedEvents => showPastEvents
+        ? pastEvents
+        : (showAllUpcoming ? upcomingEvents : upcomingEvents.Take(UpcomingPreviewCount).ToList());
+
+    private bool hasMoreUpcoming => !showPastEvents && !showAllUpcoming && upcomingEvents.Count > UpcomingPreviewCount;
+
+    private void ToggleUpcomingExpansion() => showAllUpcoming = !showAllUpcoming;
     private int eventsYear => displayedEvents.FirstOrDefault() is { } eventItem
         ? eventItem.StartsAt.ToLocalTime().Year
         : DateTime.Now.Year;

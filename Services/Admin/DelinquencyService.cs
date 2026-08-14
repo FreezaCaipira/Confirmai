@@ -165,6 +165,7 @@ public record PendingProofEntry(
     string UserName,
     int EventId,
     string EventName,
+    string GroupName,
     DateTime EventDate,
     decimal EventPrice,
     string EventHref,

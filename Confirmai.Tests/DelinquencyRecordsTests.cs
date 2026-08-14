@@ -137,6 +137,7 @@ public class DelinquencyRecordsTests
             userName,
             eventId,
             eventName,
+            "Test Group",
             eventDate,
             eventPrice,
             eventHref,
