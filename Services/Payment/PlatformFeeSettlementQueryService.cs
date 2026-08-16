@@ -73,10 +73,9 @@ public class PlatformFeeSettlementQueryService
         var settled = settlements.Where(s => s.Status == PlatformFeeSettlementStatus.Pago).Sum(s => s.Amount);
         var inAnalysis = settlements.Where(s => s.Status == PlatformFeeSettlementStatus.EmAnalise).Sum(s => s.Amount);
 
-        // Status por partida via baixa FIFO (Fase D): lotes Pago em ordem de
-        // SubmittedAt cobrem as partidas mais antigas primeiro.
-        var fifoBreakdown = await _ledger.GetGroupFeeBreakdownByMatchAsync(groupId);
-        var statusByEvent = fifoBreakdown.ToDictionary(m => m.EventId, m => m.Status);
+        // Status por partida a partir da selecao explicita de cada lote aprovado.
+        var breakdown = await _ledger.GetGroupFeeBreakdownByMatchAsync(groupId);
+        var statusByEvent = breakdown.ToDictionary(m => m.EventId, m => m.Status);
 
         var matches = matchRows
             .Select(m => new PlatformFeeMatch(
@@ -137,33 +136,43 @@ public class PlatformFeeSettlementQueryService
             })
             .ToListAsync();
 
-        var groupIds = groupRows.Select(g => g.GroupId).ToList();
+        // Groups that owe fee but never submitted a settlement must show up too,
+        // otherwise the admin cannot see who is not paying at all.
+        var accruedByGroup = await db.EventConfirmations
+            .Where(c => c.PlatformFeeAmount.HasValue)
+            .GroupBy(c => c.Event!.GroupId)
+            .Select(g => new { GroupId = g.Key, Accrued = g.Sum(c => c.PlatformFeeAmount!.Value) })
+            .ToDictionaryAsync(g => g.GroupId, g => g.Accrued);
+
+        var groupIds = groupRows.Select(g => g.GroupId)
+            .Union(accruedByGroup.Keys)
+            .ToList();
+
         var groupNames = await db.Groups
             .Where(gr => groupIds.Contains(gr.Id))
             .Select(gr => new { gr.Id, gr.Name })
             .ToDictionaryAsync(gr => gr.Id, gr => gr.Name);
 
-        var accruedByGroup = await db.EventConfirmations
-            .Where(c => c.PlatformFeeAmount.HasValue && groupIds.Contains(c.Event!.GroupId))
-            .GroupBy(c => c.Event!.GroupId)
-            .Select(g => new { GroupId = g.Key, Accrued = g.Sum(c => c.PlatformFeeAmount!.Value) })
-            .ToDictionaryAsync(g => g.GroupId, g => g.Accrued);
+        var settlementsByGroup = groupRows.ToDictionary(g => g.GroupId);
 
-        var groups = groupRows
-            .Select(g =>
+        var groups = groupIds
+            .Select(groupId =>
             {
-                accruedByGroup.TryGetValue(g.GroupId, out var accrued);
-                groupNames.TryGetValue(g.GroupId, out var name);
+                accruedByGroup.TryGetValue(groupId, out var accrued);
+                groupNames.TryGetValue(groupId, out var name);
+                settlementsByGroup.TryGetValue(groupId, out var s);
+                var settled = s?.Settled ?? 0m;
+                var inAnalysis = s?.InAnalysis ?? 0m;
                 // Due = accrued - settled, but never negative (overpayment is credit, not negative debt).
-                var due = accrued - g.Settled;
+                var due = accrued - settled;
                 if (due < 0) due = 0;
                 return new PlatformFeeGroupReview(
-                    g.GroupId,
-                    name ?? $"Grupo #{g.GroupId}",
+                    groupId,
+                    name ?? $"Grupo #{groupId}",
                     accrued,
-                    g.Settled,
+                    settled,
                     due,
-                    g.InAnalysis);
+                    inAnalysis);
             })
             .OrderByDescending(g => g.InAnalysis)
             .ThenByDescending(g => g.Due)

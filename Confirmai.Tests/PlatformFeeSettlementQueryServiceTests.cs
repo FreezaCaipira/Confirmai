@@ -308,6 +308,23 @@ public class PlatformFeeSettlementQueryServiceTests
     }
 
     [Fact]
+    public async Task GetReviewQueueAsync_GroupOwingWithoutAnySettlement_IsListed()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, _, _, _) = await SeedPaidFutsalMatchAsync(ctx.db);
+
+        var service = CreateService(ctx);
+        var queue = await service.GetReviewQueueAsync();
+
+        var g = Assert.Single(queue.Groups);
+        Assert.Equal(group.Id, g.GroupId);
+        Assert.Equal(0.75m, g.Accrued);
+        Assert.Equal(0m, g.Settled);
+        Assert.Equal(0.75m, g.Due);
+        Assert.Empty(queue.PendingSettlements);
+    }
+
+    [Fact]
     public async Task GetReviewQueueAsync_ReturnsGroupsWithAccruedAndSettled()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();

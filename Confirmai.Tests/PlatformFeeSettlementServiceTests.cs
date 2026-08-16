@@ -49,15 +49,38 @@ public class PlatformFeeSettlementServiceTests
         return userId;
     }
 
+    /// <summary>Seeds a paid futsal match with an accrued platform fee in the group.</summary>
+    private static async Task<Event> SeedMatchWithFeeAsync(
+        AppDbContext db, Group group, string dateStr, string userSuffix, decimal fee = 0.75m)
+    {
+        var evt = TestDataFactory.CreateEvent(group, dateStr, 15m);
+        db.Events.Add(evt);
+        await db.SaveChangesAsync();
+
+        var player = TestDataFactory.CreateUserWithPixKey($"p-{userSuffix}", $"J{userSuffix}", $"pix@{userSuffix}");
+        db.Users.Add(player);
+        await db.SaveChangesAsync();
+
+        var conf = TestDataFactory.CreateEventConfirmation(evt, player);
+        conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+        conf.HasPaid = true;
+        conf.PlatformFeeAmount = fee;
+        db.EventConfirmations.Add(conf);
+        await db.SaveChangesAsync();
+
+        return evt;
+    }
+
     [Fact]
     public async Task SubmitSettlementAsync_ValidInput_CreatesSettlement()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();
         var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var evt = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-10", "a");
 
         var service = CreateService(ctx.factory);
         var result = await service.SubmitSettlementAsync(
-            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg");
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { evt.Id });
 
         Assert.True(result.Success);
         Assert.NotNull(result.SettlementId);
@@ -67,6 +90,76 @@ public class PlatformFeeSettlementServiceTests
         Assert.Equal(0.75m, settlement.Amount);
         Assert.Equal(organizer.Id, settlement.SubmittedByUserId);
         Assert.Equal(PlatformFeeSettlementStatus.EmAnalise, settlement.Status);
+        Assert.Equal(evt.Id.ToString(), settlement.SelectedEventIds);
+    }
+
+    [Fact]
+    public async Task SubmitSettlementAsync_WithoutMatchSelection_IsRejected()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-10", "a");
+
+        var service = CreateService(ctx.factory);
+        var result = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg");
+
+        Assert.False(result.Success);
+        Assert.Empty(ctx.db.PlatformFeeSettlements);
+    }
+
+    [Fact]
+    public async Task SubmitSettlementAsync_AmountBelowSelectedFees_IsRejected()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var e1 = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-10", "a");
+        var e2 = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-11", "b");
+
+        var service = CreateService(ctx.factory);
+        var result = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { e1.Id, e2.Id });
+
+        Assert.False(result.Success);
+        Assert.Empty(ctx.db.PlatformFeeSettlements);
+    }
+
+    [Fact]
+    public async Task SubmitSettlementAsync_MatchFromAnotherGroup_IsRejected()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+
+        var other = TestDataFactory.CreateGroup("Outro");
+        ctx.db.Groups.Add(other);
+        await ctx.db.SaveChangesAsync();
+        var foreign = await SeedMatchWithFeeAsync(ctx.db, other, "2026-08-10", "x");
+
+        var service = CreateService(ctx.factory);
+        var result = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { foreign.Id });
+
+        Assert.False(result.Success);
+        Assert.Empty(ctx.db.PlatformFeeSettlements);
+    }
+
+    [Fact]
+    public async Task SubmitSettlementAsync_MatchAlreadyInAnotherSettlement_IsRejected()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var evt = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-10", "a");
+
+        var service = CreateService(ctx.factory);
+        var first = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { evt.Id });
+        Assert.True(first.Success);
+
+        var second = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { evt.Id });
+
+        Assert.False(second.Success);
+        Assert.Single(ctx.factory.CreateDbContext().PlatformFeeSettlements);
     }
 
     [Fact]

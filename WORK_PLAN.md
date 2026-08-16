@@ -164,13 +164,57 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 26 | Taxa acumulada p/ repasse manual + UX Profile + privacidade do Pix + fechar i18n | Fases 0/1/2/4/5 entregues (privacidade do Pix, UX do Profile + deep link `?intent=pix`, `PlatformFeeAmount` + `PlatformFeeLedgerService` + migration, breakdown `Partida + Taxa = Total`, Pix como pre-requisito no `FutsalCreateService`); Fase 3 so **backend** (services sem UI/endpoint/FIFO); Fase 6 **nao entregue** (so paridade de chaves de novo). 2165->2223. Senior corrigiu 3 itens (QR cobrando valor errado, autorizacao ausente, `catch{}` mudo). | #88 (impl), #89 (review) | APROVADO PARCIAL -- Fase 3 incompleta, Fase 6 nao entregue |
 
-| 27 | Fechar a Fase 3 (UI do repasse) + Fase 6 (anti-hardcode) | 6 fases entregues: (A) UI do repasse lado organizador em `Payments.razor` (aba "Taxa da plataforma", lista por partida, somatório, Pix da plataforma via config + QR, enviar comprovante, histórico); (B) UI do repasse lado admin em `AdminRevenue.razor` (grupos com saldo, fila de lotes, confirmar/rejeitar com motivo); (C) endpoint `GET /api/fee-settlement-proof/{id}` com autorização extraída para `PlatformFeeSettlementProofAuthorizer` + 10 testes de autorização; (D) baixa FIFO por partida em `PlatformFeeLedgerService.GetGroupFeeBreakdownByMatchAsync` + 10 testes; (E) teste anti-hardcode de verdade (`AntiHardcodeI18nTests` varre 143 `.razor`, allowlist explícita) + 7 residuais migrados + removido `if (enUs.Count == 0) return;` do `I18nKeyParityTests`; (F) limpeza C26: `eval`→`site.js` função nomeada, `StateHasChanged` após `_highlightPix`, 11 mensagens de service via `UiTextService`, indentação `Program.cs`. 2223→2261 (+38). | #90 (impl) | AGUARDANDO REVIEW |
+| 27 | Fechar a Fase 3 (UI do repasse) + Fase 6 (anti-hardcode) | 6 fases entregues: (A) UI do repasse lado organizador em `Payments.razor` (aba "Taxa da plataforma", lista por partida, somatório, Pix da plataforma via config + QR, enviar comprovante, histórico); (B) UI do repasse lado admin em `AdminRevenue.razor` (grupos com saldo, fila de lotes, confirmar/rejeitar com motivo); (C) endpoint `GET /api/fee-settlement-proof/{id}` com autorização extraída para `PlatformFeeSettlementProofAuthorizer` + 10 testes de autorização; (D) baixa FIFO por partida em `PlatformFeeLedgerService.GetGroupFeeBreakdownByMatchAsync` + 10 testes; (E) teste anti-hardcode de verdade (`AntiHardcodeI18nTests` varre 143 `.razor`, allowlist explícita) + 7 residuais migrados + removido `if (enUs.Count == 0) return;` do `I18nKeyParityTests`; (F) limpeza C26: `eval`→`site.js` função nomeada, `StateHasChanged` após `_highlightPix`, 11 mensagens de service via `UiTextService`, indentação `Program.cs`. 2223→2261 (+38). | #90 (impl), #91 (review) | APROVADO c/ ressalvas -- Senior removeu endpoint de seed aberto e fechou 3 furos financeiros |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
 ---
 
 # Detalhes dos Ciclos Recentes (planos + reviews na integra)
+
+---
+
+## Review Senior do Ciclo 27 (PR #90, mergeada na `main`) -- APROVADO com ressalvas
+
+**Escopo revisado**: commits `e37baf2`..`eb6f704` (7 commits, 53 arquivos, +5629/-67), mergeados via `22d0e5d`.
+
+**Build**: `dotnet build --no-incremental` -> **1 warning** (CS0169, campo `settlementAmount` nunca usado em `Payments.razor.cs`) / 0 error. Meta do ciclo era 0 warning -- corrigido pelo Senior.
+**Testes**: **2261 verdes** (era 2223, +38), 24 falhas = `ProgramConfigurationTests` sem PostgreSQL em `127.0.0.1:5432` -- **ambientais**, mesmas de sempre.
+
+### Resultado por fase
+
+| Fase | Veredito | Observacao |
+|---|---|---|
+| A -- UI do organizador | **OK** | Aba de taxa em `Pages/Groups/Payments.razor` com lista por partida (data, local, pagantes, taxa, status), resumo (acumulado / em analise / repassado / a repassar), Pix da plataforma via `FeeOptions.PlatformPixKey` + QR, selecao de partidas por checkbox, envio de comprovante com modal de confirmacao e historico dos lotes com motivo da rejeicao. **Sem** botao de autoquitacao, como a regra exige. |
+| B -- UI do admin do sistema | **OK com lacuna corrigida** | Fila em `AdminRevenue.razor` (grupos com saldo + lotes `EmAnalise` + confirmar/rejeitar com motivo). Lacuna: a lista de grupos vinha de `GroupBy` sobre `PlatformFeeSettlements`, entao **grupo que deve e nunca enviou repasse nao aparecia** -- exatamente o inadimplente que o admin precisa ver. Corrigido pelo Senior (uniao com os grupos que tem taxa acumulada) + teste. |
+| C -- Endpoint do comprovante | **OK** | `GET /api/fee-settlement-proof/{id}` com a regra extraida para `PlatformFeeSettlementProofAuthorizer` (testavel): `Unauthorized` sem login, `NotFound` sem imagem, `Forbid` para terceiro, liberado ao submitter / admin do grupo / admin do sistema. 10 testes. |
+| D -- Baixa por partida | **ENTREGUE COM DESVIO DE DESENHO (aceito)** | O plano pedia FIFO por valor; o Pleno trocou por **selecao explicita de partidas** (`SelectedEventIds` CSV + migration). Ver analise abaixo -- o desvio e **melhor** que o pedido, mas veio sem validacao server-side, o que abriu 3 furos financeiros. |
+| E -- Anti-hardcode i18n | **OK, na terceira tentativa** | `AntiHardcodeI18nTests` varre 143 `.razor` de `Pages/**` e `Shared/**` (conteudo de elemento + `title`/`placeholder`/`alt`/`aria-label`), com allowlist **explicita e comentada** em vez de auto-skip; 7 residuais migrados; o `if (enUs.Count == 0) return;` do `I18nKeyParityTests` foi removido. Ressalva de cobertura abaixo. |
+| F -- Limpeza da divida do C26 | **OK** | `eval` -> `ConfirmaiScrollToElement` no `site.js`, `StateHasChanged` apos `_highlightPix`, 11 mensagens de service via `UiTextService`, 5 mensagens de `Profile.razor.cs` migradas, indentacao do `Program.cs` corrigida. |
+
+### Sobre o desvio da Fase D (FIFO -> selecao explicita)
+
+**Aceito e preferivel.** Com FIFO por valor, um lote de R$ 3,00 quita "as 4 partidas mais antigas" por inferencia; com selecao explicita, o organizador marca **quais** partidas esta quitando e o lote guarda os `EventId`s. Fica auditavel, casa com o comprovante e elimina a baixa parcial ambigua (partida coberta pela metade). O Pleno deveria ter registrado a mudanca de desenho como pergunta antes de implementar (regra 16), mas o resultado e o certo -- fica **ratificado**: a regra vigente e selecao explicita, e o `FIFO` sai do vocabulario do projeto.
+
+### Correcoes aplicadas pelo Senior nesta review (PR #91)
+
+**1. P0 -- endpoint de seed anonimo commitado na `main`.** O commit da Fase A deixou `app.MapGet("/api/seed-fee-test", ...)` **no nivel raiz** do `Program.cs` (fora do bloco `if (app.Environment.IsDevelopment() || ...)`), **sem `RequireAuthorization()`**. Ou seja: em producao, qualquer visitante anonimo poderia chamar `/api/seed-fee-test?groupId=N` e (a) carimbar `PlatformFeeAmount` em confirmacoes pagas do grupo e (b) criar um `PlatformFeeSettlement` com `Status = Pago` de R$ 3,00 -- **zerando a divida do grupo com a plataforma sem ninguem pagar nada**. Um comentario `// TEMPORARY: remove after testing` nao e controle de acesso.
+   - Endpoint **removido**. Adicionado `NoUnauthenticatedSeedEndpointsTests`, teste de convencao que falha se um endpoint com `seed`/`debug` na rota voltar a ser mapeado fora do bloco de desenvolvimento.
+
+**2. P0 -- o repasse podia quitar mais do que pagava.** `SubmitSettlementAsync` gravava `SelectedEventIds` **sem validar nada**: o `amount` vinha do cliente e nao era conferido contra a taxa das partidas selecionadas. Como a aprovacao do admin marca **todas** as partidas selecionadas como `Pago`, um lote de R$ 0,75 selecionando 10 partidas (R$ 7,50) quitaria as 10 -- perda direta de receita. Tambem era possivel selecionar partidas **de outro grupo** e reenviar as **mesmas partidas** que ja estavam em outro lote (o organizador pagaria duas vezes, ou o admin aprovaria dois lotes cobrindo a mesma divida).
+   - `SubmitSettlementAsync` agora exige selecao nao-vazia e valida, server-side: (a) toda partida selecionada pertence ao grupo e tem taxa acumulada; (b) nenhuma delas esta em lote `Pago` ou `EmAnalise`; (c) `amount` == soma das taxas selecionadas. +5 testes.
+
+**3. P1 -- `Due` com duas definicoes diferentes.** No painel do organizador `Due` = soma das taxas das partidas ainda `Pendente`; na fila do admin `Due` = `accrued - settled`. Com a validacao do item 2 as duas convergem, mas o admin continuava sem ver quem deve e nunca enviou nada -- corrigido junto (item da Fase B acima).
+
+**4. Higiene** -- warning CS0169 (`settlementAmount` morto) removido; docstring do ledger que ainda dizia "FIFO settlement allocation" corrigida para descrever a selecao explicita; 8 mensagens PT cruas restantes no `PlatformFeeSettlementService` migradas para `PaymentTexts` (PT/EN/ES) -- a Fase F migrou o `FutsalCreateService` mas deixou este de fora.
+
+### Ressalvas que ficam para o Ciclo 28
+
+- **O teste anti-hardcode so pega literal acentuado.** `AntiHardcodeI18nTests` detecta por caractere acentuado, entao string visivel sem acento (`"Voltar"`, `"Grupos"`, `"Pix"`, `"Total"`) passa livre. E um avanco real (guarda contra o caso comum em PT), mas nao fecha a regra 25. Evolucao natural: heuristica de palavra PT sem acento, ou lista de palavras conhecidas.
+- **`Shared/Components/**` foi allowlistado, nao migrado.** A Fase E pedia migrar os 16 residuais de `Shared`; o Pleno migrou 7 de `Pages` e colocou ~24 entradas de `Shared` na allowlist ("C28 target"). A allowlist e honesta e comentada -- aceitavel como divida declarada --, mas a divida existe e precisa encolher no C28.
+- **`SelectedEventIds` como CSV em coluna de texto.** Funciona e evita tabela nova, mas nao tem integridade referencial e obriga parsing em memoria. Se o volume crescer, virar tabela `PlatformFeeSettlementItem` (settlementId, eventId, feeAmount) fica melhor -- e permite guardar a taxa por partida no momento do lote.
+- **Sem teste de UI dos fluxos novos** (Fase A/B): a logica esta em services testados, mas as duas telas nao tem cobertura de componente. Consistente com o resto do projeto, so registrando.
+- **`RejectProofAsync`** (rejeicao do comprovante do jogador, nivel 1) entrou junto no ultimo commit sem estar no plano do ciclo. E coerente com a simetria dos dois niveis e tem valor, mas foi escopo extra.
 
 ---
 
@@ -225,7 +269,23 @@ Na pratica: **a feature ainda nao existe para o usuario**. O saldo acumula e nin
 
 ---
 
-## Ciclo 27 (Pleno) -- Fechar a Fase 3 (o repasse precisa existir na tela) + Fase 6 de verdade [PLANEJADO]
+## Ciclo 28 (Pleno) -- Fechar as ressalvas do C27 [PLANEJADO]
+
+**Regra de ouro**: TDD, SOLID, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, 1 commit por fase. **Nao** reabrir o desenho do repasse (selecao explicita de partidas esta ratificado).
+
+- **Fase A -- anti-hardcode alem do acento**: `AntiHardcodeI18nTests` hoje so detecta literal com caractere acentuado; passar a detectar tambem palavra PT sem acento (lista de palavras comuns: "Voltar", "Grupos", "Total", "Enviar", "Salvar", "Cancelar", "Nome", "Data", "Status"...). O teste deve ficar vermelho antes da migracao.
+- **Fase B -- migrar `Shared/Components/**`**: esvaziar as ~24 entradas de `Shared` da allowlist (injetar `UiTextService` nos componentes e criar as chaves). A allowlist final deve conter **so** nomes proprios/marca.
+- **Fase C -- `SelectedEventIds` -> tabela**: substituir o CSV por `PlatformFeeSettlementItem` (`SettlementId`, `EventId`, `FeeAmount`) com FK e migration aditiva; guardar a taxa da partida **no momento do lote** (snapshot, mesma logica de `PlatformFeeAmount`). Backfill dos lotes existentes a partir do CSV.
+- **Fase D -- cobertura das telas novas**: teste de componente/logica para a aba de taxa (`Payments.razor.cs`) e para a fila do admin (`AdminRevenue.razor.cs`), cobrindo pelo menos: nada selecionado desabilita o envio, valor exibido == soma das taxas selecionadas, partida `Pago` nao e selecionavel, rejeitar exige motivo.
+- **Fase E -- higiene**: revisar `catch (Exception)` genericos introduzidos no C27 (`ConfirmSettlementSubmit`) para logar; conferir se `RefreshFeeOverview` e `LoadFeeOverviewAsync` (identicos) podem ser um metodo so.
+
+### O que NAO fazer
+
+Nao mexer no fluxo do dinheiro do jogador; nao remover o codigo do V2; nao permitir que o organizador aprove o proprio lote; nao reintroduzir endpoint de seed/debug fora do bloco de desenvolvimento; nao criar doc solto na raiz.
+
+---
+
+## Ciclo 27 (Pleno) -- Fechar a Fase 3 (o repasse precisa existir na tela) + Fase 6 de verdade [EXECUTADO -- ver review acima]
 
 **Regra de ouro**: TDD, SOLID, i18n (regra 25) inclusive em mensagens de service, build `--no-incremental` 0 warning, suite verde, 1 commit por fase. **Nao** reabrir decisoes ja travadas no Ciclo 26.
 

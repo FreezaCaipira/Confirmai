@@ -56,7 +56,7 @@ public class PlatformFeeSettlementService
             return new PlatformFeeSettlementResult
             {
                 Success = false,
-                Message = "Arquivo vazio."
+                Message = _ui["Payment.Settlement.EmptyFile"]
             };
         }
 
@@ -74,7 +74,7 @@ public class PlatformFeeSettlementService
             return new PlatformFeeSettlementResult
             {
                 Success = false,
-                Message = "Valor do repasse deve ser maior que zero."
+                Message = _ui["Payment.Settlement.InvalidAmount"]
             };
         }
 
@@ -93,7 +93,76 @@ public class PlatformFeeSettlementService
                 return new PlatformFeeSettlementResult
                 {
                     Success = false,
-                    Message = "Apenas um administrador do grupo pode enviar o repasse."
+                    Message = _ui["Payment.Settlement.NotGroupAdmin"]
+                };
+            }
+
+            if (selectedEventIds is null || selectedEventIds.Count == 0)
+            {
+                return new PlatformFeeSettlementResult
+                {
+                    Success = false,
+                    Message = _ui["Payment.Settlement.NoMatchesSelected"]
+                };
+            }
+
+            var eventIds = selectedEventIds.Distinct().ToList();
+
+            // The selected matches must belong to this group and have accrued fee.
+            var accruedByEvent = await db.EventConfirmations
+                .AsNoTracking()
+                .Where(c => c.Event!.GroupId == groupId
+                    && c.PlatformFeeAmount.HasValue
+                    && eventIds.Contains(c.Event.Id))
+                .GroupBy(c => c.Event!.Id)
+                .Select(g => new { EventId = g.Key, Fee = g.Sum(c => c.PlatformFeeAmount!.Value) })
+                .ToDictionaryAsync(g => g.EventId, g => g.Fee);
+
+            if (accruedByEvent.Count != eventIds.Count)
+            {
+                return new PlatformFeeSettlementResult
+                {
+                    Success = false,
+                    Message = _ui["Payment.Settlement.InvalidMatchSelection"]
+                };
+            }
+
+            // A match already covered by an approved or in-review settlement cannot
+            // be selected again — otherwise the organizer would pay it twice.
+            var alreadyCoveredCsv = await db.PlatformFeeSettlements
+                .AsNoTracking()
+                .Where(s => s.GroupId == groupId
+                    && s.SelectedEventIds != null
+                    && (s.Status == PlatformFeeSettlementStatus.Pago
+                        || s.Status == PlatformFeeSettlementStatus.EmAnalise))
+                .Select(s => s.SelectedEventIds!)
+                .ToListAsync();
+
+            var covered = alreadyCoveredCsv
+                .SelectMany(csv => csv.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                .Select(s => int.TryParse(s.Trim(), out var id) ? id : 0)
+                .Where(id => id > 0)
+                .ToHashSet();
+
+            if (eventIds.Any(covered.Contains))
+            {
+                return new PlatformFeeSettlementResult
+                {
+                    Success = false,
+                    Message = _ui["Payment.Settlement.MatchAlreadyCovered"]
+                };
+            }
+
+            // The amount must match the fee of the selected matches: approving the
+            // settlement marks all of them as paid, so a smaller amount would
+            // silently write off the difference.
+            var expected = accruedByEvent.Values.Sum();
+            if (amount != expected)
+            {
+                return new PlatformFeeSettlementResult
+                {
+                    Success = false,
+                    Message = _ui.Get("Payment.Settlement.AmountMismatch", expected.ToString("F2"))
                 };
             }
 
@@ -106,9 +175,7 @@ public class PlatformFeeSettlementService
                 ProofImageData = fileBytes,
                 ProofContentType = mimeType,
                 Status = PlatformFeeSettlementStatus.EmAnalise,
-                SelectedEventIds = selectedEventIds is not null && selectedEventIds.Count > 0
-                    ? string.Join(",", selectedEventIds)
-                    : null
+                SelectedEventIds = string.Join(",", eventIds)
             };
 
             db.PlatformFeeSettlements.Add(settlement);
@@ -127,7 +194,7 @@ public class PlatformFeeSettlementService
             return new PlatformFeeSettlementResult
             {
                 Success = false,
-                Message = "Erro ao enviar repasse. Tente novamente."
+                Message = _ui["Payment.Settlement.SubmitError"]
             };
         }
     }
@@ -149,7 +216,7 @@ public class PlatformFeeSettlementService
             return new PlatformFeeSettlementResult
             {
                 Success = false,
-                Message = "Apenas o administrador do sistema pode confirmar o recebimento do repasse."
+                Message = _ui["Payment.Settlement.NotSystemAdmin"]
             };
         }
 
@@ -187,7 +254,9 @@ public class PlatformFeeSettlementService
         return new PlatformFeeSettlementResult
         {
             Success = true,
-            Message = approved ? "Repasse aprovado." : "Repasse rejeitado.",
+            Message = approved
+                ? _ui["Payment.Settlement.Approved"]
+                : _ui["Payment.Settlement.Rejected"],
             SettlementId = settlement.Id
         };
     }

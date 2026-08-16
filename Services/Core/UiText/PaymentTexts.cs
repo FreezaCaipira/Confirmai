@@ -261,6 +261,17 @@ internal static class PaymentTexts
         ["Payment.Settlement.SubmitSuccess"] = "Repasse enviado com sucesso. Aguardando revisão.",
         ["Payment.Settlement.NotFound"] = "Repasse não encontrado.",
         ["Payment.Settlement.AlreadyReviewed"] = "Este repasse já foi revisado.",
+        ["Payment.Settlement.EmptyFile"] = "Arquivo vazio.",
+        ["Payment.Settlement.InvalidAmount"] = "Valor do repasse deve ser maior que zero.",
+        ["Payment.Settlement.NotGroupAdmin"] = "Apenas um administrador do grupo pode enviar o repasse.",
+        ["Payment.Settlement.NotSystemAdmin"] = "Apenas o administrador do sistema pode confirmar o recebimento do repasse.",
+        ["Payment.Settlement.SubmitError"] = "Erro ao enviar repasse. Tente novamente.",
+        ["Payment.Settlement.Approved"] = "Repasse aprovado.",
+        ["Payment.Settlement.Rejected"] = "Repasse rejeitado.",
+        ["Payment.Settlement.NoMatchesSelected"] = "Selecione as partidas que este repasse quita.",
+        ["Payment.Settlement.InvalidMatchSelection"] = "Seleção de partidas inválida para este grupo.",
+        ["Payment.Settlement.MatchAlreadyCovered"] = "Uma das partidas selecionadas já está em um repasse enviado ou aprovado.",
+        ["Payment.Settlement.AmountMismatch"] = "O valor do repasse deve ser R$ {0}, igual à soma das taxas das partidas selecionadas.",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
@@ -519,6 +530,17 @@ internal static class PaymentTexts
         ["Payment.Settlement.SubmitSuccess"] = "Settlement sent successfully. Awaiting review.",
         ["Payment.Settlement.NotFound"] = "Settlement not found.",
         ["Payment.Settlement.AlreadyReviewed"] = "This settlement has already been reviewed.",
+        ["Payment.Settlement.EmptyFile"] = "Empty file.",
+        ["Payment.Settlement.InvalidAmount"] = "Settlement amount must be greater than zero.",
+        ["Payment.Settlement.NotGroupAdmin"] = "Only a group administrator can submit the settlement.",
+        ["Payment.Settlement.NotSystemAdmin"] = "Only the system administrator can confirm the settlement.",
+        ["Payment.Settlement.SubmitError"] = "Error sending settlement. Please try again.",
+        ["Payment.Settlement.Approved"] = "Settlement approved.",
+        ["Payment.Settlement.Rejected"] = "Settlement rejected.",
+        ["Payment.Settlement.NoMatchesSelected"] = "Select the matches this settlement covers.",
+        ["Payment.Settlement.InvalidMatchSelection"] = "Invalid match selection for this group.",
+        ["Payment.Settlement.MatchAlreadyCovered"] = "One of the selected matches is already in a submitted or approved settlement.",
+        ["Payment.Settlement.AmountMismatch"] = "The settlement amount must be R$ {0}, matching the fees of the selected matches.",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
@@ -777,6 +799,17 @@ internal static class PaymentTexts
         ["Payment.Settlement.SubmitSuccess"] = "Liquidacion enviada con exito. Esperando revision.",
         ["Payment.Settlement.NotFound"] = "Liquidacion no encontrada.",
         ["Payment.Settlement.AlreadyReviewed"] = "Esta liquidacion ya fue revisada.",
+        ["Payment.Settlement.EmptyFile"] = "Archivo vacio.",
+        ["Payment.Settlement.InvalidAmount"] = "El valor de la liquidacion debe ser mayor que cero.",
+        ["Payment.Settlement.NotGroupAdmin"] = "Solo un administrador del grupo puede enviar la liquidacion.",
+        ["Payment.Settlement.NotSystemAdmin"] = "Solo el administrador del sistema puede confirmar la liquidacion.",
+        ["Payment.Settlement.SubmitError"] = "Error al enviar la liquidacion. Intentalo de nuevo.",
+        ["Payment.Settlement.Approved"] = "Liquidacion aprobada.",
+        ["Payment.Settlement.Rejected"] = "Liquidacion rechazada.",
+        ["Payment.Settlement.NoMatchesSelected"] = "Selecciona los partidos que cubre esta liquidacion.",
+        ["Payment.Settlement.InvalidMatchSelection"] = "Seleccion de partidos invalida para este grupo.",
+        ["Payment.Settlement.MatchAlreadyCovered"] = "Uno de los partidos seleccionados ya esta en una liquidacion enviada o aprobada.",
+        ["Payment.Settlement.AmountMismatch"] = "El valor de la liquidacion debe ser R$ {0}, igual a la suma de las tasas de los partidos seleccionados.",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>
