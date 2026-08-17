@@ -22,6 +22,7 @@
 @inject EventNotificationService       NotificationService
 @inject LogService                     LogService
 @inject UiTextService                  Ui
+@inject ILogger<Payments>              _logger
 
 <PageTitle>@Ui.Get("Group.PaymentsPageTitle", group?.Name ?? @Ui["Group.PageTitle"]) · Confirmai</PageTitle>
 
@@ -289,7 +290,7 @@ else
                     <section class="platform-fee-section">
                         <div class="platform-fee-section-header">
                             <h2 class="platform-fee-section-title">@Ui["Group.PlatformFeeSummary"]</h2>
-                            <button class="platform-fee-refresh-btn" type="button" @onclick="RefreshFeeOverview" title="@Ui["Group.PaymentsRefresh"]">
+                            <button class="platform-fee-refresh-btn" type="button" @onclick="LoadFeeOverviewAsync" title="@Ui["Group.PaymentsRefresh"]">
                                 <i class="fas @(isLoadingFee ? "fa-spinner fa-spin" : "fa-sync-alt")"></i>
                             </button>
                         </div>
