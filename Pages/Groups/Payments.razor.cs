@@ -73,9 +73,7 @@ public partial class Payments
     private decimal SelectedFeeAmount =>
         feeOverview is null
             ? 0m
-            : feeOverview.Matches
-                .Where(m => selectedFeeEventIds.Contains(m.EventId))
-                .Sum(m => m.FeeAmount);
+            : PlatformFeeSelectionState.SelectedAmount(feeOverview.Matches, selectedFeeEventIds);
 
     private void ToggleFeeMatchSelection(int eventId)
     {
@@ -286,7 +284,7 @@ public partial class Payments
 
     private void ShowSettlementConfirmModal()
     {
-        if (selectedFeeEventIds.Count == 0)
+        if (!PlatformFeeSelectionState.CanSubmit(selectedFeeEventIds))
         {
             settlementError = Ui["Group.PlatformFeeSelectMatches"];
             return;

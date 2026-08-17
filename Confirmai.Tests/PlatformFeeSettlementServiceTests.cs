@@ -381,6 +381,63 @@ public class PlatformFeeSettlementServiceTests
     }
 
     [Fact]
+    public async Task ReviewSettlementAsync_RejectWithoutNote_IsRejected()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var adminId = await SeedSystemAdminAsync(ctx.db);
+
+        var settlement = new PlatformFeeSettlement
+        {
+            GroupId = group.Id,
+            Amount = 0.75m,
+            SubmittedByUserId = organizer.Id,
+            Status = PlatformFeeSettlementStatus.EmAnalise
+        };
+        ctx.db.PlatformFeeSettlements.Add(settlement);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx.factory);
+        var result = await service.ReviewSettlementAsync(
+            settlement.Id, adminId, approved: false, note: null);
+
+        Assert.False(result.Success);
+
+        await using var verifyDb = ctx.factory.CreateDbContext();
+        // Settlement must remain EmAnalise — the rejection was refused.
+        Assert.Equal(PlatformFeeSettlementStatus.EmAnalise,
+            verifyDb.PlatformFeeSettlements.Single().Status);
+    }
+
+    [Fact]
+    public async Task ReviewSettlementAsync_RejectWithWhitespaceNote_IsRejected()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var adminId = await SeedSystemAdminAsync(ctx.db);
+
+        var settlement = new PlatformFeeSettlement
+        {
+            GroupId = group.Id,
+            Amount = 0.75m,
+            SubmittedByUserId = organizer.Id,
+            Status = PlatformFeeSettlementStatus.EmAnalise
+        };
+        ctx.db.PlatformFeeSettlements.Add(settlement);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx.factory);
+        var result = await service.ReviewSettlementAsync(
+            settlement.Id, adminId, approved: false, note: "   ");
+
+        Assert.False(result.Success);
+
+        await using var verifyDb = ctx.factory.CreateDbContext();
+        Assert.Equal(PlatformFeeSettlementStatus.EmAnalise,
+            verifyDb.PlatformFeeSettlements.Single().Status);
+    }
+
+    [Fact]
     public async Task ReviewSettlementAsync_AlreadyReviewed_ReturnsError()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();

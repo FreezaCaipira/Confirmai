@@ -243,6 +243,16 @@ public class PlatformFeeSettlementService
             };
         }
 
+        // A rejection must carry a reason so the organizer knows what to fix.
+        if (!approved && string.IsNullOrWhiteSpace(note))
+        {
+            return new PlatformFeeSettlementResult
+            {
+                Success = false,
+                Message = _ui["Payment.Settlement.RejectReasonRequired"]
+            };
+        }
+
         settlement.Status = approved
             ? PlatformFeeSettlementStatus.Pago
             : PlatformFeeSettlementStatus.Rejeitado;
