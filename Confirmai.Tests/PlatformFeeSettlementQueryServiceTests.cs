@@ -198,7 +198,10 @@ public class PlatformFeeSettlementQueryServiceTests
             Amount = 0.75m,
             SubmittedByUserId = user.Id,
             Status = PlatformFeeSettlementStatus.Pago,
-            SelectedEventIds = evt.Id.ToString()
+            Items = new List<PlatformFeeSettlementItem>
+            {
+                new() { EventId = evt.Id, FeeAmount = 0.75m }
+            }
         });
         await ctx.db.SaveChangesAsync();
 

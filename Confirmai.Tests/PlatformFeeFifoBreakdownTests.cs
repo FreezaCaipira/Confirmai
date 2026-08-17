@@ -61,7 +61,7 @@ public class PlatformFeeFifoBreakdownTests
 
     private static async Task AddPaidSettlementAsync(
         AppDbContext db, int groupId, string userId, decimal amount, DateTime submittedAt,
-        int[]? selectedEventIds = null)
+        int[]? selectedEventIds = null, decimal feePerMatch = 0.75m)
     {
         db.PlatformFeeSettlements.Add(new PlatformFeeSettlement
         {
@@ -70,9 +70,13 @@ public class PlatformFeeFifoBreakdownTests
             SubmittedByUserId = userId,
             SubmittedAt = submittedAt,
             Status = PlatformFeeSettlementStatus.Pago,
-            SelectedEventIds = selectedEventIds is not null && selectedEventIds.Length > 0
-                ? string.Join(",", selectedEventIds)
-                : null
+            Items = (selectedEventIds ?? Array.Empty<int>())
+                .Select(eid => new PlatformFeeSettlementItem
+                {
+                    EventId = eid,
+                    FeeAmount = feePerMatch
+                })
+                .ToList()
         });
         await db.SaveChangesAsync();
     }
@@ -162,7 +166,11 @@ public class PlatformFeeFifoBreakdownTests
         {
             GroupId = group.Id, Amount = 2.25m, SubmittedByUserId = user.Id,
             SubmittedAt = new DateTime(2026, 8, 1), Status = PlatformFeeSettlementStatus.Rejeitado,
-            SelectedEventIds = string.Join(",", events.Select(e => e.Id))
+            Items = events.Select(e => new PlatformFeeSettlementItem
+            {
+                EventId = e.Id,
+                FeeAmount = 0.75m
+            }).ToList()
         });
         await ctx.db.SaveChangesAsync();
 
@@ -186,7 +194,11 @@ public class PlatformFeeFifoBreakdownTests
         {
             GroupId = group.Id, Amount = 2.25m, SubmittedByUserId = user.Id,
             SubmittedAt = new DateTime(2026, 8, 1), Status = PlatformFeeSettlementStatus.EmAnalise,
-            SelectedEventIds = string.Join(",", events.Select(e => e.Id))
+            Items = events.Select(e => new PlatformFeeSettlementItem
+            {
+                EventId = e.Id,
+                FeeAmount = 0.75m
+            }).ToList()
         });
         await ctx.db.SaveChangesAsync();
 
