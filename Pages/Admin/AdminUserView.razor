@@ -48,7 +48,7 @@ else
                 </section>
 
                 <section class="admin-profile-panel-card">
-                    <h3>Contato</h3>
+                    <h3>@T["AdminUserView.Contact"]</h3>
                     <dl class="admin-profile-info-list">
                         <dt>Instagram</dt>
                         <dd>@(string.IsNullOrWhiteSpace(user.InstagramHandle) ? T["AdminUserView.NotInformed"] : user.InstagramHandle)</dd>
@@ -79,7 +79,7 @@ else
                     <div class="role-toggle-row">
                         <div class="role-toggle-info">
                             <strong>Gerenciador de Quadras</strong>
-                            <small>Permite criar e editar quadras/venues no portal do gestor.</small>
+                            <small>@T["AdminUserView.VenueManagerHint"]</small>
                         </div>
                         <button class="role-toggle-btn @(isVenueManager ? "role-toggle-btn--active" : "")"
                                 disabled="@roleToggleBusy"

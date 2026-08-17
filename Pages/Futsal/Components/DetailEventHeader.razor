@@ -1,8 +1,9 @@
 @using Confirmai.Models
+@inject UiTextService Ui
 
 <header class="detail-header detail-header--futsal">
     <div class="detail-header-top">
-        <a href="/grupo/@Event.GroupId" class="detail-back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+        <a href="/grupo/@Event.GroupId" class="detail-back-link"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
     </div>
     <div class="detail-header-badge">
         <span class="detail-sport-badge">⚽ Futsal</span>

@@ -1,18 +1,20 @@
+@inject UiTextService Ui
+
 @if (RankingRows?.Count == 0)
 {
     <div class="ranking-empty">
         <i class="fas fa-calendar-times"></i>
-        <p>Nenhuma partida encerrada no período.</p>
+        <p>@Ui["Group.NoFinishedMatches"]</p>
     </div>
 }
 else
 {
     <div class="ranking-header">
         <span class="ranking-pos"></span>
-        <span class="ranking-name ranking-col-label"><i class="fas fa-user"></i> Nome</span>
+        <span class="ranking-name ranking-col-label"><i class="fas fa-user"></i> @Ui["Common.Name"]</span>
         <span class="ranking-col ranking-col--label ranking-col--label-games"><i class="fas fa-futbol"></i> Partidas</span>
         <span class="ranking-col ranking-col--label ranking-col--label-highlight"><i class="fas fa-star"></i> Destaques</span>
-        <span class="ranking-col ranking-col--label ranking-col--label-wins"><i class="fas fa-trophy"></i> Vitórias</span>
+        <span class="ranking-col ranking-col--label ranking-col--label-wins"><i class="fas fa-trophy"></i> @Ui["Group.Wins"]</span>
     </div>
     <ol class="ranking-list">
         @{ int pos = 0; }
@@ -32,10 +34,10 @@ else
                         @pos
                     }
                 </span>
-                <span class="ranking-name">@row.UserName @if (isMe) { <span class="player-tag player-tag--me">Você</span> }</span>
-                <span class="ranking-col" title="Partidas">@row.GamesPlayed</span>
-                <span class="ranking-col ranking-col--highlight" title="Destaques">@row.Highlights</span>
-                <span class="ranking-col ranking-col--wins" title="Vitórias">@row.Wins</span>
+                <span class="ranking-name">@row.UserName @if (isMe) { <span class="player-tag player-tag--me">@Ui["Group.You"]</span> }</span>
+                <span class="ranking-col" title="@Ui["Group.RankingGames"]">@row.GamesPlayed</span>
+                <span class="ranking-col ranking-col--highlight" title="@Ui["Group.RankingHighlights"]">@row.Highlights</span>
+                <span class="ranking-col ranking-col--wins" title="@Ui["Group.Wins"]">@row.Wins</span>
                 @if (expandedUserId == row.UserId)
                 {
                     <div class="ranking-name-tooltip">@row.UserName</div>

@@ -18,7 +18,7 @@ internal static class AdminTexts
         ["Admin.Nav.Security"] = "Seguranca",
 
         ["AdminCommon.CloseNotice"] = "Fechar aviso",
-        ["AdminCommon.ExtraActions"] = "Acoes adicionais",
+        ["AdminCommon.ExtraActions"] = "Ações adicionais",
 
         ["AdminProducts.Kicker"] = "Painel administrativo",
         ["AdminProducts.Title"] = "Itens",
@@ -546,6 +546,11 @@ internal static class AdminTexts
         ["AdminParchmentLab.VariantD3"] = "Look de painel principal",
         ["AdminParchmentLab.Hint"] = "Sugestão: me diga a variante (A, B, C ou D) e eu aplico em todas as telas principais.",
         ["AdminParchmentLab.Back"] = "Voltar",
+
+        // Admin pages (C28 migration)
+        ["AdminUserView.Contact"] = "Contato",
+        ["AdminUserView.VenueManagerHint"] = "Permite criar e editar quadras/venues no portal do gestor.",
+        ["AdminPayments.StalenessAlertExplanation"] = "Explicação do alerta de obsolescência",
     };
 
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -1087,6 +1092,11 @@ internal static class AdminTexts
         ["AdminParchmentLab.VariantD3"] = "Main panel look",
         ["AdminParchmentLab.Hint"] = "Suggestion: tell me the variant (A, B, C or D) and I'll apply it to all main screens.",
         ["AdminParchmentLab.Back"] = "Back",
+
+        // Admin pages (C28 migration)
+        ["AdminUserView.Contact"] = "Contact",
+        ["AdminUserView.VenueManagerHint"] = "Allows creating and editing courts/venues in the manager portal.",
+        ["AdminPayments.StalenessAlertExplanation"] = "Staleness alert explanation",
     };
 
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -1628,6 +1638,11 @@ internal static class AdminTexts
         ["AdminParchmentLab.VariantD3"] = "Look de panel principal",
         ["AdminParchmentLab.Hint"] = "Sugerencia: dime la variante (A, B, C o D) y la aplico en todas las pantallas principales.",
         ["AdminParchmentLab.Back"] = "Atras",
+
+        // Admin pages (C28 migration)
+        ["AdminUserView.Contact"] = "Contacto",
+        ["AdminUserView.VenueManagerHint"] = "Permite crear y editar canchas/venues en el portal del gestor.",
+        ["AdminPayments.StalenessAlertExplanation"] = "Explicación de la alerta de obsolescencia",
     };
 
     /// <summary>

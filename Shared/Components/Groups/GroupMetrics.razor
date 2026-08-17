@@ -3,6 +3,7 @@
 @using Confirmai.Services.Groups
 
 @inject GroupMetricsService MetricsService
+@inject UiTextService Ui
 
 <div class="group-metrics">
     <div class="metrics-grid">
@@ -12,7 +13,7 @@
             </div>
             <div class="metric-content">
                 <div class="metric-value">@Metrics.TotalMembers</div>
-                <div class="metric-label">Membros</div>
+                <div class="metric-label">@Ui["Group.Members"]</div>
             </div>
         </div>
 
@@ -23,7 +24,7 @@
             <div class="metric-content">
                 <div class="metric-value">@Metrics.TotalEvents</div>
                 <div class="metric-label">Eventos</div>
-                <div class="metric-sub">@Metrics.UpcomingEvents próximos</div>
+                <div class="metric-sub">@Metrics.UpcomingEvents @Ui["Group.Upcoming"]</div>
             </div>
         </div>
 
@@ -33,7 +34,7 @@
             </div>
             <div class="metric-content">
                 <div class="metric-value">@Metrics.AverageAttendanceRate%</div>
-                <div class="metric-label">Taxa de Presença</div>
+                <div class="metric-label">@Ui["Group.AttendanceRate"]</div>
                 <div class="metric-sub @(Metrics.AverageAttendanceRate >= 70 ? "metric-sub--good" : "metric-sub--warning")">
                     @(Metrics.AverageAttendanceRate >= 70 ? "Boa" : "Atenção")
                 </div>
@@ -59,8 +60,8 @@
                 </div>
                 <div class="metric-content">
                     <div class="metric-value">@Metrics.PendingJoinRequests</div>
-                    <div class="metric-label">Solicitações Pendentes</div>
-                    <div class="metric-sub metric-sub--alert">Ação necessária</div>
+                    <div class="metric-label">@Ui["Group.PendingRequestsLabel"]</div>
+                    <div class="metric-sub metric-sub--alert">@Ui["Group.ActionNeeded"]</div>
                 </div>
             </div>
         }

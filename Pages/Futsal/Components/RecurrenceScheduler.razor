@@ -1,4 +1,5 @@
 @using Confirmai.Pages.Futsal
+@inject UiTextService Ui
 
 <fieldset class="form-section">
     <legend>Periodicidade</legend>
@@ -11,7 +12,7 @@
     @if (Form.RecurrenceEnabled)
     {
         <div class="form-group form-group--margin-top">
-            <label>Dias da semana</label>
+            <label>@Ui["Futsal.DaysOfWeek"]</label>
             <div class="weekday-grid">
                 @foreach (var (dow, label) in WeekdayOptions)
                 {

@@ -9,9 +9,9 @@
         <tr>
             <!-- Web headers -->
             <th class="web-only"></th>
-            <th class="web-only">Data/Hora</th>
+            <th class="web-only">@Ui["Group.DateTimeHeader"]</th>
             <th class="web-only">Jogadores</th>
-            <th class="web-only">Status</th>
+            <th class="web-only">@Ui["Group.StatusHeader"]</th>
             <th class="events-access-col web-only"></th>
             <!-- Mobile: no headers -->
         </tr>
@@ -25,14 +25,14 @@
                     {
                         <div class="et-empty-banner">
                             <i class="fas fa-calendar-plus"></i>
-                            <span class="et-empty-text">Nenhuma partida agendada.</span>
+                            <span class="et-empty-text">@Ui["Group.NoMatchScheduledEmpty"]</span>
                         </div>
                     }
                     else
                     {
                         <div class="et-empty-banner">
                             <i class="fas fa-calendar-plus"></i>
-                            <span class="et-empty-text">@(ShowPastEvents ? "Nenhuma partida realizada." : "Nenhuma partida agendada.")</span>
+                            <span class="et-empty-text">@(ShowPastEvents ? @Ui["Group.NoMatchPlayed"] : @Ui["Group.NoMatchScheduledEmpty"])</span>
                         </div>
                     }
                 </td>
@@ -57,7 +57,7 @@
                     <td class="web-only">
                         @if (ev.RachaScheduleId.HasValue)
                         {
-                            <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
+                            <i class="fas fa-sync-alt et-recurring-icon" title="@Ui["Group.WeeklyTitle"]"></i>
                         }
                         <span class="et-date">@Ui.FormatDateTime(ev.StartsAt, "DateDefault")</span>
                         <span class="et-time">@Ui.FormatDateTime(ev.StartsAt, "TimeDefault")</span>
@@ -106,7 +106,7 @@
                                 <div class="et-cell-right">
                                     @if (ev.RachaScheduleId.HasValue)
                                     {
-                                        <i class="fas fa-sync-alt et-recurring-icon" title="Partida semanal automática"></i>
+                                        <i class="fas fa-sync-alt et-recurring-icon" title="@Ui["Group.WeeklyTitle"]"></i>
                                     }
                                     <span class="et-date">@Ui.FormatDateTime(ev.StartsAt, "DateDefault")</span>
                                     <span class="et-time">@Ui.FormatDateTime(ev.StartsAt, "TimeDefault")</span>

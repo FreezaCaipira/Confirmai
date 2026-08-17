@@ -1,3 +1,5 @@
+@inject UiTextService Ui
+
 <div class="entity-shell @CssClass">
     <section class="entity-shell-grid" aria-label="Dados principais">
         <article class="entity-shell-card entity-shell-main">
@@ -14,7 +16,7 @@
 
     @if (FooterContent is not null)
     {
-        <section class="entity-shell-footer" aria-label="Ações adicionais">
+        <section class="entity-shell-footer" aria-label="@Ui["Shared.EntityProfileShell.AdditionalActions"]">
             @FooterContent
         </section>
     }

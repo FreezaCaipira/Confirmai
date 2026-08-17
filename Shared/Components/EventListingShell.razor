@@ -4,6 +4,7 @@
 @using Microsoft.EntityFrameworkCore
 @using System.Globalization
 @inject IDbContextFactory<AppDbContext> DbFactory
+@inject UiTextService Ui
 
 <div class="listing-block">
 <div class="event-listing">
@@ -22,8 +23,8 @@
         </div>
     }
 
-    <section class="date-selector" aria-label="Selecionar data">
-        <button class="date-nav" aria-label="Dia anterior" @onclick="PrevDay">&#8249;</button>
+    <section class="date-selector" aria-label="@Ui["Shared.EventListingShell.SelectDate"]">
+        <button class="date-nav" aria-label="@Ui["Shared.EventListingShell.PreviousDay"]" @onclick="PrevDay">&#8249;</button>
         @if (ShowDatePicker)
         {
             <input class="date-input"
@@ -39,12 +40,12 @@
                 @FormatDate(SelectedDate)
             </button>
         }
-        <button class="date-nav" aria-label="Próximo dia" @onclick="NextDay">&#8250;</button>
+        <button class="date-nav" aria-label="@Ui["Shared.EventListingShell.NextDay"]" @onclick="NextDay">&#8250;</button>
     </section>
 
     @if (IsLoading)
     {
-        <ul class="event-list" aria-label="Carregando @SportLabel" aria-busy="true">
+        <ul class="event-list" aria-label="@(Ui["Shared.EventListingShell.Loading"] + " " + @SportLabel)" aria-busy="true">
             @for (var i = 0; i < 3; i++)
             {
                 <li>
@@ -77,13 +78,13 @@
             <p>Nenhum@(SportLabel == "torneios" ? "" : "a") @SportLabel@(!string.IsNullOrEmpty(City) ? $" em {City}" : "") neste dia.</p>
             @if (SelectedDate != DateOnly.FromDateTime(DateTime.Now))
             {
-                <button class="btn-today" @onclick="SelectToday">Ver hoje</button>
+                <button class="btn-today" @onclick="SelectToday">@Ui["Shared.EventListingShell.ViewToday"]</button>
             }
         </div>
     }
     else
     {
-        <ol class="event-list" aria-label="@SportLabel disponíveis">
+        <ol class="event-list" aria-label="@SportLabel @Ui["Shared.EventListingShell.Available"]">
             @foreach (var ev in Events)
             {
                 <li>@EventCard(ev)</li>

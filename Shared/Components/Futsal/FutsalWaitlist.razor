@@ -5,7 +5,7 @@
 {
     <hr class="detail-divider">
     <section class="detail-section">
-        <h2 class="detail-section-title"><i class="fas fa-clock"></i> Lista de espera (@Event.WaitingList.Count)</h2>
+        <h2 class="detail-section-title"><i class="fas fa-clock"></i> @T["Futsal.WaitlistTitle"] (@Event.WaitingList.Count)</h2>
         <ol class="players-list">
             @{ int wIdx = 0; }
             @foreach (var w in Event.WaitingList.OrderBy(w => w.Position).ThenBy(w => w.JoinedAt))
@@ -17,7 +17,7 @@
                     @if (w.DesiredPosition == FutsalPosition.Goalkeeper) { <span class="player-tag">goleiro</span> }
                     @if (w.UserId == CurrentUserId)
                     {
-                        <span class="player-tag player-tag--me">Você</span>
+                        <span class="player-tag player-tag--me">@T["Futsal.You"]</span>
                         @if (Event.IsActive && !IsPastEvent)
                         {
                             @if (ConfirmLeaveWaitlist)

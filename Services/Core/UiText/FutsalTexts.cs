@@ -178,16 +178,32 @@ internal static class FutsalTexts
         ["Futsal.Schedule"] = "Horário",
         ["Futsal.DayOfWeek"] = "Dia da semana",
         ["Futsal.Create.PixRequired"] = "Configure sua chave Pix no perfil antes de criar uma partida com preço.",
+
+        // Futsal components (C28 migration)
+        ["Futsal.WaitlistTitle"] = "Lista de espera",
+        ["Futsal.Reserve"] = "Reserva",
+        ["Futsal.MatchHighlight"] = "Destaque da Partida",
+        ["Futsal.DaysOfWeek"] = "Dias da semana",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        // Futsal components (C28 migration)
+        ["Futsal.WaitlistTitle"] = "Waitlist",
+        ["Futsal.Reserve"] = "Reserve",
+        ["Futsal.MatchHighlight"] = "Match Highlight",
+        ["Futsal.DaysOfWeek"] = "Days of the week",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        // Futsal components (C28 migration)
+        ["Futsal.WaitlistTitle"] = "Lista de espera",
+        ["Futsal.Reserve"] = "Reserva",
+        ["Futsal.MatchHighlight"] = "Destaque de la Partida",
+        ["Futsal.DaysOfWeek"] = "Días de la semana",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

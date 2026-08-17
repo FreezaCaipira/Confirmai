@@ -3,7 +3,7 @@
 @inject UiTextService Ui
 @inject IJSRuntime JS
 
-<div class="city-selector" aria-label="Filtro de cidade">
+<div class="city-selector" aria-label="@Ui["Shared.CitySelector.FilterLabel"]">
     <label class="city-label" for="city-select">
         <svg class="city-pin" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
              fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
@@ -20,7 +20,7 @@
                 <option value="@c.Key">@c.Label</option>
             }
         </select>
-        <button class="city-geo-btn" type="button" @onclick="GetUserLocation" title="Usar minha localização" aria-label="Usar minha localização">
+        <button class="city-geo-btn" type="button" @onclick="GetUserLocation" title="@Ui["Shared.CitySelector.UseLocation"]" aria-label="@Ui["Shared.CitySelector.UseLocation"]">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="3 11 22 2 13 21 11 13 3 11" />
