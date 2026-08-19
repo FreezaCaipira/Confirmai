@@ -1,5 +1,6 @@
 @using Confirmai.Enums
 @using Confirmai.Models
+@inject UiTextService Ui
 
 <div class="poker-detail-info">
     @if (Ev.PokerEventType == PokerEventType.Tournament)
@@ -31,7 +32,7 @@
                 @if (Ev.MaxPlayers != 0)
                 {
                     <div class="poker-detail-item">
-                        <span class="poker-detail-label">Máx. jogadores</span>
+                        <span class="poker-detail-label">@Ui["Poker.MaxPlayersShort"]</span>
                         <span class="poker-detail-value">@Ev.MaxPlayers</span>
                     </div>
                 }
@@ -39,7 +40,7 @@
         </section>
 
         <section class="detail-section">
-            <h2 class="detail-section-title">Preços</h2>
+            <h2 class="detail-section-title">@Ui["Poker.Prices"]</h2>
             <div class="poker-details-grid">
                 @if (Ev.BuyInAmount.HasValue)
                 {
@@ -101,14 +102,14 @@
                 @if (Ev.CashMinBuyIn.HasValue)
                 {
                     <div class="poker-detail-item">
-                        <span class="poker-detail-label">Stack mínimo</span>
+                        <span class="poker-detail-label">@Ui["Poker.StackMinShort"]</span>
                         <span class="poker-detail-value poker-detail-value--price">R$ @Ev.CashMinBuyIn.Value.ToString("N2")</span>
                     </div>
                 }
                 @if (Ev.CashMaxBuyIn.HasValue)
                 {
                     <div class="poker-detail-item">
-                        <span class="poker-detail-label">Stack máximo</span>
+                        <span class="poker-detail-label">@Ui["Poker.StackMaxShort"]</span>
                         <span class="poker-detail-value poker-detail-value--price">R$ @Ev.CashMaxBuyIn.Value.ToString("N2")</span>
                     </div>
                 }

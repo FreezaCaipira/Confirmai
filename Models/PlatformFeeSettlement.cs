@@ -44,12 +44,12 @@ public class PlatformFeeSettlement
     public string? ReviewNote { get; set; }
 
     /// <summary>
-    /// Comma-separated list of EventIds selected by the organizer when submitting
-    /// this settlement. When the settlement is approved (Pago), these matches are
-    /// considered covered by this settlement.
+    /// Matches (events) selected by the organizer as covered by this settlement.
+    /// When the settlement is approved (Pago), these matches are considered paid.
+    /// Replaces the old <c>SelectedEventIds</c> CSV column with a proper table
+    /// that carries referential integrity and a per-match fee snapshot.
     /// </summary>
-    [StringLength(1000)]
-    public string? SelectedEventIds { get; set; }
+    public List<PlatformFeeSettlementItem> Items { get; set; } = new();
 }
 
 public enum PlatformFeeSettlementStatus

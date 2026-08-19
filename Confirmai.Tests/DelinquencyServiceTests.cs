@@ -47,7 +47,7 @@ public class DelinquencyServiceTests
         db.EventConfirmations.Add(fieldConf);
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1" };
 
         // Act
@@ -107,7 +107,7 @@ public class DelinquencyServiceTests
         db.EventConfirmations.Add(futureConf);
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1" };
 
         // Act
@@ -153,7 +153,7 @@ public class DelinquencyServiceTests
         db.EventConfirmations.Add(unpaidConf);
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1" };
 
         // Act
@@ -229,7 +229,7 @@ public class DelinquencyServiceTests
         db.EventConfirmations.Add(validConf);
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1" };
 
         // Act
@@ -290,7 +290,7 @@ public class DelinquencyServiceTests
         });
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1", "user-2" };
 
         // Act
@@ -330,7 +330,7 @@ public class DelinquencyServiceTests
         db.EventConfirmations.Add(new EventConfirmation { EventId = evt3.Id, UserId = "user-3", PaymentStatus = EventConfirmationPaymentStatus.Pending, HasPaid = false, Position = FutsalPosition.Outfield }); // 100
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1", "user-2", "user-3" };
 
         // Act
@@ -380,7 +380,7 @@ public class DelinquencyServiceTests
         db.EventConfirmations.Add(nonMemberConf);
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1" };  // Only user-1 is member
 
         // Act
@@ -433,7 +433,7 @@ public class DelinquencyServiceTests
         }
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1" };
 
         // Act
@@ -485,7 +485,7 @@ public class DelinquencyServiceTests
         db.EventConfirmations.Add(gatewayPaid);
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1" };
 
         // Act
@@ -525,7 +525,7 @@ public class DelinquencyServiceTests
         db.EventConfirmations.Add(new EventConfirmation { EventId = evt3.Id, UserId = "user-1", PaymentStatus = EventConfirmationPaymentStatus.Paid, HasPaid = true, Position = FutsalPosition.Outfield, MarkedPaidByUserId = "admin-1", MarkedPaidAt = now.AddMinutes(-20) });
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1" };
 
         // Act
@@ -561,7 +561,7 @@ public class DelinquencyServiceTests
         db.EventConfirmations.Add(new EventConfirmation { EventId = evt2.Id, UserId = "user-1", PaymentStatus = EventConfirmationPaymentStatus.Paid, HasPaid = true, Position = FutsalPosition.Outfield, MarkedPaidByUserId = "admin-2", MarkedPaidAt = DateTime.UtcNow });
         await db.SaveChangesAsync();
 
-        var service = new DelinquencyService(factory);
+        var service = new DelinquencyService(factory, Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions()));
         var memberIds = new HashSet<string> { "user-1" };
 
         // Act

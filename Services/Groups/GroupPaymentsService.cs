@@ -1,12 +1,15 @@
 using System.Security.Claims;
+using Confirmai.Configuration;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 using Confirmai.Services.Events;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Confirmai.Services.Groups;
 
@@ -21,17 +24,26 @@ public sealed class GroupPaymentsService
     private readonly AuthenticationStateProvider _authStateProvider;
     private readonly EventNotificationService _notificationService;
     private readonly LogService _logService;
+    private readonly IOptions<FeeOptions> _feeOptions;
+    private readonly PlatformFeeLedgerService _feeLedger;
+    private readonly ILogger<GroupPaymentsService> _logger;
 
     public GroupPaymentsService(
         IDbContextFactory<AppDbContext> dbFactory,
         AuthenticationStateProvider authStateProvider,
         EventNotificationService notificationService,
-        LogService logService)
+        LogService logService,
+        IOptions<FeeOptions> feeOptions,
+        PlatformFeeLedgerService feeLedger,
+        ILogger<GroupPaymentsService> logger)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
         _notificationService = notificationService;
         _logService = logService;
+        _feeOptions = feeOptions;
+        _feeLedger = feeLedger;
+        _logger = logger;
     }
 
     public async Task<string?> GetCurrentUserIdAsync()
@@ -61,6 +73,16 @@ public sealed class GroupPaymentsService
         var nowUtc = DateTime.UtcNow;
         var memberIds = group.Members.Select(m => m.UserId).ToHashSet();
         var sport = group.Sport;
+        var manualFee = _feeOptions.Value.ManualPlatformFeeFixed;
+        var gatewaysEnabled = group.EnablePaymentGateways;
+        var isFutsal = sport == Sport.Futsal;
+
+        // The player pays Price + ManualPlatformFeeFixed when the manual fee
+        // applies (futsal, no gateways, price > 0, fee > 0). The admin screens
+        // must show the same total the player was asked to pay — otherwise the
+        // proof says R$ 15,75 but the review screen shows R$ 15,00.
+        decimal TotalToPay(decimal basePrice)
+            => ManualPlatformFee.TotalToPay(gatewaysEnabled, isFutsal, basePrice, manualFee);
 
         var unpaidConfirmations = await db.EventConfirmations
             .Where(c =>
@@ -90,7 +112,7 @@ public sealed class GroupPaymentsService
                 var entries = g.Select(c =>
                 {
                     var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
-                    return new DelinquencyEntry(c.Id, c.EventId, c.Event.StartsAt, c.Event.Price!.Value, href, c.HasProof);
+                    return new DelinquencyEntry(c.Id, c.EventId, c.Event.StartsAt, TotalToPay(c.Event.Price!.Value), href, c.HasProof);
                 }).ToList();
                 return new UserDelinquency(g.Key, userName, entries);
             })
@@ -121,7 +143,7 @@ public sealed class GroupPaymentsService
             var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
             var userName = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
             var adminName = adminMap.TryGetValue(c.MarkedPaidByUserId!, out var n) ? n : "Admin";
-            return new PaymentHistoryEntry(userName, c.Event.StartsAt, c.Event.Price ?? 0, href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
+            return new PaymentHistoryEntry(userName, c.Event.StartsAt, TotalToPay(c.Event.Price ?? 0), href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
         }).ToList();
 
         var pendingProofs = await db.EventConfirmations
@@ -142,7 +164,7 @@ public sealed class GroupPaymentsService
             var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
             var userName = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
             var eventName = c.Event?.Location ?? "Partida";
-            return new PendingProofEntry(c.Id, c.UserId, userName, c.EventId, eventName, group.Name, c.Event!.StartsAt, c.Event.Price ?? 0, href, c.PixProofUploadedAt!.Value);
+            return new PendingProofEntry(c.Id, c.UserId, userName, c.EventId, eventName, group.Name, c.Event!.StartsAt, TotalToPay(c.Event.Price ?? 0), href, c.PixProofUploadedAt!.Value);
         }).ToList();
 
         return new GroupPaymentsData(delinquencyList, paymentHistory, pendingProofList);
@@ -165,6 +187,21 @@ public sealed class GroupPaymentsService
                 confirmationId.ToString(),
                 $"Admin marcou confirmacao #{confirmationId} do jogador {userId} como paga manualmente (grupo #{groupId})",
                 currentUserId, "GroupAdmin");
+
+            // Stamp the platform fee on this confirmation (V1 manual, futsal only).
+            // Same call AdminConfirmationService.TogglePaidAsync makes — without it,
+            // the fee never accrues and the organizer never sees these matches in
+            // the "Taxa da plataforma" tab.
+            try
+            {
+                await _feeLedger.StampFeeOnPaidAsync(confirmationId);
+            }
+            catch (Exception ex)
+            {
+                // Non-blocking for the admin, but never silent: an unstamped fee is revenue lost.
+                _logger.LogError(ex,
+                    "Falha ao carimbar a taxa da plataforma na confirmacao {ConfirmationId}", confirmationId);
+            }
         }
     }
 

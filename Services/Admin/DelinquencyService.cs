@@ -1,7 +1,10 @@
+using Confirmai.Configuration;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Payment;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Confirmai.Services.Admin;
 
@@ -12,10 +15,12 @@ namespace Confirmai.Services.Admin;
 public class DelinquencyService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
+    private readonly IOptions<FeeOptions> _feeOptions;
 
-    public DelinquencyService(IDbContextFactory<AppDbContext> dbFactory)
+    public DelinquencyService(IDbContextFactory<AppDbContext> dbFactory, IOptions<FeeOptions> feeOptions)
     {
         _dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
+        _feeOptions = feeOptions ?? throw new ArgumentNullException(nameof(feeOptions));
     }
 
     /// <summary>
@@ -25,11 +30,14 @@ public class DelinquencyService
     public async Task<List<UserDelinquency>> LoadUnpaidConfirmationsAsync(
         int groupId,
         HashSet<string> memberIds,
-        Sport sport)
+        Sport sport,
+        bool enablePaymentGateways = false)
     {
         await using var db = _dbFactory.CreateDbContext();
 
         var nowUtc = DateTime.UtcNow;
+        var manualFee = _feeOptions.Value.ManualPlatformFeeFixed;
+        var isFutsal = sport == Sport.Futsal;
 
         var unpaidConfirmations = await db.EventConfirmations
             .Where(c =>
@@ -72,7 +80,7 @@ public class DelinquencyService
                         c.Id,
                         c.EventId,
                         c.Event.StartsAt,
-                        c.Event.Price!.Value,
+                        ManualPlatformFee.TotalToPay(enablePaymentGateways, isFutsal, c.Event.Price!.Value, manualFee),
                         href,
                         c.HasProof);
                 }).ToList();
@@ -90,9 +98,13 @@ public class DelinquencyService
     public async Task<List<PaymentHistoryEntry>> LoadPaymentHistoryAsync(
         int groupId,
         HashSet<string> memberIds,
-        Sport sport)
+        Sport sport,
+        bool enablePaymentGateways = false)
     {
         await using var db = _dbFactory.CreateDbContext();
+
+        var manualFee = _feeOptions.Value.ManualPlatformFeeFixed;
+        var isFutsal = sport == Sport.Futsal;
 
         var manualPaid = await db.EventConfirmations
             .Where(c =>
@@ -121,7 +133,7 @@ public class DelinquencyService
             return new PaymentHistoryEntry(
                 userName,
                 c.Event.StartsAt,
-                c.Event.Price ?? 0,
+                ManualPlatformFee.TotalToPay(enablePaymentGateways, isFutsal, c.Event.Price ?? 0, manualFee),
                 href,
                 adminName,
                 c.MarkedPaidAt!.Value,

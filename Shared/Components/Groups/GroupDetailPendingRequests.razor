@@ -11,14 +11,14 @@
         <select class="input input--sm input--width-auto" value="@RequestSortOrder" @onchange="(e) => RequestSortOrderChanged.InvokeAsync((string?)e.Value ?? string.Empty)">
             <option value="newest">Mais recentes</option>
             <option value="oldest">Mais antigas</option>
-            <option value="name">Nome A-Z</option>
+            <option value="name">@Ui["Group.SortNameAZ"]</option>
         </select>
     </div>
     @if (SelectedCount > 0)
     {
         <div class="bulk-actions-row">
             <div class="bulk-actions">
-                <span class="bulk-count">@SelectedCount selecionado@(SelectedCount == 1 ? "" : "s")</span>
+                <span class="bulk-count">@SelectedCount @Ui["Group.Selected"]@(SelectedCount == 1 ? "" : "s")</span>
                 <button class="btn-approve btn-approve--sm" type="button"
                         @onclick="OnApproveSelected"
                         disabled="@IsBulkProcessing">
@@ -50,7 +50,7 @@
                     <input type="checkbox" id="req-@req.Id" checked="@SelectedRequestIds.Contains(req.Id)" @onchange="(e) => OnToggleSelection.InvokeAsync((req.Id, e.Value is true))" />
                 </div>
                 <div class="pending-request-info">
-                    <span class="pending-request-name">@(req.User?.FullName ?? req.User?.UserName ?? "Usuário")</span>
+                    <span class="pending-request-name">@(req.User?.FullName ?? req.User?.UserName ?? @Ui["Group.PendingRequestUserFallback"])</span>
                     <span class="pending-request-email">@req.User?.Email</span>
                     <div class="pending-request-meta">
                         <span class="pending-request-date">@Ui.FormatDateTime(req.RequestedAt.ToLocalTime(), "DateTimeShortCompact")</span>
@@ -60,12 +60,12 @@
                 <div class="pending-request-actions">
                     <button class="btn-approve" type="button"
                             @onclick="() => OnApprove.InvokeAsync(req.Id)"
-                            title="Aprovar solicitação">
+                            title="@Ui["Group.ApproveRequest"]">
                         <i class="fas fa-check"></i> Aprovar
                     </button>
                     <button class="btn-reject" type="button"
                             @onclick="() => OnReject.InvokeAsync(req.Id)"
-                            title="Rejeitar solicitação">
+                            title="@Ui["Group.RejectRequest"]">
                         <i class="fas fa-times"></i> Rejeitar
                     </button>
                 </div>

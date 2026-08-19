@@ -106,22 +106,13 @@ public class PlatformFeeLedgerService
             return Array.Empty<PlatformFeeMatchStatusProjection>();
 
         // Collect all event IDs covered by approved settlements (explicit selection).
-        var paidSettlementEventIds = await db.PlatformFeeSettlements
-            .Where(s => s.GroupId == groupId
-                && s.Status == PlatformFeeSettlementStatus.Pago
-                && s.SelectedEventIds != null)
-            .Select(s => s.SelectedEventIds!)
-            .ToListAsync();
-
-        var coveredEventIds = new HashSet<int>();
-        foreach (var csv in paidSettlementEventIds)
-        {
-            foreach (var idStr in csv.Split(',', StringSplitOptions.RemoveEmptyEntries))
-            {
-                if (int.TryParse(idStr.Trim(), out var id))
-                    coveredEventIds.Add(id);
-            }
-        }
+        var coveredEventIds = (await db.PlatformFeeSettlementItems
+            .AsNoTracking()
+            .Where(i => i.Settlement.GroupId == groupId
+                && i.Settlement.Status == PlatformFeeSettlementStatus.Pago)
+            .Select(i => i.EventId)
+            .ToListAsync())
+            .ToHashSet();
 
         var result = new List<PlatformFeeMatchStatusProjection>(matches.Count);
         foreach (var m in matches)
@@ -137,7 +128,7 @@ public class PlatformFeeLedgerService
     }
 }
 
-/// <summary>Per-match fee status after FIFO settlement allocation (Fase D).</summary>
+/// <summary>Per-match fee status after explicit settlement selection (Fase D).</summary>
 public record PlatformFeeMatchStatusProjection(
     int EventId,
     DateTime StartsAt,

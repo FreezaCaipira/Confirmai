@@ -103,6 +103,11 @@ public partial class AdminRevenue
     private async Task RejectSettlementAsync(int settlementId)
     {
         if (currentUserId is null) return;
+        if (string.IsNullOrWhiteSpace(rejectReason))
+        {
+            reviewMessage = T["AdminRevenue.RejectReasonRequired"];
+            return;
+        }
         rejectingSettlementId = settlementId;
         reviewMessage = string.Empty;
         try

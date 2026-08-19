@@ -129,22 +129,17 @@ public class PlatformFeeSettlementService
 
             // A match already covered by an approved or in-review settlement cannot
             // be selected again — otherwise the organizer would pay it twice.
-            var alreadyCoveredCsv = await db.PlatformFeeSettlements
+            var covered = await db.PlatformFeeSettlementItems
                 .AsNoTracking()
-                .Where(s => s.GroupId == groupId
-                    && s.SelectedEventIds != null
-                    && (s.Status == PlatformFeeSettlementStatus.Pago
-                        || s.Status == PlatformFeeSettlementStatus.EmAnalise))
-                .Select(s => s.SelectedEventIds!)
+                .Where(i => i.Settlement.GroupId == groupId
+                    && (i.Settlement.Status == PlatformFeeSettlementStatus.Pago
+                        || i.Settlement.Status == PlatformFeeSettlementStatus.EmAnalise))
+                .Select(i => i.EventId)
                 .ToListAsync();
 
-            var covered = alreadyCoveredCsv
-                .SelectMany(csv => csv.Split(',', StringSplitOptions.RemoveEmptyEntries))
-                .Select(s => int.TryParse(s.Trim(), out var id) ? id : 0)
-                .Where(id => id > 0)
-                .ToHashSet();
+            var coveredSet = covered.ToHashSet();
 
-            if (eventIds.Any(covered.Contains))
+            if (eventIds.Any(coveredSet.Contains))
             {
                 return new PlatformFeeSettlementResult
                 {
@@ -175,7 +170,13 @@ public class PlatformFeeSettlementService
                 ProofImageData = fileBytes,
                 ProofContentType = mimeType,
                 Status = PlatformFeeSettlementStatus.EmAnalise,
-                SelectedEventIds = string.Join(",", eventIds)
+                Items = eventIds
+                    .Select(eid => new PlatformFeeSettlementItem
+                    {
+                        EventId = eid,
+                        FeeAmount = accruedByEvent[eid]
+                    })
+                    .ToList()
             };
 
             db.PlatformFeeSettlements.Add(settlement);
@@ -239,6 +240,16 @@ public class PlatformFeeSettlementService
             {
                 Success = false,
                 Message = _ui["Payment.Settlement.AlreadyReviewed"]
+            };
+        }
+
+        // A rejection must carry a reason so the organizer knows what to fix.
+        if (!approved && string.IsNullOrWhiteSpace(note))
+        {
+            return new PlatformFeeSettlementResult
+            {
+                Success = false,
+                Message = _ui["Payment.Settlement.RejectReasonRequired"]
             };
         }
 

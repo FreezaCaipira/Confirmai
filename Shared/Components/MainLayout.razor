@@ -28,7 +28,7 @@
     <CascadingAuthenticationState>
         <div class="oldsite-page">
             <header class="oldsite-header">
-                <a href="/" class="oldsite-logo-wrap" aria-label="Início">
+                <a href="/" class="oldsite-logo-wrap" aria-label="@T["Group.Home"]">
                     <div class="oldsite-logo-art" aria-hidden="true"></div>
                     <h1 class="oldsite-logo">Confirma Aí!</h1>
                     <p class="oldsite-tagline">Bora jogar!?</p>
@@ -60,7 +60,7 @@
                     </div>
                     <AuthorizeView>
                         <Authorized>
-                            <a href="/grupos" class="oldsite-top-nav-link"><i class="fas fa-users" aria-hidden="true"></i> Grupos</a>
+                            <a href="/grupos" class="oldsite-top-nav-link"><i class="fas fa-users" aria-hidden="true"></i> @T["Groups.Title"]</a>
                         </Authorized>
                     </AuthorizeView>
                     <a href="/eventos" class="oldsite-top-nav-link"><span class="nav-icon-cycle" aria-hidden="true"><i class="fas fa-futbol nav-icon--a"></i><span class="nav-icon--b">🃏</span></span> @T["Nav.Sports"]</a>
@@ -74,7 +74,7 @@
                         </AuthorizeView>
                             <AuthorizeView Roles="admin">
                                 <Authorized Context="adminContext">
-                                    <a href="/admin" class="oldsite-top-nav-link">Admin</a>
+                                    <a href="/admin" class="oldsite-top-nav-link">@T["Nav.Admin"]</a>
                                 </Authorized>
                             </AuthorizeView>
 

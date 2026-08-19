@@ -237,16 +237,77 @@ internal static class GroupTexts
 
         // Partidas page
         ["Group.RecurringNotice"] = "Partidas geradas automaticamente (semanal)",
+
+        // Group detail components (C28 migration)
+        ["Group.NoMatchScheduledEmpty"] = "Nenhuma partida agendada.",
+        ["Group.NoMatchPlayed"] = "Nenhuma partida realizada.",
+        ["Group.NoMembers"] = "Sem membros.",
+        ["Group.PaymentsRefreshShort"] = "Recarregar",
+        ["Group.PlayerSentProof"] = "Jogador enviou comprovante",
+        ["Group.PendingRequestUserFallback"] = "Usuário",
+        ["Group.ApproveRequest"] = "Aprovar solicitação",
+        ["Group.RejectRequest"] = "Rejeitar solicitação",
+        ["Group.SortNameAZ"] = "Nome A-Z",
+        ["Group.Selected"] = "selecionado",
+        ["Group.Upcoming"] = "próximos",
+        ["Group.AttendanceRate"] = "Taxa de Presença",
+        ["Group.PendingRequestsLabel"] = "Solicitações Pendentes",
+        ["Group.ActionNeeded"] = "Ação necessária",
+        ["Group.NoFinishedMatches"] = "Nenhuma partida encerrada no período.",
+        ["Group.Wins"] = "Vitórias",
+        ["Group.RankingGames"] = "Partidas",
+        ["Group.RankingHighlights"] = "Destaques",
+        ["Group.WeeklyRecurrences"] = "Recorrências semanais",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        // Group detail components (C28 migration)
+        ["Group.NoMatchScheduledEmpty"] = "No matches scheduled.",
+        ["Group.NoMatchPlayed"] = "No matches played.",
+        ["Group.NoMembers"] = "No members.",
+        ["Group.PaymentsRefreshShort"] = "Reload",
+        ["Group.PlayerSentProof"] = "Player sent proof",
+        ["Group.PendingRequestUserFallback"] = "User",
+        ["Group.ApproveRequest"] = "Approve request",
+        ["Group.RejectRequest"] = "Reject request",
+        ["Group.SortNameAZ"] = "Name A-Z",
+        ["Group.Selected"] = "selected",
+        ["Group.Upcoming"] = "upcoming",
+        ["Group.AttendanceRate"] = "Attendance Rate",
+        ["Group.PendingRequestsLabel"] = "Pending Requests",
+        ["Group.ActionNeeded"] = "Action needed",
+        ["Group.NoFinishedMatches"] = "No finished matches in the period.",
+        ["Group.Wins"] = "Wins",
+        ["Group.RankingGames"] = "Matches",
+        ["Group.RankingHighlights"] = "Highlights",
+        ["Group.WeeklyRecurrences"] = "Weekly recurrences",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        // Group detail components (C28 migration)
+        ["Group.NoMatchScheduledEmpty"] = "Ninguna partida programada.",
+        ["Group.NoMatchPlayed"] = "Ninguna partida jugada.",
+        ["Group.NoMembers"] = "Sin miembros.",
+        ["Group.PaymentsRefreshShort"] = "Recargar",
+        ["Group.PlayerSentProof"] = "Jugador envió comprobante",
+        ["Group.PendingRequestUserFallback"] = "Usuario",
+        ["Group.ApproveRequest"] = "Aprobar solicitud",
+        ["Group.RejectRequest"] = "Rechazar solicitud",
+        ["Group.SortNameAZ"] = "Nombre A-Z",
+        ["Group.Selected"] = "seleccionado",
+        ["Group.Upcoming"] = "próximos",
+        ["Group.AttendanceRate"] = "Tasa de Asistencia",
+        ["Group.PendingRequestsLabel"] = "Solicitudes Pendientes",
+        ["Group.ActionNeeded"] = "Acción necesaria",
+        ["Group.NoFinishedMatches"] = "Ninguna partida finalizada en el período.",
+        ["Group.Wins"] = "Victorias",
+        ["Group.RankingGames"] = "Partidas",
+        ["Group.RankingHighlights"] = "Destaques",
+        ["Group.WeeklyRecurrences"] = "Recurrencias semanales",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

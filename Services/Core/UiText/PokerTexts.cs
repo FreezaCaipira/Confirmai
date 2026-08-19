@@ -133,16 +133,29 @@ internal static class PokerTexts
 
         // Late reg display
         ["Poker.LateRegUntil"] = "Late Reg até {0}",
+
+        // Poker detail info component (C28 migration)
+        ["Poker.MaxPlayersShort"] = "Máx. jogadores",
+        ["Poker.StackMinShort"] = "Stack mínimo",
+        ["Poker.StackMaxShort"] = "Stack máximo",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        // Poker detail info component (C28 migration)
+        ["Poker.MaxPlayersShort"] = "Max. players",
+        ["Poker.StackMinShort"] = "Min. stack",
+        ["Poker.StackMaxShort"] = "Max. stack",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        // Poker detail info component (C28 migration)
+        ["Poker.MaxPlayersShort"] = "Máx. jugadores",
+        ["Poker.StackMinShort"] = "Stack mínimo",
+        ["Poker.StackMaxShort"] = "Stack máximo",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

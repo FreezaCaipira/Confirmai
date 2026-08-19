@@ -86,11 +86,51 @@ public class PlatformFeeSettlementServiceTests
         Assert.NotNull(result.SettlementId);
 
         await using var verifyDb = ctx.factory.CreateDbContext();
-        var settlement = verifyDb.PlatformFeeSettlements.Single();
+        var settlement = await verifyDb.PlatformFeeSettlements
+            .Include(s => s.Items)
+            .SingleAsync();
         Assert.Equal(0.75m, settlement.Amount);
         Assert.Equal(organizer.Id, settlement.SubmittedByUserId);
         Assert.Equal(PlatformFeeSettlementStatus.EmAnalise, settlement.Status);
-        Assert.Equal(evt.Id.ToString(), settlement.SelectedEventIds);
+        var item = Assert.Single(settlement.Items);
+        Assert.Equal(evt.Id, item.EventId);
+        Assert.Equal(0.75m, item.FeeAmount);
+    }
+
+    [Fact]
+    public async Task SubmitSettlementAsync_MultipleMatches_StoresFeeSnapshotPerItem()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        // Match A: 2 paid players x R$0,75 = R$1,50 of accrued fee
+        var eA = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-10", "a1");
+        var playerA2 = TestDataFactory.CreateUserWithPixKey("p-a2", "JA2", "pix@a2");
+        ctx.db.Users.Add(playerA2);
+        await ctx.db.SaveChangesAsync();
+        var confA2 = TestDataFactory.CreateEventConfirmation(eA, playerA2);
+        confA2.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+        confA2.HasPaid = true;
+        confA2.PlatformFeeAmount = 0.75m;
+        ctx.db.EventConfirmations.Add(confA2);
+        await ctx.db.SaveChangesAsync();
+        // Match B: 1 paid player x R$0,75 = R$0,75 of accrued fee
+        var eB = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-11", "b");
+
+        var service = CreateService(ctx.factory);
+        var result = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 2.25m, FakeImage(), "image/jpeg", new[] { eA.Id, eB.Id });
+
+        Assert.True(result.Success);
+
+        await using var verifyDb = ctx.factory.CreateDbContext();
+        var settlement = await verifyDb.PlatformFeeSettlements
+            .Include(s => s.Items.OrderBy(i => i.EventId))
+            .SingleAsync();
+        Assert.Equal(2, settlement.Items.Count);
+        Assert.Equal(eA.Id, settlement.Items[0].EventId);
+        Assert.Equal(1.50m, settlement.Items[0].FeeAmount); // snapshot of accrued fee
+        Assert.Equal(eB.Id, settlement.Items[1].EventId);
+        Assert.Equal(0.75m, settlement.Items[1].FeeAmount);
     }
 
     [Fact]
@@ -338,6 +378,63 @@ public class PlatformFeeSettlementServiceTests
         var saved = verifyDb.PlatformFeeSettlements.Single();
         Assert.Equal(PlatformFeeSettlementStatus.Rejeitado, saved.Status);
         Assert.Equal("Valor incorreto", saved.ReviewNote);
+    }
+
+    [Fact]
+    public async Task ReviewSettlementAsync_RejectWithoutNote_IsRejected()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var adminId = await SeedSystemAdminAsync(ctx.db);
+
+        var settlement = new PlatformFeeSettlement
+        {
+            GroupId = group.Id,
+            Amount = 0.75m,
+            SubmittedByUserId = organizer.Id,
+            Status = PlatformFeeSettlementStatus.EmAnalise
+        };
+        ctx.db.PlatformFeeSettlements.Add(settlement);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx.factory);
+        var result = await service.ReviewSettlementAsync(
+            settlement.Id, adminId, approved: false, note: null);
+
+        Assert.False(result.Success);
+
+        await using var verifyDb = ctx.factory.CreateDbContext();
+        // Settlement must remain EmAnalise — the rejection was refused.
+        Assert.Equal(PlatformFeeSettlementStatus.EmAnalise,
+            verifyDb.PlatformFeeSettlements.Single().Status);
+    }
+
+    [Fact]
+    public async Task ReviewSettlementAsync_RejectWithWhitespaceNote_IsRejected()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var adminId = await SeedSystemAdminAsync(ctx.db);
+
+        var settlement = new PlatformFeeSettlement
+        {
+            GroupId = group.Id,
+            Amount = 0.75m,
+            SubmittedByUserId = organizer.Id,
+            Status = PlatformFeeSettlementStatus.EmAnalise
+        };
+        ctx.db.PlatformFeeSettlements.Add(settlement);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx.factory);
+        var result = await service.ReviewSettlementAsync(
+            settlement.Id, adminId, approved: false, note: "   ");
+
+        Assert.False(result.Success);
+
+        await using var verifyDb = ctx.factory.CreateDbContext();
+        Assert.Equal(PlatformFeeSettlementStatus.EmAnalise,
+            verifyDb.PlatformFeeSettlements.Single().Status);
     }
 
     [Fact]

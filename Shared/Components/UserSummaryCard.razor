@@ -1,4 +1,5 @@
 ﻿@using Confirmai.Models
+@inject UiTextService Ui
 
 <div class="user-summary-card">
     <div class="user-summary-avatar-wrap">
@@ -12,33 +13,33 @@
         }
     </div>
 
-    <p><b>Usuário:</b> @DisplayText(User.UserName)</p>
+    <p><b>@Ui["Shared.UserSummaryCard.User"]</b> @DisplayText(User.UserName)</p>
 
     @if (ShowUserId)
     {
         <p><b>ID:</b> @DisplayText(User.Id)</p>
     }
 
-    <p><b>Email:</b> @DisplayText(User.Email)</p>
-    <p><b>Nome completo:</b> @DisplayText(User.FullName)</p>
-    <p><b>Data de nascimento:</b> @(User.BirthDate?.ToString("dd/MM/yyyy") ?? "Não informada")</p>
+    <p><b>@Ui["Shared.UserSummaryCard.Email"]</b> @DisplayText(User.Email)</p>
+    <p><b>@Ui["Shared.UserSummaryCard.FullName"]</b> @DisplayText(User.FullName)</p>
+    <p><b>@Ui["Shared.UserSummaryCard.BirthDate"]</b> @(User.BirthDate?.ToString("dd/MM/yyyy") ?? @Ui["Shared.UserSummaryCard.NotInformedFemale"])</p>
 
     @if (ShowRoles)
     {
-        <p><b>Permissões:</b> @(RoleList.Count > 0 ? string.Join(", ", RoleList) : "user")</p>
+        <p><b>@Ui["Shared.UserSummaryCard.Permissions"]</b> @(RoleList.Count > 0 ? string.Join(", ", RoleList) : "user")</p>
     }
 
     @if (ShowStatus)
     {
         <p>
-            <b>Status:</b>
+            <b>@Ui["Shared.UserSummaryCard.Status"]</b>
             @if (User.LockoutEnd != null && User.LockoutEnd > DateTimeOffset.Now)
             {
                 <span class="user-summary-status-blocked">Bloqueado</span>
             }
             else
             {
-                <span class="user-summary-status-active">Ativo</span>
+                <span class="user-summary-status-active">@Ui["Shared.UserSummaryCard.Active"]</span>
             }
         </p>
     }

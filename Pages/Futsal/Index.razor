@@ -2,6 +2,7 @@
 @attribute [AllowAnonymous]
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@inject UiTextService Ui
 
 <PageTitle>Futsal · Confirmai</PageTitle>
 
@@ -72,7 +73,7 @@
                         }
                     </div>
                 </div>
-                <a href="/futsal/@ev.Id" class="event-action">Confirmar →</a>
+                <a href="/futsal/@ev.Id" class="event-action">@Ui["Common.Confirm"] →</a>
             </article>
         </EventCard>
     </EventListingShell>

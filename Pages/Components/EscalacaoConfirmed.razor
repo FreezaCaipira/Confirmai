@@ -1,6 +1,7 @@
 @using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
+@inject UiTextService Ui
 
 <div class="esc-teams">
     <div class="esc-team esc-team--a">
@@ -73,7 +74,7 @@
 @if (ConfirmationsReserva.Any())
 {
     <div class="esc-reserva">
-        <h3 class="esc-reserva-title">🔄 Reserva</h3>
+        <h3 class="esc-reserva-title">🔄 @Ui["Futsal.Reserve"]</h3>
         <ul class="esc-player-list">
             @foreach (var c in ConfirmationsReserva)
             {

@@ -18,7 +18,7 @@ internal static class AdminTexts
         ["Admin.Nav.Security"] = "Seguranca",
 
         ["AdminCommon.CloseNotice"] = "Fechar aviso",
-        ["AdminCommon.ExtraActions"] = "Acoes adicionais",
+        ["AdminCommon.ExtraActions"] = "Ações adicionais",
 
         ["AdminProducts.Kicker"] = "Painel administrativo",
         ["AdminProducts.Title"] = "Itens",
@@ -473,6 +473,7 @@ internal static class AdminTexts
         ["AdminRevenue.SettlementRejectPlaceholder"] = "Ex.: valor incorreto, comprovante ilegível",
         ["AdminRevenue.SettlementConfirmQuestion"] = "Confirmar o recebimento deste repasse?",
         ["AdminRevenue.SettlementSuccess"] = "Repasse revisado com sucesso.",
+        ["AdminRevenue.RejectReasonRequired"] = "Informe o motivo da rejeição.",
         ["AdminRevenue.SettlementError"] = "Erro ao revisar repasse.",
         ["AdminRevenue.SettlementEmpty"] = "Nenhum repasse aguardando revisão.",
         ["AdminRevenue.SettlementProofAlt"] = "Comprovante do repasse",
@@ -546,6 +547,11 @@ internal static class AdminTexts
         ["AdminParchmentLab.VariantD3"] = "Look de painel principal",
         ["AdminParchmentLab.Hint"] = "Sugestão: me diga a variante (A, B, C ou D) e eu aplico em todas as telas principais.",
         ["AdminParchmentLab.Back"] = "Voltar",
+
+        // Admin pages (C28 migration)
+        ["AdminUserView.Contact"] = "Contato",
+        ["AdminUserView.VenueManagerHint"] = "Permite criar e editar quadras/venues no portal do gestor.",
+        ["AdminPayments.StalenessAlertExplanation"] = "Explicação do alerta de obsolescência",
     };
 
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -1014,6 +1020,7 @@ internal static class AdminTexts
         ["AdminRevenue.SettlementRejectPlaceholder"] = "e.g. wrong amount, illegible proof",
         ["AdminRevenue.SettlementConfirmQuestion"] = "Confirm receipt of this settlement?",
         ["AdminRevenue.SettlementSuccess"] = "Settlement reviewed successfully.",
+        ["AdminRevenue.RejectReasonRequired"] = "Please provide a reason for the rejection.",
         ["AdminRevenue.SettlementError"] = "Error reviewing settlement.",
         ["AdminRevenue.SettlementEmpty"] = "No settlement awaiting review.",
         ["AdminRevenue.SettlementProofAlt"] = "Settlement proof",
@@ -1087,6 +1094,11 @@ internal static class AdminTexts
         ["AdminParchmentLab.VariantD3"] = "Main panel look",
         ["AdminParchmentLab.Hint"] = "Suggestion: tell me the variant (A, B, C or D) and I'll apply it to all main screens.",
         ["AdminParchmentLab.Back"] = "Back",
+
+        // Admin pages (C28 migration)
+        ["AdminUserView.Contact"] = "Contact",
+        ["AdminUserView.VenueManagerHint"] = "Allows creating and editing courts/venues in the manager portal.",
+        ["AdminPayments.StalenessAlertExplanation"] = "Staleness alert explanation",
     };
 
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -1555,6 +1567,7 @@ internal static class AdminTexts
         ["AdminRevenue.SettlementRejectPlaceholder"] = "ej. monto incorrecto, comprobante ilegible",
         ["AdminRevenue.SettlementConfirmQuestion"] = "Confirmar recepcion de esta liquidacion?",
         ["AdminRevenue.SettlementSuccess"] = "Liquidacion revisada con exito.",
+        ["AdminRevenue.RejectReasonRequired"] = "Informe el motivo del rechazo.",
         ["AdminRevenue.SettlementError"] = "Error al revisar la liquidacion.",
         ["AdminRevenue.SettlementEmpty"] = "Ninguna liquidacion pendiente de revision.",
         ["AdminRevenue.SettlementProofAlt"] = "Comprobante de liquidacion",
@@ -1628,6 +1641,11 @@ internal static class AdminTexts
         ["AdminParchmentLab.VariantD3"] = "Look de panel principal",
         ["AdminParchmentLab.Hint"] = "Sugerencia: dime la variante (A, B, C o D) y la aplico en todas las pantallas principales.",
         ["AdminParchmentLab.Back"] = "Atras",
+
+        // Admin pages (C28 migration)
+        ["AdminUserView.Contact"] = "Contacto",
+        ["AdminUserView.VenueManagerHint"] = "Permite crear y editar canchas/venues en el portal del gestor.",
+        ["AdminPayments.StalenessAlertExplanation"] = "Explicación de la alerta de obsolescencia",
     };
 
     /// <summary>

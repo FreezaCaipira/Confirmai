@@ -169,6 +169,26 @@ internal static class CoreTexts
         ["Payment.Save"] = "Salvar",
         ["Payment.Saving"] = "Salvando…",
         ["Payment.ManualFlow"] = "Este grupo utiliza o fluxo padrão: Pix direto para o organizador com envio de comprovante.",
+
+        // Shared components (C28 migration)
+        ["Shared.CitySelector.UseLocation"] = "Usar minha localização",
+        ["Shared.CitySelector.FilterLabel"] = "Filtro de cidade",
+        ["Shared.EntityProfileShell.AdditionalActions"] = "Ações adicionais",
+        ["Shared.EventListingShell.NextDay"] = "Próximo dia",
+        ["Shared.EventListingShell.Available"] = "disponíveis",
+        ["Shared.EventListingShell.SelectDate"] = "Selecionar data",
+        ["Shared.EventListingShell.PreviousDay"] = "Dia anterior",
+        ["Shared.EventListingShell.Loading"] = "Carregando",
+        ["Shared.EventListingShell.ViewToday"] = "Ver hoje",
+        ["Common.Page"] = "Página",
+        ["Shared.UserSummaryCard.User"] = "Usuário:",
+        ["Shared.UserSummaryCard.NotInformedFemale"] = "Não informada",
+        ["Shared.UserSummaryCard.Permissions"] = "Permissões:",
+        ["Shared.UserSummaryCard.Email"] = "Email:",
+        ["Shared.UserSummaryCard.FullName"] = "Nome completo:",
+        ["Shared.UserSummaryCard.BirthDate"] = "Data de nascimento:",
+        ["Shared.UserSummaryCard.Status"] = "Status:",
+        ["Shared.UserSummaryCard.Active"] = "Ativo",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
@@ -334,6 +354,26 @@ internal static class CoreTexts
         ["Payment.Save"] = "Save",
         ["Payment.Saving"] = "Saving…",
         ["Payment.ManualFlow"] = "This group uses the standard flow: direct Pix to the organizer with proof upload.",
+
+        // Shared components (C28 migration)
+        ["Shared.CitySelector.UseLocation"] = "Use my location",
+        ["Shared.CitySelector.FilterLabel"] = "City filter",
+        ["Shared.EntityProfileShell.AdditionalActions"] = "Additional actions",
+        ["Shared.EventListingShell.NextDay"] = "Next day",
+        ["Shared.EventListingShell.Available"] = "available",
+        ["Shared.EventListingShell.SelectDate"] = "Select date",
+        ["Shared.EventListingShell.PreviousDay"] = "Previous day",
+        ["Shared.EventListingShell.Loading"] = "Loading",
+        ["Shared.EventListingShell.ViewToday"] = "View today",
+        ["Common.Page"] = "Page",
+        ["Shared.UserSummaryCard.User"] = "User:",
+        ["Shared.UserSummaryCard.NotInformedFemale"] = "Not informed",
+        ["Shared.UserSummaryCard.Permissions"] = "Permissions:",
+        ["Shared.UserSummaryCard.Email"] = "Email:",
+        ["Shared.UserSummaryCard.FullName"] = "Full name:",
+        ["Shared.UserSummaryCard.BirthDate"] = "Date of birth:",
+        ["Shared.UserSummaryCard.Status"] = "Status:",
+        ["Shared.UserSummaryCard.Active"] = "Active",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
@@ -499,6 +539,26 @@ internal static class CoreTexts
         ["Payment.Save"] = "Guardar",
         ["Payment.Saving"] = "Guardando…",
         ["Payment.ManualFlow"] = "Este grupo usa el flujo estandar: Pix directo al organizador con envio de comprobante.",
+
+        // Shared components (C28 migration)
+        ["Shared.CitySelector.UseLocation"] = "Usar mi ubicación",
+        ["Shared.CitySelector.FilterLabel"] = "Filtro de ciudad",
+        ["Shared.EntityProfileShell.AdditionalActions"] = "Acciones adicionales",
+        ["Shared.EventListingShell.NextDay"] = "Día siguiente",
+        ["Shared.EventListingShell.Available"] = "disponibles",
+        ["Shared.EventListingShell.SelectDate"] = "Seleccionar fecha",
+        ["Shared.EventListingShell.PreviousDay"] = "Día anterior",
+        ["Shared.EventListingShell.Loading"] = "Cargando",
+        ["Shared.EventListingShell.ViewToday"] = "Ver hoy",
+        ["Common.Page"] = "Página",
+        ["Shared.UserSummaryCard.User"] = "Usuario:",
+        ["Shared.UserSummaryCard.NotInformedFemale"] = "No informada",
+        ["Shared.UserSummaryCard.Permissions"] = "Permisos:",
+        ["Shared.UserSummaryCard.Email"] = "Correo:",
+        ["Shared.UserSummaryCard.FullName"] = "Nombre completo:",
+        ["Shared.UserSummaryCard.BirthDate"] = "Fecha de nacimiento:",
+        ["Shared.UserSummaryCard.Status"] = "Estado:",
+        ["Shared.UserSummaryCard.Active"] = "Activo",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

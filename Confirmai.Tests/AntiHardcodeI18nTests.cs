@@ -5,10 +5,11 @@ using Xunit;
 namespace Confirmai.Tests;
 
 /// <summary>
-/// Anti-hardcode i18n convention test (Fase E, Ciclo 27 — third attempt).
+/// Anti-hardcode i18n convention test (Fase A, Ciclo 28 — beyond accented chars).
 /// Scans every .razor file under Pages/ and Shared/ for raw visible Portuguese
-/// literals (accented characters in element text, title, placeholder, alt,
-/// aria-label, and PageTitle). Fails when a literal is not in the allowlist.
+/// literals in element text, title, placeholder, alt, aria-label, and PageTitle.
+/// Detects both accented characters AND common unaccented Portuguese words.
+/// Fails when a literal is not in the allowlist.
 ///
 /// The allowlist is explicit and short: brand names, proper nouns, symbols,
 /// and a documented set of residuals being migrated incrementally. Each
@@ -23,6 +24,52 @@ public class AntiHardcodeI18nTests
         @"[áéíóúÁÉÍÓÚãõÃÕçÇâêôÂÊÔàèìòùÀÈÌÒÜüïñÑ]",
         RegexOptions.Compiled);
 
+    // Common unaccented Portuguese words that signal a raw visible literal.
+    // These are words so common in PT UI that their presence in a .razor file
+    // almost certainly means a hardcoded string instead of an i18n key.
+    // Short words (<= 3 chars) are excluded to avoid false positives (articles,
+    // prepositions that appear in CSS class names, expressions, etc.).
+    private static readonly HashSet<string> PtUnaccentedWords = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Voltar", "Grupos", "Total", "Enviar", "Salvar", "Cancelar", "Nome",
+        "Data", "Status", "Valor", "Preco", "Usuario", "Senha", "Email",
+        "Buscar", "Filtrar", "Limpar", "Editar", "Criar", "Excluir", "Remover",
+        "Adicionar", "Confirmar", "Rejeitar", "Aprovar", "Pendente", "Pago",
+        "Jogador", "Partida", "Grupo", "Evento", "Perfil", "Conta", "Pagamento",
+        "Comprovante", "Repasse", "Taxa", "Historico", "Resumo", "Detalhes",
+        "Configuracoes", "Notificacoes", "Mensagem", "Erro", "Sucesso",
+        "Carregando", "Nenhum", "Nenhuma", "Disponivel", "Indisponivel",
+        "Ativo", "Inativo", "Sim", "Nao", "Todos", "Todas", "Novo", "Nova",
+        "Anterior", "Proximo", "Primeiro", "Ultimo", "Inicio", "Fim",
+        "Vitorias", "Derrotas", "Empates", "Jogos", "Pontos", "Posicao",
+        "Ranking", "Classificacao", "Estatisticas", "Presenca", "Faltas",
+        "Organizador", "Admin", "Administrador", "Membro", "Membros",
+        "Solicitacao", "Solicitacoes", "Aprovar", "Rejeitar", "Pendente",
+        "Pendentes", "Atrasado", "Atrasados", "Vencido", "Vencidos",
+        "Receber", "Pagar", "Pago", "Divida", "Saldo", "Credito",
+        "Chave", "Codigo", "Telefone", "Endereco", "Cidade", "Estado",
+        "Bairro", "Rua", "Numero", "Complemento", "Cep",
+        "Segunda", "Terca", "Quarta", "Quinta", "Sexta", "Sabado", "Domingo",
+        "Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+        "Hoje", "Ontem", "Amanha", "Semana", "Mes", "Ano",
+        "Min", "Max", "Maximo", "Minimo", "Quantidade", "Qtd",
+        "Tipo", "Categoria", "Descricao", "Observacao", "Nota",
+        "Acao", "Acoes", "Visualizar", "Baixar", "Imprimir", "Compartilhar",
+        "Login", "Logout", "Registrar", "Cadastrar", "Esqueci", "Lembrar",
+        "Termos", "Privacidade", "Sobre", "Ajuda", "Suporte", "Contato",
+        "Configurar", "Habilitar", "Desabilitar", "Ativar", "Desativar",
+        "Pausar", "Continuar", "Iniciar", "Parar", "Resetar", "Atualizar",
+        "Recarregar", "Sincronizar", "Exportar", "Importar",
+        "Selecionar", "Selecionado", "Selecionados", "Marca", "Marcado",
+        "Desmarcar", "Expandir", "Recolher", "Mostrar", "Ocultar",
+        "Visivel", "Oculto", "Publico", "Privado",
+        "Casa", "Fora", "Mandante", "Visitante",
+        "Gol", "Gols", "Cartao", "Amarelo", "Vermelho",
+        "Substituicao", "Substituicoes", "Escalacao", "Titular", "Reserva",
+        "Reservas", "Bancao", "Waitlist", "Lista",
+    };
+
     // Visible attributes that should not contain raw Portuguese literals.
     private static readonly Regex VisibleAttributeRegex = new(
         @"(?:placeholder|title|alt|aria-label)\s*=\s*""([^""]*)""",
@@ -33,9 +80,10 @@ public class AntiHardcodeI18nTests
         @"<PageTitle>\s*(.*?)\s*</PageTitle>",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
-    // Element text content (between > and <) — only captures text with accents.
+    // Element text content (between > and <) — captures text with accents OR
+    // common unaccented PT words.
     private static readonly Regex ElementTextRegex = new(
-        @">\s*([^<>{]*[áéíóúÁÉÍÓÚãõÃÕçÇâêôÂÊÔàèìòùÀÈÌÒÜüïñÑ][^<]*)\s*<",
+        @">\s*([^<>{]+)\s*<",
         RegexOptions.Compiled);
 
     // Lines to skip: Blazor directives, comments, code blocks, CSS, @attributes.
@@ -62,41 +110,6 @@ public class AntiHardcodeI18nTests
         // the format pattern into the i18n value, but they're low risk.
         "EventPayment|às",
         "EventPaymentProof|às",
-
-        // ── Shared/Components residuals (C28 target). Each is a visible PT
-        // literal in a component that doesn't yet have @inject UiTextService.
-        // Migrating them requires adding the inject + keys to each component.
-        "CitySelector|Usar minha localização",
-        "EntityProfileShell|Ações adicionais",
-        "EventListingShell|Próximo dia",
-        "EventListingShell|disponíveis",
-        "MainLayout|Início",
-        "PaginationControls|Página",
-        "UserSummaryCard|Usuário:",
-        "UserSummaryCard|Não informada",
-        "UserSummaryCard|Permissões:",
-        "FutsalWaitlist|Você",
-        "GroupDetailEvents|Partida semanal automática",
-        "GroupDetailMembers|Você",
-        "GroupDetailPaymentsModal|Enviar e-mail de cobrança",
-        "GroupDetailPendingRequests|Usuário",
-        "GroupDetailPendingRequests|Aprovar solicitação",
-        "GroupDetailPendingRequests|Rejeitar solicitação",
-        "GroupMetrics|próximos",
-        "GroupMetrics|Taxa de Presença",
-        "GroupMetrics|Solicitações Pendentes",
-        "GroupMetrics|Ação necessária",
-        "RankingTable|Nenhuma partida encerrada no período.",
-        "RankingTable|Vitórias",
-        "RankingTable|Você",
-        "PokerDetailInfo|Máx. jogadores",
-        "PokerDetailInfo|Preços",
-        "PokerDetailInfo|Stack mínimo",
-        "PokerDetailInfo|Stack máximo",
-
-        // ── Pages residuals not in the Senior's list of 8 (C28 target).
-        "AdminPaymentsSummaryPanel|Explicação do alerta de obsolescência",
-        "Index|Recorrências semanais",
     };
 
     private static IEnumerable<string> GetRazorFiles()
@@ -154,7 +167,7 @@ public class AntiHardcodeI18nTests
                 foreach (Match m in attrMatches)
                 {
                     var value = m.Groups[1].Value;
-                    if (AccentedCharRegex.IsMatch(value) && !IsAllowed(fileName, value))
+                    if (IsPortugueseLiteral(value) && !IsAllowed(fileName, value))
                         violations.Add($"{relativePath}:{lineNum} attr=\"{value}\"");
                 }
 
@@ -163,7 +176,7 @@ public class AntiHardcodeI18nTests
                 foreach (Match m in textMatches)
                 {
                     var text = m.Groups[1].Value.Trim();
-                    if (text.Length > 0 && AccentedCharRegex.IsMatch(text) && !IsAllowed(fileName, text))
+                    if (text.Length > 0 && IsPortugueseLiteral(text) && !IsAllowed(fileName, text))
                         violations.Add($"{relativePath}:{lineNum} text=\"{text}\"");
                 }
             }
@@ -174,6 +187,46 @@ public class AntiHardcodeI18nTests
             $"Raw Portuguese literals found in .razor files (not in allowlist):\n" +
             string.Join("\n", violations.Take(50)) +
             (violations.Count > 50 ? $"\n... and {violations.Count - 50} more." : ""));
+    }
+
+    /// <summary>
+    /// Returns true if the text contains accented PT characters OR at least
+    /// one common unaccented PT word (as a whole word, case-insensitive).
+    /// Skips text that is primarily a Blazor expression (starts with @ or
+    /// contains @() blocks) to avoid flagging code as a literal.
+    /// </summary>
+    private static bool IsPortugueseLiteral(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return false;
+
+        // Skip Blazor expressions: @variable, @(expression), @T["..."], @Ui["..."]
+        // These are code, not visible literals. But if there's visible PT text
+        // mixed in (e.g. "Voltar" outside an @()), we still want to catch it.
+        // Strategy: strip @(...) blocks, @T/Ui["..."] lookups, and @Variable tokens,
+        // then check the remainder for PT words.
+        var stripped = Regex.Replace(text, @"@\([^)]*\)", " ");
+        stripped = Regex.Replace(stripped, @"@[A-Za-z]+\s*\[""[^""]*""\]", " ");
+        stripped = Regex.Replace(stripped, @"@[A-Za-z_][A-Za-z0-9_.?]*\([^)]*\)", " ");
+        stripped = Regex.Replace(stripped, @"@[A-Za-z_][A-Za-z0-9_.?]*", " ");
+        stripped = stripped.Trim();
+
+        if (string.IsNullOrWhiteSpace(stripped)) return false;
+
+        // Fast path: accented characters always flag.
+        if (AccentedCharRegex.IsMatch(stripped)) return true;
+
+        // Check for common unaccented PT words (whole-word match).
+        var words = stripped.Split(new[] { ' ', '\t', ',', '.', ':', ';', '!', '?', '-', '/', '(', ')', '"', '\'' },
+            StringSplitOptions.RemoveEmptyEntries);
+        foreach (var word in words)
+        {
+            var clean = word.Trim(new[] { '<', '>', '{', '}', '&', ';', '=' });
+            if (clean.Length < 3) continue;
+            if (PtUnaccentedWords.Contains(clean))
+                return true;
+        }
+
+        return false;
     }
 
     private static bool IsAllowed(string fileName, string literal)

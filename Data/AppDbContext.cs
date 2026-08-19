@@ -29,6 +29,7 @@ namespace Confirmai.Data
         public DbSet<MatchSchedule> RachaSchedules { get; set; }
         public DbSet<PostMatchVote> PostMatchVotes { get; set; }
         public DbSet<PlatformFeeSettlement> PlatformFeeSettlements { get; set; }
+        public DbSet<PlatformFeeSettlementItem> PlatformFeeSettlementItems { get; set; }
 
         // Server integration
         public DbSet<ServerApiKey> ServerApiKeys { get; set; }
@@ -512,6 +513,25 @@ namespace Confirmai.Data
                 .WithMany()
                 .HasForeignKey(v => v.VotedForUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // PlatformFeeSettlementItem — one row per match covered by a settlement.
+            // Cascade from Settlement (deleting a settlement removes its items);
+            // Restrict from Event (a match with settlements must not be hard-deleted).
+            modelBuilder.Entity<PlatformFeeSettlementItem>()
+                .HasOne(i => i.Settlement)
+                .WithMany(s => s.Items)
+                .HasForeignKey(i => i.SettlementId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PlatformFeeSettlementItem>()
+                .HasOne(i => i.Event)
+                .WithMany()
+                .HasForeignKey(i => i.EventId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PlatformFeeSettlementItem>()
+                .HasIndex(i => new { i.SettlementId, i.EventId })
+                .IsUnique();
         }
     }
 }

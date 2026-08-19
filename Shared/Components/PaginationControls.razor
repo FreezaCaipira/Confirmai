@@ -1,7 +1,8 @@
 @* DEPRECATED/INTERNAL: componente mantido apenas para histórico; não usar em páginas ativas. *@
+@inject UiTextService Ui
 <div class="pagination">
     <button type="button" @onclick="HandlePreviousAsync" disabled="@IsPreviousDisabled">@PreviousLabel</button>
-    <span class="pagination-info">Página @CurrentPage de @TotalPages</span>
+    <span class="pagination-info">@Ui["Common.Page"] @CurrentPage de @TotalPages</span>
     <button type="button" @onclick="HandleNextAsync" disabled="@IsNextDisabled">@NextLabel</button>
 </div>
 

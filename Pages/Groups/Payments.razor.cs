@@ -6,6 +6,7 @@ using Confirmai.Services.Groups;
 using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Groups;
@@ -16,6 +17,7 @@ public partial class Payments
     [Inject] private GroupPaymentsService GroupPayments { get; set; } = default!;
     [Inject] private PlatformFeeSettlementQueryService FeeQuery { get; set; } = default!;
     [Inject] private PlatformFeeSettlementService FeeSettlement { get; set; } = default!;
+    [Inject] private ILogger<Payments> Logger { get; set; } = default!;
 
     public record HistoryEntry(DateTime EventDate, decimal EventPrice, string AdminName, string EventHref, bool HasProof, int? ConfirmationId);
     public record HistoryGroup(string UserName, List<HistoryEntry> Entries, decimal TotalAmount);
@@ -73,9 +75,7 @@ public partial class Payments
     private decimal SelectedFeeAmount =>
         feeOverview is null
             ? 0m
-            : feeOverview.Matches
-                .Where(m => selectedFeeEventIds.Contains(m.EventId))
-                .Sum(m => m.FeeAmount);
+            : PlatformFeeSelectionState.SelectedAmount(feeOverview.Matches, selectedFeeEventIds);
 
     private void ToggleFeeMatchSelection(int eventId)
     {
@@ -264,19 +264,6 @@ public partial class Payments
         }
     }
 
-    private async Task RefreshFeeOverview()
-    {
-        isLoadingFee = true;
-        try
-        {
-            feeOverview = await FeeQuery.GetGroupFeeOverviewAsync(Id);
-        }
-        finally
-        {
-            isLoadingFee = false;
-        }
-    }
-
     private void HandleProofFileSelected(InputFileChangeEventArgs e)
     {
         selectedProofFile = e.File;
@@ -286,7 +273,7 @@ public partial class Payments
 
     private void ShowSettlementConfirmModal()
     {
-        if (selectedFeeEventIds.Count == 0)
+        if (!PlatformFeeSelectionState.CanSubmit(selectedFeeEventIds))
         {
             settlementError = Ui["Group.PlatformFeeSelectMatches"];
             return;
@@ -327,7 +314,7 @@ public partial class Payments
                 selectedFeeEventIds.Clear();
                 selectedProofFile = null;
                 showSettlementConfirmModal = false;
-                await RefreshFeeOverview();
+                await LoadFeeOverviewAsync();
             }
             else
             {
@@ -340,8 +327,9 @@ public partial class Payments
             settlementError = Ui["Group.PlatformFeeSubmitError"];
             showSettlementConfirmModal = false;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.LogError(ex, "Erro inesperado ao enviar repasse da taxa do grupo {GroupId}", group.Id);
             settlementError = Ui["Group.PlatformFeeSubmitError"];
             showSettlementConfirmModal = false;
         }
