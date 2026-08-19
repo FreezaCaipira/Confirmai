@@ -16,7 +16,7 @@ namespace Confirmai.Tests;
 
 public class GroupPaymentsServiceTests
 {
-    private static (IDbContextFactory<AppDbContext> factory, GroupPaymentsService svc) Setup(string? userId = null)
+    private static (IDbContextFactory<AppDbContext> factory, GroupPaymentsService svc) Setup(string? userId = null, decimal manualFee = 0m)
     {
         var factory = TestDbContextFactory.CreateInMemoryFactory($"gpay-{Guid.NewGuid()}");
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
@@ -29,17 +29,18 @@ public class GroupPaymentsServiceTests
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(identity)));
         var emailSenderMock = new Mock<IEmailSender>();
         var notificationService = new EventNotificationService(factory, emailSenderMock.Object, NullLogger<EventNotificationService>.Instance);
-        var svc = new GroupPaymentsService(factory, authMock.Object, notificationService, logService);
+        var svc = new GroupPaymentsService(factory, authMock.Object, notificationService, logService,
+            Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions { ManualPlatformFeeFixed = manualFee }));
         return (factory, svc);
     }
 
-    private static async Task<(IDbContextFactory<AppDbContext> factory, GroupPaymentsService svc, int groupId, Group group)> SetupWithGroupAndAdminAsync()
+    private static async Task<(IDbContextFactory<AppDbContext> factory, GroupPaymentsService svc, int groupId, Group group)> SetupWithGroupAndAdminAsync(decimal manualFee = 0m)
     {
-        var (factory, svc) = Setup("admin-1");
+        var (factory, svc) = Setup("admin-1", manualFee);
         await using var db = factory.CreateDbContext();
         db.Users.Add(new ApplicationUser { Id = "admin-1", UserName = "Admin", FullName = "Admin User" });
         db.Users.Add(new ApplicationUser { Id = "player-1", UserName = "Player1", FullName = "Player One" });
-        var group = new Group { Name = "Test Group", Sport = Sport.Futsal, CreatedByUserId = "admin-1" };
+        var group = new Group { Name = "Test Group", Sport = Sport.Futsal, EnablePaymentGateways = false, CreatedByUserId = "admin-1" };
         db.Groups.Add(group);
         db.GroupMembers.Add(new GroupMember { UserId = "admin-1", GroupId = 0, Role = GroupMemberRole.Admin });
         await db.SaveChangesAsync();
@@ -287,5 +288,116 @@ public class GroupPaymentsServiceTests
         });
 
         await svc.NotifyDelinquencyAsync(d, "admin-1", "Test Group", groupId);
+    }
+
+    // ── Manual platform fee inclusion (bug fix: admin must see Price + Fee) ──
+
+    [Fact]
+    public async Task LoadPaymentsDataAsync_DelinquencyIncludesManualFee_WhenFutsalManualMode()
+    {
+        var (factory, svc, groupId, group) = await SetupWithGroupAndAdminAsync(manualFee: 0.75m);
+        await using var db = factory.CreateDbContext();
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "Quadra",
+            StartsAt = DateTime.UtcNow.AddDays(-1), Price = 15m, MaxPlayers = 10
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId = ev.Id, UserId = "player-1", HasPaid = false,
+            PaymentStatus = EventConfirmationPaymentStatus.Pending,
+            Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var data = await svc.LoadPaymentsDataAsync(groupId, group);
+
+        Assert.Single(data.DelinquencyList);
+        Assert.Equal(15.75m, data.DelinquencyList[0].Entries[0].EventPrice);
+        Assert.Equal(15.75m, data.DelinquencyList[0].TotalAmount);
+    }
+
+    [Fact]
+    public async Task LoadPaymentsDataAsync_PendingProofIncludesManualFee_WhenFutsalManualMode()
+    {
+        var (factory, svc, groupId, group) = await SetupWithGroupAndAdminAsync(manualFee: 0.75m);
+        await using var db = factory.CreateDbContext();
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "Quadra",
+            StartsAt = DateTime.UtcNow.AddDays(-1), Price = 15m, MaxPlayers = 10
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId = ev.Id, UserId = "player-1", HasPaid = false,
+            PaymentStatus = EventConfirmationPaymentStatus.Pending,
+            Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow,
+            PixProofUploadedAt = DateTime.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var data = await svc.LoadPaymentsDataAsync(groupId, group);
+
+        Assert.Single(data.PendingProofList);
+        Assert.Equal(15.75m, data.PendingProofList[0].EventPrice);
+    }
+
+    [Fact]
+    public async Task LoadPaymentsDataAsync_PaymentHistoryIncludesManualFee_WhenFutsalManualMode()
+    {
+        var (factory, svc, groupId, group) = await SetupWithGroupAndAdminAsync(manualFee: 0.75m);
+        await using var db = factory.CreateDbContext();
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "Quadra",
+            StartsAt = DateTime.UtcNow.AddDays(-2), Price = 15m, MaxPlayers = 10
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId = ev.Id, UserId = "player-1", HasPaid = true,
+            PaymentStatus = EventConfirmationPaymentStatus.Paid,
+            Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow,
+            MarkedPaidByUserId = "admin-1", MarkedPaidAt = DateTime.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var data = await svc.LoadPaymentsDataAsync(groupId, group);
+
+        Assert.Single(data.PaymentHistory);
+        Assert.Equal(15.75m, data.PaymentHistory[0].EventPrice);
+    }
+
+    [Fact]
+    public async Task LoadPaymentsDataAsync_DoesNotAddFee_WhenGatewaysEnabled()
+    {
+        var (factory, svc, groupId, group) = await SetupWithGroupAndAdminAsync(manualFee: 0.75m);
+        // Override: turn on gateways — fee should NOT apply
+        group.EnablePaymentGateways = true;
+        await using var db = factory.CreateDbContext();
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "Quadra",
+            StartsAt = DateTime.UtcNow.AddDays(-1), Price = 15m, MaxPlayers = 10
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId = ev.Id, UserId = "player-1", HasPaid = false,
+            PaymentStatus = EventConfirmationPaymentStatus.Pending,
+            Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var data = await svc.LoadPaymentsDataAsync(groupId, group);
+
+        Assert.Single(data.DelinquencyList);
+        Assert.Equal(15m, data.DelinquencyList[0].Entries[0].EventPrice);
     }
 }
