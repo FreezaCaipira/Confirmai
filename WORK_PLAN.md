@@ -166,11 +166,53 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 27 | Fechar a Fase 3 (UI do repasse) + Fase 6 (anti-hardcode) | 6 fases entregues: (A) UI do repasse lado organizador em `Payments.razor` (aba "Taxa da plataforma", lista por partida, somatório, Pix da plataforma via config + QR, enviar comprovante, histórico); (B) UI do repasse lado admin em `AdminRevenue.razor` (grupos com saldo, fila de lotes, confirmar/rejeitar com motivo); (C) endpoint `GET /api/fee-settlement-proof/{id}` com autorização extraída para `PlatformFeeSettlementProofAuthorizer` + 10 testes de autorização; (D) baixa FIFO por partida em `PlatformFeeLedgerService.GetGroupFeeBreakdownByMatchAsync` + 10 testes; (E) teste anti-hardcode de verdade (`AntiHardcodeI18nTests` varre 143 `.razor`, allowlist explícita) + 7 residuais migrados + removido `if (enUs.Count == 0) return;` do `I18nKeyParityTests`; (F) limpeza C26: `eval`→`site.js` função nomeada, `StateHasChanged` após `_highlightPix`, 11 mensagens de service via `UiTextService`, indentação `Program.cs`. 2223→2261 (+38). | #90 (impl), #91 (review) | APROVADO c/ ressalvas -- Senior removeu endpoint de seed aberto e fechou 3 furos financeiros |
 
+| 28 | Fechar as ressalvas do C27 | 5 fases entregues: (A) `AntiHardcodeI18nTests` agora detecta tambem palavra PT **sem** acento (lista de ~150 palavras) -- validado empiricamente pelo Senior; (B) `Shared/Components/**` migrado, allowlist de ~24 entradas reduzida a 2 (formato de data com "as") + marca; (C) CSV `SelectedEventIds` -> tabela `PlatformFeeSettlementItem` com FK + indice unico + migration com **backfill** e `Down` reversivel; (D) `PlatformFeeSelectionState` (helper puro) + rejeicao exige motivo **no service**; (E) higiene do `Payments` (`catch` loga, metodos duplicados unificados). Extras achados pelo Pleno testando: `MarkPaidAsync` nao carimbava a taxa (repasse nunca fechava pela aba Comprovantes) e telas do admin mostravam R$ 15,00 enquanto o jogador pagava R$ 15,75. 2261->2287 (+26). | #92 (impl), #93 (review) | APROVADO -- Senior fechou 1 furo de residuo de taxa |
+
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
 ---
 
 # Detalhes dos Ciclos Recentes (planos + reviews na integra)
+
+---
+
+## Review Senior do Ciclo 28 (PR #92, mergeada na `main`) -- APROVADO
+
+**Escopo revisado**: commits `f030cd7`..`cbb6331` (8 commits, 54 arquivos, +3126/-208), mergeados via `b972a75`.
+
+**Build**: `dotnet build --no-incremental` -> **0 warning / 0 error** (meta do ciclo cumprida).
+**Testes**: **2287 verdes** (era 2267, +20), 24 falhas = `ProgramConfigurationTests` sem PostgreSQL em `127.0.0.1:5432` -- **ambientais**, mesmas de sempre.
+
+### Resultado por fase
+
+| Fase | Veredito | Observacao |
+|---|---|---|
+| A -- anti-hardcode alem do acento | **OK, verificado empiricamente** | `PtUnaccentedWords` com ~150 palavras PT comuns + strip de expressoes Blazor (`@(...)`, `@Ui["..."]`, `@Variavel`) antes de avaliar. Nao aceitei so a leitura: injetei `<span>Enviar comprovante</span>` num componente de `Shared` e o teste **falhou apontando arquivo e linha** (143 arquivos / 13.713 linhas varridos); revertido depois. A regra 25 agora tem guarda de verdade. |
+| B -- migrar `Shared/Components/**` | **OK** | A allowlist saiu de ~24 entradas de `Shared` para **2** (`EventPayment|as` e `EventPaymentProof|as`, ambas o "as" **dentro de format string de data**, nao texto visivel) + marca (`Confirmai`, `Confirma Ai!`, `Bora jogar!?`). 12 componentes de `Shared` migrados, ~130 chaves novas em `CoreTexts`/`GroupTexts`/`FutsalTexts`/`PokerTexts`/`AdminTexts`. |
+| C -- CSV -> tabela | **OK, migration bem feita** | `PlatformFeeSettlementItem` (`SettlementId`, `EventId`, `FeeAmount`) com FK `Cascade` p/ settlement, `Restrict` p/ evento e indice **unico** `(SettlementId, EventId)`. A migration cria a tabela, **faz backfill** do CSV (`string_to_array`/`unnest`, `FeeAmount` = soma de `PlatformFeeAmount` do evento) e **so depois** dropa a coluna -- ordem correta, nada de dado perdido; o `Down` reconstroi o CSV a partir dos itens. Ledger e service passaram a consultar a tabela em vez de parsear texto. |
+| D -- cobertura das telas | **OK** | `PlatformFeeSelectionState` (`IsSelectable`, `SelectedAmount`, `CanSubmit`) extraido puro e coberto por 9 testes, com a pagina delegando; rejeicao **sem motivo** agora e recusada **no service** (`ReviewSettlementAsync`) e tambem na UI (defense in depth) -- o certo, ja que a UI nao e fronteira de seguranca. |
+| E -- higiene | **OK** | `catch (Exception)` do `ConfirmSettlementSubmit` agora usa `LogError`; `RefreshFeeOverview`/`LoadFeeOverviewAsync` (identicos) unificados. |
+
+### Dois bugs de dinheiro que o Pleno achou testando (fora do plano, com razao)
+
+1. **`MarkPaidAsync` nao carimbava a taxa.** Existem dois caminhos para o organizador confirmar o pagamento do jogador: `AdminConfirmationService.TogglePaidAsync` (que chamava `StampFeeOnPaidAsync`) e `GroupPaymentsService.MarkPaidAsync`, usado pela aba **Comprovantes** de `/grupo/{id}/pagamentos` -- que **nao chamava**. Ou seja: quem confirmava pela aba de comprovantes marcava o jogador como pago e a taxa **nunca entrava no ledger**; a partida nao aparecia na aba "Taxa da plataforma" e o repasse nunca fechava. Corrigido com o mesmo padrao do outro caminho (try/catch com `LogError`, non-blocking mas nunca silencioso) + teste.
+2. **Admin via R$ 15,00 onde o jogador pagava R$ 15,75.** `GroupPaymentsService` e `DelinquencyService` montavam `DelinquencyEntry`/`PendingProofEntry`/`PaymentHistoryEntry` com `Event.Price` cru, sem a taxa manual -- o comprovante dizia 15,75 e a tela de revisao dizia 15,00. Agora os tres pontos usam `ManualPlatformFee.TotalToPay(...)`, a mesma fonte do QR e da tela do jogador (+4 testes).
+
+Ambos sao exatamente o tipo de achado que eu quero do Pleno: bug real no caminho do dinheiro, com teste. Tambem entrou um `ManualPlatformFeeFlowE2ETests` costurando a cadeia inteira (comprovante do jogador -> confirmacao -> carimbo da taxa -> lote -> aprovacao -> saldo zerado).
+
+### Correcao aplicada pelo Senior nesta review (PR #93)
+
+**P1 -- taxa residual ficava impossivel de quitar.** Com a selecao explicita, o status por partida era booleano: `EventId` presente em algum lote `Pago` => partida `Pago`. Cenario real: o organizador envia o repasse na quarta cobrindo a partida de segunda; na quinta um **jogador atrasado paga a mesma partida** e o `StampFeeOnPaidAsync` acumula outros R$ 0,75. Resultado antes do fix: a partida aparecia `Pago` (nao selecionavel), mas o saldo agregado do grupo (`accrued - settled`) continuava acusando R$ 0,75 de divida -- **divida visivel que o organizador nao tinha como pagar**, e que o admin cobraria sem contrapartida na tela.
+- `GetGroupFeeBreakdownByMatchAsync` passou a comparar **valores**: `covered` = soma do `FeeAmount` dos itens em lotes `Pago`; a partida so e `Pago` quando `covered >= accrued`, senao continua `Pendente` **exibindo o residual**.
+- `SubmitSettlementAsync` acompanha: o bloqueio de reenvio agora e (a) partida em lote `EmAnalise` **ou** (b) residual `<= 0`; e o `expected` do `amount` (e o `FeeAmount` do item) passou a ser o **residual**, nao o acumulado -- senao o organizador pagaria a partida duas vezes inteira.
+- +3 testes: residual pendente no breakdown, submit do residual aceito, partida totalmente coberta ainda recusada.
+
+### Ressalvas que ficam para o Ciclo 29
+
+- **`DelinquencyService` e codigo morto.** Esta registrado no DI, mas `grep` confirma que **nenhuma pagina ou service o chama** -- a producao usa `GroupPaymentsService`, que tem a mesma logica duplicada. O fix da taxa do item 2 foi aplicado nos dois (correto, por seguranca), mas a duplicacao e a armadilha do parametro `enablePaymentGateways = false` **default** (um futuro caller que esquecer o argumento passa a mostrar taxa em grupo com gateway ligado) pedem consolidacao: ou o service passa a ser usado, ou sai.
+- **`internal static GetCoveredFeeByEventAsync` mora no ledger e e usado pelo settlement service.** Foi o menor acoplamento possivel para nao duplicar a regra do residual, mas o lugar natural e um `PlatformFeeCoverage` proprio.
+- **FK `Restrict` em `PlatformFeeSettlementItem.EventId`**: hoje nao existe exclusao de `Event` em nenhum fluxo (`grep` por `Events.Remove` nao acha nada), entao nao ha regressao; se um dia entrar "excluir partida", ela vai falhar em partida com repasse -- o que e o comportamento certo, mas precisa de mensagem tratada.
+- **Sem teste de UI das telas** (segue valendo do C27): a logica esta em helpers/services testados, os componentes nao tem cobertura de render.
 
 ---
 
@@ -269,7 +311,23 @@ Na pratica: **a feature ainda nao existe para o usuario**. O saldo acumula e nin
 
 ---
 
-## Ciclo 28 (Pleno) -- Fechar as ressalvas do C27 [PLANEJADO]
+## Ciclo 29 (Pleno) -- Consolidacao pos-repasse [PLANEJADO]
+
+**Regra de ouro**: TDD, SOLID, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, 1 commit por fase. **Nao** reabrir o desenho do repasse (selecao explicita de partidas + residual por valor estao ratificados).
+
+- **Fase A -- resolver o `DelinquencyService`**: hoje e codigo morto com logica duplicada do `GroupPaymentsService`. Escolher **um** dos dois caminhos e justificar no PR: (a) `GroupPaymentsService` passa a delegar nele (removendo a duplicacao e o `default false` do `enablePaymentGateways`, que deve virar parametro obrigatorio), ou (b) o service e removido do DI e do repo, com os testes migrados. Teste de caracterizacao antes de mover qualquer linha.
+- **Fase B -- extrair a regra de cobertura da taxa**: `PlatformFeeLedgerService.GetCoveredFeeByEventAsync` e `internal static` e consumida pelo `PlatformFeeSettlementService`. Extrair para um tipo proprio (ex.: `PlatformFeeCoverage`) com testes diretos, e os dois services passam a depender dele.
+- **Fase C -- fechar as 2 ultimas entradas da allowlist de i18n**: `EventPayment|as` e `EventPaymentProof|as` sao format strings de data (`"dd/MM 'as' HH:mm"`). Mover o **padrao de formato** para chave de i18n (cada idioma tem o seu) e zerar a `ResidualAllowlist`.
+- **Fase D -- exclusao de partida com repasse**: a FK `Restrict` de `PlatformFeeSettlementItem.EventId` faz sentido, mas nao existe fluxo de exclusao de partida. Se/quando entrar, precisa de mensagem tratada em vez de excecao de banco -- **so implementar se o fluxo existir**; senao, registrar como decisao e seguir.
+- **Fase E -- cobertura de render das telas do repasse**: avaliar bUnit (o projeto nao tem) em um PR de spike **fechado**, ou entao teste de logica adicional para o que ainda nao esta em helper (ordenacao da lista, formatacao do resumo). Nao introduzir dependencia nova sem aprovacao.
+
+### O que NAO fazer
+
+Nao mexer no fluxo do dinheiro do jogador; nao remover o codigo do V2; nao permitir que o organizador aprove o proprio lote; nao reintroduzir endpoint de seed/debug fora do bloco de desenvolvimento; nao criar doc solto na raiz.
+
+---
+
+## Ciclo 28 (Pleno) -- Fechar as ressalvas do C27 [EXECUTADO -- ver review acima]
 
 **Regra de ouro**: TDD, SOLID, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, 1 commit por fase. **Nao** reabrir o desenho do repasse (selecao explicita de partidas esta ratificado).
 

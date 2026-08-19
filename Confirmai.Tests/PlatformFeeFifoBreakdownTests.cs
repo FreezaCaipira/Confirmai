@@ -252,6 +252,37 @@ public class PlatformFeeFifoBreakdownTests
     }
 
     [Fact]
+    public async Task GetGroupFeeBreakdownByMatchAsync_LatePayerAfterApprovedSettlement_KeepsResidualPending()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, events) = await SeedMatchesAsync(ctx.db, matchCount: 1);
+        var user = TestDataFactory.CreateUserWithPixKey("org", "Org", "pix@org");
+        ctx.db.Users.Add(user);
+        await ctx.db.SaveChangesAsync();
+        await AddPaidSettlementAsync(ctx.db, group.Id, user.Id, 0.75m, new DateTime(2026, 8, 1),
+            selectedEventIds: new[] { events[0].Id });
+
+        // A late player pays the same match after the settlement was approved:
+        // the match accrues another R$0,75 that nobody has transferred yet.
+        var late = TestDataFactory.CreateUserWithPixKey("late", "Late", "pix@late");
+        ctx.db.Users.Add(late);
+        await ctx.db.SaveChangesAsync();
+        var lateConf = TestDataFactory.CreateEventConfirmation(events[0], late);
+        lateConf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+        lateConf.HasPaid = true;
+        lateConf.PlatformFeeAmount = 0.75m;
+        ctx.db.EventConfirmations.Add(lateConf);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx);
+        var breakdown = await service.GetGroupFeeBreakdownByMatchAsync(group.Id);
+
+        var match = Assert.Single(breakdown);
+        Assert.Equal(PlatformFeeMatchStatus.Pendente, match.Status);
+        Assert.Equal(0.75m, match.FeeAmount);
+    }
+
+    [Fact]
     public async Task GetGroupFeeBreakdownByMatchAsync_NoFees_ReturnsEmpty()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();

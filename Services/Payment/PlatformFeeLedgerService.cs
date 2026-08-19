@@ -79,8 +79,10 @@ public class PlatformFeeLedgerService
 
     /// <summary>
     /// Projects the per-match fee status from the explicit match selection of
-    /// each settlement: a match is Pago only when an approved settlement lists
-    /// its event id. Rejected/EmAnalise settlements do not abate anything.
+    /// each settlement, comparing amounts: a match is Pago only when approved
+    /// settlements cover its whole accrued fee. If a late player pays the same
+    /// match after a settlement was approved, the match stays Pendente for the
+    /// residual. Rejected/EmAnalise settlements do not abate anything.
     /// </summary>
     public async Task<IReadOnlyList<PlatformFeeMatchStatusProjection>> GetGroupFeeBreakdownByMatchAsync(int groupId)
     {
@@ -105,27 +107,36 @@ public class PlatformFeeLedgerService
         if (matches.Count == 0)
             return Array.Empty<PlatformFeeMatchStatusProjection>();
 
-        // Collect all event IDs covered by approved settlements (explicit selection).
-        var coveredEventIds = (await db.PlatformFeeSettlementItems
-            .AsNoTracking()
-            .Where(i => i.Settlement.GroupId == groupId
-                && i.Settlement.Status == PlatformFeeSettlementStatus.Pago)
-            .Select(i => i.EventId)
-            .ToListAsync())
-            .ToHashSet();
+        var coveredByEvent = await GetCoveredFeeByEventAsync(db, groupId);
 
         var result = new List<PlatformFeeMatchStatusProjection>(matches.Count);
         foreach (var m in matches)
         {
-            var status = coveredEventIds.Contains(m.EventId)
+            var covered = coveredByEvent.GetValueOrDefault(m.EventId);
+            var residual = m.FeeAmount - covered;
+            var status = residual <= 0
                 ? PlatformFeeMatchStatus.Pago
                 : PlatformFeeMatchStatus.Pendente;
+            var displayedFee = status == PlatformFeeMatchStatus.Pago ? m.FeeAmount : residual;
             result.Add(new PlatformFeeMatchStatusProjection(
-                m.EventId, m.StartsAt, m.Location, m.PaidPlayers, m.FeeAmount, status));
+                m.EventId, m.StartsAt, m.Location, m.PaidPlayers, displayedFee, status));
         }
 
         return result;
     }
+
+    /// <summary>
+    /// Fee already transferred per match, from the items of approved settlements.
+    /// </summary>
+    internal static async Task<Dictionary<int, decimal>> GetCoveredFeeByEventAsync(
+        AppDbContext db, int groupId)
+        => await db.PlatformFeeSettlementItems
+            .AsNoTracking()
+            .Where(i => i.Settlement.GroupId == groupId
+                && i.Settlement.Status == PlatformFeeSettlementStatus.Pago)
+            .GroupBy(i => i.EventId)
+            .Select(g => new { EventId = g.Key, Covered = g.Sum(i => i.FeeAmount) })
+            .ToDictionaryAsync(g => g.EventId, g => g.Covered);
 }
 
 /// <summary>Per-match fee status after explicit settlement selection (Fase D).</summary>

@@ -127,19 +127,17 @@ public class PlatformFeeSettlementService
                 };
             }
 
-            // A match already covered by an approved or in-review settlement cannot
-            // be selected again — otherwise the organizer would pay it twice.
-            var covered = await db.PlatformFeeSettlementItems
+            // A match awaiting review cannot be selected again — the organizer
+            // would pay it twice.
+            var inReview = (await db.PlatformFeeSettlementItems
                 .AsNoTracking()
                 .Where(i => i.Settlement.GroupId == groupId
-                    && (i.Settlement.Status == PlatformFeeSettlementStatus.Pago
-                        || i.Settlement.Status == PlatformFeeSettlementStatus.EmAnalise))
+                    && i.Settlement.Status == PlatformFeeSettlementStatus.EmAnalise)
                 .Select(i => i.EventId)
-                .ToListAsync();
+                .ToListAsync())
+                .ToHashSet();
 
-            var coveredSet = covered.ToHashSet();
-
-            if (eventIds.Any(coveredSet.Contains))
+            if (eventIds.Any(inReview.Contains))
             {
                 return new PlatformFeeSettlementResult
                 {
@@ -148,10 +146,28 @@ public class PlatformFeeSettlementService
                 };
             }
 
-            // The amount must match the fee of the selected matches: approving the
-            // settlement marks all of them as paid, so a smaller amount would
-            // silently write off the difference.
-            var expected = accruedByEvent.Values.Sum();
+            // Fee already transferred per match. A match may be selected again only
+            // for the residual left by late payers after an approved settlement.
+            var coveredByEvent = await PlatformFeeLedgerService
+                .GetCoveredFeeByEventAsync(db, groupId);
+
+            var residualByEvent = eventIds.ToDictionary(
+                eid => eid,
+                eid => accruedByEvent[eid] - coveredByEvent.GetValueOrDefault(eid));
+
+            if (residualByEvent.Values.Any(r => r <= 0))
+            {
+                return new PlatformFeeSettlementResult
+                {
+                    Success = false,
+                    Message = _ui["Payment.Settlement.MatchAlreadyCovered"]
+                };
+            }
+
+            // The amount must match the residual fee of the selected matches:
+            // approving the settlement marks all of them as paid, so a smaller
+            // amount would silently write off the difference.
+            var expected = residualByEvent.Values.Sum();
             if (amount != expected)
             {
                 return new PlatformFeeSettlementResult
@@ -174,7 +190,7 @@ public class PlatformFeeSettlementService
                     .Select(eid => new PlatformFeeSettlementItem
                     {
                         EventId = eid,
-                        FeeAmount = accruedByEvent[eid]
+                        FeeAmount = residualByEvent[eid]
                     })
                     .ToList()
             };

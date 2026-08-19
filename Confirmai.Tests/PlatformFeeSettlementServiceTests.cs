@@ -71,6 +71,22 @@ public class PlatformFeeSettlementServiceTests
         return evt;
     }
 
+    /// <summary>Adds one more paid confirmation (with accrued fee) to an existing match.</summary>
+    private static async Task AddPaidConfirmationAsync(
+        AppDbContext db, Event evt, string userSuffix, decimal fee = 0.75m)
+    {
+        var player = TestDataFactory.CreateUserWithPixKey($"p-{userSuffix}", $"J{userSuffix}", $"pix@{userSuffix}");
+        db.Users.Add(player);
+        await db.SaveChangesAsync();
+
+        var conf = TestDataFactory.CreateEventConfirmation(evt, player);
+        conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+        conf.HasPaid = true;
+        conf.PlatformFeeAmount = fee;
+        db.EventConfirmations.Add(conf);
+        await db.SaveChangesAsync();
+    }
+
     [Fact]
     public async Task SubmitSettlementAsync_ValidInput_CreatesSettlement()
     {
@@ -194,6 +210,60 @@ public class PlatformFeeSettlementServiceTests
         var first = await service.SubmitSettlementAsync(
             group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { evt.Id });
         Assert.True(first.Success);
+
+        var second = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { evt.Id });
+
+        Assert.False(second.Success);
+        Assert.Single(ctx.factory.CreateDbContext().PlatformFeeSettlements);
+    }
+
+    [Fact]
+    public async Task SubmitSettlementAsync_ResidualFeeAfterApprovedSettlement_IsAccepted()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var evt = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-10", "a");
+
+        var service = CreateService(ctx.factory);
+        var first = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { evt.Id });
+        Assert.True(first.Success);
+
+        var approved = ctx.db.PlatformFeeSettlements.Single(s => s.Id == first.SettlementId);
+        approved.Status = PlatformFeeSettlementStatus.Pago;
+        await ctx.db.SaveChangesAsync();
+
+        // A late player pays the same match afterwards: R$0,75 of new fee that
+        // the organizer must still be able to transfer.
+        await AddPaidConfirmationAsync(ctx.db, evt, "late");
+
+        var second = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { evt.Id });
+
+        Assert.True(second.Success);
+
+        await using var verifyDb = ctx.factory.CreateDbContext();
+        var item = await verifyDb.PlatformFeeSettlementItems
+            .SingleAsync(i => i.SettlementId == second.SettlementId);
+        Assert.Equal(0.75m, item.FeeAmount);
+    }
+
+    [Fact]
+    public async Task SubmitSettlementAsync_FullyCoveredMatch_IsRejected()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var evt = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-10", "a");
+
+        var service = CreateService(ctx.factory);
+        var first = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { evt.Id });
+        Assert.True(first.Success);
+
+        var approved = ctx.db.PlatformFeeSettlements.Single(s => s.Id == first.SettlementId);
+        approved.Status = PlatformFeeSettlementStatus.Pago;
+        await ctx.db.SaveChangesAsync();
 
         var second = await service.SubmitSettlementAsync(
             group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg", new[] { evt.Id });
