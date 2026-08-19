@@ -5,6 +5,7 @@ using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 using Confirmai.Services.Events;
 using Confirmai.Services.Groups;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +30,10 @@ public class GroupPaymentsServiceTests
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(identity)));
         var emailSenderMock = new Mock<IEmailSender>();
         var notificationService = new EventNotificationService(factory, emailSenderMock.Object, NullLogger<EventNotificationService>.Instance);
+        var feeOptions = Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions { ManualPlatformFeeFixed = manualFee });
+        var feeLedger = new PlatformFeeLedgerService(factory, feeOptions);
         var svc = new GroupPaymentsService(factory, authMock.Object, notificationService, logService,
-            Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions { ManualPlatformFeeFixed = manualFee }));
+            feeOptions, feeLedger, NullLogger<GroupPaymentsService>.Instance);
         return (factory, svc);
     }
 
@@ -263,6 +266,35 @@ public class GroupPaymentsServiceTests
     {
         var (factory, svc, groupId, group) = await SetupWithGroupAndAdminAsync();
         await svc.MarkPaidAsync(999, "player-1", "admin-1", groupId);
+    }
+
+    [Fact]
+    public async Task MarkPaidAsync_StampsPlatformFee_WhenFutsalManualMode()
+    {
+        var (factory, svc, groupId, group) = await SetupWithGroupAndAdminAsync(manualFee: 0.75m);
+        await using var db = factory.CreateDbContext();
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "Quadra",
+            StartsAt = DateTime.UtcNow.AddDays(-1), Price = 15m, MaxPlayers = 10
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        var conf = new EventConfirmation
+        {
+            EventId = ev.Id, UserId = "player-1", HasPaid = false,
+            PaymentStatus = EventConfirmationPaymentStatus.Pending,
+            Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+        };
+        db.EventConfirmations.Add(conf);
+        await db.SaveChangesAsync();
+
+        await svc.MarkPaidAsync(conf.Id, "player-1", "admin-1", groupId);
+
+        await using var db2 = factory.CreateDbContext();
+        var dbConf = await db2.EventConfirmations.FindAsync(conf.Id);
+        Assert.True(dbConf!.HasPaid);
+        Assert.Equal(0.75m, dbConf.PlatformFeeAmount);
     }
 
     // ── NotifyDelinquencyAsync ────────────────────────────────────────

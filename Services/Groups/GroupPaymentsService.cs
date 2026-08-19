@@ -25,19 +25,25 @@ public sealed class GroupPaymentsService
     private readonly EventNotificationService _notificationService;
     private readonly LogService _logService;
     private readonly IOptions<FeeOptions> _feeOptions;
+    private readonly PlatformFeeLedgerService _feeLedger;
+    private readonly ILogger<GroupPaymentsService> _logger;
 
     public GroupPaymentsService(
         IDbContextFactory<AppDbContext> dbFactory,
         AuthenticationStateProvider authStateProvider,
         EventNotificationService notificationService,
         LogService logService,
-        IOptions<FeeOptions> feeOptions)
+        IOptions<FeeOptions> feeOptions,
+        PlatformFeeLedgerService feeLedger,
+        ILogger<GroupPaymentsService> logger)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
         _notificationService = notificationService;
         _logService = logService;
         _feeOptions = feeOptions;
+        _feeLedger = feeLedger;
+        _logger = logger;
     }
 
     public async Task<string?> GetCurrentUserIdAsync()
@@ -181,6 +187,21 @@ public sealed class GroupPaymentsService
                 confirmationId.ToString(),
                 $"Admin marcou confirmacao #{confirmationId} do jogador {userId} como paga manualmente (grupo #{groupId})",
                 currentUserId, "GroupAdmin");
+
+            // Stamp the platform fee on this confirmation (V1 manual, futsal only).
+            // Same call AdminConfirmationService.TogglePaidAsync makes — without it,
+            // the fee never accrues and the organizer never sees these matches in
+            // the "Taxa da plataforma" tab.
+            try
+            {
+                await _feeLedger.StampFeeOnPaidAsync(confirmationId);
+            }
+            catch (Exception ex)
+            {
+                // Non-blocking for the admin, but never silent: an unstamped fee is revenue lost.
+                _logger.LogError(ex,
+                    "Falha ao carimbar a taxa da plataforma na confirmacao {ConfirmationId}", confirmationId);
+            }
         }
     }
 
