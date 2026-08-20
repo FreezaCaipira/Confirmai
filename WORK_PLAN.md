@@ -11,12 +11,13 @@
 
 Ordem de leitura recomendada quando o contexto do Senior e reiniciado:
 0. **Deveres do Senior x Deveres do Pleno** (logo abaixo) -- **ler primeiro**: define quem executa o que. Se um prompt novo comecar rodando build/suite completa durante uma review, esta violando esta secao.
-1. **Estado Atual do Projeto** (abaixo) -- onde estamos, o que esta pronto, metricas.
-2. **Pendencias & Roadmap** (abaixo) -- o que falta, o que depende do Robson.
-3. **Linha do Tempo dos Ciclos** (abaixo) -- historico condensado de cada ciclo, PR e veredito da review.
-4. **Manual do Pleno** + **Regras para o Pleno (OBRIGATORIO)** -- como o codigo deve ser escrito.
-5. **Regras de Comunicacao Senior <-> Pleno** -- como registrar ciclos e reviews.
-6. Secoes de referencia (Setup de Ambiente, Politica .NET, CSS Vars, Comandos de Validacao, Troubleshooting Efi) -- consultar sob demanda.
+1. **Mapa de Progresso e Proximos Passos** (abaixo) -- progresso por eixo + a fila ordenada do que vem depois. Esta e a visao rapida de "onde estamos".
+2. **Estado Atual do Projeto** (abaixo) -- detalhe tecnico do que esta pronto.
+3. **Pendencias & Roadmap** (abaixo) -- o que falta, o que depende do Robson.
+4. **Linha do Tempo dos Ciclos** (abaixo) -- historico condensado de cada ciclo, PR e veredito da review.
+5. **Manual do Pleno** + **Regras para o Pleno (OBRIGATORIO)** -- como o codigo deve ser escrito.
+6. **Regras de Comunicacao Senior <-> Pleno** -- como registrar ciclos e reviews.
+7. Secoes de referencia (Setup de Ambiente, Politica .NET, CSS Vars, Comandos de Validacao, Troubleshooting Efi) -- consultar sob demanda.
 
 ---
 
@@ -118,7 +119,41 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Estado Atual do Projeto (pos-Ciclo 22)
+## Mapa de Progresso e Proximos Passos (atualizado pos-Ciclo 28)
+
+### Progresso por eixo
+
+| Eixo | Estado | O que falta |
+|---|---|---|
+| Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
+| Cobertura de testes | **BOM** -- 2290/2314, +340 testes desde o C21 | Sem teste de **render** das telas (logica esta em helpers/services). C29 Fase E avalia. |
+| i18n (regra 25) | **CONCLUIDO na pratica** (C25-C28) -- ~450 strings migradas, PT/EN/ES, teste anti-hardcode com/sem acento validado empiricamente | 2 entradas de allowlist (format string de data) -> C29 Fase C. |
+| Pagamento V1 manual (jogador) | **CONCLUIDO** -- grupo nasce manual, Pix do organizador + QR com valor total, comprovante, confirmacao do organizador, rejeicao com motivo | Validacao E2E em navegador (nunca rodada -- cota). |
+| Taxa da plataforma R$ 0,75 (futsal, modo manual) | **CONCLUIDO** -- snapshot no pagamento, taxa discriminada (`15,00 + 0,75 = 15,75`) inclusive no QR, ledger por partida, residuo por valor | Idem: falta prova em navegador. |
+| Repasse organizador -> plataforma | **CONCLUIDO** -- aba do organizador (selecao explicita de partidas, somatorio, Pix da plataforma, comprovante, historico), fila do admin (confirmar/rejeitar com motivo), endpoint do comprovante autorizado, sem autoquitacao | Idem. |
+| Consolidacao tecnica do repasse | **PENDENTE** | Ciclo 29 (planejado): `DelinquencyService` morto, extrair `PlatformFeeCoverage`, allowlist i18n, FK `Restrict`, cobertura de render. |
+| Seguranca | **BOM** -- webhooks autenticados, authz admin 17/17 + teste de convencao, CSP/HSTS, secret Efi fora do repo, teste que impede endpoint de seed/debug aberto, autorizacao do repasse no service | Pen-test financeiro antes de producao; pendencias de prod do Robson. |
+| Login/identidade | **Implementado** (Google criar-ou-vincular, SMTP, confirmacao de email) | **Depende do Robson**: OAuth Google prod + SMTP prod. Nunca exercitado em producao. |
+| Mobile UX | **Incremental, sem ciclo dedicado** -- navegacao, estados vazios (`NoGroupsHint`), UX do Profile refeita | Varredura mobile 375/768 dos fluxos principais (nao feita de forma sistematica). |
+| Pix automatico (V2) | **Codigo pronto e preservado atras do toggle** | Bloqueado nas pendencias do Robson (rotacao Efi, homologacao, nota fiscal). |
+| Observabilidade / operacao | Serilog + OpenTelemetry + alerta de payout | Metricas SignalR, alertas operacionais, revisao de CSP -- antes de producao. |
+| E2E em navegador | **NUNCA EXECUTADO** | Duas tentativas cairam por cota. E o unico eixo sem nenhuma evidencia. |
+
+### Proximos passos, em ordem
+
+1. **Mergear a PR #93** (review do C28 + fix do residuo + regra 28 + secao de deveres). Bloqueia o inicio limpo do C29.
+2. **Ciclo 29 pelo Pleno** (ja planejado abaixo): consolidacao tecnica pos-repasse -- `DelinquencyService`, `PlatformFeeCoverage`, allowlist i18n, FK, cobertura. Entrega com os numeros de build/teste no PR (regra 28).
+3. **E2E do fluxo do dinheiro em navegador** -- quando o Robson pedir e houver cota: pagamento do jogador com taxa (15,75 no QR) -> comprovante -> confirmacao do organizador -> aba de taxa -> lote -> fila do admin -> aprovacao/rejeicao. E o unico eixo sem evidencia visual.
+4. **Ciclo 30 -- varredura mobile sistematica** (375/768/desktop) dos fluxos: entrar em grupo por convite, ver eventos, confirmar presenca, pagar, consultar comprovante, estados vazios. Prioridade declarada do Robson e nunca virou ciclo proprio.
+5. **Ciclo 31 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
+6. **Login Google em producao** -- assim que o Robson gerar OAuth Client + SMTP prod (ciclo curto de fumaca dos fluxos de login).
+7. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
+
+**Nao entram agora**: WhatsApp real (postergado), Redis (so com multi-instancia ou gargalo medido), .NET 10 (quando o LTS sair).
+
+---
+
+## Estado Atual do Projeto (pos-Ciclo 28)
 
 - **Refatoracao estrutural: CONCLUIDA.** Code-behinds todos < 250 LOC; CSS modularizado por dominio (`site.css` 5.589->1.615, `events.css` 3.679->1.639, + `admin/buttons/entity-shell/event-detail/events-table/event-listing/event-create/identity/tables/escalacao/payments/marketplace.css`, todos linkados em `Pages/_Host.cshtml`); services extraidos e agora **cobertos por teste** (Ciclo 22, +174 testes).
 - **Pagamento real + taxa: implementado e revisado.** Modelo = **intermediacao automatica** (site recebe o total na chave Pix central -> webhook confirma -> Envio de Pix automatico do valor base pra chave do organizador, retendo a taxa). Taxa **FIXA**: R$0,50 (plataforma) + R$0,25 (gateway) por cima do valor da partida. Payout com retry/backoff/idempotencia deterministica + alerta admin em falha. Guarda-corpo: bloqueia cobranca se o grupo nao tem chave Pix de repasse. `serviceFeePercentage` (legacy percentual) removido de ponta a ponta.
@@ -148,7 +183,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 - Pen-test financeiro, revisao de CSP, metricas SignalR, alertas operacionais -- antes de producao.
 - Redis: so quando houver multi-instancia ou gargalo medido (nao agora).
 
-### Aparato Geral do Senior (pos-Ciclo 23) -- backlog priorizado para o Ciclo 24
+### Aparato Geral do Senior (pos-Ciclo 23) -- backlog priorizado para o Ciclo 24 [HISTORICO -- em grande parte JA ENTREGUE nos Ciclos 24-28; a fila viva esta no "Mapa de Progresso e Proximos Passos"]
 
 Varredura Senior focada em melhorias/adicoes, **separando codigo (Pleno/Senior) das pendencias do Robson**. Base: `main` @ `cb6c89a`.
 
