@@ -40,6 +40,7 @@ Esta secao complementa a "Regras para o Pleno (OBRIGATORIO)" (detalhada mais aba
 - **CSS**: mobile-first, breakpoint unico **768px** (`@media (max-width:768px)` mobile, `@media (min-width:769px)` desktop), usar **CSS vars** (nunca hex/rgba hardcoded em scoped CSS), sem `!important` novo, modular por dominio. Ver regras 1-2, 18-23 e "CSS Vars Permitidas".
 - **i18n sempre (nova regra -- ver regra 25)**: toda string visivel ao usuario passa pelo `UiTextService`/`@Ui[...]` (chave por dominio). Proibido texto hardcoded em markup `.razor` ou em mensagens de retorno de service. i18n faz parte do "done" do incremento, junto com o TDD.
 - **Qualidade minima por incremento**: `dotnet build` 0 warning + suite verde (filtrando os testes ambientais de Postgres). Sem `Console.Write`/debug commitado. Sem string de UI hardcoded nova.
+- **Quem roda build e teste (regra 28)**: o **Pleno** roda `dotnet build --no-incremental` e a **suite completa** antes de abrir o PR e **cola os numeros no corpo do PR** (`0 Warning(s)`, `Failed/Passed/Total`, quais falhas sao ambientais). O **Senior nao repete a suite completa** na review -- ele revisa diff/arquitetura/seguranca/dinheiro e confia nesses numeros + no CI. Suite completa rodada no lado do Senior queima cota que deveria ir para revisao e direcionamento.
 
 ### Como agir (fluxo de trabalho)
 - **1 branch por ciclo, 1 PR por ciclo** (excecao: mudancas so-de-doc `.md` podem ir direto pra main -- regra 16). Nunca push direto na `main` para codigo.
@@ -52,6 +53,7 @@ Esta secao complementa a "Regras para o Pleno (OBRIGATORIO)" (detalhada mais aba
 - Toda pergunta ao Senior vai numa subsecao clara (ex.: "Questionamento do Pleno -- Ciclo X"). O Senior responde na mesma regiao.
 - Achados de bug durante um ciclo de teste: registrar como achado, NAO consertar no mesmo ciclo (a menos que o plano peca).
 - Ao entregar um ciclo, resumir no PR: o que foi feito por fase, contagem de testes antes/depois, e qualquer desvio do plano.
+- **Sem os numeros de build/teste no PR, o ciclo nao esta entregue** (regras 27 + 28): o Senior devolve o PR pedindo os numeros em vez de rodar a suite por conta propria.
 
 ---
 
@@ -64,6 +66,7 @@ Criar uma secao `## Ciclo N (Pleno) -- <titulo>` contendo:
 - **Objetivo** (1-2 linhas) e por que o ciclo existe.
 - **Fases** numeradas, cada uma com procedimento e **criterio de aceitacao**.
 - **Meta de saida** mensuravel (ex.: "0 code-behind > 250 LOC", "+X testes", "0 warning").
+- **Evidencia exigida na entrega**: numeros de build + suite completa colados no PR (regra 28) -- e o Pleno que executa.
 - **O que NAO fazer** (limites do escopo).
 - Referencia aos alvos concretos (arquivos, services).
 
@@ -71,7 +74,7 @@ Criar uma secao `## Ciclo N (Pleno) -- <titulo>` contendo:
 Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, de forma **explicita** (foi pedido pelo Pleno):
 - **Veredito** no titulo: `APROVADO`, `APROVADO com ressalva`, ou `REPROVADO`.
 - **PR e branch** auditados + confirmacao de que ja esta na `main` (ou nao).
-- **Evidencias**: build (warnings), contagem de testes antes/depois, separando falhas ambientais de regressao.
+- **Evidencias**: build (warnings) e contagem de testes antes/depois **conforme reportado pelo Pleno no PR** + status do CI, separando falhas ambientais de regressao. O Senior **nao** roda a suite completa (regra 28); se precisar provar um furo, roda apenas `dotnet test --filter` da area.
 - **Por fase**: o que foi entregue vs. o que o plano pedia (META ATINGIDA / PARCIAL / FALTOU).
 - **Ressalvas** (bloqueante vs. nao-bloqueante) e o que fica pro proximo ciclo.
 - **Pendencias do Robson** repetidas (para nao se perderem).
@@ -314,6 +317,8 @@ Na pratica: **a feature ainda nao existe para o usuario**. O saldo acumula e nin
 ## Ciclo 29 (Pleno) -- Consolidacao pos-repasse [PLANEJADO]
 
 **Regra de ouro**: TDD, SOLID, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, 1 commit por fase. **Nao** reabrir o desenho do repasse (selecao explicita de partidas + residual por valor estao ratificados).
+
+**Novo nesta entrega (regra 28)**: o corpo do PR deve conter, colado do terminal, (a) a linha `0 Warning(s)` / `0 Error(s)` do `dotnet build --no-incremental` e (b) a linha final do `dotnet test` completo (`Failed: N, Passed: N, Total: N`), com as falhas ambientais identificadas. Sem esses dois blocos a review nao comeca -- o Senior nao roda mais a suite completa.
 
 - **Fase A -- resolver o `DelinquencyService`**: hoje e codigo morto com logica duplicada do `GroupPaymentsService`. Escolher **um** dos dois caminhos e justificar no PR: (a) `GroupPaymentsService` passa a delegar nele (removendo a duplicacao e o `default false` do `enablePaymentGateways`, que deve virar parametro obrigatorio), ou (b) o service e removido do DI e do repo, com os testes migrados. Teste de caracterizacao antes de mover qualquer linha.
 - **Fase B -- extrair a regra de cobertura da taxa**: `PlatformFeeLedgerService.GetCoveredFeeByEventAsync` e `internal static` e consumida pelo `PlatformFeeSettlementService`. Extrair para um tipo proprio (ex.: `PlatformFeeCoverage`) com testes diretos, e os dois services passam a depender dele.
@@ -1201,6 +1206,13 @@ Implementação de suporte a certificado via variável de ambiente em base64:
 26. **Auditoria/logs como regra no fluxo de desenvolvimento**: alem de TDD, boas praticas de CSS e documentacao, todo incremento deve incluir verificacao de auditoria -- logs relevantes (Serilog) em fluxos criticos, telemetria quando aplicavel, e verificacao de que mudancas de UI/CSS sao confirmadas visualmente (print ou inspecao no browser) antes do commit. O Pleno deve registrar na descricao do PR quais telas foram verificadas visualmente e como. "Nao mudou nada" sem evidencia nao e aceitavel -- se o estilo nao apareceu, investigar causa raiz (cache, ordem de CSS, scoped vs global) antes de commitar.
 
 27. **Entrega do PR ao final do ciclo**: ao concluir um ciclo e fazer push da branch, o Pleno deve responder ao Senior (no chat/IDE) com 3 itens: (a) **title** do PR (titulo conciso, prefixo `feat(cicloN)` ou `refactor(cicloN)`); (b) **body** do PR (resumo do que foi feito por fase, contagem de testes antes/depois, desvios do plano, arquivos modificados); (c) **link de criacao do PR** (URL `https://github.com/.../pull/new/<branch>` gerada pelo `git push`). O Pleno nao deve considerar o ciclo "entregue" ate esses 3 itens estarem apresentados.
+
+28. **Build e suite completa sao responsabilidade do PLENO -- nao do Senior**: rodar `dotnet build --no-incremental` e `dotnet test` (suite inteira, hoje ~2.300 testes) e caro em tempo/tokens e nao pode ser repetido do lado do Senior a cada review. Divisao de trabalho obrigatoria:
+    - **Pleno (executa)**: roda build + suite completa **antes de abrir o PR** e cola no corpo do PR, textualmente: a linha `0 Warning(s) / 0 Error(s)`, a linha final do `dotnet test` (`Failed: N, Passed: N, Total: N`) e a classificacao das falhas (as 24 `ProgramConfigurationTests` sem PostgreSQL sao **ambientais**). Sem esses numeros o ciclo **nao esta entregue** (complementa a regra 27). Se a suite estiver vermelha por outro motivo, o PR nao abre.
+    - **Senior (revisa)**: le diff, arquitetura, seguranca, caminho do dinheiro, i18n e consistencia com o plano. **Nao** roda a suite completa por padrao -- confia nos numeros do PR e no CI. Pode rodar, no maximo, `dotnet test --filter "FullyQualifiedName~<Area>"` quando precisar **provar** um furo especifico que encontrou, e `dotnet build` quando alterar codigo na propria PR de review.
+    - **CI e a rede de seguranca**: o workflow `Build & Test .NET 9` roda a suite completa no GitHub. Divergencia entre o numero declarado no PR e o CI e tratada como problema do Pleno.
+    - **E2E de navegador** so acontece quando o Robson pedir explicitamente, nunca como parte automatica da review.
+    - Motivo registrado: nas reviews dos Ciclos 27/28 a suite completa foi rodada 2-3x por review no ambiente do Senior, consumindo cota que deveria ir para revisao e direcionamento. A funcao do Senior e organizar, direcionar, orientar e revisar.
 
 ---
 
