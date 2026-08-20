@@ -144,20 +144,24 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 1. **Mergear a PR #93** (review do C28 + fix do residuo + regra 28 + secao de deveres). Bloqueia o inicio limpo do C29.
 2. **Ciclo 29 pelo Pleno** (ja planejado abaixo): consolidacao tecnica pos-repasse -- `DelinquencyService`, `PlatformFeeCoverage`, allowlist i18n, FK, cobertura. Entrega com os numeros de build/teste no PR (regra 28).
-3. **Ciclo 30 -- Login Google + email em DEV** (ver secao abaixo): exercitar de ponta a ponta criar-ou-vincular conta Google e confirmacao de email com SMTP local. Depende so do Robson gerar o OAuth Client de dev.
+3. **Ciclo 30 -- Login Google + email validados em PRODUCAO** (decisao do Robson; ver secao abaixo): deploy no EasyPanel e exercitar criar-ou-vincular Google + confirmacao de email com envio real, antes de divulgar o login.
 4. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): bloqueado na decisao Cloud API vs. `wa.me`.
 5. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
 6. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
 
 **Fora da fila**: E2E automatizado em navegador (opcional -- o Robson valida manualmente); varredura mobile sistematica (o modelo atual, tela por tela apontada pelo Robson, esta funcionando); Redis (so com multi-instancia ou gargalo medido); .NET 10 (quando o LTS sair).
 
-### Google OAuth e email: o que da pra testar em DEV
+### Google OAuth e email: onde validar
 
-Decidido apos pergunta do Robson ("conseguimos testar isso em dev ou somente em prod?"). **Os dois sao testaveis em dev** -- nao precisam esperar producao:
+**Decisao do Robson: validar tudo direto em PRODUCAO** (Google Auth + email real). Justificativa: o deploy no EasyPanel e simples, o dominio real com HTTPS e exatamente o que o Google espera (some o atrito do `localhost`), e o app ainda nao tem base de usuarios. Dev com `localhost`/catcher local fica disponivel como alternativa, mas nao e o caminho escolhido.
 
-- **Google OAuth**: o Google aceita `http://localhost` como redirect URI (unica excecao a exigencia de HTTPS). Basta um OAuth Client tipo *Web application* no Google Cloud Console com `http://localhost:<porta>/signin-google` em *Authorized redirect URIs*, e `ClientId`/`ClientSecret` no user-secrets. Consent screen em modo *Testing* permite ate 100 usuarios de teste sem verificacao. **So exige prod**: dominio real no redirect URI e verificacao da consent screen (segundo Client, nao substitui o de dev).
-- **SMTP / confirmacao de email**: 100% testavel em dev. Duas opcoes -- (a) Gmail + App Password no user-secrets, email chega de verdade; (b) catcher local (`smtp4dev` / Papercut) em `localhost:25`, que intercepta e exibe o email numa UI sem enviar nada -- **preferivel** para reexercitar o link de confirmacao a vontade. Troca pra prod = so connection string.
-- **Consequencia**: a pendencia "login Google/SMTP so em prod" sai da lista do Robson e vira ciclo executavel pelo Pleno. Unico input do Robson: o OAuth Client de dev.
+O que isso exige e como reduzir o risco:
+
+1. **Credenciais**: `ClientId`/`ClientSecret` e SMTP **somente como env vars no EasyPanel**, nunca em `appsettings*.json` (regra ja vigente desde a Efi).
+2. **Consent screen**: usamos apenas escopos basicos (`email`, `profile`), portanto publicar dispensa verificacao da Google -- mas exige URL de politica de privacidade. Em modo *Testing* so os emails cadastrados como test users conseguem logar.
+3. **Risco principal nao e a credencial, e o `criar-ou-vincular` contra dados reais.** A logica atual: login externo ja vinculado entra; email existente **vincula** (`AddLoginAsync`); email novo cria conta com `EmailConfirmed=true`. Um bug ai nao aparece como erro -- ele funde contas ou da acesso a conta errada, e em banco de producao isso e irreversivel. **Protocolo obrigatorio**: exercitar os 3 caminhos com a conta do Robson + uma conta de teste **antes** de divulgar o login a qualquer usuario.
+4. **Email real**: manter o volume baixo no inicio e conferir SPF/DKIM/DMARC do dominio -- dominio novo sem esses registros cai em spam e queima reputacao de envio. Testar o link de confirmacao com o email do Robson primeiro.
+5. **Rollback**: qualquer problema no fluxo de login = desligar o botao do Google (configuracao) e voltar ao login por email/senha, que ja esta em uso.
 
 ---
 
@@ -180,13 +184,13 @@ Decidido apos pergunta do Robson ("conseguimos testar isso em dev ou somente em 
 - **Rotacionar o ClientSecret Efi** no painel (o valor antigo ficou no historico do git) e reconfigurar via user-secrets (dev) / env no EasyPanel (prod). **Adiado** -- Robson viajando, sem acesso ao painel Efi.
 - **Validar o Envio de Pix Efi em homologacao** (credenciais + certificado .p12 -- ver Troubleshooting; solucao base64 disponivel). Confirmar limites de envio de Pix.
 - **Confirmar com contador** a nota fiscal sobre a taxa de servico (o dinheiro passa pela conta do site = intermediacao).
-- **Gerar OAuth Client de DEV** (`http://localhost:<porta>/signin-google`, consent screen em *Testing*) -- desbloqueia o Ciclo 30. O Client de **prod** e um segundo Client, so no deploy.
+- **Gerar o OAuth Client de PROD** (redirect `https://<dominio>/signin-google`) + publicar a consent screen (escopos basicos email/profile dispensam verificacao; exige URL de politica de privacidade) e configurar `ClientId`/`ClientSecret` + SMTP como **env vars no EasyPanel** -- desbloqueia o Ciclo 30. Client de dev nao e mais necessario (decisao: validar direto em prod).
 - **Decidir o modelo do WhatsApp**: Cloud API oficial (Meta) vs. deep link `wa.me` vs. **uma ferramenta de terceiro recomendada a ele** (nome a confirmar) -- desbloqueia o Ciclo 31. Nao planejar o ciclo antes dessa informacao: o desenho muda completamente (provider externo exige avaliar custo, lock-in, dados de contato saindo da plataforma e se o numero e da plataforma ou do organizador).
 - Confirmar `SyncPassword=false` em producao; confirmar mTLS do webhook Efi ativo em prod.
 - (SMTP/provedor de email em prod: **nao bloqueia dev** -- em dev usa-se catcher local ou Gmail App Password.)
 
 ### Candidatos a proximos ciclos (Senior planeja quando priorizado)
-- **Login Google + email em DEV** (Ciclo 30) -- ver secao "Google OAuth e email: o que da pra testar em DEV".
+- **Login Google + email em PROD** (Ciclo 30) -- ver secao "Google OAuth e email: onde validar".
 - **WhatsApp** (Ciclo 31, ultima feature do escopo) -- sai do status POSTERGADO; aguarda apenas a decisao Cloud API vs. `wa.me`.
 - **Mobile UX**: segue no modelo incremental (Robson testa com F12, aponta a tela, o ciclo corrige) -- nao ha ciclo de varredura planejado.
 - **Cobertura crescente** de testes nos demais services; E2E automatizado (Playwright 375/768/desktop) como reforco opcional.
