@@ -181,7 +181,7 @@ Decidido apos pergunta do Robson ("conseguimos testar isso em dev ou somente em 
 - **Validar o Envio de Pix Efi em homologacao** (credenciais + certificado .p12 -- ver Troubleshooting; solucao base64 disponivel). Confirmar limites de envio de Pix.
 - **Confirmar com contador** a nota fiscal sobre a taxa de servico (o dinheiro passa pela conta do site = intermediacao).
 - **Gerar OAuth Client de DEV** (`http://localhost:<porta>/signin-google`, consent screen em *Testing*) -- desbloqueia o Ciclo 30. O Client de **prod** e um segundo Client, so no deploy.
-- **Decidir o modelo do WhatsApp**: Cloud API oficial (Meta) vs. deep link `wa.me` -- desbloqueia o Ciclo 31.
+- **Decidir o modelo do WhatsApp**: Cloud API oficial (Meta) vs. deep link `wa.me` vs. **uma ferramenta de terceiro recomendada a ele** (nome a confirmar) -- desbloqueia o Ciclo 31. Nao planejar o ciclo antes dessa informacao: o desenho muda completamente (provider externo exige avaliar custo, lock-in, dados de contato saindo da plataforma e se o numero e da plataforma ou do organizador).
 - Confirmar `SyncPassword=false` em producao; confirmar mTLS do webhook Efi ativo em prod.
 - (SMTP/provedor de email em prod: **nao bloqueia dev** -- em dev usa-se catcher local ou Gmail App Password.)
 
