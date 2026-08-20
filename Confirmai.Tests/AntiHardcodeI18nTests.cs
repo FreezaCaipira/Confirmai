@@ -105,11 +105,9 @@ public class AntiHardcodeI18nTests
     // This list should shrink over time as literals are migrated to i18n keys.
     private static readonly HashSet<string> ResidualAllowlist = new(StringComparer.OrdinalIgnoreCase)
     {
-        // ── Date format strings with "às" — the "às" is inside a .ToString()
-        // format pattern, not a visible literal. These should eventually move
-        // the format pattern into the i18n value, but they're low risk.
-        "EventPayment|às",
-        "EventPaymentProof|às",
+        // Allowlist is now empty — all residuals have been migrated to i18n.
+        // Date format patterns with "às" were moved to UiTextService.FormatDateTime
+        // (DateTimeFull / DateTimeFullLong keys) in Ciclo 29 Fase C.
     };
 
     private static IEnumerable<string> GetRazorFiles()

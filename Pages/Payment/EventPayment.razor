@@ -83,7 +83,7 @@
                         @if (conf.PixProofUploadedAt.HasValue)
                         {
                             <div class="evpay-admin-proof">
-                                <p class="evpay-admin-proof-label">@string.Format(Ui["Payment.ProofSentAt"], conf.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm"))</p>
+                                <p class="evpay-admin-proof-label">@string.Format(Ui["Payment.ProofSentAt"], Ui.FormatDateTime(conf.PixProofUploadedAt.Value.ToLocalTime(), "DateTimeFull"))</p>
                                 <img src="/api/pix-proof/@conf.Id" class="evpay-admin-proof-img" alt="@Ui["Payment.ProofAlt"]" />
                             </div>
                             @if (adminMarkPaidError)

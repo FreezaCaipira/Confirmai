@@ -1,7 +1,6 @@
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Services.Core
-@using System.Globalization
 
 @inject UiTextService Ui
 
@@ -17,7 +16,7 @@
     <h1 class="evpay-title">@Event!.Group.Name</h1>
     <p class="evpay-meta">
         <i class="fas fa-calendar-alt"></i>
-        @Event.StartsAt.ToLocalTime().ToString("dddd, dd/MM/yyyy 'às' HH:mm", new CultureInfo("pt-BR"))
+        @Ui.FormatDateTime(Event.StartsAt.ToLocalTime(), "DateTimeFullLong")
     </p>
     @if (!string.IsNullOrWhiteSpace(Event.Location))
     {
