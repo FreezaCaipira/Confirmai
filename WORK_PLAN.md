@@ -1,8 +1,8 @@
 # Plano de Trabalho - Confirmai
 
-> **Documento unico e vivo do projeto.** Serve simultaneamente como: (1) canal de comunicacao Senior <-> Pleno; (2) todolist / linha do tempo do desenvolvimento; (3) manual de como o Pleno deve codar, agir e se comunicar; (4) memoria de contexto -- se a sessao do Senior for resetada, este arquivo permite recuperar TUDO que e necessario para continuar.
+> **Documento unico e vivo do projeto.** Serve simultaneamente como: (1) canal de comunicacao Senior <-> Pleno; (2) todolist / linha do tempo do desenvolvimento; (3) manual de como o Pleno deve codar, agir e se comunicar; (4) memoria de contexto -- se a sessao do Senior for resetada, este arquivo permite recuperar TUDO que e necessario para continuar. **Comece pela secao "Deveres do Senior x Deveres do Pleno"** -- ela define quem executa o que.
 >
-> **Base atual**: `main` pos-Ciclo 22 | **Testes**: 2124 verdes / 2148 (as 24 falhas sao `ProgramConfigurationTests` sem Postgres local = ambiente, NAO regressao) | **Build**: app e testes com **0 warning / 0 erro**.
+> **Base atual**: `main` pos-Ciclo 28 | **Testes**: 2290 verdes / 2314 (as 24 falhas sao `ProgramConfigurationTests` sem Postgres local = ambiente, NAO regressao) | **Build**: app e testes com **0 warning / 0 erro**.
 > **Stack**: .NET 9 (STS -> migrar p/ .NET 10 LTS quando lancar), Blazor Server, EF Core, PostgreSQL, ASP.NET Identity, SignalR, xUnit+Moq, OpenTelemetry/Serilog. Gateways de pagamento: EfiBank (Pix, ativo), AbacatePay, Appmax, BTCPayServer.
 
 ---
@@ -10,20 +10,54 @@
 ## Como ler este documento (para um contexto novo apos reset)
 
 Ordem de leitura recomendada quando o contexto do Senior e reiniciado:
-1. **Estado Atual do Projeto** (abaixo) -- onde estamos, o que esta pronto, metricas.
-2. **Pendencias & Roadmap** (abaixo) -- o que falta, o que depende do Robson.
-3. **Linha do Tempo dos Ciclos** (abaixo) -- historico condensado de cada ciclo, PR e veredito da review.
-4. **Manual do Pleno** + **Regras para o Pleno (OBRIGATORIO)** -- como o codigo deve ser escrito.
-5. **Regras de Comunicacao Senior <-> Pleno** -- como registrar ciclos e reviews.
-6. Secoes de referencia (Setup de Ambiente, Politica .NET, CSS Vars, Comandos de Validacao, Troubleshooting Efi) -- consultar sob demanda.
+0. **Deveres do Senior x Deveres do Pleno** (logo abaixo) -- **ler primeiro**: define quem executa o que. Se um prompt novo comecar rodando build/suite completa durante uma review, esta violando esta secao.
+1. **Mapa de Progresso e Proximos Passos** (abaixo) -- progresso por eixo + a fila ordenada do que vem depois. Esta e a visao rapida de "onde estamos".
+2. **Estado Atual do Projeto** (abaixo) -- detalhe tecnico do que esta pronto.
+3. **Pendencias & Roadmap** (abaixo) -- o que falta, o que depende do Robson.
+4. **Linha do Tempo dos Ciclos** (abaixo) -- historico condensado de cada ciclo, PR e veredito da review.
+5. **Manual do Pleno** + **Regras para o Pleno (OBRIGATORIO)** -- como o codigo deve ser escrito.
+6. **Regras de Comunicacao Senior <-> Pleno** -- como registrar ciclos e reviews.
+7. Secoes de referencia (Setup de Ambiente, Politica .NET, CSS Vars, Comandos de Validacao, Troubleshooting Efi) -- consultar sob demanda.
 
 ---
 
-## Papeis: Senior, Pleno e Robson
+## Deveres do Senior x Deveres do Pleno (LER ANTES DE QUALQUER COISA)
 
-- **Robson (dono do produto)**: levanta requisitos/bugs/melhorias testando o app (isso NAO e scope creep -- ver regra 22), define prioridades, e responsavel por acoes fora do codigo (rotacionar secrets, gerar credenciais OAuth, validar fiscal/juridico, deploy no EasyPanel).
-- **Senior (revisor/planejador)**: audita a `main`, revisa PRs do Pleno, planeja ciclos, escreve reviews e planos AQUI no WORK_PLAN, faz PRs de documentacao e correcoes de baixo risco. NAO implementa features grandes sem plano. Verifica build/testes/CI. Nao afirma "mergeado" sem fonte autoritativa.
-- **Pleno (executor)**: executa o ciclo descrito no WORK_PLAN, faz refactors incrementais com TDD, escreve testes, entrega **1 PR por ciclo** para o Senior revisar. O Pleno **nao tem acesso direto aos PRs no GitHub** -- por isso ciclos e reviews precisam estar 100% explicitos AQUI.
+> Esta secao existe para que **qualquer prompt/contexto futuro** execute exatamente como operamos hoje. Ela tem precedencia sobre habitos anteriores: se uma instrucao antiga sugerir que o Senior rode a suite completa, vale o que esta aqui.
+
+**Principio**: o **Pleno EXECUTA** (codigo, teste, build, evidencia). O **Senior ORGANIZA, DIRECIONA, ORIENTA e REVISA**. Processamento pesado (build, suite completa, servidor, navegador) fica **do lado do Pleno**; se migrar pro Senior, a cota evapora em tarefa que nao e de revisao.
+
+### Papeis
+- **Robson (dono do produto)**: levanta requisitos/bugs/melhorias testando o app (isso NAO e scope creep -- ver regra 22), define prioridades e decisoes de negocio, e responsavel por acoes fora do codigo (rotacionar secrets, credenciais OAuth, fiscal/juridico, deploy no EasyPanel). Chama o Senior para planejar ciclo ou revisar entrega. Merge dos PRs e dele.
+- **Senior (revisor/planejador/orientador)**: audita a `main`, planeja ciclos, revisa a entrega do Pleno, escreve planos e reviews AQUI no WORK_PLAN, responde questionamentos do Pleno, abre PR de documentacao e de correcao pontual de baixo risco.
+- **Pleno (executor)**: executa o ciclo descrito no WORK_PLAN com TDD, escreve testes, roda build e suite completa, entrega **1 PR por ciclo**. O Pleno **nao tem acesso direto aos PRs no GitHub** -- por isso ciclo e review precisam estar 100% explicitos AQUI.
+
+### Deveres do PLENO (executa)
+1. Implementar as fases do ciclo **na ordem** descrita no plano, 1 assunto por commit, com **TDD** (teste antes/junto).
+2. **Rodar `dotnet build --no-incremental`** e garantir **0 warning / 0 erro**.
+3. **Rodar a suite completa (`dotnet test`)** -- e o Pleno, nunca o Senior. Classificar falhas: as 24 `ProgramConfigurationTests` sem PostgreSQL local sao **ambientais**; qualquer outra vermelha impede abrir o PR.
+4. **Colar os numeros no corpo do PR** (regra 28): linha de warnings/erros do build + linha final do `dotnet test` (`Failed/Passed/Total`) + o que e ambiental. Sem isso o ciclo **nao esta entregue**.
+5. Verificar visualmente mudancas de UI/CSS e listar no PR quais telas verificou (regra 26).
+6. Aplicar i18n (regra 25) e as regras de CSS (mobile-first, 768px, CSS vars) no mesmo incremento.
+7. Registrar achados, duvidas e bloqueios **escrevendo no WORK_PLAN** (secao "Problemas Encontrados pelo Pleno"), sem consertar fora do escopo do ciclo.
+8. Entregar o PR com title + body + link de criacao (regra 27).
+
+### Deveres do SENIOR (organiza, direciona, orienta, revisa)
+1. **Planejar o ciclo**: objetivo, fases numeradas com criterio de aceitacao, meta mensuravel, "o que NAO fazer", arquivos/services alvo.
+2. **Revisar a entrega lendo o diff**: arquitetura, SOLID, **caminho do dinheiro**, seguranca/autorizacao, migrations e reversibilidade, i18n, aderencia ao plano, higiene (catch mudo, endpoint aberto, artefato commitado).
+3. **Confiar nos numeros do PR + no CI** para build/testes. Rodar, no maximo, `dotnet test --filter "FullyQualifiedName~<Area>"` quando precisar **provar** um furo especifico, e `dotnet build` quando ele mesmo alterar codigo na PR de review.
+4. **Escrever a review no WORK_PLAN** com veredito no titulo (`APROVADO` / `APROVADO com ressalva` / `REPROVADO`), resultado **por fase**, ressalvas (bloqueante vs. nao-bloqueante) e o que vai pro proximo ciclo.
+5. **Corrigir na PR de review** apenas o que e pequeno e critico (seguranca, dinheiro, warning); o resto vira fase do proximo ciclo.
+6. **Planejar o ciclo seguinte** a partir das ressalvas, no mesmo PR de review.
+7. Verificar o **CI** do proprio PR e nunca afirmar "mergeado" sem fonte autoritativa.
+8. Reportar ao Robson: veredito, link do PR, status real do CI, pendencias dele.
+
+### O que o SENIOR NAO faz
+- **Nao roda a suite completa** (~2.300 testes) para revisar -- isso e do Pleno (regra 28).
+- Nao sobe app/Postgres/navegador para E2E por conta propria; **E2E so quando o Robson pedir explicitamente**.
+- Nao implementa feature grande, nao refatora em massa, nao "termina o ciclo" pelo Pleno.
+- Nao muda regra de negocio ja ratificada sem decisao do Robson.
+- Nao devolve review vaga: sem numeros no PR, **devolve pedindo os numeros** em vez de executar a suite.
 
 ---
 
@@ -40,6 +74,7 @@ Esta secao complementa a "Regras para o Pleno (OBRIGATORIO)" (detalhada mais aba
 - **CSS**: mobile-first, breakpoint unico **768px** (`@media (max-width:768px)` mobile, `@media (min-width:769px)` desktop), usar **CSS vars** (nunca hex/rgba hardcoded em scoped CSS), sem `!important` novo, modular por dominio. Ver regras 1-2, 18-23 e "CSS Vars Permitidas".
 - **i18n sempre (nova regra -- ver regra 25)**: toda string visivel ao usuario passa pelo `UiTextService`/`@Ui[...]` (chave por dominio). Proibido texto hardcoded em markup `.razor` ou em mensagens de retorno de service. i18n faz parte do "done" do incremento, junto com o TDD.
 - **Qualidade minima por incremento**: `dotnet build` 0 warning + suite verde (filtrando os testes ambientais de Postgres). Sem `Console.Write`/debug commitado. Sem string de UI hardcoded nova.
+- **Quem roda build e teste (regra 28)**: o **Pleno** roda `dotnet build --no-incremental` e a **suite completa** antes de abrir o PR e **cola os numeros no corpo do PR** (`0 Warning(s)`, `Failed/Passed/Total`, quais falhas sao ambientais). O **Senior nao repete a suite completa** na review -- ele revisa diff/arquitetura/seguranca/dinheiro e confia nesses numeros + no CI. Suite completa rodada no lado do Senior queima cota que deveria ir para revisao e direcionamento.
 
 ### Como agir (fluxo de trabalho)
 - **1 branch por ciclo, 1 PR por ciclo** (excecao: mudancas so-de-doc `.md` podem ir direto pra main -- regra 16). Nunca push direto na `main` para codigo.
@@ -52,6 +87,7 @@ Esta secao complementa a "Regras para o Pleno (OBRIGATORIO)" (detalhada mais aba
 - Toda pergunta ao Senior vai numa subsecao clara (ex.: "Questionamento do Pleno -- Ciclo X"). O Senior responde na mesma regiao.
 - Achados de bug durante um ciclo de teste: registrar como achado, NAO consertar no mesmo ciclo (a menos que o plano peca).
 - Ao entregar um ciclo, resumir no PR: o que foi feito por fase, contagem de testes antes/depois, e qualquer desvio do plano.
+- **Sem os numeros de build/teste no PR, o ciclo nao esta entregue** (regras 27 + 28): o Senior devolve o PR pedindo os numeros em vez de rodar a suite por conta propria.
 
 ---
 
@@ -64,6 +100,7 @@ Criar uma secao `## Ciclo N (Pleno) -- <titulo>` contendo:
 - **Objetivo** (1-2 linhas) e por que o ciclo existe.
 - **Fases** numeradas, cada uma com procedimento e **criterio de aceitacao**.
 - **Meta de saida** mensuravel (ex.: "0 code-behind > 250 LOC", "+X testes", "0 warning").
+- **Evidencia exigida na entrega**: numeros de build + suite completa colados no PR (regra 28) -- e o Pleno que executa.
 - **O que NAO fazer** (limites do escopo).
 - Referencia aos alvos concretos (arquivos, services).
 
@@ -71,7 +108,7 @@ Criar uma secao `## Ciclo N (Pleno) -- <titulo>` contendo:
 Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, de forma **explicita** (foi pedido pelo Pleno):
 - **Veredito** no titulo: `APROVADO`, `APROVADO com ressalva`, ou `REPROVADO`.
 - **PR e branch** auditados + confirmacao de que ja esta na `main` (ou nao).
-- **Evidencias**: build (warnings), contagem de testes antes/depois, separando falhas ambientais de regressao.
+- **Evidencias**: build (warnings) e contagem de testes antes/depois **conforme reportado pelo Pleno no PR** + status do CI, separando falhas ambientais de regressao. O Senior **nao** roda a suite completa (regra 28); se precisar provar um furo, roda apenas `dotnet test --filter` da area.
 - **Por fase**: o que foi entregue vs. o que o plano pedia (META ATINGIDA / PARCIAL / FALTOU).
 - **Ressalvas** (bloqueante vs. nao-bloqueante) e o que fica pro proximo ciclo.
 - **Pendencias do Robson** repetidas (para nao se perderem).
@@ -82,7 +119,53 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Estado Atual do Projeto (pos-Ciclo 22)
+## Mapa de Progresso e Proximos Passos (atualizado pos-Ciclo 28)
+
+### Progresso por eixo
+
+| Eixo | Estado | O que falta |
+|---|---|---|
+| Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
+| Cobertura de testes | **BOM** -- 2290/2314, +340 testes desde o C21 | Sem teste de **render** das telas (logica esta em helpers/services). C29 Fase E avalia. |
+| i18n (regra 25) | **CONCLUIDO na pratica** (C25-C28) -- ~450 strings migradas, PT/EN/ES, teste anti-hardcode com/sem acento validado empiricamente | 2 entradas de allowlist (format string de data) -> C29 Fase C. |
+| Pagamento V1 manual (jogador) | **CONCLUIDO** -- grupo nasce manual, Pix do organizador + QR com valor total, comprovante, confirmacao do organizador, rejeicao com motivo | Validacao em navegador e feita **manualmente pelo Robson** (F12/mobile). Nao ha gravacao/E2E automatizado do caminho do dinheiro. |
+| Taxa da plataforma R$ 0,75 (futsal, modo manual) | **CONCLUIDO** -- snapshot no pagamento, taxa discriminada (`15,00 + 0,75 = 15,75`) inclusive no QR, ledger por partida, residuo por valor | Idem. |
+| Repasse organizador -> plataforma | **CONCLUIDO** -- aba do organizador (selecao explicita de partidas, somatorio, Pix da plataforma, comprovante, historico), fila do admin (confirmar/rejeitar com motivo), endpoint do comprovante autorizado, sem autoquitacao | Idem. |
+| Consolidacao tecnica do repasse | **PENDENTE** | Ciclo 29 (planejado): `DelinquencyService` morto, extrair `PlatformFeeCoverage`, allowlist i18n, FK `Restrict`, cobertura de render. |
+| Seguranca | **BOM** -- webhooks autenticados, authz admin 17/17 + teste de convencao, CSP/HSTS, secret Efi fora do repo, teste que impede endpoint de seed/debug aberto, autorizacao do repasse no service | Pen-test financeiro antes de producao; pendencias de prod do Robson. |
+| Login/identidade | **Implementado** (Google criar-ou-vincular, SMTP, confirmacao de email) | **Testavel em DEV** (ver "Google/SMTP em dev" abaixo) -- nunca exercitado de fato. Robson gera o OAuth Client de dev; prod exige um segundo Client. |
+| Mobile UX | **Em andamento, validado pelo Robson tela por tela** (F12/emulacao mobile) -- navegacao, estados vazios (`NoGroupsHint`), UX do Profile refeita | Continuar o modelo atual: Robson aponta a tela, o ciclo corrige. **Nao** transformar em varredura sistematica sem ele pedir. |
+| Pix automatico (V2) | **Codigo pronto e preservado atras do toggle** | Bloqueado nas pendencias do Robson (rotacao Efi, homologacao, nota fiscal). |
+| Observabilidade / operacao | Serilog + OpenTelemetry + alerta de payout | Metricas SignalR, alertas operacionais, revisao de CSP -- antes de producao. |
+| E2E automatizado em navegador | **NUNCA EXECUTADO** pelo Senior/Pleno (2 tentativas cairam por cota) | Nao e bloqueio: o Robson valida manualmente. Fica como reforco opcional do caminho do dinheiro. |
+| WhatsApp | **NAO INICIADO** -- ultima feature do escopo | Decisao pendente do Robson: **Cloud API oficial** (Business verificado + numero dedicado + templates aprovados) vs. **deep link `wa.me`** (sem custo/aprovacao, usuario clica pra enviar). O esforco muda radicalmente. |
+
+### Proximos passos, em ordem
+
+1. **Mergear a PR #93** (review do C28 + fix do residuo + regra 28 + secao de deveres). Bloqueia o inicio limpo do C29.
+2. **Ciclo 29 pelo Pleno** (ja planejado abaixo): consolidacao tecnica pos-repasse -- `DelinquencyService`, `PlatformFeeCoverage`, allowlist i18n, FK, cobertura. Entrega com os numeros de build/teste no PR (regra 28).
+3. **Ciclo 30 -- Login Google + email validados em PRODUCAO** (decisao do Robson; ver secao abaixo): deploy no EasyPanel e exercitar criar-ou-vincular Google + confirmacao de email com envio real, antes de divulgar o login.
+4. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): bloqueado na decisao Cloud API vs. `wa.me`.
+5. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
+6. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
+
+**Fora da fila**: E2E automatizado em navegador (opcional -- o Robson valida manualmente); varredura mobile sistematica (o modelo atual, tela por tela apontada pelo Robson, esta funcionando); Redis (so com multi-instancia ou gargalo medido); .NET 10 (quando o LTS sair).
+
+### Google OAuth e email: onde validar
+
+**Decisao do Robson: validar tudo direto em PRODUCAO** (Google Auth + email real). Justificativa: o deploy no EasyPanel e simples, o dominio real com HTTPS e exatamente o que o Google espera (some o atrito do `localhost`), e o app ainda nao tem base de usuarios. Dev com `localhost`/catcher local fica disponivel como alternativa, mas nao e o caminho escolhido.
+
+O que isso exige e como reduzir o risco:
+
+1. **Credenciais**: `ClientId`/`ClientSecret` e SMTP **somente como env vars no EasyPanel**, nunca em `appsettings*.json` (regra ja vigente desde a Efi).
+2. **Consent screen**: usamos apenas escopos basicos (`email`, `profile`), portanto publicar dispensa verificacao da Google -- mas exige URL de politica de privacidade. Em modo *Testing* so os emails cadastrados como test users conseguem logar.
+3. **Risco principal nao e a credencial, e o `criar-ou-vincular` contra dados reais.** A logica atual: login externo ja vinculado entra; email existente **vincula** (`AddLoginAsync`); email novo cria conta com `EmailConfirmed=true`. Um bug ai nao aparece como erro -- ele funde contas ou da acesso a conta errada, e em banco de producao isso e irreversivel. **Protocolo obrigatorio**: exercitar os 3 caminhos com a conta do Robson + uma conta de teste **antes** de divulgar o login a qualquer usuario.
+4. **Email real**: manter o volume baixo no inicio e conferir SPF/DKIM/DMARC do dominio -- dominio novo sem esses registros cai em spam e queima reputacao de envio. Testar o link de confirmacao com o email do Robson primeiro.
+5. **Rollback**: qualquer problema no fluxo de login = desligar o botao do Google (configuracao) e voltar ao login por email/senha, que ja esta em uso.
+
+---
+
+## Estado Atual do Projeto (pos-Ciclo 28)
 
 - **Refatoracao estrutural: CONCLUIDA.** Code-behinds todos < 250 LOC; CSS modularizado por dominio (`site.css` 5.589->1.615, `events.css` 3.679->1.639, + `admin/buttons/entity-shell/event-detail/events-table/event-listing/event-create/identity/tables/escalacao/payments/marketplace.css`, todos linkados em `Pages/_Host.cshtml`); services extraidos e agora **cobertos por teste** (Ciclo 22, +174 testes).
 - **Pagamento real + taxa: implementado e revisado.** Modelo = **intermediacao automatica** (site recebe o total na chave Pix central -> webhook confirma -> Envio de Pix automatico do valor base pra chave do organizador, retendo a taxa). Taxa **FIXA**: R$0,50 (plataforma) + R$0,25 (gateway) por cima do valor da partida. Payout com retry/backoff/idempotencia deterministica + alerta admin em falha. Guarda-corpo: bloqueia cobranca se o grupo nao tem chave Pix de repasse. `serviceFeePercentage` (legacy percentual) removido de ponta a ponta.
@@ -101,18 +184,20 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 - **Rotacionar o ClientSecret Efi** no painel (o valor antigo ficou no historico do git) e reconfigurar via user-secrets (dev) / env no EasyPanel (prod). **Adiado** -- Robson viajando, sem acesso ao painel Efi.
 - **Validar o Envio de Pix Efi em homologacao** (credenciais + certificado .p12 -- ver Troubleshooting; solucao base64 disponivel). Confirmar limites de envio de Pix.
 - **Confirmar com contador** a nota fiscal sobre a taxa de servico (o dinheiro passa pela conta do site = intermediacao).
-- **Gerar credenciais Google OAuth** em prod (ver secao dedicada) + credenciais SMTP/provedor de email.
+- **Gerar o OAuth Client de PROD** (redirect `https://<dominio>/signin-google`) + publicar a consent screen (escopos basicos email/profile dispensam verificacao; exige URL de politica de privacidade) e configurar `ClientId`/`ClientSecret` + SMTP como **env vars no EasyPanel** -- desbloqueia o Ciclo 30. Client de dev nao e mais necessario (decisao: validar direto em prod).
+- **Decidir o modelo do WhatsApp**: Cloud API oficial (Meta) vs. deep link `wa.me` vs. **uma ferramenta de terceiro recomendada a ele** (nome a confirmar) -- desbloqueia o Ciclo 31. Nao planejar o ciclo antes dessa informacao: o desenho muda completamente (provider externo exige avaliar custo, lock-in, dados de contato saindo da plataforma e se o numero e da plataforma ou do organizador).
 - Confirmar `SyncPassword=false` em producao; confirmar mTLS do webhook Efi ativo em prod.
+- (SMTP/provedor de email em prod: **nao bloqueia dev** -- em dev usa-se catcher local ou Gmail App Password.)
 
 ### Candidatos a proximos ciclos (Senior planeja quando priorizado)
-- **Login Google em producao** (apos Robson gerar OAuth Client) + testes dos fluxos de login.
-- **Mobile UX critico** (prioridade do Robson): fluxos entrar-em-grupo / ver-eventos / confirmar-presenca / pagar Pix/BTC / consultar comprovante / estados vazios.
-- **Cobertura crescente** de testes nos demais services; E2E mobile (Playwright 375px/768px/desktop).
-- **WhatsApp real + baseline operacional por gateway** -- POSTERGADO (aguardando ideias de outro dev).
+- **Login Google + email em PROD** (Ciclo 30) -- ver secao "Google OAuth e email: onde validar".
+- **WhatsApp** (Ciclo 31, ultima feature do escopo) -- sai do status POSTERGADO; aguarda apenas a decisao Cloud API vs. `wa.me`.
+- **Mobile UX**: segue no modelo incremental (Robson testa com F12, aponta a tela, o ciclo corrige) -- nao ha ciclo de varredura planejado.
+- **Cobertura crescente** de testes nos demais services; E2E automatizado (Playwright 375/768/desktop) como reforco opcional.
 - Pen-test financeiro, revisao de CSP, metricas SignalR, alertas operacionais -- antes de producao.
 - Redis: so quando houver multi-instancia ou gargalo medido (nao agora).
 
-### Aparato Geral do Senior (pos-Ciclo 23) -- backlog priorizado para o Ciclo 24
+### Aparato Geral do Senior (pos-Ciclo 23) -- backlog priorizado para o Ciclo 24 [HISTORICO -- em grande parte JA ENTREGUE nos Ciclos 24-28; a fila viva esta no "Mapa de Progresso e Proximos Passos"]
 
 Varredura Senior focada em melhorias/adicoes, **separando codigo (Pleno/Senior) das pendencias do Robson**. Base: `main` @ `cb6c89a`.
 
@@ -128,7 +213,7 @@ Varredura Senior focada em melhorias/adicoes, **separando codigo (Pleno/Senior) 
 
 **P3 -- higiene / futuro:**
 - **Teste de convencao anti-hardcode i18n** nas telas-alvo (proposto no C23, nao feito): falhar se aparecer literal acentuado em `.razor` dos fluxos principais.
-- **WhatsApp** (`Services/Events/EventNotificationService.cs:194` TODO) -- POSTERGADO.
+- **WhatsApp** (`Services/Events/EventNotificationService.cs:194` TODO) -- promovido a Ciclo 31 (ultima feature do escopo).
 - E2E mobile (Playwright 375/768/desktop) dos fluxos principais -- quando priorizado.
 
 **Pendencias do Robson (fora do codigo) -- NAO sao do proximo ciclo de codigo:**
@@ -166,11 +251,53 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 27 | Fechar a Fase 3 (UI do repasse) + Fase 6 (anti-hardcode) | 6 fases entregues: (A) UI do repasse lado organizador em `Payments.razor` (aba "Taxa da plataforma", lista por partida, somatório, Pix da plataforma via config + QR, enviar comprovante, histórico); (B) UI do repasse lado admin em `AdminRevenue.razor` (grupos com saldo, fila de lotes, confirmar/rejeitar com motivo); (C) endpoint `GET /api/fee-settlement-proof/{id}` com autorização extraída para `PlatformFeeSettlementProofAuthorizer` + 10 testes de autorização; (D) baixa FIFO por partida em `PlatformFeeLedgerService.GetGroupFeeBreakdownByMatchAsync` + 10 testes; (E) teste anti-hardcode de verdade (`AntiHardcodeI18nTests` varre 143 `.razor`, allowlist explícita) + 7 residuais migrados + removido `if (enUs.Count == 0) return;` do `I18nKeyParityTests`; (F) limpeza C26: `eval`→`site.js` função nomeada, `StateHasChanged` após `_highlightPix`, 11 mensagens de service via `UiTextService`, indentação `Program.cs`. 2223→2261 (+38). | #90 (impl), #91 (review) | APROVADO c/ ressalvas -- Senior removeu endpoint de seed aberto e fechou 3 furos financeiros |
 
+| 28 | Fechar as ressalvas do C27 | 5 fases entregues: (A) `AntiHardcodeI18nTests` agora detecta tambem palavra PT **sem** acento (lista de ~150 palavras) -- validado empiricamente pelo Senior; (B) `Shared/Components/**` migrado, allowlist de ~24 entradas reduzida a 2 (formato de data com "as") + marca; (C) CSV `SelectedEventIds` -> tabela `PlatformFeeSettlementItem` com FK + indice unico + migration com **backfill** e `Down` reversivel; (D) `PlatformFeeSelectionState` (helper puro) + rejeicao exige motivo **no service**; (E) higiene do `Payments` (`catch` loga, metodos duplicados unificados). Extras achados pelo Pleno testando: `MarkPaidAsync` nao carimbava a taxa (repasse nunca fechava pela aba Comprovantes) e telas do admin mostravam R$ 15,00 enquanto o jogador pagava R$ 15,75. 2261->2287 (+26). | #92 (impl), #93 (review) | APROVADO -- Senior fechou 1 furo de residuo de taxa |
+
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
 ---
 
 # Detalhes dos Ciclos Recentes (planos + reviews na integra)
+
+---
+
+## Review Senior do Ciclo 28 (PR #92, mergeada na `main`) -- APROVADO
+
+**Escopo revisado**: commits `f030cd7`..`cbb6331` (8 commits, 54 arquivos, +3126/-208), mergeados via `b972a75`.
+
+**Build**: `dotnet build --no-incremental` -> **0 warning / 0 error** (meta do ciclo cumprida).
+**Testes**: **2287 verdes** (era 2267, +20), 24 falhas = `ProgramConfigurationTests` sem PostgreSQL em `127.0.0.1:5432` -- **ambientais**, mesmas de sempre.
+
+### Resultado por fase
+
+| Fase | Veredito | Observacao |
+|---|---|---|
+| A -- anti-hardcode alem do acento | **OK, verificado empiricamente** | `PtUnaccentedWords` com ~150 palavras PT comuns + strip de expressoes Blazor (`@(...)`, `@Ui["..."]`, `@Variavel`) antes de avaliar. Nao aceitei so a leitura: injetei `<span>Enviar comprovante</span>` num componente de `Shared` e o teste **falhou apontando arquivo e linha** (143 arquivos / 13.713 linhas varridos); revertido depois. A regra 25 agora tem guarda de verdade. |
+| B -- migrar `Shared/Components/**` | **OK** | A allowlist saiu de ~24 entradas de `Shared` para **2** (`EventPayment|as` e `EventPaymentProof|as`, ambas o "as" **dentro de format string de data**, nao texto visivel) + marca (`Confirmai`, `Confirma Ai!`, `Bora jogar!?`). 12 componentes de `Shared` migrados, ~130 chaves novas em `CoreTexts`/`GroupTexts`/`FutsalTexts`/`PokerTexts`/`AdminTexts`. |
+| C -- CSV -> tabela | **OK, migration bem feita** | `PlatformFeeSettlementItem` (`SettlementId`, `EventId`, `FeeAmount`) com FK `Cascade` p/ settlement, `Restrict` p/ evento e indice **unico** `(SettlementId, EventId)`. A migration cria a tabela, **faz backfill** do CSV (`string_to_array`/`unnest`, `FeeAmount` = soma de `PlatformFeeAmount` do evento) e **so depois** dropa a coluna -- ordem correta, nada de dado perdido; o `Down` reconstroi o CSV a partir dos itens. Ledger e service passaram a consultar a tabela em vez de parsear texto. |
+| D -- cobertura das telas | **OK** | `PlatformFeeSelectionState` (`IsSelectable`, `SelectedAmount`, `CanSubmit`) extraido puro e coberto por 9 testes, com a pagina delegando; rejeicao **sem motivo** agora e recusada **no service** (`ReviewSettlementAsync`) e tambem na UI (defense in depth) -- o certo, ja que a UI nao e fronteira de seguranca. |
+| E -- higiene | **OK** | `catch (Exception)` do `ConfirmSettlementSubmit` agora usa `LogError`; `RefreshFeeOverview`/`LoadFeeOverviewAsync` (identicos) unificados. |
+
+### Dois bugs de dinheiro que o Pleno achou testando (fora do plano, com razao)
+
+1. **`MarkPaidAsync` nao carimbava a taxa.** Existem dois caminhos para o organizador confirmar o pagamento do jogador: `AdminConfirmationService.TogglePaidAsync` (que chamava `StampFeeOnPaidAsync`) e `GroupPaymentsService.MarkPaidAsync`, usado pela aba **Comprovantes** de `/grupo/{id}/pagamentos` -- que **nao chamava**. Ou seja: quem confirmava pela aba de comprovantes marcava o jogador como pago e a taxa **nunca entrava no ledger**; a partida nao aparecia na aba "Taxa da plataforma" e o repasse nunca fechava. Corrigido com o mesmo padrao do outro caminho (try/catch com `LogError`, non-blocking mas nunca silencioso) + teste.
+2. **Admin via R$ 15,00 onde o jogador pagava R$ 15,75.** `GroupPaymentsService` e `DelinquencyService` montavam `DelinquencyEntry`/`PendingProofEntry`/`PaymentHistoryEntry` com `Event.Price` cru, sem a taxa manual -- o comprovante dizia 15,75 e a tela de revisao dizia 15,00. Agora os tres pontos usam `ManualPlatformFee.TotalToPay(...)`, a mesma fonte do QR e da tela do jogador (+4 testes).
+
+Ambos sao exatamente o tipo de achado que eu quero do Pleno: bug real no caminho do dinheiro, com teste. Tambem entrou um `ManualPlatformFeeFlowE2ETests` costurando a cadeia inteira (comprovante do jogador -> confirmacao -> carimbo da taxa -> lote -> aprovacao -> saldo zerado).
+
+### Correcao aplicada pelo Senior nesta review (PR #93)
+
+**P1 -- taxa residual ficava impossivel de quitar.** Com a selecao explicita, o status por partida era booleano: `EventId` presente em algum lote `Pago` => partida `Pago`. Cenario real: o organizador envia o repasse na quarta cobrindo a partida de segunda; na quinta um **jogador atrasado paga a mesma partida** e o `StampFeeOnPaidAsync` acumula outros R$ 0,75. Resultado antes do fix: a partida aparecia `Pago` (nao selecionavel), mas o saldo agregado do grupo (`accrued - settled`) continuava acusando R$ 0,75 de divida -- **divida visivel que o organizador nao tinha como pagar**, e que o admin cobraria sem contrapartida na tela.
+- `GetGroupFeeBreakdownByMatchAsync` passou a comparar **valores**: `covered` = soma do `FeeAmount` dos itens em lotes `Pago`; a partida so e `Pago` quando `covered >= accrued`, senao continua `Pendente` **exibindo o residual**.
+- `SubmitSettlementAsync` acompanha: o bloqueio de reenvio agora e (a) partida em lote `EmAnalise` **ou** (b) residual `<= 0`; e o `expected` do `amount` (e o `FeeAmount` do item) passou a ser o **residual**, nao o acumulado -- senao o organizador pagaria a partida duas vezes inteira.
+- +3 testes: residual pendente no breakdown, submit do residual aceito, partida totalmente coberta ainda recusada.
+
+### Ressalvas que ficam para o Ciclo 29
+
+- **`DelinquencyService` e codigo morto.** Esta registrado no DI, mas `grep` confirma que **nenhuma pagina ou service o chama** -- a producao usa `GroupPaymentsService`, que tem a mesma logica duplicada. O fix da taxa do item 2 foi aplicado nos dois (correto, por seguranca), mas a duplicacao e a armadilha do parametro `enablePaymentGateways = false` **default** (um futuro caller que esquecer o argumento passa a mostrar taxa em grupo com gateway ligado) pedem consolidacao: ou o service passa a ser usado, ou sai.
+- **`internal static GetCoveredFeeByEventAsync` mora no ledger e e usado pelo settlement service.** Foi o menor acoplamento possivel para nao duplicar a regra do residual, mas o lugar natural e um `PlatformFeeCoverage` proprio.
+- **FK `Restrict` em `PlatformFeeSettlementItem.EventId`**: hoje nao existe exclusao de `Event` em nenhum fluxo (`grep` por `Events.Remove` nao acha nada), entao nao ha regressao; se um dia entrar "excluir partida", ela vai falhar em partida com repasse -- o que e o comportamento certo, mas precisa de mensagem tratada.
+- **Sem teste de UI das telas** (segue valendo do C27): a logica esta em helpers/services testados, os componentes nao tem cobertura de render.
 
 ---
 
@@ -269,7 +396,25 @@ Na pratica: **a feature ainda nao existe para o usuario**. O saldo acumula e nin
 
 ---
 
-## Ciclo 28 (Pleno) -- Fechar as ressalvas do C27 [PLANEJADO]
+## Ciclo 29 (Pleno) -- Consolidacao pos-repasse [PLANEJADO]
+
+**Regra de ouro**: TDD, SOLID, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, 1 commit por fase. **Nao** reabrir o desenho do repasse (selecao explicita de partidas + residual por valor estao ratificados).
+
+**Novo nesta entrega (regra 28)**: o corpo do PR deve conter, colado do terminal, (a) a linha `0 Warning(s)` / `0 Error(s)` do `dotnet build --no-incremental` e (b) a linha final do `dotnet test` completo (`Failed: N, Passed: N, Total: N`), com as falhas ambientais identificadas. Sem esses dois blocos a review nao comeca -- o Senior nao roda mais a suite completa.
+
+- **Fase A -- resolver o `DelinquencyService`**: hoje e codigo morto com logica duplicada do `GroupPaymentsService`. Escolher **um** dos dois caminhos e justificar no PR: (a) `GroupPaymentsService` passa a delegar nele (removendo a duplicacao e o `default false` do `enablePaymentGateways`, que deve virar parametro obrigatorio), ou (b) o service e removido do DI e do repo, com os testes migrados. Teste de caracterizacao antes de mover qualquer linha.
+- **Fase B -- extrair a regra de cobertura da taxa**: `PlatformFeeLedgerService.GetCoveredFeeByEventAsync` e `internal static` e consumida pelo `PlatformFeeSettlementService`. Extrair para um tipo proprio (ex.: `PlatformFeeCoverage`) com testes diretos, e os dois services passam a depender dele.
+- **Fase C -- fechar as 2 ultimas entradas da allowlist de i18n**: `EventPayment|as` e `EventPaymentProof|as` sao format strings de data (`"dd/MM 'as' HH:mm"`). Mover o **padrao de formato** para chave de i18n (cada idioma tem o seu) e zerar a `ResidualAllowlist`.
+- **Fase D -- exclusao de partida com repasse**: a FK `Restrict` de `PlatformFeeSettlementItem.EventId` faz sentido, mas nao existe fluxo de exclusao de partida. Se/quando entrar, precisa de mensagem tratada em vez de excecao de banco -- **so implementar se o fluxo existir**; senao, registrar como decisao e seguir.
+- **Fase E -- cobertura de render das telas do repasse**: avaliar bUnit (o projeto nao tem) em um PR de spike **fechado**, ou entao teste de logica adicional para o que ainda nao esta em helper (ordenacao da lista, formatacao do resumo). Nao introduzir dependencia nova sem aprovacao.
+
+### O que NAO fazer
+
+Nao mexer no fluxo do dinheiro do jogador; nao remover o codigo do V2; nao permitir que o organizador aprove o proprio lote; nao reintroduzir endpoint de seed/debug fora do bloco de desenvolvimento; nao criar doc solto na raiz.
+
+---
+
+## Ciclo 28 (Pleno) -- Fechar as ressalvas do C27 [EXECUTADO -- ver review acima]
 
 **Regra de ouro**: TDD, SOLID, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, 1 commit por fase. **Nao** reabrir o desenho do repasse (selecao explicita de partidas esta ratificado).
 
@@ -1143,6 +1288,13 @@ Implementação de suporte a certificado via variável de ambiente em base64:
 26. **Auditoria/logs como regra no fluxo de desenvolvimento**: alem de TDD, boas praticas de CSS e documentacao, todo incremento deve incluir verificacao de auditoria -- logs relevantes (Serilog) em fluxos criticos, telemetria quando aplicavel, e verificacao de que mudancas de UI/CSS sao confirmadas visualmente (print ou inspecao no browser) antes do commit. O Pleno deve registrar na descricao do PR quais telas foram verificadas visualmente e como. "Nao mudou nada" sem evidencia nao e aceitavel -- se o estilo nao apareceu, investigar causa raiz (cache, ordem de CSS, scoped vs global) antes de commitar.
 
 27. **Entrega do PR ao final do ciclo**: ao concluir um ciclo e fazer push da branch, o Pleno deve responder ao Senior (no chat/IDE) com 3 itens: (a) **title** do PR (titulo conciso, prefixo `feat(cicloN)` ou `refactor(cicloN)`); (b) **body** do PR (resumo do que foi feito por fase, contagem de testes antes/depois, desvios do plano, arquivos modificados); (c) **link de criacao do PR** (URL `https://github.com/.../pull/new/<branch>` gerada pelo `git push`). O Pleno nao deve considerar o ciclo "entregue" ate esses 3 itens estarem apresentados.
+
+28. **Build e suite completa sao responsabilidade do PLENO -- nao do Senior**: rodar `dotnet build --no-incremental` e `dotnet test` (suite inteira, hoje ~2.300 testes) e caro em tempo/tokens e nao pode ser repetido do lado do Senior a cada review. Divisao de trabalho obrigatoria:
+    - **Pleno (executa)**: roda build + suite completa **antes de abrir o PR** e cola no corpo do PR, textualmente: a linha `0 Warning(s) / 0 Error(s)`, a linha final do `dotnet test` (`Failed: N, Passed: N, Total: N`) e a classificacao das falhas (as 24 `ProgramConfigurationTests` sem PostgreSQL sao **ambientais**). Sem esses numeros o ciclo **nao esta entregue** (complementa a regra 27). Se a suite estiver vermelha por outro motivo, o PR nao abre.
+    - **Senior (revisa)**: le diff, arquitetura, seguranca, caminho do dinheiro, i18n e consistencia com o plano. **Nao** roda a suite completa por padrao -- confia nos numeros do PR e no CI. Pode rodar, no maximo, `dotnet test --filter "FullyQualifiedName~<Area>"` quando precisar **provar** um furo especifico que encontrou, e `dotnet build` quando alterar codigo na propria PR de review.
+    - **CI e a rede de seguranca**: o workflow `Build & Test .NET 9` roda a suite completa no GitHub. Divergencia entre o numero declarado no PR e o CI e tratada como problema do Pleno.
+    - **E2E de navegador** so acontece quando o Robson pedir explicitamente, nunca como parte automatica da review.
+    - Motivo registrado: nas reviews dos Ciclos 27/28 a suite completa foi rodada 2-3x por review no ambiente do Senior, consumindo cota que deveria ir para revisao e direcionamento. A funcao do Senior e organizar, direcionar, orientar e revisar.
 
 ---
 
