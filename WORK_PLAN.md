@@ -128,28 +128,36 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 | Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
 | Cobertura de testes | **BOM** -- 2290/2314, +340 testes desde o C21 | Sem teste de **render** das telas (logica esta em helpers/services). C29 Fase E avalia. |
 | i18n (regra 25) | **CONCLUIDO na pratica** (C25-C28) -- ~450 strings migradas, PT/EN/ES, teste anti-hardcode com/sem acento validado empiricamente | 2 entradas de allowlist (format string de data) -> C29 Fase C. |
-| Pagamento V1 manual (jogador) | **CONCLUIDO** -- grupo nasce manual, Pix do organizador + QR com valor total, comprovante, confirmacao do organizador, rejeicao com motivo | Validacao E2E em navegador (nunca rodada -- cota). |
-| Taxa da plataforma R$ 0,75 (futsal, modo manual) | **CONCLUIDO** -- snapshot no pagamento, taxa discriminada (`15,00 + 0,75 = 15,75`) inclusive no QR, ledger por partida, residuo por valor | Idem: falta prova em navegador. |
+| Pagamento V1 manual (jogador) | **CONCLUIDO** -- grupo nasce manual, Pix do organizador + QR com valor total, comprovante, confirmacao do organizador, rejeicao com motivo | Validacao em navegador e feita **manualmente pelo Robson** (F12/mobile). Nao ha gravacao/E2E automatizado do caminho do dinheiro. |
+| Taxa da plataforma R$ 0,75 (futsal, modo manual) | **CONCLUIDO** -- snapshot no pagamento, taxa discriminada (`15,00 + 0,75 = 15,75`) inclusive no QR, ledger por partida, residuo por valor | Idem. |
 | Repasse organizador -> plataforma | **CONCLUIDO** -- aba do organizador (selecao explicita de partidas, somatorio, Pix da plataforma, comprovante, historico), fila do admin (confirmar/rejeitar com motivo), endpoint do comprovante autorizado, sem autoquitacao | Idem. |
 | Consolidacao tecnica do repasse | **PENDENTE** | Ciclo 29 (planejado): `DelinquencyService` morto, extrair `PlatformFeeCoverage`, allowlist i18n, FK `Restrict`, cobertura de render. |
 | Seguranca | **BOM** -- webhooks autenticados, authz admin 17/17 + teste de convencao, CSP/HSTS, secret Efi fora do repo, teste que impede endpoint de seed/debug aberto, autorizacao do repasse no service | Pen-test financeiro antes de producao; pendencias de prod do Robson. |
-| Login/identidade | **Implementado** (Google criar-ou-vincular, SMTP, confirmacao de email) | **Depende do Robson**: OAuth Google prod + SMTP prod. Nunca exercitado em producao. |
-| Mobile UX | **Incremental, sem ciclo dedicado** -- navegacao, estados vazios (`NoGroupsHint`), UX do Profile refeita | Varredura mobile 375/768 dos fluxos principais (nao feita de forma sistematica). |
+| Login/identidade | **Implementado** (Google criar-ou-vincular, SMTP, confirmacao de email) | **Testavel em DEV** (ver "Google/SMTP em dev" abaixo) -- nunca exercitado de fato. Robson gera o OAuth Client de dev; prod exige um segundo Client. |
+| Mobile UX | **Em andamento, validado pelo Robson tela por tela** (F12/emulacao mobile) -- navegacao, estados vazios (`NoGroupsHint`), UX do Profile refeita | Continuar o modelo atual: Robson aponta a tela, o ciclo corrige. **Nao** transformar em varredura sistematica sem ele pedir. |
 | Pix automatico (V2) | **Codigo pronto e preservado atras do toggle** | Bloqueado nas pendencias do Robson (rotacao Efi, homologacao, nota fiscal). |
 | Observabilidade / operacao | Serilog + OpenTelemetry + alerta de payout | Metricas SignalR, alertas operacionais, revisao de CSP -- antes de producao. |
-| E2E em navegador | **NUNCA EXECUTADO** | Duas tentativas cairam por cota. E o unico eixo sem nenhuma evidencia. |
+| E2E automatizado em navegador | **NUNCA EXECUTADO** pelo Senior/Pleno (2 tentativas cairam por cota) | Nao e bloqueio: o Robson valida manualmente. Fica como reforco opcional do caminho do dinheiro. |
+| WhatsApp | **NAO INICIADO** -- ultima feature do escopo | Decisao pendente do Robson: **Cloud API oficial** (Business verificado + numero dedicado + templates aprovados) vs. **deep link `wa.me`** (sem custo/aprovacao, usuario clica pra enviar). O esforco muda radicalmente. |
 
 ### Proximos passos, em ordem
 
 1. **Mergear a PR #93** (review do C28 + fix do residuo + regra 28 + secao de deveres). Bloqueia o inicio limpo do C29.
 2. **Ciclo 29 pelo Pleno** (ja planejado abaixo): consolidacao tecnica pos-repasse -- `DelinquencyService`, `PlatformFeeCoverage`, allowlist i18n, FK, cobertura. Entrega com os numeros de build/teste no PR (regra 28).
-3. **E2E do fluxo do dinheiro em navegador** -- quando o Robson pedir e houver cota: pagamento do jogador com taxa (15,75 no QR) -> comprovante -> confirmacao do organizador -> aba de taxa -> lote -> fila do admin -> aprovacao/rejeicao. E o unico eixo sem evidencia visual.
-4. **Ciclo 30 -- varredura mobile sistematica** (375/768/desktop) dos fluxos: entrar em grupo por convite, ver eventos, confirmar presenca, pagar, consultar comprovante, estados vazios. Prioridade declarada do Robson e nunca virou ciclo proprio.
-5. **Ciclo 31 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
-6. **Login Google em producao** -- assim que o Robson gerar OAuth Client + SMTP prod (ciclo curto de fumaca dos fluxos de login).
-7. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
+3. **Ciclo 30 -- Login Google + email em DEV** (ver secao abaixo): exercitar de ponta a ponta criar-ou-vincular conta Google e confirmacao de email com SMTP local. Depende so do Robson gerar o OAuth Client de dev.
+4. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): bloqueado na decisao Cloud API vs. `wa.me`.
+5. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
+6. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
 
-**Nao entram agora**: WhatsApp real (postergado), Redis (so com multi-instancia ou gargalo medido), .NET 10 (quando o LTS sair).
+**Fora da fila**: E2E automatizado em navegador (opcional -- o Robson valida manualmente); varredura mobile sistematica (o modelo atual, tela por tela apontada pelo Robson, esta funcionando); Redis (so com multi-instancia ou gargalo medido); .NET 10 (quando o LTS sair).
+
+### Google OAuth e email: o que da pra testar em DEV
+
+Decidido apos pergunta do Robson ("conseguimos testar isso em dev ou somente em prod?"). **Os dois sao testaveis em dev** -- nao precisam esperar producao:
+
+- **Google OAuth**: o Google aceita `http://localhost` como redirect URI (unica excecao a exigencia de HTTPS). Basta um OAuth Client tipo *Web application* no Google Cloud Console com `http://localhost:<porta>/signin-google` em *Authorized redirect URIs*, e `ClientId`/`ClientSecret` no user-secrets. Consent screen em modo *Testing* permite ate 100 usuarios de teste sem verificacao. **So exige prod**: dominio real no redirect URI e verificacao da consent screen (segundo Client, nao substitui o de dev).
+- **SMTP / confirmacao de email**: 100% testavel em dev. Duas opcoes -- (a) Gmail + App Password no user-secrets, email chega de verdade; (b) catcher local (`smtp4dev` / Papercut) em `localhost:25`, que intercepta e exibe o email numa UI sem enviar nada -- **preferivel** para reexercitar o link de confirmacao a vontade. Troca pra prod = so connection string.
+- **Consequencia**: a pendencia "login Google/SMTP so em prod" sai da lista do Robson e vira ciclo executavel pelo Pleno. Unico input do Robson: o OAuth Client de dev.
 
 ---
 
@@ -172,14 +180,16 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 - **Rotacionar o ClientSecret Efi** no painel (o valor antigo ficou no historico do git) e reconfigurar via user-secrets (dev) / env no EasyPanel (prod). **Adiado** -- Robson viajando, sem acesso ao painel Efi.
 - **Validar o Envio de Pix Efi em homologacao** (credenciais + certificado .p12 -- ver Troubleshooting; solucao base64 disponivel). Confirmar limites de envio de Pix.
 - **Confirmar com contador** a nota fiscal sobre a taxa de servico (o dinheiro passa pela conta do site = intermediacao).
-- **Gerar credenciais Google OAuth** em prod (ver secao dedicada) + credenciais SMTP/provedor de email.
+- **Gerar OAuth Client de DEV** (`http://localhost:<porta>/signin-google`, consent screen em *Testing*) -- desbloqueia o Ciclo 30. O Client de **prod** e um segundo Client, so no deploy.
+- **Decidir o modelo do WhatsApp**: Cloud API oficial (Meta) vs. deep link `wa.me` -- desbloqueia o Ciclo 31.
 - Confirmar `SyncPassword=false` em producao; confirmar mTLS do webhook Efi ativo em prod.
+- (SMTP/provedor de email em prod: **nao bloqueia dev** -- em dev usa-se catcher local ou Gmail App Password.)
 
 ### Candidatos a proximos ciclos (Senior planeja quando priorizado)
-- **Login Google em producao** (apos Robson gerar OAuth Client) + testes dos fluxos de login.
-- **Mobile UX critico** (prioridade do Robson): fluxos entrar-em-grupo / ver-eventos / confirmar-presenca / pagar Pix/BTC / consultar comprovante / estados vazios.
-- **Cobertura crescente** de testes nos demais services; E2E mobile (Playwright 375px/768px/desktop).
-- **WhatsApp real + baseline operacional por gateway** -- POSTERGADO (aguardando ideias de outro dev).
+- **Login Google + email em DEV** (Ciclo 30) -- ver secao "Google OAuth e email: o que da pra testar em DEV".
+- **WhatsApp** (Ciclo 31, ultima feature do escopo) -- sai do status POSTERGADO; aguarda apenas a decisao Cloud API vs. `wa.me`.
+- **Mobile UX**: segue no modelo incremental (Robson testa com F12, aponta a tela, o ciclo corrige) -- nao ha ciclo de varredura planejado.
+- **Cobertura crescente** de testes nos demais services; E2E automatizado (Playwright 375/768/desktop) como reforco opcional.
 - Pen-test financeiro, revisao de CSP, metricas SignalR, alertas operacionais -- antes de producao.
 - Redis: so quando houver multi-instancia ou gargalo medido (nao agora).
 
@@ -199,7 +209,7 @@ Varredura Senior focada em melhorias/adicoes, **separando codigo (Pleno/Senior) 
 
 **P3 -- higiene / futuro:**
 - **Teste de convencao anti-hardcode i18n** nas telas-alvo (proposto no C23, nao feito): falhar se aparecer literal acentuado em `.razor` dos fluxos principais.
-- **WhatsApp** (`Services/Events/EventNotificationService.cs:194` TODO) -- POSTERGADO.
+- **WhatsApp** (`Services/Events/EventNotificationService.cs:194` TODO) -- promovido a Ciclo 31 (ultima feature do escopo).
 - E2E mobile (Playwright 375/768/desktop) dos fluxos principais -- quando priorizado.
 
 **Pendencias do Robson (fora do codigo) -- NAO sao do proximo ciclo de codigo:**
