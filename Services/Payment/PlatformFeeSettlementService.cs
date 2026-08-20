@@ -148,8 +148,7 @@ public class PlatformFeeSettlementService
 
             // Fee already transferred per match. A match may be selected again only
             // for the residual left by late payers after an approved settlement.
-            var coveredByEvent = await PlatformFeeLedgerService
-                .GetCoveredFeeByEventAsync(db, groupId);
+            var coveredByEvent = await PlatformFeeCoverage.GetCoveredByEventAsync(db, groupId);
 
             var residualByEvent = eventIds.ToDictionary(
                 eid => eid,
