@@ -3,7 +3,6 @@ using Confirmai.Configuration;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
-using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 using Confirmai.Services.Events;
 using Confirmai.Services.Payment;
