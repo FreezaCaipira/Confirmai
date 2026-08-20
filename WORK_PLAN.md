@@ -1,8 +1,8 @@
 # Plano de Trabalho - Confirmai
 
-> **Documento unico e vivo do projeto.** Serve simultaneamente como: (1) canal de comunicacao Senior <-> Pleno; (2) todolist / linha do tempo do desenvolvimento; (3) manual de como o Pleno deve codar, agir e se comunicar; (4) memoria de contexto -- se a sessao do Senior for resetada, este arquivo permite recuperar TUDO que e necessario para continuar.
+> **Documento unico e vivo do projeto.** Serve simultaneamente como: (1) canal de comunicacao Senior <-> Pleno; (2) todolist / linha do tempo do desenvolvimento; (3) manual de como o Pleno deve codar, agir e se comunicar; (4) memoria de contexto -- se a sessao do Senior for resetada, este arquivo permite recuperar TUDO que e necessario para continuar. **Comece pela secao "Deveres do Senior x Deveres do Pleno"** -- ela define quem executa o que.
 >
-> **Base atual**: `main` pos-Ciclo 22 | **Testes**: 2124 verdes / 2148 (as 24 falhas sao `ProgramConfigurationTests` sem Postgres local = ambiente, NAO regressao) | **Build**: app e testes com **0 warning / 0 erro**.
+> **Base atual**: `main` pos-Ciclo 28 | **Testes**: 2290 verdes / 2314 (as 24 falhas sao `ProgramConfigurationTests` sem Postgres local = ambiente, NAO regressao) | **Build**: app e testes com **0 warning / 0 erro**.
 > **Stack**: .NET 9 (STS -> migrar p/ .NET 10 LTS quando lancar), Blazor Server, EF Core, PostgreSQL, ASP.NET Identity, SignalR, xUnit+Moq, OpenTelemetry/Serilog. Gateways de pagamento: EfiBank (Pix, ativo), AbacatePay, Appmax, BTCPayServer.
 
 ---
@@ -10,6 +10,7 @@
 ## Como ler este documento (para um contexto novo apos reset)
 
 Ordem de leitura recomendada quando o contexto do Senior e reiniciado:
+0. **Deveres do Senior x Deveres do Pleno** (logo abaixo) -- **ler primeiro**: define quem executa o que. Se um prompt novo comecar rodando build/suite completa durante uma review, esta violando esta secao.
 1. **Estado Atual do Projeto** (abaixo) -- onde estamos, o que esta pronto, metricas.
 2. **Pendencias & Roadmap** (abaixo) -- o que falta, o que depende do Robson.
 3. **Linha do Tempo dos Ciclos** (abaixo) -- historico condensado de cada ciclo, PR e veredito da review.
@@ -19,11 +20,43 @@ Ordem de leitura recomendada quando o contexto do Senior e reiniciado:
 
 ---
 
-## Papeis: Senior, Pleno e Robson
+## Deveres do Senior x Deveres do Pleno (LER ANTES DE QUALQUER COISA)
 
-- **Robson (dono do produto)**: levanta requisitos/bugs/melhorias testando o app (isso NAO e scope creep -- ver regra 22), define prioridades, e responsavel por acoes fora do codigo (rotacionar secrets, gerar credenciais OAuth, validar fiscal/juridico, deploy no EasyPanel).
-- **Senior (revisor/planejador)**: audita a `main`, revisa PRs do Pleno, planeja ciclos, escreve reviews e planos AQUI no WORK_PLAN, faz PRs de documentacao e correcoes de baixo risco. NAO implementa features grandes sem plano. Verifica build/testes/CI. Nao afirma "mergeado" sem fonte autoritativa.
-- **Pleno (executor)**: executa o ciclo descrito no WORK_PLAN, faz refactors incrementais com TDD, escreve testes, entrega **1 PR por ciclo** para o Senior revisar. O Pleno **nao tem acesso direto aos PRs no GitHub** -- por isso ciclos e reviews precisam estar 100% explicitos AQUI.
+> Esta secao existe para que **qualquer prompt/contexto futuro** execute exatamente como operamos hoje. Ela tem precedencia sobre habitos anteriores: se uma instrucao antiga sugerir que o Senior rode a suite completa, vale o que esta aqui.
+
+**Principio**: o **Pleno EXECUTA** (codigo, teste, build, evidencia). O **Senior ORGANIZA, DIRECIONA, ORIENTA e REVISA**. Processamento pesado (build, suite completa, servidor, navegador) fica **do lado do Pleno**; se migrar pro Senior, a cota evapora em tarefa que nao e de revisao.
+
+### Papeis
+- **Robson (dono do produto)**: levanta requisitos/bugs/melhorias testando o app (isso NAO e scope creep -- ver regra 22), define prioridades e decisoes de negocio, e responsavel por acoes fora do codigo (rotacionar secrets, credenciais OAuth, fiscal/juridico, deploy no EasyPanel). Chama o Senior para planejar ciclo ou revisar entrega. Merge dos PRs e dele.
+- **Senior (revisor/planejador/orientador)**: audita a `main`, planeja ciclos, revisa a entrega do Pleno, escreve planos e reviews AQUI no WORK_PLAN, responde questionamentos do Pleno, abre PR de documentacao e de correcao pontual de baixo risco.
+- **Pleno (executor)**: executa o ciclo descrito no WORK_PLAN com TDD, escreve testes, roda build e suite completa, entrega **1 PR por ciclo**. O Pleno **nao tem acesso direto aos PRs no GitHub** -- por isso ciclo e review precisam estar 100% explicitos AQUI.
+
+### Deveres do PLENO (executa)
+1. Implementar as fases do ciclo **na ordem** descrita no plano, 1 assunto por commit, com **TDD** (teste antes/junto).
+2. **Rodar `dotnet build --no-incremental`** e garantir **0 warning / 0 erro**.
+3. **Rodar a suite completa (`dotnet test`)** -- e o Pleno, nunca o Senior. Classificar falhas: as 24 `ProgramConfigurationTests` sem PostgreSQL local sao **ambientais**; qualquer outra vermelha impede abrir o PR.
+4. **Colar os numeros no corpo do PR** (regra 28): linha de warnings/erros do build + linha final do `dotnet test` (`Failed/Passed/Total`) + o que e ambiental. Sem isso o ciclo **nao esta entregue**.
+5. Verificar visualmente mudancas de UI/CSS e listar no PR quais telas verificou (regra 26).
+6. Aplicar i18n (regra 25) e as regras de CSS (mobile-first, 768px, CSS vars) no mesmo incremento.
+7. Registrar achados, duvidas e bloqueios **escrevendo no WORK_PLAN** (secao "Problemas Encontrados pelo Pleno"), sem consertar fora do escopo do ciclo.
+8. Entregar o PR com title + body + link de criacao (regra 27).
+
+### Deveres do SENIOR (organiza, direciona, orienta, revisa)
+1. **Planejar o ciclo**: objetivo, fases numeradas com criterio de aceitacao, meta mensuravel, "o que NAO fazer", arquivos/services alvo.
+2. **Revisar a entrega lendo o diff**: arquitetura, SOLID, **caminho do dinheiro**, seguranca/autorizacao, migrations e reversibilidade, i18n, aderencia ao plano, higiene (catch mudo, endpoint aberto, artefato commitado).
+3. **Confiar nos numeros do PR + no CI** para build/testes. Rodar, no maximo, `dotnet test --filter "FullyQualifiedName~<Area>"` quando precisar **provar** um furo especifico, e `dotnet build` quando ele mesmo alterar codigo na PR de review.
+4. **Escrever a review no WORK_PLAN** com veredito no titulo (`APROVADO` / `APROVADO com ressalva` / `REPROVADO`), resultado **por fase**, ressalvas (bloqueante vs. nao-bloqueante) e o que vai pro proximo ciclo.
+5. **Corrigir na PR de review** apenas o que e pequeno e critico (seguranca, dinheiro, warning); o resto vira fase do proximo ciclo.
+6. **Planejar o ciclo seguinte** a partir das ressalvas, no mesmo PR de review.
+7. Verificar o **CI** do proprio PR e nunca afirmar "mergeado" sem fonte autoritativa.
+8. Reportar ao Robson: veredito, link do PR, status real do CI, pendencias dele.
+
+### O que o SENIOR NAO faz
+- **Nao roda a suite completa** (~2.300 testes) para revisar -- isso e do Pleno (regra 28).
+- Nao sobe app/Postgres/navegador para E2E por conta propria; **E2E so quando o Robson pedir explicitamente**.
+- Nao implementa feature grande, nao refatora em massa, nao "termina o ciclo" pelo Pleno.
+- Nao muda regra de negocio ja ratificada sem decisao do Robson.
+- Nao devolve review vaga: sem numeros no PR, **devolve pedindo os numeros** em vez de executar a suite.
 
 ---
 
