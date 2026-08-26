@@ -1,4 +1,4 @@
-using Confirmai.Services.Admin;
+using Confirmai.Services.Groups;
 
 namespace Confirmai.Tests;
 

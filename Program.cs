@@ -147,7 +147,6 @@ builder.Services.AddScoped<Confirmai.Services.Futsal.EscalacaoService>();
 builder.Services.AddScoped<Confirmai.Services.Futsal.EventDetailService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.SummaryAgeTracker>();
 builder.Services.AddScoped<ReconciliationSeverityEvaluator>();
-builder.Services.AddScoped<DelinquencyService>();
 builder.Services.AddScoped<PixProofUploadService>();
 builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.Shared.WebhookPaymentMarker>(sp => 

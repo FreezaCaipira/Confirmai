@@ -107,7 +107,7 @@ public class PlatformFeeLedgerService
         if (matches.Count == 0)
             return Array.Empty<PlatformFeeMatchStatusProjection>();
 
-        var coveredByEvent = await GetCoveredFeeByEventAsync(db, groupId);
+        var coveredByEvent = await PlatformFeeCoverage.GetCoveredByEventAsync(db, groupId);
 
         var result = new List<PlatformFeeMatchStatusProjection>(matches.Count);
         foreach (var m in matches)
@@ -124,19 +124,6 @@ public class PlatformFeeLedgerService
 
         return result;
     }
-
-    /// <summary>
-    /// Fee already transferred per match, from the items of approved settlements.
-    /// </summary>
-    internal static async Task<Dictionary<int, decimal>> GetCoveredFeeByEventAsync(
-        AppDbContext db, int groupId)
-        => await db.PlatformFeeSettlementItems
-            .AsNoTracking()
-            .Where(i => i.Settlement.GroupId == groupId
-                && i.Settlement.Status == PlatformFeeSettlementStatus.Pago)
-            .GroupBy(i => i.EventId)
-            .Select(g => new { EventId = g.Key, Covered = g.Sum(i => i.FeeAmount) })
-            .ToDictionaryAsync(g => g.EventId, g => g.Covered);
 }
 
 /// <summary>Per-match fee status after explicit settlement selection (Fase D).</summary>

@@ -2,7 +2,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services;
-using Confirmai.Services.Admin;
+using Confirmai.Services.Groups;
 using Confirmai.Services.Payment;
 using Confirmai.Services.Events;
 using Confirmai.Services.User;

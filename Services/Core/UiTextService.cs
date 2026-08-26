@@ -228,6 +228,8 @@ public sealed class UiTextService
     /// - DateTimeDefault: "dd/MM HH:mm" (e.g., "15/03 14:30")
     /// - DateTimeFullShort: "ddd, dd/MM HH:mm" (e.g., "Sat, 15/03 14:30")
     /// - DateTimeShortCompact: "dd/MM/yy HH:mm" (e.g., "15/03/26 14:30")
+    /// - DateTimeFull: "dd/MM/yyyy 'às' HH:mm" (i18n — "at" in EN, "a las" in ES)
+    /// - DateTimeFullLong: "dddd, dd/MM/yyyy 'às' HH:mm" (i18n, with weekday)
     /// </summary>
     public string FormatDateTime(DateTime dateTime, string formatKey)
     {
@@ -243,12 +245,34 @@ public sealed class UiTextService
             "DateTimeDefault" => "dd/MM HH:mm",
             "DateTimeFullShort" => "ddd, dd/MM HH:mm",
             "DateTimeShortCompact" => "dd/MM/yy HH:mm",
+            "DateTimeFull" => _language.SelectedLanguage switch
+            {
+                "en-US" => "MM/dd/yyyy 'at' HH:mm",
+                "es-ES" => "dd/MM/yyyy 'a las' HH:mm",
+                _ => "dd/MM/yyyy 'às' HH:mm"
+            },
+            "DateTimeFullLong" => _language.SelectedLanguage switch
+            {
+                "en-US" => "dddd, MM/dd/yyyy 'at' HH:mm",
+                "es-ES" => "dddd, dd/MM/yyyy 'a las' HH:mm",
+                _ => "dddd, dd/MM/yyyy 'às' HH:mm"
+            },
             _ => "g" // Default to general format if unknown
         };
 
+        // DateTimeFullLong uses the current language's culture for weekday names
+        var culture = formatKey == "DateTimeFullLong"
+            ? _language.SelectedLanguage switch
+            {
+                "en-US" => new CultureInfo("en-US"),
+                "es-ES" => new CultureInfo("es-ES"),
+                _ => new CultureInfo("pt-BR")
+            }
+            : CultureInfo.InvariantCulture;
+
         try
         {
-            return dateTime.ToString(pattern, CultureInfo.InvariantCulture);
+            return dateTime.ToString(pattern, culture);
         }
         catch
         {

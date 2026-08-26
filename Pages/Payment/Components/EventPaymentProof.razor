@@ -12,7 +12,7 @@
     {
         <div class="evpay-proof-sent">
             <i class="fas fa-check-circle evpay-proof-sent-icon"></i>
-            <span>@string.Format(Ui["Payment.ProofSentAtShort"], Confirmation.PixProofUploadedAt.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm"))</span>
+            <span>@string.Format(Ui["Payment.ProofSentAtShort"], Ui.FormatDateTime(Confirmation.PixProofUploadedAt.Value.ToLocalTime(), "DateTimeFull"))</span>
         </div>
         <img src="/api/pix-proof/@Confirmation.Id" class="evpay-proof-thumb" alt="@Ui["Payment.ProofAlt"]" />
         <label class="evpay-proof-btn evpay-proof-btn--update">
