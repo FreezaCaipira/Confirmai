@@ -95,12 +95,53 @@ public class IdentityEmailSenderTests
         }
     }
 
-    private static IdentityEmailSender CreateSender(string webRootPath, EmailOptions options)
+    [Fact]
+    public async Task SendEmailAsync_OutsideDevelopment_DoesNotPersistUnderWebRoot()
+    {
+        var webRoot = Path.Combine(Path.GetTempPath(), "Confirmai-email-tests", Guid.NewGuid().ToString("N"), "wwwroot");
+        var contentRoot = Path.Combine(Path.GetTempPath(), "Confirmai-email-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(webRoot);
+        Directory.CreateDirectory(contentRoot);
+
+        try
+        {
+            var sender = CreateSender(
+                webRoot,
+                new EmailOptions { Enabled = false },
+                contentRootPath: contentRoot,
+                environmentName: "Production");
+
+            await sender.SendEmailAsync("to@test.local", "Confirme seu email", "<a href='/confirm?token=secret'>link</a>");
+
+            Assert.Empty(Directory.GetFiles(webRoot, "*", SearchOption.AllDirectories));
+
+            var fallbackDir = Path.Combine(contentRoot, "App_Data", "fallback-emails");
+            Assert.True(Directory.Exists(fallbackDir));
+            Assert.NotEmpty(Directory.GetFiles(fallbackDir, "*.html", SearchOption.TopDirectoryOnly));
+        }
+        finally
+        {
+            foreach (var dir in new[] { webRoot, contentRoot })
+            {
+                if (Directory.Exists(dir))
+                {
+                    Directory.Delete(dir, recursive: true);
+                }
+            }
+        }
+    }
+
+    private static IdentityEmailSender CreateSender(
+        string webRootPath,
+        EmailOptions options,
+        string? contentRootPath = null,
+        string environmentName = "Development")
     {
         var environment = new TestWebHostEnvironment
         {
             WebRootPath = webRootPath,
-            ContentRootPath = webRootPath
+            ContentRootPath = contentRootPath ?? webRootPath,
+            EnvironmentName = environmentName
         };
 
         return new IdentityEmailSender(
