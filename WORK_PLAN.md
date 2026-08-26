@@ -180,6 +180,10 @@ O que isso exige e como reduzir o risco:
 
 ## Pendencias & Roadmap
 
+> **Antes de qualquer go-live**: ver "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" no fim
+> deste documento. O ambiente atual (`confirmai.m2gpju.easypanel.host`) e de teste, com
+> credenciais conscientemente expostas -- todas precisam ser rotacionadas antes da producao real.
+
 ### Pendencias do Robson (fora do codigo)
 - **Rotacionar o ClientSecret Efi** no painel (o valor antigo ficou no historico do git) e reconfigurar via user-secrets (dev) / env no EasyPanel (prod). **Adiado** -- Robson viajando, sem acesso ao painel Efi.
 - **Validar o Envio de Pix Efi em homologacao** (credenciais + certificado .p12 -- ver Troubleshooting; solucao base64 disponivel). Confirmar limites de envio de Pix.
@@ -1544,6 +1548,47 @@ Antes/durante o Ciclo 17, para o login funcionar em prod e dev:
    - Prod: variaveis de ambiente `Authentication__Google__ClientId` / `Authentication__Google__ClientSecret`
 
 Para email real + confirmacao (Fase 5): fornecer credenciais do provedor de email (SMTP host/porta/usuario/senha OU API key de SendGrid/Mailgun), tambem guardadas fora do git (user-secrets em dev, env vars em prod).
+
+---
+
+## CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL (bloqueia go-live)
+
+Contexto (decisao do Robson, 14/06/2026): o endereco `https://confirmai.m2gpju.easypanel.host`
+roda com `ASPNETCORE_ENVIRONMENT=Production`, mas **nao e producao de verdade** -- e ambiente de
+desenvolvimento/teste. Por isso credenciais expostas em chat foram aceitas conscientemente, com a
+condicao de que todas sejam resetadas antes do go-live com dominio proprio.
+
+**Nenhum go-live acontece sem executar esta lista inteira.** O risco que ela existe para evitar e
+herdar em silencio uma credencial de teste ja vazada, ou um banco com dados de teste.
+
+### Credenciais a rotacionar (todas foram expostas em chat)
+- [ ] Google OAuth `client_secret` -- criar novo no Console, **deletar o antigo**.
+- [ ] Google OAuth: novo redirect URI `https://<dominio-novo>/signin-google` + JavaScript origin;
+      remover as entradas do EasyPanel.
+- [ ] `Google__MapsApiKey` -- rotacionar E restringir por HTTP referrer do dominio novo.
+      (Restricao por referrer nao espera o go-live: chave de Maps exposta e cobrada na fatura.)
+- [ ] `EfiBank__ClientId` / `EfiBank__ClientSecret` -- rotacionar no painel da Efi.
+- [ ] `EfiBank__CertificatePath` / `CertificatePassword` -- certificado novo, com senha.
+- [ ] `ConnectionStrings__DefaultConnection` -- senha nova do Postgres.
+- [ ] `AdminSeed__Password` -- senha aleatoria (nunca placeholder de documentacao).
+- [ ] `Email__Password` -- credencial SMTP nova, emitida para o dominio definitivo.
+- [ ] `BtcPay__ApiKey` / `BtcPay__WebhookSecret` e `AbacatePay__*` -- quando/se forem configurados.
+
+### Dados
+- [ ] Banco novo (ou limpeza total): os usuarios criados durante os testes de Google Auth
+      **nao** vao para producao. Tratar o Postgres atual como descartavel.
+- [ ] Conferir que nao existe conta admin residual dos testes.
+- [ ] Limpar `App_Data/fallback-emails/` (contem tokens de confirmacao/reset validos).
+
+### Configuracao
+- [ ] `EfiBank__Sandbox` -- decidir explicitamente (V1 e Pix manual; `true` ate o V2).
+- [ ] `Email__Enabled=true` com SMTP real (com `Enabled=false` o codigo desliga
+      `RequireConfirmedEmail`, ou seja, ninguem confirma nada).
+- [ ] SPF/DKIM/DMARC configurados no dominio definitivo antes do primeiro envio.
+- [ ] `AdminSeed__SyncPassword=false` explicito.
+- [ ] Porta SMTP **587** (STARTTLS): o `IdentityEmailSender` usa `SmtpClient`, que
+      **nao** suporta SSL implicito na 465.
+- [ ] Webhooks (`BtcPay__WebhookUrl`, `EfiBank__WebhookUrl`) apontando para o dominio novo.
 
 ---
 
