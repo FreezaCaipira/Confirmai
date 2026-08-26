@@ -29,7 +29,8 @@ public class ExternalLoginModelTests
         out Mock<UserManager<ApplicationUser>> userManager,
         out Mock<IDbContextFactory<AppDbContext>> dbFactory,
         string? email = "test@example.com",
-        string providerKey = "google-user-id")
+        string providerKey = "google-user-id",
+        string? emailVerified = null)
     {
         userManager = new Mock<UserManager<ApplicationUser>>(
             new Mock<IUserStore<ApplicationUser>>().Object,
@@ -79,6 +80,10 @@ public class ExternalLoginModelTests
         if (!string.IsNullOrWhiteSpace(providerKey))
         {
             claims.Add(new Claim(ClaimTypes.NameIdentifier, providerKey));
+        }
+        if (emailVerified is not null)
+        {
+            claims.Add(new Claim("email_verified", emailVerified));
         }
 
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, "Google"));
@@ -171,6 +176,96 @@ public class ExternalLoginModelTests
 
         var redirect = Assert.IsType<RedirectToPageResult>(result);
         Assert.Equal("./Login", redirect.PageName);
+    }
+
+    [Fact]
+    public async Task OnGetCallbackAsync_UnverifiedEmail_DoesNotLinkToExistingAccount()
+    {
+        var model = CreateModel(out var signInManager, out var userManager, out _, emailVerified: "false");
+
+        signInManager
+            .Setup(x => x.ExternalLoginSignInAsync("Google", "google-user-id", false, true))
+            .ReturnsAsync(SignInResult.Failed);
+
+        var existingUser = new ApplicationUser
+        {
+            Id = "user-1",
+            UserName = "test@example.com",
+            Email = "test@example.com",
+            EmailConfirmed = true
+        };
+
+        userManager.Setup(x => x.FindByEmailAsync("test@example.com")).ReturnsAsync(existingUser);
+
+        var result = await model.OnGetCallbackAsync("/grupos");
+
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal("./Login", redirect.PageName);
+        userManager.Verify(x => x.AddLoginAsync(It.IsAny<ApplicationUser>(), It.IsAny<UserLoginInfo>()), Times.Never);
+        signInManager.Verify(x => x.SignInAsync(It.IsAny<ApplicationUser>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task OnGetCallbackAsync_UnverifiedEmail_CreatesUserUnconfirmed()
+    {
+        var model = CreateModel(out var signInManager, out var userManager, out _, emailVerified: "false");
+
+        signInManager
+            .Setup(x => x.ExternalLoginSignInAsync("Google", "google-user-id", false, true))
+            .ReturnsAsync(SignInResult.Failed);
+
+        userManager.Setup(x => x.FindByEmailAsync("test@example.com")).ReturnsAsync((ApplicationUser?)null);
+        userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(IdentityResult.Success);
+        userManager.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), "user")).ReturnsAsync(IdentityResult.Success);
+        userManager.Setup(x => x.AddLoginAsync(It.IsAny<ApplicationUser>(), It.IsAny<UserLoginInfo>())).ReturnsAsync(IdentityResult.Success);
+
+        await model.OnGetCallbackAsync("/grupos");
+
+        userManager.Verify(x => x.CreateAsync(It.Is<ApplicationUser>(u => !u.EmailConfirmed)), Times.Once);
+    }
+
+    [Fact]
+    public async Task OnGetCallbackAsync_VerifiedEmail_LinksToExistingAccount()
+    {
+        var model = CreateModel(out var signInManager, out var userManager, out _, emailVerified: "true");
+
+        signInManager
+            .Setup(x => x.ExternalLoginSignInAsync("Google", "google-user-id", false, true))
+            .ReturnsAsync(SignInResult.Failed);
+
+        var existingUser = new ApplicationUser { Id = "user-1", Email = "test@example.com" };
+        userManager.Setup(x => x.FindByEmailAsync("test@example.com")).ReturnsAsync(existingUser);
+        userManager.Setup(x => x.AddLoginAsync(existingUser, It.IsAny<UserLoginInfo>())).ReturnsAsync(IdentityResult.Success);
+
+        var result = await model.OnGetCallbackAsync("/grupos");
+
+        Assert.IsType<LocalRedirectResult>(result);
+        signInManager.Verify(x => x.SignInAsync(existingUser, false, null), Times.Once);
+    }
+
+    [Fact]
+    public async Task OnGetCallbackAsync_AddLoginFailsOnNewUser_DeletesUserAndRedirects()
+    {
+        var model = CreateModel(out var signInManager, out var userManager, out _);
+
+        signInManager
+            .Setup(x => x.ExternalLoginSignInAsync("Google", "google-user-id", false, true))
+            .ReturnsAsync(SignInResult.Failed);
+
+        userManager.Setup(x => x.FindByEmailAsync("test@example.com")).ReturnsAsync((ApplicationUser?)null);
+        userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(IdentityResult.Success);
+        userManager.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), "user")).ReturnsAsync(IdentityResult.Success);
+        userManager
+            .Setup(x => x.AddLoginAsync(It.IsAny<ApplicationUser>(), It.IsAny<UserLoginInfo>()))
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Login already associated" }));
+        userManager.Setup(x => x.DeleteAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(IdentityResult.Success);
+
+        var result = await model.OnGetCallbackAsync("/grupos");
+
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal("./Login", redirect.PageName);
+        userManager.Verify(x => x.DeleteAsync(It.IsAny<ApplicationUser>()), Times.Once);
+        signInManager.Verify(x => x.SignInAsync(It.IsAny<ApplicationUser>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
     }
 
     [Fact]

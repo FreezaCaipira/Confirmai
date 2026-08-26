@@ -43,6 +43,19 @@ namespace Confirmai.Areas.Identity.Pages.Account
         [TempData]
         public string? ErrorMessage { get; set; }
 
+        /// <summary>
+        /// True unless the provider explicitly says the email is NOT verified.
+        /// Google sends `email_verified`; providers that omit the claim are
+        /// trusted as before. An unverified email must never be enough to reach
+        /// an existing account by email match, nor to be born confirmed.
+        /// </summary>
+        private static bool IsEmailVerified(ExternalLoginInfo info)
+        {
+            var claim = info.Principal.FindFirstValue("email_verified");
+
+            return !string.Equals(claim, "false", StringComparison.OrdinalIgnoreCase);
+        }
+
         public IActionResult OnPost(string provider, string? returnUrl = null)
         {
             if (string.IsNullOrWhiteSpace(provider))
@@ -97,7 +110,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
             if (signInResult.IsNotAllowed)
             {
                 var linkedUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
-                if (linkedUser is not null && !linkedUser.EmailConfirmed)
+                if (linkedUser is not null && !linkedUser.EmailConfirmed && IsEmailVerified(info))
                 {
                     var token = await _userManager.GenerateEmailConfirmationTokenAsync(linkedUser);
                     await _userManager.ConfirmEmailAsync(linkedUser, token);
@@ -113,9 +126,17 @@ namespace Confirmai.Areas.Identity.Pages.Account
                 return RedirectToPage("./Login", new { returnUrl });
             }
 
+            var emailVerified = IsEmailVerified(info);
+
             var user = await _userManager.FindByEmailAsync(email);
             if (user is not null)
             {
+                if (!emailVerified)
+                {
+                    ErrorMessage = _t["Identity.ExternalLogin.EmailNotVerified"];
+                    return RedirectToPage("./Login", new { returnUrl });
+                }
+
                 // Link external login to existing account.
                 var addLoginResult = await _userManager.AddLoginAsync(user, info);
                 if (addLoginResult.Succeeded)
@@ -145,7 +166,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
             {
                 UserName = email,
                 Email = email,
-                EmailConfirmed = true,
+                EmailConfirmed = emailVerified,
                 MemberSince = DateTime.UtcNow
             };
 
@@ -162,7 +183,18 @@ namespace Confirmai.Areas.Identity.Pages.Account
             }
 
             await _userManager.AddToRoleAsync(newUser, "user");
-            await _userManager.AddLoginAsync(newUser, info);
+
+            // Without the login the brand-new account is unreachable: it has no
+            // password either, so a silent failure here would lock the user out
+            // of an account that already exists with their email.
+            var newUserLoginResult = await _userManager.AddLoginAsync(newUser, info);
+            if (!newUserLoginResult.Succeeded)
+            {
+                await _userManager.DeleteAsync(newUser);
+                ErrorMessage = _t["Identity.ExternalLogin.CreateError"];
+                return RedirectToPage("./Login", new { returnUrl });
+            }
+
             await _signInManager.SignInAsync(newUser, isPersistent: false);
 
             await _log.AuditAsync(

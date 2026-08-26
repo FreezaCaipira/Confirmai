@@ -79,6 +79,7 @@ internal static class AuthTexts
         ["Identity.ExternalLogin.InfoError"] = "Não foi possível obter as informações do login externo.",
         ["Identity.ExternalLogin.EmailRequired"] = "O provedor não retornou um email. Use outra forma de login.",
         ["Identity.ExternalLogin.LinkError"] = "Não foi possível vincular o login externo.",
+        ["Identity.ExternalLogin.EmailNotVerified"] = "O provedor informou que este email não foi verificado. Entre com email e senha para vincular o login externo.",
         ["Identity.ExternalLogin.CreateError"] = "Não foi possível criar a conta com o login externo.",
     };
 
@@ -155,6 +156,7 @@ internal static class AuthTexts
         ["Identity.ExternalLogin.InfoError"] = "Could not retrieve external login information.",
         ["Identity.ExternalLogin.EmailRequired"] = "The provider did not return an email. Use another login method.",
         ["Identity.ExternalLogin.LinkError"] = "Could not link the external login.",
+        ["Identity.ExternalLogin.EmailNotVerified"] = "The provider reported this email as unverified. Sign in with email and password to link the external login.",
         ["Identity.ExternalLogin.CreateError"] = "Could not create account with the external login.",
     };
 
@@ -231,6 +233,7 @@ internal static class AuthTexts
         ["Identity.ExternalLogin.InfoError"] = "No se pudo obtener la informacion del inicio de sesion externo.",
         ["Identity.ExternalLogin.EmailRequired"] = "El proveedor no devolvio un email. Usa otro metodo de inicio de sesion.",
         ["Identity.ExternalLogin.LinkError"] = "No se pudo vincular el inicio de sesion externo.",
+        ["Identity.ExternalLogin.EmailNotVerified"] = "El proveedor informo que este email no esta verificado. Inicia sesion con email y contrasena para vincular el inicio de sesion externo.",
         ["Identity.ExternalLogin.CreateError"] = "No se pudo crear la cuenta con el inicio de sesion externo.",
     };
 
