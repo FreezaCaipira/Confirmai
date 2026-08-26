@@ -119,21 +119,21 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Mapa de Progresso e Proximos Passos (atualizado pos-Ciclo 28)
+## Mapa de Progresso e Proximos Passos (atualizado pos-Ciclo 29)
 
 ### Progresso por eixo
 
 | Eixo | Estado | O que falta |
 |---|---|---|
 | Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
-| Cobertura de testes | **BOM** -- 2290/2314, +340 testes desde o C21 | Sem teste de **render** das telas (logica esta em helpers/services). C29 Fase E avalia. |
-| i18n (regra 25) | **CONCLUIDO na pratica** (C25-C28) -- ~450 strings migradas, PT/EN/ES, teste anti-hardcode com/sem acento validado empiricamente | 2 entradas de allowlist (format string de data) -> C29 Fase C. |
+| Cobertura de testes | **BOM** -- 2315 verdes (C29, com Postgres local disponivel), +350 testes desde o C21 | Sem teste de **render** das telas -- **decidido pular** (C29 Fase E): a logica esta em helpers/services cobertos; bUnit nao entra sem necessidade. |
+| i18n (regra 25) | **CONCLUIDO** (C25-C29) -- ~450 strings migradas, PT/EN/ES, teste anti-hardcode com/sem acento validado empiricamente, **allowlist zerada** e formatos de data i18n-aware | Nada aberto. Manutencao: feature nova nasce com i18n (o teste barra). |
 | Pagamento V1 manual (jogador) | **CONCLUIDO** -- grupo nasce manual, Pix do organizador + QR com valor total, comprovante, confirmacao do organizador, rejeicao com motivo | Validacao em navegador e feita **manualmente pelo Robson** (F12/mobile). Nao ha gravacao/E2E automatizado do caminho do dinheiro. |
 | Taxa da plataforma R$ 0,75 (futsal, modo manual) | **CONCLUIDO** -- snapshot no pagamento, taxa discriminada (`15,00 + 0,75 = 15,75`) inclusive no QR, ledger por partida, residuo por valor | Idem. |
 | Repasse organizador -> plataforma | **CONCLUIDO** -- aba do organizador (selecao explicita de partidas, somatorio, Pix da plataforma, comprovante, historico), fila do admin (confirmar/rejeitar com motivo), endpoint do comprovante autorizado, sem autoquitacao | Idem. |
-| Consolidacao tecnica do repasse | **PENDENTE** | Ciclo 29 (planejado): `DelinquencyService` morto, extrair `PlatformFeeCoverage`, allowlist i18n, FK `Restrict`, cobertura de render. |
+| Consolidacao tecnica do repasse | **CONCLUIDO** (C29) -- `DelinquencyService` morto removido, `PlatformFeeCoverage` extraido, allowlist i18n zerada, FK `Restrict` avaliada, cobertura de render decidida | Nada. A divida tecnica aberta na review do C28 esta encerrada. |
 | Seguranca | **BOM** -- webhooks autenticados, authz admin 17/17 + teste de convencao, CSP/HSTS, secret Efi fora do repo, teste que impede endpoint de seed/debug aberto, autorizacao do repasse no service | Pen-test financeiro antes de producao; pendencias de prod do Robson. |
-| Login/identidade | **Implementado** (Google criar-ou-vincular, SMTP, confirmacao de email) | **Testavel em DEV** (ver "Google/SMTP em dev" abaixo) -- nunca exercitado de fato. Robson gera o OAuth Client de dev; prod exige um segundo Client. |
+| Login/identidade | **Implementado** (Google criar-ou-vincular, SMTP, confirmacao de email) | **Nunca exercitado de fato.** Decisao do Robson: validar **direto em producao** (Ciclo 30). Bloqueado no OAuth Client de prod + env vars no EasyPanel. |
 | Mobile UX | **Em andamento, validado pelo Robson tela por tela** (F12/emulacao mobile) -- navegacao, estados vazios (`NoGroupsHint`), UX do Profile refeita | Continuar o modelo atual: Robson aponta a tela, o ciclo corrige. **Nao** transformar em varredura sistematica sem ele pedir. |
 | Pix automatico (V2) | **Codigo pronto e preservado atras do toggle** | Bloqueado nas pendencias do Robson (rotacao Efi, homologacao, nota fiscal). |
 | Observabilidade / operacao | Serilog + OpenTelemetry + alerta de payout | Metricas SignalR, alertas operacionais, revisao de CSP -- antes de producao. |
@@ -142,12 +142,15 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ### Proximos passos, em ordem
 
-1. **Mergear a PR #93** (review do C28 + fix do residuo + regra 28 + secao de deveres). Bloqueia o inicio limpo do C29.
-2. **Ciclo 29 pelo Pleno** (ja planejado abaixo): consolidacao tecnica pos-repasse -- `DelinquencyService`, `PlatformFeeCoverage`, allowlist i18n, FK, cobertura. Entrega com os numeros de build/teste no PR (regra 28).
-3. **Ciclo 30 -- Login Google + email validados em PRODUCAO** (decisao do Robson; ver secao abaixo): deploy no EasyPanel e exercitar criar-ou-vincular Google + confirmacao de email com envio real, antes de divulgar o login.
-4. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): bloqueado na decisao Cloud API vs. `wa.me`.
-5. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
-6. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
+**O V1 esta funcionalmente completo e a divida tecnica do repasse esta encerrada (C29).** Daqui pra frente o caminho critico nao e mais codigo de feature -- e **operacao**: o que falta depende de credenciais/decisoes do Robson.
+
+1. **Mergear a PR de review do C29** (fix de canonicalizacao do idioma + review + este mapa).
+2. **Ciclo 30 -- Login Google + email validados em PRODUCAO** (ja planejado abaixo; decisao do Robson). **Bloqueado no Robson**: OAuth Client de prod + `ClientId`/`ClientSecret`/SMTP como env vars no EasyPanel. Sem isso o ciclo nao comeca -- e o unico item que separa o app de aceitar usuario novo por Google.
+3. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): **bloqueado** no nome da ferramenta que o Robson recebeu de indicacao. Nao planejar antes -- provider de terceiro muda custo, lock-in, quem e o numero remetente e para onde vao os contatos dos jogadores.
+4. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
+5. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
+
+**Se o C30 e o C31 seguirem bloqueados**, o unico ciclo de codigo executavel agora e o **C32 (pre-producao)** -- ele nao depende de ninguem e e pre-requisito de go-live de qualquer forma. E a recomendacao do Senior enquanto as credenciais nao chegarem.
 
 **Fora da fila**: E2E automatizado em navegador (opcional -- o Robson valida manualmente); varredura mobile sistematica (o modelo atual, tela por tela apontada pelo Robson, esta funcionando); Redis (so com multi-instancia ou gargalo medido); .NET 10 (quando o LTS sair).
 
@@ -165,7 +168,7 @@ O que isso exige e como reduzir o risco:
 
 ---
 
-## Estado Atual do Projeto (pos-Ciclo 28)
+## Estado Atual do Projeto (pos-Ciclo 29)
 
 - **Refatoracao estrutural: CONCLUIDA.** Code-behinds todos < 250 LOC; CSS modularizado por dominio (`site.css` 5.589->1.615, `events.css` 3.679->1.639, + `admin/buttons/entity-shell/event-detail/events-table/event-listing/event-create/identity/tables/escalacao/payments/marketplace.css`, todos linkados em `Pages/_Host.cshtml`); services extraidos e agora **cobertos por teste** (Ciclo 22, +174 testes).
 - **Pagamento real + taxa: implementado e revisado.** Modelo = **intermediacao automatica** (site recebe o total na chave Pix central -> webhook confirma -> Envio de Pix automatico do valor base pra chave do organizador, retendo a taxa). Taxa **FIXA**: R$0,50 (plataforma) + R$0,25 (gateway) por cima do valor da partida. Payout com retry/backoff/idempotencia deterministica + alerta admin em falha. Guarda-corpo: bloqueia cobranca se o grupo nao tem chave Pix de repasse. `serviceFeePercentage` (legacy percentual) removido de ponta a ponta.
@@ -253,11 +256,46 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 28 | Fechar as ressalvas do C27 | 5 fases entregues: (A) `AntiHardcodeI18nTests` agora detecta tambem palavra PT **sem** acento (lista de ~150 palavras) -- validado empiricamente pelo Senior; (B) `Shared/Components/**` migrado, allowlist de ~24 entradas reduzida a 2 (formato de data com "as") + marca; (C) CSV `SelectedEventIds` -> tabela `PlatformFeeSettlementItem` com FK + indice unico + migration com **backfill** e `Down` reversivel; (D) `PlatformFeeSelectionState` (helper puro) + rejeicao exige motivo **no service**; (E) higiene do `Payments` (`catch` loga, metodos duplicados unificados). Extras achados pelo Pleno testando: `MarkPaidAsync` nao carimbava a taxa (repasse nunca fechava pela aba Comprovantes) e telas do admin mostravam R$ 15,00 enquanto o jogador pagava R$ 15,75. 2261->2287 (+26). | #92 (impl), #93 (review) | APROVADO -- Senior fechou 1 furo de residuo de taxa |
 
+| 29 | Consolidacao pos-repasse | 3 fases de codigo + 2 decisoes: (A) `DelinquencyService` (codigo morto, logica duplicada) **removido** do DI e do repo, records movidos para `Services/Groups/PaymentRecords.cs`, precedido de 7 testes de caracterizacao no `GroupPaymentsService`; (B) `GetCoveredFeeByEventAsync` extraido do ledger para `PlatformFeeCoverage` (query identica, +5 testes diretos), os dois services passam a depender dele; (C) `ResidualAllowlist` **zerada** -- os 2 formatos de data com "as" viraram `DateTimeFull`/`DateTimeFullLong` i18n-aware no `UiTextService` (PT/EN/ES + `CultureInfo` do idioma no weekday); (D) exclusao de partida: nao existe fluxo (`Events.Remove` inexistente) -> decisao registrada, FK `Restrict` fica defensiva; (E) cobertura de render: bUnit **pulado** (logica ja em helpers/services cobertos). 2287->2315 (com Postgres local disponivel; +12 novos, -11 removidos). Senior corrigiu a canonicalizacao do codigo de idioma (`?uiLang=en-us` dava texto EN com data PT). | #94 (impl), #95 (review) | APROVADO |
+
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
 ---
 
 # Detalhes dos Ciclos Recentes (planos + reviews na integra)
+
+---
+
+## Review Senior do Ciclo 29 (PR #94, mergeada na `main`) -- APROVADO
+
+**Escopo revisado**: commits `b9ae3a5`..`858b919` (3 commits, 20 arquivos, +467/-793), mergeados via `64c0d99`.
+
+**Build (numeros do Pleno, regra 28 cumprida)**: `dotnet build --no-incremental` -> **0 warning / 0 error**.
+**Testes (numeros do Pleno)**: `Failed: 0, Passed: 2315, Total: 2315`. Nesta execucao o Postgres local estava disponivel, entao as 24 falhas ambientais historicas (`ProgramConfigurationTests`) passaram. Liquido: +12 testes novos (7 caracterizacao + 5 `PlatformFeeCoverage`), -11 removidos com o `DelinquencyServiceTests`.
+**O Senior nao rodou a suite completa** (regra 28); rodei apenas `--filter LanguagePreferenceServiceTests` para provar o achado abaixo (9 verdes).
+
+### Resultado por fase
+
+| Fase | Veredito | Observacao |
+|---|---|---|
+| A -- resolver o `DelinquencyService` | **OK, caminho (b), justificado** | Service removido do repo e do DI; records movidos para `Services/Groups/PaymentRecords.cs` (namespace `Confirmai.Services.Groups`). Conferi que nao sobrou referencia viva (`grep`: so comentario, `WORK_PLAN` e `Tests/README`). O ponto que importava -- a armadilha do `enablePaymentGateways = false` **default** -- morreu junto: `GroupPaymentsService.LoadPaymentsDataAsync` le `group.EnablePaymentGateways` do proprio grupo, nao ha parametro para esquecer. Os 7 testes de caracterizacao foram escritos **antes** da remocao (eventos futuros, confirmacoes pagas, preco zero/nulo, ordenacao por total, nao-membros, historico so manual, ordenacao do historico) -- ordem correta. |
+| B -- extrair `PlatformFeeCoverage` | **OK** | `Services/Payment/PlatformFeeCoverage.cs` (static, 1 metodo, 1 responsabilidade); ledger e settlement service agora dependem dele em vez de um chamar o `internal static` do outro. **A query e byte-a-byte a mesma** (mesmo filtro `Status == Pago`, mesmo `GroupBy`, mesmo `AsNoTracking`) -- a regra financeira do residual nao mudou, que era a condicao da fase. +5 testes diretos (sem settlement, so aprovados contam, multiplos lotes no mesmo evento, separacao por grupo, separacao por evento). |
+| C -- zerar allowlist i18n | **OK** | `ResidualAllowlist` de fato vazia (so comentario). `UiTextService.FormatDateTime` ganhou `DateTimeFull` e `DateTimeFullLong` com padrao por idioma (PT `'às'` / EN `'at'` + `MM/dd` / ES `'a las'`) e, no caso `FullLong`, `CultureInfo` do idioma para o nome do dia da semana -- o `new CultureInfo("pt-BR")` cravado no `EventPaymentHeader` saiu. 3 `.razor` migrados. A regra 25 agora nao tem excecao declarada. |
+| D -- exclusao de partida com repasse | **OK -- decisao aceita** | Conferi de novo: nao existe `Events.Remove` em nenhum fluxo. Nada a implementar; a FK `Restrict` fica como guarda defensiva. Registrado como decisao, e o certo (implementar mensagem de erro para um fluxo que nao existe seria codigo morto novo). |
+| E -- cobertura de render | **OK -- decisao aceita, com 1 correcao de registro** | Pular bUnit e a decisao correta (dependencia nova sem necessidade; a logica esta em `PlatformFeeSelectionState`/`PlatformFeeCoverage`/ledger/settlement, todos cobertos). **Ressalva de processo**: o PR diz "confirmada pelo Robson", e o Robson nunca opinou sobre bUnit -- o que ele confirmou foi que **E2E/validacao visual e feita por ele, manualmente**. O Pleno nao deve atribuir confirmacao ao Robson por inferencia (regra 16: duvida de desenho vira pergunta no WORK_PLAN). Decisao mantida, atribuicao corrigida. |
+
+### Correcao aplicada pelo Senior nesta review
+
+**P2 -- o formato de data novo caia para PT-BR quando o idioma vinha com casing diferente.** `FormatDateTime` decide o padrao com `_language.SelectedLanguage switch { "en-US" => ..., "es-ES" => ..., _ => PT }` -- comparacao **case-sensitive**. Mas `SelectedLanguage` guarda o valor **como o caller mandou**: `LanguagePreferenceService.SetLanguage` validava contra um `HashSet` `OrdinalIgnoreCase` e atribuia a string original. E os callers reais nao sao controlados -- `MainLayout` le o idioma do **query string `?uiLang=`**, de cookie e do localStorage. Com `?uiLang=en-us` o dicionario de textos (que e `OrdinalIgnoreCase`) devolvia **ingles**, e a data saia `dd/MM/yyyy 'às' HH:mm` -- exatamente a mistura que a Fase C existia para eliminar.
+- Fix no lugar certo (a fonte, nao os consumidores): `SetLanguage` agora **canonicaliza** o codigo (`en-us` -> `en-US`) antes de atribuir, entao qualquer comparacao exata a jusante passa a funcionar. +5 testes (4 de canonicalizacao + 1 que formata `DateTimeFull` apos `SetLanguage("en-us")` e espera `03/15/2026 at 14:30`).
+
+### Ressalvas nao bloqueantes (nao viram ciclo)
+
+- **Os padroes de formato de data vivem em `switch` no codigo, nao no dicionario de i18n.** Coerente com os outros `formatKey`s ja existentes e sem string visivel hardcoded em `.razor`, entao a regra 25 esta cumprida -- mas um 4o idioma exigira editar `UiTextService` em vez de so adicionar chaves. Aceitavel enquanto forem 3 idiomas.
+- **`PaymentRecords.cs` agrupa 4 records num arquivo** (incluindo `PendingProofEntry`). Segue a convencao de records do projeto; so registrando.
+- **Sem cobertura de render** das telas -- segue valendo desde o C27, por decisao.
+
+**Divida tecnica do repasse: encerrada.** As 4 ressalvas abertas na review do C28 estao todas fechadas (codigo morto, cobertura extraida, allowlist zerada, FK avaliada). Nao ha Ciclo de consolidacao pendente.
 
 ---
 
@@ -396,7 +434,46 @@ Na pratica: **a feature ainda nao existe para o usuario**. O saldo acumula e nin
 
 ---
 
-## Ciclo 29 (Pleno) -- Consolidacao pos-repasse [PLANEJADO]
+## Ciclo 32 (Pleno) -- Pre-producao: seguranca operacional, observabilidade e checklist de deploy [PLANEJADO -- EXECUTAVEL AGORA, nao depende do Robson]
+
+**Por que este ciclo e o proximo executavel**: o C30 (Google/email) espera credenciais do Robson e o C31 (WhatsApp) espera a decisao da ferramenta. O C32 nao depende de ninguem e e pre-requisito de go-live de qualquer forma.
+
+**Regra de ouro**: TDD, SOLID, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, 1 commit por fase, numeros de build/suite colados no PR (regra 28). **Nao** alterar regra financeira, nem o desenho do repasse, nem remover o codigo do V2.
+
+- **Fase A -- pen-test do caminho do dinheiro manual (teste, nao prosa)**: escrever testes **adversariais** dos limites do V1 manual, cada um partindo de "o que um usuario mal-intencionado tentaria": jogador marcando o proprio pagamento como pago; membro comum enviando lote de repasse; organizador aprovando o proprio lote; lote com `amount` adulterado; partida de outro grupo na selecao; comprovante de terceiro via `/api/pix-proof/{id}` e `/api/fee-settlement-proof/{id}`; upload acima do limite / content-type falsificado. Onde o teste passar de primeira, **registrar como coberto**; onde falhar, corrigir no service (nunca so na UI).
+- **Fase B -- revisao de CSP e cabecalhos**: auditar a CSP atual (nonce + `X-Frame-Options`/`nosniff`/HSTS) contra o que as paginas realmente carregam (Font Awesome, QR, imagens de comprovante inline). Objetivo: **sem `unsafe-inline`/`unsafe-eval`** e sem console warning. Registrar no PR o que teve que ser liberado e por que.
+- **Fase C -- metricas e alertas operacionais**: expor metricas do que da errado em producao sem ninguem ver -- conexoes SignalR ativas/reconexoes, falhas de upload de comprovante, falhas de envio de email, lotes de repasse `EmAnalise` parados ha mais de N dias. Alerta ja existe para payout; alinhar o mesmo padrao.
+- **Fase D -- checklist de deploy EasyPanel (documento vivo no repo, nao doc solto na raiz)**: variaveis de ambiente obrigatorias (com o efeito de cada uma faltando), `SyncPassword=false`, mTLS do webhook Efi, `ASPNETCORE_ENVIRONMENT`, aplicacao de migrations, e o **procedimento de rollback**. Um item por linha, verificavel.
+- **Fase E -- higiene final pre-go-live**: `grep` por `TODO`/`FIXME` em caminho de producao e classificar (corrigir / virar item de backlog explicito / remover); confirmar que nenhum endpoint de dev/seed/debug esta fora do bloco de desenvolvimento (o teste de convencao ja guarda -- confirmar que continua verde).
+
+### O que NAO fazer
+
+Nao subir dependencia nova sem aprovacao; nao mexer no fluxo do dinheiro do jogador; nao "preparar terreno" para WhatsApp (ferramenta indefinida); nao criar doc solto na raiz.
+
+---
+
+## Ciclo 30 (Pleno + Robson) -- Login Google + email validados em PRODUCAO [PLANEJADO -- BLOQUEADO no Robson]
+
+**Bloqueio**: OAuth Client de prod (redirect `https://<dominio>/signin-google`) + `ClientId`/`ClientSecret`/SMTP como **env vars no EasyPanel**. Enquanto nao existirem, o ciclo nao comeca. Detalhes de risco na secao "Google OAuth e email: onde validar".
+
+**O que e do Pleno (executavel antes das credenciais, sem depender delas)**:
+- Cobrir o `criar-ou-vincular` com **teste** nos 3 caminhos, se ainda nao estiver: (a) login externo ja vinculado entra; (b) email existente **vincula** via `AddLoginAsync`; (c) email novo cria conta com `EmailConfirmed=true`. Esse e o codigo que, se errar em prod, **funde contas** -- e irreversivel em banco real.
+- Garantir mensagem de erro tratada (i18n) para falha do provider externo e para email ja usado por outro login, em vez de excecao crua.
+- Conferir que nenhuma credencial vaza em log (`ClientSecret`, senha SMTP) nem em pagina de erro.
+
+**O que e do Robson (em prod, na ordem)**: criar o OAuth Client -> setar as env vars -> conferir SPF/DKIM/DMARC do dominio -> exercitar os 3 caminhos com a conta dele + uma conta de teste -> so depois divulgar o login. Rollback: desligar o botao do Google e ficar no login por email/senha.
+
+---
+
+## Ciclo 31 (Pleno) -- WhatsApp [NAO PLANEJADO -- aguardando o nome da ferramenta]
+
+Ultima feature do escopo. **Nao sera planejado** antes do Robson informar qual ferramenta foi indicada a ele: o desenho muda completamente entre Cloud API oficial da Meta, deep link `wa.me` e um provider de terceiro (custo, lock-in, contatos dos jogadores saindo da plataforma, numero remetente da plataforma vs. do organizador, templates/aprovacao).
+
+**Trava que entra em qualquer um dos desenhos** (decidida na conversa com o Robson): antes de qualquer envio real, **modo dry-run** (loga a mensagem em vez de enviar) + **allowlist de destinatarios** (so o numero do Robson recebe ate ele liberar). Mensageria quebrada nao tem ctrl+z: manda mensagem errada para o celular de pessoa real, pode duplicar cobranca e, na Cloud API, custa por conversa e gera bloqueio por spam.
+
+---
+
+## Ciclo 29 (Pleno) -- Consolidacao pos-repasse [EXECUTADO -- ver review acima]
 
 **Regra de ouro**: TDD, SOLID, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, 1 commit por fase. **Nao** reabrir o desenho do repasse (selecao explicita de partidas + residual por valor estao ratificados).
 
