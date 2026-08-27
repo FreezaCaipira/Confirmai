@@ -164,7 +164,37 @@ O que isso exige e como reduzir o risco:
 2. **Consent screen**: usamos apenas escopos basicos (`email`, `profile`), portanto publicar dispensa verificacao da Google -- mas exige URL de politica de privacidade. Em modo *Testing* so os emails cadastrados como test users conseguem logar.
 3. **Risco principal nao e a credencial, e o `criar-ou-vincular` contra dados reais.** A logica atual: login externo ja vinculado entra; email existente **vincula** (`AddLoginAsync`); email novo cria conta com `EmailConfirmed=true`. Um bug ai nao aparece como erro -- ele funde contas ou da acesso a conta errada, e em banco de producao isso e irreversivel. **Protocolo obrigatorio**: exercitar os 3 caminhos com a conta do Robson + uma conta de teste **antes** de divulgar o login a qualquer usuario.
 4. **Email real**: manter o volume baixo no inicio e conferir SPF/DKIM/DMARC do dominio -- dominio novo sem esses registros cai em spam e queima reputacao de envio. Testar o link de confirmacao com o email do Robson primeiro.
+   - **Provedor escolhido (decisao do Robson, 14/06/2026): Brevo** (plano gratuito, 300 emails/dia, porta 587/STARTTLS -- compativel com o `SmtpClient` do `IdentityEmailSender`, que nao suporta SSL implicito na 465).
+   - `Email__Username` = o *Login* SMTP da Brevo (`...@smtp-brevo.com`); `Email__Password` = a **SMTP key** (`xsmtpsib-...`), **nao** a API key (`xkeysib-...`, que e para a API HTTP e nao serve para SMTP) nem a senha da conta.
+   - `Email__FromEmail` **tem que ser exatamente um sender validado na Brevo**. Se divergir, a Brevo recusa o envio; e como `Email__Enabled=true` liga o `RequireConfirmedEmail`, o cadastro por email fica travado sem mensagem de erro clara.
+   - Enquanto o remetente for `@gmail.com` (sem dominio proprio), nao ha SPF/DKIM alinhado: a entrega funciona mas cai mais facil em promocoes/spam. Suficiente para teste; autenticacao de dominio esta no checklist de reset.
 5. **Rollback**: qualquer problema no fluxo de login = desligar o botao do Google (configuracao) e voltar ao login por email/senha, que ja esta em uso.
+
+### Roteiro de validacao do Ciclo 30 (executado pelo Robson no EasyPanel)
+
+Pre-requisitos: `main` deployada (a correcao do fallback de email fora do web root e pre-requisito),
+as duas variaveis `Authentication__Google__*` e o bloco Brevo com `Email__Enabled=true`, e o sender
+validado na Brevo.
+
+1. **Cadastro por email + confirmacao real**: criar conta com email/senha, conferir que o email da
+   Brevo chega (inclusive na pasta de spam), clicar no link e confirmar que o login passa a funcionar.
+   Sem confirmar, o login deve ser **recusado** (`RequireConfirmedEmail` ativo).
+2. **Email novo cria conta via Google**: logar com uma conta Google cujo email nao existe na base.
+   Esperado: conta criada, `EmailConfirmed` refletindo o claim `email_verified` do provedor, papel `user`.
+3. **Email existente vincula**: logar com Google usando o email da conta criada no passo 1.
+   Esperado: **vincula** ao usuario existente (nao cria um segundo) e entra. Depois, conferir que o
+   login por email/senha da mesma conta continua funcionando.
+4. **Login ja vinculado entra direto**: repetir o login Google do passo 3. Esperado: entra sem
+   nenhuma tela intermediaria.
+5. **Reset de senha**: pedir "esqueci minha senha" e conferir que o email chega e o link funciona.
+6. **Logs do EasyPanel**: conferir que nao aparece `client_secret`, SMTP key nem token de confirmacao
+   nos logs.
+7. **Rollback**: remover `Authentication__Google__ClientSecret`, redeployar e confirmar que o app
+   sobe e o login por email/senha continua funcionando (o `AddGoogle` nao e registrado sem as duas
+   variaveis -- o botao do Google quebra, e esse e o comportamento esperado do rollback).
+
+Qualquer desvio nos passos 2-4 e **bloqueador de go-live**: e nesses caminhos que um bug funde contas
+ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
@@ -1648,7 +1678,11 @@ herdar em silencio uma credencial de teste ja vazada, ou um banco com dados de t
 - [ ] `EfiBank__CertificatePath` / `CertificatePassword` -- certificado novo, com senha.
 - [ ] `ConnectionStrings__DefaultConnection` -- senha nova do Postgres.
 - [ ] `AdminSeed__Password` -- senha aleatoria (nunca placeholder de documentacao).
-- [ ] `Email__Password` -- credencial SMTP nova, emitida para o dominio definitivo.
+- [ ] `Email__Password` -- **SMTP key da Brevo (`xsmtpsib-...`) foi exposta em chat**: regenerar na Brevo
+      (SMTP key settings -> nova chave, apagar a antiga) e emitir para o dominio definitivo.
+- [ ] Brevo: revogar a **API key** (`xkeysib-...`) tambem exposta em chat -- ela permite enviar email
+      em nome da conta e nao e usada pelo app (o envio e SMTP puro).
+- [ ] Brevo: trocar o sender de `@gmail.com` por um do dominio definitivo e autenticar o dominio.
 - [ ] `BtcPay__ApiKey` / `BtcPay__WebhookSecret` e `AbacatePay__*` -- quando/se forem configurados.
 
 ### Dados
