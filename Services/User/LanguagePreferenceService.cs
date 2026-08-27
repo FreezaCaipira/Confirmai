@@ -5,11 +5,15 @@ public sealed class LanguagePreferenceService
 {
     public const string DefaultLanguage = "pt-BR";
 
-    private static readonly HashSet<string> SupportedLanguageSet = new(StringComparer.OrdinalIgnoreCase)
+    // Maps any casing to the canonical code. Callers pass values that come from
+    // the `uiLang` query string, a cookie and localStorage, so "en-us" is a real
+    // input; consumers that switch on the exact code (UiTextService.FormatDateTime)
+    // would otherwise silently fall back to pt-BR.
+    private static readonly Dictionary<string, string> CanonicalLanguages = new(StringComparer.OrdinalIgnoreCase)
     {
-        "pt-BR",
-        "en-US",
-        "es-ES"
+        ["pt-BR"] = "pt-BR",
+        ["en-US"] = "en-US",
+        ["es-ES"] = "es-ES"
     };
 
     public event Action? Changed;
@@ -29,12 +33,14 @@ public sealed class LanguagePreferenceService
             ? DefaultLanguage
             : language.Trim();
 
-        if (!SupportedLanguageSet.Contains(normalized))
+        if (!CanonicalLanguages.TryGetValue(normalized, out var canonical))
         {
-            normalized = DefaultLanguage;
+            canonical = DefaultLanguage;
         }
 
-        if (string.Equals(SelectedLanguage, normalized, StringComparison.OrdinalIgnoreCase))
+        normalized = canonical;
+
+        if (string.Equals(SelectedLanguage, normalized, StringComparison.Ordinal))
         {
             return;
         }

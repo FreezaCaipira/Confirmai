@@ -41,6 +41,32 @@ public class LanguagePreferenceServiceTests
         Assert.Equal("es-ES", service.SelectedLanguage);
     }
 
+    [Theory]
+    [InlineData("en-us", "en-US")]
+    [InlineData("EN-US", "en-US")]
+    [InlineData("ES-es", "es-ES")]
+    [InlineData("pt-br", "pt-BR")]
+    public void SetLanguage_NormalizesCasingToCanonicalCode(string input, string expected)
+    {
+        var service = new LanguagePreferenceService();
+
+        service.SetLanguage(input);
+
+        Assert.Equal(expected, service.SelectedLanguage);
+    }
+
+    [Fact]
+    public void FormatDateTime_UsesEnglishPattern_WhenLanguageCameInLowercase()
+    {
+        var language = new LanguagePreferenceService();
+        language.SetLanguage("en-us");
+        var ui = new UiTextService(language);
+
+        var formatted = ui.FormatDateTime(new DateTime(2026, 3, 15, 14, 30, 0), "DateTimeFull");
+
+        Assert.Equal("03/15/2026 at 14:30", formatted);
+    }
+
     [Fact]
     public void SetLanguage_RaisesChangedOnlyWhenLanguageActuallyChanges()
     {
