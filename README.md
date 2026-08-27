@@ -67,7 +67,7 @@ dotnet watch run
 
 Acesse em `http://localhost:5000`.
 
-**E-mail em dev**: Com `Email:Enabled=false`, e-mails são salvos em `wwwroot/uploads/dev-emails/` como `.html` e `.txt`.
+**E-mail em dev**: Com `Email:Enabled=false`, e-mails são salvos em `wwwroot/uploads/dev-emails/` como `.html` e `.txt`. Fora de `Development` o fallback grava em `App_Data/fallback-emails/` (fora do web root), porque esses arquivos contêm links de confirmação e de reset de senha válidos.
 
 ### Testes
 

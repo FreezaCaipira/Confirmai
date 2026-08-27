@@ -61,15 +61,34 @@ public class IdentityEmailSender : IEmailSender
             && _options.Port > 0;
     }
 
+    /// <summary>
+    /// Fallback emails carry live confirmation and password-reset links, so
+    /// outside Development they must never land under the web root, which is
+    /// served publicly by the static files middleware.
+    /// </summary>
+    public string GetFallbackDirectory()
+    {
+        if (_environment.IsDevelopment())
+        {
+            var webRoot = string.IsNullOrWhiteSpace(_environment.WebRootPath)
+                ? AppContext.BaseDirectory
+                : _environment.WebRootPath;
+
+            return Path.Combine(webRoot, "uploads", "dev-emails");
+        }
+
+        var contentRoot = string.IsNullOrWhiteSpace(_environment.ContentRootPath)
+            ? AppContext.BaseDirectory
+            : _environment.ContentRootPath;
+
+        return Path.Combine(contentRoot, "App_Data", "fallback-emails");
+    }
+
     private async Task PersistFallbackEmailAsync(string email, string subject, string htmlMessage)
     {
         try
         {
-            var root = string.IsNullOrWhiteSpace(_environment.WebRootPath)
-                ? AppContext.BaseDirectory
-                : _environment.WebRootPath;
-
-            var fallbackDirectory = Path.Combine(root, "uploads", "dev-emails");
+            var fallbackDirectory = GetFallbackDirectory();
             Directory.CreateDirectory(fallbackDirectory);
 
             var fileName = $"{DateTime.UtcNow:yyyyMMdd_HHmmss}_{Guid.NewGuid():N}.html";
