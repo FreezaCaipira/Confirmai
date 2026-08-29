@@ -499,7 +499,10 @@ app.Use(async (context, next) =>
         "connect-src 'self' wss: ws: https://maps.googleapis.com; " +
         "frame-ancestors 'none'; " +
         "base-uri 'self'; " +
-        "form-action 'self';";
+        // The external-login form posts to our own endpoint, but browsers apply
+        // form-action to the redirect chain too, so the OAuth provider must be
+        // allowed or the redirect to the consent screen is blocked silently.
+        "form-action 'self' https://accounts.google.com;";
     await next();
 });
 
