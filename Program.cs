@@ -447,10 +447,19 @@ if (!isDevelopment)
 // real client IPs and the original scheme. Must come before HTTPS redirect.
 if (!isDevelopment)
 {
-    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    var forwardedHeadersOptions = new ForwardedHeadersOptions
     {
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-    });
+    };
+
+    // By default only loopback is trusted, so headers from a proxy running in
+    // another container are discarded and Request.Scheme stays "http" — which
+    // makes OAuth build an http redirect_uri and Google reject it. The app is
+    // only reachable through the proxy, so trust any hop.
+    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownProxies.Clear();
+
+    app.UseForwardedHeaders(forwardedHeadersOptions);
 }
 
 if (!isDevelopment)
@@ -490,7 +499,10 @@ app.Use(async (context, next) =>
         "connect-src 'self' wss: ws: https://maps.googleapis.com; " +
         "frame-ancestors 'none'; " +
         "base-uri 'self'; " +
-        "form-action 'self';";
+        // The external-login form posts to our own endpoint, but browsers apply
+        // form-action to the redirect chain too, so the OAuth provider must be
+        // allowed or the redirect to the consent screen is blocked silently.
+        "form-action 'self' https://accounts.google.com;";
     await next();
 });
 

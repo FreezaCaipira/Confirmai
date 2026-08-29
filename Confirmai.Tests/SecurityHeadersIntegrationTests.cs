@@ -65,6 +65,10 @@ public class SecurityHeadersIntegrationTests : IClassFixture<IntegrationTestWebA
         Assert.Contains("base-uri 'self'", csp);
         Assert.Contains("form-action 'self'", csp);
 
+        // The external-login redirect chain ends at the Google consent screen;
+        // without it in form-action the browser blocks the submit silently.
+        Assert.Contains("form-action 'self' https://accounts.google.com", csp);
+
         // Script-src must use a per-request nonce, not 'unsafe-inline'.
         Assert.Contains("script-src 'self' 'nonce-", csp);
         Assert.DoesNotContain("script-src 'self' 'unsafe-inline'", csp);
