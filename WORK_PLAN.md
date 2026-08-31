@@ -488,7 +488,7 @@ Nao subir dependencia nova sem aprovacao; nao mexer no fluxo do dinheiro do joga
 
 ## Ciclo 30 (Pleno + Robson) -- Login Google + email validados em PRODUCAO [EM EXECUCAO -- login Google OK]
 
-**Status (PR #98 mergeada)**: o botao do Google leva a tela de consentimento e o login conclui em `https://confirmai.m2gpju.easypanel.host`. Faltam os passos de email do roteiro (confirmacao via Brevo, reset de senha) e os 3 caminhos do criar-ou-vincular. Achados do uso real foram para o **Ciclo 30-B**.
+**Status (PR #98 mergeada)**: o botao do Google leva a tela de consentimento e o login conclui em `https://confirmai.m2gpju.easypanel.host`. O **passo 1 do roteiro fechou**: cadastro por email/senha dispara o email pela Brevo, o link confirma a conta e o login passa a ser aceito (validado pelo Robson em prod). Faltam **reset de senha** via Brevo e os **3 caminhos do criar-ou-vincular** (o de vincular Google a um email ja existente por senha e o que funde contas se errar). Achados do uso real foram para o **Ciclo 30-B** -- incluindo o acabamento das telas do Identity e o template dos emails (Fases 4 e 5), que sairam do proprio uso do fluxo validado.
 
 **Bloqueio (historico)**: OAuth Client de prod (redirect `https://<dominio>/signin-google`) + `ClientId`/`ClientSecret`/SMTP como **env vars no EasyPanel**. Enquanto nao existirem, o ciclo nao comeca. Detalhes de risco na secao "Google OAuth e email: onde validar".
 
@@ -501,9 +501,9 @@ Nao subir dependencia nova sem aprovacao; nao mexer no fluxo do dinheiro do joga
 
 ---
 
-## Ciclo 30-B (Pleno) -- Fechar o pos-login do Google: loading, botao e claims [PLANEJADO -- EXECUTAVEL AGORA]
+## Ciclo 30-B (Pleno) -- Fechar o pos-login e a apresentacao do Identity: claims, loading, botao, telas e email [PLANEJADO -- EXECUTAVEL AGORA]
 
-**Contexto**: o login Google funciona em prod desde a PR #98 (dois defeitos, ambos silenciosos: `redirect_uri` em `http` porque `ForwardedHeadersOptions` so confiava em loopback atras do proxy do EasyPanel, e `form-action 'self'` bloqueando o redirect da cadeia do POST ate `accounts.google.com`). O caminho critico esta validado; sobraram 3 achados do Robson usando o app.
+**Contexto**: o login Google funciona em prod desde a PR #98 (dois defeitos, ambos silenciosos: `redirect_uri` em `http` porque `ForwardedHeadersOptions` so confiava em loopback atras do proxy do EasyPanel, e `form-action 'self'` bloqueando o redirect da cadeia do POST ate `accounts.google.com`). O caminho critico esta validado; sobraram 5 achados do Robson usando o app -- 3 do pos-login (claims, loading, botao) e 2 de apresentacao (telas do Identity e template dos emails), estes ultimos levantados depois de a confirmacao por email real passar.
 
 **Regra de ouro**: TDD, SOLID, i18n (regra 25), CSS modular com as vars permitidas, build `--no-incremental` **0 warning**, suite completa verde, 1 commit por fase, PR com os blocos de build/test colados (regra 28).
 
@@ -530,7 +530,45 @@ O Robson relatou "faltou um loading ate carregar os dados depois de logado". O `
 
 ### Fase 3 -- Estilizar o botao do Google
 
-`.external-login-btn--google` (`Areas/Identity/Pages/Account/Login.cshtml`) hoje nao tem tratamento visual. Seguir o padrao de mercado (Google Sign-In branding): fundo branco, borda cinza clara, logo "G" a esquerda, altura alinhada aos botoes do form, estado hover/focus visivel. O logo deve ser um **SVG local em `wwwroot`** -- `img-src 'self'` no CSP bloqueia asset remoto. Texto continua vindo do i18n (`Identity.ExternalLogin.Provider`), sem string hardcoded, e cores via vars permitidas.
+**Correcao do diagnostico anterior**: `.external-login-btn--google` **existe** em `wwwroot/css/identity.css:316-323`, mas (a) e um gradiente branco generico, sem o logo, e (b) usa **hex hardcoded** (`#ffffff`, `#f0f0f0`, `#444`, `#d0d0d0`), violando a regra de cores por var. Seguir o padrao de mercado (Google Sign-In branding): fundo branco, borda cinza clara, logo "G" a esquerda, altura alinhada aos botoes do form, estado hover/focus visivel. O logo deve ser um **SVG local em `wwwroot`** -- `img-src 'self'` no CSP bloqueia asset remoto. As cores da marca do Google sao **fixas por definicao de branding**: declarar como vars proprias no `:root` (ex.: `--google-btn-bg`, `--google-btn-border`, `--google-btn-text`) e consumir por var, em vez de hex espalhado no seletor. Texto continua vindo do i18n (`Identity.ExternalLogin.Provider`), sem string hardcoded.
+
+### Fase 4 -- Telas do Identity: acabamento visual e estados de resultado
+
+Pedido do Robson depois de validar o email real: *"precisamos melhorar a estilizacao tanto das telas do app referente a isso, quanto o email em si"*. As 13 paginas de `Areas/Identity/Pages/Account/` usam o `_Layout.cshtml` proprio (`site.css` + `identity.css`, sem Bootstrap) e sao markup cru -- `<h2>`, `<div>`, `<label>`, `<input>` sem classe, estilizados so por seletor descendente `.identity-container input`. Funciona, mas nao recebeu o trabalho de CSS que o resto do app recebeu. **Nao redesenhar o card** (`.identity-container` e o padrao visual aprovado): o trabalho e acabamento e estados.
+
+Achados concretos, em ordem de gravidade:
+
+1. **Nenhuma tela distingue sucesso de erro.** `ConfirmEmail.cshtml` renderiza `StatusMessage` como `<p class="identity-muted">` -- "Email confirmado com sucesso" e "Falha ao confirmar" saem **identicas, em cinza**. E a tela que fecha o cadastro; e o unico feedback que o usuario recebe. O `ConfirmEmailModel` sabe o resultado (`result.Succeeded`, `ConfirmEmail.cshtml.cs:42`) e **descarta a informacao** ao guardar so a string. Expor um estado (ex.: `bool? IsSuccess`) e renderizar bloco de sucesso (icone/cor de acerto) vs. erro, com CTA diferente: sucesso -> "Entrar"; erro -> "Reenviar confirmacao". Mesmo tratamento em `ResendEmailConfirmation.cshtml` (hoje `StatusMessage` cinza) e em `ExternalLogin.cshtml`.
+2. **`ExternalLogin.cshtml` e um beco sem saida**: quando ha `ErrorMessage`, a pagina mostra o titulo e um `<div class="text-danger">` e **nenhum link** -- o usuario fica preso e tem que digitar a URL. Adicionar as acoes de saida (voltar ao login / tentar de novo).
+3. **String hardcoded violando a regra 25**: `"Inicio"` no link de home de `Login.cshtml:10` e `Register.cshtml:9`. Criar chave (ex.: `Identity.Common.Home`) e usar nas duas.
+4. **Inconsistencia entre as telas**: o link de home e o `.identity-footer` existem **so** em Login e Register; `identity-login-heading` existe em Login/Register/ExternalLogin e as outras usam `<h2>` cru (tamanho diferente). Padronizar: mesma heading, mesmo rodape e mesmo link de home em todas as 13.
+5. **Sem hierarquia nas acoes**: `.identity-actions` joga 3 links irmaos no mesmo peso (Login tem "Esqueci a senha", "Cadastrar", "Reenviar confirmacao"). Definir acao primaria vs. secundarias.
+6. **Acessibilidade**: `:focus` existe para input mas **nao** ha `:focus-visible` nos botoes/links; `.text-danger` nao esta associado ao input por `aria-describedby`; o `validation-summary` nao e anunciado (falta `role="alert"`). Corrigir junto -- e o mesmo arquivo.
+
+Restricoes: **nao** quebrar o antiforgery nem o `method="post"` dos forms; **nao** remover o `_ValidationScriptsPartial`; **nao** adicionar Bootstrap nem CSS framework; **nao** inflar `identity.css` com duplicata do que ja esta em `site.css`/`buttons.css` -- reusar var e padrao existentes; responsividade mobile ja tem media query em `identity.css:325+`, manter e conferir em 360px.
+
+Debito menor, opcional nesta fase: `ForgotPasswordConfirmation.cshtml.cs` reimplementa o caminho do fallback (`wwwroot/uploads/dev-emails`) que o `IdentityEmailSender.GetFallbackDirectory()` ja calcula -- duas fontes da verdade para o mesmo diretorio, e o texto da view tem `/wwwroot/uploads/dev-emails` hardcoded. Se mexer, consumir o metodo do sender.
+
+### Fase 5 -- Template dos emails: hoje e uma linha de HTML
+
+O corpo do email de confirmacao e o de reset sao **format strings de uma linha** em `Services/Core/UiText/AuthTexts.cs:69` e `:72`:
+
+```csharp
+["Identity.Email.ConfirmBody"] = "Confirme sua conta clicando aqui: <a href='{0}'>{1}</a>.",
+```
+
+Sem `<html>`, sem `<head>`, sem largura, sem identidade visual -- o cliente de email renderiza serif preto sobre branco. As notificacoes de partida sao ainda mais cruas: `EventNotificationService.cs:130` faz `$"<p>{bodyText.Replace("\n", "<br/>")}</p>"`.
+
+- **Criar um envelope unico** (ex.: `Services/Utility/EmailTemplateService.cs`) que recebe titulo, paragrafos, CTA (texto + URL) e devolve o HTML completo, e passar `Register`, `ForgotPassword`, `ResendEmailConfirmation` e `EventNotificationService` a usa-lo. O `IdentityEmailSender` continua **so transporte** -- nao e o lugar do template.
+- **HTML de email nao e HTML de web**: layout por `<table>` com largura fixa de 600px, **todo CSS inline** (Gmail remove `<style>`, Outlook usa engine do Word), sem flex/grid, sem CSS var, sem `border-radius` como requisito visual. As vars do `identity.css` **nao existem** dentro do email -- os valores tem que ser literais no template, e essa e a **unica** excecao aprovada a regra de cores por var.
+- **Logo**: preferir wordmark em texto estilizado. Imagem remota exige URL absoluta publica (o dominio ainda vai mudar) e a maioria dos clientes **bloqueia imagem por padrao** -- um logo que nao carrega piora o resultado. Se usar imagem, precisa de `alt` e o layout tem que ficar apresentavel sem ela.
+- **CTA + fallback obrigatorio**: botao (celula de tabela com background e `<a>` dentro, nao `<button>`) **e** a URL completa em texto abaixo, copiavel -- cliente que bloqueia estilo/link ainda tem que dar para confirmar a conta.
+- **Parte texto puro**: hoje o `MailMessage` vai `IsBodyHtml = true` e nada mais. Adicionar `AlternateViews` com text/plain -- HTML-only aumenta score de spam, e o remetente hoje e `@gmail.com` via Brevo, ja em desvantagem de reputacao (o Robson relatou o email caindo bem, mas isso muda com volume).
+- **i18n**: nada de texto novo hardcoded no template (rodape, "se voce nao pediu isso, ignore", aviso de expiracao do link). Chave por idioma nos 3 idiomas de `AuthTexts.cs`.
+- **Seguranca**: o link carrega o token de confirmacao/reset -- nao logar o corpo do email em nenhum nivel alem do fallback de dev que ja existe (`IdentityEmailSender.cs:31` loga o body inteiro **so** no caminho de fallback; nao estender isso ao caminho SMTP), nao mandar o token em outro lugar do corpo, e manter o `HtmlEncoder.Default.Encode(callbackUrl)` que ja e aplicado no `Register`/`ForgotPassword`.
+- **Assunto**: prefixar com `[Confirmai]` de forma consistente (hoje so a notificacao de pagamento pendente prefixa, `EventNotificationService.cs:301`) -- via i18n.
+- Testes: o template gera HTML com a URL do CTA e com a URL em texto; nao gera tag nao fechada; `AlternateViews` tem a parte text/plain; troca de idioma troca as strings; nenhuma chave nova fora do i18n (o teste de residual de i18n ja cobre isso).
+- **Evidencia no PR**: o Pleno deve rodar o app com `Email__Enabled=false`, gerar um cadastro, e colar no PR o print do HTML do fallback (`App_Data/fallback-emails` fora de Development, `wwwroot/uploads/dev-emails` em Development) renderizado no navegador. Sem o print a review nao comeca.
 
 ---
 
