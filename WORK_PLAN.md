@@ -486,9 +486,11 @@ Nao subir dependencia nova sem aprovacao; nao mexer no fluxo do dinheiro do joga
 
 ---
 
-## Ciclo 30 (Pleno + Robson) -- Login Google + email validados em PRODUCAO [PLANEJADO -- BLOQUEADO no Robson]
+## Ciclo 30 (Pleno + Robson) -- Login Google + email validados em PRODUCAO [EM EXECUCAO -- login Google OK]
 
-**Bloqueio**: OAuth Client de prod (redirect `https://<dominio>/signin-google`) + `ClientId`/`ClientSecret`/SMTP como **env vars no EasyPanel**. Enquanto nao existirem, o ciclo nao comeca. Detalhes de risco na secao "Google OAuth e email: onde validar".
+**Status (PR #98 mergeada)**: o botao do Google leva a tela de consentimento e o login conclui em `https://confirmai.m2gpju.easypanel.host`. Faltam os passos de email do roteiro (confirmacao via Brevo, reset de senha) e os 3 caminhos do criar-ou-vincular. Achados do uso real foram para o **Ciclo 30-B**.
+
+**Bloqueio (historico)**: OAuth Client de prod (redirect `https://<dominio>/signin-google`) + `ClientId`/`ClientSecret`/SMTP como **env vars no EasyPanel**. Enquanto nao existirem, o ciclo nao comeca. Detalhes de risco na secao "Google OAuth e email: onde validar".
 
 **O que e do Pleno (executavel antes das credenciais, sem depender delas)**:
 - Cobrir o `criar-ou-vincular` com **teste** nos 3 caminhos, se ainda nao estiver: (a) login externo ja vinculado entra; (b) email existente **vincula** via `AddLoginAsync`; (c) email novo cria conta com `EmailConfirmed=true`. Esse e o codigo que, se errar em prod, **funde contas** -- e irreversivel em banco real.
@@ -496,6 +498,39 @@ Nao subir dependencia nova sem aprovacao; nao mexer no fluxo do dinheiro do joga
 - Conferir que nenhuma credencial vaza em log (`ClientSecret`, senha SMTP) nem em pagina de erro.
 
 **O que e do Robson (em prod, na ordem)**: criar o OAuth Client -> setar as env vars -> conferir SPF/DKIM/DMARC do dominio -> exercitar os 3 caminhos com a conta dele + uma conta de teste -> so depois divulgar o login. Rollback: desligar o botao do Google e ficar no login por email/senha.
+
+---
+
+## Ciclo 30-B (Pleno) -- Fechar o pos-login do Google: loading, botao e claims [PLANEJADO -- EXECUTAVEL AGORA]
+
+**Contexto**: o login Google funciona em prod desde a PR #98 (dois defeitos, ambos silenciosos: `redirect_uri` em `http` porque `ForwardedHeadersOptions` so confiava em loopback atras do proxy do EasyPanel, e `form-action 'self'` bloqueando o redirect da cadeia do POST ate `accounts.google.com`). O caminho critico esta validado; sobraram 3 achados do Robson usando o app.
+
+**Regra de ouro**: TDD, SOLID, i18n (regra 25), CSS modular com as vars permitidas, build `--no-incremental` **0 warning**, suite completa verde, 1 commit por fase, PR com os blocos de build/test colados (regra 28).
+
+### Fase 1 -- Claims do provider: hoje jogamos fora tudo menos o email
+
+`Areas/Identity/Pages/Account/ExternalLogin.cshtml.cs` consome **apenas** `ClaimTypes.Email` e `email_verified`. A conta nasce com:
+
+```csharp
+new ApplicationUser { UserName = email, Email = email, EmailConfirmed = emailVerified, MemberSince = ... }
+```
+
+Ou seja `FullName` e `AvatarPath` ficam **null** mesmo com o Google mandando `name`/`given_name`/`family_name` e `picture` de graca (escopos `profile`/`email`, que o `AddGoogle` ja pede por padrao). Efeito visivel: `Profile.razor.cs:46` cai no fallback e o usuario aparece como o proprio email; o avatar cai no fallback de inicial.
+
+- Popular `FullName` a partir de `ClaimTypes.Name` (fallback: `given_name` + `family_name`).
+- Popular `AvatarPath` a partir da claim `picture`, **baixando a imagem** para `/uploads/avatars/` na convencao que o `ProfileService` ja usa. **Nao** salvar a URL do Google: (a) o CSP tem `img-src 'self' data: blob: <maps>` -- `lh3.googleusercontent.com` seria bloqueado; (b) hotlink vaza navegacao do usuario pro Google e quebra quando a URL expira. O download e best-effort: falha nao pode impedir o login.
+- **Nao sobrescrever** dado existente no caminho de vinculo a conta ja criada -- preencher so quando o campo estiver vazio, senao o login com Google apaga o nome/avatar que o usuario editou no Profile.
+- Testes: claim presente popula; claim ausente nao quebra; download falhando ainda loga o usuario; vinculo a conta com `FullName` preenchido preserva o valor.
+
+**Observacao para depois (nao e deste ciclo)**: o cadastro por email/senha (`Register.cshtml.cs`) tambem nao coleta `FullName` -- a lacuna nao e exclusiva do Google.
+
+### Fase 2 -- Loading do pos-login
+
+O Robson relatou "faltou um loading ate carregar os dados depois de logado". O `<app>` do `Pages/_Host.cshtml` usa `ServerPrerendered` e nao tem nenhum indicador enquanto o circuito SignalR nao conecta -- e o retorno do Identity e uma navegacao full-page, nao um render Blazor. O Pleno deve **primeiro reproduzir e registrar no PR qual tela e qual dado** ficam vazios (print), e so entao corrigir: indicador de boot dentro de `<app>` no `_Host.cshtml` e/ou estado de carregamento na tela de destino reutilizando `Shared/Components/Skeleton.razor` (o padrao ja existe em `Pages/Index.razor:62-68`). Nao criar componente novo de loading.
+
+### Fase 3 -- Estilizar o botao do Google
+
+`.external-login-btn--google` (`Areas/Identity/Pages/Account/Login.cshtml`) hoje nao tem tratamento visual. Seguir o padrao de mercado (Google Sign-In branding): fundo branco, borda cinza clara, logo "G" a esquerda, altura alinhada aos botoes do form, estado hover/focus visivel. O logo deve ser um **SVG local em `wwwroot`** -- `img-src 'self'` no CSP bloqueia asset remoto. Texto continua vindo do i18n (`Identity.ExternalLogin.Provider`), sem string hardcoded, e cores via vars permitidas.
 
 ---
 
