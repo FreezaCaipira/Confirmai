@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 
 namespace Confirmai.Areas.Identity.Pages.Account
 {
@@ -20,12 +21,14 @@ namespace Confirmai.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly UiTextService _t;
+        private readonly EmailTemplateService _emailTemplate;
 
-        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender, UiTextService t)
+        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender, UiTextService t, EmailTemplateService emailTemplate)
         {
             _userManager = userManager;
             _emailSender = emailSender;
             _t = t;
+            _emailTemplate = emailTemplate;
         }
 
         [BindProperty]
@@ -66,10 +69,16 @@ namespace Confirmai.Areas.Identity.Pages.Account
 
             if (callbackUrl != null)
             {
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    _t["Identity.Email.ResetSubject"],
-                    string.Format(_t["Identity.Email.ResetBody"], HtmlEncoder.Default.Encode(callbackUrl), _t["Identity.Email.ResetAction"]));
+                var subject = _t["Identity.Email.ResetSubject"];
+                var ctaText = _t["Identity.Email.ResetAction"];
+                var paragraphs = new[] { string.Format(_t["Identity.Email.ResetBody"], HtmlEncoder.Default.Encode(callbackUrl), ctaText) };
+                var html = _emailTemplate.RenderHtml(subject, subject, paragraphs, ctaText, callbackUrl);
+                var text = _emailTemplate.RenderText(subject, paragraphs, ctaText, callbackUrl);
+
+                if (_emailSender is IdentityEmailSender typedSender)
+                    await typedSender.SendEmailAsync(Input.Email, subject, html, text);
+                else
+                    await _emailSender.SendEmailAsync(Input.Email, subject, html);
             }
 
             return RedirectToPage("./ForgotPasswordConfirmation");
