@@ -610,11 +610,23 @@ Recomendadas pelo Senior, todas com dado que **ja existe** no sistema:
 6. **Vagas restantes / partida lotada** e **promocao da lista de espera** (`NotifyWaitlistPromotedAsync`).
 7. **Abertura da votacao de destaque** pos-jogo (o quorum de 50% hoje depende de o jogador lembrar de voltar).
 
-**Explicitamente NAO enviar no grupo**: cobranca nominal de inadimplencia (o DLQ existe, mas expor "o Joao nao pagou" em grupo e humilhacao publica e problema de LGPD -- se entrar, so agregado e sem nome, ou DM), chave Pix, comprovante, valor individual, e **nenhum link de autenticacao/reset** (grupo de WhatsApp e canal compartilhado; qualquer membro clicaria).
+**Explicitamente NAO enviar no grupo**: cobranca nominal de inadimplencia, chave Pix, comprovante, valor individual, e **nenhum link de autenticacao/reset** (grupo de WhatsApp e canal compartilhado; qualquer membro clicaria).
+
+### Fase 3b -- Inadimplencia por DM ao organizador (decisao do Robson, 14/06/2026)
+
+Desenho aprovado: a pendencia **nao** vai para o grupo, vai em **DM para o organizador**, e a mensagem **nao carrega valor nem nome** -- apenas avisa que existe pendencia e **redireciona para a tela de gestao de pagamentos daquele grupo**.
+
+Por que isso e melhor do que mandar os numeros, e a regra vale para todo o bot: **mensagem com valor fica desatualizada**. Se o texto diz "R$ 90 pendentes" e o jogador paga 10 minutos depois, o organizador cobra quem ja pagou. Link para a tela sempre mostra o estado real. **Regra geral do C31: o WhatsApp notifica, o app e a fonte da verdade.** Toda mensagem que dependeria de um valor/estado mutavel deve virar link.
+
+- **Nenhum campo novo**: `ApplicationUser` ja tem `WhatsAppNumber` e `WhatsAppOptIn`. Falta a UI no Profile e a regra de guarda: sem numero **ou** sem opt-in = nao envia, silenciosamente (nao e erro, e ausencia de consentimento).
+- **DM e onde mora o risco de ban**, nao o grupo -- bot mandando mensagem para numero que nunca conversou com ele e o padrao que a Meta trata como spam. Mitigacao obrigatoria: durante o cadastro do numero, o organizador **envia uma mensagem ao bot uma vez** e o numero so e considerado habilitado depois que a Evolution registrar essa conversa. Bonus: valida que o numero esta correto -- numero digitado errado significa DM para um estranho.
+- **O link e a URL normal da tela, protegida por login** -- nunca link com token de acesso embutido. Mensagem encaminhada tem que cair no login, nao na gestao financeira do grupo.
+- **Gatilho recomendado pelo Senior**: junto do lembrete do dia do jogo (1 DM por partida, quando ainda da tempo de cobrar). A alternativa de resumo periodico semanal vira ruido que o organizador aprende a ignorar; se entrar, entra depois. **Aguardando o ok do Robson entre as duas.**
+- Idempotencia: a DM entra no mesmo registro `(EventId, MessageKind)` da Fase 2 -- sem isso, restart do container manda a DM de novo.
 
 ### Fase 4 -- Configuracao e operacao
 
-- Config em `appsettings` + env var: `WhatsApp__Enabled`, `WhatsApp__BaseUrl`, `WhatsApp__Instance`, `WhatsApp__ApiKey`, `WhatsApp__DryRun` (default `true`), `WhatsApp__AllowedGroupJids`. A `ApiKey` **nunca** em `appsettings*.json` versionado -- so env var, como o resto.
+- Config em `appsettings` + env var: `WhatsApp__Enabled`, `WhatsApp__BaseUrl`, `WhatsApp__Instance`, `WhatsApp__ApiKey`, `WhatsApp__DryRun` (default `true`), `WhatsApp__AllowedGroupJids` e `WhatsApp__AllowedNumbers` (a allowlist de DM da Fase 3b -- allowlist de grupo nao protege DM). A `ApiKey` **nunca** em `appsettings*.json` versionado -- so env var, como o resto.
 - Guard rail de startup no mesmo estilo do `EfiBank:Sandbox`: `Enabled=true` com `DryRun=false` e `AllowedGroupJids` vazio em ambiente nao-Development deve **falhar o boot** em vez de sair mandando mensagem para grupo de gente real.
 - O numero pareado tem que ser **chip dedicado**, nunca o pessoal do Robson (ban do numero = perder o WhatsApp pessoal). Registrar isso como pre-requisito operacional, nao como sugestao.
 - Testes: contrato do payload da Evolution (JID de grupo, header `apikey`); dry-run nao faz chamada HTTP; JID fora da allowlist nao envia; unique index impede o segundo disparo do mesmo (EventId, MessageKind); evento cancelado/passado nao dispara; falha de envio nao interrompe a varredura.
