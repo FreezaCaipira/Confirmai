@@ -42,6 +42,10 @@
             <form method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
                 <input type="hidden" name="provider" value="@provider.Name" />
                 <button type="submit" class="external-login-btn external-login-btn--@provider.Name.ToLowerInvariant()">
+                    @if (provider.Name.Equals("Google", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <img src="/img/google-g.svg" alt="" class="external-login-btn-icon" width="18" height="18" />
+                    }
                     @T.Get("Identity.ExternalLogin.Provider", provider.DisplayName ?? string.Empty)
                 </button>
             </form>

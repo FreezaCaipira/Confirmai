@@ -314,14 +314,29 @@
 }
 
 .external-login-btn--google {
-    background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
-    color: #444;
-    border-color: #d0d0d0;
+    background: var(--google-btn-bg);
+    color: var(--google-btn-text);
+    border-color: var(--google-btn-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .external-login-btn--google:hover {
-    background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
-    border-color: #c0c0c0;
+    background: var(--google-btn-bg-hover);
+    border-color: var(--google-btn-border-hover);
+}
+
+.external-login-btn--google:focus-visible {
+    outline: 2px solid var(--google-btn-border-hover);
+    outline-offset: 2px;
+}
+
+.external-login-btn-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
 }
 
 @media (max-width: 768px) {
