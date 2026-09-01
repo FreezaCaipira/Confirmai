@@ -146,7 +146,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 1. **Mergear a PR de review do C29** (fix de canonicalizacao do idioma + review + este mapa).
 2. **Ciclo 30 -- Login Google + email validados em PRODUCAO** (ja planejado abaixo; decisao do Robson). **Bloqueado no Robson**: OAuth Client de prod + `ClientId`/`ClientSecret`/SMTP como env vars no EasyPanel. Sem isso o ciclo nao comeca -- e o unico item que separa o app de aceitar usuario novo por Google.
-3. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): **bloqueado** no nome da ferramenta que o Robson recebeu de indicacao. Nao planejar antes -- provider de terceiro muda custo, lock-in, quem e o numero remetente e para onde vao os contatos dos jogadores.
+3. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): **desbloqueado e planejado**. Robson escolheu **Evolution API** (self-hosted, nao-oficial) disparando no **grupo de WhatsApp do grupo do sistema**, nao em DM. Detalhe no Ciclo 31.
 4. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
 5. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
 
@@ -222,13 +222,13 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 - **Validar o Envio de Pix Efi em homologacao** (credenciais + certificado .p12 -- ver Troubleshooting; solucao base64 disponivel). Confirmar limites de envio de Pix.
 - **Confirmar com contador** a nota fiscal sobre a taxa de servico (o dinheiro passa pela conta do site = intermediacao).
 - **Gerar o OAuth Client de PROD** (redirect `https://<dominio>/signin-google`) + publicar a consent screen (escopos basicos email/profile dispensam verificacao; exige URL de politica de privacidade) e configurar `ClientId`/`ClientSecret` + SMTP como **env vars no EasyPanel** -- desbloqueia o Ciclo 30. Client de dev nao e mais necessario (decisao: validar direto em prod).
-- **Decidir o modelo do WhatsApp**: Cloud API oficial (Meta) vs. deep link `wa.me` vs. **uma ferramenta de terceiro recomendada a ele** (nome a confirmar) -- desbloqueia o Ciclo 31. Nao planejar o ciclo antes dessa informacao: o desenho muda completamente (provider externo exige avaliar custo, lock-in, dados de contato saindo da plataforma e se o numero e da plataforma ou do organizador).
+- ~~Decidir o modelo do WhatsApp~~ **DECIDIDO**: Evolution API, envio no grupo. Pendencias operacionais que continuam com o Robson: onde a Evolution vai rodar, qual **chip dedicado** sera pareado (nunca o numero pessoal) e qual grupo de teste entra na allowlist.
 - Confirmar `SyncPassword=false` em producao; confirmar mTLS do webhook Efi ativo em prod.
 - (SMTP/provedor de email em prod: **nao bloqueia dev** -- em dev usa-se catcher local ou Gmail App Password.)
 
 ### Candidatos a proximos ciclos (Senior planeja quando priorizado)
 - **Login Google + email em PROD** (Ciclo 30) -- ver secao "Google OAuth e email: onde validar".
-- **WhatsApp** (Ciclo 31, ultima feature do escopo) -- sai do status POSTERGADO; aguarda apenas a decisao Cloud API vs. `wa.me`.
+- **WhatsApp** (Ciclo 31, ultima feature do escopo) -- PLANEJADO (Evolution API, envio no grupo).
 - **Mobile UX**: segue no modelo incremental (Robson testa com F12, aponta a tela, o ciclo corrige) -- nao ha ciclo de varredura planejado.
 - **Cobertura crescente** de testes nos demais services; E2E automatizado (Playwright 375/768/desktop) como reforco opcional.
 - Pen-test financeiro, revisao de CSP, metricas SignalR, alertas operacionais -- antes de producao.
@@ -250,7 +250,7 @@ Varredura Senior focada em melhorias/adicoes, **separando codigo (Pleno/Senior) 
 
 **P3 -- higiene / futuro:**
 - **Teste de convencao anti-hardcode i18n** nas telas-alvo (proposto no C23, nao feito): falhar se aparecer literal acentuado em `.razor` dos fluxos principais.
-- **WhatsApp** (`Services/Events/EventNotificationService.cs:194` TODO) -- promovido a Ciclo 31 (ultima feature do escopo).
+- **WhatsApp** (`Services/Events/EventNotificationService.cs:194` TODO) -- promovido a Ciclo 31. O TODO descreve o desenho antigo por DM/opt-in e deve ser **removido** quando o C31 entrar, para nao restar duas verdades no repo.
 - E2E mobile (Playwright 375/768/desktop) dos fluxos principais -- quando priorizado.
 
 **Pendencias do Robson (fora do codigo) -- NAO sao do proximo ciclo de codigo:**
@@ -545,6 +545,8 @@ Achados concretos, em ordem de gravidade:
 5. **Sem hierarquia nas acoes**: `.identity-actions` joga 3 links irmaos no mesmo peso (Login tem "Esqueci a senha", "Cadastrar", "Reenviar confirmacao"). Definir acao primaria vs. secundarias.
 6. **Acessibilidade**: `:focus` existe para input mas **nao** ha `:focus-visible` nos botoes/links; `.text-danger` nao esta associado ao input por `aria-describedby`; o `validation-summary` nao e anunciado (falta `role="alert"`). Corrigir junto -- e o mesmo arquivo.
 
+7. **`ResetPassword` pede o email de novo** (achado do Robson testando em prod). O link do email nao carrega nenhuma identificacao (`ForgotPassword.cshtml.cs` monta `?code=...` apenas), entao o POST descobre o usuario por `FindByEmailAsync(Input.Email)` -- o usuario tem que redigitar o proprio email num fluxo onde ele **acabou de esquecer** algo. **Nao e brecha de seguranca**: o token de reset e gerado para um usuario especifico e carrega o `SecurityStamp` dele, logo digitar o email de outra pessoa faz `ResetPasswordAsync` falhar; o campo e so o jeito preguicoso do template padrao do Identity de saber **qual** usuario validar. Correcao: incluir o **`userId`** no `callbackUrl` do `ForgotPassword` e a pagina resolver o email a partir dele, deixando o campo preenchido e `readonly` (ou fora do form). **`userId`, nao email**: email em query string vaza para historico do navegador, log de proxy e header `Referer`, e e justamente o dado que identifica a pessoa -- o token continua sendo a unica credencial, entao nao ha perda de seguranca. Preservar: antiforgery, `ResetPasswordAsync` como validacao final, e o redirect para `ResetPasswordConfirmation` quando o usuario nao existe (nao revelar cadastro). Testes: link sem `userId` (link antigo, ainda em inbox de alguem) continua funcionando pelo caminho atual; `userId` inexistente nao vaza; token de um usuario com email de outro falha; reset valido gera auditoria.
+
 Restricoes: **nao** quebrar o antiforgery nem o `method="post"` dos forms; **nao** remover o `_ValidationScriptsPartial`; **nao** adicionar Bootstrap nem CSS framework; **nao** inflar `identity.css` com duplicata do que ja esta em `site.css`/`buttons.css` -- reusar var e padrao existentes; responsividade mobile ja tem media query em `identity.css:325+`, manter e conferir em 360px.
 
 Debito menor, opcional nesta fase: `ForgotPasswordConfirmation.cshtml.cs` reimplementa o caminho do fallback (`wwwroot/uploads/dev-emails`) que o `IdentityEmailSender.GetFallbackDirectory()` ja calcula -- duas fontes da verdade para o mesmo diretorio, e o texto da view tem `/wwwroot/uploads/dev-emails` hardcoded. Se mexer, consumir o metodo do sender.
@@ -572,11 +574,50 @@ Sem `<html>`, sem `<head>`, sem largura, sem identidade visual -- o cliente de e
 
 ---
 
-## Ciclo 31 (Pleno) -- WhatsApp [NAO PLANEJADO -- aguardando o nome da ferramenta]
+## Ciclo 31 (Pleno) -- WhatsApp via Evolution API, disparo no grupo [PLANEJADO -- executar depois do C30-B]
 
-Ultima feature do escopo. **Nao sera planejado** antes do Robson informar qual ferramenta foi indicada a ele: o desenho muda completamente entre Cloud API oficial da Meta, deep link `wa.me` e um provider de terceiro (custo, lock-in, contatos dos jogadores saindo da plataforma, numero remetente da plataforma vs. do organizador, templates/aprovacao).
+Ultima feature do escopo. **Decisao do Robson**: Evolution API (nao-oficial, Baileys/whatsmeow, self-hosted, pareada por QR), disparando no **grupo de WhatsApp correspondente ao grupo do sistema** -- nao em DM para cada jogador. Isso simplifica consentimento (quem esta no grupo ja recebe tudo) e reduz drasticamente o volume de envio, que e o que dispara bloqueio.
 
-**Trava que entra em qualquer um dos desenhos** (decidida na conversa com o Robson): antes de qualquer envio real, **modo dry-run** (loga a mensagem em vez de enviar) + **allowlist de destinatarios** (so o numero do Robson recebe ate ele liberar). Mensageria quebrada nao tem ctrl+z: manda mensagem errada para o celular de pessoa real, pode duplicar cobranca e, na Cloud API, custa por conversa e gera bloqueio por spam.
+**Trava que entra em qualquer desenho** (decidida com o Robson): antes de qualquer envio real, **modo dry-run** (persiste/loga a mensagem em vez de enviar) + **allowlist de destinos** (so o grupo de teste do Robson recebe ate ele liberar). Mensageria nao tem ctrl+z.
+
+**Riscos que precisam estar no PR, nao na cabeca de ninguem**: a Evolution e nao-oficial -- viola ToS da Meta e o numero pareado pode ser banido; a sessao e estado fragil (QR + credencial persistida, reinicio sem persistencia = repareamento manual); atualizacao do WhatsApp quebra a biblioteca. Consequencia de desenho: **o WhatsApp e canal secundario**. Nada critico (confirmacao de pagamento, link de auth, comprovante) pode depender dele; email + mailbox interno continuam sendo a fonte da verdade.
+
+### Fase 1 -- Abstracao e o que ja existe (nao comecar do zero)
+
+- `Services/Notification/WhatsAppNotificationService.cs` **existe e nao serve**: faz `POST {ApiUrl}?key={ApiKey}` com `{phone, message}`, que **nao e o contrato da Evolution** (`POST {base}/message/sendText/{instance}`, header `apikey`, body `{number, text}`, onde `number` para grupo e o **JID** `...@g.us`) e e por telefone individual. Reescrever atras de uma interface (`IWhatsAppSender`) com duas implementacoes: `EvolutionWhatsAppSender` e `DryRunWhatsAppSender` (default). Registro no DI escolhe pela config, como o resto do app faz com gateway.
+- `Services/Futsal/EscalacaoTextFormatter.cs` **ja formata a escalacao para WhatsApp** (`BuildWhatsAppText`, `BuildShareText`, com negrito `*...*` e emoji). **Reusar**, nao reescrever formatacao.
+- O TODO do desenho antigo em `EventNotificationService.cs:194` era por DM com `WhatsAppOptIn`. Com envio em grupo ele fica obsoleto -- remover o TODO em vez de deixar duas verdades no repo.
+- `Models/Group.cs` **nao tem** onde guardar o grupo do WhatsApp: adicionar `WhatsAppGroupJid` (nullable, `StringLength`) + migration + campo na tela de configuracao do grupo, visivel **so para o organizador**. Grupo sem JID = feature desligada para aquele grupo (mesmo padrao do `EnablePaymentGateways`).
+
+### Fase 2 -- Idempotencia do disparo (o ponto que mais quebra)
+
+`EventNotificationSchedulerService` hoje roda **1x por dia as 8h** e nao tem registro do que ja enviou -- serve para o lembrete "no dia", mas **nao** para "1 hora antes", que precisa de varredura de 15 min. Varredura frequente sem registro **duplica mensagem** a cada ciclo e a cada reinicio do container (e reinicio de container e rotina no EasyPanel).
+
+- Criar tabela de log de disparo com **unique index em (EventId, MessageKind)** e gravar **antes** de considerar enviado; a varredura pula o que ja tem registro. Sem o unique index nao ha protecao contra duas instancias/reinicio.
+- Nao enviar mensagem de evento **passado** nem de evento cancelado (o container pode subir horas depois; sem essa guarda ele dispara lembrete de partida que ja aconteceu).
+- Falha de envio nao pode derrubar a varredura nem travar as outras mensagens: log + segue.
+
+### Fase 3 -- As mensagens
+
+Do pedido do Robson:
+1. **Escalacao definida** -- gatilho quando o organizador salva os times (`EscalacaoService`), com o texto do `EscalacaoTextFormatter`.
+2. **Lembrete no dia** -- pela manha, reusando o scheduler existente.
+3. **Lembrete final 1h antes** -- com a escalacao novamente (e onde ela e mais util).
+
+Recomendadas pelo Senior, todas com dado que **ja existe** no sistema:
+4. **Cancelamento e mudanca de horario** (`NotifyEventCancelledAsync` / `NotifyEventUpdatedAsync`) -- de longe o maior valor: e a informacao que, chegando tarde, faz gente sair de casa para nada. Esta deveria ser a **primeira** a entrar, antes das tres do pedido.
+5. **Abertura de confirmacoes da partida recorrente** (`NotifyNewRecurringEventAsync`), com o link direto do evento -- e o que traz o jogador de volta para o app.
+6. **Vagas restantes / partida lotada** e **promocao da lista de espera** (`NotifyWaitlistPromotedAsync`).
+7. **Abertura da votacao de destaque** pos-jogo (o quorum de 50% hoje depende de o jogador lembrar de voltar).
+
+**Explicitamente NAO enviar no grupo**: cobranca nominal de inadimplencia (o DLQ existe, mas expor "o Joao nao pagou" em grupo e humilhacao publica e problema de LGPD -- se entrar, so agregado e sem nome, ou DM), chave Pix, comprovante, valor individual, e **nenhum link de autenticacao/reset** (grupo de WhatsApp e canal compartilhado; qualquer membro clicaria).
+
+### Fase 4 -- Configuracao e operacao
+
+- Config em `appsettings` + env var: `WhatsApp__Enabled`, `WhatsApp__BaseUrl`, `WhatsApp__Instance`, `WhatsApp__ApiKey`, `WhatsApp__DryRun` (default `true`), `WhatsApp__AllowedGroupJids`. A `ApiKey` **nunca** em `appsettings*.json` versionado -- so env var, como o resto.
+- Guard rail de startup no mesmo estilo do `EfiBank:Sandbox`: `Enabled=true` com `DryRun=false` e `AllowedGroupJids` vazio em ambiente nao-Development deve **falhar o boot** em vez de sair mandando mensagem para grupo de gente real.
+- O numero pareado tem que ser **chip dedicado**, nunca o pessoal do Robson (ban do numero = perder o WhatsApp pessoal). Registrar isso como pre-requisito operacional, nao como sugestao.
+- Testes: contrato do payload da Evolution (JID de grupo, header `apikey`); dry-run nao faz chamada HTTP; JID fora da allowlist nao envia; unique index impede o segundo disparo do mesmo (EventId, MessageKind); evento cancelado/passado nao dispara; falha de envio nao interrompe a varredura.
 
 ---
 
