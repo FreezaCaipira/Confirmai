@@ -7,6 +7,7 @@ using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 using Confirmai.Services.User;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -61,8 +63,11 @@ public class ExternalLoginModelTests
 
         var log = new LogService(dbFactory.Object, NullLogger<LogService>.Instance);
         var t = new UiTextService(new LanguagePreferenceService());
+        var claimsExtractor = new ExternalLoginClaimsExtractor(
+            new TestWebHostEnvironment(),
+            new HttpClient(new StubHttpMessageHandler()));
 
-        var model = new ExternalLoginModel(signInManager.Object, userManager.Object, log, t);
+        var model = new ExternalLoginModel(signInManager.Object, userManager.Object, log, t, claimsExtractor);
 
         var httpContext = new DefaultHttpContext();
         var pageContext = new PageContext(new ActionContext(httpContext, new RouteData(), new PageActionDescriptor()));
@@ -284,5 +289,29 @@ public class ExternalLoginModelTests
 
         var redirect = Assert.IsType<RedirectToPageResult>(result);
         Assert.Equal("./Login", redirect.PageName);
+    }
+
+    private sealed class TestWebHostEnvironment : IWebHostEnvironment
+    {
+        public string WebRootPath { get; set; } = Path.GetTempPath();
+        public string EnvironmentName { get; set; } = "Test";
+        public string ApplicationName { get; set; } = "Test";
+        public string ContentRootPath { get; set; } = Path.GetTempPath();
+        public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
+        public IFileProvider WebRootFileProvider { get; set; } = new NullFileProvider();
+    }
+
+    private sealed class StubHttpMessageHandler : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent(new byte[] { 0x89, 0x50, 0x4E, 0x47 })
+            };
+            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+            return Task.FromResult(response);
+        }
     }
 }

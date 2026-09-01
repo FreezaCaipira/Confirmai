@@ -14,6 +14,7 @@ using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
+using Confirmai.Services.User;
 
 namespace Confirmai.Areas.Identity.Pages.Account
 {
@@ -25,17 +26,20 @@ namespace Confirmai.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly LogService _log;
         private readonly UiTextService _t;
+        private readonly ExternalLoginClaimsExtractor _claimsExtractor;
 
         public ExternalLoginModel(
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
             LogService log,
-            UiTextService t)
+            UiTextService t,
+            ExternalLoginClaimsExtractor claimsExtractor)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _log = log;
             _t = t;
+            _claimsExtractor = claimsExtractor;
         }
 
         public string? ReturnUrl { get; set; }
@@ -138,6 +142,11 @@ namespace Confirmai.Areas.Identity.Pages.Account
                 }
 
                 // Link external login to existing account.
+                // Fill empty profile fields from provider claims (never overwrite).
+                await _claimsExtractor.ApplyClaimsAsync(user, info.Principal, isExistingAccount: true);
+                if (!string.IsNullOrWhiteSpace(user.FullName))
+                    await _userManager.UpdateAsync(user);
+
                 var addLoginResult = await _userManager.AddLoginAsync(user, info);
                 if (addLoginResult.Succeeded)
                 {
@@ -169,6 +178,10 @@ namespace Confirmai.Areas.Identity.Pages.Account
                 EmailConfirmed = emailVerified,
                 MemberSince = DateTime.UtcNow
             };
+
+            // Populate profile fields from provider claims (FullName + avatar).
+            // Best-effort: avatar download failure must not block login.
+            await _claimsExtractor.ApplyClaimsAsync(newUser, info.Principal, isExistingAccount: false);
 
             var createResult = await _userManager.CreateAsync(newUser);
             if (!createResult.Succeeded)
