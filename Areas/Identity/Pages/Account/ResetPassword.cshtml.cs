@@ -33,6 +33,13 @@ namespace Confirmai.Areas.Identity.Pages.Account
             [EmailAddress]
             public string Email { get; set; } = string.Empty;
 
+            /// <summary>
+            /// When true, the email field is rendered readonly (the user
+            /// arrived via a link that already identifies the account).
+            /// Not sent back on POST — the field is disabled.
+            /// </summary>
+            public bool EmailReadOnly { get; set; }
+
             [Required]
             [StringLength(100, ErrorMessage = "Password must be between {2} and {1} characters.", MinimumLength = 6)]
             [DataType(DataType.Password)]
@@ -47,15 +54,32 @@ namespace Confirmai.Areas.Identity.Pages.Account
             public string Code { get; set; } = string.Empty;
         }
 
-        public IActionResult OnGet(string? code = null)
+        public IActionResult OnGet(string? userId = null, string? code = null)
         {
             if (code == null)
             {
                 return BadRequest(_t["Identity.Reset.ErrorCodeRequired"]);
             }
 
+            // If userId is present (new links from ForgotPassword), resolve the
+            // email from it so the user doesn't have to retype it. Old links
+            // (without userId) still work — the email field stays editable.
+            string? prefilledEmail = null;
+            bool emailReadOnly = false;
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                var user = _userManager.FindByIdAsync(userId).GetAwaiter().GetResult();
+                if (user != null)
+                {
+                    prefilledEmail = user.Email;
+                    emailReadOnly = true;
+                }
+            }
+
             Input = new InputModel
             {
+                Email = prefilledEmail ?? string.Empty,
+                EmailReadOnly = emailReadOnly,
                 Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
             };
 

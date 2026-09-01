@@ -61,7 +61,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
             var callbackUrl = Url.Page(
                 "/Account/ResetPassword",
                 pageHandler: null,
-                values: new { area = "Identity", code },
+                values: new { area = "Identity", userId = user.Id, code },
                 protocol: Request.Scheme);
 
             if (callbackUrl != null)

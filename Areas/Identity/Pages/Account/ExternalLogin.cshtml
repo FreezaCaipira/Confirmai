@@ -9,5 +9,18 @@
 
 @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
 {
-    <div class="text-danger">@Model.ErrorMessage</div>
+    <div class="identity-status identity-status--error" role="alert">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>@Model.ErrorMessage</p>
+    </div>
+    <div class="identity-actions">
+        <a asp-page="./Login">@T["Identity.Common.TryAgain"]</a>
+        <a asp-page="./Register">@T["Nav.Register"]</a>
+    </div>
+}
+else
+{
+    <div class="identity-actions">
+        <a asp-page="./Login">@T["Identity.Common.BackToLogin"]</a>
+    </div>
 }

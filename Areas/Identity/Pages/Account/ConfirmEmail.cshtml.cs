@@ -22,12 +22,14 @@ namespace Confirmai.Areas.Identity.Pages.Account
         }
 
         public string StatusMessage { get; set; } = "";
+        public bool? IsSuccess { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string? userId, string? code)
         {
             if (userId == null || code == null)
             {
                 StatusMessage = _t["Identity.ConfirmEmail.InvalidLink"];
+                IsSuccess = false;
                 return Page();
             }
 
@@ -35,6 +37,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
             if (user == null)
             {
                 StatusMessage = _t["Identity.Common.UserNotFound"];
+                IsSuccess = false;
                 return Page();
             }
 
@@ -43,6 +46,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
             StatusMessage = result.Succeeded
                 ? _t["Identity.ConfirmEmail.Success"]
                 : _t["Identity.ConfirmEmail.Failure"];
+            IsSuccess = result.Succeeded;
 
             return Page();
         }
