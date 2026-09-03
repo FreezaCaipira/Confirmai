@@ -80,6 +80,9 @@
     <app>
         <component type="typeof(App)" render-mode="ServerPrerendered" />
     </app>
+    <div id="blazor-boot" class="blazor-boot" aria-hidden="true">
+        <div class="blazor-boot-spinner" role="status" aria-label="Carregando"></div>
+    </div>
     <script src="/js/ui-preferences.js"></script>
     <script src="/js/site.js" asp-append-version="true"></script>
     <script nonce="@cspNonce">
@@ -230,7 +233,33 @@
     <script src="/js/nav-progress.js" asp-append-version="true"></script>
     <script src="/js/icon-cycle.js" asp-append-version="true"></script>
     <script src="/js/session-keepalive.js" asp-append-version="true"></script>
-    <script src="/_framework/blazor.server.js"></script>
+    <script src="/_framework/blazor.server.js" autostart="false"></script>
+    <script nonce="@cspNonce">
+        (function () {
+            var boot = document.getElementById("blazor-boot");
+            function removeBoot() {
+                if (!boot) return;
+                boot.classList.add("blazor-boot--hidden");
+                setTimeout(function () { if (boot) boot.remove(); }, 300);
+            }
+            if (window.Blazor) {
+                Blazor.start().then(removeBoot).catch(removeBoot);
+            } else {
+                // Fallback: if Blazor object isn't ready yet, poll briefly
+                var tries = 0;
+                var interval = setInterval(function () {
+                    tries++;
+                    if (window.Blazor) {
+                        clearInterval(interval);
+                        Blazor.start().then(removeBoot).catch(removeBoot);
+                    } else if (tries > 50) {
+                        clearInterval(interval);
+                        removeBoot();
+                    }
+                }, 100);
+            }
+        })();
+    </script>
 </body>
 </html>
 

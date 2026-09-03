@@ -12,6 +12,7 @@ using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
+using Confirmai.Services.Utility;
 
 namespace Confirmai.Areas.Identity.Pages.Account
 {
@@ -23,19 +24,22 @@ namespace Confirmai.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
         private readonly UiTextService _t;
         private readonly LogService _log;
+        private readonly EmailTemplateService _emailTemplate;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             UiTextService t,
-            LogService log)
+            LogService log,
+            EmailTemplateService emailTemplate)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _t = t;
             _log = log;
+            _emailTemplate = emailTemplate;
         }
 
         [BindProperty]
@@ -98,10 +102,16 @@ namespace Confirmai.Areas.Identity.Pages.Account
                     {
                         try
                         {
-                            await _emailSender.SendEmailAsync(
-                                Input.Email,
-                                _t["Identity.Email.ConfirmSubject"],
-                                string.Format(_t["Identity.Email.ConfirmBody"], HtmlEncoder.Default.Encode(callbackUrl), _t["Identity.Email.ConfirmAction"]));
+                            var subject = _t["Identity.Email.ConfirmSubject"];
+                            var ctaText = _t["Identity.Email.ConfirmAction"];
+                            var paragraphs = new[] { string.Format(_t["Identity.Email.ConfirmBody"], HtmlEncoder.Default.Encode(callbackUrl), ctaText) };
+                            var html = _emailTemplate.RenderHtml(subject, subject, paragraphs, ctaText, callbackUrl);
+                            var text = _emailTemplate.RenderText(subject, paragraphs, ctaText, callbackUrl);
+
+                            if (_emailSender is IdentityEmailSender typedSender)
+                                await typedSender.SendEmailAsync(Input.Email, subject, html, text);
+                            else
+                                await _emailSender.SendEmailAsync(Input.Email, subject, html);
                         }
                         catch (Exception ex)
                         {

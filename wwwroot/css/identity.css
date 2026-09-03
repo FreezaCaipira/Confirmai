@@ -314,14 +314,86 @@
 }
 
 .external-login-btn--google {
-    background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
-    color: #444;
-    border-color: #d0d0d0;
+    background: var(--google-btn-bg);
+    color: var(--google-btn-text);
+    border-color: var(--google-btn-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .external-login-btn--google:hover {
-    background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
-    border-color: #c0c0c0;
+    background: var(--google-btn-bg-hover);
+    border-color: var(--google-btn-border-hover);
+}
+
+.external-login-btn--google:focus-visible {
+    outline: 2px solid var(--google-btn-border-hover);
+    outline-offset: 2px;
+}
+
+.external-login-btn-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+/* ── Status blocks (success/error) — C30-B Fase 4 ── */
+.identity-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    margin-bottom: var(--identity-rhythm-base, 1rem);
+}
+
+.identity-status i {
+    font-size: 1.3rem;
+    margin-top: 0.1rem;
+}
+
+.identity-status p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.identity-status--success {
+    background: rgba(40, 167, 69, 0.12);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    color: #4ade80;
+}
+
+.identity-status--success i {
+    color: #4ade80;
+}
+
+.identity-status--error {
+    background: rgba(220, 53, 69, 0.12);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #f87171;
+}
+
+.identity-status--error i {
+    color: #f87171;
+}
+
+.identity-btn-primary {
+    display: inline-block;
+    padding: 0.7rem 1.5rem;
+    background: var(--ci-accent);
+    color: var(--ci-text);
+    border: 1px solid var(--ci-accent-mid);
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.identity-btn-primary:hover {
+    background: var(--ci-accent-mid);
+    border-color: var(--ci-accent-dark);
 }
 
 @media (max-width: 768px) {

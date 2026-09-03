@@ -138,6 +138,7 @@ builder.Services.AddScoped<EventPaymentReconciliationService>();
     builder.Services.AddScoped<Confirmai.Services.Poker.PokerCreateService>();
     builder.Services.AddScoped<Confirmai.Services.Admin.ReconciliationHealthService>();
     builder.Services.AddScoped<Confirmai.Services.User.ProfileService>();
+    builder.Services.AddScoped<ExternalLoginClaimsExtractor>();
     builder.Services.AddScoped<Confirmai.Services.Admin.AdminUsersQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Utility.MailboxQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentInitializationService>();
@@ -188,6 +189,7 @@ builder.Services.AddHostedService<PendingWebhooksAlertService>();
 builder.Services.AddHostedService<PayoutRetryService>();
 builder.Services.AddHostedService<CertificateHealthCheckService>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
+builder.Services.AddScoped<EmailTemplateService>();
 builder.Services.AddScoped<AdminSecurityPolicyService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 

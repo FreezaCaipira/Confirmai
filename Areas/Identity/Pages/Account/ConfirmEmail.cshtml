@@ -6,10 +6,27 @@
 }
 
 <h2>@T["Identity.ConfirmEmail.Heading"]</h2>
-<p class="identity-muted">@Model.StatusMessage</p>
 
-<div class="identity-actions">
-    <a asp-page="./Login">@T["Identity.Common.GoToLogin"]</a>
-</div>
+@if (Model.IsSuccess == true)
+{
+    <div class="identity-status identity-status--success" role="alert">
+        <i class="fas fa-check-circle"></i>
+        <p>@Model.StatusMessage</p>
+    </div>
+    <div class="identity-actions">
+        <a asp-page="./Login" class="identity-btn-primary">@T["Identity.Common.GoToLogin"]</a>
+    </div>
+}
+else
+{
+    <div class="identity-status identity-status--error" role="alert">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>@Model.StatusMessage</p>
+    </div>
+    <div class="identity-actions">
+        <a asp-page="./ResendEmailConfirmation">@T["Identity.ConfirmEmail.ResendCta"]</a>
+        <a asp-page="./Login">@T["Identity.Common.BackToLogin"]</a>
+    </div>
+}
 
 

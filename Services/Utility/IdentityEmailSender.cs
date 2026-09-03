@@ -25,9 +25,19 @@ public class IdentityEmailSender : IEmailSender
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
+        await SendEmailAsync(email, subject, htmlMessage, textMessage: null);
+    }
+
+    /// <summary>
+    /// Sends an email with both HTML and plain-text alternatives.
+    /// The text alternative (AlternateViews) ensures spam filters and
+    /// accessibility-first clients can read the message.
+    /// </summary>
+    public async Task SendEmailAsync(string email, string subject, string htmlMessage, string? textMessage)
+    {
         if (!IsSmtpEnabled())
         {
-            await PersistFallbackEmailAsync(email, subject, htmlMessage);
+            await PersistFallbackEmailAsync(email, subject, htmlMessage, textMessage);
             _logger.LogInformation("Identity email (fallback log) -> To: {Email} | Subject: {Subject} | Body: {Body}", email, subject, htmlMessage);
             return;
         }
@@ -35,11 +45,30 @@ public class IdentityEmailSender : IEmailSender
         using var message = new MailMessage
         {
             From = new MailAddress(_options.FromEmail, _options.FromName),
-            Subject = subject,
-            Body = htmlMessage,
-            IsBodyHtml = true
+            Subject = subject
         };
         message.To.Add(email);
+
+        if (!string.IsNullOrWhiteSpace(textMessage))
+        {
+            // Plain-text alternate view (preferred by spam filters + a11y clients)
+            var textView = AlternateView.CreateAlternateViewFromString(
+                textMessage,
+                Encoding.UTF8,
+                "text/plain");
+            message.AlternateViews.Add(textView);
+
+            var htmlView = AlternateView.CreateAlternateViewFromString(
+                htmlMessage,
+                Encoding.UTF8,
+                "text/html");
+            message.AlternateViews.Add(htmlView);
+        }
+        else
+        {
+            message.Body = htmlMessage;
+            message.IsBodyHtml = true;
+        }
 
         using var client = new SmtpClient(_options.Host, _options.Port)
         {
@@ -84,7 +113,7 @@ public class IdentityEmailSender : IEmailSender
         return Path.Combine(contentRoot, "App_Data", "fallback-emails");
     }
 
-    private async Task PersistFallbackEmailAsync(string email, string subject, string htmlMessage)
+    private async Task PersistFallbackEmailAsync(string email, string subject, string htmlMessage, string? textMessage)
     {
         try
         {
@@ -112,7 +141,7 @@ public class IdentityEmailSender : IEmailSender
             textBody.AppendLine($"Subject: {subject}");
             textBody.AppendLine($"Generated (UTC): {DateTime.UtcNow:O}");
             textBody.AppendLine("----------------------------------------");
-            textBody.AppendLine(htmlMessage);
+            textBody.AppendLine(textMessage ?? htmlMessage);
             await File.WriteAllTextAsync(textFilePath, textBody.ToString(), Encoding.UTF8);
             _logger.LogInformation("Identity fallback email persisted at {FallbackPath}", filePath);
         }
