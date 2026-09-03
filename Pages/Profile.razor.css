@@ -51,13 +51,38 @@
 
 .profile-pix-row {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 0.5rem;
     padding: 0.25rem 0.5rem;
     background: var(--ci-bg-deepest);
     border-radius: 4px;
     border: 1px solid var(--ci-border);
     box-shadow: 0 1px 2px var(--shadow-md);
+}
+
+.profile-pix-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.35rem 0.5rem;
+    background: transparent;
+    border: none;
+    color: var(--ci-text);
+    font-family: var(--ci-font);
+    font-size: 0.85rem;
+}
+
+.profile-pix-input:focus {
+    outline: none;
+}
+
+.profile-pix-row:focus-within {
+    border-color: var(--ci-accent);
+}
+
+.profile-pix-feedback {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--ci-text-muted);
 }
 
 .profile-pix-section--highlight {

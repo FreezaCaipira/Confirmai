@@ -46,9 +46,22 @@
                 <h3 class="profile-pix-title">@T["Profile.PixReceiverTitle"]</h3>
                 <p class="profile-pix-hint">@T["Profile.PixReceiverHint"]</p>
                 <div class="profile-pix-row">
-                    <span class="profile-contact-label">@T["Profile.Pix"]</span>
-                    <span class="profile-contact-value">@(string.IsNullOrWhiteSpace(user!.PixKey) ? T["Profile.PixNotConfigured"] : user!.PixKey)</span>
+                    <label class="profile-contact-label" for="profile-pix-key">@T["Profile.Pix"]</label>
+                    <input id="profile-pix-key"
+                           class="profile-pix-input"
+                           @bind="profileEditModel.PixKey"
+                           placeholder="@T["Profile.PixNotConfigured"]"
+                           disabled="@isSavingProfile" />
+                    <button class="mk-btn mk-btn-primary" type="button"
+                            disabled="@isSavingProfile"
+                            @onclick="SaveOwnProfileCallback">
+                        @(isSavingProfile ? T["Profile.Saving"] : T["Profile.Save"])
+                    </button>
                 </div>
+                @if (!string.IsNullOrWhiteSpace(profileSaveFeedback))
+                {
+                    <p class="profile-pix-feedback" role="status">@profileSaveFeedback</p>
+                }
             </section>
         }
 
