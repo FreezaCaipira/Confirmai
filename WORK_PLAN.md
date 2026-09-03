@@ -582,6 +582,24 @@ Ultima feature do escopo. **Decisao do Robson**: Evolution API (nao-oficial, Bai
 
 **Riscos que precisam estar no PR, nao na cabeca de ninguem**: a Evolution e nao-oficial -- viola ToS da Meta e o numero pareado pode ser banido; a sessao e estado fragil (QR + credencial persistida, reinicio sem persistencia = repareamento manual); atualizacao do WhatsApp quebra a biblioteca. Consequencia de desenho: **o WhatsApp e canal secundario**. Nada critico (confirmacao de pagamento, link de auth, comprovante) pode depender dele; email + mailbox interno continuam sendo a fonte da verdade.
 
+### Fase 0 -- Operacao: onde a Evolution roda e qual numero (pre-requisito, feito pelo Robson)
+
+Nenhuma linha de codigo do C31 e testavel de ponta a ponta antes disso. **Decisao do Robson (14/06/2026)**: Evolution como servico no **proprio EasyPanel**, junto do resto do projeto, e **chip novo dedicado** ("Confirmai-Bot"). Aprovado pelo Senior -- VPS separada isolaria falha e RAM, mas dobra superficie de administracao para o volume de mensagem que teremos; fica como plano B se a Evolution comecar a competir com o app.
+
+Requisitos do servico no EasyPanel (o que faz a diferenca entre "funciona" e "repareia QR toda semana"):
+
+- **Estado persistido**: volume para `/evolution/instances` + **Postgres e Redis proprios**, em banco **separado** do `Confirmai`. Sem persistencia, cada redeploy/restart do EasyPanel invalida a sessao e exige novo QR **manual** -- e restart de container e rotina aqui.
+- **Servico interno, sem dominio publico**: o app fala com ela pela rede interna (`http://evolution:8080`, mesmo padrao do `confirmai_db-confirmai`). Com dominio publico, a `AUTHENTICATION_API_KEY` passa a ser a unica barreira entre a internet e o WhatsApp pareado.
+- **Pareamento**: o QR e acessivel uma unica vez -- via tunel/port-forward temporario, ou dominio protegido **removido logo apos** parear. Documentar o procedimento, porque ele repete a cada queda de sessao.
+- **Recursos**: a implementacao Node consome ~500MB-1GB de RAM; conferir o plano do servidor antes, senao ela compete com o processo .NET.
+
+Requisitos do numero (o nome do perfil nao reduz risco nenhum -- quem e banido e o numero):
+
+- **Exclusivo do bot**. Registrar o WhatsApp normal nele depois de parear derruba a sessao.
+- **Aquecer antes de automatizar**: numero recem-registrado disparando mensagem automatica e o perfil que mais toma bloqueio. Instalar o WhatsApp comum, entrar nos grupos, trocar mensagens reais alguns dias, e so depois parear.
+- **Linha tem que continuar ativa**: pre-pago sem recarga e cancelado pela operadora, e a descoberta vem como perda de sessao. Recarga automatica ou prazo anotado.
+- **SIM acessivel**: repareamento pode exigir o numero e SMS.
+
 ### Fase 1 -- Abstracao e o que ja existe (nao comecar do zero)
 
 - `Services/Notification/WhatsAppNotificationService.cs` **existe e nao serve**: faz `POST {ApiUrl}?key={ApiKey}` com `{phone, message}`, que **nao e o contrato da Evolution** (`POST {base}/message/sendText/{instance}`, header `apikey`, body `{number, text}`, onde `number` para grupo e o **JID** `...@g.us`) e e por telefone individual. Reescrever atras de uma interface (`IWhatsAppSender`) com duas implementacoes: `EvolutionWhatsAppSender` e `DryRunWhatsAppSender` (default). Registro no DI escolhe pela config, como o resto do app faz com gateway.
@@ -610,7 +628,34 @@ Recomendadas pelo Senior, todas com dado que **ja existe** no sistema:
 6. **Vagas restantes / partida lotada** e **promocao da lista de espera** (`NotifyWaitlistPromotedAsync`).
 7. **Abertura da votacao de destaque** pos-jogo (o quorum de 50% hoje depende de o jogador lembrar de voltar).
 
-**Explicitamente NAO enviar no grupo**: cobranca nominal de inadimplencia (o DLQ existe, mas expor "o Joao nao pagou" em grupo e humilhacao publica e problema de LGPD -- se entrar, so agregado e sem nome, ou DM), chave Pix, comprovante, valor individual, e **nenhum link de autenticacao/reset** (grupo de WhatsApp e canal compartilhado; qualquer membro clicaria).
+**Explicitamente NAO enviar no grupo**: cobranca **nominal** de inadimplencia (o aviso agregado e sem nome esta aprovado -- ver Fase 3b), chave Pix, comprovante, valor individual, e **nenhum link de autenticacao/reset** (grupo de WhatsApp e canal compartilhado; qualquer membro clicaria).
+
+### Fase 3b -- Aviso de pendencia de pagamento, no grupo, sem nome e sem valor (decisao do Robson, 14/06/2026)
+
+Evolucao da decisao: o Robson primeiro propos DM ao organizador; ao saber que DM e o padrao com maior risco de bloqueio, optou por **manter tudo no grupo**. **Nao havera DM no C31** -- nem para organizador.
+
+Desenho aprovado: mensagem no grupo dizendo que **existem pagamentos pendentes** na partida, **sem nome de ninguem e sem valor**, com **link para a tela de gestao de pagamentos daquele grupo**.
+
+Dois motivos, e o segundo e o que decide:
+
+1. **Mensagem com valor fica desatualizada.** Se o texto diz "R$ 90 pendentes" e o jogador paga 10 minutos depois, o organizador cobra quem ja pagou. Link sempre mostra o estado real. **Regra geral do C31: o WhatsApp notifica, o app e a fonte da verdade** -- toda mensagem que dependeria de valor/estado mutavel vira link.
+2. **Sem nome, o aviso no grupo e melhor do que a DM, nao so mais seguro.** Ele funciona como pressao social anonima: quem nao pagou le e resolve, sem ninguem ser exposto. Na DM so o organizador fica sabendo e ainda tem que cobrar um a um.
+
+O que cair fora do escopo por causa dessa decisao (menos codigo, menos dado pessoal, menos superficie de erro):
+
+- **nao** cadastrar/armazenar celular de organizador; `ApplicationUser.WhatsAppNumber` e `WhatsAppOptIn` continuam sem uso no C31;
+- **nao** precisa de tela de opt-in individual (estar no grupo do WhatsApp e o consentimento de fato);
+- **nao** precisa de `WhatsApp__AllowedNumbers` nem do passo manual de "organizador manda oi pro bot" para habilitar o numero;
+- **nao** existe caminho de envio individual no `IWhatsAppSender` do C31 -- so grupo. Sem metodo de DM, ninguem adiciona DM por acidente depois.
+
+Restricoes que continuam:
+
+- **O link e a URL normal da tela, protegida por login e restrita ao organizador** -- nunca link com token de acesso embutido. Membro que clicar cai no login e, mesmo logado, nao ve a gestao financeira; por isso mandar em canal compartilhado nao vaza nada.
+- **Nenhum nome, nenhum valor, nenhuma contagem que identifique** ("1 pendencia" em partida de 2 pessoas identifica alguem -- usar texto sem numero).
+- Gatilho: junto do lembrete do dia do jogo, quando ainda da tempo de resolver. Sem pendencia, nao manda nada.
+- Idempotencia no mesmo registro `(EventId, MessageKind)` da Fase 2 -- sem isso, restart do container reenvia.
+
+DM ao organizador fica registrada como **opcao futura**, se algum organizador pedir privacidade. Nesse caso volta a exigir numero, opt-in, allowlist de numeros e conversa iniciada pelo organizador.
 
 ### Fase 4 -- Configuracao e operacao
 
