@@ -54,22 +54,28 @@ namespace Confirmai.Areas.Identity.Pages.Account
             public string Code { get; set; } = string.Empty;
         }
 
-        public IActionResult OnGet(string? userId = null, string? code = null)
+        public async Task<IActionResult> OnGetAsync(string? userId = null, string? code = null)
         {
             if (code == null)
             {
                 return BadRequest(_t["Identity.Reset.ErrorCodeRequired"]);
             }
 
-            // If userId is present (new links from ForgotPassword), resolve the
-            // email from it so the user doesn't have to retype it. Old links
-            // (without userId) still work — the email field stays editable.
+            var decodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+
+            // The email is only prefilled when the token proves the bearer owns
+            // the link. User ids are public (/profile/{id}), so resolving the
+            // email from userId alone would let anyone read another user's email.
             string? prefilledEmail = null;
             bool emailReadOnly = false;
             if (!string.IsNullOrWhiteSpace(userId))
             {
-                var user = _userManager.FindByIdAsync(userId).GetAwaiter().GetResult();
-                if (user != null)
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user != null && await _userManager.VerifyUserTokenAsync(
+                        user,
+                        _userManager.Options.Tokens.PasswordResetTokenProvider,
+                        UserManager<ApplicationUser>.ResetPasswordTokenPurpose,
+                        decodedCode))
                 {
                     prefilledEmail = user.Email;
                     emailReadOnly = true;
@@ -80,7 +86,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
             {
                 Email = prefilledEmail ?? string.Empty,
                 EmailReadOnly = emailReadOnly,
-                Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
+                Code = decodedCode
             };
 
             return Page();
