@@ -127,13 +127,13 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 |---|---|---|
 | Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
 | Cobertura de testes | **BOM** -- 2315 verdes (C29, com Postgres local disponivel), +350 testes desde o C21 | Sem teste de **render** das telas -- **decidido pular** (C29 Fase E): a logica esta em helpers/services cobertos; bUnit nao entra sem necessidade. |
-| i18n (regra 25) | **CONCLUIDO** (C25-C29) -- ~450 strings migradas, PT/EN/ES, teste anti-hardcode com/sem acento validado empiricamente, **allowlist zerada** e formatos de data i18n-aware | Nada aberto. Manutencao: feature nova nasce com i18n (o teste barra). |
-| Pagamento V1 manual (jogador) | **CONCLUIDO** -- grupo nasce manual, Pix do organizador + QR com valor total, comprovante, confirmacao do organizador, rejeicao com motivo | Validacao em navegador e feita **manualmente pelo Robson** (F12/mobile). Nao ha gravacao/E2E automatizado do caminho do dinheiro. |
+| i18n (regra 25) | **PT completo; EN/ES PARCIAIS** -- ~450 strings migradas para chave (C25-C29), teste anti-hardcode e allowlist zerada; mas `GroupTexts`/`FutsalTexts`/`PokerTexts` tem **~430 chaves sem EN/ES** (decisao "PT-only" do V1, excluidas do teste de paridade). Em EN o usuario ve tela mista (achado do Robson em prod). | **C30-C Fase 2**: completar EN/ES dos 3 dicionarios e incluir os 3 no `I18nKeyParityTests`. |
+| Pagamento V1 manual (jogador) | **CONCLUIDO e VALIDADO EM PRODUCAO** (Robson, 14/06/2026: fluxo inteiro ate o repasse) -- grupo nasce manual, Pix do organizador + QR com valor total, comprovante, confirmacao do organizador, rejeicao com motivo | Layout do fluxo de pagamento/repasse: melhoria futura (decisao do Robson). Nao ha E2E automatizado do caminho do dinheiro. |
 | Taxa da plataforma R$ 0,75 (futsal, modo manual) | **CONCLUIDO** -- snapshot no pagamento, taxa discriminada (`15,00 + 0,75 = 15,75`) inclusive no QR, ledger por partida, residuo por valor | Idem. |
 | Repasse organizador -> plataforma | **CONCLUIDO** -- aba do organizador (selecao explicita de partidas, somatorio, Pix da plataforma, comprovante, historico), fila do admin (confirmar/rejeitar com motivo), endpoint do comprovante autorizado, sem autoquitacao | Idem. |
 | Consolidacao tecnica do repasse | **CONCLUIDO** (C29) -- `DelinquencyService` morto removido, `PlatformFeeCoverage` extraido, allowlist i18n zerada, FK `Restrict` avaliada, cobertura de render decidida | Nada. A divida tecnica aberta na review do C28 esta encerrada. |
 | Seguranca | **BOM** -- webhooks autenticados, authz admin 17/17 + teste de convencao, CSP/HSTS, secret Efi fora do repo, teste que impede endpoint de seed/debug aberto, autorizacao do repasse no service | Pen-test financeiro antes de producao; pendencias de prod do Robson. |
-| Login/identidade | **Implementado** (Google criar-ou-vincular, SMTP, confirmacao de email) | **Nunca exercitado de fato.** Decisao do Robson: validar **direto em producao** (Ciclo 30). Bloqueado no OAuth Client de prod + env vars no EasyPanel. |
+| Login/identidade | **VALIDADO EM PRODUCAO** -- Google (criar e re-logar, #107), cadastro por email via Brevo, confirmacao, reset (#104), claims/loading/botao/telas/email (C30-B, #103) | Dividas de acabamento do Identity (C30-C Fase 5). Rotacao das credenciais antes do go-live (checklist pre-producao). |
 | Mobile UX | **Em andamento, validado pelo Robson tela por tela** (F12/emulacao mobile) -- navegacao, estados vazios (`NoGroupsHint`), UX do Profile refeita | Continuar o modelo atual: Robson aponta a tela, o ciclo corrige. **Nao** transformar em varredura sistematica sem ele pedir. |
 | Pix automatico (V2) | **Codigo pronto e preservado atras do toggle** | Bloqueado nas pendencias do Robson (rotacao Efi, homologacao, nota fiscal). |
 | Observabilidade / operacao | Serilog + OpenTelemetry + alerta de payout | Metricas SignalR, alertas operacionais, revisao de CSP -- antes de producao. |
@@ -144,8 +144,8 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **O V1 esta funcionalmente completo e a divida tecnica do repasse esta encerrada (C29).** Daqui pra frente o caminho critico nao e mais codigo de feature -- e **operacao**: o que falta depende de credenciais/decisoes do Robson.
 
-1. **Mergear a PR de review do C29** (fix de canonicalizacao do idioma + review + este mapa).
-2. **Ciclo 30 -- Login Google + email validados em PRODUCAO** (ja planejado abaixo; decisao do Robson). **Bloqueado no Robson**: OAuth Client de prod + `ClientId`/`ClientSecret`/SMTP como env vars no EasyPanel. Sem isso o ciclo nao comeca -- e o unico item que separa o app de aceitar usuario novo por Google.
+1. ~~Mergear a PR de review do C29~~ feito. ~~C30 / C30-B~~ feitos e validados em prod (#96-#105, #107).
+2. **Ciclo 30-C -- achados dos testes do Robson em prod** (planejado abaixo, **executavel agora pelo Pleno**): preview da imagem no criar grupo, EN/ES dos dicionarios de produto, `.mk-btn` unico, pagina `/error` server-side, dividas do Identity.
 3. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): **desbloqueado e planejado**. Robson escolheu **Evolution API** (self-hosted, nao-oficial) disparando no **grupo de WhatsApp do grupo do sistema**, nao em DM. Detalhe no Ciclo 31.
 4. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
 5. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
@@ -465,6 +465,84 @@ Na pratica: **a feature ainda nao existe para o usuario**. O saldo acumula e nin
 - Strings PT cruas nos servicos novos (`PlatformFeeSettlementService`, mensagem de erro do `FutsalCreateService`) -- a regra 25 tambem vale para mensagem de retorno de service.
 - `Program.cs` linhas 124-125 com indentacao fora do padrao do bloco.
 - `Profile.razor.cs` ainda tem as 5 mensagens hardcoded que a review do C25 apontou.
+
+---
+
+## Ciclo 30-C (Pleno) -- Achados dos testes do Robson em producao: preview de imagem, EN/ES, botoes, pagina de erro e dividas do Identity [PLANEJADO -- EXECUTAVEL AGORA]
+
+**Contexto**: o Robson percorreu o fluxo inteiro em `https://confirmai.m2gpju.easypanel.host` -- login Google, cadastro por email, criar grupo, Pix no Profile, partida, pagamento, repasse -- e **esta funcional de ponta a ponta**. Tres bloqueadores achados no caminho ja foram corrigidos pelo Senior e estao na `main`: campo de Pix que nao existia no Profile (#105, regressao do C26), botao Salvar do Pix sem estilo (#106) e **segundo login Google quebrando** por FK no audit log (#107, bug desde o commit original do OAuth). Sobraram 5 itens nao-bloqueantes, que sao este ciclo. Layout geral do fluxo de pagamento/repasse fica para um ciclo futuro (decisao do Robson).
+
+**Regra de ouro**: TDD, SOLID, i18n (regra 25), CSS com as vars permitidas, build `--no-incremental` **0 warning**, suite completa verde, 1 commit por fase, PR com os blocos de build/test colados (regra 28). **Verificacao visual em EN e ES e obrigatoria** neste ciclo (print no PR) -- e o que o teste automatizado nao pega.
+
+Ordem sugerida: **Fase 2 (EN/ES) -> Fase 1 (preview) -> Fase 4 (pagina de erro) -> Fase 3 (botoes) -> Fase 5 (Identity)**. A Fase 2 e a maior e a mais visivel pro usuario; a 4 e a que mais ajuda a diagnosticar o proximo bug em prod.
+
+### Fase 1 -- Preview da imagem no criar grupo so aparece depois de clicar em "Criar grupo"
+
+Sintoma (Robson): ao selecionar a imagem, a mensagem "Imagem selecionada com sucesso!" e o preview **nao aparecem**; so surgem depois do clique em "Criar grupo".
+
+Causa (`Pages/Groups/Create.razor.cs`, `OnLogoSelected`): o arquivo inteiro (ate 5 MB) e lido pro servidor e devolvido ao navegador como `data:...;base64` dentro do diff de render -- um patch de ~7 MB pelo circuito SignalR, que nao chega a tempo; a tela so atualiza no proximo evento.
+
+O que fazer:
+1. Gerar o thumbnail **no navegador** com `logoFile.RequestImageFileAsync(logoFile.ContentType, 320, 320)` e ler **so o thumbnail** para o `logoPreview`. O `IBrowserFile` original continua sendo o que vai pro servidor no salvar -- nao trocar a persistencia.
+2. `await InvokeAsync(StateHasChanged)` ao final do handler, por garantia.
+3. As 4 mensagens do handler estao **hardcoded em PT** (`"Imagem selecionada com sucesso!"`, `"Formato inválido. Use PNG, JPG ou WebP."`, `"Arquivo muito grande. Máximo 5 MB."`, `"Erro ao processar imagem."`) -- violacao da regra 25 que o teste anti-hardcode nao pegou porque esta no `.cs`, nao no `.razor`. Virar chaves `Group.Logo.*` em PT/EN/ES.
+4. Teste: com um arquivo de 5 MB, `logoPreview.Length` tem que ficar abaixo de um teto (ex.: 100 KB). Se o teste anti-hardcode nao varre code-behind `.razor.cs`, **estender** para varrer -- e o que deixou essas 4 strings passarem.
+
+### Fase 2 -- Paridade EN/ES: as telas de grupo/partida/poker misturam ingles e portugues
+
+Sintoma (Robson, print): idioma em **English**, e a tela do grupo mostra "Back", "Attendance Rate", "0 upcoming" em ingles e **todo o resto em portugues** ("Pix do organizador não configurado", "Configurar agora", etc.).
+
+Causa: as telas **ja usam chave** (`@Ui[...]`); o que falta e a **traducao**. O `UiTextService` cai no pt-BR quando a chave nao existe no idioma. Estado dos dicionarios:
+
+| Arquivo | PT | EN | ES |
+|---|---:|---:|---:|
+| `GroupTexts.cs` | 221 | 19 | 22 |
+| `FutsalTexts.cs` | 149 | 4 | 7 |
+| `PokerTexts.cs` | 103 | 3 | 6 |
+| Admin / Auth / Core / Payment / Server / Utility | completos (PT = EN = ES) |
+
+Isso era uma **decisao explicita do V1** ("PT-BR only" -- ver `I18nKeyParityTests.PtBrOnlyProviders`), que o seletor de idioma na tela publica tornou incoerente: o usuario escolhe English e recebe metade. O Robson decidiu completar.
+
+O que fazer:
+1. Completar `EnUs` e `EsEs` de `GroupTexts`, `FutsalTexts` e `PokerTexts` (~430 chaves). Trabalho de volume, nao de logica. Manter o tom do que ja existe em EN/ES nos outros arquivos (formal-curto; "Pix" e "racha" nao se traduzem).
+2. **Mover os 3 arquivos de `PtBrOnlyProviders` para `TextProviders`** em `I18nKeyParityTests` -- a partir dai o teste barra chave PT sem par EN/ES. Nao apagar a lista `PtBrOnlyProviders`; deixa-la **vazia** com o comentario atualizado (a exclusao deixa de existir e isso deve ficar visivel).
+3. Atualizar a linha "i18n (regra 25)" no Mapa de Progresso (esta fase ja corrigiu o texto para refletir a realidade).
+4. **Print** no PR: tela do grupo, detalhe da partida e detalhe do poker em EN **e** em ES.
+
+### Fase 3 -- `.mk-btn` definido 4 vezes em CSS isolado, com 3 visuais diferentes
+
+Sintoma (Robson): o botao Salvar do Pix no Profile veio sem estilo (#106). Causa: `.mk-btn`/`.mk-btn-primary` so existiam no CSS **isolado** de `ProfileEditForm.razor.css` -- em `Profile.razor` a classe nao se aplica. O fix do Senior foi copiar as regras para `Profile.razor.css` escopadas em `.profile-pix-row` -- e a **5a copia**.
+
+Estado: `.mk-btn` esta definido em `ProfileEditForm.razor.css`, `AvatarUploadSection.razor.css`, `ChatComposeBox.razor.css`, `Pages/Product/Marketplace.razor.css` e agora `Profile.razor.css`. `ProfileEditForm` (gradiente, peso 800, sombra) difere de `AvatarUploadSection`/`ChatComposeBox` (flat, peso 700) -- o mesmo nome de classe renderiza dois botoes diferentes na **mesma pagina**.
+
+O que fazer:
+1. Uma definicao unica de `.mk-btn`, `.mk-btn:hover`, `.mk-btn:disabled`, `.mk-btn-primary` (+ hover) em `wwwroot/css/buttons.css` (global, ja carregado no `_Host`). Visual de referencia: o do `ProfileEditForm` (e o que o Robson viu ao lado e pediu para igualar).
+2. Remover as 5 copias dos CSS isolados. Se algum componente precisar de variacao (ex.: `Marketplace`), fazer como override **escopado e minimo**, nao redefinindo a base.
+3. Teste de convencao: nenhum `*.razor.css` declara `.mk-btn {` (mesmo padrao dos testes de CSS vars).
+4. Print antes/depois do Profile (bloco "Meus dados", avatar e Pix) e do Marketplace.
+
+### Fase 4 -- Qualquer 500 fora do circuito Blazor vira "pagina nao encontrada"
+
+Sintoma (Robson, print): o bug da #107 (excecao no callback do Google) apareceu como a tela `<NotFound>` do `App.razor`, com as chaves `App.NotFound.*` cruas. Levou a diagnostico errado ("a rota sumiu") quando era um 500.
+
+Causa: `UseExceptionHandler("/error")` re-executa a request em `/error`; nao existe Razor Page nesse caminho, entao cai no `MapFallbackToPage("/_Host")`, que sobe o Blazor. O `Router` do Blazor usa a URL **do navegador** (`/Identity/Account/ExternalLogin?...`), nao tem rota para ela e renderiza `<NotFound>`. O `Pages/Error.razor` (`@page "/error"`) nunca e alcancado por esse caminho. (As chaves cruas eram um bug separado, ja corrigido na #107.)
+
+O que fazer:
+1. Criar uma **Razor Page server-side** `Pages/Error.cshtml` (fora do Blazor) que responda `/error`, use o layout do Identity (`identity.css`), i18n via `UiTextService`, e mostre: mensagem generica, `RequestId` (`Activity.Current?.Id ?? HttpContext.TraceIdentifier`) para correlacionar com o log, e link para o inicio. **Nunca** a excecao -- em nenhum ambiente.
+2. Manter `Pages/Error.razor` so se alguma rota Blazor navegar para ele; se nao, remover (nao deixar dois `/error`).
+3. Teste de integracao: um endpoint de teste que lanca excecao deve retornar **500** com o corpo da pagina de erro (contendo o `RequestId`), e **nao** o HTML do `_Host`/`<NotFound>`.
+4. Conferir que a excecao continua indo para o Serilog com o `RequestId` -- e o unico rastro que sobra em prod.
+
+### Fase 5 -- Dividas declaradas pelo Pleno no C30-B (PR #103)
+
+Nao bloqueiam, mas o Pleno as declarou e elas fecham o C30-B:
+1. Padronizar heading/footer das 13 telas do Identity (mesmo `identity-*-heading` e mesmo bloco de links de saida).
+2. `aria-describedby` ligando cada input ao seu `.text-danger`; `role="alert"` no `validation-summary`.
+3. `ForgotPasswordConfirmation` com conteudo real (hoje esta vazio): "se o email existir, enviamos o link", CTA de voltar ao login e de tentar outro email. Consumir `IdentityEmailSender.GetFallbackDirectory()` em vez de recalcular o caminho.
+
+### O que NAO fazer
+
+Nao mexer no fluxo do dinheiro (pagamento, repasse, taxa) -- esta validado em prod. Nao redesenhar o layout do pagamento/repasse (Robson deixou para depois). Nao comecar o C31 (Evolution) -- espera a Fase 0 operacional do Robson. Nao adicionar bUnit para testar render: os testes deste ciclo sao de service/convencao/integracao, e a validacao visual e por print no PR.
 
 ---
 
