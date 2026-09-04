@@ -103,16 +103,26 @@ public class ExternalLoginModelTests
     [Fact]
     public async Task OnGetCallbackAsync_ExistingLogin_SucceedsAndRedirects()
     {
-        var model = CreateModel(out var signInManager, out var userManager, out _);
+        var model = CreateModel(out var signInManager, out var userManager, out var dbFactory);
 
         signInManager
             .Setup(x => x.ExternalLoginSignInAsync("Google", "google-user-id", false, true))
             .ReturnsAsync(SignInResult.Success);
+        userManager
+            .Setup(x => x.FindByLoginAsync("Google", "google-user-id"))
+            .ReturnsAsync(new ApplicationUser { Id = "user-1", Email = "test@example.com" });
 
         var result = await model.OnGetCallbackAsync("/grupos");
 
         var redirect = Assert.IsType<LocalRedirectResult>(result);
         Assert.Equal("/grupos", redirect.Url);
+
+        // AppLog.UserId is a FK to AspNetUsers: writing the Google provider key
+        // there throws in Postgres and turns the second login into a 500.
+        await using var db = dbFactory.Object.CreateDbContext();
+        var audit = Assert.Single(db.Logs.Where(l => l.EventType == AuditEvents.UserLoginSuccess));
+        Assert.Equal("user-1", audit.UserId);
+        Assert.Equal("user-1", audit.EntityId);
     }
 
     [Fact]

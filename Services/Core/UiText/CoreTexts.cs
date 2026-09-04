@@ -130,6 +130,10 @@ internal static class CoreTexts
         ["Error.NotFound"] = "Pagina nao encontrada",
         ["Error.AccessDenied"] = "Acesso negado",
         ["Error.InternalServer"] = "Erro interno do servidor",
+        ["App.NotFound.Title"] = "Página não encontrada",
+        ["App.NotFound.Description"] = "O endereço que você acessou não existe ou foi movido.",
+        ["App.NotFound.Help"] = "Verifique o link ou volte para o início.",
+        ["App.NotFound.BackToDashboard"] = "Voltar ao início",
 
         // Groups
         ["Groups.Title"] = "Grupos",
@@ -315,6 +319,10 @@ internal static class CoreTexts
         ["Error.NotFound"] = "Page not found",
         ["Error.AccessDenied"] = "Access denied",
         ["Error.InternalServer"] = "Internal server error",
+        ["App.NotFound.Title"] = "Page not found",
+        ["App.NotFound.Description"] = "The address you opened does not exist or has moved.",
+        ["App.NotFound.Help"] = "Check the link or go back home.",
+        ["App.NotFound.BackToDashboard"] = "Back to home",
 
         // Groups
         ["Groups.Title"] = "Groups",
@@ -500,6 +508,10 @@ internal static class CoreTexts
         ["Error.NotFound"] = "Pagina no encontrada",
         ["Error.AccessDenied"] = "Acceso denegado",
         ["Error.InternalServer"] = "Error interno del servidor",
+        ["App.NotFound.Title"] = "Página no encontrada",
+        ["App.NotFound.Description"] = "La dirección que abriste no existe o fue movida.",
+        ["App.NotFound.Help"] = "Revisa el enlace o vuelve al inicio.",
+        ["App.NotFound.BackToDashboard"] = "Volver al inicio",
 
         // Groups
         ["Groups.Title"] = "Grupos",
