@@ -100,12 +100,14 @@ namespace Confirmai.Areas.Identity.Pages.Account
 
             if (signInResult.Succeeded)
             {
+                // AppLog.UserId is a FK to AspNetUsers; the provider key is not our id.
+                var signedInUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
                 await _log.AuditAsync(
                     AuditEvents.UserLoginSuccess,
                     AuditEntities.User,
-                    info.ProviderKey,
+                    signedInUser?.Id ?? info.ProviderKey,
                     $"Login externo bem-sucedido: {info.LoginProvider}.",
-                    actorUserId: info.ProviderKey,
+                    actorUserId: signedInUser?.Id,
                     source: AdminAuditSources.Identity);
 
                 return LocalRedirect(returnUrl);
