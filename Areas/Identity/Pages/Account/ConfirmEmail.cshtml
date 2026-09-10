@@ -5,7 +5,12 @@
     ViewData["Title"] = T["Identity.ConfirmEmail.Title"];
 }
 
-<h2>@T["Identity.ConfirmEmail.Heading"]</h2>
+<a href="/" class="identity-home-link">
+    <span class="identity-home-arrow">&#8592;</span>
+    <span class="identity-home-text">@T["Identity.Common.Home"]</span>
+</a>
+
+<h2 class="identity-heading">@T["Identity.ConfirmEmail.Heading"]</h2>
 
 @if (Model.IsSuccess == true)
 {
@@ -29,4 +34,6 @@ else
     </div>
 }
 
-
+<div class="identity-footer">
+    <span>&copy; 2025 Confirmai</span>
+</div>

@@ -140,18 +140,270 @@ internal static class PokerTexts
         ["Poker.StackMaxShort"] = "Stack máximo",
     };
 
-    /// <summary>EN-US English (United States) strings - stub for extension</summary>
+    /// <summary>EN-US English (United States) strings</summary>
     public static IReadOnlyDictionary<string, string> EnUs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        // Page titles
+        ["Poker.PageTitle"] = "Poker",
+        ["Poker.CreatePageTitle"] = "Create Event · Poker · Confirmai",
+        ["Poker.EditPageTitle"] = "Edit Event · Poker · Confirmai",
+
+        // Common
+        ["Poker.EventNotFound"] = "Event not found.",
+        ["Poker.AccessDenied"] = "Access denied.",
+        ["Poker.OnlyOrganizerCanEdit"] = "Only the organizer can edit this event.",
+        ["Poker.EventCancelled"] = "This event has been cancelled.",
+        ["Poker.CancelEvent"] = "Cancel event",
+        ["Poker.CancelConfirm"] = "Are you sure? This action cannot be undone.",
+        ["Poker.EditEvent"] = "Edit event",
+        ["Poker.BackToList"] = "← Back to list",
+        ["Poker.Player"] = "Player",
+        ["Poker.You"] = "You",
+        ["Poker.Waitlist"] = "waitlist",
+        ["Poker.Confirmed"] = "Confirmed",
+
+        // Event types
+        ["Poker.Tournament"] = "Tournament",
+        ["Poker.CashGame"] = "Cash Game",
+        ["Poker.HomeGame"] = "Home Game",
+        ["Poker.NewTournament"] = "🏆 New Tournament",
+        ["Poker.NewCashGame"] = "💰 New Cash Game",
+        ["Poker.NewHomeGame"] = "🏠 New Home Game",
+        ["Poker.NewEvent"] = "New Event",
+        ["Poker.EditTournament"] = "🏆 Edit Tournament",
+        ["Poker.EditCashGame"] = "💰 Edit Cash Game",
+        ["Poker.EditHomeGame"] = "🏠 Edit Home Game",
+        ["Poker.EditEventDefault"] = "Edit Event",
+        ["Poker.CreateEvent"] = "Create Event",
+
+        // Type menu descriptions
+        ["Poker.TournamentDesc"] = "Buy-in, rebuy, GTD, late reg…",
+        ["Poker.CashGameDesc"] = "Stack min/max, modality, included…",
+        ["Poker.HomeGameDesc"] = "Access via private code",
+
+        // My events
+        ["Poker.MyMatches"] = "My Matches",
+
+        // Detail page
+        ["Poker.OpenGroup"] = "Open group:",
+        ["Poker.Inscritos"] = "Registered",
+        ["Poker.EnterToParticipate"] = "Join to participate",
+        ["Poker.YouAreInscribed"] = "✅ You are registered for this event.",
+        ["Poker.CancelInscription"] = "Cancel registration",
+        ["Poker.JoinQueue"] = "Join waitlist",
+        ["Poker.ConfirmPresence"] = "Confirm attendance",
+
+        // Private group (reuses Futsal keys where identical)
+        ["Poker.JoinRequestSent"] = "Request sent — awaiting group admin approval.",
+        ["Poker.CancelJoinRequest"] = "Cancel request",
+        ["Poker.CancellingJoin"] = "Cancelling…",
+        ["Poker.JoinRequestRejected"] = "Your join request was rejected.",
+        ["Poker.PrivateGroup"] = "This group is private. Request access from the admin.",
+        ["Poker.RequestJoin"] = "Request access",
+        ["Poker.SendingJoin"] = "Sending...",
+
+        // Home Game lock
+        ["Poker.HomeGameLockText"] = "This Home Game's details are private.\nEnter the access code to see more information.",
+        ["Poker.HomeGameEnter"] = "Enter",
+        ["Poker.HomeGameCodeWrong"] = "Incorrect code. Check with the organizer.",
+        ["Poker.HomeGameDetailsLocked"] = "Details available with access code",
+        ["Poker.HomeGameAccess"] = "Access →",
+        ["Poker.HomeGameConfirm"] = "Confirm →",
+
+        // Home Game notice (create)
+        ["Poker.HomeGameAccessCode"] = "Access code",
+        ["Poker.HomeGameNoticeText"] = "A private code will be generated automatically upon creating the event. Share it with your guests — only those with the code will see the home game details.",
+
+        // Home Game edit
+        ["Poker.HomeGameCurrentCode"] = "Current code: {0}",
+        ["Poker.HomeGameCodeCannotChange"] = "The code cannot be changed — it has already been shared with the guests.",
+
+        // Create/Edit form
+        ["Poker.Identity"] = "Identity",
+        ["Poker.EventName"] = "Event name",
+        ["Poker.PokerHouse"] = "Poker House",
+        ["Poker.YourHome"] = "Your home / venue",
+        ["Poker.Address"] = "Address",
+        ["Poker.AddressPlaceholder"] = "Street, number, neighborhood — City/State",
+        ["Poker.City"] = "City",
+        ["Poker.CityPlaceholder"] = "São Paulo",
+        ["Poker.UF"] = "State",
+        ["Poker.SelectUF"] = "— Select —",
+        ["Poker.ForeignUF"] = "EX — Foreign",
+        ["Poker.DateTime"] = "Date & Time",
+        ["Poker.Date"] = "Date",
+        ["Poker.StartTime"] = "Start time",
+        ["Poker.LateRegDate"] = "Late Registration — date",
+        ["Poker.LateRegTime"] = "Late Registration — time",
+        ["Poker.LateRegHint"] = "Leave blank if none.",
+        ["Poker.LateRegHintEdit"] = "Leave blank to remove.",
+        ["Poker.Modality"] = "Modality",
+        ["Poker.TournamentStructure"] = "Tournament Structure",
+        ["Poker.StartingStack"] = "Starting stack",
+        ["Poker.InitialBlindBB"] = "Initial Blind (in BBs)",
+        ["Poker.InitialBlindHint"] = "How many chips = 1 BB at the initial level.",
+        ["Poker.MaxPlayers"] = "Max. number of players",
+        ["Poker.MaxPlayersHint"] = "Use 0 for unlimited.",
+        ["Poker.Prices"] = "Prices",
+        ["Poker.BuyIn"] = "Buy-in (R$)",
+        ["Poker.GTD"] = "GTD — Guaranteed prize (R$)",
+        ["Poker.Rebuy"] = "Rebuy (R$)",
+        ["Poker.RebuyDouble"] = "Double rebuy (R$)",
+        ["Poker.RebuyDoubleHint"] = "May be less than rebuy×2.",
+        ["Poker.Addon"] = "Add-on (R$)",
+        ["Poker.AddonDouble"] = "Double add-on (R$)",
+        ["Poker.Stacks"] = "Stacks",
+        ["Poker.StackMin"] = "Min. stack (R$)",
+        ["Poker.StackMax"] = "Max. stack (R$)",
+        ["Poker.CashIncludes"] = "What is included for players?",
+        ["Poker.CashIncludesHint"] = "Optional — e.g. dinner included, drinks, etc.",
+        ["Poker.EventForGroup"] = "Event for group",
+
+        // Actions
+        ["Poker.CreateButton"] = "Create {0}",
+        ["Poker.Creating"] = "Creating…",
+        ["Poker.CreatingShort"] = "Creating…",
+        ["Poker.SaveChanges"] = "Save changes",
+        ["Poker.Saving"] = "Saving…",
+
+        // Late reg display
+        ["Poker.LateRegUntil"] = "Late Reg until {0}",
+
         // Poker detail info component (C28 migration)
         ["Poker.MaxPlayersShort"] = "Max. players",
         ["Poker.StackMinShort"] = "Min. stack",
         ["Poker.StackMaxShort"] = "Max. stack",
     };
 
-    /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
+    /// <summary>ES-ES Spanish (Spain) strings</summary>
     public static IReadOnlyDictionary<string, string> EsEs => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        // Page titles
+        ["Poker.PageTitle"] = "Poker",
+        ["Poker.CreatePageTitle"] = "Crear Evento · Poker · Confirmai",
+        ["Poker.EditPageTitle"] = "Editar Evento · Poker · Confirmai",
+
+        // Common
+        ["Poker.EventNotFound"] = "Evento no encontrado.",
+        ["Poker.AccessDenied"] = "Acceso denegado.",
+        ["Poker.OnlyOrganizerCanEdit"] = "Solo el organizador puede editar este evento.",
+        ["Poker.EventCancelled"] = "Este evento ha sido cancelado.",
+        ["Poker.CancelEvent"] = "Cancelar evento",
+        ["Poker.CancelConfirm"] = "¿Está seguro? Esta acción no se puede deshacer.",
+        ["Poker.EditEvent"] = "Editar evento",
+        ["Poker.BackToList"] = "← Volver a la lista",
+        ["Poker.Player"] = "Jugador",
+        ["Poker.You"] = "Usted",
+        ["Poker.Waitlist"] = "lista de espera",
+        ["Poker.Confirmed"] = "Confirmado",
+
+        // Event types
+        ["Poker.Tournament"] = "Torneo",
+        ["Poker.CashGame"] = "Cash Game",
+        ["Poker.HomeGame"] = "Home Game",
+        ["Poker.NewTournament"] = "🏆 Nuevo Torneo",
+        ["Poker.NewCashGame"] = "💰 Nuevo Cash Game",
+        ["Poker.NewHomeGame"] = "🏠 Nuevo Home Game",
+        ["Poker.NewEvent"] = "Nuevo Evento",
+        ["Poker.EditTournament"] = "🏆 Editar Torneo",
+        ["Poker.EditCashGame"] = "💰 Editar Cash Game",
+        ["Poker.EditHomeGame"] = "🏠 Editar Home Game",
+        ["Poker.EditEventDefault"] = "Editar Evento",
+        ["Poker.CreateEvent"] = "Crear Evento",
+
+        // Type menu descriptions
+        ["Poker.TournamentDesc"] = "Buy-in, rebuy, GTD, late reg…",
+        ["Poker.CashGameDesc"] = "Stack mín/máx, modalidad, incluido…",
+        ["Poker.HomeGameDesc"] = "Acceso por código privado",
+
+        // My events
+        ["Poker.MyMatches"] = "Mis Partidas",
+
+        // Detail page
+        ["Poker.OpenGroup"] = "Abrir grupo:",
+        ["Poker.Inscritos"] = "Inscritos",
+        ["Poker.EnterToParticipate"] = "Unirse para participar",
+        ["Poker.YouAreInscribed"] = "✅ Usted está inscrito en este evento.",
+        ["Poker.CancelInscription"] = "Cancelar inscripción",
+        ["Poker.JoinQueue"] = "Unirse a la lista de espera",
+        ["Poker.ConfirmPresence"] = "Confirmar asistencia",
+
+        // Private group (reuses Futsal keys where identical)
+        ["Poker.JoinRequestSent"] = "Solicitud enviada — esperando aprobación del administrador del grupo.",
+        ["Poker.CancelJoinRequest"] = "Cancelar solicitud",
+        ["Poker.CancellingJoin"] = "Cancelando…",
+        ["Poker.JoinRequestRejected"] = "Su solicitud de entrada fue rechazada.",
+        ["Poker.PrivateGroup"] = "Este grupo es privado. Solicite entrada al administrador.",
+        ["Poker.RequestJoin"] = "Solicitar entrada",
+        ["Poker.SendingJoin"] = "Enviando...",
+
+        // Home Game lock
+        ["Poker.HomeGameLockText"] = "Los detalles de este Home Game son privados.\nIngrese el código de acceso para ver más información.",
+        ["Poker.HomeGameEnter"] = "Entrar",
+        ["Poker.HomeGameCodeWrong"] = "Código incorrecto. Verifique con el organizador.",
+        ["Poker.HomeGameDetailsLocked"] = "Detalles disponibles con código de acceso",
+        ["Poker.HomeGameAccess"] = "Acceder →",
+        ["Poker.HomeGameConfirm"] = "Confirmar →",
+
+        // Home Game notice (create)
+        ["Poker.HomeGameAccessCode"] = "Código de acceso",
+        ["Poker.HomeGameNoticeText"] = "Se generará un código privado automáticamente al crear el evento. Compártalo con sus invitados — solo quienes tengan el código verán los detalles del home game.",
+
+        // Home Game edit
+        ["Poker.HomeGameCurrentCode"] = "Código actual: {0}",
+        ["Poker.HomeGameCodeCannotChange"] = "El código no se puede cambiar — ya se ha compartido con los invitados.",
+
+        // Create/Edit form
+        ["Poker.Identity"] = "Identidad",
+        ["Poker.EventName"] = "Nombre del evento",
+        ["Poker.PokerHouse"] = "Casa de Poker",
+        ["Poker.YourHome"] = "Su casa / local",
+        ["Poker.Address"] = "Dirección",
+        ["Poker.AddressPlaceholder"] = "Calle, número, barrio — Ciudad/Provincia",
+        ["Poker.City"] = "Ciudad",
+        ["Poker.CityPlaceholder"] = "São Paulo",
+        ["Poker.UF"] = "Provincia",
+        ["Poker.SelectUF"] = "— Seleccione —",
+        ["Poker.ForeignUF"] = "EX — Extranjero",
+        ["Poker.DateTime"] = "Fecha y Hora",
+        ["Poker.Date"] = "Fecha",
+        ["Poker.StartTime"] = "Hora de inicio",
+        ["Poker.LateRegDate"] = "Late Registration — fecha",
+        ["Poker.LateRegTime"] = "Late Registration — hora",
+        ["Poker.LateRegHint"] = "Dejar en blanco si no hay.",
+        ["Poker.LateRegHintEdit"] = "Dejar en blanco para eliminar.",
+        ["Poker.Modality"] = "Modalidad",
+        ["Poker.TournamentStructure"] = "Estructura del Torneo",
+        ["Poker.StartingStack"] = "Stack inicial",
+        ["Poker.InitialBlindBB"] = "Blind inicial (en BBs)",
+        ["Poker.InitialBlindHint"] = "Cuántas fichas = 1 BB en el nivel inicial.",
+        ["Poker.MaxPlayers"] = "Nº máximo de jugadores",
+        ["Poker.MaxPlayersHint"] = "Use 0 para ilimitado.",
+        ["Poker.Prices"] = "Precios",
+        ["Poker.BuyIn"] = "Buy-in (R$)",
+        ["Poker.GTD"] = "GTD — Premio garantizado (R$)",
+        ["Poker.Rebuy"] = "Rebuy (R$)",
+        ["Poker.RebuyDouble"] = "Rebuy doble (R$)",
+        ["Poker.RebuyDoubleHint"] = "Puede ser menor que rebuy×2.",
+        ["Poker.Addon"] = "Add-on (R$)",
+        ["Poker.AddonDouble"] = "Add-on doble (R$)",
+        ["Poker.Stacks"] = "Stacks",
+        ["Poker.StackMin"] = "Stack mínimo (R$)",
+        ["Poker.StackMax"] = "Stack máximo (R$)",
+        ["Poker.CashIncludes"] = "¿Qué está incluido para los jugadores?",
+        ["Poker.CashIncludesHint"] = "Opcional — ej: cena incluida, bebidas, etc.",
+        ["Poker.EventForGroup"] = "Evento para el grupo",
+
+        // Actions
+        ["Poker.CreateButton"] = "Crear {0}",
+        ["Poker.Creating"] = "Creando…",
+        ["Poker.CreatingShort"] = "Creando…",
+        ["Poker.SaveChanges"] = "Guardar cambios",
+        ["Poker.Saving"] = "Guardando…",
+
+        // Late reg display
+        ["Poker.LateRegUntil"] = "Late Reg hasta {0}",
+
         // Poker detail info component (C28 migration)
         ["Poker.MaxPlayersShort"] = "Máx. jugadores",
         ["Poker.StackMinShort"] = "Stack mínimo",

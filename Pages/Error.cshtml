@@ -1,0 +1,35 @@
+@page
+@model Confirmai.Pages.ErrorModel
+@inject Confirmai.Services.User.LanguagePreferenceService LanguagePreferenceService
+@{
+    Layout = null;
+    var title = Model.Title;
+    var cspNonce = (HttpContext.Items["csp-nonce"] as string) ?? string.Empty;
+}
+<!DOCTYPE html>
+<html lang="@LanguagePreferenceService.SelectedLanguage">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title — Confirmai</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/identity.css" asp-append-version="true" />
+</head>
+<body class="identity-body">
+    <div class="identity-container">
+        <div class="not-found-card">
+            <span class="not-found-icon" role="img" aria-label="⚠">&#9888;</span>
+            <h2 class="not-found-title">@Model.Title</h2>
+            <p class="not-found-description">@Model.Description</p>
+            @if (Model.ShowRequestId)
+            {
+                <p class="not-found-request-id">
+                    <strong>@Model.RequestIdLabel:</strong> <code>@Model.RequestId</code>
+                </p>
+            }
+            <a href="/" class="not-found-home-link">@Model.BackHomeLabel</a>
+        </div>
+    </div>
+</body>
+</html>

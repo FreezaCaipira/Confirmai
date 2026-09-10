@@ -127,6 +127,9 @@ internal static class CoreTexts
         // Error
         ["Error.Title"] = "Erro",
         ["Error.Message"] = "Algo deu errado",
+        ["Error.Description"] = "Ocorreu um erro inesperado ao processar sua solicitação. Nossa equipe foi notificada.",
+        ["Error.RequestId"] = "ID da requisição",
+        ["Error.BackHome"] = "← Voltar ao início",
         ["Error.NotFound"] = "Pagina nao encontrada",
         ["Error.AccessDenied"] = "Acesso negado",
         ["Error.InternalServer"] = "Erro interno do servidor",
@@ -316,6 +319,9 @@ internal static class CoreTexts
         // Error
         ["Error.Title"] = "Error",
         ["Error.Message"] = "Something went wrong",
+        ["Error.Description"] = "An unexpected error occurred while processing your request. Our team has been notified.",
+        ["Error.RequestId"] = "Request ID",
+        ["Error.BackHome"] = "← Back to home",
         ["Error.NotFound"] = "Page not found",
         ["Error.AccessDenied"] = "Access denied",
         ["Error.InternalServer"] = "Internal server error",
@@ -505,6 +511,9 @@ internal static class CoreTexts
         // Error
         ["Error.Title"] = "Error",
         ["Error.Message"] = "Algo salio mal",
+        ["Error.Description"] = "Ocurrió un error inesperado al procesar tu solicitud. Nuestro equipo ha sido notificado.",
+        ["Error.RequestId"] = "ID de la solicitud",
+        ["Error.BackHome"] = "← Volver al inicio",
         ["Error.NotFound"] = "Pagina no encontrada",
         ["Error.AccessDenied"] = "Acceso denegado",
         ["Error.InternalServer"] = "Error interno del servidor",

@@ -23,6 +23,13 @@ public class IdentityEmailSender : IEmailSender
         _environment = environment;
     }
 
+    /// <summary>
+    /// True when running in the Development environment. Exposed so other
+    /// components (e.g. ForgotPasswordConfirmation) can check without
+    /// injecting IWebHostEnvironment separately.
+    /// </summary>
+    public bool IsDevelopment => _environment.IsDevelopment();
+
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
         await SendEmailAsync(email, subject, htmlMessage, textMessage: null);

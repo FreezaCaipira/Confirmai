@@ -254,6 +254,69 @@ textarea:focus-visible {
     font-size: 0.96rem;
 }
 
+/* ================================================================
+   .mk-btn -- Compact button system (marketplace/profile/chat)
+   Single source of truth. Scoped CSS files may override colors and
+   sizing contextually but MUST NOT redefine the base .mk-btn selector.
+   Variants: .mk-btn-primary, .mk-btn-muted, .mk-btn-secondary
+   ================================================================ */
+.mk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0.34rem 0.9rem;
+    border: 1px solid var(--ci-border);
+    border-radius: 4px;
+    background: var(--ci-bg-card-deep);
+    color: var(--ci-text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.mk-btn:hover:not(:disabled) {
+    background: var(--accent-opacity-xs);
+    border-color: var(--ci-border-dim);
+    color: var(--ci-text);
+}
+
+.mk-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mk-btn:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+}
+
+.mk-btn-primary {
+    background: var(--ci-accent-mid);
+    border-color: var(--ci-border-dim);
+    color: var(--ci-text);
+}
+
+.mk-btn-primary:hover:not(:disabled) {
+    background: var(--ci-accent);
+    border-color: var(--ci-accent);
+    color: var(--white);
+}
+
+.mk-btn-muted {
+    background: var(--ci-bg-mid);
+    color: var(--ci-text-muted);
+}
+
+.mk-btn-muted:hover:not(:disabled) {
+    background: var(--ci-border-alt);
+    color: var(--ci-text);
+}
+
 .product-summary {
     display: flex;
     flex-direction: column;

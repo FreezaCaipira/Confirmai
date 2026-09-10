@@ -5,10 +5,10 @@ namespace Confirmai.Tests;
 
 /// <summary>
 /// Anti-hardcode test: ensures every i18n key in PtBr exists in EnUs and EsEs
-/// (and vice versa) across all text provider classes that have full i18n.
-/// Fase 6, Ciclo 26. Fase E, Ciclo 27: removed the silent `if (enUs.Count == 0) return;`
-/// — PT-BR-only domains are excluded from the data source explicitly (V1 decision,
-/// WORK_PLAN.md line 127: "Recomendo (a) para o V1" — PT-BR only for V1).
+/// (and vice versa) across all text provider classes. Fase 6, Ciclo 26. Fase E,
+/// Ciclo 27: removed the silent `if (enUs.Count == 0) return;`. C30-C Fase 2:
+/// the 3 product dictionaries (FutsalTexts, GroupTexts, PokerTexts) now have
+/// full EN/ES and are included — PtBrOnlyProviders is empty.
 /// </summary>
 public class I18nKeyParityTests
 {
@@ -23,16 +23,21 @@ public class I18nKeyParityTests
         new object[] { "AdminTexts", AdminTexts.PtBr, AdminTexts.EnUs, AdminTexts.EsEs },
         new object[] { "AuthTexts", AuthTexts.PtBr, AuthTexts.EnUs, AuthTexts.EsEs },
         new object[] { "CoreTexts", CoreTexts.PtBr, CoreTexts.EnUs, CoreTexts.EsEs },
+        new object[] { "FutsalTexts", FutsalTexts.PtBr, FutsalTexts.EnUs, FutsalTexts.EsEs },
+        new object[] { "GroupTexts", GroupTexts.PtBr, GroupTexts.EnUs, GroupTexts.EsEs },
         new object[] { "PaymentTexts", PaymentTexts.PtBr, PaymentTexts.EnUs, PaymentTexts.EsEs },
+        new object[] { "PokerTexts", PokerTexts.PtBr, PokerTexts.EnUs, PokerTexts.EsEs },
         new object[] { "ServerTexts", ServerTexts.PtBr, ServerTexts.EnUs, ServerTexts.EsEs },
         new object[] { "UtilityTexts", UtilityTexts.PtBr, UtilityTexts.EnUs, UtilityTexts.EsEs },
     };
 
-    /// <summary>PT-BR-only providers (V1 decision). Documented here so the exclusion is visible.</summary>
-    public static IReadOnlyList<string> PtBrOnlyProviders { get; } = new[]
-    {
-        "FutsalTexts", "GroupTexts", "PokerTexts"
-    };
+    /// <summary>
+    /// PT-BR-only providers (V1 decision). Empty since C30-C Fase 2: all 3
+    /// product dictionaries (FutsalTexts, GroupTexts, PokerTexts) now have
+    /// full EN-US/ES-ES translations and are in TextProviders above.
+    /// Kept as a visible marker that the exclusion no longer exists.
+    /// </summary>
+    public static IReadOnlyList<string> PtBrOnlyProviders { get; } = Array.Empty<string>();
 
     [Theory]
     [MemberData(nameof(TextProviders))]
