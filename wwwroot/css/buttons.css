@@ -269,20 +269,22 @@ textarea:focus-visible {
     padding: 0.34rem 0.9rem;
     border: 1px solid var(--ci-border);
     border-radius: 4px;
-    background: var(--ci-bg-card-deep);
-    color: var(--ci-text-muted);
+    background: var(--ci-bg-mid);
+    color: var(--ci-surface-muted);
     font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
+    font-weight: 800;
+    letter-spacing: 0.03em;
     cursor: pointer;
     text-decoration: none;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 2px 4px var(--shadow-md);
 }
 
 .mk-btn:hover:not(:disabled) {
-    background: var(--accent-opacity-xs);
-    border-color: var(--ci-border-dim);
-    color: var(--ci-text);
+    background: var(--ci-border-alt);
+    border-color: var(--ci-accent);
+    color: var(--ci-surface-light);
+    box-shadow: 0 4px 8px var(--accent-opacity-md);
 }
 
 .mk-btn:disabled {
@@ -296,15 +298,17 @@ textarea:focus-visible {
 }
 
 .mk-btn-primary {
-    background: var(--ci-accent-mid);
-    border-color: var(--ci-border-dim);
-    color: var(--ci-text);
+    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent) 100%);
+    border-color: var(--ci-accent);
+    color: var(--ci-surface-light);
+    box-shadow: 0 2px 4px var(--accent-opacity-md);
 }
 
 .mk-btn-primary:hover:not(:disabled) {
-    background: var(--ci-accent);
-    border-color: var(--ci-accent);
+    background: linear-gradient(180deg, var(--ci-accent-light) 0%, var(--ci-accent) 50%, var(--ci-accent-mid) 100%);
+    border-color: var(--ci-accent-light);
     color: var(--white);
+    box-shadow: 0 4px 8px var(--accent-opacity-xl);
 }
 
 .mk-btn-muted {
