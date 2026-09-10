@@ -174,33 +174,41 @@ public partial class Create
         if (!allowedExts.Contains(ext) || !allowedTypes.Contains(logoFile.ContentType))
         {
             logoError = true;
-            logoFeedback = "Formato inválido. Use PNG, JPG ou WebP.";
+            logoFeedback = Ui["Group.Logo.InvalidFormat"];
             logoFile = null;
+            await InvokeAsync(StateHasChanged);
             return;
         }
 
         if (logoFile.Size > maxBytes)
         {
             logoError = true;
-            logoFeedback = "Arquivo muito grande. Máximo 5 MB.";
+            logoFeedback = Ui["Group.Logo.TooLarge"];
             logoFile = null;
+            await InvokeAsync(StateHasChanged);
             return;
         }
 
         try
         {
-            var buffer = new byte[logoFile.Size];
-            await using var stream = logoFile.OpenReadStream(maxBytes);
+            // Generate a thumbnail in the browser (320x320) and read only that
+            // for the preview. The original IBrowserFile is kept for the server
+            // upload — we don't send the full 5MB through the SignalR diff.
+            var image = await logoFile.RequestImageFileAsync(logoFile.ContentType, 320, 320);
+            var buffer = new byte[image.Size];
+            await using var stream = image.OpenReadStream(maxBytes);
             await stream.ReadExactlyAsync(buffer);
-            logoPreview = $"data:{logoFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
-            logoFeedback = "Imagem selecionada com sucesso!";
+            logoPreview = $"data:{image.ContentType};base64,{Convert.ToBase64String(buffer)}";
+            logoFeedback = Ui["Group.Logo.Selected"];
             logoError = false;
         }
         catch
         {
             logoError = true;
-            logoFeedback = "Erro ao processar imagem.";
+            logoFeedback = Ui["Group.Logo.ProcessError"];
             logoFile = null;
         }
+
+        await InvokeAsync(StateHasChanged);
     }
 }
