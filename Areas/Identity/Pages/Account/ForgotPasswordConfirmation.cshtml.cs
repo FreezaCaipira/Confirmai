@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Confirmai.Services.Utility;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Confirmai.Areas.Identity.Pages.Account
 {
     public class ForgotPasswordConfirmationModel : PageModel
     {
-        private readonly IWebHostEnvironment _environment;
+        private readonly IdentityEmailSender _emailSender;
 
-        public ForgotPasswordConfirmationModel(IWebHostEnvironment environment)
+        public ForgotPasswordConfirmationModel(IdentityEmailSender emailSender)
         {
-            _environment = environment;
+            _emailSender = emailSender;
         }
 
         public bool ShowDevFallbackHint { get; private set; }
@@ -17,18 +18,14 @@ namespace Confirmai.Areas.Identity.Pages.Account
 
         public void OnGet()
         {
-            if (!_environment.IsDevelopment())
+            if (!_emailSender.IsDevelopment)
             {
                 return;
             }
 
             ShowDevFallbackHint = true;
 
-            var root = string.IsNullOrWhiteSpace(_environment.WebRootPath)
-                ? AppContext.BaseDirectory
-                : _environment.WebRootPath;
-
-            var fallbackDirectory = Path.Combine(root, "uploads", "dev-emails");
+            var fallbackDirectory = _emailSender.GetFallbackDirectory();
             if (!Directory.Exists(fallbackDirectory))
             {
                 return;

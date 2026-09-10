@@ -10,21 +10,21 @@
     <span class="identity-home-text">@T["Identity.Common.Home"]</span>
 </a>
 
-<h2 class="identity-login-heading">@T["Identity.Login.Heading"]</h2>
+<h2 class="identity-heading">@T["Identity.Login.Heading"]</h2>
 
-<div asp-validation-summary="All" class="text-danger"></div>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
 
 <form method="post">
     <input type="hidden" asp-for="ReturnUrl" />
     <div>
         <label asp-for="Input.Email">@T["Identity.Common.Email"]</label>
-        <input asp-for="Input.Email" autocomplete="username" />
-        <span asp-validation-for="Input.Email" class="text-danger"></span>
+        <input asp-for="Input.Email" autocomplete="username" aria-describedby="Input.Email-error" />
+        <span asp-validation-for="Input.Email" class="text-danger" id="Input.Email-error"></span>
     </div>
     <div>
         <label asp-for="Input.Password">@T["Identity.Common.Password"]</label>
-        <input asp-for="Input.Password" autocomplete="current-password" />
-        <span asp-validation-for="Input.Password" class="text-danger"></span>
+        <input asp-for="Input.Password" autocomplete="current-password" aria-describedby="Input.Password-error" />
+        <span asp-validation-for="Input.Password" class="text-danger" id="Input.Password-error"></span>
     </div>
     <div class="identity-remember">
         <input asp-for="Input.RememberMe" />

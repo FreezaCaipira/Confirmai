@@ -189,6 +189,7 @@ builder.Services.AddHostedService<PendingWebhooksAlertService>();
 builder.Services.AddHostedService<PayoutRetryService>();
 builder.Services.AddHostedService<CertificateHealthCheckService>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
+builder.Services.AddScoped<IdentityEmailSender>();
 builder.Services.AddScoped<EmailTemplateService>();
 builder.Services.AddScoped<AdminSecurityPolicyService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));

@@ -5,7 +5,12 @@
     ViewData["Title"] = T["Identity.Resend.Title"];
 }
 
-<h2>@T["Identity.Resend.Heading"]</h2>
+<a href="/" class="identity-home-link">
+    <span class="identity-home-arrow">&#8592;</span>
+    <span class="identity-home-text">@T["Identity.Common.Home"]</span>
+</a>
+
+<h2 class="identity-heading">@T["Identity.Resend.Heading"]</h2>
 <p class="identity-muted">@T["Identity.Resend.Subtitle"]</p>
 
 @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
@@ -13,13 +18,13 @@
     <p class="identity-muted">@Model.StatusMessage</p>
 }
 
-<div asp-validation-summary="All" class="text-danger"></div>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
 
 <form method="post">
     <div>
         <label asp-for="Input.Email">@T["Identity.Common.Email"]</label>
-        <input asp-for="Input.Email" autocomplete="username" />
-        <span asp-validation-for="Input.Email" class="text-danger"></span>
+        <input asp-for="Input.Email" autocomplete="username" aria-describedby="Input.Email-error" />
+        <span asp-validation-for="Input.Email" class="text-danger" id="Input.Email-error"></span>
     </div>
 
     <button type="submit">@T["Identity.Resend.Submit"]</button>
@@ -27,6 +32,10 @@
 
 <div class="identity-actions">
     <a asp-page="./Login">@T["Identity.Common.BackToLogin"]</a>
+</div>
+
+<div class="identity-footer">
+    <span>&copy; 2025 Confirmai</span>
 </div>
 
 @section Scripts {

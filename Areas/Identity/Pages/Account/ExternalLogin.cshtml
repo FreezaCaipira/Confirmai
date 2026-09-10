@@ -5,7 +5,12 @@
     ViewData["Title"] = T["Identity.ExternalLogin.Title"];
 }
 
-<h2 class="identity-login-heading">@T["Identity.ExternalLogin.Heading"]</h2>
+<a href="/" class="identity-home-link">
+    <span class="identity-home-arrow">&#8592;</span>
+    <span class="identity-home-text">@T["Identity.Common.Home"]</span>
+</a>
+
+<h2 class="identity-heading">@T["Identity.ExternalLogin.Heading"]</h2>
 
 @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
 {
@@ -24,3 +29,7 @@ else
         <a asp-page="./Login">@T["Identity.Common.BackToLogin"]</a>
     </div>
 }
+
+<div class="identity-footer">
+    <span>&copy; 2025 Confirmai</span>
+</div>

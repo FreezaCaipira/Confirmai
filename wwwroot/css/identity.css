@@ -183,7 +183,8 @@
     width: fit-content;
 }
 
-.identity-login-heading {
+.identity-login-heading,
+.identity-heading {
     text-align: center;
     margin: 0 0 var(--identity-rhythm-base);
 }

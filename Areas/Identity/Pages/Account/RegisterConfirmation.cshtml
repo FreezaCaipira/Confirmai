@@ -5,7 +5,12 @@
     ViewData["Title"] = T["Identity.RegisterConfirmation.Title"];
 }
 
-<h2>@T["Identity.RegisterConfirmation.Heading"]</h2>
+<a href="/" class="identity-home-link">
+    <span class="identity-home-arrow">&#8592;</span>
+    <span class="identity-home-text">@T["Identity.Common.Home"]</span>
+</a>
+
+<h2 class="identity-heading">@T["Identity.RegisterConfirmation.Heading"]</h2>
 <p class="identity-muted">
     @string.Format(T["Identity.RegisterConfirmation.Message"], Model.Email)
 </p>
@@ -13,6 +18,10 @@
 <div class="identity-actions">
     <a asp-page="./Login">@T["Identity.Common.GoToLogin"]</a>
     <a asp-page="./ResendEmailConfirmation">@T["Identity.Resend.Title"]</a>
+</div>
+
+<div class="identity-footer">
+    <span>&copy; 2025 Confirmai</span>
 </div>
 
 
