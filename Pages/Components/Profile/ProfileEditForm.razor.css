@@ -90,23 +90,13 @@
     border: 1px solid var(--accent-opacity-md);
 }
 
+/* .mk-btn base defined in buttons.css (global).
+   ProfileEditForm overrides: darker bg, heavier font, box-shadow. */
 .mk-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    min-height: 2rem;
-    padding: 0.34rem 0.9rem;
-    border: 1px solid var(--ci-border);
-    border-radius: 4px;
     background: var(--ci-bg-mid);
     color: var(--ci-surface-muted);
-    font-size: 0.8rem;
     font-weight: 800;
     letter-spacing: 0.03em;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
     box-shadow: 0 2px 4px var(--shadow-md);
 }
 
@@ -115,11 +105,6 @@
     border-color: var(--ci-accent);
     color: var(--ci-surface-light);
     box-shadow: 0 4px 8px var(--accent-opacity-md);
-}
-
-.mk-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 
 .mk-btn-primary {
