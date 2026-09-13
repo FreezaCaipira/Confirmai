@@ -4,149 +4,211 @@
 @attribute [AllowAnonymous]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.EntityFrameworkCore
-@using System.Globalization
-@using System.Net.Http.Json
-@using System.Security.Claims
-@using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
-@using Confirmai.Shared
 @using Confirmai.Shared.Components
 @using Confirmai.Shared.Components.Groups
-@using Microsoft.JSInterop
 
+<PageTitle>@Ui["Index.PageTitle"] — Confirmai</PageTitle>
 
-<PageTitle>@(activeTab == TabMyGames ? $"{Ui["Index.TabMyGames"]} — Confirmai" : "Confirmai")</PageTitle>
+<div class="home">
+    <AuthorizeView>
+        <NotAuthorized>
+            <header class="home-hero home-hero--landing">
+                <div class="home-hero-text">
+                    <h1 class="home-hero-title">@Ui["Index.LandingTitle"]</h1>
+                    <p class="home-hero-sub">@Ui["Index.LandingSubtitle"]</p>
+                </div>
+                <div class="home-hero-actions">
+                    <a href="/Identity/Account/Login" class="home-btn home-btn--primary">@Ui["Nav.Login"]</a>
+                    <a href="/Identity/Account/Register" class="home-btn">@Ui["Nav.Register"]</a>
+                </div>
+            </header>
+            <NoGroupsHint />
+        </NotAuthorized>
 
-<CascadingValue Value="CurrentCityContext">
-    <div class="sports-page">
-
-    <div class="sports-shell">
-
-    <header class="sports-hero">
-        <div class="sports-hero-text">
-            <h1 class="sports-hero-title">@Ui["Index.HeroTitle"]</h1>
-            <p class="sports-hero-sub">@Ui["Index.HeroSubtitle"]</p>
-        </div>
-        <a href="/grupos" class="sports-hero-cta">
-            <i class="fas fa-layer-group" aria-hidden="true"></i> @Ui["Groups.Title"]
-        </a>
-    </header>
-
-    @if (!string.IsNullOrWhiteSpace(userId) && userGroupCount == 0)
-    {
-        <NoGroupsHint ShowGroupsButton="true" />
-    }
-
-    <div class="sports-toolbar">
-        <h2 class="sports-section-title">@Ui["Index.SportsAvailable"]</h2>
-        <CitySelector
-            SelectedCityKey="@SelectedCityKey"
-            SelectedCityKeyChanged="SelectedCityKeyChanged"
-            Cities="@Cities" />
-    </div>
-
-    <section class="sports-grid" aria-label="@Ui["Index.SportsAvailable"]">
-        <SportCard Sport="Sport.Futsal" Href="@FutsalHref" Description="@Ui["Index.FutsalCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@futsalMatchCount" />
-        <SportCard Sport="Sport.Poker" Href="@PokerHref" Description="@Ui["Index.PokerCardDesc"]" CtaText="@Ui["Index.ViewTournaments"]" MatchCount="@pokerMatchCount" ComingSoon="true" />
-        <SportCard Sport="Sport.Volleyball" Href="@VolleyballHref" Description="@Ui["Index.VolleyballCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@volleyballMatchCount" ComingSoon="true" />
-        <SportCard Sport="Sport.BeachTennis" Href="@BeachTennisHref" Description="@Ui["Index.BeachTennisCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@beachTennisMatchCount" ComingSoon="true" />
-        <SportCard Sport="Sport.Footvolley" Href="@FootvolleyHref" Description="@Ui["Index.FootvolleyCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@footvolleyMatchCount" ComingSoon="true" />
-        <SportCard Sport="Sport.Chess" Href="@ChessHref" Description="@Ui["Index.ChessCardDesc"]" CtaText="@Ui["Index.ViewMatches"]" MatchCount="@chessMatchCount" ComingSoon="true" />
-    </section>
-
-    @if (activeTab == TabMyGames)
-    {
-        <AuthorizeView>
-            <Authorized>
-                <div class="my-conf-container">
-                    @if (confLoading)
-                    {
-                        <div class="skeleton-container">
-                            <Skeleton Class="skeleton--card" />
-                            <Skeleton Class="skeleton--card" />
-                            <Skeleton Class="skeleton--card" />
-                        </div>
-                    }
-                    else if (!upcoming.Any() && !past.Any() && !cancelled.Any())
-                    {
-                        <NoGroupsHint ShowGroupsButton="true" />
-                        <EmptyState Message="@Ui["Index.NoConfirmations"]" Actions="EmptyStateActions" />
-                    }
-                    else
-                    {
-                        <div class="my-conf-filters">
-                            <select class="my-conf-filter" @bind="filterSport">
-                                <option value="">@Ui["Index.FilterAllSports"]</option>
-                                <option value="Futsal">@Ui["Index.SportFutsal"]</option>
-                                <option value="Poker">@Ui["Index.SportPoker"]</option>
-                                <option value="Volleyball">@Ui["Index.SportVolleyball"]</option>
-                                <option value="BeachTennis">@Ui["Index.SportBeachTennis"]</option>
-                                <option value="Footvolley">@Ui["Index.SportFootvolley"]</option>
-                                <option value="Chess">@Ui["Index.SportChess"]</option>
-                            </select>
-                            <select class="my-conf-filter" @bind="filterPeriod">
-                                <option value="all">@Ui["Index.FilterAllPeriods"]</option>
-                                <option value="7days">@Ui["Index.FilterLast7Days"]</option>
-                                <option value="30days">@Ui["Index.FilterLast30Days"]</option>
-                            </select>
-                        </div>
-
-                        @if (upcoming.Any())
+        <Authorized>
+            @if (isLoading)
+            {
+                <div class="home-skeleton">
+                    <Skeleton Class="skeleton--card" />
+                    <Skeleton Class="skeleton--card" />
+                </div>
+            }
+            else if (myGroups.Count == 0)
+            {
+                <header class="home-hero">
+                    <div class="home-hero-text">
+                        <h1 class="home-hero-title">@Ui["Index.NoGroupTitle"]</h1>
+                        <p class="home-hero-sub">@Ui["Index.NoGroupSubtitle"]</p>
+                    </div>
+                </header>
+                <GroupEntryPanel />
+                <NoGroupsHint />
+            }
+            else
+            {
+                <header class="home-hero">
+                    <div class="home-hero-text">
+                        <h1 class="home-hero-title">@Ui["Index.PageTitle"]</h1>
+                        <p class="home-hero-sub">@Ui["Index.MyMatchesSubtitle"]</p>
+                    </div>
+                    <div class="home-view-toggle" role="tablist" aria-label="@Ui["Index.PageTitle"]">
+                        <button type="button" role="tab" aria-selected="@(view == ViewPlaying)"
+                                class="home-view-btn @(view == ViewPlaying ? "home-view-btn--active" : string.Empty)"
+                                @onclick="() => SetView(ViewPlaying)">
+                            @Ui["Index.ViewPlaying"] <span class="home-view-count">@upcoming.Count</span>
+                        </button>
+                        @if (organizesAny)
                         {
-                            <div class="my-conf-section">
-                                <h2 class="my-conf-section-title">
-                                    <i class="fas fa-calendar-check"></i> @Ui["Index.Upcoming"] (@upcoming.Count)
-                                </h2>
-                                <div class="my-conf-list">
-                                    @foreach (var c in upcoming)
+                            <button type="button" role="tab" aria-selected="@(view == ViewOrganizing)"
+                                    class="home-view-btn @(view == ViewOrganizing ? "home-view-btn--active" : string.Empty)"
+                                    @onclick="() => SetView(ViewOrganizing)">
+                                @Ui["Index.ViewOrganizing"] <span class="home-view-count">@organizing.Count</span>
+                            </button>
+                        }
+                    </div>
+                </header>
+
+                <section class="home-groups" aria-label="@Ui["Groups.MyGroups"]">
+                    <div class="home-section-head">
+                        <h2 class="home-section-title">@Ui["Groups.MyGroups"]</h2>
+                        <a href="/grupos" class="home-link">@Ui["Index.ManageGroups"] →</a>
+                    </div>
+                    <div class="home-group-chips">
+                        @foreach (var g in myGroups)
+                        {
+                            <a href="/grupo/@g.Id" class="home-group-chip">
+                                <span class="home-group-chip-icon" aria-hidden="true">@(g.Sport == Sport.Poker ? "🃏" : "⚽")</span>
+                                <span class="home-group-chip-name">@g.Name</span>
+                                @if (g.IsAdmin)
+                                {
+                                    <span class="home-group-chip-role">@Ui["Index.RoleAdmin"]</span>
+                                }
+                            </a>
+                        }
+                    </div>
+                </section>
+
+                @if (view == ViewOrganizing && organizesAny)
+                {
+                    <section class="home-section" aria-label="@Ui["Index.ViewOrganizing"]">
+                        <div class="home-section-head">
+                            <h2 class="home-section-title">@Ui["Index.Upcoming"]</h2>
+                        </div>
+                        @if (organizing.Count == 0)
+                        {
+                            <div class="home-empty">
+                                <p>@Ui["Index.NoOrganizing"]</p>
+                                <div class="home-empty-actions">
+                                    @foreach (var g in myGroups.Where(g => g.IsAdmin))
                                     {
-                                        <ConfirmationCard Confirmation="@c" IsPast="false" IsCancelled="false" />
+                                        <a href="/grupo/@g.Id/partidas" class="home-btn">@Ui["Index.CreateMatchIn"] @g.Name</a>
                                     }
                                 </div>
                             </div>
                         }
-
-                        @if (past.Any())
+                        else
                         {
-                            <div class="my-conf-section my-conf-section--past">
-                                <h2 class="my-conf-section-title">
-                                    <i class="fas fa-history"></i> @Ui["Index.Previous"] (@past.Count)
-                                </h2>
-                                <div class="my-conf-list">
-                                    @foreach (var c in past)
+                            <div class="home-list">
+                                @foreach (var ev in organizing)
+                                {
+                                    <a href="@DetailUrl(ev)" class="home-event">
+                                        <div class="home-event-when">
+                                            <span class="home-event-day">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateTimeFullShort")</span>
+                                        </div>
+                                        <div class="home-event-body">
+                                            <strong class="home-event-group">@ev.Group.Name</strong>
+                                            <span class="home-event-meta">
+                                                @if (!string.IsNullOrWhiteSpace(ev.Location))
+                                                {
+                                                    <span>📍 @ev.Location</span>
+                                                }
+                                                <span>👥 @ev.Confirmations.Count@(ev.MaxPlayers > 0 ? $"/{ev.MaxPlayers}" : string.Empty) @Ui["Index.ConfirmedCount"]</span>
+                                            </span>
+                                        </div>
+                                        <span class="home-event-cta">@Ui["Index.Manage"] →</span>
+                                    </a>
+                                }
+                            </div>
+                        }
+                    </section>
+                }
+                else
+                {
+                    <section class="home-section" aria-label="@Ui["Index.ViewPlaying"]">
+                        <div class="home-section-head">
+                            <h2 class="home-section-title">@Ui["Index.Upcoming"]</h2>
+                        </div>
+                        @if (upcoming.Count == 0)
+                        {
+                            <div class="home-empty">
+                                <p>@Ui["Index.NoUpcoming"]</p>
+                                <div class="home-empty-actions">
+                                    @foreach (var g in myGroups)
                                     {
-                                        <ConfirmationCard Confirmation="@c" IsPast="true" IsCancelled="false" />
+                                        <a href="/grupo/@g.Id/partidas" class="home-btn">@g.Name →</a>
                                     }
                                 </div>
                             </div>
                         }
-
-                        @if (cancelled.Any())
+                        else
                         {
-                            <div class="my-conf-section my-conf-section--cancelled">
-                                <h2 class="my-conf-section-title">
-                                    <i class="fas fa-times-circle"></i> @Ui["Index.Cancelled"] (@cancelled.Count)
-                                </h2>
-                                <div class="my-conf-list">
-                                    @foreach (var c in cancelled)
+                            <div class="home-list">
+                                @foreach (var c in upcoming)
+                                {
+                                    <ConfirmationCard Confirmation="@c" IsPast="false" IsCancelled="false" />
+                                }
+                            </div>
+                        }
+                    </section>
+
+                    @if (past.Count > 0 || cancelled.Count > 0)
+                    {
+                        <section class="home-section home-section--history" aria-label="@Ui["Index.Previous"]">
+                            <div class="home-section-head">
+                                <h2 class="home-section-title">@Ui["Index.History"]</h2>
+                                <div class="home-view-toggle home-view-toggle--small" role="tablist">
+                                    <button type="button" role="tab" aria-selected="@(!showCancelled)"
+                                            class="home-view-btn @(!showCancelled ? "home-view-btn--active" : string.Empty)"
+                                            @onclick="() => showCancelled = false">
+                                        @Ui["Index.Previous"] <span class="home-view-count">@past.Count</span>
+                                    </button>
+                                    <button type="button" role="tab" aria-selected="@showCancelled"
+                                            class="home-view-btn @(showCancelled ? "home-view-btn--active" : string.Empty)"
+                                            @onclick="() => showCancelled = true">
+                                        @Ui["Index.Cancelled"] <span class="home-view-count">@cancelled.Count</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="home-list">
+                                @if (showCancelled)
+                                {
+                                    @if (cancelled.Count == 0)
+                                    {
+                                        <div class="home-empty"><p>@Ui["Index.NoCancelled"]</p></div>
+                                    }
+                                    @foreach (var c in cancelled.Take(HistoryLimit))
                                     {
                                         <ConfirmationCard Confirmation="@c" IsPast="true" IsCancelled="true" />
                                     }
-                                </div>
+                                }
+                                else
+                                {
+                                    @if (past.Count == 0)
+                                    {
+                                        <div class="home-empty"><p>@Ui["Index.NoPrevious"]</p></div>
+                                    }
+                                    @foreach (var c in past.Take(HistoryLimit))
+                                    {
+                                        <ConfirmationCard Confirmation="@c" IsPast="true" IsCancelled="false" />
+                                    }
+                                }
                             </div>
-                        }
+                        </section>
                     }
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="listing-state">
-                    <p><a href="/Identity/Account/Login?ReturnUrl=%2F%3Ftab%3Dmeus-jogos">@Ui["Index.LoginRequired"]</a> @Ui["Index.LoginRequiredSuffix"]</p>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    }
-    </div>
-    </div>
-</CascadingValue>
+                }
+            }
+        </Authorized>
+    </AuthorizeView>
+</div>

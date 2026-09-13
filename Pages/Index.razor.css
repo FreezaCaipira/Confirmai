@@ -1,217 +1,357 @@
-/* Dashboard (C35 pilot) — built on tokens.css only. */
+/* Home — "Minhas partidas". Built on tokens.css only. */
 
-/* -- Page frame --------------------------------------------------- */
-.sports-page {
-    max-width: none;
-    margin: 0;
-    padding: 0;
-}
-
-.sports-shell {
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    background: none;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
+.home {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
     gap: var(--space-6);
 }
 
 /* -- Hero --------------------------------------------------------- */
-.sports-hero {
+.home-hero {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--space-5);
-    padding: var(--space-6) var(--space-6) var(--space-6);
+    padding: var(--space-6);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
 }
 
-.sports-hero-text {
+.home-hero--landing {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-7) var(--space-6);
+}
+
+.home-hero-text {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
     max-width: 640px;
 }
 
-.sports-hero-title {
+.home-hero-title {
     margin: 0;
     font-size: clamp(1.75rem, 3vw, 2.25rem);
     font-weight: var(--fw-bold);
     letter-spacing: -0.02em;
     line-height: 1.15;
     color: var(--text);
-    text-shadow: none;
 }
 
-.sports-hero-sub {
+.home-hero-sub {
     margin: 0;
     font-size: 1rem;
     line-height: 1.6;
     color: var(--text-2);
-    text-shadow: none;
 }
 
-.sports-hero-cta {
+.home-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+/* -- Buttons ------------------------------------------------------ */
+.home-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2);
-    flex-shrink: 0;
     min-height: 40px;
     padding: 0 var(--space-4);
+    border: 1px solid var(--border-2);
     border-radius: var(--radius-sm);
-    background: var(--accent);
-    color: var(--accent-fg);
+    background: var(--surface-3);
+    color: var(--text);
     font-size: 0.9375rem;
     font-weight: var(--fw-medium);
     text-decoration: none;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.sports-hero-cta:hover {
-    background: var(--accent-hover);
+.home-btn:hover {
+    background: var(--surface-2);
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+.home-btn--primary {
+    background: var(--accent);
+    border-color: var(--accent);
     color: var(--accent-fg);
 }
 
-.sports-hero-cta:focus-visible {
-    outline: 2px solid var(--accent-ring);
-    outline-offset: 2px;
+.home-btn--primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--accent-fg);
 }
 
-/* -- Toolbar (section title + city) ------------------------------- */
-.sports-toolbar {
+.home-link {
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    color: var(--accent-text);
+    text-decoration: none;
+}
+
+.home-link:hover {
+    text-decoration: underline;
+}
+
+/* -- View toggle (jogo | organizo) -------------------------------- */
+.home-view-toggle {
+    display: inline-flex;
+    flex-shrink: 0;
+    padding: 4px;
+    gap: 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.home-view-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 32px;
+    padding: 0 var(--space-3);
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-2);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.home-view-btn:hover {
+    color: var(--text);
+}
+
+.home-view-btn--active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow);
+}
+
+.home-view-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-full);
+    background: var(--surface-3);
+    color: var(--text-2);
+    font-size: 0.75rem;
+    font-weight: var(--fw-semibold);
+}
+
+.home-view-btn--active .home-view-count {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+}
+
+.home-view-toggle--small .home-view-btn {
+    min-height: 28px;
+    font-size: 0.8125rem;
+}
+
+/* -- Sections ----------------------------------------------------- */
+.home-section,
+.home-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.home-section-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
-    flex-wrap: wrap;
 }
 
-.sports-section-title {
+.home-section-title {
     margin: 0;
     font-size: 1.125rem;
-    font-weight: var(--fw-medium);
+    font-weight: var(--fw-semibold);
     letter-spacing: -0.01em;
     color: var(--text);
 }
 
-/* -- Sports grid -------------------------------------------------- */
-.sports-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: var(--space-4);
-    width: 100%;
-}
-
-/* -- My games ----------------------------------------------------- */
-.my-conf-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-}
-
-.skeleton-container {
+.home-list {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
 }
 
-.my-conf-filters {
+/* -- Group chips -------------------------------------------------- */
+.home-group-chips {
     display: flex;
-    gap: var(--space-2);
     flex-wrap: wrap;
+    gap: var(--space-2);
 }
 
-.my-conf-filter {
-    flex: 1;
-    min-width: 160px;
-    min-height: 36px;
-    padding: 0 var(--space-3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--surface-3);
-    color: var(--text);
-    font-size: 0.875rem;
-}
-
-.my-conf-filter:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-ring);
-}
-
-.my-conf-section {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-}
-
-.my-conf-section--past,
-.my-conf-section--cancelled {
-    opacity: 0.7;
-}
-
-.my-conf-section-title {
-    display: flex;
+.home-group-chip {
+    display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    margin: 0;
-    font-size: 0.8125rem;
+    min-height: 36px;
+    padding: 0 var(--space-3) 0 var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.875rem;
     font-weight: var(--fw-medium);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--text-2);
-    text-shadow: none;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.my-conf-list {
+.home-group-chip:hover {
+    border-color: var(--border-2);
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+.home-group-chip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-full);
+    background: var(--surface-3);
+    font-size: 0.8125rem;
+}
+
+.home-group-chip-role {
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-size: 0.6875rem;
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* -- Organizer event row ------------------------------------------ */
+.home-event {
+    display: grid;
+    grid-template-columns: 160px 1fr auto;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.home-event:hover {
+    border-color: var(--border-2);
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+.home-event-day {
+    font-size: 0.875rem;
+    font-weight: var(--fw-semibold);
+    color: var(--accent-text);
+}
+
+.home-event-body {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-1);
+    min-width: 0;
 }
 
-.listing-state {
+.home-event-group {
+    font-size: 1rem;
+    font-weight: var(--fw-semibold);
+    color: var(--text);
+}
+
+.home-event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    font-size: 0.8125rem;
+    color: var(--text-2);
+}
+
+.home-event-cta {
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    color: var(--accent-text);
+    white-space: nowrap;
+}
+
+/* -- Empty / loading ---------------------------------------------- */
+.home-empty {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
     padding: var(--space-6);
     border: 1px dashed var(--border-2);
     border-radius: var(--radius);
+    background: var(--surface);
     text-align: center;
+}
+
+.home-empty p {
+    margin: 0;
     color: var(--text-2);
 }
 
-.listing-state a {
-    color: var(--accent-text);
+.home-empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.home-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
 }
 
 /* -- Responsive --------------------------------------------------- */
 @media (max-width: 768px) {
-    .sports-shell {
+    .home {
         gap: var(--space-5);
     }
 
-    .sports-hero {
+    .home-hero,
+    .home-hero--landing {
         flex-direction: column;
         align-items: stretch;
         padding: var(--space-5);
     }
 
-    .sports-hero-cta {
-        justify-content: center;
+    .home-view-toggle {
+        align-self: flex-start;
     }
 
-    .sports-toolbar {
+    .home-section-head {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
+        gap: var(--space-2);
     }
 
-    .sports-grid {
+    .home-event {
         grid-template-columns: 1fr;
+        gap: var(--space-2);
     }
 }

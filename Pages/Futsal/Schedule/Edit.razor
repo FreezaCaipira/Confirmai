@@ -33,7 +33,7 @@
         {
             <div class="detail-not-found">
                 <h2>@Ui["Futsal.ScheduleNotFound"]</h2>
-                <a href="/meus-eventos?esporte=futsal">← @Ui["Common.Back"]</a>
+                <a href="/">← @Ui["Common.Back"]</a>
             </div>
         }
         else if (accessDenied)
@@ -41,7 +41,7 @@
             <div class="detail-not-found">
                 <h2>@Ui["Futsal.AccessDenied"]</h2>
                 <p>@Ui["Futsal.OnlyCreatorCanEditSchedule"]</p>
-                <a href="/meus-eventos?esporte=futsal">← @Ui["Common.Back"]</a>
+                <a href="/">← @Ui["Common.Back"]</a>
             </div>
         }
         else
@@ -157,7 +157,7 @@
 
                 <div class="form-actions">
                     <button class="cancel-btn" type="button"
-                            @onclick='() => NavigationManager.NavigateTo("/meus-eventos?esporte=futsal")'>
+                            @onclick='() => NavigationManager.NavigateTo($"/futsal/schedule?groupId={scheduleGroupId}")'>
                         @Ui["Common.Cancel"]
                     </button>
                     <button class="save-btn" type="submit" disabled="@isSaving">

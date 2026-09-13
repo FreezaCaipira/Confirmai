@@ -208,19 +208,6 @@ public class FutsalRefactoringE2ETests : IClassFixture<IntegrationTestWebAppFact
     // ──────────────────────────────────────────────────────────────────
 
     [Fact]
-    public async Task Regression_FutsalIndex_StillListsEvents()
-    {
-        await _factory.SeedFutsalEventAsync(creatorId: "e2e-regression-list");
-        var client = AnonymousClient();
-
-        var response = await client.GetAsync("/futsal");
-        var content = await ReadContentAsync(response);
-
-        Assert.NotNull(content);
-        Assert.Contains("futsal", content.ToLower());
-    }
-
-    [Fact]
     public async Task Regression_EventDetail_NavigationWorks()
     {
         var eventId = await _factory.SeedFutsalEventAsync(creatorId: "e2e-regression-nav");
