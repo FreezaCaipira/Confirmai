@@ -1,330 +1,112 @@
-/* ── Card base ───────────────────────────── */
+/* Sport card (C35): one neutral surface, one accent. Sport identity
+   comes from the icon only; the per-sport palettes were retired. */
+
 .sport-card {
     display: flex;
     flex-direction: column;
-    border-radius: 8px;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
     text-decoration: none;
-    color: var(--ci-text);
-    background: var(--ci-bg-card);
-    position: relative;
-    overflow: hidden;
+    transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .sport-card:hover {
-    transform: translateY(-3px);
+    border-color: var(--border-2);
+    background: var(--surface-2);
+    color: var(--text);
 }
 
 .sport-card:focus-visible {
-    outline: 2px solid var(--ci-accent-mid);
+    outline: 2px solid var(--accent-ring);
     outline-offset: 2px;
 }
 
-/* ── Card header (similar to players-group-header) ── */
+/* -- Header ------------------------------------------------------- */
 .sport-card-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0.42rem 0.85rem;
-    border-radius: 8px 8px 0 0;
-    border: 1px solid var(--ci-border-alt);
-    border-bottom: none;
+    gap: var(--space-3);
 }
 
-/* ── Futsal header ───────────────────────── */
-.sport-card--futsal .sport-card-header {
-    background: linear-gradient(180deg, var(--futsal-bg-dark) 0%, var(--futsal-green-dark) 100%);
-    border-color: var(--green-bright);
-    box-shadow: inset 0 1px 0 rgba(187, 247, 208, 0.30);
-}
-
-
-/* ── Poker header ───────────────────────── */
-.sport-card--poker .sport-card-header {
-    background: linear-gradient(180deg, var(--poker-bg-deepest) 0%, var(--poker-bg-dark) 100%);
-    border-color: var(--poker-accent);
-    box-shadow: inset 0 1px 0 rgba(196, 181, 253, 0.30);
-}
-
-
-/* ── Volleyball header ───────────────────── */
-.sport-card--volleyball .sport-card-header {
-    background: linear-gradient(180deg, var(--volleyball-bg-deepest) 0%, var(--volleyball-bg-dark) 100%);
-    border-color: var(--volleyball-border);
-    box-shadow: inset 0 1px 0 rgba(251, 191, 36, 0.30);
-}
-
-
-/* ── Beach Tennis header ─────────────────── */
-.sport-card--beachtennis .sport-card-header {
-    background: linear-gradient(180deg, var(--beachtennis-bg-deepest) 0%, var(--beachtennis-bg-dark) 100%);
-    border-color: var(--beachtennis-border);
-    box-shadow: inset 0 1px 0 rgba(251, 146, 60, 0.30);
-}
-
-
-/* ── Footvolley header ───────────────────── */
-.sport-card--footvolley .sport-card-header {
-    background: linear-gradient(180deg, var(--footvolley-bg-deepest) 0%, var(--footvolley-bg-dark) 100%);
-    border-color: var(--footvolley-accent);
-    box-shadow: inset 0 1px 0 rgba(56, 189, 248, 0.30);
-}
-
-
-/* ── Chess header ───────────────────────── */
-.sport-card--chess .sport-card-header {
-    background: linear-gradient(180deg, var(--chess-bg-deepest) 0%, var(--chess-bg-dark) 100%);
-    border-color: var(--chess-accent);
-    box-shadow: inset 0 1px 0 rgba(156, 163, 175, 0.30);
-}
-
-
-/* ── Card body ──────────────────────────── */
-.sport-card-body {
-    padding: 1.25rem 1.5rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    border: 1px solid var(--ci-border-alt);
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    background: linear-gradient(180deg, var(--ci-bg-card) 0%, var(--ci-bg) 100%);
-    position: relative;
-    overflow: hidden;
-}
-
-.sport-card--futsal .sport-card-body {
-    border-color: var(--green-bright);
-    background: linear-gradient(180deg, var(--futsal-green-dark) 0%, var(--futsal-bg-dark) 50%, var(--ci-bg) 100%);
-}
-
-.sport-card--futsal .sport-card-body::after {
-    content: "\26BD";
-    position: absolute;
-    bottom: -0.5rem;
-    right: -0.3rem;
-    font-size: 5.5rem;
-    opacity: 0.08;
-    pointer-events: none;
+.sport-card-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    font-size: 1.25rem;
     line-height: 1;
 }
 
-.sport-card--poker .sport-card-body {
-    border-color: var(--poker-accent);
-    background: linear-gradient(180deg, var(--poker-bg-dark) 0%, var(--poker-bg-deepest) 50%, var(--ci-bg) 100%);
-}
-
-.sport-card--poker .sport-card-body::after {
-    content: "\1F0CF";
-    position: absolute;
-    bottom: -0.5rem;
-    right: -0.3rem;
-    font-size: 5.5rem;
-    opacity: 0.08;
-    pointer-events: none;
-    line-height: 1;
-}
-
-/* ── Volleyball body ───────────────────── */
-.sport-card--volleyball .sport-card-body {
-    border-color: var(--volleyball-border);
-    background: linear-gradient(180deg, var(--volleyball-bg-dark) 0%, var(--volleyball-bg-deepest) 50%, var(--ci-bg) 100%);
-}
-
-.sport-card--volleyball .sport-card-body::after {
-    content: "🏐";
-    position: absolute;
-    bottom: -0.5rem;
-    right: -0.3rem;
-    font-size: 5.5rem;
-    opacity: 0.08;
-    pointer-events: none;
-    line-height: 1;
-}
-
-/* ── Beach Tennis body ─────────────────── */
-.sport-card--beachtennis .sport-card-body {
-    border-color: var(--beachtennis-border);
-    background: linear-gradient(180deg, var(--beachtennis-bg-dark) 0%, var(--beachtennis-bg-deepest) 50%, var(--ci-bg) 100%);
-}
-
-.sport-card--beachtennis .sport-card-body::after {
-    content: "\1F3BE";
-    position: absolute;
-    bottom: -0.5rem;
-    right: -0.3rem;
-    font-size: 5.5rem;
-    opacity: 0.08;
-    pointer-events: none;
-    line-height: 1;
-}
-
-/* ── Footvolley body ───────────────────── */
-.sport-card--footvolley .sport-card-body {
-    border-color: var(--footvolley-accent);
-    background: linear-gradient(180deg, var(--footvolley-bg-dark) 0%, var(--footvolley-bg-deepest) 50%, var(--ci-bg) 100%);
-}
-
-.sport-card--footvolley .sport-card-body::after {
-    content: "\26BD";
-    position: absolute;
-    bottom: -0.5rem;
-    right: -0.3rem;
-    font-size: 5.5rem;
-    opacity: 0.08;
-    pointer-events: none;
-    line-height: 1;
-}
-
-/* ── Chess body ───────────────────────── */
-.sport-card--chess .sport-card-body {
-    border-color: var(--chess-accent);
-    background: linear-gradient(180deg, var(--chess-bg-dark) 0%, var(--chess-bg-deepest) 50%, var(--ci-bg) 100%);
-}
-
-.sport-card--chess .sport-card-body::after {
-    content: "\265F";
-    position: absolute;
-    bottom: -0.5rem;
-    right: -0.3rem;
-    font-size: 5.5rem;
-    opacity: 0.08;
-    pointer-events: none;
-    line-height: 1;
-}
-
-/* ── Card parts ──────────────────────────── */
 .sport-card-label {
-    font-size: 0.73rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    text-align: center;
+    flex: 1;
+    min-width: 0;
+    font-size: 1rem;
+    font-weight: var(--fw-medium);
+    color: var(--text);
 }
 
 .sport-card-badge {
-    font-size: 0.65rem;
-    font-weight: 700;
+    flex-shrink: 0;
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-2);
+    background: var(--surface-3);
+    color: var(--text-2);
+    font-size: 0.6875rem;
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.02em;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 4px;
-    padding: 0.2rem 0.5rem;
-    color: var(--white);
 }
 
-.sport-card--futsal .sport-card-label {
-    color: var(--futsal-green-pale);
+/* -- Body --------------------------------------------------------- */
+.sport-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
 }
-
-.sport-card--poker .sport-card-label {
-    color: var(--poker-text);
-}
-
-.sport-card--volleyball .sport-card-label {
-    color: var(--volleyball-text-pale);
-}
-
-.sport-card--beachtennis .sport-card-label {
-    color: var(--beachtennis-text-pale);
-}
-
-.sport-card--footvolley .sport-card-label {
-    color: var(--footvolley-text-pale);
-}
-
-.sport-card--chess .sport-card-label {
-    color: var(--chess-text-pale);
-}
-
 
 .sport-card-desc {
-    font-size: 0.92rem;
-    color: var(--ci-text-blue);
     margin: 0;
+    font-size: 0.875rem;
     line-height: 1.5;
+    color: var(--text-2);
 }
 
 .sport-card-events {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--ci-text-muted);
-    padding: 0.3rem 0.6rem;
-    border-radius: 6px;
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border);
+    gap: var(--space-2);
     align-self: flex-start;
-}
-
-.sport-card-events i {
-    font-size: 0.72rem;
-    color: var(--ci-accent);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    color: var(--accent-text);
+    font-size: 0.75rem;
+    font-weight: var(--fw-medium);
 }
 
 .sport-card-events--empty {
-    color: var(--ci-text-subtle);
-    opacity: 0.7;
-}
-
-.sport-card-events--empty i {
-    color: var(--ci-text-subtle);
-}
-
-.sport-card--futsal .sport-card-events:not(.sport-card-events--empty) i {
-    color: var(--green-bright);
-}
-
-.sport-card--poker .sport-card-events:not(.sport-card-events--empty) i {
-    color: var(--poker-accent);
-}
-
-.sport-card--volleyball .sport-card-events:not(.sport-card-events--empty) i {
-    color: var(--volleyball-accent);
-}
-
-.sport-card--beachtennis .sport-card-events:not(.sport-card-events--empty) i {
-    color: var(--beachtennis-accent);
-}
-
-.sport-card--footvolley .sport-card-events:not(.sport-card-events--empty) i {
-    color: var(--footvolley-accent);
-}
-
-.sport-card--chess .sport-card-events:not(.sport-card-events--empty) i {
-    color: var(--chess-accent);
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-3);
 }
 
 .sport-card-cta {
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--ci-accent);
-    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: auto;
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    color: var(--accent-text);
 }
 
-.sport-card--futsal .sport-card-cta {
-    color: var(--green-bright);
-}
-
-.sport-card--poker .sport-card-cta {
-    color: var(--poker-text);
-}
-
-.sport-card--volleyball .sport-card-cta {
-    color: var(--link-info);
-}
-
-.sport-card--beachtennis .sport-card-cta {
-    color: var(--beachtennis-cta);
-}
-
-.sport-card--footvolley .sport-card-cta {
-    color: var(--footvolley-accent);
-}
-
-.sport-card--chess .sport-card-cta {
-    color: var(--chess-accent);
-}

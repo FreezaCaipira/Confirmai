@@ -1,0 +1,331 @@
+/* ================================================================
+   CONFIRMAI — APP SHELL (C35)
+
+   Restyles the MainLayout shell (header, nav, frame, widgets, footer)
+   on top of tokens.css. Loaded after entity-shell.css on purpose: the
+   legacy .oldsite-* rules there stay untouched until C36 replaces them;
+   this file is the single place that defines how the shell looks now.
+   ================================================================ */
+
+/* -- Page -------------------------------------------------------- */
+body .oldsite-page {
+    padding: 0 0 var(--space-6);
+    background: var(--bg);
+}
+
+/* -- Header ------------------------------------------------------ */
+body .oldsite-header {
+    width: 100%;
+    max-width: none;
+    margin: 0 0 var(--space-5);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: 0 var(--space-5);
+    min-height: 60px;
+    text-align: left;
+}
+
+body .oldsite-logo-wrap {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: 0;
+    border: none;
+    background: none;
+    background-image: none;
+    box-shadow: none;
+    overflow: visible;
+    flex-shrink: 0;
+}
+
+body .oldsite-logo-wrap::before,
+body .oldsite-logo-wrap::after,
+body .oldsite-logo-art {
+    display: none;
+}
+
+body .oldsite-logo {
+    font-size: 1.2rem;
+    font-weight: var(--fw-bold);
+    letter-spacing: -0.01em;
+    text-transform: none;
+    color: var(--text);
+}
+
+body .oldsite-tagline {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-3);
+    letter-spacing: 0;
+}
+
+/* -- Top nav ----------------------------------------------------- */
+body .oldsite-top-nav {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    gap: var(--space-1);
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+body .oldsite-top-nav a,
+body .oldsite-top-nav .oldsite-top-nav-link,
+body .oldsite-top-nav .oldsite-top-nav-user,
+body .oldsite-top-nav .oldsite-top-nav-logout {
+    min-height: 36px;
+    padding: 0 var(--space-3);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-2);
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    text-shadow: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+body .oldsite-top-nav a:hover,
+body .oldsite-top-nav a:focus-visible {
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+body .oldsite-top-nav a:focus-visible {
+    outline: 2px solid var(--accent-ring);
+    outline-offset: 1px;
+}
+
+body .oldsite-top-nav .oldsite-top-nav-user {
+    color: var(--text);
+}
+
+body .oldsite-top-nav .oldsite-top-nav-mailbox-icon {
+    border: none;
+}
+
+body .oldsite-top-nav .oldsite-mailbox-glyph,
+body .oldsite-top-nav .oldsite-profile-glyph {
+    filter: brightness(0) saturate(100%) invert(70%);
+}
+
+body .oldsite-top-nav .oldsite-top-nav-unread {
+    background: var(--accent);
+    color: var(--accent-fg);
+}
+
+body .nav-language-flags {
+    position: static;
+    transform: none;
+    order: 99;
+    margin-left: var(--space-2);
+    padding: 0 var(--space-2);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    min-height: 32px;
+    gap: var(--space-2);
+}
+
+body .nav-language-flags .language-flag-card.active {
+    box-shadow: 0 0 0 2px var(--accent);
+}
+
+body .nav-flex-spacer {
+    display: none;
+}
+
+.mobile-menu-toggle,
+.mobile-menu-toggle:hover {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    box-shadow: none;
+    transform: none;
+}
+
+/* -- Frame (center + right column) ------------------------------- */
+body .oldsite-frame {
+    width: min(1280px, calc(100% - 2 * var(--space-5)));
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: var(--space-5);
+    align-items: start;
+}
+
+body .oldsite-center-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+body .oldsite-main-content,
+body .oldsite-main-content:hover,
+body .main-content.main-content,
+body .main-content.main-content:hover,
+body .main-content.main-content.main-content-route-padded {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+body .oldsite-main-content h1,
+body .oldsite-main-content h2,
+body .oldsite-main-content h3 {
+    color: var(--text);
+    text-shadow: none;
+}
+
+/* -- News ticker ------------------------------------------------- */
+body .layout-news-ticker {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-2);
+    box-shadow: none;
+    font-size: 0.875rem;
+}
+
+body .layout-news-ticker strong {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-full);
+    color: var(--accent-text);
+    text-shadow: none;
+    letter-spacing: 0;
+}
+
+/* -- Right column widgets ---------------------------------------- */
+body .oldsite-right-column {
+    gap: var(--space-4);
+}
+
+body .oldsite-widget,
+body .oldsite-widget:hover {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: none;
+}
+
+body .oldsite-widget h3 {
+    padding: var(--space-3) var(--space-4);
+    background: transparent;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    text-transform: none;
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+}
+
+body .oldsite-widget p,
+body .oldsite-widget small,
+body .oldsite-widget ol {
+    padding: var(--space-3) var(--space-4);
+    color: var(--text-2);
+    font-size: 0.8125rem;
+}
+
+body .oldsite-widget ol {
+    padding-left: calc(var(--space-4) + 1rem);
+}
+
+body .oldsite-widget ol li {
+    border-bottom: none;
+    padding: var(--space-1) 0;
+}
+
+body .oldsite-widget a {
+    color: var(--text-2);
+    text-decoration: none;
+}
+
+body .oldsite-widget a:hover {
+    color: var(--text);
+}
+
+/* -- Footer ------------------------------------------------------ */
+body .oldsite-footer {
+    width: min(1280px, calc(100% - 2 * var(--space-5)));
+    margin: var(--space-6) auto 0;
+    padding: var(--space-4) 0 0;
+    border: none;
+    border-top: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-3);
+    font-size: 0.8125rem;
+}
+
+/* -- Breadcrumb -------------------------------------------------- */
+body .breadcrumb-nav {
+    font-size: 0.8125rem;
+    color: var(--text-3);
+}
+
+body .breadcrumb-nav a {
+    color: var(--text-2);
+}
+
+body .breadcrumb-nav a:hover {
+    color: var(--text);
+}
+
+/* -- Responsive -------------------------------------------------- */
+@media (max-width: 980px) {
+    body .oldsite-frame {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    body .oldsite-right-column {
+        grid-column: auto;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    body .oldsite-header {
+        flex-wrap: wrap;
+        padding: var(--space-3) var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+
+    body .oldsite-frame,
+    body .oldsite-footer {
+        width: calc(100% - 2 * var(--space-4));
+    }
+
+    body .oldsite-top-nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        box-shadow: var(--shadow-card);
+    }
+
+    body .oldsite-top-nav .nav-language-flags {
+        order: -1;
+        margin: 0;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        border-radius: 0;
+        background: var(--surface);
+    }
+
+    body .oldsite-top-nav .oldsite-top-nav-link,
+    body .oldsite-top-nav .oldsite-top-nav-user,
+    body .oldsite-top-nav .oldsite-top-nav-logout {
+        border-radius: 0;
+        border-bottom: 1px solid var(--border);
+        padding: var(--space-3) var(--space-4);
+    }
+
+    body .oldsite-right-column {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

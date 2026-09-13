@@ -24,21 +24,23 @@
 
     <div class="sports-shell">
 
-    <div class="sports-back-row">
-        <a href="/grupos" class="detail-back-link">
-            <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
+    <header class="sports-hero">
+        <div class="sports-hero-text">
+            <h1 class="sports-hero-title">@Ui["Index.HeroTitle"]</h1>
+            <p class="sports-hero-sub">@Ui["Index.HeroSubtitle"]</p>
+        </div>
+        <a href="/grupos" class="sports-hero-cta">
+            <i class="fas fa-layer-group" aria-hidden="true"></i> @Ui["Groups.Title"]
         </a>
-        <a href="/grupos" class="btn-view-groups">
-            <i class="fas fa-layer-group"></i> @Ui["Groups.Title"]
-        </a>
-    </div>
+    </header>
 
     @if (!string.IsNullOrWhiteSpace(userId) && userGroupCount == 0)
     {
         <NoGroupsHint ShowGroupsButton="true" />
     }
 
-    <div class="sports-tabs">
+    <div class="sports-toolbar">
+        <h2 class="sports-section-title">@Ui["Index.SportsAvailable"]</h2>
         <CitySelector
             SelectedCityKey="@SelectedCityKey"
             SelectedCityKeyChanged="SelectedCityKeyChanged"

@@ -1,11 +1,14 @@
 @using Confirmai.Enums
+@using Confirmai.Services.Core
+@inject UiTextService Ui
 
 <a href="@Href" class="sport-card sport-card--@SportClass">
     <div class="sport-card-header">
-        <span class="sport-card-label">@Icon @Name</span>
+        <span class="sport-card-icon" aria-hidden="true">@Icon</span>
+        <span class="sport-card-label">@Name</span>
         @if (ComingSoon)
         {
-            <span class="sport-card-badge">Em breve</span>
+            <span class="sport-card-badge">@Ui["Index.ComingSoon"]</span>
         }
     </div>
     <div class="sport-card-body">
