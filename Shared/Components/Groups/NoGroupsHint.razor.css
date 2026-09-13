@@ -1,10 +1,10 @@
 .onboarding-hint {
-    max-width: 560px;
-    margin: 0 auto 1.25rem;
-    padding: 1rem 1.2rem;
-    border-radius: 12px;
-    background: linear-gradient(180deg, rgba(79, 156, 248, 0.08) 0%, rgba(79, 156, 248, 0.03) 100%);
-    border: 1px solid var(--ci-accent-mid);
+    max-width: none;
+    margin: 0;
+    padding: var(--space-5);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
 }
 
 .onboarding-hint-header {
@@ -13,20 +13,20 @@
     gap: 0.5rem;
     margin-bottom: 0.75rem;
     font-size: 0.95rem;
-    font-weight: 800;
-    color: var(--ci-accent);
+    font-weight: var(--fw-medium);
+    color: var(--text);
 }
 
 .onboarding-hint-header i {
     font-size: 1.1rem;
+    color: var(--accent-text);
 }
 
 .onboarding-hint-intro {
     margin: 0 0 0.75rem;
     font-size: 0.85rem;
     line-height: 1.45;
-    color: var(--ci-text);
-    opacity: 0.85;
+    color: var(--text-2);
 }
 
 .onboarding-steps {
@@ -48,10 +48,10 @@
     width: 1.5rem;
     height: 1.5rem;
     border-radius: 50%;
-    background: var(--ci-accent-mid);
-    color: var(--white);
+    background: var(--accent);
+    color: var(--accent-fg);
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: var(--fw-bold);
     flex-shrink: 0;
 }
 
@@ -63,4 +63,17 @@
 
 ::deep .btn-view-groups {
     margin-top: 1rem;
+    background: var(--surface-3);
+    border: 1px solid var(--border-2);
+    color: var(--text);
+    font-weight: var(--fw-medium);
+    text-shadow: none;
+    box-shadow: none;
+}
+
+::deep .btn-view-groups:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-fg);
+    box-shadow: none;
 }

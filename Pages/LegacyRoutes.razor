@@ -1,0 +1,18 @@
+@page "/futsal"
+@page "/poker"
+@page "/dashboard"
+@page "/meus-eventos"
+@page "/minhas-confirmacoes"
+@attribute [AllowAnonymous]
+@using Microsoft.AspNetCore.Authorization
+@inject NavigationManager Navigation
+@inject UiTextService Ui
+
+<PageTitle>@Ui["Common.Redirecting"]</PageTitle>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.NavigateTo("/", replace: true);
+    }
+}

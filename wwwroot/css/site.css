@@ -86,25 +86,25 @@
     /* -- Typography (aliased to CI font) -- */
     --font-display: var(--ci-font);
 
-    /* â”€â”€ Confirmai dark navy tokens (use these for all new code) â”€â”€ */
-    --ci-bg:           #090f18;
-    --ci-bg-card:      #111927;
-    --ci-bg-card-deep: #0d1825;
-    --ci-bg-input:     #07111d;
-    --ci-accent:       #4f9cf8;
-    --ci-accent-mid:   #1a5ab0;
-    --ci-accent-dark:  #0d3270;
-    --ci-border:       #1b3d6c;
-    --ci-border-dim:   #1a5298;
-    --ci-text:         #f1f5f9;
-    --ci-text-blue:    #deeeff;
-    --ci-text-link:    #7ab6ff;
-    --ci-text-link-bright: #bae6fd;
-    --ci-text-muted:   #8aacc8;
-    --ci-text-subtle:  #6082a0;
-    --ci-text-info:    #8fc2f3;
-    --ci-text-info-strong: #b7dbff;
-    --ci-font:         -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    /* -- Confirmai component vars: aliases of tokens.css (C35) -- */
+    --ci-bg:           var(--bg);
+    --ci-bg-card:      var(--surface);
+    --ci-bg-card-deep: var(--surface-2);
+    --ci-bg-input:     var(--surface-3);
+    --ci-accent:       var(--accent-text);
+    --ci-accent-mid:   var(--accent);
+    --ci-accent-dark:  var(--accent-hover);
+    --ci-border:       var(--border);
+    --ci-border-dim:   var(--border-2);
+    --ci-text:         var(--text);
+    --ci-text-blue:    var(--text);
+    --ci-text-link:    var(--accent-text);
+    --ci-text-link-bright: #93c5fd;
+    --ci-text-muted:   var(--text-2);
+    --ci-text-subtle:  var(--text-3);
+    --ci-text-info:    #93c5fd;
+    --ci-text-info-strong: #bfdbfe;
+    --ci-font:         var(--font);
 
     /* ── Google Sign-In branding (fixed by definition of branding) ── */
     --google-btn-bg:      #ffffff;
@@ -131,9 +131,9 @@
     --amber:           #fbbf24;   /* poker/alert accent */
 
     /* â”€â”€ Cool surfaces extras â”€â”€ */
-    --ci-surface-muted:  #cbd5e1; /* disabled text, placeholders */
-    --ci-surface-light:  #e0f2fe; /* info highlights, badges */
-    --ci-border-soft:    #1b3868; /* alternate border shade */
+    --ci-surface-muted:  #d4d4d8; /* disabled text, placeholders */
+    --ci-surface-light:  #e4e4e7; /* info highlights, badges */
+    --ci-border-soft:    var(--border); /* alternate border shade */
 
     /* â”€â”€ Poker/violet theme â”€â”€ */
     --poker-accent:      #a78bfa; /* poker badges, headers */
@@ -144,8 +144,8 @@
     --link-info:         #93c5fd; /* collision links, info links */
 
     /* â”€â”€ Neutral â”€â”€ */
-    --text-muted-gray:   #888;    /* secondary text, timestamps */
-    --slate-muted:       #94a3b8; /* tertiary text */
+    --text-muted-gray:   var(--text-3); /* secondary text, timestamps */
+    --slate-muted:       var(--text-2); /* tertiary text */
 
     /* â”€â”€ Ciclo 6 â€” Novas vars â”€â”€ */
 
@@ -186,29 +186,29 @@
     --chess-bg-deepest:    #111827;
 
     /* CI extras */
-    --ci-bg-deepest:       #050810;
-    --ci-accent-light:     #7dd3fc;
-    --ci-bg-alt:           #0a1928;
-    --ci-border-alt:       #1a3a5c;
+    --ci-bg-deepest:       var(--bg);
+    --ci-accent-light:     #93c5fd;
+    --ci-bg-alt:           var(--surface);
+    --ci-border-alt:       var(--border);
 
     /* Status extras */
-    --red-strong:          #ef4444;
+    --red-strong:          var(--danger);
     --red-pale:            #fecaca;
     --red-lightest:        #fef2f2;
     --amber-light:         #fcd34d;
     --amber-warm:          #fde68a;
 
     /* Neutrals */
-    --slate-light:         #e2e8f0;
-    --slate-mid:           #64748b;
+    --slate-light:         #e4e4e7;
+    --slate-mid:           var(--text-3);
 
     /* â”€â”€ Ciclo 6 â€” Shadow/Opacity vars â”€â”€ */
     
     /* Black opacity shadows */
-    --shadow-md:           rgba(0, 0, 0, 0.3);
-    --shadow-lg:           rgba(0, 0, 0, 0.4);
-    --shadow-xl:           rgba(0, 0, 0, 0.3);
-    --shadow-2xl:          rgba(0, 0, 0, 0.6);
+    --shadow-md:           rgba(0, 0, 0, 0.2);
+    --shadow-lg:           rgba(0, 0, 0, 0.25);
+    --shadow-xl:           rgba(0, 0, 0, 0.25);
+    --shadow-2xl:          rgba(0, 0, 0, 0.3);
     
     /* Accent shadows */
     --shadow-accent-sm:    var(--accent-opacity-md);
@@ -234,11 +234,11 @@
     --overlay-lg:          rgba(0, 0, 0, 0.55);
     
     /* Accent blue opacity */
-    --accent-opacity-sm:   rgba(79, 156, 248, 0.2);
-    --accent-opacity-md:   rgba(79, 156, 248, 0.3);
-    --accent-opacity-lg:   rgba(79, 156, 248, 0.4);
-    --accent-opacity-xl:   rgba(79, 156, 248, 0.5);
-    --accent-opacity-2xl:  rgba(79, 156, 248, 0.6);
+    --accent-opacity-sm:   rgba(59, 130, 246, 0.2);
+    --accent-opacity-md:   rgba(59, 130, 246, 0.3);
+    --accent-opacity-lg:   rgba(59, 130, 246, 0.4);
+    --accent-opacity-xl:   rgba(59, 130, 246, 0.5);
+    --accent-opacity-2xl:  rgba(59, 130, 246, 0.6);
     
     /* Green opacity */
     --green-opacity-sm:    rgba(74, 222, 128, 0.2);
@@ -277,9 +277,9 @@
     --white:               #ffffff;
 
     /* CI navy extras (gradients, deep surfaces) */
-    --ci-bg-mid:           #112240;
-    --ci-bg-deep:          #0d1825;
-    --ci-bg-dark:          #0a1f35;
+    --ci-bg-mid:           var(--surface-2);
+    --ci-bg-deep:          var(--surface);
+    --ci-bg-dark:          var(--surface);
 
     /* Green spectrum */
     --green-strong:        #15803d;
@@ -310,22 +310,22 @@
     --pink-mid:            #f472b6;
 
     /* Slate extras */
-    --slate-dark:          #334155;
-    --slate-pale:          #e2e8f0;
+    --slate-dark:          var(--border-2);
+    --slate-pale:          #e4e4e7;
     --slate-warm:          #78716c;
 
     /* â”€â”€ Ciclo 9 Fase 1 â€” novas vars rgba â”€â”€ */
 
     /* Accent subtle (blue-400 low opacity) */
-    --accent-opacity-xs:   rgba(79, 156, 248, 0.1);
-    --accent-opacity-2xs:  rgba(79, 156, 248, 0.15);
+    --accent-opacity-xs:   rgba(59, 130, 246, 0.1);
+    --accent-opacity-2xs:  rgba(59, 130, 246, 0.15);
 
     /* Green mid opacity */
     --green-opacity-xl:    rgba(74, 222, 128, 0.5);
     --green-opacity-2xl:   rgba(74, 222, 128, 0.6);
 
     /* Black heavy */
-    --shadow-3xl:          rgba(0, 0, 0, 0.7);
+    --shadow-3xl:          rgba(0, 0, 0, 0.35);
 
     /* Blue-300 (96,165,250) â€” cor diferente de accent (79,156,248) */
     --blue300-opacity-xs:  rgba(96, 165, 250, 0.1);
@@ -368,10 +368,10 @@
     --slate-border-xl:     rgba(148, 163, 184, 0.3);
 
     /* Navy/CI accent (26,90,176) */
-    --ci-accent-opacity-xs: rgba(26, 90, 176, 0.12);
-    --ci-accent-opacity-sm: rgba(26, 90, 176, 0.18);
-    --ci-accent-opacity-md: rgba(26, 90, 176, 0.2);
-    --ci-accent-opacity-lg: rgba(26, 90, 176, 0.25);
+    --ci-accent-opacity-xs: rgba(59, 130, 246, 0.12);
+    --ci-accent-opacity-sm: rgba(59, 130, 246, 0.18);
+    --ci-accent-opacity-md: rgba(59, 130, 246, 0.2);
+    --ci-accent-opacity-lg: rgba(59, 130, 246, 0.25);
 
     /* Slate functional (100,116,139) */
     --slate-functional-md: rgba(100, 116, 139, 0.3);
@@ -521,7 +521,7 @@
    ================================================================ */
 html,
 body {
-    background: var(--ci-bg-card);
+    background: var(--bg);
     color: var(--ci-text);
     font-family: var(--ci-font);
     margin: 0;
@@ -1165,7 +1165,7 @@ body::before {
 /* â”€â”€ Page background â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 html,
 body {
-    background: var(--ci-bg-card);
+    background: var(--bg);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     color: var(--ci-text);
 }

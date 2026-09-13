@@ -60,12 +60,8 @@
                     </div>
                     <AuthorizeView>
                         <Authorized>
+                            <a href="/" class="oldsite-top-nav-link"><i class="fas fa-calendar-check" aria-hidden="true"></i> @T["Nav.Sports"]</a>
                             <a href="/grupos" class="oldsite-top-nav-link"><i class="fas fa-users" aria-hidden="true"></i> @T["Groups.Title"]</a>
-                        </Authorized>
-                    </AuthorizeView>
-                    <a href="/eventos" class="oldsite-top-nav-link"><span class="nav-icon-cycle" aria-hidden="true"><i class="fas fa-futbol nav-icon--a"></i><span class="nav-icon--b">🃏</span></span> @T["Nav.Sports"]</a>
-                    <AuthorizeView>
-                        <Authorized>
                             <a href="/payments" class="oldsite-top-nav-link"><i class="fas fa-wallet" aria-hidden="true"></i> @T["Nav.Payments"]</a>
                             <AuthorizeView Policy="ServerAdmin">
                             <Authorized Context="gmContext">
@@ -131,13 +127,6 @@
                 <aside class="oldsite-right-column">
                     <ActivePaymentMethodsWidget />
 
-                    <section class="oldsite-widget">
-                        <h3>Eventos</h3>
-                        <ol>
-                            <li><a href="/futsal">Futsal</a></li>
-                            <li><a href="/poker">Poker</a></li>
-                        </ol>
-                    </section>
 
 
                 </aside>

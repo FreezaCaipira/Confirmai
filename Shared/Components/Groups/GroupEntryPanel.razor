@@ -1,0 +1,48 @@
+@using Confirmai.Services.Core
+@inject UiTextService Ui
+@inject NavigationManager NavigationManager
+
+<div class="group-entry">
+    <div class="group-entry-option">
+        <p class="group-entry-label"><i class="fas fa-key" aria-hidden="true"></i> @Ui["Groups.JoinCode"]</p>
+        <p class="group-entry-hint">@Ui["Group.JoinCodeHint"]</p>
+        <form class="group-entry-row" @onsubmit="JoinWithCode" @onsubmit:preventDefault>
+            <input class="group-entry-input" type="text" maxlength="8"
+                   placeholder="Ex: ABCD1234" aria-label="@Ui["Groups.JoinCode"]"
+                   @bind="joinCode" @bind:event="oninput" />
+            <button class="group-entry-btn" type="submit" disabled="@(joinCode.Trim().Length == 0)">
+                @Ui["Groups.Enter"]
+            </button>
+        </form>
+        @if (!string.IsNullOrWhiteSpace(joinCodeError))
+        {
+            <p class="group-entry-error" role="alert">@joinCodeError</p>
+        }
+    </div>
+
+    <div class="group-entry-divider" aria-hidden="true"><span>@Ui["Groups.Or"]</span></div>
+
+    <div class="group-entry-option">
+        <p class="group-entry-label"><i class="fas fa-plus" aria-hidden="true"></i> @Ui["Groups.CreateNew"]</p>
+        <p class="group-entry-hint">@Ui["GroupEntry.CreateHint"]</p>
+        <a href="/grupos/criar" class="group-entry-btn group-entry-btn--secondary">
+            @Ui["Groups.CreateNew"]
+        </a>
+    </div>
+</div>
+
+@code {
+    private string joinCode = string.Empty;
+    private string joinCodeError = string.Empty;
+
+    private void JoinWithCode()
+    {
+        var code = joinCode.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            joinCodeError = Ui["GroupEntry.CodeRequired"];
+            return;
+        }
+        NavigationManager.NavigateTo($"/convite/{code}");
+    }
+}
