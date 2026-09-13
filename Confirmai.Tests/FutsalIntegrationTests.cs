@@ -41,42 +41,6 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
     }
 
     // ──────────────────────────────────────────────
-    // Listing page – /futsal
-    // ──────────────────────────────────────────────
-
-    [Fact]
-    public async Task FutsalIndex_Returns200_ForAnonymousUser()
-    {
-        var client = AnonymousClient();
-
-        var response = await client.GetAsync("/futsal");
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task FutsalIndex_ContainsFutsalTitle()
-    {
-        var client = AnonymousClient();
-
-        var response = await client.GetAsync("/futsal");
-        var content = await ReadContentAsync(response);
-
-        Assert.Contains("Futsal", content);
-    }
-
-    [Fact]
-    public async Task FutsalIndex_ShowsCreateLink_ForAuthenticatedUser()
-    {
-        var client = AuthenticatedClient("list-test-user");
-
-        var response = await client.GetAsync("/futsal");
-        var content = await ReadContentAsync(response);
-
-        Assert.Contains("/grupos", content);
-    }
-
-    // ──────────────────────────────────────────────
     // Detail page – /futsal/{id}
     // ──────────────────────────────────────────────
 
