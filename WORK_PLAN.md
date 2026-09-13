@@ -632,6 +632,13 @@ Nao mudar o valor da taxa nem a matematica do V2; nao criar isencao por usuario 
 
 **Por que assim**: 10 ciclos de CSS retocaram pagina por pagina e o resultado ainda parece "primitivo" (palavras do Robson). Os exemplos que ele mandou tem um sistema de **poucos tokens**; o nosso tem 236 vars e 3 paletas. Retocar de novo produziria uma 4a camada.
 
+**Ferramenta CSS (pergunta do Robson, decisao do Senior): NAO entra framework.** Tailwind/Bootstrap exigiria reescrever o markup de ~50 componentes com CSS isolation e adicionar pipeline Node ao build .NET, para chegar onde tokens + CSS puro chegam. Para garantir a qualidade **sem** framework:
+1. **Referencia numerica, nao gosto**: os tokens seguem o **shadcn/ui dark (paleta zinc + acento azul)** -- e o sistema por tras dos dashboards de referencia do Robson e sao so valores CSS. O Pleno copia os valores; nao inventa tom.
+2. **Contraste medido**: toda combinacao texto/superficie com razao AA (>= 4.5:1) registrada no PR e verificada por teste (parser das vars + calculo de contraste), nao por olho.
+3. **Criterio de aceite escrito** para o piloto: card = `--surface` + borda 1px + `--radius` 12 + espacamento 24; sem gradiente de fundo; sem sombra pesada; 1 acento; tipografia com 3 pesos.
+4. **Plano B**: se o piloto reprovar no gate, avaliar Tailwind **so** no Dashboard antes de espalhar -- nunca o contrario.
+5. Unica dependencia opcional aceita: **Lucide** (icones SVG) no lugar do Font Awesome, se o Pleno mostrar ganho visual no piloto.
+
 ### Fase 1 -- Tokens (`wwwroot/css/tokens.css`, carregado antes de tudo)
 ~14 tokens, e so eles: `--bg` (quase-preto neutro, ex. `#0b0d12`), `--surface` (1 tom acima), `--surface-2` (elevado), `--border` (1px, ~12% de branco), `--text`, `--text-2`, `--text-3`, `--accent` (**um** so, saturado -- **decisao do Robson: azul**), `--accent-fg`, `--success`, `--warning`, `--danger`, `--radius` (12px), `--radius-sm` (8px), `--shadow` (uma, suave). Tudo em `oklch` ou hex com contraste **AA verificado** (texto >= 4.5:1, texto secundario >= 4.5:1 sobre surface, borda visivel). Registrar as razoes de contraste no PR.
 
