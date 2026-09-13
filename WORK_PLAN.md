@@ -566,7 +566,7 @@ Nao mexer no fluxo do dinheiro (pagamento, repasse, taxa) -- esta validado em pr
 
 **Contexto**: o MVP esta funcional em producao (grupos, partidas, confirmacao, pagamento manual, taxa, repasse, login Google/email). O Robson decidiu **lapidar antes de integrar o WhatsApp**: estrutura, UML/casos de uso, layout, botao do Google, auditoria, isencao de taxa por grupo e onboarding. O Senior concordou com a lista e reordenou: **o mapa de casos de uso vem primeiro porque testes, auditoria, onboarding e layout derivam dele**; isencao de taxa antes do layout porque destrava os primeiros clientes agora.
 
-**Ordem**: C33 (casos de uso + testes de integracao em Postgres) -> C34 (isencao de taxa + auditoria + seguranca) -> C35 (design tokens + tela-piloto, **aprovacao do Robson antes de espalhar**) -> C36 (layout geral + hero + botao Google + onboarding) -> C31 Evolution -> C32 pre-producao.
+**Ordem**: C33 (casos de uso + testes de integracao em Postgres) -> C34 (isencao de taxa + auditoria + seguranca) -> C35 (design tokens + tela-piloto, **aprovacao do Robson antes de espalhar**) -> C36-A (Senior, FEITO: grupo como unica porta de entrada) -> C36-B (Pleno: propagar o padrao + botao Google + onboarding) -> C31 Evolution -> C32 pre-producao.
 
 **Regra de ouro em todos**: TDD, SOLID, i18n (regra 25), CSS so com vars, build `--no-incremental` 0 warning, suite completa verde, 1 commit por fase, **blocos de build/test colados no PR (regra 28 -- PR sem isso volta sem review)**.
 
@@ -654,30 +654,76 @@ Nao espalhar para outras telas neste ciclo; nao introduzir framework CSS; nao cr
 
 ---
 
-## Ciclo 36 (Pleno) -- Layout geral no padrao aprovado + botao Google + onboarding [PLANEJADO -- depois do gate do C35]
+## Ciclo 36 -- Layout geral no padrao aprovado + botao Google + onboarding
 
-### Fase 1 -- Propagar o padrao do piloto
-Grupo, partida, poker, Profile, pagamento/repasse (o "layout do pagamento" que o Robson adiou entra aqui), Admin. Remover, por tela, CSS isolado que so existia para compensar a paleta antiga. Meta mensuravel: **reduzir** linhas de `*.razor.css` (registrar antes/depois no PR).
+**Estado (14/06/2026)**: C35 (PR #112) **aprovado pelo Robson** ("melhorou muito"; "agora parece um layout moderno, os elementos tem acabamento e suavidade"). **C36-A feito pelo Senior** (PR #113, mergeada): o grupo e a unica porta de entrada -- `/` virou "Minhas partidas" (chips dos meus grupos, toggle Jogo/Organizo, empty state entrar/criar grupo), vitrine por cidade/esporte removida (`Futsal/Index`, `Poker/Index`, `Dashboard`, `MyEvents`, `MyConfirmations`, `EventListingShell`, `CitySelector`, `SportCard`, `CityContext`, `CityService`), rotas legadas com redirect em `Pages/LegacyRoutes.razor`, nav = Partidas / Grupos / Pagamentos. **O restante (C36-B, abaixo) e do Pleno**: o core esta pronto e serve de base; e aplicacao sistematica, tela a tela.
 
-### Fase 2 -- Botao do Google conforme branding da Google
-Componente proprio (`GoogleSignInButton` partial/cshtml) seguindo as guidelines: fundo `#131314` no tema escuro, borda `#8E918F`, logo colorido 18px, Roboto 500 14px, texto via i18n ("Continuar com o Google"). Nao herda `.btn`. Aplicar em Login e Register. Print lado a lado com o botao local.
+### Direcao do Robson para o C36-B (ler antes de tocar em CSS)
+1. **Manter o escuro como esta** (fundo `--bg`, cards `--surface` + borda 1px `--border` + raio `--radius`).
+2. **Usar mais o azul** -- o azul da tag "Novidades" (`--accent-soft` fundo + `--accent-text` texto; botao cheio `--accent`) -- **para direcionar o usuario ao fluxo desejado**, nao como decoracao. Regra: **em cada tela existe UM proximo passo, e ele e o unico elemento azul cheio.** Tudo que nao e o proximo passo fica em cinza (`--surface-2`/`--border-2`/`--text-2`).
+3. Elementos que "se mantiveram como antes" (print da tela `/grupos`: cards com fundo/borda vermelha ou azul por esporte, botoes verdes "Ver Partidas"/"Entrar", caixa de convite com borda azul cheia, cookie banner em navy + verde) **precisam ser atualizados** para o novo padrao.
 
-### Fase 3 -- Onboarding por **empty state**, nao por tour
-Decisao do Robson: "onboarding ninguem le, por isso a UX/UI tem que ser intuitiva -- a tela de partidas precisa deixar claro que o user precisa fazer parte de um grupo para poder jogar". **Regra geral**: toda tela cujo conteudo depende de um pre-requisito (estar num grupo, ter Pix, ter partida) mostra, no lugar da lista vazia, **o pre-requisito + o CTA que o resolve**. Nunca lista vazia muda, nunca so "nenhuma partida".
-Derivado do mapa de UCs do C33:
-0. **Tela de partidas sem grupo** (o caso apontado pelo Robson): "Partidas acontecem dentro de um grupo. Entre com um codigo de convite ou crie o seu" + os 2 CTAs. Mesma mensagem em qualquer atalho que leve a partida sem grupo (menu, dashboard, link direto).
-1. Sem grupo -> a propria tela explica "crie um grupo ou entre com um codigo de convite" com os 2 CTAs (ja existe `NoGroupsHint`; ampliar).
-2. Grupo sem partida (organizador) -> CTA "criar a primeira partida" com 1 frase do que acontece depois.
-3. Organizador sem Pix tentando criar partida paga -> aviso **bloqueante** com link para o Profile (hoje so aviso no grupo).
-4. Checklist de 3 passos no dashboard do organizador (Pix cadastrado, 1a partida criada, convite enviado) que **some** quando completo. Estado derivado dos dados, nao flag no banco.
-5. Jogador convidado: primeira tela apos entrar pelo convite mostra a proxima partida e o botao de confirmar -- nada mais.
+### Vocabulario de cor (unico permitido; teste de contraste do C35 continua valendo)
+| Papel | Token | Exemplo |
+|---|---|---|
+| Acao primaria (o proximo passo da tela) | `--accent` fundo + `--accent-fg` texto | "Criar partida", "Confirmar presenca", "Entrar" (com codigo), "Salvar" |
+| Acao secundaria | `--surface-2` fundo + `--border-2` borda + `--text` | "Cancelar", "Ver todas", "Gerenciar" |
+| Link / texto de destaque | `--accent-text` | "Gerenciar grupos ->" |
+| Estado ativo / selecionado / badge informativo | `--accent-soft` fundo + `--accent-text` texto (a tag "Novidades") | toggle ativo, aba ativa, badge "Admin", badge de esporte |
+| Atencao que pede acao do usuario | `--warning-soft` + `--warning` | "Pix pendente", "pagamento em analise" |
+| Sucesso (estado, nunca botao) | `--success-soft` + `--success` | "Pago", "Confirmado" |
+| Erro / destrutivo | `--danger-soft` + `--danger` | "Cancelar partida", validacao |
+
+**Proibido**: verde em botao (verde = estado, nao acao); cor por esporte em fundo/borda de card (esporte vira badge `--accent-soft` com icone); gradiente de fundo; sombra alem de `--shadow`/`--shadow-card`; qualquer hex/rgba novo fora de `tokens.css`; as vars `--futsal-*`, `--poker-*`, `--parchment-*`, `--gold-*`, `--green-*`, `--red-*` em codigo novo (elas continuam existindo como alias, mas a meta e **zerar os usos** nas telas do fluxo principal).
+
+### Fase 1 -- `/grupos` (a tela do print) e `/grupo/{id}` (hub)
+Arquivos: `Pages/Groups/Index.razor(.css)`, `wwwroot/css/event-listing.css` (`.group-card*`, `.groups-*`), `Pages/Groups/Detail.razor(.css)`, `Shared/Components/Groups/GroupMetrics.razor.css`, `Shared/Components/Groups/NoGroupsHint.razor`.
+- Card de grupo = `--surface` + `--border` + `--radius`, **sem** fundo vermelho/azul: `.group-card--action-required` passa a mostrar a pendencia como badge `--warning-soft` ("Pix pendente") no card, nao como borda vermelha. Badge de esporte em `--accent-soft`. Hover: borda `--border-2` (sem elevar sombra).
+- Bloco "Entrar em outro grupo": **reutilizar `GroupEntryPanel`** (criado no C36-A, `Shared/Components/Groups/GroupEntryPanel.razor`) no lugar do bloco proprio -- apaga o CSS duplicado de `Groups/Index.razor.css`. Como o usuario ja tem grupos, a acao primaria da tela e **"Criar novo grupo"** (azul); "Entrar com codigo" fica secundario. Remover o botao verde "Ver Partidas" (a home ja e isso; a nav "Partidas" leva la).
+- Hub do grupo: abas com estado ativo em `--accent-soft`/`--accent-text` (mesmo toggle da home, classe compartilhada em `wwwroot/css/shell.css` ou novo `wwwroot/css/components.css` -- **um** lugar); acao primaria do organizador = "Criar partida"; do jogador = "Confirmar presenca" na proxima partida.
+- Print antes/depois desktop + mobile (390px) no PR.
+
+### Fase 2 -- Partida (detalhe, criacao, edicao, escalacao) futsal e poker
+Arquivos: `Pages/Futsal/Detail|Create|Edit|Escalacao.razor(.css)`, `Pages/Poker/Detail|Create|Edit.razor(.css)`, `wwwroot/css/event-detail.css`, `event-create.css`, `events.css`, `escalacao.css`, `Shared/Components/ConfirmationCard.razor.css`.
+- Detalhe: um so CTA azul, que muda com o estado do usuario -- nao confirmado -> "Confirmar presenca"; confirmado e nao pago -> "Pagar"; pago -> nenhum botao azul, badge `--success-soft` "Pago". Lista de confirmados em linhas `--surface-2` com avatar; goleiro/linha como badge `--accent-soft`, nao cor propria.
+- Criacao/edicao: formulario em card unico, campos `--surface-3` + borda `--border`, foco `--accent-ring`; "Criar partida" azul, "Cancelar" secundario.
+- Zerar `--futsal-*`/`--poker-*` nessas telas (esporte = badge + icone).
+
+### Fase 3 -- Pagamento e repasse (o "layout do pagamento" adiado pelo Robson)
+Arquivos: `Pages/Payment/Payment|ViewPayment|PaymentsHistory.razor(.css)` (`Payment.razor.css` tem **32 gradientes**), `Pages/Groups/Payments.razor(.css)` (35 sombras), `Shared/Components/Groups/GroupDetailPaymentsModal.razor.css`, `Pages/Groups/Components/PixReceiverSelector|PayoutAccountEditor.razor.css`.
+- Status de pagamento em badges do vocabulario (`--warning` em analise, `--success` pago, `--danger` rejeitado); QR/Pix copia-e-cola em card `--surface-2`; "Enviar comprovante" e "Confirmar recebimento" sao os CTAs azuis das respectivas telas.
+- **Nao mudar nenhuma regra ou fluxo de pagamento** -- so classes/CSS. Bug encontrado -> PR separado.
+
+### Fase 4 -- Profile, cookie banner, Identity, Admin
+- `Pages/Profile.razor(.css)` + `Pages/Components/Profile/*.razor.css`: header do perfil sem gradiente; "Salvar" azul nos dois blocos (ja unificado em `buttons.css`, verificar).
+- `Shared/Components/CookieConsent.razor.css`: fundo `--surface`, borda `--border`, "Aceitar tudo" azul, "Recusar opcionais" secundario, "Personalizar" link `--accent-text`. Sem gradiente navy, sem verde.
+- `wwwroot/css/identity.css` + `Areas/Identity/Pages/*.cshtml`: mesmos tokens; "Entrar"/"Cadastrar" azul.
+- `wwwroot/css/admin.css` (27 gradientes, 43 sombras) e `Pages/Admin/*.razor.css`: so tokens; admin nao precisa de polimento visual, precisa parar de destoar.
+
+### Fase 5 -- Botao do Google conforme branding da Google
+Componente proprio (partial `_GoogleSignInButton.cshtml`) seguindo as guidelines: fundo `#131314` no tema escuro, borda `#8E918F`, logo colorido 18px, Roboto 500 14px, texto via i18n ("Continuar com o Google"). **Excecao unica** a regra de hex fora de `tokens.css` (cores impostas pela Google; comentar isso no CSS). Nao herda `.btn`. Aplicar em Login e Register. Print lado a lado com o botao local.
+
+### Fase 6 -- Onboarding por **empty state** (o que sobrou apos o C36-A)
+Regra geral (decisao do Robson): toda tela cujo conteudo depende de um pre-requisito mostra **o pre-requisito + o CTA azul que o resolve**, nunca lista vazia. Ja feito no C36-A: sem grupo (home), sem partida confirmada, organizador sem partida ("Criar partida em X"). Falta:
+1. Grupo sem partida, visto de dentro do grupo (`/grupo/{id}` e `/grupo/{id}/partidas`) -> CTA "Criar a primeira partida" + 1 frase do que acontece depois; para o jogador, "O organizador ainda nao marcou a proxima partida".
+2. Organizador sem Pix tentando criar partida **paga** -> aviso **bloqueante** no formulario com link para o Profile (`#pix`).
+3. Checklist de 3 passos no hub do grupo para o admin (Pix cadastrado, 1a partida criada, convite enviado) que **some** quando completo. Estado derivado dos dados, nao flag no banco.
+4. Jogador que entrou pelo convite cai no hub do grupo mostrando a proxima partida e "Confirmar presenca" -- nada mais.
 Sem biblioteca de tour; sem modal de boas-vindas.
 
-### Fase 4 -- Titulo do hero
-Uma linha que diga o que o produto faz para quem chega sem contexto ("Organize o racha, confirme presenca e receba sem cobrar um por um" -- proposta; Robson decide), subtitulo com os 3 verbos, CTA unico. i18n nos 3 idiomas.
+### Fase 7 -- Titulo do hero (landing deslogada)
+Hoje: "Organize o racha da sua turma sem dor de cabeca" (`Index.LandingTitle`). Robson decide o texto final; proposta alternativa: "Organize o racha, confirme presenca e receba sem cobrar um por um". Subtitulo com os 3 verbos, CTA unico azul ("Criar conta"), "Entrar" secundario. i18n nos 3 idiomas.
+
+### Metricas e evidencias obrigatorias no PR (uma PR por fase, nesta ordem)
+- Linhas de `*.razor.css` + `wwwroot/css/*.css` **antes/depois** (a meta e reduzir: CSS que so compensava a paleta antiga sai).
+- `grep -c "linear-gradient"` antes/depois por arquivo tocado (meta: 0 nas telas do fluxo principal).
+- `grep -cE "\-\-(futsal|poker|parchment|gold|green|red)-"` antes/depois nos arquivos tocados.
+- Print desktop (1366) e mobile (390) de cada tela, antes/depois, PT.
+- `DesignTokensContrastTests` verde; se precisar de token novo, adiciona em `tokens.css` **com** o par de contraste no teste.
+- Testes anti-hardcode e de paridade i18n verdes; todo texto novo em PT/EN/ES.
 
 ### O que NAO fazer
-Nao mudar fluxo funcional durante o redesenho (se achar bug, PR separado); nao adicionar animacao alem de transicoes de 150ms.
+Nao mudar fluxo funcional durante o redesenho (bug -> PR separado); nao criar token fora de `tokens.css`; nao usar verde/vermelho/roxo como cor de acao; nao adicionar framework CSS nem biblioteca de icones sem aprovacao do Senior; nao "melhorar" a home do C36-A alem de aplicar as classes compartilhadas; nao adicionar animacao alem de transicoes de 150ms; nao tocar em `Pages/Admin/ParchmentLab.razor` (laboratorio, sera removido em ciclo proprio).
 
 ---
 
