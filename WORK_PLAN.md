@@ -145,10 +145,11 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 **O V1 esta funcionalmente completo e a divida tecnica do repasse esta encerrada (C29).** Daqui pra frente o caminho critico nao e mais codigo de feature -- e **operacao**: o que falta depende de credenciais/decisoes do Robson.
 
 1. ~~Mergear a PR de review do C29~~ feito. ~~C30 / C30-B~~ feitos e validados em prod (#96-#105, #107).
-2. **Ciclo 30-C -- achados dos testes do Robson em prod** (planejado abaixo, **executavel agora pelo Pleno**): preview da imagem no criar grupo, EN/ES dos dicionarios de produto, `.mk-btn` unico, pagina `/error` server-side, dividas do Identity.
-3. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): **desbloqueado e planejado**. Robson escolheu **Evolution API** (self-hosted, nao-oficial) disparando no **grupo de WhatsApp do grupo do sistema**, nao em DM. Detalhe no Ciclo 31.
-4. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
-5. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
+2. ~~Ciclo 30-C~~ feito (#109, review + correcao #110).
+3. **PROGRAMA DE LAPIDACAO POS-MVP (C33-C36)** -- decisao do Robson (14/06/2026) de lapidar **antes** da Evolution: casos de uso + testes em Postgres (C33) -> isencao de taxa por grupo + auditoria do dinheiro + seguranca (C34) -> design tokens + tela-piloto com gate do Robson (C35) -> layout geral + botao Google + onboarding (C36). Detalhe nas secoes proprias.
+4. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): **desbloqueado e planejado**. Robson escolheu **Evolution API** (self-hosted, nao-oficial) disparando no **grupo de WhatsApp do grupo do sistema**, nao em DM. Detalhe no Ciclo 31.
+5. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
+6. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
 
 **Se o C30 e o C31 seguirem bloqueados**, o unico ciclo de codigo executavel agora e o **C32 (pre-producao)** -- ele nao depende de ninguem e e pre-requisito de go-live de qualquer forma. E a recomendacao do Senior enquanto as credenciais nao chegarem.
 
@@ -468,7 +469,7 @@ Na pratica: **a feature ainda nao existe para o usuario**. O saldo acumula e nin
 
 ---
 
-## Ciclo 30-C (Pleno) -- Achados dos testes do Robson em producao: preview de imagem, EN/ES, botoes, pagina de erro e dividas do Identity [PLANEJADO -- EXECUTAVEL AGORA]
+## Ciclo 30-C (Pleno) -- Achados dos testes do Robson em producao: preview de imagem, EN/ES, botoes, pagina de erro e dividas do Identity [EXECUTADO -- PR #109, ver review acima]
 
 **Contexto**: o Robson percorreu o fluxo inteiro em `https://confirmai.m2gpju.easypanel.host` -- login Google, cadastro por email, criar grupo, Pix no Profile, partida, pagamento, repasse -- e **esta funcional de ponta a ponta**. Tres bloqueadores achados no caminho ja foram corrigidos pelo Senior e estao na `main`: campo de Pix que nao existia no Profile (#105, regressao do C26), botao Salvar do Pix sem estilo (#106) e **segundo login Google quebrando** por FK no audit log (#107, bug desde o commit original do OAuth). Sobraram 5 itens nao-bloqueantes, que sao este ciclo. Layout geral do fluxo de pagamento/repasse fica para um ciclo futuro (decisao do Robson).
 
@@ -543,6 +544,131 @@ Nao bloqueiam, mas o Pleno as declarou e elas fecham o C30-B:
 ### O que NAO fazer
 
 Nao mexer no fluxo do dinheiro (pagamento, repasse, taxa) -- esta validado em prod. Nao redesenhar o layout do pagamento/repasse (Robson deixou para depois). Nao comecar o C31 (Evolution) -- espera a Fase 0 operacional do Robson. Nao adicionar bUnit para testar render: os testes deste ciclo sao de service/convencao/integracao, e a validacao visual e por print no PR.
+
+---
+
+## Review Senior do Ciclo 30-C (PR #109, mergeada na `main`) -- APROVADO com 1 correcao
+
+**Resultado por fase**: as 5 fases entregues no escopo. EN/ES completos (Group 221, Futsal 149, Poker 103) e os 3 dicionarios no `I18nKeyParityTests`; preview via `RequestImageFileAsync(320,320)` + `StateHasChanged` + 4 mensagens em i18n; `/error` virou Razor Page server-side com `RequestId`, `Error.razor` removido; `.mk-btn` base unico em `buttons.css` + `MkBtnConventionTests`; 13 telas do Identity com heading/footer, `role="alert"`, `aria-describedby`; `ForgotPasswordConfirmation` com conteudo. CI verde.
+
+**Correcao aplicada pelo Senior (PR #110)**: na Fase 3 a base foi unificada, mas o override de cor/gradiente ficou em `ProfileEditForm.razor.css` -- o Salvar do Pix (`Profile.razor`, sem CSS isolado) recebia o visual global chapado e o achado do Robson continuava. O visual do ProfileEditForm agora **e** a definicao global; #106 fechada como superada.
+
+**Ressalvas (entram no proximo ciclo do Pleno, nao bloqueiam)**:
+1. Bloco "### Build" do PR **vazio** -- regra 28 nao cumprida. Sem build/suite colados, a review nao deveria comecar.
+2. `ErrorPageIntegrationTests` so faz `GET /error`; nao prova o caminho real (excecao -> re-execucao). Falta endpoint de teste que lanca e assere o HTML da pagina de erro, nao o `_Host`.
+3. Anti-hardcode em `.razor.cs` nasceu com **29 strings em `ResidualAllowlist`** -- reintroduz o padrao que o C29 zerou. Vira fase de migracao (C33), nao divida permanente.
+4. Sem teste do teto de tamanho do `logoPreview` (plano pedia <= 100 KB). Aceito sem bUnit; registrado.
+5. Verificacao visual EN/ES pendente com o Robson.
+
+---
+
+## PROGRAMA DE LAPIDACAO POS-MVP (decisao do Robson, 14/06/2026) -- Ciclos 33 a 36, antes da Evolution
+
+**Contexto**: o MVP esta funcional em producao (grupos, partidas, confirmacao, pagamento manual, taxa, repasse, login Google/email). O Robson decidiu **lapidar antes de integrar o WhatsApp**: estrutura, UML/casos de uso, layout, botao do Google, auditoria, isencao de taxa por grupo e onboarding. O Senior concordou com a lista e reordenou: **o mapa de casos de uso vem primeiro porque testes, auditoria, onboarding e layout derivam dele**; isencao de taxa antes do layout porque destrava os primeiros clientes agora.
+
+**Ordem**: C33 (casos de uso + testes de integracao em Postgres) -> C34 (isencao de taxa + auditoria + seguranca) -> C35 (design tokens + tela-piloto, **aprovacao do Robson antes de espalhar**) -> C36 (layout geral + hero + botao Google + onboarding) -> C31 Evolution -> C32 pre-producao.
+
+**Regra de ouro em todos**: TDD, SOLID, i18n (regra 25), CSS so com vars, build `--no-incremental` 0 warning, suite completa verde, 1 commit por fase, **blocos de build/test colados no PR (regra 28 -- PR sem isso volta sem review)**.
+
+### Diagnostico do Senior (o que a inspecao do repo mostrou)
+
+- **Auditoria**: 68 chamadas `AuditAsync`, 76 eventos em `AuditEvents`, todos usados. O buraco e **no caminho do dinheiro**: `PlatformFeeSettlementService` (envio, confirmacao e rejeicao do repasse pelo admin) e `PixProofUploadService` (upload do comprovante) tem **zero** audit. Ou seja: o que mais precisa de rastro e o que menos tem.
+- **Testes**: `IntegrationTestWebAppFactory` e `TestDataFactory` usam **InMemory**; nao ha Testcontainers. Foi isso que deixou passar o FK do segundo login Google (#107). O CI ja tem Postgres (2 testes so passam la).
+- **Isencao de taxa**: nao existe nada (`FeeOptions` e global; `EventConfirmation.PlatformFeeAmount` e o snapshot por pagamento). Bom: o snapshot e exatamente o ponto certo para gravar zero.
+- **CSS**: 236 variaveis em `site.css`, varias so alias de outras (`--bg-deep: var(--ci-bg-card-deep)`), paletas parchment/dourado/azul competindo. O que os exemplos do Robson tem e o oposto: 1 fundo neutro quase-preto, superficie 1 tom acima, borda 1px sutil, raio 12-16px, 1 acento saturado, resto em cinzas, espaco generoso.
+- **Botao Google**: `Login.cshtml` ja tem o `google-g.svg`, mas o botao usa a mesma classe/visual do login local. A Google exige (branding guidelines) fundo branco ou `#131314`, borda `#747775`/`#8E918F`, Roboto 500 14px, logo colorido 18px e texto "Continuar com o Google"/"Continue with Google".
+- **UML**: `docs/` tem deploy, runbooks e checklist -- **nenhum** diagrama de fluxo.
+
+---
+
+## Ciclo 33 (Pleno) -- Mapa de casos de uso por ator + testes de integracao em Postgres [PLANEJADO -- EXECUTAVEL AGORA]
+
+**Objetivo**: saber, por escrito e com ID, tudo que Jogador, Organizador e Admin podem fazer; e que cada caso de uso critico tenha teste de integracao rodando contra **Postgres real**.
+
+### Fase 1 -- Diagramas em `docs/uml/` (Mermaid, versionado; nada de imagem solta)
+1. `casos-de-uso.md`: 3 diagramas (`flowchart`/`graph` Mermaid), um por ator -- **Jogador**, **Organizador** (inclui tudo do Jogador), **Admin da plataforma**. Cada caso de uso com ID estavel `UC-J-01`, `UC-O-01`, `UC-A-01`... e uma linha: pre-condicao, resultado, tela/rota, service que executa. Levantar a lista **lendo `Pages/` e os `[Authorize]`**, nao de memoria.
+2. `estados.md`: diagrama de estados (`stateDiagram-v2`) de **`EventConfirmation`** (pendente -> pago manual -> rejeitado/estornado, lista de espera -> promovido) e do **lote de repasse** (`PlatformFeeSettlement`: rascunho -> em analise -> confirmado/rejeitado). Sao os 2 objetos que carregam dinheiro.
+3. `sequencia-pagamento-manual.md`: `sequenceDiagram` do caminho jogador -> QR -> comprovante -> organizador confirma -> snapshot da taxa -> ledger -> repasse -> admin.
+4. Em cada UC: coluna **"Teste"** com o nome do teste que o cobre, ou `FALTA`. Essa coluna e o produto da fase.
+
+### Fase 2 -- Postgres nos testes de integracao
+1. Adicionar **Testcontainers.PostgreSql** (dependencia de teste; aprovada pelo Senior por ser a unica forma de pegar FK/unique/transacao). `IntegrationTestWebAppFactory` passa a subir Postgres; manter InMemory **so** nos testes unitarios de service que nao dependem de constraint.
+2. No CI ja existe Postgres: usar `POSTGRES_CONNECTION` do ambiente quando definido (evita Docker-in-Docker); local usa Testcontainers.
+3. Primeiro teste novo: **reproduzir o bug da #107** (audit com `UserId` invalido deve falhar em Postgres) -- e o teste que provaria que a infraestrutura pega o que o InMemory deixou passar.
+
+### Fase 3 -- Fechar os `FALTA` criticos
+Escrever teste de integracao para todo UC marcado `FALTA` que envolva **dinheiro, permissao ou dado de outro usuario**. Os demais viram backlog listado no proprio `casos-de-uso.md`.
+
+### Fase 4 -- Migrar as 29 strings do `ResidualAllowlist` (ressalva 3 do C30-C)
+Zerar a allowlist do anti-hardcode em `.razor.cs`. Chaves em PT/EN/ES, paridade garantida pelo teste.
+
+### O que NAO fazer
+Nao gerar diagrama de classes do dominio inteiro (ruido); nao adicionar bUnit; nao mexer em layout.
+
+---
+
+## Ciclo 34 (Pleno) -- Isencao de taxa por grupo + auditoria do caminho do dinheiro + revisao de seguranca [PLANEJADO -- depois do C33]
+
+### Fase 1 -- Isencao de taxa da plataforma por grupo (primeiros clientes)
+Decisao do Robson: grupos escolhidos nao pagam a taxa, para crescer organicamente. Travas do Senior:
+1. **So o admin da plataforma** liga/desliga, em `AdminUserView`/tela de grupo do admin -- **nao** e opcao do organizador. `Group.PlatformFeeWaivedUntil` (`DateTime?`) + `Group.PlatformFeeWaiverReason` (texto curto) + migration. Isencao **sempre com prazo**; sem prazo nao existe (evita desconto eterno esquecido). Admin pode renovar.
+2. A taxa continua sendo **calculada e registrada como zero** no snapshot (`EventConfirmation.PlatformFeeAmount = 0`) e no ledger -- **nunca pulada**. O repasse continua funcionando com lotes de R$ 0 excluidos da selecao. Assim voce sabe quanto deixou de cobrar (metrica de aquisicao no `AdminRevenue`: "isento no periodo").
+3. Regra unica em um service (`PlatformFeePolicy` ou equivalente): `Resolve(group, now) -> fee`. `GroupPaymentsService`, `EventPayment` e `EventPaymentSummary` consomem daqui; **nenhum** `ManualPlatformFeeFixed` lido direto fora dele.
+4. UI do jogador: QR e resumo mostram `15,00` sem a linha da taxa quando isento (nao "taxa: R$ 0,00").
+5. Audit `GroupFeeWaiverChanged` (quem, grupo, ate quando, motivo). Testes: isento antes/depois do prazo, snapshot zero, ledger zero, organizador nao consegue ligar.
+
+### Fase 2 -- Auditoria onde falta (achado do diagnostico)
+Novos eventos e chamadas: `SettlementSubmitted`, `SettlementConfirmed`, `SettlementRejected` (com motivo) em `PlatformFeeSettlementService`; `ProofUploaded` / `ProofReplaced` em `PixProofUploadService`; `GroupJoinRequested/Approved/Rejected`; `UserProfileUpdated` quando **chave Pix** muda (e dado de recebimento). Cada um com teste que assere a linha em `Logs`. Revisar o mapa de UCs do C33: **todo UC que muda dinheiro ou permissao tem audit** -- coluna nova "Audit" no `casos-de-uso.md`.
+
+### Fase 3 -- Revisao de seguranca focada (nao varredura generica)
+Ja houve 2 varreduras (C19, P0-P2 entregues). Aqui: (a) Fase A do C32 antecipada -- testes **adversariais** do caminho manual (jogador marcando o proprio pagamento, membro enviando repasse, comprovante de terceiro pelos endpoints, upload com content-type falsificado); (b) `IDOR` em toda rota com `{id}` listada no mapa de UCs; (c) rate limit nos endpoints de upload e no `ExternalLogin`. Onde falhar, corrigir **no service**.
+
+### O que NAO fazer
+Nao mudar o valor da taxa nem a matematica do V2; nao criar isencao por usuario ou por partida.
+
+---
+
+## Ciclo 35 (Pleno + Robson) -- Design tokens + tela-piloto [PLANEJADO -- depois do C34; **gate de aprovacao do Robson**]
+
+**Por que assim**: 10 ciclos de CSS retocaram pagina por pagina e o resultado ainda parece "primitivo" (palavras do Robson). Os exemplos que ele mandou tem um sistema de **poucos tokens**; o nosso tem 236 vars e 3 paletas. Retocar de novo produziria uma 4a camada.
+
+### Fase 1 -- Tokens (`wwwroot/css/tokens.css`, carregado antes de tudo)
+~14 tokens, e so eles: `--bg` (quase-preto neutro, ex. `#0b0d12`), `--surface` (1 tom acima), `--surface-2` (elevado), `--border` (1px, ~12% de branco), `--text`, `--text-2`, `--text-3`, `--accent` (**um** so, saturado -- Robson escolhe entre azul e roxo), `--accent-fg`, `--success`, `--warning`, `--danger`, `--radius` (12px), `--radius-sm` (8px), `--shadow` (uma, suave). Tudo em `oklch` ou hex com contraste **AA verificado** (texto >= 4.5:1, texto secundario >= 4.5:1 sobre surface, borda visivel). Registrar as razoes de contraste no PR.
+
+### Fase 2 -- Remapear as 236 vars atuais para os tokens
+As vars atuais viram **alias** dos tokens (`--ci-bg-card: var(--surface)`), sem tocar nas paginas. Parchment/dourado deixam de existir como cor de fundo; dourado sobrevive so como `--warning` se necessario. Teste de CSS vars continua verde. Prints antes/depois de 5 telas para o Robson ver o efeito global do remapeamento **antes** da fase 3.
+
+### Fase 3 -- Tela-piloto: Dashboard (`Pages/Index`)
+Redesenhar **uma** tela no padrao dos exemplos: cards com `--surface` + `--border` 1px + `--radius`, espacamento 24px, tipografia com 3 pesos, metricas em destaque, sem sombra pesada, sem gradiente de fundo. Hero com titulo curto, subtitulo em `--text-2` e **um** CTA em `--accent`.
+**GATE**: o Robson aprova o piloto (print desktop + mobile) **antes** do C36. Se reprovar, ajusta-se o token, nao a tela.
+
+### O que NAO fazer
+Nao espalhar para outras telas neste ciclo; nao introduzir framework CSS; nao criar tokens alem dos listados sem justificativa no PR.
+
+---
+
+## Ciclo 36 (Pleno) -- Layout geral no padrao aprovado + botao Google + onboarding [PLANEJADO -- depois do gate do C35]
+
+### Fase 1 -- Propagar o padrao do piloto
+Grupo, partida, poker, Profile, pagamento/repasse (o "layout do pagamento" que o Robson adiou entra aqui), Admin. Remover, por tela, CSS isolado que so existia para compensar a paleta antiga. Meta mensuravel: **reduzir** linhas de `*.razor.css` (registrar antes/depois no PR).
+
+### Fase 2 -- Botao do Google conforme branding da Google
+Componente proprio (`GoogleSignInButton` partial/cshtml) seguindo as guidelines: fundo `#131314` no tema escuro, borda `#8E918F`, logo colorido 18px, Roboto 500 14px, texto via i18n ("Continuar com o Google"). Nao herda `.btn`. Aplicar em Login e Register. Print lado a lado com o botao local.
+
+### Fase 3 -- Onboarding por **empty state**, nao por tour
+Derivado do mapa de UCs do C33:
+1. Sem grupo -> a propria tela explica "crie um grupo ou entre com um codigo de convite" com os 2 CTAs (ja existe `NoGroupsHint`; ampliar).
+2. Grupo sem partida (organizador) -> CTA "criar a primeira partida" com 1 frase do que acontece depois.
+3. Organizador sem Pix tentando criar partida paga -> aviso **bloqueante** com link para o Profile (hoje so aviso no grupo).
+4. Checklist de 3 passos no dashboard do organizador (Pix cadastrado, 1a partida criada, convite enviado) que **some** quando completo. Estado derivado dos dados, nao flag no banco.
+5. Jogador convidado: primeira tela apos entrar pelo convite mostra a proxima partida e o botao de confirmar -- nada mais.
+Sem biblioteca de tour; sem modal de boas-vindas.
+
+### Fase 4 -- Titulo do hero
+Uma linha que diga o que o produto faz para quem chega sem contexto ("Organize o racha, confirme presenca e receba sem cobrar um por um" -- proposta; Robson decide), subtitulo com os 3 verbos, CTA unico. i18n nos 3 idiomas.
+
+### O que NAO fazer
+Nao mudar fluxo funcional durante o redesenho (se achar bug, PR separado); nao adicionar animacao alem de transicoes de 150ms.
 
 ---
 
