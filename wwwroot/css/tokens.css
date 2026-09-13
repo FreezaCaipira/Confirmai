@@ -1,0 +1,74 @@
+/* ================================================================
+   CONFIRMAI — DESIGN TOKENS (C35)
+
+   Single source of truth for the visual system. Loaded before every
+   other stylesheet. Palette: neutral dark (zinc-like), one accent
+   (blue). Every legacy variable in site.css :root is an alias of one
+   of these tokens; new code should reference the tokens directly.
+
+   Contrast (WCAG AA, measured — see DesignTokensContrastTests):
+     --text     on --bg / --surface  >= 12:1
+     --text-2   on --bg / --surface  >=  7:1
+     --text-3   on --surface         >=  4.5:1
+     --accent-fg on --accent          >=  4.5:1
+     --accent-text on --bg/--surface  >=  4.5:1 (links)
+   ================================================================ */
+:root {
+    /* -- Surfaces (darkest -> lightest) -------------------------- */
+    --bg:          #09090b;   /* page background            */
+    --surface:     #111114;   /* cards, panels              */
+    --surface-2:   #18181b;   /* nested / hover surface     */
+    --surface-3:   #1f1f23;   /* inputs, active states      */
+
+    /* -- Borders ------------------------------------------------- */
+    --border:      #27272a;   /* default 1px border         */
+    --border-2:    #3f3f46;   /* emphasised / hover border  */
+
+    /* -- Text ---------------------------------------------------- */
+    --text:        #fafafa;   /* primary                    */
+    --text-2:      #a5a5ad;   /* secondary                  */
+    --text-3:      #8a8a93;   /* tertiary / placeholders    */
+
+    /* -- Accent (blue, the only saturated hue) ------------------- */
+    --accent:        #2563eb; /* interactive fill (buttons) */
+    --accent-hover:  #1d4ed8;
+    --accent-fg:     #ffffff; /* text on accent fill        */
+    --accent-text:   #60a5fa; /* links / accent text on dark */
+    --accent-soft:   rgba(59, 130, 246, 0.14); /* tinted backgrounds */
+    --accent-border: rgba(59, 130, 246, 0.40);
+    --accent-ring:   rgba(59, 130, 246, 0.35); /* focus ring         */
+
+    /* -- Semantic ------------------------------------------------ */
+    --success:      #22c55e;
+    --success-soft: rgba(34, 197, 94, 0.14);
+    --warning:      #f59e0b;
+    --warning-soft: rgba(245, 158, 11, 0.14);
+    --danger:       #ef4444;
+    --danger-soft:  rgba(239, 68, 68, 0.14);
+
+    /* -- Shape --------------------------------------------------- */
+    --radius-sm:   8px;
+    --radius:      12px;
+    --radius-lg:   16px;
+    --radius-full: 999px;
+
+    /* -- Elevation (soft, low-contrast) -------------------------- */
+    --shadow:      0 1px 2px rgba(0, 0, 0, 0.30);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.30), 0 8px 24px rgba(0, 0, 0, 0.25);
+
+    /* -- Spacing scale ------------------------------------------- */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+
+    /* -- Typography ---------------------------------------------- */
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --fw-regular: 400;
+    --fw-medium:  500;
+    --fw-semibold: 600;
+    --fw-bold:    700;
+}
