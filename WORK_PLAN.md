@@ -633,7 +633,7 @@ Nao mudar o valor da taxa nem a matematica do V2; nao criar isencao por usuario 
 **Por que assim**: 10 ciclos de CSS retocaram pagina por pagina e o resultado ainda parece "primitivo" (palavras do Robson). Os exemplos que ele mandou tem um sistema de **poucos tokens**; o nosso tem 236 vars e 3 paletas. Retocar de novo produziria uma 4a camada.
 
 ### Fase 1 -- Tokens (`wwwroot/css/tokens.css`, carregado antes de tudo)
-~14 tokens, e so eles: `--bg` (quase-preto neutro, ex. `#0b0d12`), `--surface` (1 tom acima), `--surface-2` (elevado), `--border` (1px, ~12% de branco), `--text`, `--text-2`, `--text-3`, `--accent` (**um** so, saturado -- Robson escolhe entre azul e roxo), `--accent-fg`, `--success`, `--warning`, `--danger`, `--radius` (12px), `--radius-sm` (8px), `--shadow` (uma, suave). Tudo em `oklch` ou hex com contraste **AA verificado** (texto >= 4.5:1, texto secundario >= 4.5:1 sobre surface, borda visivel). Registrar as razoes de contraste no PR.
+~14 tokens, e so eles: `--bg` (quase-preto neutro, ex. `#0b0d12`), `--surface` (1 tom acima), `--surface-2` (elevado), `--border` (1px, ~12% de branco), `--text`, `--text-2`, `--text-3`, `--accent` (**um** so, saturado -- **decisao do Robson: azul**), `--accent-fg`, `--success`, `--warning`, `--danger`, `--radius` (12px), `--radius-sm` (8px), `--shadow` (uma, suave). Tudo em `oklch` ou hex com contraste **AA verificado** (texto >= 4.5:1, texto secundario >= 4.5:1 sobre surface, borda visivel). Registrar as razoes de contraste no PR.
 
 ### Fase 2 -- Remapear as 236 vars atuais para os tokens
 As vars atuais viram **alias** dos tokens (`--ci-bg-card: var(--surface)`), sem tocar nas paginas. Parchment/dourado deixam de existir como cor de fundo; dourado sobrevive so como `--warning` se necessario. Teste de CSS vars continua verde. Prints antes/depois de 5 telas para o Robson ver o efeito global do remapeamento **antes** da fase 3.
@@ -656,7 +656,9 @@ Grupo, partida, poker, Profile, pagamento/repasse (o "layout do pagamento" que o
 Componente proprio (`GoogleSignInButton` partial/cshtml) seguindo as guidelines: fundo `#131314` no tema escuro, borda `#8E918F`, logo colorido 18px, Roboto 500 14px, texto via i18n ("Continuar com o Google"). Nao herda `.btn`. Aplicar em Login e Register. Print lado a lado com o botao local.
 
 ### Fase 3 -- Onboarding por **empty state**, nao por tour
+Decisao do Robson: "onboarding ninguem le, por isso a UX/UI tem que ser intuitiva -- a tela de partidas precisa deixar claro que o user precisa fazer parte de um grupo para poder jogar". **Regra geral**: toda tela cujo conteudo depende de um pre-requisito (estar num grupo, ter Pix, ter partida) mostra, no lugar da lista vazia, **o pre-requisito + o CTA que o resolve**. Nunca lista vazia muda, nunca so "nenhuma partida".
 Derivado do mapa de UCs do C33:
+0. **Tela de partidas sem grupo** (o caso apontado pelo Robson): "Partidas acontecem dentro de um grupo. Entre com um codigo de convite ou crie o seu" + os 2 CTAs. Mesma mensagem em qualquer atalho que leve a partida sem grupo (menu, dashboard, link direto).
 1. Sem grupo -> a propria tela explica "crie um grupo ou entre com um codigo de convite" com os 2 CTAs (ja existe `NoGroupsHint`; ampliar).
 2. Grupo sem partida (organizador) -> CTA "criar a primeira partida" com 1 frase do que acontece depois.
 3. Organizador sem Pix tentando criar partida paga -> aviso **bloqueante** com link para o Profile (hoje so aviso no grupo).
