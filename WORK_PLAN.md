@@ -676,6 +676,18 @@ Nao espalhar para outras telas neste ciclo; nao introduzir framework CSS; nao cr
 
 **Proibido**: verde em botao (verde = estado, nao acao); cor por esporte em fundo/borda de card (esporte vira badge `--accent-soft` com icone); gradiente de fundo; sombra alem de `--shadow`/`--shadow-card`; qualquer hex/rgba novo fora de `tokens.css`; as vars `--futsal-*`, `--poker-*`, `--parchment-*`, `--gold-*`, `--green-*`, `--red-*` em codigo novo (elas continuam existindo como alias, mas a meta e **zerar os usos** nas telas do fluxo principal).
 
+### Fase 0 -- Header (barra superior): respiro nas bordas e ordem dos elementos
+Pedido do Robson (14/06/2026): "o title principal bem como a internacionalizacao estao muito proximos da extremidade; a ordenacao dos elementos do menu superior pode melhorar; a internacionalizacao tinha ficado boa centralizada". Causa: `.oldsite-header` (`wwwroot/css/shell.css`) e um flex de largura total com `padding: 0 var(--space-5)` e a nav em `flex-end`, enquanto o conteudo (`.oldsite-frame`, `entity-shell.css`) e centralizado em `min(1520px, ...)` -- logo e bandeiras encostam na borda da janela, desalinhados do conteudo.
+Fazer (so `Shared/Components/MainLayout.razor` + `shell.css`; nada de logica):
+1. Wrapper interno `.oldsite-header-inner` com **a mesma largura e margem do `.oldsite-frame`** (`width: min(1520px, calc(100% - 0.2rem)); margin: 0 auto; padding: 0 var(--space-6)`), grid de 3 zonas `auto 1fr auto`.
+2. **Esquerda**: logo + tagline (tagline some abaixo de 1024px).
+3. **Centro**: nav principal -- `Partidas · Grupos · Pagamentos` (+ `Admin` para admin, + `Integracao` so quando aplicavel) -- centralizada, item ativo em `--accent-soft`/`--accent-text` (mesma classe do toggle da home). Deslogado: centro vazio.
+4. **Direita**, nesta ordem: idioma (3 bandeiras, `gap: var(--space-1)`), mensagens (icone + badge), avatar/nome (link ao perfil; `"Bem-vindo, email"` vira so o **nome** ou avatar -- o email nao cabe e nao e informacao util no header), `Sair` como link secundario. Deslogado: idioma, `Entrar` (secundario), `Cadastrar` (azul -- e o proximo passo).
+   *Alternativa do Robson*: bandeiras **centralizadas** (ele achou melhor assim antes). Decidir com print das duas variantes no PR: (a) bandeiras a direita antes do usuario, (b) bandeiras centralizadas a direita da nav. Ele escolhe.
+5. Mobile (<= 768px): logo a esquerda, botao Menu a direita; o drawer lista nav, idioma, mensagens, perfil, sair, nesta ordem. Nada encostado: padding `var(--space-4)` no drawer.
+6. Remover o `order: 99` e `margin-left` das bandeiras e qualquer regra do header que sobrou em `site.css`/`MainLayout.razor.css` (um so lugar: `shell.css`).
+Evidencia: print 1366 e 390 antes/depois; medir que a borda esquerda do logo alinha com a borda esquerda do card "Novidades".
+
 ### Fase 1 -- `/grupos` (a tela do print) e `/grupo/{id}` (hub)
 Arquivos: `Pages/Groups/Index.razor(.css)`, `wwwroot/css/event-listing.css` (`.group-card*`, `.groups-*`), `Pages/Groups/Detail.razor(.css)`, `Shared/Components/Groups/GroupMetrics.razor.css`, `Shared/Components/Groups/NoGroupsHint.razor`.
 - Card de grupo = `--surface` + `--border` + `--radius`, **sem** fundo vermelho/azul: `.group-card--action-required` passa a mostrar a pendencia como badge `--warning-soft` ("Pix pendente") no card, nao como borda vermelha. Badge de esporte em `--accent-soft`. Hover: borda `--border-2` (sem elevar sombra).
@@ -714,7 +726,7 @@ Sem biblioteca de tour; sem modal de boas-vindas.
 ### Fase 7 -- Titulo do hero (landing deslogada)
 Hoje: "Organize o racha da sua turma sem dor de cabeca" (`Index.LandingTitle`). Robson decide o texto final; proposta alternativa: "Organize o racha, confirme presenca e receba sem cobrar um por um". Subtitulo com os 3 verbos, CTA unico azul ("Criar conta"), "Entrar" secundario. i18n nos 3 idiomas.
 
-### Metricas e evidencias obrigatorias no PR (uma PR por fase, nesta ordem)
+### Metricas e evidencias obrigatorias no PR (uma PR por fase, nesta ordem; a Fase 0 e a menor e a mais visivel -- comecar por ela)
 - Linhas de `*.razor.css` + `wwwroot/css/*.css` **antes/depois** (a meta e reduzir: CSS que so compensava a paleta antiga sai).
 - `grep -c "linear-gradient"` antes/depois por arquivo tocado (meta: 0 nas telas do fluxo principal).
 - `grep -cE "\-\-(futsal|poker|parchment|gold|green|red)-"` antes/depois nos arquivos tocados.
