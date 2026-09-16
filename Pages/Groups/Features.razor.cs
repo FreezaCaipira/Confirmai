@@ -82,12 +82,12 @@ public partial class Features
             var newValue = await FeaturesService.TogglePostMatchRankingAsync(group.Id, group.EnablePostMatchRanking, currentUserId);
             group.EnablePostMatchRanking = newValue;
             saveMessage = newValue
-                ? "Ranking pós-partida ativado."
-                : "Ranking pós-partida desativado.";
+                ? Ui["Group.RankingPostMatchEnabled"]
+                : Ui["Group.RankingPostMatchDisabled"];
         }
         catch
         {
-            saveMessage = "Erro ao salvar. Tente novamente.";
+            saveMessage = Ui["Group.SaveError"];
             saveError   = true;
         }
         finally { isSaving = false; }
@@ -104,12 +104,12 @@ public partial class Features
             var newValue = await FeaturesService.ToggleBestPlayerVotingAsync(group.Id, group.EnableBestPlayerVoting, currentUserId);
             group.EnableBestPlayerVoting = newValue;
             saveMessage = newValue
-                ? "Votação melhor da partida ativada."
-                : "Votação melhor da partida desativada.";
+                ? Ui["Group.BestPlayerVotingEnabled"]
+                : Ui["Group.BestPlayerVotingDisabled"];
         }
         catch
         {
-            saveMessage = "Erro ao salvar. Tente novamente.";
+            saveMessage = Ui["Group.SaveError"];
             saveError   = true;
         }
         finally { isSaving = false; }
@@ -138,7 +138,7 @@ public partial class Features
         }
         catch
         {
-            saveMessage = "Erro ao salvar. Tente novamente.";
+            saveMessage = Ui["Group.SaveError"];
             saveError   = true;
         }
         finally { isSaving = false; }
@@ -161,7 +161,7 @@ public partial class Features
         }
         catch
         {
-            roleMessage = "Erro ao salvar. Tente novamente.";
+            roleMessage = Ui["Group.SaveError"];
             roleError   = true;
         }
         finally
@@ -188,7 +188,7 @@ public partial class Features
         }
         catch
         {
-            pixMessage = "Erro ao salvar. Tente novamente.";
+            pixMessage = Ui["Group.SaveError"];
             pixError   = true;
         }
         finally { isSavingPix = false; }
@@ -236,7 +236,7 @@ public partial class Features
         }
         catch
         {
-            payoutMessage = "Erro ao salvar. Tente novamente.";
+            payoutMessage = Ui["Group.SaveError"];
             payoutError = true;
         }
         finally { isSavingPayout = false; }

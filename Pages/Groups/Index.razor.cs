@@ -27,6 +27,7 @@ public partial class Index
     [Inject] private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private Confirmai.Services.Groups.GroupDetailService GroupDetailService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -117,7 +118,7 @@ public partial class Index
         var code = joinCode.Trim().ToUpperInvariant();
         if (string.IsNullOrWhiteSpace(code))
         {
-            joinCodeError = "Digite o código de convite.";
+            joinCodeError = Ui["GroupEntry.CodeRequired"];
             return;
         }
         NavigationManager.NavigateTo($"/convite/{code}");
@@ -139,44 +140,7 @@ public partial class Index
 
         try
         {
-            await using var db = await DbFactory.CreateDbContextAsync();
-            var pendingRequests = await db.GroupJoinRequests
-                .Where(r => r.GroupId == groupId && r.Status == JoinRequestStatus.Pending)
-                .Include(r => r.User)
-                .ToListAsync();
-
-            var group = await db.Groups.FindAsync(groupId);
-            if (group == null) return;
-
-            foreach (var req in pendingRequests)
-            {
-                var alreadyMember = await db.GroupMembers
-                    .AnyAsync(m => m.GroupId == req.GroupId && m.UserId == req.UserId);
-                if (!alreadyMember)
-                {
-                    db.GroupMembers.Add(new GroupMember
-                    {
-                        GroupId = req.GroupId,
-                        UserId = req.UserId,
-                        Role = GroupMemberRole.Member,
-                        CreatedAt = DateTime.UtcNow,
-                    });
-                }
-                req.Status = JoinRequestStatus.Approved;
-                req.RespondedAt = DateTime.UtcNow;
-                req.RespondedByUserId = currentUserId;
-
-                db.UserMailboxMessages.Add(new UserMailboxMessage
-                {
-                    SenderUserId = null,
-                    RecipientUserId = req.UserId,
-                    RecipientDisplayName = req.User?.UserName,
-                    Subject = $"Você foi aprovado em \"{group.Name}\"",
-                    Body = $"Sua solicitação para entrar no grupo **{group.Name}** foi aprovada! Você já pode acessar o grupo.",
-                    CreatedAt = DateTime.UtcNow,
-                });
-            }
-            await db.SaveChangesAsync();
+            await GroupDetailService.ApproveAllPendingAsync(groupId, currentUserId);
             await LoadGroups();
         }
         finally

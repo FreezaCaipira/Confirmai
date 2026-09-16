@@ -148,7 +148,7 @@ public partial class Create
 
             if (!result.Success)
             {
-                saveError = result.Error ?? "Erro ao criar evento.";
+                saveError = result.Error ?? Ui["Poker.CreateEventError"];
                 collisionHref = result.CollisionHref;
                 return;
             }

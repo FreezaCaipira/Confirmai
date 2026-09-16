@@ -126,7 +126,7 @@ public partial class AdminVenueEdit : IAsyncDisposable
 
         var user = await UserManager.FindByEmailAsync(email);
         if (user is null)
-            adminSearchError = "Nenhum usuário encontrado com esse e-mail.";
+            adminSearchError = T["AdminVenues.UserNotFoundByEmail"];
         else
             searchedUser = user;
     }

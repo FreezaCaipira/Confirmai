@@ -165,7 +165,7 @@ public partial class Edit
 
             if (ev is null || ev.CreatedByUserId != userId)
             {
-                saveError = "Acesso negado.";
+                saveError = Ui["Poker.AccessDenied"];
                 isSaving  = false;
                 return;
             }

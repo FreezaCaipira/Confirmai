@@ -144,7 +144,7 @@ public partial class VenueEdit : IAsyncDisposable
                 var existing = await db.Venues.AsNoTracking().FirstOrDefaultAsync(v => v.Id == Id);
                 if (existing is not null && !isAdmin && existing.VenueAdminUserId != userId)
                 {
-                    saveError = "Você não tem permissão para editar esta quadra.";
+                    saveError = T["VenueEdit.AccessDenied"];
                     isSaving  = false;
                     return;
                 }

@@ -168,7 +168,7 @@ public partial class Create
 
             if (!result.Success)
             {
-                saveError = result.Error ?? "Erro ao criar partida.";
+                saveError = result.Error ?? Ui["Futsal.CreateMatchError"];
                 collisionHref = result.CollisionHref;
                 return;
             }

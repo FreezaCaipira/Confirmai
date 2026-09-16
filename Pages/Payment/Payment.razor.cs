@@ -161,7 +161,7 @@ public partial class Payment : IAsyncDisposable
 
             if (result == null || (result.Error == null && result.SellerKeyNotice == null))
             {
-                NotifyUser("Nao foi possivel gerar o pagamento PIX.", "error");
+                NotifyUser(T["PaymentBuy.PixGenerateError"], "error");
                 return;
             }
 
@@ -181,7 +181,7 @@ public partial class Payment : IAsyncDisposable
             PaymentId = result.PaymentId;
             IsPaid = false;
             paymentRecord = result.PaymentRecord;
-            NotifyUser("Pagamento PIX gerado. Escaneie o QR code ou copie o codigo PIX.", "success");
+            NotifyUser(T["PaymentBuy.PixGenerated"], "success");
         }
         finally
         {
@@ -199,7 +199,7 @@ public partial class Payment : IAsyncDisposable
             T["PaymentBuy.AlreadyConfirmed"],
             T["PaymentBuy.Confirmed"],
             T["PaymentBuy.CheckError"],
-            "A confirmacao automatica para PIX nao esta disponivel. Aguarde a validacao manual.",
+            T["PaymentBuy.PixAutoConfirmUnavailable"],
             amt => FormatBtcWithUsdText(amt));
 
         if (result.IsPaid)
@@ -216,7 +216,7 @@ public partial class Payment : IAsyncDisposable
         if (string.Equals(CurrencyPreferenceService.SelectedFiatCurrency, "BRL", StringComparison.OrdinalIgnoreCase)) { pixCurrencyNotice = null; return; }
         CurrencyPreferenceService.SetCurrency("BRL");
         if (persistPreference) await JS.InvokeVoidAsync("localStorage.setItem", "Confirmai.fiatCurrency", CurrencyPreferenceService.SelectedFiatCurrency);
-        pixCurrencyNotice = "PIX funciona apenas com BRL. A cotacao foi alterada automaticamente para BRL.";
+        pixCurrencyNotice = T["PaymentBuy.PixBrlOnlyNotice"];
     }
 
     private Task OnUseSiteIntermediaryChangedAsync() { pixSellerKeyNotice = null; return Task.CompletedTask; }

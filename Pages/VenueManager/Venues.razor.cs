@@ -72,7 +72,7 @@ public partial class Venues
 
         if (!isAdmin && venue.VenueAdminUserId != userId)
         {
-            deleteError = "Você não tem permissão para remover esta quadra.";
+            deleteError = T["VenueManager.DeleteAccessDenied"];
             return;
         }
 

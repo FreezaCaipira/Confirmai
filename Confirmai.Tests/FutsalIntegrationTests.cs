@@ -204,6 +204,9 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
 
     private async Task<int> SeedPrivateFutsalEventAsync(string creatorId)
     {
+        // GroupMember.UserId is a real FK under Postgres.
+        await _factory.EnsureUserAsync(creatorId);
+
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 

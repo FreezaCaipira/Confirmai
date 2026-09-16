@@ -95,6 +95,9 @@ public class LogRetentionServiceTests : IClassFixture<IntegrationTestWebAppFacto
     {
         var marker = Guid.NewGuid().ToString("N");
 
+        // AppLog.UserId is a real FK under Postgres.
+        await _factory.EnsureUserAsync("user-abc");
+
         using (var scope = _factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -144,7 +147,7 @@ public class LogRetentionServiceTests : IClassFixture<IntegrationTestWebAppFacto
             await db.SaveChangesAsync();
         }
 
-        // Should not throw — filtering on IpAddress != null skips this entry
+        // Should not throw ï¿½ filtering on IpAddress != null skips this entry
         await RunRetentionAsync();
 
         using var verifyScope = _factory.Services.CreateScope();

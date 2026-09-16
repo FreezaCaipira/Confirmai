@@ -28,7 +28,7 @@ public partial class Admin
     private int adminPendingWithChargeId;
     private int adminStalePending;
     private string adminLastAutoSweepLabel = "Sem varredura automatica registrada.";
-    private string adminLastHealthRefreshLabel = "Ainda nao atualizado.";
+    private string adminLastHealthRefreshLabel = string.Empty;
     private string adminPendingTrendLabel = "Sem dados suficientes para tendencia.";
     private bool adminPendingTrendWarning;
     private int adminWarningThreshold = AdminSettingsService.DefaultReconciliationWarningThreshold;
@@ -39,6 +39,7 @@ public partial class Admin
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        adminLastHealthRefreshLabel = T["AdminDashboard.HealthNotUpdated"];
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         currentUser = authState.User;
 
@@ -76,7 +77,7 @@ public partial class Admin
 
             if (reconciliationThresholdSaved)
             {
-                reconciliationThresholdMessage = "Limiares de reconciliacao salvos com sucesso.";
+                reconciliationThresholdMessage = T["AdminDashboard.ThresholdsSaved"];
                 await LoadReconciliationHealthAsync();
             }
             else
@@ -138,10 +139,10 @@ public partial class Admin
             if (saved)
             {
                 siteIntermediaryPixKey = await AdminSettingsService.GetSiteIntermediaryPixKeyForAdminAsync(currentUser) ?? string.Empty;
-                sitePixMessage = "Chave PIX do intermedio salva com sucesso.";
+                sitePixMessage = T["AdminDashboard.SitePixKeySaved"];
                 return;
             }
-            sitePixMessage = "A chave PIX deve ter no maximo 160 caracteres.";
+            sitePixMessage = T["AdminDashboard.SitePixKeyMaxLength"];
         }
         catch (UnauthorizedAccessException)
         {

@@ -197,17 +197,17 @@ public partial class Mailbox
     {
         composerInfoMessage = null;
         var selected = SelectedContact;
-        if (selected == null) { composerInfoMessage = "Selecione uma conversa antes de enviar."; return; }
-        if (string.IsNullOrWhiteSpace(composerBody)) { composerInfoMessage = "Digite uma mensagem para enviar."; return; }
+        if (selected == null) { composerInfoMessage = T["Mailbox.SelectConversationToSend"]; return; }
+        if (string.IsNullOrWhiteSpace(composerBody)) { composerInfoMessage = T["Mailbox.EmptyMessage"]; return; }
 
         var normalizedBody = composerBody.Trim();
-        if (string.IsNullOrWhiteSpace(normalizedBody)) { composerInfoMessage = "Digite uma mensagem para enviar."; return; }
+        if (string.IsNullOrWhiteSpace(normalizedBody)) { composerInfoMessage = T["Mailbox.EmptyMessage"]; return; }
 
         isSendingReply = true;
 
         if (string.IsNullOrWhiteSpace(composerRecipientUserId))
         {
-            composerInfoMessage = "Selecione uma conversa antes de enviar.";
+            composerInfoMessage = T["Mailbox.SelectConversationToSend"];
             isSendingReply = false;
             return;
         }
@@ -216,7 +216,7 @@ public partial class Mailbox
             currentUserId, composerRecipientUserId, selected.ContactName, normalizedBody);
 
         composerBody = string.Empty;
-        composerInfoMessage = "Mensagem enviada.";
+        composerInfoMessage = T["Mailbox.MessageSent"];
         isSendingReply = false;
 
         selectedConversationKey = selected.ConversationKey;

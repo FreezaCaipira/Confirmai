@@ -29,7 +29,7 @@ public partial class AdminPaymentsSummaryPanel
     [Parameter] public string LastRefreshLabel { get; set; } = "Ainda não atualizado.";
     [Parameter] public string LastRefreshAgeLabel { get; set; } = "n/d";
     [Parameter] public string LastRefreshAgeClass { get; set; } = string.Empty;
-    [Parameter] public string LastAutoRefreshPauseLabel { get; set; } = "Nenhuma pausa registrada.";
+    [Parameter] public string LastAutoRefreshPauseLabel { get; set; } = string.Empty;
     [Parameter] public string LastAutomaticSweepLabel { get; set; } = "Nenhum sweep automático registrado.";
     [Parameter] public string LastAutomaticSweepDetails { get; set; } = string.Empty;
     [Parameter] public string LastManualSweepLabel { get; set; } = "Nenhum sweep manual registrado.";

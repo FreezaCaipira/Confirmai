@@ -45,7 +45,7 @@ else
                                 <a class="history-btn action-btn icon-only" href="@($"/admin/audit/User/{u.Id}")" title="@T["AdminAuditTimeline.ViewHistory"]" aria-label="@T["AdminAuditTimeline.ViewHistory"]">
                                     <i class="fas fa-history"></i>
                                 </a>
-                                <button class="edit-btn action-btn icon-only" @onclick="() => EditUserHandler(u.Id)" title="@T["Products.Edit"]" aria-label="@T["Products.Edit"]">
+                                <button class="edit-btn action-btn icon-only" @onclick="() => EditUserHandler(u.Id)" title="@T["AdminUsers.Edit"]" aria-label="@T["AdminUsers.Edit"]">
                                     <i class="fas fa-pencil-alt"></i>
                                 </button>
                                 @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
@@ -60,7 +60,7 @@ else
                                         <i class="fas fa-lock"></i>
                                     </button>
                                 }
-                                <button class="danger action-btn icon-only" @onclick="() => DeleteUserHandler(u.Id)" title="@T["Products.Remove"]" aria-label="@T["Products.Remove"]">
+                                <button class="danger action-btn icon-only" @onclick="() => DeleteUserHandler(u.Id)" title="@T["AdminUsers.Remove"]" aria-label="@T["AdminUsers.Remove"]">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>

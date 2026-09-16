@@ -293,6 +293,10 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 
 | 29 | Consolidacao pos-repasse | 3 fases de codigo + 2 decisoes: (A) `DelinquencyService` (codigo morto, logica duplicada) **removido** do DI e do repo, records movidos para `Services/Groups/PaymentRecords.cs`, precedido de 7 testes de caracterizacao no `GroupPaymentsService`; (B) `GetCoveredFeeByEventAsync` extraido do ledger para `PlatformFeeCoverage` (query identica, +5 testes diretos), os dois services passam a depender dele; (C) `ResidualAllowlist` **zerada** -- os 2 formatos de data com "as" viraram `DateTimeFull`/`DateTimeFullLong` i18n-aware no `UiTextService` (PT/EN/ES + `CultureInfo` do idioma no weekday); (D) exclusao de partida: nao existe fluxo (`Events.Remove` inexistente) -> decisao registrada, FK `Restrict` fica defensiva; (E) cobertura de render: bUnit **pulado** (logica ja em helpers/services cobertos). 2287->2315 (com Postgres local disponivel; +12 novos, -11 removidos). Senior corrigiu a canonicalizacao do codigo de idioma (`?uiLang=en-us` dava texto EN com data PT). | #94 (impl), #95 (review) | APROVADO |
 
+| 30-C | Achados dos testes do Robson em prod | Paridade EN/ES dos 3 dicionarios de produto (~430 chaves), preview de imagem via thumbnail no navegador, pagina `/error` server-side, `.mk-btn` unificado em `buttons.css`, heading/footer/aria nas 13 telas do Identity. Senior corrigiu: o visual de referencia do `.mk-btn` virou a base global (estava como override scoped -- botao Pix sem scoped CSS herdava o visual errado). 2379 testes. | #109 (impl), #110 (fix Senior) | APROVADO c/ 1 correcao + 5 ressalvas |
+|
+| 33 | Mapa de casos de uso + Postgres nos testes + FALTA criticos + allowlist zerada | 4 fases: (1) `docs/uml/` -- ~102 UCs por ator com coluna Teste, estados (`EventConfirmationPaymentStatus`, `PlatformFeeSettlement`, `GroupJoinRequest`), sequencia do pagamento manual; (2) `IntegrationTestWebAppFactory` em **Postgres real** (schema `citest_*` por factory via Search Path; migrate explicito em `ConfigureWebHost` porque o do startup roda em thread do entry-point) -- achou **40 seeds com FK invalida** que o InMemory aceitava (classe do bug #107; corrigidas em ~11 classes, zero mudanca de producao); (3) FALTA criticos: `/convite` e "aprovar todas" extraidos de page->service (`ApproveAllPendingAsync` re-verifica admin no service), 18 testes novos cobrindo endpoints de comprovante (401/403/200 por papel), `RejectProofAsync`+audit, submit/review de repasse, Register/Logout/ChangePassword POSTs; (4) `ResidualAllowlist` **zerada** -- 39 literais `.razor.cs` migrados p/ i18n + stragglers ("Acesso negado.", default de parametro, "Desconhecido", aviso PIX-BRL) + teste de re-execucao excecao->`/error`. Extras: novo teste `ReferencedI18nKeys_ExistInProviders` achou **12 chaves i18n referenciadas sem definicao** (7 `PaymentBuy.*` na pagina de pagamento crypto -- usuario via o nome cru da chave; `Products.Edit/Remove` na tabela de usuarios era dominio errado). 2397->2417. | a criar (branch `feat/ciclo33-casos-de-uso-postgres`) | Aguardando review |
+
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
 ---
@@ -581,7 +585,7 @@ Nao mexer no fluxo do dinheiro (pagamento, repasse, taxa) -- esta validado em pr
 
 ---
 
-## Ciclo 33 (Pleno) -- Mapa de casos de uso por ator + testes de integracao em Postgres [PLANEJADO -- EXECUTAVEL AGORA]
+## Ciclo 33 (Pleno) -- Mapa de casos de uso por ator + testes de integracao em Postgres [EXECUTADO -- ver review]
 
 **Objetivo**: saber, por escrito e com ID, tudo que Jogador, Organizador e Admin podem fazer; e que cada caso de uso critico tenha teste de integracao rodando contra **Postgres real**.
 

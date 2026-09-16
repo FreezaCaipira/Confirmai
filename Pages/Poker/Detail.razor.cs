@@ -90,7 +90,7 @@ public partial class Detail
         }
         catch
         {
-            joinRequestError = "Não foi possível enviar a solicitação agora. Tente novamente em instantes.";
+            joinRequestError = Ui["Poker.JoinRequestSendError"];
         }
         finally
         {
@@ -119,7 +119,7 @@ public partial class Detail
         }
         catch
         {
-            joinRequestError = "Não foi possível cancelar a solicitação agora. Tente novamente em instantes.";
+            joinRequestError = Ui["Poker.JoinRequestCancelError"];
         }
         finally
         {
@@ -151,7 +151,7 @@ public partial class Detail
         await using var db = await DbFactory.CreateDbContextAsync();
         var existing = await db.EventConfirmations
             .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
-        if (existing is not null) { actionError = "Você já está inscrito."; return; }
+        if (existing is not null) { actionError = Ui["Poker.AlreadyRegistered"]; return; }
 
         db.EventConfirmations.Add(new EventConfirmation
         {

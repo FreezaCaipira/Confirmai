@@ -132,13 +132,13 @@ public partial class Edit
 
             if (ev is null || (ev.CreatedByUserId != userId && !auth.User.IsInRole("admin")))
             {
-                saveError = "Acesso negado.";
+                saveError = Ui["Futsal.AccessDenied"];
                 isSaving  = false;
                 return;
             }
 
             var venue = venues.FirstOrDefault(v => v.Id == form.VenueId);
-            if (venue is null) { saveError = "Quadra inválida."; isSaving = false; return; }
+            if (venue is null) { saveError = Ui["Futsal.InvalidVenue"]; isSaving = false; return; }
 
             var oldStartsAt = ev.StartsAt;
             var newStartsAt = DateTime.SpecifyKind(form.Date.ToDateTime(form.Time), DateTimeKind.Utc);

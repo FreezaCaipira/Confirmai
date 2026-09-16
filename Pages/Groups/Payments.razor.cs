@@ -177,7 +177,7 @@ public partial class Payments
 
     private async Task HandleMarkPaidAsync((int ConfirmationId, string UserId) args)
     {
-        var confirmed = await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja confirmar este pagamento?");
+        var confirmed = await JS.InvokeAsync<bool>("confirm", Ui["Group.PaymentsMarkPaidConfirm"]);
         if (confirmed)
             await AdminMarkPaid(args.ConfirmationId, args.UserId);
     }

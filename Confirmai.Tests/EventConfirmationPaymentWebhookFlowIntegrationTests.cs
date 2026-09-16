@@ -88,12 +88,16 @@ public class EventConfirmationPaymentWebhookFlowIntegrationTests : IClassFixture
 
     private async Task SeedEventConfirmationAsync(string txId, bool hasPaid)
     {
+        // EventConfirmation.UserId and EventId are real FKs under Postgres.
+        await _factory.EnsureUserAsync("user-e2e-flow");
+        var eventId = await _factory.SeedFutsalEventAsync(creatorId: "e2e-flow-creator");
+
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         db.EventConfirmations.Add(new EventConfirmation
         {
-            EventId = 1,
+            EventId = eventId,
             UserId = "user-e2e-flow",
             PixTxId = txId,
             HasPaid = hasPaid,

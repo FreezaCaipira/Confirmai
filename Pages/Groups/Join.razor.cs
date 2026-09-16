@@ -23,6 +23,7 @@ public partial class Join
     [Inject] private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private Confirmai.Services.Groups.GroupDetailService GroupDetailService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,33 +67,21 @@ public partial class Join
         if (currentUserId is null || group is null) return;
         actionError = string.Empty;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        // Re-check membership to prevent duplicate insert on double-click
-        var exists = await db.GroupMembers
-            .AnyAsync(m => m.GroupId == group.Id && m.UserId == currentUserId);
-        if (exists)
-        {
-            alreadyMember = true;
-            return;
-        }
-
-        db.GroupMembers.Add(new GroupMember
-        {
-            GroupId   = group.Id,
-            UserId    = currentUserId,
-            Role      = GroupMemberRole.Member,
-            CreatedAt = DateTime.UtcNow,
-        });
-
         try
         {
-            await db.SaveChangesAsync();
-            joined = true;
+            var (success, error) = await GroupDetailService.JoinWithCodeAsync(group.Id, currentUserId, Code);
+            if (success)
+            {
+                joined = true;
+            }
+            else
+            {
+                actionError = error ?? Ui["Group.JoinError"];
+            }
         }
         catch (Exception)
         {
-            actionError = "Erro ao entrar no grupo. Tente novamente.";
+            actionError = Ui["Group.JoinError"];
         }
     }
 }
