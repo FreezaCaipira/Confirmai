@@ -227,4 +227,60 @@ public sealed class GroupDetailService
 
         await db.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Approves every pending join request of a group (the "approve all" action
+    /// on /grupos). Same semantics as <see cref="ApproveSelectedAsync"/> scoped
+    /// to the group. No-ops unless the approver is an admin member of the group.
+    /// </summary>
+    public async Task ApproveAllPendingAsync(int groupId, string approverUserId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        var isAdmin = await db.GroupMembers
+            .AnyAsync(m => m.GroupId == groupId
+                && m.UserId == approverUserId
+                && m.Role == GroupMemberRole.Admin);
+        if (!isAdmin) return;
+
+        var group = await db.Groups.FindAsync(groupId);
+        if (group is null) return;
+
+        var pendingRequests = await db.GroupJoinRequests
+            .Where(r => r.GroupId == groupId && r.Status == JoinRequestStatus.Pending)
+            .Include(r => r.User)
+            .ToListAsync();
+
+        foreach (var req in pendingRequests)
+        {
+            var alreadyMember = await db.GroupMembers
+                .AnyAsync(m => m.GroupId == req.GroupId && m.UserId == req.UserId);
+            if (!alreadyMember)
+            {
+                db.GroupMembers.Add(new GroupMember
+                {
+                    GroupId = req.GroupId,
+                    UserId = req.UserId,
+                    Role = GroupMemberRole.Member,
+                    CreatedAt = DateTime.UtcNow,
+                });
+            }
+
+            req.Status = JoinRequestStatus.Approved;
+            req.RespondedAt = DateTime.UtcNow;
+            req.RespondedByUserId = approverUserId;
+
+            db.UserMailboxMessages.Add(new UserMailboxMessage
+            {
+                SenderUserId = null,
+                RecipientUserId = req.UserId,
+                RecipientDisplayName = req.User?.UserName,
+                Subject = $"Voce foi aprovado em \"{group.Name}\"",
+                Body = $"Sua solicitacao para entrar no grupo **{group.Name}** foi aprovada! Voce ja pode acessar o grupo.",
+                CreatedAt = DateTime.UtcNow,
+            });
+        }
+
+        await db.SaveChangesAsync();
+    }
 }
