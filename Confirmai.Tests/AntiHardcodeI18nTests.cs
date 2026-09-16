@@ -372,4 +372,85 @@ public class AntiHardcodeI18nTests
     {
         return Regex.Replace(content, @"@\*.*?\*@", "", RegexOptions.Singleline);
     }
+
+    /// <summary>
+    /// Missing-key guard (C33 Fase 4): every i18n key referenced via
+    /// T["Key"]/Ui["Key"]/T["Key"] lookups in Pages/, Shared/ and Areas/
+    /// must exist in the merged provider dictionaries. Without this, a
+    /// referenced-but-undefined key silently renders the raw key name to
+    /// the user (UiTextService falls back to the key itself).
+    /// </summary>
+    [Fact]
+    public void ReferencedI18nKeys_ExistInProviders()
+    {
+        var definedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var provider in new[]
+        {
+            Services.Core.UiText.AdminTexts.PtBr,
+            Services.Core.UiText.AuthTexts.PtBr,
+            Services.Core.UiText.CoreTexts.PtBr,
+            Services.Core.UiText.FutsalTexts.PtBr,
+            Services.Core.UiText.GroupTexts.PtBr,
+            Services.Core.UiText.PaymentTexts.PtBr,
+            Services.Core.UiText.PokerTexts.PtBr,
+            Services.Core.UiText.ServerTexts.PtBr,
+            Services.Core.UiText.UtilityTexts.PtBr,
+        })
+        {
+            foreach (var key in provider.Keys)
+                definedKeys.Add(key);
+        }
+
+        var keyLookupRegex = new Regex(
+            @"(?:Ui|T|_t|_T)\s*\[\s*""(?<key>[^""]+)""\s*\]",
+            RegexOptions.Compiled);
+        var skipLineRegex = new Regex(
+            @"^\s*(?://|/\*|\*|///|using|namespace)",
+            RegexOptions.Compiled);
+
+        var baseDir = AppContext.BaseDirectory;
+        var dir = new DirectoryInfo(baseDir);
+        while (dir is not null)
+        {
+            if (dir.GetFiles("*.csproj").Any() && Directory.Exists(Path.Combine(dir.FullName, "Pages")))
+                break;
+            dir = dir.Parent;
+        }
+        Assert.NotNull(dir);
+
+        var violations = new List<string>();
+        var filesScanned = 0;
+
+        foreach (var sub in new[] { "Pages", "Shared", "Areas" })
+        {
+            var subDir = Path.Combine(dir!.FullName, sub);
+            if (!Directory.Exists(subDir)) continue;
+            var files = Directory.GetFiles(subDir, "*.*", SearchOption.AllDirectories)
+                .Where(f => f.EndsWith(".razor") || f.EndsWith(".razor.cs")
+                    || f.EndsWith(".cshtml") || f.EndsWith(".cshtml.cs"));
+            foreach (var file in files)
+            {
+                filesScanned++;
+                var relativePath = file.Replace('\\', '/');
+                var content = StripComments(File.ReadAllText(file));
+                var lineNum = 0;
+                foreach (var line in content.Split('\n'))
+                {
+                    lineNum++;
+                    if (skipLineRegex.IsMatch(line)) continue;
+                    foreach (Match m in keyLookupRegex.Matches(line))
+                    {
+                        var key = m.Groups["key"].Value;
+                        if (!definedKeys.Contains(key))
+                            violations.Add($"{relativePath}:{lineNum} missing key \"{key}\"");
+                    }
+                }
+            }
+        }
+
+        Assert.True(violations.Count == 0,
+            $"Scanned {filesScanned} files. Referenced i18n keys not defined in any provider:\n" +
+            string.Join("\n", violations.Take(50)) +
+            (violations.Count > 50 ? $"\n... and {violations.Count - 50} more." : ""));
+    }
 }

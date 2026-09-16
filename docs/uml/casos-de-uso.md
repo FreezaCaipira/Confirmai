@@ -290,21 +290,36 @@ flowchart LR
 
 ## Backlog FALTA consolidado
 
-### Critico (dinheiro, permissao ou dado de outro usuario) — alvo da Fase 3
+### Critico (dinheiro, permissao ou dado de outro usuario)
 
-| UC | Por que critico |
-|---|---|
-| UC-O-16 Rejeitar comprovante | Acao auditada mas sem teste; limpa prova de pagamento |
-| UC-O-06 Aprovar todas pendentes | Efeito em massa sobre membros, sem service/audit |
-| UC-J-09 Entrar via `/convite` (page) | Join imediato sem aprovacao; so o caminho alternativo tem teste |
-| UC-J-17 Poker inscrever/cancelar | `Poker/Detail.razor.cs` inteiro sem cobertura |
-| UC-J-23 Historico/cancelar pagamento | Cancelamento de `PaymentRecord` pendente sem teste |
-| UC-J-22 audit gap | Upload de comprovante sem `AuditAsync` (Fase 2 do C34 adiciona; teste aqui valida) |
-| UC-O-20/UC-A-22/23 audit gap | Settlement submit/review sem `AuditAsync` (teste aqui falhara ate o C34 adicionar — documentado) |
-| UC-A-08/09/10 Bloquear/desbloquear/excluir usuario | Permissao destrutiva sem teste |
-| UC-A-12 Papel venue_manager | Grant/revoke de papel sem teste nem audit |
-| `/api/pix-proof/{id}` handler | Endpoint que vaza imagem se autorizacao falhar — sem teste do handler em si |
-| UC-J-01 Register POST / UC-J-07 ChangePassword POST / UC-J-08 Logout POST | Fluxos de identidade sem teste de acao |
+Cobertos na Fase 3 do C33 (`C33CriticalUseCaseTests`, 18 testes em Postgres):
+UC-O-16 (rejeitar comprovante), UC-O-06 (aprovar todas — agora com check de
+admin no service), UC-J-09 (`/convite` delega para `JoinWithCodeAsync`),
+`/api/pix-proof/{id}` e `/api/fee-settlement-proof/{id}` (401/403/200 por
+papel), UC-J-01 (Register POST), UC-J-07 (ChangePassword POST), UC-J-08
+(Logout GET/POST).
+
+| UC | Por que critico | Status |
+|---|---|---|
+| UC-J-17 Poker inscrever/cancelar | `Poker/Detail.razor.cs` inteiro sem cobertura | FALTA |
+| UC-J-23 Historico/cancelar pagamento | Cancelamento de `PaymentRecord` pendente sem teste | FALTA |
+| UC-J-22 audit gap | Upload de comprovante sem `AuditAsync` (Fase 2 do C34 adiciona; teste aqui valida) | FALTA audit |
+| UC-O-20/UC-A-22/23 audit gap | Settlement submit/review sem `AuditAsync` (C34 adiciona — teste ja cobre o comportamento atual) | FALTA audit |
+| UC-A-08/09/10 Bloquear/desbloquear/excluir usuario | Permissao destrutiva sem teste | FALTA |
+| UC-A-12 Papel venue_manager | Grant/revoke de papel sem teste nem audit | FALTA |
+| UC-O-03/04/05 aprovar/rejeitar | `ApproveRequestAsync`/`RejectRequestAsync`/`*SelectedAsync` validam papel so na UI (o novo `ApproveAllPendingAsync` ja re-verifica no service) | service nao revalida |
+
+### Defeitos encontrados no C33 (corrigidos)
+
+- **Chaves i18n referenciadas sem definicao** — `PaymentBuy.GenerateError`,
+  `Generated`, `NotFoundByAddress`, `AlreadyConfirmed`, `Confirmed`,
+  `CheckError`, `NotReceived` (pagina de pagamento crypto) e
+  `Common.Redirecting`, `AdminUserView.RolesPermissions`,
+  `PaymentDetails.Subtitle`, `Products.Edit`, `Products.Remove`:
+  `UiTextService` devolve o nome da chave crua ao usuario. Definidas na
+  Fase 4 + novo teste `ReferencedI18nKeys_ExistInProviders` barra regresso.
+  `Products.*` na tabela de usuarios era dominio errado — repontado para
+  `AdminUsers.Edit`/`AdminUsers.Remove`.
 
 ### Nao-critico (backlog listado, sem teste imediato)
 
