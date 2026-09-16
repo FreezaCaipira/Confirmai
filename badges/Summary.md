@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 09/13/2026 - 13:06:00 |
-| Coverage date: | 09/13/2026 - 13:05:54 |
+| Generated on: | 09/16/2026 - 09:02:19 |
+| Coverage date: | 09/16/2026 - 09:02:14 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 513 |
 | Files: | 612 |
-| **Line coverage:** | 92.7% (132526 of 142824) |
-| Covered lines: | 132526 |
-| Uncovered lines: | 10298 |
+| **Line coverage:** | 92.7% (132525 of 142824) |
+| Covered lines: | 132525 |
+| Uncovered lines: | 10299 |
 | Coverable lines: | 142824 |
 | Total lines: | 174762 |
-| **Branch coverage:** | 38.5% (3298 of 8566) |
-| Covered branches: | 3298 |
+| **Branch coverage:** | 38.4% (3297 of 8566) |
+| Covered branches: | 3297 |
 | Total branches: | 8566 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 358_34758731328 |
+| Tag: | 363_35076808535 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **132526** | **10298** | **142824** | **191515** | **92.7%** | **3298** | **8566** | **38.5%** |
+| **Confirmai** | **132525** | **10299** | **142824** | **191515** | **92.7%** | **3297** | **8566** | **38.4%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 0 | 1 | 1 | 51 | 0% | 0 | 4 | 0% |
@@ -498,7 +498,7 @@
 | Confirmai.Services.Utility.MailboxMessageView | 11 | 0 | 11 | 327 | 100% | 0 | 0 |  |
 | Confirmai.Services.Utility.MailboxQueryService | 171 | 11 | 182 | 327 | 93.9% | 69 | 114 | 60.5% |
 | Confirmai.Services.Utility.PiiSanitizer | 13 | 2 | 15 | 157 | 86.6% | 6 | 6 | 100% |
-| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 49 | 52 | 94.2% |
+| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 48 | 52 | 92.3% |
 | Confirmai.Services.Utility.TestnetBitcoinPaymentService | 49 | 18 | 67 | 132 | 73.1% | 16 | 24 | 66.6% |
 | Confirmai.Shared.Components.ActivePaymentMethodsWidget | 28 | 3 | 31 | 78 | 90.3% | 12 | 16 | 75% |
 | Confirmai.Shared.Components.Admin.AdminLogsFilterBar | 38 | 10 | 48 | 124 | 79.1% | 2 | 4 | 50% |
@@ -536,7 +536,7 @@
 | Confirmai.Shared.Helpers.BtcUsdFormatter | 19 | 0 | 19 | 49 | 100% | 17 | 20 | 85% |
 | Confirmai.Shared.Helpers.EventAccess | 6 | 0 | 6 | 31 | 100% | 14 | 14 | 100% |
 | Confirmai.Shared.Helpers.EventMinimums | 22 | 0 | 22 | 49 | 100% | 6 | 6 | 100% |
-| Confirmai.Shared.MainLayout | 111 | 37 | 148 | 373 | 75% | 49 | 72 | 68% |
+| Confirmai.Shared.MainLayout | 110 | 38 | 148 | 373 | 74.3% | 49 | 72 | 68% |
 | Confirmai.Shared.RouteNotAuthorized | 8 | 0 | 8 | 30 | 100% | 5 | 6 | 83.3% |
 | Program | 455 | 144 | 599 | 769 | 75.9% | 54 | 88 | 61.3% |
 | System.Text.RegularExpressions.Generated | 258 | 32 | 290 | 816 | 88.9% | 121 | 150 | 80.6% |
