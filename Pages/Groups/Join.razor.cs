@@ -76,12 +76,12 @@ public partial class Join
             }
             else
             {
-                actionError = error ?? "Erro ao entrar no grupo. Tente novamente.";
+                actionError = error ?? Ui["Group.JoinError"];
             }
         }
         catch (Exception)
         {
-            actionError = "Erro ao entrar no grupo. Tente novamente.";
+            actionError = Ui["Group.JoinError"];
         }
     }
 }

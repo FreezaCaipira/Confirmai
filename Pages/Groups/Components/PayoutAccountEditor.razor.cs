@@ -64,7 +64,7 @@ public partial class PayoutAccountEditor
         {
             PixKeyType = PixKeyType.Cpf,
             PixKeyValue = "12345678901",
-            BeneficiaryName = "Organizador Teste",
+            BeneficiaryName = Ui["Group.PayoutTestBeneficiaryName"],
             BeneficiaryCpf = "12345678901",
             BankAccountNumber = "123456"
         };
@@ -74,28 +74,28 @@ public partial class PayoutAccountEditor
     {
         if (string.IsNullOrWhiteSpace(FormData.PixKeyValue))
         {
-            Message = "A chave PIX é obrigatória.";
+            Message = Ui["Group.PixKeyRequired"];
             IsError = true;
             return;
         }
 
         if (string.IsNullOrWhiteSpace(FormData.BeneficiaryName))
         {
-            Message = "O nome do beneficiário é obrigatório.";
+            Message = Ui["Group.BeneficiaryNameRequired"];
             IsError = true;
             return;
         }
 
         if (string.IsNullOrWhiteSpace(FormData.BeneficiaryCpf))
         {
-            Message = "O CPF do beneficiário é obrigatório.";
+            Message = Ui["Group.BeneficiaryCpfRequired"];
             IsError = true;
             return;
         }
 
         if (string.IsNullOrWhiteSpace(FormData.BankAccountNumber))
         {
-            Message = "O número da conta é obrigatório.";
+            Message = Ui["Group.BankAccountRequired"];
             IsError = true;
             return;
         }
@@ -109,7 +109,7 @@ public partial class PayoutAccountEditor
         PixKeyType.Cnpj => "CNPJ",
         PixKeyType.Email => "E-mail",
         PixKeyType.Phone => "Telefone",
-        PixKeyType.Random => "Chave Aleatória",
-        _ => "Desconhecido"
+        PixKeyType.Random => Ui["Group.PixKeyRandom"],
+        _ => Ui["Group.PixKeyTypeUnknown"]
     };
 }

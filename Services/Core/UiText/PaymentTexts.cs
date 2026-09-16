@@ -273,6 +273,13 @@ internal static class PaymentTexts
         ["Payment.Settlement.InvalidMatchSelection"] = "Seleção de partidas inválida para este grupo.",
         ["Payment.Settlement.MatchAlreadyCovered"] = "Uma das partidas selecionadas já está em um repasse enviado ou aprovado.",
         ["Payment.Settlement.AmountMismatch"] = "O valor do repasse deve ser R$ {0}, igual à soma das taxas das partidas selecionadas.",
+
+        // Payment page code-behind messages
+        ["Payment.GenerateChargeError"] = "Erro ao gerar cobrança.",
+        ["PaymentBuy.PixGenerateError"] = "Não foi possível gerar o pagamento PIX.",
+        ["PaymentBuy.PixGenerated"] = "Pagamento PIX gerado. Escaneie o QR code ou copie o código PIX.",
+        ["PaymentBuy.PixBrlOnlyNotice"] = "PIX funciona apenas com BRL. A cotação foi alterada automaticamente para BRL.",
+        ["PaymentBuy.PixAutoConfirmUnavailable"] = "A confirmação automática para PIX não está disponível. Aguarde a validação manual.",
     };
 
     /// <summary>EN-US English (United States) strings - stub for extension</summary>
@@ -543,6 +550,13 @@ internal static class PaymentTexts
         ["Payment.Settlement.InvalidMatchSelection"] = "Invalid match selection for this group.",
         ["Payment.Settlement.MatchAlreadyCovered"] = "One of the selected matches is already in a submitted or approved settlement.",
         ["Payment.Settlement.AmountMismatch"] = "The settlement amount must be R$ {0}, matching the fees of the selected matches.",
+
+        // Payment page code-behind messages
+        ["Payment.GenerateChargeError"] = "Error generating charge.",
+        ["PaymentBuy.PixGenerateError"] = "Could not generate the PIX payment.",
+        ["PaymentBuy.PixGenerated"] = "PIX payment generated. Scan the QR code or copy the PIX code.",
+        ["PaymentBuy.PixBrlOnlyNotice"] = "PIX only works with BRL. The exchange rate was automatically switched to BRL.",
+        ["PaymentBuy.PixAutoConfirmUnavailable"] = "Automatic confirmation for PIX is not available. Please wait for manual validation.",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings - stub for extension</summary>
@@ -813,6 +827,13 @@ internal static class PaymentTexts
         ["Payment.Settlement.InvalidMatchSelection"] = "Seleccion de partidos invalida para este grupo.",
         ["Payment.Settlement.MatchAlreadyCovered"] = "Uno de los partidos seleccionados ya esta en una liquidacion enviada o aprobada.",
         ["Payment.Settlement.AmountMismatch"] = "El valor de la liquidacion debe ser R$ {0}, igual a la suma de las tasas de los partidos seleccionados.",
+
+        // Payment page code-behind messages
+        ["Payment.GenerateChargeError"] = "Error al generar el cobro.",
+        ["PaymentBuy.PixGenerateError"] = "No se pudo generar el pago PIX.",
+        ["PaymentBuy.PixGenerated"] = "Pago PIX generado. Escanee el código QR o copie el código PIX.",
+        ["PaymentBuy.PixBrlOnlyNotice"] = "PIX solo funciona con BRL. La cotización se cambió automáticamente a BRL.",
+        ["PaymentBuy.PixAutoConfirmUnavailable"] = "La confirmación automática para PIX no está disponible. Espere la validación manual.",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

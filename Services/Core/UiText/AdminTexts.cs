@@ -100,6 +100,7 @@ internal static class AdminTexts
         ["AdminPayments.LastDashboardUpdate"] = "Última atualização do dashboard:",
         ["AdminPayments.NoUpdateFor"] = "Sem atualização há:",
         ["AdminPayments.LastAutoRefreshPause"] = "Última pausa por aba em segundo plano:",
+        ["AdminPayments.NoPauseRecorded"] = "Nenhuma pausa registrada.",
         ["AdminPayments.LastAutoSweep"] = "Último sweep automático:",
         ["AdminPayments.LastSweepSummary"] = "Resumo do último sweep:",
         ["AdminPayments.LastManualSweep"] = "Último sweep manual:",
@@ -428,6 +429,10 @@ internal static class AdminTexts
         ["AdminDashboard.SitePixKeyLabel"] = "Chave PIX do intermédio do site",
         ["AdminDashboard.SitePixKeyPlaceholder"] = "Ex: email, telefone, cpf/cnpj ou chave aleatória",
         ["AdminDashboard.SavePixKey"] = "Salvar chave PIX",
+        ["AdminDashboard.HealthNotUpdated"] = "Ainda não atualizado.",
+        ["AdminDashboard.ThresholdsSaved"] = "Limiares de reconciliação salvos com sucesso.",
+        ["AdminDashboard.SitePixKeySaved"] = "Chave PIX do intermédio salva com sucesso.",
+        ["AdminDashboard.SitePixKeyMaxLength"] = "A chave PIX deve ter no máximo 160 caracteres.",
 
         // Admin Revenue
         ["AdminRevenue.PageTitle"] = "Relatório de Receita — Confirmai",
@@ -522,6 +527,7 @@ internal static class AdminTexts
         ["AdminVenues.SearchByEmail"] = "Buscar por e-mail…",
         ["AdminVenues.Assign"] = "Atribuir",
         ["AdminVenues.Saving"] = "Salvando…",
+        ["AdminVenues.UserNotFoundByEmail"] = "Nenhum usuário encontrado com esse e-mail.",
 
         // Parchment Lab
         ["AdminParchmentLab.Aria"] = "Comparativo de papiros",
@@ -647,6 +653,7 @@ internal static class AdminTexts
         ["AdminPayments.LastDashboardUpdate"] = "Last dashboard update:",
         ["AdminPayments.NoUpdateFor"] = "No update for:",
         ["AdminPayments.LastAutoRefreshPause"] = "Last background tab pause:",
+        ["AdminPayments.NoPauseRecorded"] = "No pause recorded.",
         ["AdminPayments.LastAutoSweep"] = "Last automatic sweep:",
         ["AdminPayments.LastSweepSummary"] = "Last sweep summary:",
         ["AdminPayments.LastManualSweep"] = "Last manual sweep:",
@@ -975,6 +982,10 @@ internal static class AdminTexts
         ["AdminDashboard.SitePixKeyLabel"] = "Site intermediary PIX key",
         ["AdminDashboard.SitePixKeyPlaceholder"] = "Ex: email, phone, cpf/cnpj or random key",
         ["AdminDashboard.SavePixKey"] = "Save PIX key",
+        ["AdminDashboard.HealthNotUpdated"] = "Not updated yet.",
+        ["AdminDashboard.ThresholdsSaved"] = "Reconciliation thresholds saved successfully.",
+        ["AdminDashboard.SitePixKeySaved"] = "Intermediary PIX key saved successfully.",
+        ["AdminDashboard.SitePixKeyMaxLength"] = "The PIX key must be at most 160 characters.",
 
         // Admin Revenue
         ["AdminRevenue.PageTitle"] = "Revenue Report — Confirmai",
@@ -1069,6 +1080,7 @@ internal static class AdminTexts
         ["AdminVenues.SearchByEmail"] = "Search by email…",
         ["AdminVenues.Assign"] = "Assign",
         ["AdminVenues.Saving"] = "Saving…",
+        ["AdminVenues.UserNotFoundByEmail"] = "No user found with that email.",
 
         // Parchment Lab
         ["AdminParchmentLab.Aria"] = "Parchment comparison",
@@ -1194,6 +1206,7 @@ internal static class AdminTexts
         ["AdminPayments.LastDashboardUpdate"] = "Ultima actualizacion del dashboard:",
         ["AdminPayments.NoUpdateFor"] = "Sin actualizacion hace:",
         ["AdminPayments.LastAutoRefreshPause"] = "Ultima pausa por pestaña en segundo plano:",
+        ["AdminPayments.NoPauseRecorded"] = "Ninguna pausa registrada.",
         ["AdminPayments.LastAutoSweep"] = "Ultimo sweep automatico:",
         ["AdminPayments.LastSweepSummary"] = "Resumen del ultimo sweep:",
         ["AdminPayments.LastManualSweep"] = "Ultimo sweep manual:",
@@ -1522,6 +1535,10 @@ internal static class AdminTexts
         ["AdminDashboard.SitePixKeyLabel"] = "Clave PIX del intermediario del sitio",
         ["AdminDashboard.SitePixKeyPlaceholder"] = "Ej: email, telefono, cpf/cnpj o clave aleatoria",
         ["AdminDashboard.SavePixKey"] = "Guardar clave PIX",
+        ["AdminDashboard.HealthNotUpdated"] = "Aun no actualizado.",
+        ["AdminDashboard.ThresholdsSaved"] = "Umbrales de reconciliacion guardados con exito.",
+        ["AdminDashboard.SitePixKeySaved"] = "Clave PIX del intermediario guardada con exito.",
+        ["AdminDashboard.SitePixKeyMaxLength"] = "La clave PIX debe tener como maximo 160 caracteres.",
 
         // Admin Revenue
         ["AdminRevenue.PageTitle"] = "Reporte de Ingresos — Confirmai",
@@ -1616,6 +1633,7 @@ internal static class AdminTexts
         ["AdminVenues.SearchByEmail"] = "Buscar por email…",
         ["AdminVenues.Assign"] = "Asignar",
         ["AdminVenues.Saving"] = "Guardando…",
+        ["AdminVenues.UserNotFoundByEmail"] = "Ningun usuario encontrado con ese email.",
 
         // Parchment Lab
         ["AdminParchmentLab.Aria"] = "Comparativo de papiros",

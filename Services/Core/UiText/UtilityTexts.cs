@@ -88,6 +88,9 @@ internal static class UtilityTexts
         ["Mailbox.NoContent"] = "Sem conteudo.",
         ["Mailbox.Yesterday"] = "ontem",
         ["Mailbox.Now"] = "agora",
+        ["Mailbox.SelectConversationToSend"] = "Selecione uma conversa antes de enviar.",
+        ["Mailbox.EmptyMessage"] = "Digite uma mensagem para enviar.",
+        ["Mailbox.MessageSent"] = "Mensagem enviada.",
 
         ["Integration.Title"] = "Integracao do Servidor via API",
         ["Integration.Subtitle"] = "Conecte seu servidor OpenTibia ao marketplace em poucos minutos",
@@ -252,6 +255,7 @@ internal static class UtilityTexts
         ["VenueManager.TypeFutsal"] = "Quadra de Futsal",
         ["VenueManager.TypePoker"] = "Casa de Poker",
         ["VenueManager.TypeOther"] = "Outro",
+        ["VenueManager.DeleteAccessDenied"] = "Você não tem permissão para remover esta quadra.",
 
         // VenueEdit
         ["VenueEdit.NewTitle"] = "Novo Local",
@@ -494,6 +498,9 @@ internal static class UtilityTexts
         ["Mailbox.NoContent"] = "No content.",
         ["Mailbox.Yesterday"] = "yesterday",
         ["Mailbox.Now"] = "now",
+        ["Mailbox.SelectConversationToSend"] = "Select a conversation before sending.",
+        ["Mailbox.EmptyMessage"] = "Type a message to send.",
+        ["Mailbox.MessageSent"] = "Message sent.",
 
         ["Integration.Title"] = "Server Integration via API",
         ["Integration.Subtitle"] = "Connect your OpenTibia server to the marketplace in minutes",
@@ -660,6 +667,7 @@ internal static class UtilityTexts
         ["VenueManager.TypeFutsal"] = "Futsal Court",
         ["VenueManager.TypePoker"] = "Poker House",
         ["VenueManager.TypeOther"] = "Other",
+        ["VenueManager.DeleteAccessDenied"] = "You do not have permission to remove this venue.",
 
         // VenueEdit
         ["VenueEdit.NewTitle"] = "New Venue",
@@ -902,6 +910,9 @@ internal static class UtilityTexts
         ["Mailbox.NoContent"] = "Sin contenido.",
         ["Mailbox.Yesterday"] = "ayer",
         ["Mailbox.Now"] = "ahora",
+        ["Mailbox.SelectConversationToSend"] = "Selecciona una conversacion antes de enviar.",
+        ["Mailbox.EmptyMessage"] = "Escribe un mensaje para enviar.",
+        ["Mailbox.MessageSent"] = "Mensaje enviado.",
 
         ["Integration.Title"] = "Integracion del servidor via API",
         ["Integration.Subtitle"] = "Conecta tu servidor OpenTibia al mercado en minutos",
@@ -1068,6 +1079,7 @@ internal static class UtilityTexts
         ["VenueManager.TypeFutsal"] = "Cancha de Futsal",
         ["VenueManager.TypePoker"] = "Casa de Poker",
         ["VenueManager.TypeOther"] = "Otro",
+        ["VenueManager.DeleteAccessDenied"] = "No tienes permiso para eliminar este lugar.",
 
         // VenueEdit
         ["VenueEdit.NewTitle"] = "Nuevo Lugar",

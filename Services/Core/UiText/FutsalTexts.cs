@@ -184,6 +184,13 @@ internal static class FutsalTexts
         ["Futsal.Reserve"] = "Reserva",
         ["Futsal.MatchHighlight"] = "Destaque da Partida",
         ["Futsal.DaysOfWeek"] = "Dias da semana",
+
+        // Code-behind error messages
+        ["Futsal.CreateMatchError"] = "Erro ao criar partida.",
+        ["Futsal.ConfirmPresenceError"] = "Erro ao confirmar presença.",
+        ["Futsal.JoinRequestSendError"] = "Não foi possível enviar a solicitação agora.",
+        ["Futsal.JoinRequestCancelError"] = "Não foi possível cancelar a solicitação.",
+        ["Futsal.InvalidVenue"] = "Quadra inválida.",
     };
 
     /// <summary>EN-US English (United States) strings</summary>
@@ -365,6 +372,13 @@ internal static class FutsalTexts
         ["Futsal.Reserve"] = "Reserve",
         ["Futsal.MatchHighlight"] = "Match Highlight",
         ["Futsal.DaysOfWeek"] = "Days of the week",
+
+        // Code-behind error messages
+        ["Futsal.CreateMatchError"] = "Error creating match.",
+        ["Futsal.ConfirmPresenceError"] = "Error confirming attendance.",
+        ["Futsal.JoinRequestSendError"] = "Could not send the request now.",
+        ["Futsal.JoinRequestCancelError"] = "Could not cancel the request.",
+        ["Futsal.InvalidVenue"] = "Invalid court.",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings</summary>
@@ -546,6 +560,13 @@ internal static class FutsalTexts
         ["Futsal.Reserve"] = "Reserva",
         ["Futsal.MatchHighlight"] = "Destaque de la Partida",
         ["Futsal.DaysOfWeek"] = "Días de la semana",
+
+        // Code-behind error messages
+        ["Futsal.CreateMatchError"] = "Error al crear el partido.",
+        ["Futsal.ConfirmPresenceError"] = "Error al confirmar asistencia.",
+        ["Futsal.JoinRequestSendError"] = "No se pudo enviar la solicitud ahora.",
+        ["Futsal.JoinRequestCancelError"] = "No se pudo cancelar la solicitud.",
+        ["Futsal.InvalidVenue"] = "Cancha inválida.",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

@@ -88,7 +88,7 @@ public partial class Create
 
             if (string.IsNullOrWhiteSpace(userId))
             {
-                saveError = "Você precisa estar autenticado.";
+                saveError = Ui["Group.AuthRequired"];
                 isSaving  = false;
                 return;
             }

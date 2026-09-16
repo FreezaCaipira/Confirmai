@@ -112,7 +112,7 @@ public partial class EventPayment : IAsyncDisposable
             var result = await EventPaymentSvc.GeneratePixChargeAsync(conf.Id, selectedGatewayName, groupGatewaysEnabled);
             if (!result.Success)
             {
-                errorMsg = result.ErrorMessage ?? "Erro ao gerar cobranca.";
+                errorMsg = result.ErrorMessage ?? Ui["Payment.GenerateChargeError"];
                 payState = PayState.Idle;
                 return;
             }

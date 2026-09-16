@@ -105,91 +105,10 @@ public class AntiHardcodeI18nTests
     // This list should shrink over time as literals are migrated to i18n keys.
     private static readonly HashSet<string> ResidualAllowlist = new(StringComparer.OrdinalIgnoreCase)
     {
-        // .razor allowlist is empty — all residuals migrated (C29 Fase C).
-        //
-        // ── Pre-existing .razor.cs code-behind debt (C30-C Fase 1) ──
-        // These are user-facing strings hardcoded in C# code-behind files that
-        // predate the .razor.cs scan extension. They are documented here so the
-        // test guards against NEW violations while the old ones are migrated
-        // incrementally. Format: "fileName|literal"
-        // TODO: migrate these to i18n keys in a future cycle.
-
-        // Mailbox.razor.cs
-        "Mailbox|Selecione uma conversa antes de enviar.",
-        "Mailbox|Digite uma mensagem para enviar.",
-        "Mailbox|Mensagem enviada.",
-
-        // Admin.razor.cs
-        "Admin|Ainda nao atualizado.",
-        "Admin|Limiares de reconciliacao salvos com sucesso.",
-        "Admin|Chave PIX do intermedio salva com sucesso.",
-        "Admin|A chave PIX deve ter no maximo 160 caracteres.",
-
-        // AdminPayments.razor.cs
-        "AdminPayments|Nenhuma pausa registrada.",
-
-        // AdminVenueEdit.razor.cs
-        "AdminVenueEdit|Nenhum usuário encontrado com esse e-mail.",
-
-        // Futsal/Create.razor.cs
-        "Create|Erro ao criar partida.",
-
-        // Futsal/Detail.razor.cs
-        "Detail|Nao foi possivel enviar a solicitacao agora.",
-        "Detail|Nao foi possivel cancelar a solicitacao.",
-        "Detail|Erro ao confirmar presenca.",
-
-        // Futsal/Edit.razor.cs
-        "Edit|Quadra inválida.",
-
-        // Groups/Create.razor.cs
-        "Create|Você precisa estar autenticado.",
-
-        // Groups/Features.razor.cs
-        "Features|Ranking pós-partida ativado.",
-        "Features|Ranking pós-partida desativado.",
-        "Features|Votação melhor da partida ativada.",
-        "Features|Votação melhor da partida desativada.",
-        "Features|Erro ao salvar. Tente novamente.",
-
-        // Groups/Index.razor.cs
-        "Index|Digite o código de convite.",
-
-        // Groups/Join.razor.cs
-        "Join|Erro ao entrar no grupo. Tente novamente.",
-
-        // Groups/Payments.razor.cs
-        "Payments|Tem certeza que deseja confirmar este pagamento?",
-
-        // Payment/EventPayment.razor.cs
-        "EventPayment|Erro ao gerar cobranca.",
-
-        // Payment/Payment.razor.cs
-        "Payment|Nao foi possivel gerar o pagamento PIX.",
-        "Payment|Pagamento PIX gerado. Escaneie o QR code ou copie o codigo PIX.",
-        "Payment|A confirmacao automatica para PIX nao esta disponivel. Aguarde a validacao manual.",
-
-        // Poker/Create.razor.cs
-        "Create|Erro ao criar evento.",
-
-        // Poker/Detail.razor.cs
-        "Detail|Você já está inscrito.",
-        "Detail|Não foi possível enviar a solicitação agora. Tente novamente em instantes.",
-        "Detail|Não foi possível cancelar a solicitação agora. Tente novamente em instantes.",
-
-        // VenueManager/VenueEdit.razor.cs
-        "VenueEdit|Você não tem permissão para editar esta quadra.",
-
-        // VenueManager/Venues.razor.cs
-        "Venues|Você não tem permissão para remover esta quadra.",
-
-        // Groups/Components/PayoutAccountEditor.razor.cs
-        "PayoutAccountEditor|Organizador Teste",
-        "PayoutAccountEditor|A chave PIX é obrigatória.",
-        "PayoutAccountEditor|O nome do beneficiário é obrigatório.",
-        "PayoutAccountEditor|O CPF do beneficiário é obrigatório.",
-        "PayoutAccountEditor|O número da conta é obrigatório.",
-        "PayoutAccountEditor|Chave Aleatória",
+        // Empty — .razor residuals migrated in C29 Fase C and the .razor.cs
+        // code-behind debt (39 literals) migrated in C33 Fase 4. Any NEW
+        // violation fails the test; do not re-add entries here, migrate the
+        // literal to an i18n key instead.
     };
 
     private static IEnumerable<string> GetRazorFiles()

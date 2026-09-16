@@ -35,7 +35,7 @@ public partial class AdminPayments : IAsyncDisposable
     private bool isAutoRefreshEnabled = true;
     private bool isSummaryRefreshing;
     private bool isAutoRefreshPausedByVisibility;
-    private string lastAutoRefreshPauseLabel = "Nenhuma pausa registrada.";
+    private string lastAutoRefreshPauseLabel = string.Empty;
 
     private string reconcileChargeId = string.Empty;
     private bool isReconciling;
@@ -65,6 +65,7 @@ public partial class AdminPayments : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        lastAutoRefreshPauseLabel = T["AdminPayments.NoPauseRecorded"];
         var quote = await BitcoinQuoteService.GetQuoteAsync();
         btcUsdRate = quote?.btc_usd;
         btcBrlRate = quote?.btc_brl;

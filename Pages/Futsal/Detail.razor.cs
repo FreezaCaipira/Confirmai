@@ -73,7 +73,7 @@ public partial class Detail
         requestingJoin = true;
         joinRequestError = string.Empty;
         try { await EventDetailSvc.RequestToJoinAsync(ev.GroupId, currentUserId); await LoadEvent(); }
-        catch { joinRequestError = "Nao foi possivel enviar a solicitacao agora."; }
+        catch { joinRequestError = Ui["Futsal.JoinRequestSendError"]; }
         finally { requestingJoin = false; }
     }
 
@@ -83,7 +83,7 @@ public partial class Detail
         cancellingJoin = true;
         joinRequestError = string.Empty;
         try { await EventDetailSvc.CancelJoinRequestAsync(userJoinRequest.Id); await LoadEvent(); }
-        catch { joinRequestError = "Nao foi possivel cancelar a solicitacao."; }
+        catch { joinRequestError = Ui["Futsal.JoinRequestCancelError"]; }
         finally { cancellingJoin = false; }
     }
 
@@ -96,7 +96,7 @@ public partial class Detail
         if (currentUserId is null || ev is null) return;
         actionError = string.Empty;
         var result = await EventDetailSvc.ConfirmPresenceAsync(Id, currentUserId, chosenPos);
-        if (!result.Success) { actionError = result.Error ?? "Erro ao confirmar presenca."; return; }
+        if (!result.Success) { actionError = result.Error ?? Ui["Futsal.ConfirmPresenceError"]; return; }
         await LoadEvent();
     }
 

@@ -90,6 +90,7 @@ internal static class GroupTexts
         ["Group.SelectCity"] = "Selecione a UF",
         ["Group.CreateButton"] = "Criar Grupo",
         ["Group.Creating"] = "Criando…",
+        ["Group.AuthRequired"] = "Você precisa estar autenticado.",
 
         // Join page
         ["Group.InvalidInvite"] = "Convite inválido ou expirado.",
@@ -105,9 +106,15 @@ internal static class GroupTexts
         ["Group.DateTimeHeader"] = "Data/Hora",
         ["Group.PlayersHeader"] = "Jogadores",
         ["Group.StatusHeader"] = "Status",
+        ["Group.JoinError"] = "Erro ao entrar no grupo. Tente novamente.",
 
         // Features page
         ["Group.ConfigTitle"] = "Configurações do grupo",
+        ["Group.RankingPostMatchEnabled"] = "Ranking pós-partida ativado.",
+        ["Group.RankingPostMatchDisabled"] = "Ranking pós-partida desativado.",
+        ["Group.BestPlayerVotingEnabled"] = "Votação melhor da partida ativada.",
+        ["Group.BestPlayerVotingDisabled"] = "Votação melhor da partida desativada.",
+        ["Group.SaveError"] = "Erro ao salvar. Tente novamente.",
 
         // FeaturesToggles component
         ["Group.PaymentsSection"] = "Pagamentos",
@@ -153,6 +160,12 @@ internal static class GroupTexts
         ["Group.TestData"] = "Dados de teste",
         ["Group.PayoutSaving"] = "Salvando…",
         ["Group.PixKeyRandom"] = "Chave Aleatória",
+        ["Group.PixKeyTypeUnknown"] = "Desconhecido",
+        ["Group.PayoutTestBeneficiaryName"] = "Organizador Teste",
+        ["Group.PixKeyRequired"] = "A chave PIX é obrigatória.",
+        ["Group.BeneficiaryNameRequired"] = "O nome do beneficiário é obrigatório.",
+        ["Group.BeneficiaryCpfRequired"] = "O CPF do beneficiário é obrigatório.",
+        ["Group.BankAccountRequired"] = "O número da conta é obrigatório.",
 
         // Payments page
         ["Group.PaymentsTitle"] = "Pagamentos",
@@ -168,6 +181,7 @@ internal static class GroupTexts
         ["Group.PaymentsProofAccept"] = "Aceitar",
         ["Group.PaymentsProofReject"] = "Rejeitar",
         ["Group.PaymentsProofAcceptConfirm"] = "Confirmar este pagamento?",
+        ["Group.PaymentsMarkPaidConfirm"] = "Tem certeza que deseja confirmar este pagamento?",
         ["Group.PaymentsProofRejectConfirm"] = "Rejeitar este comprovante? O jogador terá que enviar novamente.",
         ["Group.PaymentsProofAccepting"] = "Aceitando...",
         ["Group.PaymentsProofRejecting"] = "Rejeitando...",
@@ -349,6 +363,7 @@ internal static class GroupTexts
         ["Group.SelectCity"] = "Select UF",
         ["Group.CreateButton"] = "Create Group",
         ["Group.Creating"] = "Creating…",
+        ["Group.AuthRequired"] = "You must be signed in.",
 
         // Join page
         ["Group.InvalidInvite"] = "Invalid or expired invite.",
@@ -364,9 +379,15 @@ internal static class GroupTexts
         ["Group.DateTimeHeader"] = "Date/Time",
         ["Group.PlayersHeader"] = "Players",
         ["Group.StatusHeader"] = "Status",
+        ["Group.JoinError"] = "Error joining the group. Please try again.",
 
         // Features page
         ["Group.ConfigTitle"] = "Group settings",
+        ["Group.RankingPostMatchEnabled"] = "Post-match ranking enabled.",
+        ["Group.RankingPostMatchDisabled"] = "Post-match ranking disabled.",
+        ["Group.BestPlayerVotingEnabled"] = "Best player voting enabled.",
+        ["Group.BestPlayerVotingDisabled"] = "Best player voting disabled.",
+        ["Group.SaveError"] = "Error saving. Please try again.",
 
         // FeaturesToggles component
         ["Group.PaymentsSection"] = "Payments",
@@ -412,6 +433,12 @@ internal static class GroupTexts
         ["Group.TestData"] = "Test data",
         ["Group.PayoutSaving"] = "Saving…",
         ["Group.PixKeyRandom"] = "Random Key",
+        ["Group.PixKeyTypeUnknown"] = "Unknown",
+        ["Group.PayoutTestBeneficiaryName"] = "Test Organizer",
+        ["Group.PixKeyRequired"] = "The Pix key is required.",
+        ["Group.BeneficiaryNameRequired"] = "The beneficiary name is required.",
+        ["Group.BeneficiaryCpfRequired"] = "The beneficiary CPF is required.",
+        ["Group.BankAccountRequired"] = "The account number is required.",
 
         // Payments page
         ["Group.PaymentsTitle"] = "Payments",
@@ -427,6 +454,7 @@ internal static class GroupTexts
         ["Group.PaymentsProofAccept"] = "Accept",
         ["Group.PaymentsProofReject"] = "Reject",
         ["Group.PaymentsProofAcceptConfirm"] = "Confirm this payment?",
+        ["Group.PaymentsMarkPaidConfirm"] = "Are you sure you want to confirm this payment?",
         ["Group.PaymentsProofRejectConfirm"] = "Reject this proof? The player will have to resend it.",
         ["Group.PaymentsProofAccepting"] = "Accepting...",
         ["Group.PaymentsProofRejecting"] = "Rejecting...",
@@ -608,6 +636,7 @@ internal static class GroupTexts
         ["Group.SelectCity"] = "Seleccione la UF",
         ["Group.CreateButton"] = "Crear Grupo",
         ["Group.Creating"] = "Creando…",
+        ["Group.AuthRequired"] = "Debes estar autenticado.",
 
         // Join page
         ["Group.InvalidInvite"] = "Invitación inválida o expirada.",
@@ -623,9 +652,15 @@ internal static class GroupTexts
         ["Group.DateTimeHeader"] = "Fecha/Hora",
         ["Group.PlayersHeader"] = "Jugadores",
         ["Group.StatusHeader"] = "Estado",
+        ["Group.JoinError"] = "Error al entrar en el grupo. Inténtalo de nuevo.",
 
         // Features page
         ["Group.ConfigTitle"] = "Configuraciones del grupo",
+        ["Group.RankingPostMatchEnabled"] = "Ranking post-partida activado.",
+        ["Group.RankingPostMatchDisabled"] = "Ranking post-partida desactivado.",
+        ["Group.BestPlayerVotingEnabled"] = "Votación del mejor de la partida activada.",
+        ["Group.BestPlayerVotingDisabled"] = "Votación del mejor de la partida desactivada.",
+        ["Group.SaveError"] = "Error al guardar. Inténtalo de nuevo.",
 
         // FeaturesToggles component
         ["Group.PaymentsSection"] = "Pagos",
@@ -671,6 +706,12 @@ internal static class GroupTexts
         ["Group.TestData"] = "Datos de prueba",
         ["Group.PayoutSaving"] = "Guardando…",
         ["Group.PixKeyRandom"] = "Clave Aleatoria",
+        ["Group.PixKeyTypeUnknown"] = "Desconocido",
+        ["Group.PayoutTestBeneficiaryName"] = "Organizador de Prueba",
+        ["Group.PixKeyRequired"] = "La clave Pix es obligatoria.",
+        ["Group.BeneficiaryNameRequired"] = "El nombre del beneficiario es obligatorio.",
+        ["Group.BeneficiaryCpfRequired"] = "El CPF del beneficiario es obligatorio.",
+        ["Group.BankAccountRequired"] = "El número de cuenta es obligatorio.",
 
         // Payments page
         ["Group.PaymentsTitle"] = "Pagos",
@@ -686,6 +727,7 @@ internal static class GroupTexts
         ["Group.PaymentsProofAccept"] = "Aceptar",
         ["Group.PaymentsProofReject"] = "Rechazar",
         ["Group.PaymentsProofAcceptConfirm"] = "¿Confirmar este pago?",
+        ["Group.PaymentsMarkPaidConfirm"] = "¿Seguro que deseas confirmar este pago?",
         ["Group.PaymentsProofRejectConfirm"] = "¿Rechazar este comprobante? El jugador tendrá que enviarlo de nuevo.",
         ["Group.PaymentsProofAccepting"] = "Aceptando...",
         ["Group.PaymentsProofRejecting"] = "Rechazando...",

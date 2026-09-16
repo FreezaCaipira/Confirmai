@@ -118,7 +118,7 @@ public partial class Index
         var code = joinCode.Trim().ToUpperInvariant();
         if (string.IsNullOrWhiteSpace(code))
         {
-            joinCodeError = "Digite o código de convite.";
+            joinCodeError = Ui["GroupEntry.CodeRequired"];
             return;
         }
         NavigationManager.NavigateTo($"/convite/{code}");

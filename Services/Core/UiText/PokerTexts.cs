@@ -138,6 +138,12 @@ internal static class PokerTexts
         ["Poker.MaxPlayersShort"] = "Máx. jogadores",
         ["Poker.StackMinShort"] = "Stack mínimo",
         ["Poker.StackMaxShort"] = "Stack máximo",
+
+        // Code-behind error messages
+        ["Poker.CreateEventError"] = "Erro ao criar evento.",
+        ["Poker.AlreadyRegistered"] = "Você já está inscrito.",
+        ["Poker.JoinRequestSendError"] = "Não foi possível enviar a solicitação agora. Tente novamente em instantes.",
+        ["Poker.JoinRequestCancelError"] = "Não foi possível cancelar a solicitação agora. Tente novamente em instantes.",
     };
 
     /// <summary>EN-US English (United States) strings</summary>
@@ -273,6 +279,12 @@ internal static class PokerTexts
         ["Poker.MaxPlayersShort"] = "Max. players",
         ["Poker.StackMinShort"] = "Min. stack",
         ["Poker.StackMaxShort"] = "Max. stack",
+
+        // Code-behind error messages
+        ["Poker.CreateEventError"] = "Error creating event.",
+        ["Poker.AlreadyRegistered"] = "You are already registered.",
+        ["Poker.JoinRequestSendError"] = "Could not send the request now. Please try again in a moment.",
+        ["Poker.JoinRequestCancelError"] = "Could not cancel the request now. Please try again in a moment.",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings</summary>
@@ -408,6 +420,12 @@ internal static class PokerTexts
         ["Poker.MaxPlayersShort"] = "Máx. jugadores",
         ["Poker.StackMinShort"] = "Stack mínimo",
         ["Poker.StackMaxShort"] = "Stack máximo",
+
+        // Code-behind error messages
+        ["Poker.CreateEventError"] = "Error al crear el evento.",
+        ["Poker.AlreadyRegistered"] = "Ya está inscrito.",
+        ["Poker.JoinRequestSendError"] = "No se pudo enviar la solicitud ahora. Inténtelo de nuevo en unos instantes.",
+        ["Poker.JoinRequestCancelError"] = "No se pudo cancelar la solicitud ahora. Inténtelo de nuevo en unos instantes.",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>
