@@ -566,7 +566,7 @@ Nao mexer no fluxo do dinheiro (pagamento, repasse, taxa) -- esta validado em pr
 
 **Contexto**: o MVP esta funcional em producao (grupos, partidas, confirmacao, pagamento manual, taxa, repasse, login Google/email). O Robson decidiu **lapidar antes de integrar o WhatsApp**: estrutura, UML/casos de uso, layout, botao do Google, auditoria, isencao de taxa por grupo e onboarding. O Senior concordou com a lista e reordenou: **o mapa de casos de uso vem primeiro porque testes, auditoria, onboarding e layout derivam dele**; isencao de taxa antes do layout porque destrava os primeiros clientes agora.
 
-**Ordem**: C33 (casos de uso + testes de integracao em Postgres) -> C34 (isencao de taxa + auditoria + seguranca) -> C35 (design tokens + tela-piloto, **aprovacao do Robson antes de espalhar**) -> C36-A (Senior, FEITO: grupo como unica porta de entrada) -> C36-B (Pleno: propagar o padrao + botao Google + onboarding) -> C31 Evolution -> C32 pre-producao.
+**Ordem**: C33 (casos de uso + testes de integracao em Postgres) -> C34 (isencao de taxa + auditoria + seguranca) -> C35 (design tokens + tela-piloto, **aprovacao do Robson antes de espalhar**) -> C36-A (Senior, FEITO: grupo como unica porta de entrada) -> C36-B (Pleno: propagar o padrao + botao Google + onboarding) -> C36-C (Pleno: pagamentos no escopo do grupo, nav Partidas · Grupos) -> C31 Evolution -> C32 pre-producao.
 
 **Regra de ouro em todos**: TDD, SOLID, i18n (regra 25), CSS so com vars, build `--no-incremental` 0 warning, suite completa verde, 1 commit por fase, **blocos de build/test colados no PR (regra 28 -- PR sem isso volta sem review)**.
 
@@ -725,6 +725,40 @@ Sem biblioteca de tour; sem modal de boas-vindas.
 
 ### Fase 7 -- Titulo do hero (landing deslogada)
 Hoje: "Organize o racha da sua turma sem dor de cabeca" (`Index.LandingTitle`). Robson decide o texto final; proposta alternativa: "Organize o racha, confirme presenca e receba sem cobrar um por um". Subtitulo com os 3 verbos, CTA unico azul ("Criar conta"), "Entrar" secundario. i18n nos 3 idiomas.
+
+### C36-C -- Pagamentos entram no escopo do grupo; nav = Partidas · Grupos [PLANEJADO -- Pleno, logo apos a Fase 0 do C36-B; aprovado pelo Robson em 14/06/2026: "muito bom, vamos nessa!"]
+**Decisao do Robson**: "levar essa tela de pagamentos para dentro do escopo do grupo, parecido com o acesso que o admin do grupo tem; simplificar o menu superior removendo Pagamentos; o user tambem tem acesso a tela de partidas do grupo, porem com as permissoes de user normal". Mesmo principio do C36-A: tudo acontece dentro do grupo.
+
+**Achados da inspecao que moldam o ciclo**:
+- `/payments` (`Pages/Payment/PaymentsHistory.razor`) **nao e pagamento de partida**: lista `PaymentRecord` do marketplace antigo (produtos). Nao toca `EventConfirmation`. Para o jogador e uma tela morta.
+- `/grupo/{id}/partidas` (`Pages/Groups/Partidas.razor`) **ja e acessivel ao membro** (o hub mostra o botao para todos; criar/editar so para admin). Mas **nao verifica se o usuario e membro** -- qualquer logado com o id ve as partidas de um grupo privado. `Ranking.razor.cs` faz a checagem certa (`isMember`); `Partidas` e `Payments` nao.
+- `/grupo/{id}/pagamentos` (`Pages/Groups/Payments.razor(.cs)`, `Services/Groups/GroupPaymentsService.LoadGroupAndCheckAdminAsync`) e **admin-only**: abas comprovantes / inadimplentes / historico / taxa da plataforma.
+
+#### Fase 1 -- Nav e rota morta
+- Remover "Pagamentos" da nav autenticada em `MainLayout.razor` (desktop e drawer). Nav final: **Partidas · Grupos** (+ Admin; Integracao so quando aplicavel).
+- `/payments` e `/payments/view/{id}` -> `Pages/LegacyRoutes.razor` redirecionando para `/`. `PaymentsHistory` e `ViewPayment` **saem** (junto com o CSS isolado) **se** o marketplace nao tiver rota viva apontando para elas; se tiver (`Pages/Product/*`), manter as paginas sem link na nav e registrar como divida do marketplace. Chave `Nav.Payments` sai dos 3 dicionarios se nao sobrar uso (teste anti-hardcode vai apontar).
+- Teste: `LegacyRoute_RedirectsToHome` ganha `/payments`.
+
+#### Fase 2 -- Checagem de membro nas telas do grupo (correcao de acesso)
+- Extrair `GroupAccess` (service ou metodo estatico em `Services/Groups/`) com `IsMember(group, userId)` / `IsAdmin(group, userId)`; usar em `Detail`, `Partidas`, `Ranking`, `Payments`, `Features` no lugar dos `group.Members.Any(...)` repetidos.
+- Nao-membro em `/grupo/{id}/partidas`, `/ranking`, `/pagamentos`: **mesma tela** que o hub ja mostra para nao-membro (linha 214 do `Detail.razor`: "voce nao faz parte deste grupo" + pedir para entrar), nao 404 nem lista.
+- Testes de integracao (padrao do `HomeGroupFirstIntegrationTests`): membro ve, nao-membro nao ve nome de partida nem valores, em cada uma das 3 rotas.
+
+#### Fase 3 -- `/grupo/{id}/pagamentos` com visao do jogador
+Mesma rota, conteudo por permissao:
+- **Membro (nao admin)**: aba unica **"Meus pagamentos"** -- so as `EventConfirmation` do proprio usuario naquele grupo, agrupadas por estado: **A pagar** (`PaymentStatus == Pending`, partida futura ou passada) com CTA azul "Pagar" -> `/pagamento/evento/{ConfirmationId}`; **Em analise** (comprovante enviado, aguardando organizador); **Pago**. Valor por linha, total a pagar no topo. Nunca ve dados de outros membros, nem a aba de taxa.
+- **Admin**: abas atuais + a aba "Meus pagamentos" (admin tambem joga e paga).
+- `LoadGroupAndCheckAdminAsync` vira `LoadGroupAndRoleAsync` retornando `(Group, IsMember, IsAdmin)`; a consulta "minhas confirmacoes no grupo" vai para `GroupPaymentsService` com teste unitario (filtra por `UserId` **e** `GroupId`; confirmacao de partida cancelada nao aparece em "A pagar").
+- Hub (`Detail.razor`): botao "Pagamentos" passa a aparecer para **todo membro** (hoje so admin); badge com o numero de pendencias do usuario quando > 0.
+- Visual no vocabulario do C36-B: A pagar = `--warning-soft`, Em analise = `--accent-soft`, Pago = `--success-soft`; um so CTA azul por linha.
+
+#### Fase 4 -- Visao consolidada na home (compensa a saida do "Pagamentos" global)
+- `Pages/Index.razor`: quando o usuario tem confirmacoes `Pending` em qualquer grupo, um aviso `--accent-soft` no topo: "Voce tem N pagamentos pendentes" -- se 1 grupo, link direto para `/grupo/{id}/pagamentos`; se varios, lista de chips "Grupo X (2)". Dados ja estao carregados em `Index.razor.cs` (`upcoming` + `past`), so agregar; nada de query nova.
+- `ConfirmationCard` ja mostra o estado de pagamento; garantir que "Pagar" nele seja o CTA azul e que exista em partidas **passadas** nao pagas (divida nao morre com a partida).
+- Teste: usuario com 2 pendencias em 2 grupos ve o aviso e os 2 chips; usuario sem pendencias nao ve o bloco.
+
+#### O que NAO fazer
+Nao mudar regra de pagamento, taxa, repasse, comprovante ou inadimplencia -- so **quem ve o que** e **onde**. Nao criar tela nova fora do grupo. Nao remover `EventPayment` (`/pagamento/evento/{id}`), que continua sendo a tela de pagar. Textos novos em PT/EN/ES. Uma PR por fase; a Fase 2 e correcao de acesso e vai **primeiro** se o Pleno preferir.
 
 ### Metricas e evidencias obrigatorias no PR (uma PR por fase, nesta ordem; a Fase 0 e a menor e a mais visivel -- comecar por ela)
 - Linhas de `*.razor.css` + `wwwroot/css/*.css` **antes/depois** (a meta e reduzir: CSS que so compensava a paleta antiga sai).
