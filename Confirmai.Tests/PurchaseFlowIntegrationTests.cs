@@ -72,6 +72,10 @@ public class PurchaseFlowIntegrationTests : IClassFixture<IntegrationTestWebAppF
 
     private async Task SeedPaymentAsync(string invoiceId, string buyerId, string sellerId, string productName)
     {
+        // Products.UserId and Payments.UserId are real FKs under Postgres.
+        await _factory.EnsureUserAsync(sellerId);
+        await _factory.EnsureUserAsync(buyerId);
+
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 

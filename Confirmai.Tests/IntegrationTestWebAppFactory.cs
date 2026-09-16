@@ -16,12 +16,81 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Npgsql;
 
 namespace Confirmai.Tests;
 
 public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
 {
-    private readonly string _databaseName = $"Confirmai-int-{Guid.NewGuid()}";
+    private string? _schemaName;
+    private string? _connectionString;
+    private string? _adminConnectionString;
+
+    /// <summary>
+    /// Lazily creates the per-factory citest_* schema in the shared Postgres
+    /// backend and applies migrations. Called inside ConfigureWebHost (sync)
+    /// because the app's own startup MigrateAsync runs in the entry-point
+    /// thread after the test host is captured — it cannot be relied on.
+    /// Derived factories (WithWebHostBuilder) reuse the same schema, matching
+    /// the old shared InMemory database semantics.
+    /// </summary>
+    private void EnsurePostgresSchema()
+    {
+        if (_connectionString is not null)
+        {
+            return;
+        }
+
+        var backend = PostgresTestBackend.Get();
+        _adminConnectionString = backend.ConnectionString;
+        _schemaName = $"citest_{DateTime.UtcNow:yyMMddHHmm}_{Guid.NewGuid():N}";
+
+        using (var conn = new NpgsqlConnection(_adminConnectionString))
+        {
+            conn.Open();
+            using var cmd = new NpgsqlCommand($"CREATE SCHEMA \"{_schemaName}\"", conn);
+            cmd.ExecuteNonQuery();
+        }
+
+        _connectionString = new NpgsqlConnectionStringBuilder(_adminConnectionString)
+        {
+            SearchPath = _schemaName
+        }.ConnectionString;
+
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseNpgsql(_connectionString)
+            .Options;
+        using var db = new AppDbContext(options);
+        db.Database.Migrate();
+    }
+
+    /// <summary>
+    /// Drops the per-factory schema after the host stops. Leftover citest_*
+    /// schemas from killed runs are swept by PostgresTestBackend.
+    /// </summary>
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+
+        if (_schemaName is not null && _adminConnectionString is not null)
+        {
+            try
+            {
+                using var conn = new NpgsqlConnection(_adminConnectionString);
+                conn.Open();
+                using var cmd = new NpgsqlCommand($"DROP SCHEMA IF EXISTS \"{_schemaName}\" CASCADE", conn);
+                cmd.ExecuteNonQuery();
+            }
+            catch
+            {
+                // Best-effort cleanup; stale schemas are swept by PostgresTestBackend.
+            }
+
+            _schemaName = null;
+            _connectionString = null;
+            _adminConnectionString = null;
+        }
+    }
 
     /// <summary>
     /// Seeds a minimal Futsal group + event. Returns the created event ID.
@@ -32,6 +101,8 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
         bool lineupConfirmed = false,
         string creatorId = "test-creator-1")
     {
+        await EnsureUserAsync(creatorId);
+
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -69,6 +140,8 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
     /// </summary>
     public async Task<int> SeedGroupWithAdminAsync(string adminUserId, string groupName = "Grupo de Teste")
     {
+        await EnsureUserAsync(adminUserId);
+
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -93,6 +166,35 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
         await db.SaveChangesAsync();
 
         return group.Id;
+    }
+
+    /// <summary>
+    /// Inserts a minimal ApplicationUser with the given Id when absent.
+    /// Postgres enforces FK on UserId columns — seeds that used to get away
+    /// with bare ids under InMemory must call this first.
+    /// </summary>
+    public async Task EnsureUserAsync(string userId, string? email = null)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        if (await db.Users.AnyAsync(u => u.Id == userId))
+        {
+            return;
+        }
+
+        db.Users.Add(new ApplicationUser
+        {
+            Id = userId,
+            UserName = email ?? $"{userId}@test.local",
+            NormalizedUserName = (email ?? $"{userId}@test.local").ToUpperInvariant(),
+            Email = email ?? $"{userId}@test.local",
+            NormalizedEmail = (email ?? $"{userId}@test.local").ToUpperInvariant(),
+            EmailConfirmed = true,
+            SecurityStamp = Guid.NewGuid().ToString("N"),
+            ConcurrencyStamp = Guid.NewGuid().ToString("N"),
+        });
+        await db.SaveChangesAsync();
     }
 
     /// <summary>
@@ -125,12 +227,13 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+        EnsurePostgresSchema();
 
         builder.ConfigureAppConfiguration((_, configBuilder) =>
         {
             var settings = new Dictionary<string, string?>
             {
-                ["ConnectionStrings:DefaultConnection"] = "Host=localhost;Port=5432;Database=Confirmai_tests;Username=test;Password=test",
+                ["ConnectionStrings:DefaultConnection"] = _connectionString,
                 ["AdminSeed:Email"] = "admin@test.local",
                 ["AdminSeed:Password"] = "Admin123!Aa",
                 ["AdminSeed:FullName"] = "Admin Test",
@@ -165,11 +268,11 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
                 services.Remove(dbContextDescriptor);
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseInMemoryDatabase(_databaseName));
+                options.UseNpgsql(_connectionString));
 
             services.RemoveAll<IDbContextFactory<AppDbContext>>();
             services.AddDbContextFactory<AppDbContext>(options =>
-                options.UseInMemoryDatabase(_databaseName));
+                options.UseNpgsql(_connectionString));
 
             services.RemoveAll<BitcoinQuoteService>();
             services.RemoveAll<CryptoQuoteService>();

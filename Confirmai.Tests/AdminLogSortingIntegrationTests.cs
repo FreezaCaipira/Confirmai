@@ -111,6 +111,11 @@ public class AdminLogSortingIntegrationTests : IClassFixture<IntegrationTestWebA
         string? userId = null,
         DateTime? timestampUtc = null)
     {
+        if (userId is not null)
+        {
+            await _factory.EnsureUserAsync(userId);
+        }
+
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 

@@ -21,6 +21,7 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
     {
         const string adminUserId = "groups-admin-1";
         var groupId = await _factory.SeedGroupWithAdminAsync(adminUserId, "Grupo Badge Pendente");
+        await _factory.EnsureUserAsync("requester-user-1");
 
         using (var scope = _factory.Services.CreateScope())
         {
@@ -56,6 +57,7 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         const string adminUserId = "groups-admin-2";
         var noPendingGroupId = await _factory.SeedGroupWithAdminAsync(adminUserId, "Grupo Sem Pendencias");
         var withPendingGroupId = await _factory.SeedGroupWithAdminAsync(adminUserId, "Grupo Com Pendencias");
+        await _factory.EnsureUserAsync("requester-user-2");
 
         using (var scope = _factory.Services.CreateScope())
         {
@@ -95,6 +97,7 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         const string adminUserId = "groups-admin-3";
         await _factory.SeedGroupWithAdminAsync(adminUserId, "Grupo Sem Pendencias Query");
         var withPendingGroupId = await _factory.SeedGroupWithAdminAsync(adminUserId, "Grupo Com Pendencias Query");
+        await _factory.EnsureUserAsync("requester-user-3");
 
         using (var scope = _factory.Services.CreateScope())
         {
@@ -129,6 +132,7 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
     {
         const string adminUserId = "groups-admin-4";
         var pendingGroupId = await _factory.SeedGroupWithAdminAsync(adminUserId, "Grupo Ação Necessária");
+        await _factory.EnsureUserAsync("requester-user-4");
 
         using (var scope = _factory.Services.CreateScope())
         {

@@ -112,8 +112,8 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
         const string invoiceId = "inv-http-utf8-too-large";
         await SeedPaymentAsync(invoiceId);
 
-        // '€' is 3 bytes in UTF-8, so byte size can exceed the limit even with fewer characters.
-        var multibyteNote = new string('€', 120);
+        // 'ï¿½' is 3 bytes in UTF-8, so byte size can exceed the limit even with fewer characters.
+        var multibyteNote = new string('ï¿½', 120);
         var payload = $"{{\"invoiceId\":\"{invoiceId}\",\"type\":\"InvoiceSettled\",\"note\":\"{multibyteNote}\"}}";
 
         using var content = new StringContent(payload, Encoding.UTF8, "application/json");
@@ -132,12 +132,12 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
 
         string? payloadAtLimit = null;
 
-        // Find a note with mixed UTF-8 widths (3-byte '€' + 1-byte 'a') that lands exactly on the byte limit.
+        // Find a note with mixed UTF-8 widths (3-byte 'ï¿½' + 1-byte 'a') that lands exactly on the byte limit.
         for (var euroCount = 0; euroCount <= maxBytes && payloadAtLimit is null; euroCount++)
         {
             for (var asciiCount = 0; asciiCount <= maxBytes; asciiCount++)
             {
-            var note = new string('€', euroCount) + new string('a', asciiCount);
+            var note = new string('ï¿½', euroCount) + new string('a', asciiCount);
                 var candidate = $"{{\"invoiceId\":\"{invoiceId}\",\"type\":\"InvoiceSettled\",\"note\":\"{note}\"}}";
                 var byteCount = Encoding.UTF8.GetByteCount(candidate);
 
@@ -170,7 +170,7 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
         const string invoiceId = "inv-http-utf8-unknown-length-too-large";
         await SeedPaymentAsync(invoiceId);
 
-        var multibyteNote = new string('€', 140);
+        var multibyteNote = new string('ï¿½', 140);
         var payload = $"{{\"invoiceId\":\"{invoiceId}\",\"type\":\"InvoiceSettled\",\"note\":\"{multibyteNote}\"}}";
 
         using var content = new UnknownLengthStringContent(payload);
@@ -453,13 +453,17 @@ public class WebhookEndpointIntegrationTests : IClassFixture<IntegrationTestWebA
 
     private async Task SeedPaymentAsync(string invoiceId)
     {
+        // Products.UserId and Payments.UserId are real FKs under Postgres.
+        await _factory.EnsureUserAsync("seller-int-1");
+        await _factory.EnsureUserAsync("buyer-int-1");
+
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         var product = new Product
         {
-            Name = "Produto integração",
-            Description = "Produto para teste de integração",
+            Name = "Produto integraï¿½ï¿½o",
+            Description = "Produto para teste de integraï¿½ï¿½o",
             Price = 0.0001m,
             UserId = "seller-int-1"
         };

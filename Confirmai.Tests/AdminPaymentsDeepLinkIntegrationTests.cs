@@ -36,6 +36,12 @@ public class AdminPaymentsDeepLinkIntegrationTests : IClassFixture<IntegrationTe
     [Fact]
     public async Task AdminPaymentsPage_RendersGatewayTelemetrySection_WhenGatewaysHaveData()
     {
+        // EventConfirmation.UserId and EventId are real FKs under Postgres.
+        await _factory.EnsureUserAsync("gateway-user-1");
+        await _factory.EnsureUserAsync("gateway-user-2");
+        await _factory.EnsureUserAsync("gateway-user-3");
+        var eventId = await _factory.SeedFutsalEventAsync(creatorId: "gateway-telemetry-creator");
+
         using (var scope = _factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -43,7 +49,7 @@ public class AdminPaymentsDeepLinkIntegrationTests : IClassFixture<IntegrationTe
             db.EventConfirmations.AddRange(
                 new EventConfirmation
                 {
-                    EventId = 501,
+                    EventId = eventId,
                     UserId = "gateway-user-1",
                     PixTxId = "gw-telemetry-1",
                     PaymentGatewayName = "EfiBank",
@@ -53,7 +59,7 @@ public class AdminPaymentsDeepLinkIntegrationTests : IClassFixture<IntegrationTe
                 },
                 new EventConfirmation
                 {
-                    EventId = 502,
+                    EventId = eventId,
                     UserId = "gateway-user-2",
                     PixTxId = "gw-telemetry-2",
                     PaymentGatewayName = "EfiBank",
@@ -63,7 +69,7 @@ public class AdminPaymentsDeepLinkIntegrationTests : IClassFixture<IntegrationTe
                 },
                 new EventConfirmation
                 {
-                    EventId = 503,
+                    EventId = eventId,
                     UserId = "gateway-user-3",
                     PixTxId = "gw-telemetry-3",
                     PaymentGatewayName = "AbacatePay",

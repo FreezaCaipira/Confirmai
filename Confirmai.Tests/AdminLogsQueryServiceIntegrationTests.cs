@@ -105,6 +105,9 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
     {
         var marker = Guid.NewGuid().ToString("N");
 
+        // The policy service writes an audit log with this user id (FK_Logs_AspNetUsers_UserId).
+        await _factory.EnsureUserAsync($"admin-security-{marker}");
+
         using (var updateScope = _factory.Services.CreateScope())
         {
             var policyService = updateScope.ServiceProvider.GetRequiredService<AdminSecurityPolicyService>();
@@ -210,6 +213,11 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
         string? userId = null,
         DateTime? timestampUtc = null)
     {
+        if (userId is not null)
+        {
+            await _factory.EnsureUserAsync(userId);
+        }
+
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
