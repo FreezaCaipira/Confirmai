@@ -145,10 +145,11 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 **O V1 esta funcionalmente completo e a divida tecnica do repasse esta encerrada (C29).** Daqui pra frente o caminho critico nao e mais codigo de feature -- e **operacao**: o que falta depende de credenciais/decisoes do Robson.
 
 1. ~~Mergear a PR de review do C29~~ feito. ~~C30 / C30-B~~ feitos e validados em prod (#96-#105, #107).
-2. **Ciclo 30-C -- achados dos testes do Robson em prod** (planejado abaixo, **executavel agora pelo Pleno**): preview da imagem no criar grupo, EN/ES dos dicionarios de produto, `.mk-btn` unico, pagina `/error` server-side, dividas do Identity.
-3. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): **desbloqueado e planejado**. Robson escolheu **Evolution API** (self-hosted, nao-oficial) disparando no **grupo de WhatsApp do grupo do sistema**, nao em DM. Detalhe no Ciclo 31.
-4. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
-5. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
+2. ~~Ciclo 30-C~~ feito (#109, review + correcao #110).
+3. **PROGRAMA DE LAPIDACAO POS-MVP (C33-C36)** -- decisao do Robson (14/06/2026) de lapidar **antes** da Evolution: casos de uso + testes em Postgres (C33) -> isencao de taxa por grupo + auditoria do dinheiro + seguranca (C34) -> design tokens + tela-piloto com gate do Robson (C35) -> layout geral + botao Google + onboarding (C36). Detalhe nas secoes proprias.
+4. **Ciclo 31 -- WhatsApp** (ultima feature do escopo): **desbloqueado e planejado**. Robson escolheu **Evolution API** (self-hosted, nao-oficial) disparando no **grupo de WhatsApp do grupo do sistema**, nao em DM. Detalhe no Ciclo 31.
+5. **Ciclo 32 -- pre-producao**: revisao de CSP, metricas SignalR/alertas, checklist de deploy (EasyPanel), `SyncPassword=false`, mTLS do webhook, pen-test financeiro do caminho manual.
+6. **V2 (Pix automatico)** -- so depois do go-live do V1 e das pendencias Efi/fiscal do Robson.
 
 **Se o C30 e o C31 seguirem bloqueados**, o unico ciclo de codigo executavel agora e o **C32 (pre-producao)** -- ele nao depende de ninguem e e pre-requisito de go-live de qualquer forma. E a recomendacao do Senior enquanto as credenciais nao chegarem.
 
@@ -468,7 +469,7 @@ Na pratica: **a feature ainda nao existe para o usuario**. O saldo acumula e nin
 
 ---
 
-## Ciclo 30-C (Pleno) -- Achados dos testes do Robson em producao: preview de imagem, EN/ES, botoes, pagina de erro e dividas do Identity [PLANEJADO -- EXECUTAVEL AGORA]
+## Ciclo 30-C (Pleno) -- Achados dos testes do Robson em producao: preview de imagem, EN/ES, botoes, pagina de erro e dividas do Identity [EXECUTADO -- PR #109, ver review acima]
 
 **Contexto**: o Robson percorreu o fluxo inteiro em `https://confirmai.m2gpju.easypanel.host` -- login Google, cadastro por email, criar grupo, Pix no Profile, partida, pagamento, repasse -- e **esta funcional de ponta a ponta**. Tres bloqueadores achados no caminho ja foram corrigidos pelo Senior e estao na `main`: campo de Pix que nao existia no Profile (#105, regressao do C26), botao Salvar do Pix sem estilo (#106) e **segundo login Google quebrando** por FK no audit log (#107, bug desde o commit original do OAuth). Sobraram 5 itens nao-bloqueantes, que sao este ciclo. Layout geral do fluxo de pagamento/repasse fica para um ciclo futuro (decisao do Robson).
 
@@ -543,6 +544,232 @@ Nao bloqueiam, mas o Pleno as declarou e elas fecham o C30-B:
 ### O que NAO fazer
 
 Nao mexer no fluxo do dinheiro (pagamento, repasse, taxa) -- esta validado em prod. Nao redesenhar o layout do pagamento/repasse (Robson deixou para depois). Nao comecar o C31 (Evolution) -- espera a Fase 0 operacional do Robson. Nao adicionar bUnit para testar render: os testes deste ciclo sao de service/convencao/integracao, e a validacao visual e por print no PR.
+
+---
+
+## Review Senior do Ciclo 30-C (PR #109, mergeada na `main`) -- APROVADO com 1 correcao
+
+**Resultado por fase**: as 5 fases entregues no escopo. EN/ES completos (Group 221, Futsal 149, Poker 103) e os 3 dicionarios no `I18nKeyParityTests`; preview via `RequestImageFileAsync(320,320)` + `StateHasChanged` + 4 mensagens em i18n; `/error` virou Razor Page server-side com `RequestId`, `Error.razor` removido; `.mk-btn` base unico em `buttons.css` + `MkBtnConventionTests`; 13 telas do Identity com heading/footer, `role="alert"`, `aria-describedby`; `ForgotPasswordConfirmation` com conteudo. CI verde.
+
+**Correcao aplicada pelo Senior (PR #110)**: na Fase 3 a base foi unificada, mas o override de cor/gradiente ficou em `ProfileEditForm.razor.css` -- o Salvar do Pix (`Profile.razor`, sem CSS isolado) recebia o visual global chapado e o achado do Robson continuava. O visual do ProfileEditForm agora **e** a definicao global; #106 fechada como superada.
+
+**Ressalvas (entram no proximo ciclo do Pleno, nao bloqueiam)**:
+1. Bloco "### Build" do PR **vazio** -- regra 28 nao cumprida. Sem build/suite colados, a review nao deveria comecar.
+2. `ErrorPageIntegrationTests` so faz `GET /error`; nao prova o caminho real (excecao -> re-execucao). Falta endpoint de teste que lanca e assere o HTML da pagina de erro, nao o `_Host`.
+3. Anti-hardcode em `.razor.cs` nasceu com **29 strings em `ResidualAllowlist`** -- reintroduz o padrao que o C29 zerou. Vira fase de migracao (C33), nao divida permanente.
+4. Sem teste do teto de tamanho do `logoPreview` (plano pedia <= 100 KB). Aceito sem bUnit; registrado.
+5. Verificacao visual EN/ES pendente com o Robson.
+
+---
+
+## PROGRAMA DE LAPIDACAO POS-MVP (decisao do Robson, 14/06/2026) -- Ciclos 33 a 36, antes da Evolution
+
+**Contexto**: o MVP esta funcional em producao (grupos, partidas, confirmacao, pagamento manual, taxa, repasse, login Google/email). O Robson decidiu **lapidar antes de integrar o WhatsApp**: estrutura, UML/casos de uso, layout, botao do Google, auditoria, isencao de taxa por grupo e onboarding. O Senior concordou com a lista e reordenou: **o mapa de casos de uso vem primeiro porque testes, auditoria, onboarding e layout derivam dele**; isencao de taxa antes do layout porque destrava os primeiros clientes agora.
+
+**Ordem**: C33 (casos de uso + testes de integracao em Postgres) -> C34 (isencao de taxa + auditoria + seguranca) -> C35 (design tokens + tela-piloto, **aprovacao do Robson antes de espalhar**) -> C36-A (Senior, FEITO: grupo como unica porta de entrada) -> C36-B (Pleno: propagar o padrao + botao Google + onboarding) -> C36-C (Pleno: pagamentos no escopo do grupo, nav Partidas · Grupos) -> C31 Evolution -> C32 pre-producao.
+
+**Regra de ouro em todos**: TDD, SOLID, i18n (regra 25), CSS so com vars, build `--no-incremental` 0 warning, suite completa verde, 1 commit por fase, **blocos de build/test colados no PR (regra 28 -- PR sem isso volta sem review)**.
+
+### Diagnostico do Senior (o que a inspecao do repo mostrou)
+
+- **Auditoria**: 68 chamadas `AuditAsync`, 76 eventos em `AuditEvents`, todos usados. O buraco e **no caminho do dinheiro**: `PlatformFeeSettlementService` (envio, confirmacao e rejeicao do repasse pelo admin) e `PixProofUploadService` (upload do comprovante) tem **zero** audit. Ou seja: o que mais precisa de rastro e o que menos tem.
+- **Testes**: `IntegrationTestWebAppFactory` e `TestDataFactory` usam **InMemory**; nao ha Testcontainers. Foi isso que deixou passar o FK do segundo login Google (#107). O CI ja tem Postgres (2 testes so passam la).
+- **Isencao de taxa**: nao existe nada (`FeeOptions` e global; `EventConfirmation.PlatformFeeAmount` e o snapshot por pagamento). Bom: o snapshot e exatamente o ponto certo para gravar zero.
+- **CSS**: 236 variaveis em `site.css`, varias so alias de outras (`--bg-deep: var(--ci-bg-card-deep)`), paletas parchment/dourado/azul competindo. O que os exemplos do Robson tem e o oposto: 1 fundo neutro quase-preto, superficie 1 tom acima, borda 1px sutil, raio 12-16px, 1 acento saturado, resto em cinzas, espaco generoso.
+- **Botao Google**: `Login.cshtml` ja tem o `google-g.svg`, mas o botao usa a mesma classe/visual do login local. A Google exige (branding guidelines) fundo branco ou `#131314`, borda `#747775`/`#8E918F`, Roboto 500 14px, logo colorido 18px e texto "Continuar com o Google"/"Continue with Google".
+- **UML**: `docs/` tem deploy, runbooks e checklist -- **nenhum** diagrama de fluxo.
+
+---
+
+## Ciclo 33 (Pleno) -- Mapa de casos de uso por ator + testes de integracao em Postgres [PLANEJADO -- EXECUTAVEL AGORA]
+
+**Objetivo**: saber, por escrito e com ID, tudo que Jogador, Organizador e Admin podem fazer; e que cada caso de uso critico tenha teste de integracao rodando contra **Postgres real**.
+
+### Fase 1 -- Diagramas em `docs/uml/` (Mermaid, versionado; nada de imagem solta)
+1. `casos-de-uso.md`: 3 diagramas (`flowchart`/`graph` Mermaid), um por ator -- **Jogador**, **Organizador** (inclui tudo do Jogador), **Admin da plataforma**. Cada caso de uso com ID estavel `UC-J-01`, `UC-O-01`, `UC-A-01`... e uma linha: pre-condicao, resultado, tela/rota, service que executa. Levantar a lista **lendo `Pages/` e os `[Authorize]`**, nao de memoria.
+2. `estados.md`: diagrama de estados (`stateDiagram-v2`) de **`EventConfirmation`** (pendente -> pago manual -> rejeitado/estornado, lista de espera -> promovido) e do **lote de repasse** (`PlatformFeeSettlement`: rascunho -> em analise -> confirmado/rejeitado). Sao os 2 objetos que carregam dinheiro.
+3. `sequencia-pagamento-manual.md`: `sequenceDiagram` do caminho jogador -> QR -> comprovante -> organizador confirma -> snapshot da taxa -> ledger -> repasse -> admin.
+4. Em cada UC: coluna **"Teste"** com o nome do teste que o cobre, ou `FALTA`. Essa coluna e o produto da fase.
+
+### Fase 2 -- Postgres nos testes de integracao
+1. Adicionar **Testcontainers.PostgreSql** (dependencia de teste; aprovada pelo Senior por ser a unica forma de pegar FK/unique/transacao). `IntegrationTestWebAppFactory` passa a subir Postgres; manter InMemory **so** nos testes unitarios de service que nao dependem de constraint.
+2. No CI ja existe Postgres: usar `POSTGRES_CONNECTION` do ambiente quando definido (evita Docker-in-Docker); local usa Testcontainers.
+3. Primeiro teste novo: **reproduzir o bug da #107** (audit com `UserId` invalido deve falhar em Postgres) -- e o teste que provaria que a infraestrutura pega o que o InMemory deixou passar.
+
+### Fase 3 -- Fechar os `FALTA` criticos
+Escrever teste de integracao para todo UC marcado `FALTA` que envolva **dinheiro, permissao ou dado de outro usuario**. Os demais viram backlog listado no proprio `casos-de-uso.md`.
+
+### Fase 4 -- Migrar as 29 strings do `ResidualAllowlist` (ressalva 3 do C30-C)
+Zerar a allowlist do anti-hardcode em `.razor.cs`. Chaves em PT/EN/ES, paridade garantida pelo teste.
+
+### O que NAO fazer
+Nao gerar diagrama de classes do dominio inteiro (ruido); nao adicionar bUnit; nao mexer em layout.
+
+---
+
+## Ciclo 34 (Pleno) -- Isencao de taxa por grupo + auditoria do caminho do dinheiro + revisao de seguranca [PLANEJADO -- depois do C33]
+
+### Fase 1 -- Isencao de taxa da plataforma por grupo (primeiros clientes)
+Decisao do Robson: grupos escolhidos nao pagam a taxa, para crescer organicamente. Travas do Senior:
+1. **So o admin da plataforma** liga/desliga, em `AdminUserView`/tela de grupo do admin -- **nao** e opcao do organizador. `Group.PlatformFeeWaivedUntil` (`DateTime?`) + `Group.PlatformFeeWaiverReason` (texto curto) + migration. Isencao **sempre com prazo**; sem prazo nao existe (evita desconto eterno esquecido). Admin pode renovar.
+2. A taxa continua sendo **calculada e registrada como zero** no snapshot (`EventConfirmation.PlatformFeeAmount = 0`) e no ledger -- **nunca pulada**. O repasse continua funcionando com lotes de R$ 0 excluidos da selecao. Assim voce sabe quanto deixou de cobrar (metrica de aquisicao no `AdminRevenue`: "isento no periodo").
+3. Regra unica em um service (`PlatformFeePolicy` ou equivalente): `Resolve(group, now) -> fee`. `GroupPaymentsService`, `EventPayment` e `EventPaymentSummary` consomem daqui; **nenhum** `ManualPlatformFeeFixed` lido direto fora dele.
+4. UI do jogador: QR e resumo mostram `15,00` sem a linha da taxa quando isento (nao "taxa: R$ 0,00").
+5. Audit `GroupFeeWaiverChanged` (quem, grupo, ate quando, motivo). Testes: isento antes/depois do prazo, snapshot zero, ledger zero, organizador nao consegue ligar.
+
+### Fase 2 -- Auditoria onde falta (achado do diagnostico)
+Novos eventos e chamadas: `SettlementSubmitted`, `SettlementConfirmed`, `SettlementRejected` (com motivo) em `PlatformFeeSettlementService`; `ProofUploaded` / `ProofReplaced` em `PixProofUploadService`; `GroupJoinRequested/Approved/Rejected`; `UserProfileUpdated` quando **chave Pix** muda (e dado de recebimento). Cada um com teste que assere a linha em `Logs`. Revisar o mapa de UCs do C33: **todo UC que muda dinheiro ou permissao tem audit** -- coluna nova "Audit" no `casos-de-uso.md`.
+
+### Fase 3 -- Revisao de seguranca focada (nao varredura generica)
+Ja houve 2 varreduras (C19, P0-P2 entregues). Aqui: (a) Fase A do C32 antecipada -- testes **adversariais** do caminho manual (jogador marcando o proprio pagamento, membro enviando repasse, comprovante de terceiro pelos endpoints, upload com content-type falsificado); (b) `IDOR` em toda rota com `{id}` listada no mapa de UCs; (c) rate limit nos endpoints de upload e no `ExternalLogin`. Onde falhar, corrigir **no service**.
+
+### O que NAO fazer
+Nao mudar o valor da taxa nem a matematica do V2; nao criar isencao por usuario ou por partida.
+
+---
+
+## Ciclo 35 (Pleno + Robson) -- Design tokens + tela-piloto [PLANEJADO -- depois do C34; **gate de aprovacao do Robson**]
+
+**Por que assim**: 10 ciclos de CSS retocaram pagina por pagina e o resultado ainda parece "primitivo" (palavras do Robson). Os exemplos que ele mandou tem um sistema de **poucos tokens**; o nosso tem 236 vars e 3 paletas. Retocar de novo produziria uma 4a camada.
+
+**Ferramenta CSS (pergunta do Robson, decisao do Senior): NAO entra framework.** Tailwind/Bootstrap exigiria reescrever o markup de ~50 componentes com CSS isolation e adicionar pipeline Node ao build .NET, para chegar onde tokens + CSS puro chegam. Para garantir a qualidade **sem** framework:
+1. **Referencia numerica, nao gosto**: os tokens seguem o **shadcn/ui dark (paleta zinc + acento azul)** -- e o sistema por tras dos dashboards de referencia do Robson e sao so valores CSS. O Pleno copia os valores; nao inventa tom.
+2. **Contraste medido**: toda combinacao texto/superficie com razao AA (>= 4.5:1) registrada no PR e verificada por teste (parser das vars + calculo de contraste), nao por olho.
+3. **Criterio de aceite escrito** para o piloto: card = `--surface` + borda 1px + `--radius` 12 + espacamento 24; sem gradiente de fundo; sem sombra pesada; 1 acento; tipografia com 3 pesos.
+4. **Plano B**: se o piloto reprovar no gate, avaliar Tailwind **so** no Dashboard antes de espalhar -- nunca o contrario.
+5. Unica dependencia opcional aceita: **Lucide** (icones SVG) no lugar do Font Awesome, se o Pleno mostrar ganho visual no piloto.
+
+### Fase 1 -- Tokens (`wwwroot/css/tokens.css`, carregado antes de tudo)
+~14 tokens, e so eles: `--bg` (quase-preto neutro, ex. `#0b0d12`), `--surface` (1 tom acima), `--surface-2` (elevado), `--border` (1px, ~12% de branco), `--text`, `--text-2`, `--text-3`, `--accent` (**um** so, saturado -- **decisao do Robson: azul**), `--accent-fg`, `--success`, `--warning`, `--danger`, `--radius` (12px), `--radius-sm` (8px), `--shadow` (uma, suave). Tudo em `oklch` ou hex com contraste **AA verificado** (texto >= 4.5:1, texto secundario >= 4.5:1 sobre surface, borda visivel). Registrar as razoes de contraste no PR.
+
+### Fase 2 -- Remapear as 236 vars atuais para os tokens
+As vars atuais viram **alias** dos tokens (`--ci-bg-card: var(--surface)`), sem tocar nas paginas. Parchment/dourado deixam de existir como cor de fundo; dourado sobrevive so como `--warning` se necessario. Teste de CSS vars continua verde. Prints antes/depois de 5 telas para o Robson ver o efeito global do remapeamento **antes** da fase 3.
+
+### Fase 3 -- Tela-piloto: Dashboard (`Pages/Index`)
+Redesenhar **uma** tela no padrao dos exemplos: cards com `--surface` + `--border` 1px + `--radius`, espacamento 24px, tipografia com 3 pesos, metricas em destaque, sem sombra pesada, sem gradiente de fundo. Hero com titulo curto, subtitulo em `--text-2` e **um** CTA em `--accent`.
+**GATE**: o Robson aprova o piloto (print desktop + mobile) **antes** do C36. Se reprovar, ajusta-se o token, nao a tela.
+
+### O que NAO fazer
+Nao espalhar para outras telas neste ciclo; nao introduzir framework CSS; nao criar tokens alem dos listados sem justificativa no PR.
+
+---
+
+## Ciclo 36 -- Layout geral no padrao aprovado + botao Google + onboarding
+
+**Estado (14/06/2026)**: C35 (PR #112) **aprovado pelo Robson** ("melhorou muito"; "agora parece um layout moderno, os elementos tem acabamento e suavidade"). **C36-A feito pelo Senior** (PR #113, mergeada): o grupo e a unica porta de entrada -- `/` virou "Minhas partidas" (chips dos meus grupos, toggle Jogo/Organizo, empty state entrar/criar grupo), vitrine por cidade/esporte removida (`Futsal/Index`, `Poker/Index`, `Dashboard`, `MyEvents`, `MyConfirmations`, `EventListingShell`, `CitySelector`, `SportCard`, `CityContext`, `CityService`), rotas legadas com redirect em `Pages/LegacyRoutes.razor`, nav = Partidas / Grupos / Pagamentos. **O restante (C36-B, abaixo) e do Pleno**: o core esta pronto e serve de base; e aplicacao sistematica, tela a tela.
+
+### Direcao do Robson para o C36-B (ler antes de tocar em CSS)
+1. **Manter o escuro como esta** (fundo `--bg`, cards `--surface` + borda 1px `--border` + raio `--radius`).
+2. **Usar mais o azul** -- o azul da tag "Novidades" (`--accent-soft` fundo + `--accent-text` texto; botao cheio `--accent`) -- **para direcionar o usuario ao fluxo desejado**, nao como decoracao. Regra: **em cada tela existe UM proximo passo, e ele e o unico elemento azul cheio.** Tudo que nao e o proximo passo fica em cinza (`--surface-2`/`--border-2`/`--text-2`).
+3. Elementos que "se mantiveram como antes" (print da tela `/grupos`: cards com fundo/borda vermelha ou azul por esporte, botoes verdes "Ver Partidas"/"Entrar", caixa de convite com borda azul cheia, cookie banner em navy + verde) **precisam ser atualizados** para o novo padrao.
+
+### Vocabulario de cor (unico permitido; teste de contraste do C35 continua valendo)
+| Papel | Token | Exemplo |
+|---|---|---|
+| Acao primaria (o proximo passo da tela) | `--accent` fundo + `--accent-fg` texto | "Criar partida", "Confirmar presenca", "Entrar" (com codigo), "Salvar" |
+| Acao secundaria | `--surface-2` fundo + `--border-2` borda + `--text` | "Cancelar", "Ver todas", "Gerenciar" |
+| Link / texto de destaque | `--accent-text` | "Gerenciar grupos ->" |
+| Estado ativo / selecionado / badge informativo | `--accent-soft` fundo + `--accent-text` texto (a tag "Novidades") | toggle ativo, aba ativa, badge "Admin", badge de esporte |
+| Atencao que pede acao do usuario | `--warning-soft` + `--warning` | "Pix pendente", "pagamento em analise" |
+| Sucesso (estado, nunca botao) | `--success-soft` + `--success` | "Pago", "Confirmado" |
+| Erro / destrutivo | `--danger-soft` + `--danger` | "Cancelar partida", validacao |
+
+**Proibido**: verde em botao (verde = estado, nao acao); cor por esporte em fundo/borda de card (esporte vira badge `--accent-soft` com icone); gradiente de fundo; sombra alem de `--shadow`/`--shadow-card`; qualquer hex/rgba novo fora de `tokens.css`; as vars `--futsal-*`, `--poker-*`, `--parchment-*`, `--gold-*`, `--green-*`, `--red-*` em codigo novo (elas continuam existindo como alias, mas a meta e **zerar os usos** nas telas do fluxo principal).
+
+### Fase 0 -- Header (barra superior): respiro nas bordas e ordem dos elementos
+Pedido do Robson (14/06/2026): "o title principal bem como a internacionalizacao estao muito proximos da extremidade; a ordenacao dos elementos do menu superior pode melhorar; a internacionalizacao tinha ficado boa centralizada". Causa: `.oldsite-header` (`wwwroot/css/shell.css`) e um flex de largura total com `padding: 0 var(--space-5)` e a nav em `flex-end`, enquanto o conteudo (`.oldsite-frame`, `entity-shell.css`) e centralizado em `min(1520px, ...)` -- logo e bandeiras encostam na borda da janela, desalinhados do conteudo.
+Fazer (so `Shared/Components/MainLayout.razor` + `shell.css`; nada de logica):
+1. Wrapper interno `.oldsite-header-inner` com **a mesma largura e margem do `.oldsite-frame`** (`width: min(1520px, calc(100% - 0.2rem)); margin: 0 auto; padding: 0 var(--space-6)`), grid de 3 zonas `auto 1fr auto`.
+2. **Esquerda**: so a marca minima -- icone (`.oldsite-logo-art`) + "Confirma Ai" em `font-size: var(--fs-sm)`/`--fw-semibold`, como link para `/` (o usuario precisa de uma "casa" clicavel). **Tagline "Bora jogar!?" sai do header** (decisao do Robson: "nao e crucial que seja exibido nem o title e nem esse subtitle") e passa a existir so na landing deslogada e nas telas do Identity (login/cadastro), onde a marca tem espaco para respirar. Remover `.oldsite-tagline` do `MainLayout.razor`; nao apagar a chave/texto, so realocar.
+3. **Centro**: nav principal -- `Partidas · Grupos · Pagamentos` (+ `Admin` para admin, + `Integracao` so quando aplicavel) -- centralizada, item ativo em `--accent-soft`/`--accent-text` (mesma classe do toggle da home). Deslogado: centro vazio.
+4. **Direita**, nesta ordem: idioma (3 bandeiras, `gap: var(--space-1)`), mensagens (icone + badge), avatar/nome (link ao perfil; `"Bem-vindo, email"` vira so o **nome** ou avatar -- o email nao cabe e nao e informacao util no header), `Sair` como link secundario. Deslogado: idioma, `Entrar` (secundario), `Cadastrar` (azul -- e o proximo passo).
+   *Alternativa do Robson*: bandeiras **centralizadas** (ele achou melhor assim antes). Decidir com print das duas variantes no PR: (a) bandeiras a direita antes do usuario, (b) bandeiras centralizadas a direita da nav. Ele escolhe.
+5. Mobile (<= 768px): logo a esquerda, botao Menu a direita; o drawer lista nav, idioma, mensagens, perfil, sair, nesta ordem. Nada encostado: padding `var(--space-4)` no drawer.
+6. Remover o `order: 99` e `margin-left` das bandeiras e qualquer regra do header que sobrou em `site.css`/`MainLayout.razor.css` (um so lugar: `shell.css`).
+Evidencia: print 1366 e 390 antes/depois; medir que a borda esquerda do logo alinha com a borda esquerda do card "Novidades".
+
+### Fase 1 -- `/grupos` (a tela do print) e `/grupo/{id}` (hub)
+Arquivos: `Pages/Groups/Index.razor(.css)`, `wwwroot/css/event-listing.css` (`.group-card*`, `.groups-*`), `Pages/Groups/Detail.razor(.css)`, `Shared/Components/Groups/GroupMetrics.razor.css`, `Shared/Components/Groups/NoGroupsHint.razor`.
+- Card de grupo = `--surface` + `--border` + `--radius`, **sem** fundo vermelho/azul: `.group-card--action-required` passa a mostrar a pendencia como badge `--warning-soft` ("Pix pendente") no card, nao como borda vermelha. Badge de esporte em `--accent-soft`. Hover: borda `--border-2` (sem elevar sombra).
+- Bloco "Entrar em outro grupo": **reutilizar `GroupEntryPanel`** (criado no C36-A, `Shared/Components/Groups/GroupEntryPanel.razor`) no lugar do bloco proprio -- apaga o CSS duplicado de `Groups/Index.razor.css`. Como o usuario ja tem grupos, a acao primaria da tela e **"Criar novo grupo"** (azul); "Entrar com codigo" fica secundario. Remover o botao verde "Ver Partidas" (a home ja e isso; a nav "Partidas" leva la).
+- Hub do grupo: abas com estado ativo em `--accent-soft`/`--accent-text` (mesmo toggle da home, classe compartilhada em `wwwroot/css/shell.css` ou novo `wwwroot/css/components.css` -- **um** lugar); acao primaria do organizador = "Criar partida"; do jogador = "Confirmar presenca" na proxima partida.
+- Print antes/depois desktop + mobile (390px) no PR.
+
+### Fase 2 -- Partida (detalhe, criacao, edicao, escalacao) futsal e poker
+Arquivos: `Pages/Futsal/Detail|Create|Edit|Escalacao.razor(.css)`, `Pages/Poker/Detail|Create|Edit.razor(.css)`, `wwwroot/css/event-detail.css`, `event-create.css`, `events.css`, `escalacao.css`, `Shared/Components/ConfirmationCard.razor.css`.
+- Detalhe: um so CTA azul, que muda com o estado do usuario -- nao confirmado -> "Confirmar presenca"; confirmado e nao pago -> "Pagar"; pago -> nenhum botao azul, badge `--success-soft` "Pago". Lista de confirmados em linhas `--surface-2` com avatar; goleiro/linha como badge `--accent-soft`, nao cor propria.
+- Criacao/edicao: formulario em card unico, campos `--surface-3` + borda `--border`, foco `--accent-ring`; "Criar partida" azul, "Cancelar" secundario.
+- Zerar `--futsal-*`/`--poker-*` nessas telas (esporte = badge + icone).
+
+### Fase 3 -- Pagamento e repasse (o "layout do pagamento" adiado pelo Robson)
+Arquivos: `Pages/Payment/Payment|ViewPayment|PaymentsHistory.razor(.css)` (`Payment.razor.css` tem **32 gradientes**), `Pages/Groups/Payments.razor(.css)` (35 sombras), `Shared/Components/Groups/GroupDetailPaymentsModal.razor.css`, `Pages/Groups/Components/PixReceiverSelector|PayoutAccountEditor.razor.css`.
+- Status de pagamento em badges do vocabulario (`--warning` em analise, `--success` pago, `--danger` rejeitado); QR/Pix copia-e-cola em card `--surface-2`; "Enviar comprovante" e "Confirmar recebimento" sao os CTAs azuis das respectivas telas.
+- **Nao mudar nenhuma regra ou fluxo de pagamento** -- so classes/CSS. Bug encontrado -> PR separado.
+
+### Fase 4 -- Profile, cookie banner, Identity, Admin
+- `Pages/Profile.razor(.css)` + `Pages/Components/Profile/*.razor.css`: header do perfil sem gradiente; "Salvar" azul nos dois blocos (ja unificado em `buttons.css`, verificar).
+- `Shared/Components/CookieConsent.razor.css`: fundo `--surface`, borda `--border`, "Aceitar tudo" azul, "Recusar opcionais" secundario, "Personalizar" link `--accent-text`. Sem gradiente navy, sem verde.
+- `wwwroot/css/identity.css` + `Areas/Identity/Pages/*.cshtml`: mesmos tokens; "Entrar"/"Cadastrar" azul.
+- `wwwroot/css/admin.css` (27 gradientes, 43 sombras) e `Pages/Admin/*.razor.css`: so tokens; admin nao precisa de polimento visual, precisa parar de destoar.
+
+### Fase 5 -- Botao do Google conforme branding da Google
+Componente proprio (partial `_GoogleSignInButton.cshtml`) seguindo as guidelines: fundo `#131314` no tema escuro, borda `#8E918F`, logo colorido 18px, Roboto 500 14px, texto via i18n ("Continuar com o Google"). **Excecao unica** a regra de hex fora de `tokens.css` (cores impostas pela Google; comentar isso no CSS). Nao herda `.btn`. Aplicar em Login e Register. Print lado a lado com o botao local.
+
+### Fase 6 -- Onboarding por **empty state** (o que sobrou apos o C36-A)
+Regra geral (decisao do Robson): toda tela cujo conteudo depende de um pre-requisito mostra **o pre-requisito + o CTA azul que o resolve**, nunca lista vazia. Ja feito no C36-A: sem grupo (home), sem partida confirmada, organizador sem partida ("Criar partida em X"). Falta:
+1. Grupo sem partida, visto de dentro do grupo (`/grupo/{id}` e `/grupo/{id}/partidas`) -> CTA "Criar a primeira partida" + 1 frase do que acontece depois; para o jogador, "O organizador ainda nao marcou a proxima partida".
+2. Organizador sem Pix tentando criar partida **paga** -> aviso **bloqueante** no formulario com link para o Profile (`#pix`).
+3. Checklist de 3 passos no hub do grupo para o admin (Pix cadastrado, 1a partida criada, convite enviado) que **some** quando completo. Estado derivado dos dados, nao flag no banco.
+4. Jogador que entrou pelo convite cai no hub do grupo mostrando a proxima partida e "Confirmar presenca" -- nada mais.
+Sem biblioteca de tour; sem modal de boas-vindas.
+
+### Fase 7 -- Titulo do hero (landing deslogada)
+Hoje: "Organize o racha da sua turma sem dor de cabeca" (`Index.LandingTitle`). Robson decide o texto final; proposta alternativa: "Organize o racha, confirme presenca e receba sem cobrar um por um". Subtitulo com os 3 verbos, CTA unico azul ("Criar conta"), "Entrar" secundario. i18n nos 3 idiomas.
+
+### C36-C -- Pagamentos entram no escopo do grupo; nav = Partidas · Grupos [PLANEJADO -- Pleno, logo apos a Fase 0 do C36-B; aprovado pelo Robson em 14/06/2026: "muito bom, vamos nessa!"]
+**Decisao do Robson**: "levar essa tela de pagamentos para dentro do escopo do grupo, parecido com o acesso que o admin do grupo tem; simplificar o menu superior removendo Pagamentos; o user tambem tem acesso a tela de partidas do grupo, porem com as permissoes de user normal". Mesmo principio do C36-A: tudo acontece dentro do grupo.
+
+**Achados da inspecao que moldam o ciclo**:
+- `/payments` (`Pages/Payment/PaymentsHistory.razor`) **nao e pagamento de partida**: lista `PaymentRecord` do marketplace antigo (produtos). Nao toca `EventConfirmation`. Para o jogador e uma tela morta.
+- `/grupo/{id}/partidas` (`Pages/Groups/Partidas.razor`) **ja e acessivel ao membro** (o hub mostra o botao para todos; criar/editar so para admin). Mas **nao verifica se o usuario e membro** -- qualquer logado com o id ve as partidas de um grupo privado. `Ranking.razor.cs` faz a checagem certa (`isMember`); `Partidas` e `Payments` nao.
+- `/grupo/{id}/pagamentos` (`Pages/Groups/Payments.razor(.cs)`, `Services/Groups/GroupPaymentsService.LoadGroupAndCheckAdminAsync`) e **admin-only**: abas comprovantes / inadimplentes / historico / taxa da plataforma.
+
+#### Fase 1 -- Nav e rota morta
+- Remover "Pagamentos" da nav autenticada em `MainLayout.razor` (desktop e drawer). Nav final: **Partidas · Grupos** (+ Admin; Integracao so quando aplicavel).
+- `/payments` e `/payments/view/{id}` -> `Pages/LegacyRoutes.razor` redirecionando para `/`. `PaymentsHistory` e `ViewPayment` **saem** (junto com o CSS isolado) **se** o marketplace nao tiver rota viva apontando para elas; se tiver (`Pages/Product/*`), manter as paginas sem link na nav e registrar como divida do marketplace. Chave `Nav.Payments` sai dos 3 dicionarios se nao sobrar uso (teste anti-hardcode vai apontar).
+- Teste: `LegacyRoute_RedirectsToHome` ganha `/payments`.
+
+#### Fase 2 -- Checagem de membro nas telas do grupo (correcao de acesso)
+- Extrair `GroupAccess` (service ou metodo estatico em `Services/Groups/`) com `IsMember(group, userId)` / `IsAdmin(group, userId)`; usar em `Detail`, `Partidas`, `Ranking`, `Payments`, `Features` no lugar dos `group.Members.Any(...)` repetidos.
+- Nao-membro em `/grupo/{id}/partidas`, `/ranking`, `/pagamentos`: **mesma tela** que o hub ja mostra para nao-membro (linha 214 do `Detail.razor`: "voce nao faz parte deste grupo" + pedir para entrar), nao 404 nem lista.
+- Testes de integracao (padrao do `HomeGroupFirstIntegrationTests`): membro ve, nao-membro nao ve nome de partida nem valores, em cada uma das 3 rotas.
+
+#### Fase 3 -- `/grupo/{id}/pagamentos` com visao do jogador
+Mesma rota, conteudo por permissao:
+- **Membro (nao admin)**: aba unica **"Meus pagamentos"** -- so as `EventConfirmation` do proprio usuario naquele grupo, agrupadas por estado: **A pagar** (`PaymentStatus == Pending`, partida futura ou passada) com CTA azul "Pagar" -> `/pagamento/evento/{ConfirmationId}`; **Em analise** (comprovante enviado, aguardando organizador); **Pago**. Valor por linha, total a pagar no topo. Nunca ve dados de outros membros, nem a aba de taxa.
+- **Admin**: abas atuais + a aba "Meus pagamentos" (admin tambem joga e paga).
+- `LoadGroupAndCheckAdminAsync` vira `LoadGroupAndRoleAsync` retornando `(Group, IsMember, IsAdmin)`; a consulta "minhas confirmacoes no grupo" vai para `GroupPaymentsService` com teste unitario (filtra por `UserId` **e** `GroupId`; confirmacao de partida cancelada nao aparece em "A pagar").
+- Hub (`Detail.razor`): botao "Pagamentos" passa a aparecer para **todo membro** (hoje so admin); badge com o numero de pendencias do usuario quando > 0.
+- Visual no vocabulario do C36-B: A pagar = `--warning-soft`, Em analise = `--accent-soft`, Pago = `--success-soft`; um so CTA azul por linha.
+
+#### Fase 4 -- Visao consolidada na home (compensa a saida do "Pagamentos" global)
+- `Pages/Index.razor`: quando o usuario tem confirmacoes `Pending` em qualquer grupo, um aviso `--accent-soft` no topo: "Voce tem N pagamentos pendentes" -- se 1 grupo, link direto para `/grupo/{id}/pagamentos`; se varios, lista de chips "Grupo X (2)". Dados ja estao carregados em `Index.razor.cs` (`upcoming` + `past`), so agregar; nada de query nova.
+- `ConfirmationCard` ja mostra o estado de pagamento; garantir que "Pagar" nele seja o CTA azul e que exista em partidas **passadas** nao pagas (divida nao morre com a partida).
+- Teste: usuario com 2 pendencias em 2 grupos ve o aviso e os 2 chips; usuario sem pendencias nao ve o bloco.
+
+#### O que NAO fazer
+Nao mudar regra de pagamento, taxa, repasse, comprovante ou inadimplencia -- so **quem ve o que** e **onde**. Nao criar tela nova fora do grupo. Nao remover `EventPayment` (`/pagamento/evento/{id}`), que continua sendo a tela de pagar. Textos novos em PT/EN/ES. Uma PR por fase; a Fase 2 e correcao de acesso e vai **primeiro** se o Pleno preferir.
+
+### Metricas e evidencias obrigatorias no PR (uma PR por fase, nesta ordem; a Fase 0 e a menor e a mais visivel -- comecar por ela)
+- Linhas de `*.razor.css` + `wwwroot/css/*.css` **antes/depois** (a meta e reduzir: CSS que so compensava a paleta antiga sai).
+- `grep -c "linear-gradient"` antes/depois por arquivo tocado (meta: 0 nas telas do fluxo principal).
+- `grep -cE "\-\-(futsal|poker|parchment|gold|green|red)-"` antes/depois nos arquivos tocados.
+- Print desktop (1366) e mobile (390) de cada tela, antes/depois, PT.
+- `DesignTokensContrastTests` verde; se precisar de token novo, adiciona em `tokens.css` **com** o par de contraste no teste.
+- Testes anti-hardcode e de paridade i18n verdes; todo texto novo em PT/EN/ES.
+
+### O que NAO fazer
+Nao mudar fluxo funcional durante o redesenho (bug -> PR separado); nao criar token fora de `tokens.css`; nao usar verde/vermelho/roxo como cor de acao; nao adicionar framework CSS nem biblioteca de icones sem aprovacao do Senior; nao "melhorar" a home do C36-A alem de aplicar as classes compartilhadas; nao adicionar animacao alem de transicoes de 150ms; nao tocar em `Pages/Admin/ParchmentLab.razor` (laboratorio, sera removido em ciclo proprio).
 
 ---
 
