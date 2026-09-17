@@ -121,6 +121,8 @@ builder.Services.AddScoped<EventPaymentReconciliationService>();
     builder.Services.AddScoped<EventPaymentChargeCalculator>();
     builder.Services.AddScoped<EventConfirmationPaymentStatusService>();
     builder.Services.AddScoped<AdminConfirmationService>();
+    builder.Services.AddScoped<PlatformFeePolicy>();
+    builder.Services.AddScoped<PlatformFeeWaiverService>();
     builder.Services.AddScoped<PlatformFeeLedgerService>();
     builder.Services.AddScoped<PlatformFeeSettlementService>();
     builder.Services.AddScoped<PlatformFeeSettlementQueryService>();

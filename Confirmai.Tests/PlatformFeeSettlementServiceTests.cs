@@ -165,6 +165,23 @@ public class PlatformFeeSettlementServiceTests
     }
 
     [Fact]
+    public async Task SubmitSettlementAsync_ZeroFeeMatch_IsRejected()
+    {
+        // A waived match is stamped with fee 0 — it has nothing to settle and
+        // must be excluded from selection even if submitted directly.
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var evt = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-10", "a", fee: 0m);
+
+        var service = CreateService(ctx.factory);
+        var result = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0m, FakeImage(), "image/jpeg", new[] { evt.Id });
+
+        Assert.False(result.Success);
+        Assert.Empty(ctx.db.PlatformFeeSettlements);
+    }
+
+    [Fact]
     public async Task SubmitSettlementAsync_AmountBelowSelectedFees_IsRejected()
     {
         var ctx = TestDataFactory.CreateDbContextWithFactory();

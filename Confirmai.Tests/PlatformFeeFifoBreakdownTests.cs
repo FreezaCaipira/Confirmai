@@ -24,7 +24,7 @@ public class PlatformFeeFifoBreakdownTests
         decimal manualFee = 0.75m)
     {
         var options = Options.Create(TestFeeOptions(manualFee));
-        return new PlatformFeeLedgerService(ctx.factory, options);
+        return new PlatformFeeLedgerService(ctx.factory, new PlatformFeePolicy(options));
     }
 
     /// <summary>Seeds a group with N paid futsal confirmations spread across distinct events (one per match).</summary>

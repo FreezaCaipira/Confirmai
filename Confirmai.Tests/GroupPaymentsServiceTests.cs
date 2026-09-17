@@ -31,9 +31,10 @@ public class GroupPaymentsServiceTests
         var emailSenderMock = new Mock<IEmailSender>();
         var notificationService = new EventNotificationService(factory, emailSenderMock.Object, NullLogger<EventNotificationService>.Instance);
         var feeOptions = Microsoft.Extensions.Options.Options.Create(new Confirmai.Configuration.FeeOptions { ManualPlatformFeeFixed = manualFee });
-        var feeLedger = new PlatformFeeLedgerService(factory, feeOptions);
+        var feePolicy = new PlatformFeePolicy(feeOptions);
+        var feeLedger = new PlatformFeeLedgerService(factory, feePolicy);
         var svc = new GroupPaymentsService(factory, authMock.Object, notificationService, logService,
-            feeOptions, feeLedger, NullLogger<GroupPaymentsService>.Instance);
+            feeLedger, feePolicy, NullLogger<GroupPaymentsService>.Instance);
         return (factory, svc);
     }
 

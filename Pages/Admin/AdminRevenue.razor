@@ -243,6 +243,87 @@
                     }
                 }
             </div>
+
+            @* ── Per-group platform fee waiver (Ciclo 34) ── *@
+            <div class="admin-revenue-settlement-queue">
+                <h2 class="admin-revenue-section-title">@T["AdminRevenue.FeeWaiverTitle"]</h2>
+                <p class="admin-revenue-settlement-message">@T["AdminRevenue.FeeWaiverHint"]</p>
+
+                @if (waivedStats is not null && waivedStats.WaivedConfirmations > 0)
+                {
+                    <p class="admin-revenue-settlement-message">
+                        @T["AdminRevenue.FeeWaiverWaivedPeriod"]:
+                        <strong>R$ @waivedStats.WaivedAmount.ToString("N2", PtBr)</strong>
+                        (@waivedStats.WaivedConfirmations @T["AdminRevenue.FeeWaiverWaivedDetail"])
+                    </p>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(waiverMessage))
+                {
+                    <p class="admin-revenue-settlement-message">@waiverMessage</p>
+                }
+
+                <div class="admin-revenue-reject-cell">
+                    <select class="admin-revenue-input" @bind="waiverGroupId" aria-label="@T["AdminRevenue.FeeWaiverGroup"]">
+                        <option value="0">@T["AdminRevenue.FeeWaiverGroup"]</option>
+                        @foreach (var g in waiverGroupOptions)
+                        {
+                            <option value="@g.Id">@g.Name</option>
+                        }
+                    </select>
+                    <input type="date" class="admin-revenue-input" @bind="waiverUntil"
+                           aria-label="@T["AdminRevenue.FeeWaiverUntil"]" />
+                    <input type="text" class="admin-revenue-input" @bind="waiverReason"
+                           placeholder="@T["AdminRevenue.FeeWaiverReasonPlaceholder"]"
+                           aria-label="@T["AdminRevenue.FeeWaiverReason"]" />
+                    <button class="admin-revenue-btn admin-revenue-btn--success" type="button"
+                            disabled="@(waiverSaving || waiverGroupId <= 0)"
+                            @onclick="SaveWaiverAsync">
+                        @if (waiverSaving)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                        }
+                        @T["AdminRevenue.FeeWaiverSave"]
+                    </button>
+                </div>
+
+                @if (waiverRows.Count == 0)
+                {
+                    <p class="listing-state">@T["AdminRevenue.FeeWaiverEmpty"]</p>
+                }
+                else
+                {
+                    <table class="admin-revenue-table">
+                        <thead>
+                            <tr>
+                                <th>@T["AdminRevenue.FeeWaiverGroup"]</th>
+                                <th>@T["AdminRevenue.FeeWaiverUntil"]</th>
+                                <th>@T["AdminRevenue.FeeWaiverReason"]</th>
+                                <th>@T["AdminRevenue.FeeWaiverStatus"]</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var w in waiverRows)
+                            {
+                                <tr>
+                                    <td>@w.GroupName</td>
+                                    <td>@(w.WaivedUntil.HasValue ? T.FormatDateTime(w.WaivedUntil.Value.ToLocalTime(), "DateDefault") : "—")</td>
+                                    <td>@w.Reason</td>
+                                    <td>@(w.Active ? T["AdminRevenue.FeeWaiverActive"] : T["AdminRevenue.FeeWaiverExpired"])</td>
+                                    <td>
+                                        <button class="admin-revenue-btn admin-revenue-btn--danger" type="button"
+                                                disabled="@waiverSaving"
+                                                @onclick="() => RevokeWaiverAsync(w.GroupId)">
+                                            @T["AdminRevenue.FeeWaiverRevoke"]
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
         </article>
     </section>
 

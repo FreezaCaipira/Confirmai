@@ -109,10 +109,11 @@ public class PlatformFeeSettlementService
             var eventIds = selectedEventIds.Distinct().ToList();
 
             // The selected matches must belong to this group and have accrued fee.
+            // Zero-stamped (waived) lots are excluded — there is nothing to settle.
             var accruedByEvent = await db.EventConfirmations
                 .AsNoTracking()
                 .Where(c => c.Event!.GroupId == groupId
-                    && c.PlatformFeeAmount.HasValue
+                    && c.PlatformFeeAmount > 0
                     && eventIds.Contains(c.Event.Id))
                 .GroupBy(c => c.Event!.Id)
                 .Select(g => new { EventId = g.Key, Fee = g.Sum(c => c.PlatformFeeAmount!.Value) })

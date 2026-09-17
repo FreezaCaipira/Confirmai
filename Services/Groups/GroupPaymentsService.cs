@@ -23,8 +23,8 @@ public sealed class GroupPaymentsService
     private readonly AuthenticationStateProvider _authStateProvider;
     private readonly EventNotificationService _notificationService;
     private readonly LogService _logService;
-    private readonly IOptions<FeeOptions> _feeOptions;
     private readonly PlatformFeeLedgerService _feeLedger;
+    private readonly PlatformFeePolicy _feePolicy;
     private readonly ILogger<GroupPaymentsService> _logger;
 
     public GroupPaymentsService(
@@ -32,16 +32,16 @@ public sealed class GroupPaymentsService
         AuthenticationStateProvider authStateProvider,
         EventNotificationService notificationService,
         LogService logService,
-        IOptions<FeeOptions> feeOptions,
         PlatformFeeLedgerService feeLedger,
+        PlatformFeePolicy feePolicy,
         ILogger<GroupPaymentsService> logger)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
         _notificationService = notificationService;
         _logService = logService;
-        _feeOptions = feeOptions;
         _feeLedger = feeLedger;
+        _feePolicy = feePolicy;
         _logger = logger;
     }
 
@@ -72,7 +72,7 @@ public sealed class GroupPaymentsService
         var nowUtc = DateTime.UtcNow;
         var memberIds = group.Members.Select(m => m.UserId).ToHashSet();
         var sport = group.Sport;
-        var manualFee = _feeOptions.Value.ManualPlatformFeeFixed;
+        var manualFee = _feePolicy.ResolveManualFee(group, nowUtc);
         var gatewaysEnabled = group.EnablePaymentGateways;
         var isFutsal = sport == Sport.Futsal;
 
@@ -142,7 +142,12 @@ public sealed class GroupPaymentsService
             var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
             var userName = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
             var adminName = adminMap.TryGetValue(c.MarkedPaidByUserId!, out var n) ? n : "Admin";
-            return new PaymentHistoryEntry(userName, c.Event.StartsAt, TotalToPay(c.Event.Price ?? 0), href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
+            // History shows what was actually charged: the stamped fee snapshot when
+            // it exists (a waiver granted later must not rewrite past charges).
+            var amount = c.PlatformFeeAmount.HasValue
+                ? (c.Event.Price ?? 0) + c.PlatformFeeAmount.Value
+                : TotalToPay(c.Event.Price ?? 0);
+            return new PaymentHistoryEntry(userName, c.Event.StartsAt, amount, href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
         }).ToList();
 
         var pendingProofs = await db.EventConfirmations

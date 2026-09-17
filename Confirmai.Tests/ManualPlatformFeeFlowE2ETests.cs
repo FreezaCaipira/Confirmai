@@ -68,7 +68,7 @@ public class ManualPlatformFeeFlowE2ETests
         var feeOptions = Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m });
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
-        var feeLedger = new PlatformFeeLedgerService(factory, feeOptions);
+        var feeLedger = new PlatformFeeLedgerService(factory, new PlatformFeePolicy(feeOptions));
         var confirmSvc = new AdminConfirmationService(factory, logService, feeLedger, NullLogger<AdminConfirmationService>.Instance);
         var settlementSvc = new PlatformFeeSettlementService(
             factory, NullLogger<PlatformFeeSettlementService>.Instance,
@@ -156,7 +156,7 @@ public class ManualPlatformFeeFlowE2ETests
         var feeOptions = Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m });
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
-        var feeLedger = new PlatformFeeLedgerService(factory, feeOptions);
+        var feeLedger = new PlatformFeeLedgerService(factory, new PlatformFeePolicy(feeOptions));
         var confirmSvc = new AdminConfirmationService(factory, logService, feeLedger, NullLogger<AdminConfirmationService>.Instance);
         var settlementSvc = new PlatformFeeSettlementService(
             factory, NullLogger<PlatformFeeSettlementService>.Instance,
@@ -229,7 +229,7 @@ public class ManualPlatformFeeFlowE2ETests
         var feeOptions = Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m });
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
-        var feeLedger = new PlatformFeeLedgerService(factory, feeOptions);
+        var feeLedger = new PlatformFeeLedgerService(factory, new PlatformFeePolicy(feeOptions));
         var confirmSvc = new AdminConfirmationService(factory, logService, feeLedger, NullLogger<AdminConfirmationService>.Instance);
         var settlementSvc = new PlatformFeeSettlementService(
             factory, NullLogger<PlatformFeeSettlementService>.Instance,

@@ -41,6 +41,9 @@ public partial class EventPayment : IAsyncDisposable
     /// </summary>
     internal bool ShouldShowManualPix => !groupGatewaysEnabled || FeeOptions.Value.ShowDirectPixToOrganizer;
 
+    /// <summary>Manual fee resolved through the policy — 0 while the group is waived.</summary>
+    private decimal ResolvedManualFee => FeePolicy.ResolveManualFee(conf?.Event?.Group, DateTime.UtcNow);
+
     /// <summary>
     /// True when the fixed platform fee is charged on top of the match price (V1 manual, futsal).
     /// </summary>
@@ -48,7 +51,7 @@ public partial class EventPayment : IAsyncDisposable
         groupGatewaysEnabled,
         conf?.Event?.Sport == Sport.Futsal,
         conf?.Event?.Price ?? 0m,
-        FeeOptions.Value.ManualPlatformFeeFixed);
+        ResolvedManualFee);
 
     /// <summary>
     /// Amount the player must transfer. Must match the value encoded in the Pix QR payload.
@@ -57,7 +60,7 @@ public partial class EventPayment : IAsyncDisposable
         groupGatewaysEnabled,
         conf?.Event?.Sport == Sport.Futsal,
         conf?.Event?.Price ?? 0m,
-        FeeOptions.Value.ManualPlatformFeeFixed);
+        ResolvedManualFee);
 
     private PayState payState = PayState.Idle;
     private string? brCode;
@@ -71,6 +74,7 @@ public partial class EventPayment : IAsyncDisposable
     private CancellationTokenSource? _copyCts;
 
     [Inject] private EventPaymentService EventPaymentSvc { get; set; } = default!;
+    [Inject] private PlatformFeePolicy FeePolicy { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

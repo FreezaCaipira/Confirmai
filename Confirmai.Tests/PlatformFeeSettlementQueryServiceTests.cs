@@ -26,7 +26,7 @@ public class PlatformFeeSettlementQueryServiceTests
         decimal manualFee = 0.75m)
     {
         var options = Options.Create(TestFeeOptions(manualFee));
-        var ledger = new PlatformFeeLedgerService(ctx.factory, options);
+        var ledger = new PlatformFeeLedgerService(ctx.factory, new PlatformFeePolicy(options));
         return new PlatformFeeSettlementQueryService(ctx.factory, options, ledger);
     }
 
@@ -259,7 +259,7 @@ public class PlatformFeeSettlementQueryServiceTests
         var (group, _, _, _) = await SeedPaidFutsalMatchAsync(ctx.db);
 
         var options = Options.Create(new FeeOptions { Enabled = true, ManualPlatformFeeFixed = 0.75m });
-        var ledger = new PlatformFeeLedgerService(ctx.factory, options);
+        var ledger = new PlatformFeeLedgerService(ctx.factory, new PlatformFeePolicy(options));
         var service = new PlatformFeeSettlementQueryService(ctx.factory, options, ledger);
         var overview = await service.GetGroupFeeOverviewAsync(group.Id);
 
