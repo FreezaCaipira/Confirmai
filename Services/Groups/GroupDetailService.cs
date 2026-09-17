@@ -7,6 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Confirmai.Services.Groups;
 
+public enum JoinWithCodeResult
+{
+    Joined = 0,
+    AlreadyMember = 1,
+    InvalidCode = 2
+}
+
 public sealed class GroupDetailData
 {
     public Group? Group { get; set; }
@@ -96,30 +103,37 @@ public sealed class GroupDetailService
         }
     }
 
-    public async Task<(bool Success, string? Error)> JoinWithCodeAsync(int groupId, string userId, string code)
+    /// <summary>
+    /// Joins a group by invite code. Returns an outcome code — the caller
+    /// (page) translates it to the localized message; the service never
+    /// returns user-facing strings.
+    /// </summary>
+    public async Task<JoinWithCodeResult> JoinWithCodeAsync(int groupId, string userId, string code)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
         var group = await db.Groups.FirstOrDefaultAsync(g => g.Id == groupId);
         if (group is null || string.IsNullOrWhiteSpace(group.InviteCode) ||
             !string.Equals(code, group.InviteCode, StringComparison.OrdinalIgnoreCase))
         {
-            return (false, "Codigo invalido. Verifique e tente novamente.");
+            return JoinWithCodeResult.InvalidCode;
         }
 
         var exists = await db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == userId);
-        if (!exists)
+        if (exists)
         {
-            db.GroupMembers.Add(new GroupMember
-            {
-                GroupId = groupId,
-                UserId = userId,
-                Role = GroupMemberRole.Member,
-                CreatedAt = DateTime.UtcNow,
-            });
-            await db.SaveChangesAsync();
+            return JoinWithCodeResult.AlreadyMember;
         }
 
-        return (true, null);
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = groupId,
+            UserId = userId,
+            Role = GroupMemberRole.Member,
+            CreatedAt = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
+
+        return JoinWithCodeResult.Joined;
     }
 
     public async Task ApproveRequestAsync(int requestId, string approverUserId, string groupName)

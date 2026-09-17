@@ -124,10 +124,10 @@ public partial class Detail : IAsyncDisposable
         if (currentUserId is null || group is null) return;
         codeError = string.Empty;
         var typed = enteredCode.Trim().ToUpperInvariant();
-        var (success, error) = await GroupService.JoinWithCodeAsync(group.Id, currentUserId, typed);
-        if (!success)
+        var result = await GroupService.JoinWithCodeAsync(group.Id, currentUserId, typed);
+        if (result == Confirmai.Services.Groups.JoinWithCodeResult.InvalidCode)
         {
-            codeError = error ?? string.Empty;
+            codeError = Ui["GroupEntry.InvalidCode"];
             return;
         }
         await LoadGroup();
