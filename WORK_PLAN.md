@@ -585,6 +585,19 @@ Nao mexer no fluxo do dinheiro (pagamento, repasse, taxa) -- esta validado em pr
 
 ---
 
+## Review Senior do Ciclo 33 (PR #114) -- APROVADO c/ ressalvas
+
+**Escopo cumprido nas 4 fases.** `docs/uml/` com ~102 UCs por ator + coluna Teste, estados de `EventConfirmation`/`PlatformFeeSettlement`/`GroupJoinRequest`, sequencia do pagamento manual; `IntegrationTestWebAppFactory` em **Postgres real** (schema `citest_*` por factory, resolucao env -> user-secrets -> Testcontainers, sweep de schemas orfaos); `PostgresConstraintIntegrationTests` reproduz o bug da #107; 40 seeds com FK invalida corrigidos; `ApproveAllPendingAsync` e `JoinWithCodeAsync` extraidos p/ `GroupDetailService` com re-checagem de admin no service; allowlist do anti-hardcode **zerada** (39 strings) + teste `ReferencedI18nKeys_ExistInProviders` que pegou 12 chaves cruas em prod; teste real de re-execucao do `/error`. Build 0/0, 2417 testes, CI verde. Bloco Build preenchido (ressalva 1 do C30-C atendida).
+
+**Achado mais valioso**: o `MigrateAsync` do startup roda em thread do entry-point depois do host ser capturado -- por isso credenciais invalidas nunca falhavam nos testes. Explica por que o InMemory "passava" ha 30 ciclos.
+
+**Ressalvas (nao bloqueiam; entram no C34/C36-C):**
+1. O proprio mapa confirma o que o C36-C corrige: `UC-J-14` marca `/grupo/{id}` e `/partidas` como **publicos**; `UC-O-28` ("services nao revalidam") e `UC-O-30` ("toggle sem re-checagem") mostram que so o metodo novo re-verifica papel no service. `GroupAccess` do C36-C Fase 2 deve cobrir tambem `ApproveRequestAsync`/`RejectRequestAsync`/`*SelectedAsync` e os `Admin*` do `EventDetailService`.
+2. `Join.razor.cs`: antes, membro que reentrava caia em `alreadyMember`; agora `JoinWithCodeAsync` devolve sucesso e a tela mostra "voce entrou". Pequena regressao de UX -- devolver um terceiro estado (`AlreadyMember`) na tupla.
+3. `JoinWithCodeAsync` devolve "Codigo invalido..." hardcoded em PT dentro do service -- fora do alcance do anti-hardcode (`.razor.cs`). Padrao: service devolve **codigo**, a page traduz. Vale um teste anti-hardcode tambem em `Services/` (mensagens de mailbox sao a excecao, ja sem acento por escolha do C29).
+4. 41 `FALTA` restantes no mapa (14 de audit -> C34). Os de permissao que sobraram: `UC-O-24` guarda de cancelar futsal, `UC-O-26/27` poker edit/cancel, `UC-A-08/09/12` lockout e papel. Entram como Fase 3b do C34.
+5. Verificacao visual EN/ES segue pendente com o Robson (desde o C30-C).
+
 ## Ciclo 33 (Pleno) -- Mapa de casos de uso por ator + testes de integracao em Postgres [EXECUTADO -- ver review]
 
 **Objetivo**: saber, por escrito e com ID, tudo que Jogador, Organizador e Admin podem fazer; e que cada caso de uso critico tenha teste de integracao rodando contra **Postgres real**.
