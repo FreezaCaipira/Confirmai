@@ -3,6 +3,7 @@ using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Core;
+using Confirmai.Services.Groups;
 using Confirmai.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 
@@ -213,8 +214,12 @@ public class EventDetailService
     public async Task AdminRemoveConfirmationAsync(int confirmationId, string? currentUserId, int? eventId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var conf = await db.EventConfirmations.FindAsync(confirmationId);
+        var conf = await db.EventConfirmations
+            .Include(c => c.Event)
+            .FirstOrDefaultAsync(c => c.Id == confirmationId);
         if (conf is null) return;
+        if (conf.Event is null ||
+            !await GroupAccess.IsGroupAdminAsync(db, conf.Event.GroupId, currentUserId)) return;
         var position = conf.Position ?? FutsalPosition.Outfield;
         var targetUserId = conf.UserId;
         db.EventConfirmations.Remove(conf);

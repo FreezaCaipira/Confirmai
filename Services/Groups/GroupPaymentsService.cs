@@ -177,8 +177,13 @@ public sealed class GroupPaymentsService
     public async Task MarkPaidAsync(int confirmationId, string userId, string? currentUserId, int groupId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var conf = await db.EventConfirmations.FindAsync(confirmationId);
-        if (conf is not null && !conf.HasPaid && conf.PaymentGatewayName == null)
+        if (!await GroupAccess.IsGroupAdminAsync(db, groupId, currentUserId)) return;
+        var conf = await db.EventConfirmations
+            .Include(c => c.Event)
+            .FirstOrDefaultAsync(c => c.Id == confirmationId);
+        // The confirmation must belong to the group the caller administers —
+        // otherwise an admin of group A could mark payments in group B.
+        if (conf is not null && conf.Event?.GroupId == groupId && !conf.HasPaid && conf.PaymentGatewayName == null)
         {
             conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
             conf.HasPaid = true;
@@ -213,6 +218,9 @@ public sealed class GroupPaymentsService
     {
         if (currentUserId is null) return;
 
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        if (!await GroupAccess.IsGroupAdminAsync(db, groupId, currentUserId)) return;
+
         var entries = d.Entries.Select(e => (e.EventDate, e.EventPrice)).ToList();
 
         await _notificationService.NotifyDelinquencyAsync(
@@ -236,8 +244,11 @@ public sealed class GroupPaymentsService
     public async Task RejectProofAsync(int confirmationId, string? currentUserId, int groupId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var conf = await db.EventConfirmations.FindAsync(confirmationId);
-        if (conf is null || conf.PixProofUploadedAt is null) return;
+        if (!await GroupAccess.IsGroupAdminAsync(db, groupId, currentUserId)) return;
+        var conf = await db.EventConfirmations
+            .Include(c => c.Event)
+            .FirstOrDefaultAsync(c => c.Id == confirmationId);
+        if (conf is null || conf.Event?.GroupId != groupId || conf.PixProofUploadedAt is null) return;
 
         conf.PixProofImageData = null;
         conf.PixProofContentType = null;

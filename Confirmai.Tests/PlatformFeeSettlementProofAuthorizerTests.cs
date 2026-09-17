@@ -14,8 +14,13 @@ public class PlatformFeeSettlementProofAuthorizerTests
         (AppDbContext db, IDbContextFactory<AppDbContext> factory) ctx)
         => new(ctx.factory);
 
-    private static byte[] FakeImage(int size = 512) =>
-        Enumerable.Range(0, size).Select(_ => (byte)0xAB).ToArray();
+    private static byte[] FakeImage(int size = 512)
+    {
+        var bytes = Enumerable.Range(0, size).Select(_ => (byte)0xAB).ToArray();
+        // JPEG signature so the bytes pass ImageSignatureValidator
+        bytes[0] = 0xFF; bytes[1] = 0xD8; bytes[2] = 0xFF;
+        return bytes;
+    }
 
     private static async Task<(Group group, ApplicationUser organizer, PlatformFeeSettlement settlement)> SeedSettlementWithProofAsync(
         AppDbContext db, PlatformFeeSettlementStatus status = PlatformFeeSettlementStatus.EmAnalise)

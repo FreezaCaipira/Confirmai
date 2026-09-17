@@ -72,6 +72,16 @@ public class PlatformFeeSettlementService
             };
         }
 
+        // The declared MIME type is client-controlled — check the file signature.
+        if (!ImageSignatureValidator.MatchesDeclaredType(fileBytes, mimeType))
+        {
+            return new PlatformFeeSettlementResult
+            {
+                Success = false,
+                Message = _ui["Payment.Settlement.InvalidImageType"]
+            };
+        }
+
         if (amount <= 0)
         {
             return new PlatformFeeSettlementResult

@@ -18,8 +18,13 @@ public class PlatformFeeSettlementServiceTests
             new UiTextService(new LanguagePreferenceService()),
             new LogService(factory, NullLogger<LogService>.Instance));
 
-    private static byte[] FakeImage(int size = 1024) =>
-        Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();
+    private static byte[] FakeImage(int size = 1024)
+    {
+        var bytes = Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();
+        // JPEG signature so the bytes pass ImageSignatureValidator
+        bytes[0] = 0xFF; bytes[1] = 0xD8; bytes[2] = 0xFF;
+        return bytes;
+    }
 
     /// <summary>Group + an organizer that is an admin of that group (allowed to submit a settlement).</summary>
     private static async Task<(Group group, ApplicationUser organizer)> SeedGroupWithOrganizerAsync(AppDbContext db)

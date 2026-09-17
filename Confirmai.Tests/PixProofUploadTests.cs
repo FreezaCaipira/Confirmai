@@ -62,11 +62,11 @@ public class PixProofUploadTests
         var fileBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }; // JPEG magic number
 
         // Act
-        var result = await svc.UploadProofAsync(confId, fileBytes, "image/jpeg");
+        var result = await svc.UploadProofAsync(confId, fileBytes, "image/jpeg", "user-1");
 
         // Assert
         Assert.True(result.Success);
-        Assert.Contains("sucesso", result.Message);
+        Assert.Equal(PixProofUploadError.None, result.Error);
         Assert.NotNull(result.UploadedAt);
 
         await using var verifyDb = factory.CreateDbContext();
@@ -97,7 +97,7 @@ public class PixProofUploadTests
         var fileBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47 }; // PNG magic number
 
         // Act
-        var result = await svc.UploadProofAsync(confId, fileBytes, "image/png");
+        var result = await svc.UploadProofAsync(confId, fileBytes, "image/png", "user-1");
 
         // Assert
         Assert.True(result.Success);
@@ -122,10 +122,10 @@ public class PixProofUploadTests
         await db.SaveChangesAsync();
         var confId = conf.Id;
 
-        var fileBytes = new byte[] { 0x52, 0x49, 0x46, 0x46 }; // WEBP magic number
+        var fileBytes = new byte[] { 0x52, 0x49, 0x46, 0x46, 0x24, 0, 0, 0, 0x57, 0x45, 0x42, 0x50 }; // WEBP magic: RIFF<size>WEBP
 
         // Act
-        var result = await svc.UploadProofAsync(confId, fileBytes, "image/webp");
+        var result = await svc.UploadProofAsync(confId, fileBytes, "image/webp", "user-1");
 
         // Assert
         Assert.True(result.Success);
@@ -153,11 +153,11 @@ public class PixProofUploadTests
         var fileBytes = new byte[] { 0x00, 0x01, 0x02, 0x03 };
 
         // Act
-        var result = await svc.UploadProofAsync(confId, fileBytes, "application/pdf");
+        var result = await svc.UploadProofAsync(confId, fileBytes, "application/pdf", "user-1");
 
         // Assert
         Assert.False(result.Success);
-        Assert.Contains("JPG", result.Message);
+        Assert.Equal(PixProofUploadError.InvalidImage, result.Error);
         await using var verifyDb = factory.CreateDbContext();
         Assert.Null(verifyDb.EventConfirmations.Single().PixProofImageData);
     }
@@ -182,11 +182,11 @@ public class PixProofUploadTests
         var fileBytes = new byte[] { 0x00, 0x01, 0x02, 0x03 };
 
         // Act
-        var result = await svc.UploadProofAsync(confId, fileBytes, "");
+        var result = await svc.UploadProofAsync(confId, fileBytes, "", "user-1");
 
         // Assert
         Assert.False(result.Success);
-        Assert.Contains("JPG", result.Message);
+        Assert.Equal(PixProofUploadError.InvalidImage, result.Error);
     }
 
     [Fact]
@@ -207,11 +207,11 @@ public class PixProofUploadTests
         var confId = conf.Id;
 
         // Act
-        var result = await svc.UploadProofAsync(confId, new byte[0], "image/jpeg");
+        var result = await svc.UploadProofAsync(confId, new byte[0], "image/jpeg", "user-1");
 
         // Assert
         Assert.False(result.Success);
-        Assert.Contains("vazio", result.Message);
+        Assert.Equal(PixProofUploadError.InvalidImage, result.Error);
     }
 
     [Fact]
@@ -232,11 +232,11 @@ public class PixProofUploadTests
         var confId = conf.Id;
 
         // Act
-        var result = await svc.UploadProofAsync(confId, null!, "image/jpeg");
+        var result = await svc.UploadProofAsync(confId, null!, "image/jpeg", "user-1");
 
         // Assert
         Assert.False(result.Success);
-        Assert.Contains("vazio", result.Message);
+        Assert.Equal(PixProofUploadError.InvalidImage, result.Error);
     }
 
     [Fact]
@@ -261,11 +261,11 @@ public class PixProofUploadTests
         Array.Fill(fileBytes, (byte)0xFF);
 
         // Act
-        var result = await svc.UploadProofAsync(confId, fileBytes, "image/jpeg");
+        var result = await svc.UploadProofAsync(confId, fileBytes, "image/jpeg", "user-1");
 
         // Assert
         Assert.False(result.Success);
-        Assert.Contains("muito grande", result.Message);
+        Assert.Equal(PixProofUploadError.FileTooLarge, result.Error);
         await using var verifyDb = factory.CreateDbContext();
         Assert.Null(verifyDb.EventConfirmations.Single().PixProofImageData);
     }
@@ -290,9 +290,10 @@ public class PixProofUploadTests
         // Create exactly 5MB file
         var fileBytes = new byte[5 * 1024 * 1024];
         Array.Fill(fileBytes, (byte)0xFF);
+        fileBytes[1] = 0xD8; // JPEG signature: FF D8 FF
 
         // Act
-        var result = await svc.UploadProofAsync(confId, fileBytes, "image/jpeg");
+        var result = await svc.UploadProofAsync(confId, fileBytes, "image/jpeg", "user-1");
 
         // Assert
         Assert.True(result.Success);
@@ -307,11 +308,11 @@ public class PixProofUploadTests
         var (_, svc, _) = Build();
 
         // Act
-        var result = await svc.UploadProofAsync(999, new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }, "image/jpeg");
+        var result = await svc.UploadProofAsync(999, new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }, "image/jpeg", "user-1");
 
         // Assert
         Assert.False(result.Success);
-        Assert.Contains("não encontrada", result.Message);
+        Assert.Equal(PixProofUploadError.NotFound, result.Error);
     }
 
     [Fact]
@@ -338,7 +339,7 @@ public class PixProofUploadTests
         var fileBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
 
         // Act
-        var result = await svc.UploadProofAsync(confId1, fileBytes, "image/jpeg");
+        var result = await svc.UploadProofAsync(confId1, fileBytes, "image/jpeg", "user-1");
 
         // Assert
         Assert.True(result.Success);
@@ -371,7 +372,7 @@ public class PixProofUploadTests
         var beforeCall = DateTime.UtcNow;
 
         // Act
-        var result = await svc.UploadProofAsync(confId, fileBytes, "image/jpeg");
+        var result = await svc.UploadProofAsync(confId, fileBytes, "image/jpeg", "user-1");
 
         var afterCall = DateTime.UtcNow;
 
@@ -406,14 +407,14 @@ public class PixProofUploadTests
         var newFileBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47 };
 
         // Upload first proof
-        await svc.UploadProofAsync(confId, oldFileBytes, "image/jpeg");
+        await svc.UploadProofAsync(confId, oldFileBytes, "image/jpeg", "user-1");
         await using var verifyDb1 = factory.CreateDbContext();
         var firstUpload = verifyDb1.EventConfirmations.Single().PixProofUploadedAt;
 
         await Task.Delay(10);  // Small delay to ensure different timestamp
 
         // Act - Upload second proof
-        var result = await svc.UploadProofAsync(confId, newFileBytes, "image/png");
+        var result = await svc.UploadProofAsync(confId, newFileBytes, "image/png", "user-1");
 
         // Assert
         Assert.True(result.Success);
@@ -444,7 +445,7 @@ public class PixProofUploadTests
         var fileBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
 
         // Act
-        var result = await svc.UploadProofAsync(confId, fileBytes, "IMAGE/JPEG");
+        var result = await svc.UploadProofAsync(confId, fileBytes, "IMAGE/JPEG", "user-1");
 
         // Assert
         Assert.True(result.Success);

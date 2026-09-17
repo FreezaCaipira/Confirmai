@@ -18,9 +18,10 @@ public class AdminConfirmationServiceTests
     {
         // Arrange
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, "admin-1");
         var conf = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Pending,
             HasPaid = false,
@@ -57,9 +58,10 @@ public class AdminConfirmationServiceTests
     {
         // Arrange
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, "admin-1");
         var conf = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Paid,
             HasPaid = true,
@@ -98,9 +100,10 @@ public class AdminConfirmationServiceTests
     {
         // Arrange
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, "admin-1");
         var conf = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Paid,
             HasPaid = true,
@@ -121,8 +124,7 @@ public class AdminConfirmationServiceTests
         // Assert
         Assert.True(result.Found);
         Assert.False(result.Updated);
-        Assert.NotNull(result.Message);
-        Assert.Contains("gateway", result.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(AdminMutationDenyReason.GatewayPayment, result.DenyReason);
 
         await using var verifyDb = factory.CreateDbContext();
         var saved = verifyDb.EventConfirmations.Single();
@@ -136,9 +138,10 @@ public class AdminConfirmationServiceTests
         // Arrange - Pending with gateway name should still be toggleable
         // (can happen if gateway payment was initiated but not yet confirmed)
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, "admin-1");
         var conf = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Pending,
             HasPaid = false,
@@ -181,9 +184,10 @@ public class AdminConfirmationServiceTests
     {
         // Arrange
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, "admin-1");
         var conf = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Pending,
             HasPaid = false,
@@ -216,9 +220,10 @@ public class AdminConfirmationServiceTests
     {
         // Arrange
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, "admin-1");
         var conf = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Pending,
             HasPaid = false,
@@ -251,9 +256,10 @@ public class AdminConfirmationServiceTests
     {
         // Arrange
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, "admin-1");
         var conf = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Paid,
             HasPaid = true,
@@ -273,8 +279,7 @@ public class AdminConfirmationServiceTests
         // Assert
         Assert.True(result.Found);
         Assert.False(result.Updated);
-        Assert.NotNull(result.Message);
-        Assert.Contains("gateway", result.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(AdminMutationDenyReason.GatewayPayment, result.DenyReason);
 
         await using var verifyDb = factory.CreateDbContext();
         var count = verifyDb.EventConfirmations.Count();
@@ -301,9 +306,10 @@ public class AdminConfirmationServiceTests
     {
         // Arrange - verify isolation: only update the targeted confirmation
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, "admin-1");
         var conf1 = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Pending,
             HasPaid = false,
@@ -311,7 +317,7 @@ public class AdminConfirmationServiceTests
         };
         var conf2 = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-2",
             PaymentStatus = EventConfirmationPaymentStatus.Pending,
             HasPaid = false,
@@ -343,9 +349,10 @@ public class AdminConfirmationServiceTests
     {
         // Arrange
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, "admin-1");
         var conf = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Pending,
             HasPaid = false,

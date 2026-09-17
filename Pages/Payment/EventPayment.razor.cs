@@ -209,7 +209,7 @@ public partial class EventPayment : IAsyncDisposable
             await file.OpenReadStream(MaxBytes).CopyToAsync(ms);
             var bytes = ms.ToArray();
 
-            var result = await PixProofUploadService.UploadProofAsync(conf.Id, bytes, file.ContentType);
+            var result = await PixProofUploadService.UploadProofAsync(conf.Id, bytes, file.ContentType, userId);
             if (result.Success)
             {
                 conf.PixProofImageData = bytes;
@@ -223,7 +223,13 @@ public partial class EventPayment : IAsyncDisposable
             }
             else
             {
-                proofError = result.Message;
+                proofError = result.Error switch
+                {
+                    PixProofUploadError.InvalidImage => Ui.Get("Payment.ProofInvalidImage"),
+                    PixProofUploadError.FileTooLarge => Ui.Get("Payment.ProofTooLarge"),
+                    PixProofUploadError.Forbidden => Ui.Get("Payment.ProofForbidden"),
+                    _ => Ui.Get("Payment.ProofError")
+                };
             }
         }
         catch (IOException)

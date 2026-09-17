@@ -4,6 +4,7 @@ using Confirmai.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Confirmai.Services.Core;
+using Confirmai.Services.Groups;
 using Confirmai.Services.Payment;
 
 namespace Confirmai.Services.Admin;
@@ -39,10 +40,24 @@ public class AdminConfirmationService
         await using var db = _dbFactory.CreateDbContext();
         var conf = await db.EventConfirmations
             .AsTracking()
+            .Include(c => c.Event)
             .FirstOrDefaultAsync(c => c.Id == confirmationId);
 
         if (conf is null)
             return new AdminTogglePaidResult { Found = false };
+
+        // Only a group admin of the event's group may mark a manual payment.
+        // The UI also guards this, but the service cannot trust the caller.
+        if (conf.Event is null ||
+            !await GroupAccess.IsGroupAdminAsync(db, conf.Event.GroupId, currentUserId))
+        {
+            return new AdminTogglePaidResult
+            {
+                Found = true,
+                Updated = false,
+                DenyReason = AdminMutationDenyReason.Forbidden
+            };
+        }
 
         // Guard: prevent unmarking payment from gateway
         if (conf.HasPaid && conf.PaymentGatewayName != null)
@@ -50,7 +65,7 @@ public class AdminConfirmationService
             {
                 Found = true,
                 Updated = false,
-                Message = "Não é possível desconfirmar um pagamento realizado através de gateway de pagamento."
+                DenyReason = AdminMutationDenyReason.GatewayPayment
             };
 
         var isPaid = conf.PaymentStatus == EventConfirmationPaymentStatus.Paid;
@@ -135,10 +150,22 @@ public class AdminConfirmationService
         await using var db = _dbFactory.CreateDbContext();
         var conf = await db.EventConfirmations
             .AsTracking()
+            .Include(c => c.Event)
             .FirstOrDefaultAsync(c => c.Id == confirmationId);
 
         if (conf is null)
             return new AdminRemoveConfirmationResult { Found = false };
+
+        if (conf.Event is null ||
+            !await GroupAccess.IsGroupAdminAsync(db, conf.Event.GroupId, currentUserId))
+        {
+            return new AdminRemoveConfirmationResult
+            {
+                Found = true,
+                Updated = false,
+                DenyReason = AdminMutationDenyReason.Forbidden
+            };
+        }
 
         // Guard: prevent removal if payment came from gateway
         if (conf.PaymentGatewayName != null)
@@ -146,7 +173,7 @@ public class AdminConfirmationService
             {
                 Found = true,
                 Updated = false,
-                Message = "Não é possível remover uma confirmação com pagamento de gateway."
+                DenyReason = AdminMutationDenyReason.GatewayPayment
             };
 
         db.EventConfirmations.Remove(conf);
@@ -178,11 +205,21 @@ public class AdminConfirmationService
     }
 }
 
+/// <summary>Why a mutation was denied — pages translate this, never the service.</summary>
+public enum AdminMutationDenyReason
+{
+    None,
+    /// <summary>Caller is not a group admin of the event's group.</summary>
+    Forbidden,
+    /// <summary>Confirmation carries a gateway payment and cannot be reverted/removed.</summary>
+    GatewayPayment
+}
+
 public class AdminTogglePaidResult
 {
     public bool Found { get; set; }
     public bool Updated { get; set; }
-    public string? Message { get; set; }
+    public AdminMutationDenyReason DenyReason { get; set; }
     public EventConfirmationPaymentStatus? NewStatus { get; set; }
 }
 
@@ -190,5 +227,5 @@ public class AdminRemoveConfirmationResult
 {
     public bool Found { get; set; }
     public bool Updated { get; set; }
-    public string? Message { get; set; }
+    public AdminMutationDenyReason DenyReason { get; set; }
 }

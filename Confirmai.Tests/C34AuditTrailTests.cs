@@ -43,8 +43,13 @@ public class C34AuditTrailTests
         return new GroupDetailService(factory, authMock.Object, NewLog(factory));
     }
 
-    private static byte[] FakeImage(int size = 1024) =>
-        Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();
+    private static byte[] FakeImage(int size = 1024)
+    {
+        var bytes = Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();
+        // JPEG signature so the bytes pass ImageSignatureValidator
+        bytes[0] = 0xFF; bytes[1] = 0xD8; bytes[2] = 0xFF;
+        return bytes;
+    }
 
     private static async Task<(Group group, ApplicationUser organizer)> SeedGroupWithOrganizerAsync(AppDbContext db)
     {
@@ -163,7 +168,7 @@ public class C34AuditTrailTests
         await ctx.db.SaveChangesAsync();
 
         var svc = NewUploadService(ctx.factory);
-        var result = await svc.UploadProofAsync(conf.Id, FakeImage(), "image/jpeg");
+        var result = await svc.UploadProofAsync(conf.Id, FakeImage(), "image/jpeg", player.Id);
 
         Assert.True(result.Success);
         var audit = ctx.db.Logs.Single(l => l.EventType == AuditEvents.ProofUploaded);
@@ -189,7 +194,8 @@ public class C34AuditTrailTests
         await ctx.db.SaveChangesAsync();
 
         var svc = NewUploadService(ctx.factory);
-        var result = await svc.UploadProofAsync(conf.Id, FakeImage(), "image/png");
+        var pngBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+        var result = await svc.UploadProofAsync(conf.Id, pngBytes, "image/png", player.Id);
 
         Assert.True(result.Success);
         var audit = ctx.db.Logs.Single(l => l.EventType == AuditEvents.ProofReplaced);

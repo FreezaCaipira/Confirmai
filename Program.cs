@@ -533,8 +533,10 @@ app.UseStaticFiles(new StaticFileOptions
         }
     }
 });
-app.UseRateLimiter();
 app.UseRouting();
+// Must run AFTER UseRouting: endpoint-scoped policies (RequireRateLimiting /
+// EnableRateLimiting) need the matched endpoint's metadata.
+app.UseRateLimiter();
 
 app.Use(async (context, next) =>
 {
