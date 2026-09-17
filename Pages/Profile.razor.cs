@@ -116,12 +116,13 @@ public partial class Profile
 
         isSavingProfile = true;
         profileSaveFeedback = null;
-        user.InstagramHandle = NormalizeOptional(profileEditModel.InstagramHandle);
-        user.DiscordHandle = NormalizeOptional(profileEditModel.DiscordHandle);
-        user.PixKey = NormalizeOptional(profileEditModel.PixKey);
-        var result = await UserManager.UpdateAsync(user);
+        var (succeeded, _) = await ProfileSvc.SaveOwnProfileAsync(
+            user,
+            NormalizeOptional(profileEditModel.InstagramHandle),
+            NormalizeOptional(profileEditModel.DiscordHandle),
+            NormalizeOptional(profileEditModel.PixKey));
         isSavingProfile = false;
-        profileSaveFeedback = result.Succeeded ? T["Profile.SaveSuccess"] : T["Profile.SaveGenericError"];
+        profileSaveFeedback = succeeded ? T["Profile.SaveSuccess"] : T["Profile.SaveGenericError"];
     }
 
     private static string? NormalizeOptional(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

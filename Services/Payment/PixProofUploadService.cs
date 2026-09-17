@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Confirmai.Data;
+using Confirmai.Services.Core;
 
 namespace Confirmai.Services.Payment;
 
@@ -11,13 +12,15 @@ public class PixProofUploadService
 {
     private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly ILogger<PixProofUploadService> _logger;
+    private readonly LogService _log;
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
     private static readonly string[] AllowedMimeTypes = { "image/jpeg", "image/png", "image/webp" };
 
-    public PixProofUploadService(IDbContextFactory<AppDbContext> factory, ILogger<PixProofUploadService> logger)
+    public PixProofUploadService(IDbContextFactory<AppDbContext> factory, ILogger<PixProofUploadService> logger, LogService log)
     {
         _factory = factory;
         _logger = logger;
+        _log = log;
     }
 
     /// <summary>
@@ -73,11 +76,21 @@ public class PixProofUploadService
                 };
             }
 
+            var replaced = confirmation.PixProofImageData is { Length: > 0 };
+
             confirmation.PixProofImageData = fileBytes;
             confirmation.PixProofContentType = mimeType;
             confirmation.PixProofUploadedAt = DateTime.UtcNow;
 
             await db.SaveChangesAsync();
+
+            await _log.AuditAsync(
+                replaced ? AuditEvents.ProofReplaced : AuditEvents.ProofUploaded,
+                AuditEntities.EventConfirmation,
+                confirmationId.ToString(),
+                replaced ? "Comprovante Pix substituído" : "Comprovante Pix enviado",
+                actorUserId: confirmation.UserId,
+                metadata: new { confirmationId, eventId = confirmation.EventId, mimeType, sizeBytes = fileBytes.Length });
 
             return new PixProofUploadResult
             {

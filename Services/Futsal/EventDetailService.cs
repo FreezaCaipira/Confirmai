@@ -94,14 +94,23 @@ public class EventDetailService
 
         if (!alreadyPending)
         {
-            db.GroupJoinRequests.Add(new GroupJoinRequest
+            var req = new GroupJoinRequest
             {
                 GroupId = groupId,
                 UserId = userId,
                 RequestedAt = DateTime.UtcNow,
                 Status = JoinRequestStatus.Pending,
-            });
+            };
+            db.GroupJoinRequests.Add(req);
             await db.SaveChangesAsync();
+
+            await _logService.AuditAsync(
+                AuditEvents.GroupJoinRequested,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                "Solicitação de entrada no grupo",
+                actorUserId: userId,
+                metadata: new { requestId = req.Id, groupId });
         }
     }
 

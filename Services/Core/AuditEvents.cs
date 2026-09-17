@@ -64,6 +64,18 @@ public static class AuditEvents
     public const string AdminSettingChanged        = "admin.setting.changed";
     public const string AdminAuditViewed           = "admin.audit.viewed";
 
+    // -- Platform fee settlement (repasse do organizador -> plataforma) --
+    public const string SettlementSubmitted = "settlement.submitted";
+    public const string SettlementConfirmed = "settlement.confirmed";
+    public const string SettlementRejected  = "settlement.rejected";
+
+    // -- Comprovante Pix do jogador --
+    public const string ProofUploaded = "proof.uploaded";
+    public const string ProofReplaced = "proof.replaced";
+
+    // -- User --
+    public const string UserProfileUpdated = "user.profile.updated"; // dados de recebimento (PixKey)
+
     // -- Event (partida/sess�o) --
     public const string EventCreated = "event.created";
     public const string EventUpdated = "event.updated";
@@ -89,6 +101,9 @@ public static class AuditEvents
     public const string GroupPayoutAccountCreated = "group.payout.account.created";
     public const string GroupPayoutAccountUpdated = "group.payout.account.updated";
     public const string GroupFeeWaiverChanged    = "group.fee.waiver.changed";
+    public const string GroupJoinRequested       = "group.join.requested";
+    public const string GroupJoinApproved        = "group.join.approved";
+    public const string GroupJoinRejected        = "group.join.rejected";
 
     // -- Delinqu�ncia --
     public const string DelinquencyNotified = "delinquency.notified";
@@ -116,4 +131,6 @@ public static class AuditEntities
     public const string Event             = "Event";
     public const string Group             = "Group";
     public const string EventConfirmation = "EventConfirmation";
+    public const string PlatformFeeSettlement = "PlatformFeeSettlement";
+    public const string GroupJoinRequest  = "GroupJoinRequest";
 }

@@ -23,7 +23,8 @@ public class GroupDetailServiceTests
         authMock
             .Setup(x => x.GetAuthenticationStateAsync())
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(identity)));
-        var svc = new GroupDetailService(factory, authMock.Object);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
+        var svc = new GroupDetailService(factory, authMock.Object, logService);
         return (factory, svc);
     }
 

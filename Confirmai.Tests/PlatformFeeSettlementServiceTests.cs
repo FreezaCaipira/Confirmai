@@ -14,7 +14,9 @@ namespace Confirmai.Tests;
 public class PlatformFeeSettlementServiceTests
 {
     private static PlatformFeeSettlementService CreateService(IDbContextFactory<AppDbContext> factory)
-        => new(factory, NullLogger<PlatformFeeSettlementService>.Instance, new UiTextService(new LanguagePreferenceService()));
+        => new(factory, NullLogger<PlatformFeeSettlementService>.Instance,
+            new UiTextService(new LanguagePreferenceService()),
+            new LogService(factory, NullLogger<LogService>.Instance));
 
     private static byte[] FakeImage(int size = 1024) =>
         Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();

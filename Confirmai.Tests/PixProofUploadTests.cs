@@ -24,7 +24,8 @@ public class PixProofUploadTests
 
         var db = new AppDbContext(options);
         var factory = new TestInMemoryDbContextFactory(dbName);
-        var svc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
+        var svc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance,
+            new LogService(factory, NullLogger<LogService>.Instance));
         return (db, svc, factory);
     }
 

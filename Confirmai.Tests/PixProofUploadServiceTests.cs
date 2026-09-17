@@ -1,8 +1,10 @@
 using Confirmai.Data;
 using Confirmai.Models;
+using Confirmai.Services.Core;
 using Confirmai.Services.Payment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Confirmai.Tests;
@@ -23,8 +25,9 @@ public class PixProofUploadServiceTests
         var db = TestDataFactory.CreateDbContext();
         var dbFactoryMock = new Mock<IDbContextFactory<AppDbContext>>();
         dbFactoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(db);
+        dbFactoryMock.Setup(f => f.CreateDbContext()).Returns(db);
         
-        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object);
+        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object, new LogService(dbFactoryMock.Object, NullLogger<LogService>.Instance));
         var fileBytes = new byte[] { 0x01, 0x02, 0x03 };
 
         // Act
@@ -42,8 +45,9 @@ public class PixProofUploadServiceTests
         var db = TestDataFactory.CreateDbContext();
         var dbFactoryMock = new Mock<IDbContextFactory<AppDbContext>>();
         dbFactoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(db);
+        dbFactoryMock.Setup(f => f.CreateDbContext()).Returns(db);
         
-        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object);
+        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object, new LogService(dbFactoryMock.Object, NullLogger<LogService>.Instance));
 
         // Act
         var result = await service.UploadProofAsync(1, Array.Empty<byte>(), "image/jpeg");
@@ -60,8 +64,9 @@ public class PixProofUploadServiceTests
         var db = TestDataFactory.CreateDbContext();
         var dbFactoryMock = new Mock<IDbContextFactory<AppDbContext>>();
         dbFactoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(db);
+        dbFactoryMock.Setup(f => f.CreateDbContext()).Returns(db);
         
-        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object);
+        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object, new LogService(dbFactoryMock.Object, NullLogger<LogService>.Instance));
         var largeFile = new byte[6 * 1024 * 1024]; // 6 MB
 
         // Act
@@ -79,8 +84,9 @@ public class PixProofUploadServiceTests
         var db = TestDataFactory.CreateDbContext();
         var dbFactoryMock = new Mock<IDbContextFactory<AppDbContext>>();
         dbFactoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(db);
+        dbFactoryMock.Setup(f => f.CreateDbContext()).Returns(db);
         
-        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object);
+        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object, new LogService(dbFactoryMock.Object, NullLogger<LogService>.Instance));
         var fileBytes = new byte[] { 0x01, 0x02, 0x03 };
 
         // Act
@@ -108,8 +114,9 @@ public class PixProofUploadServiceTests
 
         var dbFactoryMock = new Mock<IDbContextFactory<AppDbContext>>();
         dbFactoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(db);
+        dbFactoryMock.Setup(f => f.CreateDbContext()).Returns(db);
         
-        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object);
+        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object, new LogService(dbFactoryMock.Object, NullLogger<LogService>.Instance));
         var fileBytes = new byte[] { 0x01, 0x02, 0x03 };
 
         // Act
@@ -148,8 +155,9 @@ public class PixProofUploadServiceTests
 
         var dbFactoryMock = new Mock<IDbContextFactory<AppDbContext>>();
         dbFactoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(db);
+        dbFactoryMock.Setup(f => f.CreateDbContext()).Returns(db);
         
-        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object);
+        var service = new PixProofUploadService(dbFactoryMock.Object, _loggerMock.Object, new LogService(dbFactoryMock.Object, NullLogger<LogService>.Instance));
         var fileBytes = new byte[] { 0x01, 0x02, 0x03 };
 
         // Act

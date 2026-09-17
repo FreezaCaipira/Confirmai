@@ -67,12 +67,12 @@ public class ManualPlatformFeeFlowE2ETests
 
         var feeOptions = Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m });
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
-        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
+        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance, logService);
         var feeLedger = new PlatformFeeLedgerService(factory, new PlatformFeePolicy(feeOptions));
         var confirmSvc = new AdminConfirmationService(factory, logService, feeLedger, NullLogger<AdminConfirmationService>.Instance);
         var settlementSvc = new PlatformFeeSettlementService(
             factory, NullLogger<PlatformFeeSettlementService>.Instance,
-            new UiTextService(new LanguagePreferenceService()));
+            new UiTextService(new LanguagePreferenceService()), logService);
 
         // Seed: group (futsal, manual), organizer (group admin), player, event R$15,00
         var group = TestDataFactory.CreateGroup("Racha do Zé");
@@ -155,12 +155,12 @@ public class ManualPlatformFeeFlowE2ETests
 
         var feeOptions = Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m });
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
-        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
+        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance, logService);
         var feeLedger = new PlatformFeeLedgerService(factory, new PlatformFeePolicy(feeOptions));
         var confirmSvc = new AdminConfirmationService(factory, logService, feeLedger, NullLogger<AdminConfirmationService>.Instance);
         var settlementSvc = new PlatformFeeSettlementService(
             factory, NullLogger<PlatformFeeSettlementService>.Instance,
-            new UiTextService(new LanguagePreferenceService()));
+            new UiTextService(new LanguagePreferenceService()), logService);
 
         var group = TestDataFactory.CreateGroup("Racha 2");
         group.Sport = Sport.Futsal;
@@ -228,12 +228,12 @@ public class ManualPlatformFeeFlowE2ETests
 
         var feeOptions = Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m });
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
-        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
+        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance, logService);
         var feeLedger = new PlatformFeeLedgerService(factory, new PlatformFeePolicy(feeOptions));
         var confirmSvc = new AdminConfirmationService(factory, logService, feeLedger, NullLogger<AdminConfirmationService>.Instance);
         var settlementSvc = new PlatformFeeSettlementService(
             factory, NullLogger<PlatformFeeSettlementService>.Instance,
-            new UiTextService(new LanguagePreferenceService()));
+            new UiTextService(new LanguagePreferenceService()), logService);
 
         var group = TestDataFactory.CreateGroup("Racha 3");
         group.Sport = Sport.Futsal;

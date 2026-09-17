@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,13 +27,16 @@ public sealed class GroupDetailService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly AuthenticationStateProvider _authStateProvider;
+    private readonly LogService _log;
 
     public GroupDetailService(
         IDbContextFactory<AppDbContext> dbFactory,
-        AuthenticationStateProvider authStateProvider)
+        AuthenticationStateProvider authStateProvider,
+        LogService log)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
+        _log = log;
     }
 
     public async Task<string?> GetCurrentUserIdAsync()
@@ -81,14 +85,23 @@ public sealed class GroupDetailService
                         && r.Status == JoinRequestStatus.Pending);
         if (!already)
         {
-            db.GroupJoinRequests.Add(new GroupJoinRequest
+            var req = new GroupJoinRequest
             {
                 GroupId = groupId,
                 UserId = userId,
                 RequestedAt = DateTime.UtcNow,
                 Status = JoinRequestStatus.Pending,
-            });
+            };
+            db.GroupJoinRequests.Add(req);
             await db.SaveChangesAsync();
+
+            await _log.AuditAsync(
+                AuditEvents.GroupJoinRequested,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                "Solicitação de entrada no grupo",
+                actorUserId: userId,
+                metadata: new { requestId = req.Id, groupId });
         }
     }
 
@@ -133,6 +146,14 @@ public sealed class GroupDetailService
         });
         await db.SaveChangesAsync();
 
+        await _log.AuditAsync(
+            AuditEvents.GroupMemberAdded,
+            AuditEntities.Group,
+            groupId.ToString(),
+            "Usuário entrou no grupo via código de convite",
+            actorUserId: userId,
+            metadata: new { groupId, memberUserId = userId, via = "invite-code" });
+
         return JoinWithCodeResult.Joined;
     }
 
@@ -171,6 +192,14 @@ public sealed class GroupDetailService
         });
 
         await db.SaveChangesAsync();
+
+        await _log.AuditAsync(
+            AuditEvents.GroupJoinApproved,
+            AuditEntities.GroupJoinRequest,
+            req.Id.ToString(),
+            $"Solicitação aprovada no grupo \"{groupName}\"",
+            actorUserId: approverUserId,
+            metadata: new { requestId = req.Id, req.GroupId, req.UserId });
     }
 
     public async Task RejectRequestAsync(int requestId, string rejecterUserId)
@@ -182,6 +211,14 @@ public sealed class GroupDetailService
         req.RespondedAt = DateTime.UtcNow;
         req.RespondedByUserId = rejecterUserId;
         await db.SaveChangesAsync();
+
+        await _log.AuditAsync(
+            AuditEvents.GroupJoinRejected,
+            AuditEntities.GroupJoinRequest,
+            req.Id.ToString(),
+            "Solicitação de entrada rejeitada",
+            actorUserId: rejecterUserId,
+            metadata: new { requestId = req.Id, req.GroupId, req.UserId });
     }
 
     public async Task ApproveSelectedAsync(HashSet<int> requestIds, string approverUserId, string groupName)
@@ -223,6 +260,17 @@ public sealed class GroupDetailService
         }
 
         await db.SaveChangesAsync();
+
+        foreach (var req in requests)
+        {
+            await _log.AuditAsync(
+                AuditEvents.GroupJoinApproved,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                $"Solicitação aprovada no grupo \"{groupName}\"",
+                actorUserId: approverUserId,
+                metadata: new { requestId = req.Id, req.GroupId, req.UserId });
+        }
     }
 
     public async Task RejectSelectedAsync(HashSet<int> requestIds, string rejecterUserId)
@@ -240,6 +288,17 @@ public sealed class GroupDetailService
         }
 
         await db.SaveChangesAsync();
+
+        foreach (var req in requests)
+        {
+            await _log.AuditAsync(
+                AuditEvents.GroupJoinRejected,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                "Solicitação de entrada rejeitada",
+                actorUserId: rejecterUserId,
+                metadata: new { requestId = req.Id, req.GroupId, req.UserId });
+        }
     }
 
     /// <summary>
@@ -296,5 +355,16 @@ public sealed class GroupDetailService
         }
 
         await db.SaveChangesAsync();
+
+        foreach (var req in pendingRequests)
+        {
+            await _log.AuditAsync(
+                AuditEvents.GroupJoinApproved,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                $"Solicitação aprovada no grupo \"{group.Name}\"",
+                actorUserId: approverUserId,
+                metadata: new { requestId = req.Id, req.GroupId, req.UserId });
+        }
     }
 }

@@ -1,6 +1,7 @@
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -13,12 +14,41 @@ public sealed class ProfileService
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IWebHostEnvironment _env;
+    private readonly LogService _log;
 
-    public ProfileService(IDbContextFactory<AppDbContext> dbFactory, UserManager<ApplicationUser> userManager, IWebHostEnvironment env)
+    public ProfileService(IDbContextFactory<AppDbContext> dbFactory, UserManager<ApplicationUser> userManager, IWebHostEnvironment env, LogService log)
     {
         _dbFactory = dbFactory;
         _userManager = userManager;
         _env = env;
+        _log = log;
+    }
+
+    /// <summary>
+    /// Saves the user's own editable profile fields. A PixKey change is
+    /// money-relevant (it is the receiving account for manual payments), so it
+    /// is recorded in the audit trail (<see cref="AuditEvents.UserProfileUpdated"/>).
+    /// </summary>
+    public async Task<(bool Succeeded, bool PixChanged)> SaveOwnProfileAsync(
+        ApplicationUser user, string? instagramHandle, string? discordHandle, string? pixKey)
+    {
+        var pixChanged = !string.Equals(user.PixKey, pixKey, StringComparison.Ordinal);
+        user.InstagramHandle = instagramHandle;
+        user.DiscordHandle = discordHandle;
+        user.PixKey = pixKey;
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded && pixChanged)
+        {
+            await _log.AuditAsync(
+                AuditEvents.UserProfileUpdated,
+                AuditEntities.User,
+                user.Id,
+                "Chave Pix de recebimento alterada pelo próprio usuário",
+                actorUserId: user.Id);
+        }
+
+        return (result.Succeeded, pixChanged);
     }
 
     public async Task<(int FutsalTotal, int FutsalGk, int FutsalOut, int PokerTotal)> LoadSportStatsAsync(string userId)
