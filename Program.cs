@@ -142,6 +142,8 @@ builder.Services.AddScoped<EventPaymentReconciliationService>();
     builder.Services.AddScoped<Confirmai.Services.User.ProfileService>();
     builder.Services.AddScoped<ExternalLoginClaimsExtractor>();
     builder.Services.AddScoped<Confirmai.Services.Admin.AdminUsersQueryService>();
+    builder.Services.AddScoped<Confirmai.Services.Admin.AdminUserService>();
+    builder.Services.AddScoped<Confirmai.Services.Events.EventCancellationService>();
 builder.Services.AddScoped<Confirmai.Services.Utility.MailboxQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentInitializationService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentCommandService>();

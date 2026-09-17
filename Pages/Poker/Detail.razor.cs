@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Events;
 using Confirmai.Shared.Helpers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -17,6 +18,7 @@ public partial class Detail
     private Event? ev = null;
     private bool isLoading = true;
     private string? currentUserId = null;
+    private bool isSystemAdmin = false;
     private bool homeGameUnlocked = false;
     private string codeInput = string.Empty;
     private bool codeWrong = false;
@@ -31,6 +33,7 @@ public partial class Detail
     {
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
         currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        isSystemAdmin = auth.User.IsInRole("admin");
         await LoadEvent();
     }
 
@@ -182,13 +185,9 @@ public partial class Detail
     private async Task CancelEvent()
     {
         if (currentUserId is null) return;
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var dbEv = await db.Events.FirstOrDefaultAsync(e => e.Id == Id);
-        if (dbEv is null || dbEv.CreatedByUserId != currentUserId) return;
-        dbEv.IsActive = false;
-        await db.SaveChangesAsync();
+        var result = await EventCancellation.CancelAsync(Id, currentUserId, isSystemAdmin);
+        if (result != EventCancellationResult.Success) return;
         showCancelConfirm = false;
-        await NotificationService.NotifyEventCancelledAsync(Id, currentUserId!);
         await LoadEvent();
     }
 

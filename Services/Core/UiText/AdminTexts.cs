@@ -582,6 +582,7 @@ internal static class AdminTexts
         // Admin pages (C28 migration)
         ["AdminUserView.Contact"] = "Contato",
         ["AdminUserView.VenueManagerHint"] = "Permite criar e editar quadras/venues no portal do gestor.",
+        ["AdminUserView.RoleToggleError"] = "Nao foi possivel alterar o papel. Tente novamente.",
         ["AdminPayments.StalenessAlertExplanation"] = "Explicação do alerta de obsolescência",
     };
 
@@ -1160,6 +1161,7 @@ internal static class AdminTexts
         // Admin pages (C28 migration)
         ["AdminUserView.Contact"] = "Contact",
         ["AdminUserView.VenueManagerHint"] = "Allows creating and editing courts/venues in the manager portal.",
+        ["AdminUserView.RoleToggleError"] = "Could not change the role. Please try again.",
         ["AdminPayments.StalenessAlertExplanation"] = "Staleness alert explanation",
     };
 
@@ -1738,6 +1740,7 @@ internal static class AdminTexts
         // Admin pages (C28 migration)
         ["AdminUserView.Contact"] = "Contacto",
         ["AdminUserView.VenueManagerHint"] = "Permite crear y editar canchas/venues en el portal del gestor.",
+        ["AdminUserView.RoleToggleError"] = "No se pudo cambiar el rol. Intenta de nuevo.",
         ["AdminPayments.StalenessAlertExplanation"] = "Explicación de la alerta de obsolescencia",
     };
 

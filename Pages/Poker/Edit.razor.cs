@@ -4,6 +4,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Events;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -98,7 +99,7 @@ public partial class Edit
             return;
         }
 
-        if (ev.CreatedByUserId != userId)
+        if (!EventCancellationService.CanManage(ev, userId, auth.User.IsInRole("admin")))
         {
             accessDenied = true;
             isLoading    = false;
@@ -163,7 +164,7 @@ public partial class Edit
                 .Include(e => e.Group)
                 .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Poker);
 
-            if (ev is null || ev.CreatedByUserId != userId)
+            if (ev is null || !EventCancellationService.CanManage(ev, userId, auth.User.IsInRole("admin")))
             {
                 saveError = Ui["Poker.AccessDenied"];
                 isSaving  = false;

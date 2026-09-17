@@ -165,10 +165,10 @@ flowchart LR
 | UC-O-21 | Ver comprovante de repasse | modal | `GET /api/fee-settlement-proof/{id}` → `PlatformFeeSettlementProofAuthorizer` | Submitter/admin grupo/sysadmin | Imagem servida | nao | `PlatformFeeSettlementProofAuthorizerTests` (10) |
 | UC-O-22 | Criar partida futsal | `/futsal/create` | `FutsalCreateService.InitializeAsync` (gate admin) + `SaveAsync` | Admin do grupo; Pix se preco>0 | `Event` (+`RachaSchedule` se recorrente) | sim | `FutsalCreateServiceTests` (8) |
 | UC-O-23 | Editar partida futsal | `/futsal/{id}/edit` | EF na page + `EventCollisionService` + `NotifyEventUpdatedAsync` | Criador do evento ou sysadmin | Evento atualizado + notificacao | sim | `FutsalIntegrationTests.FutsalEdit_*`; `EventNotificationServiceTests` |
-| UC-O-24 | Cancelar partida futsal | `/futsal/{id}/edit` | EF + `NotifyEventCancelledAsync` | Criador ou sysadmin | `IsActive=false` + notificacao | sim | parcial (notificacao); guarda FALTA |
+| UC-O-24 | Cancelar partida futsal | `/futsal/{id}/edit` | `EventCancellationService.CancelAsync` (guarda criador/sysadmin no service, C34-F3b) | Criador ou sysadmin | `IsActive=false` + notificacao | sim | `C34PermissionTests.CancelEvent_*` |
 | UC-O-25 | Criar evento poker | `/poker/create` | `PokerCreateService.InitializeAsync` (gate) + `SaveAsync` | Admin do grupo | `Event` poker (+HomeGameCode) | nao | `PokerCreateServiceTests` (10) |
-| UC-O-26 | Editar evento poker | `/poker/{id}/edit` | EF + `EventCollisionService` | `CreatedByUserId` | Evento atualizado | nao | FALTA |
-| UC-O-27 | Cancelar evento poker | `/poker/{id}` | EF + `NotifyEventCancelledAsync` | `CreatedByUserId` | `IsActive=false` | nao | FALTA |
+| UC-O-26 | Editar evento poker | `/poker/{id}/edit` | EF + `EventCollisionService`; guarda `EventCancellationService.CanManage` (C34-F3b) | Criador ou sysadmin | Evento atualizado | nao | `C34PermissionTests.CanManage_*` |
+| UC-O-27 | Cancelar evento poker | `/poker/{id}` | `EventCancellationService.CancelAsync` (guarda + audit novos no poker, C34-F3b) | Criador ou sysadmin | `IsActive=false` + notificacao | sim | `C34PermissionTests.CancelEvent_*` |
 | UC-O-28 | Gerir roster/espera/vagas ** | `/futsal/{id}` | `EventDetailService.AdminRemove*`/`AdminAdd*SlotAsync` | Admin; `AdminRemoveConfirmationAsync` revalida no service (C34-F3); slots/waitlist seguem so-UI ate C36-C | Roster/vagas ajustados; waitlist promovida | parcial (remocao sim; vagas nao) | `EventDetailServiceTests.Admin*SlotAsync_*`; `C34SecurityAdversarialTests.AdminRemoveConfirmation_*`; remocoes de waitlist FALTA |
 | UC-O-29 | Escalacao (confirmar/resetar/nomes) | `/futsal/{id}/escalacao` | `EscalacaoService.ConfirmLineup/ResetLineup/SaveTeamNamesAsync` | `isAdmin` do LoadAsync | `TeamId`, `LineupConfirmedAt`, nomes | nao | `EscalacaoServiceTests.*` |
 | UC-O-30 | Gerir schedules do racha | `/futsal/schedule`, `/edit` | EF na page; `RachaSchedulerService` (background) | Lista filtrada por `CreatedByUserId`; toggle sem re-checagem | `RachaSchedule` atualizado/IsActive | nao | `RachaSchedulerServiceTests` (geracao); toggle/edit FALTA |
@@ -234,11 +234,11 @@ flowchart LR
 | UC-A-04 | Thresholds de reconciliacao | `/admin` | `SetReconciliationSeverityThresholdsForAdminAsync` | admin; critical >= warning | Thresholds persistidos | sim | FALTA |
 | UC-A-05/06 | Idioma / moeda (preferencias) | `/admin` | `LanguagePreferenceService`, `CurrencyPreferenceService` | admin | Preferencia pessoal | nao | `LanguagePreferenceServiceTests`; `CurrencyPreferenceServiceTests` |
 | UC-A-07 | Listar/filtrar usuarios ** | `/admin/users` | `AdminUsersQueryService`; `AdminUsersFilterStateService` | admin | Pagina + papeis | nao | `AdminUsersQueryServiceTests`; `AdminUsersFilterStateServiceTests` |
-| UC-A-08 | Bloquear usuario ** | `/admin/users` | `UserManager.SetLockoutEndDateAsync(Max)` + `LogAsync` | admin | Lockout permanente | log (Warning) | FALTA |
-| UC-A-09 | Desbloquear usuario ** | `/admin/users` | `SetLockoutEndDateAsync(null)` | admin | Lockout removido | log | FALTA |
-| UC-A-10 | Excluir usuario ** | `/admin/users` | `UserManager.DeleteAsync` + `AuditAsync(UserDeleted)` | admin | Usuario removido | sim | FALTA |
+| UC-A-08 | Bloquear usuario ** | `/admin/users` | `AdminUserService.SetLockoutAsync` (C34-F3b; ator = admin, antes logava o alvo) | admin | Lockout permanente | sim (`user.locked`) | `C34PermissionTests.SetLockout_*` |
+| UC-A-09 | Desbloquear usuario ** | `/admin/users` | `AdminUserService.SetLockoutAsync` | admin | Lockout removido | sim (`user.unlocked`) | `C34PermissionTests.SetLockout_*` |
+| UC-A-10 | Excluir usuario ** | `/admin/users` | `AdminUserService.DeleteUserAsync` (C34-F3b; ator corrigido para o admin) | admin | Usuario removido | sim (`user.deleted`) | `C34PermissionTests` (via `AdminUserService`) |
 | UC-A-11 | Ver perfil completo ** | `/admin/users/view/{UserId}` | `UserManager.FindByIdAsync`, `IsInRoleAsync` | admin | Perfil renderizado | nao | FALTA (rota coberta) |
-| UC-A-12 | Papel venue_manager ** | `/admin/users/view/{UserId}` | `AddToRoleAsync`/`RemoveFromRoleAsync` | admin | Papel alternado | nao | FALTA |
+| UC-A-12 | Papel venue_manager ** | `/admin/users/view/{UserId}` | `AdminUserService.ToggleVenueManagerAsync` (C34-F3b; `UserRoleAssigned/Removed` existiam e nunca eram emitidos) | admin | Papel alternado | sim | `C34PermissionTests.ToggleVenueManager_*` |
 | UC-A-13 | Editar dados sociais/Pix do usuario ** | `/admin/users/edit/{UserId}` | `UserManager.UpdateAsync` + `LogAsync` | admin | Usuario atualizado | log | `EditUserModelTests` (modelo); acao FALTA |
 | UC-A-14 | Listar pagamentos ** | `/admin/payments` | `AdminPaymentsQueryService` | admin | Tabela + deep-link `/payments/view` | nao | `AdminPaymentsQueryServiceTests`; `AdminPaymentsDeepLinkIntegrationTests` |
 | UC-A-15 | Painel de reconciliacao ** | `/admin/payments` | `AdminPaymentsSummaryService`, `SummaryAgeTracker`, `ReconciliationSeverityEvaluator` | admin | Resumo + severidade | nao | `AdminPaymentsSummaryServiceTests`; `ReconciliationSeverityEvaluatorTests` |
@@ -306,8 +306,8 @@ papel), UC-J-01 (Register POST), UC-J-07 (ChangePassword POST), UC-J-08
 | UC-J-23 Historico/cancelar pagamento | Cancelamento de `PaymentRecord` pendente sem teste | FALTA |
 | UC-J-22 audit gap | Upload de comprovante sem `AuditAsync` (Fase 2 do C34 adiciona; teste aqui valida) | COBERTO C34 (`ProofUploaded`/`ProofReplaced` + `C34AuditTrailTests`) |
 | UC-O-20/UC-A-22/23 audit gap | Settlement submit/review sem `AuditAsync` (C34 adiciona — teste ja cobre o comportamento atual) | COBERTO C34 (`Settlement*` + `C34AuditTrailTests`) |
-| UC-A-08/09/10 Bloquear/desbloquear/excluir usuario | Permissao destrutiva sem teste | FALTA |
-| UC-A-12 Papel venue_manager | Grant/revoke de papel sem teste nem audit | FALTA |
+| UC-A-08/09/10 Bloquear/desbloquear/excluir usuario | Permissao destrutiva sem teste | COBERTO C34-F3b (`AdminUserService` + `C34PermissionTests`; audit com ator correto) |
+| UC-A-12 Papel venue_manager | Grant/revoke de papel sem teste nem audit | COBERTO C34-F3b (`ToggleVenueManagerAsync` emite `UserRoleAssigned/Removed`) |
 | UC-O-03/04/05 aprovar/rejeitar | `ApproveRequestAsync`/`RejectRequestAsync`/`*SelectedAsync` validam papel so na UI (o novo `ApproveAllPendingAsync` ja re-verifica no service) | service nao revalida |
 
 ### Defeitos encontrados no C33 (corrigidos)

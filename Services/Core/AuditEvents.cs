@@ -16,6 +16,7 @@ public static class AuditEvents
     public const string UserLoginFailed          = "user.login.failed";
     public const string UserLinkedExternalLogin  = "user.external_login.linked";
     public const string UserLockedOut            = "user.locked";
+    public const string UserUnlocked             = "user.unlocked";
     public const string UserPasswordChanged = "user.password.changed";
     public const string UserPasswordReset   = "user.password.reset";
     public const string UserRoleAssigned    = "user.role.assigned";
