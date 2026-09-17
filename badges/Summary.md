@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 09/16/2026 - 11:53:44 |
-| Coverage date: | 09/16/2026 - 11:53:38 |
+| Generated on: | 09/17/2026 - 20:32:49 |
+| Coverage date: | 09/17/2026 - 20:32:43 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 513 |
 | Files: | 612 |
-| **Line coverage:** | 92.9% (132845 of 142992) |
-| Covered lines: | 132845 |
-| Uncovered lines: | 10147 |
+| **Line coverage:** | 92.9% (132851 of 142992) |
+| Covered lines: | 132851 |
+| Uncovered lines: | 10141 |
 | Coverable lines: | 142992 |
 | Total lines: | 174941 |
-| **Branch coverage:** | 39% (3344 of 8568) |
-| Covered branches: | 3344 |
+| **Branch coverage:** | 39% (3348 of 8568) |
+| Covered branches: | 3348 |
 | Total branches: | 8568 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 365_35092445612 |
+| Tag: | 367_35271052834 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **132845** | **10147** | **142992** | **191750** | **92.9%** | **3344** | **8568** | **39%** |
+| **Confirmai** | **132851** | **10141** | **142992** | **191750** | **92.9%** | **3348** | **8568** | **39%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -224,7 +224,7 @@
 | Confirmai.Pages.Components.Profile.ProfileContactsDisplay | 0 | 14 | 14 | 45 | 0% | 0 | 16 | 0% |
 | Confirmai.Pages.Components.Profile.ProfileEditForm | 0 | 14 | 14 | 62 | 0% | 0 | 4 | 0% |
 | Confirmai.Pages.Components.Profile.ProfileHeaderCard | 0 | 31 | 31 | 110 | 0% | 0 | 32 | 0% |
-| Confirmai.Pages.Components.Profile.ProfileLoadingStates | 6 | 1 | 7 | 26 | 85.7% | 3 | 4 | 75% |
+| Confirmai.Pages.Components.Profile.ProfileLoadingStates | 7 | 0 | 7 | 26 | 100% | 4 | 4 | 100% |
 | Confirmai.Pages.Components.Profile.ProfilePixVisibility | 1 | 0 | 1 | 12 | 100% | 0 | 0 |  |
 | Confirmai.Pages.Components.Profile.ProfileSportStats | 0 | 21 | 21 | 71 | 0% | 0 | 8 | 0% |
 | Confirmai.Pages.Contact | 3 | 4 | 7 | 30 | 42.8% | 0 | 2 | 0% |
@@ -381,7 +381,7 @@
 | Confirmai.Services.Events.EventConfirmationPaymentTransitionResult | 7 | 0 | 7 | 136 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.EventNotificationSchedulerService | 36 | 19 | 55 | 129 | 65.4% | 5 | 10 | 50% |
 | Confirmai.Services.Events.EventNotificationService | 153 | 22 | 175 | 307 | 87.4% | 60 | 76 | 78.9% |
-| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
+| Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
@@ -498,12 +498,12 @@
 | Confirmai.Services.Utility.MailboxMessageView | 11 | 0 | 11 | 327 | 100% | 0 | 0 |  |
 | Confirmai.Services.Utility.MailboxQueryService | 171 | 11 | 182 | 327 | 93.9% | 69 | 114 | 60.5% |
 | Confirmai.Services.Utility.PiiSanitizer | 13 | 2 | 15 | 157 | 86.6% | 6 | 6 | 100% |
-| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 48 | 52 | 92.3% |
+| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 49 | 52 | 94.2% |
 | Confirmai.Services.Utility.TestnetBitcoinPaymentService | 49 | 18 | 67 | 132 | 73.1% | 16 | 24 | 66.6% |
 | Confirmai.Shared.Components.ActivePaymentMethodsWidget | 28 | 3 | 31 | 78 | 90.3% | 12 | 16 | 75% |
 | Confirmai.Shared.Components.Admin.AdminLogsFilterBar | 38 | 10 | 48 | 124 | 79.1% | 2 | 4 | 50% |
 | Confirmai.Shared.Components.Admin.AdminLogsQuickFilters | 25 | 0 | 25 | 68 | 100% | 3 | 4 | 75% |
-| Confirmai.Shared.Components.Admin.AdminLogsTable | 35 | 14 | 49 | 144 | 71.4% | 14 | 30 | 46.6% |
+| Confirmai.Shared.Components.Admin.AdminLogsTable | 36 | 13 | 49 | 144 | 73.4% | 15 | 30 | 50% |
 | Confirmai.Shared.Components.Admin.AdminUsersFilterBar | 0 | 25 | 25 | 58 | 0% | 0 | 0 |  |
 | Confirmai.Shared.Components.Admin.AdminUsersPagination | 0 | 12 | 12 | 32 | 0% | 0 | 0 |  |
 | Confirmai.Shared.Components.Admin.AdminUsersTable | 0 | 48 | 48 | 151 | 0% | 0 | 18 | 0% |
