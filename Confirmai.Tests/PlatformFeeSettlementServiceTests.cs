@@ -14,10 +14,17 @@ namespace Confirmai.Tests;
 public class PlatformFeeSettlementServiceTests
 {
     private static PlatformFeeSettlementService CreateService(IDbContextFactory<AppDbContext> factory)
-        => new(factory, NullLogger<PlatformFeeSettlementService>.Instance, new UiTextService(new LanguagePreferenceService()));
+        => new(factory, NullLogger<PlatformFeeSettlementService>.Instance,
+            new UiTextService(new LanguagePreferenceService()),
+            new LogService(factory, NullLogger<LogService>.Instance));
 
-    private static byte[] FakeImage(int size = 1024) =>
-        Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();
+    private static byte[] FakeImage(int size = 1024)
+    {
+        var bytes = Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();
+        // JPEG signature so the bytes pass ImageSignatureValidator
+        bytes[0] = 0xFF; bytes[1] = 0xD8; bytes[2] = 0xFF;
+        return bytes;
+    }
 
     /// <summary>Group + an organizer that is an admin of that group (allowed to submit a settlement).</summary>
     private static async Task<(Group group, ApplicationUser organizer)> SeedGroupWithOrganizerAsync(AppDbContext db)
@@ -159,6 +166,23 @@ public class PlatformFeeSettlementServiceTests
         var service = CreateService(ctx.factory);
         var result = await service.SubmitSettlementAsync(
             group.Id, organizer.Id, 0.75m, FakeImage(), "image/jpeg");
+
+        Assert.False(result.Success);
+        Assert.Empty(ctx.db.PlatformFeeSettlements);
+    }
+
+    [Fact]
+    public async Task SubmitSettlementAsync_ZeroFeeMatch_IsRejected()
+    {
+        // A waived match is stamped with fee 0 — it has nothing to settle and
+        // must be excluded from selection even if submitted directly.
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var (group, organizer) = await SeedGroupWithOrganizerAsync(ctx.db);
+        var evt = await SeedMatchWithFeeAsync(ctx.db, group, "2026-08-10", "a", fee: 0m);
+
+        var service = CreateService(ctx.factory);
+        var result = await service.SubmitSettlementAsync(
+            group.Id, organizer.Id, 0m, FakeImage(), "image/jpeg", new[] { evt.Id });
 
         Assert.False(result.Success);
         Assert.Empty(ctx.db.PlatformFeeSettlements);

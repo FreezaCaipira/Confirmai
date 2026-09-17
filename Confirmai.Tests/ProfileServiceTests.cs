@@ -23,7 +23,8 @@ public class ProfileServiceTests
             null!, null!, null!, null!, null!, null!);
         var envMock = new Mock<IWebHostEnvironment>();
         envMock.Setup(x => x.WebRootPath).Returns(Path.GetTempPath());
-        var svc = new ProfileService(factory, userManager, envMock.Object);
+        var svc = new ProfileService(factory, userManager, envMock.Object,
+            new Confirmai.Services.Core.LogService(factory, NullLogger<Confirmai.Services.Core.LogService>.Instance));
         return (factory, svc, userManager);
     }
 

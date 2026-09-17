@@ -38,6 +38,7 @@ public partial class Edit
     [Inject] private EventNotificationService NotificationService { get; set; } = default!;
     [Inject] private EventCollisionService EventCollisionService { get; set; } = default!;
     [Inject] private LogService LogService { get; set; } = default!;
+    [Inject] private EventCancellationService EventCancellation { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,7 +61,7 @@ public partial class Edit
             return;
         }
 
-        if (ev.CreatedByUserId != userId && !isSystemAdmin)
+        if (!EventCancellationService.CanManage(ev, userId, isSystemAdmin))
         {
             accessDenied = true;
             isLoading    = false;
@@ -130,7 +131,7 @@ public partial class Edit
                 .Include(e => e.Group)
                 .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
 
-            if (ev is null || (ev.CreatedByUserId != userId && !auth.User.IsInRole("admin")))
+            if (ev is null || !EventCancellationService.CanManage(ev, userId, auth.User.IsInRole("admin")))
             {
                 saveError = Ui["Futsal.AccessDenied"];
                 isSaving  = false;
@@ -193,21 +194,10 @@ public partial class Edit
         cancelError = string.Empty;
         try
         {
-            await using var db = await DbFactory.CreateDbContextAsync();
-            var dbEv = await db.Events.FirstOrDefaultAsync(e => e.Id == Id);
-            if (dbEv is null) return;
             var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
             var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (dbEv.CreatedByUserId != userId && !auth.User.IsInRole("admin")) return;
-            dbEv.IsActive = false;
-            await db.SaveChangesAsync();
-            await NotificationService.NotifyEventCancelledAsync(Id, userId!);
-            await LogService.AuditAsync(
-                AuditEvents.EventCancelled,
-                AuditEntities.Event,
-                Id.ToString(),
-                $"Partida #{Id} cancelada pelo admin/criador",
-                userId, "EventEdit");
+            var result = await EventCancellation.CancelAsync(Id, userId, auth.User.IsInRole("admin"));
+            if (result != EventCancellationResult.Success) return;
             NavigationManager.NavigateTo($"/futsal/{Id}");
         }
         catch (Exception ex)

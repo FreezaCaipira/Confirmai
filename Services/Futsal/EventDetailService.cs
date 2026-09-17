@@ -3,6 +3,7 @@ using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Core;
+using Confirmai.Services.Groups;
 using Confirmai.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 
@@ -94,14 +95,23 @@ public class EventDetailService
 
         if (!alreadyPending)
         {
-            db.GroupJoinRequests.Add(new GroupJoinRequest
+            var req = new GroupJoinRequest
             {
                 GroupId = groupId,
                 UserId = userId,
                 RequestedAt = DateTime.UtcNow,
                 Status = JoinRequestStatus.Pending,
-            });
+            };
+            db.GroupJoinRequests.Add(req);
             await db.SaveChangesAsync();
+
+            await _logService.AuditAsync(
+                AuditEvents.GroupJoinRequested,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                "Solicitação de entrada no grupo",
+                actorUserId: userId,
+                metadata: new { requestId = req.Id, groupId });
         }
     }
 
@@ -204,8 +214,12 @@ public class EventDetailService
     public async Task AdminRemoveConfirmationAsync(int confirmationId, string? currentUserId, int? eventId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var conf = await db.EventConfirmations.FindAsync(confirmationId);
+        var conf = await db.EventConfirmations
+            .Include(c => c.Event)
+            .FirstOrDefaultAsync(c => c.Id == confirmationId);
         if (conf is null) return;
+        if (conf.Event is null ||
+            !await GroupAccess.IsGroupAdminAsync(db, conf.Event.GroupId, currentUserId)) return;
         var position = conf.Position ?? FutsalPosition.Outfield;
         var targetUserId = conf.UserId;
         db.EventConfirmations.Remove(conf);

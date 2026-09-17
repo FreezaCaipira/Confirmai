@@ -23,7 +23,8 @@ public class GroupDetailServiceTests
         authMock
             .Setup(x => x.GetAuthenticationStateAsync())
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(identity)));
-        var svc = new GroupDetailService(factory, authMock.Object);
+        var logService = new LogService(factory, NullLogger<LogService>.Instance);
+        var svc = new GroupDetailService(factory, authMock.Object, logService);
         return (factory, svc);
     }
 
@@ -188,10 +189,9 @@ public class GroupDetailServiceTests
     {
         var (factory, svc, groupId) = await SetupWithGroupAsync();
 
-        var (success, error) = await svc.JoinWithCodeAsync(groupId, "u1", "ABC123");
+        var result = await svc.JoinWithCodeAsync(groupId, "u1", "ABC123");
 
-        Assert.True(success);
-        Assert.Null(error);
+        Assert.Equal(JoinWithCodeResult.Joined, result);
     }
 
     [Fact]
@@ -211,10 +211,9 @@ public class GroupDetailServiceTests
     {
         var (factory, svc, groupId) = await SetupWithGroupAsync();
 
-        var (success, error) = await svc.JoinWithCodeAsync(groupId, "u1", "WRONG");
+        var result = await svc.JoinWithCodeAsync(groupId, "u1", "WRONG");
 
-        Assert.False(success);
-        Assert.NotNull(error);
+        Assert.Equal(JoinWithCodeResult.InvalidCode, result);
     }
 
     [Fact]
@@ -222,21 +221,20 @@ public class GroupDetailServiceTests
     {
         var (factory, svc) = Setup();
 
-        var (success, error) = await svc.JoinWithCodeAsync(999, "u1", "ABC123");
+        var result = await svc.JoinWithCodeAsync(999, "u1", "ABC123");
 
-        Assert.False(success);
-        Assert.NotNull(error);
+        Assert.Equal(JoinWithCodeResult.InvalidCode, result);
     }
 
     [Fact]
-    public async Task JoinWithCodeAsync_DoesNotDuplicateMember_WhenAlreadyMember()
+    public async Task JoinWithCodeAsync_ReturnsAlreadyMember_WhenAlreadyMember()
     {
         var (factory, svc, groupId) = await SetupWithGroupAsync();
         await svc.JoinWithCodeAsync(groupId, "u1", "ABC123");
 
-        var (success, _) = await svc.JoinWithCodeAsync(groupId, "u1", "ABC123");
+        var result = await svc.JoinWithCodeAsync(groupId, "u1", "ABC123");
 
-        Assert.True(success);
+        Assert.Equal(JoinWithCodeResult.AlreadyMember, result);
         await using var db = factory.CreateDbContext();
         var count = await db.GroupMembers.CountAsync(m => m.GroupId == groupId && m.UserId == "u1");
         Assert.Equal(1, count);

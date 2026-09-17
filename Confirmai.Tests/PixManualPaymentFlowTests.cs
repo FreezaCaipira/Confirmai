@@ -41,9 +41,9 @@ public class PixManualPaymentFlowTests
 
         var db = new AppDbContext(options);
         var factory = new TestInMemoryDbContextFactory(dbName);
-        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
-        
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
+        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance, logService);
+
         var confirmSvc = new AdminConfirmationService(factory, logService);
         
         return (db, uploadSvc, confirmSvc, factory);
@@ -66,6 +66,7 @@ public class PixManualPaymentFlowTests
         db.Events.Add(evt);
         db.Users.Add(payer);
         db.Users.Add(admin);
+        db.GroupMembers.Add(new GroupMember { Group = group, UserId = "admin-1", Role = GroupMemberRole.Admin });
         db.EventConfirmations.Add(conf);
         await db.SaveChangesAsync();
 
@@ -73,7 +74,7 @@ public class PixManualPaymentFlowTests
         var proofBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }; // JPEG magic number
 
         // Act 1: User uploads Pix proof
-        var uploadResult = await uploadSvc.UploadProofAsync(confId, proofBytes, "image/jpeg");
+        var uploadResult = await uploadSvc.UploadProofAsync(confId, proofBytes, "image/jpeg", "payer-1");
 
         // Assert 1: Proof is saved, payment status is still pending
         Assert.True(uploadResult.Success);
@@ -129,15 +130,18 @@ public class PixManualPaymentFlowTests
         db.Groups.Add(group);
         db.Events.Add(evt);
         db.Users.AddRange(admin, payer1, payer2, payer3);
+        db.GroupMembers.Add(new GroupMember { Group = group, UserId = "admin-1", Role = GroupMemberRole.Admin });
         db.EventConfirmations.AddRange(conf1, conf2, conf3);
         await db.SaveChangesAsync();
 
-        var proofBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
+        var jpegBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
+        var pngBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+        var webpBytes = new byte[] { 0x52, 0x49, 0x46, 0x46, 0x24, 0, 0, 0, 0x57, 0x45, 0x42, 0x50 };
 
         // Act 1: All three payers upload proofs
-        await uploadSvc.UploadProofAsync(conf1.Id, proofBytes, "image/jpeg");
-        await uploadSvc.UploadProofAsync(conf2.Id, proofBytes, "image/png");
-        await uploadSvc.UploadProofAsync(conf3.Id, proofBytes, "image/webp");
+        await uploadSvc.UploadProofAsync(conf1.Id, jpegBytes, "image/jpeg", "payer-1");
+        await uploadSvc.UploadProofAsync(conf2.Id, pngBytes, "image/png", "payer-2");
+        await uploadSvc.UploadProofAsync(conf3.Id, webpBytes, "image/webp", "payer-3");
 
         // Act 2: Admin confirms only payer 1 and 3 (rejects payer 2)
         await confirmSvc.TogglePaidAsync(conf1.Id, "admin-1");
@@ -190,7 +194,7 @@ public class PixManualPaymentFlowTests
         var proofBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
 
         // Act: User uploads proof but admin doesn't confirm yet
-        await uploadSvc.UploadProofAsync(confId, proofBytes, "image/jpeg");
+        await uploadSvc.UploadProofAsync(confId, proofBytes, "image/jpeg", "payer-1");
 
         // Assert: Proof is saved but payment status remains pending
         await using var verifyDb = factory.CreateDbContext();
@@ -219,6 +223,7 @@ public class PixManualPaymentFlowTests
         db.Events.Add(evt);
         db.Users.Add(admin);
         db.Users.Add(payer);
+        db.GroupMembers.Add(new GroupMember { Group = group, UserId = "admin-1", Role = GroupMemberRole.Admin });
         db.EventConfirmations.Add(conf);
         await db.SaveChangesAsync();
 
@@ -226,7 +231,7 @@ public class PixManualPaymentFlowTests
         var proofBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
 
         // Act 1: Upload proof and confirm payment
-        await uploadSvc.UploadProofAsync(confId, proofBytes, "image/jpeg");
+        await uploadSvc.UploadProofAsync(confId, proofBytes, "image/jpeg", "payer-1");
         var toggleResult1 = await confirmSvc.TogglePaidAsync(confId, "admin-1");
         Assert.True(toggleResult1.Updated);
         Assert.Equal(EventConfirmationPaymentStatus.Paid, toggleResult1.NewStatus);
@@ -263,15 +268,16 @@ public class PixManualPaymentFlowTests
         db.Events.Add(evt);
         db.Users.Add(admin);
         db.Users.Add(payer);
+        db.GroupMembers.Add(new GroupMember { Group = group, UserId = "admin-1", Role = GroupMemberRole.Admin });
         db.EventConfirmations.Add(conf);
         await db.SaveChangesAsync();
 
         var confId = conf.Id;
         var proof1 = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }; // JPEG
-        var proof2 = new byte[] { 0x89, 0x50, 0x4E, 0x47 }; // PNG
+        var proof2 = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }; // PNG
 
         // Act 1: Upload proof and confirm
-        await uploadSvc.UploadProofAsync(confId, proof1, "image/jpeg");
+        await uploadSvc.UploadProofAsync(confId, proof1, "image/jpeg", "payer-1");
         var confirmResult = await confirmSvc.TogglePaidAsync(confId, "admin-1");
         Assert.True(confirmResult.Updated);
 
@@ -281,7 +287,7 @@ public class PixManualPaymentFlowTests
         await Task.Delay(50); // Ensure timestamp difference
 
         // Act 2: Payer replaces with better quality proof
-        await uploadSvc.UploadProofAsync(confId, proof2, "image/png");
+        await uploadSvc.UploadProofAsync(confId, proof2, "image/png", "payer-1");
 
         // Assert: Payment status unchanged, proof updated, timestamp preserved
         await using var verifyDb2 = factory.CreateDbContext();
@@ -322,11 +328,11 @@ public class PixManualPaymentFlowTests
         Array.Fill(tooLargeFile, (byte)0xFF);
 
         // Act: Attempt to upload oversized file
-        var uploadResult = await uploadSvc.UploadProofAsync(confId, tooLargeFile, "image/jpeg");
+        var uploadResult = await uploadSvc.UploadProofAsync(confId, tooLargeFile, "image/jpeg", "payer-1");
 
         // Assert: Upload failed and state is unchanged
         Assert.False(uploadResult.Success);
-        Assert.Contains("muito grande", uploadResult.Message);
+        Assert.Equal(PixProofUploadError.FileTooLarge, uploadResult.Error);
 
         await using var verifyDb = factory.CreateDbContext();
         var unchanged = verifyDb.EventConfirmations.Single();
@@ -361,13 +367,14 @@ public class PixManualPaymentFlowTests
         db.Groups.Add(group);
         db.Events.Add(evt);
         db.Users.AddRange(admin, payer1, payer2);
+        db.GroupMembers.Add(new GroupMember { Group = group, UserId = "admin-1", Role = GroupMemberRole.Admin });
         db.EventConfirmations.AddRange(conf1, conf2);
         await db.SaveChangesAsync();
 
         var proofBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
 
         // Act: Payer 2 uploads manual Pix proof
-        var uploadResult = await uploadSvc.UploadProofAsync(conf2.Id, proofBytes, "image/jpeg");
+        var uploadResult = await uploadSvc.UploadProofAsync(conf2.Id, proofBytes, "image/jpeg", "payer-2");
         Assert.True(uploadResult.Success);
 
         // Act: Admin confirms manual Pix

@@ -120,9 +120,11 @@ public class AdminPaymentsModalTests
     {
         // Arrange
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var adminId = "admin-user";
+        var (_, evt) = await TestDataFactory.SeedEventWithAdminAsync(db, adminId);
         var conf = new EventConfirmation
         {
-            EventId = 1,
+            EventId = evt.Id,
             UserId = "user-1",
             PaymentStatus = EventConfirmationPaymentStatus.Pending,
             HasPaid = false,
@@ -134,7 +136,6 @@ public class AdminPaymentsModalTests
 
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var adminService = new AdminConfirmationService(factory, logService);
-        var adminId = "admin-user";
 
         // Act
         var result = await adminService.TogglePaidAsync(confirmationId, adminId);

@@ -29,8 +29,13 @@ namespace Confirmai.Tests;
 /// </summary>
 public class ManualPlatformFeeFlowE2ETests
 {
-    private static byte[] FakeImage(int size = 1024) =>
-        Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();
+    private static byte[] FakeImage(int size = 1024)
+    {
+        var bytes = Enumerable.Range(0, size).Select(_ => (byte)0xFF).ToArray();
+        // JPEG signature so the bytes pass ImageSignatureValidator
+        bytes[0] = 0xFF; bytes[1] = 0xD8; bytes[2] = 0xFF;
+        return bytes;
+    }
 
     private sealed class TestInMemoryDbContextFactory : IDbContextFactory<AppDbContext>
     {
@@ -67,12 +72,12 @@ public class ManualPlatformFeeFlowE2ETests
 
         var feeOptions = Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m });
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
-        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
-        var feeLedger = new PlatformFeeLedgerService(factory, feeOptions);
+        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance, logService);
+        var feeLedger = new PlatformFeeLedgerService(factory, new PlatformFeePolicy(feeOptions));
         var confirmSvc = new AdminConfirmationService(factory, logService, feeLedger, NullLogger<AdminConfirmationService>.Instance);
         var settlementSvc = new PlatformFeeSettlementService(
             factory, NullLogger<PlatformFeeSettlementService>.Instance,
-            new UiTextService(new LanguagePreferenceService()));
+            new UiTextService(new LanguagePreferenceService()), logService);
 
         // Seed: group (futsal, manual), organizer (group admin), player, event R$15,00
         var group = TestDataFactory.CreateGroup("Racha do Zé");
@@ -106,7 +111,7 @@ public class ManualPlatformFeeFlowE2ETests
         var sysAdminId = await SeedSystemAdminAsync(db);
 
         // ── Step 1: Player uploads Pix proof ──
-        var uploadResult = await uploadSvc.UploadProofAsync(conf.Id, FakeImage(), "image/jpeg");
+        var uploadResult = await uploadSvc.UploadProofAsync(conf.Id, FakeImage(), "image/jpeg", player.Id);
         Assert.True(uploadResult.Success);
 
         // ── Step 2: Group admin accepts the proof (via AdminConfirmationService) ──
@@ -155,12 +160,12 @@ public class ManualPlatformFeeFlowE2ETests
 
         var feeOptions = Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m });
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
-        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
-        var feeLedger = new PlatformFeeLedgerService(factory, feeOptions);
+        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance, logService);
+        var feeLedger = new PlatformFeeLedgerService(factory, new PlatformFeePolicy(feeOptions));
         var confirmSvc = new AdminConfirmationService(factory, logService, feeLedger, NullLogger<AdminConfirmationService>.Instance);
         var settlementSvc = new PlatformFeeSettlementService(
             factory, NullLogger<PlatformFeeSettlementService>.Instance,
-            new UiTextService(new LanguagePreferenceService()));
+            new UiTextService(new LanguagePreferenceService()), logService);
 
         var group = TestDataFactory.CreateGroup("Racha 2");
         group.Sport = Sport.Futsal;
@@ -191,8 +196,8 @@ public class ManualPlatformFeeFlowE2ETests
         var sysAdminId = await SeedSystemAdminAsync(db);
 
         // Both players upload proof and admin confirms both
-        await uploadSvc.UploadProofAsync(conf1.Id, FakeImage(), "image/jpeg");
-        await uploadSvc.UploadProofAsync(conf2.Id, FakeImage(), "image/png");
+        await uploadSvc.UploadProofAsync(conf1.Id, FakeImage(), "image/jpeg", p1.Id);
+        await uploadSvc.UploadProofAsync(conf2.Id, new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }, "image/png", p2.Id);
         await confirmSvc.TogglePaidAsync(conf1.Id, organizer.Id);
         await confirmSvc.TogglePaidAsync(conf2.Id, organizer.Id);
 
@@ -228,12 +233,12 @@ public class ManualPlatformFeeFlowE2ETests
 
         var feeOptions = Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m });
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
-        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance);
-        var feeLedger = new PlatformFeeLedgerService(factory, feeOptions);
+        var uploadSvc = new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance, logService);
+        var feeLedger = new PlatformFeeLedgerService(factory, new PlatformFeePolicy(feeOptions));
         var confirmSvc = new AdminConfirmationService(factory, logService, feeLedger, NullLogger<AdminConfirmationService>.Instance);
         var settlementSvc = new PlatformFeeSettlementService(
             factory, NullLogger<PlatformFeeSettlementService>.Instance,
-            new UiTextService(new LanguagePreferenceService()));
+            new UiTextService(new LanguagePreferenceService()), logService);
 
         var group = TestDataFactory.CreateGroup("Racha 3");
         group.Sport = Sport.Futsal;
@@ -260,7 +265,7 @@ public class ManualPlatformFeeFlowE2ETests
         var sysAdminId = await SeedSystemAdminAsync(db);
 
         // Player pays, admin confirms, fee stamped
-        await uploadSvc.UploadProofAsync(conf.Id, FakeImage(), "image/jpeg");
+        await uploadSvc.UploadProofAsync(conf.Id, FakeImage(), "image/jpeg", player.Id);
         await confirmSvc.TogglePaidAsync(conf.Id, organizer.Id);
 
         // Organizer submits settlement

@@ -2,6 +2,7 @@ using System.Globalization;
 using Confirmai.Configuration;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 
@@ -15,12 +16,13 @@ public partial class EventPaymentSummary
     [Parameter] public bool ShowFeeBreakdown { get; set; }
 
     [Inject] private IOptions<FeeOptions> FeeOptions { get; set; } = default!;
+    [Inject] private PlatformFeePolicy FeePolicy { get; set; } = default!;
 
     private CultureInfo PtBr { get; } = new CultureInfo("pt-BR");
 
     private decimal BasePrice => Confirmation?.Event?.Price ?? 0m;
 
-    private decimal ManualFee => FeeOptions.Value.ManualPlatformFeeFixed;
+    private decimal ManualFee => FeePolicy.ResolveManualFee(Confirmation?.Event?.Group, DateTime.UtcNow);
 
     private decimal GetTotalAmount()
     {
@@ -29,10 +31,15 @@ public partial class EventPaymentSummary
 
         var basePrice = Confirmation.Event.Price.Value;
 
-        if (ShowFeeBreakdown)
-        {
-            return basePrice + FeeOptions.Value.ManualPlatformFeeFixed;
-        }
+        // V1 manual flow (no gateways): total via ManualPlatformFee so the fee
+        // only applies to futsal and resolves to 0 while the group is waived —
+        // never the V2 fee fields.
+        if (Confirmation.Event?.Group is { EnablePaymentGateways: false })
+            return ManualPlatformFee.TotalToPay(
+                gatewaysEnabled: false,
+                isFutsal: Confirmation.Event.Sport == Sport.Futsal,
+                basePrice,
+                ManualFee);
 
         if (!FeeOptions.Value.IsConfigured)
             return basePrice;

@@ -130,6 +130,36 @@ internal static class TestDataFactory
             ConfirmedAt = DateTime.UtcNow
         };
     }
+
+    /// <summary>
+    /// Seeds a Group + Event + admin member so service-level authorization
+    /// checks (GroupAccess.IsGroupAdminAsync) pass for <paramref name="adminUserId"/>.
+    /// </summary>
+    public static async Task<(Group group, Event evt)> SeedEventWithAdminAsync(
+        AppDbContext db, string adminUserId, Sport sport = Sport.Futsal)
+    {
+        var group = new Group { Name = "Grupo Teste", Sport = sport };
+        db.Groups.Add(group);
+        await db.SaveChangesAsync();
+
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = group.Id,
+            UserId = adminUserId,
+            Role = GroupMemberRole.Admin
+        });
+
+        var evt = new Event
+        {
+            GroupId = group.Id,
+            Sport = sport,
+            StartsAt = DateTime.UtcNow.AddDays(1),
+            Price = 10m
+        };
+        db.Events.Add(evt);
+        await db.SaveChangesAsync();
+        return (group, evt);
+    }
 }
 
 

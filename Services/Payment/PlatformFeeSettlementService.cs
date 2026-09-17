@@ -17,17 +17,20 @@ public class PlatformFeeSettlementService
     private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly ILogger<PlatformFeeSettlementService> _logger;
     private readonly UiTextService _ui;
+    private readonly LogService _log;
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
     private static readonly string[] AllowedMimeTypes = { "image/jpeg", "image/png", "image/webp" };
 
     public PlatformFeeSettlementService(
         IDbContextFactory<AppDbContext> factory,
         ILogger<PlatformFeeSettlementService> logger,
-        UiTextService ui)
+        UiTextService ui,
+        LogService log)
     {
         _factory = factory;
         _logger = logger;
         _ui = ui;
+        _log = log;
     }
 
     /// <summary>
@@ -66,6 +69,16 @@ public class PlatformFeeSettlementService
             {
                 Success = false,
                 Message = _ui.Get("Payment.Settlement.FileTooLarge", MaxFileSizeBytes / (1024 * 1024))
+            };
+        }
+
+        // The declared MIME type is client-controlled — check the file signature.
+        if (!ImageSignatureValidator.MatchesDeclaredType(fileBytes, mimeType))
+        {
+            return new PlatformFeeSettlementResult
+            {
+                Success = false,
+                Message = _ui["Payment.Settlement.InvalidImageType"]
             };
         }
 
@@ -109,10 +122,11 @@ public class PlatformFeeSettlementService
             var eventIds = selectedEventIds.Distinct().ToList();
 
             // The selected matches must belong to this group and have accrued fee.
+            // Zero-stamped (waived) lots are excluded — there is nothing to settle.
             var accruedByEvent = await db.EventConfirmations
                 .AsNoTracking()
                 .Where(c => c.Event!.GroupId == groupId
-                    && c.PlatformFeeAmount.HasValue
+                    && c.PlatformFeeAmount > 0
                     && eventIds.Contains(c.Event.Id))
                 .GroupBy(c => c.Event!.Id)
                 .Select(g => new { EventId = g.Key, Fee = g.Sum(c => c.PlatformFeeAmount!.Value) })
@@ -197,6 +211,14 @@ public class PlatformFeeSettlementService
             db.PlatformFeeSettlements.Add(settlement);
             await db.SaveChangesAsync();
 
+            await _log.AuditAsync(
+                AuditEvents.SettlementSubmitted,
+                AuditEntities.PlatformFeeSettlement,
+                settlement.Id.ToString(),
+                $"Repasse enviado pelo organizador: R$ {amount:F2} ({eventIds.Count} partidas)",
+                actorUserId: submittedByUserId,
+                metadata: new { settlementId = settlement.Id, groupId, amount, eventIds });
+
             return new PlatformFeeSettlementResult
             {
                 Success = true,
@@ -276,6 +298,16 @@ public class PlatformFeeSettlementService
         settlement.ReviewNote = note;
 
         await db.SaveChangesAsync();
+
+        await _log.AuditAsync(
+            approved ? AuditEvents.SettlementConfirmed : AuditEvents.SettlementRejected,
+            AuditEntities.PlatformFeeSettlement,
+            settlement.Id.ToString(),
+            approved
+                ? $"Repasse confirmado: R$ {settlement.Amount:F2}"
+                : $"Repasse rejeitado: {note}",
+            actorUserId: reviewerUserId,
+            metadata: new { settlementId = settlement.Id, settlement.GroupId, settlement.Amount, approved, note });
 
         return new PlatformFeeSettlementResult
         {

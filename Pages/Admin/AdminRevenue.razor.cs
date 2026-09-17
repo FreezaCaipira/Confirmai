@@ -27,11 +27,22 @@ public partial class AdminRevenue
     private string reviewMessage = string.Empty;
     private int? viewingProofSettlementId;
 
+    // ── Per-group platform fee waiver (Ciclo 34) ─────────────────────────
+    private IReadOnlyList<(int Id, string Name)> waiverGroupOptions = Array.Empty<(int, string)>();
+    private IReadOnlyList<GroupFeeWaiverRow> waiverRows = Array.Empty<GroupFeeWaiverRow>();
+    private GroupFeeWaivedStats? waivedStats;
+    private int waiverGroupId;
+    private DateTime waiverUntil = DateTime.UtcNow.Date.AddDays(31);
+    private string waiverReason = string.Empty;
+    private string waiverMessage = string.Empty;
+    private bool waiverSaving;
+
     [Inject] private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
     [Inject] private AdminRevenueReportService RevenueReportService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private PlatformFeeSettlementQueryService FeeQuery { get; set; } = default!;
     [Inject] private PlatformFeeSettlementService FeeSettlement { get; set; } = default!;
+    [Inject] private PlatformFeeWaiverService FeeWaiver { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
@@ -42,7 +53,7 @@ public partial class AdminRevenue
         // Default to last 30 days
         endDate = DateTime.UtcNow;
         startDate = DateTime.UtcNow.AddDays(-30);
-        await Task.WhenAll(LoadReportAsync(), LoadReviewQueueAsync());
+        await Task.WhenAll(LoadReportAsync(), LoadReviewQueueAsync(), LoadWaiverAsync());
     }
 
     private async Task LoadReportAsync()
@@ -134,6 +145,67 @@ public partial class AdminRevenue
         viewingProofSettlementId = settlementId;
         return Task.CompletedTask;
     }
+
+    // ── Per-group platform fee waiver (Ciclo 34) ─────────────────────────
+
+    private async Task LoadWaiverAsync()
+    {
+        waiverGroupOptions = await FeeWaiver.GetGroupsAsync();
+        waiverRows = await FeeWaiver.GetWaiverOverviewAsync();
+        waivedStats = await FeeWaiver.GetWaivedStatsAsync(startDate, endDate);
+    }
+
+    private async Task SaveWaiverAsync()
+    {
+        if (currentUserId is null || waiverGroupId <= 0 || waiverSaving) return;
+        waiverSaving = true;
+        waiverMessage = string.Empty;
+        try
+        {
+            // The picked day is the last waived day: store the exclusive end (next day 00:00 UTC).
+            var untilUtc = DateTime.SpecifyKind(waiverUntil.Date.AddDays(1), DateTimeKind.Utc);
+            var result = await FeeWaiver.SetWaiverAsync(waiverGroupId, currentUserId, untilUtc, waiverReason);
+            waiverMessage = result.Success
+                ? T["AdminRevenue.FeeWaiverSaved"]
+                : WaiverErrorText(result.Error);
+            if (result.Success)
+                await LoadWaiverAsync();
+        }
+        finally
+        {
+            waiverSaving = false;
+        }
+    }
+
+    private async Task RevokeWaiverAsync(int groupId)
+    {
+        if (currentUserId is null || waiverSaving) return;
+        waiverSaving = true;
+        waiverMessage = string.Empty;
+        try
+        {
+            var result = await FeeWaiver.ClearWaiverAsync(groupId, currentUserId);
+            waiverMessage = result.Success
+                ? T["AdminRevenue.FeeWaiverRevoked"]
+                : WaiverErrorText(result.Error);
+            if (result.Success)
+                await LoadWaiverAsync();
+        }
+        finally
+        {
+            waiverSaving = false;
+        }
+    }
+
+    private string WaiverErrorText(PlatformFeeWaiverError error) => error switch
+    {
+        PlatformFeeWaiverError.NotAuthorized => T["AdminRevenue.FeeWaiverErrNotAuthorized"],
+        PlatformFeeWaiverError.ExpirationNotFuture => T["AdminRevenue.FeeWaiverErrExpiration"],
+        PlatformFeeWaiverError.ReasonRequired => T["AdminRevenue.FeeWaiverErrReason"],
+        PlatformFeeWaiverError.ReasonTooLong => T["AdminRevenue.FeeWaiverErrReasonTooLong"],
+        PlatformFeeWaiverError.GroupNotFound => T["AdminRevenue.FeeWaiverErrGroupNotFound"],
+        _ => T["AdminRevenue.SettlementError"],
+    };
 
     private string? currentUserId;
 }

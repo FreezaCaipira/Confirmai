@@ -53,6 +53,17 @@ namespace Confirmai.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        /// <summary>
+        /// Fim (exclusivo, UTC) da isenção da taxa de plataforma do fluxo manual.
+        /// Nulo = sem isenção. Sempre tem prazo: a isenção expira sozinha e a taxa
+        /// volta a ser cobrada sem intervenção. Só o sysadmin altera (nunca o organizador).
+        /// </summary>
+        public DateTime? PlatformFeeWaivedUntil { get; set; }
+
+        /// <summary>Motivo curto da isenção (obrigatório ao conceder; ex.: "grupo parceiro piloto").</summary>
+        [StringLength(200)]
+        public string? PlatformFeeWaiverReason { get; set; }
+
         [StringLength(450)]
         public string? CreatedByUserId { get; set; }
 

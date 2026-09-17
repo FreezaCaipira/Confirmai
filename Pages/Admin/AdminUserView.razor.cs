@@ -1,6 +1,8 @@
 using Confirmai.Models;
+using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace Confirmai.Pages.Admin;
@@ -24,6 +26,8 @@ public partial class AdminUserView
     [Inject] private UserManager<ApplicationUser> UserManager { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private UiTextService T { get; set; } = default!;
+    [Inject] private AdminUserService AdminUserService { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -45,14 +49,15 @@ public partial class AdminUserView
         roleToggleBusy  = true;
         roleToggleError = string.Empty;
 
-        IdentityResult result = isVenueManager
-            ? await UserManager.RemoveFromRoleAsync(user, "venue_manager")
-            : await UserManager.AddToRoleAsync(user, "venue_manager");
+        var auth    = await AuthStateProvider.GetAuthenticationStateAsync();
+        var actorId = auth.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var (result, isManager, errors) =
+            await AdminUserService.ToggleVenueManagerAsync(user.Id, actorId);
 
-        if (result.Succeeded)
-            isVenueManager = !isVenueManager;
+        if (result == AdminUserMutationResult.Success)
+            isVenueManager = isManager;
         else
-            roleToggleError = string.Join(" ", result.Errors.Select(e => e.Description));
+            roleToggleError = errors ?? T["AdminUserView.RoleToggleError"];
 
         roleToggleBusy = false;
     }

@@ -24,7 +24,7 @@ public class PlatformFeeLedgerServiceTests
         decimal manualFee = 0.75m)
     {
         var options = Options.Create(TestFeeOptions(manualFee));
-        return new PlatformFeeLedgerService(ctx.factory, options);
+        return new PlatformFeeLedgerService(ctx.factory, new PlatformFeePolicy(options));
     }
 
     [Fact]
@@ -232,6 +232,116 @@ public class PlatformFeeLedgerServiceTests
         var result = await service.StampFeeOnPaidAsync(conf.Id);
 
         Assert.False(result);
+    }
+
+    [Fact]
+    public async Task StampFeeOnPaidAsync_WaivedGroup_StampsZeroNotSkipped()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var group = TestDataFactory.CreateGroup("Test", enablePaymentGateways: false);
+        group.Sport = Sport.Futsal;
+        group.PlatformFeeWaivedUntil = DateTime.UtcNow.AddDays(30);
+        group.PlatformFeeWaiverReason = "grupo parceiro piloto";
+        ctx.db.Groups.Add(group);
+        await ctx.db.SaveChangesAsync();
+
+        var evt = TestDataFactory.CreateEvent(group, "2026-08-10", 20.0m);
+        ctx.db.Events.Add(evt);
+        await ctx.db.SaveChangesAsync();
+
+        var user = TestDataFactory.CreateUserWithPixKey("u1", "Player 1", "pix@test");
+        ctx.db.Users.Add(user);
+        await ctx.db.SaveChangesAsync();
+
+        var conf = TestDataFactory.CreateEventConfirmation(evt, user);
+        conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+        conf.HasPaid = true;
+        ctx.db.EventConfirmations.Add(conf);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx);
+        var result = await service.StampFeeOnPaidAsync(conf.Id);
+
+        Assert.True(result);
+        await using var verifyDb = ctx.factory.CreateDbContext();
+        var saved = verifyDb.EventConfirmations.Single();
+        // Waived: the fee is still stamped — explicitly zero, never skipped.
+        Assert.Equal(0m, saved.PlatformFeeAmount);
+
+        // Zero lots are excluded from the settlement breakdown — nothing to settle.
+        var breakdown = await service.GetGroupFeeBreakdownByMatchAsync(group.Id);
+        Assert.Empty(breakdown);
+
+        // The ledger balance records the zero fee (accrued stays 0).
+        var (accrued, _, due) = await service.GetGroupBalanceAsync(group.Id);
+        Assert.Equal(0m, accrued);
+        Assert.Equal(0m, due);
+    }
+
+    [Fact]
+    public async Task StampFeeOnPaidAsync_ExpiredWaiver_StampsNormalFee()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var group = TestDataFactory.CreateGroup("Test", enablePaymentGateways: false);
+        group.Sport = Sport.Futsal;
+        group.PlatformFeeWaivedUntil = DateTime.UtcNow.AddDays(-1);
+        group.PlatformFeeWaiverReason = "grupo parceiro piloto";
+        ctx.db.Groups.Add(group);
+        await ctx.db.SaveChangesAsync();
+
+        var evt = TestDataFactory.CreateEvent(group, "2026-08-10", 20.0m);
+        ctx.db.Events.Add(evt);
+        await ctx.db.SaveChangesAsync();
+
+        var user = TestDataFactory.CreateUserWithPixKey("u1", "Player 1", "pix@test");
+        ctx.db.Users.Add(user);
+        await ctx.db.SaveChangesAsync();
+
+        var conf = TestDataFactory.CreateEventConfirmation(evt, user);
+        conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+        conf.HasPaid = true;
+        ctx.db.EventConfirmations.Add(conf);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx);
+        var result = await service.StampFeeOnPaidAsync(conf.Id);
+
+        Assert.True(result);
+        await using var verifyDb = ctx.factory.CreateDbContext();
+        var saved = verifyDb.EventConfirmations.Single();
+        Assert.Equal(0.75m, saved.PlatformFeeAmount);
+    }
+
+    [Fact]
+    public async Task StampFeeOnPaidAsync_ZeroFeeNotWaived_StillDoesNotStamp()
+    {
+        // Configured fee off + no waiver: nothing to record (keeps the old early-exit).
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var group = TestDataFactory.CreateGroup("Test", enablePaymentGateways: false);
+        group.Sport = Sport.Futsal;
+        ctx.db.Groups.Add(group);
+        await ctx.db.SaveChangesAsync();
+
+        var evt = TestDataFactory.CreateEvent(group, "2026-08-10", 20.0m);
+        ctx.db.Events.Add(evt);
+        await ctx.db.SaveChangesAsync();
+
+        var user = TestDataFactory.CreateUserWithPixKey("u1", "Player 1", "pix@test");
+        ctx.db.Users.Add(user);
+        await ctx.db.SaveChangesAsync();
+
+        var conf = TestDataFactory.CreateEventConfirmation(evt, user);
+        conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+        conf.HasPaid = true;
+        ctx.db.EventConfirmations.Add(conf);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx, manualFee: 0m);
+        var result = await service.StampFeeOnPaidAsync(conf.Id);
+
+        Assert.False(result);
+        await using var verifyDb = ctx.factory.CreateDbContext();
+        Assert.Null(verifyDb.EventConfirmations.Single().PlatformFeeAmount);
     }
 
     [Fact]

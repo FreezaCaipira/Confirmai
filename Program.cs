@@ -121,6 +121,8 @@ builder.Services.AddScoped<EventPaymentReconciliationService>();
     builder.Services.AddScoped<EventPaymentChargeCalculator>();
     builder.Services.AddScoped<EventConfirmationPaymentStatusService>();
     builder.Services.AddScoped<AdminConfirmationService>();
+    builder.Services.AddScoped<PlatformFeePolicy>();
+    builder.Services.AddScoped<PlatformFeeWaiverService>();
     builder.Services.AddScoped<PlatformFeeLedgerService>();
     builder.Services.AddScoped<PlatformFeeSettlementService>();
     builder.Services.AddScoped<PlatformFeeSettlementQueryService>();
@@ -140,6 +142,8 @@ builder.Services.AddScoped<EventPaymentReconciliationService>();
     builder.Services.AddScoped<Confirmai.Services.User.ProfileService>();
     builder.Services.AddScoped<ExternalLoginClaimsExtractor>();
     builder.Services.AddScoped<Confirmai.Services.Admin.AdminUsersQueryService>();
+    builder.Services.AddScoped<Confirmai.Services.Admin.AdminUserService>();
+    builder.Services.AddScoped<Confirmai.Services.Events.EventCancellationService>();
 builder.Services.AddScoped<Confirmai.Services.Utility.MailboxQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentInitializationService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentCommandService>();
@@ -531,8 +535,10 @@ app.UseStaticFiles(new StaticFileOptions
         }
     }
 });
-app.UseRateLimiter();
 app.UseRouting();
+// Must run AFTER UseRouting: endpoint-scoped policies (RequireRateLimiting /
+// EnableRateLimiting) need the matched endpoint's metadata.
+app.UseRateLimiter();
 
 app.Use(async (context, next) =>
 {

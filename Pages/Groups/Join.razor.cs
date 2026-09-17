@@ -69,14 +69,18 @@ public partial class Join
 
         try
         {
-            var (success, error) = await GroupDetailService.JoinWithCodeAsync(group.Id, currentUserId, Code);
-            if (success)
+            var result = await GroupDetailService.JoinWithCodeAsync(group.Id, currentUserId, Code);
+            if (result == Confirmai.Services.Groups.JoinWithCodeResult.Joined)
             {
                 joined = true;
             }
+            else if (result == Confirmai.Services.Groups.JoinWithCodeResult.AlreadyMember)
+            {
+                alreadyMember = true;
+            }
             else
             {
-                actionError = error ?? Ui["Group.JoinError"];
+                actionError = Ui["GroupEntry.InvalidCode"];
             }
         }
         catch (Exception)

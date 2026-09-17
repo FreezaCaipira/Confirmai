@@ -15,26 +15,25 @@ namespace Confirmai.Services.Payment;
 public class PlatformFeeLedgerService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
-    private readonly IOptions<FeeOptions> _feeOptions;
+    private readonly PlatformFeePolicy _feePolicy;
 
     public PlatformFeeLedgerService(
         IDbContextFactory<AppDbContext> dbFactory,
-        IOptions<FeeOptions> feeOptions)
+        PlatformFeePolicy feePolicy)
     {
         _dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
-        _feeOptions = feeOptions ?? throw new ArgumentNullException(nameof(feeOptions));
+        _feePolicy = feePolicy ?? throw new ArgumentNullException(nameof(feePolicy));
     }
 
     /// <summary>
     /// Stamps the platform fee on a confirmation when it is marked as paid.
     /// Idempotent: only stamps if PlatformFeeAmount is still null.
     /// Only applies to futsal events in manual mode (no gateways) with a positive price.
+    /// A waived group is still stamped — with an explicit 0 — so the snapshot and
+    /// the ledger record the fee as zero instead of silently skipping it.
     /// </summary>
     public async Task<bool> StampFeeOnPaidAsync(int confirmationId)
     {
-        var fee = _feeOptions.Value.ManualPlatformFeeFixed;
-        if (fee <= 0) return false;
-
         await using var db = _dbFactory.CreateDbContext();
 
         var conf = await db.EventConfirmations
@@ -52,6 +51,11 @@ public class PlatformFeeLedgerService
         if (group.Sport != Sport.Futsal) return false;
         if (group.EnablePaymentGateways) return false;
         if (conf.Event!.Price.GetValueOrDefault() <= 0) return false;
+
+        var nowUtc = DateTime.UtcNow;
+        var waived = _feePolicy.IsWaived(group, nowUtc);
+        var fee = _feePolicy.ResolveManualFee(group, nowUtc);
+        if (!waived && fee <= 0) return false; // configured fee off and not waived: nothing to stamp
 
         conf.PlatformFeeAmount = fee;
         await db.SaveChangesAsync();
@@ -89,8 +93,9 @@ public class PlatformFeeLedgerService
         await using var db = _dbFactory.CreateDbContext();
 
         // Matches (events) with accrued fee, oldest first.
+        // Zero-stamped (waived) lots are excluded — nothing to settle for them.
         var matches = await db.EventConfirmations
-            .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount.HasValue)
+            .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount > 0)
             .Include(c => c.Event)
             .GroupBy(c => new { c.Event!.Id, c.Event.StartsAt, c.Event.Location })
             .Select(g => new

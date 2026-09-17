@@ -19,6 +19,7 @@ Thumbs.db
 
 # Local development email fallbacks
 wwwroot/uploads/dev-emails/
+App_Data/fallback-emails/
 
 # Playwright E2E artifacts
 e2e/node_modules/

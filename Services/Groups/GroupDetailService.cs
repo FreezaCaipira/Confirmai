@@ -2,10 +2,18 @@ using System.Security.Claims;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Confirmai.Services.Groups;
+
+public enum JoinWithCodeResult
+{
+    Joined = 0,
+    AlreadyMember = 1,
+    InvalidCode = 2
+}
 
 public sealed class GroupDetailData
 {
@@ -19,13 +27,16 @@ public sealed class GroupDetailService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly AuthenticationStateProvider _authStateProvider;
+    private readonly LogService _log;
 
     public GroupDetailService(
         IDbContextFactory<AppDbContext> dbFactory,
-        AuthenticationStateProvider authStateProvider)
+        AuthenticationStateProvider authStateProvider,
+        LogService log)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
+        _log = log;
     }
 
     public async Task<string?> GetCurrentUserIdAsync()
@@ -74,14 +85,23 @@ public sealed class GroupDetailService
                         && r.Status == JoinRequestStatus.Pending);
         if (!already)
         {
-            db.GroupJoinRequests.Add(new GroupJoinRequest
+            var req = new GroupJoinRequest
             {
                 GroupId = groupId,
                 UserId = userId,
                 RequestedAt = DateTime.UtcNow,
                 Status = JoinRequestStatus.Pending,
-            });
+            };
+            db.GroupJoinRequests.Add(req);
             await db.SaveChangesAsync();
+
+            await _log.AuditAsync(
+                AuditEvents.GroupJoinRequested,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                "Solicitação de entrada no grupo",
+                actorUserId: userId,
+                metadata: new { requestId = req.Id, groupId });
         }
     }
 
@@ -96,30 +116,45 @@ public sealed class GroupDetailService
         }
     }
 
-    public async Task<(bool Success, string? Error)> JoinWithCodeAsync(int groupId, string userId, string code)
+    /// <summary>
+    /// Joins a group by invite code. Returns an outcome code — the caller
+    /// (page) translates it to the localized message; the service never
+    /// returns user-facing strings.
+    /// </summary>
+    public async Task<JoinWithCodeResult> JoinWithCodeAsync(int groupId, string userId, string code)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
         var group = await db.Groups.FirstOrDefaultAsync(g => g.Id == groupId);
         if (group is null || string.IsNullOrWhiteSpace(group.InviteCode) ||
             !string.Equals(code, group.InviteCode, StringComparison.OrdinalIgnoreCase))
         {
-            return (false, "Codigo invalido. Verifique e tente novamente.");
+            return JoinWithCodeResult.InvalidCode;
         }
 
         var exists = await db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == userId);
-        if (!exists)
+        if (exists)
         {
-            db.GroupMembers.Add(new GroupMember
-            {
-                GroupId = groupId,
-                UserId = userId,
-                Role = GroupMemberRole.Member,
-                CreatedAt = DateTime.UtcNow,
-            });
-            await db.SaveChangesAsync();
+            return JoinWithCodeResult.AlreadyMember;
         }
 
-        return (true, null);
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = groupId,
+            UserId = userId,
+            Role = GroupMemberRole.Member,
+            CreatedAt = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
+
+        await _log.AuditAsync(
+            AuditEvents.GroupMemberAdded,
+            AuditEntities.Group,
+            groupId.ToString(),
+            "Usuário entrou no grupo via código de convite",
+            actorUserId: userId,
+            metadata: new { groupId, memberUserId = userId, via = "invite-code" });
+
+        return JoinWithCodeResult.Joined;
     }
 
     public async Task ApproveRequestAsync(int requestId, string approverUserId, string groupName)
@@ -157,6 +192,14 @@ public sealed class GroupDetailService
         });
 
         await db.SaveChangesAsync();
+
+        await _log.AuditAsync(
+            AuditEvents.GroupJoinApproved,
+            AuditEntities.GroupJoinRequest,
+            req.Id.ToString(),
+            $"Solicitação aprovada no grupo \"{groupName}\"",
+            actorUserId: approverUserId,
+            metadata: new { requestId = req.Id, req.GroupId, req.UserId });
     }
 
     public async Task RejectRequestAsync(int requestId, string rejecterUserId)
@@ -168,6 +211,14 @@ public sealed class GroupDetailService
         req.RespondedAt = DateTime.UtcNow;
         req.RespondedByUserId = rejecterUserId;
         await db.SaveChangesAsync();
+
+        await _log.AuditAsync(
+            AuditEvents.GroupJoinRejected,
+            AuditEntities.GroupJoinRequest,
+            req.Id.ToString(),
+            "Solicitação de entrada rejeitada",
+            actorUserId: rejecterUserId,
+            metadata: new { requestId = req.Id, req.GroupId, req.UserId });
     }
 
     public async Task ApproveSelectedAsync(HashSet<int> requestIds, string approverUserId, string groupName)
@@ -209,6 +260,17 @@ public sealed class GroupDetailService
         }
 
         await db.SaveChangesAsync();
+
+        foreach (var req in requests)
+        {
+            await _log.AuditAsync(
+                AuditEvents.GroupJoinApproved,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                $"Solicitação aprovada no grupo \"{groupName}\"",
+                actorUserId: approverUserId,
+                metadata: new { requestId = req.Id, req.GroupId, req.UserId });
+        }
     }
 
     public async Task RejectSelectedAsync(HashSet<int> requestIds, string rejecterUserId)
@@ -226,6 +288,17 @@ public sealed class GroupDetailService
         }
 
         await db.SaveChangesAsync();
+
+        foreach (var req in requests)
+        {
+            await _log.AuditAsync(
+                AuditEvents.GroupJoinRejected,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                "Solicitação de entrada rejeitada",
+                actorUserId: rejecterUserId,
+                metadata: new { requestId = req.Id, req.GroupId, req.UserId });
+        }
     }
 
     /// <summary>
@@ -282,5 +355,16 @@ public sealed class GroupDetailService
         }
 
         await db.SaveChangesAsync();
+
+        foreach (var req in pendingRequests)
+        {
+            await _log.AuditAsync(
+                AuditEvents.GroupJoinApproved,
+                AuditEntities.GroupJoinRequest,
+                req.Id.ToString(),
+                $"Solicitação aprovada no grupo \"{group.Name}\"",
+                actorUserId: approverUserId,
+                metadata: new { requestId = req.Id, req.GroupId, req.UserId });
+        }
     }
 }

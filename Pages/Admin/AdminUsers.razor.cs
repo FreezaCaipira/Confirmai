@@ -5,6 +5,7 @@ using Confirmai.Shared;
 using Confirmai.Shared.Components;
 using Confirmai.Shared.Components.Admin;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.JSInterop;
 
@@ -18,6 +19,8 @@ public partial class AdminUsers
     [Inject] private LogService LogService { get; set; } = default!;
     [Inject] private AdminUsersFilterStateService AdminUsersFilterStateService { get; set; } = default!;
     [Inject] private AdminUsersQueryService AdminUsersQuery { get; set; } = default!;
+    [Inject] private AdminUserService AdminUserService { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private UiTextService T { get; set; } = default!;
 
     [CascadingParameter] public Toast? ToastRef { get; set; }
@@ -68,23 +71,23 @@ public partial class AdminUsers
     private async Task GoToPrevPage() { if (currentPage > 1) { currentPage--; await LoadUsersPageAsync(); } }
     private async Task GoToNextPage() { if (currentPage < totalPages) { currentPage++; await LoadUsersPageAsync(); } }
 
+    private async Task<string?> CurrentAdminIdAsync()
+        => (await AuthStateProvider.GetAuthenticationStateAsync()).User
+            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
     private async Task LockUser(string userId)
     {
         if (!await JS.InvokeAsync<bool>("confirm", T["AdminUsers.ConfirmLock"])) return;
-        var user = await UserManager.FindByIdAsync(userId);
-        if (user == null) { ToastRef?.Show(T["AdminUsers.NotFoundToast"], "error"); return; }
-        await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
-        await LogService.LogAsync(string.Format(T["AdminUsers.LogLocked"], userId), source: "Admin", level: "Warning", userId: userId);
+        var result = await AdminUserService.SetLockoutAsync(userId, locked: true, await CurrentAdminIdAsync());
+        if (result == AdminUserMutationResult.NotFound) { ToastRef?.Show(T["AdminUsers.NotFoundToast"], "error"); return; }
         ToastRef?.Show(T["AdminUsers.LockedToast"], "warning");
         await LoadUsersPageAsync();
     }
 
     private async Task UnlockUser(string userId)
     {
-        var user = await UserManager.FindByIdAsync(userId);
-        if (user == null) { ToastRef?.Show(T["AdminUsers.NotFoundToast"], "error"); return; }
-        await UserManager.SetLockoutEndDateAsync(user, null);
-        await LogService.LogAsync(string.Format(T["AdminUsers.LogUnlocked"], userId), source: "Admin", level: "Info", userId: userId);
+        var result = await AdminUserService.SetLockoutAsync(userId, locked: false, await CurrentAdminIdAsync());
+        if (result == AdminUserMutationResult.NotFound) { ToastRef?.Show(T["AdminUsers.NotFoundToast"], "error"); return; }
         ToastRef?.Show(T["AdminUsers.UnlockedToast"], "success");
         await LoadUsersPageAsync();
     }
@@ -95,19 +98,15 @@ public partial class AdminUsers
     private async Task DeleteUser(string userId)
     {
         if (!await JS.InvokeAsync<bool>("confirm", T["AdminUsers.ConfirmDelete"])) return;
-        var user = await UserManager.FindByIdAsync(userId);
-        if (user == null) { ToastRef?.Show(T["AdminUsers.NotFoundToast"], "error"); return; }
-        var result = await UserManager.DeleteAsync(user);
-        if (result.Succeeded)
+        var (result, errors) = await AdminUserService.DeleteUserAsync(userId, await CurrentAdminIdAsync());
+        if (result == AdminUserMutationResult.NotFound) { ToastRef?.Show(T["AdminUsers.NotFoundToast"], "error"); return; }
+        if (result == AdminUserMutationResult.Success)
         {
-            await LogService.AuditAsync(AuditEvents.UserDeleted, AuditEntities.User, userId,
-                string.Format(T["AdminUsers.LogDeleted"], userId), source: AdminAuditSources.Identity, level: "Warning");
             ToastRef?.Show(T["AdminUsers.DeletedToast"], "info");
             await LoadUsersPageAsync();
         }
         else
         {
-            var errors = string.Join("; ", result.Errors.Select(e => e.Description));
             ToastRef?.Show($"{T["AdminUsers.DeleteErrorToast"]}: {errors}", "error");
         }
     }

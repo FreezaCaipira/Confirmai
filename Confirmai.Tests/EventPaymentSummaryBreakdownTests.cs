@@ -34,13 +34,17 @@ public class EventPaymentSummaryBreakdownTests
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         feeField!.SetValue(summary, feeOptions);
 
+        var policyField = typeof(EventPaymentSummary).GetProperty("FeePolicy",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        policyField!.SetValue(summary, new Confirmai.Services.Payment.PlatformFeePolicy(feeOptions));
+
         return summary;
     }
 
     private static EventConfirmation CreateConf(decimal price)
     {
         var group = new Group { Name = "Test", EnablePaymentGateways = false, Sport = Sport.Futsal };
-        var evt = new Event { Group = group, Price = price, StartsAt = DateTime.UtcNow };
+        var evt = new Event { Group = group, Sport = Sport.Futsal, Price = price, StartsAt = DateTime.UtcNow };
         return new EventConfirmation { Event = evt, Position = FutsalPosition.Outfield };
     }
 
@@ -99,6 +103,29 @@ public class EventPaymentSummaryBreakdownTests
         var result = (decimal)method!.Invoke(summary, null)!;
 
         Assert.Equal(0m, result);
+    }
+
+    [Fact]
+    public void GetTotalAmount_WaivedGroup_ReturnsBaseOnly()
+    {
+        // Waived group (V1 manual, futsal): player sees the base price — no fee line.
+        var group = new Group
+        {
+            Name = "Test",
+            EnablePaymentGateways = false,
+            Sport = Sport.Futsal,
+            PlatformFeeWaivedUntil = DateTime.UtcNow.AddDays(30),
+            PlatformFeeWaiverReason = "piloto",
+        };
+        var evt = new Event { Group = group, Sport = Sport.Futsal, Price = 15.0m, StartsAt = DateTime.UtcNow };
+        var conf = new EventConfirmation { Event = evt, Position = FutsalPosition.Outfield };
+        var summary = CreateSummary(conf, showFeeBreakdown: false);
+
+        var method = typeof(EventPaymentSummary).GetMethod("GetTotalAmount",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var result = (decimal)method!.Invoke(summary, null)!;
+
+        Assert.Equal(15.0m, result);
     }
 
     [Fact]
