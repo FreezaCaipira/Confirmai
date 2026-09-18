@@ -640,7 +640,7 @@ Nao gerar diagrama de classes do dominio inteiro (ruido); nao adicionar bUnit; n
 4. Poker passou a aceitar cancelamento por sysadmin e a auditar `event.cancelled` (antes divergia do futsal). Mudanca de comportamento correta, mas deveria ter vindo destacada no titulo da fase, nao no meio da nota.
 5. Verificacao visual EN/ES em prod segue pendente com o Robson (3o ciclo).
 
-## Ciclo 34 (Pleno) -- Isencao de taxa por grupo + auditoria do caminho do dinheiro + revisao de seguranca [EXECUTADO -- aguardando review]
+## Ciclo 34 (Pleno) -- Isencao de taxa por grupo + auditoria do caminho do dinheiro + revisao de seguranca [EXECUTADO -- PR #116, ver review acima]
 
 ### Fase 1 -- Isencao de taxa da plataforma por grupo (primeiros clientes)
 Decisao do Robson: grupos escolhidos nao pagam a taxa, para crescer organicamente. Travas do Senior:
