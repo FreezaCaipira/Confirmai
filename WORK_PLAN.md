@@ -626,6 +626,20 @@ Nao gerar diagrama de classes do dominio inteiro (ruido); nao adicionar bUnit; n
 
 ---
 
+## Review Senior do Ciclo 34 (PR #116) -- APROVADO c/ 1 ressalva de dinheiro (decisao do Robson) + ressalvas menores
+
+**Escopo cumprido nas 5 fases (0, 1, 2, 3, 3b).** Isencao por grupo com as 3 travas pedidas: so sysadmin (`PlatformFeeWaiverService.IsSystemAdminAsync`), **sempre com prazo** (`PlatformFeeWaivedUntil`, rejeita data passada) e motivo obrigatorio, audit `GroupFeeWaiverChanged`; taxa **carimbada como 0** no snapshot (`StampFeeOnPaidAsync`) em vez de pulada, lotes R$0 fora do repasse, metrica "isento no periodo". `PlatformFeePolicy` e o unico leitor de `ManualPlatformFeeFixed`. Auditoria do caminho do dinheiro que faltava (comprovante, repasse, join, Pix do perfil). Autorizacao movida para o service em `TogglePaid/RemoveConfirmation/MarkPaid/RejectProof/NotifyDelinquency` + IDOR por `Event.GroupId`; magic bytes em upload; `EventCancellationService` unifica futsal/poker; `AdminUserService` corrige o **ator** do audit (gravava o alvo). Build 0/0, 2477 testes, CI verde.
+
+**Achado real do Pleno**: `app.UseRateLimiter()` antes de `UseRouting()` -- as policies por endpoint (login 20/min, webhook 30/min) **nunca dispararam** desde que foram criadas. Corrigido com teste de 429.
+
+**Ressalva 1 (dinheiro -- decidir com o Robson antes do C36-C)**: a isencao e resolvida com `DateTime.UtcNow` em **dois instantes diferentes**: quando o jogador ve o QR (`EventPayment.ResolvedManualFee`) e quando o organizador marca pago (`StampFeeOnPaidAsync`). Se a isencao expirar entre os dois, o jogador paga sem taxa e o snapshot carimba a taxa cheia -> organizador deve ao site um valor que nao recebeu (ou o inverso, se a isencao for concedida no meio). Recomendacao: resolver a isencao por **`Event.StartsAt`** (data da partida) nos dois pontos -- deterministico, e "isento ate X" passa a significar "partidas ate X", que e o que o admin entende. Alternativa: carimbar a taxa na criacao da confirmacao. E 1 linha em 2 lugares + teste; entra na Fase 0 do C36-C.
+
+**Ressalvas menores**:
+2. Ainda validam papel so na UI: `ApproveRequestAsync`/`RejectRequestAsync`/`*SelectedAsync` e os `Admin*` de vaga/espera do `EventDetailService` -- ja agendados para o `GroupAccess` do C36-C (o `GroupAccess.cs` criado agora so tem `IsGroupAdminAsync`; o C36-C adiciona `IsMemberAsync`).
+3. Processo: ~670 artefatos (`App_Data/fallback-emails/`) entraram num commit e foram removidos por **amend** antes do push. Aceitavel antes do push; depois do push, nunca. `.gitignore` corrigido. Regra: `git status` antes de todo commit.
+4. Poker passou a aceitar cancelamento por sysadmin e a auditar `event.cancelled` (antes divergia do futsal). Mudanca de comportamento correta, mas deveria ter vindo destacada no titulo da fase, nao no meio da nota.
+5. Verificacao visual EN/ES em prod segue pendente com o Robson (3o ciclo).
+
 ## Ciclo 34 (Pleno) -- Isencao de taxa por grupo + auditoria do caminho do dinheiro + revisao de seguranca [EXECUTADO -- aguardando review]
 
 ### Fase 1 -- Isencao de taxa da plataforma por grupo (primeiros clientes)
