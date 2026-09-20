@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 09/17/2026 - 23:58:48 |
-| Coverage date: | 09/17/2026 - 23:58:42 |
+| Generated on: | 09/20/2026 - 02:35:50 |
+| Coverage date: | 09/20/2026 - 02:35:45 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 523 |
 | Files: | 620 |
-| **Line coverage:** | 92.9% (134984 of 145185) |
-| Covered lines: | 134984 |
-| Uncovered lines: | 10201 |
+| **Line coverage:** | 92.9% (134971 of 145185) |
+| Covered lines: | 134971 |
+| Uncovered lines: | 10214 |
 | Coverable lines: | 145185 |
 | Total lines: | 177668 |
-| **Branch coverage:** | 39.8% (3505 of 8793) |
-| Covered branches: | 3505 |
+| **Branch coverage:** | 39.8% (3500 of 8793) |
+| Covered branches: | 3500 |
 | Total branches: | 8793 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 369_35288922731 |
+| Tag: | 371_35484237327 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **134984** | **10201** | **145185** | **195365** | **92.9%** | **3505** | **8793** | **39.8%** |
+| **Confirmai** | **134971** | **10214** | **145185** | **195365** | **92.9%** | **3500** | **8793** | **39.8%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -225,7 +225,7 @@
 | Confirmai.Pages.Components.Profile.ProfileContactsDisplay | 0 | 14 | 14 | 45 | 0% | 0 | 16 | 0% |
 | Confirmai.Pages.Components.Profile.ProfileEditForm | 0 | 14 | 14 | 62 | 0% | 0 | 4 | 0% |
 | Confirmai.Pages.Components.Profile.ProfileHeaderCard | 0 | 31 | 31 | 110 | 0% | 0 | 32 | 0% |
-| Confirmai.Pages.Components.Profile.ProfileLoadingStates | 7 | 0 | 7 | 26 | 100% | 4 | 4 | 100% |
+| Confirmai.Pages.Components.Profile.ProfileLoadingStates | 6 | 1 | 7 | 26 | 85.7% | 3 | 4 | 75% |
 | Confirmai.Pages.Components.Profile.ProfilePixVisibility | 1 | 0 | 1 | 12 | 100% | 0 | 0 |  |
 | Confirmai.Pages.Components.Profile.ProfileSportStats | 0 | 21 | 21 | 71 | 0% | 0 | 8 | 0% |
 | Confirmai.Pages.Contact | 3 | 4 | 7 | 30 | 42.8% | 0 | 2 | 0% |
@@ -370,7 +370,7 @@
 | Confirmai.Services.Core.UiText.PokerTexts | 423 | 0 | 423 | 441 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.ServerTexts | 342 | 0 | 342 | 362 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.UtilityTexts | 1240 | 0 | 1240 | 1255 | 100% | 0 | 0 |  |
-| Confirmai.Services.Core.UiTextService | 91 | 23 | 114 | 346 | 79.8% | 79 | 105 | 75.2% |
+| Confirmai.Services.Core.UiTextService | 90 | 24 | 114 | 346 | 78.9% | 78 | 105 | 74.2% |
 | Confirmai.Services.Crypto.BitcoinQuoteService | 40 | 19 | 59 | 116 | 67.7% | 14 | 20 | 70% |
 | Confirmai.Services.Crypto.CryptoQuoteService | 47 | 28 | 75 | 149 | 62.6% | 18 | 30 | 60% |
 | Confirmai.Services.EventPayments.AbacatePayEventPaymentGateway | 6 | 5 | 11 | 29 | 54.5% | 0 | 0 |  |
@@ -382,9 +382,9 @@
 | Confirmai.Services.Events.EventCollisionService | 24 | 0 | 24 | 60 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Events.EventConfirmationPaymentStatusService | 78 | 8 | 86 | 136 | 90.6% | 23 | 25 | 92% |
 | Confirmai.Services.Events.EventConfirmationPaymentTransitionResult | 7 | 0 | 7 | 136 | 100% | 0 | 0 |  |
-| Confirmai.Services.Events.EventNotificationSchedulerService | 43 | 12 | 55 | 129 | 78.1% | 7 | 10 | 70% |
+| Confirmai.Services.Events.EventNotificationSchedulerService | 36 | 19 | 55 | 129 | 65.4% | 5 | 10 | 50% |
 | Confirmai.Services.Events.EventNotificationService | 153 | 22 | 175 | 307 | 87.4% | 61 | 76 | 80.2% |
-| Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
+| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
