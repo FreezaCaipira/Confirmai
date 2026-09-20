@@ -97,10 +97,10 @@
 
     private string PaymentStatusColor => Confirmation.PaymentStatus switch
     {
-        EventConfirmationPaymentStatus.Paid => "#4ade80",
-        EventConfirmationPaymentStatus.Failed => "#ef4444",
-        EventConfirmationPaymentStatus.Refunded => "#fbbf24",
-        EventConfirmationPaymentStatus.Expired => "#f97316",
-        _ => "var(--text-muted)"
+        EventConfirmationPaymentStatus.Paid => "var(--success)",
+        EventConfirmationPaymentStatus.Failed => "var(--danger)",
+        EventConfirmationPaymentStatus.Refunded => "var(--warning)",
+        EventConfirmationPaymentStatus.Expired => "var(--warning)",
+        _ => "var(--accent-text)"
     };
 }
