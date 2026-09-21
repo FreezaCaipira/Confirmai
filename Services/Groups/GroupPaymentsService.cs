@@ -98,6 +98,31 @@ public sealed class GroupPaymentsService
     }
 
     /// <summary>
+    /// How many of the caller's confirmations in this group are actionable debts
+    /// (same rule as <see cref="PendingByGroup"/>). Feeds the "Pagamentos" badge
+    /// on the group hub — membership is revalidated here, never trusted from UI.
+    /// </summary>
+    public async Task<int> CountMyPendingAsync(int groupId, string? currentUserId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        if (currentUserId is null ||
+            !await GroupAccess.IsMemberAsync(db, groupId, currentUserId))
+            return 0;
+
+        return await db.EventConfirmations
+            .CountAsync(c =>
+                c.Event.GroupId == groupId &&
+                c.UserId == currentUserId &&
+                c.Event.IsActive &&
+                c.Event.Price != null &&
+                c.Event.Price > 0 &&
+                c.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
+                !c.HasPaid &&
+                c.Position != FutsalPosition.Goalkeeper &&
+                c.PixProofUploadedAt == null);
+    }
+
+    /// <summary>
     /// The caller's own payment state inside the group: every priced, non-goalkeeper
     /// confirmation they hold, newest first. Membership is enforced here — the page
     /// must not rely on a UI check to decide whose rows are returned.

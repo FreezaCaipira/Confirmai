@@ -179,6 +179,41 @@
 }
 
 /* ──────────────────────────────────────────────────────────── */
+/* Meus pagamentos (C36-C Fase 3) — member-facing groups          */
+/* ──────────────────────────────────────────────────────────── */
+
+.mypay-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    margin: 0 var(--space-4) var(--space-3);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    font-weight: var(--fw-medium);
+}
+
+.mypay-total strong {
+    color: var(--warning);
+    font-size: 1.05rem;
+}
+
+.mypay-section {
+    margin: var(--space-4) var(--space-4) var(--space-2);
+    font-size: 0.95rem;
+    font-weight: var(--fw-semibold);
+    color: var(--text-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.mypay-section--due i { color: var(--warning); }
+.mypay-section--review i { color: var(--accent-text); }
+.mypay-section--paid i { color: var(--success); }
+
+/* ──────────────────────────────────────────────────────────── */
 /* History Filters */
 /* ──────────────────────────────────────────────────────────── */
 

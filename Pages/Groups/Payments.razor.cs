@@ -118,6 +118,15 @@ public partial class Payments
         }
     }
 
+    // ── Meus pagamentos (C36-C Fase 3) — grouped by actionable state ────────
+    private List<MyPaymentEntry> myToPay =>
+        myPayments.Where(p => !p.HasPaid && !p.ProofPending).ToList();
+    private List<MyPaymentEntry> myInReview =>
+        myPayments.Where(p => p.ProofPending).ToList();
+    private List<MyPaymentEntry> myPaid =>
+        myPayments.Where(p => p.HasPaid).ToList();
+    private decimal myTotalDue => myToPay.Sum(p => p.TotalToPay);
+
     private List<PaymentHistoryEntry>? filteredHistory =>
         string.IsNullOrEmpty(historyFilterUserId)
             ? paymentHistory
@@ -144,8 +153,10 @@ public partial class Payments
         }
         if (isAdmin)
             await LoadPaymentsData();
-        else
-            myPayments = await GroupPayments.LoadMyPaymentsAsync(Id, currentUserId);
+        // "Meus pagamentos" exists for every member — admins play and pay too.
+        // For non-admins it is the only view; for admins it is an extra tab.
+        myPayments = await GroupPayments.LoadMyPaymentsAsync(Id, currentUserId);
+        if (!isAdmin) paymentTab = "mine";
         isLoading = false;
     }
 

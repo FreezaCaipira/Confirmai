@@ -1,0 +1,88 @@
+@using Confirmai.Services.Groups
+@inject UiTextService Ui
+
+@if (Entries.Count == 0)
+{
+    <div class="payments-empty">
+        <i class="fas fa-check-circle"></i>
+        <p>@Ui["Group.MyPaymentsEmpty"]</p>
+    </div>
+}
+else
+{
+    @if (TotalDue > 0)
+    {
+        <div class="mypay-total">
+            <span>@Ui["Group.MyPaymentsTotalDue"]</span>
+            <strong>R$ @TotalDue.ToString("F2")</strong>
+        </div>
+    }
+    @if (ToPay.Count > 0)
+    {
+        <h3 class="mypay-section mypay-section--due"><i class="fas fa-exclamation-circle"></i> @Ui["Group.MyPaymentsToPay"] (@ToPay.Count)</h3>
+        <ul class="payments-user-list">
+            @foreach (var entry in ToPay)
+            {
+                <li class="payments-user-item">
+                    <a href="@entry.EventHref" class="payments-user-info">
+                        <span class="payments-user-name">@entry.EventDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                        <span class="payments-user-sub">R$ @entry.TotalToPay.ToString("F2")</span>
+                    </a>
+                    <div class="payments-user-actions">
+                        <a href="@entry.PayHref" class="btn-pay">
+                            <i class="fas fa-qrcode"></i> @Ui["Group.MyPaymentPay"]
+                        </a>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+    @if (InReview.Count > 0)
+    {
+        <h3 class="mypay-section mypay-section--review"><i class="fas fa-clock"></i> @Ui["Group.MyPaymentsInReview"] (@InReview.Count)</h3>
+        <ul class="payments-user-list">
+            @foreach (var entry in InReview)
+            {
+                <li class="payments-user-item">
+                    <a href="@entry.EventHref" class="payments-user-info">
+                        <span class="payments-user-name">@entry.EventDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                        <span class="payments-user-sub">R$ @entry.TotalToPay.ToString("F2")</span>
+                    </a>
+                    <div class="payments-user-actions">
+                        <span class="payments-badge payments-badge--pending"><i class="fas fa-clock"></i> @Ui["Group.MyPaymentProofSent"]</span>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+    @if (Paid.Count > 0)
+    {
+        <h3 class="mypay-section mypay-section--paid"><i class="fas fa-check"></i> @Ui["Group.MyPaymentsPaid"] (@Paid.Count)</h3>
+        <ul class="payments-user-list">
+            @foreach (var entry in Paid)
+            {
+                <li class="payments-user-item">
+                    <a href="@entry.EventHref" class="payments-user-info">
+                        <span class="payments-user-name">@entry.EventDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                        <span class="payments-user-sub">R$ @entry.TotalToPay.ToString("F2")</span>
+                    </a>
+                    <div class="payments-user-actions">
+                        <span class="payments-badge payments-badge--paid"><i class="fas fa-check"></i> @Ui["Group.MyPaymentPaid"]</span>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+}
+
+@code {
+    [Parameter] public IReadOnlyList<MyPaymentEntry> Entries { get; set; } = [];
+
+    private List<MyPaymentEntry> ToPay =>
+        Entries.Where(p => !p.HasPaid && !p.ProofPending).ToList();
+    private List<MyPaymentEntry> InReview =>
+        Entries.Where(p => p.ProofPending).ToList();
+    private List<MyPaymentEntry> Paid =>
+        Entries.Where(p => p.HasPaid).ToList();
+    private decimal TotalDue => ToPay.Sum(p => p.TotalToPay);
+}

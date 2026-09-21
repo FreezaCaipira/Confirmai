@@ -10,6 +10,7 @@ public partial class Detail : IAsyncDisposable
 {
     [Parameter] public int Id { get; set; }
     [Inject] private GroupDetailService GroupService { get; set; } = default!;
+    [Inject] private GroupPaymentsService GroupPayments { get; set; } = default!;
 
     private Group? group;
     private List<GroupJoinRequest> pendingRequests = new();
@@ -26,6 +27,7 @@ public partial class Detail : IAsyncDisposable
     private HashSet<int> selectedRequestIds = new();
     private bool isBulkProcessing;
     private bool showAllMembers;
+    private int myPendingPayments;
 
     private CancellationTokenSource? _copyInviteCts;
     private CancellationTokenSource? _copyCodeCts;
@@ -51,6 +53,9 @@ public partial class Detail : IAsyncDisposable
         group = data.Group;
         pendingRequests = data.PendingRequests;
         userJoinRequest = data.UserJoinRequest;
+        myPendingPayments = data.Group is not null
+            ? await GroupPayments.CountMyPendingAsync(Id, currentUserId)
+            : 0;
         showAllMembers = false;
         isLoading = false;
     }

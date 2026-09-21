@@ -79,44 +79,7 @@ else if (!isAdmin)
                 <h1 class="detail-title payments-title"><i class="fas fa-money-bill-wave"></i> @Ui["Group.MyPaymentsTitle"]</h1>
             </header>
 
-            @if (myPayments.Count == 0)
-            {
-                <div class="payments-empty">
-                    <i class="fas fa-check-circle"></i>
-                    <p>@Ui["Group.MyPaymentsEmpty"]</p>
-                </div>
-            }
-            else
-            {
-                <ul class="payments-user-list">
-                    @foreach (var entry in myPayments)
-                    {
-                        <li class="payments-user-item">
-                            <a href="@entry.EventHref" class="payments-user-info">
-                                <span class="payments-user-name">@entry.EventDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
-                                <span class="payments-user-sub">R$ @entry.TotalToPay.ToString("F2")</span>
-                            </a>
-                            <div class="payments-user-actions">
-                                @if (entry.HasPaid)
-                                {
-                                    <span class="payments-badge payments-badge--paid"><i class="fas fa-check"></i> @Ui["Group.MyPaymentPaid"]</span>
-                                }
-                                else if (entry.ProofPending)
-                                {
-                                    <span class="payments-badge payments-badge--pending"><i class="fas fa-clock"></i> @Ui["Group.MyPaymentProofSent"]</span>
-                                }
-                                else
-                                {
-                                    <span class="payments-badge payments-badge--delinquent"><i class="fas fa-exclamation-circle"></i> @Ui["Group.MyPaymentPending"]</span>
-                                    <a href="@entry.PayHref" class="btn-pay">
-                                        <i class="fas fa-qrcode"></i> @Ui["Group.MyPaymentPay"]
-                                    </a>
-                                }
-                            </div>
-                        </li>
-                    }
-                </ul>
-            }
+            <MyPaymentsList Entries="@myPayments" />
         </div>
     </div>
 }
@@ -171,6 +134,15 @@ else
                         <span class="payments-tab-count payments-tab-count--history">@paymentHistory.Count</span>
                     }
                 </button>
+                <button class="payments-tab @(paymentTab == "mine" ? "payments-tab--active" : "")"
+                        type="button"
+                        @onclick="@(() => HandleTabChange("mine"))">
+                    <i class="fas fa-user"></i> @Ui["Group.MyPaymentsTitle"]
+                    @if (myToPay.Count > 0)
+                    {
+                        <span class="payments-tab-count payments-tab-count--delinquent">@myToPay.Count</span>
+                    }
+                </button>
                 @if (ShouldShowPlatformFeeTab)
                 {
                     <button class="payments-tab @(paymentTab == "platformfee" ? "payments-tab--active payments-tab--platformfee" : "")"
@@ -188,6 +160,10 @@ else
             @if (isLoadingPayments)
             {
                 <div class="payments-loading"><i class="fas fa-spinner fa-spin"></i> @Ui["Group.PaymentsLoading"]</div>
+            }
+            else if (paymentTab == "mine")
+            {
+                <MyPaymentsList Entries="@myPayments" />
             }
             else if (paymentTab == "history")
             {

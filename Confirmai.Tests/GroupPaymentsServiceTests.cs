@@ -830,4 +830,65 @@ public class GroupPaymentsServiceTests
         Assert.Single(mine);
         Assert.Equal(15.75m, mine[0].TotalToPay);
     }
+
+    // ── CountMyPendingAsync (hub badge, C36-C Fase 3/4) ────────────────
+
+    [Fact]
+    public async Task CountMyPendingAsync_CountsOnlyActionableDebts()
+    {
+        var (factory, svc, groupId, _) = await SetupWithGroupAndAdminAsync();
+        await using var db = factory.CreateDbContext();
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "A",
+            StartsAt = DateTime.UtcNow.AddDays(-1), Price = 15m, MaxPlayers = 10
+        };
+        var evFuture = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "B",
+            StartsAt = DateTime.UtcNow.AddDays(2), Price = 15m, MaxPlayers = 10
+        };
+        db.Events.AddRange(ev, evFuture);
+        await db.SaveChangesAsync();
+        db.EventConfirmations.AddRange(
+            // owes — counts
+            new EventConfirmation
+            {
+                EventId = ev.Id, UserId = "player-1", HasPaid = false,
+                PaymentStatus = EventConfirmationPaymentStatus.Pending,
+                Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+            },
+            new EventConfirmation
+            {
+                EventId = evFuture.Id, UserId = "player-1", HasPaid = false,
+                PaymentStatus = EventConfirmationPaymentStatus.Pending,
+                Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+            },
+            // proof sent — under review, not actionable
+            new EventConfirmation
+            {
+                EventId = ev.Id, UserId = "player-1", HasPaid = false,
+                PaymentStatus = EventConfirmationPaymentStatus.Pending,
+                Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow,
+                PixProofUploadedAt = DateTime.UtcNow
+            },
+            // other member's debt — never leaks into the badge
+            new EventConfirmation
+            {
+                EventId = ev.Id, UserId = "admin-1", HasPaid = false,
+                PaymentStatus = EventConfirmationPaymentStatus.Pending,
+                Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+            });
+        await db.SaveChangesAsync();
+
+        Assert.Equal(2, await svc.CountMyPendingAsync(groupId, "player-1"));
+    }
+
+    [Fact]
+    public async Task CountMyPendingAsync_Outsider_GetsZero()
+    {
+        var (factory, svc, groupId, _) = await SetupWithGroupAndAdminAsync();
+        Assert.Equal(0, await svc.CountMyPendingAsync(groupId, "outsider-1"));
+        Assert.Equal(0, await svc.CountMyPendingAsync(groupId, null));
+    }
 }
