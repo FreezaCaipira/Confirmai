@@ -4,6 +4,7 @@ using Confirmai.Models;
 using Confirmai.Services.Core;
 using Confirmai.Services.Events;
 using Confirmai.Services.Futsal;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -18,7 +19,10 @@ public class EventDetailServiceTests
         var factory = TestDbContextFactory.CreateInMemoryFactory($"edetail-{Guid.NewGuid()}");
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
         var notificationService = new EventNotificationService(factory, Mock.Of<IEmailSender>(), NullLogger<EventNotificationService>.Instance);
-        var svc = new EventDetailService(factory, logService, notificationService);
+        var feeOptions = Microsoft.Extensions.Options.Options.Create(
+            new Confirmai.Configuration.FeeOptions { ManualPlatformFeeFixed = 0.75m });
+        var svc = new EventDetailService(factory, logService, notificationService,
+            new PlatformFeePolicy(feeOptions));
         return (factory, svc);
     }
 

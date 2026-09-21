@@ -268,7 +268,7 @@ flowchart LR
 | UC-A-39 | Remover admin de venue ** | `/admin/venues/edit/{Id}` | `UserManager` + `AuditAsync(venue.admin_removed)` | admin | Vinculo removido | sim | FALTA |
 | UC-A-40 | Parchment lab | `/admin/parchment-lab` | estatico | admin | Pagina | nao | FALTA (so convencao de Authorize) |
 | UC-A-41 | Docs de integracao | `/docs/integration` | estatico | claim `server_admin` | Pagina + .lua | nao | FALTA |
-| UC-A-42 | Isencao de taxa por grupo ** (C34) | `/admin/revenue` | `PlatformFeeWaiverService.SetWaiverAsync`/`ClearWaiverAsync` + `PlatformFeePolicy` | sysadmin (re-verificado no service); prazo futuro + motivo | `Group.PlatformFeeWaivedUntil`+`Reason`; taxa manual resolve 0; snapshot/ledger carimbam 0 | sim (`GroupFeeWaiverChanged`) | `PlatformFeeWaiverServiceTests` (9); `PlatformFeeLedgerServiceTests.*Waived*` (3); `EventPaymentSummaryBreakdownTests.*Waived*` |
+| UC-A-42 | Isencao de taxa por grupo ** (C34, janela no C36-C) | `/admin/revenue` | `PlatformFeeWaiverService.SetWaiverAsync`/`ClearWaiverAsync` + `PlatformFeePolicy` | sysadmin (re-verificado no service); prazo futuro + motivo | Janela `[WaivedFrom, WaivedUntil)`: taxa carimbada **na criacao da confirmacao** (`ResolveStampForNewConfirmation`); isencao nao retroage (decisao Robson); legados sem carimbo resolvem por `ConfirmedAt` no stamp | sim (`GroupFeeWaiverChanged`) | `PlatformFeeWaiverServiceTests` (9); `C36CFeeStampTests` (7); `EventPaymentSummaryBreakdownTests.*Waived*` |
 
 ## Endpoints HTTP nao-Blazor
 

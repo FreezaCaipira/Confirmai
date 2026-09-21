@@ -41,8 +41,14 @@ public partial class EventPayment : IAsyncDisposable
     /// </summary>
     internal bool ShouldShowManualPix => !groupGatewaysEnabled || FeeOptions.Value.ShowDirectPixToOrganizer;
 
-    /// <summary>Manual fee resolved through the policy — 0 while the group is waived.</summary>
-    private decimal ResolvedManualFee => FeePolicy.ResolveManualFee(conf?.Event?.Group, DateTime.UtcNow);
+    /// <summary>
+    /// Manual fee: the stamped value wins (C36-C Fase 0 — the fee is resolved
+    /// once, at confirmation creation). Legacy unstamped rows resolve by
+    /// ConfirmedAt so what the player sees matches what the stamp will record.
+    /// </summary>
+    private decimal ResolvedManualFee
+        => conf?.PlatformFeeAmount
+           ?? FeePolicy.ResolveManualFee(conf?.Event?.Group, conf?.ConfirmedAt ?? DateTime.UtcNow);
 
     /// <summary>
     /// True when the fixed platform fee is charged on top of the match price (V1 manual, futsal).

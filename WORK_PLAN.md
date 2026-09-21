@@ -766,6 +766,14 @@ Hoje: "Organize o racha da sua turma sem dor de cabeca" (`Index.LandingTitle`). 
 ### C36-C -- Pagamentos entram no escopo do grupo; nav = Partidas · Grupos [PLANEJADO -- Pleno, logo apos a Fase 0 do C36-B; aprovado pelo Robson em 14/06/2026: "muito bom, vamos nessa!"]
 **Decisao do Robson**: "levar essa tela de pagamentos para dentro do escopo do grupo, parecido com o acesso que o admin do grupo tem; simplificar o menu superior removendo Pagamentos; o user tambem tem acesso a tela de partidas do grupo, porem com as permissoes de user normal". Mesmo principio do C36-A: tudo acontece dentro do grupo.
 
+#### Fase 0 -- Ressalva de dinheiro do C34 (decisao do Robson): isencao vale a partir da concessao, nao retroage
+O C34 resolvia a isencao por `UtcNow` em cada leitura (QR, resumo, gestao, stamp) — janela de divergencia entre o que o jogador viu e o que o ledger carimbou. Decisao do Robson: "isencao vale a partir disso; o que ja foi pago mantem". Implementacao:
+- `Group.PlatformFeeWaivedFrom` (novo, UTC): inicio da janela = instante da concessao. `IsWaived(group, asOf)` vira `From <= asOf < Until`; `From` nulo (dados antigos) = "desde sempre" (retrocompativel).
+- **Carimbo na criacao**: `EventDetailService.ConfirmPresenceAsync` e `PromoteFromWaitlistAsync` gravam `PlatformFeeAmount = ResolveStampForNewConfirmation(...)` (futsal + manual + preco>0). Um unico instante de resolucao por confirmacao.
+- **Stamp tardio** (`StampFeeOnPaidAsync`): legados sem carimbo resolvem por `conf.ConfirmedAt`, nao `UtcNow` — determinístico.
+- **Exibicao** (`EventPayment`, `EventPaymentSummary`, `GroupPaymentsService`): o carimbo vence; fallback resolve por `ConfirmedAt` — a tela mostra exatamente o que sera cobrado.
+- Migration `PlatformFeeWaivedFrom`; `C36CFeeStampTests` (7).
+
 **Achados da inspecao que moldam o ciclo**:
 - `/payments` (`Pages/Payment/PaymentsHistory.razor`) **nao e pagamento de partida**: lista `PaymentRecord` do marketplace antigo (produtos). Nao toca `EventConfirmation`. Para o jogador e uma tela morta.
 - `/grupo/{id}/partidas` (`Pages/Groups/Partidas.razor`) **ja e acessivel ao membro** (o hub mostra o botao para todos; criar/editar so para admin). Mas **nao verifica se o usuario e membro** -- qualquer logado com o id ve as partidas de um grupo privado. `Ranking.razor.cs` faz a checagem certa (`isMember`); `Partidas` e `Payments` nao.

@@ -4,6 +4,7 @@ using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Core;
 using Confirmai.Services.Groups;
+using Confirmai.Services.Payment;
 using Confirmai.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,15 +28,18 @@ public class EventDetailService
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly LogService _logService;
     private readonly Confirmai.Services.Events.EventNotificationService _notificationService;
+    private readonly PlatformFeePolicy _feePolicy;
 
     public EventDetailService(
         IDbContextFactory<AppDbContext> dbFactory,
         LogService logService,
-        Confirmai.Services.Events.EventNotificationService notificationService)
+        Confirmai.Services.Events.EventNotificationService notificationService,
+        PlatformFeePolicy feePolicy)
     {
         _dbFactory = dbFactory;
         _logService = logService;
         _notificationService = notificationService;
+        _feePolicy = feePolicy;
     }
 
     public async Task<EventDetailLoadResult> LoadAsync(int eventId, string? currentUserId)
@@ -142,6 +146,7 @@ public class EventDetailService
 
         var eventEntity = await db.Events
             .Include(e => e.Confirmations)
+            .Include(e => e.Group)
             .FirstOrDefaultAsync(e => e.Id == eventId);
         if (eventEntity is null)
             return new ConfirmPresenceResult(false, "Evento não encontrado.", false);
@@ -179,6 +184,8 @@ public class EventDetailService
                 UserId = userId,
                 Position = eventEntity.MaxGoalkeepers > 0 ? chosenPos : FutsalPosition.Outfield,
                 ConfirmedAt = DateTime.UtcNow,
+                PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(
+                    eventEntity.Group, eventEntity.Price, DateTime.UtcNow),
             });
             await db.SaveChangesAsync();
             return new ConfirmPresenceResult(true, null, false);
@@ -291,12 +298,15 @@ public class EventDetailService
             .FirstOrDefaultAsync();
         if (next is null) return;
 
+        var ev = await db.Events.Include(e => e.Group).FirstOrDefaultAsync(e => e.Id == eventId);
         db.EventConfirmations.Add(new EventConfirmation
         {
             EventId = eventId,
             UserId = next.UserId,
             Position = position,
             ConfirmedAt = DateTime.UtcNow,
+            PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(
+                ev?.Group, ev?.Price, DateTime.UtcNow),
         });
         db.WaitingLists.Remove(next);
         await db.SaveChangesAsync();

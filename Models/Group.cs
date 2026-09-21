@@ -54,6 +54,14 @@ namespace Confirmai.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
+        /// Início (inclusivo, UTC) da isenção — o instante da concessão. A isenção
+        /// vale para confirmações criadas dentro da janela [From, Until): o que
+        /// já existia antes não retroage (decisão do Robson, C36-C Fase 0).
+        /// Nulo em dados antigos = "desde sempre" (retrocompatível).
+        /// </summary>
+        public DateTime? PlatformFeeWaivedFrom { get; set; }
+
+        /// <summary>
         /// Fim (exclusivo, UTC) da isenção da taxa de plataforma do fluxo manual.
         /// Nulo = sem isenção. Sempre tem prazo: a isenção expira sozinha e a taxa
         /// volta a ser cobrada sem intervenção. Só o sysadmin altera (nunca o organizador).
