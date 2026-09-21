@@ -349,6 +349,45 @@
     white-space: nowrap;
 }
 
+/* -- Pending payments banner (C36-C Fase 4) ------------------------- */
+.home-pending-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--warning);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+}
+
+.home-pending-icon {
+    color: var(--warning);
+    font-size: 1.25rem;
+}
+
+.home-pending-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.home-pending-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.home-pending-link {
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    color: var(--accent-text);
+    text-decoration: none;
+}
+
+.home-pending-link:hover {
+    text-decoration: underline;
+}
+
 /* -- Empty / loading ---------------------------------------------- */
 .home-empty {
     display: flex;

@@ -142,7 +142,7 @@ public partial class Detail
     private async Task AdminAddOutfieldSlot()
     {
         if (!IsGroupAdmin() || ev is null) return;
-        await EventDetailSvc.AdminAddOutfieldSlotAsync(ev.Id);
+        await EventDetailSvc.AdminAddOutfieldSlotAsync(ev.Id, currentUserId);
         await LoadEvent();
     }
 
@@ -153,14 +153,14 @@ public partial class Detail
         var currentMaxOut = ev.MaxGoalkeepers.HasValue ? ev.MaxPlayers - ev.MaxGoalkeepers.Value : ev.MaxPlayers;
         var currentConfOut = ev.Confirmations.Count(c => c.Position != FutsalPosition.Goalkeeper);
         if (currentMaxOut <= minInfo.MinOutfield || currentMaxOut <= currentConfOut) return;
-        await EventDetailSvc.AdminRemoveOutfieldSlotAsync(ev.Id);
+        await EventDetailSvc.AdminRemoveOutfieldSlotAsync(ev.Id, currentUserId);
         await LoadEvent();
     }
 
     private async Task AdminAddGoalkeeperSlot()
     {
         if (!IsGroupAdmin() || ev is null) return;
-        await EventDetailSvc.AdminAddGoalkeeperSlotAsync(ev.Id);
+        await EventDetailSvc.AdminAddGoalkeeperSlotAsync(ev.Id, currentUserId);
         await LoadEvent();
     }
 
@@ -171,7 +171,7 @@ public partial class Detail
         var currentGk = ev.MaxGoalkeepers ?? 0;
         var currentConfGk = ev.Confirmations.Count(c => c.Position == FutsalPosition.Goalkeeper);
         if (currentGk <= minInfo.MinGoalkeepers || currentGk <= currentConfGk) return;
-        await EventDetailSvc.AdminRemoveGoalkeeperSlotAsync(ev.Id, currentGk - 1);
+        await EventDetailSvc.AdminRemoveGoalkeeperSlotAsync(ev.Id, currentGk - 1, currentUserId);
         await LoadEvent();
     }
 

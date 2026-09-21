@@ -90,6 +90,26 @@
                     </div>
                 </section>
 
+                @if (pendingPaymentGroups.Count > 0)
+                {
+                    <section class="home-pending" aria-label="@Ui["Index.PendingPaymentsTitle"]">
+                        <div class="home-pending-card">
+                            <span class="home-pending-icon" aria-hidden="true"><i class="fas fa-exclamation-circle"></i></span>
+                            <div class="home-pending-body">
+                                <strong>@Ui["Index.PendingPaymentsTitle"]</strong>
+                                <div class="home-pending-links">
+                                    @foreach (var p in pendingPaymentGroups)
+                                    {
+                                        <a href="/grupo/@p.GroupId/pagamentos" class="home-pending-link">
+                                            @p.GroupName (@p.Count) →
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                }
+
                 @if (view == ViewOrganizing && organizesAny)
                 {
                     <section class="home-section" aria-label="@Ui["Index.ViewOrganizing"]">

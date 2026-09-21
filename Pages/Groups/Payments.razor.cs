@@ -24,7 +24,9 @@ public partial class Payments
     private Group? group;
     private bool isLoading = true;
     private bool isAdmin;
+    private bool isMember;
     private string? currentUserId;
+    private List<MyPaymentEntry> myPayments = new();
     private bool isLoadingPayments;
     private List<UserDelinquency> delinquencyList = new();
     private List<PaymentHistoryEntry> paymentHistory = new();
@@ -116,6 +118,15 @@ public partial class Payments
         }
     }
 
+    // ── Meus pagamentos (C36-C Fase 3) — grouped by actionable state ────────
+    private List<MyPaymentEntry> myToPay =>
+        myPayments.Where(p => !p.HasPaid && !p.ProofPending).ToList();
+    private List<MyPaymentEntry> myInReview =>
+        myPayments.Where(p => p.ProofPending).ToList();
+    private List<MyPaymentEntry> myPaid =>
+        myPayments.Where(p => p.HasPaid).ToList();
+    private decimal myTotalDue => myToPay.Sum(p => p.TotalToPay);
+
     private List<PaymentHistoryEntry>? filteredHistory =>
         string.IsNullOrEmpty(historyFilterUserId)
             ? paymentHistory
@@ -134,13 +145,18 @@ public partial class Payments
     protected override async Task OnInitializedAsync()
     {
         currentUserId = await GroupPayments.GetCurrentUserIdAsync();
-        (group, isAdmin) = await GroupPayments.LoadGroupAndCheckAdminAsync(Id, currentUserId);
-        if (group is null || !isAdmin)
+        (group, isAdmin, isMember) = await GroupPayments.LoadGroupAccessAsync(Id, currentUserId);
+        if (group is null || !isMember)
         {
             isLoading = false;
             return;
         }
-        await LoadPaymentsData();
+        if (isAdmin)
+            await LoadPaymentsData();
+        // "Meus pagamentos" exists for every member — admins play and pay too.
+        // For non-admins it is the only view; for admins it is an extra tab.
+        myPayments = await GroupPayments.LoadMyPaymentsAsync(Id, currentUserId);
+        if (!isAdmin) paymentTab = "mine";
         isLoading = false;
     }
 

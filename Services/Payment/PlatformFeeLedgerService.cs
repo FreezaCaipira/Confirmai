@@ -48,13 +48,13 @@ public class PlatformFeeLedgerService
 
         var group = conf.Event?.Group;
         if (group is null) return false;
-        if (group.Sport != Sport.Futsal) return false;
-        if (group.EnablePaymentGateways) return false;
-        if (conf.Event!.Price.GetValueOrDefault() <= 0) return false;
+        if (!PlatformFeePolicy.AppliesTo(group, conf.Event!.Price)) return false;
 
-        var nowUtc = DateTime.UtcNow;
-        var waived = _feePolicy.IsWaived(group, nowUtc);
-        var fee = _feePolicy.ResolveManualFee(group, nowUtc);
+        // Legado sem carimbo (criada antes do C36-C): resolve pelo instante da
+        // confirmacao, nao do stamp — a isencao concedida depois nao retroage.
+        var asOf = conf.ConfirmedAt;
+        var waived = _feePolicy.IsWaived(group, asOf);
+        var fee = _feePolicy.ResolveManualFee(group, asOf);
         if (!waived && fee <= 0) return false; // configured fee off and not waived: nothing to stamp
 
         conf.PlatformFeeAmount = fee;

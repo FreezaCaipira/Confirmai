@@ -50,12 +50,37 @@
         </div>
     </div>
 }
-else if (group is null || !isAdmin)
+else if (group is null || !isMember)
 {
     <div class="detail-not-found">
         <i class="fas fa-lock detail-not-found-icon"></i>
         <h2>@Ui["Group.NotAuthorized"]</h2>
         <a href="/grupo/@Id">← @Ui["Common.Back"]</a>
+    </div>
+}
+else if (!isAdmin)
+{
+    <div class="detail-page">
+        <div class="detail-card">
+            <header class="detail-header">
+                <div class="detail-header-top">
+                    <a href="/grupo/@Id" class="detail-back-link">
+                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
+                    </a>
+                    <a href="/grupos" class="btn-view-groups">
+                        <i class="fas fa-layer-group"></i> @Ui["Groups.Title"]
+                    </a>
+                </div>
+                <div class="detail-header-badge">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
+                    </span>
+                </div>
+                <h1 class="detail-title payments-title"><i class="fas fa-money-bill-wave"></i> @Ui["Group.MyPaymentsTitle"]</h1>
+            </header>
+
+            <MyPaymentsList Entries="@myPayments" />
+        </div>
     </div>
 }
 else
@@ -109,6 +134,15 @@ else
                         <span class="payments-tab-count payments-tab-count--history">@paymentHistory.Count</span>
                     }
                 </button>
+                <button class="payments-tab @(paymentTab == "mine" ? "payments-tab--active" : "")"
+                        type="button"
+                        @onclick="@(() => HandleTabChange("mine"))">
+                    <i class="fas fa-user"></i> @Ui["Group.MyPaymentsTitle"]
+                    @if (myToPay.Count > 0)
+                    {
+                        <span class="payments-tab-count payments-tab-count--delinquent">@myToPay.Count</span>
+                    }
+                </button>
                 @if (ShouldShowPlatformFeeTab)
                 {
                     <button class="payments-tab @(paymentTab == "platformfee" ? "payments-tab--active payments-tab--platformfee" : "")"
@@ -126,6 +160,10 @@ else
             @if (isLoadingPayments)
             {
                 <div class="payments-loading"><i class="fas fa-spinner fa-spin"></i> @Ui["Group.PaymentsLoading"]</div>
+            }
+            else if (paymentTab == "mine")
+            {
+                <MyPaymentsList Entries="@myPayments" />
             }
             else if (paymentTab == "history")
             {

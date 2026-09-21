@@ -41,7 +41,8 @@ public class C34SecurityAdversarialTests
     private static EventDetailService NewEventSvc(IDbContextFactory<AppDbContext> f) =>
         new(f, NewLog(f),
             new EventNotificationService(f, new Mock<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender>().Object,
-                NullLogger<EventNotificationService>.Instance));
+                NullLogger<EventNotificationService>.Instance),
+            new PlatformFeePolicy(Options.Create(new FeeOptions { ManualPlatformFeeFixed = 0.75m })));
 
     private static GroupPaymentsService NewPaymentsSvc(IDbContextFactory<AppDbContext> f, string? authUserId = "admin-1")
     {

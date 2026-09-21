@@ -59,6 +59,7 @@ public sealed class PlatformFeeWaiverService
         if (group is null)
             return new PlatformFeeWaiverResult(false, PlatformFeeWaiverError.GroupNotFound);
 
+        group.PlatformFeeWaivedFrom = now;
         group.PlatformFeeWaivedUntil = untilUtc;
         group.PlatformFeeWaiverReason = trimmed;
         await db.SaveChangesAsync();
@@ -69,7 +70,7 @@ public sealed class PlatformFeeWaiverService
             groupId.ToString(),
             $"Isenção de taxa concedida/renovada até {untilUtc:u}: {trimmed}",
             actorUserId: adminUserId,
-            metadata: new { groupId, waivedUntil = untilUtc, reason = trimmed });
+            metadata: new { groupId, waivedFrom = now, waivedUntil = untilUtc, reason = trimmed });
 
         return new PlatformFeeWaiverResult(true, PlatformFeeWaiverError.None);
     }
@@ -91,6 +92,7 @@ public sealed class PlatformFeeWaiverService
             return new PlatformFeeWaiverResult(true, PlatformFeeWaiverError.None);
 
         var previousUntil = group.PlatformFeeWaivedUntil;
+        group.PlatformFeeWaivedFrom = null;
         group.PlatformFeeWaivedUntil = null;
         group.PlatformFeeWaiverReason = null;
         await db.SaveChangesAsync();

@@ -22,7 +22,9 @@ public partial class EventPaymentSummary
 
     private decimal BasePrice => Confirmation?.Event?.Price ?? 0m;
 
-    private decimal ManualFee => FeePolicy.ResolveManualFee(Confirmation?.Event?.Group, DateTime.UtcNow);
+    private decimal ManualFee
+        => Confirmation?.PlatformFeeAmount
+           ?? FeePolicy.ResolveManualFee(Confirmation?.Event?.Group, Confirmation?.ConfirmedAt ?? DateTime.UtcNow);
 
     private decimal GetTotalAmount()
     {

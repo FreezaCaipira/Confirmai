@@ -35,6 +35,12 @@ public class GroupDetailServiceTests
         var group = new Group { Name = "Test Group", InviteCode = "ABC123", CreatedByUserId = creatorId };
         db.Groups.Add(group);
         await db.SaveChangesAsync();
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = group.Id, UserId = "admin-1",
+            Role = GroupMemberRole.Admin, CreatedAt = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
         return (factory, svc, group.Id);
     }
 

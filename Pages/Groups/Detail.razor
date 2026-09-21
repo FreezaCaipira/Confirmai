@@ -176,10 +176,14 @@ else
                                 <i class="fas fa-trophy"></i> @Ui["Group.RankingLink"]
                             </a>
                         }
-                        @if (isAdmin)
+                        @if (isMember)
                         {
                             <a class="detail-admin-btn detail-admin-btn--pagamentos" href="/grupo/@group.Id/pagamentos">
                                 <i class="fas fa-money-bill-wave"></i> @Ui["Group.PaymentsLink"]
+                                @if (myPendingPayments > 0)
+                                {
+                                    <span class="payments-tab-count payments-tab-count--delinquent">@myPendingPayments</span>
+                                }
                             </a>
                         }
                     </div>

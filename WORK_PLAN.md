@@ -763,8 +763,16 @@ Sem biblioteca de tour; sem modal de boas-vindas.
 ### Fase 7 -- Titulo do hero (landing deslogada)
 Hoje: "Organize o racha da sua turma sem dor de cabeca" (`Index.LandingTitle`). Robson decide o texto final; proposta alternativa: "Organize o racha, confirme presenca e receba sem cobrar um por um". Subtitulo com os 3 verbos, CTA unico azul ("Criar conta"), "Entrar" secundario. i18n nos 3 idiomas.
 
-### C36-C -- Pagamentos entram no escopo do grupo; nav = Partidas · Grupos [PLANEJADO -- Pleno, logo apos a Fase 0 do C36-B; aprovado pelo Robson em 14/06/2026: "muito bom, vamos nessa!"]
+### C36-C -- Pagamentos entram no escopo do grupo; nav = Partidas · Grupos [EXECUTADO -- branch `feat/ciclo36c-pagamentos-grupo`]
 **Decisao do Robson**: "levar essa tela de pagamentos para dentro do escopo do grupo, parecido com o acesso que o admin do grupo tem; simplificar o menu superior removendo Pagamentos; o user tambem tem acesso a tela de partidas do grupo, porem com as permissoes de user normal". Mesmo principio do C36-A: tudo acontece dentro do grupo.
+
+#### Fase 0 -- Ressalva de dinheiro do C34 (decisao do Robson): isencao vale a partir da concessao, nao retroage
+O C34 resolvia a isencao por `UtcNow` em cada leitura (QR, resumo, gestao, stamp) — janela de divergencia entre o que o jogador viu e o que o ledger carimbou. Decisao do Robson: "isencao vale a partir disso; o que ja foi pago mantem". Implementacao:
+- `Group.PlatformFeeWaivedFrom` (novo, UTC): inicio da janela = instante da concessao. `IsWaived(group, asOf)` vira `From <= asOf < Until`; `From` nulo (dados antigos) = "desde sempre" (retrocompativel).
+- **Carimbo na criacao**: `EventDetailService.ConfirmPresenceAsync` e `PromoteFromWaitlistAsync` gravam `PlatformFeeAmount = ResolveStampForNewConfirmation(...)` (futsal + manual + preco>0). Um unico instante de resolucao por confirmacao.
+- **Stamp tardio** (`StampFeeOnPaidAsync`): legados sem carimbo resolvem por `conf.ConfirmedAt`, nao `UtcNow` — determinístico.
+- **Exibicao** (`EventPayment`, `EventPaymentSummary`, `GroupPaymentsService`): o carimbo vence; fallback resolve por `ConfirmedAt` — a tela mostra exatamente o que sera cobrado.
+- Migration `PlatformFeeWaivedFrom`; `C36CFeeStampTests` (7).
 
 **Achados da inspecao que moldam o ciclo**:
 - `/payments` (`Pages/Payment/PaymentsHistory.razor`) **nao e pagamento de partida**: lista `PaymentRecord` do marketplace antigo (produtos). Nao toca `EventConfirmation`. Para o jogador e uma tela morta.
@@ -796,6 +804,20 @@ Mesma rota, conteudo por permissao:
 
 #### O que NAO fazer
 Nao mudar regra de pagamento, taxa, repasse, comprovante ou inadimplencia -- so **quem ve o que** e **onde**. Nao criar tela nova fora do grupo. Nao remover `EventPayment` (`/pagamento/evento/{id}`), que continua sendo a tela de pagar. Textos novos em PT/EN/ES. Uma PR por fase; a Fase 2 e correcao de acesso e vai **primeiro** se o Pleno preferir.
+
+#### C36-C -- Registro de execucao (todas as fases no mesmo PR, aprovado pelo Robson)
+
+| Fase | Commit | Conteudo |
+|---|---|---|
+| 0 | `a9091d4` | Ressalva de dinheiro do C34: `PlatformFeeWaivedFrom` (janela [From, Until)), taxa carimbada na criacao da confirmacao (`ConfirmPresenceAsync` + `PromoteFromWaitlistAsync`); stamp tardio de legados resolve por `ConfirmedAt`; exibicao (QR/resumo/gestao) le o carimbo. Migration + `C36CFeeStampTests` (7). |
+| 1 | `61b4f92` | Nav sem `/payments` (NavLink + chaves `Nav.Payments` x3 removidas). **Decisao**: a rota `/payments` segue viva — `PaymentDetails` navega de volta para ela e `ViewPayment` e usada pelo marketplace; registrada como divida do marketplace em vez de redirect. |
+| 2 | `61b4f92` | `GroupAccess.IsMemberAsync` + helpers. **`Partidas` nao tinha guarda nenhuma** — nao-membro via eventos de grupo privado; agora sai antes de carregar eventos. `Approve*/Reject*Selected*` revalidam admin por `request.GroupId` (incl. IDOR cruzado). `AdminRemoveFromWaitlistAsync` + 4 `Admin*SlotAsync` ganharam `currentUserId` + check de admin — **fecha a ressalva 2 do C34**. `C36CGroupAccessTests` (12). |
+| 3 | `02b1464` + `52f2bea` | `/grupo/{id}/pagamentos` por papel: `LoadGroupAccessAsync` (Group/IsAdmin/IsMember) — nao-membro -> NotAuthorized; membro -> `MyPaymentsList` (A pagar / Em analise / Pago + total); admin -> abas de gestao **+ aba "Meus pagamentos"** (admin joga e paga). `LoadMyPaymentsAsync` revalida membership no service; carimbo da taxa vence. |
+| 4 | `02b1464` + `52f2bea` | Home: banner "Pagamentos pendentes" por grupo -> `/grupo/{id}/pagamentos` (`PendingByGroup` estatico testavel). `ConfirmationCard`: botao Pagar -> `/pagamento/evento/{id}` quando o proprio jogador deve; badge "Comprovante em analise"; nunca para pago/goleiro/gratis/cancelado. Hub: botao Pagamentos para todo membro + badge `CountMyPendingAsync`. |
+
+**Desvios do plano**: (a) `/payments` nao virou redirect — tem links vivos do marketplace; (b) a "mesma tela de nao-membro do hub" virou o bloco `NotAuthorized` padrao das telas (o pedir-para-entrar continua so no hub); (c) `MyPaymentsList` virou componente compartilhado para nao duplicar markup na view admin.
+
+**Build `--no-incremental`**: 0 warnings, 0 errors. **Suite: 2511 verdes** (2484 -> 2511, +27).
 
 ### C36-D -- Elevacao e fluxo do grupo: 8 pontos do Robson (PLANEJADO -- Pleno; substitui a Fase 1 e parte da Fase 4 do C36-B)
 
