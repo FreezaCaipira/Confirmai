@@ -22,7 +22,7 @@ body .oldsite-header {
     max-width: none;
     margin: 0 0 var(--space-5);
     padding: 0;
-    background: var(--surface);
+    background: var(--bg);
     border-top: 2px solid var(--accent);
     border-bottom: 1px solid var(--border);
     display: block;
@@ -202,7 +202,7 @@ body .nav-language-flags {
     order: 0;
     margin: 0 var(--space-2) 0 0;
     padding: 0 var(--space-2);
-    background: var(--surface-2);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     min-height: 32px;
@@ -261,7 +261,7 @@ body .oldsite-main-content h3 {
 
 /* -- News ticker ------------------------------------------------- */
 body .layout-news-ticker {
-    background: var(--surface);
+    background: transparent;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     color: var(--text-2);

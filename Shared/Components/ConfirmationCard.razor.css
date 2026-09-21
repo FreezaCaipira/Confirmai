@@ -5,8 +5,8 @@
     align-items: center;
     gap: var(--space-4);
     padding: var(--space-4);
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
     border-left: 3px solid var(--accent);
     border-radius: var(--radius);
     transition: border-color 0.15s ease, background 0.15s ease;
@@ -16,7 +16,7 @@
 .my-conf-card:hover {
     border-color: var(--accent-border);
     border-left-color: var(--accent);
-    background: var(--surface-2);
+    background: var(--surface-3);
 }
 
 @keyframes fadeIn {
