@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 09/21/2026 - 17:42:11 |
-| Coverage date: | 09/21/2026 - 17:42:05 |
+| Generated on: | 09/21/2026 - 19:03:03 |
+| Coverage date: | 09/21/2026 - 19:02:58 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 523 |
 | Files: | 620 |
-| **Line coverage:** | 92.9% (135065 of 145267) |
-| Covered lines: | 135065 |
-| Uncovered lines: | 10202 |
+| **Line coverage:** | 92.9% (135072 of 145267) |
+| Covered lines: | 135072 |
+| Uncovered lines: | 10195 |
 | Coverable lines: | 145267 |
 | Total lines: | 177687 |
-| **Branch coverage:** | 39.7% (3483 of 8755) |
-| Covered branches: | 3483 |
+| **Branch coverage:** | 39.8% (3485 of 8755) |
+| Covered branches: | 3485 |
 | Total branches: | 8755 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 376_35633281159 |
+| Tag: | 378_35641950404 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **135065** | **10202** | **145267** | **195384** | **92.9%** | **3483** | **8755** | **39.7%** |
+| **Confirmai** | **135072** | **10195** | **145267** | **195384** | **92.9%** | **3485** | **8755** | **39.8%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -382,7 +382,7 @@
 | Confirmai.Services.Events.EventCollisionService | 24 | 0 | 24 | 60 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Events.EventConfirmationPaymentStatusService | 78 | 8 | 86 | 136 | 90.6% | 23 | 25 | 92% |
 | Confirmai.Services.Events.EventConfirmationPaymentTransitionResult | 7 | 0 | 7 | 136 | 100% | 0 | 0 |  |
-| Confirmai.Services.Events.EventNotificationSchedulerService | 36 | 19 | 55 | 129 | 65.4% | 5 | 10 | 50% |
+| Confirmai.Services.Events.EventNotificationSchedulerService | 43 | 12 | 55 | 129 | 78.1% | 7 | 10 | 70% |
 | Confirmai.Services.Events.EventNotificationService | 153 | 22 | 175 | 307 | 87.4% | 61 | 76 | 80.2% |
 | Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
