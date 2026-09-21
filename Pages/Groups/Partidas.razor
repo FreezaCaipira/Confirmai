@@ -51,6 +51,14 @@ else if (group is null)
         <a href="/">← @Ui["Common.Back"]</a>
     </div>
 }
+else if (!isMember)
+{
+    <div class="detail-not-found">
+        <i class="fas fa-lock detail-not-found-icon"></i>
+        <h2>@Ui["Group.NotAuthorized"]</h2>
+        <a href="/">← @Ui["Common.Back"]</a>
+    </div>
+}
 else
 {
     var isAdmin  = currentUserId is not null &&

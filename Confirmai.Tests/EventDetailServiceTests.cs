@@ -33,6 +33,12 @@ public class EventDetailServiceTests
         var group = new Group { Name = "Test Group", CreatedByUserId = "creator-1" };
         db.Groups.Add(group);
         await db.SaveChangesAsync();
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = group.Id, UserId = "admin-1",
+            Role = GroupMemberRole.Admin, CreatedAt = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
 
         var ev = new Event
         {
@@ -248,7 +254,7 @@ public class EventDetailServiceTests
         await using var db = factory.CreateDbContext();
         var originalMax = (await db.Events.FindAsync(eventId))!.MaxPlayers;
 
-        await svc.AdminAddOutfieldSlotAsync(eventId);
+        await svc.AdminAddOutfieldSlotAsync(eventId, "admin-1");
 
         await using var db2 = factory.CreateDbContext();
         var dbEv = await db2.Events.FindAsync(eventId);
@@ -262,7 +268,7 @@ public class EventDetailServiceTests
         await using var db = factory.CreateDbContext();
         var originalMax = (await db.Events.FindAsync(eventId))!.MaxPlayers;
 
-        await svc.AdminRemoveOutfieldSlotAsync(eventId);
+        await svc.AdminRemoveOutfieldSlotAsync(eventId, "admin-1");
 
         await using var db2 = factory.CreateDbContext();
         var dbEv = await db2.Events.FindAsync(eventId);
@@ -276,7 +282,7 @@ public class EventDetailServiceTests
         await using var db = factory.CreateDbContext();
         var originalGk = (await db.Events.FindAsync(eventId))!.MaxGoalkeepers ?? 0;
 
-        await svc.AdminAddGoalkeeperSlotAsync(eventId);
+        await svc.AdminAddGoalkeeperSlotAsync(eventId, "admin-1");
 
         await using var db2 = factory.CreateDbContext();
         var dbEv = await db2.Events.FindAsync(eventId);
@@ -288,7 +294,7 @@ public class EventDetailServiceTests
     {
         var (factory, svc, eventId, _) = await SetupWithEventAsync();
 
-        await svc.AdminRemoveGoalkeeperSlotAsync(eventId, 1);
+        await svc.AdminRemoveGoalkeeperSlotAsync(eventId, 1, "admin-1");
 
         await using var db = factory.CreateDbContext();
         var dbEv = await db.Events.FindAsync(eventId);

@@ -3,6 +3,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services;
+using Confirmai.Services.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -18,6 +19,7 @@ public partial class Partidas
 
     private Group?                    group            = null;
     private bool                      isLoading        = true;
+    private bool                      isMember         = false;
     private string?                   currentUserId    = null;
     private bool                      showPastEvents   = false;
     private bool                      showAllUpcoming  = false;
@@ -50,6 +52,10 @@ public partial class Partidas
             .FirstOrDefaultAsync(g => g.Id == Id);
 
         if (group is null) { isLoading = false; return; }
+
+        isMember = currentUserId is not null &&
+            await GroupAccess.IsMemberAsync(db, Id, currentUserId);
+        if (!isMember) { isLoading = false; return; }
 
         recentEvents = await db.Events
             .Where(e => e.GroupId == Id)

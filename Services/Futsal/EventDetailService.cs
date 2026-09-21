@@ -239,51 +239,57 @@ public class EventDetailService
     public async Task AdminRemoveFromWaitlistAsync(int waitlistId, string? currentUserId, int? eventId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var entry = await db.WaitingLists.FindAsync(waitlistId);
-        if (entry is not null)
-        {
-            var wlUserId = entry.UserId;
-            db.WaitingLists.Remove(entry);
-            await db.SaveChangesAsync();
-            await _logService.AuditAsync(AuditEvents.EventWaitlistRemoved, AuditEntities.EventConfirmation, waitlistId.ToString(),
-                $"Admin removeu jogador {wlUserId} da lista de espera (evento #{eventId})", currentUserId, "EventAdmin");
-        }
+        var entry = await db.WaitingLists
+            .Include(w => w.Event)
+            .FirstOrDefaultAsync(w => w.Id == waitlistId);
+        if (entry is null) return;
+        if (entry.Event is null ||
+            !await GroupAccess.IsGroupAdminAsync(db, entry.Event.GroupId, currentUserId)) return;
+        var wlUserId = entry.UserId;
+        db.WaitingLists.Remove(entry);
+        await db.SaveChangesAsync();
+        await _logService.AuditAsync(AuditEvents.EventWaitlistRemoved, AuditEntities.EventConfirmation, waitlistId.ToString(),
+            $"Admin removeu jogador {wlUserId} da lista de espera (evento #{eventId})", currentUserId, "EventAdmin");
     }
 
-    public async Task AdminAddOutfieldSlotAsync(int eventId)
+    public async Task AdminAddOutfieldSlotAsync(int eventId, string? currentUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
         var evt = await db.Events.FindAsync(eventId);
-        if (evt is null) return;
+        if (evt is null ||
+            !await GroupAccess.IsGroupAdminAsync(db, evt.GroupId, currentUserId)) return;
         evt.MaxPlayers += 1;
         await db.SaveChangesAsync();
         await PromoteFromWaitlistAsync(db, eventId, FutsalPosition.Outfield);
     }
 
-    public async Task AdminRemoveOutfieldSlotAsync(int eventId)
+    public async Task AdminRemoveOutfieldSlotAsync(int eventId, string? currentUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
         var evt = await db.Events.FindAsync(eventId);
-        if (evt is null) return;
+        if (evt is null ||
+            !await GroupAccess.IsGroupAdminAsync(db, evt.GroupId, currentUserId)) return;
         evt.MaxPlayers -= 1;
         await db.SaveChangesAsync();
     }
 
-    public async Task AdminAddGoalkeeperSlotAsync(int eventId)
+    public async Task AdminAddGoalkeeperSlotAsync(int eventId, string? currentUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
         var evt = await db.Events.FindAsync(eventId);
-        if (evt is null) return;
+        if (evt is null ||
+            !await GroupAccess.IsGroupAdminAsync(db, evt.GroupId, currentUserId)) return;
         evt.MaxGoalkeepers = (evt.MaxGoalkeepers ?? 0) + 1;
         await db.SaveChangesAsync();
         await PromoteFromWaitlistAsync(db, eventId, FutsalPosition.Goalkeeper);
     }
 
-    public async Task AdminRemoveGoalkeeperSlotAsync(int eventId, int newMaxGk)
+    public async Task AdminRemoveGoalkeeperSlotAsync(int eventId, int newMaxGk, string? currentUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
         var evt = await db.Events.FindAsync(eventId);
-        if (evt is null) return;
+        if (evt is null ||
+            !await GroupAccess.IsGroupAdminAsync(db, evt.GroupId, currentUserId)) return;
         evt.MaxGoalkeepers = newMaxGk;
         await db.SaveChangesAsync();
     }

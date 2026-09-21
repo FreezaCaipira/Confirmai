@@ -162,6 +162,7 @@ public sealed class GroupDetailService
         await using var db = await _dbFactory.CreateDbContextAsync();
         var req = await db.GroupJoinRequests.FindAsync(requestId);
         if (req is null || req.Status != JoinRequestStatus.Pending) return;
+        if (!await GroupAccess.IsGroupAdminAsync(db, req.GroupId, approverUserId)) return;
 
         var alreadyMember = await db.GroupMembers
             .AnyAsync(m => m.GroupId == req.GroupId && m.UserId == req.UserId);
@@ -207,6 +208,7 @@ public sealed class GroupDetailService
         await using var db = await _dbFactory.CreateDbContextAsync();
         var req = await db.GroupJoinRequests.FindAsync(requestId);
         if (req is null || req.Status != JoinRequestStatus.Pending) return;
+        if (!await GroupAccess.IsGroupAdminAsync(db, req.GroupId, rejecterUserId)) return;
         req.Status = JoinRequestStatus.Rejected;
         req.RespondedAt = DateTime.UtcNow;
         req.RespondedByUserId = rejecterUserId;
@@ -228,6 +230,11 @@ public sealed class GroupDetailService
             .Where(r => requestIds.Contains(r.Id) && r.Status == JoinRequestStatus.Pending)
             .Include(r => r.User)
             .ToListAsync();
+
+        // Only requests of groups where the caller is an admin are processed.
+        var adminGroupIds = await GroupAccess.AdminGroupIdsAsync(
+            db, requests.Select(r => r.GroupId), approverUserId);
+        requests = requests.Where(r => adminGroupIds.Contains(r.GroupId)).ToList();
 
         foreach (var req in requests)
         {
@@ -279,6 +286,10 @@ public sealed class GroupDetailService
         var requests = await db.GroupJoinRequests
             .Where(r => requestIds.Contains(r.Id) && r.Status == JoinRequestStatus.Pending)
             .ToListAsync();
+
+        var adminGroupIds = await GroupAccess.AdminGroupIdsAsync(
+            db, requests.Select(r => r.GroupId), rejecterUserId);
+        requests = requests.Where(r => adminGroupIds.Contains(r.GroupId)).ToList();
 
         foreach (var req in requests)
         {

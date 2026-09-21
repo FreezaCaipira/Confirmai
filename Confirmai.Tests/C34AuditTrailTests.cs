@@ -232,6 +232,11 @@ public class C34AuditTrailTests
         var user = TestDataFactory.CreateUserWithPixKey("u-1", "U1", "u1@test");
         var admin = TestDataFactory.CreateUserWithPixKey("gadmin", "GA", "ga@test");
         ctx.db.Users.AddRange(user, admin);
+        ctx.db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = group.Id, UserId = admin.Id,
+            Role = GroupMemberRole.Admin, CreatedAt = DateTime.UtcNow,
+        });
         await ctx.db.SaveChangesAsync();
         var req = new GroupJoinRequest
         {
@@ -258,6 +263,11 @@ public class C34AuditTrailTests
         var user = TestDataFactory.CreateUserWithPixKey("u-1", "U1", "u1@test");
         var admin = TestDataFactory.CreateUserWithPixKey("gadmin", "GA", "ga@test");
         ctx.db.Users.AddRange(user, admin);
+        ctx.db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = group.Id, UserId = admin.Id,
+            Role = GroupMemberRole.Admin, CreatedAt = DateTime.UtcNow,
+        });
         await ctx.db.SaveChangesAsync();
         var req = new GroupJoinRequest
         {

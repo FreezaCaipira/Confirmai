@@ -144,9 +144,9 @@ flowchart LR
 |---|---|---|---|---|---|---|---|
 | UC-O-01 | Criar grupo | `/grupos/criar` | EF na page + `GroupCreated` | Autenticado | Grupo + InviteCode + role Admin | sim | parcial (`GroupInviteCodeGenerationTests`) |
 | UC-O-02 | Copiar/compartilhar convite | `/grupo/{id}` | `Detail.razor.cs` CopyInviteLink/CopyCode/ShareWhatsApp | Admin do grupo | Link `/convite/{code}` copiado | nao | FALTA |
-| UC-O-03 | Aprovar entrada (1 a 1) ** | `/grupo/{id}` | `GroupDetailService.ApproveRequestAsync` | Admin (so UI; service nao valida papel) | `GroupMember` + request Approved + mailbox | sim (`GroupJoinApproved`, C34) | `GroupDetailServiceTests.ApproveRequestAsync_*`; `C34AuditTrailTests.ApproveRequest_WritesGroupJoinApprovedAudit` |
-| UC-O-04 | Rejeitar entrada ** | `/grupo/{id}` | `GroupDetailService.RejectRequestAsync` | Admin (so UI) | Request Rejected | sim (`GroupJoinRejected`, C34) | `GroupDetailServiceTests.RejectRequestAsync_*`; `C34AuditTrailTests.RejectRequest_WritesGroupJoinRejectedAudit` |
-| UC-O-05 | Aprovar/rejeitar em lote ** | `/grupo/{id}` | `ApproveSelectedAsync`/`RejectSelectedAsync` | Admin (so UI) | Efeito em massa | sim (`GroupJoinApproved`/`GroupJoinRejected` por request, C34) | `GroupDetailServiceTests.*SelectedAsync_*` |
+| UC-O-03 | Aprovar entrada (1 a 1) ** | `/grupo/{id}` | `GroupDetailService.ApproveRequestAsync` | Admin revalidado no service (C36-C-F2) | `GroupMember` + request Approved + mailbox | sim (`GroupJoinApproved`, C34) | `GroupDetailServiceTests.ApproveRequestAsync_*`; `C34AuditTrailTests.ApproveRequest_WritesGroupJoinApprovedAudit` |
+| UC-O-04 | Rejeitar entrada ** | `/grupo/{id}` | `GroupDetailService.RejectRequestAsync` | Admin revalidado no service (C36-C-F2) | Request Rejected | sim (`GroupJoinRejected`, C34) | `GroupDetailServiceTests.RejectRequestAsync_*`; `C34AuditTrailTests.RejectRequest_WritesGroupJoinRejectedAudit` |
+| UC-O-05 | Aprovar/rejeitar em lote ** | `/grupo/{id}` | `ApproveSelectedAsync`/`RejectSelectedAsync` | Admin por request no service (C36-C-F2) | Efeito em massa | sim (`GroupJoinApproved`/`GroupJoinRejected` por request, C34) | `GroupDetailServiceTests.*SelectedAsync_*` |
 | UC-O-06 | Aprovar todas pendentes ** | `/grupos` | `GroupDetailService.ApproveAllPendingAsync` (re-verifica admin no service) | Admin | Todos viram membros + mailbox | sim (`GroupJoinApproved` por request, C34) | `C33CriticalUseCaseTests.ApproveAllPendingAsync_*` (3) |
 | UC-O-07 | Promover/remover admin ** | `/grupo/{id}/configuracoes` | `GroupFeaturesService.SetMemberRoleAsync` (checa criador no service; impede remover ultimo admin) | Criador do grupo | `GroupMember.Role` alterado | sim | `GroupFeaturesServiceTests.SetMemberRoleAsync_*` (3 testes) |
 | UC-O-08 | Ligar/desligar features | `/grupo/{id}/configuracoes` | `GroupFeaturesService.TogglePostMatchRanking/BestPlayerVoting/PaymentGatewaysAsync` | Admin (UI; service nao revalida) | Flags do grupo | sim | `GroupFeaturesServiceTests.Toggle*`; `GroupFeatureRulesTests` |
@@ -169,7 +169,7 @@ flowchart LR
 | UC-O-25 | Criar evento poker | `/poker/create` | `PokerCreateService.InitializeAsync` (gate) + `SaveAsync` | Admin do grupo | `Event` poker (+HomeGameCode) | nao | `PokerCreateServiceTests` (10) |
 | UC-O-26 | Editar evento poker | `/poker/{id}/edit` | EF + `EventCollisionService`; guarda `EventCancellationService.CanManage` (C34-F3b) | Criador ou sysadmin | Evento atualizado | nao | `C34PermissionTests.CanManage_*` |
 | UC-O-27 | Cancelar evento poker | `/poker/{id}` | `EventCancellationService.CancelAsync` (guarda + audit novos no poker, C34-F3b) | Criador ou sysadmin | `IsActive=false` + notificacao | sim | `C34PermissionTests.CancelEvent_*` |
-| UC-O-28 | Gerir roster/espera/vagas ** | `/futsal/{id}` | `EventDetailService.AdminRemove*`/`AdminAdd*SlotAsync` | Admin; `AdminRemoveConfirmationAsync` revalida no service (C34-F3); slots/waitlist seguem so-UI ate C36-C | Roster/vagas ajustados; waitlist promovida | parcial (remocao sim; vagas nao) | `EventDetailServiceTests.Admin*SlotAsync_*`; `C34SecurityAdversarialTests.AdminRemoveConfirmation_*`; remocoes de waitlist FALTA |
+| UC-O-28 | Gerir roster/espera/vagas ** | `/futsal/{id}` | `EventDetailService.AdminRemove*`/`AdminAdd*SlotAsync` | Admin revalidado no service em todos os `Admin*` (C34-F3 + C36-C-F2) | Roster/vagas ajustados; waitlist promovida | parcial (remocao sim; vagas nao) | `EventDetailServiceTests.Admin*SlotAsync_*`; `C34SecurityAdversarialTests.AdminRemoveConfirmation_*`; `C36CGroupAccessTests` (waitlist + slots + IDOR cruzado) |
 | UC-O-29 | Escalacao (confirmar/resetar/nomes) | `/futsal/{id}/escalacao` | `EscalacaoService.ConfirmLineup/ResetLineup/SaveTeamNamesAsync` | `isAdmin` do LoadAsync | `TeamId`, `LineupConfirmedAt`, nomes | nao | `EscalacaoServiceTests.*` |
 | UC-O-30 | Gerir schedules do racha | `/futsal/schedule`, `/edit` | EF na page; `RachaSchedulerService` (background) | Lista filtrada por `CreatedByUserId`; toggle sem re-checagem | `RachaSchedule` atualizado/IsActive | nao | `RachaSchedulerServiceTests` (geracao); toggle/edit FALTA |
 
@@ -308,7 +308,7 @@ papel), UC-J-01 (Register POST), UC-J-07 (ChangePassword POST), UC-J-08
 | UC-O-20/UC-A-22/23 audit gap | Settlement submit/review sem `AuditAsync` (C34 adiciona — teste ja cobre o comportamento atual) | COBERTO C34 (`Settlement*` + `C34AuditTrailTests`) |
 | UC-A-08/09/10 Bloquear/desbloquear/excluir usuario | Permissao destrutiva sem teste | COBERTO C34-F3b (`AdminUserService` + `C34PermissionTests`; audit com ator correto) |
 | UC-A-12 Papel venue_manager | Grant/revoke de papel sem teste nem audit | COBERTO C34-F3b (`ToggleVenueManagerAsync` emite `UserRoleAssigned/Removed`) |
-| UC-O-03/04/05 aprovar/rejeitar | `ApproveRequestAsync`/`RejectRequestAsync`/`*SelectedAsync` validam papel so na UI (o novo `ApproveAllPendingAsync` ja re-verifica no service) | service nao revalida |
+| UC-O-03/04/05 aprovar/rejeitar | `ApproveRequestAsync`/`RejectRequestAsync`/`*SelectedAsync` revalidam `GroupAccess.IsGroupAdminAsync` por request no service (C36-C-F2) | coberto |
 
 ### Defeitos encontrados no C33 (corrigidos)
 
@@ -330,3 +330,8 @@ remocao de roster, schedule toggle), UC-A-04, UC-A-11, UC-A-13-acao, UC-A-29,
 UC-A-34..39 (venues), UC-A-40/41, `/health`, estaticos `.lua`, marketplace
 UC-J-24/25 lado pagina (rotas legacy orfas — `/marketplace` e `/products`
 redirectam para `/servers`, que nao existe).
+
+Divida do marketplace (C36-C Fase 1): `/payments` e `/payments/view/{id}`
+sairiam para `LegacyRoutes`, mas `PaymentDetails.razor` (fluxo de produto)
+linka `/payments/view/{id}` e seu `GoBack` navega para `/payments` — rotas
+vivas. O link saiu da nav; as paginas ficam ate o marketplace ser revisado.
