@@ -71,7 +71,7 @@ public class PlatformFeeLedgerService
         await using var db = _dbFactory.CreateDbContext();
 
         var accrued = await db.EventConfirmations
-            .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount.HasValue)
+            .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount.HasValue && c.PaymentStatus == EventConfirmationPaymentStatus.Paid)
             .SumAsync(c => c.PlatformFeeAmount!.Value);
 
         var settled = await db.PlatformFeeSettlements
@@ -95,7 +95,7 @@ public class PlatformFeeLedgerService
         // Matches (events) with accrued fee, oldest first.
         // Zero-stamped (waived) lots are excluded — nothing to settle for them.
         var matches = await db.EventConfirmations
-            .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount > 0)
+            .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount > 0 && c.PaymentStatus == EventConfirmationPaymentStatus.Paid)
             .Include(c => c.Event)
             .GroupBy(c => new { c.Event!.Id, c.Event.StartsAt, c.Event.Location })
             .Select(g => new

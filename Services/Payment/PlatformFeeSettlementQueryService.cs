@@ -37,7 +37,7 @@ public class PlatformFeeSettlementQueryService
         await using var db = await _dbFactory.CreateDbContextAsync();
 
         var matchRows = await db.EventConfirmations
-            .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount > 0)
+            .Where(c => c.Event!.GroupId == groupId && c.PlatformFeeAmount > 0 && c.PaymentStatus == EventConfirmationPaymentStatus.Paid)
             .Include(c => c.Event)
                 .ThenInclude(e => e!.Group)
             .GroupBy(c => new { c.Event!.Id, c.Event.StartsAt, c.Event.Location, GroupName = c.Event.Group!.Name })
@@ -139,7 +139,7 @@ public class PlatformFeeSettlementQueryService
         // Groups that owe fee but never submitted a settlement must show up too,
         // otherwise the admin cannot see who is not paying at all.
         var accruedByGroup = await db.EventConfirmations
-            .Where(c => c.PlatformFeeAmount > 0)
+            .Where(c => c.PlatformFeeAmount > 0 && c.PaymentStatus == EventConfirmationPaymentStatus.Paid)
             .GroupBy(c => c.Event!.GroupId)
             .Select(g => new { GroupId = g.Key, Accrued = g.Sum(c => c.PlatformFeeAmount!.Value) })
             .ToDictionaryAsync(g => g.GroupId, g => g.Accrued);

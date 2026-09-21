@@ -192,4 +192,30 @@ public class C36CFeeStampTests
         var promoted = await db.EventConfirmations.SingleAsync(c => c.UserId == "p2");
         Assert.Equal(0m, promoted.PlatformFeeAmount);
     }
+
+    // ---- Review Senior: carimbo na criacao nao pode virar divida antes do pagamento ----
+
+    [Fact]
+    public async Task Ledger_UnpaidStampedConfirmation_DoesNotAccrue()
+    {
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var (groupId, eventId) = await SeedWaivableEventAsync(db);
+        var svc = NewDetailSvc(factory);
+        await svc.ConfirmPresenceAsync(eventId, "p1", FutsalPosition.Outfield);
+        await svc.ConfirmPresenceAsync(eventId, "p2", FutsalPosition.Outfield);
+
+        var (accruedUnpaid, _, _) = await NewLedger(factory).GetGroupBalanceAsync(groupId);
+        Assert.Equal(0m, accruedUnpaid);
+
+        var conf = await db.EventConfirmations.SingleAsync(c => c.UserId == "p1");
+        conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+        await db.SaveChangesAsync();
+
+        var (accruedPaid, _, _) = await NewLedger(factory).GetGroupBalanceAsync(groupId);
+        Assert.Equal(Fee, accruedPaid);
+
+        var matches = await NewLedger(factory).GetGroupFeeBreakdownByMatchAsync(groupId);
+        Assert.Single(matches);
+        Assert.Equal(Fee, matches[0].FeeAmount);
+    }
 }
