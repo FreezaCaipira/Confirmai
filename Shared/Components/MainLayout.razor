@@ -6,6 +6,7 @@
 @using Confirmai.Services
 @using Confirmai.Shared.Components
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.EntityFrameworkCore
@@ -28,80 +29,65 @@
     <CascadingAuthenticationState>
         <div class="oldsite-page">
             <header class="oldsite-header">
-                <a href="/" class="oldsite-logo-wrap" aria-label="@T["Group.Home"]">
-                    <div class="oldsite-logo-art" aria-hidden="true"></div>
-                    <h1 class="oldsite-logo">Confirma Aí!</h1>
-                    <p class="oldsite-tagline">Bora jogar!?</p>
-                </a>
-                <button class="mobile-menu-toggle" @onclick="ToggleMobileMenu" aria-label="Toggle menu" aria-expanded="@isMobileMenuOpen">
-                    <i class="fas fa-bars"></i>
-                    <span class="mobile-menu-label">Menu</span>
-                </button>
-                <nav class="oldsite-top-nav @(isMobileMenuOpen ? "mobile-menu-open" : "")" aria-label="Main menu">
-                    <div class="nav-language-flags" role="group" aria-label="@T["Layout.Language"]">
-                        <a class="language-flag-card lang-br @(IsLanguageSelected("pt-BR") ? "active" : string.Empty)"
-                           title="@T["Layout.LanguagePtBr"]"
-                           aria-label="@T["Layout.LanguagePtBr"]"
-                           href="@BuildLanguageUrl("pt-BR")">
-                            <img class="flag-icon" src="/images/flags/br.svg" alt="" aria-hidden="true" />
-                        </a>
-                        <a class="language-flag-card lang-us @(IsLanguageSelected("en-US") ? "active" : string.Empty)"
-                           title="@T["Layout.LanguageEnUs"]"
-                           aria-label="@T["Layout.LanguageEnUs"]"
-                           href="@BuildLanguageUrl("en-US")">
-                            <img class="flag-icon" src="/images/flags/us.svg" alt="" aria-hidden="true" />
-                        </a>
-                        <a class="language-flag-card lang-es @(IsLanguageSelected("es-ES") ? "active" : string.Empty)"
-                           title="@T["Layout.LanguageEsEs"]"
-                           aria-label="@T["Layout.LanguageEsEs"]"
-                           href="@BuildLanguageUrl("es-ES")">
-                            <img class="flag-icon" src="/images/flags/es.svg" alt="" aria-hidden="true" />
-                        </a>
-                    </div>
-                    <AuthorizeView>
-                        <Authorized>
-                            <a href="/" class="oldsite-top-nav-link"><i class="fas fa-calendar-check" aria-hidden="true"></i> @T["Nav.Sports"]</a>
-                            <a href="/grupos" class="oldsite-top-nav-link"><i class="fas fa-users" aria-hidden="true"></i> @T["Groups.Title"]</a>
-                            <a href="/payments" class="oldsite-top-nav-link"><i class="fas fa-wallet" aria-hidden="true"></i> @T["Nav.Payments"]</a>
-                            <AuthorizeView Policy="ServerAdmin">
-                            <Authorized Context="gmContext">
-                                <a href="/docs/integration" class="oldsite-top-nav-link">@T["Nav.Integration"]</a>
-                            </Authorized>
-                        </AuthorizeView>
-                            <AuthorizeView Roles="admin">
-                                <Authorized Context="adminContext">
-                                    <a href="/admin" class="oldsite-top-nav-link">@T["Nav.Admin"]</a>
-                                </Authorized>
-                            </AuthorizeView>
-
-                            <span class="nav-flex-spacer"></span>
-
-                            <a href="/mailbox" class="oldsite-top-nav-link oldsite-top-nav-mailbox-icon" title="@T["Nav.Mailbox"]" aria-label="@T["Nav.Mailbox"]">
-                                <span class="oldsite-mailbox-wrap">
-                                    <img class="oldsite-mailbox-glyph" src="/images/icons/mail-letter.svg" alt="" aria-hidden="true" />
-                                    @if (unreadMailboxCount > 0)
+                <div class="shell-header-inner">
+                    <a href="/" class="oldsite-logo-wrap" aria-label="@T["Group.Home"]">
+                        <span class="shell-brand-mark" aria-hidden="true"><i class="fas fa-check"></i></span>
+                        <span class="oldsite-logo">Confirma Aí!</span>
+                    </a>
+                    <button class="mobile-menu-toggle" @onclick="ToggleMobileMenu" aria-label="Toggle menu" aria-expanded="@isMobileMenuOpen">
+                        <i class="fas fa-bars"></i>
+                        <span class="mobile-menu-label">Menu</span>
+                    </button>
+                    <nav class="oldsite-top-nav @(isMobileMenuOpen ? "mobile-menu-open" : "")" aria-label="Main menu">
+                        <AuthorizeView>
+                            <Authorized>
+                                <div class="shell-nav-main">
+                                    <NavLink href="/" Match="NavLinkMatch.All" class="oldsite-top-nav-link" ActiveClass="active"><i class="fas fa-calendar-check" aria-hidden="true"></i> @T["Nav.Sports"]</NavLink>
+                                    <NavLink href="/grupos" class="oldsite-top-nav-link" ActiveClass="active"><i class="fas fa-users" aria-hidden="true"></i> @T["Groups.Title"]</NavLink>
+                                    <NavLink href="/payments" class="oldsite-top-nav-link" ActiveClass="active"><i class="fas fa-wallet" aria-hidden="true"></i> @T["Nav.Payments"]</NavLink>
+                                    <AuthorizeView Policy="ServerAdmin">
+                                        <Authorized Context="gmContext">
+                                            <NavLink href="/docs/integration" class="oldsite-top-nav-link" ActiveClass="active">@T["Nav.Integration"]</NavLink>
+                                        </Authorized>
+                                    </AuthorizeView>
+                                    <AuthorizeView Roles="admin">
+                                        <Authorized Context="adminContext">
+                                            <NavLink href="/admin" class="oldsite-top-nav-link" ActiveClass="active"><i class="fas fa-shield-alt" aria-hidden="true"></i> @T["Nav.Admin"]</NavLink>
+                                        </Authorized>
+                                    </AuthorizeView>
+                                </div>
+                                <div class="shell-nav-user">
+                                    @LanguageFlags
+                                    <a href="/mailbox" class="oldsite-top-nav-link oldsite-top-nav-mailbox-icon" title="@T["Nav.Mailbox"]" aria-label="@T["Nav.Mailbox"]">
+                                        <span class="oldsite-mailbox-wrap">
+                                            <img class="oldsite-mailbox-glyph" src="/images/icons/mail-letter.svg" alt="" aria-hidden="true" />
+                                            @if (unreadMailboxCount > 0)
+                                            {
+                                                <span class="oldsite-top-nav-unread">@unreadMailboxCount</span>
+                                            }
+                                        </span>
+                                        <span class="mobile-nav-text">@T["Nav.Mailbox"]</span>
+                                    </a>
+                                    @if (!string.IsNullOrWhiteSpace(currentUserId))
                                     {
-                                        <span class="oldsite-top-nav-unread">@unreadMailboxCount</span>
+                                        <a href="/profile/@currentUserId" class="oldsite-top-nav-link oldsite-top-nav-profile-link" title="@DisplayName(context.User)" aria-label="@T["Nav.Profile"]">
+                                            <img class="oldsite-profile-glyph" src="/images/icons/user-profile.svg" alt="" aria-hidden="true" />
+                                            <span class="shell-nav-username">@DisplayName(context.User)</span>
+                                        </a>
                                     }
-                                </span>
-                                <span class="mobile-nav-text">@T["Nav.Mailbox"]</span>
-                            </a>
-                            @if (!string.IsNullOrWhiteSpace(currentUserId))
-                            {
-                                <a href="/profile/@currentUserId" class="oldsite-top-nav-link oldsite-top-nav-profile-link" title="@T["Nav.Profile"]" aria-label="@T["Nav.Profile"]">
-                                    <img class="oldsite-profile-glyph" src="/images/icons/user-profile.svg" alt="" aria-hidden="true" />
-                                    <span class="mobile-nav-text">@T["Nav.Profile"]</span>
-                                </a>
-                                <span class="oldsite-top-nav-user">@T["Layout.Hello"], @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? T["Layout.UserFallback"] : context.User.Identity.Name)!</span>
-                            }
-                            <a href="/Identity/Account/Logout" class="oldsite-top-nav-link oldsite-top-nav-logout">@T["Layout.Logout"]</a>
-                        </Authorized>
-                        <NotAuthorized>
-                            <a href="/Identity/Account/Login" class="oldsite-top-nav-link">@T["Nav.Login"]</a>
-                            <a href="/Identity/Account/Register" class="oldsite-top-nav-link">@T["Nav.Register"]</a>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                </nav>
+                                    <a href="/Identity/Account/Logout" class="oldsite-top-nav-link oldsite-top-nav-logout">@T["Layout.Logout"]</a>
+                                </div>
+                            </Authorized>
+                            <NotAuthorized>
+                                <div class="shell-nav-user shell-nav-user--anon">
+                                    @LanguageFlags
+                                    <a href="/Identity/Account/Login" class="oldsite-top-nav-link">@T["Nav.Login"]</a>
+                                    <a href="/Identity/Account/Register" class="oldsite-top-nav-link shell-nav-cta">@T["Nav.Register"]</a>
+                                </div>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </nav>
+                </div>
             </header>
 
             <div class="oldsite-frame">
@@ -141,6 +127,38 @@
 
 @code {
     private Toast? ToastRef;
+
+    private RenderFragment LanguageFlags => __builder =>
+    {
+        <div class="nav-language-flags" role="group" aria-label="@T["Layout.Language"]">
+            <a class="language-flag-card lang-br @(IsLanguageSelected("pt-BR") ? "active" : string.Empty)"
+               title="@T["Layout.LanguagePtBr"]"
+               aria-label="@T["Layout.LanguagePtBr"]"
+               href="@BuildLanguageUrl("pt-BR")">
+                <img class="flag-icon" src="/images/flags/br.svg" alt="" aria-hidden="true" />
+            </a>
+            <a class="language-flag-card lang-us @(IsLanguageSelected("en-US") ? "active" : string.Empty)"
+               title="@T["Layout.LanguageEnUs"]"
+               aria-label="@T["Layout.LanguageEnUs"]"
+               href="@BuildLanguageUrl("en-US")">
+                <img class="flag-icon" src="/images/flags/us.svg" alt="" aria-hidden="true" />
+            </a>
+            <a class="language-flag-card lang-es @(IsLanguageSelected("es-ES") ? "active" : string.Empty)"
+               title="@T["Layout.LanguageEsEs"]"
+               aria-label="@T["Layout.LanguageEsEs"]"
+               href="@BuildLanguageUrl("es-ES")">
+                <img class="flag-icon" src="/images/flags/es.svg" alt="" aria-hidden="true" />
+            </a>
+        </div>
+    };
+
+    private string DisplayName(ClaimsPrincipal user)
+    {
+        var name = user.Identity?.Name;
+        if (string.IsNullOrWhiteSpace(name)) return T["Layout.UserFallback"];
+        var at = name.IndexOf('@');
+        return at > 0 ? name[..at] : name;
+    }
     private string selectedLanguage = LanguagePreferenceService.DefaultLanguage;
     private int newsTickerIndex;
     private int globalActiveOffers;

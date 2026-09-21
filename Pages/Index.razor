@@ -72,10 +72,10 @@
 
                 <section class="home-groups" aria-label="@Ui["Groups.MyGroups"]">
                     <div class="home-section-head">
-                        <h2 class="home-section-title">@Ui["Groups.MyGroups"]</h2>
+                        <h2 class="home-section-title">@Ui["Groups.MyGroups"] <span class="home-section-count">@myGroups.Count</span></h2>
                         <a href="/grupos" class="home-link">@Ui["Index.ManageGroups"] →</a>
                     </div>
-                    <div class="home-group-chips">
+                    <div class="home-section-body home-group-chips">
                         @foreach (var g in myGroups)
                         {
                             <a href="/grupo/@g.Id" class="home-group-chip">
@@ -94,8 +94,9 @@
                 {
                     <section class="home-section" aria-label="@Ui["Index.ViewOrganizing"]">
                         <div class="home-section-head">
-                            <h2 class="home-section-title">@Ui["Index.Upcoming"]</h2>
+                            <h2 class="home-section-title">@Ui["Index.Upcoming"] <span class="home-section-count">@organizing.Count</span></h2>
                         </div>
+                        <div class="home-section-body">
                         @if (organizing.Count == 0)
                         {
                             <div class="home-empty">
@@ -132,14 +133,16 @@
                                 }
                             </div>
                         }
+                        </div>
                     </section>
                 }
                 else
                 {
                     <section class="home-section" aria-label="@Ui["Index.ViewPlaying"]">
                         <div class="home-section-head">
-                            <h2 class="home-section-title">@Ui["Index.Upcoming"]</h2>
+                            <h2 class="home-section-title">@Ui["Index.Upcoming"] <span class="home-section-count">@upcoming.Count</span></h2>
                         </div>
+                        <div class="home-section-body">
                         @if (upcoming.Count == 0)
                         {
                             <div class="home-empty">
@@ -161,11 +164,10 @@
                                 }
                             </div>
                         }
+                        </div>
                     </section>
 
-                    @if (past.Count > 0 || cancelled.Count > 0)
-                    {
-                        <section class="home-section home-section--history" aria-label="@Ui["Index.Previous"]">
+                    <section class="home-section home-section--history" aria-label="@Ui["Index.History"]">
                             <div class="home-section-head">
                                 <h2 class="home-section-title">@Ui["Index.History"]</h2>
                                 <div class="home-view-toggle home-view-toggle--small" role="tablist">
@@ -181,7 +183,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="home-list">
+                            <div class="home-section-body home-list">
                                 @if (showCancelled)
                                 {
                                     @if (cancelled.Count == 0)
@@ -206,7 +208,6 @@
                                 }
                             </div>
                         </section>
-                    }
                 }
             }
         </Authorized>

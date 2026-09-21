@@ -1,20 +1,28 @@
+/* Confirmation row on the home. Built on tokens.css only. */
+
 .my-conf-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    margin-bottom: 0.75rem;
-    transition: all 0.3s ease;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    transition: border-color 0.15s ease, background 0.15s ease;
     animation: fadeIn 0.3s ease-out;
+}
+
+.my-conf-card:hover {
+    border-color: var(--accent-border);
+    border-left-color: var(--accent);
+    background: var(--surface-2);
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(6px);
     }
     to {
         opacity: 1;
@@ -23,46 +31,30 @@
 }
 
 .my-conf-card--past {
-    opacity: 0.7;
+    opacity: 0.75;
+    border-left-color: var(--border-2);
 }
 
 .my-conf-card--cancelled {
-    opacity: 0.6;
-    border-color: var(--red-strong);
+    opacity: 0.7;
+    border-left-color: var(--danger);
 }
 
 .my-conf-card--urgent {
-    border-color: var(--amber-mid);
-    background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(249, 115, 22, 0.1) 100%);
-    animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
-    }
-    50% {
-        box-shadow: 0 0 0 8px rgba(249, 115, 22, 0);
-    }
+    border-left-color: var(--warning);
+    border-color: var(--warning-soft);
 }
 
 .my-conf-sport {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    font-size: 1.5rem;
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    font-size: 1.35rem;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
     flex-shrink: 0;
-}
-
-.my-conf-sport--futsal {
-    background: var(--green-opacity-sm);
-}
-
-.my-conf-sport--poker {
-    background: rgba(244, 114, 182, 0.1);
 }
 
 .my-conf-body {
@@ -73,67 +65,57 @@
 .my-conf-name-row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     flex-wrap: wrap;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .my-conf-name {
     font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-weight: var(--fw-semibold);
+    color: var(--text);
 }
 
-.meta-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-.meta-chip--confirmed {
-    background: var(--green-opacity-sm);
-    color: var(--green-bright);
-}
-
-.my-conf-cancelled {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    background: var(--red-opacity-sm);
-    color: var(--red-strong);
-}
-
+.meta-chip,
+.my-conf-cancelled,
 .my-conf-pos {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    gap: var(--space-1);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
     font-size: 0.75rem;
-    background: var(--bg-deep);
-    color: var(--text-muted);
+    font-weight: var(--fw-medium);
+}
+
+.meta-chip--confirmed {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.my-conf-cancelled {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.my-conf-pos {
+    background: var(--accent-soft);
+    color: var(--accent-text);
 }
 
 .my-conf-meta {
     font-size: 0.875rem;
-    color: var(--text-muted);
-    margin: 0.25rem 0;
+    color: var(--text-2);
+    margin: var(--space-1) 0 0;
 }
 
 .my-conf-price {
-    color: var(--green-bright);
-    font-weight: 500;
+    color: var(--text);
+    font-weight: var(--fw-medium);
 }
 
 .my-conf-status {
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 }
 
 .my-conf-actions {
@@ -143,20 +125,52 @@
 .my-conf-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
+    gap: var(--space-2);
+    min-height: 36px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
 .my-conf-btn--view {
-    background: var(--accent-gold);
-    color: var(--ci-bg-deepest);
+    background: var(--accent);
+    color: var(--accent-fg);
 }
 
 .my-conf-btn--view:hover {
-    background: var(--gold-amber);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--accent-fg);
+}
+
+.my-conf-card--past .my-conf-btn--view,
+.my-conf-card--cancelled .my-conf-btn--view {
+    background: transparent;
+    border-color: var(--accent-border);
+    color: var(--accent-text);
+}
+
+.my-conf-card--past .my-conf-btn--view:hover,
+.my-conf-card--cancelled .my-conf-btn--view:hover {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+}
+
+@media (max-width: 768px) {
+    .my-conf-card {
+        flex-wrap: wrap;
+    }
+
+    .my-conf-actions {
+        width: 100%;
+    }
+
+    .my-conf-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }

@@ -88,7 +88,8 @@ public class HomeGroupFirstIntegrationTests : IClassFixture<IntegrationTestWebAp
         Assert.Contains("Racha do Admin", content);
         Assert.Contains($"/grupo/{groupId}", content);
         Assert.Contains("home-view-toggle", content);
-        Assert.Equal(2, System.Text.RegularExpressions.Regex.Matches(content, "role=\"tab\"").Count);
+        Assert.Equal(4, System.Text.RegularExpressions.Regex.Matches(content, "role=\"tab\"").Count);
+        Assert.Contains("home-section--history", content);
         Assert.DoesNotContain("group-entry-input", content);
     }
 }
