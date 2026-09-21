@@ -17,6 +17,23 @@ public record GroupPaymentsData(
     List<PaymentHistoryEntry> PaymentHistory,
     List<PendingProofEntry> PendingProofList);
 
+/// <summary>Pending-payment count for one group (home banner, C36-C Fase 4).</summary>
+public record PendingPaymentGroup(int GroupId, string GroupName, int Count);
+
+/// <summary>
+/// One row of the member-facing "Meus pagamentos" view: only the caller's own
+/// confirmations, so a player never sees another member's payment state.
+/// </summary>
+public record MyPaymentEntry(
+    int ConfirmationId,
+    int EventId,
+    DateTime EventDate,
+    decimal TotalToPay,
+    bool HasPaid,
+    bool ProofPending,
+    string EventHref,
+    string PayHref);
+
 public sealed class GroupPaymentsService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
@@ -53,17 +70,72 @@ public sealed class GroupPaymentsService
 
     public async Task<(Group? Group, bool IsAdmin)> LoadGroupAndCheckAdminAsync(int groupId, string? currentUserId)
     {
+        var (group, isAdmin, _) = await LoadGroupAccessAsync(groupId, currentUserId);
+        return (group, isAdmin);
+    }
+
+    /// <summary>
+    /// Loads the group and resolves the caller's relationship to it in one query.
+    /// The page uses IsMember to gate the whole route and IsAdmin to choose
+    /// between the management view and the member's own "Meus pagamentos".
+    /// </summary>
+    public async Task<(Group? Group, bool IsAdmin, bool IsMember)> LoadGroupAccessAsync(
+        int groupId, string? currentUserId)
+    {
         await using var db = await _dbFactory.CreateDbContextAsync();
         var group = await db.Groups
             .Include(g => g.Members)
             .FirstOrDefaultAsync(g => g.Id == groupId);
 
-        if (group is null) return (null, false);
+        if (group is null) return (null, false, false);
 
-        var isAdmin = currentUserId is not null &&
+        var isMember = currentUserId is not null &&
+                       group.Members.Any(m => m.UserId == currentUserId);
+        var isAdmin = isMember &&
                       group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
 
-        return (group, isAdmin);
+        return (group, isAdmin, isMember);
+    }
+
+    /// <summary>
+    /// The caller's own payment state inside the group: every priced, non-goalkeeper
+    /// confirmation they hold, newest first. Membership is enforced here — the page
+    /// must not rely on a UI check to decide whose rows are returned.
+    /// The stamped platform fee wins (C36-C Fase 0); legacy rows resolve by ConfirmedAt.
+    /// </summary>
+    public async Task<List<MyPaymentEntry>> LoadMyPaymentsAsync(int groupId, string? currentUserId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        if (currentUserId is null ||
+            !await GroupAccess.IsMemberAsync(db, groupId, currentUserId))
+            return new List<MyPaymentEntry>();
+
+        var group = await db.Groups.AsNoTracking().FirstOrDefaultAsync(g => g.Id == groupId);
+        if (group is null) return new List<MyPaymentEntry>();
+
+        var confirmations = await db.EventConfirmations
+            .Where(c =>
+                c.Event.GroupId == groupId &&
+                c.UserId == currentUserId &&
+                c.Event.Price != null &&
+                c.Event.Price > 0 &&
+                c.Position != FutsalPosition.Goalkeeper)
+            .Include(c => c.Event)
+            .OrderByDescending(c => c.Event.StartsAt)
+            .Take(100)
+            .ToListAsync();
+
+        var isFutsal = group.Sport == Sport.Futsal;
+        return confirmations.Select(c =>
+        {
+            var href = isFutsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
+            var total = ManualPlatformFee.TotalToPay(group.EnablePaymentGateways, isFutsal,
+                c.Event.Price!.Value, c.PlatformFeeAmount ?? _feePolicy.ResolveManualFee(group, c.ConfirmedAt));
+            return new MyPaymentEntry(
+                c.Id, c.EventId, c.Event.StartsAt, total,
+                c.HasPaid, c.PixProofUploadedAt != null && !c.HasPaid,
+                href, $"/pagamento/evento/{c.Id}");
+        }).ToList();
     }
 
     public async Task<GroupPaymentsData> LoadPaymentsDataAsync(int groupId, Group group)
@@ -178,6 +250,26 @@ public sealed class GroupPaymentsService
 
         return new GroupPaymentsData(delinquencyList, paymentHistory, pendingProofList);
     }
+
+    /// <summary>
+    /// The player's own unpaid priced confirmations, grouped per group — feeds the
+    /// home pending-payments banner (C36-C Fase 4). A proof already uploaded is
+    /// under review, not an actionable debt; cancelled events and goalkeepers
+    /// never owe. Operates on already-loaded confirmations of a single user, so
+    /// no other member's data can leak into the result.
+    /// </summary>
+    public static List<PendingPaymentGroup> PendingByGroup(IEnumerable<EventConfirmation> confirmations)
+        => confirmations
+            .Where(c => c.Event.IsActive &&
+                        c.Event.Price.HasValue && c.Event.Price.Value > 0 &&
+                        c.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
+                        !c.HasPaid &&
+                        c.Position != FutsalPosition.Goalkeeper &&
+                        c.PixProofUploadedAt == null)
+            .GroupBy(c => new { c.Event.GroupId, c.Event.Group.Name })
+            .Select(g => new PendingPaymentGroup(g.Key.GroupId, g.Key.Name, g.Count()))
+            .OrderByDescending(g => g.Count)
+            .ToList();
 
     public async Task MarkPaidAsync(int confirmationId, string userId, string? currentUserId, int groupId)
     {

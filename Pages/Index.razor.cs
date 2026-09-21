@@ -3,6 +3,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Core;
+using Confirmai.Services.Groups;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,7 @@ public partial class Index
     private List<EventConfirmation> past = new();
     private List<EventConfirmation> cancelled = new();
     private List<Event> organizing = new();
+    private List<PendingPaymentGroup> pendingPaymentGroups = new();
 
     private bool organizesAny => myGroups.Any(g => g.IsAdmin) || organizing.Count > 0;
 
@@ -80,6 +82,10 @@ public partial class Index
         upcoming  = confs.Where(c => c.Event.IsActive && c.Event.StartsAt >= now).ToList();
         past      = confs.Where(c => c.Event.IsActive && c.Event.StartsAt < now).OrderByDescending(c => c.Event.StartsAt).ToList();
         cancelled = confs.Where(c => !c.Event.IsActive).OrderByDescending(c => c.Event.StartsAt).ToList();
+
+        // C36-C Fase 4: the player's own unpaid priced confirmations, grouped per
+        // group for the home banner. Proof already sent is not actionable here.
+        pendingPaymentGroups = GroupPaymentsService.PendingByGroup(confs);
 
         var adminGroupIds = myGroups.Where(g => g.IsAdmin).Select(g => g.Id).ToList();
         organizing = await db.Events

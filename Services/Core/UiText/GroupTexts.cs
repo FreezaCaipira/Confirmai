@@ -169,6 +169,12 @@ internal static class GroupTexts
 
         // Payments page
         ["Group.PaymentsTitle"] = "Pagamentos",
+        ["Group.MyPaymentsTitle"] = "Meus pagamentos",
+        ["Group.MyPaymentsEmpty"] = "Você não tem pagamentos neste grupo.",
+        ["Group.MyPaymentPaid"] = "Pago",
+        ["Group.MyPaymentPending"] = "Pendente",
+        ["Group.MyPaymentProofSent"] = "Comprovante em análise",
+        ["Group.MyPaymentPay"] = "Pagar",
         ["Group.PaymentsPending"] = "Pendentes",
         ["Group.PaymentsHistory"] = "Histórico",
         ["Group.PaymentsProofs"] = "Comprovantes",
@@ -442,6 +448,12 @@ internal static class GroupTexts
 
         // Payments page
         ["Group.PaymentsTitle"] = "Payments",
+        ["Group.MyPaymentsTitle"] = "My payments",
+        ["Group.MyPaymentsEmpty"] = "You have no payments in this group.",
+        ["Group.MyPaymentPaid"] = "Paid",
+        ["Group.MyPaymentPending"] = "Pending",
+        ["Group.MyPaymentProofSent"] = "Proof under review",
+        ["Group.MyPaymentPay"] = "Pay",
         ["Group.PaymentsPending"] = "Pending",
         ["Group.PaymentsHistory"] = "History",
         ["Group.PaymentsProofs"] = "Proofs",
@@ -715,6 +727,12 @@ internal static class GroupTexts
 
         // Payments page
         ["Group.PaymentsTitle"] = "Pagos",
+        ["Group.MyPaymentsTitle"] = "Mis pagos",
+        ["Group.MyPaymentsEmpty"] = "No tienes pagos en este grupo.",
+        ["Group.MyPaymentPaid"] = "Pagado",
+        ["Group.MyPaymentPending"] = "Pendiente",
+        ["Group.MyPaymentProofSent"] = "Comprobante en revisión",
+        ["Group.MyPaymentPay"] = "Pagar",
         ["Group.PaymentsPending"] = "Pendientes",
         ["Group.PaymentsHistory"] = "Historial",
         ["Group.PaymentsProofs"] = "Comprobantes",

@@ -50,12 +50,74 @@
         </div>
     </div>
 }
-else if (group is null || !isAdmin)
+else if (group is null || !isMember)
 {
     <div class="detail-not-found">
         <i class="fas fa-lock detail-not-found-icon"></i>
         <h2>@Ui["Group.NotAuthorized"]</h2>
         <a href="/grupo/@Id">← @Ui["Common.Back"]</a>
+    </div>
+}
+else if (!isAdmin)
+{
+    <div class="detail-page">
+        <div class="detail-card">
+            <header class="detail-header">
+                <div class="detail-header-top">
+                    <a href="/grupo/@Id" class="detail-back-link">
+                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
+                    </a>
+                    <a href="/grupos" class="btn-view-groups">
+                        <i class="fas fa-layer-group"></i> @Ui["Groups.Title"]
+                    </a>
+                </div>
+                <div class="detail-header-badge">
+                    <span class="detail-sport-badge">
+                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
+                    </span>
+                </div>
+                <h1 class="detail-title payments-title"><i class="fas fa-money-bill-wave"></i> @Ui["Group.MyPaymentsTitle"]</h1>
+            </header>
+
+            @if (myPayments.Count == 0)
+            {
+                <div class="payments-empty">
+                    <i class="fas fa-check-circle"></i>
+                    <p>@Ui["Group.MyPaymentsEmpty"]</p>
+                </div>
+            }
+            else
+            {
+                <ul class="payments-user-list">
+                    @foreach (var entry in myPayments)
+                    {
+                        <li class="payments-user-item">
+                            <a href="@entry.EventHref" class="payments-user-info">
+                                <span class="payments-user-name">@entry.EventDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                <span class="payments-user-sub">R$ @entry.TotalToPay.ToString("F2")</span>
+                            </a>
+                            <div class="payments-user-actions">
+                                @if (entry.HasPaid)
+                                {
+                                    <span class="payments-badge payments-badge--paid"><i class="fas fa-check"></i> @Ui["Group.MyPaymentPaid"]</span>
+                                }
+                                else if (entry.ProofPending)
+                                {
+                                    <span class="payments-badge payments-badge--pending"><i class="fas fa-clock"></i> @Ui["Group.MyPaymentProofSent"]</span>
+                                }
+                                else
+                                {
+                                    <span class="payments-badge payments-badge--delinquent"><i class="fas fa-exclamation-circle"></i> @Ui["Group.MyPaymentPending"]</span>
+                                    <a href="@entry.PayHref" class="btn-pay">
+                                        <i class="fas fa-qrcode"></i> @Ui["Group.MyPaymentPay"]
+                                    </a>
+                                }
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
     </div>
 }
 else

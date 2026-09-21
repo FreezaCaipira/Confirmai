@@ -39,8 +39,16 @@
                 <p class="my-conf-meta my-conf-status" style="color: @PaymentStatusColor">@PaymentStatusLabel</p>
             }
         }
+        @if (ProofSent)
+        {
+            <p class="my-conf-meta my-conf-status" style="color: var(--warning)">⏳ @Ui["Index.ProofSent"]</p>
+        }
     </div>
     <div class="my-conf-actions">
+        @if (ShowPayAction)
+        {
+            <a href="/pagamento/evento/@Confirmation.Id" class="my-conf-btn my-conf-btn--pay"><i class="fas fa-qrcode"></i> @Ui["Index.Pay"]</a>
+        }
         <a href="@DetailUrl" class="my-conf-btn my-conf-btn--view"><i class="fas fa-arrow-right"></i> @Ui["Index.Enter"]</a>
     </div>
 </div>
@@ -70,6 +78,18 @@
 
     private bool IsUrgent => !IsPast && !IsCancelled &&
         (Confirmation.Event.StartsAt - DateTime.UtcNow).TotalHours <= 24;
+
+    // The card belongs to the signed-in player, so it may surface their own
+    // unpaid priced confirmation — goalkeepers and free events never pay.
+    private bool OwesPayment => !IsCancelled &&
+        Confirmation.Event.Price.HasValue && Confirmation.Event.Price.Value > 0 &&
+        Confirmation.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
+        !Confirmation.HasPaid &&
+        Confirmation.Position != FutsalPosition.Goalkeeper;
+
+    private bool ProofSent => OwesPayment && Confirmation.PixProofUploadedAt is not null;
+
+    private bool ShowPayAction => OwesPayment && Confirmation.PixProofUploadedAt is null;
 
     private string DetailUrl => Confirmation.Event.Sport == Sport.Futsal
         ? $"/futsal/{Confirmation.Event.Id}"

@@ -664,4 +664,170 @@ public class GroupPaymentsServiceTests
         Assert.Equal(2, data.PaymentHistory.Count);
         Assert.True(data.PaymentHistory[0].MarkedAt >= data.PaymentHistory[1].MarkedAt);
     }
+
+    // ── LoadGroupAccessAsync / LoadMyPaymentsAsync (C36-C Fase 3) ──────
+
+    [Fact]
+    public async Task LoadGroupAccessAsync_MemberSeesIsMember_NotAdmin()
+    {
+        var (factory, svc, groupId, _) = await SetupWithGroupAndAdminAsync();
+
+        var (group, isAdmin, isMember) = await svc.LoadGroupAccessAsync(groupId, "player-1");
+
+        Assert.NotNull(group);
+        Assert.False(isAdmin);
+        Assert.True(isMember);
+    }
+
+    [Fact]
+    public async Task LoadGroupAccessAsync_OutsiderIsNeitherMemberNorAdmin()
+    {
+        var (factory, svc, groupId, _) = await SetupWithGroupAndAdminAsync();
+
+        var (group, isAdmin, isMember) = await svc.LoadGroupAccessAsync(groupId, "outsider-1");
+
+        Assert.NotNull(group);
+        Assert.False(isAdmin);
+        Assert.False(isMember);
+    }
+
+    [Fact]
+    public async Task LoadMyPaymentsAsync_ReturnsOwnConfirmations_Only()
+    {
+        var (factory, svc, groupId, _) = await SetupWithGroupAndAdminAsync();
+        await using var db = factory.CreateDbContext();
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "A",
+            StartsAt = DateTime.UtcNow.AddDays(-1), Price = 15m, MaxPlayers = 10
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        db.EventConfirmations.AddRange(
+            new EventConfirmation
+            {
+                EventId = ev.Id, UserId = "player-1", HasPaid = false,
+                PaymentStatus = EventConfirmationPaymentStatus.Pending,
+                Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+            },
+            new EventConfirmation
+            {
+                EventId = ev.Id, UserId = "admin-1", HasPaid = false,
+                PaymentStatus = EventConfirmationPaymentStatus.Pending,
+                Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+            });
+        await db.SaveChangesAsync();
+
+        var mine = await svc.LoadMyPaymentsAsync(groupId, "player-1");
+
+        Assert.Single(mine);
+        Assert.Equal("player-1", "player-1"); // rows carry no other user's data
+        Assert.Equal(15m, mine[0].TotalToPay);
+        Assert.False(mine[0].HasPaid);
+        Assert.Equal($"/pagamento/evento/{mine[0].ConfirmationId}", mine[0].PayHref);
+    }
+
+    [Fact]
+    public async Task LoadMyPaymentsAsync_OutsiderGetsEmptyList()
+    {
+        var (factory, svc, groupId, _) = await SetupWithGroupAndAdminAsync();
+        await using var db = factory.CreateDbContext();
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "A",
+            StartsAt = DateTime.UtcNow.AddDays(-1), Price = 15m, MaxPlayers = 10
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId = ev.Id, UserId = "player-1", HasPaid = false,
+            PaymentStatus = EventConfirmationPaymentStatus.Pending,
+            Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var result = await svc.LoadMyPaymentsAsync(groupId, "outsider-1");
+
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task LoadMyPaymentsAsync_NullUser_GetsEmptyList()
+    {
+        var (factory, svc, groupId, _) = await SetupWithGroupAndAdminAsync();
+
+        var result = await svc.LoadMyPaymentsAsync(groupId, null);
+
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task LoadMyPaymentsAsync_ExcludesGoalkeepersAndFreeEvents()
+    {
+        var (factory, svc, groupId, _) = await SetupWithGroupAndAdminAsync();
+        await using var db = factory.CreateDbContext();
+        var paid = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "Pago",
+            StartsAt = DateTime.UtcNow.AddDays(-1), Price = 15m, MaxPlayers = 10
+        };
+        var free = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "Gratis",
+            StartsAt = DateTime.UtcNow.AddDays(-2), Price = 0m, MaxPlayers = 10
+        };
+        db.Events.AddRange(paid, free);
+        await db.SaveChangesAsync();
+        db.EventConfirmations.AddRange(
+            new EventConfirmation
+            {
+                EventId = paid.Id, UserId = "player-1", HasPaid = false,
+                PaymentStatus = EventConfirmationPaymentStatus.Pending,
+                Position = FutsalPosition.Goalkeeper, ConfirmedAt = DateTime.UtcNow
+            },
+            new EventConfirmation
+            {
+                EventId = free.Id, UserId = "player-1", HasPaid = false,
+                PaymentStatus = EventConfirmationPaymentStatus.Pending,
+                Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow
+            });
+        await db.SaveChangesAsync();
+
+        var mine = await svc.LoadMyPaymentsAsync(groupId, "player-1");
+
+        Assert.Empty(mine);
+    }
+
+    [Fact]
+    public async Task LoadMyPaymentsAsync_StampedFeeWins_OverLivePolicy()
+    {
+        // Group has a fee waiver now, but this confirmation was stamped with the
+        // full fee at creation — the player must see what they were charged.
+        var (factory, svc, groupId, group) = await SetupWithGroupAndAdminAsync(manualFee: 0.75m);
+        await using var db = factory.CreateDbContext();
+        var dbGroup = await db.Groups.FindAsync(groupId);
+        dbGroup!.PlatformFeeWaivedFrom = DateTime.UtcNow.AddDays(-1);
+        dbGroup.PlatformFeeWaivedUntil = DateTime.UtcNow.AddDays(30);
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, Location = "A",
+            StartsAt = DateTime.UtcNow.AddDays(-1), Price = 15m, MaxPlayers = 10
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId = ev.Id, UserId = "player-1", HasPaid = false,
+            PaymentStatus = EventConfirmationPaymentStatus.Pending,
+            Position = FutsalPosition.Outfield, ConfirmedAt = DateTime.UtcNow,
+            PlatformFeeAmount = 0.75m
+        });
+        await db.SaveChangesAsync();
+
+        var mine = await svc.LoadMyPaymentsAsync(groupId, "player-1");
+
+        Assert.Single(mine);
+        Assert.Equal(15.75m, mine[0].TotalToPay);
+    }
 }

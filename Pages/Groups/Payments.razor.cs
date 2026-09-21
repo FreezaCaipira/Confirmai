@@ -24,7 +24,9 @@ public partial class Payments
     private Group? group;
     private bool isLoading = true;
     private bool isAdmin;
+    private bool isMember;
     private string? currentUserId;
+    private List<MyPaymentEntry> myPayments = new();
     private bool isLoadingPayments;
     private List<UserDelinquency> delinquencyList = new();
     private List<PaymentHistoryEntry> paymentHistory = new();
@@ -134,13 +136,16 @@ public partial class Payments
     protected override async Task OnInitializedAsync()
     {
         currentUserId = await GroupPayments.GetCurrentUserIdAsync();
-        (group, isAdmin) = await GroupPayments.LoadGroupAndCheckAdminAsync(Id, currentUserId);
-        if (group is null || !isAdmin)
+        (group, isAdmin, isMember) = await GroupPayments.LoadGroupAccessAsync(Id, currentUserId);
+        if (group is null || !isMember)
         {
             isLoading = false;
             return;
         }
-        await LoadPaymentsData();
+        if (isAdmin)
+            await LoadPaymentsData();
+        else
+            myPayments = await GroupPayments.LoadMyPaymentsAsync(Id, currentUserId);
         isLoading = false;
     }
 
