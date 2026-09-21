@@ -14,11 +14,14 @@
      --accent-text on --bg/--surface  >=  4.5:1 (links)
    ================================================================ */
 :root {
-    /* -- Surfaces (darkest -> lightest) -------------------------- */
-    --bg:          #09090b;   /* page background            */
-    --surface:     #111114;   /* cards, panels              */
-    --surface-2:   #18181b;   /* nested / hover surface     */
-    --surface-3:   #1f1f23;   /* inputs, active states      */
+    /* -- Surfaces: elevation levels, one step lighter per nesting -- */
+    /* L0 chrome (page, header, footer, ticker) -> L1 panels ->      */
+    /* L2 cards inside a panel -> L3 hover/active/popover.           */
+    /* A child never shares its parent's tone. See docs/design-system.md */
+    --bg:          #09090b;   /* L0 page / chrome           */
+    --surface:     #121215;   /* L1 panels, sections        */
+    --surface-2:   #19191d;   /* L2 cards inside a panel    */
+    --surface-3:   #232329;   /* L3 hover, active, popover  */
 
     /* -- Borders ------------------------------------------------- */
     --border:      #27272a;   /* default 1px border         */

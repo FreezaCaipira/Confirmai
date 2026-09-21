@@ -203,12 +203,12 @@ header {
 }
 
 footer.oldsite-footer {
-    background: var(--ci-bg-mid);
-    color: var(--ci-text-blue);
+    background: transparent;
+    color: var(--text-3);
     text-align: center;
-    padding: 1rem;
+    padding: var(--space-4) 0 0;
     border: none;
-    border-top: 1px solid var(--ci-border);
+    border-top: 1px solid var(--border);
 }
 
 .logout-btn {
