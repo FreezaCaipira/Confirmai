@@ -3,19 +3,21 @@
 @using Confirmai.Services.Core
 @inject UiTextService T
 
-<section class="profile-card profile-edit-section">
-    <h3 class="profile-edit-heading">@T["Profile.MyData"]</h3>
+<section class="panel profile-edit-panel">
+    <div class="panel-head">
+        <h3 class="panel-title"><i class="fas fa-user-edit"></i> @T["Profile.MyData"]</h3>
+    </div>
     <div class="profile-edit-form">
         <EditForm Model="EditModel" OnValidSubmit="HandleSaveProfile">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <div class="profile-edit-grid">
                 <div class="form-group">
-                    <label>@T["Profile.Instagram"]</label>
+                    <label class="profile-field-label">@T["Profile.Instagram"]</label>
                     <InputText class="input" @bind-Value="EditModel.InstagramHandle" />
                 </div>
                 <div class="form-group">
-                    <label>@T["Profile.Discord"]</label>
+                    <label class="profile-field-label">@T["Profile.Discord"]</label>
                     <InputText class="input" @bind-Value="EditModel.DiscordHandle" />
                 </div>
             </div>
@@ -24,7 +26,7 @@
                 <p class="profile-feedback" role="status">@SaveFeedback</p>
             }
             <div class="profile-edit-actions">
-                <button class="mk-btn mk-btn-primary" type="submit" disabled="@IsSaving">
+                <button class="btn btn-primary" type="submit" disabled="@IsSaving">
                     @(IsSaving ? T["Profile.Saving"] : T["Profile.Save"])
                 </button>
             </div>

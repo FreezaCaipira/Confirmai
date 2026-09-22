@@ -18,7 +18,7 @@
 
 @if (!loading && user is not null)
 {
-    <div class="entity-shell profile-page">
+    <div class="profile-page">
 
         @* ── Card de identidade (header + avatar unificados) ─────────────── *@
         <ProfileHeaderCard User="@user" IsOwnProfile="@isOwnProfile"
@@ -42,22 +42,47 @@
                 OnSaveProfile="@SaveOwnProfileCallback" />
 
             @* ── Recebimento (Pix) — bloco proprio com ancora ─────────────── *@
-            <section id="pix" class="profile-card profile-pix-section @(_highlightPix ? "profile-pix-section--highlight" : "")">
-                <h3 class="profile-pix-title">@T["Profile.PixReceiverTitle"]</h3>
-                <p class="profile-pix-hint">@T["Profile.PixReceiverHint"]</p>
-                <div class="profile-pix-row">
-                    <label class="profile-contact-label" for="profile-pix-key">@T["Profile.Pix"]</label>
-                    <input id="profile-pix-key"
-                           class="profile-pix-input"
-                           @bind="profileEditModel.PixKey"
-                           placeholder="@T["Profile.PixNotConfigured"]"
-                           disabled="@isSavingProfile" />
-                    <button class="mk-btn mk-btn-primary" type="button"
-                            disabled="@isSavingProfile"
-                            @onclick="SaveOwnProfileCallback">
-                        @(isSavingProfile ? T["Profile.Saving"] : T["Profile.Save"])
-                    </button>
+            <section id="pix" class="panel profile-pix-panel @(_highlightPix ? "profile-pix-panel--highlight" : "")">
+                <div class="panel-head">
+                    <h3 class="panel-title"><i class="fas fa-qrcode"></i> @T["Profile.PixReceiverTitle"]</h3>
                 </div>
+                @if (string.IsNullOrWhiteSpace(profileEditModel.PixKey))
+                {
+                    <div class="empty-state profile-pix-empty">
+                        <i class="fas fa-qrcode empty-state-icon"></i>
+                        <p class="profile-pix-hint">@T["Profile.PixReceiverHint"]</p>
+                        <div class="profile-pix-row">
+                            <label class="profile-field-label" for="profile-pix-key">@T["Profile.Pix"]</label>
+                            <input id="profile-pix-key"
+                                   class="input"
+                                   @bind="profileEditModel.PixKey"
+                                   placeholder="@T["Profile.PixNotConfigured"]"
+                                   disabled="@isSavingProfile" />
+                            <button class="btn btn-primary" type="button"
+                                    disabled="@isSavingProfile"
+                                    @onclick="SaveOwnProfileCallback">
+                                @(isSavingProfile ? T["Profile.Saving"] : T["Profile.PixRegister"])
+                            </button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="profile-pix-hint">@T["Profile.PixReceiverHint"]</p>
+                    <div class="profile-pix-row">
+                        <label class="profile-field-label" for="profile-pix-key">@T["Profile.Pix"]</label>
+                        <input id="profile-pix-key"
+                               class="input"
+                               @bind="profileEditModel.PixKey"
+                               placeholder="@T["Profile.PixNotConfigured"]"
+                               disabled="@isSavingProfile" />
+                        <button class="btn btn-primary" type="button"
+                                disabled="@isSavingProfile"
+                                @onclick="SaveOwnProfileCallback">
+                            @(isSavingProfile ? T["Profile.Saving"] : T["Profile.Save"])
+                        </button>
+                    </div>
+                }
                 @if (!string.IsNullOrWhiteSpace(profileSaveFeedback))
                 {
                     <p class="profile-pix-feedback" role="status">@profileSaveFeedback</p>
@@ -77,8 +102,10 @@
         @* ── Chat (só para outros perfis autenticados) ───────────────────── *@
         @if (!isOwnProfile && isAuthenticated)
         {
-            <div class="profile-card profile-message-card">
-                <h3 class="profile-message-title">@T["Profile.ChatTitle"]</h3>
+            <section class="panel profile-message-panel">
+                <div class="panel-head">
+                    <h3 class="panel-title"><i class="fas fa-comments"></i> @T["Profile.ChatTitle"]</h3>
+                </div>
                 <div class="profile-chat-thread" aria-label="@T["Profile.ChatAria"]">
                     <ProfileChatThread ChatMessages="@chatMessages" />
                 </div>
@@ -90,7 +117,7 @@
                     ShowRefreshButton="@chatMessages.Any()"
                     OnSendMessage="@SendMailboxMessageCallback"
                     OnRefreshChat="@RefreshChatCallback" />
-            </div>
+            </section>
         }
 
     </div>

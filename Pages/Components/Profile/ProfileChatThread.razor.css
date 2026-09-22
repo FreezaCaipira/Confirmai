@@ -1,56 +1,53 @@
+/* ── Thread do chat de perfil: bolhas L2/L3 (C36-D Fase 6) ── */
+
 .profile-chat-empty {
-    text-align: center;
-    padding: 0.72rem;
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: var(--ci-surface-muted);
-    border: 1px dashed var(--ci-border);
-    border-radius: 4px;
-    background: var(--ci-bg-deepest);
-    box-shadow: inset 0 2px 4px var(--shadow-lg);
+    padding: var(--space-4);
+}
+
+.profile-chat-empty p {
+    margin: 0;
+    color: var(--text-2);
+}
+
+.profile-chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
 }
 
 .profile-chat-bubble {
     width: fit-content;
     max-width: 78%;
-    border: 1px solid var(--ci-border);
-    border-radius: 8px;
-    padding: 0.44rem;
-    background: var(--ci-bg-deepest);
-    display: grid;
-    gap: 0.14rem;
-    box-shadow: 0 2px 4px var(--shadow-md);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-3);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .profile-chat-bubble.incoming {
-    justify-self: start;
+    align-self: flex-start;
 }
 
 .profile-chat-bubble.outgoing {
-    justify-self: end;
-    border-color: var(--ci-accent);
-    background: var(--ci-border-alt);
-    box-shadow: 0 2px 4px var(--accent-opacity-md);
+    align-self: flex-end;
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
 }
 
 .profile-chat-bubble p {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     line-height: 1.35;
-    color: var(--ci-text);
+    color: var(--text);
     white-space: pre-wrap;
     word-break: break-word;
 }
 
-.profile-chat-bubble.outgoing p {
-    color: var(--ci-surface-light);
-    text-shadow: 0 0 8px var(--accent-opacity-lg);
-}
-
 .profile-chat-meta {
-    justify-self: end;
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: var(--slate-muted);
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
+    align-self: flex-end;
+    font-size: 0.6875rem;
+    color: var(--text-3);
 }

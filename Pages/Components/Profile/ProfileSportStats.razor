@@ -2,13 +2,13 @@
 @using Confirmai.Services.Core
 @inject UiTextService T
 
-<div class="profile-sport-card">
-    <div class="profile-sport-tabs" role="tablist">
-        <button class="profile-sport-tab @(ActiveSport == Sport.Futsal ? "active" : string.Empty)"
+<section class="panel profile-sport-panel">
+    <div class="seg-toggle profile-sport-tabs" role="tablist">
+        <button class="seg-item @(ActiveSport == Sport.Futsal ? "seg-item--active" : string.Empty)"
                 role="tab" type="button" @onclick='() => HandleSetSport(Sport.Futsal)'>
             @T["Profile.SportFutsal"]
         </button>
-        <button class="profile-sport-tab @(ActiveSport == Sport.Poker ? "active" : string.Empty)"
+        <button class="seg-item @(ActiveSport == Sport.Poker ? "seg-item--active" : string.Empty)"
                 role="tab" type="button" @onclick='() => HandleSetSport(Sport.Poker)'>
             @T["Profile.SportPoker"]
         </button>
@@ -18,7 +18,7 @@
     {
         <div class="profile-sport-stats" role="tabpanel">
             <div class="profile-stat-item">
-                <span class="profile-stat-number">@FutsalTotal</span>
+                <span class="profile-stat-number @(FutsalTotal > 0 ? "profile-stat-number--accent" : string.Empty)">@FutsalTotal</span>
                 <span class="profile-stat-label">@T["Profile.StatMatches"]</span>
             </div>
             <div class="profile-stat-item">
@@ -35,9 +35,9 @@
     {
         <div class="profile-sport-stats" role="tabpanel">
             <div class="profile-stat-item">
-                <span class="profile-stat-number">@PokerTotal</span>
+                <span class="profile-stat-number @(PokerTotal > 0 ? "profile-stat-number--accent" : string.Empty)">@PokerTotal</span>
                 <span class="profile-stat-label">@T["Profile.StatSessions"]</span>
             </div>
         </div>
     }
-</div>
+</section>

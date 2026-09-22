@@ -43,6 +43,14 @@ public class CssNoLegacyVarsTests
         "Pages/Components/MailboxConversationList.razor.css",
         "Pages/Components/MailboxFilters.razor.css",
         "Pages/Components/MailboxThreadPane.razor.css",
+        // Profile (C36-D Fase 6)
+        "Pages/Profile.razor.css",
+        "Pages/Components/Profile/ChatComposeBox.razor.css",
+        "Pages/Components/Profile/ProfileChatThread.razor.css",
+        "Pages/Components/Profile/ProfileContactsDisplay.razor.css",
+        "Pages/Components/Profile/ProfileEditForm.razor.css",
+        "Pages/Components/Profile/ProfileHeaderCard.razor.css",
+        "Pages/Components/Profile/ProfileSportStats.razor.css",
     ];
 
     private static readonly Regex LegacyVarRegex = new(
