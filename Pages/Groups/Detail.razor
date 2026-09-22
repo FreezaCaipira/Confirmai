@@ -55,7 +55,7 @@ else if (group is null)
 {
     <div class="detail-not-found">
         <h2>@Ui["Group.NotFound"]</h2>
-        <a href="/">← @Ui["Common.Back"]</a>
+        <a href="/" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -72,7 +72,7 @@ else
             @* ── Cabeçalho ─────────────────────────────────────────── *@
             <header class="detail-header">
                 <div class="detail-header-top">
-                    <a href="/grupos" class="detail-back-link">
+                    <a href="/grupos" class="btn btn-ghost">
                         <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
                     </a>
                 </div>
@@ -103,7 +103,7 @@ else
                     <div class="invite-row">
                         <span class="invite-label"><i class="fas fa-link"></i> @Ui["Group.InviteLink"]</span>
                         <code class="invite-code-display" id="invite-url-text">@inviteUrl</code>
-                        <button class="invite-copy-btn" type="button"
+                        <button class="btn btn-ghost btn-sm" type="button"
                                 @onclick="() => CopyInviteLink(inviteUrl)">
                             <i class="fas fa-copy"></i> @(copiedInvite ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
                         </button>
@@ -112,18 +112,18 @@ else
                     <div class="invite-row">
                         <span class="invite-label"><i class="fas fa-key"></i> @Ui["Group.Code"]</span>
                         <code class="invite-code-display invite-code-only">@group.InviteCode</code>
-                        <button class="invite-copy-btn" type="button"
+                        <button class="btn btn-ghost btn-sm" type="button"
                                 @onclick="() => CopyCode(group.InviteCode!)">
                             <i class="fas fa-copy"></i> @(copiedCode ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
                         </button>
                     </div>
                     <hr class="invite-row-divider" />
                     <div class="invite-block-actions">
-                        <button class="detail-admin-btn detail-admin-btn--whatsapp invite-block-btn" type="button"
+                        <button class="btn @(group.Members.Count == 1 ? "btn-primary" : "btn-secondary")" type="button"
                                 @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
                             <i class="fab fa-whatsapp"></i> @Ui["Group.Invite"]
                         </button>
-                        <a class="detail-admin-btn invite-block-btn invite-block-btn--settings" href="/grupo/@group.Id/configuracoes">
+                        <a class="btn btn-secondary" href="/grupo/@group.Id/configuracoes">
                             <i class="fas fa-cog"></i> @Ui["Group.Settings"]
                         </a>
                     </div>
@@ -167,18 +167,18 @@ else
                         <i class="fas fa-users"></i> @Ui["Group.Members"] (@group.Members.Count)
                     </h2>
                     <div class="detail-section-actions">
-                        <a class="detail-admin-btn detail-admin-btn--partidas" href="/grupo/@group.Id/partidas">
+                        <a class="btn btn-secondary" href="/grupo/@group.Id/partidas">
                             <i class="fas fa-calendar-alt"></i> @Ui["Group.PartidasLink"]
                         </a>
                         @if (isMember && group.EnablePostMatchRanking)
                         {
-                            <a class="detail-admin-btn detail-admin-btn--ranking" href="/grupo/@group.Id/ranking">
+                            <a class="btn btn-secondary" href="/grupo/@group.Id/ranking">
                                 <i class="fas fa-trophy"></i> @Ui["Group.RankingLink"]
                             </a>
                         }
                         @if (isMember)
                         {
-                            <a class="detail-admin-btn detail-admin-btn--pagamentos" href="/grupo/@group.Id/pagamentos">
+                            <a class="btn btn-secondary" href="/grupo/@group.Id/pagamentos">
                                 <i class="fas fa-money-bill-wave"></i> @Ui["Group.PaymentsLink"]
                                 @if (myPendingPayments > 0)
                                 {
@@ -225,7 +225,7 @@ else
                             <i class="fas fa-hourglass-half"></i>
                             @Ui["Group.JoinRequestSent"]
                         </p>
-                        <button class="cancel-join-btn" type="button" @onclick="CancelJoinRequest" disabled="@cancellingJoin">
+                        <button class="btn btn-ghost" type="button" @onclick="CancelJoinRequest" disabled="@cancellingJoin">
                             <i class="fas fa-times"></i>
                             @(cancellingJoin ? @Ui["Group.CancellingJoin"] : @Ui["Group.CancelJoinRequest"])
                         </button>
@@ -243,7 +243,7 @@ else
                             <i class="fas fa-info-circle"></i>
                             @Ui["Group.NotMemberInfo"]
                         </p>
-                        <button class="confirm-btn" type="button" @onclick="RequestToJoin"
+                        <button class="btn btn-primary" type="button" @onclick="RequestToJoin"
                                 disabled="@requestingJoin">
                             <i class="fas fa-user-plus"></i>
                             @(requestingJoin ? @Ui["Group.SendingJoin"] : @Ui["Group.RequestJoin"])

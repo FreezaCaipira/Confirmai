@@ -427,29 +427,6 @@
     line-height: 1.4;
 }
 
-.invite-copy-btn {
-    flex-shrink: 0;
-    background: var(--ci-bg-deep);
-    border: 1px solid var(--ci-border);
-    border-radius: 7px;
-    color: var(--ci-text-muted);
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 0.3rem 0.75rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
-    white-space: nowrap;
-}
-
-.invite-copy-btn:hover {
-    background: var(--ci-bg-dark);
-    color: var(--link-info);
-    border-color: var(--ci-accent-mid);
-}
-
 .invite-block-actions {
     display: flex;
     flex-direction: row;
@@ -1043,13 +1020,6 @@
         display: block;
     }
 
-    .event-access-btn {
-        width: 100%;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
     .et-empty {
         padding: 1.5rem 0.75rem;
         font-size: 0.85rem;
@@ -1075,7 +1045,6 @@
         font-size: 0.8rem;
     }
 
-    .groups-create-btn,
     .groups-view-events-btn {
         font-size: 0.9rem;
         padding: 0.5rem 0.8rem;
@@ -1456,7 +1425,6 @@
 
 /* â”€â”€ Listing action buttons (shared base) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn-create-event,
-.btn-view-groups,
 .my-events-link-btn {
     display: inline-flex;
     align-items: center;
@@ -1548,19 +1516,6 @@
 }
 
 /* â”€â”€ Variant: Green (Ver Grupos) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.btn-view-groups {
-    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-dark) 100%);
-    color: var(--ci-bg-deepest);
-    border: 1px solid var(--green-bright);
-    text-shadow: 0 0 10px var(--green-opacity-xl);
-}
-
-.btn-view-groups:hover {
-    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, var(--green-strong) 100%);
-    border-color: var(--green-soft);
-    box-shadow: 0 4px 8px var(--green-opacity-xl);
-}
-
 @media (max-width: 768px) {
     .player-item:has(.player-tag--cancel-confirm) .player-tag:not(.player-tag--cancel-confirm):not(.player-tag--cancel-yes):not(.player-tag--cancel-no),
     .player-item:has(.player-tag--pay-confirm) .player-tag:not(.player-tag--pay-confirm):not(.player-tag--admin-pay-yes):not(.player-tag--admin-pay-no),
@@ -1569,7 +1524,6 @@
     }
 
     .btn-create-event,
-    .btn-view-groups,
     .my-events-link-btn {
         font-size: 0.8rem;
         padding: 0.38rem 0.8rem;
@@ -1605,9 +1559,4 @@
         font-size: 0.72rem;
     }
 
-    .invite-copy-btn {
-        align-self: flex-end;
-        font-size: 0.72rem;
-        padding: 0.25rem 0.6rem;
     }
-}

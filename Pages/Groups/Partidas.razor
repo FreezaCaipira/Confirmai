@@ -48,7 +48,7 @@ else if (group is null)
 {
     <div class="detail-not-found">
         <h2>@Ui["Groups.NotFound"]</h2>
-        <a href="/">← @Ui["Common.Back"]</a>
+        <a href="/" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
     </div>
 }
 else if (!isMember)
@@ -56,7 +56,7 @@ else if (!isMember)
     <div class="detail-not-found">
         <i class="fas fa-lock detail-not-found-icon"></i>
         <h2>@Ui["Group.NotAuthorized"]</h2>
-        <a href="/">← @Ui["Common.Back"]</a>
+        <a href="/" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -72,11 +72,8 @@ else
 
             <header class="detail-header">
                 <div class="detail-header-top">
-                    <a href="/grupo/@group.Id" class="detail-back-link">
+                    <a href="/grupo/@group.Id" class="btn btn-ghost">
                         <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
-                    </a>
-                    <a href="/grupos" class="btn-view-groups">
-                        <i class="fas fa-layer-group"></i> @Ui["Groups.Title"]
                     </a>
                 </div>
                 <div class="detail-header-title-row">
@@ -113,11 +110,11 @@ else
                         {
                             @if (group.Sport == Sport.Futsal)
                             {
-                                <a href="/futsal/schedule?groupId=@group.Id" class="groups-create-btn groups-create-btn--semanais detail-events-create-btn">
+                                <a href="/futsal/schedule?groupId=@group.Id" class="btn btn-secondary">
                                     <i class="fas fa-sync-alt"></i> @Ui["Groups.Semanais"]
                                 </a>
                             }
-                            <a href="@newEventHref" class="groups-create-btn detail-events-create-btn">
+                            <a href="@newEventHref" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> @Ui["Groups.NovaPartida"]
                             </a>
                         }
@@ -134,7 +131,7 @@ else
                 @if (hasMoreUpcoming || (!showPastEvents && showAllUpcoming && upcomingEvents.Count > UpcomingPreviewCount))
                 {
                     <div class="events-expand-row">
-                        <button class="events-expand-btn" type="button" @onclick="ToggleUpcomingExpansion">
+                        <button class="btn btn-ghost btn-sm" type="button" @onclick="ToggleUpcomingExpansion">
                             @if (showAllUpcoming)
                             {
                                 <i class="fas fa-chevron-up"></i> @Ui["Groups.VerMenos"]

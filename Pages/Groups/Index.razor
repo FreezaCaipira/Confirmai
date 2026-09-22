@@ -60,7 +60,7 @@
                         <input class="input join-code-input" type="text" maxlength="8"
                                placeholder="Ex: ABCD1234"
                                @bind="joinCode" @bind:event="oninput" />
-                        <button class="confirm-btn" type="button" @onclick="JoinWithCode"
+                        <button class="btn btn-secondary" type="button" @onclick="JoinWithCode"
                                 disabled="@(joinCode.Trim().Length == 0)">
                             @Ui["Groups.Enter"]
                         </button>
@@ -74,7 +74,7 @@
                 <div class="groups-entry-divider"><span>@Ui["Groups.Or"]</span></div>
 
                 <div class="groups-action-row">
-                    <a href="/grupos/criar" class="groups-create-btn">
+                    <a href="/grupos/criar" class="btn btn-primary">
                         <i class="fas fa-plus"></i> @Ui["Groups.CreateNew"]
                     </a>
                 </div>
@@ -202,7 +202,7 @@
                         <input class="input join-code-input" type="text" maxlength="8"
                                placeholder="Ex: ABCD1234"
                                @bind="joinCode" @bind:event="oninput" />
-                        <button class="confirm-btn" type="button" @onclick="JoinWithCode"
+                        <button class="btn btn-secondary" type="button" @onclick="JoinWithCode"
                                 disabled="@(joinCode.Trim().Length == 0)">
                             @Ui["Groups.Enter"]
                         </button>
@@ -216,7 +216,7 @@
                 <div class="groups-entry-divider"><span>@Ui["Groups.Or"]</span></div>
 
                 <div class="groups-action-row">
-                    <a href="/grupos/criar" class="groups-create-btn">
+                    <a href="/grupos/criar" class="btn btn-primary">
                         <i class="fas fa-plus"></i> @Ui["Groups.CreateNew"]
                     </a>
                     <a href="/" class="groups-view-events-btn">

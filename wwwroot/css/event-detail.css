@@ -348,23 +348,6 @@ body .entity-shell-card.evpay-main {
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.32);
 }
 
-.invite-block-btn {
-    align-self: auto;
-    margin-top: 0;
-}
-
-.invite-block-btn--settings {
-    background: rgba(30, 41, 59, 0.7);
-    border-color: rgba(148, 163, 184, 0.45);
-    color: var(--ci-surface-muted);
-}
-
-.invite-block-btn--settings:hover {
-    background: rgba(51, 65, 85, 0.85);
-    border-color: rgba(148, 163, 184, 0.6);
-    color: var(--slate-light);
-}
-
 .detail-admin-btn--danger {
     border-color: var(--red-bg-dark);
     color: var(--red-soft);

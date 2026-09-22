@@ -1,0 +1,131 @@
+/* ==========================================================================
+   components.css — um so sistema de botoes (C36-D Fase 1)
+   Carregado DEPOIS de shell.css e ANTES de Confirmai.styles.css (_Host.cshtml).
+   Regra: 4 variantes (.btn-primary, .btn-secondary, .btn-ghost, .btn-danger)
+   + um tamanho (.btn-sm). Cor nao diferencia funcao — o rotulo diferencia.
+   ========================================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 40px;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--accent-ring);
+    outline-offset: 2px;
+}
+
+/* O unico azul cheio por tela — o proximo passo. */
+.btn-primary {
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    color: var(--accent-fg);
+}
+
+/* Acao secundaria — L2 neutro, ganha azul so no hover/foco. */
+.btn-secondary {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border-2);
+}
+
+.btn-secondary:hover {
+    background: var(--surface-3);
+    border-color: var(--accent-border);
+    color: var(--text);
+}
+
+/* Navegacao discreta — Voltar, cancelar, acoes de baixa prioridade. */
+.btn-ghost {
+    background: transparent;
+    color: var(--text-2);
+    border: 1px solid transparent;
+}
+
+.btn-ghost:hover {
+    color: var(--accent-text);
+    background: var(--accent-soft);
+}
+
+/* Destrutivo — sempre confirmado por modal/confirm upstream. */
+.btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+}
+
+.btn-danger:hover {
+    background: var(--danger);
+    color: var(--accent-fg);
+}
+
+.btn-sm {
+    min-height: 32px;
+    padding: 0 var(--space-3);
+    font-size: 0.8125rem;
+}
+
+.btn:disabled,
+.btn[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Aliases temporarios (mesmas declaracoes — sem @extend em CSS puro).
+   .home-btn: home autorizada (Index.razor.css) — migra nas proximas fases.
+   .mk-btn:   legado de buttons.css usado no Profile — migra na Fase 6.
+   -------------------------------------------------------------------------- */
+
+.home-btn,
+.mk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 40px;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border-2);
+}
+
+.home-btn:hover,
+.mk-btn:hover {
+    background: var(--surface-3);
+    border-color: var(--accent-border);
+    color: var(--text);
+}
+
+.home-btn--primary {
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: 1px solid transparent;
+}
+
+.home-btn--primary:hover {
+    background: var(--accent-hover);
+    color: var(--accent-fg);
+}

@@ -69,7 +69,6 @@
     }
 
     .btn-create-event,
-    .btn-view-groups,
     .my-events-link-btn,
     .listing-back-btn {
         justify-content: center;
@@ -272,48 +271,6 @@
 
 .groups-entry-divider::before { left: 0; }
 .groups-entry-divider::after { right: 0; }
-
-.groups-create-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.45rem;
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
-    border: 1px solid var(--ci-accent);
-    border-radius: 10px;
-    color: var(--ci-surface-light);
-    font-size: 0.84rem;
-    font-weight: 700;
-    padding: 0.54rem 1.05rem;
-    text-decoration: none;
-    transition: background 0.15s, color 0.15s, transform 0.12s, box-shadow 0.15s;
-    white-space: nowrap;
-    margin: 0;
-    width: fit-content;
-    max-width: 100%;
-    box-shadow: 0 6px 18px rgba(28, 92, 166, 0.25);
-}
-
-.groups-create-btn:hover {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
-    color: var(--white);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
-}
-
-.groups-create-btn--semanais {
-    background: var(--futsal-green-dark);
-    color: var(--futsal-green-pale);
-    border: 1.5px solid var(--green-strong);
-    box-shadow: 0 6px 18px rgba(34, 197, 94, 0.25);
-}
-
-.groups-create-btn--semanais:hover {
-    background: var(--green-strong);
-    color: var(--green-soft);
-    border-color: var(--green-bright);
-    box-shadow: 0 8px 22px rgba(34, 197, 94, 0.32);
-}
 
 .groups-action-row {
     display: flex;
