@@ -217,6 +217,11 @@
     color: var(--warning);
 }
 
+.status-badge--accent {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+}
+
 /* --------------------------------------------------------------------------
    .event-row — card de partida em linha (derivado do .home-event da home;
    a home migra para esta classe na Fase 3).
@@ -344,6 +349,20 @@
 
 .panel-title i {
     color: var(--accent-text);
+}
+
+.panel-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-size: 0.75rem;
+    font-weight: var(--fw-semibold);
 }
 
 /* Estado vazio dentro de um painel (empty-state). */

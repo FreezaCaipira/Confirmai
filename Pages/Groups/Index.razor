@@ -9,6 +9,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
 @using Confirmai.Shared.Components.Groups
 @using Confirmai.Services.Core
 @inject UiTextService Ui
@@ -16,7 +17,8 @@
 
 <PageTitle>@Ui["Groups.Title"] — Confirmai</PageTitle>
 
-<div class="groups-page">
+<div class="detail-page">
+    <div class="hub-stack">
 
     @if (isLoading)
     {
@@ -43,187 +45,161 @@
             </div>
         </div>
     }
-    else if (groups.Count == 0)
+    else if (groups.Count == 0 && myPendingRequests.Count == 0)
     {
-        <section class="groups-block">
+        <section class="panel">
             <NoGroupsHint />
-
-            <div class="groups-block-header">
-                <h2 class="groups-title"><i class="fas fa-sign-in-alt"></i> @Ui["Groups.JoinGroup"]</h2>
-                <p class="groups-block-sub">@Ui["Group.JoinCodeHint"]</p>
-            </div>
-
-            <div class="groups-entry-stack">
-                <div class="join-code-section">
-                    <p class="join-code-label"><i class="fas fa-key"></i> @Ui["Groups.JoinCode"]</p>
-                    <div class="join-code-row">
-                        <input class="input join-code-input" type="text" maxlength="8"
-                               placeholder="Ex: ABCD1234"
-                               @bind="joinCode" @bind:event="oninput" />
-                        <button class="btn btn-secondary" type="button" @onclick="JoinWithCode"
-                                disabled="@(joinCode.Trim().Length == 0)">
-                            @Ui["Groups.Enter"]
-                        </button>
-                    </div>
-                    @if (!string.IsNullOrWhiteSpace(joinCodeError))
-                    {
-                        <p class="validation-message">@joinCodeError</p>
-                    }
-                </div>
-
-                <div class="groups-entry-divider"><span>@Ui["Groups.Or"]</span></div>
-
-                <div class="groups-action-row">
-                    <a href="/grupos/criar" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> @Ui["Groups.CreateNew"]
-                    </a>
-                </div>
-            </div>
+            <GroupEntryPanel />
         </section>
     }
     else
     {
-        <section class="groups-block">
-            <div class="groups-block-header">
-                <h2 class="groups-title"><i class="fas fa-layer-group"></i> @Ui["Groups.MyGroups"]</h2>
-            </div>
+        @if (groups.Count > 0)
+        {
+            <section class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title">
+                        <i class="fas fa-layer-group"></i> @Ui["Groups.MyGroups"]
+                    </h2>
+                    <span class="panel-count">@groups.Count</span>
+                </div>
 
-            <div class="groups-grid">
-                @foreach (var g in groups)
+                @if (!string.IsNullOrWhiteSpace(leaveError))
                 {
-                    var isAdmin = IsCurrentUserAdmin(g);
-                    var pendingCount = GetPendingRequestsCount(g.Id);
-                    var hasPending = isAdmin && pendingCount > 0;
-                    var needsPix = GroupNeedsPixSetup(g);
-                    var nextEvent = g.Events
-                        .Where(e => e.IsActive && e.StartsAt > DateTime.UtcNow)
-                        .OrderBy(e => e.StartsAt)
-                        .FirstOrDefault();
-                    var backgroundStyle = string.IsNullOrWhiteSpace(g.LogoPath)
-                        ? GetDefaultBackgroundStyle(g.Sport)
-                        : $"background-image: url('{g.LogoPath}'); background-size: cover; background-position: center;";
-                    var hasCustomLogo = !string.IsNullOrWhiteSpace(g.LogoPath);
-                    <a class="group-card @(hasPending || needsPix ? "group-card--action-required" : "") @(hasCustomLogo ? "" : "group-card--default-bg")" href="/grupo/@g.Id" style="@backgroundStyle" data-test-is-admin="@isAdmin.ToString()"  data-test-pending-count="@pendingCount">
-                        <div class="group-card-overlay"></div>
-                        @if (!hasCustomLogo)
-                        {
-                            <div class="group-card-icon">
-                                @if (g.Sport == Sport.Futsal)
-                                {
-                                    <i class="fas fa-futbol"></i>
-                                }
-                                else
-                                {
-                                    <i class="fas fa-cards"></i>
-                                }
-                            </div>
-                        }
-                        <div class="group-card-content">
-                            <div class="group-card-top">
-                                <span class="group-card-sport">
-                                    @(g.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
-                                </span>
-                                <div class="group-card-badges">
-                                    @if (weeklySchedulesByGroup.TryGetValue(g.Id, out var days) && days.Count > 0)
+                    <p class="group-leave-error" role="alert">@leaveError</p>
+                }
+
+                <ul class="group-rows">
+                    @foreach (var g in groups)
+                    {
+                        var isAdmin = IsCurrentUserAdmin(g);
+                        var pendingCount = GetPendingRequestsCount(g.Id);
+                        var needsPix = GroupNeedsPixSetup(g);
+                        <li class="group-row" data-test-is-admin="@isAdmin.ToString()" data-test-pending-count="@pendingCount">
+                            <span class="group-row-icon">
+                                <i class="fas @(g.Sport == Sport.Futsal ? "fa-futbol" : "fa-cards")"></i>
+                            </span>
+                            <span class="group-row-body">
+                                <span class="group-row-name">@g.Name</span>
+                                <span class="group-row-meta">
+                                    @if (!string.IsNullOrWhiteSpace(g.City))
                                     {
-                                        <span class="player-tag player-tag--weekly" title="@Ui["Group.WeeklyTitle"]">
-                                            <i class="fas fa-sync-alt"></i> @Ui["Group.Weekly"] @string.Join(" / ", days.Select(d => WeekdayNamesPt[(int)d]))
+                                        <span><i class="fas fa-map-marker-alt"></i> @g.City@(!string.IsNullOrWhiteSpace(g.StateCode) ? $"/{g.StateCode}" : "")</span>
+                                    }
+                                    <span><i class="fas fa-users"></i> @g.Members.Count @Ui["Group.Member" + (g.Members.Count != 1 ? "s" : "")]</span>
+                                </span>
+                            </span>
+                            <span class="group-row-badges">
+                                @if (isAdmin)
+                                {
+                                    <span class="status-badge status-badge--accent">@Ui["Group.Admin"]</span>
+                                }
+                                @if (isAdmin && pendingCount > 0)
+                                {
+                                    <span class="status-badge status-badge--accent">
+                                        @pendingCount @Ui["Group.Pending" + (pendingCount == 1 ? "Singular" : "Plural")]
+                                    </span>
+                                }
+                                @if (needsPix)
+                                {
+                                    <span class="status-badge status-badge--pending" title="@Ui["Group.PixPendingTitle"]">@Ui["Group.PixPending"]</span>
+                                }
+                                @if (!g.IsActive)
+                                {
+                                    <span class="status-badge">@Ui["Group.InactiveTag"]</span>
+                                }
+                            </span>
+                            <span class="group-row-actions">
+                                <a href="/grupo/@g.Id" class="btn btn-secondary btn-sm">@Ui["Groups.Open"]</a>
+                                <span class="group-menu">
+                                    <button class="btn btn-ghost btn-sm" type="button"
+                                            aria-label="@Ui["Group.MemberActions"]"
+                                            @onclick="() => ToggleMenu(g.Id)" @onclick:stopPropagation="true">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    @if (openMenuGroupId == g.Id)
+                                    {
+                                        <span class="group-menu-pop">
+                                            @if (isAdmin && !string.IsNullOrWhiteSpace(g.InviteCode))
+                                            {
+                                                <button class="group-menu-item" type="button"
+                                                        @onclick="() => CopyInvite(g)">
+                                                    <i class="fas fa-copy"></i>
+                                                    @(copiedGroupId == g.Id ? Ui["Group.Copied"] : Ui["Group.CopyInvite"])
+                                                </button>
+                                            }
+                                            @if (confirmLeaveGroupId == g.Id)
+                                            {
+                                                <button class="group-menu-item group-menu-item--danger" type="button"
+                                                        disabled="@isLeaving"
+                                                        @onclick="() => LeaveGroup(g)">
+                                                    <i class="fas fa-sign-out-alt"></i> @Ui["Group.LeaveGroupConfirm"]
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="group-menu-item group-menu-item--danger" type="button"
+                                                        @onclick="() => confirmLeaveGroupId = g.Id">
+                                                    <i class="fas fa-sign-out-alt"></i> @Ui["Group.LeaveGroup"]
+                                                </button>
+                                            }
                                         </span>
                                     }
-                                    @if (isAdmin)
-                                    {
-                                        <span class="player-tag player-tag--admin">@Ui["Group.Admin"]</span>
-                                        @if (hasPending)
-                                        {
-                                            <span class="player-tag player-tag--pending-requests">@pendingCount @Ui["Group.Pending" + (pendingCount == 1 ? "Singular" : "Plural")]</span>
-                                        }
-                                        @if (needsPix)
-                                        {
-                                            <span class="player-tag player-tag--pix-missing" title="@Ui["Group.PixPendingTitle"]">@Ui["Group.PixPending"]</span>
-                                        }
-                                    }
-                                    @if (!g.IsActive)
-                                    {
-                                        <span class="player-tag">@Ui["Group.InactiveTag"]</span>
-                                    }
-                                </div>
-                            </div>
-                            <h2 class="group-card-name">@g.Name</h2>
-                            @if (!string.IsNullOrWhiteSpace(g.City))
-                            {
-                                <p class="group-card-location">
-                                    <i class="fas fa-map-marker-alt"></i> @g.City/@g.StateCode
-                                </p>
-                            }
-                            <div class="group-card-meta">
-                                <span><i class="fas fa-users"></i> @g.Members.Count @Ui["Group.Member" + (g.Members.Count != 1 ? "s" : "")]</span>
-                                @if (nextEvent is not null)
-                                {
-                                    <span><i class="fas fa-calendar-alt"></i> @nextEvent.StartsAt.ToLocalTime().ToString("dd/MM HH:mm")</span>
-                                }
-                                else
-                                {
-                                    <span class="group-card-no-event"><i class="fas fa-calendar-times"></i> @Ui["Group.NoMatchScheduled"]</span>
-                                }
-                            </div>
-                        </div>
-                        @if (hasPending)
-                        {
-                            <div class="group-card-pending-actions" @onclick:stopPropagation="true">
-                                <button class="group-card-approve-btn" @onclick="() => ApproveAllPending(g.Id)" disabled="@isProcessingApproval">
-                                    @if (isProcessingApproval && processingGroupId == g.Id)
-                                    {
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="fas fa-check-double"></i>
-                                    }
-                                    @Ui["Group.Approve"] @pendingCount
-                                </button>
-                            </div>
-                        }
-                    </a>
-                }
-            </div>
-        </section>
-
-        <hr class="detail-divider detail-divider--groups" />
-
-        <section class="groups-block groups-block--secondary">
-            <div class="groups-block-header">
-                <h2 class="groups-title groups-title--sm"><i class="fas fa-sign-in-alt"></i> @Ui["Groups.JoinOther"]</h2>
-            </div>
-
-            <div class="groups-entry-stack">
-                <div class="join-code-section">
-                    <p class="join-code-label"><i class="fas fa-key"></i> @Ui["Groups.JoinCode"]</p>
-                    <div class="join-code-row">
-                        <input class="input join-code-input" type="text" maxlength="8"
-                               placeholder="Ex: ABCD1234"
-                               @bind="joinCode" @bind:event="oninput" />
-                        <button class="btn btn-secondary" type="button" @onclick="JoinWithCode"
-                                disabled="@(joinCode.Trim().Length == 0)">
-                            @Ui["Groups.Enter"]
-                        </button>
-                    </div>
-                    @if (!string.IsNullOrWhiteSpace(joinCodeError))
-                    {
-                        <p class="validation-message">@joinCodeError</p>
+                                </span>
+                            </span>
+                        </li>
                     }
-                </div>
+                </ul>
+            </section>
+        }
 
-                <div class="groups-entry-divider"><span>@Ui["Groups.Or"]</span></div>
-
-                <div class="groups-action-row">
-                    <a href="/grupos/criar" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> @Ui["Groups.CreateNew"]
-                    </a>
-                    <a href="/" class="groups-view-events-btn">
-                        <i class="fas fa-calendar-alt"></i> @Ui["Groups.ViewMatches"]
-                    </a>
+        @if (myPendingRequests.Count > 0)
+        {
+            <section class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title">
+                        <i class="fas fa-hourglass-half"></i> @Ui["Groups.PendingRequests"]
+                    </h2>
+                    <span class="panel-count">@myPendingRequests.Count</span>
                 </div>
+                <ul class="group-rows">
+                    @foreach (var req in myPendingRequests)
+                    {
+                        <li class="group-row">
+                            <span class="group-row-icon">
+                                <i class="fas @(req.Group?.Sport == Sport.Poker ? "fa-cards" : "fa-futbol")"></i>
+                            </span>
+                            <span class="group-row-body">
+                                <span class="group-row-name">@(req.Group?.Name ?? $"#{req.GroupId}")</span>
+                                <span class="group-row-meta">
+                                    <span>@Ui.FormatDateTime(req.RequestedAt.ToLocalTime(), "DateDefault")</span>
+                                </span>
+                            </span>
+                            <span class="group-row-badges">
+                                <span class="status-badge status-badge--accent">@Ui["Group.AwaitingApproval"]</span>
+                            </span>
+                            <span class="group-row-actions">
+                                <button class="btn btn-ghost btn-sm" type="button"
+                                        disabled="@cancellingRequestId.HasValue"
+                                        @onclick="() => CancelMyRequest(req.Id)">
+                                    <i class="fas fa-times"></i> @Ui["Group.CancelRequest"]
+                                </button>
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </section>
+        }
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2 class="panel-title">
+                    <i class="fas fa-sign-in-alt"></i> @Ui["Groups.JoinOther"]
+                </h2>
             </div>
+            <GroupEntryPanel Compact="true" />
         </section>
     }
+
+    </div>
 </div>

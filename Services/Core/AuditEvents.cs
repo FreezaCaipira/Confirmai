@@ -134,4 +134,5 @@ public static class AuditEntities
     public const string EventConfirmation = "EventConfirmation";
     public const string PlatformFeeSettlement = "PlatformFeeSettlement";
     public const string GroupJoinRequest  = "GroupJoinRequest";
+    public const string GroupMember       = "GroupMember";
 }

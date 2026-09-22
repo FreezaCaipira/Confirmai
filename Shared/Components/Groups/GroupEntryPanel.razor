@@ -2,15 +2,18 @@
 @inject UiTextService Ui
 @inject NavigationManager NavigationManager
 
-<div class="group-entry">
+<div class="group-entry @(Compact ? "group-entry--compact" : "")">
     <div class="group-entry-option">
         <p class="group-entry-label"><i class="fas fa-key" aria-hidden="true"></i> @Ui["Groups.JoinCode"]</p>
-        <p class="group-entry-hint">@Ui["Group.JoinCodeHint"]</p>
+        @if (!Compact)
+        {
+            <p class="group-entry-hint">@Ui["Group.JoinCodeHint"]</p>
+        }
         <form class="group-entry-row" @onsubmit="JoinWithCode" @onsubmit:preventDefault>
             <input class="group-entry-input" type="text" maxlength="8"
                    placeholder="Ex: ABCD1234" aria-label="@Ui["Groups.JoinCode"]"
                    @bind="joinCode" @bind:event="oninput" />
-            <button class="group-entry-btn" type="submit" disabled="@(joinCode.Trim().Length == 0)">
+            <button class="btn @(Compact ? "btn-secondary" : "btn-primary")" type="submit" disabled="@(joinCode.Trim().Length == 0)">
                 @Ui["Groups.Enter"]
             </button>
         </form>
@@ -24,14 +27,23 @@
 
     <div class="group-entry-option">
         <p class="group-entry-label"><i class="fas fa-plus" aria-hidden="true"></i> @Ui["Groups.CreateNew"]</p>
-        <p class="group-entry-hint">@Ui["GroupEntry.CreateHint"]</p>
-        <a href="/grupos/criar" class="group-entry-btn group-entry-btn--secondary">
+        @if (!Compact)
+        {
+            <p class="group-entry-hint">@Ui["GroupEntry.CreateHint"]</p>
+        }
+        <a href="/grupos/criar" class="btn @(Compact ? "btn-primary" : "btn-secondary")">
             @Ui["Groups.CreateNew"]
         </a>
     </div>
 </div>
 
 @code {
+    /// <summary>
+    /// Compact layout for screens where the user already has groups:
+    /// "Criar novo grupo" becomes the primary action and hints are hidden.
+    /// </summary>
+    [Parameter] public bool Compact { get; set; }
+
     private string joinCode = string.Empty;
     private string joinCodeError = string.Empty;
 

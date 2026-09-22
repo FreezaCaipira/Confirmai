@@ -68,7 +68,7 @@ public partial class Detail
     {
         if (currentUserId is null || group is null || userJoinRequest is null) return;
         cancellingJoin = true;
-        await GroupService.CancelJoinRequestAsync(userJoinRequest.Id);
+        await GroupService.CancelJoinRequestAsync(userJoinRequest.Id, currentUserId);
         cancellingJoin = false;
         await LoadGroup();
     }

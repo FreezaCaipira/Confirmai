@@ -118,6 +118,14 @@ internal static class GroupTexts
         ["Group.EventFull"] = "cheia",
         ["Group.EventOpen"] = "aberto",
         ["Group.EventNext"] = "próxima",
+        ["Groups.Open"] = "Abrir",
+        ["Group.CopyInvite"] = "Copiar convite",
+        ["Group.LeaveGroup"] = "Sair do grupo",
+        ["Group.LeaveGroupConfirm"] = "Confirmar saída",
+        ["Group.AwaitingApproval"] = "Aguardando aprovação",
+        ["Group.CancelRequest"] = "Cancelar pedido",
+        ["Group.SoleAdminCantLeave"] = "Você é o único administrador. Promova outro membro antes de sair.",
+        ["Groups.PendingRequests"] = "Pedidos pendentes",
         ["Group.JoinError"] = "Erro ao entrar no grupo. Tente novamente.",
 
         // Features page
@@ -424,6 +432,14 @@ internal static class GroupTexts
         ["Group.EventFull"] = "full",
         ["Group.EventOpen"] = "open",
         ["Group.EventNext"] = "next",
+        ["Groups.Open"] = "Open",
+        ["Group.CopyInvite"] = "Copy invite",
+        ["Group.LeaveGroup"] = "Leave group",
+        ["Group.LeaveGroupConfirm"] = "Confirm leaving",
+        ["Group.AwaitingApproval"] = "Awaiting approval",
+        ["Group.CancelRequest"] = "Cancel request",
+        ["Group.SoleAdminCantLeave"] = "You are the only admin. Promote another member before leaving.",
+        ["Groups.PendingRequests"] = "Pending requests",
         ["Group.JoinError"] = "Error joining the group. Please try again.",
 
         // Features page
@@ -730,6 +746,14 @@ internal static class GroupTexts
         ["Group.EventFull"] = "lleno",
         ["Group.EventOpen"] = "abierto",
         ["Group.EventNext"] = "próximo",
+        ["Groups.Open"] = "Abrir",
+        ["Group.CopyInvite"] = "Copiar invitación",
+        ["Group.LeaveGroup"] = "Salir del grupo",
+        ["Group.LeaveGroupConfirm"] = "Confirmar salida",
+        ["Group.AwaitingApproval"] = "Esperando aprobación",
+        ["Group.CancelRequest"] = "Cancelar solicitud",
+        ["Group.SoleAdminCantLeave"] = "Eres el único administrador. Promueve a otro miembro antes de salir.",
+        ["Groups.PendingRequests"] = "Solicitudes pendientes",
         ["Group.JoinError"] = "Error al entrar en el grupo. Inténtalo de nuevo.",
 
         // Features page

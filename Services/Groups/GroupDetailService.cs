@@ -15,6 +15,13 @@ public enum JoinWithCodeResult
     InvalidCode = 2
 }
 
+public enum LeaveGroupResult
+{
+    Left = 0,
+    NotMember = 1,
+    SoleAdmin = 2
+}
+
 public sealed class GroupDetailData
 {
     public Group? Group { get; set; }
@@ -117,15 +124,69 @@ public sealed class GroupDetailService
         }
     }
 
-    public async Task CancelJoinRequestAsync(int requestId)
+    /// <summary>
+    /// Pending join requests the user sent (not yet answered by an admin).
+    /// Used by /grupos so the requester can see and cancel them.
+    /// </summary>
+    public async Task<List<GroupJoinRequest>> GetMyPendingRequestsAsync(string userId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        return await db.GroupJoinRequests
+            .Where(r => r.UserId == userId && r.Status == JoinRequestStatus.Pending)
+            .Include(r => r.Group)
+            .OrderByDescending(r => r.RequestedAt)
+            .ToListAsync();
+    }
+
+    public async Task CancelJoinRequestAsync(int requestId, string userId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
         var req = await db.GroupJoinRequests.FindAsync(requestId);
-        if (req is not null && req.Status == JoinRequestStatus.Pending)
+        if (req is not null && req.Status == JoinRequestStatus.Pending && req.UserId == userId)
         {
             db.GroupJoinRequests.Remove(req);
             await db.SaveChangesAsync();
         }
+    }
+
+    /// <summary>
+    /// Removes the caller's own membership. The sole admin of a group cannot
+    /// leave — they must promote another admin first, otherwise the group
+    /// becomes unmanageable.
+    /// </summary>
+    public async Task<LeaveGroupResult> LeaveGroupAsync(int groupId, string userId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        var member = await db.GroupMembers
+            .FirstOrDefaultAsync(m => m.GroupId == groupId && m.UserId == userId);
+        if (member is null)
+        {
+            return LeaveGroupResult.NotMember;
+        }
+
+        if (member.Role == GroupMemberRole.Admin)
+        {
+            var otherAdminExists = await db.GroupMembers
+                .AnyAsync(m => m.GroupId == groupId && m.UserId != userId
+                            && m.Role == GroupMemberRole.Admin);
+            if (!otherAdminExists)
+            {
+                return LeaveGroupResult.SoleAdmin;
+            }
+        }
+
+        db.GroupMembers.Remove(member);
+        await db.SaveChangesAsync();
+
+        await _log.AuditAsync(
+            AuditEvents.GroupMemberRemoved,
+            AuditEntities.GroupMember,
+            member.Id.ToString(),
+            "Membro saiu do grupo",
+            actorUserId: userId,
+            metadata: new { groupId, userId, leftVoluntarily = true });
+
+        return LeaveGroupResult.Left;
     }
 
     /// <summary>

@@ -206,20 +206,6 @@
     color: var(--text);
 }
 
-.home-section-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 var(--space-2);
-    border-radius: var(--radius-full);
-    background: var(--accent-soft);
-    color: var(--accent-text);
-    font-size: 0.75rem;
-    font-weight: var(--fw-semibold);
-}
-
 .home-section-body {
     padding: var(--space-4) var(--space-5);
 }
