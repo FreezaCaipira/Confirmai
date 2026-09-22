@@ -59,7 +59,11 @@ public sealed class PlatformFeeWaiverService
         if (group is null)
             return new PlatformFeeWaiverResult(false, PlatformFeeWaiverError.GroupNotFound);
 
-        group.PlatformFeeWaivedFrom = now;
+        // Renovar uma isenção ativa estende o prazo sem reabrir a janela:
+        // confirmações criadas na vigência anterior continuam dentro dela.
+        var active = group.PlatformFeeWaivedUntil is DateTime cur && cur > now;
+        if (!active || group.PlatformFeeWaivedFrom is null)
+            group.PlatformFeeWaivedFrom = now;
         group.PlatformFeeWaivedUntil = untilUtc;
         group.PlatformFeeWaiverReason = trimmed;
         await db.SaveChangesAsync();
@@ -70,7 +74,7 @@ public sealed class PlatformFeeWaiverService
             groupId.ToString(),
             $"Isenção de taxa concedida/renovada até {untilUtc:u}: {trimmed}",
             actorUserId: adminUserId,
-            metadata: new { groupId, waivedFrom = now, waivedUntil = untilUtc, reason = trimmed });
+            metadata: new { groupId, waivedFrom = group.PlatformFeeWaivedFrom, waivedUntil = untilUtc, reason = trimmed });
 
         return new PlatformFeeWaiverResult(true, PlatformFeeWaiverError.None);
     }

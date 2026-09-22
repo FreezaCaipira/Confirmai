@@ -127,6 +127,7 @@ public class PlatformFeeSettlementService
                 .AsNoTracking()
                 .Where(c => c.Event!.GroupId == groupId
                     && c.PlatformFeeAmount > 0
+                    && c.PaymentStatus == EventConfirmationPaymentStatus.Paid
                     && eventIds.Contains(c.Event.Id))
                 .GroupBy(c => c.Event!.Id)
                 .Select(g => new { EventId = g.Key, Fee = g.Sum(c => c.PlatformFeeAmount!.Value) })

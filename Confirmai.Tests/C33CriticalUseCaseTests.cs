@@ -63,7 +63,10 @@ public class C33CriticalUseCaseTests : IClassFixture<IntegrationTestWebAppFactor
         {
             EventId = eventId,
             UserId = userId,
-            PaymentStatus = EventConfirmationPaymentStatus.Pending,
+            // Fee accrues to the ledger only once the player has paid.
+            PaymentStatus = feeAmount is null
+                ? EventConfirmationPaymentStatus.Pending
+                : EventConfirmationPaymentStatus.Paid,
             PlatformFeeAmount = feeAmount,
         };
         if (withProof)

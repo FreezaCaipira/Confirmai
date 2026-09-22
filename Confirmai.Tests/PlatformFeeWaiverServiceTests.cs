@@ -261,4 +261,22 @@ public class PlatformFeeWaiverServiceTests
         Assert.Equal(2, stats.WaivedConfirmations);
         Assert.Equal(1.50m, stats.WaivedAmount);
     }
+
+    [Fact]
+    public async Task SetWaiver_RenewingActiveWaiver_KeepsOriginalFrom()
+    {
+        var ctx = TestDataFactory.CreateDbContextWithFactory();
+        var admin = await SeedSysAdminAsync(ctx.db);
+        var group = await SeedGroupAsync(ctx.db);
+        var service = CreateService(ctx);
+
+        await service.SetWaiverAsync(group.Id, admin.Id, DateTime.UtcNow.AddDays(7), "piloto");
+        var from1 = (await ctx.db.Groups.AsNoTracking().SingleAsync(g => g.Id == group.Id)).PlatformFeeWaivedFrom;
+
+        await service.SetWaiverAsync(group.Id, admin.Id, DateTime.UtcNow.AddDays(30), "renovado");
+        var renewed = await ctx.db.Groups.AsNoTracking().SingleAsync(g => g.Id == group.Id);
+
+        Assert.Equal(from1, renewed.PlatformFeeWaivedFrom);
+        Assert.True(renewed.PlatformFeeWaivedUntil > DateTime.UtcNow.AddDays(29));
+    }
 }
