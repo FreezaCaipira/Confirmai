@@ -157,9 +157,9 @@ public class MailboxFormatterTests
     [Fact]
     public void FormatRelativeTime_ReturnsYesterdayText_WhenDateIsYesterday()
     {
-        // Use a fixed date where yesterday is unambiguous
-        var utcNow = DateTime.UtcNow;
-        var utcDate = utcNow.Date.AddHours(-utcNow.Hour - 1); // yesterday in local time (UTC-3)
+        // Noon local yesterday is unambiguously "yesterday" in any timezone;
+        // the old UTC-based formula broke when local date != UTC date.
+        var utcDate = DateTime.Now.Date.AddDays(-1).AddHours(12).ToUniversalTime();
         var result = MailboxFormatter.FormatRelativeTime(utcDate, "agora", "ontem");
         // The result should be either "ontem" or a dd/MM date depending on exact timezone
         Assert.True(result == "ontem" || System.Text.RegularExpressions.Regex.IsMatch(result, @"^\d{2}/\d{2}$"), $"Unexpected result: {result}");

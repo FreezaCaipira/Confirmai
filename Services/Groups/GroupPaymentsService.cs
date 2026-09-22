@@ -154,8 +154,11 @@ public sealed class GroupPaymentsService
         return confirmations.Select(c =>
         {
             var href = isFutsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
-            var total = ManualPlatformFee.TotalToPay(group.EnablePaymentGateways, isFutsal,
-                c.Event.Price!.Value, c.PlatformFeeAmount ?? _feePolicy.ResolveManualFee(group, c.ConfirmedAt));
+            // The stamp is what the player was charged — it always wins.
+            var total = c.PlatformFeeAmount.HasValue
+                ? c.Event.Price!.Value + c.PlatformFeeAmount.Value
+                : ManualPlatformFee.TotalToPay(group.EnablePaymentGateways, isFutsal,
+                    c.Event.Price!.Value, _feePolicy.ResolveManualFee(group, c.ConfirmedAt));
             return new MyPaymentEntry(
                 c.Id, c.EventId, c.Event.StartsAt, total,
                 c.HasPaid, c.PixProofUploadedAt != null && !c.HasPaid,
@@ -179,9 +182,14 @@ public sealed class GroupPaymentsService
         // C36-C Fase 0: the fee is per-confirmation — the stamped value wins;
         // legacy unstamped rows resolve by ConfirmedAt (a later waiver must not
         // rewrite what the player was charged).
+        // C36-C Fase 0 / review: a stamped fee is what the player was actually
+        // charged — it always wins, even if the group later enables gateways.
+        // Only unstamped (legacy) rows go through the live Applies() check.
         decimal TotalToPay(decimal basePrice, DateTime confirmedAt, decimal? stampedFee)
-            => ManualPlatformFee.TotalToPay(gatewaysEnabled, isFutsal, basePrice,
-                stampedFee ?? _feePolicy.ResolveManualFee(group, confirmedAt));
+            => stampedFee.HasValue
+                ? basePrice + stampedFee.Value
+                : ManualPlatformFee.TotalToPay(gatewaysEnabled, isFutsal, basePrice,
+                    _feePolicy.ResolveManualFee(group, confirmedAt));
 
         var unpaidConfirmations = await db.EventConfirmations
             .Where(c =>
@@ -246,9 +254,7 @@ public sealed class GroupPaymentsService
             var adminName = adminMap.TryGetValue(c.MarkedPaidByUserId!, out var n) ? n : "Admin";
             // History shows what was actually charged: the stamped fee snapshot when
             // it exists (a waiver granted later must not rewrite past charges).
-            var amount = c.PlatformFeeAmount.HasValue
-                ? (c.Event.Price ?? 0) + c.PlatformFeeAmount.Value
-                : TotalToPay(c.Event.Price ?? 0, c.ConfirmedAt, c.PlatformFeeAmount);
+            var amount = TotalToPay(c.Event.Price ?? 0, c.ConfirmedAt, c.PlatformFeeAmount);
             return new PaymentHistoryEntry(userName, c.Event.StartsAt, amount, href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
         }).ToList();
 

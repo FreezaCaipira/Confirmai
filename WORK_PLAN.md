@@ -636,9 +636,11 @@ Nao gerar diagrama de classes do dominio inteiro (ruido); nao adicionar bUnit; n
 
 **Ressalvas (nao bloqueiam)**:
 3. Poker (`Pages/Poker/Detail.razor.cs`) cria confirmacao sem carimbo -- correto, a taxa manual so existe em futsal (`PlatformFeePolicy.AppliesTo`), mas o ponto de criacao continua fora do service; entra na unificacao futuro do poker.
-4. `GroupPaymentsService` linhas 249-251: ramo `HasValue ? Price + Fee : TotalToPay(...)` e redundante com `TotalToPay` agora recebendo o carimbo -- simplificar no proximo toque.
-5. `LoadMyPaymentsAsync` faz `Take(100)` sem paginacao/aviso -- suficiente hoje, registrar.
+4. ~~`GroupPaymentsService` linhas 249-251~~ **FEITO**: o `TotalToPay` local agora trata o carimbo como "o que foi cobrado" (sempre `base + stamp` quando presente, mesmo se o grupo ligar gateways depois); o ramo ternario do historico saiu. `LoadMyPaymentsAsync` recebeu o mesmo tratamento -- antes um carimbo podia sumir da tela do jogador se o grupo ligasse gateways.
+5. `LoadMyPaymentsAsync` faz `Take(100)` sem paginacao/aviso -- suficiente hoje, registrado.
 6. Verificacao visual EN/ES em prod segue com o Robson.
+
+**Follow-up do Pleno**: flake de timezone em `MailboxFormatterTests.ReturnsYesterdayText` corrigido (data gerada por formula UTC quebrava quando data local != data UTC; agora usa `DateTime.Now` local -> `ToUniversalTime`).
 
 ## Review Senior do Ciclo 34 (PR #116) -- APROVADO c/ 1 ressalva de dinheiro (decisao do Robson) + ressalvas menores
 
