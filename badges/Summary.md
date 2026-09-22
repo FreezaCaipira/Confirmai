@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 09/22/2026 - 00:44:34 |
-| Coverage date: | 09/22/2026 - 00:44:27 |
+| Generated on: | 09/22/2026 - 00:59:02 |
+| Coverage date: | 09/22/2026 - 00:58:56 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 527 |
 | Files: | 623 |
-| **Line coverage:** | 93% (136924 of 147185) |
-| Covered lines: | 136924 |
+| **Line coverage:** | 93% (136927 of 147188) |
+| Covered lines: | 136927 |
 | Uncovered lines: | 10261 |
-| Coverable lines: | 147185 |
-| Total lines: | 179949 |
-| **Branch coverage:** | 40% (3574 of 8917) |
-| Covered branches: | 3574 |
-| Total branches: | 8917 |
+| Coverable lines: | 147188 |
+| Total lines: | 179955 |
+| **Branch coverage:** | 40% (3573 of 8915) |
+| Covered branches: | 3573 |
+| Total branches: | 8915 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 382_35672946592 |
+| Tag: | 383_35673859760 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **136924** | **10261** | **147185** | **198604** | **93%** | **3574** | **8917** | **40%** |
+| **Confirmai** | **136927** | **10261** | **147188** | **198628** | **93%** | **3573** | **8915** | **40%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -408,11 +408,11 @@
 | Confirmai.Services.Groups.GroupFeaturesService | 264 | 1 | 265 | 368 | 99.6% | 71 | 84 | 84.5% |
 | Confirmai.Services.Groups.GroupMetricsService | 53 | 0 | 53 | 97 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Groups.GroupMetricsSnapshot | 8 | 0 | 8 | 97 | 100% | 0 | 0 |  |
-| Confirmai.Services.Groups.GroupPaymentsData | 4 | 0 | 4 | 387 | 100% | 0 | 0 |  |
-| Confirmai.Services.Groups.GroupPaymentsService | 229 | 4 | 233 | 387 | 98.2% | 89 | 118 | 75.4% |
-| Confirmai.Services.Groups.MyPaymentEntry | 5 | 4 | 9 | 387 | 55.5% | 0 | 0 |  |
+| Confirmai.Services.Groups.GroupPaymentsData | 4 | 0 | 4 | 393 | 100% | 0 | 0 |  |
+| Confirmai.Services.Groups.GroupPaymentsService | 232 | 4 | 236 | 393 | 98.3% | 88 | 116 | 75.8% |
+| Confirmai.Services.Groups.MyPaymentEntry | 5 | 4 | 9 | 393 | 55.5% | 0 | 0 |  |
 | Confirmai.Services.Groups.PaymentHistoryEntry | 8 | 1 | 9 | 43 | 88.8% | 0 | 0 |  |
-| Confirmai.Services.Groups.PendingPaymentGroup | 1 | 0 | 1 | 387 | 100% | 0 | 0 |  |
+| Confirmai.Services.Groups.PendingPaymentGroup | 1 | 0 | 1 | 393 | 100% | 0 | 0 |  |
 | Confirmai.Services.Groups.PendingProofEntry | 10 | 1 | 11 | 43 | 90.9% | 0 | 0 |  |
 | Confirmai.Services.Groups.UserDelinquency | 5 | 0 | 5 | 43 | 100% | 0 | 0 |  |
 | Confirmai.Services.Interfaces.EventPaymentChargeResult | 1 | 0 | 1 | 15 | 100% | 0 | 0 |  |
