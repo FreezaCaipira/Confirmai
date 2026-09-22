@@ -18,40 +18,47 @@
 <PageTitle>@T["Mailbox.PageTitle"]</PageTitle>
 
 <div class="mailbox-page">
-    <div class="mailbox-shell-card" aria-label="@T["Mailbox.Aria"]">
+    <section class="panel mailbox-panel" aria-label="@T["Mailbox.Aria"]">
         @if (isLoading)
         {
             <div class="loading-spinner">@T["Mailbox.Loading"]</div>
         }
         else
         {
-                <div class="mailbox-page-header">
-                    <h3 class="mailbox-page-title">@T["Mailbox.Title"]</h3>
+            <div class="panel-head mailbox-head">
+                <h3 class="panel-title"><i class="fas fa-inbox"></i> @T["Mailbox.Title"]</h3>
+                @{ var unreadTotal = conversationContacts.Sum(c => c.UnreadCount); }
+                @if (unreadTotal > 0)
+                {
+                    <span class="panel-count">@unreadTotal</span>
+                }
+            </div>
+
+            <div class="mailbox-body">
+                <div class="mailbox-col-list">
+                    <MailboxFilters
+                        SearchTerm="@searchTerm"
+                        PageSize="@pageSize"
+                        InboxUnreadOnly="@inboxUnreadOnly"
+                        OnApplyFilters="@ApplyFiltersAsync"
+                        OnResetFilters="@ResetFiltersAsync" />
+
+                    <MailboxConversationList
+                        Conversations="@conversationContacts"
+                        SelectedConversationKey="@selectedConversationKey"
+                        CurrentPage="@conversationPage"
+                        PageSize="@pageSize"
+                        ConversationTotal="@conversationTotal"
+                        ActiveConversationTotal="@activeConversationTotal"
+                        ArchivedConversationTotal="@archivedConversationTotal"
+                        ShowArchived="@showArchivedConversations"
+                        OnSelectConversation="@SelectConversationCallback"
+                        OnMarkAsRead="@MarkAsReadCallback"
+                        OnArchive="@ArchiveCallback"
+                        OnSwitchFolder="@SwitchFolderCallback"
+                        OnPreviousPage="@PreviousPageCallback"
+                        OnNextPage="@NextPageCallback" />
                 </div>
-
-                <MailboxFilters
-                    SearchTerm="@searchTerm"
-                    PageSize="@pageSize"
-                    InboxUnreadOnly="@inboxUnreadOnly"
-                    OnApplyFilters="@ApplyFiltersAsync"
-                    OnResetFilters="@ResetFiltersAsync" />
-
-                <section class="mailbox-workspace" aria-label="@T["Mailbox.WorkspaceAria"]">
-<MailboxConversationList
-                    Conversations="@conversationContacts"
-                    SelectedConversationKey="@selectedConversationKey"
-                    CurrentPage="@conversationPage"
-                    PageSize="@pageSize"
-                    ConversationTotal="@conversationTotal"
-                    ActiveConversationTotal="@activeConversationTotal"
-                    ArchivedConversationTotal="@archivedConversationTotal"
-                    ShowArchived="@showArchivedConversations"
-                    OnSelectConversation="@SelectConversationCallback"
-                    OnMarkAsRead="@MarkAsReadCallback"
-                    OnArchive="@ArchiveCallback"
-                    OnSwitchFolder="@SwitchFolderCallback"
-                    OnPreviousPage="@PreviousPageCallback"
-                    OnNextPage="@NextPageCallback" />
 
                 <MailboxThreadPane
                     SelectedContact="@SelectedContact"
@@ -62,7 +69,7 @@
                     IsSendingReply="@isSendingReply"
                     ThreadStreamRef="@threadStreamRef"
                     OnSendReply="@SendReplyCallback" />
-                </section>
-            }
-    </div>
+            </div>
+        }
+    </section>
 </div>

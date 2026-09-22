@@ -2,9 +2,11 @@ using System.Security.Claims;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Groups;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Groups;
 
@@ -12,22 +14,23 @@ public partial class Index
 {
     private string?      currentUserId = null;
     private List<Group>  groups        = new();
+    private List<GroupJoinRequest> myPendingRequests = new();
     private bool         isLoading     = true;
     private Dictionary<int, int> pendingJoinRequestsByGroup = new();
-    private Dictionary<int, List<DayOfWeek>> weeklySchedulesByGroup = new();
 
-    private static readonly string[] WeekdayNamesPt =
-    { "Domingos", "Segundas", "Terças", "Quartas", "Quintas", "Sextas", "Sábados" };
-
-    private string       joinCode      = string.Empty;
-    private string       joinCodeError = string.Empty;
-    private bool         isProcessingApproval = false;
-    private int?         processingGroupId = null;
+    private int?    openMenuGroupId;
+    private int?    confirmLeaveGroupId;
+    private int?    copiedGroupId;
+    private int?    cancellingRequestId;
+    private bool    isLeaving;
+    private string? leaveError;
 
     [Inject] private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
-    [Inject] private Confirmai.Services.Groups.GroupDetailService GroupDetailService { get; set; } = default!;
+    [Inject] private IConfiguration Config { get; set; } = default!;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Inject] private GroupDetailService GroupDetailService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,46 +43,31 @@ public partial class Index
     {
         if (currentUserId is null) return;
         isLoading = true;
+        leaveError = null;
         await using var db = await DbFactory.CreateDbContextAsync();
 
-        // First: get group IDs
         var userGroupIds = await db.GroupMembers
             .Where(m => m.UserId == currentUserId)
             .Select(m => m.GroupId)
             .Distinct()
             .ToListAsync();
 
-        if (!userGroupIds.Any())
-        {
-            groups = new List<Group>();
-            isLoading = false;
-            return;
-        }
+        groups = userGroupIds.Count == 0
+            ? new List<Group>()
+            : await db.Groups
+                .Where(g => userGroupIds.Contains(g.Id))
+                .OrderByDescending(g => g.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin))
+                .ThenBy(g => g.Name)
+                .ToListAsync();
 
-        // Second: load groups by ID - separate Groups from Events first
-        groups = await db.Groups
-            .Where(g => userGroupIds.Contains(g.Id))
-            .OrderByDescending(g => g.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin))
-            .ThenBy(g => g.Name)
-            .ToListAsync();
-
-        // Third: explicitly load Members for each group
         foreach (var group in groups)
         {
-            // Force load Members
             await db.Entry(group).Collection(g => g.Members).LoadAsync();
-            // Force load Events
-            await db.Entry(group).Collection(g => g.Events).LoadAsync();
+            foreach (var member in group.Members)
+            {
+                await db.Entry(member).Reference(m => m.User).LoadAsync();
+            }
         }
-
-        // Load weekly schedules for groups
-        var schedules = await db.RachaSchedules
-            .Where(rs => userGroupIds.Contains(rs.GroupId) && rs.IsActive)
-            .Select(rs => new { rs.GroupId, rs.DayOfWeek })
-            .ToListAsync();
-        weeklySchedulesByGroup = schedules
-            .GroupBy(s => s.GroupId)
-            .ToDictionary(g => g.Key, g => g.Select(s => s.DayOfWeek).Distinct().OrderBy(d => (int)d).ToList());
 
         var adminGroupIds = groups
             .Where(IsCurrentUserAdmin)
@@ -93,6 +81,8 @@ public partial class Index
                 .GroupBy(r => r.GroupId)
                 .Select(g => new { GroupId = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.GroupId, x => x.Count);
+
+        myPendingRequests = await GroupDetailService.GetMyPendingRequestsAsync(currentUserId);
 
         groups = groups
             .OrderByDescending(g => GetPendingRequestsCount(g.Id) > 0)
@@ -113,40 +103,74 @@ public partial class Index
         => IsCurrentUserAdmin(group)
         && !group.Members.Any(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey));
 
-    private void JoinWithCode()
+    private void ToggleMenu(int groupId)
     {
-        var code = joinCode.Trim().ToUpperInvariant();
-        if (string.IsNullOrWhiteSpace(code))
-        {
-            joinCodeError = Ui["GroupEntry.CodeRequired"];
-            return;
-        }
-        NavigationManager.NavigateTo($"/convite/{code}");
+        openMenuGroupId = openMenuGroupId == groupId ? null : groupId;
+        confirmLeaveGroupId = null;
     }
 
-    private string GetDefaultBackgroundStyle(Sport sport)
+    private async Task CopyInvite(Group group)
     {
-        return sport == Sport.Futsal
-            ? "background: linear-gradient(135deg, #1a472e 0%, #0f2619 100%);"  // Green for futsal
-            : "background: linear-gradient(135deg, #2d1a47 0%, #1a0f26 100%);"  // Purple for poker
-        ;
-    }
-
-    private async Task ApproveAllPending(int groupId)
-    {
-        if (currentUserId is null) return;
-        isProcessingApproval = true;
-        processingGroupId = groupId;
-
+        if (string.IsNullOrWhiteSpace(group.InviteCode)) return;
+        var baseUrl = (Config["App:BaseUrl"]?.TrimEnd('/')) ?? NavigationManager.BaseUri.TrimEnd('/');
+        var inviteUrl = $"{baseUrl}/convite/{group.InviteCode}";
         try
         {
-            await GroupDetailService.ApproveAllPendingAsync(groupId, currentUserId);
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", inviteUrl);
+            copiedGroupId = group.Id;
+            _ = ResetCopiedAfterDelay(group.Id);
+        }
+        catch (JSDisconnectedException) { }
+    }
+
+    private async Task ResetCopiedAfterDelay(int groupId)
+    {
+        await Task.Delay(2000);
+        if (copiedGroupId == groupId)
+        {
+            copiedGroupId = null;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task LeaveGroup(Group group)
+    {
+        if (currentUserId is null || isLeaving) return;
+        isLeaving = true;
+        leaveError = null;
+        try
+        {
+            var result = await GroupDetailService.LeaveGroupAsync(group.Id, currentUserId);
+            if (result == LeaveGroupResult.SoleAdmin)
+            {
+                leaveError = Ui["Group.SoleAdminCantLeave"];
+            }
+            else
+            {
+                openMenuGroupId = null;
+                confirmLeaveGroupId = null;
+                await LoadGroups();
+            }
+        }
+        finally
+        {
+            isLeaving = false;
+            confirmLeaveGroupId = null;
+        }
+    }
+
+    private async Task CancelMyRequest(int requestId)
+    {
+        if (currentUserId is null) return;
+        cancellingRequestId = requestId;
+        try
+        {
+            await GroupDetailService.CancelJoinRequestAsync(requestId, currentUserId);
             await LoadGroups();
         }
         finally
         {
-            isProcessingApproval = false;
-            processingGroupId = null;
+            cancellingRequestId = null;
         }
     }
 }

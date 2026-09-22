@@ -230,6 +230,8 @@ public sealed class UiTextService
     /// - DateTimeShortCompact: "dd/MM/yy HH:mm" (e.g., "15/03/26 14:30")
     /// - DateTimeFull: "dd/MM/yyyy 'às' HH:mm" (i18n — "at" in EN, "a las" in ES)
     /// - DateTimeFullLong: "dddd, dd/MM/yyyy 'às' HH:mm" (i18n, with weekday)
+    /// - DateLong: "dddd, dd 'de' MMMM" (i18n weekday + full date, capitalized)
+    /// - DateWeekday: "ddd dd/MM" (i18n abbreviated weekday + date)
     /// </summary>
     public string FormatDateTime(DateTime dateTime, string formatKey)
     {
@@ -257,11 +259,17 @@ public sealed class UiTextService
                 "es-ES" => "dddd, dd/MM/yyyy 'a las' HH:mm",
                 _ => "dddd, dd/MM/yyyy 'às' HH:mm"
             },
+            "DateLong" => _language.SelectedLanguage switch
+            {
+                "en-US" => "dddd, MMMM dd",
+                _ => "dddd, dd 'de' MMMM"
+            },
+            "DateWeekday" => "ddd dd/MM",
             _ => "g" // Default to general format if unknown
         };
 
-        // DateTimeFullLong uses the current language's culture for weekday names
-        var culture = formatKey == "DateTimeFullLong"
+        // Formats with weekday/month names use the current language's culture
+        var culture = formatKey is "DateTimeFullLong" or "DateLong" or "DateWeekday"
             ? _language.SelectedLanguage switch
             {
                 "en-US" => new CultureInfo("en-US"),
@@ -272,7 +280,10 @@ public sealed class UiTextService
 
         try
         {
-            return dateTime.ToString(pattern, culture);
+            var formatted = dateTime.ToString(pattern, culture);
+            return formatKey == "DateLong" && formatted.Length > 0
+                ? char.ToUpper(formatted[0], culture) + formatted[1..]
+                : formatted;
         }
         catch
         {

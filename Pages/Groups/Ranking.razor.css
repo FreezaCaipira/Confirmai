@@ -1,10 +1,3 @@
-/* ── Title ────────────────────────────────────────────────────── */
-.detail-title.ranking-title {
-    color: var(--amber);
-    text-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 2px 4px var(--shadow-md);
-    text-align: center;
-}
-
 /* ── Skeleton lines ───────────────────────── */
 .skeleton-line--md { max-width: 200px; }
 .skeleton-line--sm { max-width: 150px; }
@@ -13,7 +6,7 @@
 .ranking-footnote {
     margin-top: 1rem;
     font-size: 0.78rem;
-    color: var(--ci-surface-muted);
+    color: var(--text-2);
     display: flex;
     align-items: center;
     gap: 0.35rem;

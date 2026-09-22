@@ -1,6 +1,7 @@
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Services
+@using Confirmai.Services.Events
 @inject NavigationManager NavigationManager
 @inject UiTextService Ui
 
@@ -10,7 +11,7 @@
             <!-- Web headers -->
             <th class="web-only"></th>
             <th class="web-only">@Ui["Group.DateTimeHeader"]</th>
-            <th class="web-only">Jogadores</th>
+            <th class="web-only">@Ui["Group.PlayersHeader"]</th>
             <th class="web-only">@Ui["Group.StatusHeader"]</th>
             <th class="events-access-col web-only"></th>
             <!-- Mobile: no headers -->
@@ -21,18 +22,28 @@
         {
             <tr>
                 <td colspan="6" class="et-empty">
-                    @if (!ShowPastEvents && IsAdmin)
+                    @if (ShowPastEvents)
+                    {
+                        <div class="et-empty-banner">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="et-empty-text">@Ui["Group.NoMatchPlayed"]</span>
+                        </div>
+                    }
+                    else if (IsAdmin)
                     {
                         <div class="et-empty-banner">
                             <i class="fas fa-calendar-plus"></i>
                             <span class="et-empty-text">@Ui["Group.NoMatchScheduledEmpty"]</span>
+                            <a href="@NewEventHref" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> @Ui["Group.CreateFirstMatch"]
+                            </a>
                         </div>
                     }
                     else
                     {
                         <div class="et-empty-banner">
                             <i class="fas fa-calendar-plus"></i>
-                            <span class="et-empty-text">@(ShowPastEvents ? @Ui["Group.NoMatchPlayed"] : @Ui["Group.NoMatchScheduledEmpty"])</span>
+                            <span class="et-empty-text">@Ui["Group.NoMatchOrganizer"]</span>
                         </div>
                     }
                 </td>
@@ -55,12 +66,22 @@
                     
                     <!-- Web: Date column -->
                     <td class="web-only">
-                        @if (ev.RachaScheduleId.HasValue)
-                        {
-                            <i class="fas fa-sync-alt et-recurring-icon" title="@Ui["Group.WeeklyTitle"]"></i>
-                        }
-                        <span class="et-date">@Ui.FormatDateTime(ev.StartsAt, "DateDefault")</span>
-                        <span class="et-time">@Ui.FormatDateTime(ev.StartsAt, "TimeDefault")</span>
+                        <span class="et-when" tabindex="0" aria-describedby="et-tip-@ev.Id">
+                            @if (ev.RachaScheduleId.HasValue)
+                            {
+                                <i class="fas fa-sync-alt et-recurring-icon" title="@Ui["Group.WeeklyTitle"]"></i>
+                            }
+                            <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateWeekday")</span>
+                            <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                            <span role="tooltip" id="et-tip-@ev.Id" class="et-tooltip">
+                                <span class="et-tip-line">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateLong")</span>
+                                <span class="et-tip-line et-tip-relative">@RelativeText(ev)</span>
+                                @if (TipMeta(ev) is { } tipMeta)
+                                {
+                                    <span class="et-tip-line et-tip-meta">@tipMeta</span>
+                                }
+                            </span>
+                        </span>
                     </td>
                     
                     <!-- Web: Players column -->
@@ -72,29 +93,29 @@
                     <td class="web-only et-status-col">
                         @if (!ev.IsActive)
                         {
-                            <span class="player-tag player-tag--cancel">cancelado</span>
+                            <span class="et-status et-status--cancelled">@Ui["Group.EventCancelled"]</span>
                         }
                         else if (isFull)
                         {
-                            <span class="player-tag player-tag--full">lotado</span>
+                            <span class="et-status et-status--full">@Ui["Group.EventFull"]</span>
                         }
                         else
                         {
-                            <span class="player-tag player-tag--open">aberto</span>
+                            <span class="et-status et-status--open">@Ui["Group.EventOpen"]</span>
                         }
                         @if (isNextUpcoming)
                         {
-                            <span class="event-next-badge">pr&oacute;xima</span>
+                            <span class="et-status et-status--next">@Ui["Group.EventNext"]</span>
                         }
                     </td>
                     
                     <!-- Web: Access column -->
                     <td class="events-access-col web-only">
-                        <button class="event-access-btn"
+                        <button class="btn btn-secondary btn-sm"
                                 type="button"
                                 @onclick:stopPropagation="true"
                                 @onclick="() => NavigationManager.NavigateTo(href)">
-                            Acessar
+                            @Ui["Group.Access"]
                         </button>
                     </td>
                     
@@ -104,12 +125,22 @@
                         <div class="et-cell">
                             <div class="et-cell-header">
                                 <div class="et-cell-right">
-                                    @if (ev.RachaScheduleId.HasValue)
-                                    {
-                                        <i class="fas fa-sync-alt et-recurring-icon" title="@Ui["Group.WeeklyTitle"]"></i>
-                                    }
-                                    <span class="et-date">@Ui.FormatDateTime(ev.StartsAt, "DateDefault")</span>
-                                    <span class="et-time">@Ui.FormatDateTime(ev.StartsAt, "TimeDefault")</span>
+                                    <span class="et-when" tabindex="0" aria-describedby="et-tip-m-@ev.Id">
+                                        @if (ev.RachaScheduleId.HasValue)
+                                        {
+                                            <i class="fas fa-sync-alt et-recurring-icon" title="@Ui["Group.WeeklyTitle"]"></i>
+                                        }
+                                        <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateWeekday")</span>
+                                        <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                                        <span role="tooltip" id="et-tip-m-@ev.Id" class="et-tooltip">
+                                            <span class="et-tip-line">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateLong")</span>
+                                            <span class="et-tip-line et-tip-relative">@RelativeText(ev)</span>
+                                            @if (TipMeta(ev) is { } tipMetaMobile)
+                                            {
+                                                <span class="et-tip-line et-tip-meta">@tipMetaMobile</span>
+                                            }
+                                        </span>
+                                    </span>
                                 </div>
                             </div>
                             <div class="et-cell-meta">
@@ -118,15 +149,15 @@
                                 </span>
                                 @if (!ev.IsActive)
                                 {
-                                    <span class="player-tag player-tag--cancel">cancelado</span>
+                                    <span class="et-status et-status--cancelled">@Ui["Group.EventCancelled"]</span>
                                 }
                                 else if (isFull)
                                 {
-                                    <span class="player-tag player-tag--full">lotado</span>
+                                    <span class="et-status et-status--full">@Ui["Group.EventFull"]</span>
                                 }
                                 else
                                 {
-                                    <span class="player-tag player-tag--open">aberto</span>
+                                    <span class="et-status et-status--open">@Ui["Group.EventOpen"]</span>
                                 }
                             </div>
                         </div>
@@ -146,4 +177,28 @@
     [Parameter] public Dictionary<int, int>      EventNumbers     { get; set; } = new();
     [Parameter] public bool                      IsAdmin          { get; set; }
     [Parameter] public string                    NewEventHref     { get; set; } = string.Empty;
+
+    private string RelativeText(Event ev)
+    {
+        var rel = EventDateText.Relative(ev.StartsAt.ToLocalTime(), DateTime.Now);
+        return rel.Kind switch
+        {
+            EventRelativeKind.Today    => Ui["Event.RelativeToday"],
+            EventRelativeKind.Tomorrow => Ui["Event.RelativeTomorrow"],
+            EventRelativeKind.InDays   => Ui.Get("Event.RelativeInDays", rel.Days),
+            _                          => Ui.Get("Event.RelativeDaysAgo", rel.Days),
+        };
+    }
+
+    private string? TipMeta(Event ev)
+    {
+        var venue = ev.Venue?.Name;
+        if (string.IsNullOrWhiteSpace(venue)) venue = ev.Location;
+        var weekly = ev.RachaScheduleId.HasValue;
+        if (string.IsNullOrWhiteSpace(venue))
+        {
+            return weekly ? Ui["Group.WeeklyTitle"] : null;
+        }
+        return weekly ? $"{venue} · {Ui["Group.WeeklyTitle"]}" : venue;
+    }
 }

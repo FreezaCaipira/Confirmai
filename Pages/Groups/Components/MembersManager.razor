@@ -25,54 +25,70 @@
             var isConfirmingPromote = ConfirmPromoteMemberId == m.Id;
             <li class="feat-member-item">
                 <div class="feat-member-info">
-                    <span class="feat-member-name">@(m.User?.FullName ?? m.User?.UserName ?? @Ui["Group.Member"])</span>
-                    @if (isAdminM) { <span class="player-tag player-tag--admin">@Ui["Group.Admin"]</span> }
-                    @if (m.UserId == CreatedByUserId) { <span class="player-tag">@Ui["Group.Creator"]</span> }
-                    @if (isSelf)   { <span class="player-tag player-tag--me">@Ui["Group.You"]</span> }
-                </div>
-                @if (!isSelf && CanManageAdminRoles)
-                {
-                    @if (isAdminM)
+                    @if (!string.IsNullOrWhiteSpace(m.User?.AvatarPath))
                     {
-                        <button class="feat-role-btn feat-role-btn--demote"
-                                type="button"
-                                disabled="@(IsSavingRole || onlyAdmin)"
-                                title="@(onlyAdmin ? @Ui["Group.MustHaveOneAdmin"] : @Ui["Group.RemoveAdminTitle"])"
-                                @onclick="() => HandleSetMemberRole(m.Id, GroupMemberRole.Member)">
-                            <i class="fas fa-user-minus"></i> @Ui["Group.RemoveAdmin"]
-                        </button>
+                        <img class="member-avatar" src="@m.User!.AvatarPath" alt="" />
                     }
                     else
                     {
-                        @if (isConfirmingPromote)
+                        <span class="member-avatar member-avatar--initials">@Initials(m)</span>
+                    }
+                    <span class="feat-member-name">@(m.User?.FullName ?? m.User?.UserName ?? @Ui["Group.Member"])</span>
+                    @if (isAdminM) { <span class="member-badge member-badge--admin">@Ui["Group.Admin"]</span> }
+                    @if (m.UserId == CreatedByUserId) { <span class="member-badge member-badge--me">@Ui["Group.Creator"]</span> }
+                    @if (isSelf)   { <span class="member-badge member-badge--me">@Ui["Group.You"]</span> }
+                </div>
+                @if (isConfirmingPromote)
+                {
+                    <div class="feat-role-confirm">
+                        <span class="feat-role-confirm-text">@Ui["Group.MakeAdminConfirm"]</span>
+                        <button class="btn btn-secondary btn-sm"
+                                type="button"
+                                disabled="@IsSavingRole"
+                                @onclick="() => HandleSetMemberRole(m.Id, GroupMemberRole.Admin)">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="btn btn-ghost btn-sm"
+                                type="button"
+                                disabled="@IsSavingRole"
+                                @onclick="() => HandleCancelPromote()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                }
+                else if (!isSelf && CanManageAdminRoles)
+                {
+                    <div class="member-menu">
+                        <button class="btn btn-ghost btn-sm member-menu-btn" type="button"
+                                aria-label="@Ui["Group.MemberActions"]"
+                                @onclick="() => ToggleMenu(m.Id)">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        @if (openMenuMemberId == m.Id)
                         {
-                            <div class="feat-role-confirm">
-                                <span class="feat-role-confirm-text">@Ui["Group.MakeAdminConfirm"]</span>
-                                <button class="feat-role-btn feat-role-btn--confirm-yes"
-                                        type="button"
-                                        disabled="@IsSavingRole"
-                                        @onclick="() => HandleSetMemberRole(m.Id, GroupMemberRole.Admin)">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="feat-role-btn feat-role-btn--confirm-no"
-                                        type="button"
-                                        disabled="@IsSavingRole"
-                                        @onclick="() => HandleCancelPromote()">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                            <div class="member-menu-pop">
+                                @if (isAdminM)
+                                {
+                                    <button class="member-menu-item member-menu-item--danger"
+                                            type="button"
+                                            disabled="@(IsSavingRole || onlyAdmin)"
+                                            title="@(onlyAdmin ? @Ui["Group.MustHaveOneAdmin"] : @Ui["Group.RemoveAdminTitle"])"
+                                            @onclick="() => DemoteFromMenu(m.Id)">
+                                        <i class="fas fa-user-minus"></i> @Ui["Group.RemoveAdmin"]
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="member-menu-item"
+                                            type="button"
+                                            disabled="@IsSavingRole"
+                                            @onclick="() => PromoteFromMenu(m.Id)">
+                                        <i class="fas fa-user-shield"></i> @Ui["Group.MakeAdmin"]
+                                    </button>
+                                }
                             </div>
                         }
-                        else
-                        {
-                            <button class="feat-role-btn feat-role-btn--promote"
-                                    type="button"
-                                    disabled="@IsSavingRole"
-                                    title="@Ui["Group.PromoteToAdmin"]"
-                                    @onclick="() => HandleInitiatePromote(m.Id)">
-                                <i class="fas fa-user-shield"></i> @Ui["Group.MakeAdmin"]
-                            </button>
-                        }
-                    }
+                    </div>
                 }
             </li>
         }

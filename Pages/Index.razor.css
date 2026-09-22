@@ -7,16 +7,20 @@
 }
 
 /* -- Hero --------------------------------------------------------- */
+/* Unica excecao a regra "sem gradiente" (design-system §1 regra 5):
+   o hero e L1 sem filhos-card e orienta a tela. Degrade sutil que
+   termina em --accent (o ponto mais claro --accent-light reprovaria
+   o texto em AA, entao ele nao entra no degrade). */
 .home-hero {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--space-5);
     padding: var(--space-6);
-    background: var(--surface);
+    background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent) 100%);
     border: 1px solid var(--accent-border);
     border-radius: var(--radius-lg);
-    box-shadow: inset 0 2px 0 var(--accent);
+    color: var(--accent-fg);
 }
 
 .home-hero--landing {
@@ -38,14 +42,14 @@
     font-weight: var(--fw-bold);
     letter-spacing: -0.02em;
     line-height: 1.15;
-    color: var(--text);
+    color: var(--accent-fg);
 }
 
 .home-hero-sub {
     margin: 0;
     font-size: 1rem;
     line-height: 1.6;
-    color: var(--text-2);
+    color: var(--accent-fg-2);
 }
 
 .home-hero-actions {
@@ -170,6 +174,62 @@
     font-size: 0.8125rem;
 }
 
+/* Toggle dentro do hero azul: trilha translucida, ativo invertido. */
+.home-hero .home-view-toggle {
+    background: var(--on-accent-soft);
+    border-color: transparent;
+}
+
+.home-hero .home-view-btn {
+    color: var(--accent-fg-2);
+}
+
+.home-hero .home-view-btn:hover {
+    color: var(--accent-fg);
+}
+
+.home-hero .home-view-btn--active {
+    background: var(--accent-fg);
+    color: var(--accent);
+    box-shadow: none;
+}
+
+.home-hero .home-view-count {
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--accent-fg);
+}
+
+.home-hero .home-view-btn--active .home-view-count {
+    background: var(--accent);
+    color: var(--accent-fg);
+}
+
+/* CTAs da landing dentro do hero: "Criar conta" branco sobre azul,
+   "Entrar" ghost branco. */
+.home-hero .home-btn--primary {
+    background: var(--accent-fg);
+    border-color: var(--accent-fg);
+    color: var(--accent);
+}
+
+.home-hero .home-btn--primary:hover {
+    background: var(--accent-fg-2);
+    border-color: var(--accent-fg-2);
+    color: var(--accent-hover);
+}
+
+.home-hero .home-btn {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.45);
+    color: var(--accent-fg);
+}
+
+.home-hero .home-btn:hover {
+    background: var(--on-accent-soft);
+    border-color: var(--accent-fg);
+    color: var(--accent-fg);
+}
+
 /* -- Sections ----------------------------------------------------- */
 /* Each sector is an L1 panel; its head is a title strip (same tone,
    divider only) and the cards inside sit one level up (L2). */
@@ -204,20 +264,6 @@
     font-weight: var(--fw-semibold);
     letter-spacing: -0.01em;
     color: var(--text);
-}
-
-.home-section-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 var(--space-2);
-    border-radius: var(--radius-full);
-    background: var(--accent-soft);
-    color: var(--accent-text);
-    font-size: 0.75rem;
-    font-weight: var(--fw-semibold);
 }
 
 .home-section-body {

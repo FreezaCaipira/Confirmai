@@ -147,6 +147,8 @@ internal static class CoreTexts
         ["Breadcrumb.Dashboard"] = "Dashboard",
         ["Breadcrumb.Marketplace"] = "Marketplace",
         ["Breadcrumb.Languages"] = "Idiomas",
+        ["Breadcrumb.Group"] = "Grupo",
+        ["Breadcrumb.Groups"] = "Grupos",
 
         // Error
         ["Error.Title"] = "Erro",
@@ -363,6 +365,8 @@ internal static class CoreTexts
         ["Breadcrumb.Dashboard"] = "Dashboard",
         ["Breadcrumb.Marketplace"] = "Marketplace",
         ["Breadcrumb.Languages"] = "Languages",
+        ["Breadcrumb.Group"] = "Group",
+        ["Breadcrumb.Groups"] = "Groups",
 
         // Error
         ["Error.Title"] = "Error",
@@ -579,6 +583,8 @@ internal static class CoreTexts
         ["Breadcrumb.Dashboard"] = "Panel",
         ["Breadcrumb.Marketplace"] = "Mercado",
         ["Breadcrumb.Languages"] = "Idiomas",
+        ["Breadcrumb.Group"] = "Grupo",
+        ["Breadcrumb.Groups"] = "Grupos",
 
         // Error
         ["Error.Title"] = "Error",

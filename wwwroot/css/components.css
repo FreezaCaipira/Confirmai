@@ -1,0 +1,406 @@
+/* ==========================================================================
+   components.css — um so sistema de botoes (C36-D Fase 1)
+   Carregado DEPOIS de shell.css e ANTES de Confirmai.styles.css (_Host.cshtml).
+   Regra: 4 variantes (.btn-primary, .btn-secondary, .btn-ghost, .btn-danger)
+   + um tamanho (.btn-sm). Cor nao diferencia funcao — o rotulo diferencia.
+   ========================================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 40px;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--accent-ring);
+    outline-offset: 2px;
+}
+
+/* O unico azul cheio por tela — o proximo passo. */
+.btn-primary {
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    color: var(--accent-fg);
+}
+
+/* Acao secundaria — L2 neutro, ganha azul so no hover/foco. */
+.btn-secondary {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border-2);
+}
+
+.btn-secondary:hover {
+    background: var(--surface-3);
+    border-color: var(--accent-border);
+    color: var(--text);
+}
+
+/* Navegacao discreta — Voltar, cancelar, acoes de baixa prioridade. */
+.btn-ghost {
+    background: transparent;
+    color: var(--text-2);
+    border: 1px solid transparent;
+}
+
+.btn-ghost:hover {
+    color: var(--accent-text);
+    background: var(--accent-soft);
+}
+
+/* Destrutivo — sempre confirmado por modal/confirm upstream. */
+.btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+}
+
+.btn-danger:hover {
+    background: var(--danger);
+    color: var(--accent-fg);
+}
+
+.btn-sm {
+    min-height: 32px;
+    padding: 0 var(--space-3);
+    font-size: 0.8125rem;
+}
+
+.btn:disabled,
+.btn[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Aliases temporarios (mesmas declaracoes — sem @extend em CSS puro).
+   .home-btn: home autorizada (Index.razor.css) — migra nas proximas fases.
+   .mk-btn:   legado de buttons.css usado no Profile — migra na Fase 6.
+   -------------------------------------------------------------------------- */
+
+.home-btn,
+.mk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 40px;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border-2);
+}
+
+.home-btn:hover,
+.mk-btn:hover {
+    background: var(--surface-3);
+    border-color: var(--accent-border);
+    color: var(--text);
+}
+
+.home-btn--primary {
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: 1px solid transparent;
+}
+
+.home-btn--primary:hover {
+    background: var(--accent-hover);
+    color: var(--accent-fg);
+}
+
+/* --------------------------------------------------------------------------
+   .seg-toggle — segmented control compartilhado (C36-D Fase 8).
+   Mesma linguagem do toggle da home (L2 container, item ativo --accent-soft).
+   -------------------------------------------------------------------------- */
+
+.seg-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+}
+
+.seg-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 32px;
+    padding: 0 var(--space-3);
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-2);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.seg-item:hover {
+    color: var(--text);
+}
+
+.seg-item--active {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    box-shadow: inset 0 0 0 1px var(--accent-border);
+}
+
+.seg-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-full);
+    background: var(--surface-3);
+    color: var(--text-2);
+    font-size: 0.75rem;
+    font-weight: var(--fw-semibold);
+}
+
+.seg-item--active .seg-count {
+    background: var(--accent);
+    color: var(--accent-fg);
+}
+
+/* --------------------------------------------------------------------------
+   .status-badge — chip de estado compartilhado (confirmado / em analise).
+   -------------------------------------------------------------------------- */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: var(--fw-semibold);
+    white-space: nowrap;
+}
+
+.status-badge--confirmed {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.status-badge--pending {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.status-badge--accent {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+}
+
+/* --------------------------------------------------------------------------
+   .event-row — card de partida em linha (derivado do .home-event da home;
+   a home migra para esta classe na Fase 3).
+   -------------------------------------------------------------------------- */
+
+.event-row {
+    display: grid;
+    grid-template-columns: 160px 1fr auto;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.event-row:hover {
+    border-color: var(--accent-border);
+    background: var(--surface-3);
+}
+
+.event-row-when {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.event-row-day {
+    font-size: 0.875rem;
+    font-weight: var(--fw-semibold);
+    color: var(--accent-text);
+}
+
+.event-row-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+}
+
+.event-row-title {
+    font-size: 1rem;
+    font-weight: var(--fw-semibold);
+    color: var(--text);
+}
+
+.event-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    font-size: 0.8125rem;
+    color: var(--text-2);
+}
+
+.event-row-side {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+@media (max-width: 640px) {
+    .event-row {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+    }
+}
+
+/* --------------------------------------------------------------------------
+   .hub-stack — coluna de paineis L1 das telas do grupo (C36-D Fase 8).
+   -------------------------------------------------------------------------- */
+
+.hub-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+/* --------------------------------------------------------------------------
+   .panel — painel L1 (mesmo tratamento dos paineis da home, #119).
+   Filho nunca tem o tom do pai: conteudo dentro do panel e L2 (--surface-2).
+   -------------------------------------------------------------------------- */
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-card);
+}
+
+.panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    padding-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-head--spread {
+    align-items: center;
+}
+
+.panel-head-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.panel-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: var(--fw-semibold);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.panel-title i {
+    color: var(--accent-text);
+}
+
+.panel-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-size: 0.75rem;
+    font-weight: var(--fw-semibold);
+}
+
+/* Campo de texto L2 (input/select/textarea). */
+.input {
+    width: 100%;
+    min-height: 40px;
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 0.9375rem;
+}
+
+.input::placeholder {
+    color: var(--text-3);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+/* Estado vazio dentro de um painel (empty-state). */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--space-5);
+    border: 1px dashed var(--accent-border);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    text-align: center;
+}
+
+.empty-state-icon {
+    font-size: 1.5rem;
+    color: var(--text-3);
+}

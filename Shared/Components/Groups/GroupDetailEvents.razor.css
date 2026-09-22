@@ -1,0 +1,194 @@
+/* ── Tabela de partidas: linhas L2 dentro do painel L1 (C36-D Fase 8) ── */
+
+.events-table {
+    border-collapse: separate;
+    border-spacing: 0 var(--space-2);
+}
+
+.events-table thead th {
+    color: var(--text-3);
+    border-bottom: none;
+    padding: 0 var(--space-3) var(--space-1);
+    font-weight: var(--fw-semibold);
+}
+
+.events-table tbody tr.events-table-row {
+    border-bottom: none;
+}
+
+/* Cada linha e um bloco L2; cantos arredondados nas celulas das pontas. */
+.events-table tbody tr.events-table-row td {
+    background: var(--surface-2);
+    border-top: 1px solid var(--border-2);
+    border-bottom: 1px solid var(--border-2);
+    padding: var(--space-2) var(--space-3);
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.events-table tbody tr.events-table-row td:first-child {
+    border-left: 1px solid var(--border-2);
+    border-top-left-radius: var(--radius-sm);
+    border-bottom-left-radius: var(--radius-sm);
+}
+
+.events-table tbody tr.events-table-row td:last-child {
+    border-right: 1px solid var(--border-2);
+    border-top-right-radius: var(--radius-sm);
+    border-bottom-right-radius: var(--radius-sm);
+}
+
+.events-table tbody tr.events-table-row:hover td {
+    background: var(--surface-3);
+    border-color: var(--accent-border);
+}
+
+.events-table tbody tr.et-empty-row td,
+.events-table tbody tr td.et-empty {
+    background: transparent;
+    border: none;
+}
+
+.et-empty {
+    color: var(--text-3);
+}
+
+.et-empty-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.et-num {
+    color: var(--text-3);
+    font-size: 0.8125rem;
+}
+
+.et-date {
+    color: var(--text);
+    font-weight: var(--fw-medium);
+}
+
+.et-time {
+    color: var(--text-2);
+}
+
+.et-players {
+    color: var(--text-2);
+}
+
+.et-players--full {
+    color: var(--warning);
+    font-weight: var(--fw-semibold);
+}
+
+.et-players--empty {
+    color: var(--text-3);
+}
+
+/* ── Status badges (vocabulario novo: cor e estado, nao cor de acao) ── */
+
+.et-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: var(--fw-semibold);
+    text-transform: lowercase;
+    white-space: nowrap;
+}
+
+.et-status--open {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.et-status--next {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+}
+
+.et-status--full {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.et-status--cancelled {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+/* ── Tooltip da data (L3 popover, CSS puro; C36-D Fase 2) ── */
+
+.et-when {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-2);
+}
+
+.et-tooltip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 20;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--surface-3);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+    box-shadow: var(--shadow-card);
+    white-space: nowrap;
+    font-size: 0.8125rem;
+    font-weight: var(--fw-regular);
+    color: var(--text);
+    text-align: left;
+}
+
+.et-when:hover .et-tooltip,
+.et-when:focus-within .et-tooltip {
+    display: flex;
+}
+
+.et-tip-line {
+    display: block;
+}
+
+.et-tip-relative {
+    color: var(--accent-text);
+    font-weight: var(--fw-semibold);
+}
+
+.et-tip-meta {
+    color: var(--text-2);
+}
+
+/* Em touch nao existe hover: o detalhe vira linha visivel abaixo da data. */
+@media (max-width: 768px) {
+    .et-when {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+    }
+
+    .et-tooltip {
+        position: static;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        width: 100%;
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        white-space: normal;
+    }
+
+    .et-tip-relative {
+        font-weight: var(--fw-medium);
+    }
+}

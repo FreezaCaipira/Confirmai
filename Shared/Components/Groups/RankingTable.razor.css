@@ -55,7 +55,7 @@
 .ranking-name {
     flex: 1;
     min-width: 0;
-    color: var(--ci-surface-muted);
+    color: var(--text-2);
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -85,7 +85,7 @@
 }
 
 .ranking-col--label-highlight {
-    color: var(--poker-accent);
+    color: var(--accent-text);
 }
 
 .ranking-col--label-wins {
@@ -97,7 +97,7 @@
 }
 
 .ranking-col--highlight {
-    color: var(--poker-accent);
+    color: var(--accent-text);
 }
 
 /* ── Empty state ──────────────────────────────────────────────── */
@@ -107,13 +107,13 @@
     align-items: center;
     gap: 0.5rem;
     padding: 2rem 1rem;
-    color: var(--ci-text-info);
+    color: var(--accent-text);
     font-size: 0.9rem;
 }
 
 .ranking-empty i {
     font-size: 2rem;
-    color: var(--ci-text-info-strong);
+    color: var(--accent);
 }
 
 /* ── Name tooltip (mobile) ───────────────────────────────────── */
@@ -123,7 +123,7 @@
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--ci-bg-deep);
+    background: var(--surface-3);
     border: 1px solid var(--amber-opacity-lg);
     color: var(--amber);
     padding: 0.4rem 0.7rem;

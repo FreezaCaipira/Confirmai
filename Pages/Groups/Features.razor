@@ -8,6 +8,7 @@
 @using Confirmai.Services
 @using Confirmai.Services.Groups
 @using Confirmai.Pages.Groups.Components
+@using Confirmai.Shared.Components.Groups
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -45,7 +46,7 @@ else if (group is null || !isAdmin)
     <div class="detail-not-found">
         <i class="fas fa-lock detail-not-found-icon"></i>
         <h2>@Ui["Group.NotAuthorized"]</h2>
-        <a href="/">← @Ui["Common.Back"]</a>
+        <a href="/" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -55,24 +56,24 @@ else
     var canManageAdminRoles = isCreator;
 
     <div class="detail-page">
-        <div class="detail-card">
+        <div class="hub-stack">
 
-            <header class="detail-header">
-                <div class="detail-header-top">
-                    <a href="/grupo/@group.Id" class="detail-back-link">
-                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
-                    </a>
-                    <a href="/grupos" class="btn-view-groups">
-                        <i class="fas fa-layer-group"></i> @Ui["Groups.Title"]
-                    </a>
+            <GroupHeader Group="@group" IsAdmin="@isAdmin" />
+
+            <section class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="fas fa-cog"></i> @Ui["Group.ConfigTitle"]</h2>
                 </div>
-                <div class="detail-header-content">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
-                    </span>
-                    <h1 class="detail-title">@Ui["Group.ConfigTitle"]</h1>
-                </div>
-            </header>
+
+            @* ── Convite ────────────────────────────────────────────── *@
+            <section class="detail-section">
+                <h2 class="detail-section-title">
+                    <i class="fas fa-user-plus"></i> @Ui["Group.Invite"]
+                </h2>
+                <GroupInviteBlock InviteCode="@(group.InviteCode ?? string.Empty)" />
+            </section>
+
+            <hr class="detail-divider">
 
             @* ── Pagamentos & Funcionalidades ─────────────────────────── *@
             <FeaturesToggles
@@ -126,6 +127,7 @@ else
                 OnInitiatePromote="@InitiatePromoteCallback"
                 OnCancelPromote="@CancelPromoteCallback" />
 
+            </section>
         </div>
     </div>
 }

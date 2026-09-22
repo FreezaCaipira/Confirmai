@@ -1,80 +1,44 @@
+/* ── Filtros da caixa postal: uma linha compacta (C36-D Fase 5) ── */
+
 .mailbox-filters {
-    display: grid;
-    grid-template-columns: 1.5fr minmax(120px, 0.45fr) minmax(180px, 0.6fr) auto;
-    gap: 0.42rem;
-    align-items: end;
-    margin-bottom: 0.72rem;
-    padding: 0.56rem;
-    border: 1px solid var(--ci-border);
-    border-radius: 4px;
-    background: var(--ci-bg-card);
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border);
 }
 
 .mailbox-filter-field {
-    display: grid;
-    gap: 0.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
 }
 
-.mailbox-filter-field label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--ci-text-muted);
+.mailbox-filter-search {
+    flex: 1 1 160px;
 }
 
-.mailbox-search {
-    font-size: 0.67rem;
+.mailbox-filter-label {
+    font-size: 0.75rem;
+    color: var(--text-3);
+    font-weight: var(--fw-medium);
 }
 
 .mailbox-check-label {
     display: inline-flex;
     align-items: center;
-    gap: 0.38rem;
-    font-size: 0.73rem;
-    color: var(--ci-text);
-    font-weight: 700;
+    gap: var(--space-2);
+    font-size: 0.8125rem;
+    color: var(--text-2);
+    padding-bottom: var(--space-2);
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .mailbox-filter-actions {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 0.36rem;
-}
-
-.mailbox-filter-actions .mk-btn {
-    min-height: 1.85rem;
-    padding: 0.18rem 0.55rem;
-    border-radius: 3px;
-    border: 1px solid var(--ci-border);
-    background: var(--ci-bg-deep);
-    color: var(--ci-text);
-    font-size: 0.72rem;
-    font-weight: 700;
-    box-shadow: 0 2px 4px var(--shadow-md);
-}
-
-.mailbox-filters input,
-.mailbox-filters select,
-.mailbox-filters textarea {
-    width: 100%;
-    box-sizing: border-box;
-    min-height: 1.82rem;
-    border: 1px solid var(--ci-border);
-    border-radius: 4px;
-    background: var(--ci-bg-input);
-    color: var(--ci-text);
-    padding: 0.16rem 0.4rem;
-    font-size: 0.76rem;
-}
-
-.mailbox-filters input[type="checkbox"] {
-    width: 14px;
-    min-height: 14px;
-    padding: 0;
-}
-
-@media (max-width: 1024px) {
-    .mailbox-filters {
-        grid-template-columns: 1fr;
-        align-items: stretch;
-    }
+    display: flex;
+    gap: var(--space-2);
+    margin-left: auto;
 }

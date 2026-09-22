@@ -2,22 +2,29 @@
 @using System.Globalization
 
 <aside class="mailbox-list-pane">
-    <div class="mailbox-folder-tabs" aria-label="@T["Mailbox.ConversationListAria"]">
-        <button class="mailbox-folder-tab @(ShowArchived ? string.Empty : "active")" type="button" @onclick="@(() => HandleSwitchFolder(false))">@T["Mailbox.TabActive"] (@ActiveConversationTotal)</button>
-        <button class="mailbox-folder-tab @(ShowArchived ? "active" : string.Empty)" type="button" @onclick="@(() => HandleSwitchFolder(true))">@T["Mailbox.TabArchived"] (@ArchivedConversationTotal)</button>
+    <div class="seg-toggle mailbox-seg" aria-label="@T["Mailbox.ConversationListAria"]">
+        <button class="seg-item @(ShowArchived ? string.Empty : "seg-item--active")" type="button" @onclick="@(() => HandleSwitchFolder(false))">
+            @T["Mailbox.TabActive"] <span class="seg-count">@ActiveConversationTotal</span>
+        </button>
+        <button class="seg-item @(ShowArchived ? "seg-item--active" : string.Empty)" type="button" @onclick="@(() => HandleSwitchFolder(true))">
+            @T["Mailbox.TabArchived"] <span class="seg-count">@ArchivedConversationTotal</span>
+        </button>
     </div>
 
     @if (!Conversations.Any())
     {
-        <p class="market-empty">@T["Mailbox.NoConversations"]</p>
+        <div class="empty-state mailbox-list-empty">
+            <i class="fas fa-inbox empty-state-icon"></i>
+            <p>@T["Mailbox.NoConversations"]</p>
+        </div>
     }
     else
     {
-        <div class="mailbox-list mailbox-list-compact">
+        <div class="mailbox-list">
             @foreach (var contact in Conversations)
             {
                 var isSelected = string.Equals(SelectedConversationKey, contact.ConversationKey, StringComparison.Ordinal);
-                <div class="mailbox-list-item @(contact.HasUnread ? "unread" : string.Empty) @(isSelected ? "active" : string.Empty)">
+                <div class="mailbox-list-item @(contact.HasUnread ? "mailbox-list-item--unread" : string.Empty) @(isSelected ? "mailbox-list-item--active" : string.Empty)">
                     <button class="mailbox-list-item-main"
                             type="button"
                             @onclick="@(() => HandleSelectConversation(contact.ConversationKey))">
@@ -32,38 +39,33 @@
                             </div>
                             <span class="mailbox-list-item-time">@FormatRelativeTime(contact.LastCreatedAt)</span>
                         </div>
-                        <div class="mailbox-list-item-peer">@T["Mailbox.ConversationInProgress"]</div>
-                        @if (contact.HasUnread)
-                        {
-                            <div class="mailbox-list-item-status">
-                                <span class="mailbox-chip mailbox-chip-alert">@contact.UnreadCount @T["Mailbox.Unread"]</span>
-                            </div>
-                        }
                         <div class="mailbox-list-item-snippet">@BuildSnippet(contact.LastBody)</div>
                     </button>
 
-                    @if (contact.HasUnread)
-                    {
-                        <button class="mk-btn mk-btn-secondary mailbox-list-item-mark-read"
-                                type="button"
-                                @onclick="@(() => HandleMarkAsRead(contact.ConversationKey))">
-                            @T["Mailbox.MarkAsRead"]
-                        </button>
-                    }
+                    <div class="mailbox-list-item-actions">
+                        @if (contact.HasUnread)
+                        {
+                            <button class="btn btn-ghost btn-sm"
+                                    type="button"
+                                    @onclick="@(() => HandleMarkAsRead(contact.ConversationKey))">
+                                @T["Mailbox.MarkAsRead"]
+                            </button>
+                        }
 
-                    <button class="mk-btn mk-btn-secondary mailbox-list-item-mark-read"
-                            type="button"
-                            @onclick="@(() => HandleArchive(contact.ConversationKey))">
-                        @(ShowArchived ? T["Mailbox.Unarchive"] : T["Mailbox.Archive"])
-                    </button>
+                        <button class="btn btn-ghost btn-sm"
+                                type="button"
+                                @onclick="@(() => HandleArchive(contact.ConversationKey))">
+                            @(ShowArchived ? T["Mailbox.Unarchive"] : T["Mailbox.Archive"])
+                        </button>
+                    </div>
                 </div>
             }
         </div>
 
         <div class="mailbox-pagination">
-            <button class="mk-btn mk-btn-secondary" type="button" disabled="@(CurrentPage <= 1)" @onclick="HandlePreviousPage">@T["Mailbox.PrevPage"]</button>
-            <span>@string.Format(T["Mailbox.PageInfo"], CurrentPage, TotalPages(ConversationTotal))</span>
-            <button class="mk-btn mk-btn-secondary" type="button" disabled="@(CurrentPage >= TotalPages(ConversationTotal))" @onclick="HandleNextPage">@T["Mailbox.NextPage"]</button>
+            <button class="btn btn-ghost btn-sm" type="button" disabled="@(CurrentPage <= 1)" @onclick="HandlePreviousPage">@T["Mailbox.PrevPage"]</button>
+            <span class="mailbox-pagination-info">@string.Format(T["Mailbox.PageInfo"], CurrentPage, TotalPages(ConversationTotal))</span>
+            <button class="btn btn-ghost btn-sm" type="button" disabled="@(CurrentPage >= TotalPages(ConversationTotal))" @onclick="HandleNextPage">@T["Mailbox.NextPage"]</button>
         </div>
     }
 </aside>

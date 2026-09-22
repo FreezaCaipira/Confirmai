@@ -4,10 +4,14 @@
 
 @if (!ChatMessages.Any())
 {
-    <div class="profile-chat-empty">@T["Profile.NoMessages"]</div>
+    <div class="empty-state profile-chat-empty">
+        <i class="fas fa-comment-dots empty-state-icon"></i>
+        <p>@T["Profile.NoMessages"]</p>
+    </div>
 }
 else
 {
+    <div class="profile-chat-messages">
     @foreach (var msg in ChatMessages)
     {
         <article class="profile-chat-bubble @(msg.IsIncoming ? "incoming" : "outgoing")">
@@ -15,4 +19,5 @@ else
             <span class="profile-chat-meta">@msg.CreatedAt.ToLocalTime().ToString("dd/MM HH:mm", CultureInfo.InvariantCulture)</span>
         </article>
     }
+    </div>
 }

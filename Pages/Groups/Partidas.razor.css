@@ -1,9 +1,5 @@
 /* Partidas page uses global events.css for detail-events-* and events-table classes */
 
-.partidas-title {
-    margin-bottom: 1rem;
-}
-
 /* -- Expand/collapse button for upcoming matches preview -- */
 .events-expand-row {
     display: flex;
@@ -11,25 +7,3 @@
     padding: 0.75rem 0 0.25rem;
 }
 
-.events-expand-btn {
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-border);
-    color: var(--ci-accent-light);
-    font-size: 0.85rem;
-    font-weight: 700;
-    padding: 0.5rem 1.25rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 2px 4px var(--shadow-md);
-}
-
-.events-expand-btn:hover {
-    background: var(--ci-accent-mid);
-    border-color: var(--ci-accent);
-    color: var(--ci-surface-light);
-    box-shadow: 0 4px 8px var(--shadow-accent-sm);
-}

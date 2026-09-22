@@ -57,23 +57,7 @@
 
 .onboarding-step-text {
     font-size: 0.85rem;
-    color: var(--ci-text);
+    color: var(--text);
     line-height: 1.35;
 }
 
-::deep .btn-view-groups {
-    margin-top: 1rem;
-    background: var(--surface-3);
-    border: 1px solid var(--border-2);
-    color: var(--text);
-    font-weight: var(--fw-medium);
-    text-shadow: none;
-    box-shadow: none;
-}
-
-::deep .btn-view-groups:hover {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-fg);
-    box-shadow: none;
-}

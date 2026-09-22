@@ -46,8 +46,8 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        // Badge shows "N pendente(s)" and card gets action-required class
-        Assert.Contains("group-card--action-required", html);
+        // Management row shows the pending count badge
+        Assert.Contains("data-test-pending-count=\"1\"", html);
         Assert.Contains("pendente", html);
     }
 
@@ -213,17 +213,16 @@ public class GroupsIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         
-        // Verify groups are being displayed
-        var hasGroupCard = html.Contains("group-card");
-        Assert.True(hasGroupCard, "HTML should contain group cards");
+        // Verify groups are being displayed as management rows
+        Assert.Contains("group-row", html);
         
         // Check the data attributes
         var isAdminMatch = System.Text.RegularExpressions.Regex.Match(html, "data-test-is-admin=\"([^\"]*)\"");
         Assert.True(isAdminMatch.Success, "Should have data-test-is-admin attribute");
         Assert.Equal("True", isAdminMatch.Groups[1].Value);
         
-        // Check that the group card exists with action-required class
-        Assert.Contains("group-card--action-required", html);
-        Assert.Contains("player-tag--pending-requests", html);
+        // Check the pending-count badge on the row
+        Assert.Contains("data-test-pending-count=\"1\"", html);
+        Assert.Contains("status-badge--accent", html);
     }
 }

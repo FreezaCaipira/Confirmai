@@ -35,7 +35,7 @@ else if (group is null)
 {
     <div class="detail-not-found">
         <h2>@Ui["Group.InvalidInvite"]</h2>
-        <a href="/">@Ui["Group.BackToStart"]</a>
+        <a href="/" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> @Ui["Group.BackToStart"]</a>
     </div>
 }
 else
@@ -48,7 +48,7 @@ else
                     <span class="detail-sport-badge">
                         @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
                     </span>
-                    <a class="detail-back-link" href="/">
+                    <a class="btn btn-ghost" href="/">
                         <i class="fas fa-arrow-left"></i> @Ui["Group.Home"]
                     </a>
                 </div>
@@ -169,7 +169,7 @@ else
                 @if (currentUserId is null)
                 {
                     <a href="/Identity/Account/Login?ReturnUrl=@Uri.EscapeDataString(NavigationManager.Uri)"
-                       class="confirm-btn">
+                       class="btn btn-primary">
                         <i class="fas fa-sign-in-alt"></i> @Ui["Group.EnterToJoin"]
                     </a>
                 }
@@ -179,7 +179,7 @@ else
                         <i class="fas fa-check-circle"></i>
                         <span>@Ui["Group.AlreadyMember"]</span>
                     </div>
-                    <a href="/grupo/@group.Id" class="confirm-btn confirm-btn--mt">
+                    <a href="/grupo/@group.Id" class="btn btn-primary">
                         @Ui["Group.ViewGroup"]
                     </a>
                 }
@@ -189,7 +189,7 @@ else
                         <i class="fas fa-check-circle"></i>
                         <span>@Ui.Get("Group.JoinedGroup", group.Name)</span>
                     </div>
-                    <a href="/grupo/@group.Id" class="confirm-btn confirm-btn--mt">
+                    <a href="/grupo/@group.Id" class="btn btn-primary">
                         @Ui["Group.ViewGroup"]
                     </a>
                 }
@@ -199,7 +199,7 @@ else
                     {
                         <p class="detail-error">@actionError</p>
                     }
-                    <button class="confirm-btn" type="button" @onclick="JoinGroup">
+                    <button class="btn btn-primary" type="button" @onclick="JoinGroup">
                         <i class="fas fa-user-plus"></i> @Ui["Group.JoinGroupBtn"]
                     </button>
                 }

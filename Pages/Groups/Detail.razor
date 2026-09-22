@@ -3,7 +3,6 @@
 @attribute [AllowAnonymous]
 
 @using System.Security.Claims
-@using Confirmai.Data
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Services
@@ -13,7 +12,6 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
 
-@inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider    AuthStateProvider
 @inject NavigationManager              NavigationManager
 @inject IConfiguration                 Config
@@ -55,7 +53,7 @@ else if (group is null)
 {
     <div class="detail-not-found">
         <h2>@Ui["Group.NotFound"]</h2>
-        <a href="/">← @Ui["Common.Back"]</a>
+        <a href="/" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> @Ui["Common.Back"]</a>
     </div>
 }
 else
@@ -65,191 +63,279 @@ else
     var isMember  = currentUserId is not null &&
                    group.Members.Any(m => m.UserId == currentUserId);
     var baseUrl   = (Config["App:BaseUrl"]?.TrimEnd('/'))  ?? NavigationManager.BaseUri.TrimEnd('/');
+    var inviteUrl = $"{baseUrl}/convite/{group.InviteCode}";
 
     <div class="detail-page">
-        <div class="detail-card">
+        <div class="hub-stack">
 
-            @* ── Cabeçalho ─────────────────────────────────────────── *@
-            <header class="detail-header">
-                <div class="detail-header-top">
-                    <a href="/grupos" class="detail-back-link">
-                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
-                    </a>
-                </div>
-                <div class="detail-header-content">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
-                    </span>
-                    <h1 class="detail-title">@group.Name</h1>
-                    @if (!string.IsNullOrWhiteSpace(group.City))
-                    {
-                        <p class="detail-location">
-                            <i class="fas fa-map-marker-alt"></i>
-                            @group.City/@group.StateCode
-                        </p>
-                    }
-                </div>
-                @if (!group.IsActive)
-                {
-                    <div class="cancelled-banner"><i class="fas fa-ban"></i> @Ui["Group.Inactive"]</div>
-                }
-            </header>
+            @* ── Cabeçalho do grupo (compartilhado, com sub-nav) ──────── *@
+            <GroupHeader Group="@group" IsAdmin="@isAdmin" />
 
-            @* ── Convite (somente admin) ────────────────────────────── *@
-            @if (isAdmin)
+            @if (!group.IsActive)
             {
-                <div class="invite-block">
-                    @{ var inviteUrl = $"{baseUrl}/convite/{group.InviteCode}"; }
-                    <div class="invite-row">
-                        <span class="invite-label"><i class="fas fa-link"></i> @Ui["Group.InviteLink"]</span>
-                        <code class="invite-code-display" id="invite-url-text">@inviteUrl</code>
-                        <button class="invite-copy-btn" type="button"
-                                @onclick="() => CopyInviteLink(inviteUrl)">
-                            <i class="fas fa-copy"></i> @(copiedInvite ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
-                        </button>
-                    </div>
-                    <hr class="invite-row-divider" />
-                    <div class="invite-row">
-                        <span class="invite-label"><i class="fas fa-key"></i> @Ui["Group.Code"]</span>
-                        <code class="invite-code-display invite-code-only">@group.InviteCode</code>
-                        <button class="invite-copy-btn" type="button"
-                                @onclick="() => CopyCode(group.InviteCode!)">
-                            <i class="fas fa-copy"></i> @(copiedCode ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
-                        </button>
-                    </div>
-                    <hr class="invite-row-divider" />
-                    <div class="invite-block-actions">
-                        <button class="detail-admin-btn detail-admin-btn--whatsapp invite-block-btn" type="button"
-                                @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
-                            <i class="fab fa-whatsapp"></i> @Ui["Group.Invite"]
-                        </button>
-                        <a class="detail-admin-btn invite-block-btn invite-block-btn--settings" href="/grupo/@group.Id/configuracoes">
-                            <i class="fas fa-cog"></i> @Ui["Group.Settings"]
+                <div class="cancelled-banner"><i class="fas fa-ban"></i> @Ui["Group.Inactive"]</div>
+            }
+
+            @if (isMember)
+            {
+                @* ── Ações do grupo ──────────────────────────────────── *@
+                <section class="panel hub-actions-panel" aria-label="@Ui["Group.ActionsLabel"]">
+                    <div class="hub-actions">
+                        <a class="hub-action" href="/grupo/@group.Id/partidas">
+                            <span class="hub-action-icon"><i class="fas fa-calendar-alt"></i></span>
+                            <span class="hub-action-text">
+                                <span class="hub-action-label">@Ui["Group.PartidasLink"]</span>
+                                <span class="hub-action-sub">@upcomingEventsCount @Ui["Group.Upcoming"]</span>
+                            </span>
                         </a>
-                    </div>
-                </div>
-            }
-
-            @* ── Aviso: nenhum admin tem Pix (apenas para admins, apenas Pix direto) ── *@
-            @if (isAdmin && !group.EnablePaymentGateways && !group.Members.Any(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey)))
-            {
-                <hr class="detail-divider">
-                <div class="detail-pix-notice">
-                    <span class="detail-pix-notice-icon"><i class="fas fa-exclamation-triangle"></i></span>
-                    <div class="detail-pix-notice-body">
-                        <strong>@Ui["Group.PixNotConfigured"]</strong>
-                        <p>@Ui["Group.PixNotConfiguredDesc"]</p>
-                        <a href="/grupo/@group.Id/configuracoes" class="detail-pix-notice-link">@Ui["Group.ConfigureNow"]</a>
-                    </div>
-                </div>
-            }
-
-            <hr class="detail-divider">
-
-            @* ── Métricas (somente admin) ───────────────────────────── *@
-            @if (isAdmin)
-            {
-                <section class="detail-section">
-                    <div class="detail-section-header">
-                        <h2 class="detail-section-title">
-                            <i class="fas fa-chart-line"></i> @Ui["Group.Metrics"]
-                        </h2>
-                    </div>
-                    <GroupMetrics GroupId="@group.Id" />
-                </section>
-            }
-
-            @* ── Membros ────────────────────────────────────────────── *@
-            <hr class="detail-divider">
-            <section class="detail-section">
-                <div class="detail-section-header">
-                    <h2 class="detail-section-title">
-                        <i class="fas fa-users"></i> @Ui["Group.Members"] (@group.Members.Count)
-                    </h2>
-                    <div class="detail-section-actions">
-                        <a class="detail-admin-btn detail-admin-btn--partidas" href="/grupo/@group.Id/partidas">
-                            <i class="fas fa-calendar-alt"></i> @Ui["Group.PartidasLink"]
-                        </a>
-                        @if (isMember && group.EnablePostMatchRanking)
-                        {
-                            <a class="detail-admin-btn detail-admin-btn--ranking" href="/grupo/@group.Id/ranking">
-                                <i class="fas fa-trophy"></i> @Ui["Group.RankingLink"]
-                            </a>
-                        }
-                        @if (isMember)
-                        {
-                            <a class="detail-admin-btn detail-admin-btn--pagamentos" href="/grupo/@group.Id/pagamentos">
-                                <i class="fas fa-money-bill-wave"></i> @Ui["Group.PaymentsLink"]
+                        <a class="hub-action" href="/grupo/@group.Id/pagamentos">
+                            <span class="hub-action-icon"><i class="fas fa-money-bill-wave"></i></span>
+                            <span class="hub-action-text">
+                                <span class="hub-action-label">@Ui["Group.PaymentsLink"]</span>
                                 @if (myPendingPayments > 0)
                                 {
-                                    <span class="payments-tab-count payments-tab-count--delinquent">@myPendingPayments</span>
+                                    <span class="hub-action-sub hub-action-sub--warn">
+                                        @myPendingPayments @(myPendingPayments == 1 ? Ui["Group.PendingSingular"] : Ui["Group.PendingPlural"])
+                                    </span>
                                 }
+                                else
+                                {
+                                    <span class="hub-action-sub">@Ui["Group.PaymentsUpToDate"]</span>
+                                }
+                            </span>
+                        </a>
+                        @if (group.EnablePostMatchRanking)
+                        {
+                            <a class="hub-action" href="/grupo/@group.Id/ranking">
+                                <span class="hub-action-icon"><i class="fas fa-trophy"></i></span>
+                                <span class="hub-action-text">
+                                    <span class="hub-action-label">@Ui["Group.RankingLink"]</span>
+                                    <span class="hub-action-sub">@Ui["Group.RankingSub"]</span>
+                                </span>
                             </a>
                         }
+                        @if (isAdmin)
+                        {
+                            <a class="hub-action" href="/grupo/@group.Id/configuracoes">
+                                <span class="hub-action-icon"><i class="fas fa-cog"></i></span>
+                                <span class="hub-action-text">
+                                    <span class="hub-action-label">@Ui["Group.Settings"]</span>
+                                    <span class="hub-action-sub">@Ui["Group.SettingsSub"]</span>
+                                </span>
+                            </a>
+                            <button class="hub-action" type="button"
+                                    @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
+                                <span class="hub-action-icon"><i class="fab fa-whatsapp"></i></span>
+                                <span class="hub-action-text">
+                                    <span class="hub-action-label">@Ui["Group.Invite"]</span>
+                                    <span class="hub-action-sub">@Ui["Group.InviteSub"]</span>
+                                </span>
+                            </button>
+                        }
                     </div>
-                </div>
-                <GroupDetailMembers
-                    Members="@group.Members"
-                    CurrentUserId="@currentUserId"
-                    ShowAllMembers="@showAllMembers"
-                    OnToggleMembersView="@ToggleMembersView" />
-            </section>
+                </section>
 
-            @* ── Solicitações de entrada (admin) ─────────────────────── *@
-            @if (isAdmin && pendingRequests.Count > 0)
-            {
-                <hr class="detail-divider">
-                <GroupDetailPendingRequests
-                    PendingCount="@pendingRequests.Count"
-                    SelectedCount="@selectedRequestIds.Count"
-                    IsBulkProcessing="@isBulkProcessing"
-                    @bind-RequestSortOrder="requestSortOrder"
-                    SortedPendingRequests="@sortedPendingRequests"
-                    SelectedRequestIds="@selectedRequestIds"
-                    OnApprove="ApproveRequest"
-                    OnReject="RejectRequest"
-                    OnApproveSelected="ApproveSelected"
-                    OnRejectSelected="RejectSelected"
-                    OnClearSelection="ClearSelection"
-                    OnToggleSelection="((int id, bool sel) args) => ToggleRequestSelection(args.id, args.sel)" />
-            }
-
-            @* ── Não membro: solicitar entrada ────────────────────────── *@
-            @if (currentUserId is not null && !isMember)
-            {
-                <hr class="detail-divider">
-                <div class="join-request-section">
-                    @if (userJoinRequest?.Status == JoinRequestStatus.Pending)
+                @* ── Próxima partida ───────────────────────────────── *@
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2 class="panel-title">
+                            <i class="fas fa-calendar-day"></i> @Ui["Group.NextMatch"]
+                        </h2>
+                    </div>
+                    @if (nextEvent is not null)
                     {
-                        <p class="join-request-pending">
-                            <i class="fas fa-hourglass-half"></i>
-                            @Ui["Group.JoinRequestSent"]
-                        </p>
-                        <button class="cancel-join-btn" type="button" @onclick="CancelJoinRequest" disabled="@cancellingJoin">
+                        var myConfirmation = nextEvent.Confirmations
+                            .FirstOrDefault(c => c.UserId == currentUserId);
+                        var eventHref = nextEvent.Sport == Sport.Futsal
+                            ? $"/futsal/{nextEvent.Id}"
+                            : $"/poker/{nextEvent.Id}";
+                        var owes = myConfirmation is not null && !myConfirmation.HasPaid
+                            && myConfirmation.PaymentStatus == EventConfirmationPaymentStatus.Pending
+                            && nextEvent.Price.HasValue && nextEvent.Price.Value > 0
+                            && myConfirmation.Position != FutsalPosition.Goalkeeper;
+                        var proofSent = owes && myConfirmation!.PixProofUploadedAt is not null;
+                        <div class="event-row">
+                            <div class="event-row-when">
+                                <span class="event-row-day">@Ui.FormatDateTime(nextEvent.StartsAt.ToLocalTime(), "DateTimeFullShort")</span>
+                            </div>
+                            <div class="event-row-body">
+                                <span class="event-row-title">@group.Name</span>
+                                <span class="event-row-meta">
+                                    @if (!string.IsNullOrWhiteSpace(nextEvent.Location))
+                                    {
+                                        <span>📍 @nextEvent.Location</span>
+                                    }
+                                    <span>👥 @nextEvent.Confirmations.Count@(nextEvent.MaxPlayers > 0 ? $"/{nextEvent.MaxPlayers}" : string.Empty) @Ui["Index.ConfirmedCount"]</span>
+                                </span>
+                            </div>
+                            <div class="event-row-side">
+                                @if (proofSent)
+                                {
+                                    <span class="status-badge status-badge--pending">
+                                        <i class="fas fa-clock"></i> @Ui["Index.ProofSent"]
+                                    </span>
+                                }
+                                else if (owes)
+                                {
+                                    <a href="/pagamento/evento/@myConfirmation!.Id" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-qrcode"></i> @Ui["Index.Pay"]
+                                    </a>
+                                }
+                                else if (myConfirmation is not null)
+                                {
+                                    <span class="status-badge status-badge--confirmed">
+                                        <i class="fas fa-check"></i> @Ui["Index.Confirmed"]
+                                    </span>
+                                }
+                                else
+                                {
+                                    <a href="@eventHref" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-check"></i> @Ui["Group.ConfirmPresence"]
+                                    </a>
+                                }
+                                <a href="@eventHref" class="btn btn-ghost btn-sm">
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="hub-next-empty">
+                            @if (isAdmin)
+                            {
+                                <p class="hub-next-empty-text">@Ui["Group.NoMatchScheduledEmpty"]</p>
+                                <a href="@(group.Sport == Sport.Futsal ? $"/futsal/create?groupId={group.Id}" : $"/poker/create?groupId={group.Id}")" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> @Ui["Groups.NovaPartida"]
+                                </a>
+                            }
+                            else
+                            {
+                                <p class="hub-next-empty-text">@Ui["Group.NoMatchOrganizer"]</p>
+                            }
+                        </div>
+                    }
+                </section>
+
+                @* ── Aviso: nenhum admin tem Pix (apenas admin, apenas Pix direto) ── *@
+                @if (isAdmin && !group.EnablePaymentGateways && !group.Members.Any(m => m.Role == GroupMemberRole.Admin && !string.IsNullOrWhiteSpace(m.User?.PixKey)))
+                {
+                    <div class="detail-pix-notice">
+                        <span class="detail-pix-notice-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                        <div class="detail-pix-notice-body">
+                            <strong>@Ui["Group.PixNotConfigured"]</strong>
+                            <p>@Ui["Group.PixNotConfiguredDesc"]</p>
+                            <a href="/grupo/@group.Id/configuracoes" class="detail-pix-notice-link">@Ui["Group.ConfigureNow"]</a>
+                        </div>
+                    </div>
+                }
+
+                @* ── Métricas (somente admin) ────────────────────────── *@
+                @if (isAdmin)
+                {
+                    <section class="panel">
+                        <div class="panel-head">
+                            <h2 class="panel-title">
+                                <i class="fas fa-chart-line"></i> @Ui["Group.Metrics"]
+                            </h2>
+                        </div>
+                        <GroupMetrics GroupId="@group.Id" />
+                    </section>
+                }
+
+                @* ── Membros + pedidos de entrada ────────────────────── *@
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2 class="panel-title">
+                            <i class="fas fa-users"></i> @Ui["Group.Members"] (@group.Members.Count)
+                        </h2>
+                    </div>
+
+                    @if (isAdmin && pendingRequests.Count > 0)
+                    {
+                        <div class="hub-requests">
+                            <div class="hub-requests-head">
+                                <h3 class="hub-requests-title">
+                                    @Ui["Group.PendingRequestsLabel"] (@pendingRequests.Count)
+                                </h3>
+                                @if (pendingRequests.Count >= 2)
+                                {
+                                    <button class="btn btn-primary btn-sm" type="button"
+                                            @onclick="ApproveAllRequests" disabled="@isBulkProcessing">
+                                        <i class="fas fa-check-double"></i> @Ui["Group.ApproveAll"]
+                                    </button>
+                                }
+                            </div>
+                            <ul class="hub-request-list">
+                                @foreach (var req in pendingRequests.OrderByDescending(r => r.RequestedAt))
+                                {
+                                    <li class="hub-request-item">
+                                        <div class="hub-request-info">
+                                            <span class="hub-request-name">@(req.User?.FullName ?? req.User?.UserName ?? Ui["Group.PendingRequestUserFallback"])</span>
+                                            <span class="hub-request-email">@req.User?.Email</span>
+                                        </div>
+                                        <div class="hub-request-actions">
+                                            <button class="btn btn-secondary btn-sm" type="button"
+                                                    @onclick="() => ApproveRequest(req.Id)"
+                                                    title="@Ui["Group.ApproveRequest"]">
+                                                <i class="fas fa-check"></i> @Ui["Group.Approve"]
+                                            </button>
+                                            <button class="btn btn-ghost btn-sm" type="button"
+                                                    @onclick="() => RejectRequest(req.Id)"
+                                                    title="@Ui["Group.RejectRequest"]">
+                                                <i class="fas fa-times"></i> @Ui["Group.Reject"]
+                                            </button>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <GroupDetailMembers
+                        Members="@group.Members"
+                        CurrentUserId="@currentUserId"
+                        ShowAllMembers="@showAllMembers"
+                        OnToggleMembersView="@ToggleMembersView" />
+                </section>
+            }
+            else
+            {
+                @* ── Não-membro: um painel só ────────────────────────── *@
+                <section class="panel empty-state">
+                    @if (currentUserId is null)
+                    {
+                        <i class="fas fa-lock empty-state-icon"></i>
+                        <p class="join-request-info">@Ui["Group.NotMemberInfo"]</p>
+                        <a class="btn btn-primary" href="/Identity/Account/Login?ReturnUrl=@Uri.EscapeDataString(NavigationManager.Uri)">
+                            <i class="fas fa-sign-in-alt"></i> @Ui["Group.LoginToJoin"]
+                        </a>
+                    }
+                    else if (userJoinRequest?.Status == JoinRequestStatus.Pending)
+                    {
+                        <i class="fas fa-hourglass-half empty-state-icon"></i>
+                        <p class="join-request-pending">@Ui["Group.JoinRequestSent"]</p>
+                        <button class="btn btn-ghost" type="button" @onclick="CancelJoinRequest" disabled="@cancellingJoin">
                             <i class="fas fa-times"></i>
                             @(cancellingJoin ? @Ui["Group.CancellingJoin"] : @Ui["Group.CancelJoinRequest"])
                         </button>
                     }
                     else if (userJoinRequest?.Status == JoinRequestStatus.Rejected)
                     {
-                        <p class="join-request-pending join-request-pending--rejected">
-                            <i class="fas fa-times-circle"></i>
-                            @Ui["Group.JoinRequestRejected"]
-                        </p>
+                        <i class="fas fa-times-circle empty-state-icon"></i>
+                        <p class="join-request-pending join-request-pending--rejected">@Ui["Group.JoinRequestRejected"]</p>
                     }
                     else
                     {
-                        <p class="join-request-info">
-                            <i class="fas fa-info-circle"></i>
-                            @Ui["Group.NotMemberInfo"]
-                        </p>
-                        <button class="confirm-btn" type="button" @onclick="RequestToJoin"
+                        <i class="fas fa-user-plus empty-state-icon"></i>
+                        <p class="join-request-info">@Ui["Group.NotMemberInfo"]</p>
+                        <button class="btn btn-primary" type="button" @onclick="RequestToJoin"
                                 disabled="@requestingJoin">
                             <i class="fas fa-user-plus"></i>
                             @(requestingJoin ? @Ui["Group.SendingJoin"] : @Ui["Group.RequestJoin"])
                         </button>
                     }
-                </div>
+                </section>
             }
 
         </div>

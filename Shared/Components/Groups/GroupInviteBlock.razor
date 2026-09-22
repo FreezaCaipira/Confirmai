@@ -1,0 +1,100 @@
+@using Confirmai.Services.Core
+@using Microsoft.JSInterop
+@inject UiTextService Ui
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject IConfiguration Config
+@implements IAsyncDisposable
+
+<div class="invite-block">
+    @{ var inviteUrl = $"{BaseUrl}/convite/{InviteCode}"; }
+    <div class="invite-row">
+        <span class="invite-label"><i class="fas fa-link"></i> @Ui["Group.InviteLink"]</span>
+        <code class="invite-code-display" id="invite-url-text">@inviteUrl</code>
+        <button class="btn btn-ghost btn-sm" type="button"
+                @onclick="() => CopyInviteLink(inviteUrl)">
+            <i class="fas fa-copy"></i> @(copiedInvite ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
+        </button>
+    </div>
+    <hr class="invite-row-divider" />
+    <div class="invite-row">
+        <span class="invite-label"><i class="fas fa-key"></i> @Ui["Group.Code"]</span>
+        <code class="invite-code-display invite-code-only">@InviteCode</code>
+        <button class="btn btn-ghost btn-sm" type="button"
+                @onclick="() => CopyCode(InviteCode)">
+            <i class="fas fa-copy"></i> @(copiedCode ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
+        </button>
+    </div>
+    <hr class="invite-row-divider" />
+    <div class="invite-block-actions">
+        <button class="btn btn-secondary" type="button"
+                @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
+            <i class="fab fa-whatsapp"></i> @Ui["Group.Invite"]
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string InviteCode { get; set; } = string.Empty;
+
+    private bool copiedInvite;
+    private bool copiedCode;
+    private CancellationTokenSource? _copyInviteCts;
+    private CancellationTokenSource? _copyCodeCts;
+
+    private string BaseUrl =>
+        (Config["App:BaseUrl"]?.TrimEnd('/')) ?? NavigationManager.BaseUri.TrimEnd('/');
+
+    private async Task CopyInviteLink(string url)
+    {
+        try { await JS.InvokeVoidAsync("navigator.clipboard.writeText", url); }
+        catch { }
+        _copyInviteCts?.Cancel();
+        _copyInviteCts = new CancellationTokenSource();
+        var ct = _copyInviteCts.Token;
+        try
+        {
+            copiedInvite = true;
+            await Task.Delay(2000, ct);
+            if (!ct.IsCancellationRequested) copiedInvite = false;
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            copiedInvite = false;
+        }
+    }
+
+    private async Task CopyCode(string code)
+    {
+        try { await JS.InvokeVoidAsync("navigator.clipboard.writeText", code); }
+        catch { }
+        _copyCodeCts?.Cancel();
+        _copyCodeCts = new CancellationTokenSource();
+        var ct = _copyCodeCts.Token;
+        try
+        {
+            copiedCode = true;
+            await Task.Delay(2000, ct);
+            if (!ct.IsCancellationRequested) copiedCode = false;
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            copiedCode = false;
+        }
+    }
+
+    private async Task ShareInviteOnWhatsApp(string url)
+    {
+        var shareUrl = $"https://wa.me/?text={Uri.EscapeDataString(url)}";
+        await JS.InvokeVoidAsync("open", shareUrl, "_blank", "noopener,noreferrer");
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _copyInviteCts?.Cancel();
+        _copyCodeCts?.Cancel();
+        _copyInviteCts?.Dispose();
+        _copyCodeCts?.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}

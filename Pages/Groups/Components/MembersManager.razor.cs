@@ -42,12 +42,38 @@ public partial class MembersManager
     [Parameter]
     public EventCallback OnCancelPromote { get; set; }
 
+    private int? openMenuMemberId;
+
+    private void ToggleMenu(int memberId)
+        => openMenuMemberId = openMenuMemberId == memberId ? null : memberId;
+
+    private async Task PromoteFromMenu(int memberId)
+    {
+        openMenuMemberId = null;
+        await OnInitiatePromote.InvokeAsync(memberId);
+    }
+
+    private async Task DemoteFromMenu(int memberId)
+    {
+        openMenuMemberId = null;
+        await OnSetMemberRole.InvokeAsync((memberId, GroupMemberRole.Member));
+    }
+
     private async Task HandleSetMemberRole(int memberId, GroupMemberRole newRole)
         => await OnSetMemberRole.InvokeAsync((memberId, newRole));
 
-    private async Task HandleInitiatePromote(int memberId)
-        => await OnInitiatePromote.InvokeAsync(memberId);
-
     private async Task HandleCancelPromote()
         => await OnCancelPromote.InvokeAsync();
+
+    private static string Initials(GroupMember m)
+    {
+        var name = m.User?.FullName ?? m.User?.UserName ?? "?";
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length switch
+        {
+            0 => "?",
+            1 => parts[0][..Math.Min(2, parts[0].Length)].ToUpperInvariant(),
+            _ => string.Concat(parts[0][0], parts[^1][0]).ToUpperInvariant(),
+        };
+    }
 }

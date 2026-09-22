@@ -29,6 +29,7 @@ public partial class Ranking
     private Group?          group        = null;
     private bool            isLoading    = true;
     private bool            isMember     = false;
+    private bool            isAdmin      = false;
     private string?         currentUserId = null;
     private RankingView     viewMode     = RankingView.Month;
     private int             currentYear  = DateTime.Now.Year;
@@ -67,6 +68,8 @@ public partial class Ranking
 
         isMember = currentUserId is not null &&
                    group.Members.Any(m => m.UserId == currentUserId);
+        isAdmin = currentUserId is not null &&
+                  group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
 
         if (!isMember || !group.EnablePostMatchRanking) { isLoading = false; return; }
 

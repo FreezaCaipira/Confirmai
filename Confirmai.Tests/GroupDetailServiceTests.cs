@@ -174,7 +174,7 @@ public class GroupDetailServiceTests
         db.GroupJoinRequests.Add(req);
         await db.SaveChangesAsync();
 
-        await svc.CancelJoinRequestAsync(req.Id);
+        await svc.CancelJoinRequestAsync(req.Id, "u1");
 
         await using var db2 = factory.CreateDbContext();
         var deleted = await db2.GroupJoinRequests.FindAsync(req.Id);
@@ -185,7 +185,7 @@ public class GroupDetailServiceTests
     public async Task CancelJoinRequestAsync_DoesNothing_WhenRequestNotFound()
     {
         var (factory, svc) = Setup();
-        await svc.CancelJoinRequestAsync(999);
+        await svc.CancelJoinRequestAsync(999, "u1");
     }
 
     // ── JoinWithCodeAsync ─────────────────────────────────────────────
@@ -370,5 +370,112 @@ public class GroupDetailServiceTests
         await using var db2 = factory.CreateDbContext();
         var rejected = await db2.GroupJoinRequests.Where(r => r.Status == JoinRequestStatus.Rejected).ToListAsync();
         Assert.Equal(2, rejected.Count);
+    }
+
+    // ── GetMyPendingRequestsAsync (C36-D Fase 4) ─────────────────────
+
+    [Fact]
+    public async Task GetMyPendingRequestsAsync_ReturnsOnlyOwnPending_WithGroup()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await using var db = factory.CreateDbContext();
+        db.Users.Add(new ApplicationUser { Id = "u1", UserName = "User1" });
+        db.Users.Add(new ApplicationUser { Id = "u2", UserName = "User2" });
+        db.GroupJoinRequests.AddRange(
+            new GroupJoinRequest { GroupId = groupId, UserId = "u1", Status = JoinRequestStatus.Pending, RequestedAt = DateTime.UtcNow },
+            new GroupJoinRequest { GroupId = groupId, UserId = "u1", Status = JoinRequestStatus.Rejected, RequestedAt = DateTime.UtcNow },
+            new GroupJoinRequest { GroupId = groupId, UserId = "u2", Status = JoinRequestStatus.Pending, RequestedAt = DateTime.UtcNow });
+        await db.SaveChangesAsync();
+
+        var mine = await svc.GetMyPendingRequestsAsync("u1");
+
+        Assert.Single(mine);
+        Assert.Equal("u1", mine[0].UserId);
+        Assert.Equal("Test Group", mine[0].Group.Name);
+    }
+
+    // ── CancelJoinRequestAsync ownership (C36-D Fase 4) ──────────────
+
+    [Fact]
+    public async Task CancelJoinRequestAsync_DoesNothing_WhenRequestBelongsToAnotherUser()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await using var db = factory.CreateDbContext();
+        var req = new GroupJoinRequest
+        {
+            GroupId = groupId, UserId = "u1", Status = JoinRequestStatus.Pending,
+            RequestedAt = DateTime.UtcNow
+        };
+        db.GroupJoinRequests.Add(req);
+        await db.SaveChangesAsync();
+
+        await svc.CancelJoinRequestAsync(req.Id, "u2");
+
+        await using var db2 = factory.CreateDbContext();
+        Assert.NotNull(await db2.GroupJoinRequests.FindAsync(req.Id));
+    }
+
+    // ── LeaveGroupAsync (C36-D Fase 4) ───────────────────────────────
+
+    [Fact]
+    public async Task LeaveGroupAsync_RemovesMembership_ForRegularMember()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await using var db = factory.CreateDbContext();
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = groupId, UserId = "u1", Role = GroupMemberRole.Member,
+            CreatedAt = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
+
+        var result = await svc.LeaveGroupAsync(groupId, "u1");
+
+        Assert.Equal(LeaveGroupResult.Left, result);
+        await using var db2 = factory.CreateDbContext();
+        Assert.False(await db2.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == "u1"));
+        Assert.True(await db2.Logs.AnyAsync(l => l.EventType == AuditEvents.GroupMemberRemoved));
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_ReturnsNotMember_WhenUserIsNotInGroup()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+
+        var result = await svc.LeaveGroupAsync(groupId, "outsider");
+
+        Assert.Equal(LeaveGroupResult.NotMember, result);
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_BlocksSoleAdmin()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+
+        var result = await svc.LeaveGroupAsync(groupId, "admin-1");
+
+        Assert.Equal(LeaveGroupResult.SoleAdmin, result);
+        await using var db = factory.CreateDbContext();
+        Assert.True(await db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == "admin-1"));
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_AllowsAdmin_WhenAnotherAdminExists()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await using var db = factory.CreateDbContext();
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = groupId, UserId = "admin-2", Role = GroupMemberRole.Admin,
+            CreatedAt = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
+
+        var result = await svc.LeaveGroupAsync(groupId, "admin-1");
+
+        Assert.Equal(LeaveGroupResult.Left, result);
+        await using var db2 = factory.CreateDbContext();
+        Assert.False(await db2.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == "admin-1"));
+        Assert.True(await db2.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == "admin-2"));
     }
 }

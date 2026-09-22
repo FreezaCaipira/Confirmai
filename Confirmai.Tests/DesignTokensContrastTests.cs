@@ -65,6 +65,11 @@ public class DesignTokensContrastTests
     [InlineData("text-2", "surface-2", 7.0)]
     [InlineData("text-3", "surface", 4.5)]
     [InlineData("accent-fg", "accent", 4.5)]
+    [InlineData("accent-fg-2", "accent", 4.5)]
+    [InlineData("accent-fg", "accent-hover", 4.5)]
+    [InlineData("accent-fg-2", "accent-hover", 4.5)]
+    [InlineData("text", "accent", 4.5)]
+    [InlineData("text", "accent-hover", 4.5)]
     [InlineData("accent-text", "bg", 4.5)]
     [InlineData("accent-text", "surface", 4.5)]
     public void Tokens_MeetAaContrast(string fg, string bg, double minimum)

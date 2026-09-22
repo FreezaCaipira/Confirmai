@@ -60,6 +60,7 @@ public partial class Partidas
         recentEvents = await db.Events
             .Where(e => e.GroupId == Id)
             .Include(e => e.Confirmations)
+            .Include(e => e.Venue)
             .OrderByDescending(e => e.StartsAt)
             .Take(200)
             .ToListAsync();

@@ -1,140 +1,161 @@
-/* ── Members list ────────────────────────────────────────────── */
+/* ── Members list (linhas L2 dentro do painel L1) ─────────────── */
 .feat-members-list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 .feat-member-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    background: rgba(15, 26, 48, 0.7);
-    border: 1px solid rgba(51, 76, 120, 0.4);
-    border-radius: 8px;
-    padding: 0.65rem 0.9rem;
+    gap: var(--space-3);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
 }
 
 .feat-member-info {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     flex: 1;
     min-width: 0;
 }
 
+.member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.member-avatar--initials {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-size: 0.75rem;
+    font-weight: var(--fw-semibold);
+}
+
 .feat-member-name {
-    color: var(--ci-surface-muted);
-    font-size: 0.9rem;
+    color: var(--text);
+    font-size: 0.9375rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.feat-role-btn {
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 0.3rem 0.65rem;
-    border-radius: 6px;
-    border: 1px solid;
-    cursor: pointer;
-    display: flex;
+.member-badge {
+    display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    white-space: nowrap;
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: var(--fw-semibold);
     flex-shrink: 0;
-    transition: opacity 0.15s;
 }
 
-.feat-role-btn:disabled {
-    opacity: 0.4;
+.member-badge--admin {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+}
+
+.member-badge--me {
+    background: var(--surface-3);
+    color: var(--text-2);
+}
+
+/* ── Menu "..." (acoes de admin por membro) ───────────────────── */
+.member-menu {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.member-menu-pop {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+    background: var(--surface-3);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-1);
+}
+
+.member-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.875rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.member-menu-item:hover:not(:disabled) {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+}
+
+.member-menu-item--danger {
+    color: var(--danger);
+}
+
+.member-menu-item--danger:hover:not(:disabled) {
+    background: transparent;
+    color: var(--danger);
+}
+
+.member-menu-item:disabled {
+    opacity: 0.45;
     cursor: not-allowed;
 }
 
-.feat-role-btn--promote {
-    background: var(--blue300-opacity-xs);
-    border-color: var(--blue300-opacity-xl);
-    color: var(--link-info);
-}
-
-.feat-role-btn--promote:not(:disabled):hover {
-    background: var(--blue300-opacity-sm);
-    border-color: rgba(96, 165, 250, 0.8);
-    color: var(--ci-surface-light);
-}
-
-.feat-role-btn--demote {
-    background: var(--red-soft-opacity-xs);
-    border-color: var(--red-light-lg);
-    color: var(--red-soft);
-}
-
-.feat-role-btn--demote:not(:disabled):hover {
-    background: var(--red-light-md);
-    border-color: rgba(248, 113, 113, 0.8);
-    color: var(--red-pale);
-}
-
+/* ── Confirmacao inline de promocao ───────────────────────────── */
 .feat-role-confirm {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     flex-shrink: 0;
     flex-wrap: wrap;
 }
 
 .feat-role-confirm-text {
-    font-size: 0.78rem;
-    color: var(--amber);
-    background: var(--amber-opacity-xs);
-    border: 1px solid var(--amber-opacity-sm);
-    border-radius: 6px;
-    padding: 0.35rem 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--warning);
+    background: var(--warning-soft);
+    border: 1px solid var(--warning);
+    border-radius: var(--radius-sm);
+    padding: var(--space-1) var(--space-3);
     white-space: nowrap;
 }
 
-.feat-role-btn--confirm-yes,
-.feat-role-btn--confirm-no {
-    min-width: 36px;
-    justify-content: center;
-    padding: 0.35rem 0.55rem;
-}
-
-.feat-role-btn--confirm-yes {
-    background: var(--green-opacity-sm);
-    border-color: rgba(74, 222, 128, 0.55);
-    color: var(--futsal-green-pale);
-}
-
-.feat-role-btn--confirm-yes:not(:disabled):hover {
-    background: var(--green-opacity-sm);
-    border-color: rgba(74, 222, 128, 0.85);
-    color: var(--futsal-green-pale);
-}
-
-.feat-role-btn--confirm-no {
-    background: var(--red-soft-opacity-xs);
-    border-color: rgba(248, 113, 113, 0.55);
-    color: var(--red-soft);
-}
-
-.feat-role-btn--confirm-no:not(:disabled):hover {
-    background: var(--red-light-md);
-    border-color: rgba(248, 113, 113, 0.85);
-    color: var(--red-pale);
-}
-
 .feat-role-note {
-    margin: -0.35rem 0 0.9rem;
+    margin: calc(-1 * var(--space-1)) 0 var(--space-4);
     font-size: 0.82rem;
-    color: var(--ci-text-info);
+    color: var(--text-2);
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: var(--space-2);
 }
 
 /* Mobile responsive styles */
@@ -142,28 +163,25 @@
     .feat-member-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.75rem;
+        gap: var(--space-3);
     }
 
     .feat-member-info {
         width: 100%;
     }
 
+    .member-menu {
+        align-self: flex-end;
+    }
+
     .feat-role-confirm {
         width: 100%;
         justify-content: space-between;
-        gap: 0.75rem;
+        gap: var(--space-3);
     }
 
     .feat-role-confirm-text {
         flex: 1;
         text-align: center;
-    }
-
-    .feat-role-btn--confirm-yes,
-    .feat-role-btn--confirm-no {
-        flex: 1;
-        min-width: 44px;
-        padding: 0.5rem 0.75rem;
     }
 }

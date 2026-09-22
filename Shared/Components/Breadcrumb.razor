@@ -1,7 +1,10 @@
-﻿@using Confirmai.Services
+﻿@using Confirmai.Data
+@using Confirmai.Services
 @using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.EntityFrameworkCore
 @inject NavigationManager NavigationManager
 @inject UiTextService T
+@inject IDbContextFactory<AppDbContext> DbFactory
 
 @if (Segments.Count >= 2)
 {
@@ -10,7 +13,7 @@
         {
             if (index < Segments.Count - 1)
             {
-                <a href="@BuildUrl(index)">@segment</a>
+                <a href="@Hrefs[index]">@segment</a>
                 <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
             }
             else
@@ -23,30 +26,46 @@
 
 @code {
     private List<string> Segments = new();
+    private List<string> Hrefs = new();
     private List<string> OriginalSegments = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         NavigationManager.LocationChanged += OnLocationChanged;
-        UpdateSegments();
+        await UpdateSegments();
     }
 
     private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
-        UpdateSegments();
+        await UpdateSegments();
         await InvokeAsync(StateHasChanged);
     }
 
-    private void UpdateSegments()
+    private async Task UpdateSegments()
     {
         var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         var pathOnly = uri.Split('?', '#')[0];
-        var allSegments = pathOnly.Split('/', StringSplitOptions.RemoveEmptyEntries)
+        var rawSegments = pathOnly.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var allSegments = rawSegments
             .Where(s => !IsIdSegment(s))
             .ToList();
 
         OriginalSegments = allSegments;
         Segments = allSegments.Select(s => MapSegment(s)).ToList();
+        Hrefs = Enumerable.Range(0, Segments.Count).Select(BuildUrl).ToList();
+
+        // Group routes: "Grupos > {group name} > ..." instead of "Grupo > ...".
+        if (rawSegments.Length >= 2
+            && string.Equals(rawSegments[0], "grupo", StringComparison.OrdinalIgnoreCase)
+            && int.TryParse(rawSegments[1], out var crumbGroupId)
+            && Segments.Count >= 1)
+        {
+            var groupName = await LoadGroupNameAsync(crumbGroupId) ?? $"#{crumbGroupId}";
+            Segments[0] = T["Breadcrumb.Groups"];
+            Hrefs[0] = "/grupos";
+            Segments.Insert(1, groupName);
+            Hrefs.Insert(1, $"/grupo/{crumbGroupId}");
+        }
 
         // On payment page, show the previous step based on returnUrl (real origin page).
         if (allSegments.Count >= 2
@@ -90,8 +109,8 @@
             "logs" => T["Breadcrumb.Logs"],
             "escalacao" => "Escalação",
             "convite"   => "Convite",
-            "grupos"    => "Grupos",
-            "grupo"     => "Grupo",
+            "grupos"    => T["Breadcrumb.Groups"],
+            "grupo"     => T["Breadcrumb.Group"],
             "futsal"    => "Futsal",
             "poker"     => "Poker",
             "edit" => T["Breadcrumb.Edit"],
@@ -128,6 +147,15 @@
                 : char.ToUpper(word[0]) + word[1..].ToLowerInvariant());
 
         return string.Join(' ', words);
+    }
+
+    private async Task<string?> LoadGroupNameAsync(int groupId)
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        return await db.Groups
+            .Where(g => g.Id == groupId)
+            .Select(g => g.Name)
+            .FirstOrDefaultAsync();
     }
 
     public void Dispose()

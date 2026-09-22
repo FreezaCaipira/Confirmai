@@ -15,6 +15,10 @@
     border-radius: var(--radius);
 }
 
+.group-entry--compact .group-entry-option {
+    padding: var(--space-4);
+}
+
 .group-entry-label {
     display: flex;
     align-items: center;
@@ -69,47 +73,9 @@
     box-shadow: 0 0 0 3px var(--accent-ring);
 }
 
-.group-entry-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    min-height: 40px;
-    padding: 0 var(--space-4);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius-sm);
-    background: var(--accent);
-    color: var(--accent-fg);
-    font: inherit;
-    font-size: 0.9375rem;
-    font-weight: var(--fw-medium);
-    text-decoration: none;
-    cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.group-entry-btn:hover {
-    background: var(--accent-hover);
-    border-color: var(--accent-hover);
-    color: var(--accent-fg);
-}
-
-.group-entry-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.group-entry-btn--secondary {
+.group-entry-option > .btn {
     margin-top: auto;
-    background: var(--surface-3);
-    border-color: var(--border-2);
-    color: var(--text);
-}
-
-.group-entry-btn--secondary:hover {
-    background: var(--surface-2);
-    border-color: var(--accent);
-    color: var(--text);
+    align-self: flex-start;
 }
 
 .group-entry-error {

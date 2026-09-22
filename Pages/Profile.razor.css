@@ -1,182 +1,83 @@
-/* -- Layout geral --------------------------------------------------------- */
+/* ── /profile: coluna de paineis L1 (C36-D Fase 6) ── */
 
 .profile-page {
-    display: grid;
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
     max-width: 760px;
-    margin: 1.5rem auto;
-    padding: 0 1rem;
-    --entity-line: var(--ci-border);
-    --entity-accent: var(--ci-accent);
-    --entity-ink: var(--ci-text);
-    --entity-muted: var(--ci-text-blue);
+    margin: var(--space-6) auto;
+    padding: 0 var(--space-4);
 }
 
-/* -- Card base ------------------------------------------------------------- */
+/* -- Pix receiver panel ---------------------------------------------------- */
 
-.profile-card {
-    border: 1px solid var(--ci-border);
-    border-top: 2px solid var(--ci-border-dim);
-    border-radius: 14px;
-    background: var(--ci-bg-card);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    transition: border-color 0.25s ease, border-top-color 0.25s ease, box-shadow 0.25s ease;
+.profile-pix-panel--highlight {
+    border-color: var(--accent-border);
+    animation: pix-highlight-pulse 2s ease;
 }
 
-/* -- Pix receiver section -------------------------------------------------- */
-
-.profile-pix-section {
-    padding: 0.72rem 1.1rem;
-    display: grid;
-    gap: 0.4rem;
-}
-
-.profile-pix-title {
-    margin: 0;
-    font-size: 0.85rem;
-    font-weight: 800;
-    color: var(--ci-surface-light);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    text-shadow: 0 0 10px var(--accent-opacity-xl);
+@keyframes pix-highlight-pulse {
+    0% { box-shadow: 0 0 0 4px var(--accent-ring), var(--shadow-card); }
+    100% { box-shadow: 0 0 0 2px var(--accent-ring), var(--shadow-card); }
 }
 
 .profile-pix-hint {
+    margin: 0 0 var(--space-3);
+    font-size: 0.8125rem;
+    color: var(--text-2);
+    line-height: 1.4;
+}
+
+.profile-pix-empty {
+    gap: var(--space-3);
+}
+
+.profile-pix-empty .profile-pix-hint {
     margin: 0;
-    font-size: 0.78rem;
-    color: var(--ci-text-muted);
-    line-height: 1.3;
 }
 
 .profile-pix-row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem 0.5rem;
-    background: var(--ci-bg-deepest);
-    border-radius: 4px;
-    border: 1px solid var(--ci-border);
-    box-shadow: 0 1px 2px var(--shadow-md);
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 480px;
 }
 
-.profile-pix-input {
+.profile-field-label {
+    font-size: 0.8125rem;
+    font-weight: var(--fw-medium);
+    color: var(--text-2);
+    flex: 0 0 auto;
+}
+
+.profile-pix-row .input {
     flex: 1;
     min-width: 0;
-    padding: 0.35rem 0.5rem;
-    background: transparent;
-    border: none;
-    color: var(--ci-text);
-    font-family: var(--ci-font);
-    font-size: 0.85rem;
-}
-
-.profile-pix-input:focus {
-    outline: none;
-}
-
-.profile-pix-row:focus-within {
-    border-color: var(--ci-accent);
 }
 
 .profile-pix-feedback {
-    margin: 0;
-    font-size: 0.78rem;
-    color: var(--ci-text-muted);
+    margin: var(--space-2) 0 0;
+    font-size: 0.8125rem;
+    font-weight: var(--fw-medium);
+    color: var(--accent-text);
 }
 
-.profile-pix-section--highlight {
-    border-color: var(--ci-accent);
-    box-shadow: 0 0 0 2px var(--accent-opacity-md), var(--shadow-md);
-    animation: pix-highlight-pulse 2s ease;
-}
-
-@keyframes pix-highlight-pulse {
-    0% { box-shadow: 0 0 0 4px var(--accent-opacity-lg), var(--shadow-md); }
-    100% { box-shadow: 0 0 0 2px var(--accent-opacity-md), var(--shadow-md); }
-}
-
-/* -- Card de mensagem (parent wrapper) ------------------------------------- */
-
-.profile-message-card {
-    padding: 0.9rem 1.1rem;
-    display: grid;
-    gap: 0.56rem;
-    background: var(--ci-bg-card);
-    border-bottom: 1px solid var(--ci-border);
-}
-
-.profile-message-title {
-    margin: 0;
-    font-family: var(--ci-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: var(--ci-surface-light);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    border-bottom: 2px solid;
-    border-image: linear-gradient(to right, var(--ci-accent), var(--ci-accent-light), var(--ci-accent)) 1;
-    padding-bottom: 0.5rem;
-    text-shadow: 0 0 10px var(--accent-opacity-xl);
-}
+/* -- Chat panel ------------------------------------------------------------ */
 
 .profile-chat-thread {
-    display: grid;
-    gap: 0.34rem;
-    max-height: 220px;
+    max-height: 260px;
     overflow-y: auto;
-    padding-right: 0.1rem;
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-border);
-    border-radius: 4px;
-    padding: 0.5rem;
-    box-shadow: inset 0 2px 4px var(--shadow-lg);
+    margin-bottom: var(--space-3);
 }
 
-/* Mobile responsiveness */
 @media (max-width: 640px) {
     .profile-page {
-        margin: 1rem auto;
-        padding: 0 0.8rem;
-        gap: 0.8rem;
-    }
-
-    .profile-message-card {
-        padding: 0.75rem 0.9rem;
-        gap: 0.5rem;
-    }
-
-    .profile-message-title {
-        font-size: 0.85rem;
-        padding-bottom: 0.4rem;
+        margin: var(--space-4) auto;
+        padding: 0 var(--space-3);
     }
 
     .profile-chat-thread {
-        max-height: 180px;
-        padding: 0.4rem;
-    }
-}
-
-/* Mobile muito pequeno (<375px) */
-@media (max-width: 375px) {
-    .profile-page {
-        margin: 0.8rem auto;
-        padding: 0 0.6rem;
-        gap: 0.6rem;
-    }
-
-    .profile-message-card {
-        padding: 0.6rem 0.75rem;
-        gap: 0.4rem;
-    }
-
-    .profile-message-title {
-        font-size: 0.8rem;
-        padding-bottom: 0.35rem;
-    }
-
-    .profile-chat-thread {
-        max-height: 150px;
-        padding: 0.35rem;
+        max-height: 200px;
     }
 }
