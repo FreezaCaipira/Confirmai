@@ -1,0 +1,120 @@
+/* ── Tabela de partidas: linhas L2 dentro do painel L1 (C36-D Fase 8) ── */
+
+.events-table {
+    border-collapse: separate;
+    border-spacing: 0 var(--space-2);
+}
+
+.events-table thead th {
+    color: var(--text-3);
+    border-bottom: none;
+    padding: 0 var(--space-3) var(--space-1);
+    font-weight: var(--fw-semibold);
+}
+
+.events-table tbody tr.events-table-row {
+    border-bottom: none;
+}
+
+/* Cada linha e um bloco L2; cantos arredondados nas celulas das pontas. */
+.events-table tbody tr.events-table-row td {
+    background: var(--surface-2);
+    border-top: 1px solid var(--border-2);
+    border-bottom: 1px solid var(--border-2);
+    padding: var(--space-2) var(--space-3);
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.events-table tbody tr.events-table-row td:first-child {
+    border-left: 1px solid var(--border-2);
+    border-top-left-radius: var(--radius-sm);
+    border-bottom-left-radius: var(--radius-sm);
+}
+
+.events-table tbody tr.events-table-row td:last-child {
+    border-right: 1px solid var(--border-2);
+    border-top-right-radius: var(--radius-sm);
+    border-bottom-right-radius: var(--radius-sm);
+}
+
+.events-table tbody tr.events-table-row:hover td {
+    background: var(--surface-3);
+    border-color: var(--accent-border);
+}
+
+.events-table tbody tr.et-empty-row td,
+.events-table tbody tr td.et-empty {
+    background: transparent;
+    border: none;
+}
+
+.et-empty {
+    color: var(--text-3);
+}
+
+.et-empty-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.et-num {
+    color: var(--text-3);
+    font-size: 0.8125rem;
+}
+
+.et-date {
+    color: var(--text);
+    font-weight: var(--fw-medium);
+}
+
+.et-time {
+    color: var(--text-2);
+}
+
+.et-players {
+    color: var(--text-2);
+}
+
+.et-players--full {
+    color: var(--warning);
+    font-weight: var(--fw-semibold);
+}
+
+.et-players--empty {
+    color: var(--text-3);
+}
+
+/* ── Status badges (vocabulario novo: cor e estado, nao cor de acao) ── */
+
+.et-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: var(--fw-semibold);
+    text-transform: lowercase;
+    white-space: nowrap;
+}
+
+.et-status--open {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.et-status--next {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+}
+
+.et-status--full {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.et-status--cancelled {
+    background: var(--danger-soft);
+    color: var(--danger);
+}

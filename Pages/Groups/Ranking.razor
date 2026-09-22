@@ -60,21 +60,14 @@ else if (!group.EnablePostMatchRanking)
 else
 {
     <div class="detail-page">
-        <div class="detail-card">
+        <div class="hub-stack">
 
-            <header class="detail-header">
-                <div class="detail-header-top">
-                    <a href="/grupo/@group.Id" class="btn btn-ghost">
-                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
-                    </a>
+            <GroupHeader Group="@group" IsAdmin="@isAdmin" />
+
+            <section class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="fas fa-trophy"></i> @Ui["Group.RankingTitle"]</h2>
                 </div>
-                <div class="detail-header-badge">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
-                    </span>
-                </div>
-                <h1 class="detail-title ranking-title"><i class="fas fa-trophy"></i> @Ui["Group.RankingTitle"]</h1>
-            </header>
 
             @* ── Filtro ────────────────────────────────────────────────── *@
             <RankingViewSelector
@@ -91,6 +84,7 @@ else
                 <i class="fas fa-info-circle"></i>
                 @Ui["Group.RankingFootnote"]
             </p>
+            </section>
 
         </div>
     </div>

@@ -22,6 +22,7 @@ public sealed class GroupDetailData
     public GroupJoinRequest? UserJoinRequest { get; set; }
     public string? CurrentUserId { get; set; }
     public int UpcomingEventsCount { get; set; }
+    public Event? NextEvent { get; set; }
 }
 
 public sealed class GroupDetailService
@@ -63,6 +64,12 @@ public sealed class GroupDetailService
             var now = DateTime.UtcNow;
             data.UpcomingEventsCount = await db.Events
                 .CountAsync(e => e.GroupId == groupId && e.IsActive && e.StartsAt > now);
+
+            data.NextEvent = await db.Events
+                .Where(e => e.GroupId == groupId && e.IsActive && e.StartsAt > now)
+                .Include(e => e.Confirmations)
+                .OrderBy(e => e.StartsAt)
+                .FirstOrDefaultAsync();
 
             data.PendingRequests = await db.GroupJoinRequests
                 .Where(r => r.GroupId == groupId && r.Status == JoinRequestStatus.Pending)

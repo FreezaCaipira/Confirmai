@@ -23,6 +23,7 @@ public partial class Detail
     private bool showAllMembers;
     private int myPendingPayments;
     private int upcomingEventsCount;
+    private Event? nextEvent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -38,6 +39,7 @@ public partial class Detail
         pendingRequests = data.PendingRequests;
         userJoinRequest = data.UserJoinRequest;
         upcomingEventsCount = data.UpcomingEventsCount;
+        nextEvent = data.NextEvent;
         myPendingPayments = data.Group is not null
             ? await GroupPayments.CountMyPendingAsync(Id, currentUserId)
             : 0;

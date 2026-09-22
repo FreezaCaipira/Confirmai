@@ -61,43 +61,28 @@ else if (group is null || !isMember)
 else if (!isAdmin)
 {
     <div class="detail-page">
-        <div class="detail-card">
-            <header class="detail-header">
-                <div class="detail-header-top">
-                    <a href="/grupo/@Id" class="btn btn-ghost">
-                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
-                    </a>
+        <div class="hub-stack">
+            <GroupHeader Group="@group" IsAdmin="@isAdmin" />
+            <section class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="fas fa-money-bill-wave"></i> @Ui["Group.MyPaymentsTitle"]</h2>
                 </div>
-                <div class="detail-header-badge">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
-                    </span>
-                </div>
-                <h1 class="detail-title payments-title"><i class="fas fa-money-bill-wave"></i> @Ui["Group.MyPaymentsTitle"]</h1>
-            </header>
-
-            <MyPaymentsList Entries="@myPayments" />
+                <MyPaymentsList Entries="@myPayments" />
+            </section>
         </div>
     </div>
 }
 else
 {
     <div class="detail-page">
-        <div class="detail-card">
+        <div class="hub-stack">
 
-            <header class="detail-header">
-                <div class="detail-header-top">
-                    <a href="/grupo/@Id" class="btn btn-ghost">
-                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
-                    </a>
+            <GroupHeader Group="@group" IsAdmin="@isAdmin" />
+
+            <section class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="fas fa-money-bill-wave"></i> @Ui["Group.PaymentsTitle"]</h2>
                 </div>
-                <div class="detail-header-badge">
-                    <span class="detail-sport-badge">
-                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"])
-                    </span>
-                </div>
-                <h1 class="detail-title payments-title"><i class="fas fa-money-bill-wave"></i> @Ui["Group.PaymentsTitle"]</h1>
-            </header>
 
             @* ── Tabs ──────────────────────────────────────────────── *@
             <div class="payments-tabs">
@@ -637,6 +622,7 @@ else
                 </ul>
                 }
             }
+            </section>
 
         </div>
     </div>

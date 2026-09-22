@@ -1,0 +1,26 @@
+@using Confirmai.Enums
+@using Confirmai.Models
+@using Confirmai.Services.Core
+@inject UiTextService Ui
+
+<header class="panel group-header">
+    <div class="group-header-body">
+        <span class="group-header-sport">
+            @(Group.Sport == Sport.Futsal ? Ui["Group.SportFutsal"] : Ui["Group.SportPoker"])
+        </span>
+        <h1 class="group-header-title">@Group.Name</h1>
+        @if (!string.IsNullOrWhiteSpace(Group.City))
+        {
+            <p class="group-header-location">
+                <i class="fas fa-map-marker-alt"></i>
+                @Group.City@(!string.IsNullOrWhiteSpace(Group.StateCode) ? $"/{Group.StateCode}" : string.Empty)
+            </p>
+        }
+    </div>
+    <GroupSubNav GroupId="@Group.Id" IsAdmin="@IsAdmin" ShowRanking="@Group.EnablePostMatchRanking" />
+</header>
+
+@code {
+    [Parameter] public Group Group { get; set; } = default!;
+    [Parameter] public bool IsAdmin { get; set; }
+}

@@ -1,9 +1,5 @@
 /* Partidas page uses global events.css for detail-events-* and events-table classes */
 
-.partidas-title {
-    margin-bottom: 1rem;
-}
-
 /* -- Expand/collapse button for upcoming matches preview -- */
 .events-expand-row {
     display: flex;

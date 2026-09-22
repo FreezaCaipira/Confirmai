@@ -68,46 +68,29 @@ else
         : $"/poker/create?groupId={group.Id}";
 
     <div class="detail-page">
-        <div class="detail-card">
+        <div class="hub-stack">
 
-            <header class="detail-header">
-                <div class="detail-header-top">
-                    <a href="/grupo/@group.Id" class="btn btn-ghost">
-                        <i class="fas fa-arrow-left"></i> @Ui["Common.Back"]
-                    </a>
-                </div>
-                <div class="detail-header-title-row">
-                    <span class="detail-header-subtitle">
-                        @(group.Sport == Sport.Futsal ? @Ui["Group.SportFutsal"] : @Ui["Group.SportPoker"]) — @Ui["Groups.Partidas"] <span class="detail-events-year">@eventsYear</span>
-                    </span>
-                </div>
-                <h1 class="detail-title">@group.Name</h1>
-            </header>
+            <GroupHeader Group="@group" IsAdmin="@isAdmin" />
 
-            <section class="detail-section">
-                @if (displayedEvents.Any(e => e.RachaScheduleId.HasValue))
-                {
-                    <div class="events-recurring-notice">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>@Ui["Group.RecurringNotice"]</span>
-                    </div>
-                }
-                <div class="detail-events-tabs">
-                    <div class="detail-events-tabs-left">
-                        <button class="detail-events-tab @(!showPastEvents ? "active" : string.Empty)"
-                                type="button"
+            <section class="panel">
+                <div class="panel-head panel-head--spread">
+                    <div class="seg-toggle" role="tablist">
+                        <button class="seg-item @(!showPastEvents ? "seg-item--active" : string.Empty)"
+                                type="button" role="tab"
                                 @onclick="() => { showPastEvents = false; showAllUpcoming = false; }">
-                            <i class="fas fa-bolt"></i> @Ui["Groups.Proximas"] (@upcomingEvents.Count)
+                            <i class="fas fa-bolt"></i> @Ui["Groups.Proximas"]
+                            <span class="seg-count">@upcomingEvents.Count</span>
                         </button>
-                        <button class="detail-events-tab @(showPastEvents ? "active" : string.Empty)"
-                                type="button"
+                        <button class="seg-item @(showPastEvents ? "seg-item--active" : string.Empty)"
+                                type="button" role="tab"
                                 @onclick="() => showPastEvents = true">
-                            <i class="fas fa-history"></i> @Ui["Groups.Realizadas"] (@pastEvents.Count)
+                            <i class="fas fa-history"></i> @Ui["Groups.Realizadas"]
+                            <span class="seg-count">@pastEvents.Count</span>
                         </button>
                     </div>
-                    <div class="detail-events-tabs-right">
-                        @if (isAdmin)
-                        {
+                    @if (isAdmin)
+                    {
+                        <div class="panel-head-actions">
                             @if (group.Sport == Sport.Futsal)
                             {
                                 <a href="/futsal/schedule?groupId=@group.Id" class="btn btn-secondary">
@@ -117,9 +100,16 @@ else
                             <a href="@newEventHref" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> @Ui["Groups.NovaPartida"]
                             </a>
-                        }
-                    </div>
+                        </div>
+                    }
                 </div>
+                @if (displayedEvents.Any(e => e.RachaScheduleId.HasValue))
+                {
+                    <div class="events-recurring-notice">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>@Ui["Group.RecurringNotice"]</span>
+                    </div>
+                }
                 <GroupDetailEvents
                     Group="@group"
                     DisplayedEvents="@displayedEvents"

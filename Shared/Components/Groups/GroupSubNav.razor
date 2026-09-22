@@ -1,0 +1,46 @@
+@using Confirmai.Services.Core
+@inject UiTextService Ui
+@inject NavigationManager NavigationManager
+
+<nav class="seg-toggle group-subnav" aria-label="@Ui["Group.SubNavLabel"]">
+    <a class="seg-item @Active("")" href="/grupo/@GroupId">
+        @Ui["Group.NavOverview"]
+    </a>
+    <a class="seg-item @Active("partidas")" href="/grupo/@GroupId/partidas">
+        @Ui["Group.PartidasLink"]
+    </a>
+    <a class="seg-item @Active("pagamentos")" href="/grupo/@GroupId/pagamentos">
+        @Ui["Group.PaymentsLink"]
+    </a>
+    @if (ShowRanking)
+    {
+        <a class="seg-item @Active("ranking")" href="/grupo/@GroupId/ranking">
+            @Ui["Group.RankingLink"]
+        </a>
+    }
+    @if (IsAdmin)
+    {
+        <a class="seg-item @Active("configuracoes")" href="/grupo/@GroupId/configuracoes">
+            @Ui["Group.Settings"]
+        </a>
+    }
+</nav>
+
+@code {
+    [Parameter] public int GroupId { get; set; }
+    [Parameter] public bool IsAdmin { get; set; }
+    [Parameter] public bool ShowRanking { get; set; }
+
+    private string Active(string segment)
+    {
+        var path = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+        var suffix = $"/grupo/{GroupId}";
+        if (!path.StartsWith(suffix, StringComparison.OrdinalIgnoreCase))
+            return string.Empty;
+        var rest = path[suffix.Length..].Trim('/');
+        var current = rest.Split('/', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? string.Empty;
+        return string.Equals(current, segment, StringComparison.OrdinalIgnoreCase)
+            ? "seg-item--active"
+            : string.Empty;
+    }
+}

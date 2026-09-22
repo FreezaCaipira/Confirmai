@@ -1,90 +1,5 @@
-/* ── Hub do grupo: coluna de paineis L1 independentes (C36-D Fase 7) ── */
-
-.hub-stack {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-}
-
-/* Painel L1 generico — mesmo tratamento dos paineis da home. */
-.panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: var(--space-5);
-    box-shadow: var(--shadow-card);
-}
-
-.panel-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    flex-wrap: wrap;
-    padding-bottom: var(--space-3);
-    margin-bottom: var(--space-4);
-    border-bottom: 1px solid var(--border);
-}
-
-.panel-title {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: var(--fw-semibold);
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-}
-
-.panel-title i {
-    color: var(--accent-text);
-}
-
-/* ── Cabecalho ────────────────────────────────────────────────── */
-
-.hub-header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    margin-bottom: var(--space-4);
-}
-
-.hub-header-body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    align-items: flex-start;
-}
-
-.hub-sport-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-full);
-    background: var(--accent-soft);
-    color: var(--accent-text);
-    font-size: 0.75rem;
-    font-weight: var(--fw-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.hub-title {
-    margin: 0;
-    font-size: var(--fs-2xl);
-    font-weight: var(--fw-bold);
-    color: var(--text);
-}
-
-.hub-location {
-    margin: 0;
-    font-size: 0.875rem;
-    color: var(--text-2);
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-}
+/* ── Hub do grupo: coluna de paineis L1 independentes (C36-D Fase 7) ──
+   .hub-stack e .panel* vivem em components.css (compartilhados pelas 5 telas). */
 
 /* ── Acoes do grupo (navegacao interna — o painel mais visivel) ── */
 
@@ -223,31 +138,6 @@
     flex-shrink: 0;
 }
 
-/* ── Estado vazio (nao-membro) ────────────────────────────────── */
-
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-6) var(--space-5);
-    text-align: center;
-}
-
-.empty-state-icon {
-    font-size: 1.5rem;
-    color: var(--text-3);
-}
-
-.empty-state .join-request-info,
-.empty-state .join-request-pending {
-    margin: 0;
-    color: var(--text-2);
-}
-
-.join-request-pending--rejected {
-    color: var(--danger);
-}
 
 /* ── Aviso Pix (mantido, agora com tokens novos) ──────────────── */
 
@@ -313,4 +203,26 @@
 
 .detail-events-title--no-mb {
     margin-bottom: 0;
+}
+
+.join-request-pending--rejected {
+    color: var(--danger);
+}
+
+.hub-next-empty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    padding: var(--space-4);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+}
+
+.hub-next-empty-text {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 0.9375rem;
 }

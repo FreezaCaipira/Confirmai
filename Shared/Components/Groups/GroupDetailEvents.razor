@@ -10,7 +10,7 @@
             <!-- Web headers -->
             <th class="web-only"></th>
             <th class="web-only">@Ui["Group.DateTimeHeader"]</th>
-            <th class="web-only">Jogadores</th>
+            <th class="web-only">@Ui["Group.PlayersHeader"]</th>
             <th class="web-only">@Ui["Group.StatusHeader"]</th>
             <th class="events-access-col web-only"></th>
             <!-- Mobile: no headers -->
@@ -21,18 +21,28 @@
         {
             <tr>
                 <td colspan="6" class="et-empty">
-                    @if (!ShowPastEvents && IsAdmin)
+                    @if (ShowPastEvents)
+                    {
+                        <div class="et-empty-banner">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="et-empty-text">@Ui["Group.NoMatchPlayed"]</span>
+                        </div>
+                    }
+                    else if (IsAdmin)
                     {
                         <div class="et-empty-banner">
                             <i class="fas fa-calendar-plus"></i>
                             <span class="et-empty-text">@Ui["Group.NoMatchScheduledEmpty"]</span>
+                            <a href="@NewEventHref" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> @Ui["Group.CreateFirstMatch"]
+                            </a>
                         </div>
                     }
                     else
                     {
                         <div class="et-empty-banner">
                             <i class="fas fa-calendar-plus"></i>
-                            <span class="et-empty-text">@(ShowPastEvents ? @Ui["Group.NoMatchPlayed"] : @Ui["Group.NoMatchScheduledEmpty"])</span>
+                            <span class="et-empty-text">@Ui["Group.NoMatchOrganizer"]</span>
                         </div>
                     }
                 </td>
@@ -72,19 +82,19 @@
                     <td class="web-only et-status-col">
                         @if (!ev.IsActive)
                         {
-                            <span class="player-tag player-tag--cancel">cancelado</span>
+                            <span class="et-status et-status--cancelled">@Ui["Group.EventCancelled"]</span>
                         }
                         else if (isFull)
                         {
-                            <span class="player-tag player-tag--full">lotado</span>
+                            <span class="et-status et-status--full">@Ui["Group.EventFull"]</span>
                         }
                         else
                         {
-                            <span class="player-tag player-tag--open">aberto</span>
+                            <span class="et-status et-status--open">@Ui["Group.EventOpen"]</span>
                         }
                         @if (isNextUpcoming)
                         {
-                            <span class="event-next-badge">pr&oacute;xima</span>
+                            <span class="et-status et-status--next">@Ui["Group.EventNext"]</span>
                         }
                     </td>
                     
@@ -94,7 +104,7 @@
                                 type="button"
                                 @onclick:stopPropagation="true"
                                 @onclick="() => NavigationManager.NavigateTo(href)">
-                            Acessar
+                            @Ui["Group.Access"]
                         </button>
                     </td>
                     
@@ -118,15 +128,15 @@
                                 </span>
                                 @if (!ev.IsActive)
                                 {
-                                    <span class="player-tag player-tag--cancel">cancelado</span>
+                                    <span class="et-status et-status--cancelled">@Ui["Group.EventCancelled"]</span>
                                 }
                                 else if (isFull)
                                 {
-                                    <span class="player-tag player-tag--full">lotado</span>
+                                    <span class="et-status et-status--full">@Ui["Group.EventFull"]</span>
                                 }
                                 else
                                 {
-                                    <span class="player-tag player-tag--open">aberto</span>
+                                    <span class="et-status et-status--open">@Ui["Group.EventOpen"]</span>
                                 }
                             </div>
                         </div>
