@@ -118,3 +118,77 @@
     background: var(--danger-soft);
     color: var(--danger);
 }
+
+/* ── Tooltip da data (L3 popover, CSS puro; C36-D Fase 2) ── */
+
+.et-when {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-2);
+}
+
+.et-tooltip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 20;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--surface-3);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+    box-shadow: var(--shadow-card);
+    white-space: nowrap;
+    font-size: 0.8125rem;
+    font-weight: var(--fw-regular);
+    color: var(--text);
+    text-align: left;
+}
+
+.et-when:hover .et-tooltip,
+.et-when:focus-within .et-tooltip {
+    display: flex;
+}
+
+.et-tip-line {
+    display: block;
+}
+
+.et-tip-relative {
+    color: var(--accent-text);
+    font-weight: var(--fw-semibold);
+}
+
+.et-tip-meta {
+    color: var(--text-2);
+}
+
+/* Em touch nao existe hover: o detalhe vira linha visivel abaixo da data. */
+@media (max-width: 768px) {
+    .et-when {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+    }
+
+    .et-tooltip {
+        position: static;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        width: 100%;
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        white-space: normal;
+    }
+
+    .et-tip-relative {
+        font-weight: var(--fw-medium);
+    }
+}

@@ -70,6 +70,51 @@ public class UiTextServiceStaticTests
     }
 
     [Fact]
+    public void FormatDateTime_DateLong_Portuguese_ReturnsWeekdayAndFullDate()
+    {
+        var language = new LanguagePreferenceService();
+        language.SetLanguage("pt-BR");
+        var service = new UiTextService(language);
+        // 2026-06-22 is a Monday
+        var result = service.FormatDateTime(new DateTime(2026, 6, 22, 14, 30, 0, DateTimeKind.Utc), "DateLong");
+        Assert.Equal("Segunda-feira, 22 de junho", result);
+    }
+
+    [Fact]
+    public void FormatDateTime_DateLong_English_ReturnsWeekdayAndFullDate()
+    {
+        var language = new LanguagePreferenceService();
+        language.SetLanguage("en-US");
+        var service = new UiTextService(language);
+        var result = service.FormatDateTime(new DateTime(2026, 6, 22, 14, 30, 0, DateTimeKind.Utc), "DateLong");
+        Assert.Equal("Monday, June 22", result);
+    }
+
+    [Fact]
+    public void FormatDateTime_DateLong_Spanish_ReturnsWeekdayAndFullDate()
+    {
+        var language = new LanguagePreferenceService();
+        language.SetLanguage("es-ES");
+        var service = new UiTextService(language);
+        var result = service.FormatDateTime(new DateTime(2026, 6, 22, 14, 30, 0, DateTimeKind.Utc), "DateLong");
+        Assert.Equal("Lunes, 22 de junio", result);
+    }
+
+    [Theory]
+    [InlineData("pt-BR", "seg")]
+    [InlineData("en-US", "Mon")]
+    [InlineData("es-ES", "lun")]
+    public void FormatDateTime_DateWeekday_ShowsAbbreviatedWeekday(string lang, string weekdayPrefix)
+    {
+        var language = new LanguagePreferenceService();
+        language.SetLanguage(lang);
+        var service = new UiTextService(language);
+        var result = service.FormatDateTime(new DateTime(2026, 6, 22, 14, 30, 0, DateTimeKind.Utc), "DateWeekday");
+        Assert.StartsWith(weekdayPrefix, result);
+        Assert.EndsWith("22/06", result);
+    }
+
+    [Fact]
     public void FormatDateTime_DateTimeShortCompact_ReturnsCorrectFormat()
     {
         // Arrange
