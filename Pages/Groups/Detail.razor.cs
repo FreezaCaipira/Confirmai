@@ -6,7 +6,7 @@ using Microsoft.JSInterop;
 
 namespace Confirmai.Pages.Groups;
 
-public partial class Detail : IAsyncDisposable
+public partial class Detail
 {
     [Parameter] public int Id { get; set; }
     [Inject] private GroupDetailService GroupService { get; set; } = default!;
@@ -17,28 +17,12 @@ public partial class Detail : IAsyncDisposable
     private GroupJoinRequest? userJoinRequest;
     private bool isLoading = true;
     private string? currentUserId;
-    private bool copiedInvite;
-    private bool copiedCode;
     private bool requestingJoin;
     private bool cancellingJoin;
-    private string enteredCode = string.Empty;
-    private string codeError = string.Empty;
-    private string requestSortOrder = "newest";
-    private HashSet<int> selectedRequestIds = new();
     private bool isBulkProcessing;
     private bool showAllMembers;
     private int myPendingPayments;
-
-    private CancellationTokenSource? _copyInviteCts;
-    private CancellationTokenSource? _copyCodeCts;
-
-    private IEnumerable<GroupJoinRequest> sortedPendingRequests => requestSortOrder switch
-    {
-        "newest" => pendingRequests.OrderByDescending(r => r.RequestedAt),
-        "oldest" => pendingRequests.OrderBy(r => r.RequestedAt),
-        "name" => pendingRequests.OrderBy(r => r.User?.FullName ?? r.User?.UserName ?? ""),
-        _ => pendingRequests
-    };
+    private int upcomingEventsCount;
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +37,7 @@ public partial class Detail : IAsyncDisposable
         group = data.Group;
         pendingRequests = data.PendingRequests;
         userJoinRequest = data.UserJoinRequest;
+        upcomingEventsCount = data.UpcomingEventsCount;
         myPendingPayments = data.Group is not null
             ? await GroupPayments.CountMyPendingAsync(Id, currentUserId)
             : 0;
@@ -60,45 +45,7 @@ public partial class Detail : IAsyncDisposable
         isLoading = false;
     }
 
-    private async Task CopyInviteLink(string url)
-    {
-        try { await JS.InvokeVoidAsync("navigator.clipboard.writeText", url); }
-        catch { }
-        _copyInviteCts?.Cancel();
-        _copyInviteCts = new CancellationTokenSource();
-        var ct = _copyInviteCts.Token;
-        try
-        {
-            copiedInvite = true;
-            await Task.Delay(2000, ct);
-            if (!ct.IsCancellationRequested) copiedInvite = false;
-        }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            copiedInvite = false;
-        }
-    }
-
     private void ToggleMembersView() => showAllMembers = !showAllMembers;
-
-    private async Task CopyCode(string code)
-    {
-        try { await JS.InvokeVoidAsync("navigator.clipboard.writeText", code); }
-        catch { }
-        _copyCodeCts?.Cancel();
-        _copyCodeCts = new CancellationTokenSource();
-        var ct = _copyCodeCts.Token;
-        try
-        {
-            copiedCode = true;
-            await Task.Delay(2000, ct);
-            if (!ct.IsCancellationRequested) copiedCode = false;
-        }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            copiedCode = false;
-        }
-    }
 
     private async Task ShareInviteOnWhatsApp(string url)
     {
@@ -124,20 +71,6 @@ public partial class Detail : IAsyncDisposable
         await LoadGroup();
     }
 
-    private async Task JoinWithCode()
-    {
-        if (currentUserId is null || group is null) return;
-        codeError = string.Empty;
-        var typed = enteredCode.Trim().ToUpperInvariant();
-        var result = await GroupService.JoinWithCodeAsync(group.Id, currentUserId, typed);
-        if (result == Confirmai.Services.Groups.JoinWithCodeResult.InvalidCode)
-        {
-            codeError = Ui["GroupEntry.InvalidCode"];
-            return;
-        }
-        await LoadGroup();
-    }
-
     private async Task ApproveRequest(int requestId)
     {
         if (currentUserId is null || group is null) return;
@@ -152,52 +85,18 @@ public partial class Detail : IAsyncDisposable
         await LoadGroup();
     }
 
-    private async Task ApproveSelected()
+    private async Task ApproveAllRequests()
     {
-        if (currentUserId is null || group is null || selectedRequestIds.Count == 0) return;
+        if (currentUserId is null || group is null) return;
         isBulkProcessing = true;
         try
         {
-            await GroupService.ApproveSelectedAsync(selectedRequestIds, currentUserId, group.Name);
-            selectedRequestIds.Clear();
+            await GroupService.ApproveAllPendingAsync(group.Id, currentUserId);
             await LoadGroup();
         }
         finally
         {
             isBulkProcessing = false;
         }
-    }
-
-    private async Task RejectSelected()
-    {
-        if (currentUserId is null || selectedRequestIds.Count == 0) return;
-        isBulkProcessing = true;
-        try
-        {
-            await GroupService.RejectSelectedAsync(selectedRequestIds, currentUserId);
-            selectedRequestIds.Clear();
-            await LoadGroup();
-        }
-        finally
-        {
-            isBulkProcessing = false;
-        }
-    }
-
-    private void ClearSelection() => selectedRequestIds.Clear();
-
-    private void ToggleRequestSelection(int requestId, bool isSelected)
-    {
-        if (isSelected) selectedRequestIds.Add(requestId);
-        else selectedRequestIds.Remove(requestId);
-    }
-
-    public ValueTask DisposeAsync()
-    {
-        _copyInviteCts?.Cancel();
-        _copyCodeCts?.Cancel();
-        _copyInviteCts?.Dispose();
-        _copyCodeCts?.Dispose();
-        return ValueTask.CompletedTask;
     }
 }

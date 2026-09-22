@@ -1326,17 +1326,6 @@
 }
 
 /* -- Group detail: join request section ---------------------------- */
-.join-request-section {
-    background: var(--ci-bg-deep);
-    border: 1px solid var(--ci-border);
-    border-radius: 12px;
-    padding: 1rem 1.1rem;
-    margin-top: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
 .join-request-info {
     font-size: 0.85rem;
     color: var(--ci-text-muted);

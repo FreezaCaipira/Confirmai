@@ -8,6 +8,7 @@
 @using Confirmai.Services
 @using Confirmai.Services.Groups
 @using Confirmai.Pages.Groups.Components
+@using Confirmai.Shared.Components.Groups
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -70,6 +71,16 @@ else
                     <h1 class="detail-title">@Ui["Group.ConfigTitle"]</h1>
                 </div>
             </header>
+
+            @* ── Convite ────────────────────────────────────────────── *@
+            <section class="detail-section">
+                <h2 class="detail-section-title">
+                    <i class="fas fa-user-plus"></i> @Ui["Group.Invite"]
+                </h2>
+                <GroupInviteBlock InviteCode="@(group.InviteCode ?? string.Empty)" />
+            </section>
+
+            <hr class="detail-divider">
 
             @* ── Pagamentos & Funcionalidades ─────────────────────────── *@
             <FeaturesToggles
