@@ -3,34 +3,47 @@
 <article class="mailbox-thread-pane">
     @if (SelectedContact == null)
     {
-        <div class="mailbox-thread-empty">@T["Mailbox.SelectConversation"]</div>
+        <div class="empty-state mailbox-thread-empty">
+            <i class="fas fa-comments empty-state-icon"></i>
+            <p>@T["Mailbox.SelectConversation"]</p>
+        </div>
     }
     else
     {
         var contact = SelectedContact;
+        var lastMessage = ConversationMessages.Count > 0 ? ConversationMessages[^1] : null;
 
         <header class="mailbox-thread-head">
             <div class="mailbox-thread-title-block">
                 <span class="mailbox-thread-title-kicker">@T["Mailbox.ThreadKickerUser"]</span>
                 <a class="mailbox-thread-title-user" href="@($"/profile/{contact.ContactUserId}")">@contact.ContactName</a>
             </div>
-            <span>@ConversationMessages.Count @T["Mailbox.ThreadMessages"]</span>
+            <div class="mailbox-thread-head-meta">
+                @if (lastMessage is not null)
+                {
+                    <span class="mailbox-thread-last-date">@T.FormatDateTime(lastMessage.CreatedAt.ToLocalTime(), "DateLong")</span>
+                }
+                <span class="mailbox-thread-msg-count">@ConversationMessages.Count @T["Mailbox.ThreadMessages"]</span>
+            </div>
         </header>
 
         <div class="mailbox-thread-stream" @ref="ThreadStreamRef">
             @if (IsThreadLoading)
             {
-                <div class="mailbox-thread-empty">@T["Mailbox.ThreadLoading"]</div>
+                <div class="mailbox-thread-empty-inline">@T["Mailbox.ThreadLoading"]</div>
             }
             else if (!ConversationMessages.Any())
             {
-                <div class="mailbox-thread-empty">@T["Mailbox.ThreadEmpty"]</div>
+                <div class="empty-state mailbox-thread-empty">
+                    <i class="fas fa-comment-dots empty-state-icon"></i>
+                    <p>@T["Mailbox.ThreadEmpty"]</p>
+                </div>
             }
             else
             {
                 @foreach (var threadMsg in ConversationMessages)
                 {
-                    <article class="mailbox-thread-bubble @(threadMsg.IsIncoming ? "incoming" : "outgoing") @(string.IsNullOrWhiteSpace(threadMsg.RoleClass) ? string.Empty : $"mailbox-thread-bubble-{threadMsg.RoleClass}")">
+                    <article class="mailbox-thread-bubble @(threadMsg.IsIncoming ? "incoming" : "outgoing")">
                         <header class="mailbox-thread-bubble-meta">
                             <strong class="mailbox-thread-author">@threadMsg.AuthorName</strong>
                             <time class="mailbox-thread-time" datetime="@threadMsg.CreatedAt.ToString("O", CultureInfo.InvariantCulture)">
@@ -49,14 +62,15 @@
                 <p class="mailbox-composer-info">@ComposerInfoMessage</p>
             }
 
-            <div class="mailbox-filter-field">
-                <label for="composer-body">@T["Mailbox.ComposerLabel"]</label>
-                <textarea id="composer-body" class="mk-input mailbox-composer-textarea" @bind="ComposerBody"></textarea>
+            <div class="mailbox-composer-field">
+                <label class="mailbox-composer-label" for="composer-body">@T["Mailbox.ComposerLabel"]</label>
+                <div class="mailbox-composer-row">
+                    <textarea id="composer-body" class="input mailbox-composer-textarea" @bind="ComposerBody"></textarea>
+                    <button class="btn btn-primary mailbox-composer-send" type="button" disabled="@IsSendingReply" @onclick="HandleSendReply">
+                        <i class="fas fa-paper-plane"></i> @(IsSendingReply ? T["Mailbox.Sending"] : T["Mailbox.Send"])
+                    </button>
+                </div>
             </div>
         </section>
-
-        <div class="mailbox-actions">
-            <button class="mk-btn mk-btn-primary" type="button" disabled="@IsSendingReply" @onclick="HandleSendReply">@(IsSendingReply ? T["Mailbox.Sending"] : T["Mailbox.Send"])</button>
-        </div>
     }
 </article>

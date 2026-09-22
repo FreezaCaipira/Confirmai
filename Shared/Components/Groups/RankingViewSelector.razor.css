@@ -19,12 +19,12 @@
 }
 
 .ranking-tab:hover {
-    border-color: var(--ci-accent);
-    color: var(--ci-accent-light);
+    border-color: var(--accent);
+    color: var(--accent-text);
 }
 
 .ranking-tab--active {
     border-color: var(--blue300-opacity-2xl);
     background: rgba(10, 28, 60, 0.7);
-    color: var(--ci-accent-light);
+    color: var(--accent-text);
 }
