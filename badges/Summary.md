@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 09/22/2026 - 18:27:32 |
-| Coverage date: | 09/22/2026 - 18:27:26 |
+| Generated on: | 09/24/2026 - 19:03:40 |
+| Coverage date: | 09/24/2026 - 19:03:34 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 530 |
 | Files: | 624 |
-| **Line coverage:** | 93.4% (137711 of 147438) |
-| Covered lines: | 137711 |
-| Uncovered lines: | 9727 |
+| **Line coverage:** | 93.3% (137700 of 147438) |
+| Covered lines: | 137700 |
+| Uncovered lines: | 9738 |
 | Coverable lines: | 147438 |
 | Total lines: | 180366 |
-| **Branch coverage:** | 44.2% (3996 of 9040) |
-| Covered branches: | 3996 |
+| **Branch coverage:** | 44.1% (3992 of 9040) |
+| Covered branches: | 3992 |
 | Total branches: | 9040 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 385_35766817219 |
+| Tag: | 387_36045074966 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **137711** | **9727** | **147438** | **199137** | **93.4%** | **3996** | **9040** | **44.2%** |
+| **Confirmai** | **137700** | **9738** | **147438** | **199137** | **93.3%** | **3992** | **9040** | **44.1%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -383,10 +383,10 @@
 | Confirmai.Services.Events.EventConfirmationPaymentStatusService | 78 | 8 | 86 | 136 | 90.6% | 23 | 25 | 92% |
 | Confirmai.Services.Events.EventConfirmationPaymentTransitionResult | 7 | 0 | 7 | 136 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.EventDateText | 8 | 0 | 8 | 25 | 100% | 6 | 6 | 100% |
-| Confirmai.Services.Events.EventNotificationSchedulerService | 43 | 12 | 55 | 129 | 78.1% | 7 | 10 | 70% |
+| Confirmai.Services.Events.EventNotificationSchedulerService | 36 | 19 | 55 | 129 | 65.4% | 5 | 10 | 50% |
 | Confirmai.Services.Events.EventNotificationService | 153 | 22 | 175 | 307 | 87.4% | 61 | 76 | 80.2% |
 | Confirmai.Services.Events.EventRelativeDate | 1 | 0 | 1 | 25 | 100% | 0 | 0 |  |
-| Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
+| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
@@ -512,7 +512,7 @@
 | Confirmai.Services.Utility.MailboxMessageView | 11 | 0 | 11 | 327 | 100% | 0 | 0 |  |
 | Confirmai.Services.Utility.MailboxQueryService | 171 | 11 | 182 | 327 | 93.9% | 69 | 114 | 60.5% |
 | Confirmai.Services.Utility.PiiSanitizer | 13 | 2 | 15 | 157 | 86.6% | 6 | 6 | 100% |
-| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 49 | 52 | 94.2% |
+| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 48 | 52 | 92.3% |
 | Confirmai.Services.Utility.TestnetBitcoinPaymentService | 49 | 18 | 67 | 132 | 73.1% | 16 | 24 | 66.6% |
 | Confirmai.Shared.Components.ActivePaymentMethodsWidget | 28 | 3 | 31 | 78 | 90.3% | 12 | 16 | 75% |
 | Confirmai.Shared.Components.Admin.AdminLogsFilterBar | 38 | 10 | 48 | 124 | 79.1% | 2 | 4 | 50% |
