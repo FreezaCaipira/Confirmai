@@ -302,7 +302,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 || 36-A | Grupo como porta de entrada | Home logada reorganizada (grupos primeiro, proximas partidas, historico); onboarding por empty state. Feito pelo Senior. | #113 | APROVADO |
 || 36-B | Layout geral: header + elevacao L0-L3 | Fase 0: header alinhado, setores da home, contornos azuis, ConfirmationCard em tokens (#118). Regra de elevacao L0-L3 + `docs/design-system.md` (#119). Feito pelo Senior; fases 2-3 restantes absorvidas pelo C36-D. | #118, #119 | APROVADO |
 || 36-C | Pagamentos no escopo do grupo + carimbo de taxa | Fase 0: `PlatformFeeWaivedFrom` (janela [From,Until)) + taxa carimbada na criacao da confirmacao (ressalva de dinheiro do C34). F1: nav sem /payments (rota viva = divida registrada). F2: `GroupAccess.IsMemberAsync`, guarda em /partidas (vazava eventos de grupo privado), authz por `request.GroupId` em approve/reject, waitlist+slots com currentUserId (fecha ressalva 2 do C34). F3+F4: `/grupo/{id}/pagamentos` por papel (membro: meus pagamentos agrupados; admin: gestao + aba propria), badge no hub, banner de pendencias na home, "Pagar" no card. Senior corrigiu na review: taxa so vira receita com `Paid` (5 queries) + renovacao de isencao preserva `From`; Pleno fechou ressalva 4 (`TotalToPay` com carimbo sempre vence) + flake de timezone. 2513 testes. | #120 (plano), #121 (impl), #122 (review) | APROVADO |
-|| 36-D | Elevacao e fluxo do grupo (8 pontos do Robson) | 8 fases em 1 branch: F1 botoes unificados (`components.css`, 4 variantes); F7 hub em paineis L1; F8 `GroupHeader`/`GroupSubNav` + `/partidas` elevada + breadcrumb com nome do grupo; F4 `/grupos` = gestao de participacao (`LeaveGroupAsync`, pedidos pendentes visiveis, cancelar com ownership); F2 hover na data (tooltip CSS-puro acessivel, `DateWeekday`/`DateLong`, fix UTC); F5 `/mailbox` em 3 niveis + `CssNoLegacyVarsTests` (guardiao de migrados); F6 `/profile` em paineis; F3 hero azul (unica excecao de gradiente, AA testado). 2513->2559 (+46). | a criar (branch `feat/ciclo36d`) | Aguardando review |
+|| 36-D | Elevacao e fluxo do grupo (8 pontos do Robson) | 8 fases em 1 branch: F1 botoes unificados (`components.css`, 4 variantes); F7 hub em paineis L1; F8 `GroupHeader`/`GroupSubNav` + `/partidas` elevada + breadcrumb com nome do grupo; F4 `/grupos` = gestao de participacao (`LeaveGroupAsync`, pedidos pendentes visiveis, cancelar com ownership); F2 hover na data (tooltip CSS-puro acessivel, `DateWeekday`/`DateLong`, fix UTC); F5 `/mailbox` em 3 niveis + `CssNoLegacyVarsTests` (guardiao de migrados); F6 `/profile` em paineis; F3 hero azul (unica excecao de gradiente, AA testado). 2513->2559 (+46). | #123 | APROVADO c/ ressalvas (review #124) |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -840,7 +840,7 @@ Nao mudar regra de pagamento, taxa, repasse, comprovante ou inadimplencia -- so 
 
 **Build `--no-incremental`**: 0 warnings, 0 errors. **Suite: 2511 verdes** (2484 -> 2511, +27).
 
-### C36-D -- Elevacao e fluxo do grupo: 8 pontos do Robson [EXECUTADO -- ver review] -- branch unica `feat/ciclo36d` (8 commits, 1 por fase, na ordem do plano); substitui a Fase 1 e parte da Fase 4 do C36-B
+### C36-D -- Elevacao e fluxo do grupo: 8 pontos do Robson [EXECUTADO -- APROVADO c/ ressalvas, ver review abaixo] -- branch unica `feat/ciclo36d` (8 commits, 1 por fase, na ordem do plano); substitui a Fase 1 e parte da Fase 4 do C36-B
 
 **Estado (14/06/2026)**: a **Fase 0 do C36-B ja foi feita pelo Senior** (#118 header alinhado + setores da home + detalhes azuis; #119 regra de elevacao L0-L3 + `docs/design-system.md`). O Robson testou o app apos a #119 e levantou 8 pontos; o Senior decidiu **nao** executar (custo) e detalhou aqui para o Pleno chegar o mais perto possivel da solucao -- o Senior so lapida na review.
 
@@ -989,6 +989,25 @@ Nao tocar em regra de negocio, autorizacao (fora do que o C36-C ja pede) nem rot
 
 ### O que NAO fazer
 Nao mudar fluxo funcional durante o redesenho (bug -> PR separado); nao criar token fora de `tokens.css`; nao usar verde/vermelho/roxo como cor de acao; nao adicionar framework CSS nem biblioteca de icones sem aprovacao do Senior; nao "melhorar" a home do C36-A alem de aplicar as classes compartilhadas; nao adicionar animacao alem de transicoes de 150ms; nao tocar em `Pages/Admin/ParchmentLab.razor` (laboratorio, sera removido em ciclo proprio).
+
+#### Review Senior do C36-D (PR #123, mergeada na `main`) -- APROVADO c/ ressalvas
+
+**Verificado localmente** (`main` em `d73d45d`): build 0 warning / 0 error; suite 2559 testes, 2535 verdes + 24 `ProgramConfigurationTests` que falham so por credencial de Postgres desta maquina (preexistente, documentado). Os numeros do Pleno conferem. As correcoes financeiras da review C36-C (#122) e a ressalva 4 (`1c1b193`) continuam intactas apos o merge.
+
+**Aprovado, fase a fase**
+- F1: `components.css` com exatamente as 4 variantes + `.btn-sm`; nenhum hex/rgba fora de `tokens.css` nos arquivos migrados; `CssNoLegacyVarsTests` guarda 32 arquivos e a lista so cresce -- e o tipo de guardiao que impede regressao silenciosa.
+- F7/F8: hub em paineis L1 (header / proxima partida / membros / acoes), `GroupHeader` + `GroupSubNav` nas telas privadas, breadcrumb com nome do grupo, `/partidas` mantem a checagem de membro do C36-C. Fluxo `/grupos -> hub -> partidas|pagamentos|ranking|config` fica legivel.
+- F4: `/grupos` virou gestao de participacao. `LeaveGroupAsync` bloqueia admin unico e audita; `CancelJoinRequestAsync` agora exige ownership (era IDOR: qualquer logado cancelava pedido alheio pelo id). `GetMyPendingRequestsAsync` fecha lacuna real (o solicitante nao via o proprio pedido).
+- F2: tooltip CSS-puro com `role=tooltip` + `aria-describedby`, hover e foco; `DateWeekday`/`DateLong` por cultura; `EventDateText` puro e testado; fix de UTC->local correto.
+- F5/F6: mailbox e profile em L1/L2/L3, `mk-*` zerado; achado do Pleno (`mk-input` scoped que nunca estilizava) confirmado.
+- F3: desvio tecnico correto -- terminar o degrade em `--accent` em vez de `--accent-light` foi a decisao certa (o clarao reprovaria AA); 5 pares on-accent testados. Unica excecao de gradiente documentada.
+
+**Ressalva 1 (dados, para o Pleno na proxima rodada -- nao bloqueia)**: `LeaveGroupAsync` remove a membership sem olhar as confirmacoes do usuario. Efeitos: (a) confirmacoes em partidas futuras continuam ocupando vaga; (b) confirmacoes com pagamento `Pending` **somem da lista de inadimplentes do admin**, porque `GroupPaymentsService` filtra por `memberIds` dos membros atuais -- ou seja, sair do grupo apaga a divida da visao do organizador. O mesmo vale para a remocao pelo admin (preexistente). Regra proposta: bloquear a saida enquanto houver pagamento pendente em partida do grupo (mensagem i18n apontando para "Meus pagamentos") e, ao sair sem divida, cancelar as confirmacoes em partidas futuras (liberando vaga/lista de espera). Teste de integracao para os dois caminhos.
+
+**Ressalvas menores**
+- Branches `feat/ciclo36d-fase*` redundantes no remoto: deletar (decisao do Robson; sem impacto no codigo).
+- Validacao visual 1366/390 e EN/ES continua com o Robson em prod (E2E nao roda no ambiente do Pleno).
+- Fora de escopo confirmado e ainda no visual antigo: `Groups/Create`, `Payments.razor.css` (32 gradientes/rgba), Futsal/Poker, `Payment*`, Identity/Admin -- sao as fases 2-3 do C36-B, proximo ciclo de layout.
 
 #### Entrega do Pleno -- C36-D (para a review do Senior)
 
