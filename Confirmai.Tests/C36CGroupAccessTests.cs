@@ -35,7 +35,7 @@ public class C36CGroupAccessTests
         var authMock = new Mock<AuthenticationStateProvider>();
         authMock.Setup(x => x.GetAuthenticationStateAsync())
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
-        return new GroupDetailService(f, authMock.Object, NewLog(f));
+        return new GroupDetailService(f, authMock.Object, NewLog(f), NewEventSvc(f));
     }
 
     private static EventDetailService NewEventSvc(IDbContextFactory<AppDbContext> f) =>

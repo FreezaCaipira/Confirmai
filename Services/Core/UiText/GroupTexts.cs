@@ -129,6 +129,7 @@ internal static class GroupTexts
         ["Group.AwaitingApproval"] = "Aguardando aprovação",
         ["Group.CancelRequest"] = "Cancelar pedido",
         ["Group.SoleAdminCantLeave"] = "Você é o único administrador. Promova outro membro antes de sair.",
+        ["Group.PendingPaymentCantLeave"] = "Você tem pagamentos pendentes neste grupo. Quite-os ou cancele sua presença em \"Meus pagamentos\" antes de sair.",
         ["Groups.PendingRequests"] = "Pedidos pendentes",
         ["Group.JoinError"] = "Erro ao entrar no grupo. Tente novamente.",
 
@@ -447,6 +448,7 @@ internal static class GroupTexts
         ["Group.AwaitingApproval"] = "Awaiting approval",
         ["Group.CancelRequest"] = "Cancel request",
         ["Group.SoleAdminCantLeave"] = "You are the only admin. Promote another member before leaving.",
+        ["Group.PendingPaymentCantLeave"] = "You have pending payments in this group. Pay them or cancel your presence under \"My payments\" before leaving.",
         ["Groups.PendingRequests"] = "Pending requests",
         ["Group.JoinError"] = "Error joining the group. Please try again.",
 
@@ -765,6 +767,7 @@ internal static class GroupTexts
         ["Group.AwaitingApproval"] = "Esperando aprobación",
         ["Group.CancelRequest"] = "Cancelar solicitud",
         ["Group.SoleAdminCantLeave"] = "Eres el único administrador. Promueve a otro miembro antes de salir.",
+        ["Group.PendingPaymentCantLeave"] = "Tienes pagos pendientes en este grupo. Págalos o cancela tu asistencia en \"Mis pagos\" antes de salir.",
         ["Groups.PendingRequests"] = "Solicitudes pendientes",
         ["Group.JoinError"] = "Error al entrar en el grupo. Inténtalo de nuevo.",
 

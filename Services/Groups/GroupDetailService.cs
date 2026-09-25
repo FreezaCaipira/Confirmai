@@ -19,7 +19,8 @@ public enum LeaveGroupResult
 {
     Left = 0,
     NotMember = 1,
-    SoleAdmin = 2
+    SoleAdmin = 2,
+    PendingPayment = 3
 }
 
 public sealed class GroupDetailData
@@ -37,15 +38,18 @@ public sealed class GroupDetailService
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly AuthenticationStateProvider _authStateProvider;
     private readonly LogService _log;
+    private readonly Futsal.EventDetailService _eventDetailService;
 
     public GroupDetailService(
         IDbContextFactory<AppDbContext> dbFactory,
         AuthenticationStateProvider authStateProvider,
-        LogService log)
+        LogService log,
+        Futsal.EventDetailService eventDetailService)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
         _log = log;
+        _eventDetailService = eventDetailService;
     }
 
     public async Task<string?> GetCurrentUserIdAsync()
@@ -175,6 +179,54 @@ public sealed class GroupDetailService
             }
         }
 
+        // Review C36-D: an unpaid pending confirmation on a priced match is
+        // the player's debt — and the delinquency views filter by CURRENT
+        // memberIds, so removing the membership would erase the debt from
+        // the organizer's sight. The player resolves it first: pays (or has
+        // the proof reviewed) via "Meus pagamentos", or cancels presence on
+        // the match. Cancelled events carry no debt and never block.
+        var hasPendingPayment = await db.EventConfirmations
+            .AnyAsync(c =>
+                c.UserId == userId &&
+                c.Event.GroupId == groupId &&
+                c.Event.IsActive &&
+                c.Event.Price != null &&
+                c.Event.Price > 0 &&
+                c.Position != FutsalPosition.Goalkeeper &&
+                !c.HasPaid &&
+                c.PaymentStatus == EventConfirmationPaymentStatus.Pending);
+        if (hasPendingPayment)
+        {
+            return LeaveGroupResult.PendingPayment;
+        }
+
+        // Leaving frees the spots the player would keep holding: unpaid
+        // confirmations on future matches are cancelled through the same
+        // path as a self-cancel (waitlist promotion included) and every
+        // waitlist entry in the group is removed. Paid or gateway-charged
+        // confirmations are kept — they are financial records and a
+        // purchased spot; the organizer can still remove them explicitly.
+        var nowUtc = DateTime.UtcNow;
+        var cancellableEventIds = await db.EventConfirmations
+            .Where(c => c.UserId == userId &&
+                c.Event.GroupId == groupId &&
+                c.Event.StartsAt >= nowUtc &&
+                !c.HasPaid &&
+                c.PaymentStatus != EventConfirmationPaymentStatus.Paid &&
+                c.PaymentGatewayName == null)
+            .Select(c => c.EventId)
+            .ToListAsync();
+
+        foreach (var eventId in cancellableEventIds)
+        {
+            await _eventDetailService.CancelConfirmationAsync(eventId, userId);
+        }
+
+        var waitlistEntries = await db.WaitingLists
+            .Where(w => w.UserId == userId && w.Event.GroupId == groupId)
+            .ToListAsync();
+        db.WaitingLists.RemoveRange(waitlistEntries);
+
         db.GroupMembers.Remove(member);
         await db.SaveChangesAsync();
 
@@ -184,7 +236,14 @@ public sealed class GroupDetailService
             member.Id.ToString(),
             "Membro saiu do grupo",
             actorUserId: userId,
-            metadata: new { groupId, userId, leftVoluntarily = true });
+            metadata: new
+            {
+                groupId,
+                userId,
+                leftVoluntarily = true,
+                cancelledConfirmations = cancellableEventIds.Count,
+                removedWaitlistEntries = waitlistEntries.Count,
+            });
 
         return LeaveGroupResult.Left;
     }
