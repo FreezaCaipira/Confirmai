@@ -2,8 +2,8 @@
 
 |||
 |:---|:---|
-| Generated on: | 09/25/2026 - 05:24:19 |
-| Coverage date: | 09/25/2026 - 05:24:13 |
+| Generated on: | 09/25/2026 - 05:24:51 |
+| Coverage date: | 09/25/2026 - 05:24:45 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 530 |
@@ -13,11 +13,11 @@
 | Uncovered lines: | 9740 |
 | Coverable lines: | 147480 |
 | Total lines: | 180432 |
-| **Branch coverage:** | 44.1% (3996 of 9046) |
-| Covered branches: | 3996 |
+| **Branch coverage:** | 44.1% (3997 of 9046) |
+| Covered branches: | 3997 |
 | Total branches: | 9046 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 389_36098145881 |
+| Tag: | 390_36098184746 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **137740** | **9740** | **147480** | **199262** | **93.3%** | **3996** | **9046** | **44.1%** |
+| **Confirmai** | **137740** | **9740** | **147480** | **199262** | **93.3%** | **3997** | **9046** | **44.1%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -210,7 +210,7 @@
 | Confirmai.Pages.Admin.AdminVenues | 0 | 109 | 109 | 263 | 0% | 0 | 52 | 0% |
 | Confirmai.Pages.Admin.Components.AdminPaymentsAdvancedToolsModal | 32 | 24 | 56 | 172 | 57.1% | 6 | 34 | 17.6% |
 | Confirmai.Pages.Admin.Components.AdminPaymentsFilters | 23 | 12 | 35 | 77 | 65.7% | 1 | 2 | 50% |
-| Confirmai.Pages.Admin.Components.AdminPaymentsSummaryPanel | 76 | 12 | 88 | 193 | 86.3% | 14 | 30 | 46.6% |
+| Confirmai.Pages.Admin.Components.AdminPaymentsSummaryPanel | 76 | 12 | 88 | 193 | 86.3% | 15 | 30 | 50% |
 | Confirmai.Pages.Admin.Components.AdminPaymentsTable | 9 | 23 | 32 | 95 | 28.1% | 1 | 12 | 8.3% |
 | Confirmai.Pages.Admin.ParchmentLab | 0 | 23 | 23 | 72 | 0% | 0 | 0 |  |
 | Confirmai.Pages.Components.ConversationContactView | 8 | 0 | 8 | 25 | 100% | 0 | 0 |  |
