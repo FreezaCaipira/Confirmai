@@ -145,6 +145,10 @@ public partial class Index
             {
                 leaveError = Ui["Group.SoleAdminCantLeave"];
             }
+            else if (result == LeaveGroupResult.PendingPayment)
+            {
+                leaveError = Ui["Group.PendingPaymentCantLeave"];
+            }
             else
             {
                 openMenuGroupId = null;

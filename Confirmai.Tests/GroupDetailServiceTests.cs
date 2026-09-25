@@ -24,7 +24,15 @@ public class GroupDetailServiceTests
             .Setup(x => x.GetAuthenticationStateAsync())
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(identity)));
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
-        var svc = new GroupDetailService(factory, authMock.Object, logService);
+        var notificationService = new Confirmai.Services.Events.EventNotificationService(
+            factory, Mock.Of<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender>(),
+            NullLogger<Confirmai.Services.Events.EventNotificationService>.Instance);
+        var eventSvc = new Confirmai.Services.Futsal.EventDetailService(
+            factory, logService, notificationService,
+            new Confirmai.Services.Payment.PlatformFeePolicy(
+                Microsoft.Extensions.Options.Options.Create(
+                    new Confirmai.Configuration.FeeOptions { ManualPlatformFeeFixed = 0.75m })));
+        var svc = new GroupDetailService(factory, authMock.Object, logService, eventSvc);
         return (factory, svc);
     }
 
@@ -477,5 +485,202 @@ public class GroupDetailServiceTests
         await using var db2 = factory.CreateDbContext();
         Assert.False(await db2.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == "admin-1"));
         Assert.True(await db2.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == "admin-2"));
+    }
+
+    // ── LeaveGroupAsync vs. debt (review C36-D ressalva 1) ────────────
+
+    private static async Task<int> SeedEventAsync(
+        IDbContextFactory<AppDbContext> factory, int groupId,
+        DateTime startsAt, decimal? price, bool isActive = true)
+    {
+        await using var db = factory.CreateDbContext();
+        var ev = new Event
+        {
+            GroupId = groupId, Sport = Sport.Futsal, StartsAt = startsAt,
+            DurationMinutes = 120, MaxPlayers = 10, Price = price,
+            IsActive = isActive, CreatedByUserId = "creator-1",
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        return ev.Id;
+    }
+
+    private static async Task SeedMemberAsync(
+        IDbContextFactory<AppDbContext> factory, int groupId, string userId,
+        GroupMemberRole role = GroupMemberRole.Member)
+    {
+        await using var db = factory.CreateDbContext();
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = groupId, UserId = userId, Role = role,
+            CreatedAt = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedConfirmationAsync(
+        IDbContextFactory<AppDbContext> factory, int eventId, string userId,
+        bool hasPaid = false,
+        EventConfirmationPaymentStatus status = EventConfirmationPaymentStatus.Pending,
+        FutsalPosition? position = FutsalPosition.Outfield)
+    {
+        await using var db = factory.CreateDbContext();
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId = eventId, UserId = userId, Position = position,
+            ConfirmedAt = DateTime.UtcNow, HasPaid = hasPaid,
+            PaymentStatus = status,
+        });
+        await db.SaveChangesAsync();
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_BlocksPendingPayment_OnPastPricedEvent()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedMemberAsync(factory, groupId, "u1");
+        var eventId = await SeedEventAsync(factory, groupId,
+            DateTime.UtcNow.AddDays(-1), price: 15m);
+        await SeedConfirmationAsync(factory, eventId, "u1");
+
+        var result = await svc.LeaveGroupAsync(groupId, "u1");
+
+        Assert.Equal(LeaveGroupResult.PendingPayment, result);
+        await using var db = factory.CreateDbContext();
+        Assert.True(await db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == "u1"));
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_BlocksPendingPayment_OnFuturePricedEvent()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedMemberAsync(factory, groupId, "u1");
+        var eventId = await SeedEventAsync(factory, groupId,
+            DateTime.UtcNow.AddDays(1), price: 15m);
+        await SeedConfirmationAsync(factory, eventId, "u1");
+
+        var result = await svc.LeaveGroupAsync(groupId, "u1");
+
+        Assert.Equal(LeaveGroupResult.PendingPayment, result);
+        await using var db = factory.CreateDbContext();
+        Assert.True(await db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == "u1"));
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_Allows_WhenPastEventIsPaid()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedMemberAsync(factory, groupId, "u1");
+        var eventId = await SeedEventAsync(factory, groupId,
+            DateTime.UtcNow.AddDays(-1), price: 15m);
+        await SeedConfirmationAsync(factory, eventId, "u1",
+            hasPaid: true, status: EventConfirmationPaymentStatus.Paid);
+
+        var result = await svc.LeaveGroupAsync(groupId, "u1");
+
+        Assert.Equal(LeaveGroupResult.Left, result);
+        await using var db = factory.CreateDbContext();
+        Assert.False(await db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == "u1"));
+        // The paid record is financial history — it is never deleted.
+        Assert.True(await db.EventConfirmations.AnyAsync(c => c.EventId == eventId && c.UserId == "u1"));
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_Allows_GoalkeeperUnpaid_OnPricedEvent()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedMemberAsync(factory, groupId, "u1");
+        var eventId = await SeedEventAsync(factory, groupId,
+            DateTime.UtcNow.AddDays(-1), price: 15m);
+        await SeedConfirmationAsync(factory, eventId, "u1",
+            position: FutsalPosition.Goalkeeper);
+
+        var result = await svc.LeaveGroupAsync(groupId, "u1");
+
+        Assert.Equal(LeaveGroupResult.Left, result);
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_Allows_WhenEventWasCancelled()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedMemberAsync(factory, groupId, "u1");
+        var eventId = await SeedEventAsync(factory, groupId,
+            DateTime.UtcNow.AddDays(-1), price: 15m, isActive: false);
+        await SeedConfirmationAsync(factory, eventId, "u1");
+
+        var result = await svc.LeaveGroupAsync(groupId, "u1");
+
+        Assert.Equal(LeaveGroupResult.Left, result);
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_CancelsFutureUnpaidConfirmations_AndPromotesWaitlist()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedMemberAsync(factory, groupId, "u1");
+        await SeedMemberAsync(factory, groupId, "u2");
+        var eventId = await SeedEventAsync(factory, groupId,
+            DateTime.UtcNow.AddDays(1), price: null);
+        await SeedConfirmationAsync(factory, eventId, "u1");
+        await using (var db = factory.CreateDbContext())
+        {
+            db.WaitingLists.Add(new WaitingList
+            {
+                EventId = eventId, UserId = "u2", Position = 1,
+                JoinedAt = DateTime.UtcNow,
+            });
+            await db.SaveChangesAsync();
+        }
+
+        var result = await svc.LeaveGroupAsync(groupId, "u1");
+
+        Assert.Equal(LeaveGroupResult.Left, result);
+        await using var db2 = factory.CreateDbContext();
+        Assert.False(await db2.EventConfirmations.AnyAsync(c => c.EventId == eventId && c.UserId == "u1"));
+        // The freed spot goes to the next in line, same as a self-cancel.
+        Assert.True(await db2.EventConfirmations.AnyAsync(c => c.EventId == eventId && c.UserId == "u2"));
+        Assert.False(await db2.WaitingLists.AnyAsync(w => w.EventId == eventId && w.UserId == "u2"));
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_KeepsPaidFutureConfirmation()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedMemberAsync(factory, groupId, "u1");
+        var eventId = await SeedEventAsync(factory, groupId,
+            DateTime.UtcNow.AddDays(1), price: 15m);
+        await SeedConfirmationAsync(factory, eventId, "u1",
+            hasPaid: true, status: EventConfirmationPaymentStatus.Paid);
+
+        var result = await svc.LeaveGroupAsync(groupId, "u1");
+
+        Assert.Equal(LeaveGroupResult.Left, result);
+        await using var db = factory.CreateDbContext();
+        Assert.True(await db.EventConfirmations.AnyAsync(c => c.EventId == eventId && c.UserId == "u1"));
+    }
+
+    [Fact]
+    public async Task LeaveGroupAsync_RemovesWaitlistEntries()
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedMemberAsync(factory, groupId, "u1");
+        var eventId = await SeedEventAsync(factory, groupId,
+            DateTime.UtcNow.AddDays(1), price: 15m);
+        await using (var db = factory.CreateDbContext())
+        {
+            db.WaitingLists.Add(new WaitingList
+            {
+                EventId = eventId, UserId = "u1", Position = 1,
+                JoinedAt = DateTime.UtcNow,
+            });
+            await db.SaveChangesAsync();
+        }
+
+        var result = await svc.LeaveGroupAsync(groupId, "u1");
+
+        Assert.Equal(LeaveGroupResult.Left, result);
+        await using var db2 = factory.CreateDbContext();
+        Assert.False(await db2.WaitingLists.AnyAsync(w => w.EventId == eventId && w.UserId == "u1"));
     }
 }

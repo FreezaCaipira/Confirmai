@@ -40,7 +40,15 @@ public class C34AuditTrailTests
         var authMock = new Mock<AuthenticationStateProvider>();
         authMock.Setup(x => x.GetAuthenticationStateAsync())
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
-        return new GroupDetailService(factory, authMock.Object, NewLog(factory));
+        var eventSvc = new Confirmai.Services.Futsal.EventDetailService(
+            factory, NewLog(factory),
+            new Confirmai.Services.Events.EventNotificationService(
+                factory, Mock.Of<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender>(),
+                NullLogger<Confirmai.Services.Events.EventNotificationService>.Instance),
+            new Confirmai.Services.Payment.PlatformFeePolicy(
+                Microsoft.Extensions.Options.Options.Create(
+                    new Confirmai.Configuration.FeeOptions { ManualPlatformFeeFixed = 0.75m })));
+        return new GroupDetailService(factory, authMock.Object, NewLog(factory), eventSvc);
     }
 
     private static byte[] FakeImage(int size = 1024)

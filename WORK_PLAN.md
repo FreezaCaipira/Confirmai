@@ -1009,6 +1009,15 @@ Nao mudar fluxo funcional durante o redesenho (bug -> PR separado); nao criar to
 - Validacao visual 1366/390 e EN/ES continua com o Robson em prod (E2E nao roda no ambiente do Pleno).
 - Fora de escopo confirmado e ainda no visual antigo: `Groups/Create`, `Payments.razor.css` (32 gradientes/rgba), Futsal/Poker, `Payment*`, Identity/Admin -- sao as fases 2-3 do C36-B, proximo ciclo de layout.
 
+#### Follow-up do Pleno -- ressalva 1 (saida do grupo vs divida) [ENTREGUE -- branch `fix/ciclo36d-ressalva1-saida-divida`]
+
+- `LeaveGroupAsync` agora retorna `LeaveGroupResult.PendingPayment` e **bloqueia a saida** quando o usuario tem confirmacao nao-paga com `PaymentStatus == Pending` em partida precificada ativa do grupo (nao-goleiro). Cobre divida de partida passada (a lista de inadimplentes), comprovante em analise (sempre `Pending`) e partida futura nao-paga -- o usuario resolve em "Meus pagamentos" ou cancelando a presenca. Chave i18n `Group.PendingPaymentCantLeave` x3, erro inline `role="alert"` em `/grupos`.
+- Ao sair sem divida: confirmações **nao-pagas em partidas futuras** sao canceladas pelo mesmo caminho do auto-cancelamento (`EventDetailService.CancelConfirmationAsync` -- inclui promocao da lista de espera) e **todas** as entradas da waiting list do grupo sao removidas. Confirmações pagas ou com cobranca de gateway sao **mantidas** -- sao registro financeiro e vaga comprada; o organizador pode remové-las explicitamente.
+- Auditoria estendida: `GroupMemberRemoved` ganha `cancelledConfirmations` + `removedWaitlistEntries` no metadata.
+- **Nota sobre "remocao pelo admin"**: nao existe hoje fluxo de admin remover membro do grupo (a unica remocao de `GroupMember` e a saida voluntaria) -- a regra fica coberta se esse fluxo for criado reutilizando este metodo. A remocao de **confirmacao** pelo admin (`AdminRemoveConfirmationAsync`) continua podendo apagar divida de partida passada -- e um ato deliberado do organizador (perdao manual), mantido; se a intencao for bloquear/forcar motivo, registrar como decisao.
+- **Achado extra corrigido**: `PartidasDateTooltipIntegrationTests` falhava aos sabados -- a regex esperava `á` literal mas o HTML entrega `s&#xE1;b`. Regex afrouxada para `[^<]*\d{2}/\d{2}`.
+- **Numeros (regra 28)**: build `--no-incremental` 0/0; suite 2559 -> **2567** (+8 testes do LeaveGroupAsync vs divida).
+
 #### Entrega do Pleno -- C36-D (para a review do Senior)
 
 - **Branch unica**: `feat/ciclo36d` -- 8 commits, 1 por fase, na ordem do plano (`c1da540` F1, `10e0142` F7, `852583f` F8, `9113d52` F4, `c3b2c69` F2, `7d4927f` F5, `e90b28b` F6, `4079786` F3). Resultado por fase esta documentado no item "Resultado" de cada fase acima.
