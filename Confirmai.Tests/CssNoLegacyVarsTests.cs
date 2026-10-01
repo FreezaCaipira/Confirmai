@@ -55,6 +55,7 @@ public class CssNoLegacyVarsTests
         "wwwroot/css/event-detail.css",
         "wwwroot/css/event-create.css",
         "wwwroot/css/escalacao.css",
+        "wwwroot/css/events.css",
         "Pages/Futsal/Detail.razor.css",
         "Pages/Futsal/Create.razor.css",
         "Pages/Futsal/Edit.razor.css",
