@@ -4,54 +4,53 @@
 
 /* Base styles using ID for specificity */
 #payments-history-page {
-    background: var(--ci-bg);
+    background: var(--bg);
 }
 
 #payments-history-page .entity-shell-card {
-    background: var(--ci-bg);
+    background: var(--bg);
     border-radius: 8px;
     padding: 1.5rem;
 }
 
 #payments-history-page .page-section-title {
-    color: var(--ci-surface-light);
+    color: var(--text);
     font-size: 1.5rem;
     font-weight: 800;
     margin: 0 0 1rem;
     text-align: center;
-    text-shadow: 0 0 15px var(--accent-opacity-xl), 0 2px 4px var(--shadow-md);
 }
 
 #payments-history-page .filter-bar {
-    background: var(--ci-bg-card-deep);
+    background: var(--surface-2);
     border-radius: 8px;
     padding: 0.75rem;
     margin-bottom: 1rem;
-    box-shadow: 0 2px 4px var(--shadow-md);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 #payments-history-page .filter-bar input,
 #payments-history-page .filter-bar select,
 #payments-history-page .filter-bar input[type="date"] {
-    background: var(--ci-bg);
-    color: var(--ci-text);
+    background: var(--bg);
+    color: var(--text);
     border-radius: 6px;
 }
 
 #payments-history-page .filter-bar input::placeholder {
-    color: var(--slate-mid);
+    color: var(--text-3);
 }
 
 #payments-history-page .filter-bar button {
-    background: var(--ci-bg-card-deep);
-    color: var(--ci-accent);
+    background: var(--surface-2);
+    color: var(--accent-text);
     border-radius: 6px;
     font-weight: 700;
 }
 
 #payments-history-page .filter-bar button:hover {
-    color: var(--link-info);
-    background: var(--accent-opacity-xs);
+    color: var(--accent-text);
+    background: var(--accent-soft);
 }
 
 #payments-history-page .payments-history-table {
@@ -81,135 +80,132 @@
 }
 
 #payments-history-page .order-status-badge.pago {
-    background: var(--futsal-bg-dark);
-    color: var(--green-bright);
-    border: 1px solid var(--futsal-green-dark);
-    text-shadow: none;
+    background: var(--surface);
+    color: var(--success);
+    border: 1px solid var(--surface-2);
 }
 
 #payments-history-page .order-status-badge.aguardandopagamento {
-    background: var(--ci-bg-alt);
-    color: var(--ci-accent);
-    border: 1px solid var(--ci-border-dim);
+    background: var(--surface);
+    color: var(--accent-text);
+    border: var(--border-2);
 }
 
 /* ========================================
    SENT TAB (History) - Blue Theme
    ======================================== */
 #payments-history-page.payments-history-shell--sent .entity-shell-card {
-    border: 1px solid var(--ci-border);
-    border-top: 1px solid var(--ci-border);
-    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-xs);
+    border: var(--border);
+    border-top: var(--border);
+    box-shadow: 0 8px 24px var(--shadow-card), 0 4px 12px var(--shadow-card), 0 0 0 1px var(--accent-soft);
 }
 
 #payments-history-page.payments-history-shell--sent .filter-bar {
-    border: 1px solid var(--ci-border);
+    border: var(--border);
 }
 
 #payments-history-page.payments-history-shell--sent .filter-bar input,
 #payments-history-page.payments-history-shell--sent .filter-bar select,
 #payments-history-page.payments-history-shell--sent .filter-bar input[type="date"] {
-    border: 1px solid var(--ci-border);
+    border: var(--border);
 }
 
 #payments-history-page.payments-history-shell--sent .filter-bar button {
-    border: 1px solid var(--ci-border);
+    border: var(--border);
 }
 
 #payments-history-page.payments-history-shell--sent .filter-bar button:hover {
-    border-color: var(--ci-accent);
+    border-color: var(--accent-text);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table {
-    border: 1px solid var(--ci-border-soft);
+    border: var(--border);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table th {
-    background: var(--ci-bg-alt);
-    border-bottom: 1px solid var(--ci-border-dim);
-    color: var(--ci-accent);
-    text-shadow: none;
+    background: var(--surface);
+    border-bottom: var(--border-2);
+    color: var(--accent-text);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table td {
     background: transparent;
-    border-bottom: 1px solid var(--ci-border-alt);
-    color: var(--ci-text-muted);
+    border-bottom: var(--border);
+    color: var(--text-2);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table tr:nth-child(even) td {
-    background: var(--ci-bg-alt);
+    background: var(--surface);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table tr:hover td {
-    background: var(--ci-accent-opacity-lg);
+    background: var(--accent-soft);
 }
 
 #payments-history-page.payments-history-shell--sent .payments-history-table .payment-row-paid td,
 #payments-history-page.payments-history-shell--sent .payments-history-table .payment-row-pending td {
-    border-bottom-color: var(--ci-border);
+    border-bottom-color: var(--border);
 }
 
 /* ========================================
    RECEIVED TAB (Pending) - Red Theme
    ======================================== */
 #payments-history-page.payments-history-shell--received .entity-shell-card {
-    border: 1px solid var(--red-border);
-    border-top: 1px solid var(--red-border);
-    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--red-opacity-2xs);
+    border: 1px solid var(--danger);
+    border-top: 1px solid var(--danger);
+    box-shadow: 0 8px 24px var(--shadow-card), 0 4px 12px var(--shadow-card), 0 0 0 1px var(--danger-soft);
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar {
-    border: 1px solid var(--red-border);
+    border: 1px solid var(--danger);
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar input,
 #payments-history-page.payments-history-shell--received .filter-bar select,
 #payments-history-page.payments-history-shell--received .filter-bar input[type="date"] {
-    border: 1px solid var(--red-border);
+    border: 1px solid var(--danger);
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar button {
-    border: 1px solid var(--red-border);
-    color: var(--red-soft);
+    border: 1px solid var(--danger);
+    color: var(--danger);
 }
 
 #payments-history-page.payments-history-shell--received .filter-bar button:hover {
-    border-color: var(--red-strong);
-    color: var(--red-text-light);
+    border-color: var(--danger);
+    color: var(--danger);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table {
-    border: 1px solid var(--red-border);
+    border: 1px solid var(--danger);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table th {
-    background: var(--brown-deep);
-    border-bottom: 1px solid var(--red-border);
-    color: var(--red-text-light);
-    text-shadow: none;
+    background: var(--surface-3);
+    border-bottom: 1px solid var(--danger);
+    color: var(--danger);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table td {
     background: transparent;
-    border-bottom: 1px solid var(--ci-border-alt);
-    color: var(--red-text-light);
+    border-bottom: var(--border);
+    color: var(--danger);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table tr:nth-child(even) td {
-    background: var(--brown-deep);
+    background: var(--surface-3);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table tr:hover td {
-    background: rgba(127, 29, 29, 0.15);
+    background: var(--danger-soft);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table .payment-row-paid td {
-    border-bottom-color: var(--red-border);
+    border-bottom-color: var(--danger);
 }
 
 #payments-history-page.payments-history-shell--received .payments-history-table .payment-row-pending td {
-    border-bottom-color: var(--red-strong);
+    border-bottom-color: var(--danger);
 }
 
 
@@ -229,9 +225,9 @@
     font-family: inherit;
     cursor: pointer;
     border-radius: 8px;
-    border: 1px solid var(--ci-border);
-    background: var(--ci-bg-card-deep);
-    color: var(--ci-text-subtle);
+    border: var(--border);
+    background: var(--surface-2);
+    color: var(--text-3);
     transition: border-color 0.15s, color 0.15s, background 0.15s;
     line-height: 1.2;
     text-align: left;
@@ -239,15 +235,15 @@
 }
 
 .payments-tab-btn:hover:not(.active) {
-    border-color: var(--ci-border-alt);
-    color: var(--ci-text-muted);
-    background: rgba(26, 90, 176, 0.1);
+    border-color: var(--border);
+    color: var(--text-2);
+    background: var(--accent-soft);
 }
 
 .payments-tab-btn.active {
-    background: var(--ci-bg-alt);
-    border-color: var(--ci-accent-mid);
-    color: var(--ci-accent);
+    background: var(--surface);
+    border-color: var(--accent-text);
+    color: var(--accent-text);
     cursor: default;
 }
 
@@ -261,15 +257,15 @@
     border-radius: 999px;
     font-size: 0.75rem;
     font-weight: 900;
-    background: var(--ci-accent-opacity-lg);
-    color: var(--ci-text-subtle);
+    background: var(--accent-soft);
+    color: var(--text-3);
     margin-left: 0.1rem;
     line-height: 1;
 }
 
 .payments-tab-btn.active .payments-tab-count {
-    background: var(--accent-opacity-sm);
-    color: var(--ci-accent);
+    background: var(--accent-soft);
+    color: var(--accent-text);
 }
 
 .payments-filter-card {
@@ -398,16 +394,15 @@
 
 /* Custom theme overrides for payments history */
 .payments-history-shell .payments-history-table .order-status-badge.aguardandopagamento {
-    background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold-amber) 100%);
-    color: var(--brown-mid);
-    border: 1px solid var(--brown-deep);
+    background: var(--warning-soft);
+    color: var(--warning);
+    border: 1px solid var(--warning);
 }
 
 .payments-history-shell .payments-history-table .order-status-badge.pago {
-    background: var(--futsal-bg-dark);
-    color: var(--green-bright);
-    border: 1px solid var(--futsal-green-dark);
-    text-shadow: none;
+    background: var(--surface);
+    color: var(--success);
+    border: 1px solid var(--surface-2);
 }
 
 .payments-history-shell .payments-history-table .action-btn {
@@ -425,9 +420,8 @@
 }
 
 .payments-history-shell .payments-history-pagination .pagination-info {
-    color: var(--ci-text-subtle);
+    color: var(--text-3);
     font-weight: 800;
-    text-shadow: none;
 }
 
 /* Export actions */
@@ -444,18 +438,18 @@
     min-height: 2.35rem;
     font-size: 0.85rem;
     font-weight: 600;
-    border: 1px solid var(--ci-border-alt);
-    background: var(--ci-accent-opacity-sm);
-    color: var(--ci-text-muted);
+    border: var(--border);
+    background: var(--accent-soft);
+    color: var(--text-2);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .export-btn:hover {
-    background: var(--ci-accent-opacity-lg);
-    border-color: var(--ci-accent);
-    color: var(--ci-text-blue);
+    background: var(--accent-soft);
+    border-color: var(--accent-text);
+    color: var(--text);
 }
 
 .export-btn:disabled {
@@ -469,86 +463,86 @@
 
 /* -- Inline style replacements for conditional styling ----------------- */
 .payments-history-shell--bg {
-    background: var(--ci-bg);
+    background: var(--bg);
 }
 
 /* Entity shell card - sent theme */
 .payments-history-shell--sent .entity-shell-card {
-    border: 1px solid var(--ci-border);
-    border-top: 1px solid var(--ci-border);
-    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--accent-opacity-xs);
-    background: var(--ci-bg);
+    border: var(--border);
+    border-top: var(--border);
+    box-shadow: 0 8px 24px var(--shadow-card), 0 4px 12px var(--shadow-card), 0 0 0 1px var(--accent-soft);
+    background: var(--bg);
     border-radius: 8px;
     padding: 1.5rem;
 }
 
 /* Entity shell card - received theme */
 .payments-history-shell--received .entity-shell-card {
-    border: 1px solid var(--red-border);
-    border-top: 1px solid var(--red-border);
-    box-shadow: 0 8px 24px var(--shadow-2xl), 0 4px 12px var(--shadow-lg), 0 0 0 1px var(--red-opacity-2xs);
-    background: var(--ci-bg);
+    border: 1px solid var(--danger);
+    border-top: 1px solid var(--danger);
+    box-shadow: 0 8px 24px var(--shadow-card), 0 4px 12px var(--shadow-card), 0 0 0 1px var(--danger-soft);
+    background: var(--bg);
     border-radius: 8px;
     padding: 1.5rem;
 }
 
 /* Filter bar - sent theme */
 .payments-history-shell--sent .payments-filter-card {
-    border: 1px solid var(--ci-border);
+    border: var(--border);
 }
 
 /* Filter bar - received theme */
 .payments-history-shell--received .payments-filter-card {
-    border: 1px solid var(--red-border);
+    border: 1px solid var(--danger);
 }
 
 /* Table - sent theme */
 .payments-history-shell--sent .payments-history-table {
-    border: 1px solid var(--ci-border-soft);
+    border: var(--border);
 }
 
 /* Table - received theme */
 .payments-history-shell--received .payments-history-table {
-    border: 1px solid var(--red-border);
+    border: 1px solid var(--danger);
 }
 
 /* Table header - sent theme */
 .payments-history-shell--sent .payments-history-table thead {
-    background: var(--ci-bg-alt);
-    border-bottom: 1px solid var(--ci-border-dim);
-    color: var(--ci-accent);
+    background: var(--surface);
+    border-bottom: var(--border-2);
+    color: var(--accent-text);
 }
 
 /* Table header - received theme */
 .payments-history-shell--received .payments-history-table thead {
-    background: var(--brown-deep);
-    border-bottom: 1px solid var(--red-border);
-    color: var(--red-text-light);
+    background: var(--surface-3);
+    border-bottom: 1px solid var(--danger);
+    color: var(--danger);
 }
 
 /* Table row - sent theme */
 .payments-history-shell--sent .payments-history-table tbody tr {
-    border-bottom: 1px solid var(--ci-border);
+    border-bottom: var(--border);
 }
 
 /* Table row - received paid theme */
 .payments-history-shell--received .payments-history-table tbody .tr--paid {
-    border-bottom: 1px solid var(--red-border);
+    border-bottom: 1px solid var(--danger);
 }
 
 /* Table row - received pending theme */
 .payments-history-shell--received .payments-history-table tbody .tr--pending {
-    border-bottom: 1px solid var(--red-strong);
+    border-bottom: 1px solid var(--danger);
 }
 
 /* Table cell date - sent theme */
 .payments-history-shell--sent .payments-history-table .td--date {
-    color: var(--ci-text-muted);
+    color: var(--text-2);
 }
 
 /* Table cell date - received theme */
 .payments-history-shell--received .payments-history-table .td--date {
-    color: var(--red-text-light);
+    color: var(--danger);
 }
 
 

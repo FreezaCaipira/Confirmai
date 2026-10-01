@@ -63,6 +63,15 @@ public class CssNoLegacyVarsTests
         "Pages/Poker/Create.razor.css",
         "Pages/Poker/Edit.razor.css",
         "Shared/Components/ConfirmationCard.razor.css",
+        // Payment/settlement screens (C36-B Fase 3)
+        "Pages/Payment/Payment.razor.css",
+        "Pages/Payment/PaymentDetails.razor.css",
+        "Pages/Payment/ViewPayment.razor.css",
+        "Pages/Payment/PaymentsHistory.razor.css",
+        "Pages/Groups/Payments.razor.css",
+        "Shared/Components/Groups/GroupDetailPaymentsModal.razor.css",
+        "Pages/Groups/Components/PixReceiverSelector.razor.css",
+        "Pages/Groups/Components/PayoutAccountEditor.razor.css",
     ];
 
     private static readonly Regex LegacyVarRegex = new(

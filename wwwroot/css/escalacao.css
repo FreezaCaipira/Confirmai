@@ -45,7 +45,7 @@
 
 .esc-gate-icon--past {
     background: var(--accent-soft);
-    border-color: var(--accent-soft);
+    border-color: var(--accent);
     color: var(--accent-text);
 }
 
@@ -71,7 +71,7 @@
     margin-top: .5rem;
     padding: .45rem 1rem;
     border-radius: 8px;
-    border: 1px solid var(--accent-soft);
+    border: 1px solid var(--accent);
     color: var(--accent-text);
     font-size: .85rem;
     font-weight: 600;
@@ -274,7 +274,7 @@
     font-weight: 700;
     color: var(--accent-text);
     background: var(--warning-soft);
-    border: 1px solid var(--warning-soft);
+    border: 1px solid var(--warning);
     border-radius: 999px;
     padding: .1rem .45rem;
     white-space: nowrap;
@@ -393,7 +393,7 @@
 
 .esc-btn--danger-ghost {
     background: transparent;
-    border: 1px solid var(--danger-soft);
+    border: 1px solid var(--danger);
     color: var(--danger);
 }
 .esc-btn--danger-ghost:hover { background: var(--danger-soft); }
@@ -565,7 +565,7 @@
     width: 3.5rem;
     padding: .4rem .5rem;
     border-radius: 7px;
-    border: 1px solid var(--accent-soft);
+    border: 1px solid var(--accent);
     background: var(--surface);
     color: var(--text);
     font-size: 1.2rem;
@@ -701,7 +701,7 @@
     padding: .65rem .85rem;
     border-radius: 8px;
     background: var(--accent-soft);
-    border: 1px solid var(--accent-soft);
+    border: 1px solid var(--accent);
     color: var(--accent-text);
     font-size: .875rem;
 }
@@ -711,7 +711,7 @@
 .esc-vote-change-btn {
     flex-shrink: 0;
     background: none;
-    border: 1px solid var(--accent-soft);
+    border: 1px solid var(--accent);
     border-radius: 6px;
     color: var(--accent-text);
     font-size: .75rem;
@@ -760,7 +760,7 @@
     padding: .85rem 1rem;
     border-radius: 10px;
     background: var(--warning-soft);
-    border: 1px solid var(--warning-soft);
+    border: 1px solid var(--warning);
     margin-bottom: .5rem;
 }
 

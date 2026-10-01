@@ -42,7 +42,7 @@
 
 .my-conf-card--urgent {
     border-left-color: var(--warning);
-    border-color: var(--warning-soft);
+    border-color: var(--warning);
 }
 
 .my-conf-sport {

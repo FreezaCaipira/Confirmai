@@ -117,7 +117,7 @@ body .entity-shell-card.evpay-main {
     letter-spacing: 0.06em;
     color: var(--success);
     background: var(--success-soft);
-    border: 1px solid var(--success-soft);
+    border: 1px solid var(--success);
     border-radius: 20px;
     padding: 0.2rem 0.7rem;
 }
@@ -349,7 +349,7 @@ body .entity-shell-card.evpay-main {
 }
 
 .detail-admin-btn--danger {
-    border-color: var(--danger-soft);
+    border-color: var(--danger);
     color: var(--danger);
 }
 
@@ -431,7 +431,7 @@ body .entity-shell-card.evpay-main {
     justify-content: center;
     gap: 0.5rem;
     background: var(--accent-soft);
-    border: 1px solid var(--accent-soft);
+    border: 1px solid var(--accent);
     border-radius: 8px;
     color: var(--accent-text);
     font-size: 0.88rem;
@@ -678,7 +678,7 @@ body .entity-shell-card.evpay-main {
 
 .player-tag--mvp {
     background: var(--warning-soft);
-    border: 1px solid var(--warning-soft);
+    border: 1px solid var(--warning);
     border-radius: 999px;
     color: var(--warning);
     font-size: 0.72rem;
@@ -799,7 +799,7 @@ body .entity-shell-card.evpay-main {
     gap: 0.2rem;
 }
 .add-slot-row--gk:hover {
-    border-color: var(--accent-soft);
+    border-color: var(--accent);
     color: var(--accent-text);
     background: var(--accent-soft);
 }

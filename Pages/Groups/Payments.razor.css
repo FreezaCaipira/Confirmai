@@ -15,8 +15,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.6rem;
-    color: var(--green-light);
-    text-shadow: 0 0 15px var(--green-opacity-2xl), 0 2px 4px var(--text-shadow-sm);
+    color: var(--success);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -27,12 +26,11 @@
     display: flex;
     gap: 0.75rem;
     padding: 1.25rem 1.75rem;
-    border-bottom: 2px solid;
-    border-image: linear-gradient(to right, var(--ci-accent), var(--ci-accent-light), var(--ci-accent)) 1;
+    border-bottom: 2px solid var(--accent-border);
     align-items: center;
     flex-wrap: wrap;
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-bg-mid) 50%, var(--ci-bg-dark) 100%);
-    box-shadow: 0 4px 12px var(--shadow-lg), inset 0 1px 0 var(--inset-accent-sm), inset 0 -1px 0 var(--shadow-md);
+    background: var(--surface-2);
+    box-shadow: var(--shadow);
     position: relative;
 }
 
@@ -43,13 +41,13 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(to right, transparent, var(--sky-blue-md), transparent);
+    background: var(--border);
 }
 
 .payments-tab {
-    background: var(--ci-bg);
-    border: 1px solid var(--ci-border);
-    color: var(--slate-muted);
+    background: var(--bg);
+    border: var(--border);
+    color: var(--text-2);
     font-size: 0.95rem;
     font-weight: 800;
     padding: 0.6rem 1.2rem;
@@ -60,65 +58,64 @@
     align-items: center;
     gap: 0.5rem;
     white-space: nowrap;
-    box-shadow: 0 2px 4px var(--shadow-md);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .payments-tab:hover {
-    background: var(--ci-bg-card);
-    border-color: var(--ci-accent);
-    color: var(--ci-surface-muted);
-    box-shadow: 0 4px 8px var(--shadow-accent-sm);
+    background: var(--surface);
+    border-color: var(--accent-text);
+    color: var(--text-3);
+    box-shadow: 0 4px 8px var(--shadow);
 }
 
 .payments-tab--active {
-    color: var(--ci-surface-light);
-    border-color: var(--ci-accent);
-    background: var(--ci-accent-mid);
-    box-shadow: 0 4px 8px var(--shadow-accent-sm), inset 0 0 0 1px var(--accent-opacity-sm);
-    text-shadow: 0 0 10px var(--shadow-accent-lg);
+    color: var(--text);
+    border-color: var(--accent-text);
+    background: var(--accent);
+    box-shadow: 0 4px 8px var(--shadow), inset 0 0 0 1px var(--accent-soft);
+
 }
 
 .payments-tab--delinquent {
-    border-color: var(--red-strong);
-    background: linear-gradient(180deg, var(--red-strong) 0%, var(--red-border) 100%);
-    color: var(--white);
-    box-shadow: 0 4px 8px var(--shadow-red-sm);
-    text-shadow: none;
+    border-color: var(--danger);
+    background: var(--danger-soft);
+    color: var(--danger);
+    box-shadow: 0 4px 8px var(--shadow);
 }
 
 .payments-tab--history {
-    border-color: var(--ci-accent);
-    background: var(--ci-accent-mid);
-    box-shadow: 0 4px 8px var(--shadow-accent-sm), inset 0 0 0 1px var(--accent-opacity-sm);
-    text-shadow: 0 0 10px var(--shadow-accent-lg);
+    border-color: var(--accent-text);
+    background: var(--accent);
+    box-shadow: 0 4px 8px var(--shadow), inset 0 0 0 1px var(--accent-soft);
+
 }
 
 .payments-tab-count {
-    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
-    color: var(--white);
+    background: var(--danger-soft);
+    color: var(--danger);
     font-size: 0.75rem;
     padding: 0.15rem 0.4rem;
     border-radius: 3px;
     font-weight: 800;
-    box-shadow: 0 2px 4px var(--shadow-red-sm);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .payments-tab-count--delinquent {
-    background: var(--white);
-    color: var(--red-border);
-    box-shadow: 0 2px 4px var(--shadow-red-sm);
+    background: var(--accent-fg);
+    color: var(--danger);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .payments-tab-count--history {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
-    color: var(--ci-surface-light);
-    box-shadow: 0 2px 4px var(--shadow-accent-sm);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .payments-refresh-btn {
     background: transparent;
-    border: 1px solid var(--ci-border);
-    color: var(--ci-surface-muted);
+    border: var(--border);
+    color: var(--text-3);
     font-size: 0.85rem;
     padding: 0.4rem 0.55rem;
     border-radius: 6px;
@@ -132,9 +129,9 @@
 }
 
 .payments-refresh-btn:hover {
-    border-color: var(--ci-accent);
-    color: var(--ci-accent);
-    background: var(--accent-opacity-xs);
+    border-color: var(--accent-text);
+    color: var(--accent-text);
+    background: var(--accent-soft);
 }
 
 .payments-refresh-btn:disabled {
@@ -149,7 +146,7 @@
 .payments-loading {
     padding: 2rem;
     text-align: center;
-    color: var(--slate-muted);
+    color: var(--text-2);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -160,22 +157,21 @@
 .payments-empty {
     padding: 2rem;
     text-align: center;
-    color: var(--ci-surface-light);
-    background: var(--ci-bg);
-    border: 1px solid var(--ci-border);
+    color: var(--text);
+    background: var(--bg);
+    border: var(--border);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
     margin: 1rem;
-    box-shadow: inset 0 2px 4px var(--shadow-lg);
+    box-shadow: inset 0 2px 4px var(--shadow-card);
 }
 
 .payments-empty i {
     font-size: 2.5rem;
-    color: var(--ci-accent);
-    text-shadow: 0 0 15px var(--shadow-accent-lg);
+    color: var(--accent-text);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -225,30 +221,30 @@
 }
 
 .payments-history-filters select {
-    background: var(--ci-bg);
-    border: 1px solid var(--ci-border);
+    background: var(--bg);
+    border: var(--border);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
-    color: var(--ci-text);
+    color: var(--text);
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: inset 0 2px 4px var(--shadow-md);
+    box-shadow: inset 0 2px 4px var(--shadow);
 }
 
 .payments-history-filters select:hover {
-    border-color: var(--ci-accent);
+    border-color: var(--accent-text);
 }
 
 .payments-history-filters select:focus {
     outline: none;
-    border-color: var(--ci-accent);
-    box-shadow: 0 0 0 2px var(--shadow-accent-sm), inset 0 2px 4px var(--shadow-md);
+    border-color: var(--accent-text);
+    box-shadow: 0 0 0 2px var(--shadow), inset 0 2px 4px var(--shadow);
 }
 
 .payments-history-filters select option {
-    background: var(--ci-bg);
-    color: var(--ci-text);
+    background: var(--bg);
+    color: var(--text);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -265,8 +261,8 @@
 }
 
 .payments-user-item {
-    background: var(--ci-bg);
-    border: 2px solid var(--red-strong);
+    background: var(--bg);
+    border: 2px solid var(--danger);
     border-radius: 8px;
     padding: 1rem 1.25rem;
     padding-right: 1.5rem;
@@ -278,44 +274,43 @@
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
-    box-shadow: 0 4px 8px var(--shadow-red-sm), 0 0 20px rgba(239, 68, 68, 0.2);
+    box-shadow: var(--shadow);
 }
 
 .payments-user-item:hover {
-    background: var(--ci-bg-deepest);
-    border-color: var(--red-soft);
-    box-shadow: 0 6px 12px var(--red-opacity-lg), 0 0 30px rgba(239, 68, 68, 0.3);
+    background: var(--bg);
+    border-color: var(--danger);
+    box-shadow: var(--shadow-card);
 }
 
 /* History tab — neutral green/teal instead of red */
 .payments-user-item--history {
-    border: 2px solid var(--ci-border);
-    box-shadow: 0 4px 8px var(--shadow-md), 0 0 20px rgba(34, 197, 94, 0.15);
+    border: var(--border);
+    box-shadow: var(--shadow);
 }
 
 .payments-user-item--history:hover {
-    border-color: var(--green-strong);
-    box-shadow: 0 6px 12px var(--green-opacity-md), 0 0 30px rgba(34, 197, 94, 0.25);
+    border-color: var(--success);
+    box-shadow: var(--shadow-card);
 }
 
 .payments-user-item--history.payments-user-item--selected {
-    background: var(--green-opacity-sm);
-    border-color: var(--green-strong);
-    box-shadow: 0 6px 12px var(--green-opacity-md), inset 0 0 0 1px var(--green-opacity-sm);
+    background: var(--success-soft);
+    border-color: var(--success);
+    box-shadow: 0 6px 12px var(--success-soft), inset 0 0 0 1px var(--success-soft);
 }
 
 .payments-user-item--selected {
-    background: var(--red-bg-dark);
-    border-color: var(--red-soft);
-    box-shadow: 0 6px 12px var(--red-opacity-md), inset 0 0 0 1px var(--shadow-red-sm);
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    box-shadow: 0 6px 12px var(--danger-soft), inset 0 0 0 1px var(--shadow);
 }
 
 .payments-user-name {
     font-weight: 800;
-    color: var(--ci-surface-light);
+    color: var(--text);
     font-size: 0.95rem;
     min-width: 150px;
-    text-shadow: 0 0 8px var(--shadow-accent-sm);
 }
 
 .payments-user-meta {
@@ -334,31 +329,31 @@
     font-weight: 800;
     padding: 0.3rem 0.6rem;
     border-radius: 5px;
-    box-shadow: 0 2px 4px var(--shadow-md);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .payments-badge--games {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 50%, var(--ci-accent-dark) 100%);
-    color: var(--ci-surface-light);
-    border: 1px solid var(--ci-accent-light);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    border: 1px solid var(--accent-border);
 }
 
 .payments-badge--amount {
-    background: linear-gradient(180deg, var(--red-strong) 0%, var(--red-border) 100%);
-    color: var(--white);
-    border: 1px solid var(--red-strong);
+    background: var(--danger-soft);
+    color: var(--danger);
+    border: 1px solid var(--danger);
 }
 
 .payments-badge--amount--history {
-    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-strong) 50%, var(--green-dark) 100%);
-    color: var(--white);
-    border: 1px solid var(--green-strong);
+    background: var(--success-soft);
+    color: var(--success);
+    border: 1px solid var(--success);
 }
 
 .payments-badge--proof {
-    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
-    color: var(--green-soft);
-    border: 1px solid var(--green-soft);
+    background: var(--success-soft);
+    color: var(--success);
+    border: 1px solid var(--success);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -366,18 +361,18 @@
 /* ──────────────────────────────────────────────────────────── */
 
 .payments-detail-panel {
-    background: var(--ci-bg);
-    border-left: 3px solid var(--red-strong);
+    background: var(--bg);
+    border-left: 3px solid var(--danger);
     border-radius: 0 0 8px 8px;
     margin-top: -0.5rem;
     margin-bottom: 0.75rem;
     padding: 1rem 1.25rem;
-    box-shadow: 0 4px 8px var(--shadow-red-sm), inset 0 2px 4px var(--shadow-lg);
+    box-shadow: 0 4px 8px var(--shadow), inset 0 2px 4px var(--shadow-card);
 }
 
 .payments-detail-panel--history {
-    border-left-color: var(--green-strong);
-    box-shadow: 0 4px 8px var(--green-opacity-sm), inset 0 2px 4px var(--shadow-lg);
+    border-left-color: var(--success);
+    box-shadow: 0 4px 8px var(--success-soft), inset 0 2px 4px var(--shadow-card);
 }
 
 .payments-detail-summary {
@@ -386,30 +381,27 @@
     align-items: center;
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--red-opacity-sm);
+    border-bottom: 1px solid var(--danger);
 }
 
 .payments-detail-panel--history .payments-detail-summary {
-    border-bottom-color: var(--green-opacity-md);
+    border-bottom-color: var(--success);
 }
 
 .payments-detail-panel--history .payments-summary-total {
-    color: var(--green-bright);
-    text-shadow: 0 0 10px var(--green-opacity-xl);
+    color: var(--success);
 }
 
 .payments-summary-label {
     font-size: 0.85rem;
-    color: var(--ci-surface-muted);
+    color: var(--text-3);
     font-weight: 800;
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
 }
 
 .payments-summary-total {
     font-size: 1rem;
     font-weight: 800;
-    color: var(--red-light);
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
+    color: var(--danger);
 }
 
 .payments-detail-list {
@@ -426,34 +418,31 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0.75rem;
-    background: var(--ci-bg);
-    border: 1px solid var(--ci-border);
+    background: var(--bg);
+    border: var(--border);
     border-radius: 6px;
     gap: 0.5rem;
-    box-shadow: 0 2px 4px var(--shadow-md);
+    box-shadow: 0 2px 4px var(--shadow);
     flex-wrap: wrap;
 }
 
 .payments-detail-date {
     font-size: 0.85rem;
-    color: var(--ci-surface-muted);
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
+    color: var(--text-3);
 }
 
 .payments-detail-price {
     font-size: 0.85rem;
     font-weight: 800;
-    color: var(--green-bright);
-    text-shadow: 0 0 10px var(--green-opacity-xl);
+    color: var(--success);
 }
 
 .payments-detail-admin {
     font-size: 0.8rem;
-    color: var(--slate-muted);
+    color: var(--text-2);
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
 }
 
 .payments-detail-actions {
@@ -480,18 +469,17 @@
     gap: 0.3rem;
     font-size: 0.8rem;
     font-weight: 800;
-    color: var(--green-soft);
+    color: var(--success);
     padding: 0.3rem 0.6rem;
     border-radius: 5px;
-    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-strong) 50%, var(--green-strong) 100%);
-    border: 1px solid var(--green-soft);
-    box-shadow: 0 2px 4px var(--shadow-green-sm);
+    background: var(--success-soft);
+    border: 1px solid var(--success);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .payments-notifying {
-    color: var(--ci-surface-muted);
+    color: var(--text-3);
     font-size: 0.85rem;
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
 }
 
 .payments-notify-btn {
@@ -509,27 +497,27 @@
 }
 
 .payments-notify-btn--email {
-    color: var(--amber);
-    border-color: var(--amber-opacity-md);
-    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border-color: var(--warning);
+    background: var(--warning-soft);
 }
 
 .payments-notify-btn--email:hover {
-    background: rgba(245, 158, 11, 0.25);
-    border-color: var(--amber);
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    background: var(--warning-soft);
+    border-color: var(--warning);
+    box-shadow: var(--shadow);
 }
 
 .payments-notify-btn--whatsapp {
-    color: var(--green-bright);
-    border-color: var(--green-opacity-md);
-    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border-color: var(--success);
+    background: var(--success-soft);
 }
 
 .payments-notify-btn--whatsapp:hover {
-    background: rgba(16, 185, 129, 0.25);
-    border-color: var(--green-bright);
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    background: var(--success-soft);
+    border-color: var(--success);
+    box-shadow: var(--shadow);
 }
 
 .payments-chevron {
@@ -537,7 +525,7 @@
     right: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--slate-mid);
+    color: var(--text-3);
     font-size: 0.75rem;
 }
 
@@ -551,9 +539,9 @@
     gap: 0.3rem;
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--ci-accent);
+    color: var(--accent-text);
     text-decoration: none;
-    border: 1px solid var(--blue300-opacity-lg);
+    border: 1px solid var(--accent);
     padding: 0.4rem 0.8rem;
     border-radius: 5px;
     transition: all 0.2s;
@@ -562,22 +550,22 @@
 }
 
 .payments-view-proof-btn:hover {
-    color: var(--link-info);
-    border-color: var(--blue300-opacity-2xl);
-    background: var(--blue300-opacity-xs);
+    color: var(--accent-text);
+    border-color: var(--accent);
+    background: var(--accent-soft);
 }
 
 .payments-view-proof-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
-    color: var(--slate-mid);
-    border-color: var(--slate-functional-md);
+    color: var(--text-3);
+    border-color: var(--border-2);
 }
 
 .payments-view-proof-btn:disabled:hover {
     background: transparent;
-    border-color: var(--slate-functional-md);
-    color: var(--slate-mid);
+    border-color: var(--border-2);
+    color: var(--text-3);
 }
 
 .payments-entry-link {
@@ -586,9 +574,9 @@
     gap: 0.3rem;
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--amber);
+    color: var(--warning);
     text-decoration: none;
-    border: 1px solid rgba(161, 118, 24, 0.35);
+    border: 1px solid var(--warning);
     padding: 0.3rem 0.6rem;
     border-radius: 5px;
     transition: all 0.2s;
@@ -596,9 +584,9 @@
 }
 
 .payments-entry-link:hover {
-    color: var(--amber-warm);
-    border-color: rgba(253, 230, 138, 0.6);
-    background: var(--amber-opacity-xs);
+    color: var(--warning);
+    border-color: var(--warning);
+    background: var(--warning-soft);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -611,7 +599,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--shadow-3xl);
+    background: var(--shadow-card);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -620,14 +608,14 @@
 }
 
 .payment-proof-viewer-content {
-    background: var(--ci-bg-alt);
-    border: 1px solid var(--slate-border-lg);
+    background: var(--surface);
+    border: 1px solid var(--border-2);
     border-radius: 12px;
     max-width: 500px;
     width: 100%;
     padding: 1.5rem;
     position: relative;
-    box-shadow: 0 20px 25px -5px var(--shadow-xl);
+    box-shadow: 0 20px 25px -5px var(--shadow-card);
 }
 
 .payment-proof-viewer-close {
@@ -636,7 +624,7 @@
     right: 1rem;
     background: transparent;
     border: none;
-    color: var(--slate-muted);
+    color: var(--text-2);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0;
@@ -650,8 +638,8 @@
 }
 
 .payment-proof-viewer-close:hover {
-    background: var(--slate-border-sm);
-    color: var(--ci-surface-muted);
+    background: var(--border);
+    color: var(--text-3);
 }
 
 .payment-proof-img {
@@ -659,8 +647,8 @@
     height: auto;
     max-height: 500px;
     border-radius: 8px;
-    border: 1px solid var(--slate-border-lg);
-    background: var(--overlay-sm);
+    border: 1px solid var(--border-2);
+    background: var(--scrim);
 }
 
 /* ──────────────────────────────────────────────────────────── */
@@ -787,10 +775,10 @@
 /* ------------------------------------------------------------ */
 
 .payments-tab--platformfee {
-    border-color: var(--gold);
-    background: var(--gold-deep);
-    box-shadow: 0 4px 8px var(--shadow-accent-sm), inset 0 0 0 1px var(--accent-opacity-sm);
-    text-shadow: 0 0 10px var(--shadow-accent-lg);
+    border-color: var(--accent-text);
+    background: var(--accent);
+    box-shadow: 0 4px 8px var(--shadow), inset 0 0 0 1px var(--accent-soft);
+
 }
 
 .platform-fee-section {
@@ -801,16 +789,15 @@
 }
 
 .platform-fee-section-title {
-    color: var(--ci-accent-light);
+    color: var(--accent-text);
     font-size: 1.05rem;
     font-weight: 800;
     margin: 0 0 0.75rem 0;
-    text-shadow: 0 0 12px var(--shadow-accent-sm);
 }
 
 .platform-fee-divider {
     border: none;
-    border-top: 1px solid var(--ci-border);
+    border-top: var(--border);
     margin: 1.5rem 0;
     width: 100%;
 }
@@ -829,9 +816,9 @@
 
 .platform-fee-refresh-btn {
     background: transparent;
-    border: 1px solid var(--ci-border);
+    border: var(--border);
     border-radius: 6px;
-    color: var(--ci-accent-light);
+    color: var(--accent-text);
     font-size: 0.85rem;
     padding: 0.35rem 0.6rem;
     cursor: pointer;
@@ -840,8 +827,8 @@
 }
 
 .platform-fee-refresh-btn:hover {
-    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
-    border-color: var(--ci-accent);
+    background: var(--surface-3);
+    border-color: var(--accent-text);
 }
 
 .payments-tab-refresh {
@@ -852,9 +839,9 @@
 
 .payments-refresh-btn--visible {
     background: transparent;
-    border: 1px solid var(--ci-border);
+    border: var(--border);
     border-radius: 6px;
-    color: var(--ci-accent-light);
+    color: var(--accent-text);
     font-size: 0.85rem;
     font-weight: 600;
     padding: 0.4rem 0.75rem;
@@ -866,8 +853,8 @@
 }
 
 .payments-refresh-btn--visible:hover {
-    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
-    border-color: var(--ci-accent);
+    background: var(--surface-3);
+    border-color: var(--accent-text);
 }
 
 .platform-fee-matches-title {
@@ -878,18 +865,18 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border-soft);
+    background: var(--surface-3);
+    border: var(--border);
     border-radius: 8px;
     padding: 0.6rem 0.9rem;
     margin: 0 0 0.75rem 0;
     font-size: 0.82rem;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     line-height: 1.4;
 }
 
 .platform-fee-info-card i {
-    color: var(--ci-accent-light);
+    color: var(--accent-text);
     flex-shrink: 0;
 }
 
@@ -899,9 +886,9 @@
     margin: 0.25rem 0;
     padding: 0.4rem 1rem;
     background: transparent;
-    border: 1px solid var(--ci-border);
+    border: var(--border);
     border-radius: 6px;
-    color: var(--ci-accent-light);
+    color: var(--accent-text);
     font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
@@ -911,18 +898,18 @@
 .platform-fee-toggle-row td {
     text-align: center;
     padding: 0.25rem 0;
-    border-bottom: 1px solid var(--ci-border);
+    border-bottom: var(--border);
 }
 
 .platform-fee-toggle-btn:hover {
-    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
-    border-color: var(--ci-accent);
+    background: var(--surface-3);
+    border-color: var(--accent-text);
 }
 
 .platform-fee-table-total td {
     font-weight: 800;
-    border-top: 2px solid var(--ci-border);
-    color: var(--ci-text);
+    border-top: var(--border);
+    color: var(--text);
     padding-top: 0.6rem;
 }
 
@@ -935,11 +922,11 @@
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: var(--ci-accent);
+    accent-color: var(--accent-text);
 }
 
 .platform-fee-row--selected {
-    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
+    background: var(--surface-3);
 }
 
 .platform-fee-select-actions {
@@ -949,10 +936,10 @@
 }
 
 .platform-fee-select-btn {
-    border: 1px solid var(--ci-border);
+    border: var(--border);
     border-radius: 6px;
     background: transparent;
-    color: var(--ci-accent-light);
+    color: var(--accent-text);
     font-size: 0.8rem;
     font-weight: 700;
     padding: 0.4rem 0.75rem;
@@ -964,17 +951,17 @@
 }
 
 .platform-fee-select-btn:hover {
-    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
-    border-color: var(--ci-accent);
+    background: var(--surface-3);
+    border-color: var(--accent-text);
 }
 
 .platform-fee-select-btn--clear {
-    color: var(--red-light, #fca5a5);
-    border-color: var(--red-strong, #b91c1c);
+    color: var(--danger);
+    border-color: var(--danger);
 }
 
 .platform-fee-select-btn--clear:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--danger-soft);
 }
 
 .platform-fee-selected-amount {
@@ -982,15 +969,15 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1rem;
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-accent);
+    background: var(--surface-3);
+    border: 1px solid var(--accent);
     border-radius: 6px;
 }
 
 .platform-fee-selected-value {
     font-size: 1.25rem;
     font-weight: 800;
-    color: var(--white);
+    color: var(--accent-fg);
 }
 
 .platform-fee-proof-btn {
@@ -999,9 +986,9 @@
     justify-content: center;
     gap: 0.5rem;
     cursor: pointer;
-    background: var(--ci-bg-input);
-    border: 1.5px dashed var(--ci-accent);
-    color: var(--ci-accent-light);
+    background: var(--surface-3);
+    border: 1.5px dashed var(--accent);
+    color: var(--accent-text);
     border-radius: 8px;
     padding: 0.7rem 1rem;
     font-size: 0.85rem;
@@ -1021,9 +1008,9 @@
 }
 
 .platform-fee-proof-btn:hover {
-    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
-    border-color: var(--ci-accent-light);
-    color: var(--ci-text);
+    background: var(--surface-3);
+    border-color: var(--accent-text);
+    color: var(--text);
 }
 
 .platform-fee-proof-input-hidden {
@@ -1043,8 +1030,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    background: var(--ci-accent);
-    color: var(--white);
+    background: var(--accent);
+    color: var(--accent-fg);
 }
 
 .platform-fee-send-btn:hover:not(:disabled) {
@@ -1063,7 +1050,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--scrim);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -1072,14 +1059,14 @@
 }
 
 .payment-modal {
-    background: var(--ci-bg-alt);
-    border: 1px solid var(--ci-border);
+    background: var(--surface);
+    border: var(--border);
     border-radius: 12px;
     max-width: 950px;
     width: 95%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-card);
 }
 
 .payment-modal--confirm {
@@ -1092,13 +1079,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.25rem;
-    border-bottom: 1px solid var(--ci-border);
+    border-bottom: var(--border);
 }
 
 .payment-modal-title {
     font-size: 1.1rem;
     font-weight: 800;
-    color: var(--ci-text);
+    color: var(--text);
     margin: 0;
     display: flex;
     align-items: center;
@@ -1108,7 +1095,7 @@
 .payment-close-btn {
     background: transparent;
     border: none;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     font-size: 1.2rem;
     cursor: pointer;
     padding: 0.25rem 0.5rem;
@@ -1117,8 +1104,8 @@
 }
 
 .payment-close-btn:hover {
-    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
-    color: var(--ci-text);
+    background: var(--surface-3);
+    color: var(--text);
 }
 
 .payment-modal-body {
@@ -1127,14 +1114,14 @@
 
 .payment-confirm-text {
     font-size: 0.95rem;
-    color: var(--ci-text);
+    color: var(--text);
     line-height: 1.6;
     margin: 0 0 0.75rem 0;
 }
 
 .payment-confirm-file {
     font-size: 0.85rem;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     margin: 0;
     display: flex;
     align-items: center;
@@ -1163,18 +1150,18 @@
 
 .payment-modal-btn--cancel {
     background: transparent;
-    border: 1px solid var(--ci-border);
-    color: var(--ci-text-muted);
+    border: var(--border);
+    color: var(--text-2);
 }
 
 .payment-modal-btn--cancel:hover {
-    background: var(--ci-surface-hover, rgba(255, 255, 255, 0.05));
-    color: var(--ci-text);
+    background: var(--surface-3);
+    color: var(--text);
 }
 
 .payment-modal-btn--confirm {
-    background: var(--ci-accent);
-    color: var(--white);
+    background: var(--accent);
+    color: var(--accent-fg);
 }
 
 .payment-modal-btn--confirm:hover:not(:disabled) {
@@ -1198,10 +1185,10 @@
 
 .platform-fee-fill-btn {
     flex-shrink: 0;
-    border: 1px solid var(--ci-accent);
+    border: 1px solid var(--accent);
     border-radius: 6px;
     background: transparent;
-    color: var(--ci-accent-light);
+    color: var(--accent-text);
     font-size: 0.8rem;
     font-weight: 700;
     padding: 0.4rem 0.75rem;
@@ -1214,8 +1201,8 @@
 }
 
 .platform-fee-fill-btn:hover {
-    background: var(--ci-accent);
-    color: var(--ci-surface-light, #fff);
+    background: var(--accent);
+    color: var(--text);
 }
 
 .platform-fee-summary-grid {
@@ -1226,18 +1213,18 @@
 }
 
 .platform-fee-summary-card {
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-border);
+    background: var(--surface);
+    border: var(--border);
     border-radius: 8px;
     padding: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-    box-shadow: 0 2px 6px var(--shadow-md);
+    box-shadow: 0 2px 6px var(--shadow);
 }
 
 .platform-fee-summary-label {
-    color: var(--ci-text);
+    color: var(--text);
     font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -1245,44 +1232,44 @@
 }
 
 .platform-fee-summary-value {
-    color: var(--white);
+    color: var(--accent-fg);
     font-size: 1.4rem;
     font-weight: 800;
 }
 
 .platform-fee-summary-card--highlight {
-    border-color: var(--gold);
-    background: linear-gradient(135deg, var(--gold-deep) 0%, var(--ci-bg-card) 100%);
-    box-shadow: 0 4px 12px var(--shadow-accent-sm);
+    border-color: var(--accent-border);
+    background: var(--accent-soft);
+    box-shadow: var(--shadow);
 }
 
 .platform-fee-summary-card--highlight .platform-fee-summary-label {
-    color: var(--white);
+    color: var(--accent-text);
 }
 
 .platform-fee-summary-card--highlight .platform-fee-summary-value {
-    color: var(--white);
+    color: var(--accent-fg);
 }
 
 .platform-fee-summary-card--warning {
-    border-color: var(--amber);
+    border-color: var(--warning);
 }
 
 .platform-fee-summary-card--warning .platform-fee-summary-value {
-    color: var(--amber-light);
+    color: var(--warning);
 }
 
 .platform-fee-summary-card--success {
-    border-color: var(--green-strong);
+    border-color: var(--success);
 }
 
 .platform-fee-summary-card--success .platform-fee-summary-value {
-    color: var(--green-light);
+    color: var(--success);
 }
 
 .platform-fee-pix-card {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border-soft);
+    background: var(--surface-2);
+    border: var(--border);
     border-radius: 8px;
     padding: 1.25rem;
     margin-top: 1.5rem;
@@ -1290,18 +1277,18 @@
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
-    box-shadow: 0 2px 8px var(--shadow-md);
+    box-shadow: 0 2px 8px var(--shadow);
 }
 
 .platform-fee-pix-title {
-    color: var(--gold-light);
+    color: var(--accent-text);
     font-size: 1rem;
     font-weight: 800;
     margin: 0;
 }
 
 .platform-fee-pix-hint {
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     font-size: 0.85rem;
     text-align: center;
     margin: 0;
@@ -1314,10 +1301,10 @@
     margin: 0.75rem auto;
     width: 260px;
     height: 260px;
-    background: var(--white);
+    background: var(--accent-fg);
     padding: 5px;
     border-radius: 6px;
-    box-shadow: 0 2px 8px var(--shadow-lg);
+    box-shadow: 0 2px 8px var(--shadow-card);
     overflow: hidden;
 }
 
@@ -1342,14 +1329,14 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border);
+    background: var(--surface-3);
+    border: var(--border);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
 }
 
 .platform-fee-pix-code {
-    color: var(--ci-text-blue);
+    color: var(--text);
     font-family: monospace;
     font-size: 0.9rem;
     word-break: break-all;
@@ -1362,24 +1349,24 @@
 }
 
 .platform-fee-table thead th {
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     padding: 0.6rem 0.5rem;
-    border-bottom: 1px solid var(--ci-border);
+    border-bottom: var(--border);
     text-align: left;
 }
 
 .platform-fee-table tbody td {
     padding: 0.6rem 0.5rem;
-    border-bottom: 1px solid var(--ci-border-dim);
-    color: var(--ci-text);
+    border-bottom: var(--border-2);
+    color: var(--text);
 }
 
 .platform-fee-table tbody tr:hover {
-    background: var(--ci-bg-card);
+    background: var(--surface);
 }
 
 .platform-fee-status {
@@ -1390,29 +1377,29 @@
 }
 
 .platform-fee-status--pending {
-    background: var(--amber-strong);
-    color: var(--white);
+    background: var(--warning);
+    color: var(--accent-fg);
 }
 
 .platform-fee-status--paid {
-    background: var(--green-strong);
-    color: var(--white);
+    background: var(--success);
+    color: var(--accent-fg);
 }
 
 .platform-fee-status--rejected {
-    background: var(--red-strong);
-    color: var(--white);
+    background: var(--danger);
+    color: var(--accent-fg);
 }
 
 .platform-fee-submit-card {
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-border);
+    background: var(--surface);
+    border: var(--border);
     border-radius: 8px;
     padding: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    box-shadow: 0 2px 8px var(--shadow-md);
+    box-shadow: 0 2px 8px var(--shadow);
     width: 100%;
     max-width: 360px;
     box-sizing: border-box;
@@ -1420,31 +1407,31 @@
 }
 
 .platform-fee-label {
-    color: var(--ci-text);
+    color: var(--text);
     font-size: 0.85rem;
     font-weight: 600;
 }
 
 .platform-fee-input {
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border);
+    background: var(--surface-3);
+    border: var(--border);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
-    color: var(--ci-text);
+    color: var(--text);
     font-size: 1rem;
     max-width: 240px;
 }
 
 .platform-fee-input:focus {
-    border-color: var(--ci-accent);
+    border-color: var(--accent-text);
     outline: none;
-    box-shadow: 0 0 0 2px var(--shadow-accent-sm);
+    box-shadow: 0 0 0 2px var(--shadow);
 }
 
 .platform-fee-success {
-    color: var(--green-light);
-    background: var(--green-dark);
-    border: 1px solid var(--green-strong);
+    color: var(--success);
+    background: var(--success);
+    border: 1px solid var(--success);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
     margin: 0;
@@ -1452,9 +1439,9 @@
 }
 
 .platform-fee-error {
-    color: var(--red-text-light);
-    background: var(--red-bg-dark);
-    border: 1px solid var(--red-strong);
+    color: var(--danger);
+    background: var(--danger-soft);
+    border: 1px solid var(--danger);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
     margin: 0;
@@ -1521,11 +1508,11 @@
     grid-template-columns: 140px 1fr auto;
     gap: 1.25rem;
     align-items: start;
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-border);
+    background: var(--surface);
+    border: var(--border);
     border-radius: 8px;
     padding: 1rem;
-    box-shadow: 0 2px 4px var(--shadow-md);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .proof-review-image {
@@ -1537,7 +1524,7 @@
     max-width: 140px;
     height: auto;
     border-radius: 6px;
-    border: 1px solid var(--ci-border);
+    border: var(--border);
     object-fit: cover;
     transition: filter 0.2s;
 }
@@ -1560,14 +1547,14 @@
 
 .proof-review-label {
     font-size: 0.75rem;
-    color: var(--slate-muted);
+    color: var(--text-2);
     min-width: 90px;
     flex-shrink: 0;
 }
 
 .proof-review-value {
     font-size: 0.9rem;
-    color: var(--ci-text);
+    color: var(--text);
 }
 
 .proof-review-value--player {
@@ -1576,11 +1563,11 @@
 
 .proof-review-value--amount {
     font-weight: 700;
-    color: var(--green-soft, #4ade80);
+    color: var(--success);
 }
 
 .proof-review-link {
-    color: var(--ci-accent-light);
+    color: var(--accent-text);
     text-decoration: none;
     font-size: 0.9rem;
 }
@@ -1612,17 +1599,17 @@
 }
 
 .proof-review-btn--accept {
-    background: #15803d;
-    color: #fff;
+    background: var(--accent);
+    color: var(--accent-fg);
 }
 
 .proof-review-btn--accept:hover {
-    filter: brightness(1.15);
+    background: var(--accent-hover);
 }
 
 .proof-review-btn--reject {
-    background: #b91c1c;
-    color: #fff;
+    background: var(--danger);
+    color: var(--accent-fg);
 }
 
 .proof-review-btn--reject:hover {
@@ -1631,15 +1618,15 @@
 
 .proof-review-status {
     font-size: 0.85rem;
-    color: var(--slate-muted);
+    color: var(--text-2);
     text-align: center;
     padding: 0.5rem;
 }
 
 /* Tab styling for proofs tab */
 .payments-tab--proofs.payments-tab--active {
-    border-bottom-color: var(--ci-accent);
-    color: var(--ci-accent-light);
+    border-bottom-color: var(--accent-text);
+    color: var(--accent-text);
 }
 
 @media (max-width: 768px) {
