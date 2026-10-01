@@ -74,6 +74,18 @@
                 @* ── Valor ──────────────────────────────────────────────────────────────────── *@
                 <PriceInput Form="@form" />
 
+                @if (PixRequiredBlocking)
+                {
+                    <div class="pix-required-banner" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>@Ui["Group.PixNotConfigured"]</strong>
+                            <p>@Ui["Futsal.Create.PixRequired"]</p>
+                            <a href="/profile/@adminUserId?intent=pix" class="pix-required-link">@Ui["Group.ConfigureNow"]</a>
+                        </div>
+                    </div>
+                }
+
                 @* ── Periodicidade ──────────────────────────────────────────────────────────── *@
                 <RecurrenceScheduler
                     Form="@form"
@@ -93,11 +105,11 @@
                 }
 
                 <div class="form-actions">
-                    <button class="cancel-btn" type="button"
+                    <button class="btn btn-secondary" type="button"
                             @onclick='() => NavigationManager.NavigateTo(preselectedGroup is not null ? $"/grupo/{preselectedGroup.Id}" : "/grupos")'>
                         @Ui["Common.Cancel"]
                     </button>
-                    <button class="save-btn" type="submit" disabled="@(isSaving || !venues.Any())">
+                    <button class="btn btn-primary" type="submit" disabled="@(isSaving || !venues.Any() || PixRequiredBlocking)">
                         @(isSaving ? @Ui["Futsal.Creating"] : @Ui["Futsal.CreateMatch"])
                     </button>
                 </div>

@@ -2,7 +2,7 @@
 /* As classes .create-event-page, .create-event-card, .form-section,
    .form-group, .form-row-2, .input, .form-hint, .required,
    .input-prefix-wrap, .input-prefix, .form-actions,
-   .save-btn, .cancel-btn, .validation-* são definidas em
+   .btn, .validation-* são definidas em
    Pages/Futsal/Create.razor.css e compartilhadas via bundle global. */
 
 /* ── Inline styles estáticos ───────────────── */
@@ -89,10 +89,3 @@
 .homegame-notice strong { display: block; font-size: 0.9rem; margin-bottom: 0.3rem; }
 .homegame-notice p { font-size: 0.82rem; color: var(--warning); margin: 0; line-height: 1.5; }
 
-/* ── Save button poker variant ───────────── */
-.save-btn--poker {
-    background: var(--accent);
-    border-color: var(--accent-border);
-}
-
-.save-btn--poker:hover:not(:disabled) { background: var(--accent-hover); }

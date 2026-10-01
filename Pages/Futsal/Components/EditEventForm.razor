@@ -147,7 +147,7 @@
         {
             @if (!ShowCancelConfirm)
             {
-                <button class="save-btn edit-cancel-btn" type="button"
+                <button class="btn btn-danger" type="button"
                         @onclick="() => OnShowCancelConfirm(true)">
                     <i class="fas fa-ban"></i> @Ui["Futsal.CancelMatch"]
                 </button>
@@ -156,14 +156,14 @@
             {
                 <div class="cancel-confirm-block">
                     <span>@Ui["Futsal.CancelMatchConfirm"]</span>
-                    <button class="save-btn edit-cancel-no-btn" type="button"
+                    <button class="btn btn-secondary" type="button"
                             @onclick="() => OnShowCancelConfirm(false)">@Ui["Futsal.No"]</button>
-                    <button class="save-btn edit-cancel-btn" type="button"
+                    <button class="btn btn-danger" type="button"
                             @onclick="OnCancelConfirmed">@Ui["Futsal.SimCancelar"]</button>
                 </div>
             }
         }
-        <button class="save-btn" type="submit" disabled="@IsSaving">
+        <button class="btn btn-primary" type="submit" disabled="@IsSaving">
             @(IsSaving ? @Ui["Futsal.Saving"] : @Ui["Futsal.SaveChanges"])
         </button>
     </div>

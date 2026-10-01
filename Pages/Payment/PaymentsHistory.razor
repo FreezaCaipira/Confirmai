@@ -110,7 +110,7 @@
                     {
                         @if (!p.IsPaid)
                         {
-                            <button class="edit-btn action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")' title="@T["Common.View"]" aria-label="@T["Common.View"]">
+                            <button class="btn btn-ghost action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")' title="@T["Common.View"]" aria-label="@T["Common.View"]">
                                 <i class="fas fa-eye"></i>
                             </button>
                             <button class="danger action-btn icon-only" @onclick='() => ConfirmCancelPayment(p.Id)' title="@T["Common.Cancel"]" aria-label="@T["Common.Cancel"]">
@@ -119,14 +119,14 @@
                         }
                         else
                         {
-                            <button class="details-btn action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")' title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                            <button class="btn btn-ghost action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")' title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
                                 <i class="fas fa-eye"></i>
                             </button>
                         }
                     }
                     else
                     {
-                        <button class="details-btn action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")' title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                        <button class="btn btn-ghost action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")' title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
                             <i class="fas fa-eye"></i>
                         </button>
                     }

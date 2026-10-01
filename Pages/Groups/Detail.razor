@@ -65,6 +65,13 @@ else
     var baseUrl   = (Config["App:BaseUrl"]?.TrimEnd('/'))  ?? NavigationManager.BaseUri.TrimEnd('/');
     var inviteUrl = $"{baseUrl}/convite/{group.InviteCode}";
 
+    // Checklist de onboarding do admin (C36-B Fase 6): estado derivado dos
+    // dados, some quando completo. "Convite enviado" ~ alguem alem do criador.
+    var adminHasPix    = group.Members.Any(m => m.Role == GroupMemberRole.Admin
+        && !string.IsNullOrWhiteSpace(m.User?.PixKey));
+    var inviteSent     = group.Members.Count > 1;
+    var checklistDone  = adminHasPix && hasAnyEvent && inviteSent;
+
     <div class="detail-page">
         <div class="hub-stack">
 
@@ -74,6 +81,41 @@ else
             @if (!group.IsActive)
             {
                 <div class="cancelled-banner"><i class="fas fa-ban"></i> @Ui["Group.Inactive"]</div>
+            }
+
+            @if (isAdmin && !checklistDone)
+            {
+                <section class="panel hub-checklist">
+                    <div class="panel-head">
+                        <h2 class="panel-title"><i class="fas fa-list-check"></i> @Ui["Group.Checklist.Title"]</h2>
+                    </div>
+                    <ul class="hub-checklist-steps">
+                        <li class="hub-checklist-step @(adminHasPix ? "is-done" : string.Empty)">
+                            <i class="fas @(adminHasPix ? "fa-circle-check" : "fa-circle")"></i>
+                            <span>@Ui["Group.Checklist.Pix"]</span>
+                            @if (!adminHasPix)
+                            {
+                                <a href="/profile/@currentUserId?intent=pix" class="btn btn-primary btn-sm">@Ui["Group.ConfigureNow"]</a>
+                            }
+                        </li>
+                        <li class="hub-checklist-step @(hasAnyEvent ? "is-done" : string.Empty)">
+                            <i class="fas @(hasAnyEvent ? "fa-circle-check" : "fa-circle")"></i>
+                            <span>@Ui["Group.Checklist.FirstMatch"]</span>
+                            @if (!hasAnyEvent)
+                            {
+                                <a href="@(group.Sport == Sport.Futsal ? $"/futsal/create?groupId={group.Id}" : $"/poker/create?groupId={group.Id}")" class="btn btn-primary btn-sm">@Ui["Group.CreateFirstMatch"]</a>
+                            }
+                        </li>
+                        <li class="hub-checklist-step @(inviteSent ? "is-done" : string.Empty)">
+                            <i class="fas @(inviteSent ? "fa-circle-check" : "fa-circle")"></i>
+                            <span>@Ui["Group.Checklist.InviteSent"]</span>
+                            @if (!inviteSent)
+                            {
+                                <a href="/grupo/@group.Id/configuracoes" class="btn btn-primary btn-sm">@Ui["Group.CopyInvite"]</a>
+                            }
+                        </li>
+                    </ul>
+                </section>
             }
 
             @if (isMember)

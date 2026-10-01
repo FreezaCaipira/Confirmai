@@ -13,6 +13,8 @@ public sealed class FutsalCreateInitData
 {
     public Group? PreselectedGroup { get; set; }
     public List<Venue> Venues { get; set; } = new();
+    public bool AdminHasPixKey { get; set; }
+    public string? AdminUserId { get; set; }
 }
 
 public sealed record FutsalCreateResult(
@@ -71,7 +73,18 @@ public sealed class FutsalCreateService
             .ThenBy(v => v.Name)
             .ToListAsync();
 
-        return new FutsalCreateInitData { PreselectedGroup = group, Venues = venues };
+        var adminHasPix = userId is not null && await db.Users
+            .Where(u => u.Id == userId)
+            .Select(u => u.PixKey != null && u.PixKey != "")
+            .FirstOrDefaultAsync();
+
+        return new FutsalCreateInitData
+        {
+            PreselectedGroup = group,
+            Venues = venues,
+            AdminHasPixKey = adminHasPix,
+            AdminUserId = userId,
+        };
     }
 
     public async Task<FutsalCreateResult> SaveAsync(

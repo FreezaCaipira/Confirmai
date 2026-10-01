@@ -226,3 +226,30 @@
     color: var(--text-2);
     font-size: 0.9375rem;
 }
+
+/* Checklist de onboarding do admin (some quando completo) */
+.hub-checklist-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hub-checklist-step {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.hub-checklist-step i { color: var(--text-3); }
+.hub-checklist-step.is-done i { color: var(--success); }
+.hub-checklist-step.is-done span { color: var(--text-2); text-decoration: line-through; }
+.hub-checklist-step .btn { margin-left: auto; }
