@@ -73,6 +73,21 @@ public class CssNoLegacyVarsTests
         "Shared/Components/Groups/GroupDetailPaymentsModal.razor.css",
         "Pages/Groups/Components/PixReceiverSelector.razor.css",
         "Pages/Groups/Components/PayoutAccountEditor.razor.css",
+        // Groups create + cookie banner + Identity + Admin (C36-B Fase 4)
+        "Pages/Groups/Create.razor.css",
+        "Shared/Components/CookieConsent.razor.css",
+        "wwwroot/css/identity.css",
+        "wwwroot/css/admin.css",
+        "Pages/Admin/Admin.razor.css",
+        "Pages/Admin/AdminAuditTimeline.razor.css",
+        "Pages/Admin/AdminLanguages.razor.css",
+        "Pages/Admin/AdminLogs.razor.css",
+        "Pages/Admin/AdminPayments.razor.css",
+        "Pages/Admin/AdminRevenue.razor.css",
+        "Pages/Admin/AdminUserView.razor.css",
+        "Pages/Admin/AdminUsers.razor.css",
+        "Pages/Admin/AdminVenueEdit.razor.css",
+        "Pages/Admin/AdminVenues.razor.css",
     ];
 
     private static readonly Regex LegacyVarRegex = new(

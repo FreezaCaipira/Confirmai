@@ -134,11 +134,11 @@
             }
 
             <div class="form-actions">
-                <button class="cancel-btn" type="button"
+                <button class="btn btn-secondary" type="button"
                         @onclick='() => NavigationManager.NavigateTo("/grupos")'>
                     @Ui["Common.Cancel"]
                 </button>
-                <button class="save-btn" type="submit" disabled="@isSaving">
+                <button class="btn btn-primary" type="submit" disabled="@isSaving">
                     @(isSaving ? @Ui["Group.Creating"] : @Ui["Group.CreateButton"])
                 </button>
             </div>

@@ -1,42 +1,42 @@
 .admin-welcome {
     font-size: 1.25rem;
     font-weight: 800;
-    color: var(--brown-text);
+    color: var(--text-2);
     margin: 0;
-    text-shadow: 0 0 10px rgba(201, 160, 106, 0.4), 0 2px 4px var(--shadow-xs);
+    text-shadow: none;
 }
 
 .admin-settings-card {
     margin: 1rem 0 0.5rem 0;
-    background: linear-gradient(170deg, var(--parchment-light) 0%, var(--parchment-dark) 100%);
-    border: 1px solid var(--brown-border);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 10px;
-    box-shadow: inset 0 0 0 1px rgba(255, 244, 214, 0.68), 0 8px 24px var(--shadow-lg), 0 4px 12px var(--shadow-md);
+    box-shadow: var(--shadow-card);
     padding: 0.9rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.7rem;
     flex-wrap: wrap;
-    color: var(--brown-text);
+    color: var(--text-2);
 }
 
 .fiat-select {
-    background: rgba(255, 248, 231, 0.88);
-    color: var(--brown-text);
-    border: 1px solid var(--brown-border-warm);
+    background: var(--surface-2);
+    color: var(--text-2);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0.35rem 0.6rem;
-    box-shadow: inset 0 2px 4px var(--shadow-2xs);
+    box-shadow: inset 0 2px 4px var(--shadow);
 }
 
 .fee-input {
     width: 120px;
-    background: rgba(255, 248, 231, 0.88);
-    color: var(--brown-text);
-    border: 1px solid var(--brown-border-warm);
+    background: var(--surface-2);
+    color: var(--text-2);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0.35rem 0.6rem;
-    box-shadow: inset 0 2px 4px var(--shadow-2xs);
+    box-shadow: inset 0 2px 4px var(--shadow);
 }
 
 .fee-input[type="text"] {
@@ -48,11 +48,11 @@
 }
 
 .operation-fee-message.ok {
-    color: var(--futsal-green-dark);
+    color: var(--surface-2);
 }
 
 .operation-fee-message.error {
-    color: var(--red-bg-dark);
+    color: var(--danger-soft);
 }
 
 .security-settings-card {
@@ -61,13 +61,13 @@
 
 .security-header h3 {
     margin: 0;
-    color: var(--bg-dark-mid);
+    color: var(--surface);
     letter-spacing: 0.2px;
 }
 
 .security-header p {
     margin: 0.35rem 0 0;
-    color: var(--brown-text);
+    color: var(--text-2);
     font-size: 0.92rem;
 }
 
@@ -84,17 +84,17 @@
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
-    background: linear-gradient(170deg, var(--parchment-light) 0%, var(--parchment-dark) 100%);
-    border: 1px solid var(--brown-border);
-    box-shadow: 0 4px 12px var(--shadow-md), inset 0 0 0 1px rgba(255, 244, 214, 0.5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
 }
 
 .security-panel h4 {
     margin: 0;
     font-size: 0.96rem;
     font-weight: 800;
-    color: var(--brown-text);
-    text-shadow: 0 0 8px rgba(201, 160, 106, 0.3);
+    color: var(--text-2);
+    text-shadow: none;
 }
 
 .security-baseline-grid {
@@ -409,7 +409,7 @@
     border-radius: 3px;
     cursor: pointer;
     transition: filter 0.12s ease, transform 0.1s ease;
-    border: 1px solid var(--ci-accent-opacity-lg);
+    border: 1px solid var(--accent-soft);
 }
 
 .entity-shell.admin-page .action-btn.icon-only i {
@@ -419,48 +419,48 @@
 }
 
 .entity-shell.admin-page .details-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent) 100%);
-    color: var(--ci-surface-light);
+    background: var(--accent);
+    color: var(--text);
 }
 
 .entity-shell.admin-page .details-btn.action-btn.icon-only i {
-    color: var(--ci-surface-light);
+    color: var(--text);
 }
 
 .entity-shell.admin-page .edit-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, var(--ci-border-alt) 0%, var(--ci-accent-mid) 100%);
-    color: var(--ci-surface-light);
+    background: var(--accent-hover);
+    color: var(--text);
 }
 
 .entity-shell.admin-page .edit-btn.action-btn.icon-only i {
-    color: var(--ci-surface-light);
+    color: var(--text);
 }
 
 .entity-shell.admin-page .success-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, var(--futsal-green-dark) 0%, var(--futsal-bg-dark) 100%);
-    color: var(--futsal-green-pale);
+    background: var(--surface-2);
+    color: var(--success);
 }
 
 .entity-shell.admin-page .success-btn.action-btn.icon-only i {
-    color: var(--futsal-green-pale);
+    color: var(--success);
 }
 
 .entity-shell.admin-page .warning-btn.action-btn.icon-only {
-    background: linear-gradient(180deg, var(--brown-deep) 0%, var(--bg-deepest) 100%);
-    color: var(--amber-light);
+    background: var(--surface-3);
+    color: var(--warning);
 }
 
 .entity-shell.admin-page .warning-btn.action-btn.icon-only i {
-    color: var(--amber-light);
+    color: var(--warning);
 }
 
 .entity-shell.admin-page .danger.action-btn.icon-only {
-    background: linear-gradient(180deg, var(--red-bg-dark) 0%, var(--red-border) 100%);
-    color: var(--red-pale);
+    background: var(--danger-soft);
+    color: var(--danger);
 }
 
 .entity-shell.admin-page .danger.action-btn.icon-only i {
-    color: var(--red-pale);
+    color: var(--danger);
 }
 
 .entity-shell.admin-page .action-btn.icon-only:hover {
@@ -514,7 +514,7 @@
 }
 
 .admin-kpi-card:focus-visible {
-    outline: 2px solid var(--gold-deep);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
@@ -537,12 +537,12 @@
 }
 
 .admin-reconciliation-health-grid span {
-    color: var(--ci-surface-muted);
+    color: var(--text-3);
     font-size: 0.85rem;
 }
 
 .admin-reconciliation-health-grid .admin-reconciliation-trend-warning {
-    color: var(--gold-soft);
+    color: var(--accent-soft);
     font-weight: 700;
 }
 
@@ -558,7 +558,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.22rem;
-    color: var(--ci-surface-muted);
+    color: var(--text-3);
     font-size: 0.8rem;
     min-width: 160px;
 }

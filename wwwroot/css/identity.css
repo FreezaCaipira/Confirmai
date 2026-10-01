@@ -6,23 +6,23 @@
     justify-content: center;
     padding: 24px 12px;
     box-sizing: border-box;
-    background: var(--ci-bg);
-    color: var(--ci-text);
+    background: var(--bg);
+    color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
 .identity-container {
-    --identity-border: var(--ci-border);
+    --identity-border: var(--border);
     --identity-rhythm-tight: 0.65rem;
     --identity-rhythm-base: 0.95rem;
     --identity-rhythm-loose: 1.2rem;
     width: min(480px, 100%);
     margin: 0;
-    background: linear-gradient(154deg, var(--ci-bg-card) 0%, var(--ci-bg-deepest) 100%);
-    border: 1px solid var(--ci-border);
-    border-top: 2px solid var(--ci-border-dim);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--border-2);
     border-radius: 14px;
-    box-shadow: 0 0 0 1px var(--ci-accent-opacity-xs), 0 12px 30px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 0 0 1px var(--accent-soft), var(--shadow-card);
     padding: 2rem 1.9rem 1.6rem;
     box-sizing: border-box;
     position: relative;
@@ -33,14 +33,14 @@
     position: absolute;
     inset: 0.55rem;
     border-radius: 9px;
-    border: 1px solid rgba(26, 90, 176, 0.55);
+    border: 1px solid var(--accent-border);
     pointer-events: none;
 }
 
 .identity-container h1,
 .identity-container h2,
 .identity-container h3 {
-    color: var(--ci-text-blue);
+    color: var(--text);
     margin-top: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     text-shadow: none;
@@ -69,7 +69,7 @@
 }
 
 .identity-container label {
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     font-weight: 500;
     font-size: 0.88rem;
     position: relative;
@@ -85,10 +85,10 @@
     font-size: 0.97rem;
     box-sizing: border-box;
     border-radius: 7px;
-    border: 1px solid var(--ci-border);
-    background: var(--ci-bg-deepest);
-    color: var(--ci-text);
-    box-shadow: inset 0 1px 3px var(--shadow-md);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: inset 0 1px 3px var(--shadow);
     transition: border-color 0.2s, box-shadow 0.2s;
     position: relative;
     z-index: 1;
@@ -101,7 +101,7 @@
 }
 
 .identity-container input::placeholder {
-    color: var(--ci-text-subtle);
+    color: var(--text-3);
     opacity: 1;
 }
 
@@ -109,15 +109,15 @@
 .identity-container select:focus,
 .identity-container textarea:focus {
     outline: none;
-    border-color: var(--ci-accent-mid);
-    box-shadow: 0 0 0 2px rgba(26, 90, 176, 0.28);
+    border-color: var(--accent-text);
+    box-shadow: 0 0 0 2px var(--accent-ring);
 }
 
 .identity-container button,
 .identity-container input[type="submit"] {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    color: var(--ci-text);
-    border: 1px solid var(--ci-border-dim);
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: 1px solid var(--accent);
     padding: 0.68rem 1.1rem;
     border-radius: 8px;
     margin: var(--identity-rhythm-base) auto 0;
@@ -135,18 +135,17 @@
 
 .identity-container button:hover,
 .identity-container input[type="submit"]:hover {
-    background: linear-gradient(180deg, var(--ci-accent) 0%, var(--ci-accent-mid) 100%);
-    border-color: var(--ci-border-dim);
-    transform: translateY(-1px);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
 }
 
 .identity-container a {
-    color: var(--ci-accent);
+    color: var(--accent-text);
     text-decoration: none;
 }
 
 .identity-container a:hover {
-    color: var(--ci-text-info);
+    color: var(--accent-text);
 }
 
 .identity-home-link {
@@ -154,7 +153,7 @@
     top: 0.9rem;
     left: 1rem;
     text-decoration: none;
-    color: var(--ci-accent);
+    color: var(--accent-text);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -164,7 +163,7 @@
 }
 
 .identity-home-link:hover {
-    color: var(--ci-text-info);
+    color: var(--accent-text);
 }
 
 .identity-home-arrow {
@@ -200,7 +199,7 @@
 .identity-remember input[type="checkbox"] {
     width: auto;
     margin: 0;
-    accent-color: var(--ci-accent);
+    accent-color: var(--accent-text);
 }
 
 .identity-remember label {
@@ -210,7 +209,7 @@
 
 .validation-summary-errors,
 .text-danger {
-    color: var(--red-soft);
+    color: var(--danger);
 }
 
 .identity-container > .validation-summary-errors,
@@ -234,24 +233,24 @@
     justify-content: center;
     margin-top: var(--identity-rhythm-loose);
     padding-top: var(--identity-rhythm-tight);
-    border-top: 1px solid var(--ci-border);
+    border-top: 1px solid var(--border);
     font-size: 0.92rem;
     position: relative;
     z-index: 1;
 }
 
 .identity-actions a {
-    color: var(--ci-accent);
+    color: var(--accent-text);
     text-decoration: underline;
     transition: color 0.2s;
 }
 
 .identity-actions a:hover {
-    color: var(--ci-text-info);
+    color: var(--accent-text);
 }
 
 .identity-muted {
-    color: var(--ci-text-subtle);
+    color: var(--text-3);
     line-height: 1.45;
     position: relative;
     z-index: 1;
@@ -260,7 +259,7 @@
 .identity-footer {
     margin-top: calc(var(--identity-rhythm-loose) + 0.2rem);
     text-align: center;
-    color: var(--ci-accent);
+    color: var(--accent-text);
     font-size: 0.88rem;
     position: relative;
     z-index: 1;
@@ -273,13 +272,13 @@
     gap: 0.75rem;
     margin-top: var(--identity-rhythm-loose);
     padding-top: var(--identity-rhythm-tight);
-    border-top: 1px solid var(--ci-border);
+    border-top: 1px solid var(--border);
     position: relative;
     z-index: 1;
 }
 
 .external-login-divider {
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -293,9 +292,9 @@
 
 .external-login-btn {
     width: 100%;
-    background: var(--ci-bg-deepest);
-    color: var(--ci-text);
-    border: 1px solid var(--ci-border);
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 0.65rem 1rem;
     font-size: 0.95rem;
@@ -309,29 +308,47 @@
 }
 
 .external-login-btn:hover {
-    background: var(--ci-bg-card);
-    border-color: var(--ci-border-dim);
+    background: var(--surface);
+    border-color: var(--border-2);
     transform: translateY(-1px);
 }
 
-.external-login-btn--google {
-    background: var(--google-btn-bg);
-    color: var(--google-btn-text);
-    border-color: var(--google-btn-border);
+/* Google Sign-In button: branding imposed by Google guidelines
+   (https://developers.google.com/identity/branding-guidelines).
+   EXCECAO unica de cores literais fora de tokens.css -- nao usar como
+   precedente para outros componentes. */
+.google-signin-btn {
+    width: 100%;
+    background: #131314;
+    color: #e3e3e3;
+    border: 1px solid #8e918f;
+    border-radius: 8px;
+    padding: 0.65rem 1rem;
+    font-family: Roboto, var(--font);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    transition: background 0.2s, border-color 0.2s;
 }
 
-.external-login-btn--google:hover {
-    background: var(--google-btn-bg-hover);
-    border-color: var(--google-btn-border-hover);
+.google-signin-btn:hover {
+    background: #1f1f1f;
+    border-color: #a8aba8;
 }
 
-.external-login-btn--google:focus-visible {
-    outline: 2px solid var(--google-btn-border-hover);
+.google-signin-btn:focus-visible {
+    outline: 2px solid #a8c7fa;
     outline-offset: 2px;
+}
+
+.google-signin-btn-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
 }
 
 .external-login-btn-icon {
@@ -361,31 +378,31 @@
 }
 
 .identity-status--success {
-    background: rgba(40, 167, 69, 0.12);
-    border: 1px solid rgba(40, 167, 69, 0.3);
-    color: #4ade80;
+    background: var(--success-soft);
+    border: 1px solid var(--success);
+    color: var(--success);
 }
 
 .identity-status--success i {
-    color: #4ade80;
+    color: var(--success);
 }
 
 .identity-status--error {
-    background: rgba(220, 53, 69, 0.12);
-    border: 1px solid rgba(220, 53, 69, 0.3);
-    color: #f87171;
+    background: var(--danger-soft);
+    border: 1px solid var(--danger);
+    color: var(--danger);
 }
 
 .identity-status--error i {
-    color: #f87171;
+    color: var(--danger);
 }
 
 .identity-btn-primary {
     display: inline-block;
     padding: 0.7rem 1.5rem;
-    background: var(--ci-accent);
-    color: var(--ci-text);
-    border: 1px solid var(--ci-accent-mid);
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: 1px solid var(--accent);
     border-radius: 6px;
     text-decoration: none;
     font-weight: 600;
@@ -393,8 +410,9 @@
 }
 
 .identity-btn-primary:hover {
-    background: var(--ci-accent-mid);
-    border-color: var(--ci-accent-dark);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--accent-fg);
 }
 
 @media (max-width: 768px) {
@@ -443,39 +461,39 @@
 .not-found-card {
     margin: 3rem auto;
     max-width: 768px;
-    background: var(--ci-bg-card);
-    color: var(--ci-text);
-    border: 1px solid var(--ci-border-alt);
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 16px;
-    box-shadow: 0 2px 24px var(--shadow-md);
+    box-shadow: 0 2px 24px var(--shadow);
     padding: 2.5rem 2rem;
     text-align: center;
 }
 
 .not-found-icon {
     font-size: 3rem;
-    color: var(--red-soft);
+    color: var(--danger);
 }
 
 .not-found-title {
     margin: 1rem 0 0.5rem 0;
-    color: var(--ci-accent);
+    color: var(--accent-text);
 }
 
 .not-found-description {
-    color: var(--slate-muted);
+    color: var(--text-2);
     margin-bottom: 2rem;
     line-height: 1.6;
 }
 
 .not-found-request-id {
-    color: var(--slate-muted);
+    color: var(--text-2);
     font-size: 0.9rem;
     margin-bottom: 1.5rem;
 }
 
 .not-found-request-id code {
-    background: var(--ci-bg-app, var(--ci-bg));
+    background: var(--bg);
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
     font-size: 0.85rem;
@@ -483,17 +501,17 @@
 
 .not-found-home-link {
     display: inline-block;
-    background: var(--ci-accent-mid);
-    color: var(--white);
+    background: var(--accent);
+    color: var(--accent-fg);
     font-weight: 700;
     padding: 0.65rem 1.8rem;
     border-radius: 8px;
     text-decoration: none;
     font-size: 1rem;
-    border: 1px solid var(--ci-accent);
+    border: var(--accent-border);
     transition: background 0.15s;
 }
 
 .not-found-home-link:hover {
-    background: var(--ci-accent-dark);
+    background: var(--accent-hover);
 }
