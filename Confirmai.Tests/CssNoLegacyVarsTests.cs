@@ -51,6 +51,18 @@ public class CssNoLegacyVarsTests
         "Pages/Components/Profile/ProfileEditForm.razor.css",
         "Pages/Components/Profile/ProfileHeaderCard.razor.css",
         "Pages/Components/Profile/ProfileSportStats.razor.css",
+        // Event screens (C36-B Fase 2)
+        "wwwroot/css/event-detail.css",
+        "wwwroot/css/event-create.css",
+        "wwwroot/css/escalacao.css",
+        "Pages/Futsal/Detail.razor.css",
+        "Pages/Futsal/Create.razor.css",
+        "Pages/Futsal/Edit.razor.css",
+        "Pages/Futsal/Escalacao.razor.css",
+        "Pages/Poker/Detail.razor.css",
+        "Pages/Poker/Create.razor.css",
+        "Pages/Poker/Edit.razor.css",
+        "Shared/Components/ConfirmationCard.razor.css",
     ];
 
     private static readonly Regex LegacyVarRegex = new(

@@ -13,10 +13,10 @@
 .detail-card {
     width: 100%;
     max-width: 680px;
-    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
-    border: 1px solid var(--ci-border);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 14px;
-    box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+    box-shadow: var(--shadow);
     padding: 1.75rem 1.5rem;
     display: flex;
     flex-direction: column;
@@ -25,11 +25,11 @@
 
 /* -- Payment page card (/pagamento/evento/{id}) â€” N2 background ------- */
 body .entity-shell-card.evpay-main {
-    background: linear-gradient(180deg, var(--ci-bg-alt) 0%, var(--ci-bg) 100%);
-    border: 1px solid var(--ci-border);
-    border-top: 1px solid var(--ci-border);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 1px solid var(--border);
     border-radius: 14px;
-    box-shadow: inset 0 1px 0 rgba(79, 156, 248, 0.14);
+    box-shadow: var(--shadow);
     max-width: 100%;
     box-sizing: border-box;
 }
@@ -84,7 +84,7 @@ body .entity-shell-card.evpay-main {
     gap: 0.3rem;
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--ci-text-blue);
+    color: var(--text);
 }
 
 .detail-back-link {
@@ -92,10 +92,10 @@ body .entity-shell-card.evpay-main {
     align-items: center;
     justify-content: center;
     gap: 0.45rem;
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
-    border: 1px solid var(--ci-accent);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
     border-radius: 10px;
-    color: var(--ci-surface-light);
+    color: var(--text);
     font-size: 0.84rem;
     font-weight: 700;
     padding: 0.45rem 0.85rem;
@@ -104,10 +104,10 @@ body .entity-shell-card.evpay-main {
     transition: all 0.2s ease;
 }
 .detail-back-link:hover {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-mid) 100%);
-    color: var(--white);
+    background: var(--surface-3);
+    color: var(--text);
     transform: translateY(-1px);
-    box-shadow: 0 8px 22px rgba(34, 109, 196, 0.32);
+    box-shadow: var(--shadow);
 }
 
 .detail-sport-badge {
@@ -115,9 +115,9 @@ body .entity-shell-card.evpay-main {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--green-bright);
-    background: var(--green-opacity-sm);
-    border: 1px solid var(--green-opacity-md);
+    color: var(--success);
+    background: var(--success-soft);
+    border: 1px solid var(--success-soft);
     border-radius: 20px;
     padding: 0.2rem 0.7rem;
 }
@@ -125,7 +125,7 @@ body .entity-shell-card.evpay-main {
 .detail-title {
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--ci-text);
+    color: var(--text);
     margin: 0;
     line-height: 1.2;
     text-align: center;
@@ -141,7 +141,7 @@ body .entity-shell-card.evpay-main {
 .detail-event-num {
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--ci-text);
+    color: var(--text);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -152,30 +152,30 @@ body .entity-shell-card.evpay-main {
     align-items: center;
     gap: 0.35rem;
     font-size: 0.8rem;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
 }
 
 .detail-group-link {
-    color: var(--ci-text-link);
+    color: var(--accent-text);
     text-decoration: none;
     font-weight: 600;
 }
 
 .detail-group-link:hover {
-    color: var(--ci-text-info);
+    color: var(--accent-text);
     text-decoration: underline;
 }
 
 .detail-localname {
     font-size: 0.85rem;
-    color: var(--ci-text-blue);
+    color: var(--text);
     margin: 0;
     font-style: italic;
 }
 
 .detail-location {
     font-size: 0.85rem;
-    color: var(--ci-text-blue);
+    color: var(--text);
     margin: 0;
     display: flex;
     align-items: center;
@@ -184,7 +184,7 @@ body .entity-shell-card.evpay-main {
 
 .detail-organizer {
     font-size: 0.8rem;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     margin: 0;
     display: flex;
     align-items: center;
@@ -192,13 +192,13 @@ body .entity-shell-card.evpay-main {
 }
 
 .detail-organizer-link {
-    color: var(--ci-text-link);
+    color: var(--accent-text);
     text-decoration: none;
     font-weight: 600;
 }
 
 .detail-organizer-link:hover {
-    color: var(--ci-text-info);
+    color: var(--accent-text);
     text-decoration: underline;
 }
 
@@ -214,14 +214,14 @@ body .entity-shell-card.evpay-main {
     align-items: center;
     gap: 0.4rem;
     font-size: 0.82rem;
-    color: var(--ci-text-blue);
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
     border-radius: 20px;
     padding: 0.3rem 0.75rem;
 }
 
-.detail-chip--price { border-color: var(--futsal-green-dark); color: var(--green-bright); font-weight: 700; }
+.detail-chip--price { border-color: var(--surface-2); color: var(--success); font-weight: 700; }
 
 /* -- Admin bar (edit button) --------------------------------------- */
 .detail-admin-bar {
@@ -235,7 +235,7 @@ body .entity-shell-card.evpay-main {
     gap: .5rem;
     margin-top: 0.6rem;
     padding-top: 0.6rem;
-    border-top: 1px solid rgba(255,255,255,.06);
+    border-top: 1px solid var(--border);
 }
 
 .detail-admin-btn {
@@ -244,9 +244,9 @@ body .entity-shell-card.evpay-main {
     gap: 0.4rem;
     font-size: 0.82rem;
     font-weight: 600;
-    color: var(--ci-text-muted);
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
+    color: var(--text-2);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 0.35rem 0.85rem;
     text-decoration: none;
@@ -254,32 +254,32 @@ body .entity-shell-card.evpay-main {
 }
 
 .detail-admin-btn:hover {
-    border-color: var(--ci-accent-mid);
-    color: var(--ci-text-link);
+    border-color: var(--accent-text);
+    color: var(--accent-text);
 }
 
 .detail-admin-btn--poker:hover {
-    border-color: var(--poker-accent);
-    color: var(--poker-accent);
+    border-color: var(--accent-text);
+    color: var(--accent-text);
 }
 
 .detail-admin-btn--lineup {
-    border-color: var(--futsal-green-dark);
-    color: var(--green-bright);
-    background: linear-gradient(180deg, var(--green-opacity-xs) 0%, var(--ci-bg-card-deep) 100%);
+    border-color: var(--surface-2);
+    color: var(--success);
+    background: var(--surface-2);
     font-weight: 700;
 }
 
 .detail-admin-btn--lineup:hover {
-    border-color: var(--green-strong);
-    color: var(--green-bright);
-    background: linear-gradient(180deg, var(--green-opacity-sm) 0%, var(--ci-bg-card) 100%);
-    box-shadow: 0 2px 10px var(--green-opacity-sm);
+    border-color: var(--success);
+    color: var(--success);
+    background: var(--surface-3);
+    box-shadow: 0 2px 10px var(--success-soft);
 }
 
 .detail-admin-btn--ranking {
-    border-color: rgba(161, 118, 24, 0.55);
-    color: var(--amber);
+    border-color: var(--warning);
+    color: var(--warning);
     padding: 0.54rem 1.05rem;
     border-radius: 10px;
     font-size: 0.84rem;
@@ -287,13 +287,13 @@ body .entity-shell-card.evpay-main {
 }
 
 .detail-admin-btn--ranking:hover {
-    border-color: var(--amber);
-    color: var(--amber-warm);
+    border-color: var(--warning);
+    color: var(--warning);
 }
 
 .detail-admin-btn--partidas {
-    border-color: var(--ci-accent-mid);
-    color: var(--ci-text-link-bright);
+    border-color: var(--accent-text);
+    color: var(--accent-text);
     padding: 0.54rem 1.05rem;
     border-radius: 10px;
     font-size: 0.84rem;
@@ -301,14 +301,14 @@ body .entity-shell-card.evpay-main {
 }
 
 .detail-admin-btn--partidas:hover {
-    border-color: var(--ci-text-link);
-    color: var(--white);
-    background: var(--accent-opacity-xs);
+    border-color: var(--accent-text);
+    color: var(--accent-fg);
+    background: var(--accent-soft);
 }
 
 .detail-admin-btn--pagamentos {
-    border-color: rgba(74, 222, 128, 0.55);
-    color: var(--green-bright);
+    border-color: var(--success);
+    color: var(--success);
     padding: 0.54rem 1.05rem;
     font-size: 0.84rem;
     font-weight: 700;
@@ -316,46 +316,46 @@ body .entity-shell-card.evpay-main {
 }
 
 .detail-admin-btn--pagamentos:hover {
-    border-color: var(--green-bright);
-    color: var(--green-soft);
-    background: rgba(74, 222, 128, 0.08);
+    border-color: var(--success);
+    color: var(--success);
+    background: var(--surface-3);
 }
 
 .detail-admin-btn--whatsapp {
-    background: linear-gradient(180deg, #25D366 0%, #1da851 100%);
-    border-color: rgba(37, 211, 102, 0.5);
-    color: #fff;
+    background: var(--surface-2);
+    border-color: var(--border-2);
+    color: var(--text);
 }
 
 .detail-admin-btn--whatsapp:hover {
-    background: linear-gradient(180deg, #2ee67a 0%, #22c95e 100%);
-    border-color: rgba(37, 211, 102, 0.7);
-    color: #fff;
+    background: var(--surface-3);
+    border-color: var(--accent-border);
+    color: var(--text);
 }
 
 .detail-admin-btn--invite {
-    background: var(--ci-bg-dark);
-    border-color: var(--ci-accent-mid);
-    color: var(--ci-surface-light);
+    background: var(--surface);
+    border-color: var(--accent-text);
+    color: var(--text);
     font-weight: 700;
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
+    box-shadow: var(--shadow);
 }
 
 .detail-admin-btn--invite:hover {
-    border-color: var(--ci-text-link);
-    color: var(--white);
-    background: var(--ci-accent-mid);
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.32);
+    border-color: var(--accent-text);
+    color: var(--accent-fg);
+    background: var(--accent);
+    box-shadow: var(--shadow-card);
 }
 
 .detail-admin-btn--danger {
-    border-color: var(--red-bg-dark);
-    color: var(--red-soft);
+    border-color: var(--danger-soft);
+    color: var(--danger);
 }
 
 .detail-admin-btn--danger:hover {
-    border-color: var(--red-strong);
-    color: var(--red-text-light);
+    border-color: var(--danger);
+    color: var(--danger);
 }
 
 .detail-admin-btn--disabled {
@@ -370,9 +370,9 @@ body .entity-shell-card.evpay-main {
     top: calc(100% + 7px);
     left: 50%;
     transform: translateX(-50%);
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-accent-mid);
-    color: var(--slate-light);
+    background: var(--surface);
+    border: 1px solid var(--accent-border);
+    color: var(--text);
     font-size: 0.72rem;
     font-weight: 500;
     padding: 0.3rem 0.65rem;
@@ -397,14 +397,14 @@ body .entity-shell-card.evpay-main {
 
 .cancel-confirm-block span {
     font-size: 0.8rem;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
 }
 
 /* -- Edit page danger zone ----------------------------------------- */
 .edit-danger-zone {
     margin-top: 2rem;
     padding-top: 1.25rem;
-    border-top: 1px solid rgba(239,68,68,.25);
+    border-top: 1px solid var(--danger);
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -416,10 +416,10 @@ body .entity-shell-card.evpay-main {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: var(--red-bg-dark);
-    border: 1px solid var(--red-border);
+    background: var(--danger-soft);
+    border: 1px solid var(--danger);
     border-radius: 8px;
-    color: var(--red-soft);
+    color: var(--danger);
     font-size: 0.88rem;
     font-weight: 600;
     padding: 0.6rem 1rem;
@@ -430,10 +430,10 @@ body .entity-shell-card.evpay-main {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    background: rgba(10, 20, 42, 0.7);
-    border: 1px solid var(--blue300-opacity-lg);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-soft);
     border-radius: 8px;
-    color: var(--ci-accent);
+    color: var(--accent-text);
     font-size: 0.88rem;
     font-weight: 600;
     padding: 0.6rem 1rem;
@@ -451,21 +451,21 @@ body .entity-shell-card.evpay-main {
 }
 
 .quorum-bar--ok {
-    background: var(--futsal-bg-dark);
-    border: 1px solid var(--futsal-green-dark);
-    color: var(--green-bright);
+    background: var(--surface);
+    border: 1px solid var(--surface-2);
+    color: var(--success);
 }
 
 .quorum-bar--warn {
-    background: rgba(251,191,36,0.07);
-    border: 1px solid rgba(251,191,36,0.25);
-    color: var(--amber);
+    background: var(--warning-soft);
+    border: 1px solid var(--warning);
+    color: var(--warning);
 }
 
 .quorum-bar--past {
-    background: rgba(15, 32, 70, 0.75);
-    border: 1px solid rgba(96, 165, 250, 0.55);
-    color: var(--link-info);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    color: var(--accent-text);
     justify-content: center;
     font-weight: 700;
 }
@@ -473,7 +473,7 @@ body .entity-shell-card.evpay-main {
 .quorum-bar strong { color: inherit; }
 
 .cancelled-notice {
-    color: var(--red-soft);
+    color: var(--danger);
     font-size: 0.88rem;
     font-weight: 600;
     text-align: center;
@@ -485,7 +485,7 @@ body .entity-shell-card.evpay-main {
 
 .detail-divider {
     border: none;
-    border-top: 1px solid rgba(255,255,255,0.06);
+    border-top: 1px solid var(--border);
     margin: 0.75rem 0;
 }
 
@@ -494,7 +494,7 @@ body .entity-shell-card.evpay-main {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--ci-accent);
+    color: var(--accent-text);
     margin: 0 0 0.25rem;
 }
 
@@ -525,8 +525,8 @@ body .entity-shell-card.evpay-main {
     align-items: center;
     justify-content: space-between;
     padding: 0.42rem 0.85rem;
-    background: var(--ci-bg-alt);
-    border: 1px solid var(--ci-border-dim);
+    background: var(--surface);
+    border: 1px solid var(--border-2);
     border-radius: 8px 8px 0 0;
     border-bottom: none;
     margin-bottom: 0;
@@ -534,21 +534,20 @@ body .entity-shell-card.evpay-main {
 
 /* Make section headers clearly distinct from row backgrounds */
 .players-group--gk .players-group-header {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-bg-dark) 100%);
-    border-color: var(--ci-text-link);
-    box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.34);
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
 }
 
 .players-group--line .players-group-header {
-    background: linear-gradient(180deg, var(--futsal-green-dark) 0%, var(--futsal-green-dark) 100%);
-    border-color: var(--green-bright);
-    box-shadow: inset 0 1px 0 rgba(187, 247, 208, 0.30);
+    background: var(--surface-2);
+    border-color: var(--success);
+    
 }
 
 .players-label {
     font-size: 0.73rem;
     font-weight: 700;
-    color: var(--ci-accent);
+    color: var(--accent-text);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     flex: 1;
@@ -556,39 +555,39 @@ body .entity-shell-card.evpay-main {
 }
 
 .players-group--gk .players-label {
-    color: var(--ci-text-info);
+    color: var(--accent-text);
 }
 
 .players-group--line .players-label {
-    color: var(--futsal-green-pale);
+    color: var(--success);
 }
 
 .players-count {
     font-size: 0.75rem;
-    color: var(--green-bright);
+    color: var(--success);
     font-weight: 700;
-    background: var(--futsal-bg-dark);
-    border: 1px solid var(--futsal-green-dark);
+    background: var(--surface);
+    border: 1px solid var(--surface-2);
     border-radius: 10px;
     padding: 0.08rem 0.55rem;
 }
 
 .players-group--gk .players-count:not(.is-full) {
-    color: var(--ci-text-info);
-    background: var(--ci-bg-dark);
-    border-color: var(--ci-accent-mid);
+    color: var(--accent-text);
+    background: var(--surface);
+    border-color: var(--accent-text);
 }
 
 .players-group--line .players-count:not(.is-full) {
-    color: var(--futsal-green-pale);
-    background: var(--futsal-green-dark);
-    border-color: var(--green-strong);
+    color: var(--success);
+    background: var(--surface-2);
+    border-color: var(--success);
 }
 
 .players-count.is-full {
-    color: var(--red-soft);
-    background: var(--red-bg-dark);
-    border-color: var(--red-border);
+    color: var(--danger);
+    background: var(--danger-soft);
+    border-color: var(--danger);
 }
 
 /* -- Players list --------------------------------------------------- */
@@ -599,7 +598,7 @@ body .entity-shell-card.evpay-main {
     display: flex;
     flex-direction: column;
     gap: 0;
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -607,16 +606,16 @@ body .entity-shell-card.evpay-main {
 /* Connected to group header: square top corners, blue border */
 .players-group .players-list {
     border-top: none;
-    border-color: var(--ci-border-dim);
+    border-color: var(--border-2);
     border-radius: 0 0 8px 8px;
 }
 
 .players-group--gk .players-list {
-    border-color: var(--ci-accent-mid);
+    border-color: var(--accent-text);
 }
 
 .players-group--line .players-list {
-    border-color: var(--green-strong);
+    border-color: var(--success);
 }
 
 .player-item {
@@ -625,23 +624,23 @@ body .entity-shell-card.evpay-main {
     gap: 0.6rem;
     padding: 0.48rem 0.85rem;
     border-radius: 0;
-    background: var(--ci-bg-card-deep);
+    background: var(--surface-2);
     border: none;
-    border-bottom: 1px solid var(--ci-bg-dark);
+    border-bottom: 1px solid var(--surface);
 }
 
 .players-list .player-item:last-child { border-bottom: none; }
 
 /* zebra: even rows clearly darker */
-.players-list .player-item:nth-child(even) { background: var(--ci-bg); }
+.players-list .player-item:nth-child(even) { background: var(--bg); }
 
 .members-toggle-btn {
     align-self: center;
     margin-top: 0.45rem;
     background: transparent;
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--border);
     border-radius: 999px;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     font-size: 0.76rem;
     font-weight: 700;
     padding: 0.22rem 0.72rem;
@@ -653,35 +652,35 @@ body .entity-shell-card.evpay-main {
 }
 
 .members-toggle-btn:hover {
-    border-color: var(--ci-accent-mid);
-    color: var(--ci-text-info);
-    background: rgba(59, 130, 246, 0.08);
+    border-color: var(--accent-text);
+    color: var(--accent-text);
+    background: var(--accent-soft);
 }
 
 .players-list .player-item.player-item--me {
-    background: linear-gradient(90deg, rgba(37, 99, 235, 0.26) 0%, rgba(11, 25, 40, 0.96) 60%, var(--ci-bg-alt) 100%);
-    box-shadow: inset 4px 0 0 var(--ci-text-link), inset 0 1px 0 rgba(96, 165, 250, 0.24), inset 0 -1px 0 rgba(96, 165, 250, 0.18);
+    background: var(--accent-soft);
+    box-shadow: inset 4px 0 0 var(--accent);
 }
 
 .player-item--me .player-name {
-    color: var(--ci-text-info);
+    color: var(--accent-text);
     font-weight: 700;
 }
 
 .player-item--me .player-num {
-    color: var(--link-info);
+    color: var(--accent-text);
 }
 
 .players-list .player-item.player-item--mvp {
-    background: linear-gradient(90deg, rgba(251,191,36,.16) 0%, var(--ci-bg-card-deep) 65%);
-    box-shadow: inset 3px 0 0 var(--amber);
+    background: var(--warning-soft);
+    box-shadow: inset 3px 0 0 var(--warning);
 }
 
 .player-tag--mvp {
-    background: rgba(251,191,36,.12);
-    border: 1px solid var(--amber-opacity-lg);
+    background: var(--warning-soft);
+    border: 1px solid var(--warning-soft);
     border-radius: 999px;
-    color: var(--amber);
+    color: var(--warning);
     font-size: 0.72rem;
     font-weight: 700;
     padding: 0.1rem 0.45rem;
@@ -691,33 +690,33 @@ body .entity-shell-card.evpay-main {
 .player-item--waitlist { opacity: 0.65; }
 /* rotation slots: jogadores que revezam â€” fundo levemente diferente */
 .players-list .player-item.player-item--rotation {
-    background: var(--futsal-bg-dark);
+    background: var(--surface);
 }
-.players-list .player-item.player-item--rotation:nth-child(even) { background: var(--futsal-bg-dark); }
+.players-list .player-item.player-item--rotation:nth-child(even) { background: var(--surface); }
 /* empty decorative slots â€” no bg override so zebra applies */
 .player-item--empty    { opacity: 0.38; }
 /* clickable vacant slot */
 .player-item--slot {
     position: relative;
-    background: var(--ci-bg-deep);
+    background: var(--surface);
     cursor: default;
     transition: background 0.12s;
 }
-.player-item--slot:hover { background: var(--ci-bg-dark); }
-.players-list .player-item--slot:nth-child(even) { background: var(--ci-bg); }
-.players-list .player-item--slot:nth-child(even):hover { background: var(--ci-bg-deep); }
+.player-item--slot:hover { background: var(--surface); }
+.players-list .player-item--slot:nth-child(even) { background: var(--bg); }
+.players-list .player-item--slot:nth-child(even):hover { background: var(--surface); }
 
 .player-num {
     width: 1.5rem;
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--ci-text-link);
+    color: var(--accent-text);
     text-align: right;
     flex-shrink: 0;
 }
 
-.player-name        { flex: 1; font-size: 0.9rem; color: var(--slate-light); font-weight: 500; }
-.player-slot-empty  { flex: 1; color: var(--ci-accent-mid); font-size: 0.85rem; }
+.player-name        { flex: 1; font-size: 0.9rem; color: var(--text); font-weight: 500; }
+.player-slot-empty  { flex: 1; color: var(--accent-text); font-size: 0.85rem; }
 
 /* -- Admin: adicionar / remover vaga --------------------------- */
 .slot-controls {
@@ -736,9 +735,9 @@ body .entity-shell-card.evpay-main {
 .slot-ctrl-btn--remove {
     flex: 1;
     background: transparent;
-    border: 1.5px dashed rgba(248, 113, 113, 0.35);
+    border: 1.5px dashed var(--danger);
     border-radius: 8px;
-    color: rgba(248, 113, 113, 0.65);
+    color: var(--danger);
     font-size: 0.76rem;
     font-weight: 600;
     padding: 0.4rem 0.6rem;
@@ -751,9 +750,9 @@ body .entity-shell-card.evpay-main {
 }
 
 .slot-ctrl-btn--remove:hover:not(:disabled) {
-    border-color: rgba(248, 113, 113, 0.7);
-    color: var(--red-soft);
-    background: rgba(248, 113, 113, 0.06);
+    border-color: var(--danger);
+    color: var(--danger);
+    background: var(--danger-soft);
 }
 
 .slot-ctrl-btn--remove:disabled {
@@ -762,22 +761,22 @@ body .entity-shell-card.evpay-main {
 }
 
 .slot-ctrl-btn--remove-gk {
-    border-color: var(--blue300-opacity-lg);
-    color: rgba(96, 165, 250, 0.65);
+    border-color: var(--danger);
+    color: var(--danger);
 }
 .slot-ctrl-btn--remove-gk:hover:not(:disabled) {
-    border-color: rgba(96, 165, 250, 0.7);
-    color: var(--ci-text-link);
-    background: rgba(96, 165, 250, 0.06);
+    border-color: var(--danger);
+    color: var(--danger);
+    background: var(--danger-soft);
 }
 
 
 .add-slot-row {
     width: 100%;
     background: transparent;
-    border: 1.5px dashed rgba(74, 222, 128, 0.55);
+    border: 1.5px dashed var(--border-2);
     border-radius: 8px;
-    color: rgba(74, 222, 128, 0.85);
+    color: var(--text-2);
     font-size: 0.76rem;
     font-weight: 600;
     padding: 0.4rem 0.6rem;
@@ -790,27 +789,27 @@ body .entity-shell-card.evpay-main {
     transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 .add-slot-row:hover {
-    border-color: rgba(74, 222, 128, 0.85);
-    color: var(--green-bright);
-    background: rgba(74, 222, 128, 0.08);
+    border-color: var(--accent-border);
+    color: var(--accent-text);
+    background: var(--accent-soft);
 }
 .add-slot-row--gk {
-    border-color: rgba(96, 165, 250, 0.55);
-    color: var(--blue300-opacity-3xl);
+    border-color: var(--border-2);
+    color: var(--text-2);
     gap: 0.2rem;
 }
 .add-slot-row--gk:hover {
-    border-color: var(--blue300-opacity-3xl);
-    color: var(--ci-text-link);
-    background: var(--blue300-opacity-xs);
+    border-color: var(--accent-soft);
+    color: var(--accent-text);
+    background: var(--accent-soft);
 }
 
 .waitlist-cta {
     width: 100%;
     background: transparent;
-    border: 1.5px dashed rgba(251, 191, 36, 0.55);
+    border: 1.5px dashed var(--border-2);
     border-radius: 8px;
-    color: var(--amber-opacity-2xl);
+    color: var(--text-2);
     font-size: 0.76rem;
     font-weight: 600;
     padding: 0.4rem 0;
@@ -823,18 +822,18 @@ body .entity-shell-card.evpay-main {
     transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 .waitlist-cta:hover {
-    border-color: var(--amber-opacity-2xl);
-    color: var(--amber);
-    background: var(--amber-opacity-xs);
+    border-color: var(--accent-border);
+    color: var(--accent-text);
+    background: var(--accent-soft);
 }
 .waitlist-cta--gk {
-    border-color: rgba(251, 191, 36, 0.5);
-    color: rgba(251, 191, 36, 0.8);
+    border-color: var(--border-2);
+    color: var(--text-2);
 }
 .waitlist-cta--gk:hover {
-    border-color: var(--amber-opacity-2xl);
-    color: var(--amber-mid);
-    background: rgba(251, 191, 36, 0.04);
+    border-color: var(--accent-border);
+    color: var(--accent-text);
+    background: var(--accent-soft);
 }
 
 
@@ -845,10 +844,10 @@ body .entity-shell-card.evpay-main {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    background: rgba(74, 222, 128, 0.08);
-    border: 1px solid var(--green-opacity-lg);
+    background: var(--surface-3);
+    border: 1px solid var(--accent-border);
     border-radius: 999px;
-    color: var(--green-bright);
+    color: var(--accent-text);
     font-size: 0.78rem;
     font-weight: 700;
     padding: 0.2rem 0.85rem;
@@ -858,52 +857,52 @@ body .entity-shell-card.evpay-main {
     white-space: nowrap;
 }
 .player-slot-btn:hover {
-    background: rgba(74, 222, 128, 0.18);
-    border-color: var(--green-bright);
-    color: var(--green-soft);
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-text);
 }
 .player-slot-btn--gk {
-    background: var(--blue300-opacity-xs);
-    border-color: var(--blue300-opacity-lg);
-    color: var(--ci-text-link);
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+    color: var(--accent-text);
 }
 .player-slot-btn--gk:hover {
-    background: rgba(96, 165, 250, 0.18);
-    border-color: var(--ci-text-link);
-    color: var(--link-info);
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-text);
 }
 
 .player-tag {
     font-size: 0.7rem;
     font-weight: 700;
-    color: var(--red-soft);
-    background: var(--red-bg-dark);
-    border: 1px solid var(--red-border);
+    color: var(--danger);
+    background: var(--danger-soft);
+    border: 1px solid var(--danger);
     border-radius: 8px;
     padding: 1px 7px;
 }
 
 .player-tag--admin {
-    color: var(--amber);
-    background: rgba(251,191,36,0.1);
-    border-color: var(--amber-opacity-lg);
+    color: var(--warning);
+    background: var(--warning-soft);
+    border-color: var(--warning);
 }
 
 .player-tag--open {
-    color: var(--green-bright);
-    background: rgba(74,222,128,0.1);
-    border-color: var(--green-opacity-md);
+    color: var(--success);
+    background: var(--success-soft);
+    border-color: var(--success);
 }
 
 .player-tag--full {
-    color: var(--amber-light);
-    background: rgba(251,146,60,0.1);
-    border-color: rgba(251,146,60,0.3);
+    color: var(--warning);
+    background: var(--warning-soft);
+    border-color: var(--warning);
 }
 
 .player-tag--weekly {
-    color: var(--link-info);
-    background: var(--blue300-opacity-xs);
-    border-color: var(--blue300-opacity-sm);
+    color: var(--accent-text);
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
 }
 
