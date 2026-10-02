@@ -2,8 +2,8 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/02/2026 - 03:02:49 |
-| Coverage date: | 10/02/2026 - 03:02:43 |
+| Generated on: | 10/02/2026 - 03:40:20 |
+| Coverage date: | 10/02/2026 - 03:40:15 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 530 |
@@ -13,11 +13,11 @@
 | Uncovered lines: | 9741 |
 | Coverable lines: | 147545 |
 | Total lines: | 180553 |
-| **Branch coverage:** | 44.3% (4031 of 9092) |
-| Covered branches: | 4031 |
+| **Branch coverage:** | 44.3% (4030 of 9092) |
+| Covered branches: | 4030 |
 | Total branches: | 9092 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 399_36958171205 |
+| Tag: | 402_36960994269 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **137804** | **9741** | **147545** | **199426** | **93.3%** | **4031** | **9092** | **44.3%** |
+| **Confirmai** | **137804** | **9741** | **147545** | **199426** | **93.3%** | **4030** | **9092** | **44.3%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -512,7 +512,7 @@
 | Confirmai.Services.Utility.MailboxMessageView | 11 | 0 | 11 | 327 | 100% | 0 | 0 |  |
 | Confirmai.Services.Utility.MailboxQueryService | 171 | 11 | 182 | 327 | 93.9% | 69 | 114 | 60.5% |
 | Confirmai.Services.Utility.PiiSanitizer | 13 | 2 | 15 | 157 | 86.6% | 6 | 6 | 100% |
-| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 49 | 52 | 94.2% |
+| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 48 | 52 | 92.3% |
 | Confirmai.Services.Utility.TestnetBitcoinPaymentService | 49 | 18 | 67 | 132 | 73.1% | 16 | 24 | 66.6% |
 | Confirmai.Shared.Components.ActivePaymentMethodsWidget | 28 | 3 | 31 | 78 | 90.3% | 12 | 16 | 75% |
 | Confirmai.Shared.Components.Admin.AdminLogsFilterBar | 38 | 10 | 48 | 124 | 79.1% | 2 | 4 | 50% |
