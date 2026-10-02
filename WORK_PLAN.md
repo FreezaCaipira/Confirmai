@@ -119,7 +119,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Mapa de Progresso e Proximos Passos (atualizado pos-C36, PRs #127-#129)
+## Mapa de Progresso e Proximos Passos (atualizado pos-C36-E, PRs #127-#132)
 
 ### Progresso por eixo
 
@@ -127,17 +127,17 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 |---|---|---|
 | Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
 | Casos de uso / UML (C33) | **CONCLUIDO** -- `docs/uml/` (~102 UCs por ator, estados, sequencia do pagamento manual) | Manter a coluna Teste atualizada a cada ciclo. |
-| Cobertura de testes | **BOM** -- 2572 testes, integracao em **Postgres real** (C33), CI verde | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
+| Cobertura de testes | **BOM** -- 2581 testes, integracao em **Postgres real** (C33), CI verde; `CssStructureTests` guarda todo CSS proprio (#132) | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
 | i18n PT/EN/ES | **COMPLETO** -- allowlist zerada, paridade + chaves referenciadas testadas | Validacao visual EN/ES em prod (Robson). |
-| Pagamento V1 manual + taxa + repasse | **CONCLUIDO e VALIDADO EM PRODUCAO**; taxa carimbada na confirmacao, receita so com `Paid` (#122), isencao por grupo com janela `[From,Until)` (C34/C36-C), saida do grupo bloqueada com divida (#125) | Regra do Pix unica no criar partida (C36-E). |
+| Pagamento V1 manual + taxa + repasse | **CONCLUIDO e VALIDADO EM PRODUCAO**; taxa carimbada na confirmacao, receita so com `Paid` (#122), isencao por grupo com janela `[From,Until)` (C34/C36-C), saida do grupo bloqueada com divida (#125); regra do Pix unica no criar partida (C36-E, #131/#132) | Nada funcional. |
 | Seguranca / autorizacao | **BOM** -- authz no service (C34), `GroupAccess` membro/admin (C36-C), IDORs fechados, rate limiter corrigido, magic bytes no upload | Pen-test do caminho do dinheiro (C32 Fase A). |
 | Auditoria | **CONCLUIDO** no caminho do dinheiro (C34) | Nada. |
 | Login/identidade | **VALIDADO EM PRODUCAO**; botao Google oficial (variante clara) no login **e** no cadastro (#129) | Rotacao de credenciais (checklist pre-producao). |
 | Produto: grupo como porta de entrada | **CONCLUIDO** (C36-A/C/D) -- home = minhas partidas, `/grupos` = gestao, hub + subnav, pagamentos no escopo do grupo | Nada. |
-| Onboarding por empty state | **CONCLUIDO** (C36-B F6) -- checklist do admin, Pix bloqueante | **Ressalva 2 do C36-B** (aviso de Pix duplicado). |
+| Onboarding por empty state | **CONCLUIDO** (C36-B F6 + C36-E) -- checklist do admin e o aviso unico, Pix bloqueante pela regra do grupo | Nada. |
 | Layout / design system L0-L3 | **~80%** -- header, home, hub/subnav, `/grupos`, mailbox, profile, partida futsal/poker, pagamento/repasse do grupo, Identity, admin, cookie banner migrados; 63 arquivos guardados pelo `CssNoLegacyVarsTests` | Lapidacao visual (fim da fila, passo 5): **tela do jogador pagar** (`/pagamento/evento/{id}`) ainda no visual antigo; `buttons.css`/`entity-shell.css`/`MainLayout.razor.css` ainda consomem `--ci-*`; Fase 7 (texto do hero). |
-| Pre-producao (C32) | **NAO INICIADO** -- executavel, nao depende de ninguem | Pen-test, CSP, metricas, checklist EasyPanel, higiene. |
-| WhatsApp (C31, Evolution no grupo) | **PLANEJADO, adiado de proposito** ate fechar a lapidacao | Fase 0 operacional do Robson (servico no EasyPanel + chip dedicado aquecido). |
+| Pre-producao (C32) | **~50% ja coberto por ciclos anteriores** (C34 adversarial, nonce no script-src, HSTS, metricas de pagamento, `docs/production-checklist.md`, 1 TODO so) -- plano refeito so com o delta | **Proximo ciclo do Pleno.** Ver secao do Ciclo 32. |
+| WhatsApp (C31, Evolution no grupo) | **PLANEJADO** -- liberado depois do C32 (lapidacao funcional fechada no C36-E) | Fase 0 operacional do Robson (servico no EasyPanel + chip dedicado aquecido). |
 | Pix automatico (V2) | Codigo preservado atras do toggle | Pendencias Efi/fiscal do Robson; so depois do go-live do V1. |
 
 ### Proximos passos, em ordem
@@ -1114,21 +1114,57 @@ Ressalva menor (nao vira ciclo): os cancelamentos gravam em contexto proprio ant
 
 ---
 
-## Ciclo 32 (Pleno) -- Pre-producao: seguranca operacional, observabilidade e checklist de deploy [PLANEJADO -- EXECUTAVEL AGORA, nao depende do Robson]
+## Ciclo 32 (Pleno) -- Pre-producao: so o que falta (plano refeito pos-C36-E) [PLANEJADO -- EXECUTAVEL AGORA, nao depende do Robson]
 
-**Por que este ciclo e o proximo executavel**: o C30 (Google/email) espera credenciais do Robson e o C31 (WhatsApp) espera a decisao da ferramenta. O C32 nao depende de ninguem e e pre-requisito de go-live de qualquer forma.
+**Por que refeito**: o plano original (pos-C29) foi escrito antes do C33/C34/C36. Varredura do Senior na `main` pos-#132 mostrou que boa parte ja existe. Este plano lista **o que ja esta coberto (nao refazer)** e **so o delta**. Um branch, um PR, 1 commit por fase.
 
-**Regra de ouro**: TDD, SOLID, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, 1 commit por fase, numeros de build/suite colados no PR (regra 28). **Nao** alterar regra financeira, nem o desenho do repasse, nem remover o codigo do V2.
+**Regra de ouro**: TDD, i18n (regra 25), build `--no-incremental` **0 warning**, suite verde, numeros de build/suite no PR (regra 28). **Nao** alterar regra financeira, desenho do repasse nem codigo do V2. **Nao** subir dependencia nova. **Nao** criar doc solto na raiz.
 
-- **Fase A -- pen-test do caminho do dinheiro manual (teste, nao prosa)**: escrever testes **adversariais** dos limites do V1 manual, cada um partindo de "o que um usuario mal-intencionado tentaria": jogador marcando o proprio pagamento como pago; membro comum enviando lote de repasse; organizador aprovando o proprio lote; lote com `amount` adulterado; partida de outro grupo na selecao; comprovante de terceiro via `/api/pix-proof/{id}` e `/api/fee-settlement-proof/{id}`; upload acima do limite / content-type falsificado. Onde o teste passar de primeira, **registrar como coberto**; onde falhar, corrigir no service (nunca so na UI).
-- **Fase B -- revisao de CSP e cabecalhos**: auditar a CSP atual (nonce + `X-Frame-Options`/`nosniff`/HSTS) contra o que as paginas realmente carregam (Font Awesome, QR, imagens de comprovante inline). Objetivo: **sem `unsafe-inline`/`unsafe-eval`** e sem console warning. Registrar no PR o que teve que ser liberado e por que.
-- **Fase C -- metricas e alertas operacionais**: expor metricas do que da errado em producao sem ninguem ver -- conexoes SignalR ativas/reconexoes, falhas de upload de comprovante, falhas de envio de email, lotes de repasse `EmAnalise` parados ha mais de N dias. Alerta ja existe para payout; alinhar o mesmo padrao.
-- **Fase D -- checklist de deploy EasyPanel (documento vivo no repo, nao doc solto na raiz)**: variaveis de ambiente obrigatorias (com o efeito de cada uma faltando), `SyncPassword=false`, mTLS do webhook Efi, `ASPNETCORE_ENVIRONMENT`, aplicacao de migrations, e o **procedimento de rollback**. Um item por linha, verificavel.
-- **Fase E -- higiene final pre-go-live**: `grep` por `TODO`/`FIXME` em caminho de producao e classificar (corrigir / virar item de backlog explicito / remover); confirmar que nenhum endpoint de dev/seed/debug esta fora do bloco de desenvolvimento (o teste de convencao ja guarda -- confirmar que continua verde).
+### Ja coberto (registrar no PR como "coberto", nao reescrever)
+- Marcar pago / remover confirmacao / rejeitar comprovante / notificar inadimplencia por estranho, membro comum e admin de outro grupo: `C34SecurityAdversarialTests`.
+- Comprovante: dono-only, exe disfarcado de jpeg, content-type forjado, vazio, acima do limite: `C34SecurityAdversarialTests`, `PixProofUploadServiceTests`, `PixProofUploadTests`.
+- Lote de repasse: membro comum, admin de outro grupo, partida de outro grupo, partida ja em outro lote, valor abaixo das taxas, valor zero: `PlatformFeeSettlementServiceTests`. Leitura do comprovante do lote por terceiro: `PlatformFeeSettlementProofAuthorizerTests`.
+- CSP com nonce no `script-src`, `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS: `Program.cs` + `SecurityHeadersIntegrationTests`.
+- `AdminSeed:SyncPassword` ja e `false` por padrao fora de Development (`AppInitializationService`, `?? IsDevelopment()`).
+- Endpoint de seed (`/api/test/seed-event-confirmations`) so em Development/Testing (`Program.cs`).
+- Metricas de pagamento (`PaymentDomainMetrics`) + exemplos de alerta em `docs/monitoring/`.
+- `TODO/FIXME` em codigo de producao: 1 so (`EventNotificationService`, gancho do WhatsApp -> fica, aponta pro C31).
 
-### O que NAO fazer
+### Fase A -- pen-test: so as lacunas (testes, em `C32MoneyPathAdversarialTests.cs`)
+1. `ReviewSettlementAsync` chamado por **admin do grupo** (nao sysadmin) aprovando o proprio lote -> recusado, lote segue `EmAnalise`.
+2. `ReviewSettlementAsync` em lote **ja revisado** (aprovar 2x / aprovar um rejeitado) -> recusado, sem segundo efeito no ledger.
+3. Jogador chamando o service de "Meus pagamentos" (`GroupPaymentsService`) com `groupId` de grupo do qual **nao e membro** -> vazio/forbidden, nunca dado de terceiro.
+4. HTTP: `GET /api/pix-proof/{id}` e `/api/fee-settlement-proof/{id}` **sem login** -> 401/redirect (nao 200), e com usuario sem relacao -> 403/404. Se ja houver equivalente no `C33CriticalUseCaseTests`, so referenciar.
+Onde o teste falhar: corrigir **no service**, nunca so na UI.
 
-Nao subir dependencia nova sem aprovacao; nao mexer no fluxo do dinheiro do jogador; nao "preparar terreno" para WhatsApp (ferramenta indefinida); nao criar doc solto na raiz.
+### Fase B -- CSP: fechar o que da e documentar o resto
+- `connect-src` hoje aceita `ws:` (sem TLS). Em producao deixar so `wss:`; `ws:` apenas em Development. Teste em `SecurityHeadersIntegrationTests` para os dois ambientes.
+- `style-src 'unsafe-inline'` **fica** (Blazor injeta estilo inline; ha 6 `style="..."` em markup). Registrar no PR como risco aceito, com o motivo. Opcional: zerar os 6 `style=` se for trivial, sem remover o `unsafe-inline`.
+- Conferir que todo host liberado ainda e usado (`maps.googleapis.com` -> `wwwroot/js/venue-autocomplete.js`; `cdnjs` -> Font Awesome). Host sem uso sai.
+
+### Fase C -- metricas operacionais que faltam
+Novo `Services/Core/OperationalMetrics.cs` (mesmo padrao de `PaymentDomainMetrics`, registrar em `AddMeter` no `Program.cs`):
+- `confirmai_circuits_active` (UpDownCounter) e `confirmai_circuits_reconnect_total` via um `CircuitHandler` (Blazor Server) -- hoje nao existe nenhum.
+- `confirmai_email_send_failed_total` no `IdentityEmailSender` (catch do SMTP; **sem** endereco/token no tag).
+- `confirmai_proof_upload_rejected_total{reason}` (mime, assinatura, tamanho, ownership) no upload de comprovante do jogador e do lote.
+- `confirmai_fee_settlements_pending_stale` (ObservableGauge): lotes `EmAnalise` ha mais de N dias (config `Ops:StaleSettlementDays`, default 3).
+Testes com `MeterListener` (um por metrica). Acrescentar as regras de alerta correspondentes em `docs/monitoring/prometheus-payments-alerts.example.yml`.
+
+### Fase D -- checklist de deploy EasyPanel (atualizar `docs/production-checklist.md`, nao criar outro doc)
+O checklist atual e de docker-compose/nginx/BTCPay. Adicionar no topo uma secao **"EasyPanel (deploy atual)"**, um item verificavel por linha:
+- env vars obrigatorias e o efeito de cada uma faltando: connection string, `Authentication__Google__ClientId/ClientSecret` (sem elas o botao some), bloco `Email__*` da Brevo (`Email__FromEmail` = sender validado; SMTP key, nao API key), `AdminSeed__SyncPassword=false` explicito, `ASPNETCORE_ENVIRONMENT=Production`;
+- proxy reverso: `ForwardedHeaders` (redirect_uri do OAuth em https -- #98);
+- migrations aplicadas no boot (confirmar no log);
+- rollback no EasyPanel: redeploy da imagem/commit anterior + smoke;
+- marcar BTCPay/AbacatePay/Efi como **V2 / desligados** (toggle de gateways off).
+Juntar com o "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" deste arquivo por referencia, sem duplicar.
+
+### Fase E -- higiene (curta)
+- Teste de convencao: nenhum `MapGet/MapPost` com `/api/test` ou `seed` fora do bloco Development/Testing (se ja existir, so confirmar verde).
+- Branches remotas mergeadas: listar no PR para o Robson apagar (nao apagar).
+
+### Fase F -- [SO SE O ROBSON APROVAR] remover telas legadas fora do fluxo
+`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration`: remover pagina + CSS + chaves i18n sem uso + entradas no `CssNoLegacyVarsTests`/allowlists; rota antiga redireciona para `/`.
 
 ---
 
