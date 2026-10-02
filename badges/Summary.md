@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/02/2026 - 03:02:10 |
-| Coverage date: | 10/02/2026 - 03:02:05 |
+| Generated on: | 10/02/2026 - 03:02:49 |
+| Coverage date: | 10/02/2026 - 03:02:43 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 530 |
 | Files: | 624 |
-| **Line coverage:** | 93.3% (137798 of 147537) |
-| Covered lines: | 137798 |
-| Uncovered lines: | 9739 |
-| Coverable lines: | 147537 |
-| Total lines: | 180533 |
-| **Branch coverage:** | 44.3% (4028 of 9088) |
-| Covered branches: | 4028 |
-| Total branches: | 9088 |
+| **Line coverage:** | 93.3% (137804 of 147545) |
+| Covered lines: | 137804 |
+| Uncovered lines: | 9741 |
+| Coverable lines: | 147545 |
+| Total lines: | 180553 |
+| **Branch coverage:** | 44.3% (4031 of 9092) |
+| Covered branches: | 4031 |
+| Total branches: | 9092 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 398_36958122490 |
+| Tag: | 399_36958171205 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **137798** | **9739** | **147537** | **199406** | **93.3%** | **4028** | **9088** | **44.3%** |
+| **Confirmai** | **137804** | **9741** | **147545** | **199426** | **93.3%** | **4031** | **9092** | **44.3%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -39,7 +39,7 @@
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ForgotPasswordConfirmation | 2 | 1 | 3 | 43 | 66.6% | 6 | 8 | 75% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_Login | 5 | 0 | 5 | 73 | 100% | 17 | 24 | 70.8% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_Logout | 0 | 1 | 1 | 15 | 0% | 0 | 2 | 0% |
-| AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_Register | 1 | 0 | 1 | 48 | 100% | 8 | 8 | 100% |
+| AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_Register | 3 | 0 | 3 | 57 | 100% | 9 | 10 | 90% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_RegisterConfirmation | 1 | 0 | 1 | 27 | 100% | 4 | 4 | 100% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ResendEmailConfirmation | 2 | 0 | 2 | 45 | 100% | 7 | 8 | 87.5% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ResetPassword | 0 | 2 | 2 | 60 | 0% | 0 | 30 | 0% |
@@ -54,7 +54,7 @@
 | Confirmai.Areas.Identity.Pages.Account.LoginModel | 88 | 2 | 90 | 176 | 97.7% | 23 | 28 | 82.1% |
 | Confirmai.Areas.Identity.Pages.Account.LogoutModel | 11 | 2 | 13 | 39 | 84.6% | 4 | 8 | 50% |
 | Confirmai.Areas.Identity.Pages.Account.RegisterConfirmationModel | 5 | 0 | 5 | 23 | 100% | 2 | 2 | 100% |
-| Confirmai.Areas.Identity.Pages.Account.RegisterModel | 60 | 8 | 68 | 143 | 88.2% | 6 | 12 | 50% |
+| Confirmai.Areas.Identity.Pages.Account.RegisterModel | 64 | 10 | 74 | 154 | 86.4% | 8 | 14 | 57.1% |
 | Confirmai.Areas.Identity.Pages.Account.ResendEmailConfirmationModel | 16 | 20 | 36 | 93 | 44.4% | 2 | 8 | 25% |
 | Confirmai.Areas.Identity.Pages.Account.ResetPasswordModel | 34 | 20 | 54 | 133 | 62.9% | 10 | 20 | 50% |
 | Confirmai.Config.BtcPayOptions | 2 | 0 | 2 | 9 | 100% | 0 | 0 |  |
