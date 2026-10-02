@@ -314,30 +314,35 @@
 }
 
 /* Google Sign-In button: branding imposed by Google guidelines
-   (https://developers.google.com/identity/branding-guidelines).
+   (https://developers.google.com/identity/branding-guidelines), variante
+   clara: contrasta com o tema escuro e nao se confunde com os botoes do sistema.
    EXCECAO unica de cores literais fora de tokens.css -- nao usar como
    precedente para outros componentes. */
 .google-signin-btn {
     width: 100%;
-    background: #131314;
-    color: #e3e3e3;
-    border: 1px solid #8e918f;
-    border-radius: 8px;
+    background: #ffffff;
+    color: #1f1f1f;
+    border: 1px solid #747775;
+    border-radius: 999px;
     padding: 0.65rem 1rem;
     font-family: Roboto, var(--font);
     font-size: 14px;
     font-weight: 500;
+    line-height: 20px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    transition: background 0.2s, border-color 0.2s;
+    gap: 10px;
+    transition: background 0.2s;
 }
 
 .google-signin-btn:hover {
-    background: #1f1f1f;
-    border-color: #a8aba8;
+    background: #f2f2f2;
+}
+
+.google-signin-btn:active {
+    background: #e3e3e3;
 }
 
 .google-signin-btn:focus-visible {

@@ -33,6 +33,15 @@
     <button type="submit">@T["Nav.Register"]</button>
 </form>
 
+@if (Model.ExternalLogins.Any(p => p.Name.Equals("Google", StringComparison.OrdinalIgnoreCase)))
+{
+    <div class="external-login">
+        <span class="external-login-divider">@T["Identity.ExternalLogin.Divider"]</span>
+        @{ ViewData["ReturnUrl"] = Model.ReturnUrl; }
+        <partial name="_GoogleSignInButton" />
+    </div>
+}
+
 <div class="identity-actions">
     <a asp-page="./Login">@T["Identity.Register.HaveAccount"]</a>
     <a asp-page="./ResendEmailConfirmation">@T["Identity.Resend.Title"]</a>
