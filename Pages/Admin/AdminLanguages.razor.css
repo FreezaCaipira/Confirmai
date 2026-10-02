@@ -1,19 +1,19 @@
-﻿/* Admin Security shell — dark navy theme */
+/* Admin Security shell — dark navy theme */
 .admin-security-shell .entity-shell-subtitle,
 .admin-security-shell .security-header p,
 .admin-security-shell .security-label,
 .admin-security-shell .security-input-grid label,
 .admin-security-shell .security-baseline-group h5 {
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--shadow-accent-sm);
+    color: var(--text);
+    text-shadow: 0 0 6px var(--shadow);
 }
 
 .admin-security-shell .security-header h3 {
-    color: var(--ci-text-blue);
-    background: linear-gradient(180deg, var(--ci-bg-mid) 0%, var(--ci-bg-alt) 100%);
+    color: var(--text);
+    background: var(--surface-2);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
-    border-bottom: 1px solid var(--ci-border);
+    border-bottom: 1px solid var(--border);
     text-shadow: none;
     font-family: var(--font-display);
     text-transform: uppercase;
@@ -26,42 +26,42 @@
 .admin-security-shell .security-toggle,
 .admin-security-shell .security-input-grid input,
 .admin-security-shell .security-input-grid select {
-    color: var(--ci-text-blue);
+    color: var(--text);
 }
 
 .admin-security-shell .security-panel {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
 }
 
 .admin-security-shell .security-baseline-row {
-    border-bottom: 1px dashed var(--ci-border);
+    border-bottom: 1px dashed var(--border);
 }
 
 .admin-security-shell .security-baseline-group {
-    border-top: 1px solid var(--ci-border);
+    border-top: 1px solid var(--border);
 }
 
 .admin-security-shell .security-env-pill {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-border-dim);
-    color: var(--ci-text-blue);
+    background: var(--accent);
+    border: 1px solid var(--border-2);
+    color: var(--text);
 }
 
 .admin-security-shell .security-boolean-badge.on {
-    color: var(--green-bright);
-    background: var(--futsal-bg-dark);
-    border-color: var(--futsal-green-dark);
+    color: var(--success);
+    background: var(--surface);
+    border-color: var(--surface-2);
 }
 
 .admin-security-shell .security-boolean-badge.off {
-    color: var(--red-soft);
-    background: var(--red-bg-dark);
-    border-color: var(--red-border);
+    color: var(--danger);
+    background: var(--danger-soft);
+    border-color: var(--danger);
 }
 
 .admin-security-shell .security-toggle input[type="checkbox"] {
-    accent-color: var(--ci-accent);
+    accent-color: var(--accent-text);
 }
 
 /* --- Structural styles --- */
@@ -70,16 +70,16 @@
 .security-label,
 .security-input-grid label,
 .security-baseline-group h5 {
-    color: var(--ci-text-blue);
-    text-shadow: 0 0 6px var(--shadow-accent-sm);
+    color: var(--text);
+    text-shadow: 0 0 6px var(--shadow);
 }
 
 .security-header h3 {
-    color: var(--ci-text-blue);
-    background: linear-gradient(180deg, var(--ci-bg-mid) 0%, var(--ci-bg-alt) 100%);
+    color: var(--text);
+    background: var(--surface-2);
     margin: -0.5rem -0.62rem 0.5rem;
     padding: 0.34rem 0.62rem;
-    border-bottom: 1px solid var(--ci-border);
+    border-bottom: 1px solid var(--border);
     text-shadow: none;
     font-family: var(--font-display);
     text-transform: uppercase;
@@ -92,42 +92,42 @@
 .security-toggle,
 .security-input-grid input,
 .security-input-grid select {
-    color: var(--ci-text-blue);
+    color: var(--text);
 }
 
 .security-panel {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
 }
 
 .security-baseline-row {
-    border-bottom: 1px dashed var(--ci-border);
+    border-bottom: 1px dashed var(--border);
 }
 
 .security-baseline-group {
-    border-top: 1px solid var(--ci-border);
+    border-top: 1px solid var(--border);
 }
 
 .security-env-pill {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent-dark) 100%);
-    border: 1px solid var(--ci-border-dim);
-    color: var(--ci-text-blue);
+    background: var(--accent);
+    border: 1px solid var(--border-2);
+    color: var(--text);
 }
 
 .security-boolean-badge.on {
-    color: var(--green-bright);
-    background: var(--futsal-bg-dark);
-    border-color: var(--futsal-green-dark);
+    color: var(--success);
+    background: var(--surface);
+    border-color: var(--surface-2);
 }
 
 .security-boolean-badge.off {
-    color: var(--red-soft);
-    background: var(--red-bg-dark);
-    border-color: var(--red-border);
+    color: var(--danger);
+    background: var(--danger-soft);
+    border-color: var(--danger);
 }
 
 .security-toggle input[type="checkbox"] {
-    accent-color: var(--ci-accent);
+    accent-color: var(--accent-text);
 }
 
 @media (max-width: 1024px) {

@@ -305,11 +305,11 @@
             }
 
             <div class="form-actions">
-                <button class="cancel-btn" type="button"
+                <button class="btn btn-secondary" type="button"
                         @onclick='() => NavigationManager.NavigateTo(preselectedGroup is not null ? $"/grupo/{preselectedGroup.Id}" : "/grupos")'>
                     @Ui["Common.Cancel"]
                 </button>
-                <button class="save-btn save-btn--poker" type="submit" disabled="@isSaving">
+                <button class="btn btn-primary" type="submit" disabled="@isSaving">
                     @(isSaving ? @Ui["Poker.Creating"] : Ui.Get("Poker.CreateButton", EventTypeLabel(form.EventType)))
                 </button>
             </div>

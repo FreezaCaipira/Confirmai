@@ -4,74 +4,74 @@
 .skeleton-line--md { max-width: 200px; }
 .skeleton-line--sm { max-width: 150px; }
 
-.detail-header--futsal .detail-sport-badge { color: var(--green-bright); }
+.detail-header--futsal .detail-sport-badge { color: var(--success); }
 
 /* Payment Status Badge States */
 .player-tag--paid {
-    background: linear-gradient(180deg, var(--green-bright) 0%, var(--green-bright) 50%, var(--green-strong) 100%);
-    border: 1px solid var(--green-soft);
-    color: var(--green-soft);
-    box-shadow: 0 2px 4px var(--green-opacity-md);
+    background: var(--success-soft);
+    border: 1px solid var(--success);
+    color: var(--success);
+    box-shadow: 0 2px 4px var(--success-soft);
 }
 
 .player-tag--paid:hover {
-    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-bright) 50%, var(--green-bright) 100%);
-    border-color: var(--futsal-green-pale);
-    box-shadow: 0 4px 8px var(--green-opacity-xl);
+    background: var(--success-soft);
+    border-color: var(--success);
+    box-shadow: 0 4px 8px var(--success-soft);
 }
 
 .player-tag--proof-pending {
-    background: var(--blue300-opacity-xs);
-    border: 1px solid var(--blue300-opacity-md);
-    color: var(--link-info);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    color: var(--accent-text);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .player-tag--proof-pending:hover {
-    background: var(--blue300-opacity-sm);
-    border-color: var(--blue300-opacity-xl);
+    background: var(--accent-soft);
+    border-color: var(--accent);
 }
 
 .player-tag--pay-pending {
-    background: var(--amber-opacity-xs);
-    border: 1px solid var(--amber-opacity-md);
-    color: var(--amber);
+    background: var(--warning-soft);
+    border: 1px solid var(--warning);
+    color: var(--warning);
 }
 
 .player-tag--pay-btn {
-    background: var(--blue300-opacity-xs);
-    border: 1px solid var(--blue300-opacity-md);
-    color: var(--link-info);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    color: var(--accent-text);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .player-tag--pay-btn:hover {
-    background: var(--blue300-opacity-sm);
-    border-color: var(--blue300-opacity-xl);
+    background: var(--accent-soft);
+    border-color: var(--accent);
 }
 
 .player-tag--receiver-badge {
-    background: linear-gradient(180deg, var(--amber) 0%, var(--amber-mid) 50%, var(--amber-dark) 100%);
-    border: 1px solid var(--amber-light);
-    color: var(--amber-lightest);
+    background: var(--warning-soft);
+    border: 1px solid var(--warning);
+    color: var(--warning);
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    box-shadow: 0 2px 4px var(--amber-opacity-sm);
+    box-shadow: 0 2px 4px var(--warning-soft);
 }
 
 /* Goalkeeper "Não Paga" Badge */
 .player-tag--no-pay {
-    background: var(--blue300-opacity-xs);
-    border: 1px solid var(--blue300-opacity-md);
-    color: var(--link-info);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    color: var(--accent-text);
 }
 
 .player-tag--no-pay:hover {
-    background: var(--blue300-opacity-sm);
-    border-color: var(--blue300-opacity-xl);
+    background: var(--accent-soft);
+    border-color: var(--accent);
 }
 
 @keyframes fadeIn {

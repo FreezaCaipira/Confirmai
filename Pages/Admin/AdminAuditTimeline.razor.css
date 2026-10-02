@@ -8,7 +8,7 @@
     border-radius: 6px;
     margin-bottom: 1rem;
     font-size: 0.875rem;
-    color: var(--link-blue);
+    color: var(--accent-text);
 }
 
 .admin-audit-timeline-shell .timeline-entity-sep {
@@ -24,17 +24,17 @@
 .admin-audit-timeline-shell .timeline-ts {
     white-space: nowrap;
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--text-2);
 }
 
 .admin-audit-timeline-shell .timeline-event-type {
     font-family: monospace;
     font-size: 0.8rem;
-    background: rgba(126, 179, 232, 0.08);
-    border: 1px solid rgba(126, 179, 232, 0.2);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
     border-radius: 4px;
     padding: 1px 5px;
-    color: var(--link-blue);
+    color: var(--accent-text);
     white-space: nowrap;
 }
 
@@ -45,7 +45,7 @@
 .admin-audit-timeline-shell .timeline-metadata-toggle {
     cursor: pointer;
     font-size: 0.75rem;
-    color: var(--link-blue);
+    color: var(--accent-text);
     user-select: none;
 }
 
@@ -60,7 +60,7 @@
     padding: 0.4rem 0.5rem;
     max-height: 200px;
     overflow-y: auto;
-    color: var(--ci-surface-muted);
+    color: var(--text-3);
 }
 
 /* inherit log-table styles from site.css / AdminLogs.razor.css theme */
@@ -71,7 +71,7 @@
 
 .admin-audit-timeline-shell .timeline-table th {
     background: var(--bg-night-cool);
-    color: var(--link-blue);
+    color: var(--accent-text);
     font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -83,12 +83,12 @@
 .admin-audit-timeline-shell .timeline-table td {
     padding: 0.4rem 0.6rem;
     font-size: 0.85rem;
-    border-bottom: 1px solid rgba(58, 66, 85, 0.4);
+    border-bottom: 1px solid var(--border);
     vertical-align: top;
 }
 
 .admin-audit-timeline-shell .timeline-table tr:hover td {
-    background: var(--white-opacity-2xs);
+    background: var(--accent-soft);
 }
 
 /* Responsive: stack on narrow screens */
@@ -107,7 +107,7 @@
         display: flex;
         justify-content: space-between;
         gap: 0.5rem;
-        border-bottom: 1px solid rgba(58, 66, 85, 0.3);
+        border-bottom: 1px solid var(--border);
         padding: 0.3rem 0.5rem;
         font-size: 0.82rem;
     }
@@ -115,7 +115,7 @@
     .admin-audit-timeline-shell .timeline-table td::before {
         content: attr(data-label);
         font-weight: 600;
-        color: var(--link-blue);
+        color: var(--accent-text);
         min-width: 90px;
         font-size: 0.75rem;
     }

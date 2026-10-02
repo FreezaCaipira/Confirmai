@@ -10,18 +10,18 @@
     align-items: flex-start;
     gap: 1rem;
     padding-bottom: 0.85rem;
-    border-bottom: 1px solid var(--border-slate);
+    border-bottom: 1px solid var(--border);
 }
 
 .payment-receipt-title {
     margin: 0;
-    color: var(--gold);
+    color: var(--accent-text);
     font-size: 1.28rem;
 }
 
 .payment-receipt-subtitle {
     margin: 0.35rem 0 0;
-    color: var(--ci-text-blue);
+    color: var(--text);
     font-size: 0.97rem;
 }
 
@@ -34,15 +34,15 @@
 }
 
 .payment-receipt-status.paid {
-    background: rgba(46, 125, 50, 0.2);
-    color: var(--green-bright);
-    border: 1px solid rgba(46, 125, 50, 0.6);
+    background: var(--success-soft);
+    color: var(--success);
+    border: 1px solid var(--success);
 }
 
 .payment-receipt-status.pending {
-    background: rgba(255, 152, 0, 0.2);
-    color: var(--amber-warm);
-    border: 1px solid rgba(255, 152, 0, 0.6);
+    background: var(--warning-soft);
+    color: var(--warning);
+    border: 1px solid var(--warning);
 }
 
 .payment-receipt-grid {
@@ -52,11 +52,11 @@
 }
 
 .payment-receipt-card {
-    background: var(--bg-slate-warm);
-    border: 1px solid var(--border-slate);
+    background: var(--surface);
+    border: 1px solid var(--border);
     padding: 1.2rem;
     border-radius: 12px;
-    box-shadow: 0 2px 12px var(--shadow-sm);
+    box-shadow: 0 2px 12px var(--shadow);
     min-width: 0;
 }
 
@@ -71,7 +71,7 @@
 
 .payment-reference-title {
     margin: 0 0 0.9rem;
-    color: var(--gold);
+    color: var(--accent-text);
     font-size: 1.02rem;
 }
 
@@ -94,8 +94,8 @@
 
 .payment-address {
     font-family: monospace;
-    background: var(--bg-slate-warm);
-    color: var(--gold);
+    background: var(--surface);
+    color: var(--accent-text);
     border-radius: 4px;
     padding: 0.2em 0.5em;
     margin-right: 0.7em;
@@ -130,8 +130,8 @@
 }
 
 .payment-link-btn {
-    background: var(--ci-accent);
-    color: var(--white);
+    background: var(--accent);
+    color: var(--accent-fg);
     border: none;
     border-radius: 8px;
     padding: 0.6rem 1rem;
@@ -145,8 +145,8 @@
 }
 
 .payment-link-btn:hover {
-    background: var(--ci-accent-mid);
-    color: var(--white);
+    background: var(--accent);
+    color: var(--accent-fg);
 }
 
 .payment-link-text {
@@ -157,7 +157,7 @@
 }
 
 .label {
-    color: var(--gold);
+    color: var(--accent-text);
     font-weight: bold;
     width: 8.8rem;
     min-width: 8.8rem;
@@ -183,8 +183,8 @@
 
 .payment-reference-actions .payment-btn,
 .payment-reference-actions .payment-btn:visited {
-    background: var(--green-bright);
-    color: var(--white);
+    background: var(--success);
+    color: var(--accent-fg);
     border: none;
     border-radius: 8px;
     padding: 0.6rem 1rem;
@@ -199,8 +199,8 @@
 }
 
 .payment-reference-actions .payment-btn:hover {
-    background: var(--green-strong);
-    color: var(--white);
+    background: var(--success);
+    color: var(--accent-fg);
 }
 
 /* Extracted from site.css: page-specific rules */

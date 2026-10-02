@@ -296,11 +296,11 @@
                 }
 
                 <div class="form-actions">
-                    <button class="cancel-btn" type="button"
+                    <button class="btn btn-secondary" type="button"
                             @onclick='() => NavigationManager.NavigateTo($"/poker/{Id}")'>
                         @Ui["Common.Cancel"]
                     </button>
-                    <button class="save-btn save-btn--poker" type="submit" disabled="@isSaving">
+                    <button class="btn btn-primary" type="submit" disabled="@isSaving">
                         @(isSaving ? @Ui["Poker.Saving"] : @Ui["Poker.SaveChanges"])
                     </button>
                 </div>

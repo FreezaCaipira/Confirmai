@@ -151,4 +151,69 @@ public class GroupDetailIntegrationTests : IClassFixture<IntegrationTestWebAppFa
         Assert.DoesNotContain("metric-card", html);
         Assert.DoesNotContain("invite-code-display", html);
     }
+
+
+    [Fact]
+    public async Task GroupHub_Admin_IncompleteChecklist_ShowsOnboardingPanel()
+    {
+        const string adminUserId = "hub-admin-cl1";
+        var groupId = await _factory.SeedGroupWithAdminAsync(adminUserId, "Grupo Checklist");
+
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Test-UserId", adminUserId);
+        client.DefaultRequestHeaders.Add("X-Test-UserName", "admin");
+
+        var response = await client.GetAsync($"/grupo/{groupId}");
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("hub-checklist", html);
+        Assert.Contains("intent=pix", html);
+        Assert.Contains("/futsal/create?groupId=", html);
+        Assert.Contains($"/grupo/{groupId}/configuracoes", html);
+    }
+
+    [Fact]
+    public async Task GroupHub_Admin_CompleteChecklist_HidesPanel()
+    {
+        const string adminUserId = "hub-admin-cl2";
+        const string memberUserId = "hub-member-cl2";
+        var groupId = await SeedGroupAsync(adminUserId, memberUserId);
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var admin = await db.Users.FindAsync(adminUserId);
+            admin!.PixKey = "admin@pix.com";
+            await db.SaveChangesAsync();
+        }
+
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Test-UserId", adminUserId);
+        client.DefaultRequestHeaders.Add("X-Test-UserName", "admin");
+
+        var response = await client.GetAsync($"/grupo/{groupId}");
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.DoesNotContain("hub-checklist", html);
+    }
+
+    [Fact]
+    public async Task GroupHub_Member_NeverSeesChecklist()
+    {
+        const string adminUserId = "hub-admin-cl3";
+        const string memberUserId = "hub-member-cl3";
+        var groupId = await SeedGroupAsync(adminUserId, memberUserId);
+
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Test-UserId", memberUserId);
+        client.DefaultRequestHeaders.Add("X-Test-UserName", "member");
+
+        var response = await client.GetAsync($"/grupo/{groupId}");
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.DoesNotContain("hub-checklist", html);
+    }
 }

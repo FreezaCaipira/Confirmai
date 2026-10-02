@@ -42,7 +42,7 @@
 
 .my-conf-card--urgent {
     border-left-color: var(--warning);
-    border-color: var(--warning-soft);
+    border-color: var(--warning);
 }
 
 .my-conf-sport {
@@ -118,6 +118,12 @@
     font-weight: var(--fw-medium);
 }
 
+.my-conf-status--paid     { color: var(--success); }
+.my-conf-status--failed   { color: var(--danger); }
+.my-conf-status--refunded { color: var(--warning); }
+.my-conf-status--pending  { color: var(--warning); }
+.my-conf-status--info     { color: var(--accent-text); }
+
 .my-conf-actions {
     flex-shrink: 0;
     display: flex;
@@ -126,14 +132,14 @@
 }
 
 .my-conf-btn--pay {
-    background: var(--warning);
-    border-color: var(--warning);
-    color: #1a1a1a;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-fg);
 }
 
 .my-conf-btn--pay:hover {
-    filter: brightness(0.95);
-    color: #1a1a1a;
+    background: var(--accent-hover);
+    color: var(--accent-fg);
 }
 
 .my-conf-btn {

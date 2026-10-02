@@ -15,15 +15,15 @@
 .admin-revenue-label {
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
 }
 
 .admin-revenue-input {
     padding: 0.5rem 0.75rem;
-    border: 1px solid var(--ci-border);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    background: var(--ci-bg-card-deep);
-    color: var(--ci-text);
+    background: var(--surface-2);
+    color: var(--text);
     font-size: 0.9rem;
 }
 
@@ -31,8 +31,8 @@
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 8px;
-    background: var(--ci-accent);
-    color: var(--white);
+    background: var(--accent);
+    color: var(--accent-fg);
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
@@ -47,8 +47,8 @@
 }
 
 .admin-revenue-btn--secondary {
-    background: var(--slate-border-sm);
-    color: var(--ci-text);
+    background: var(--border);
+    color: var(--text);
 }
 
 .admin-revenue-summary {
@@ -58,7 +58,7 @@
 .admin-revenue-section-title {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--ci-text);
+    color: var(--text);
     margin: 0 0 1rem;
 }
 
@@ -70,8 +70,8 @@
 }
 
 .admin-revenue-card {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 1rem;
     display: flex;
@@ -80,35 +80,35 @@
 }
 
 .admin-revenue-card--highlight {
-    border-color: var(--ci-accent);
-    background: rgba(59,130,246,0.08);
+    border-color: var(--accent-text);
+    background: var(--accent-soft);
 }
 
 .admin-revenue-card--success {
-    border-color: var(--green-strong);
-    background: rgba(34,197,94,0.08);
+    border-color: var(--success);
+    background: var(--success-soft);
 }
 
 .admin-revenue-card--warning {
-    border-color: var(--orange-soft);
-    background: rgba(249,115,22,0.08);
+    border-color: var(--warning-soft);
+    background: var(--warning-soft);
 }
 
 .admin-revenue-card--error {
-    border-color: var(--red-soft);
-    background: rgba(239,68,68,0.08);
+    border-color: var(--danger);
+    background: var(--danger-soft);
 }
 
 .admin-revenue-card-label {
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
 }
 
 .admin-revenue-card-value {
     font-size: 1.2rem;
     font-weight: 700;
-    color: var(--ci-text);
+    color: var(--text);
 }
 
 .admin-revenue-breakdown {
@@ -118,13 +118,13 @@
 .admin-revenue-table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--ci-bg-card-deep);
+    background: var(--surface-2);
     border-radius: 10px;
     overflow: hidden;
 }
 
 .admin-revenue-table thead {
-    background: var(--ci-bg-deep);
+    background: var(--surface);
 }
 
 .admin-revenue-table th {
@@ -132,20 +132,20 @@
     text-align: left;
     font-size: 0.8rem;
     font-weight: 700;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
 
 .admin-revenue-table td {
     padding: 0.75rem 1rem;
-    border-top: 1px solid var(--ci-border);
+    border-top: 1px solid var(--border);
     font-size: 0.9rem;
-    color: var(--ci-text);
+    color: var(--text);
 }
 
 .admin-revenue-table tbody tr:hover {
-    background: rgba(59,130,246,0.04);
+    background: var(--accent-soft);
 }
 
 @media (max-width: 768px) {
@@ -180,7 +180,7 @@
 }
 
 .admin-revenue-section-subtitle {
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     font-size: 0.9rem;
     font-weight: 700;
     margin: 1rem 0 0.5rem 0;
@@ -189,18 +189,18 @@
 }
 
 .admin-revenue-settlement-message {
-    background: var(--ci-bg-card);
-    border: 1px solid var(--ci-border);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
-    color: var(--ci-text);
+    color: var(--text);
     font-size: 0.9rem;
 }
 
 .admin-revenue-proof-btn {
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border);
-    color: var(--ci-accent-light);
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--accent-text);
     border-radius: 4px;
     padding: 0.3rem 0.5rem;
     cursor: pointer;
@@ -208,30 +208,30 @@
 }
 
 .admin-revenue-proof-btn:hover {
-    border-color: var(--ci-accent);
-    color: var(--ci-accent);
+    border-color: var(--accent-text);
+    color: var(--accent-text);
 }
 
 .admin-revenue-btn--success {
-    border-color: var(--green-strong);
-    color: var(--green-light);
-    background: var(--green-dark);
+    border-color: var(--success);
+    color: var(--success);
+    background: var(--success);
 }
 
 .admin-revenue-btn--success:hover {
-    background: var(--green-strong);
-    color: var(--white);
+    background: var(--success);
+    color: var(--accent-fg);
 }
 
 .admin-revenue-btn--danger {
-    border-color: var(--red-strong);
-    color: var(--red-text-light);
-    background: var(--red-bg-dark);
+    border-color: var(--danger);
+    color: var(--danger);
+    background: var(--danger-soft);
 }
 
 .admin-revenue-btn--danger:hover {
-    background: var(--red-strong);
-    color: var(--white);
+    background: var(--danger);
+    color: var(--accent-fg);
 }
 
 .admin-revenue-reject-cell {
@@ -249,7 +249,7 @@
 .payment-proof-viewer {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: var(--scrim);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -267,21 +267,21 @@
     position: absolute;
     top: -2.5rem;
     right: 0;
-    background: var(--white);
+    background: var(--accent-fg);
     border: none;
     border-radius: 50%;
     width: 2rem;
     height: 2rem;
     cursor: pointer;
     font-size: 1rem;
-    color: var(--bg-dark);
+    color: var(--surface);
 }
 
 .payment-proof-img {
     max-width: 90vw;
     max-height: 80vh;
     border-radius: 8px;
-    box-shadow: 0 4px 24px var(--shadow-xl);
+    box-shadow: 0 4px 24px var(--shadow-card);
 }
 
 @media (max-width: 768px) {

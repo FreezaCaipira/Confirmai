@@ -6,24 +6,24 @@
 }
 
 .admin-profile-panel-card {
-    border: 1px solid var(--brown-border-light);
-    background: linear-gradient(180deg, var(--parchment-cream) 0%, var(--parchment-mid) 100%);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
     border-radius: 7px;
     padding: 0.64rem;
-    box-shadow: inset 0 0 0 1px rgba(255, 245, 222, 0.66);
+    box-shadow: var(--shadow);
 }
 
 .admin-profile-panel-card h3 {
     margin: 0 0 0.42rem;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.97rem;
-    color: var(--parchment-soft);
+    color: var(--surface);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     padding: 0.38rem 0.6rem;
-    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
+    background: var(--accent);
     border-radius: 4px;
-    text-shadow: 0 1px 0 rgba(33, 15, 5, 0.55);
+    text-shadow: none;
     margin: -0.64rem -0.64rem 0.5rem;
     border-radius: 7px 7px 0 0;
 }
@@ -39,7 +39,7 @@
     margin: 0;
     font-size: 0.72rem;
     font-weight: 800;
-    color: var(--brown-text);
+    color: var(--text-2);
     text-transform: uppercase;
     letter-spacing: 0.02em;
 }
@@ -48,7 +48,7 @@
     margin: 0;
     font-size: 0.82rem;
     font-weight: 700;
-    color: var(--brown-text);
+    color: var(--text-2);
     min-width: 0;
     overflow-wrap: anywhere;
 }
@@ -56,7 +56,7 @@
 .admin-profile-governance-copy {
     margin: 0 0 0.42rem;
     font-size: 0.78rem;
-    color: var(--brown-text);
+    color: var(--text-2);
     line-height: 1.34;
 }
 
@@ -89,22 +89,22 @@
 .role-toggle-info strong {
     display: block;
     font-size: 0.88rem;
-    color: var(--brown-text);
+    color: var(--text-2);
     margin-bottom: 0.12rem;
 }
 
 .role-toggle-info small {
     font-size: 0.76rem;
-    color: var(--brown-text);
+    color: var(--text-2);
 }
 
 .role-toggle-btn {
     flex-shrink: 0;
     padding: 0.35rem 0.85rem;
     border-radius: 5px;
-    border: 1.5px solid var(--amber-mid);
-    background: var(--parchment-cream);
-    color: var(--amber-dark);
+    border: 1.5px solid var(--warning);
+    background: var(--surface-2);
+    color: var(--warning);
     font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
@@ -112,17 +112,17 @@
 }
 
 .role-toggle-btn:hover:not(:disabled) {
-    background: var(--amber-warm);
+    background: var(--warning);
 }
 
 .role-toggle-btn--active {
-    background: var(--red-pale);
-    border-color: var(--red-dark);
-    color: var(--red-strong);
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--danger);
 }
 
 .role-toggle-btn--active:hover:not(:disabled) {
-    background: var(--red-pale);
+    background: var(--danger);
 }
 
 .role-toggle-btn:disabled {
@@ -135,8 +135,8 @@
 }
 
 .admin-user-stat-card {
-    border: 1px solid var(--brown-border-accent);
-    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-light) 100%);
+    border: 1px solid var(--border);
+    background: var(--surface);
     border-radius: 6px;
     padding: 0.4rem;
     display: grid;
@@ -146,13 +146,13 @@
 .admin-user-stat-label {
     font-size: 0.67rem;
     font-weight: 700;
-    color: var(--brown-text);
+    color: var(--text-2);
 }
 
 .admin-user-stat-value {
     font-size: 1rem;
     font-weight: 900;
-    color: var(--brown-text);
+    color: var(--text-2);
 }
 
 /* Outfit */
@@ -165,7 +165,7 @@
 .admin-outfit-image {
     max-width: 96px;
     image-rendering: pixelated;
-    filter: drop-shadow(0 2px 4px var(--shadow-sm));
+    filter: drop-shadow(0 2px 4px var(--shadow));
 }
 
 /* Admin extensions card */
@@ -177,8 +177,8 @@
 .action-row .mk-btn {
     min-width: 120px;
     padding: 0.44rem 1.2rem;
-    border: 2px solid var(--brown-mid);
-    border-image: linear-gradient(to bottom right, var(--gold-soft), var(--gold-dark) 40%, var(--bg-dark) 70%, var(--gold-soft)) 1;
+    border: 2px solid var(--border-2);
+    border: 1px solid var(--accent-border);
     border-radius: 0;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.88rem;
@@ -190,21 +190,21 @@
 }
 
 .action-row .mk-btn-muted {
-    background: linear-gradient(180deg, var(--parchment-mid) 0%, var(--parchment-dark) 100%);
-    color: var(--brown-text);
-    text-shadow: 0 1px 0 rgba(255, 240, 200, 0.35);
+    background: var(--surface);
+    color: var(--text-2);
+    text-shadow: none;
 }
 
 .action-row .mk-btn-secondary {
-    background: linear-gradient(180deg, var(--gold-amber) 0%, var(--gold-dark) 100%);
-    color: var(--parchment-soft);
-    text-shadow: 0 1px 0 rgba(33, 15, 5, 0.45);
+    background: var(--accent);
+    color: var(--surface);
+    text-shadow: none;
 }
 
 .action-row .mk-btn-primary {
-    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
-    color: var(--parchment-soft);
-    text-shadow: 0 1px 0 rgba(33, 15, 5, 0.55);
+    background: var(--accent);
+    color: var(--surface);
+    text-shadow: none;
 }
 
 .action-row .mk-btn:hover {

@@ -12,38 +12,39 @@
     justify-content: flex-end;
     align-items: center;
     padding-top: 1.25rem;
-    border-top: 2px solid;
-    border-image: linear-gradient(to right, var(--ci-accent), var(--ci-accent-light), var(--ci-accent)) 1;
+    border-top: 2px solid var(--accent-border);
 }
 
 .edit-cancel-btn {
-    background: linear-gradient(180deg, var(--red-soft) 0%, var(--red-strong) 50%, var(--red-border) 100%);
-    border-color: var(--red-pale);
-    box-shadow: 0 2px 4px var(--shadow-red-sm);
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    color: var(--danger);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .edit-cancel-btn:hover:not(:disabled) {
-    background: linear-gradient(180deg, var(--red-pale) 0%, var(--red-soft) 50%, var(--red-strong) 100%);
-    border-color: var(--red-pale);
-    box-shadow: 0 4px 8px var(--red-opacity-lg);
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--accent-fg);
+    box-shadow: 0 4px 8px var(--danger-soft);
 }
 
 .edit-cancel-no-btn {
-    background: var(--ci-bg-card);
-    border-color: var(--slate-mid);
-    box-shadow: 0 2px 4px var(--shadow-md);
+    background: var(--surface);
+    border-color: var(--text-3);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .edit-cancel-no-btn:hover:not(:disabled) {
-    background: var(--ci-bg-alt);
-    border-color: var(--slate-muted);
-    box-shadow: 0 4px 8px var(--shadow-lg);
+    background: var(--surface);
+    border-color: var(--text-2);
+    box-shadow: 0 4px 8px var(--shadow-card);
 }
 /* ── Input focus override (neutralize browser defaults) ─────────── */
 .edit-event-form input:focus,
 .edit-event-form select:focus,
 .edit-event-form textarea:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--green-opacity-md), inset 0 2px 4px var(--shadow-lg);
-    border-color: var(--green-light);
+    box-shadow: 0 0 0 2px var(--accent-ring);
+    border-color: var(--accent);
 }

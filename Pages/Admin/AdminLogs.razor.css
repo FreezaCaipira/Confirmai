@@ -6,7 +6,7 @@
 .admin-logs-shell .log-level-info,
 .admin-logs-shell .log-source-badge.admin-orders-review,
 .admin-logs-shell .log-table th {
-    color: var(--brown-text);
+    color: var(--text-2);
 }
 
 /* Inline history link inside message cell */
@@ -21,16 +21,16 @@
     border-radius: 4px;
     font-size: 0.78rem;
     vertical-align: middle;
-    background: var(--green);
-    color: var(--text-light);
+    background: var(--success);
+    color: var(--text);
     text-decoration: none;
     box-shadow: none;
     transition: background 0.2s ease;
 }
 
 .admin-logs-shell .logs-timeline-link:hover {
-    background: var(--green-dark);
-    color: var(--text-light);
+    background: var(--success);
+    color: var(--text);
 }
 
 .admin-logs-shell .logs-main-filter-bar {
@@ -61,8 +61,8 @@
 }
 
 .admin-logs-shell .logs-filter-group-label {
-    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
-    color: var(--parchment-light);
+    background: var(--accent);
+    color: var(--surface);
     padding: 0.3rem 0.7rem;
     border-radius: 4px;
     font-size: 0.76rem;
@@ -71,7 +71,7 @@
     text-transform: uppercase;
     min-width: auto;
     white-space: nowrap;
-    text-shadow: 0 1px 2px var(--shadow-light);
+    text-shadow: 0 1px 2px var(--shadow);
     flex-shrink: 0;
 }
 
@@ -82,7 +82,7 @@
 .admin-logs-shell .logs-total-count {
     font-size: 0.92rem;
     margin: 0.3rem 0 0.5rem;
-    color: var(--brown-text);
+    color: var(--text-2);
     text-shadow: none;
 }
 
@@ -93,16 +93,16 @@
 .admin-logs-shell .log-table-container {
     max-height: 600px;
     overflow-y: auto;
-    border: 1px solid var(--brown-border);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    background: var(--parchment);
+    background: var(--surface);
 }
 
 .admin-logs-shell .log-table th {
     padding: 0.58rem 0.5rem;
     font-size: 0.88rem;
     white-space: nowrap;
-    color: var(--gold-soft);
+    color: var(--accent-soft);
 }
 
 .admin-logs-shell .log-table td {
@@ -120,9 +120,9 @@
 }
 
 .admin-logs-shell .pagination button {
-    background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold-dark) 100%);
-    border: 1px solid var(--brown-border);
-    color: var(--brown-deep);
+    background: var(--accent);
+    border: 1px solid var(--border);
+    color: var(--surface-3);
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 700;
     border-radius: 4px;
@@ -141,47 +141,47 @@
 }
 
 .admin-logs-shell .pagination .pagination-info {
-    color: var(--brown-text-dark);
+    color: var(--text-2);
     font-weight: 800;
     font-size: 0.9rem;
 }
 
 .admin-logs-shell .orders-review-restored-notice {
     margin-bottom: 0.55rem;
-    border-left: 3px solid var(--rust);
-    background: var(--parchment-light);
-    color: var(--brown-text);
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    color: var(--text-2);
 }
 
 .admin-logs-shell .orders-review-sort-summary {
     margin-bottom: 0.3rem;
-    color: var(--brown-text);
+    color: var(--text-2);
     text-shadow: none;
 }
 
 .admin-logs-shell .orders-review-restored-close {
-    color: var(--rust);
+    color: var(--accent-text);
 }
 
 .admin-logs-shell .orders-review-restored-close:hover {
-    color: var(--rust-dark);
+    color: var(--accent-text);
 }
 
 .admin-logs-shell .log-source-badge.admin-orders-review {
-    background: var(--parchment-light);
-    border-color: var(--brown-border);
+    background: var(--surface);
+    border-color: var(--border);
 }
 
 .admin-logs-shell .evidence-link {
-    color: var(--brown-text);
+    color: var(--text-2);
 }
 
 .admin-logs-shell .evidence-link:hover {
-    color: var(--brown-deep);
+    color: var(--surface-3);
 }
 
 .admin-logs-shell .logs-empty-state {
-    color: var(--brown-text);
+    color: var(--text-2);
     font-weight: 700;
     margin: 0.2rem 0 0.9rem;
 }
@@ -195,23 +195,23 @@
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
-    color: var(--gold-soft);
+    color: var(--accent-soft);
 }
 
 .admin-logs-shell .table-sort-btn:hover,
 .admin-logs-shell .table-sort-btn.active {
-    color: var(--gold);
+    color: var(--accent-text);
 }
 
 .admin-logs-shell .logs-main-filter-bar .logs-export-btn,
 .admin-logs-shell .logs-main-filter-bar button,
 .admin-logs-shell .logs-chip-group button,
 .admin-logs-shell .filter-bar button.quick-range-btn {
-    background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold-dark) 100%);
-    color: var(--brown-deep);
-    border: 1px solid var(--brown-border);
+    background: var(--accent);
+    color: var(--surface-3);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.25), 0 2px 6px rgba(32, 18, 8, 0.18);
+    box-shadow: var(--shadow);
     text-shadow: none;
     font-weight: 800;
     font-family: Georgia, "Times New Roman", serif;
@@ -226,11 +226,11 @@
 
 .admin-logs-shell .logs-quick-range-bar .quick-range-btn.active,
 .admin-logs-shell .logs-audit-filter-bar .quick-range-btn.active {
-    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
-    color: var(--parchment-light);
-    border: 1px solid var(--rust);
-    box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.12), 0 1px 3px rgba(34, 16, 6, 0.25);
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
+    background: var(--accent);
+    color: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: var(--shadow);
+    text-shadow: 0 1px 2px none;
 }
 
 .admin-logs-shell .log-level-badge {
@@ -248,21 +248,21 @@
 }
 
 .admin-logs-shell .log-level-badge.log-level-info {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent) 100%);
-    color: var(--ci-accent-mid);
-    border-color: var(--ci-accent);
+    background: var(--accent);
+    color: var(--accent-text);
+    border-color: var(--accent-text);
 }
 
 .admin-logs-shell .log-level-badge.log-level-warning {
-    background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold-deep) 100%);
-    color: var(--brown-deep);
-    border-color: var(--gold-dark);
+    background: var(--accent-hover);
+    color: var(--surface-3);
+    border-color: var(--accent);
 }
 
 .admin-logs-shell .log-level-badge.log-level-error {
-    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
-    color: var(--parchment-soft);
-    border-color: var(--rust-dark);
+    background: var(--accent);
+    color: var(--surface);
+    border-color: var(--accent-text);
 }
 
 /* Filter sizing */
@@ -352,7 +352,7 @@
 .log-level-info,
 .log-source-badge.admin-orders-review,
 .log-table th {
-    color: var(--brown-text);
+    color: var(--text-2);
 }
 
 
@@ -384,8 +384,8 @@
 }
 
 .logs-filter-group-label {
-    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
-    color: var(--parchment-light);
+    background: var(--accent);
+    color: var(--surface);
     padding: 0.3rem 0.7rem;
     border-radius: 4px;
     font-size: 0.76rem;
@@ -394,7 +394,7 @@
     text-transform: uppercase;
     min-width: auto;
     white-space: nowrap;
-    text-shadow: 0 1px 2px var(--shadow-light);
+    text-shadow: 0 1px 2px var(--shadow);
     flex-shrink: 0;
 }
 
@@ -405,7 +405,7 @@
 .logs-total-count {
     font-size: 0.92rem;
     margin: 0.3rem 0 0.5rem;
-    color: var(--brown-text);
+    color: var(--text-2);
 }
 
 .log-table {
@@ -433,9 +433,9 @@
 }
 
 .pagination button {
-    background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold-dark) 100%);
-    border: 1px solid var(--brown-border);
-    color: var(--brown-deep);
+    background: var(--accent);
+    border: 1px solid var(--border);
+    color: var(--surface-3);
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 700;
     border-radius: 4px;
@@ -454,7 +454,7 @@
 }
 
 .pagination .pagination-info {
-    color: var(--brown-text-dark);
+    color: var(--text-2);
     font-weight: 800;
     font-size: 0.9rem;
 }
@@ -515,19 +515,19 @@
 
 .logs-total-count,
 .orders-review-sort-summary {
-    color: var(--brown-text);
+    color: var(--text-2);
     text-shadow: none;
 }
 
 .logs-empty-state {
-    color: var(--brown-text);
+    color: var(--text-2);
     font-weight: 700;
     margin: 0.2rem 0 0.9rem;
 }
 
 .log-table th,
 .table-sort-btn {
-    color: var(--gold-soft);
+    color: var(--accent-soft);
 }
 
 .table-sort-btn {
@@ -543,18 +543,18 @@
 
 .table-sort-btn:hover,
 .table-sort-btn.active {
-    color: var(--gold);
+    color: var(--accent-text);
 }
 
 .logs-main-filter-bar .logs-export-btn,
 .logs-main-filter-bar button,
 .logs-chip-group button,
 .filter-bar button.quick-range-btn {
-    background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold-dark) 100%);
-    color: var(--brown-deep);
-    border: 1px solid var(--brown-border);
+    background: var(--accent);
+    color: var(--surface-3);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.25), 0 2px 6px rgba(32, 18, 8, 0.18);
+    box-shadow: var(--shadow);
     text-shadow: none;
     font-weight: 800;
     font-family: Georgia, "Times New Roman", serif;
@@ -569,25 +569,25 @@
 
 .logs-quick-range-bar .quick-range-btn.active,
 .logs-audit-filter-bar .quick-range-btn.active {
-    background: linear-gradient(180deg, var(--rust-orange) 0%, var(--rust-dark) 100%);
-    color: var(--parchment-light);
-    border: 1px solid var(--rust);
-    box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.12), 0 1px 3px rgba(34, 16, 6, 0.25);
-    text-shadow: 0 1px 2px var(--text-shadow-sm);
+    background: var(--accent);
+    color: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: var(--shadow);
+    text-shadow: 0 1px 2px none;
 }
 
 .orders-review-restored-notice {
-    border-left: 3px solid var(--rust);
-    background: var(--parchment-light);
-    color: var(--brown-text);
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    color: var(--text-2);
 }
 
 .orders-review-restored-close {
-    color: var(--rust);
+    color: var(--accent-text);
 }
 
 .orders-review-restored-close:hover {
-    color: var(--rust-dark);
+    color: var(--accent-text);
 }
 
 .log-level-badge {
@@ -605,21 +605,21 @@
 }
 
 .log-level-badge.log-level-info {
-    background: linear-gradient(180deg, var(--ci-accent-mid) 0%, var(--ci-accent) 100%);
-    color: var(--ci-accent-mid);
-    border-color: var(--ci-accent);
+    background: var(--accent);
+    color: var(--accent-text);
+    border-color: var(--accent-text);
 }
 
 .log-level-badge.log-level-warning {
-    background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold-deep) 100%);
-    color: var(--brown-deep);
-    border-color: var(--gold-dark);
+    background: var(--accent-hover);
+    color: var(--surface-3);
+    border-color: var(--accent);
 }
 
 .log-level-badge.log-level-error {
-    background: linear-gradient(180deg, var(--rust) 0%, var(--rust-dark) 100%);
-    color: var(--parchment-soft);
-    border-color: var(--rust-dark);
+    background: var(--accent);
+    color: var(--surface);
+    border-color: var(--accent-text);
 }
 
 

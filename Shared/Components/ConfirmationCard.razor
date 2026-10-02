@@ -36,12 +36,12 @@
             }
             @if (Confirmation.PaymentStatus != EventConfirmationPaymentStatus.Pending)
             {
-                <p class="my-conf-meta my-conf-status" style="color: @PaymentStatusColor">@PaymentStatusLabel</p>
+                <p class="my-conf-meta my-conf-status @PaymentStatusClass">@PaymentStatusLabel</p>
             }
         }
         @if (ProofSent)
         {
-            <p class="my-conf-meta my-conf-status" style="color: var(--warning)">⏳ @Ui["Index.ProofSent"]</p>
+            <p class="my-conf-meta my-conf-status my-conf-status--pending">⏳ @Ui["Index.ProofSent"]</p>
         }
     </div>
     <div class="my-conf-actions">
@@ -115,12 +115,12 @@
         _ => string.Empty
     };
 
-    private string PaymentStatusColor => Confirmation.PaymentStatus switch
+    private string PaymentStatusClass => Confirmation.PaymentStatus switch
     {
-        EventConfirmationPaymentStatus.Paid => "var(--success)",
-        EventConfirmationPaymentStatus.Failed => "var(--danger)",
-        EventConfirmationPaymentStatus.Refunded => "var(--warning)",
-        EventConfirmationPaymentStatus.Expired => "var(--warning)",
-        _ => "var(--accent-text)"
+        EventConfirmationPaymentStatus.Paid => "my-conf-status--paid",
+        EventConfirmationPaymentStatus.Failed => "my-conf-status--failed",
+        EventConfirmationPaymentStatus.Refunded => "my-conf-status--refunded",
+        EventConfirmationPaymentStatus.Expired => "my-conf-status--refunded",
+        _ => "my-conf-status--info"
     };
 }

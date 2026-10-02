@@ -3,8 +3,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
+    background: var(--surface-2);
+    border: var(--border);
     border-radius: 8px;
     margin-bottom: 1rem;
 }
@@ -15,26 +15,26 @@
 
 .feat-payout-label {
     font-size: 0.875rem;
-    color: var(--ci-text-muted);
+    color: var(--text-2);
     margin-bottom: 0.25rem;
 }
 
 .feat-payout-value {
     font-size: 1rem;
-    color: var(--ci-text);
+    color: var(--text);
     font-weight: 500;
     margin-bottom: 0.25rem;
 }
 
 .feat-payout-beneficiary {
     font-size: 0.875rem;
-    color: var(--ci-text-subtle);
+    color: var(--text-3);
 }
 
 .feat-payout-edit-btn {
     padding: 0.5rem 1rem;
-    background: var(--ci-accent);
-    color: var(--ci-bg-deepest);
+    background: var(--accent);
+    color: var(--accent-fg);
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -43,7 +43,7 @@
 }
 
 .feat-payout-edit-btn:hover {
-    background: var(--ci-accent-light);
+    background: var(--accent-text);
 }
 
 .feat-payout-edit-btn:disabled {
@@ -52,8 +52,8 @@
 }
 
 .feat-payout-form {
-    background: var(--ci-bg-card-deep);
-    border: 1px solid var(--ci-border);
+    background: var(--surface-2);
+    border: var(--border);
     border-radius: 8px;
     padding: 1.5rem;
 }
@@ -65,7 +65,7 @@
 .feat-payout-label {
     display: block;
     font-size: 0.875rem;
-    color: var(--ci-text);
+    color: var(--text);
     margin-bottom: 0.5rem;
 }
 
@@ -73,10 +73,10 @@
 .feat-payout-input {
     width: 100%;
     padding: 0.625rem;
-    background: var(--ci-bg-input);
-    border: 1px solid var(--ci-border-dim);
+    background: var(--surface-3);
+    border: var(--border-2);
     border-radius: 6px;
-    color: var(--ci-text);
+    color: var(--text);
     font-size: 0.875rem;
     box-sizing: border-box;
 }
@@ -84,7 +84,7 @@
 .feat-payout-select:focus,
 .feat-payout-input:focus {
     outline: none;
-    border-color: var(--ci-accent);
+    border-color: var(--accent-text);
 }
 
 .feat-payout-actions {
@@ -96,8 +96,8 @@
 .feat-payout-test-btn {
     padding: 0.625rem 1.25rem;
     background: transparent;
-    color: var(--ci-accent);
-    border: 1px solid var(--ci-accent);
+    color: var(--accent-text);
+    border: 1px solid var(--accent);
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.875rem;
@@ -105,8 +105,8 @@
 }
 
 .feat-payout-test-btn:hover {
-    background: var(--ci-accent);
-    color: var(--ci-bg-deepest);
+    background: var(--accent);
+    color: var(--accent-fg);
 }
 
 .feat-payout-test-btn:disabled {
@@ -117,8 +117,8 @@
 .feat-payout-cancel-btn {
     padding: 0.625rem 1.25rem;
     background: transparent;
-    color: var(--ci-text-muted);
-    border: 1px solid var(--ci-border-dim);
+    color: var(--text-2);
+    border: var(--border-2);
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.875rem;
@@ -126,8 +126,8 @@
 }
 
 .feat-payout-cancel-btn:hover {
-    background: var(--ci-bg-dark);
-    color: var(--ci-text);
+    background: var(--surface);
+    color: var(--text);
 }
 
 .feat-payout-cancel-btn:disabled {
@@ -137,8 +137,8 @@
 
 .feat-payout-save-btn {
     padding: 0.625rem 1.25rem;
-    background: var(--green);
-    color: var(--white);
+    background: var(--success);
+    color: var(--accent-fg);
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -147,7 +147,7 @@
 }
 
 .feat-payout-save-btn:hover {
-    background: var(--green-light);
+    background: var(--success);
 }
 
 .feat-payout-save-btn:disabled {
@@ -159,9 +159,9 @@
     margin-top: 1rem;
     padding: 0.75rem 1rem;
     border-radius: 8px;
-    background: rgba(34, 197, 94, 0.12);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    color: #4ade80;
+    background: var(--success-soft);
+    border: 1px solid var(--success);
+    color: var(--success);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -173,13 +173,13 @@
 }
 
 .features-save-msg--error {
-    background: rgba(248, 113, 113, 0.15);
-    border-color: rgba(248, 113, 113, 0.3);
-    color: #f87171;
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    color: var(--danger);
 }
 
 .features-save-msg--error i {
-    color: #f87171;
+    color: var(--danger);
 }
 
 @media (max-width: 768px) {

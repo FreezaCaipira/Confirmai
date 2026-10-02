@@ -25,7 +25,8 @@ public class ExternalLoginIntegrationTests : IClassFixture<IntegrationTestWebApp
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var html = await response.Content.ReadAsStringAsync();
-            Assert.Contains("Entrar com Google", html);
+            Assert.Contains("google-signin-btn", html);
+            Assert.Contains("Continuar com o Google", html);
         }
         finally
         {
