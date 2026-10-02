@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -61,7 +62,15 @@ namespace Confirmai.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; } = string.Empty;
         }
 
-        public void OnGet() { }
+        public IList<AuthenticationScheme> ExternalLogins { get; set; } = [];
+
+        public string? ReturnUrl { get; set; }
+
+        public async Task OnGetAsync(string? returnUrl = null)
+        {
+            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ReturnUrl = returnUrl ?? Url.Content("~/");
+        }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -136,6 +145,8 @@ namespace Confirmai.Areas.Identity.Pages.Account
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ReturnUrl = Url.Content("~/");
             return Page();
         }
     }
