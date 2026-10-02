@@ -103,14 +103,41 @@ public sealed class FutsalCreateService
 
         await using var db = await _dbFactory.CreateDbContextAsync();
 
-        Group group;
+        // V1 manual flow: priced match needs a Pix key resolvable at the
+        // GROUP level (chosen receiver -> any admin with Pix), same rule as
+        // the payment QR. A group created inline starts with gateways off and
+        // the creator as the only admin, so the rule reduces to the creator's
+        // key and is checked before the group is persisted.
+        Group? existingGroup = null;
         if (preselectedGroup is not null)
         {
-            group = await db.Groups
+            existingGroup = await db.Groups
                 .Include(g => g.Members)
                     .ThenInclude(m => m.User)
                 .FirstOrDefaultAsync(g => g.Id == preselectedGroup.Id)
                 ?? preselectedGroup;
+        }
+
+        if (form.Price > 0 && !(existingGroup?.EnablePaymentGateways ?? false))
+        {
+            var pixKey = existingGroup is not null
+                ? EventPaymentService.GetGroupAdminPixKey(existingGroup)
+                : (await db.Users.FirstOrDefaultAsync(u => u.Id == userId))?.PixKey;
+
+            if (string.IsNullOrWhiteSpace(pixKey))
+            {
+                return new FutsalCreateResult(
+                    false,
+                    _ui["Futsal.Create.PixRequired"],
+                    "/profile/" + userId + "?intent=pix",
+                    null);
+            }
+        }
+
+        Group group;
+        if (existingGroup is not null)
+        {
+            group = existingGroup;
         }
         else
         {
@@ -134,33 +161,6 @@ public sealed class FutsalCreateService
                 UserId = userId,
                 Role = GroupMemberRole.Admin,
             });
-        }
-
-        // V1 manual flow: priced match needs a Pix key resolvable at the
-        // GROUP level (chosen receiver -> any admin with Pix), same rule as
-        // the payment QR. For a group created inline the creator is the
-        // only admin, so the rule reduces to the creator's key.
-        if (form.Price > 0 && !group.EnablePaymentGateways)
-        {
-            string? pixKey;
-            if (preselectedGroup is not null)
-            {
-                pixKey = EventPaymentService.GetGroupAdminPixKey(group);
-            }
-            else
-            {
-                var admin = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
-                pixKey = admin?.PixKey;
-            }
-
-            if (string.IsNullOrWhiteSpace(pixKey))
-            {
-                return new FutsalCreateResult(
-                    false,
-                    _ui["Futsal.Create.PixRequired"],
-                    "/profile/" + userId + "?intent=pix",
-                    null);
-            }
         }
 
         var collision = await _collisionService.FindGroupTimeCollisionAsync(group.Id, startsAt);
