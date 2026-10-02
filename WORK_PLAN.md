@@ -300,7 +300,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 | 34 | Isencao de taxa por grupo + auditoria do dinheiro + seguranca no service layer | Fase 0 (ressalvas C33): `/convite` com outcome `Joined/AlreadyMember/InvalidCode` e sem PT hardcoded no service. Fase 1: `PlatformFeeWaivedUntil`+`WaiverReason` no `Group`, `PlatformFeePolicy` unica (nenhum `ManualPlatformFeeFixed` lido fora dela), snapshot/ledger zerados, lotes R$0 fora do repasse, toggle admin em `AdminRevenue` + audit `GroupFeeWaiverChanged`. Fase 2: audit no caminho do dinheiro — `ProofUploaded/Replaced`, `Settlement*`, `GroupJoin*`, `UserProfileUpdated` (Pix), `GroupMemberAdded`. Fase 3: authz no service — `TogglePaid`/`RemoveConfirmation`/`AdminRemoveConfirmation`/`MarkPaid`/`RejectProof`/`NotifyDelinquency` verificam `GroupMemberRole.Admin`; IDOR cruzado (`conf.Event.GroupId`); ownership no upload de comprovante; magic bytes JPEG/PNG/WebP; **`UseRateLimiter` estava antes de `UseRouting` — policies por-endpoint nunca disparavam** (achado real, corrigido, teste prova 429). Fase 3b: `EventCancellationService` (guarda criador/sysadmin unificada; poker ganha admin+audit), `AdminUserService` (lock/unlock/delete/papel com ator correto — antes o log gravava o alvo; `UserRoleAssigned/Removed` existiam sem uso), convencao `/admin/*`->Authorize. 2417->2477. | #116 (impl), #117 (review) | APROVADO |
 || 35 | Design tokens + tela-piloto | `tokens.css` (paleta navy semantica: bg/surface/text/border/accent/status/space/radius/fs/fw), `DesignTokensContrastTests` (pares AA), piloto na home. | #112 | APROVADO (gate do Robson) |
 || 36-A | Grupo como porta de entrada | Home logada reorganizada (grupos primeiro, proximas partidas, historico); onboarding por empty state. Feito pelo Senior. | #113 | APROVADO |
-|| 36-B | Layout geral: header + elevacao L0-L3 | Fase 0: header alinhado, setores da home, contornos azuis, ConfirmationCard em tokens (#118). Regra de elevacao L0-L3 + `docs/design-system.md` (#119). Feito pelo Senior. Fases 2-6 pelo Pleno num PR unico: telas de partida futsal/poker + `events.css`, pagamento/repasse, Groups/Create + cookie banner + Identity + admin, botao Google (branding, excecao de hex), onboarding por empty state + Pix bloqueante no criar partida. Markup das telas migradas saiu das classes de botao legadas para `.btn` variants. Fase 7 (titulo do hero) bloqueada: depende do texto do Robson. 2570 testes. | #118, #119; branch `feat/ciclo36b-fases23` | Fases 2-6 EXECUTADO -- ver review |
+|| 36-B | Layout geral: header + elevacao L0-L3 | Fase 0: header alinhado, setores da home, contornos azuis, ConfirmationCard em tokens (#118). Regra de elevacao L0-L3 + `docs/design-system.md` (#119). Feito pelo Senior. Fases 2-6 pelo Pleno num PR unico: telas de partida futsal/poker + `events.css`, pagamento/repasse, Groups/Create + cookie banner + Identity + admin, botao Google (branding, excecao de hex), onboarding por empty state + Pix bloqueante no criar partida. Markup das telas migradas saiu das classes de botao legadas para `.btn` variants. Fase 7 (titulo do hero) bloqueada: depende do texto do Robson. 2570 testes. | #118, #119, #127 (impl) | Fases 2-6 APROVADO c/ ressalvas (Pix por grupo, aviso duplicado); Fase 7 aguarda texto do Robson |
 || 36-C | Pagamentos no escopo do grupo + carimbo de taxa | Fase 0: `PlatformFeeWaivedFrom` (janela [From,Until)) + taxa carimbada na criacao da confirmacao (ressalva de dinheiro do C34). F1: nav sem /payments (rota viva = divida registrada). F2: `GroupAccess.IsMemberAsync`, guarda em /partidas (vazava eventos de grupo privado), authz por `request.GroupId` em approve/reject, waitlist+slots com currentUserId (fecha ressalva 2 do C34). F3+F4: `/grupo/{id}/pagamentos` por papel (membro: meus pagamentos agrupados; admin: gestao + aba propria), badge no hub, banner de pendencias na home, "Pagar" no card. Senior corrigiu na review: taxa so vira receita com `Paid` (5 queries) + renovacao de isencao preserva `From`; Pleno fechou ressalva 4 (`TotalToPay` com carimbo sempre vence) + flake de timezone. 2513 testes. | #120 (plano), #121 (impl), #122 (review) | APROVADO |
 || 36-D | Elevacao e fluxo do grupo (8 pontos do Robson) | 8 fases em 1 branch: F1 botoes unificados (`components.css`, 4 variantes); F7 hub em paineis L1; F8 `GroupHeader`/`GroupSubNav` + `/partidas` elevada + breadcrumb com nome do grupo; F4 `/grupos` = gestao de participacao (`LeaveGroupAsync`, pedidos pendentes visiveis, cancelar com ownership); F2 hover na data (tooltip CSS-puro acessivel, `DateWeekday`/`DateLong`, fix UTC); F5 `/mailbox` em 3 niveis + `CssNoLegacyVarsTests` (guardiao de migrados); F6 `/profile` em paineis; F3 hero azul (unica excecao de gradiente, AA testado). 2513->2559 (+46). | #123, #125 | APROVADO (review #124; ressalva 1 fechada na #125) |
 
@@ -630,6 +630,45 @@ Zerar a allowlist do anti-hardcode em `.razor.cs`. Chaves em PT/EN/ES, paridade 
 Nao gerar diagrama de classes do dominio inteiro (ruido); nao adicionar bUnit; nao mexer em layout.
 
 ---
+
+## Review Senior do Ciclo 36-B Fases 2-6 (PR #127, mergeada na `main`) -- APROVADO c/ ressalvas
+
+**Verificado localmente na `main` (`550dc8d`)**: build Release 0 warning / 0 erro; suite 2570 = 2546 verdes + as 24 ambientais de sempre (`ProgramConfigurationTests`, `28P01` de credencial do Postgres local). CI da #127 verde. Numero bate com o declarado pelo Pleno.
+
+**Aprovado:**
+- Fases 2-4 so mexeram em CSS/markup de classe: nenhum service de pagamento/repasse/taxa no diff; os filtros `PaymentStatus == Paid` da #122/#125 continuam no `PlatformFeeLedgerService`. Pills de severidade do admin (texto `warning` sobre fundo `warning`) corrigidas -- bom achado.
+- `CssNoLegacyVarsTests` cresceu para 55+ arquivos, gradiente so no `.home-hero*`. `--scrim` mora no `tokens.css` (rgba no lugar certo).
+- Fase 5: `_GoogleSignInButton` posta para `/Account/ExternalLogin` com `provider=Google` + `returnUrl` (form tag helper gera o antiforgery); outros provedores seguem no form generico. Hex `#131314/#8E918F/#E3E3E3` sao da guideline da Google -- excecao unica, comentada. Chave nova nos 3 idiomas.
+- Fase 6: bloqueio do Pix e real (submit desabilitado + backstop no `SaveAsync`, com 4 testes); checklist so para admin, derivado dos dados, some quando completo (+3 testes); `HasAnyEvent` ignora partidas inativas.
+- Fase 7 corretamente parada: depende do texto do Robson.
+- Mojibake (`â€”`) em comentarios de `admin/site/events/event-detail/buttons.css` e **preexistente** (contagem identica antes/depois do PR) -- so comentario, limpeza opcional.
+
+**Ressalva 1 (regra, para o Pleno) -- "tem Pix" significa 3 coisas diferentes:**
+
+| Onde | Regra hoje |
+|---|---|
+| QR/pagamento (`EventPaymentService.GetGroupAdminPixKey`) | recebedor escolhido do grupo -> senao qualquer admin com Pix |
+| Checklist do hub (`Groups/Detail.razor`) | qualquer admin com Pix |
+| Criar partida (`FutsalCreateService.InitializeAsync` + `SaveAsync`) | **o usuario logado** tem Pix |
+
+Efeito: co-admin sem Pix pessoal e **bloqueado** de criar partida paga num grupo cujo QR funciona (chave do outro admin), e o hub mostra "Pix ✓" enquanto o formulario bloqueia. O backstop por usuario vem do C26; a Fase 6 so tornou a contradicao visivel. Correcao:
+```
+// FutsalCreateService (Init e SaveAsync), grupo existente:
+var groupWithUsers = db.Groups.Include(g => g.Members).ThenInclude(m => m.User) ...;
+var hasPix = !string.IsNullOrWhiteSpace(EventPaymentService.GetGroupAdminPixKey(groupWithUsers));
+// grupo novo criado inline: criador e o unico admin -> regra atual (Pix do usuario)
+```
+- `FutsalCreateInitData.AdminHasPixKey` -> `GroupHasPixKey`; o link do aviso continua no perfil do proprio usuario (`/profile/{me}?intent=pix`).
+- `Futsal.Create.PixRequired` (PT/EN/ES): "Nenhum administrador do grupo tem chave Pix. Cadastre a sua no perfil antes de criar uma partida com preco."
+- Testes em `FutsalCreatePixPrerequisiteTests`: (a) co-admin sem Pix + outro admin com Pix -> `Success`; (b) recebedor escolhido com Pix, criador sem -> `Success`; (c) nenhum admin com Pix -> erro (o atual).
+
+**Ressalva 2 (UX, para o Pleno) -- dois avisos de Pix no hub:** quando nenhum admin tem Pix, o admin ve o passo do checklist (link perfil) **e** o `detail-pix-notice` legado (`Groups/Detail.razor` ~263, link configuracoes). Sempre que o legado aparece o checklist tambem aparece (`!adminHasPix` => `!checklistDone`). Remover o bloco legado + seu CSS; manter `Group.PixNotConfigured*` so se ainda usadas em outro lugar (`Groups/Index` usa regra propria).
+
+**Menores (sem ciclo):**
+- "Convite enviado" = `Members.Count > 1` e proxy, nao prova envio -- aceito (estado derivado era requisito); o botao leva a configuracoes, onde esta o `GroupInviteBlock`.
+- Sem teste do banner/submit desabilitado no `Futsal/Create` (so o backstop do service e testado) -- cobrir junto da ressalva 1.
+- Achado do Pleno: `Register.cshtml` nao oferece Google. **Decisao do Robson** (recomendo sim: mesmo partial, cadastro em 1 clique).
+- Validacao visual 1366/390 e EN/ES em prod segue com o Robson.
 
 ## Review Senior do Ciclo 36-C (PR #121) -- APROVADO c/ 1 correcao de dinheiro aplicada pelo Senior
 
