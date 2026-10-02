@@ -177,7 +177,7 @@ internal static class FutsalTexts
         ["Futsal.Identification"] = "Identificação",
         ["Futsal.Schedule"] = "Horário",
         ["Futsal.DayOfWeek"] = "Dia da semana",
-        ["Futsal.Create.PixRequired"] = "Configure sua chave Pix no perfil antes de criar uma partida com preço.",
+        ["Futsal.Create.PixRequired"] = "Nenhum administrador do grupo tem chave Pix. Cadastre a sua no perfil antes de criar uma partida com preço.",
 
         // Futsal components (C28 migration)
         ["Futsal.WaitlistTitle"] = "Lista de espera",
@@ -365,7 +365,7 @@ internal static class FutsalTexts
         ["Futsal.Identification"] = "Identification",
         ["Futsal.Schedule"] = "Schedule",
         ["Futsal.DayOfWeek"] = "Day of the week",
-        ["Futsal.Create.PixRequired"] = "Set up your Pix key in the profile before creating a match with a price.",
+        ["Futsal.Create.PixRequired"] = "No group admin has a Pix key. Register yours in the profile before creating a match with a price.",
 
         // Futsal components (C28 migration)
         ["Futsal.WaitlistTitle"] = "Waitlist",
@@ -553,7 +553,7 @@ internal static class FutsalTexts
         ["Futsal.Identification"] = "Identificación",
         ["Futsal.Schedule"] = "Horario",
         ["Futsal.DayOfWeek"] = "Día de la semana",
-        ["Futsal.Create.PixRequired"] = "Configura tu clave Pix en el perfil antes de crear un partido con precio.",
+        ["Futsal.Create.PixRequired"] = "Ningún administrador del grupo tiene clave Pix. Registra la tuya en el perfil antes de crear un partido con precio.",
 
         // Futsal components (C28 migration)
         ["Futsal.WaitlistTitle"] = "Lista de espera",

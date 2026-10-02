@@ -42,13 +42,13 @@ public partial class Create
     private List<Venue> venues = new();
     private Venue? selectedVenue;
     private Group? preselectedGroup;
-    private bool adminHasPixKey;
+    private bool groupHasPixKey;
     private string? adminUserId;
     private bool PixRequiredBlocking =>
         form.Price > 0
         && preselectedGroup is not null
         && !preselectedGroup.EnablePaymentGateways
-        && !adminHasPixKey;
+        && !groupHasPixKey;
     private bool isLoading = true;
     private bool isSaving;
     private string saveError = string.Empty;
@@ -86,7 +86,7 @@ public partial class Create
 
         preselectedGroup = data.PreselectedGroup;
         venues = data.Venues;
-        adminHasPixKey = data.AdminHasPixKey;
+        groupHasPixKey = data.GroupHasPixKey;
         adminUserId = data.AdminUserId;
         isLoading = false;
     }
