@@ -319,4 +319,35 @@ public class FutsalCreatePixPrerequisiteTests
         Assert.NotNull(data.PreselectedGroup);
         Assert.True(data.GroupHasPixKey);
     }
+
+    [Fact]
+    public async Task SaveAsync_InlineGroup_PricedMatch_CreatorWithoutPix_DoesNotPersistGroup()
+    {
+        var ctx = SetupDb();
+        var userId = "inline-creator-no-pix";
+
+        ctx.db.Users.Add(new ApplicationUser { Id = userId, UserName = "Creator", FullName = "Creator" });
+        var venue = new Venue { Name = "Quadra", City = "SP", StateCode = "SP", IsActive = true };
+        ctx.db.Venues.Add(venue);
+        await ctx.db.SaveChangesAsync();
+
+        var form = new CreateMatchFormData
+        {
+            GroupName = "Inline sem Pix",
+            VenueId = venue.Id,
+            Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)),
+            Time = new TimeOnly(20, 0),
+            Price = 20.0m,
+            MaxPlayers = 10,
+            MaxGoalkeepers = 2,
+        };
+
+        var service = CreateService(ctx.factory, userId);
+        var result = await service.SaveAsync(form, new List<Venue> { venue }, null, "futsal");
+
+        Assert.False(result.Success);
+        Assert.Contains("intent=pix", result.CollisionHref);
+        await using var check = await ctx.factory.CreateDbContextAsync();
+        Assert.False(await check.Groups.AnyAsync(g => g.Name == "Inline sem Pix"));
+    }
 }
