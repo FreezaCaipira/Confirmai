@@ -4,6 +4,7 @@ using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Core;
 using Confirmai.Services.Events;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +14,7 @@ public sealed class FutsalCreateInitData
 {
     public Group? PreselectedGroup { get; set; }
     public List<Venue> Venues { get; set; } = new();
-    public bool AdminHasPixKey { get; set; }
+    public bool GroupHasPixKey { get; set; }
     public string? AdminUserId { get; set; }
 }
 
@@ -61,6 +62,7 @@ public sealed class FutsalCreateService
 
         var group = await db.Groups
             .Include(g => g.Members)
+                .ThenInclude(m => m.User)
             .FirstOrDefaultAsync(g => g.Id == groupId.Value
                 && g.Members.Any(m => m.UserId == userId && m.Role == GroupMemberRole.Admin));
 
@@ -73,16 +75,12 @@ public sealed class FutsalCreateService
             .ThenBy(v => v.Name)
             .ToListAsync();
 
-        var adminHasPix = userId is not null && await db.Users
-            .Where(u => u.Id == userId)
-            .Select(u => u.PixKey != null && u.PixKey != "")
-            .FirstOrDefaultAsync();
-
         return new FutsalCreateInitData
         {
             PreselectedGroup = group,
             Venues = venues,
-            AdminHasPixKey = adminHasPix,
+            GroupHasPixKey = !string.IsNullOrWhiteSpace(
+                EventPaymentService.GetGroupAdminPixKey(group)),
             AdminUserId = userId,
         };
     }
@@ -108,7 +106,11 @@ public sealed class FutsalCreateService
         Group group;
         if (preselectedGroup is not null)
         {
-            group = preselectedGroup;
+            group = await db.Groups
+                .Include(g => g.Members)
+                    .ThenInclude(m => m.User)
+                .FirstOrDefaultAsync(g => g.Id == preselectedGroup.Id)
+                ?? preselectedGroup;
         }
         else
         {
@@ -134,11 +136,24 @@ public sealed class FutsalCreateService
             });
         }
 
-        // V1 manual flow: admin must have a Pix key to create a priced match
+        // V1 manual flow: priced match needs a Pix key resolvable at the
+        // GROUP level (chosen receiver -> any admin with Pix), same rule as
+        // the payment QR. For a group created inline the creator is the
+        // only admin, so the rule reduces to the creator's key.
         if (form.Price > 0 && !group.EnablePaymentGateways)
         {
-            var admin = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (admin is null || string.IsNullOrWhiteSpace(admin.PixKey))
+            string? pixKey;
+            if (preselectedGroup is not null)
+            {
+                pixKey = EventPaymentService.GetGroupAdminPixKey(group);
+            }
+            else
+            {
+                var admin = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                pixKey = admin?.PixKey;
+            }
+
+            if (string.IsNullOrWhiteSpace(pixKey))
             {
                 return new FutsalCreateResult(
                     false,

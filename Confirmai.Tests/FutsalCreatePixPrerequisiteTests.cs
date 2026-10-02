@@ -192,4 +192,131 @@ public class FutsalCreatePixPrerequisiteTests
 
         Assert.True(result.Success);
     }
+
+
+    [Fact]
+    public async Task SaveAsync_PricedMatch_CoAdminWithoutPix_OtherAdminHasPix_Succeeds()
+    {
+        var ctx = SetupDb();
+        var creatorId = "admin-no-pix-2";
+        var receiverId = "admin-with-pix-2";
+
+        ctx.db.Users.Add(new ApplicationUser { Id = creatorId, UserName = "Creator", FullName = "Creator" });
+        ctx.db.Users.Add(TestDataFactory.CreateUserWithPixKey(receiverId, "Receiver", "receiver@pix"));
+
+        var group = TestDataFactory.CreateGroup("Test", enablePaymentGateways: false);
+        group.Sport = Sport.Futsal;
+        group.Members.Add(new GroupMember { UserId = creatorId, Role = GroupMemberRole.Admin });
+        group.Members.Add(new GroupMember { UserId = receiverId, Role = GroupMemberRole.Admin });
+        ctx.db.Groups.Add(group);
+        await ctx.db.SaveChangesAsync();
+
+        var venue = new Venue { Name = "Quadra", City = "SP", StateCode = "SP", IsActive = true };
+        ctx.db.Venues.Add(venue);
+        await ctx.db.SaveChangesAsync();
+
+        var form = new CreateMatchFormData
+        {
+            GroupName = "Test",
+            VenueId = venue.Id,
+            Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)),
+            Time = new TimeOnly(20, 0),
+            Price = 20.0m,
+            MaxPlayers = 10,
+            MaxGoalkeepers = 2,
+        };
+
+        var service = CreateService(ctx.factory, creatorId);
+        var result = await service.SaveAsync(form, new List<Venue> { venue }, group, "futsal");
+
+        Assert.True(result.Success);
+        Assert.NotNull(result.EventId);
+    }
+
+    [Fact]
+    public async Task SaveAsync_PricedMatch_ChosenReceiverWithPix_CreatorWithout_Succeeds()
+    {
+        var ctx = SetupDb();
+        var creatorId = "admin-no-pix-3";
+        var receiverId = "receiver-pix-3";
+
+        ctx.db.Users.Add(new ApplicationUser { Id = creatorId, UserName = "Creator", FullName = "Creator" });
+        ctx.db.Users.Add(TestDataFactory.CreateUserWithPixKey(receiverId, "Receiver", "receiver@pix"));
+
+        var group = TestDataFactory.CreateGroup("Test", enablePaymentGateways: false);
+        group.Sport = Sport.Futsal;
+        group.PixReceiverUserId = receiverId;
+        group.Members.Add(new GroupMember { UserId = creatorId, Role = GroupMemberRole.Admin });
+        group.Members.Add(new GroupMember { UserId = receiverId, Role = GroupMemberRole.Member });
+        ctx.db.Groups.Add(group);
+        await ctx.db.SaveChangesAsync();
+
+        var venue = new Venue { Name = "Quadra", City = "SP", StateCode = "SP", IsActive = true };
+        ctx.db.Venues.Add(venue);
+        await ctx.db.SaveChangesAsync();
+
+        var form = new CreateMatchFormData
+        {
+            GroupName = "Test",
+            VenueId = venue.Id,
+            Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)),
+            Time = new TimeOnly(20, 0),
+            Price = 20.0m,
+            MaxPlayers = 10,
+            MaxGoalkeepers = 2,
+        };
+
+        var service = CreateService(ctx.factory, creatorId);
+        var result = await service.SaveAsync(form, new List<Venue> { venue }, group, "futsal");
+
+        Assert.True(result.Success);
+        Assert.NotNull(result.EventId);
+    }
+
+
+    [Fact]
+    public async Task InitializeAsync_GroupWithoutAnyAdminPix_ReturnsGroupHasPixKeyFalse()
+    {
+        var ctx = SetupDb();
+        var adminId = "init-admin-no-pix";
+
+        ctx.db.Users.Add(new ApplicationUser { Id = adminId, UserName = "Admin", FullName = "Admin" });
+
+        var group = TestDataFactory.CreateGroup("Test", enablePaymentGateways: false);
+        group.Sport = Sport.Futsal;
+        group.Members.Add(new GroupMember { UserId = adminId, Role = GroupMemberRole.Admin });
+        ctx.db.Groups.Add(group);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx.factory, adminId);
+        var data = await service.InitializeAsync(group.Id);
+
+        Assert.NotNull(data.PreselectedGroup);
+        Assert.False(data.GroupHasPixKey);
+        Assert.Equal(adminId, data.AdminUserId);
+    }
+
+    [Fact]
+    public async Task InitializeAsync_OtherAdminWithPix_ReturnsGroupHasPixKeyTrue()
+    {
+        var ctx = SetupDb();
+        var creatorId = "init-creator-no-pix";
+        var otherAdminId = "init-other-admin-pix";
+
+        ctx.db.Users.Add(new ApplicationUser { Id = creatorId, UserName = "Creator", FullName = "Creator" });
+        ctx.db.Users.Add(TestDataFactory.CreateUserWithPixKey(otherAdminId, "Other", "other@pix"));
+
+        var group = TestDataFactory.CreateGroup("Test", enablePaymentGateways: false);
+        group.Sport = Sport.Futsal;
+        group.Members.Add(new GroupMember { UserId = creatorId, Role = GroupMemberRole.Admin });
+        group.Members.Add(new GroupMember { UserId = otherAdminId, Role = GroupMemberRole.Admin });
+        ctx.db.Groups.Add(group);
+        await ctx.db.SaveChangesAsync();
+
+        var service = CreateService(ctx.factory, creatorId);
+        var data = await service.InitializeAsync(group.Id);
+
+        Assert.NotNull(data.PreselectedGroup);
+        Assert.True(data.GroupHasPixKey);
+    }
 }

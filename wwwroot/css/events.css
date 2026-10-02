@@ -608,11 +608,6 @@
     .pending-request-meta { font-size: 0.75rem; flex-direction: column; align-items: flex-start; gap: 0.25rem; }
     .btn-approve, .btn-reject { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
     .btn-approve--sm, .btn-reject--sm, .btn-cancel--sm { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
-    .detail-pix-notice { padding: 0.75rem; }
-    .detail-pix-notice-icon { font-size: 1rem; }
-    .detail-pix-notice-body strong { font-size: 0.85rem; }
-    .detail-pix-notice-body p { font-size: 0.8rem; }
-    .detail-pix-notice-link { font-size: 0.8rem; }
 }
 
 /* -- Venue map embed ----------------------------------------------- */
@@ -937,7 +932,6 @@
 }
 
 /* -- Pix notice banner (Detail page, admin only) -------------- */
-.detail-pix-notice {
     display: flex;
     gap: 0.9rem;
     align-items: flex-start;
@@ -947,41 +941,29 @@
     padding: 0.9rem 1.1rem;
     margin-bottom: 0.25rem;
 }
-
-.detail-pix-notice-icon {
     font-size: 1.1rem;
     color: var(--warning);
     flex-shrink: 0;
     margin-top: 0.05rem;
 }
-
-.detail-pix-notice-body {
     flex: 1;
     min-width: 0;
 }
-
-.detail-pix-notice-body strong {
     display: block;
     color: var(--warning);
     font-size: 0.9rem;
     margin-bottom: 0.2rem;
 }
-
-.detail-pix-notice-body p {
     color: var(--text-2);
     font-size: 0.82rem;
     margin: 0 0 0.5rem;
     line-height: 1.45;
 }
-
-.detail-pix-notice-link {
     font-size: 0.82rem;
     font-weight: 600;
     color: var(--warning);
     text-decoration: none;
 }
-
-.detail-pix-notice-link:hover {
     color: var(--warning);
     text-decoration: underline;
 }
