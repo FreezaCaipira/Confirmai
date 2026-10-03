@@ -101,6 +101,8 @@ builder.Services.AddSingleton<BitcoinQuoteService>();
 builder.Services.AddSingleton<CryptoQuoteService>();
 builder.Services.AddSingleton<PaymentEventBus>();
 builder.Services.AddSingleton<PaymentDomainMetrics>();
+builder.Services.AddSingleton<OperationalMetrics>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler, MetricsCircuitHandler>();
 
 builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>();
 builder.Services.AddScoped<IBitcoinPaymentService, TestnetBitcoinPaymentService>();
@@ -191,6 +193,7 @@ builder.Services.AddHostedService<EventNotificationSchedulerService>();
 builder.Services.AddHostedService<EventPaymentReconciliationWorker>();
 builder.Services.AddHostedService<PendingWebhooksAlertService>();
 builder.Services.AddHostedService<PayoutRetryService>();
+builder.Services.AddHostedService<StaleSettlementMetricsService>();
 builder.Services.AddHostedService<CertificateHealthCheckService>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
 builder.Services.AddScoped<IdentityEmailSender>();
@@ -386,6 +389,7 @@ if (otelOptions.IsEnabled && Uri.IsWellFormedUriString(otelOptions.Endpoint, Uri
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
             .AddMeter(PaymentDomainMetrics.MeterName)
+            .AddMeter(OperationalMetrics.MeterName)
             .AddOtlpExporter(o =>
             {
                 o.Endpoint = new Uri(otelOptions.Endpoint);

@@ -18,6 +18,7 @@ public class PlatformFeeSettlementService
     private readonly ILogger<PlatformFeeSettlementService> _logger;
     private readonly UiTextService _ui;
     private readonly LogService _log;
+    private readonly OperationalMetrics? _ops;
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
     private static readonly string[] AllowedMimeTypes = { "image/jpeg", "image/png", "image/webp" };
 
@@ -25,8 +26,10 @@ public class PlatformFeeSettlementService
         IDbContextFactory<AppDbContext> factory,
         ILogger<PlatformFeeSettlementService> logger,
         UiTextService ui,
-        LogService log)
+        LogService log,
+        OperationalMetrics? ops = null)
     {
+        _ops = ops;
         _factory = factory;
         _logger = logger;
         _ui = ui;
@@ -47,6 +50,7 @@ public class PlatformFeeSettlementService
         if (string.IsNullOrWhiteSpace(mimeType) ||
             !AllowedMimeTypes.Contains(mimeType, StringComparer.OrdinalIgnoreCase))
         {
+            _ops?.ProofUploadRejected("mime");
             return new PlatformFeeSettlementResult
             {
                 Success = false,
@@ -56,6 +60,7 @@ public class PlatformFeeSettlementService
 
         if (fileBytes is null || fileBytes.Length == 0)
         {
+            _ops?.ProofUploadRejected("empty");
             return new PlatformFeeSettlementResult
             {
                 Success = false,
@@ -65,6 +70,7 @@ public class PlatformFeeSettlementService
 
         if (fileBytes.Length > MaxFileSizeBytes)
         {
+            _ops?.ProofUploadRejected("size");
             return new PlatformFeeSettlementResult
             {
                 Success = false,
@@ -75,6 +81,7 @@ public class PlatformFeeSettlementService
         // The declared MIME type is client-controlled — check the file signature.
         if (!ImageSignatureValidator.MatchesDeclaredType(fileBytes, mimeType))
         {
+            _ops?.ProofUploadRejected("signature");
             return new PlatformFeeSettlementResult
             {
                 Success = false,
@@ -103,6 +110,7 @@ public class PlatformFeeSettlementService
 
             if (!isGroupAdmin)
             {
+                _ops?.ProofUploadRejected("ownership");
                 return new PlatformFeeSettlementResult
                 {
                     Success = false,

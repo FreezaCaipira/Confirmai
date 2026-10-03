@@ -1,4 +1,5 @@
 using Confirmai.Configuration;
+using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
 using System.Net;
@@ -12,15 +13,18 @@ public class IdentityEmailSender : IEmailSender
     private readonly ILogger<IdentityEmailSender> _logger;
     private readonly EmailOptions _options;
     private readonly IWebHostEnvironment _environment;
+    private readonly OperationalMetrics? _ops;
 
     public IdentityEmailSender(
         ILogger<IdentityEmailSender> logger,
         IOptions<EmailOptions> options,
-        IWebHostEnvironment environment)
+        IWebHostEnvironment environment,
+        OperationalMetrics? ops = null)
     {
         _logger = logger;
         _options = options.Value;
         _environment = environment;
+        _ops = ops;
     }
 
     /// <summary>
@@ -83,7 +87,17 @@ public class IdentityEmailSender : IEmailSender
             Credentials = new NetworkCredential(_options.Username, _options.Password)
         };
 
-        await client.SendMailAsync(message);
+        try
+        {
+            await client.SendMailAsync(message);
+        }
+        catch
+        {
+            // Counter only — never tag the recipient or message content.
+            _ops?.EmailSendFailed();
+            throw;
+        }
+
         _logger.LogInformation("Identity email sent via SMTP to {Email}.", email);
     }
 
