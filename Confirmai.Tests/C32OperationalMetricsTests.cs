@@ -7,6 +7,7 @@ using Confirmai.Services.Payment;
 using Confirmai.Services.Utility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -152,7 +153,11 @@ public class C32OperationalMetricsTests
         await db.SaveChangesAsync();
 
         var metrics = new OperationalMetrics();
-        var service = new StaleSettlementMetricsService(factory, metrics,
+        var services = new ServiceCollection()
+            .AddSingleton(factory)
+            .BuildServiceProvider();
+        var service = new StaleSettlementMetricsService(
+            services.GetRequiredService<IServiceScopeFactory>(), metrics,
             new ConfigurationBuilder().Build(),
             NullLogger<StaleSettlementMetricsService>.Instance);
 

@@ -13,18 +13,18 @@ public sealed class StaleSettlementMetricsService : BackgroundService
 {
     private static readonly TimeSpan RefreshInterval = TimeSpan.FromMinutes(5);
 
-    private readonly IDbContextFactory<AppDbContext> _factory;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly OperationalMetrics _metrics;
     private readonly IConfiguration _configuration;
     private readonly ILogger<StaleSettlementMetricsService> _logger;
 
     public StaleSettlementMetricsService(
-        IDbContextFactory<AppDbContext> factory,
+        IServiceScopeFactory scopeFactory,
         OperationalMetrics metrics,
         IConfiguration configuration,
         ILogger<StaleSettlementMetricsService> logger)
     {
-        _factory = factory;
+        _scopeFactory = scopeFactory;
         _metrics = metrics;
         _configuration = configuration;
         _logger = logger;
@@ -57,7 +57,9 @@ public sealed class StaleSettlementMetricsService : BackgroundService
         var staleDays = _configuration.GetValue("Ops:StaleSettlementDays", 3);
         var cutoff = DateTime.UtcNow.AddDays(-staleDays);
 
-        await using var db = await _factory.CreateDbContextAsync(ct);
+        using var scope = _scopeFactory.CreateScope();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+        await using var db = await factory.CreateDbContextAsync(ct);
         var count = await db.PlatformFeeSettlements
             .CountAsync(s => s.Status == PlatformFeeSettlementStatus.EmAnalise
                 && s.SubmittedAt < cutoff, ct);
