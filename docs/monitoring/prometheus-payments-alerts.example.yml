@@ -11,6 +11,13 @@
 # - confirmai_webhook_warnings_total
 # - confirmai_payment_reconciliation_pending_growth_events_total
 #
+# Operational counters (C32 Fase C, meter Confirmai.Ops):
+# - confirmai_circuits_active
+# - confirmai_circuits_reconnect_total
+# - confirmai_email_send_failed_total
+# - confirmai_proof_upload_rejected_total{reason}
+# - confirmai_fee_settlements_pending_stale
+#
 # Keep this file as a template and adapt metric names to your telemetry backend.
 
 groups:
@@ -76,3 +83,50 @@ groups:
           summary: "Pendências em reconciliação estão crescendo"
           description: "A reconciliação registrou crescimento de pending em 3 ou mais varreduras nos últimos 30 minutos."
           runbook: "docs/observability-payments-runbook.md"
+
+  - name: confirmai-ops
+    interval: 30s
+    rules:
+      - alert: ConfirmaiEmailSendFailedSpike
+        expr: sum(increase(confirmai_email_send_failed_total[15m])) > 3
+        for: 5m
+        labels:
+          severity: p1
+          team: ops
+          component: email
+        annotations:
+          summary: "Falhas de envio de email SMTP"
+          description: "Mais de 3 falhas de envio de email em 15 minutos — cadastro/reset travados (RequireConfirmedEmail)."
+
+      - alert: ConfirmaiProofUploadRejectedSpike
+        expr: sum(increase(confirmai_proof_upload_rejected_total[15m])) > 20
+        for: 5m
+        labels:
+          severity: p2
+          team: ops
+          component: proof-upload
+        annotations:
+          summary: "Pico de comprovantes rejeitados"
+          description: "Mais de 20 uploads de comprovante rejeitados em 15 minutos — verificar a tag reason (mime, signature, size, ownership)."
+
+      - alert: ConfirmaiFeeSettlementStale
+        expr: confirmai_fee_settlements_pending_stale > 0
+        for: 30m
+        labels:
+          severity: p2
+          team: payments
+          component: settlement
+        annotations:
+          summary: "Repasse de taxa parado em análise"
+          description: "Existe lote de repasse EmAnalise há mais de Ops:StaleSettlementDays dias (default 3)."
+
+      - alert: ConfirmaiCircuitReconnectSpike
+        expr: sum(increase(confirmai_circuits_reconnect_total[10m])) > 30
+        for: 5m
+        labels:
+          severity: p3
+          team: ops
+          component: blazor
+        annotations:
+          summary: "Reconexões de circuito Blazor em massa"
+          description: "Mais de 30 reconexões de circuito em 10 minutos — rede ou instância instável."

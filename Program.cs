@@ -101,6 +101,8 @@ builder.Services.AddSingleton<BitcoinQuoteService>();
 builder.Services.AddSingleton<CryptoQuoteService>();
 builder.Services.AddSingleton<PaymentEventBus>();
 builder.Services.AddSingleton<PaymentDomainMetrics>();
+builder.Services.AddSingleton<OperationalMetrics>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler, MetricsCircuitHandler>();
 
 builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>();
 builder.Services.AddScoped<IBitcoinPaymentService, TestnetBitcoinPaymentService>();
@@ -191,6 +193,7 @@ builder.Services.AddHostedService<EventNotificationSchedulerService>();
 builder.Services.AddHostedService<EventPaymentReconciliationWorker>();
 builder.Services.AddHostedService<PendingWebhooksAlertService>();
 builder.Services.AddHostedService<PayoutRetryService>();
+builder.Services.AddHostedService<StaleSettlementMetricsService>();
 builder.Services.AddHostedService<CertificateHealthCheckService>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
 builder.Services.AddScoped<IdentityEmailSender>();
@@ -386,6 +389,7 @@ if (otelOptions.IsEnabled && Uri.IsWellFormedUriString(otelOptions.Endpoint, Uri
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
             .AddMeter(PaymentDomainMetrics.MeterName)
+            .AddMeter(OperationalMetrics.MeterName)
             .AddOtlpExporter(o =>
             {
                 o.Endpoint = new Uri(otelOptions.Endpoint);
@@ -503,7 +507,9 @@ app.Use(async (context, next) =>
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
         "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com; " +
-        "connect-src 'self' wss: ws: https://maps.googleapis.com; " +
+        // ws: is only needed in Development (browser link / non-TLS loopback);
+        // production Blazor Server reconnects exclusively over wss:.
+        "connect-src 'self' wss: " + (isDevelopment ? "ws: " : "") + "https://maps.googleapis.com; " +
         "frame-ancestors 'none'; " +
         "base-uri 'self'; " +
         // The external-login form posts to our own endpoint, but browsers apply

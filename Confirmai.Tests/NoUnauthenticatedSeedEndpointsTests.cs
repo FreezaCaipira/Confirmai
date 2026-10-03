@@ -31,7 +31,8 @@ public class NoUnauthenticatedSeedEndpointsTests
         var rootMappings = Regex.Matches(source, @"^app\.Map\w+\(""([^""]+)""", RegexOptions.Multiline)
             .Select(m => m.Groups[1].Value)
             .Where(route => route.Contains("seed", StringComparison.OrdinalIgnoreCase)
-                || route.Contains("debug", StringComparison.OrdinalIgnoreCase))
+                || route.Contains("debug", StringComparison.OrdinalIgnoreCase)
+                || route.StartsWith("/api/test", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         Assert.True(rootMappings.Count == 0,

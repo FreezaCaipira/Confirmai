@@ -13,14 +13,16 @@ public class PixProofUploadService
     private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly ILogger<PixProofUploadService> _logger;
     private readonly LogService _log;
+    private readonly OperationalMetrics? _ops;
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
     private static readonly string[] AllowedMimeTypes = { "image/jpeg", "image/png", "image/webp" };
 
-    public PixProofUploadService(IDbContextFactory<AppDbContext> factory, ILogger<PixProofUploadService> logger, LogService log)
+    public PixProofUploadService(IDbContextFactory<AppDbContext> factory, ILogger<PixProofUploadService> logger, LogService log, OperationalMetrics? ops = null)
     {
         _factory = factory;
         _logger = logger;
         _log = log;
+        _ops = ops;
     }
 
     /// <summary>
@@ -39,17 +41,20 @@ public class PixProofUploadService
             !AllowedMimeTypes.Contains(mimeType, StringComparer.OrdinalIgnoreCase) ||
             fileBytes is null || fileBytes.Length == 0)
         {
+            _ops?.ProofUploadRejected("mime");
             return new PixProofUploadResult { Success = false, Error = PixProofUploadError.InvalidImage };
         }
 
         if (fileBytes.Length > MaxFileSizeBytes)
         {
+            _ops?.ProofUploadRejected("size");
             return new PixProofUploadResult { Success = false, Error = PixProofUploadError.FileTooLarge };
         }
 
         // The declared MIME type is client-controlled — check the file signature.
         if (!ImageSignatureValidator.MatchesDeclaredType(fileBytes, mimeType))
         {
+            _ops?.ProofUploadRejected("signature");
             return new PixProofUploadResult { Success = false, Error = PixProofUploadError.InvalidImage };
         }
 
@@ -60,11 +65,13 @@ public class PixProofUploadService
 
             if (confirmation is null)
             {
+                _ops?.ProofUploadRejected("not_found");
                 return new PixProofUploadResult { Success = false, Error = PixProofUploadError.NotFound };
             }
 
             if (confirmation.UserId != userId)
             {
+                _ops?.ProofUploadRejected("ownership");
                 return new PixProofUploadResult { Success = false, Error = PixProofUploadError.Forbidden };
             }
 
@@ -93,11 +100,13 @@ public class PixProofUploadService
         }
         catch (IOException ex)
         {
+            _ops?.ProofUploadRejected("io");
             _logger.LogWarning(ex, "Erro de I/O ao processar upload de comprovante Pix para confirmação {ConfirmationId}", confirmationId);
             return new PixProofUploadResult { Success = false, Error = PixProofUploadError.IoError };
         }
         catch (Exception ex)
         {
+            _ops?.ProofUploadRejected("unexpected");
             _logger.LogError(ex, "Erro inesperado ao processar upload de comprovante Pix para confirmação {ConfirmationId}", confirmationId);
             return new PixProofUploadResult { Success = false, Error = PixProofUploadError.Unexpected };
         }
