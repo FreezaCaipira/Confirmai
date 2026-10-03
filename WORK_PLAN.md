@@ -119,7 +119,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Mapa de Progresso e Proximos Passos (atualizado pos-C36-E, PRs #127-#132)
+## Mapa de Progresso e Proximos Passos (atualizado pos-C32, PRs #127-#134)
 
 ### Progresso por eixo
 
@@ -127,17 +127,17 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 |---|---|---|
 | Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
 | Casos de uso / UML (C33) | **CONCLUIDO** -- `docs/uml/` (~102 UCs por ator, estados, sequencia do pagamento manual) | Manter a coluna Teste atualizada a cada ciclo. |
-| Cobertura de testes | **BOM** -- 2581 testes, integracao em **Postgres real** (C33), CI verde; `CssStructureTests` guarda todo CSS proprio (#132) | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
+| Cobertura de testes | **BOM** -- 2592 testes, integracao em **Postgres real** (C33), CI verde; `CssStructureTests` guarda todo CSS proprio (#132) | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
 | i18n PT/EN/ES | **COMPLETO** -- allowlist zerada, paridade + chaves referenciadas testadas | Validacao visual EN/ES em prod (Robson). |
 | Pagamento V1 manual + taxa + repasse | **CONCLUIDO e VALIDADO EM PRODUCAO**; taxa carimbada na confirmacao, receita so com `Paid` (#122), isencao por grupo com janela `[From,Until)` (C34/C36-C), saida do grupo bloqueada com divida (#125); regra do Pix unica no criar partida (C36-E, #131/#132) | Nada funcional. |
-| Seguranca / autorizacao | **BOM** -- authz no service (C34), `GroupAccess` membro/admin (C36-C), IDORs fechados, rate limiter corrigido, magic bytes no upload | Pen-test do caminho do dinheiro (C32 Fase A). |
+| Seguranca / autorizacao | **BOM** -- authz no service (C34), `GroupAccess` membro/admin (C36-C), IDORs fechados, rate limiter corrigido, magic bytes no upload | Nada funcional. C32 Fase A fechou o pen-test do dinheiro; `style-src 'unsafe-inline'` e risco aceito (Blazor). |
 | Auditoria | **CONCLUIDO** no caminho do dinheiro (C34) | Nada. |
 | Login/identidade | **VALIDADO EM PRODUCAO**; botao Google oficial (variante clara) no login **e** no cadastro (#129) | Rotacao de credenciais (checklist pre-producao). |
 | Produto: grupo como porta de entrada | **CONCLUIDO** (C36-A/C/D) -- home = minhas partidas, `/grupos` = gestao, hub + subnav, pagamentos no escopo do grupo | Nada. |
 | Onboarding por empty state | **CONCLUIDO** (C36-B F6 + C36-E) -- checklist do admin e o aviso unico, Pix bloqueante pela regra do grupo | Nada. |
 | Layout / design system L0-L3 | **~80%** -- header, home, hub/subnav, `/grupos`, mailbox, profile, partida futsal/poker, pagamento/repasse do grupo, Identity, admin, cookie banner migrados; 63 arquivos guardados pelo `CssNoLegacyVarsTests` | Lapidacao visual (fim da fila, passo 5): **tela do jogador pagar** (`/pagamento/evento/{id}`) ainda no visual antigo; `buttons.css`/`entity-shell.css`/`MainLayout.razor.css` ainda consomem `--ci-*`; Fase 7 (texto do hero). |
-| Pre-producao (C32) | **~50% ja coberto por ciclos anteriores** (C34 adversarial, nonce no script-src, HSTS, metricas de pagamento, `docs/production-checklist.md`, 1 TODO so) -- plano refeito so com o delta | **Proximo ciclo do Pleno.** Ver secao do Ciclo 32. |
-| WhatsApp (C31, Evolution no grupo) | **PLANEJADO** -- liberado depois do C32 (lapidacao funcional fechada no C36-E) | Fase 0 operacional do Robson (servico no EasyPanel + chip dedicado aquecido). |
+| Pre-producao (C32) | **CONCLUIDO** (PR #134, review na secao abaixo) -- pen-test do dinheiro, CSP sem `ws:` em prod, meter `Confirmai.Ops` + 4 alertas, secao EasyPanel no checklist | Fase F (telas legadas) aguarda decisao do Robson. Configurar no EasyPanel as variaveis da secao 0 do `production-checklist.md`. |
+| WhatsApp (C31, Evolution no grupo) | **PLANEJADO -- LIBERADO** (C32 fechado) | Fase 0 operacional do Robson (servico no EasyPanel + chip dedicado aquecido). |
 | Pix automatico (V2) | Codigo preservado atras do toggle | Pendencias Efi/fiscal do Robson; so depois do go-live do V1. |
 
 ### Proximos passos, em ordem
@@ -636,6 +636,28 @@ Nao gerar diagrama de classes do dominio inteiro (ruido); nao adicionar bUnit; n
 
 ---
 
+## Review Senior do Ciclo 32 (PR #134, mergeada na `main`) -- APROVADO c/ 1 correcao de doc aplicada pelo Senior
+
+**Verificacao local na `main` (`43e47bd`)**: build Release 0 warning / 0 erro; 2592 testes, 2568 verdes + as 24 `ProgramConfigurationTests` ambientais de sempre (`28P01`, credencial do Postgres local). Nenhum service de dinheiro mudou de regra: `PixProofUploadService` e `PlatformFeeSettlementService` so ganharam chamadas de metrica nos `return` de recusa; filtros `PaymentStatus == Paid` (#122) intactos.
+
+**Por fase:**
+- **A (pen-test)**: os 4 casos da spec existem e afirmam o estado depois da tentativa (status, `ReviewedByUserId`, nota de rejeicao), nao so o `Success == false` -- certo. Comprovantes HTTP sem login/sem relacao ja cobertos no C33, conferido.
+- **B (CSP)**: `ws:` so em Development/Testing (mesmo `isDevelopment` do cookie), producao so `wss:`; teste nos dois ambientes. `style-src 'unsafe-inline'` documentado como risco aceito.
+- **C (metricas)**: `MetricsCircuitHandler` so conta reconexao depois de um `OnConnectionDown` (a primeira conexao nao conta) e limpa o dicionario no fechamento -- sem vazamento. Falha SMTP relanca a excecao (comportamento preservado). Tag `reason` so com valores fixos (`mime`/`size`/`signature`/`ownership`/...), sem email, Pix ou nome de arquivo. Correcao do proprio Pleno (singleton consumindo dependencia scoped -> `IServiceScopeFactory`) esta certa.
+- **D (EasyPanel)**: secao 0 cobre o pedido. **Corrigido pelo Senior**: a linha do `ASPNETCORE_ENVIRONMENT` dizia que, sem a variavel, o app assume Development. Falso: o ASP.NET Core assume `Production`, e o `Dockerfile` ja define `Production`. O risco real e alguem setar `Development`/`Testing` no painel; a linha agora diz isso. Ajustada tambem a linha do endpoint de seed: citava `/api/test/seed-order`, que nao existe -- o real e `/api/test/seed-event-confirmations`, mapeado em Development **e** Testing. Conferido no codigo: `Email__Enabled=false` desliga `RequireConfirmedEmail` e o cadastro auto-confirma (`Register.cshtml.cs`), entao o rollback do email descrito esta certo.
+- **E (higiene)**: guardiao agora pega `/api/test`; branches listadas, nada apagado. Ok.
+
+**Ressalvas menores (sem ciclo):**
+1. `OperationalMetrics` cria o `ObservableGauge` no construtor sobre um `Meter` estatico: cada instancia registra um gauge novo. Em producao e singleton (1 gauge); so os testes criam varias -- por isso o teste do gauge usa `Assert.Contains`. Se um dia virar problema, mover o gauge para campo estatico.
+2. Em `PixProofUploadService`, arquivo vazio e contado como `reason=mime` (condicao combinada); no repasse ha `empty` separado. Cosmetico para o dashboard.
+3. `OperationalMetrics? ops = null` nos services: aceitavel (mantem os testes antigos construindo sem DI); em producao o DI sempre injeta.
+
+**Lição pro Pleno**: documento operacional e codigo -- toda afirmacao do tipo "sem X o app faz Y" precisa ser conferida no framework/`Dockerfile`, nao deduzida. Quem le o checklist no deploy confia nele.
+
+**Proximo**: C31 (Evolution) liberado, dependendo da Fase 0 operacional do Robson (servico no EasyPanel + chip dedicado aquecido). Fase F do C32 segue aguardando decisao.
+
+---
+
 ## Review Senior do Ciclo 36-E (PR #131, mergeada na `main`) -- APROVADO c/ 2 correcoes aplicadas pelo Senior
 
 **Verificacao local:** build 0 warning / 0 erro; 2581 testes (2557 verdes + as 24 `ProgramConfigurationTests` ambientais de sempre).
@@ -1115,7 +1137,7 @@ Ressalva menor (nao vira ciclo): os cancelamentos gravam em contexto proprio ant
 
 ---
 
-## Ciclo 32 (Pleno) -- Pre-producao: so o que falta (plano refeito pos-C36-E) [PLANEJADO -- EXECUTAVEL AGORA, nao depende do Robson]
+## Ciclo 32 (Pleno) -- Pre-producao: so o que falta (plano refeito pos-C36-E) [EXECUTADO -- PR #134, ver review]
 
 **Por que refeito**: o plano original (pos-C29) foi escrito antes do C33/C34/C36. Varredura do Senior na `main` pos-#132 mostrou que boa parte ja existe. Este plano lista **o que ja esta coberto (nao refazer)** e **so o delta**. Um branch, um PR, 1 commit por fase.
 

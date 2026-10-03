@@ -14,7 +14,7 @@ juntar com o "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" do `WORK_PLAN.md
 ### Variáveis de ambiente obrigatórias (efeito de cada uma faltando)
 
 - [ ] `ConnectionStrings__DefaultConnection` — sem ela o app **não sobe** (`MigrateAsync` falha no boot).
-- [ ] `ASPNETCORE_ENVIRONMENT=Production` — sem ela o app assume Development: cookies sem TLS, `AdminSeed:SyncPassword` default `true`, `ws:` na CSP, sem HTTPS redirect.
+- [ ] `ASPNETCORE_ENVIRONMENT=Production` — o `Dockerfile` já define, e sem a variável o ASP.NET Core assume `Production`. O risco real é alguém setar `Development` (ou `Testing`) no painel: cookies sem TLS, `AdminSeed:SyncPassword` default `true`, `ws:` na CSP, sem HTTPS redirect e endpoints `/api/test/*` expostos. Conferir que o valor é exatamente `Production`.
 - [ ] `AdminSeed__SyncPassword=false` — **explícito**. Em Production o default já é `false`, mas fixá-lo impede que uma cópia de config de dev reescreva a senha do admin a cada boot.
 - [ ] `AdminSeed__Email` / `AdminSeed__Password` / `AdminSeed__FullName` — sem elas nenhum admin é criado (log: "Pulando criação de usuário admin seed"). **Remover após o primeiro boot e troca de senha.**
 - [ ] `Authentication__Google__ClientId` + `Authentication__Google__ClientSecret` — sem as duas o botão do Google **some** (o `AddGoogle` não é registrado) e o login por email/senha continua funcionando. Rollback do Google = remover as variáveis.
@@ -156,7 +156,7 @@ ASPNETCORE_ENVIRONMENT=Production
 - [ ] Logs não expõem senhas, tokens ou dados pessoais (verificar `LogRetentionService` — IPs anonimizados após 30 dias, logs não-financeiros purgados após 90 dias)
 - [ ] Rate limiting ativo: o app configura `webhook` rate limiter em produção
 - [ ] Headers de segurança ativos: CSP com nonce, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` (testados via `SecurityHeadersIntegrationTests`)
-- [ ] Endpoint `/api/test/seed-order` **não está acessível** (automaticamente omitido quando `ASPNETCORE_ENVIRONMENT != Development`)
+- [ ] Endpoint `/api/test/seed-event-confirmations` **não está acessível** (só é mapeado em `Development` ou `Testing`)
 - [ ] `SeedTestUsers:Enabled` não está definido como `true` em produção
 
 ---
