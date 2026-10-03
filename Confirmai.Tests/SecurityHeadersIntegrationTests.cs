@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.AspNetCore.Hosting;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Payment;
@@ -91,6 +92,45 @@ public class SecurityHeadersIntegrationTests : IClassFixture<IntegrationTestWebA
         Assert.False(string.IsNullOrEmpty(nonceA));
         Assert.False(string.IsNullOrEmpty(nonceB));
         Assert.NotEqual(nonceA, nonceB);
+    }
+
+    /// <summary>
+    /// C32 Fase B: connect-src allows ws: (plain websocket) only in
+    /// Development/Testing — production Blazor Server reconnects over wss:.
+    /// The Testing environment counts as development, matching the cookie
+    /// policy (the test host has no TLS).
+    /// </summary>
+    [Fact]
+    public async Task ContentSecurityPolicy_DevelopmentEnvironment_AllowsWsConnectSrc()
+    {
+        using var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+
+        var response = await client.GetAsync("/about");
+
+        Assert.True(response.Headers.TryGetValues("Content-Security-Policy", out var cspValues));
+        var csp = Assert.Single(cspValues);
+        Assert.Contains("connect-src 'self' wss: ws: ", csp);
+    }
+
+    [Fact]
+    public async Task ContentSecurityPolicy_ProductionEnvironment_DropsWsConnectSrc()
+    {
+        using var prodFactory = _factory.WithWebHostBuilder(builder =>
+            builder.UseEnvironment("Production"));
+        using var client = prodFactory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+
+        var response = await client.GetAsync("/about");
+
+        Assert.True(response.Headers.TryGetValues("Content-Security-Policy", out var cspValues));
+        var csp = Assert.Single(cspValues);
+        Assert.Contains("connect-src 'self' wss: ", csp);
+        Assert.DoesNotContain("connect-src 'self' wss: ws: ", csp);
     }
 
     private static string? ExtractNonce(HttpResponseMessage response)

@@ -503,7 +503,9 @@ app.Use(async (context, next) =>
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
         "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com; " +
-        "connect-src 'self' wss: ws: https://maps.googleapis.com; " +
+        // ws: is only needed in Development (browser link / non-TLS loopback);
+        // production Blazor Server reconnects exclusively over wss:.
+        "connect-src 'self' wss: " + (isDevelopment ? "ws: " : "") + "https://maps.googleapis.com; " +
         "frame-ancestors 'none'; " +
         "base-uri 'self'; " +
         // The external-login form posts to our own endpoint, but browsers apply
