@@ -165,6 +165,10 @@ public class C32OperationalMetricsTests
         await service.RefreshOnceAsync();
         recorder.Observe();
 
-        Assert.Equal(new long[] { 1 }, recorder.Values);
+        // Each OperationalMetrics instance in the process registers its own
+        // gauge on the static meter (siblings from other tests report 0);
+        // in production there is a single singleton. What matters is the
+        // refreshed value is among the observations.
+        Assert.Contains(1L, recorder.Values);
     }
 }
