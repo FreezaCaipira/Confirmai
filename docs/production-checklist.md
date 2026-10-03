@@ -4,6 +4,43 @@ Use este documento antes de qualquer deploy em produção para garantir que todo
 
 ---
 
+## 0. EasyPanel (deploy atual)
+
+Um item verificável por linha. As seções 1+ abaixo seguem válidas como referência
+de variáveis; esta seção cobre o deploy real de hoje. Antes do go-live real,
+juntar com o "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" do `WORK_PLAN.md`
+(rotação de todas as credenciais) — este documento não o repete.
+
+### Variáveis de ambiente obrigatórias (efeito de cada uma faltando)
+
+- [ ] `ConnectionStrings__DefaultConnection` — sem ela o app **não sobe** (`MigrateAsync` falha no boot).
+- [ ] `ASPNETCORE_ENVIRONMENT=Production` — sem ela o app assume Development: cookies sem TLS, `AdminSeed:SyncPassword` default `true`, `ws:` na CSP, sem HTTPS redirect.
+- [ ] `AdminSeed__SyncPassword=false` — **explícito**. Em Production o default já é `false`, mas fixá-lo impede que uma cópia de config de dev reescreva a senha do admin a cada boot.
+- [ ] `AdminSeed__Email` / `AdminSeed__Password` / `AdminSeed__FullName` — sem elas nenhum admin é criado (log: "Pulando criação de usuário admin seed"). **Remover após o primeiro boot e troca de senha.**
+- [ ] `Authentication__Google__ClientId` + `Authentication__Google__ClientSecret` — sem as duas o botão do Google **some** (o `AddGoogle` não é registrado) e o login por email/senha continua funcionando. Rollback do Google = remover as variáveis.
+- [ ] Bloco Brevo completo: `Email__Enabled=true`, `Email__Host=smtp-relay.brevo.com`, `Email__Port=587`, `Email__UseSsl=true`, `Email__Username` (login SMTP `...@smtp-brevo.com`), `Email__Password` (**SMTP key** `xsmtpsib-...`, não API key `xkeysib-...`), `Email__FromEmail` (**sender validado na Brevo** — se divergir, a Brevo recusa o envio), `Email__FromName`. Sem `Email__Enabled=true` o `RequireConfirmedEmail` fica desligado; com sender inválido o cadastro por email **trava sem erro claro** (email nunca chega).
+- [ ] `OpenTelemetry__Endpoint` + `OpenTelemetry__Headers` (opcional) — sem elas as métricas `confirmai_*` existem mas não saem do processo.
+
+### Proxy reverso e boot
+
+- [ ] `ForwardedHeaders` ativo — o EasyPanel termina TLS no proxy; sem `X-Forwarded-Proto` o `redirect_uri` do OAuth sai em `http://` e o Google recusa (PR #98).
+- [ ] Log de boot mostra migrations aplicadas — procurar por `Migrate`/seed no log do primeiro deploy; `db.Database.MigrateAsync()` roda no startup.
+- [ ] `ASPNETCORE_URLS`/porta conforme o proxy do EasyPanel espera (app escuta HTTP interno; TLS só na borda).
+
+### Gateways de pagamento (V2 — desligados)
+
+- [ ] BTCPay, AbacatePay e Efi estão **V2 / desligados**: sem credenciais de gateway nas env vars e `EnablePaymentGateways=false` em todos os grupos (o toggle é por grupo, no banco). O caminho do dinheiro do V1 é 100% manual (Pix do admin + comprovante).
+- [ ] Webhook Efi mTLS — só quando o V2 for ativado; hoje não há endpoint esperando webhook externo de gateway.
+
+### Rollback no EasyPanel
+
+- [ ] Identificar a imagem/commit do deploy anterior (tag no EasyPanel) **antes** de deployar.
+- [ ] Rollback = redeploy da imagem/commit anterior + smoke: home abre, login por email/senha funciona, `/grupos` carrega.
+- [ ] Se a falha for no Google: remover `Authentication__Google__ClientSecret` + redeploy (o botão some, app segue).
+- [ ] Se a falha for no email: `Email__Enabled=false` + redeploy (desliga `RequireConfirmedEmail`; cadastro volta a não exigir confirmação).
+
+---
+
 ## 1. Variáveis de ambiente / User Secrets
 
 Todas as entradas marcadas como `__SET_VIA_USER_SECRETS_OR_ENV__` em `appsettings.Production.json` precisam ser definidas via variáveis de ambiente (`ASPNETCORE_*` ou via Docker env) ou via .NET User Secrets no servidor.
