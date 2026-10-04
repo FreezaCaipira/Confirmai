@@ -1,3 +1,5 @@
+@using Confirmai.Services.Core
+@inject UiTextService Ui
 @using Confirmai.Enums
 @using Confirmai.Models
 
@@ -14,7 +16,7 @@
                 <li class="player-item @(w.UserId == CurrentUserId ? "player-item--me" : "")">
                     <span class="player-num">@wIdx</span>
                     <span class="player-name">@(w.User?.FullName ?? w.User?.UserName ?? "Jogador")</span>
-                    @if (w.DesiredPosition == FutsalPosition.Goalkeeper) { <span class="player-tag">goleiro</span> }
+                    @if (w.DesiredPosition == FutsalPosition.Goalkeeper) { <span class="player-tag">@Ui["Futsal.Waitlist.GoalkeeperTag"]</span> }
                     @if (w.UserId == CurrentUserId)
                     {
                         <span class="player-tag player-tag--me">@T["Futsal.You"]</span>
@@ -22,7 +24,7 @@
                         {
                             @if (ConfirmLeaveWaitlist)
                             {
-                                <span class="player-tag player-tag--cancel-confirm">sair da fila?</span>
+                                <span class="player-tag player-tag--cancel-confirm">@Ui["Futsal.Waitlist.LeaveConfirm"]</span>
                                 <button class="player-tag player-tag--cancel-yes" type="button" @onclick="HandleLeaveWaitlist">
                                     <i class="fas fa-check"></i>
                                 </button>

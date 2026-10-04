@@ -35,7 +35,7 @@
             <div class="esc-mvp-banner">
                 <span class="esc-mvp-trophy">🏆</span>
                 <div>
-                    <p class="esc-mvp-label">Destaque</p>
+                    <p class="esc-mvp-label">@Ui["Lineup.Mvp"]</p>
                     <p class="esc-mvp-name">@mvpName</p>
                     <p class="esc-mvp-votes">@(mvp?.Count() ?? 0) votos · @voteCount/@totalVoters votaram</p>
                 </div>
@@ -47,7 +47,7 @@
                 var myVoteName = votePlayers.FirstOrDefault(p => p.UserId == MyVote.VotedForUserId)?.User?.FullName
                                  ?? votePlayers.FirstOrDefault(p => p.UserId == MyVote.VotedForUserId)?.User?.Email
                                  ?? "—";
-                <p class="esc-vote-mine"><i class="fas fa-check-circle"></i> Seu voto: <strong>@myVoteName</strong></p>
+                <p class="esc-vote-mine"><i class="fas fa-check-circle"></i> @Ui["Lineup.YourVote"] <strong>@myVoteName</strong></p>
             }
         }
         else if (MyVote is not null && !IsEditingVote)
@@ -58,7 +58,7 @@
                              ?? "—";
             <div class="esc-vote-pending">
                 <i class="fas fa-check-circle"></i>
-                <p>Seu voto: <strong>@myVoteName</strong> — aguardando mais votos…</p>
+                <p>@Ui["Lineup.YourVote"] <strong>@myVoteName</strong> — @Ui["Lineup.WaitingVotes"]</p>
                 <button class="esc-vote-change-btn" @onclick="@(() => HandleEditingVoteChanged(true))">
                     <i class="fas fa-pen"></i> Trocar
                 </button>
@@ -93,7 +93,7 @@
         }
         else
         {
-            <p class="esc-hint"><i class="fas fa-info-circle"></i> Apenas jogadores escalados podem votar.</p>
+            <p class="esc-hint"><i class="fas fa-info-circle"></i> @Ui["Lineup.OnlyLineupVotes"]</p>
         }
     </div>
 }

@@ -3,6 +3,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Core;
+using Confirmai.Services.Events;
 using Confirmai.Services.Groups;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -36,6 +37,8 @@ public partial class Index
     private List<EventConfirmation> cancelled = new();
     private List<Event> organizing = new();
     private List<PendingPaymentGroup> pendingPaymentGroups = new();
+    private DateTime localNow = DateTime.Now;
+    private HomeTodaySummary today = new(HomeGreeting.Morning, [], null, 0, 0);
 
     private bool organizesAny => myGroups.Any(g => g.IsAdmin) || organizing.Count > 0;
 
@@ -96,6 +99,13 @@ public partial class Index
                         && (e.CreatedByUserId == userId || adminGroupIds.Contains(e.GroupId)))
             .OrderBy(e => e.StartsAt)
             .ToListAsync();
+
+        var unread = await db.UserMailboxMessages
+            .AsNoTracking()
+            .CountAsync(m => m.RecipientUserId == userId && !m.IsRead && !m.IsArchivedByRecipient);
+
+        localNow = DateTime.Now;
+        today = HomeToday.Build(upcoming, organizing, pendingPaymentGroups.Sum(p => p.Count), unread, localNow);
 
         isLoading = false;
     }

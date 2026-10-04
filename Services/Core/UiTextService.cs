@@ -226,7 +226,7 @@ public sealed class UiTextService
     /// - DateDefault: "dd/MM" (e.g., "15/03")
     /// - TimeDefault: "HH:mm" (e.g., "14:30")
     /// - DateTimeDefault: "dd/MM HH:mm" (e.g., "15/03 14:30")
-    /// - DateTimeFullShort: "ddd, dd/MM HH:mm" (e.g., "Sat, 15/03 14:30")
+    /// - DateTimeFullShort: "ddd, dd/MM HH:mm" (i18n abbreviated weekday, e.g., "sáb., 15/03 14:30")
     /// - DateTimeShortCompact: "dd/MM/yy HH:mm" (e.g., "15/03/26 14:30")
     /// - DateTimeFull: "dd/MM/yyyy 'às' HH:mm" (i18n — "at" in EN, "a las" in ES)
     /// - DateTimeFullLong: "dddd, dd/MM/yyyy 'às' HH:mm" (i18n, with weekday)
@@ -269,7 +269,7 @@ public sealed class UiTextService
         };
 
         // Formats with weekday/month names use the current language's culture
-        var culture = formatKey is "DateTimeFullLong" or "DateLong" or "DateWeekday"
+        var culture = formatKey is "DateTimeFullShort" or "DateTimeFullLong" or "DateLong" or "DateWeekday"
             ? _language.SelectedLanguage switch
             {
                 "en-US" => new CultureInfo("en-US"),

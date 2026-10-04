@@ -10,7 +10,7 @@
             <input class="esc-team-name-input esc-team-name-input--a"
                    @bind="TeamAName" @bind:event="oninput"
                    @onblur="HandleSaveTeamNames"
-                   maxlength="50" placeholder="Time A" />
+                   maxlength="50" placeholder="@Ui["Lineup.TeamA"]" />
         }
         else
         {
@@ -22,7 +22,7 @@
                 <li class="esc-player esc-player--gk @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
                     <i class="fas fa-hand-paper esc-player-icon"></i>
                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
-                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
+                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ @Ui["Lineup.Mvp"]</span> }
                 </li>
             }
             @{ int numA = 1; }
@@ -31,7 +31,7 @@
                 <li class="esc-player @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
                     <span class="esc-player-num">@(numA++)</span>
                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
-                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
+                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ @Ui["Lineup.Mvp"]</span> }
                 </li>
             }
         </ul>
@@ -43,7 +43,7 @@
             <input class="esc-team-name-input esc-team-name-input--b"
                    @bind="TeamBName" @bind:event="oninput"
                    @onblur="HandleSaveTeamNames"
-                   maxlength="50" placeholder="Time B" />
+                   maxlength="50" placeholder="@Ui["Lineup.TeamB"]" />
         }
         else
         {
@@ -55,7 +55,7 @@
                 <li class="esc-player esc-player--gk @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
                     <i class="fas fa-hand-paper esc-player-icon"></i>
                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
-                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
+                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ @Ui["Lineup.Mvp"]</span> }
                 </li>
             }
             @{ int numB = 1; }
@@ -64,7 +64,7 @@
                 <li class="esc-player @(MvpRevealed && c.UserId == MvpUserId ? "esc-player--mvp" : "")">
                     <span class="esc-player-num">@(numB++)</span>
                     <span class="esc-player-name">@(c.User.FullName ?? c.User.Email)</span>
-                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ Destaque</span> }
+                    @if (MvpRevealed && c.UserId == MvpUserId) { <span class="esc-player-mvp-tag">⭐ @Ui["Lineup.Mvp"]</span> }
                 </li>
             }
         </ul>

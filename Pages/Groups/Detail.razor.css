@@ -26,7 +26,7 @@
 
 .hub-action:hover {
     background: var(--surface-3);
-    border-color: var(--accent-border);
+    border-color: var(--feat-border, var(--accent-border));
 }
 
 .hub-action:focus-visible {
@@ -41,8 +41,8 @@
     width: 40px;
     height: 40px;
     border-radius: var(--radius-sm);
-    background: var(--accent-soft);
-    color: var(--accent-text);
+    background: var(--feat-soft, var(--accent-soft));
+    color: var(--feat, var(--accent-text));
     font-size: 1rem;
     flex-shrink: 0;
 }

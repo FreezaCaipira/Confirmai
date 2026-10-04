@@ -41,8 +41,8 @@
     height: 36px;
     flex-shrink: 0;
     border-radius: var(--radius-full);
-    background: var(--accent-soft);
-    color: var(--accent-text);
+    background: var(--feat-soft, var(--accent-soft));
+    color: var(--feat, var(--accent-text));
     font-size: 1rem;
 }
 
@@ -154,4 +154,22 @@
     border-radius: var(--radius-sm);
     color: var(--warning);
     font-size: 0.875rem;
+}
+
+@media (max-width: 480px) {
+    .group-row {
+        flex-wrap: wrap;
+    }
+
+    .group-row-body {
+        flex: 1 1 calc(100% - 36px - var(--space-3));
+    }
+
+    .group-row-badges {
+        margin-left: calc(36px + var(--space-3));
+    }
+
+    .group-row-actions {
+        margin-left: auto;
+    }
 }

@@ -1,16 +1,18 @@
+@using Confirmai.Services.Core
+@inject UiTextService Ui
 @using Confirmai.Pages.Futsal
 
 <fieldset class="form-section">
-    <legend>Vagas</legend>
+    <legend>@Ui["FutsalForm.Slots"]</legend>
 
     <div class="form-row-2">
         <div class="form-group">
-            <label>Vagas totais (linha + goleiros) <span class="required">*</span></label>
+            <label>@Ui["FutsalForm.SlotsTotal"] <span class="required">*</span></label>
             <InputNumber class="input" @bind-Value="@Form.MaxPlayers" min="1" max="100" />
             <ValidationMessage For="@(() => Form.MaxPlayers)" class="validation-message" />
         </div>
         <div class="form-group">
-            <label>Goleiros</label>
+            <label>@Ui["FutsalForm.Goalkeepers"]</label>
             <InputNumber class="input" @bind-Value="@Form.MaxGoalkeepers" min="0" max="10" disabled="@Form.RotateInGoal" />
         </div>
     </div>

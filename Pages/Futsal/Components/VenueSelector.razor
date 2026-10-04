@@ -1,11 +1,13 @@
+@using Confirmai.Services.Core
+@inject UiTextService Ui
 @using Confirmai.Enums
 @using Confirmai.Models
 
 <fieldset class="form-section">
-    <legend>Local</legend>
+    <legend>@Ui["FutsalForm.Venue"]</legend>
 
     <div class="form-group">
-        <label>Quadra / Society / Campo <span class="required">*</span></label>
+        <label>@Ui["FutsalForm.VenueLabel"] <span class="required">*</span></label>
         @if (!Venues.Any())
         {
             <p class="form-hint form-hint--warn">
@@ -15,7 +17,7 @@
         else
         {
             <select class="input" @onchange="HandleVenueChanged">
-                <option value="0" selected="@(SelectedVenueId == 0)">— Selecione a quadra —</option>
+                <option value="0" selected="@(SelectedVenueId == 0)">@Ui["FutsalForm.VenueSelect"]</option>
                 @foreach (var v in Venues)
                 {
                     <option value="@v.Id" selected="@(v.Id == SelectedVenueId)">@v.Name (@VenueTypeLabel(v.Type)) — @v.City/@v.StateCode</option>

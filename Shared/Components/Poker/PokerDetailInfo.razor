@@ -6,26 +6,26 @@
     @if (Ev.PokerEventType == PokerEventType.Tournament)
     {
         <section class="detail-section">
-            <h2 class="detail-section-title">Estrutura</h2>
+            <h2 class="detail-section-title">@Ui["PokerInfo.Structure"]</h2>
             <div class="poker-details-grid">
                 @if (Ev.Modality.HasValue)
                 {
                     <div class="poker-detail-item">
-                        <span class="poker-detail-label">Modalidade</span>
+                        <span class="poker-detail-label">@Ui["PokerInfo.Format"]</span>
                         <span class="poker-detail-value">@ModalityLabel(Ev.Modality.Value)</span>
                     </div>
                 }
                 @if (Ev.StartingStack.HasValue)
                 {
                     <div class="poker-detail-item">
-                        <span class="poker-detail-label">Fichas iniciais</span>
+                        <span class="poker-detail-label">@Ui["PokerInfo.StartingChips"]</span>
                         <span class="poker-detail-value">@Ev.StartingStack.Value.ToString("N0")</span>
                     </div>
                 }
                 @if (Ev.InitialBlindBB.HasValue)
                 {
                     <div class="poker-detail-item">
-                        <span class="poker-detail-label">Blind inicial</span>
+                        <span class="poker-detail-label">@Ui["PokerInfo.StartingBlind"]</span>
                         <span class="poker-detail-value">@Ev.InitialBlindBB.Value BB</span>
                     </div>
                 }
@@ -66,7 +66,7 @@
                 @if (Ev.RebuyDoubleAmount.HasValue)
                 {
                     <div class="poker-detail-item">
-                        <span class="poker-detail-label">Rebuy duplo</span>
+                        <span class="poker-detail-label">@Ui["PokerInfo.DoubleRebuy"]</span>
                         <span class="poker-detail-value">R$ @Ev.RebuyDoubleAmount.Value.ToString("N2")</span>
                     </div>
                 }
@@ -80,7 +80,7 @@
                 @if (Ev.AddonDoubleAmount.HasValue)
                 {
                     <div class="poker-detail-item">
-                        <span class="poker-detail-label">Add-on duplo</span>
+                        <span class="poker-detail-label">@Ui["PokerInfo.DoubleAddon"]</span>
                         <span class="poker-detail-value">R$ @Ev.AddonDoubleAmount.Value.ToString("N2")</span>
                     </div>
                 }
@@ -95,7 +95,7 @@
                 @if (Ev.Modality.HasValue)
                 {
                     <div class="poker-detail-item">
-                        <span class="poker-detail-label">Modalidade</span>
+                        <span class="poker-detail-label">@Ui["PokerInfo.Format"]</span>
                         <span class="poker-detail-value">@ModalityLabel(Ev.Modality.Value)</span>
                     </div>
                 }
@@ -117,7 +117,7 @@
             @if (!string.IsNullOrWhiteSpace(Ev.CashIncludes))
             {
                 <div class="cash-includes-block">
-                    <span class="cash-includes-label"><i class="fas fa-gift"></i> Incluso:</span>
+                    <span class="cash-includes-label"><i class="fas fa-gift"></i> @Ui["PokerInfo.Included"]</span>
                     <span class="cash-includes-value">@Ev.CashIncludes</span>
                 </div>
             }
@@ -127,7 +127,7 @@
     {
         <div class="homegame-unlocked-notice">
             <i class="fas fa-unlock"></i>
-            <span>Acesso concedido. Bem-vindo ao home game!</span>
+            <span>@Ui["PokerInfo.AccessGranted"]</span>
         </div>
     }
 </div>

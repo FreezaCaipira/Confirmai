@@ -1,0 +1,126 @@
+@using Confirmai.Enums
+@using Confirmai.Services.Core
+@using Confirmai.Services.Events
+@using Confirmai.Services.Groups
+@inject UiTextService Ui
+
+<section class="panel today-panel" aria-labelledby="today-title">
+    <div class="today-head">
+        <div>
+            <h2 id="today-title" class="today-greeting">@Ui[GreetingKey]</h2>
+            <p class="today-date">@Ui.FormatDateTime(LocalNow, "DateLong")</p>
+        </div>
+    </div>
+
+    <div class="today-tiles">
+        <a class="today-tile feat--matches" href="@MatchesHref">
+            <span class="feat-icon" aria-hidden="true"><i class="fas fa-calendar-day"></i></span>
+            <span class="today-tile-body">
+                <span class="today-tile-value">@Summary.Today.Count</span>
+                <span class="today-tile-label">@Ui["Index.TodayMatches"]</span>
+                <span class="today-tile-sub">@NextText</span>
+            </span>
+        </a>
+
+        <a class="today-tile feat--payments @(Summary.PendingPayments > 0 ? "today-tile--alert" : string.Empty)" href="@PaymentsHref">
+            <span class="feat-icon" aria-hidden="true"><i class="fas fa-money-bill-wave"></i></span>
+            <span class="today-tile-body">
+                <span class="today-tile-value">@Summary.PendingPayments</span>
+                <span class="today-tile-label">@Ui["Index.PendingPaymentsTitle"]</span>
+                <span class="today-tile-sub">@PendingText</span>
+            </span>
+        </a>
+
+        <a class="today-tile feat--settings" href="/mailbox">
+            <span class="feat-icon" aria-hidden="true"><i class="fas fa-envelope"></i></span>
+            <span class="today-tile-body">
+                <span class="today-tile-value">@Summary.UnreadMessages</span>
+                <span class="today-tile-label">@Ui["Index.TodayUnread"]</span>
+                <span class="today-tile-sub">@Ui["Index.TodayOpenMailbox"]</span>
+            </span>
+        </a>
+    </div>
+
+    @if (Summary.Today.Count > 0)
+    {
+        <ul class="today-list" aria-label="@Ui["Index.TodayMatches"]">
+            @foreach (var m in Summary.Today)
+            {
+                <li>
+                    <a class="today-item" href="@DetailHref(m)">
+                        <span class="today-item-time">@m.StartsLocal.ToString("HH:mm")</span>
+                        <span class="today-item-name">@m.GroupName</span>
+                        @if (m.Organizing)
+                        {
+                            <span class="today-item-tag">@Ui["Index.TodayOrganizing"]</span>
+                        }
+                        <i class="fas fa-chevron-right today-item-chevron" aria-hidden="true"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
+    <div class="today-tip" role="note">
+        <span class="today-tip-icon" aria-hidden="true"><i class="fas fa-lightbulb"></i></span>
+        <div class="today-tip-body">
+            <span class="today-tip-title">@Ui["Index.TipTitle"]</span>
+            <p class="today-tip-text">@Ui[TipKeys[tipIndex]]</p>
+        </div>
+        <div class="today-tip-nav">
+            <button type="button" class="btn btn-ghost btn-sm" aria-label="@Ui["Index.TipPrev"]" @onclick="PrevTip">
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            </button>
+            <span class="today-tip-count">@(tipIndex + 1)/@HomeToday.TipCount</span>
+            <button type="button" class="btn btn-ghost btn-sm" aria-label="@Ui["Index.TipNext"]" @onclick="NextTip">
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public HomeTodaySummary Summary { get; set; } = default!;
+    [Parameter] public DateTime LocalNow { get; set; }
+    [Parameter] public IReadOnlyList<PendingPaymentGroup> PendingGroups { get; set; } = [];
+    [Parameter] public int FallbackGroupId { get; set; }
+
+    private static readonly string[] TipKeys =
+    [
+        "Index.Tip1",
+        "Index.Tip2",
+        "Index.Tip3",
+        "Index.Tip4",
+        "Index.Tip5",
+    ];
+
+    private int tipIndex;
+
+    protected override void OnInitialized() => tipIndex = HomeToday.TipOfTheDay(LocalNow);
+
+    private string GreetingKey => Summary.Greeting switch
+    {
+        HomeGreeting.Morning   => "Index.GreetingMorning",
+        HomeGreeting.Afternoon => "Index.GreetingAfternoon",
+        _                      => "Index.GreetingEvening",
+    };
+
+    private string NextText => Summary.Next is { } next
+        ? Ui.Get("Index.TodayNext", $"{Ui.FormatDateTime(next.StartsLocal, "DateWeekday")} {next.StartsLocal:HH:mm}")
+        : Ui["Index.TodayNoUpcoming"];
+
+    private string MatchesHref => Summary.Next is { } next ? DetailHref(next) : "/grupos";
+
+    private string PaymentsHref => $"/grupo/{PendingGroups.FirstOrDefault()?.GroupId ?? FallbackGroupId}/pagamentos";
+
+    private string PendingText => PendingGroups.Count > 0
+        ? string.Join(", ", PendingGroups.Select(g => $"{g.GroupName} ({g.Count})"))
+        : Ui["Index.TodayAllPaid"];
+
+    private static string DetailHref(HomeTodayMatch m) =>
+        m.Sport == Sport.Poker ? $"/poker/{m.EventId}" : $"/futsal/{m.EventId}";
+
+    private void PrevTip() => tipIndex = (tipIndex + HomeToday.TipCount - 1) % HomeToday.TipCount;
+
+    private void NextTip() => tipIndex = (tipIndex + 1) % HomeToday.TipCount;
+}

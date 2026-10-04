@@ -9,7 +9,7 @@
     <div class="payment-overlay" @onclick="async () => await OnClose.InvokeAsync()">
         <div class="payment-modal" @onclick:stopPropagation="true">
             <div class="payment-modal-header">
-                <h2 class="payment-modal-title"><i class="fas fa-money-bill-wave"></i> Pagamentos</h2>
+                <h2 class="payment-modal-title"><i class="fas fa-money-bill-wave"></i> @Ui["PaymentsModal.Title"]</h2>
                 <button class="payment-close-btn" type="button" @onclick="async () => await OnClose.InvokeAsync()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -41,7 +41,7 @@
 
             @if (IsLoadingPayments)
             {
-                <div class="payment-loading"><i class="fas fa-spinner fa-spin"></i> Carregando…</div>
+                <div class="payment-loading"><i class="fas fa-spinner fa-spin"></i> @Ui["PaymentsModal.Loading"]</div>
             }
             else if (PaymentTab == "history")
             {
@@ -127,7 +127,7 @@
                             <div class="payment-notify-actions" @onclick:stopPropagation="true">
                                 @if (NotifiedUserIds?.Contains(userId) == true)
                                 {
-                                    <span class="payment-notified-badge"><i class="fas fa-check"></i> Notificado</span>
+                                    <span class="payment-notified-badge"><i class="fas fa-check"></i> @Ui["PaymentsModal.Notified"]</span>
                                 }
                                 else if (NotifyingUserId == userId)
                                 {
@@ -141,7 +141,7 @@
                                         <i class="fas fa-envelope"></i>
                                     </button>
                                     <button class="payment-notify-btn payment-notify-btn--whatsapp" type="button"
-                                            title="Cobrar via WhatsApp"
+                                            title="@Ui["PaymentsModal.ChargeWhatsApp"]"
                                             @onclick="@(e => OpenWhatsAppHandler(d))">
                                         <i class="fab fa-whatsapp"></i>
                                     </button>

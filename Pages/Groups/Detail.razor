@@ -123,14 +123,14 @@ else
                 @* ── Ações do grupo ──────────────────────────────────── *@
                 <section class="panel hub-actions-panel" aria-label="@Ui["Group.ActionsLabel"]">
                     <div class="hub-actions">
-                        <a class="hub-action" href="/grupo/@group.Id/partidas">
+                        <a class="hub-action feat--matches" href="/grupo/@group.Id/partidas">
                             <span class="hub-action-icon"><i class="fas fa-calendar-alt"></i></span>
                             <span class="hub-action-text">
                                 <span class="hub-action-label">@Ui["Group.PartidasLink"]</span>
                                 <span class="hub-action-sub">@upcomingEventsCount @Ui["Group.Upcoming"]</span>
                             </span>
                         </a>
-                        <a class="hub-action" href="/grupo/@group.Id/pagamentos">
+                        <a class="hub-action feat--payments" href="/grupo/@group.Id/pagamentos">
                             <span class="hub-action-icon"><i class="fas fa-money-bill-wave"></i></span>
                             <span class="hub-action-text">
                                 <span class="hub-action-label">@Ui["Group.PaymentsLink"]</span>
@@ -148,7 +148,7 @@ else
                         </a>
                         @if (group.EnablePostMatchRanking)
                         {
-                            <a class="hub-action" href="/grupo/@group.Id/ranking">
+                            <a class="hub-action feat--ranking" href="/grupo/@group.Id/ranking">
                                 <span class="hub-action-icon"><i class="fas fa-trophy"></i></span>
                                 <span class="hub-action-text">
                                     <span class="hub-action-label">@Ui["Group.RankingLink"]</span>
@@ -158,14 +158,14 @@ else
                         }
                         @if (isAdmin)
                         {
-                            <a class="hub-action" href="/grupo/@group.Id/configuracoes">
+                            <a class="hub-action feat--settings" href="/grupo/@group.Id/configuracoes">
                                 <span class="hub-action-icon"><i class="fas fa-cog"></i></span>
                                 <span class="hub-action-text">
                                     <span class="hub-action-label">@Ui["Group.Settings"]</span>
                                     <span class="hub-action-sub">@Ui["Group.SettingsSub"]</span>
                                 </span>
                             </a>
-                            <button class="hub-action" type="button"
+                            <button class="hub-action feat--invite" type="button"
                                     @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
                                 <span class="hub-action-icon"><i class="fab fa-whatsapp"></i></span>
                                 <span class="hub-action-text">
@@ -178,7 +178,7 @@ else
                 </section>
 
                 @* ── Próxima partida ───────────────────────────────── *@
-                <section class="panel">
+                <section class="panel feat--matches">
                     <div class="panel-head">
                         <h2 class="panel-title">
                             <i class="fas fa-calendar-day"></i> @Ui["Group.NextMatch"]
@@ -273,7 +273,7 @@ else
                 }
 
                 @* ── Membros + pedidos de entrada ────────────────────── *@
-                <section class="panel">
+                <section class="panel feat--members">
                     <div class="panel-head">
                         <h2 class="panel-title">
                             <i class="fas fa-users"></i> @Ui["Group.Members"] (@group.Members.Count)

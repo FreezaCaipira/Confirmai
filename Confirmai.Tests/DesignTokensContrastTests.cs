@@ -72,6 +72,14 @@ public class DesignTokensContrastTests
     [InlineData("text", "accent-hover", 4.5)]
     [InlineData("accent-text", "bg", 4.5)]
     [InlineData("accent-text", "surface", 4.5)]
+    [InlineData("feat-matches", "surface-2", 4.5)]
+    [InlineData("feat-payments", "surface-2", 4.5)]
+    [InlineData("feat-members", "surface-2", 4.5)]
+    [InlineData("feat-ranking", "surface-2", 4.5)]
+    [InlineData("feat-settings", "surface-2", 4.5)]
+    [InlineData("feat-attendance", "surface-2", 4.5)]
+    [InlineData("feat-invite", "surface-2", 4.5)]
+    [InlineData("text-3", "surface-3", 4.5)]
     public void Tokens_MeetAaContrast(string fg, string bg, double minimum)
     {
         var tokens = LoadTokens();

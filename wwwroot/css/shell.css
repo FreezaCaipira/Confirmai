@@ -296,7 +296,10 @@ body .oldsite-widget h3 {
     padding: var(--space-3) var(--space-4);
     background: transparent;
     border-bottom: 1px solid var(--border);
+    border-left: none;
     color: var(--text);
+    font-family: var(--font);
+    letter-spacing: 0;
     text-transform: none;
     font-size: 0.875rem;
     font-weight: var(--fw-medium);
@@ -342,12 +345,29 @@ body .oldsite-footer {
 
 /* -- Breadcrumb -------------------------------------------------- */
 body .breadcrumb-nav {
+    justify-content: flex-start;
+    gap: var(--space-1);
+    margin: 0 0 var(--space-4);
+    font-family: var(--font);
     font-size: 0.8125rem;
+    letter-spacing: 0;
     color: var(--text-3);
 }
 
 body .breadcrumb-nav a {
+    padding: 0;
     color: var(--accent-text);
+    font-weight: var(--fw-medium);
+}
+
+body .breadcrumb-current {
+    color: var(--text-2);
+    font-weight: var(--fw-medium);
+    opacity: 1;
+}
+
+body .breadcrumb-sep {
+    color: var(--text-3);
 }
 
 body .breadcrumb-nav a:hover {

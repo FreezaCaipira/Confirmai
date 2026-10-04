@@ -35,8 +35,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--accent-soft);
-    color: var(--accent-text);
+    background: var(--feat-members-soft);
+    color: var(--feat-members);
     font-size: 0.75rem;
     font-weight: var(--fw-semibold);
 }

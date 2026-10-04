@@ -300,6 +300,53 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
+    width: 100%;
+    min-width: 0;
+}
+
+/* Sub-nav do grupo rola na horizontal em vez de estourar o painel. */
+.seg-toggle.group-subnav {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.group-subnav .seg-item {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Telas do grupo ocupam a coluna inteira, alinhadas ao ticker/header. */
+.detail-page:has(> .hub-stack) {
+    display: block;
+    padding: 0;
+}
+
+/* --------------------------------------------------------------------------
+   .feat--* — cor por feature (docs/design-system.md §7). Define --feat,
+   --feat-soft e --feat-border para o bloco; icones, filete do painel e
+   hover dos cards herdam. Nunca pinta botao nem superficie grande.
+   -------------------------------------------------------------------------- */
+
+.feat--matches    { --feat: var(--feat-matches);    --feat-soft: var(--feat-matches-soft);    --feat-border: var(--feat-matches-border); }
+.feat--payments   { --feat: var(--feat-payments);   --feat-soft: var(--feat-payments-soft);   --feat-border: var(--feat-payments-border); }
+.feat--members    { --feat: var(--feat-members);    --feat-soft: var(--feat-members-soft);    --feat-border: var(--feat-members-border); }
+.feat--ranking    { --feat: var(--feat-ranking);    --feat-soft: var(--feat-ranking-soft);    --feat-border: var(--feat-ranking-border); }
+.feat--settings   { --feat: var(--feat-settings);   --feat-soft: var(--feat-settings-soft);   --feat-border: var(--feat-settings-border); }
+.feat--attendance { --feat: var(--feat-attendance); --feat-soft: var(--feat-attendance-soft); --feat-border: var(--feat-attendance-border); }
+.feat--invite     { --feat: var(--feat-invite);     --feat-soft: var(--feat-invite-soft);     --feat-border: var(--feat-invite-border); }
+
+.feat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    background: var(--feat-soft, var(--accent-soft));
+    color: var(--feat, var(--accent-text));
+    font-size: 1rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -348,7 +395,12 @@
 }
 
 .panel-title i {
-    color: var(--accent-text);
+    color: var(--feat, var(--accent-text));
+}
+
+/* Painel de uma feature: filete superior na cor dela. */
+.panel[class*="feat--"] {
+    border-top: 2px solid var(--feat-border);
 }
 
 .panel-count {

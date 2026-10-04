@@ -19,18 +19,18 @@
     /* L2 cards inside a panel -> L3 hover/active/popover.           */
     /* A child never shares its parent's tone. See docs/design-system.md */
     --bg:          #09090b;   /* L0 page / chrome           */
-    --surface:     #121215;   /* L1 panels, sections        */
-    --surface-2:   #19191d;   /* L2 cards inside a panel    */
-    --surface-3:   #232329;   /* L3 hover, active, popover  */
+    --surface:     #141418;   /* L1 panels, sections        */
+    --surface-2:   #1e1e23;   /* L2 cards inside a panel    */
+    --surface-3:   #2a2a31;   /* L3 hover, active, popover  */
 
     /* -- Borders ------------------------------------------------- */
-    --border:      #27272a;   /* default 1px border         */
+    --border:      #2a2a30;   /* default 1px border         */
     --border-2:    #3f3f46;   /* emphasised / hover border  */
 
     /* -- Text ---------------------------------------------------- */
     --text:        #fafafa;   /* primary                    */
-    --text-2:      #a5a5ad;   /* secondary                  */
-    --text-3:      #8a8a93;   /* tertiary / placeholders    */
+    --text-2:      #b4b4bc;   /* secondary                  */
+    --text-3:      #93939c;   /* tertiary / placeholders    */
 
     /* -- Accent (blue, the only saturated hue) ------------------- */
     --accent:        #2563eb; /* interactive fill (buttons) */
@@ -50,6 +50,32 @@
     --warning-soft: rgba(245, 158, 11, 0.14);
     --danger:       #ef4444;
     --danger-soft:  rgba(239, 68, 68, 0.14);
+
+    /* -- Feature hues (icon/rim/tint only, never a fill or a button) --
+       Each feature of the group keeps one hue so screens are told apart
+       at a glance. Blue stays the action/focus color; these never paint
+       a button or a large surface. AA >= 4.5:1 on --surface-2. */
+    --feat-matches:         #60a5fa;
+    --feat-matches-soft:    rgba(96, 165, 250, 0.14);
+    --feat-matches-border:  rgba(96, 165, 250, 0.40);
+    --feat-payments:        #2dd4bf;
+    --feat-payments-soft:   rgba(45, 212, 191, 0.14);
+    --feat-payments-border: rgba(45, 212, 191, 0.40);
+    --feat-members:         #a78bfa;
+    --feat-members-soft:    rgba(167, 139, 250, 0.14);
+    --feat-members-border:  rgba(167, 139, 250, 0.40);
+    --feat-ranking:         #fb923c;
+    --feat-ranking-soft:    rgba(251, 146, 60, 0.14);
+    --feat-ranking-border:  rgba(251, 146, 60, 0.40);
+    --feat-settings:        #94a3b8;
+    --feat-settings-soft:   rgba(148, 163, 184, 0.14);
+    --feat-settings-border: rgba(148, 163, 184, 0.40);
+    --feat-attendance:        #4ade80;
+    --feat-attendance-soft:   rgba(74, 222, 128, 0.14);
+    --feat-attendance-border: rgba(74, 222, 128, 0.40);
+    --feat-invite:          #25d366; /* WhatsApp brand */
+    --feat-invite-soft:     rgba(37, 211, 102, 0.14);
+    --feat-invite-border:   rgba(37, 211, 102, 0.40);
 
     /* -- Overlay ------------------------------------------------- */
     --scrim:        rgba(9, 9, 11, 0.78); /* modal backdrop          */

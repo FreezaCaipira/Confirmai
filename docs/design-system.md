@@ -59,12 +59,45 @@ placeholders e rodapé. Contraste AA é garantido por
 - Largura de conteúdo: `min(1280px, calc(100% - 2 * var(--space-5)))`,
   centralizada; header e footer usam a **mesma** largura interna.
 
-## 5. Checklist por PR visual
+## 5. Cor por feature: identidade, não decoração
+
+Cada feature do grupo tem **um** matiz, para as telas e os cards se
+distinguirem de relance sem virar arco-íris. O matiz só aparece em ícone,
+filete superior do painel, avatar/iniciais e borda de hover — nunca em
+botão, fundo de painel ou texto corrido. Azul continua sendo ação/foco/ativo.
+
+| Feature | Classe | Token |
+|---|---|---|
+| Partidas, eventos | `.feat--matches` | `--feat-matches` (azul claro) |
+| Pagamentos, Pix | `.feat--payments` | `--feat-payments` (teal) |
+| Grupos, membros | `.feat--members` | `--feat-members` (violeta) |
+| Ranking | `.feat--ranking` | `--feat-ranking` (laranja — não confunde com o amarelo de atenção) |
+| Configurações | `.feat--settings` | `--feat-settings` (ardósia) |
+| Presença | `.feat--attendance` | `--feat-attendance` (verde) |
+| Convite WhatsApp | `.feat--invite` | `--feat-invite` (verde da marca) |
+
+Uso: a classe vai no container (`<section class="panel feat--payments">`,
+`<a class="hub-action feat--matches">`) e define `--feat`, `--feat-soft` e
+`--feat-border`; os filhos leem `var(--feat, var(--accent-text))`, então
+sem classe tudo cai no azul padrão. `.feat-icon` é o quadrado de ícone pronto.
+Status (sucesso/atenção/erro) continua semântico e vence a cor da feature.
+
+### 5.1 Painel "Hoje" (home)
+
+`Shared/Components/HomeTodayPanel.razor` é um painel L1 com tiles L2, um por
+feature (`.feat--matches`, `.feat--payments`, `.feat--settings` para a caixa
+postal). O tile de pagamentos ganha borda `--warning` quando há pendência
+(status vence feature). Os dados vêm de `HomeToday.Build` (puro, testado em
+`HomeTodayTests`), calculado sobre o que a home já carrega + 1 `COUNT` de
+mensagens não lidas. A dica do dia é um carrossel sem JS (`TipKeys`).
+
+## 6. Checklist por PR visual
 
 - [ ] Zero hex/rgba fora de `tokens.css`; zero `linear-gradient`; zero vars
       legadas (`--ci-*`, `--futsal-*`, `--poker-*`, `--green-*`, `--red-*`,
       `--parchment-*`) em código novo.
 - [ ] Cada container tem tom diferente do pai (tabela §1).
 - [ ] Um único `--accent` cheio por tela.
+- [ ] Cor de feature só via `.feat--*` (§5), nunca em botão ou fundo.
 - [ ] `DesignTokensContrastTests`, `AntiHardcode*` e `Css*` verdes.
 - [ ] Prints 1366 e 390 no PR.

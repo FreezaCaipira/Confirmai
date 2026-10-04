@@ -10,7 +10,7 @@
             <input class="esc-team-name-input esc-team-name-input--a"
                    @bind="@TeamAName" @bind:event="oninput"
                    @onblur="SaveTeamNamesCallback"
-                   maxlength="50" placeholder="Time A" />
+                   maxlength="50" placeholder="@Ui["Lineup.TeamA"]" />
         }
         else
         {
@@ -23,7 +23,7 @@
                     <span class="esc-player-name">@s.Name</span>
                     <span class="esc-player-side">
                         <i class="fas fa-hand-paper esc-player-icon"></i>
-                        <button class="esc-move-btn" title="Mover para Time B" @onclick="() => HandleMovePlayer(s, true)">
+                        <button class="esc-move-btn" title="@Ui["Lineup.MoveToB"]" @onclick="() => HandleMovePlayer(s, true)">
                             <i class="fas fa-arrow-right"></i>
                         </button>
                     </span>
@@ -36,7 +36,7 @@
                     <span class="esc-player-name">@s.Name</span>
                     <span class="esc-player-side">
                         <span class="esc-player-num">@(draftNumA++)</span>
-                        <button class="esc-move-btn" title="Mover para Time B" @onclick="() => HandleMovePlayer(s, true)">
+                        <button class="esc-move-btn" title="@Ui["Lineup.MoveToB"]" @onclick="() => HandleMovePlayer(s, true)">
                             <i class="fas fa-arrow-right"></i>
                         </button>
                     </span>
@@ -51,7 +51,7 @@
             <input class="esc-team-name-input esc-team-name-input--b"
                    @bind="@TeamBName" @bind:event="oninput"
                    @onblur="SaveTeamNamesCallback"
-                   maxlength="50" placeholder="Time B" />
+                   maxlength="50" placeholder="@Ui["Lineup.TeamB"]" />
         }
         else
         {
@@ -62,7 +62,7 @@
             {
                 <li class="esc-player esc-player--gk">
                     <span class="esc-player-side">
-                        <button class="esc-move-btn" title="Mover para Time A" @onclick="() => HandleMovePlayer(s, false)">
+                        <button class="esc-move-btn" title="@Ui["Lineup.MoveToA"]" @onclick="() => HandleMovePlayer(s, false)">
                             <i class="fas fa-arrow-left"></i>
                         </button>
                         <i class="fas fa-hand-paper esc-player-icon"></i>
@@ -75,7 +75,7 @@
             {
                 <li class="esc-player">
                     <span class="esc-player-side">
-                        <button class="esc-move-btn" title="Mover para Time A" @onclick="() => HandleMovePlayer(s, false)">
+                        <button class="esc-move-btn" title="@Ui["Lineup.MoveToA"]" @onclick="() => HandleMovePlayer(s, false)">
                             <i class="fas fa-arrow-left"></i>
                         </button>
                         <span class="esc-player-num">@(draftNumB++)</span>
