@@ -180,6 +180,82 @@ public class C31WhatsAppDispatchTests
         Assert.Equal(2, row2.Attempts);
     }
 
+    // ── F3b: group-scoped payment-pending notice ─────────────────────────────
+
+    [Fact]
+    public async Task PaymentPending_SendsGroupNotice_WithoutNamesOrAmounts()
+    {
+        var (factory, svc, sender) = Setup(Opts());
+        var groupId = await SeedGroupOnlyAsync(factory);
+
+        await svc.DispatchPaymentPendingAsync(groupId, "Pelada");
+
+        var (jid, text) = Assert.Single(sender.Calls);
+        Assert.Equal("111@g.us", jid);
+        Assert.Contains("pendentes", text);
+        Assert.Contains("Pelada", text);
+        // No player names or money amounts in a group message.
+        Assert.DoesNotContain("R$", text);
+    }
+
+    [Fact]
+    public async Task PaymentPending_SecondCallWithin24h_Skips()
+    {
+        var (factory, svc, sender) = Setup(Opts());
+        var groupId = await SeedGroupOnlyAsync(factory);
+
+        await svc.DispatchPaymentPendingAsync(groupId, "Pelada");
+        await svc.DispatchPaymentPendingAsync(groupId, "Pelada");
+
+        Assert.Single(sender.Calls);
+    }
+
+    [Fact]
+    public async Task PaymentPending_JidOutsideAllowlist_NeverSends()
+    {
+        var (factory, svc, sender) = Setup(Opts(allowed: "999@g.us"));
+        var groupId = await SeedGroupOnlyAsync(factory);
+
+        await svc.DispatchPaymentPendingAsync(groupId, "Pelada");
+
+        Assert.Empty(sender.Calls);
+    }
+
+    [Fact]
+    public async Task PaymentPending_GroupWithoutJid_NeverSends()
+    {
+        var (factory, svc, sender) = Setup(Opts());
+        await using (var db = factory.CreateDbContext())
+        {
+            db.Groups.Add(new Group { Name = "SemJid" });
+            await db.SaveChangesAsync();
+            var groupId = db.Groups.First().Id;
+            await svc.DispatchPaymentPendingAsync(groupId, "SemJid");
+        }
+
+        Assert.Empty(sender.Calls);
+    }
+
+    [Fact]
+    public async Task PaymentPending_Disabled_NeverSends()
+    {
+        var (factory, svc, sender) = Setup(Opts(enabled: false));
+        var groupId = await SeedGroupOnlyAsync(factory);
+
+        await svc.DispatchPaymentPendingAsync(groupId, "Pelada");
+
+        Assert.Empty(sender.Calls);
+    }
+
+    private static async Task<int> SeedGroupOnlyAsync(IDbContextFactory<AppDbContext> factory)
+    {
+        await using var db = factory.CreateDbContext();
+        var group = new Group { Name = "Pelada", WhatsAppGroupJid = "111@g.us" };
+        db.Groups.Add(group);
+        await db.SaveChangesAsync();
+        return group.Id;
+    }
+
     [Fact]
     public async Task Dispatch_ExhaustedAttempts_GivesUp()
     {

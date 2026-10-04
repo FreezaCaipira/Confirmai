@@ -30,8 +30,13 @@ public class WhatsAppDispatch
 {
     public int Id { get; set; }
 
-    public int EventId { get; set; }
-    public Event Event { get; set; } = null!;
+    /// <summary>
+    /// Null for group-scoped kinds (e.g. PaymentPending) — those dedupe via a
+    /// 24h window on (GroupJid, MessageKind) since a unique index cannot
+    /// deduplicate NULLs.
+    /// </summary>
+    public int? EventId { get; set; }
+    public Event? Event { get; set; }
 
     [StringLength(40)]
     public string MessageKind { get; set; } = string.Empty;

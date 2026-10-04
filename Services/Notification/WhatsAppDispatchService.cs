@@ -105,6 +105,84 @@ public sealed class WhatsAppDispatchService
         return attempts;
     }
 
+    /// <summary>
+    /// C31 F3b — group-scoped pending-payment notice (no names, no amounts).
+    /// Group-scoped rows carry EventId = null, so the unique index does not
+    /// deduplicate them; instead a Sent row for the same JID inside the last
+    /// 24h suppresses repeats (an admin notifying N delinquents in one sitting
+    /// produces exactly one group message).
+    /// </summary>
+    public async Task DispatchPaymentPendingAsync(int groupId, string groupName, CancellationToken ct = default)
+    {
+        var opts = _options.Value;
+        if (!opts.Enabled) return;
+
+        try
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync(ct);
+
+            var group = await db.Groups.AsNoTracking()
+                .FirstOrDefaultAsync(g => g.Id == groupId, ct);
+            if (group is null) return;
+
+            var jid = group.WhatsAppGroupJid;
+            if (string.IsNullOrWhiteSpace(jid)) return;
+
+            if (!opts.ParseAllowedGroupJids().Contains(jid))
+            {
+                _ops?.WhatsAppSend("blocked_allowlist");
+                _logger.LogWarning(
+                    "WhatsApp: JID fora da allowlist, aviso de pendencia do grupo {GroupId} nao enviado.",
+                    groupId);
+                return;
+            }
+
+            var kind = WhatsAppMessageKind.PaymentPending.ToString();
+            var since = DateTime.UtcNow.AddHours(-24);
+            var recentlySent = await db.WhatsAppDispatches.AnyAsync(d =>
+                d.EventId == null
+                && d.GroupJid == jid
+                && d.MessageKind == kind
+                && d.Status == WhatsAppDispatchStatus.Sent
+                && d.SentAtUtc > since, ct);
+            if (recentlySent) return;
+
+            var dispatch = new WhatsAppDispatch
+            {
+                EventId = null,
+                MessageKind = kind,
+                GroupJid = jid,
+                Status = WhatsAppDispatchStatus.Failed,
+                Attempts = 1,
+                FirstAttemptAtUtc = DateTime.UtcNow
+            };
+            db.WhatsAppDispatches.Add(dispatch);
+
+            var result = await _sender.SendGroupTextAsync(jid,
+                WhatsAppTexts.PaymentPending(groupName, GroupPaymentsLink(groupId)), ct);
+
+            if (result.Status != WhatsAppSendStatus.Failed)
+            {
+                dispatch.Status = WhatsAppDispatchStatus.Sent;
+                dispatch.SentAtUtc = DateTime.UtcNow;
+                _ops?.WhatsAppSend(result.Status == WhatsAppSendStatus.DryRun ? "dry_run" : "sent");
+            }
+            else
+            {
+                _ops?.WhatsAppSend("failed");
+                _logger.LogWarning("WhatsApp: aviso de pendencia do grupo {GroupId} falhou ({Error}).",
+                    groupId, result.Error);
+            }
+
+            await db.SaveChangesAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "WhatsApp: erro inesperado no aviso de pendencia do grupo {GroupId}.",
+                groupId);
+        }
+    }
+
     public async Task DispatchAsync(int eventId, WhatsAppMessageKind kind, string text, CancellationToken ct = default)
     {
         var opts = _options.Value;
