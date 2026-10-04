@@ -119,7 +119,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Mapa de Progresso e Proximos Passos (atualizado pos-C32, PRs #127-#135)
+## Mapa de Progresso e Proximos Passos (atualizado pos-#139, cor por feature + painel Hoje)
 
 ### Progresso por eixo
 
@@ -144,6 +144,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
+0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [EXECUTAVEL AGORA]** -- 8 pontos (botao Google, `/grupos`, configuracoes, Meus pagamentos, aba da taxa, pagar via tela da partida, degrade no header, dias/local nos cards da home) + guardiao de classe CSS orfa. Plano na secao "Ciclo 37" abaixo. Pode rodar em paralelo a Fase 0 da Evolution (Robson).
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
 2. **C32 -- pre-producao [EXECUTADO -- ver review].** Fases A-E em `feat/ciclo32`. Resumo na Linha do Tempo. Fase F (remover telas legadas) pendente de aprovacao do Robson.
 3. **C31 -- Evolution API [CODIGO CONCLUIDO -- PR #137, review do Senior com 3 correcoes]** -- fases 1-4 + 3b entregues em dry-run (ver "Review Senior do Ciclo 31"). O que falta e so operacional: a Fase 0 do Robson (Evolution no EasyPanel + chip dedicado aquecido + JID do grupo de teste na allowlist) libera o primeiro envio real. Em paralelo, o Robson configura no EasyPanel as variaveis `WhatsApp__*` da secao 0 do `docs/production-checklist.md`.
@@ -199,6 +200,84 @@ validado na Brevo.
 
 Qualquer desvio nos passos 2-4 e **bloqueador de go-live**: e nesses caminhos que um bug funde contas
 ou da acesso a conta de outra pessoa, sem aparecer como erro.
+
+---
+
+## Ciclo 37 (Pleno) -- Achados dos testes do Robson em producao (pos-#139) [PLANEJADO -- EXECUTAVEL AGORA]
+
+**Origem**: 8 pontos do Robson testando a `main` pos-#139 em producao. O Senior reproduziu localmente (1366/820/390) e achou a causa de cada um. **Causa raiz comum dos itens 3, 4 e 5 (e de outras telas): isolamento de CSS do Blazor.** Um `Componente.razor.css` so estiliza o markup do **proprio** componente (atributo `b-xxxx`). Quando um bloco de markup e extraido para um componente filho e o CSS fica no pai (ou o filho reaproveita classes do CSS de um irmao), o filho renderiza **sem estilo nenhum** -- foi o que gerou a "lista em html puro". A varredura do Senior achou **97 classes orfas em 20 componentes**.
+
+**Regra de ouro**: 1 branch `feat/ciclo37`, 1 PR, 1 commit por fase, na ordem. TDD onde houver logica (fases 6 e 8). i18n PT/EN/ES (regra 25). Build `--no-incremental` **0 warning**, suite verde, numeros no PR (regra 28). Design system L0-L3 + `.feat--*` do #139 (`docs/design-system.md`): cor de feature so em icone/filete/badge/borda de hover, botao neutro ou azul, hex/rgba so em `tokens.css`. **Nao** alterar regra financeira. **Nao** usar `::deep` como atalho para resolver orfas (acopla pai e filho); o CSS vai para o `.razor.css` do componente que renderiza o markup, ou para `components.css` quando for vocabulario compartilhado.
+
+### Fase 0 -- guardiao: teste de classe orfa (fazer PRIMEIRO, ele guia as fases 3-5)
+Novo `CssScopedOrphanClassesTests`: para cada `X.razor`, toda classe usada em `class="..."` que **so** existe no `.razor.css` de **outro** componente (e nao existe em `wwwroot/css/*.css` nem no `X.razor.css`) e orfa. Algoritmo pronto (o Senior rodou em Python): ler classes de `wwwroot/css/*.css` (global) e de cada `**/*.razor.css` (scoped, ignorando `bin/` e `obj/`); por `.razor`, extrair tokens de `class="..."` removendo `@(...)` e `@ident`, aceitar so `^[a-z][\w-]+$`.
+- Allowlist **que so encolhe**, so com o legado fora do fluxo (`Pages/Payment/PaymentCheckoutPanel.razor`, `Pages/Payment/PaymentProductSummary.razor` = `/marketplace`; `Pages/Futsal/Schedule/Edit.razor` = `/futsal/schedule`; admin: `AdminAuditTimeline`, `AdminVenueEdit`, `AdminVenues`, `AdminPaymentsTable`, `AdminLogsTable`, `AdminUsersTable`). Todo o resto tem que ficar zerado ao fim do ciclo.
+- Orfas do fluxo principal que **este ciclo zera** (lista do Senior):
+  - `Shared/Components/Groups/MyPaymentsList.razor` -> 10 classes que estao em `Payments.razor.css` (**item 4 do Robson**);
+  - `Pages/Groups/Components/WhatsAppGroupJidEditor.razor` (sem `.razor.css`; usa `feat-pix-*` de `PixReceiverSelector.razor.css`), `PixReceiverSelector`, `PayoutAccountEditor`, `MembersManager` -> `features-section-sub`/`features-save-msg` de `FeaturesToggles.razor.css` (**item 3**);
+  - `Shared/Components/Poker/PokerDetailInfo.razor` -> 10 classes em `Pages/Poker/Detail.razor.css` (detalhes do poker sem estilo);
+  - `Pages/Futsal/Components/RecurrenceScheduler.razor` (`weekday-chip`, `weekday-grid`, `switch-label`), `SlotsAndGoalkeeperConfig`, `EditEventForm`, `Pages/VenueManager/VenueEdit.razor` (`switch-label`), `Pages/Poker/Edit.razor` (`modality-*`, `homegame-notice`) -> tudo de `Pages/Futsal/Create.razor.css`/`Pages/Poker/Create.razor.css` (formulario de partida);
+  - `Pages/Futsal/Components/DetailEventHeader.razor` -> `detail-header--futsal`.
+  Vocabulario usado por varios (`switch-label`, `features-section-sub`, `features-save-msg`, `feat-pix-form/label/select/save-btn`) vai para `wwwroot/css/components.css` uma vez so; o resto para o `.razor.css` do proprio filho. Remover do CSS do pai o que ficou sem uso.
+
+### Fase 1 -- botao do Google (item 1)
+**Causa**: `identity.css` tem `.identity-container button { background: var(--accent); min-width: 180px; margin: ... auto 0; display: block; ... }` (especificidade 0,1,1), que **ganha** de `.google-signin-btn` (0,1,0). Resultado: o botao do Google herda o azul/tamanho do "Entrar" -- o CSS da variante oficial existe, mas nunca vence.
+- Trocar os seletores da variante oficial para `.identity-container .google-signin-btn` (e `:hover/:active/:focus-visible`), resetando o que o seletor generico injeta: `min-width: 0; margin: 0; display: inline-flex; width: 100%; min-height: 40px; border-radius: 999px; font-size: 14px; font-weight: 500`. Conferir tambem o bloco `@media` (linha ~458) que reaplica `font-size/padding/min-width` em `.identity-container button`.
+- Botao conforme guideline (variante clara): fundo `#FFFFFF`, borda `#747775`, texto `#1F1F1F`, logo "G" colorido 18px a esquerda, texto "Continuar com o Google" (chave i18n existente), altura 40px, pilula. Continua sendo a unica excecao de hex fora de `tokens.css` (comentario ja existe).
+- Teste em `CssComponentsTests` (ou novo): a regra que define `background` do botao Google tem especificidade >= a de `.identity-container button`. Conferir login **e** cadastro (o botao so aparece com `Authentication__Google__*` configurado; localmente usar valores fake).
+
+### Fase 2 -- `/grupos`: bloco "Entrar em outro grupo" (item 2)
+Hoje: o card "Criar novo grupo" repete o titulo no botao, nao tem descricao, e as duas metades tem alturas/alinhamentos diferentes (codigo fica com input+botao, criar fica com um botao solto); em 820px o "OU" fica flutuando e o widget lateral cai para baixo do conteudo.
+- As duas metades viram cards L2 simetricos: icone `.feat-icon` + titulo + 1 linha de descricao (nova chave: "Comece um grupo e convide a galera" / EN / ES) + acao alinhada no rodape do card (`margin-top: auto`, mesma altura nos dois).
+- Botao do criar: texto "Criar grupo" (sem repetir o titulo), `mk-btn` primario; no card de codigo, "Entrar" fica secundario.
+- Divisor "ou": vertical no desktop, horizontal (linha + "ou" centralizado) abaixo de 768px.
+- Validar 1366, 820 e 390.
+
+### Fase 3 -- `/grupo/{id}/configuracoes` (item 3)
+Hoje: 6 secoes separadas so por `<hr>` dentro de um unico painel; titulos em caixa alta pequenos; textos de apoio grandes demais (orfas da Fase 0); o JID do WhatsApp com input/botao nativos; o card "Intermedio do site" encosta no titulo "Funcionalidades adicionais" (sem espacamento); no mobile a sub-nav corta "Configuracoes".
+- Estrutura: cada secao vira um **card L2** dentro do painel L1 (`.settings-section`), com cabecalho padrao: `.feat-icon` (cor da feature: convite `--feat-invite`, pagamentos `--feat-payments`, funcionalidades `--feat-settings`, Pix `--feat-payments`, WhatsApp `--feat-invite`, membros `--feat-members`) + titulo em sentence case (nao caixa alta) + subtitulo `--text-2` 0.875rem. Remover os `<hr class="detail-divider">`. Gap vertical `--space-5` entre cards.
+- Formularios (Pix, JID): label em cima, input + botao na mesma linha no desktop e empilhados em 390px; botao "Salvar" no padrao `mk-btn` (hoje o do Pix e verde contornado e o do JID e nativo).
+- Toggles (intermedio, ranking, votacao): uma linha por toggle (titulo + descricao a esquerda, switch a direita), descricao com no maximo 2 linhas no desktop; estado desabilitado com o motivo em `--text-3`, nao a linha inteira apagada.
+- Opcional, se couber sem quebrar: navegacao interna por ancora (Convite · Pagamentos · Funcionalidades · Pix · WhatsApp · Membros) no topo do painel.
+
+### Fase 4 -- `/grupo/{id}/pagamentos` -> "Meus pagamentos" (item 4)
+- `MyPaymentsList` ganha o proprio `MyPaymentsList.razor.css` com as classes que hoje estao no `Payments.razor.css` (e saem de la). Classes sem definicao nenhuma tambem precisam existir: `payments-user-info`, `payments-user-sub`, `payments-user-actions`, `payments-badge--paid`, `payments-badge--pending`, `btn-pay`.
+- Cada item vira uma linha L2: data/hora + grupo/partida a esquerda, valor + badge de status, acao a direita. O link da linha vai para a **tela da partida** (coerente com a Fase 6); o botao "Pagar" pode ficar aqui (esta aba e o contexto de pagamento), mas no padrao `mk-btn`.
+
+### Fase 5 -- aba "Taxa da plataforma" (item 5)
+Visto no print do Senior (1366): titulos de secao centralizados em azul (`.platform-fee-section-title` usa `--accent-text`, `--center`), so 1 dos 4 cards do resumo com fundo, buracos grandes entre secoes, linha "Total" desalinhada da coluna Taxa, divisor invisivel, e **bug de texto**: no historico, o status "Rejeitado" aparece como "**Motivo**".
+- Titulos: alinhados a esquerda, `--text`, mesmo cabecalho das outras abas. Remover `--center`.
+- Resumo: 4 cards L2 iguais (mesmo fundo/borda); a cor semantica so no **valor** (a repassar = `--feat-payments`, em analise = warning, ja repassado = success). Hoje `.platform-fee-summary-grid` esta definido 2x em media queries (linhas ~1414 e ~1451): consolidar.
+- `.platform-fee-divider { border-top: var(--border); }` e invalido (`--border` e so cor): usar `1px solid var(--border)` ou remover o divisor em favor de gap.
+- Tabela: coluna "Total" alinhada com "Taxa" (`td` vazio na coluna certa / `colspan`), numeros a direita (`font-variant-numeric: tabular-nums`).
+- Bug: `Payments.razor` linha ~515 usa `Ui["Group.PlatformFeeHistoryNote"]` (cabecalho "Motivo") como rotulo do status Rejeitado. Criar `Group.PlatformFeeStatusRejected` (PT "Rejeitado" / EN "Rejected" / ES "Rechazado") + teste.
+- Espacamento: `gap` entre secoes `--space-6`, sem os blocos vazios de ~100px.
+
+### Fase 6 -- pagar sempre passando pela tela da partida (item 6) -- TDD
+Decisao do Robson: o jogador **nao** pula da home/hub direto para `/pagamento/evento/{id}`; ele entra na partida e paga de la.
+- `Shared/Components/ConfirmationCard.razor` linha ~50: remover o botao "Pagar"; quando `ShowPayAction`, mostrar um badge "Pagamento pendente" (chave existente ou nova) e o "Entrar" volta a ser o botao principal.
+- `Pages/Groups/Detail.razor` linha ~222 (proxima partida do hub): o "Pagar" vira link para a tela da partida (mesmo destino do `->` ao lado), com o texto "Pagar" mantido ou trocado por badge -- sem `href="/pagamento/evento/..."`.
+- **Atencao (achado do Senior): a tela do poker nao tem botao de pagar.** `Pages/Futsal/Detail.razor` tem (linha ~402, `pay-btn`), mas nenhum arquivo de `Pages/Poker`/`Shared/Components/Poker` linka `/pagamento/evento`. Sem corrigir isso, remover o atalho da home **deixa o jogador de poker sem caminho para pagar**. Adicionar o CTA de pagamento na tela do poker com a mesma regra do futsal (aparece se deve e nao enviou comprovante).
+- Teste: nenhum componente de home/hub (`Pages/Index*`, `Pages/Groups/Detail*`, `Shared/Components/ConfirmationCard*`, `HomeTodayPanel*`) contem `/pagamento/evento`; e a tela do poker contem. Os links legitimos para `/pagamento/evento` ficam so nas telas da partida e na aba "Meus pagamentos".
+
+### Fase 7 -- degrade no header (item 7)
+Hoje `shell.css` `body .oldsite-header { background: var(--bg); }` (chapado).
+- Novo token em `tokens.css`: `--header-bg` com um degrade sutil horizontal do azul de acao muito diluido para o fundo, por ex. `linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, var(--bg)) 0%, var(--surface) 55%, var(--bg) 100%)`. Manter o filete azul de 2px no topo.
+- Atualizar `docs/design-system.md`: o header passa a ser a **segunda excecao documentada** de gradiente (junto com o hero). O `CssComponentsTests` que proibe gradiente tem que aceitar so esses dois seletores.
+- Contraste AA dos itens do nav/brand sobre a cor mais clara do degrade: adicionar ao `DesignTokensContrastTests`.
+- Entregar com prints 1366/390 para o Robson escolher; se ele nao gostar, reverter e so 1 commit.
+
+### Fase 8 -- cards de grupo da home com dias e local (item 8) -- TDD
+Hoje `Pages/Index.razor` linhas ~80-90 mostram so icone + nome + badge admin (`home-group-chip`).
+- Fonte dos dados: `MatchSchedule` (`db.RachaSchedules`: `GroupId`, `DayOfWeek`, `TimeOfDay`, `VenueId`/`Venue`, `LocalName`, `IsActive`), criado pela recorrencia do `FutsalCreateService`. Fallback quando o grupo nao tem agenda ativa: as proximas partidas ativas do grupo (`Events` futuros: dia da semana de `StartsAt.ToLocalTime()` e `Venue?.Name ?? Location`).
+- Logica pura testavel (mesmo padrao do `HomeToday`): `Services/Events/GroupScheduleSummary.cs` com `Build(IEnumerable<MatchSchedule> schedules, IEnumerable<Event> upcoming, DateTime localNow) -> (IReadOnlyList<DayOfWeek> Days, string? Venue, TimeOnly? Time)`; dias distintos ordenados de segunda a domingo; local = o da agenda ativa mais proxima (ou da proxima partida). Testes: so agenda, so partidas, ambos, nenhum (card mostra "Sem partidas marcadas"), agenda inativa ignorada.
+- Query: 1 consulta para todos os grupos do usuario (`Where(GroupId in ids && IsActive)`, `AsNoTracking`), sem N+1.
+- Card: o chip vira card L2 (`.feat--members` no filete/icone) com nome + badge admin, linha "seg · qua · 19:00" (dia abreviado no idioma via `UiTextService`/cultura, igual ao `DateTimeFullShort` do #139) e linha "📍 Quadra Central". Grid de 2 colunas no desktop, 1 no 390px.
+
+### Entrega
+- PR unico com a lista de fases, prints antes/depois 1366/390 de: login (com Google fake), `/grupos`, configuracoes, Meus pagamentos, Taxa da plataforma, home.
+- Numeros: build 0 warning; suite (as 24 `ProgramConfigurationTests` locais sao ambientais).
+- Registrar no PR o que ficou na allowlist de orfas (so legado).
 
 ---
 
