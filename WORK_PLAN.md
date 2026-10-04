@@ -127,7 +127,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 |---|---|---|
 | Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
 | Casos de uso / UML (C33) | **CONCLUIDO** -- `docs/uml/` (~102 UCs por ator, estados, sequencia do pagamento manual) | Manter a coluna Teste atualizada a cada ciclo. |
-| Cobertura de testes | **BOM** -- 2592 testes, integracao em **Postgres real** (C33), CI verde; `CssStructureTests` guarda todo CSS proprio (#132) | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
+| Cobertura de testes | **BOM** -- 2636 testes, integracao em **Postgres real** (C33), CI verde; `CssStructureTests` guarda todo CSS proprio (#132) | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
 | i18n PT/EN/ES | **COMPLETO** -- allowlist zerada, paridade + chaves referenciadas testadas | Validacao visual EN/ES em prod (Robson). |
 | Pagamento V1 manual + taxa + repasse | **CONCLUIDO e VALIDADO EM PRODUCAO**; taxa carimbada na confirmacao, receita so com `Paid` (#122), isencao por grupo com janela `[From,Until)` (C34/C36-C), saida do grupo bloqueada com divida (#125); regra do Pix unica no criar partida (C36-E, #131/#132) | Nada funcional. |
 | Seguranca / autorizacao | **BOM** -- authz no service (C34), `GroupAccess` membro/admin (C36-C), IDORs fechados, rate limiter corrigido, magic bytes no upload | Nada funcional. C32 Fase A fechou o pen-test do dinheiro; `style-src 'unsafe-inline'` e risco aceito (Blazor). |
@@ -137,7 +137,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 | Onboarding por empty state | **CONCLUIDO** (C36-B F6 + C36-E) -- checklist do admin e o aviso unico, Pix bloqueante pela regra do grupo | Nada. |
 | Layout / design system L0-L3 | **~80%** -- header, home, hub/subnav, `/grupos`, mailbox, profile, partida futsal/poker, pagamento/repasse do grupo, Identity, admin, cookie banner migrados; 63 arquivos guardados pelo `CssNoLegacyVarsTests` | Lapidacao visual (fim da fila, passo 5): **tela do jogador pagar** (`/pagamento/evento/{id}`) ainda no visual antigo; `buttons.css`/`entity-shell.css`/`MainLayout.razor.css` ainda consomem `--ci-*`; Fase 7 (texto do hero). |
 | Pre-producao (C32) | **CONCLUIDO** (PR #134, review na secao abaixo) -- pen-test do dinheiro, CSP sem `ws:` em prod, meter `Confirmai.Ops` + 4 alertas, secao EasyPanel no checklist | Fase F (telas legadas) aguarda decisao do Robson. Configurar no EasyPanel as variaveis da secao 0 do `production-checklist.md`. |
-| WhatsApp (C31, Evolution no grupo) | **CODIGO CONCLUIDO** (`feat/ciclo31`, fases 1-4 + 3b; item 7 fora conforme plano) | Tudo em dry-run por default. Falta so a Fase 0 do Robson (Evolution no EasyPanel + chip dedicado aquecido + JID do grupo de teste) para o primeiro envio real. |
+| WhatsApp (C31, Evolution no grupo) | **CODIGO CONCLUIDO e REVISADO** (PR #137; review do Senior com 3 correcoes -- reagendamento, lembrete do dia apos o de 1h, timeout HTTP) | Tudo em dry-run por default. Falta so a Fase 0 do Robson (Evolution no EasyPanel + chip dedicado aquecido + JID do grupo de teste) para o primeiro envio real. |
 | Pix automatico (V2) | Codigo preservado atras do toggle | Pendencias Efi/fiscal do Robson; so depois do go-live do V1. |
 
 ### Proximos passos, em ordem
@@ -146,7 +146,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
 2. **C32 -- pre-producao [EXECUTADO -- ver review].** Fases A-E em `feat/ciclo32`. Resumo na Linha do Tempo. Fase F (remover telas legadas) pendente de aprovacao do Robson.
-3. **C31 -- Evolution API [CODIGO CONCLUIDO em `feat/ciclo31`]** -- fases 1-4 + 3b entregues em dry-run (ver "Resultado" na secao do Ciclo 31). O que falta e so operacional: a Fase 0 do Robson (Evolution no EasyPanel + chip dedicado aquecido + JID do grupo de teste na allowlist) libera o primeiro envio real. Em paralelo, o Robson configura no EasyPanel as variaveis `WhatsApp__*` da secao 0 do `docs/production-checklist.md`.
+3. **C31 -- Evolution API [CODIGO CONCLUIDO -- PR #137, review do Senior com 3 correcoes]** -- fases 1-4 + 3b entregues em dry-run (ver "Review Senior do Ciclo 31"). O que falta e so operacional: a Fase 0 do Robson (Evolution no EasyPanel + chip dedicado aquecido + JID do grupo de teste na allowlist) libera o primeiro envio real. Em paralelo, o Robson configura no EasyPanel as variaveis `WhatsApp__*` da secao 0 do `docs/production-checklist.md`.
 4. **Go-live real**: "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" (rotacao de todas as credenciais).
 5. **Lapidacao visual (fim da fila)** -- um ciclo so, quando o funcional fechar:
    - tela do jogador pagar (`Pages/Payment/EventPayment.razor` + `Components/EventPayment*.razor.css`) no vocabulario do C36-B Fase 3 -- so CSS/classe, entra no `CssNoLegacyVarsTests`;
@@ -308,6 +308,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 || 36-D | Elevacao e fluxo do grupo (8 pontos do Robson) | 8 fases em 1 branch: F1 botoes unificados (`components.css`, 4 variantes); F7 hub em paineis L1; F8 `GroupHeader`/`GroupSubNav` + `/partidas` elevada + breadcrumb com nome do grupo; F4 `/grupos` = gestao de participacao (`LeaveGroupAsync`, pedidos pendentes visiveis, cancelar com ownership); F2 hover na data (tooltip CSS-puro acessivel, `DateWeekday`/`DateLong`, fix UTC); F5 `/mailbox` em 3 niveis + `CssNoLegacyVarsTests` (guardiao de migrados); F6 `/profile` em paineis; F3 hero azul (unica excecao de gradiente, AA testado). 2513->2559 (+46). | #123, #125 | APROVADO (review #124; ressalva 1 fechada na #125) |
 || 36-E | Regra do Pix unica + aviso duplicado no hub (ressalvas da review #128) | 1 PR, 2 fases. F1: `FutsalCreateService` (Init + `SaveAsync`) passa a usar `EventPaymentService.GetGroupAdminPixKey` -- recebedor escolhido -> primeiro admin com Pix -- em vez do Pix do usuario logado; `AdminHasPixKey` -> `GroupHasPixKey`; grupo criado inline mantem a regra por usuario (criador e o unico admin); `SaveAsync` recarrega o grupo com `Members->User`. `Futsal.Create.PixRequired` x3: "Nenhum administrador do grupo tem chave Pix...". Testes: co-admin sem Pix + outro admin com Pix -> Success; recebedor escolhido (membro) com Pix -> Success; Init `GroupHasPixKey` false/true; casos anteriores mantidos (banner do form coberto pelo lado do dado: render condicional de `Price>0` nao aparece no GET estatico). F2: `detail-pix-notice` removido de `Groups/Detail.razor` + razor.css + media query orfa em `events.css` -- checklist vira o aviso unico; `Group.PixNotConfiguredDesc` x3 removida (sem uso), `PixNotConfigured`/`ConfigureNow` seguem no banner do Create. 2570->2576 (+6). | #131 (impl), review Senior abaixo | APROVADO c/ 2 correcoes do Senior (CSS orfao em `events.css`; grupo inline orfao sem Pix) |
 || 32 | Pre-producao (delta pos-C36) | 1 PR, fases A-E. **A** pen-test: `C32MoneyPathAdversarialTests` com os 4 casos da spec -- todos passam de primeira (guardas ja vigentes: sysadmin no review, status EmAnalise, IsMemberAsync, proofs HTTP ja cobertos no C33). **B** CSP: `connect-src` sem `ws:` em producao (`ws:` so Dev/Testing, mesmo criterio do cookie); hosts auditados -- todos em uso; `unsafe-inline` em style-src documentado como risco aceito. **C** `OperationalMetrics` (meter `Confirmai.Ops`): circuits ativos/reconexoes via `MetricsCircuitHandler`, falha SMTP no `IdentityEmailSender`, comprovante rejeitado `{reason}` no jogador e no lote, gauge de repasses EmAnalise parados (`Ops:StaleSettlementDays`, default 3) via `StaleSettlementMetricsService`; 4 alertas novos no exemplo Prometheus. **D** secao "EasyPanel (deploy atual)" no topo do `production-checklist.md`. **E** convencao `/api/test` no guardiao de endpoints + inventario de branches mortas (13 mergeadas + 12 antigas) no PR. Suite pegou e foi corrigido: singleton consumindo `IDbContextFactory` scoped -> `IServiceScopeFactory`. 2576->2592 (+16). | feat/ciclo32 | [EXECUTADO -- ver review]; Fase F (telas legadas) aguarda aprovacao do Robson |
+|| 31 | WhatsApp via Evolution, so no grupo (dry-run) | `IWhatsAppSender` so de grupo (Evolution real + dry-run default), `Group.WhatsAppGroupJid` com guarda de admin no service, `WhatsAppDispatches` com unique `(EventId, MessageKind)` criado antes do envio, gatilhos de cancelamento/horario/recorrente/waitlist/escalacao, sweep 15min (dia + 1h com escalacao), aviso de pendencia sem nome/valor, boot guard + allowlist, metrica `confirmai_whatsapp_send_total` + 2 alertas, checklist. Senior corrigiu: reagendamento abria so 1 slot por evento (2a mudanca de horario e lembretes do novo horario eram engolidos), lembrete do dia saia depois do de 1h, timeout HTTP de 100s. 2592->2636. | #137 (impl), review abaixo | APROVADO c/ 3 correcoes do Senior; primeiro envio real aguarda a Fase 0 do Robson |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -1276,6 +1277,44 @@ Sem `<html>`, sem `<head>`, sem largura, sem identidade visual -- o cliente de e
 - **Assunto**: prefixar com `[Confirmai]` de forma consistente (hoje so a notificacao de pagamento pendente prefixa, `EventNotificationService.cs:301`) -- via i18n.
 - Testes: o template gera HTML com a URL do CTA e com a URL em texto; nao gera tag nao fechada; `AlternateViews` tem a parte text/plain; troca de idioma troca as strings; nenhuma chave nova fora do i18n (o teste de residual de i18n ja cobre isso).
 - **Evidencia no PR**: o Pleno deve rodar o app com `Email__Enabled=false`, gerar um cadastro, e colar no PR o print do HTML do fallback (`App_Data/fallback-emails` fora de Development, `wwwroot/uploads/dev-emails` em Development) renderizado no navegador. Sem o print a review nao comeca.
+
+---
+
+## Review Senior do Ciclo 31 (PR #137, mergeada na `main`) -- APROVADO com 3 correcoes do Senior
+
+**Escopo revisado**: `b5991d8`..`e51a767` (7 commits), merge `a79cd21`.
+
+**Build (Senior, `--no-incremental`)**: 0 warning / 0 error. **Testes (Senior, suite completa)**: 2633 no merge do Pleno; 2636 apos as correcoes, 2612 verdes + as 24 `ProgramConfigurationTests` ambientais de sempre (`28P01` no Postgres local).
+
+### Resultado por fase
+
+| Fase | Veredito | Observacao |
+|---|---|---|
+| F1 sender + JID | OK | Contrato real da Evolution (`/message/sendText/{instance}`, header `apikey`, `{number,text}`); nao existe metodo de DM; legado e seus testes removidos juntos; JID validado e guardado por admin **no service**. |
+| F2 idempotencia | OK c/ correcao | Linha criada antes do envio + unique index; allowlist, cancelado, passado e `MaxAttempts` testados. Ver correcao 1. |
+| F3 gatilhos + sweep | OK c/ correcoes | Cancelamento chega ao grupo mesmo sem confirmados; escalacao no `ConfirmLineupAsync`. Ver correcoes 1 e 2. Item 6 "vagas restantes / lotada" **nao foi entregue** (so a promocao da waitlist) e o resultado do Pleno nao registrou isso -- ver ressalva 3. |
+| F3b pendencias | OK | Sem nome, sem valor, sem contagem; link para `/grupo/{id}/pagamentos`. |
+| F4 guard + metricas + checklist | OK | Boot falha com envio real sem credenciais (qualquer ambiente) ou sem allowlist (fora de dev/test); tag `result` com 4 valores fixos, sem JID/texto. |
+
+### Correcoes aplicadas pelo Senior nesta review
+
+1. **Reagendamento ficava mudo a partir da 2a vez (bug funcional, o item de maior valor do C31).** O slot de idempotencia era `(EventId, "EventUpdated")`: a primeira mudanca de horario gravava `Sent` e **toda mudanca seguinte era descartada como duplicada**. O mesmo valia para os lembretes: lembrete de 1h enviado para 19h, partida movida para 21h -> nenhum lembrete do novo horario. Correcao: `DispatchAsync(..., slot)` -- `EventUpdated`, `DayReminder` e `HourReminder` usam `WhatsAppDispatchService.StartSlot(ev.StartsAt)` (`yyyyMMddHHmm` UTC) no `MessageKind` (`"HourReminder:202610042200"`, cabe nos 40 chars). Sem migration: o unique index continua `(EventId, MessageKind)`. Testes `RescheduledTwice_NotifiesGroupBothTimes` e `Sweep_AfterReschedule_RemindsTheNewTimeAgain` -- **ambos falham sem a correcao**.
+2. **Lembrete do dia saia depois do de 1h.** No sweep seguinte ao de 1h, o evento sai da janela (60,90] e caia no ramo do `DayReminder` ("Hoje tem...") 45 min antes do jogo. Os testes do Pleno passavam porque a maquina roda em UTC e o teste executou antes das 7h (o ramo do dia exige hora local >= 7) -- em CI apos as 7h, `Sweep_SecondRun_ResendsNothing` quebraria. Correcao: o dia so dispara com mais de 90 min de antecedencia. Teste `Sweep_DayReminder_NeverFollowsTheHourReminder`.
+3. **Timeout HTTP de 100s no caminho do usuario.** O `EvolutionWhatsAppSender` roda **inline** em cancelar partida, mudar horario e confirmar escalacao; com a Evolution fora do ar, o organizador ficaria ate 100s (default do `HttpClient`) esperando a tela. Correcao: `AddHttpClient<EvolutionWhatsAppSender>(c => c.Timeout = 10s)`; o dispatcher ja trata a falha como `Failed` e segue.
+
+### Ressalvas nao bloqueantes (nao viram ciclo agora)
+
+1. **Concorrencia do aviso de pendencia**: dedupe por consulta de 24h, sem indice (o unique nao cobre `EventId NULL`). Dois cliques simultaneos em "notificar" podem mandar 2 avisos. Aceito: acao manual do admin, impacto e uma mensagem repetida.
+2. **Envio OK + falha ao gravar `Sent`** pode reenviar na proxima tentativa. Limitacao de qualquer integracao sem idempotency key no provedor; aceito.
+3. **"Vagas restantes / partida lotada" (item 6)** nao existe. Sugestao: so entrar se o Robson sentir falta em prod (risco de virar spam a cada confirmacao).
+4. **Cancelar partida ja passada** ainda manda "cancelada" no grupo (o guard de passado isenta `EventCancelled`). Raro; aceito.
+5. **FK `WhatsAppDispatches.EventId` sem cascade** (a 2a migration voltou para `NoAction`). Hoje nada apaga `Event` (usuario e `SetNull`, grupo nao e excluido); se um dia existir exclusao de grupo/evento, trocar para `Cascade`.
+6. **Dry-run loga o texto inteiro** (a escalacao tem nomes). Aceitavel para validar o texto antes do envio real; nao deixar em dry-run em prod por meses.
+7. **Fuso**: o sweep usa `ToLocalTime()` -> depende de `TZ=America/Sao_Paulo` no container, que esta no checklist. Sem ela, "lembrete do dia" sai as 4h de Brasilia (7h UTC).
+
+### Proximo
+
+So operacional: Fase 0 do Robson (Evolution no EasyPanel, chip aquecido, JID do grupo de teste na allowlist) -> ativacao na ordem do `production-checklist.md` (dry-run em prod primeiro, depois `DryRun=false`). Depois: reset de credenciais e go-live.
 
 ---
 

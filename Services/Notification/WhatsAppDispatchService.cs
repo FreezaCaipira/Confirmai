@@ -62,8 +62,8 @@ public sealed class WhatsAppDispatchService
 
     /// <summary>
     /// C31 itens 2-3 — 15-minute sweep run by WhatsAppReminderSchedulerService.
-    /// Sends DayReminder (event's local date == today, local hour &gt;= 7, not
-    /// started) and HourReminder (starts in (60, 90] minutes so a 15-min sweep
+    /// Sends DayReminder (event's local date == today, local hour &gt;= 7, more
+    /// than 90 min away so it never follows the hour reminder) and HourReminder (starts in (60, 90] minutes so a 15-min sweep
     /// always catches the window once). Idempotent via the dispatch rows.
     /// Returns the number of dispatch attempts made.
     /// </summary>
@@ -95,13 +95,14 @@ public sealed class WhatsAppDispatchService
             if (untilStart > TimeSpan.FromMinutes(60) && untilStart <= TimeSpan.FromMinutes(90))
             {
                 await DispatchAsync(ev.Id, WhatsAppMessageKind.HourReminder,
-                    WhatsAppTexts.HourReminder(ev, EventLink(ev)), ct);
+                    WhatsAppTexts.HourReminder(ev, EventLink(ev)), ct, StartSlot(ev.StartsAt));
                 attempts++;
             }
-            else if (localNow.Hour >= 7 && ev.StartsAt.ToLocalTime().Date == localToday)
+            else if (untilStart > TimeSpan.FromMinutes(90)
+                     && localNow.Hour >= 7 && ev.StartsAt.ToLocalTime().Date == localToday)
             {
                 await DispatchAsync(ev.Id, WhatsAppMessageKind.DayReminder,
-                    WhatsAppTexts.DayReminder(ev, EventLink(ev)), ct);
+                    WhatsAppTexts.DayReminder(ev, EventLink(ev)), ct, StartSlot(ev.StartsAt));
                 attempts++;
             }
         }
@@ -186,8 +187,19 @@ public sealed class WhatsAppDispatchService
         }
     }
 
-    public async Task DispatchAsync(int eventId, WhatsAppMessageKind kind, string text, CancellationToken ct = default)
+    /// <summary>
+    /// Idempotency slot for messages tied to a start time: a reschedule opens a
+    /// new slot, so the new time is announced and reminded again.
+    /// </summary>
+    public static string StartSlot(DateTime startsAtUtc) => startsAtUtc.ToString("yyyyMMddHHmm");
+
+    /// <param name="slot">Optional discriminator appended to the kind in the
+    /// unique (EventId, MessageKind) key, e.g. <see cref="StartSlot"/>.</param>
+    public async Task DispatchAsync(int eventId, WhatsAppMessageKind kind, string text,
+        CancellationToken ct = default, string? slot = null)
     {
+        var messageKey = slot is null ? kind.ToString() : $"{kind}:{slot}";
+
         var opts = _options.Value;
         if (!opts.Enabled) return;
 
@@ -221,7 +233,7 @@ public sealed class WhatsAppDispatchService
             }
 
             var dispatch = await db.WhatsAppDispatches
-                .FirstOrDefaultAsync(d => d.EventId == eventId && d.MessageKind == kind.ToString(), ct);
+                .FirstOrDefaultAsync(d => d.EventId == eventId && d.MessageKind == messageKey, ct);
 
             if (dispatch?.Status == WhatsAppDispatchStatus.Sent) return;
             if (dispatch is not null && dispatch.Attempts >= MaxAttempts) return;
@@ -231,7 +243,7 @@ public sealed class WhatsAppDispatchService
                 dispatch = new WhatsAppDispatch
                 {
                     EventId = eventId,
-                    MessageKind = kind.ToString(),
+                    MessageKind = messageKey,
                     GroupJid = jid,
                     Status = WhatsAppDispatchStatus.Failed,
                     FirstAttemptAtUtc = DateTime.UtcNow

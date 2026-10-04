@@ -241,4 +241,58 @@ public class C31WhatsAppFlowsTests
         Assert.Equal(0, await dispatch.RunReminderSweepAsync(now));
         Assert.Empty(sender.Calls);
     }
+
+    // ── review Senior: reschedule opens a new idempotency slot ──────────────
+
+    [Fact]
+    public async Task RescheduledTwice_NotifiesGroupBothTimes()
+    {
+        var (factory, dispatch, sender) = Setup();
+        var first = DateTime.UtcNow.AddDays(1);
+        var eventId = await SeedEventAsync(factory, first);
+        var notif = Notif(factory, dispatch);
+
+        await MoveEventAsync(factory, eventId, first.AddHours(2));
+        await notif.NotifyEventUpdatedAsync(eventId, "admin-1", first);
+        await MoveEventAsync(factory, eventId, first.AddHours(4));
+        await notif.NotifyEventUpdatedAsync(eventId, "admin-1", first.AddHours(2));
+
+        Assert.Equal(2, sender.Calls.Count(c => c.Text.Contains("Horário alterado")));
+    }
+
+    [Fact]
+    public async Task Sweep_AfterReschedule_RemindsTheNewTimeAgain()
+    {
+        var (factory, dispatch, sender) = Setup();
+        var now = DateTime.UtcNow;
+        var eventId = await SeedEventAsync(factory, now.AddMinutes(75));
+
+        await dispatch.RunReminderSweepAsync(now);
+        await MoveEventAsync(factory, eventId, now.AddMinutes(150));
+        await dispatch.RunReminderSweepAsync(now.AddMinutes(75));
+
+        Assert.Equal(2, sender.Calls.Count(c => c.Text.Contains("Falta 1 hora")));
+    }
+
+    [Fact]
+    public async Task Sweep_DayReminder_NeverFollowsTheHourReminder()
+    {
+        var (factory, dispatch, sender) = Setup();
+        var now = DateTime.UtcNow;
+        await SeedEventAsync(factory, now.AddMinutes(75));
+
+        await dispatch.RunReminderSweepAsync(now);
+        await dispatch.RunReminderSweepAsync(now.AddMinutes(15));
+        await dispatch.RunReminderSweepAsync(now.AddMinutes(30));
+
+        Assert.DoesNotContain(sender.Calls, c => c.Text.Contains("Hoje tem"));
+    }
+
+    private static async Task MoveEventAsync(IDbContextFactory<AppDbContext> factory, int eventId, DateTime startsAt)
+    {
+        await using var db = factory.CreateDbContext();
+        var ev = await db.Events.SingleAsync(e => e.Id == eventId);
+        ev.StartsAt = startsAt;
+        await db.SaveChangesAsync();
+    }
 }
