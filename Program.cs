@@ -174,7 +174,16 @@ builder.Services.AddScoped<LanguagePreferenceService>();
 builder.Services.AddScoped<UiTextService>(sp => new UiTextService(sp.GetRequiredService<LanguagePreferenceService>()));
 builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<GroupMetricsService>();
-builder.Services.AddScoped<WhatsAppNotificationService>();
+// C31 — WhatsApp via Evolution API (grupo, nunca DM). DryRun is the default;
+// real sends only happen with DryRun=false + JID allowlist (boot guard below).
+builder.Services.Configure<WhatsAppOptions>(builder.Configuration.GetSection("WhatsApp"));
+builder.Services.AddHttpClient<EvolutionWhatsAppSender>();
+builder.Services.AddScoped<DryRunWhatsAppSender>();
+builder.Services.AddScoped<IWhatsAppSender>(sp =>
+    sp.GetRequiredService<IOptions<WhatsAppOptions>>().Value.DryRun
+        ? sp.GetRequiredService<DryRunWhatsAppSender>()
+        : sp.GetRequiredService<EvolutionWhatsAppSender>());
+builder.Services.AddScoped<WhatsAppDispatchService>();
 builder.Services.AddScoped<AdminSettingsService>();
 builder.Services.AddScoped<AdminRevenueReportService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();

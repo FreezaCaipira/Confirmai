@@ -47,6 +47,11 @@ public partial class Features
     private bool    payoutError        = false;
     private GroupPayoutAccount? payoutAccount = null;
 
+    // WhatsApp group (C31)
+    private bool    isSavingWhatsApp   = false;
+    private string  whatsAppMessage    = string.Empty;
+    private bool    whatsAppError      = false;
+
     protected override async Task OnInitializedAsync()
     {
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -244,4 +249,26 @@ public partial class Features
 
     private async Task SavePayoutAccountCallback(GroupPayoutAccount formData)
         => await SavePayoutAccount(formData);
+
+    private async Task SaveWhatsAppJidCallback(string? jid)
+    {
+        if (group is null) return;
+        isSavingWhatsApp = true;
+        whatsAppMessage  = string.Empty;
+        whatsAppError    = false;
+        try
+        {
+            var (success, message) = await FeaturesService.SaveWhatsAppGroupJidAsync(group.Id, jid, currentUserId);
+            whatsAppMessage = message;
+            whatsAppError = !success;
+            if (success)
+                await LoadAsync();
+        }
+        catch
+        {
+            whatsAppMessage = Ui["Group.SaveError"];
+            whatsAppError   = true;
+        }
+        finally { isSavingWhatsApp = false; }
+    }
 }

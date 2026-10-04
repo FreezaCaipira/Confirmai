@@ -138,6 +138,9 @@ internal static class GroupTexts
 
         // Features page
         ["Group.ConfigTitle"] = "Configurações do grupo",
+        ["Group.WhatsAppTitle"] = "Notificações no WhatsApp",
+        ["Group.WhatsAppSub"] = "Cole o JID do grupo do WhatsApp para receber avisos da partida nele. Vazio = desligado. O formato é o do grupo (termina em @g.us).",
+        ["Group.WhatsAppJidLabel"] = "JID do grupo do WhatsApp",
         ["Group.RankingPostMatchEnabled"] = "Ranking pós-partida ativado.",
         ["Group.RankingPostMatchDisabled"] = "Ranking pós-partida desativado.",
         ["Group.BestPlayerVotingEnabled"] = "Votação melhor da partida ativada.",
@@ -460,6 +463,9 @@ internal static class GroupTexts
 
         // Features page
         ["Group.ConfigTitle"] = "Group settings",
+        ["Group.WhatsAppTitle"] = "WhatsApp notifications",
+        ["Group.WhatsAppSub"] = "Paste the WhatsApp group JID to get match notices in it. Empty = off. The format is the group one (ends in @g.us).",
+        ["Group.WhatsAppJidLabel"] = "WhatsApp group JID",
         ["Group.RankingPostMatchEnabled"] = "Post-match ranking enabled.",
         ["Group.RankingPostMatchDisabled"] = "Post-match ranking disabled.",
         ["Group.BestPlayerVotingEnabled"] = "Best player voting enabled.",
@@ -782,6 +788,9 @@ internal static class GroupTexts
 
         // Features page
         ["Group.ConfigTitle"] = "Configuraciones del grupo",
+        ["Group.WhatsAppTitle"] = "Notificaciones en WhatsApp",
+        ["Group.WhatsAppSub"] = "Pega el JID del grupo de WhatsApp para recibir avisos del partido en él. Vacío = apagado. El formato es el de grupo (termina en @g.us).",
+        ["Group.WhatsAppJidLabel"] = "JID del grupo de WhatsApp",
         ["Group.RankingPostMatchEnabled"] = "Ranking post-partida activado.",
         ["Group.RankingPostMatchDisabled"] = "Ranking post-partida desactivado.",
         ["Group.BestPlayerVotingEnabled"] = "Votación del mejor de la partida activada.",

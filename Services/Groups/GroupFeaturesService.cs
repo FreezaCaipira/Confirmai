@@ -291,6 +291,55 @@ public sealed class GroupFeaturesService
         return (true, "Destino Pix salvo com sucesso.");
     }
 
+    /// <summary>
+    /// C31 — saves the linked WhatsApp group JID. Service-layer admin check
+    /// (GroupAccess, C36-C pattern): the page's isAdmin gate is not an
+    /// authorization boundary. Empty = feature off for the group.
+    /// </summary>
+    public async Task<(bool Success, string Message)> SaveWhatsAppGroupJidAsync(
+        int groupId, string? jid, string? currentUserId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        if (!await GroupAccess.IsGroupAdminAsync(db, groupId, currentUserId))
+            return (false, "Somente administradores do grupo podem alterar o grupo de WhatsApp.");
+
+        var dbGroup = await db.Groups.FindAsync(groupId);
+        if (dbGroup is null) return (false, "Grupo não encontrado.");
+
+        if (!Notification.WhatsAppGroupJid.IsValidOrEmpty(jid))
+            return (false, "JID inválido: use o formato do grupo do WhatsApp (ex.: 1203630xxxxxxxx@g.us).");
+
+        var previous = dbGroup.WhatsAppGroupJid;
+        var requested = string.IsNullOrWhiteSpace(jid) ? null : jid.Trim();
+        dbGroup.WhatsAppGroupJid = requested;
+        await db.SaveChangesAsync();
+
+        if (!string.Equals(previous, requested, StringComparison.Ordinal))
+        {
+            await _logService.AuditAsync(
+                AuditEvents.GroupWhatsAppJidChanged,
+                AuditEntities.Group,
+                dbGroup.Id.ToString(),
+                requested is null
+                    ? "Grupo de WhatsApp desvinculado."
+                    : "Grupo de WhatsApp vinculado/alterado.",
+                currentUserId,
+                source: "GroupFeatures",
+                metadata: new
+                {
+                    GroupId = dbGroup.Id,
+                    Linked = requested is not null,
+                    ChangedByUserId = currentUserId,
+                    ChangedAtUtc = DateTime.UtcNow,
+                });
+        }
+
+        return (true, requested is null
+            ? "Notificações de WhatsApp desativadas para este grupo."
+            : "Grupo de WhatsApp salvo com sucesso.");
+    }
+
     public async Task<(bool Success, string Message)> SavePayoutAccountAsync(
         int groupId, GroupPayoutAccount formData, int? existingAccountId, string? currentUserId)
     {

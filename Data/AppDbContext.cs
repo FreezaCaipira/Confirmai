@@ -30,6 +30,7 @@ namespace Confirmai.Data
         public DbSet<PostMatchVote> PostMatchVotes { get; set; }
         public DbSet<PlatformFeeSettlement> PlatformFeeSettlements { get; set; }
         public DbSet<PlatformFeeSettlementItem> PlatformFeeSettlementItems { get; set; }
+        public DbSet<WhatsAppDispatch> WhatsAppDispatches { get; set; }
 
         // Server integration
         public DbSet<ServerApiKey> ServerApiKeys { get; set; }
@@ -370,6 +371,12 @@ namespace Confirmai.Data
                 .HasIndex(ec => ec.PixTxId)
                 .IsUnique()
                 .HasFilter("\"PixTxId\" IS NOT NULL");
+
+            // C31 — idempotência do disparo: nunca duas mensagens do mesmo
+            // tipo para a mesma partida, nem em restart nem em varredura dupla.
+            modelBuilder.Entity<WhatsAppDispatch>()
+                .HasIndex(d => new { d.EventId, d.MessageKind })
+                .IsUnique();
 
             modelBuilder.Entity<EventConfirmation>()
                 .Property(ec => ec.PaymentStatus)

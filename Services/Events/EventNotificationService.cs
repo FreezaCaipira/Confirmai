@@ -190,22 +190,6 @@ public class EventNotificationService
             try   { await _emailSender.SendEmailAsync(user.Email, subject, bodyHtml); }
             catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de notificação para {Email}", user.Email); }
         }
-
-        // TODO (WhatsApp) ────────────────────────────────────────────────────
-        // Pré-requisitos:
-        //   1. Adicionar campo PhoneNumber (E.164, ex: "+5535999990000") em ApplicationUser
-        //      e um bool WhatsAppOptIn (consentimento explícito do usuário).
-        //   2. Escolher provider: Evolution API (self-hosted), Z-API ou Twilio.
-        //      Criar IWhatsAppSender + implementação concreta; registrar em Program.cs.
-        //   3. Injetar IWhatsAppSender neste serviço e enviar mensagem logo abaixo:
-        //
-        //   foreach (var user in recipients)
-        //   {
-        //       if (!user.WhatsAppOptIn || string.IsNullOrWhiteSpace(user.PhoneNumber)) continue;
-        //       try { await _whatsAppSender.SendTextAsync(user.PhoneNumber, bodyText); }
-        //       catch { /* ignore */ }
-        //   }
-        // ────────────────────────────────────────────────────────────────────
     }
 
     /// <summary>
