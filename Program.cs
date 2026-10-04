@@ -177,7 +177,7 @@ builder.Services.AddScoped<GroupMetricsService>();
 // C31 — WhatsApp via Evolution API (grupo, nunca DM). DryRun is the default;
 // real sends only happen with DryRun=false + JID allowlist (boot guard below).
 builder.Services.Configure<WhatsAppOptions>(builder.Configuration.GetSection("WhatsApp"));
-builder.Services.AddHttpClient<EvolutionWhatsAppSender>();
+builder.Services.AddHttpClient<EvolutionWhatsAppSender>(c => c.Timeout = TimeSpan.FromSeconds(10));
 builder.Services.AddScoped<DryRunWhatsAppSender>();
 builder.Services.AddScoped<IWhatsAppSender>(sp =>
     sp.GetRequiredService<IOptions<WhatsAppOptions>>().Value.DryRun

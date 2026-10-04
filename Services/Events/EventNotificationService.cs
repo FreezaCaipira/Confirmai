@@ -100,7 +100,8 @@ public class EventNotificationService
 
         if (_whatsApp is not null)
             await _whatsApp.DispatchAsync(ev.Id, WhatsAppMessageKind.EventUpdated,
-                WhatsAppTexts.EventRescheduled(ev, oldStartsAt, _whatsApp.EventLink(ev)));
+                WhatsAppTexts.EventRescheduled(ev, oldStartsAt, _whatsApp.EventLink(ev)),
+                slot: WhatsAppDispatchService.StartSlot(ev.StartsAt));
     }
 
     // ── internos ─────────────────────────────────────────────────────────────
