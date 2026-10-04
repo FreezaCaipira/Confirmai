@@ -1,6 +1,7 @@
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Notification;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,15 +17,18 @@ public class EventNotificationService
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly IEmailSender                   _emailSender;
     private readonly ILogger<EventNotificationService> _logger;
+    private readonly WhatsAppDispatchService?       _whatsApp;
 
     public EventNotificationService(
         IDbContextFactory<AppDbContext> dbFactory,
         IEmailSender emailSender,
-        ILogger<EventNotificationService> logger)
+        ILogger<EventNotificationService> logger,
+        WhatsAppDispatchService? whatsApp = null)
     {
         _dbFactory   = dbFactory;
         _emailSender = emailSender;
         _logger      = logger;
+        _whatsApp    = whatsApp;
     }
 
     /// <summary>
@@ -54,6 +58,10 @@ public class EventNotificationService
                        $"Equipe Confirmai";
 
         await SendToParticipantsAsync(db, ev, cancelledByUserId, subject, bodyText);
+
+        if (_whatsApp is not null)
+            await _whatsApp.DispatchAsync(ev.Id, WhatsAppMessageKind.EventCancelled,
+                WhatsAppTexts.EventCancelled(ev, _whatsApp.EventLink(ev)));
     }
 
     /// <summary>
@@ -89,6 +97,10 @@ public class EventNotificationService
                        $"Equipe Confirmai";
 
         await SendToParticipantsAsync(db, ev, updatedByUserId, subject, bodyText);
+
+        if (_whatsApp is not null)
+            await _whatsApp.DispatchAsync(ev.Id, WhatsAppMessageKind.EventUpdated,
+                WhatsAppTexts.EventRescheduled(ev, oldStartsAt, _whatsApp.EventLink(ev)));
     }
 
     // ── internos ─────────────────────────────────────────────────────────────
@@ -151,6 +163,10 @@ public class EventNotificationService
             try   { await _emailSender.SendEmailAsync(member.User.Email, subject, bodyHtml); }
             catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de notificação para {Email}", member.User.Email); }
         }
+
+        if (_whatsApp is not null)
+            await _whatsApp.DispatchAsync(ev.Id, WhatsAppMessageKind.RecurringCreated,
+                WhatsAppTexts.RecurringCreated(ev, _whatsApp.EventLink(ev)));
     }
 
     private async Task SendToParticipantsAsync(
@@ -190,22 +206,6 @@ public class EventNotificationService
             try   { await _emailSender.SendEmailAsync(user.Email, subject, bodyHtml); }
             catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de notificação para {Email}", user.Email); }
         }
-
-        // TODO (WhatsApp) ────────────────────────────────────────────────────
-        // Pré-requisitos:
-        //   1. Adicionar campo PhoneNumber (E.164, ex: "+5535999990000") em ApplicationUser
-        //      e um bool WhatsAppOptIn (consentimento explícito do usuário).
-        //   2. Escolher provider: Evolution API (self-hosted), Z-API ou Twilio.
-        //      Criar IWhatsAppSender + implementação concreta; registrar em Program.cs.
-        //   3. Injetar IWhatsAppSender neste serviço e enviar mensagem logo abaixo:
-        //
-        //   foreach (var user in recipients)
-        //   {
-        //       if (!user.WhatsAppOptIn || string.IsNullOrWhiteSpace(user.PhoneNumber)) continue;
-        //       try { await _whatsAppSender.SendTextAsync(user.PhoneNumber, bodyText); }
-        //       catch { /* ignore */ }
-        //   }
-        // ────────────────────────────────────────────────────────────────────
     }
 
     /// <summary>
@@ -249,6 +249,10 @@ public class EventNotificationService
             try { await _emailSender.SendEmailAsync(user.Email, subject, bodyHtml); }
             catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de promoção de espera para {Email}", user.Email); }
         }
+
+        if (_whatsApp is not null)
+            await _whatsApp.DispatchAsync(ev.Id, WhatsAppMessageKind.WaitlistPromoted,
+                WhatsAppTexts.WaitlistPromoted(ev, _whatsApp.EventLink(ev)));
     }
 
     /// <summary>

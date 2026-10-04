@@ -1,0 +1,38 @@
+@using Confirmai.Models
+@using Confirmai.Services.Core
+@inject UiTextService Ui
+
+<section class="detail-section features-section">
+    <h2 class="detail-section-title">
+        <i class="fas fa-comment-dots"></i> @Ui["Group.WhatsAppTitle"]
+    </h2>
+    <p class="features-section-sub">
+        @Ui["Group.WhatsAppSub"]
+    </p>
+
+    <div class="feat-pix-form">
+        <label class="feat-pix-label" for="whatsapp-jid-input">@Ui["Group.WhatsAppJidLabel"]</label>
+        <input id="whatsapp-jid-input"
+               class="feat-pix-select"
+               type="text"
+               inputmode="text"
+               autocomplete="off"
+               spellcheck="false"
+               placeholder="1203630xxxxxxxx@g.us"
+               @bind="localJid"
+               disabled="@IsSaving" />
+        <button class="feat-pix-save-btn" type="button"
+                disabled="@IsSaving"
+                @onclick="HandleSave">
+            <i class="fas fa-save"></i> @(IsSaving ? Ui["Payment.Saving"] : Ui["Payment.Save"])
+        </button>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Message))
+    {
+        <p class="features-save-msg @(IsError ? "features-save-msg--error" : "")">
+            <i class="fas @(IsError ? "fa-times-circle" : "fa-check-circle")"></i>
+            @Message
+        </p>
+    }
+</section>

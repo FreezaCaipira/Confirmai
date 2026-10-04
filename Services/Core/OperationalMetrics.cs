@@ -27,6 +27,9 @@ public sealed class OperationalMetrics
     private readonly Counter<long> _proofUploadRejected =
         Meter.CreateCounter<long>("confirmai_proof_upload_rejected_total");
 
+    private readonly Counter<long> _whatsAppSend =
+        Meter.CreateCounter<long>("confirmai_whatsapp_send_total");
+
     private int _staleFeeSettlements;
 
     public OperationalMetrics()
@@ -47,6 +50,10 @@ public sealed class OperationalMetrics
     /// <summary>Reason tags: mime, empty, size, signature, ownership, not_found, io, unexpected.</summary>
     public void ProofUploadRejected(string reason) =>
         _proofUploadRejected.Add(1, new KeyValuePair<string, object?>("reason", reason));
+
+    /// <summary>Result tags: sent, dry_run, blocked_allowlist, failed. Never JID/text/group names.</summary>
+    public void WhatsAppSend(string result) =>
+        _whatsAppSend.Add(1, new KeyValuePair<string, object?>("result", result));
 
     /// <summary>Latest stale-settlement count, refreshed by StaleSettlementMetricsService.</summary>
     public void RecordStaleFeeSettlements(int count) =>

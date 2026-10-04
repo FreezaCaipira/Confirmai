@@ -83,6 +83,14 @@ namespace Confirmai.Models
         public string? PixReceiverUserId { get; set; }
         public ApplicationUser? PixReceiverUser { get; set; }
 
+        /// <summary>
+        /// JID do grupo de WhatsApp ligado a este grupo (formato NNN-NNN@g.us).
+        /// Nulo/vazio = notificacoes WhatsApp desligadas para o grupo (mesmo
+        /// padrao de opt-in do EnablePaymentGateways). C31.
+        /// </summary>
+        [StringLength(64)]
+        public string? WhatsAppGroupJid { get; set; }
+
         public ICollection<GroupMember> Members { get; set; } = new List<GroupMember>();
         public ICollection<Event> Events { get; set; } = new List<Event>();
     }

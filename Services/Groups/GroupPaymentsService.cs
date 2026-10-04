@@ -43,6 +43,7 @@ public sealed class GroupPaymentsService
     private readonly PlatformFeeLedgerService _feeLedger;
     private readonly PlatformFeePolicy _feePolicy;
     private readonly ILogger<GroupPaymentsService> _logger;
+    private readonly Services.Notification.WhatsAppDispatchService? _whatsApp;
 
     public GroupPaymentsService(
         IDbContextFactory<AppDbContext> dbFactory,
@@ -51,13 +52,15 @@ public sealed class GroupPaymentsService
         LogService logService,
         PlatformFeeLedgerService feeLedger,
         PlatformFeePolicy feePolicy,
-        ILogger<GroupPaymentsService> logger)
+        ILogger<GroupPaymentsService> logger,
+        Services.Notification.WhatsAppDispatchService? whatsApp = null)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
         _notificationService = notificationService;
         _logService = logService;
         _feeLedger = feeLedger;
+        _whatsApp = whatsApp;
         _feePolicy = feePolicy;
         _logger = logger;
     }
@@ -363,6 +366,9 @@ public sealed class GroupPaymentsService
             groupId.ToString(),
             $"Admin notificou jogador {d.UserId} ({d.UserName}) sobre {d.Entries.Count} partida(s) em aberto - R$ {d.TotalAmount:F2} (grupo #{groupId})",
             currentUserId, "GroupAdmin");
+
+        if (_whatsApp is not null)
+            await _whatsApp.DispatchPaymentPendingAsync(groupId, groupName);
     }
 
     /// <summary>

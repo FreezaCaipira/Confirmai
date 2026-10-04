@@ -112,6 +112,16 @@ else
 
             <hr class="detail-divider">
 
+            @* ── WhatsApp (C31) ────────────────────────────────────── *@
+            <WhatsAppGroupJidEditor
+                CurrentJid="@group.WhatsAppGroupJid"
+                IsSaving="@isSavingWhatsApp"
+                Message="@whatsAppMessage"
+                IsError="@whatsAppError"
+                OnSaveJid="@SaveWhatsAppJidCallback" />
+
+            <hr class="detail-divider">
+
             @* ── Membros & Permissões ───────────────────────────────── *@
             <MembersManager
                 Members="@members"

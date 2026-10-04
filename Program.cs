@@ -174,7 +174,17 @@ builder.Services.AddScoped<LanguagePreferenceService>();
 builder.Services.AddScoped<UiTextService>(sp => new UiTextService(sp.GetRequiredService<LanguagePreferenceService>()));
 builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<GroupMetricsService>();
-builder.Services.AddScoped<WhatsAppNotificationService>();
+// C31 — WhatsApp via Evolution API (grupo, nunca DM). DryRun is the default;
+// real sends only happen with DryRun=false + JID allowlist (boot guard below).
+builder.Services.Configure<WhatsAppOptions>(builder.Configuration.GetSection("WhatsApp"));
+builder.Services.AddHttpClient<EvolutionWhatsAppSender>();
+builder.Services.AddScoped<DryRunWhatsAppSender>();
+builder.Services.AddScoped<IWhatsAppSender>(sp =>
+    sp.GetRequiredService<IOptions<WhatsAppOptions>>().Value.DryRun
+        ? sp.GetRequiredService<DryRunWhatsAppSender>()
+        : sp.GetRequiredService<EvolutionWhatsAppSender>());
+builder.Services.AddScoped<WhatsAppDispatchService>();
+builder.Services.AddHostedService<WhatsAppReminderSchedulerService>();
 builder.Services.AddScoped<AdminSettingsService>();
 builder.Services.AddScoped<AdminRevenueReportService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();
@@ -445,6 +455,25 @@ if (!isDevelopment)
             "AbacatePay: ApiKey começa com 'abc_dev_' em um ambiente não-Development. " +
             "Substitua pela ApiKey de produção (abc_live_...) antes de processar pagamentos reais.");
     }
+}
+
+// C31 guard: envio real de WhatsApp (Enabled=true + DryRun=false) exige a
+// Evolution completa; fora de Development/Testing a allowlist nao pode estar
+// vazia — preferimos falhar o boot a mandar mensagem para grupo errado.
+var waOpts = app.Services.GetRequiredService<IOptions<WhatsAppOptions>>().Value;
+if (waOpts.Enabled && !waOpts.DryRun)
+{
+    if (string.IsNullOrWhiteSpace(waOpts.BaseUrl) ||
+        string.IsNullOrWhiteSpace(waOpts.Instance) ||
+        string.IsNullOrWhiteSpace(waOpts.ApiKey))
+        throw new InvalidOperationException(
+            "WhatsApp: Enabled=true e DryRun=false exigem WhatsApp__BaseUrl, " +
+            "WhatsApp__Instance e WhatsApp__ApiKey configurados.");
+
+    if (!isDevelopment && waOpts.ParseAllowedGroupJids().Count == 0)
+        throw new InvalidOperationException(
+            "WhatsApp: envio real fora de Development/Testing exige " +
+            "WhatsApp__AllowedGroupJids com pelo menos um JID ...@g.us.");
 }
 
 // S-1: Error handler + HTTPS redirect + HSTS

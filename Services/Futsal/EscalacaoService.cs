@@ -2,6 +2,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Pages.Components;
+using Confirmai.Services.Notification;
 using Confirmai.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,10 +22,13 @@ public sealed record EscalacaoLoadResult(
 public class EscalacaoService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
+    private readonly WhatsAppDispatchService? _whatsApp;
 
-    public EscalacaoService(IDbContextFactory<AppDbContext> dbFactory)
+    public EscalacaoService(IDbContextFactory<AppDbContext> dbFactory,
+        WhatsAppDispatchService? whatsApp = null)
     {
         _dbFactory = dbFactory;
+        _whatsApp = whatsApp;
     }
 
     public async Task<EscalacaoLoadResult> LoadAsync(int eventId, string? currentUserId)
@@ -111,6 +115,20 @@ public class EscalacaoService
             dbEv.LineupConfirmedAt = DateTime.UtcNow;
 
         await db.SaveChangesAsync();
+
+        if (_whatsApp is not null && dbEv is not null)
+        {
+            var full = await db.Events
+                .Include(e => e.Group)
+                .Include(e => e.Venue)
+                .Include(e => e.Confirmations)
+                    .ThenInclude(c => c.User)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == eventId);
+            if (full is not null)
+                await _whatsApp.DispatchAsync(eventId, WhatsAppMessageKind.LineupConfirmed,
+                    WhatsAppTexts.LineupConfirmed(full, _whatsApp.EventLink(full)));
+        }
     }
 
     public async Task ResetLineupAsync(int eventId)
