@@ -1,6 +1,7 @@
 @using Confirmai.Enums
 @using Confirmai.Services.Core
 @using Confirmai.Services.Events
+@using Confirmai.Services.Groups
 @inject UiTextService Ui
 
 <section class="panel today-panel" aria-labelledby="today-title">
@@ -26,7 +27,7 @@
             <span class="today-tile-body">
                 <span class="today-tile-value">@Summary.PendingPayments</span>
                 <span class="today-tile-label">@Ui["Index.PendingPaymentsTitle"]</span>
-                <span class="today-tile-sub">@(Summary.PendingPayments > 0 ? Ui["Index.PendingPaymentsCta"] : Ui["Index.TodayAllPaid"])</span>
+                <span class="today-tile-sub">@PendingText</span>
             </span>
         </a>
 
@@ -81,7 +82,8 @@
 @code {
     [Parameter, EditorRequired] public HomeTodaySummary Summary { get; set; } = default!;
     [Parameter] public DateTime LocalNow { get; set; }
-    [Parameter] public int PaymentsGroupId { get; set; }
+    [Parameter] public IReadOnlyList<PendingPaymentGroup> PendingGroups { get; set; } = [];
+    [Parameter] public int FallbackGroupId { get; set; }
 
     private static readonly string[] TipKeys =
     [
@@ -109,7 +111,11 @@
 
     private string MatchesHref => Summary.Next is { } next ? DetailHref(next) : "/grupos";
 
-    private string PaymentsHref => $"/grupo/{PaymentsGroupId}/pagamentos";
+    private string PaymentsHref => $"/grupo/{PendingGroups.FirstOrDefault()?.GroupId ?? FallbackGroupId}/pagamentos";
+
+    private string PendingText => PendingGroups.Count > 0
+        ? string.Join(", ", PendingGroups.Select(g => $"{g.GroupName} ({g.Count})"))
+        : Ui["Index.TodayAllPaid"];
 
     private static string DetailHref(HomeTodayMatch m) =>
         m.Sport == Sport.Poker ? $"/poker/{m.EventId}" : $"/futsal/{m.EventId}";
