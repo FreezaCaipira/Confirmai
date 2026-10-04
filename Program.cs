@@ -184,6 +184,7 @@ builder.Services.AddScoped<IWhatsAppSender>(sp =>
         ? sp.GetRequiredService<DryRunWhatsAppSender>()
         : sp.GetRequiredService<EvolutionWhatsAppSender>());
 builder.Services.AddScoped<WhatsAppDispatchService>();
+builder.Services.AddHostedService<WhatsAppReminderSchedulerService>();
 builder.Services.AddScoped<AdminSettingsService>();
 builder.Services.AddScoped<AdminRevenueReportService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();

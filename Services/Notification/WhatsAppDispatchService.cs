@@ -46,9 +46,9 @@ public sealed class WhatsAppDispatchService
     public string? EventLink(Event ev)
     {
         var baseUrl = _options.Value.PublicBaseUrl;
-        return string.IsNullOrWhiteSpace(baseUrl)
-            ? null
-            : $"{baseUrl.TrimEnd('/')}/partida/{ev.Id}";
+        if (string.IsNullOrWhiteSpace(baseUrl)) return null;
+        var path = ev.Sport == Sport.Poker ? "poker" : "futsal";
+        return $"{baseUrl.TrimEnd('/')}/{path}/{ev.Id}";
     }
 
     /// <summary>Absolute URL of the group payments page, or null when PublicBaseUrl is unset.</summary>
@@ -58,6 +58,51 @@ public sealed class WhatsAppDispatchService
         return string.IsNullOrWhiteSpace(baseUrl)
             ? null
             : $"{baseUrl.TrimEnd('/')}/grupo/{groupId}/pagamentos";
+    }
+
+    /// <summary>
+    /// C31 itens 2-3 — 15-minute sweep run by WhatsAppReminderSchedulerService.
+    /// Sends DayReminder (event's local date == today, local hour &gt;= 7, not
+    /// started) and HourReminder (starts in (60, 90] minutes so a 15-min sweep
+    /// always catches the window once). Idempotent via the dispatch rows.
+    /// Returns the number of dispatch attempts made.
+    /// </summary>
+    public async Task<int> RunReminderSweepAsync(DateTime utcNow, CancellationToken ct = default)
+    {
+        if (!_options.Value.Enabled) return 0;
+
+        var localNow = utcNow.ToLocalTime();
+        var localToday = localNow.Date;
+
+        await using var db = await _dbFactory.CreateDbContextAsync(ct);
+        var candidates = await db.Events
+            .Include(e => e.Group)
+            .Include(e => e.Venue)
+            .AsNoTracking()
+            .Where(e => e.IsActive
+                        && e.Group!.WhatsAppGroupJid != null
+                        && e.StartsAt > utcNow
+                        && e.StartsAt <= utcNow.Date.AddDays(2))
+            .ToListAsync(ct);
+
+        var attempts = 0;
+        foreach (var ev in candidates)
+        {
+            var untilStart = ev.StartsAt - utcNow;
+            if (untilStart > TimeSpan.FromMinutes(60) && untilStart <= TimeSpan.FromMinutes(90))
+            {
+                await DispatchAsync(ev.Id, WhatsAppMessageKind.HourReminder,
+                    WhatsAppTexts.HourReminder(ev, EventLink(ev)), ct);
+                attempts++;
+            }
+            else if (localNow.Hour >= 7 && ev.StartsAt.ToLocalTime().Date == localToday)
+            {
+                await DispatchAsync(ev.Id, WhatsAppMessageKind.DayReminder,
+                    WhatsAppTexts.DayReminder(ev, EventLink(ev)), ct);
+                attempts++;
+            }
+        }
+        return attempts;
     }
 
     public async Task DispatchAsync(int eventId, WhatsAppMessageKind kind, string text, CancellationToken ct = default)

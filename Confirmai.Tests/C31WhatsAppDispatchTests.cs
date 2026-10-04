@@ -16,26 +16,14 @@ namespace Confirmai.Tests;
 /// </summary>
 public class C31WhatsAppDispatchTests
 {
-    private sealed class RecordingSender : IWhatsAppSender
-    {
-        public List<(string Jid, string Text)> Calls { get; } = new();
-        public WhatsAppSendStatus NextStatus { get; set; } = WhatsAppSendStatus.DryRun;
-
-        public Task<WhatsAppSendResult> SendGroupTextAsync(string groupJid, string text, CancellationToken ct = default)
-        {
-            Calls.Add((groupJid, text));
-            return Task.FromResult(new WhatsAppSendResult(NextStatus, NextStatus == WhatsAppSendStatus.Failed ? "boom" : null));
-        }
-    }
-
     private static WhatsAppOptions Opts(bool enabled = true, string allowed = "111@g.us") =>
         new() { Enabled = enabled, DryRun = true, AllowedGroupJids = allowed };
 
-    private static (IDbContextFactory<AppDbContext> factory, WhatsAppDispatchService svc, RecordingSender sender)
+    private static (IDbContextFactory<AppDbContext> factory, WhatsAppDispatchService svc, RecordingWhatsAppSender sender)
         Setup(WhatsAppOptions options)
     {
         var factory = TestDbContextFactory.CreateInMemoryFactory($"wad-{Guid.NewGuid()}");
-        var sender = new RecordingSender();
+        var sender = new RecordingWhatsAppSender();
         var svc = new WhatsAppDispatchService(factory, sender, Options.Create(options),
             NullLogger<WhatsAppDispatchService>.Instance);
         return (factory, svc, sender);
