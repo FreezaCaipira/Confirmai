@@ -153,6 +153,28 @@ public class C31WhatsAppFlowsTests
     }
 
     [Fact]
+    public async Task Sweep_HourReminder_IncludesLineup_WhenConfirmed()
+    {
+        var (factory, dispatch, sender) = Setup();
+        var now = DateTime.UtcNow;
+        var eventId = await SeedEventAsync(factory, now.AddMinutes(75));
+        await using (var db = factory.CreateDbContext())
+        {
+            db.Users.Add(new ApplicationUser { Id = "u1", UserName = "u1", FullName = "João" });
+            db.EventConfirmations.Add(new EventConfirmation { EventId = eventId, UserId = "u1", TeamId = 0 });
+            (await db.Events.FindAsync(eventId))!.LineupConfirmedAt = now;
+            await db.SaveChangesAsync();
+        }
+
+        await dispatch.RunReminderSweepAsync(now);
+
+        var (_, text) = Assert.Single(sender.Calls);
+        Assert.Contains("1 hora", text);
+        Assert.Contains("TIME A", text);
+        Assert.Contains("João", text);
+    }
+
+    [Fact]
     public async Task Sweep_NoHourReminder_OutsideWindow()
     {
         var (factory, dispatch, sender) = Setup();

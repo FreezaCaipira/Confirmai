@@ -60,12 +60,25 @@ public static class WhatsAppTexts
         return sb.ToString().TrimEnd();
     }
 
+    /// <summary>
+    /// The one-hour reminder carries the current lineup whenever one was
+    /// confirmed (futsal) — the last pre-game read is where it is most useful.
+    /// </summary>
     public static string HourReminder(Event ev, string? link)
     {
         var sb = new StringBuilder();
         sb.AppendLine($"⏰ *Falta 1 hora! — {ev.Group.Name}*");
         var local = ev.Venue?.Name ?? ev.Location;
         if (!string.IsNullOrWhiteSpace(local)) sb.AppendLine($"📍 {local}");
+
+        if (ev.LineupConfirmedAt is not null
+            && ev.Sport == Enums.Sport.Futsal
+            && ev.Confirmations is { Count: > 0 })
+        {
+            sb.AppendLine();
+            sb.AppendLine(EscalacaoTextFormatter.BuildWhatsAppText(ev));
+        }
+
         AppendLink(sb, link);
         return sb.ToString().TrimEnd();
     }

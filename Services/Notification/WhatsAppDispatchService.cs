@@ -78,7 +78,10 @@ public sealed class WhatsAppDispatchService
         var candidates = await db.Events
             .Include(e => e.Group)
             .Include(e => e.Venue)
+            .Include(e => e.Confirmations)
+                .ThenInclude(c => c.User)
             .AsNoTracking()
+            .AsSplitQuery()
             .Where(e => e.IsActive
                         && e.Group!.WhatsAppGroupJid != null
                         && e.StartsAt > utcNow
