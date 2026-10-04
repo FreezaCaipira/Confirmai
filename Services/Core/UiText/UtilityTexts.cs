@@ -166,7 +166,7 @@ internal static class UtilityTexts
         ["Common.No"] = "Não",
         ["Common.ToBeDefined"] = "A definir",
 
-        ["Widget.PaymentMethods.Title"] = "formas de pagamento",
+        ["Widget.PaymentMethods.Title"] = "Formas de pagamento",
         ["Widget.PaymentMethods.Loading"] = "Carregando metodos ativos...",
         ["Widget.PaymentMethods.Empty"] = "Nenhuma forma de pagamento ativa no painel admin.",
 
@@ -578,7 +578,7 @@ internal static class UtilityTexts
         ["Common.No"] = "No",
         ["Common.ToBeDefined"] = "To be defined",
 
-        ["Widget.PaymentMethods.Title"] = "payment methods",
+        ["Widget.PaymentMethods.Title"] = "Payment methods",
         ["Widget.PaymentMethods.Loading"] = "Loading active methods...",
         ["Widget.PaymentMethods.Empty"] = "No active payment methods in the admin panel.",
 
@@ -992,7 +992,7 @@ internal static class UtilityTexts
         ["Common.No"] = "No",
         ["Common.ToBeDefined"] = "A definir",
 
-        ["Widget.PaymentMethods.Title"] = "metodos de pago",
+        ["Widget.PaymentMethods.Title"] = "Métodos de pago",
         ["Widget.PaymentMethods.Loading"] = "Cargando metodos activos...",
         ["Widget.PaymentMethods.Empty"] = "No hay metodos de pago activos en el panel admin.",
 

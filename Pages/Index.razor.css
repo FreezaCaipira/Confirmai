@@ -259,7 +259,7 @@
     gap: var(--space-2);
     margin: 0;
     padding-left: var(--space-3);
-    border-left: 3px solid var(--accent);
+    border-left: 3px solid var(--feat, var(--accent));
     font-size: 1rem;
     font-weight: var(--fw-semibold);
     letter-spacing: -0.01em;
@@ -321,7 +321,8 @@
     width: 24px;
     height: 24px;
     border-radius: var(--radius-full);
-    background: var(--accent-soft);
+    background: var(--feat-members-soft);
+    color: var(--feat-members);
     font-size: 0.8125rem;
 }
 

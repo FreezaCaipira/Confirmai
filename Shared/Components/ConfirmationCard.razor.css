@@ -167,6 +167,19 @@
     color: var(--accent-fg);
 }
 
+/* Com "Pagar" presente, "Entrar" vira secundario: um azul cheio por card. */
+.my-conf-btn--pay ~ .my-conf-btn--view {
+    background: var(--surface-3);
+    border-color: var(--border-2);
+    color: var(--text);
+}
+
+.my-conf-btn--pay ~ .my-conf-btn--view:hover {
+    background: var(--surface-3);
+    border-color: var(--accent-border);
+    color: var(--accent-text);
+}
+
 .my-conf-card--past .my-conf-btn--view,
 .my-conf-card--cancelled .my-conf-btn--view {
     background: transparent;
@@ -190,6 +203,7 @@
     }
 
     .my-conf-btn {
+        box-sizing: border-box;
         width: 100%;
         justify-content: center;
     }

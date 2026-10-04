@@ -9,6 +9,7 @@
 }
 
 .metric-card {
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -21,7 +22,7 @@
 
 .metric-card:hover {
     background: var(--surface-3);
-    border-color: var(--accent-border);
+    border-color: var(--border-2);
 }
 
 .metric-card--alert {
@@ -37,11 +38,12 @@
     border-radius: var(--radius-full);
     font-size: 1rem;
     flex-shrink: 0;
-    background: var(--accent-soft);
-    color: var(--accent-text);
+    background: var(--feat-soft, var(--accent-soft));
+    color: var(--feat, var(--accent-text));
 }
 
 .metric-card--alert .metric-icon {
+    background: var(--danger-soft);
     color: var(--danger);
 }
 
@@ -84,6 +86,6 @@
 
 @media (max-width: 768px) {
     .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }

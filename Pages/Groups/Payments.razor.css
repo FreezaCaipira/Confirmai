@@ -24,92 +24,66 @@
 
 .payments-tabs {
     display: flex;
-    gap: 0.75rem;
-    padding: 1.25rem 1.75rem;
-    border-bottom: 2px solid var(--accent-border);
-    align-items: center;
     flex-wrap: wrap;
-    background: var(--surface-2);
-    box-shadow: var(--shadow);
-    position: relative;
-}
-
-.payments-tabs::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: var(--border);
+    align-items: center;
+    gap: var(--space-2);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border);
 }
 
 .payments-tab {
-    background: var(--bg);
-    border: var(--border);
-    color: var(--text-2);
-    font-size: 0.95rem;
-    font-weight: 800;
-    padding: 0.6rem 1.2rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
+    min-height: 36px;
+    padding: 0 var(--space-3);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    color: var(--text-2);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: var(--fw-medium);
     white-space: nowrap;
-    box-shadow: 0 2px 4px var(--shadow);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .payments-tab:hover {
-    background: var(--surface);
-    border-color: var(--accent-text);
-    color: var(--text-3);
-    box-shadow: 0 4px 8px var(--shadow);
-}
-
-.payments-tab--active {
+    background: var(--surface-3);
     color: var(--text);
-    border-color: var(--accent-text);
-    background: var(--accent);
-    box-shadow: 0 4px 8px var(--shadow), inset 0 0 0 1px var(--accent-soft);
-
 }
 
-.payments-tab--delinquent {
-    border-color: var(--danger);
-    background: var(--danger-soft);
-    color: var(--danger);
-    box-shadow: 0 4px 8px var(--shadow);
+.payments-tab:focus-visible {
+    outline: 2px solid var(--accent-ring);
+    outline-offset: 2px;
 }
 
-.payments-tab--history {
-    border-color: var(--accent-text);
-    background: var(--accent);
-    box-shadow: 0 4px 8px var(--shadow), inset 0 0 0 1px var(--accent-soft);
-
+.payments-tab--active,
+.payments-tab--active:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+    color: var(--accent-text);
 }
 
 .payments-tab-count {
-    background: var(--danger-soft);
-    color: var(--danger);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-full);
+    background: var(--surface-3);
+    color: var(--text-2);
     font-size: 0.75rem;
-    padding: 0.15rem 0.4rem;
-    border-radius: 3px;
-    font-weight: 800;
-    box-shadow: 0 2px 4px var(--shadow);
+    font-weight: var(--fw-semibold);
 }
 
 .payments-tab-count--delinquent {
-    background: var(--accent-fg);
+    background: var(--danger-soft);
     color: var(--danger);
-    box-shadow: 0 2px 4px var(--shadow);
-}
-
-.payments-tab-count--history {
-    background: var(--accent-soft);
-    color: var(--accent-text);
-    box-shadow: 0 2px 4px var(--shadow);
 }
 
 .payments-refresh-btn {
@@ -158,7 +132,7 @@
     padding: 2rem;
     text-align: center;
     color: var(--text);
-    background: var(--bg);
+    background: var(--surface-2);
     border: var(--border);
     border-radius: 8px;
     display: flex;
@@ -221,7 +195,7 @@
 }
 
 .payments-history-filters select {
-    background: var(--bg);
+    background: var(--surface-2);
     border: var(--border);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
@@ -243,7 +217,7 @@
 }
 
 .payments-history-filters select option {
-    background: var(--bg);
+    background: var(--surface-2);
     color: var(--text);
 }
 
@@ -261,7 +235,7 @@
 }
 
 .payments-user-item {
-    background: var(--bg);
+    background: var(--surface-2);
     border: 2px solid var(--danger);
     border-radius: 8px;
     padding: 1rem 1.25rem;
@@ -278,7 +252,7 @@
 }
 
 .payments-user-item:hover {
-    background: var(--bg);
+    background: var(--surface-3);
     border-color: var(--danger);
     box-shadow: var(--shadow-card);
 }
@@ -361,7 +335,7 @@
 /* ──────────────────────────────────────────────────────────── */
 
 .payments-detail-panel {
-    background: var(--bg);
+    background: var(--surface-2);
     border-left: 3px solid var(--danger);
     border-radius: 0 0 8px 8px;
     margin-top: -0.5rem;
@@ -418,7 +392,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0.75rem;
-    background: var(--bg);
+    background: var(--surface-3);
     border: var(--border);
     border-radius: 6px;
     gap: 0.5rem;
@@ -656,18 +630,9 @@
 /* ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 480px) {
-    .payments-tabs {
-        padding: 1rem 0.8rem;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-    }
-
     .payments-tab {
-        width: 100%;
+        flex: 1 1 auto;
         justify-content: center;
-        padding: 0.5rem 0.8rem;
-        font-size: 0.85rem;
     }
 
     .payments-refresh-btn {
@@ -773,13 +738,6 @@
 /* ------------------------------------------------------------ */
 /* Platform Fee Settlement Tab (Fase A do Ciclo 27) */
 /* ------------------------------------------------------------ */
-
-.payments-tab--platformfee {
-    border-color: var(--accent-text);
-    background: var(--accent);
-    box-shadow: 0 4px 8px var(--shadow), inset 0 0 0 1px var(--accent-soft);
-
-}
 
 .platform-fee-section {
     padding: 1.25rem 1.75rem;
@@ -1621,12 +1579,6 @@
     color: var(--text-2);
     text-align: center;
     padding: 0.5rem;
-}
-
-/* Tab styling for proofs tab */
-.payments-tab--proofs.payments-tab--active {
-    border-bottom-color: var(--accent-text);
-    color: var(--accent-text);
 }
 
 @media (max-width: 768px) {

@@ -17,6 +17,8 @@
 
 .group-entry--compact .group-entry-option {
     padding: var(--space-4);
+    background: var(--surface-2);
+    border-color: var(--border-2);
 }
 
 .group-entry-label {
@@ -95,7 +97,7 @@
 
 @media (max-width: 768px) {
     .group-entry {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: var(--space-3);
     }
 
