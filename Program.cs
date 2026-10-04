@@ -457,6 +457,25 @@ if (!isDevelopment)
     }
 }
 
+// C31 guard: envio real de WhatsApp (Enabled=true + DryRun=false) exige a
+// Evolution completa; fora de Development/Testing a allowlist nao pode estar
+// vazia — preferimos falhar o boot a mandar mensagem para grupo errado.
+var waOpts = app.Services.GetRequiredService<IOptions<WhatsAppOptions>>().Value;
+if (waOpts.Enabled && !waOpts.DryRun)
+{
+    if (string.IsNullOrWhiteSpace(waOpts.BaseUrl) ||
+        string.IsNullOrWhiteSpace(waOpts.Instance) ||
+        string.IsNullOrWhiteSpace(waOpts.ApiKey))
+        throw new InvalidOperationException(
+            "WhatsApp: Enabled=true e DryRun=false exigem WhatsApp__BaseUrl, " +
+            "WhatsApp__Instance e WhatsApp__ApiKey configurados.");
+
+    if (!isDevelopment && waOpts.ParseAllowedGroupJids().Count == 0)
+        throw new InvalidOperationException(
+            "WhatsApp: envio real fora de Development/Testing exige " +
+            "WhatsApp__AllowedGroupJids com pelo menos um JID ...@g.us.");
+}
+
 // S-1: Error handler + HTTPS redirect + HSTS
 if (!isDevelopment)
 {

@@ -130,3 +130,25 @@ groups:
         annotations:
           summary: "Reconexões de circuito Blazor em massa"
           description: "Mais de 30 reconexões de circuito em 10 minutos — rede ou instância instável."
+
+      - alert: ConfirmaiWhatsAppSendFailing
+        expr: sum(increase(confirmai_whatsapp_send_total{result="failed"}[15m])) > 5
+        for: 30m
+        labels:
+          severity: p3
+          team: ops
+          component: whatsapp
+        annotations:
+          summary: "Envios de WhatsApp falhando"
+          description: "Mais de 5 falhas de envio WhatsApp em 15 minutos — verificar Evolution API, ApiKey e instância. Canal secundário: nenhum fluxo crítico depende dele."
+
+      - alert: ConfirmaiWhatsAppAllowlistBlocked
+        expr: sum(increase(confirmai_whatsapp_send_total{result="blocked_allowlist"}[1h])) > 0
+        for: 5m
+        labels:
+          severity: p3
+          team: ops
+          component: whatsapp
+        annotations:
+          summary: "Mensagem WhatsApp bloqueada pela allowlist"
+          description: "Um JID configurado em algum grupo nao esta na WhatsApp__AllowedGroupJids — conferir se o JID e legitimo e adicionar a lista."
