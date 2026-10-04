@@ -70,6 +70,8 @@
                     </div>
                 </header>
 
+                <HomeTodayPanel Summary="@today" LocalNow="@localNow" PaymentsGroupId="@(pendingPaymentGroups.FirstOrDefault()?.GroupId ?? myGroups[0].Id)" />
+
                 <section class="home-groups feat--members" aria-label="@Ui["Groups.MyGroups"]">
                     <div class="home-section-head">
                         <h2 class="home-section-title">@Ui["Groups.MyGroups"] <span class="panel-count">@myGroups.Count</span></h2>
