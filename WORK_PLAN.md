@@ -119,7 +119,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Mapa de Progresso e Proximos Passos (atualizado pos-C32, PRs #127-#134)
+## Mapa de Progresso e Proximos Passos (atualizado pos-C32, PRs #127-#135)
 
 ### Progresso por eixo
 
@@ -137,7 +137,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 | Onboarding por empty state | **CONCLUIDO** (C36-B F6 + C36-E) -- checklist do admin e o aviso unico, Pix bloqueante pela regra do grupo | Nada. |
 | Layout / design system L0-L3 | **~80%** -- header, home, hub/subnav, `/grupos`, mailbox, profile, partida futsal/poker, pagamento/repasse do grupo, Identity, admin, cookie banner migrados; 63 arquivos guardados pelo `CssNoLegacyVarsTests` | Lapidacao visual (fim da fila, passo 5): **tela do jogador pagar** (`/pagamento/evento/{id}`) ainda no visual antigo; `buttons.css`/`entity-shell.css`/`MainLayout.razor.css` ainda consomem `--ci-*`; Fase 7 (texto do hero). |
 | Pre-producao (C32) | **CONCLUIDO** (PR #134, review na secao abaixo) -- pen-test do dinheiro, CSP sem `ws:` em prod, meter `Confirmai.Ops` + 4 alertas, secao EasyPanel no checklist | Fase F (telas legadas) aguarda decisao do Robson. Configurar no EasyPanel as variaveis da secao 0 do `production-checklist.md`. |
-| WhatsApp (C31, Evolution no grupo) | **PLANEJADO -- LIBERADO** (C32 fechado) | Fase 0 operacional do Robson (servico no EasyPanel + chip dedicado aquecido). |
+| WhatsApp (C31, Evolution no grupo) | **PROXIMO CICLO DO PLENO** -- plano atualizado pos-C32 (secao do Ciclo 31, "Atualizacao pos-C32") | Codigo pode comecar ja em dry-run. Fase 0 do Robson (servico no EasyPanel + chip dedicado aquecido) so bloqueia o primeiro envio real. |
 | Pix automatico (V2) | Codigo preservado atras do toggle | Pendencias Efi/fiscal do Robson; so depois do go-live do V1. |
 
 ### Proximos passos, em ordem
@@ -146,7 +146,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
 2. **C32 -- pre-producao [EXECUTADO -- ver review].** Fases A-E em `feat/ciclo32`. Resumo na Linha do Tempo. Fase F (remover telas legadas) pendente de aprovacao do Robson.
-3. **C31 -- Evolution API** -- comeca quando a Fase 0 operacional do Robson estiver pronta (servico no EasyPanel + chip dedicado aquecido). Dry-run + allowlist obrigatorios. Pode ser planejado em paralelo ao C32.
+3. **C31 -- Evolution API [PROXIMO -- EXECUTAVEL AGORA em dry-run]** -- plano atualizado pos-C32 (ver "Atualizacao pos-C32" na secao do Ciclo 31). O Pleno coda e testa tudo com `DryRun=true`; a Fase 0 do Robson (servico no EasyPanel + chip dedicado aquecido, que precisa de alguns dias de uso normal) corre em paralelo e so bloqueia o primeiro envio real no grupo de teste. Em paralelo, o Robson configura no EasyPanel as variaveis da secao 0 do `docs/production-checklist.md` (C32).
 4. **Go-live real**: "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" (rotacao de todas as credenciais).
 5. **Lapidacao visual (fim da fila)** -- um ciclo so, quando o funcional fechar:
    - tela do jogador pagar (`Pages/Payment/EventPayment.razor` + `Components/EventPayment*.razor.css`) no vocabulario do C36-B Fase 3 -- so CSS/classe, entra no `CssNoLegacyVarsTests`;
@@ -1279,7 +1279,24 @@ Sem `<html>`, sem `<head>`, sem largura, sem identidade visual -- o cliente de e
 
 ---
 
-## Ciclo 31 (Pleno) -- WhatsApp via Evolution API, disparo no grupo [PLANEJADO -- executar depois do C30-B]
+## Ciclo 31 (Pleno) -- WhatsApp via Evolution API, disparo no grupo [PLANEJADO -- EXECUTAVEL AGORA em dry-run; envio real depende da Fase 0 do Robson]
+
+### Atualizacao pos-C32 (Senior) -- LER ANTES das fases abaixo: o que mudou desde que este plano foi escrito (C30-B)
+
+O plano abaixo continua valendo; esta lista so corrige o que a `main` mudou desde entao. **Onde houver conflito, vale esta lista.**
+
+- **Nao precisa esperar a Fase 0 para codar.** Fases 1-4 sao 100% testaveis com `WhatsApp__DryRun=true` (default) e `HttpMessageHandler` fake. A Fase 0 (servico + chip) so bloqueia o **primeiro envio real** no grupo de teste do Robson, que e o ultimo passo do ciclo.
+- **Fase 1 -- caminhos reais**: o TODO antigo esta em `Services/Events/EventNotificationService.cs:194` (o desenho por DM com `PhoneNumber`/`WhatsAppOptIn`) -- remover o bloco inteiro. `Services/Notification/WhatsAppNotificationService.cs` **nao tem nenhum chamador** (so o registro em `Program.cs:177`) e tem 5 testes em `Confirmai.Tests/WhatsAppNotificationServiceTests.cs` que testam o contrato errado: apagar a classe, o registro e esses testes **no mesmo commit**, substituindo por testes do `IWhatsAppSender` (isso nao e mascarar teste: o comportamento testado deixa de existir).
+- **Fase 1 -- campo do JID**: a tela e `/grupo/{id}/configuracoes` (`Pages/Groups/Features.razor`). Salvar o `WhatsAppGroupJid` passa pelo service com a checagem de **admin do grupo** (`GroupAccess`, padrao do C36-C), nao so pela UI. Validar formato `^[0-9-]+@g\.us$` no service; vazio = desligado.
+- **Fase 3 -- gatilho da escalacao**: o metodo e `EscalacaoService.ConfirmLineupAsync` (nao existe "salvar times"). `ResetLineupAsync` + nova confirmacao **nao** reenvia a mensagem `LineupConfirmed` (idempotencia por `(EventId, MessageKind)`); a escalacao final vai no lembrete de 1h antes, que sempre le o estado atual.
+- **Fase 3 -- item 7 (votacao de destaque)**: nao existe evento "votacao aberta"; o voto e `EscalacaoService.CastVoteAsync`. Se entrar, o gatilho e `SaveScoreAsync` (placar salvo). **Opcional, ultimo da fila** -- pode ficar fora do C31.
+- **Fase 3b -- link**: a tela de pagamentos do grupo agora e `/grupo/{id}/pagamentos` e, desde o C36-C, **membro ve so os proprios pagamentos** e admin ve todos. Entao o mesmo link serve aos dois: o jogador que clicar cai direto na propria pendencia. Continua sem token na URL e sem nome/valor/contagem na mensagem.
+- **Observabilidade (novo, padrao do C32)**: contador `confirmai_whatsapp_send_total{result}` no `OperationalMetrics` (meter `Confirmai.Ops`), com `result` em `sent` / `dry_run` / `blocked_allowlist` / `failed` (valores fixos; nunca JID, texto ou nome do grupo). Alerta no `docs/monitoring/prometheus-payments-alerts.example.yml`: falhas seguidas = sessao caiu (`sum(increase(confirmai_whatsapp_send_total{result="failed"}[30m])) > 3`). Sessao caida e o incidente mais provavel da Evolution; sem isso a descoberta e "ninguem recebeu o lembrete".
+- **Guard rail de boot**: seguir o estilo dos guardas existentes em `Program.cs` (teste em `ProgramConfigurationTests`/teste dedicado); `Enabled=true` + `DryRun=false` + `AllowedGroupJids` vazio fora de Development/Testing = falha no boot.
+- **CSP nao muda**: a chamada a Evolution e server-side (`HttpClient`), nao passa pelo navegador.
+- **Checklist**: adicionar as variaveis `WhatsApp__*` na secao 0 (EasyPanel) do `docs/production-checklist.md`, com rollback = `WhatsApp__Enabled=false` + redeploy.
+- **Ordem sugerida de commits**: F1 (abstracao + dry-run + remocao do legado) -> F2 (tabela de disparo + unique index + guardas de passado/cancelado) -> F3 item 4 (cancelamento/mudanca de horario, o de maior valor) -> F3 itens 1-3 -> F3b -> F3 itens 5-6 -> F4 (config, guard rail, metricas, checklist). Item 7 so se sobrar.
+
 
 Ultima feature do escopo. **Decisao do Robson**: Evolution API (nao-oficial, Baileys/whatsmeow, self-hosted, pareada por QR), disparando no **grupo de WhatsApp correspondente ao grupo do sistema** -- nao em DM para cada jogador. Isso simplifica consentimento (quem esta no grupo ja recebe tudo) e reduz drasticamente o volume de envio, que e o que dispara bloqueio.
 
