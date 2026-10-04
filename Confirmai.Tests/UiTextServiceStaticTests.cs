@@ -53,20 +53,21 @@ public class UiTextServiceStaticTests
         Assert.Equal("22/06 14:30", result);
     }
 
-    [Fact]
-    public void FormatDateTime_DateTimeFullShort_ReturnsCorrectFormat()
+    [Theory]
+    [InlineData("pt-BR", "seg")]
+    [InlineData("en-US", "Mon")]
+    [InlineData("es-ES", "lun")]
+    public void FormatDateTime_DateTimeFullShort_WeekdayFollowsLanguage(string lang, string weekdayPrefix)
     {
-        // Arrange
         var language = new LanguagePreferenceService();
-        language.SetLanguage("pt-BR");
+        language.SetLanguage(lang);
         var service = new UiTextService(language);
         var dateTime = new DateTime(2026, 6, 22, 14, 30, 0, DateTimeKind.Utc);
 
-        // Act
         var result = service.FormatDateTime(dateTime, "DateTimeFullShort");
 
-        // Assert
-        Assert.Equal("Mon, 22/06 14:30", result);
+        Assert.StartsWith(weekdayPrefix, result);
+        Assert.EndsWith(", 22/06 14:30", result);
     }
 
     [Fact]
