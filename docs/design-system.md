@@ -71,7 +71,7 @@ botão, fundo de painel ou texto corrido. Azul continua sendo ação/foco/ativo.
 | Partidas, eventos | `.feat--matches` | `--feat-matches` (azul claro) |
 | Pagamentos, Pix | `.feat--payments` | `--feat-payments` (teal) |
 | Grupos, membros | `.feat--members` | `--feat-members` (violeta) |
-| Ranking | `.feat--ranking` | `--feat-ranking` (amarelo) |
+| Ranking | `.feat--ranking` | `--feat-ranking` (laranja — não confunde com o amarelo de atenção) |
 | Configurações | `.feat--settings` | `--feat-settings` (ardósia) |
 | Presença | `.feat--attendance` | `--feat-attendance` (verde) |
 | Convite WhatsApp | `.feat--invite` | `--feat-invite` (verde da marca) |
@@ -81,6 +81,15 @@ Uso: a classe vai no container (`<section class="panel feat--payments">`,
 `--feat-border`; os filhos leem `var(--feat, var(--accent-text))`, então
 sem classe tudo cai no azul padrão. `.feat-icon` é o quadrado de ícone pronto.
 Status (sucesso/atenção/erro) continua semântico e vence a cor da feature.
+
+### 5.1 Painel "Hoje" (home)
+
+`Shared/Components/HomeTodayPanel.razor` é um painel L1 com tiles L2, um por
+feature (`.feat--matches`, `.feat--payments`, `.feat--settings` para a caixa
+postal). O tile de pagamentos ganha borda `--warning` quando há pendência
+(status vence feature). Os dados vêm de `HomeToday.Build` (puro, testado em
+`HomeTodayTests`), calculado sobre o que a home já carrega + 1 `COUNT` de
+mensagens não lidas. A dica do dia é um carrossel sem JS (`TipKeys`).
 
 ## 6. Checklist por PR visual
 
