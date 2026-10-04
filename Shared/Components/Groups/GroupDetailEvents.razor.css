@@ -192,3 +192,16 @@
         font-weight: var(--fw-medium);
     }
 }
+
+.et-status-col {
+    white-space: nowrap;
+}
+
+.et-status + .et-status {
+    margin-left: var(--space-1);
+}
+
+.events-table tbody tr.events-table-row td.events-access-col {
+    width: 1%;
+    padding-right: var(--space-2);
+}
