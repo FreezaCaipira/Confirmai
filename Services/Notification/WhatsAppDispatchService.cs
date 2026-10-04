@@ -95,14 +95,14 @@ public sealed class WhatsAppDispatchService
             if (untilStart > TimeSpan.FromMinutes(60) && untilStart <= TimeSpan.FromMinutes(90))
             {
                 await DispatchAsync(ev.Id, WhatsAppMessageKind.HourReminder,
-                    WhatsAppTexts.HourReminder(ev, EventLink(ev)), ct, StartSlot(ev.StartsAt));
+                    WhatsAppTexts.HourReminder(ev, EventLink(ev)), ct, StartSlot(ev.StartsAt), utcNow);
                 attempts++;
             }
             else if (untilStart > TimeSpan.FromMinutes(90)
                      && localNow.Hour >= 7 && ev.StartsAt.ToLocalTime().Date == localToday)
             {
                 await DispatchAsync(ev.Id, WhatsAppMessageKind.DayReminder,
-                    WhatsAppTexts.DayReminder(ev, EventLink(ev)), ct, StartSlot(ev.StartsAt));
+                    WhatsAppTexts.DayReminder(ev, EventLink(ev)), ct, StartSlot(ev.StartsAt), utcNow);
                 attempts++;
             }
         }
@@ -196,7 +196,7 @@ public sealed class WhatsAppDispatchService
     /// <param name="slot">Optional discriminator appended to the kind in the
     /// unique (EventId, MessageKind) key, e.g. <see cref="StartSlot"/>.</param>
     public async Task DispatchAsync(int eventId, WhatsAppMessageKind kind, string text,
-        CancellationToken ct = default, string? slot = null)
+        CancellationToken ct = default, string? slot = null, DateTime? utcNow = null)
     {
         var messageKey = slot is null ? kind.ToString() : $"{kind}:{slot}";
 
@@ -217,7 +217,7 @@ public sealed class WhatsAppDispatchService
             // Cancelled events only get the cancellation message; past events
             // get nothing except (still worth announcing) a late cancellation.
             var isCancelled = !ev.IsActive;
-            var isPast = ev.StartsAt <= DateTime.UtcNow;
+            var isPast = ev.StartsAt <= (utcNow ?? DateTime.UtcNow);
             if (kind != WhatsAppMessageKind.EventCancelled && (isCancelled || isPast)) return;
 
             var jid = ev.Group.WhatsAppGroupJid;
