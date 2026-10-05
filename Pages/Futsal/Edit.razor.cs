@@ -68,11 +68,13 @@ public partial class Edit
             return;
         }
 
-        venues = await db.Venues
-            .Where(v => v.IsActive)
-            .OrderBy(v => v.City)
-            .ThenBy(v => v.Name)
-            .ToListAsync();
+        // C38 F4: mesma lista filtrada da criacao, mas a quadra atual da
+        // partida entra sempre — partida legada fora da cidade continua
+        // editavel (o SaveAsync nao valida cidade na edicao).
+        venues = CityNormalizer.VenuesForGroup(
+            await db.Venues.Where(v => v.IsActive).OrderBy(v => v.Name).ToListAsync(),
+            ev.Group,
+            ev.Venue);
 
         var startsLocal = ev.StartsAt.ToLocalTime();
         form = new EditEventFormData

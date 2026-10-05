@@ -53,6 +53,13 @@ public partial class Create
         && !groupHasPixKey;
     private string PixReturnUrl =>
         Uri.EscapeDataString($"/futsal/create?groupId={GroupId}");
+    // C38 F4: cidade do grupo sem quadra — aviso no topo, nao no submit.
+    private string GroupCityLabel =>
+        preselectedGroup is null
+            ? "-"
+            : $"{preselectedGroup.City}/{(preselectedGroup.StateCode == "EX" ? Ui["Group.ForeignUF"] : preselectedGroup.StateCode)}";
+    private bool NoVenueInGroupCity =>
+        preselectedGroup is not null && !venues.Any();
     private bool isLoading = true;
     private bool isSaving;
     private string saveError = string.Empty;

@@ -59,6 +59,17 @@
                     </div>
                 }
 
+                @if (NoVenueInGroupCity)
+                {
+                    <div class="pix-required-banner" role="alert">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>@Ui["FutsalForm.NoVenueTitle"]</strong>
+                            <p>@Ui.Get("FutsalForm.NoVenueInCity", GroupCityLabel)</p>
+                        </div>
+                    </div>
+                }
+
                 @* ── Identidade da partida ─────────────────────────────────────────────────── *@
                 <FutsalMatchIdentity
                     Form="@form"
@@ -71,6 +82,7 @@
                     Venues="@venues"
                     SelectedVenueId="@form.VenueId"
                     SelectedVenue="@selectedVenue"
+                    GroupCityLabel="@GroupCityLabel"
                     OnVenueChanged="@VenueChangedCallback" />
 
                 @* ── Data, hora e duração ───────────────────────────────────────────────────── *@

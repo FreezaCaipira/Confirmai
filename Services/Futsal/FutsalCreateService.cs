@@ -69,11 +69,11 @@ public sealed class FutsalCreateService
         if (group is null)
             return new FutsalCreateInitData();
 
-        var venues = await db.Venues
-            .Where(v => v.IsActive)
-            .OrderBy(v => v.City)
-            .ThenBy(v => v.Name)
-            .ToListAsync();
+        // C38 F4: so quadras da cidade do grupo (comparacao normalizada —
+        // "São Paulo" == "Sao Paulo"; grupo "Exterior" compara so a cidade).
+        var venues = CityNormalizer.VenuesForGroup(
+            await db.Venues.Where(v => v.IsActive).OrderBy(v => v.Name).ToListAsync(),
+            group);
 
         return new FutsalCreateInitData
         {
@@ -117,6 +117,15 @@ public sealed class FutsalCreateService
                 .FirstOrDefaultAsync(g => g.Id == preselectedGroup.Id)
                 ?? preselectedGroup;
         }
+
+        // C38 F4: nunca confiar no VenueId do cliente — a quadra precisa ser
+        // da cidade do grupo. Grupo criado inline herda cidade/UF da quadra.
+        if (existingGroup is not null && !CityNormalizer.VenueMatchesGroup(venue, existingGroup))
+            return new FutsalCreateResult(
+                false,
+                _ui.Get("Futsal.InvalidVenueForCity", $"{existingGroup.City}/{existingGroup.StateCode}"),
+                null,
+                null);
 
         if (form.Price > 0 && !(existingGroup?.EnablePaymentGateways ?? false))
         {

@@ -10,9 +10,7 @@
         <label>@Ui["FutsalForm.VenueLabel"] <span class="required">*</span></label>
         @if (!Venues.Any())
         {
-            <p class="form-hint form-hint--warn">
-                Nenhuma quadra cadastrada ainda. Solicite ao administrador do sistema.
-            </p>
+            <p class="form-hint form-hint--warn">@NoVenueText</p>
         }
         else
         {
@@ -20,7 +18,7 @@
                 <option value="0" selected="@(SelectedVenueId == 0)">@Ui["FutsalForm.VenueSelect"]</option>
                 @foreach (var v in Venues)
                 {
-                    <option value="@v.Id" selected="@(v.Id == SelectedVenueId)">@v.Name (@VenueTypeLabel(v.Type)) — @v.City/@v.StateCode</option>
+                    <option value="@v.Id" selected="@(v.Id == SelectedVenueId)">@v.Name (@VenueTypeLabel(v.Type))</option>
                 }
             </select>
         }

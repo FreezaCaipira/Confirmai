@@ -46,7 +46,7 @@
                     <option value="0">@Ui["Futsal.VenueSelect"]</option>
                     @foreach (var v in Venues)
                     {
-                        <option value="@v.Id">@v.Name (@VenueTypeLabel(v.Type)) — @v.City/@v.StateCode</option>
+                        <option value="@v.Id">@v.Name (@VenueTypeLabel(v.Type))</option>
                     }
                 </InputSelect>
             }
