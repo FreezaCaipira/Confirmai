@@ -26,28 +26,6 @@ public class CssScopedOrphanClassesTests
     private static readonly IReadOnlyDictionary<string, string[]> AllowedOrphans =
         new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
         {
-            // === In-flow orphans — zerados ao longo do C37 (fases 3-5) ===
-            ["Shared/Components/Poker/PokerDetailInfo.razor"] = new[]
-            {
-                "cash-includes-block", "cash-includes-label",
-                "cash-includes-value", "homegame-unlocked-notice",
-                "poker-detail-item", "poker-detail-label", "poker-detail-value",
-                "poker-detail-value--gtd", "poker-detail-value--price",
-                "poker-details-grid"
-            },
-            ["Pages/Futsal/Components/RecurrenceScheduler.razor"] = new[]
-            {
-                "weekday-chip", "weekday-grid"
-            },
-            ["Pages/Poker/Edit.razor"] = new[]
-            {
-                "homegame-notice", "modality-chip", "modality-grid"
-            },
-            ["Pages/Futsal/Components/DetailEventHeader.razor"] = new[]
-            {
-                "detail-header--futsal"
-            },
-
             // === Legado fora do fluxo (ate a C32 Fase F remover as telas) ===
             ["Pages/Payment/PaymentCheckoutPanel.razor"] = new[]
             {

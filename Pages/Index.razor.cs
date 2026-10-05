@@ -89,6 +89,22 @@ public partial class Index
         foreach (var g in myGroups)
             g.Schedule = schedulesByGroup.GetValueOrDefault(g.Id);
 
+        var withoutSchedule = myGroups.Where(g => g.Schedule is null).Select(g => g.Id).ToList();
+        if (withoutSchedule.Count > 0)
+        {
+            var horizon = now.AddDays(14);
+            var upcoming = await db.Events
+                .AsNoTracking()
+                .Include(e => e.Venue)
+                .Where(e => e.IsActive && e.StartsAt > now && e.StartsAt <= horizon
+                            && withoutSchedule.Contains(e.GroupId))
+                .ToListAsync();
+            var upcomingByGroup = upcoming.GroupBy(e => e.GroupId)
+                .ToDictionary(g => g.Key, g => GroupScheduleSummary.BuildFromUpcoming(g));
+            foreach (var g in myGroups.Where(g => g.Schedule is null))
+                g.Schedule = upcomingByGroup.GetValueOrDefault(g.Id);
+        }
+
         // Tracking query: Confirmation -> Event -> Confirmations is a cycle EF rejects with AsNoTracking.
         var confs = await db.EventConfirmations
             .Include(c => c.Event).ThenInclude(e => e.Group)

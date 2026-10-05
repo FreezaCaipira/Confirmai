@@ -20,40 +20,6 @@
 
 /* -- Venue preview: styles in events.css (shared with EditEventForm) -- */
 
-/* -- Weekday chips ------------------------- */
-.weekday-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.35rem;
-}
-
-.weekday-chip {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.35rem 0.85rem;
-    border-radius: 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-3);
-    font-size: 0.82rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: background 0.14s, border-color 0.14s, color 0.14s, box-shadow 0.14s;
-    user-select: none;
-    box-shadow: 0 2px 4px var(--shadow);
-}
-
-.weekday-chip input[type=checkbox] { display: none; }
-
-.weekday-chip--on {
-    background: var(--accent-soft);
-    border-color: var(--success);
-    color: var(--success);
-    box-shadow: 0 2px 4px var(--success-soft);
-}
-
 /* .switch-label -> components.css (vocabulario global) */
 
 /* form-actions, save-btn, cancel-btn, validation-* ? events.css */

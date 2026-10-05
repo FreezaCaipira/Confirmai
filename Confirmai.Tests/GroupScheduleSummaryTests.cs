@@ -89,4 +89,49 @@ public class GroupScheduleSummaryTests
         Assert.Null(line!.VenueName);
         Assert.Equal(new TimeOnly(20, 0), line.CommonTime);
     }
+
+    private static Event Upcoming(DateTime utc, string? venue = null, string location = "Rua X")
+        => new()
+        {
+            StartsAt = utc,
+            Location = location,
+            IsActive = true,
+            Venue = venue is null ? null : new Venue { Name = venue, Type = VenueType.Society },
+        };
+
+    [Fact]
+    public void BuildFromUpcoming_Empty_ReturnsNull()
+    {
+        Assert.Null(GroupScheduleSummary.BuildFromUpcoming([]));
+    }
+
+    [Fact]
+    public void BuildFromUpcoming_UsesLocalDayAndNextEventVenue()
+    {
+        var first = new DateTime(2030, 1, 7, 22, 0, 0, DateTimeKind.Utc);
+        var line = GroupScheduleSummary.BuildFromUpcoming(new[]
+        {
+            Upcoming(first.AddDays(3), venue: "Quadra B"),
+            Upcoming(first, venue: "Quadra A"),
+        });
+
+        Assert.NotNull(line);
+        Assert.Equal(
+            new[] { first.ToLocalTime().DayOfWeek, first.AddDays(3).ToLocalTime().DayOfWeek }
+                .OrderBy(d => ((int)d + 6) % 7),
+            line!.Days);
+        Assert.Equal(TimeOnly.FromDateTime(first.ToLocalTime()), line.CommonTime);
+        Assert.Equal("Quadra A", line.VenueName);
+    }
+
+    [Fact]
+    public void BuildFromUpcoming_WithoutVenue_FallsBackToLocation()
+    {
+        var line = GroupScheduleSummary.BuildFromUpcoming(new[]
+        {
+            Upcoming(new DateTime(2030, 1, 7, 22, 0, 0, DateTimeKind.Utc), location: "Ginásio do bairro"),
+        });
+
+        Assert.Equal("Ginásio do bairro", line!.VenueName);
+    }
 }
