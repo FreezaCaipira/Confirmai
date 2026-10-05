@@ -317,9 +317,15 @@
    (https://developers.google.com/identity/branding-guidelines), variante
    clara: contrasta com o tema escuro e nao se confunde com os botoes do sistema.
    EXCECAO unica de cores literais fora de tokens.css -- nao usar como
-   precedente para outros componentes. */
-.google-signin-btn {
+   precedente para outros componentes.
+   O prefixo .identity-container e obrigatorio: sem ele o seletor generico
+   ".identity-container button" (0,1,1) vence a variante (0,1,0) e o botao
+   herda o azul/min-width do "Entrar" (achado do Robson, C37 item 1). */
+.identity-container .google-signin-btn {
     width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    margin: 0;
     background: #ffffff;
     color: #1f1f1f;
     border: 1px solid #747775;
@@ -337,15 +343,15 @@
     transition: background 0.2s;
 }
 
-.google-signin-btn:hover {
+.identity-container .google-signin-btn:hover {
     background: #f2f2f2;
 }
 
-.google-signin-btn:active {
+.identity-container .google-signin-btn:active {
     background: #e3e3e3;
 }
 
-.google-signin-btn:focus-visible {
+.identity-container .google-signin-btn:focus-visible {
     outline: 2px solid #a8c7fa;
     outline-offset: 2px;
 }
@@ -455,7 +461,7 @@
         padding: 0.8rem 1rem;
     }
 
-    .identity-container button,
+    .identity-container button:not(.google-signin-btn),
     .identity-container input[type="submit"] {
         font-size: 1.1rem;
         padding: 0.8rem 1.4rem;
