@@ -73,6 +73,10 @@ public class CssNoLegacyVarsTests
         "Shared/Components/Groups/GroupDetailPaymentsModal.razor.css",
         "Pages/Groups/Components/PixReceiverSelector.razor.css",
         "Pages/Groups/Components/PayoutAccountEditor.razor.css",
+        // Group settings screen (C37 Fase 3 — secoes L2 + feat-icon)
+        "Pages/Groups/Components/FeaturesToggles.razor.css",
+        "Pages/Groups/Components/MembersManager.razor.css",
+        "Shared/Components/Groups/MyPaymentsList.razor.css",
         // Groups create + cookie banner + Identity + Admin (C36-B Fase 4)
         "Pages/Groups/Create.razor.css",
         "Shared/Components/CookieConsent.razor.css",
@@ -97,6 +101,12 @@ public class CssNoLegacyVarsTests
     private static readonly Regex HomeHeroRuleRegex = new(
         @"\.home-hero[^{}]*\{[^{}]*\}",
         RegexOptions.Compiled);
+
+    // Documented gradient tokens (--header-gradient, C37 F7) live in
+    // tokens.css as custom properties — strip the declaration itself.
+    private static readonly Regex GradientTokenRegex = new(
+        @"--[\w-]*gradient[\w-]*\s*:[^;]+;",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     private static DirectoryInfo RepoRoot()
     {
@@ -145,9 +155,10 @@ public class CssNoLegacyVarsTests
         {
             var path = Path.Combine(root, file);
             if (!File.Exists(path)) continue;
-            // .home-hero is the documented gradient exception: strip its
-            // rules before checking for linear-gradient.
+            // .home-hero and --*-gradient tokens are the documented gradient
+            // exceptions: strip them before checking for linear-gradient.
             var css = HomeHeroRuleRegex.Replace(File.ReadAllText(path), string.Empty);
+            css = GradientTokenRegex.Replace(css, string.Empty);
             if (css.Contains("linear-gradient", StringComparison.Ordinal))
                 violations.Add(file);
         }

@@ -72,8 +72,9 @@ public class GroupsIndexIntegrationTests : IClassFixture<IntegrationTestWebAppFa
         Assert.Contains("Racha Um", html);
         Assert.Contains("Racha Dois", html);
 
-        // "Criar novo grupo" is the primary action of the entry panel
-        Assert.Matches("class=\"btn btn-primary\"[^>]*>\\s*Criar novo grupo", html);
+        // "Criar grupo" is the primary action of the entry panel (C37 F2:
+        // o botao nao repete o titulo do card "Criar novo grupo")
+        Assert.Matches("class=\"btn btn-primary\"[^>]*>\\s*Criar grupo", html);
 
         // Event-listing leftovers are gone
         Assert.DoesNotContain("Ver Partidas", html);

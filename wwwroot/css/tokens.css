@@ -23,6 +23,12 @@
     --surface-2:   #1e1e23;   /* L2 cards inside a panel    */
     --surface-3:   #2a2a31;   /* L3 hover, active, popover  */
 
+    /* Degradê sutil do header do shell (C37 F7) — segunda exceção a
+       "sem gradiente", ao lado de .home-hero (design-system.md §1).
+       Tom-para-tom L1→L0: o texto (--text/--text-2) mantém o mesmo
+       contraste AA medido acima; não pinta nenhum conteúdo. */
+    --header-gradient: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+
     /* -- Borders ------------------------------------------------- */
     --border:      #2a2a30;   /* default 1px border         */
     --border-2:    #3f3f46;   /* emphasised / hover border  */

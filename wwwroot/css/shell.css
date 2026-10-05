@@ -22,7 +22,9 @@ body .oldsite-header {
     max-width: none;
     margin: 0 0 var(--space-5);
     padding: 0;
-    background: var(--bg);
+    /* C37 F7: degradê sutil L1→L0 via token --header-gradient (exceção
+       documentada em tokens.css / design-system.md §1). */
+    background: var(--header-gradient, var(--bg));
     border-top: 2px solid var(--accent);
     border-bottom: 1px solid var(--border);
     display: block;

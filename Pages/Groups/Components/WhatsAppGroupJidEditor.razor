@@ -2,18 +2,19 @@
 @using Confirmai.Services.Core
 @inject UiTextService Ui
 
-<section class="detail-section features-section">
-    <h2 class="detail-section-title">
-        <i class="fas fa-comment-dots"></i> @Ui["Group.WhatsAppTitle"]
-    </h2>
-    <p class="features-section-sub">
-        @Ui["Group.WhatsAppSub"]
-    </p>
+<section class="settings-section feat--invite">
+    <div class="settings-section-head">
+        <span class="feat-icon"><i class="fab fa-whatsapp"></i></span>
+        <div>
+            <h2 class="settings-section-title">@Ui["Group.WhatsAppTitle"]</h2>
+            <p class="settings-section-sub">@Ui["Group.WhatsAppSub"]</p>
+        </div>
+    </div>
 
     <div class="feat-pix-form">
         <label class="feat-pix-label" for="whatsapp-jid-input">@Ui["Group.WhatsAppJidLabel"]</label>
         <input id="whatsapp-jid-input"
-               class="feat-pix-select"
+               class="feat-pix-input"
                type="text"
                inputmode="text"
                autocomplete="off"
@@ -21,7 +22,7 @@
                placeholder="1203630xxxxxxxx@g.us"
                @bind="localJid"
                disabled="@IsSaving" />
-        <button class="feat-pix-save-btn" type="button"
+        <button class="btn btn-primary btn-sm" type="button"
                 disabled="@IsSaving"
                 @onclick="HandleSave">
             <i class="fas fa-save"></i> @(IsSaving ? Ui["Payment.Saving"] : Ui["Payment.Save"])

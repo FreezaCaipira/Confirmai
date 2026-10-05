@@ -93,6 +93,11 @@
     color: var(--success);
 }
 
+.meta-chip--pending {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
 .my-conf-cancelled {
     background: var(--danger-soft);
     color: var(--danger);
@@ -131,17 +136,6 @@
     gap: var(--space-2);
 }
 
-.my-conf-btn--pay {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-fg);
-}
-
-.my-conf-btn--pay:hover {
-    background: var(--accent-hover);
-    color: var(--accent-fg);
-}
-
 .my-conf-btn {
     display: inline-flex;
     align-items: center;
@@ -165,19 +159,6 @@
     background: var(--accent-hover);
     border-color: var(--accent-hover);
     color: var(--accent-fg);
-}
-
-/* Com "Pagar" presente, "Entrar" vira secundario: um azul cheio por card. */
-.my-conf-btn--pay ~ .my-conf-btn--view {
-    background: var(--surface-3);
-    border-color: var(--border-2);
-    color: var(--text);
-}
-
-.my-conf-btn--pay ~ .my-conf-btn--view:hover {
-    background: var(--surface-3);
-    border-color: var(--accent-border);
-    color: var(--accent-text);
 }
 
 .my-conf-card--past .my-conf-btn--view,

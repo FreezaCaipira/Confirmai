@@ -47,7 +47,7 @@
     <div class="my-conf-actions">
         @if (ShowPayAction)
         {
-            <a href="/pagamento/evento/@Confirmation.Id" class="my-conf-btn my-conf-btn--pay"><i class="fas fa-qrcode"></i> @Ui["Index.Pay"]</a>
+            <span class="meta-chip meta-chip--pending"><i class="fas fa-clock"></i> @Ui["Index.PaymentDue"]</span>
         }
         <a href="@DetailUrl" class="my-conf-btn my-conf-btn--view"><i class="fas fa-arrow-right"></i> @Ui["Index.Enter"]</a>
     </div>

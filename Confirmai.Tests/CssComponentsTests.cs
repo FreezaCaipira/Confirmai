@@ -89,4 +89,35 @@ public class CssComponentsTests
         Assert.True(violations.Count == 0,
             "Old button families found in group screens:\n" + string.Join("\n", violations));
     }
+
+    /// <summary>
+    /// C37 Fase 1 (item 1 do Robson): .identity-container button (0,1,1) used
+    /// to beat .google-signin-btn (0,1,0) — the Google button inherited the
+    /// blue/min-width of "Entrar". The variant must keep the
+    /// .identity-container prefix and reset what the generic rule injects.
+    /// </summary>
+    [Fact]
+    public void GoogleSignInButton_SelectorOutranks_GenericIdentityButton()
+    {
+        var css = File.ReadAllText(Path.Combine(RepoRoot().FullName, "wwwroot", "css", "identity.css"));
+
+        // The rule that defines the Google button's background must carry the
+        // .identity-container prefix (specificity 0,2,0 > generic 0,1,1).
+        var rule = Regex.Match(css,
+            @"([^{}]+)\{[^}]*background:\s*#fff");
+        Assert.True(rule.Success, "google-signin-btn background rule not found");
+        Assert.Contains(".identity-container", rule.Groups[1].Value);
+        Assert.Contains(".google-signin-btn", rule.Groups[1].Value);
+
+        // And it must reset the properties the generic rule injects.
+        var block = Regex.Match(css,
+            @"\.identity-container\s+\.google-signin-btn\s*\{([^}]*)");
+        Assert.True(block.Success);
+        foreach (var decl in new[] { "min-width: 0", "margin: 0", "min-height: 40px" })
+            Assert.Contains(decl, block.Groups[1].Value);
+
+        // The media query that re-styles .identity-container button must not
+        // hit the Google variant.
+        Assert.Contains("button:not(.google-signin-btn)", css);
+    }
 }

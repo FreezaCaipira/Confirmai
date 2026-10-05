@@ -262,6 +262,23 @@ else
                     {
                         <div class="confirmed-block">
                             <p class="confirmed-label confirmed-label--poker">@Ui["Poker.YouAreInscribed"]</p>
+                            @if (ev.Price.HasValue && ev.Price.Value > 0)
+                            {
+                                @if (userConf.HasPaid)
+                                {
+                                    <span class="payment-done-label"><i class="fas fa-check-circle"></i> @Ui.Get("Poker.PaidAmount", ev.Price.Value.ToString("N2"))</span>
+                                }
+                                else if (userConf.PixProofUploadedAt.HasValue)
+                                {
+                                    <span class="payment-done-label"><i class="fas fa-check-circle"></i> @Ui["Poker.ProofSent"]</span>
+                                }
+                                else
+                                {
+                                    <a href="/pagamento/evento/@userConf.Id" class="pay-btn pay-btn--sm">
+                                        @Ui.Get("Poker.PayAmount", ev.Price.Value.ToString("N2"))
+                                    </a>
+                                }
+                            }
                             <button class="cancel-confirm-btn" @onclick="CancelConfirmation">
                                 @Ui["Poker.CancelInscription"]
                             </button>

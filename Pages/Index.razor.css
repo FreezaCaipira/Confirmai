@@ -326,6 +326,28 @@
     font-size: 0.8125rem;
 }
 
+.home-group-chip-text {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    min-width: 0;
+}
+
+.home-group-chip-meta {
+    font-size: 0.7rem;
+    font-weight: var(--fw-regular);
+    color: var(--text-3);
+    max-width: 28ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home-group-chip:hover .home-group-chip-meta {
+    color: var(--accent-text);
+}
+
 .home-group-chip-role {
     padding: 2px 8px;
     border-radius: var(--radius-full);

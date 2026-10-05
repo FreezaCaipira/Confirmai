@@ -1,31 +1,25 @@
-/* ── Features section ─────────────────────────────────────────── */
-.features-section-sub {
-    font-size: 0.875rem;
-    color: var(--slate-mid);
-    margin: -0.25rem 0 1.25rem;
-}
-
+/* ── Feature cards (toggles) ────────────────────────────────────── */
 .features-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-3);
 }
 
 .feature-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    background: rgba(15, 26, 48, 0.7);
-    border: 1px solid rgba(51, 76, 120, 0.45);
-    border-radius: 10px;
-    padding: 1rem 1.1rem;
+    gap: var(--space-4);
+    background: var(--surface-3);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    padding: var(--space-4);
     transition: border-color 0.2s, background 0.2s;
 }
 
 .feature-card--on {
-    border-color: var(--green-opacity-lg);
-    background: rgba(10, 36, 22, 0.55);
+    border-color: var(--success);
+    background: var(--success-soft);
 }
 
 .feature-card--disabled {
@@ -36,31 +30,31 @@
 .feature-card-info {
     display: flex;
     align-items: flex-start;
-    gap: 0.85rem;
+    gap: var(--space-3);
     flex: 1;
     min-width: 0;
 }
 
 .feature-card-icon {
     font-size: 1.25rem;
-    color: var(--ci-accent);
+    color: var(--feat, var(--accent-text));
     flex-shrink: 0;
     margin-top: 0.1rem;
 }
 
 .feature-card--on .feature-card-icon {
-    color: var(--green-bright);
+    color: var(--success);
 }
 
 .feature-card-title {
     display: block;
-    color: var(--ci-surface-muted);
+    color: var(--text);
     font-size: 0.95rem;
     margin-bottom: 0.2rem;
 }
 
 .feature-card-desc {
-    color: var(--slate-mid);
+    color: var(--text-2);
     font-size: 0.82rem;
     line-height: 1.45;
     margin: 0;
@@ -74,7 +68,7 @@
 .feat-gateway-note {
     margin: 0.45rem 0 0;
     font-size: 0.78rem;
-    color: var(--ci-text-info);
+    color: var(--text-3);
 }
 
 /* ── Toggle switch ─────────────────────────────────────────────── */
@@ -97,10 +91,10 @@
 .feature-toggle-track {
     position: absolute;
     inset: 0;
-    background: rgba(51, 65, 85, 0.8);
-    border-radius: 24px;
+    background: var(--surface);
+    border-radius: var(--radius-full);
     transition: background 0.22s;
-    border: 1px solid rgba(100, 116, 139, 0.4);
+    border: 1px solid var(--border-2);
 }
 
 .feature-toggle-track::after {
@@ -110,50 +104,22 @@
     left: 3px;
     width: 18px;
     height: 18px;
-    background: rgba(203, 213, 225, 0.6);
+    background: var(--text-3);
     border-radius: 50%;
     transition: left 0.22s, background 0.22s;
 }
 
 .feature-toggle input:checked ~ .feature-toggle-track {
-    background: var(--green-opacity-lg);
-    border-color: var(--green-opacity-xl);
+    background: var(--success-soft);
+    border-color: var(--success);
 }
 
 .feature-toggle input:checked ~ .feature-toggle-track::after {
     left: 23px;
-    background: var(--green-bright);
+    background: var(--success);
 }
 
 .feature-toggle input:disabled ~ .feature-toggle-track {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-/* ── Save messages ─────────────────────────────────────────────── */
-.features-save-msg {
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    background: var(--green-opacity-sm);
-    border: 1px solid var(--green-opacity-2xl);
-    color: var(--futsal-green-pale);
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.features-save-msg i {
-    font-size: 1rem;
-}
-
-.features-save-msg--error {
-    background: rgba(248, 113, 113, 0.15);
-    border-color: var(--red-soft-opacity-md);
-    color: var(--red-soft);
-}
-
-.features-save-msg--error i {
-    color: var(--red-soft);
 }

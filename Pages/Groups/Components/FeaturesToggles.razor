@@ -3,11 +3,14 @@
 @using Confirmai.Services.Core
 @inject UiTextService Ui
 
-<section class="detail-section features-section">
-    <h2 class="detail-section-title">
-        <i class="fas fa-credit-card"></i> @Ui["Group.PaymentsSection"]
-    </h2>
-    <p class="features-section-sub">@Ui["Group.PaymentsSectionSub"]</p>
+<section class="settings-section feat--payments">
+    <div class="settings-section-head">
+        <span class="feat-icon"><i class="fas fa-credit-card"></i></span>
+        <div>
+            <h2 class="settings-section-title">@Ui["Group.PaymentsSection"]</h2>
+            <p class="settings-section-sub">@Ui["Group.PaymentsSectionSub"]</p>
+        </div>
+    </div>
 
     <div class="features-list">
         <div class="feature-card @(Group!.EnablePaymentGateways ? "feature-card--on" : "")">
@@ -51,11 +54,14 @@
     }
 </section>
 
-<section class="detail-section features-section">
-    <h2 class="detail-section-title">
-        <i class="fas fa-sliders-h"></i> @Ui["Group.AdditionalFeatures"]
-    </h2>
-    <p class="features-section-sub">@Ui["Group.AdditionalFeaturesSub"]</p>
+<section class="settings-section feat--settings">
+    <div class="settings-section-head">
+        <span class="feat-icon"><i class="fas fa-sliders-h"></i></span>
+        <div>
+            <h2 class="settings-section-title">@Ui["Group.AdditionalFeatures"]</h2>
+            <p class="settings-section-sub">@Ui["Group.AdditionalFeaturesSub"]</p>
+        </div>
+    </div>
 
     <div class="features-list">
         <div class="feature-card @(Group!.EnablePostMatchRanking ? "feature-card--on" : "") @(Group!.EnablePaymentGateways ? "" : "feature-card--disabled")">

@@ -312,7 +312,7 @@ else
                             </button>
                         </div>
                         <div class="platform-fee-summary-grid">
-                            <div class="platform-fee-summary-card platform-fee-summary-card--highlight">
+                            <div class="platform-fee-summary-card">
                                 <span class="platform-fee-summary-label">@Ui["Group.PlatformFeeToSettle"]</span>
                                 <span class="platform-fee-summary-value">R$ @feeOverview.Due.ToString("F2")</span>
                             </div>
@@ -332,7 +332,7 @@ else
 
                         <hr class="platform-fee-divider" />
 
-                        <h3 class="platform-fee-section-title platform-fee-section-title--center platform-fee-matches-title">@Ui["Group.PlatformFeeMatches"]</h3>
+                        <h3 class="platform-fee-section-title platform-fee-matches-title">@Ui["Group.PlatformFeeMatches"]</h3>
                         <div class="platform-fee-info-card">
                             <i class="fas fa-info-circle"></i>
                             <span>@Ui["Group.PlatformFeeMatchesHint"]</span>
@@ -437,7 +437,7 @@ else
                                 </div>
 
                                 <div class="platform-fee-submit-card">
-                                    <h3 class="platform-fee-section-title platform-fee-section-title--center">@Ui["Group.PlatformFeeSubmit"]</h3>
+                                    <h3 class="platform-fee-section-title">@Ui["Group.PlatformFeeSubmit"]</h3>
                                         @if (!string.IsNullOrWhiteSpace(settlementSuccess))
                                         {
                                             <p class="platform-fee-success"><i class="fas fa-check-circle"></i> @settlementSuccess</p>
@@ -483,7 +483,7 @@ else
 
                         <hr class="platform-fee-divider" />
 
-                        <h3 class="platform-fee-section-title platform-fee-section-title--center platform-fee-matches-title">@Ui["Group.PlatformFeeHistory"]</h3>
+                        <h3 class="platform-fee-section-title platform-fee-matches-title">@Ui["Group.PlatformFeeHistory"]</h3>
                         @if (feeOverview.Settlements.Count == 0)
                         {
                             <div class="payments-empty">
@@ -512,7 +512,7 @@ else
                                             <td>R$ @s.Amount.ToString("F2")</td>
                                             <td>
                                                 <span class="platform-fee-status platform-fee-status--@(s.Status == PlatformFeeSettlementStatus.Pago ? "paid" : s.Status == PlatformFeeSettlementStatus.Rejeitado ? "rejected" : "pending")">
-                                                    @(s.Status == PlatformFeeSettlementStatus.Pago ? Ui["Group.PlatformFeeStatusPaid"] : s.Status == PlatformFeeSettlementStatus.Rejeitado ? Ui["Group.PlatformFeeHistoryNote"] : Ui["Group.PlatformFeeStatusPending"])
+                                                    @(s.Status == PlatformFeeSettlementStatus.Pago ? Ui["Group.PlatformFeeStatusPaid"] : s.Status == PlatformFeeSettlementStatus.Rejeitado ? Ui["Group.PlatformFeeStatusRejected"] : Ui["Group.PlatformFeeStatusPending"])
                                                 </span>
                                             </td>
                                             <td>@(s.ReviewedAt.HasValue ? Ui.FormatDateTime(s.ReviewedAt.Value.ToLocalTime(), "DateDefault") : "—")</td>

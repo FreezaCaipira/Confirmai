@@ -86,13 +86,31 @@
     color: var(--danger);
 }
 
+/* Divider: vertical rule on desktop, horizontal rule + centered "ou" on mobile */
 .group-entry-divider {
     display: flex;
     align-items: center;
+    justify-content: center;
+    position: relative;
     color: var(--text-3);
     font-size: 0.8125rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
+}
+
+.group-entry-divider::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    border-left: 1px solid var(--border-2);
+}
+
+.group-entry-divider span {
+    position: relative;
+    background: var(--surface);
+    padding: var(--space-1) var(--space-2);
 }
 
 @media (max-width: 768px) {
@@ -101,7 +119,12 @@
         gap: var(--space-3);
     }
 
-    .group-entry-divider {
-        justify-content: center;
+    .group-entry-divider::before {
+        top: 50%;
+        bottom: auto;
+        left: 0;
+        right: 0;
+        border-left: none;
+        border-top: 1px solid var(--border-2);
     }
 }

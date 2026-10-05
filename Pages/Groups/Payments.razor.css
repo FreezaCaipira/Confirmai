@@ -88,7 +88,7 @@
 
 .payments-refresh-btn {
     background: transparent;
-    border: var(--border);
+    border: 1px solid var(--border);
     color: var(--text-3);
     font-size: 0.85rem;
     padding: 0.4rem 0.55rem;
@@ -133,7 +133,7 @@
     text-align: center;
     color: var(--text);
     background: var(--surface-2);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -196,7 +196,7 @@
 
 .payments-history-filters select {
     background: var(--surface-2);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
     color: var(--text);
@@ -259,7 +259,7 @@
 
 /* History tab — neutral green/teal instead of red */
 .payments-user-item--history {
-    border: var(--border);
+    border: 1px solid var(--border);
     box-shadow: var(--shadow);
 }
 
@@ -393,7 +393,7 @@
     align-items: center;
     padding: 0.5rem 0.75rem;
     background: var(--surface-3);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 6px;
     gap: 0.5rem;
     box-shadow: 0 2px 4px var(--shadow);
@@ -755,13 +755,9 @@
 
 .platform-fee-divider {
     border: none;
-    border-top: var(--border);
+    border-top: 1px solid var(--border);
     margin: 1.5rem 0;
     width: 100%;
-}
-
-.platform-fee-section-title--center {
-    text-align: center;
 }
 
 .platform-fee-section-header {
@@ -774,7 +770,7 @@
 
 .platform-fee-refresh-btn {
     background: transparent;
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--accent-text);
     font-size: 0.85rem;
@@ -797,7 +793,7 @@
 
 .payments-refresh-btn--visible {
     background: transparent;
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--accent-text);
     font-size: 0.85rem;
@@ -824,7 +820,7 @@
     align-items: center;
     gap: 0.5rem;
     background: var(--surface-3);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 0.6rem 0.9rem;
     margin: 0 0 0.75rem 0;
@@ -844,7 +840,7 @@
     margin: 0.25rem 0;
     padding: 0.4rem 1rem;
     background: transparent;
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--accent-text);
     font-size: 0.85rem;
@@ -856,7 +852,7 @@
 .platform-fee-toggle-row td {
     text-align: center;
     padding: 0.25rem 0;
-    border-bottom: var(--border);
+    border-bottom: 1px solid var(--border);
 }
 
 .platform-fee-toggle-btn:hover {
@@ -866,7 +862,7 @@
 
 .platform-fee-table-total td {
     font-weight: 800;
-    border-top: var(--border);
+    border-top: 1px solid var(--border);
     color: var(--text);
     padding-top: 0.6rem;
 }
@@ -894,7 +890,7 @@
 }
 
 .platform-fee-select-btn {
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 6px;
     background: transparent;
     color: var(--accent-text);
@@ -1018,7 +1014,7 @@
 
 .payment-modal {
     background: var(--surface);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 12px;
     max-width: 950px;
     width: 95%;
@@ -1037,7 +1033,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.25rem;
-    border-bottom: var(--border);
+    border-bottom: 1px solid var(--border);
 }
 
 .payment-modal-title {
@@ -1108,7 +1104,7 @@
 
 .payment-modal-btn--cancel {
     background: transparent;
-    border: var(--border);
+    border: 1px solid var(--border);
     color: var(--text-2);
 }
 
@@ -1172,7 +1168,7 @@
 
 .platform-fee-summary-card {
     background: var(--surface);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 1rem;
     display: flex;
@@ -1195,20 +1191,6 @@
     font-weight: 800;
 }
 
-.platform-fee-summary-card--highlight {
-    border-color: var(--accent-border);
-    background: var(--accent-soft);
-    box-shadow: var(--shadow);
-}
-
-.platform-fee-summary-card--highlight .platform-fee-summary-label {
-    color: var(--accent-text);
-}
-
-.platform-fee-summary-card--highlight .platform-fee-summary-value {
-    color: var(--accent-fg);
-}
-
 .platform-fee-summary-card--warning {
     border-color: var(--warning);
 }
@@ -1227,7 +1209,7 @@
 
 .platform-fee-pix-card {
     background: var(--surface-2);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 1.25rem;
     margin-top: 1.5rem;
@@ -1288,7 +1270,7 @@
     align-items: center;
     gap: 0.5rem;
     background: var(--surface-3);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
 }
@@ -1313,13 +1295,13 @@
     text-transform: uppercase;
     letter-spacing: 0.04em;
     padding: 0.6rem 0.5rem;
-    border-bottom: var(--border);
+    border-bottom: 1px solid var(--border);
     text-align: left;
 }
 
 .platform-fee-table tbody td {
     padding: 0.6rem 0.5rem;
-    border-bottom: var(--border-2);
+    border-bottom: 1px solid var(--border-2);
     color: var(--text);
 }
 
@@ -1351,7 +1333,7 @@
 
 .platform-fee-submit-card {
     background: var(--surface);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 1rem;
     display: flex;
@@ -1372,7 +1354,7 @@
 
 .platform-fee-input {
     background: var(--surface-3);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
     color: var(--text);
@@ -1467,7 +1449,7 @@
     gap: 1.25rem;
     align-items: start;
     background: var(--surface);
-    border: var(--border);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 1rem;
     box-shadow: 0 2px 4px var(--shadow);
@@ -1482,7 +1464,7 @@
     max-width: 140px;
     height: auto;
     border-radius: 6px;
-    border: var(--border);
+    border: 1px solid var(--border);
     object-fit: cover;
     transition: filter 0.2s;
 }

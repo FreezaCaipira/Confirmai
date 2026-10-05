@@ -1,0 +1,174 @@
+/* ── Meus pagamentos (lista do jogador) — C37 F4 ────────────────── */
+
+.payments-empty {
+    padding: var(--space-6);
+    text-align: center;
+    color: var(--text-2);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.payments-empty i {
+    font-size: 2rem;
+    color: var(--success);
+}
+
+.payments-empty p {
+    margin: 0;
+}
+
+.mypay-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    font-weight: var(--fw-medium);
+}
+
+.mypay-total strong {
+    color: var(--warning);
+    font-size: 1.05rem;
+}
+
+.mypay-section {
+    margin: var(--space-4) 0 var(--space-2);
+    font-size: 0.95rem;
+    font-weight: var(--fw-semibold);
+    color: var(--text-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.mypay-section--due i { color: var(--warning); }
+.mypay-section--review i { color: var(--accent-text); }
+.mypay-section--paid i { color: var(--success); }
+
+.payments-user-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.payments-user-item {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.payments-user-item:hover {
+    background: var(--surface-3);
+    border-color: var(--border-2);
+}
+
+.payments-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+    text-decoration: none;
+}
+
+.payments-user-info:hover {
+    text-decoration: none;
+}
+
+.payments-user-name {
+    font-weight: var(--fw-semibold);
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.payments-user-sub {
+    font-size: 0.85rem;
+    color: var(--text-2);
+}
+
+.payments-user-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+}
+
+.btn-pay {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.45rem var(--space-4);
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: var(--fw-semibold);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btn-pay:hover {
+    background: var(--accent-text);
+    color: var(--accent-fg);
+    text-decoration: none;
+}
+
+.payments-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: var(--fw-semibold);
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-sm);
+}
+
+.payments-badge--pending {
+    background: var(--warning-soft);
+    color: var(--warning);
+    border: 1px solid var(--warning);
+}
+
+.payments-badge--paid {
+    background: var(--success-soft);
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+@media (max-width: 480px) {
+    .payments-user-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+
+    .payments-user-actions {
+        width: 100%;
+    }
+
+    .btn-pay {
+        width: 100%;
+        justify-content: center;
+    }
+}
