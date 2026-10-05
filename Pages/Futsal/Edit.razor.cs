@@ -6,6 +6,7 @@ using Confirmai.Models;
 using Confirmai.Pages.Futsal.Components;
 using Confirmai.Services.Core;
 using Confirmai.Services.Events;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -131,11 +132,20 @@ public partial class Edit
 
             var ev = await db.Events
                 .Include(e => e.Group)
+                    .ThenInclude(g => g.Members)
+                        .ThenInclude(m => m.User)
                 .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
 
             if (ev is null || !EventCancellationService.CanManage(ev, userId, auth.User.IsInRole("admin")))
             {
                 saveError = Ui["Futsal.AccessDenied"];
+                isSaving  = false;
+                return;
+            }
+
+            if (form.Price > 0 && form.Price != ev.Price && !EventPaymentService.GroupCanCharge(ev.Group))
+            {
+                saveError = Ui["Futsal.Edit.PixRequired"];
                 isSaving  = false;
                 return;
             }

@@ -144,7 +144,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
-0. **C38 (Pleno) -- achados do testador externo em prod [EXECUTADO -- ver review]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
+0. **C38 (Pleno) -- achados do testador externo em prod [REVISADO -- APROVADO c/ 1 correcao; poker aguarda decisao do Robson]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
 2. **C32 -- pre-producao [EXECUTADO -- ver review].** Fases A-E em `feat/ciclo32`. Resumo na Linha do Tempo. Fase F (remover telas legadas) pendente de aprovacao do Robson.
@@ -463,6 +463,25 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 # Detalhes dos Ciclos Recentes (planos + reviews na integra)
 
 ---
+
+## Review Senior do Ciclo 38 (PR #144, mergeada na `main`) -- APROVADO c/ 1 correcao + 1 decisao do Robson pendente
+
+Rodado na `main` pos-#144: build Release 0 warnings; 2703 testes, 2679 passam, 24 falham (os de sempre: `ProgramConfigurationTests`, credencial do Postgres local).
+
+**Conferido contra o plano (codigo, nao so o resumo do PR):**
+- F1 cadastro/reset: requisitos de senha gerados da `SecurityPolicySnapshot` ativa (DI singleton), `identity-register.js` estatico (CSP ok, nada inline), mostrar/ocultar senha, "senhas conferem", `LocalizedIdentityErrorDescriber` + `ModelStateLocalizer` (chave i18n no `ErrorMessage`). Email so valida formato no blur, sem consulta de existencia. OK.
+- F4 quadra: `CityNormalizer.VenuesForGroup` (sem acento/caixa/espaco; EX compara so cidade), `SaveAsync` rejeita quadra fora da cidade antes de qualquer `SaveChanges`, edicao mantem a quadra legada, aviso no topo do formulario em PT/EN/ES. OK.
+- F3 `CityAutocomplete`: combobox com `aria-*`, teclado, `onmousedown:preventDefault` (toque nao perde a selecao no blur); servidor so aceita grafia oficial do `cities.json` (Groups/Create e VenueEdit). OK.
+- F2: `.seg-toggle` com `flex-wrap` + `max-width: 100%`, sem `overflow-x: hidden` global. OK.
+- F5 futsal: aviso no topo, valor travado em 0 sem Pix (gratis continua possivel), `returnUrl` so local (`LocalUrls.IsLocal`). OK.
+
+**Corrigido pelo Senior (`Pages/Futsal/Edit.razor.cs`):** a edicao da partida de futsal nao checava Pix -- criar gratis e depois editar o valor para R$ 20 contornava a F5 inteira. Agora mudar para um valor > 0 exige `EventPaymentService.GroupCanCharge(group)` (gateway ligado OU `GetGroupAdminPixKey`), antes do `SaveChanges`; manter o valor que ja existia nao bloqueia. Teste: `C38ReviewFutsalEditPixTests`.
+
+**Erro do Senior no plano do C38 (decisao do Robson pendente):** o plano dizia que no poker "o jogador chega na tela de pagar sem chave". Falso: o poker nunca grava `Event.Price` (`PokerCreateService` so grava `BuyInAmount`/`CashMinBuyIn`), e todo o caminho de pagamento (`EventPaymentService`, botao "Pagar" do C37 em `Poker/Detail.razor`) depende de `Event.Price`. Ou seja: hoje o poker nao cobra pelo app, o buy-in e informativo (pago na mesa). Consequencia da F5 no poker: grupo de poker sem Pix fica com buy-in/stack travados em 0 e nao consegue nem anunciar o valor -- regressao de produto, sem proteger dinheiro nenhum. Opcoes para o Robson: (a) poker nao cobra pelo app -> tirar a trava/aviso de Pix do poker (e os testes `PokerCreatePixPrerequisiteTests`); (b) poker passa a cobrar pelo app -> ciclo proprio (gravar `Event.Price`, definir o que cobrar em torneio vs cash, rebuy/add-on), e ai a trava faz sentido.
+
+**Ressalvas (nao bloqueiam):**
+- Erro de Pix no `SaveAsync` (futsal e poker) volta o link do perfil em `CollisionHref`, renderizado com o texto "Abrir partida existente". Com o valor travado em 0 o caminho quase nunca acontece; arrumar quando mexer nessas telas.
+- `identity-register.js`: espaco conta como simbolo no Identity mas nao no indicador -- so feedback visual, o servidor decide.
 
 ## Review Senior do Ciclo 37 (PR #141, mergeada na `main`) -- APROVADO c/ 2 correcoes aplicadas pelo Senior
 
