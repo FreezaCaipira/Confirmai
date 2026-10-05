@@ -1,0 +1,36 @@
+@using Confirmai.Services.Core
+@inject UiTextService Ui
+
+<div class="city-autocomplete">
+    <input type="text"
+           class="input"
+           role="combobox"
+           aria-autocomplete="list"
+           aria-expanded="@isOpen"
+           aria-controls="@ListId"
+           aria-activedescendant="@ActiveDescendantId"
+           placeholder="@Placeholder"
+           value="@text"
+           disabled="@Disabled"
+           autocomplete="off"
+           @oninput="OnInput"
+           @onkeydown="OnKeyDown"
+           @onblur="OnBlur" />
+
+    @if (isOpen && suggestions.Count > 0)
+    {
+        <ul id="@ListId" role="listbox" class="city-suggestions">
+            @for (var i = 0; i < suggestions.Count; i++)
+            {
+                var index = i;
+                var city = suggestions[i];
+                <li id="@OptionId(index)"
+                    role="option"
+                    aria-selected="@(index == activeIndex)"
+                    class="city-suggestion@(index == activeIndex ? " is-active" : null)"
+                    @onmousedown="() => Select(city)"
+                    @onmousedown:preventDefault>@city</li>
+            }
+        </ul>
+    }
+</div>

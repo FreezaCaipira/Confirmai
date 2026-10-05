@@ -14,6 +14,7 @@
 @using System.Text.Json
 @using Microsoft.EntityFrameworkCore
 @using Confirmai.Services.Core
+@using Confirmai.Pages.Groups.Components
 @inject UiTextService Ui
 
 
@@ -114,13 +115,10 @@
                         }
                         else
                         {
-                            <InputSelect class="input" @bind-Value="form.City">
-                                <option value="">@Ui["Group.SelectUF"]</option>
-                                @foreach (var city in citiesByState[form.StateCode])
-                                {
-                                    <option value="@city">@city</option>
-                                }
-                            </InputSelect>
+                            <CityAutocomplete
+                                Cities="@citiesByState[form.StateCode]"
+                                @bind-Value="form.City"
+                                Placeholder="@Ui["Group.SelectCity"]" />
                         }
                         <ValidationMessage For="@(() => form.City)" class="validation-message" />
                     </div>
