@@ -4,6 +4,7 @@ using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
+using Confirmai.Services.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -29,8 +30,8 @@ namespace Confirmai.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "Identity.Validation.Required")]
+            [EmailAddress(ErrorMessage = "Identity.Validation.Email")]
             public string Email { get; set; } = string.Empty;
 
             /// <summary>
@@ -40,17 +41,17 @@ namespace Confirmai.Areas.Identity.Pages.Account
             /// </summary>
             public bool EmailReadOnly { get; set; }
 
-            [Required]
-            [StringLength(100, ErrorMessage = "Password must be between {2} and {1} characters.", MinimumLength = 6)]
+            [Required(ErrorMessage = "Identity.Validation.Required")]
+            [LocalizedStringLength(100, MinimumLength = 6)]
             [DataType(DataType.Password)]
             public string Password { get; set; } = string.Empty;
 
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "Password and confirmation do not match.")]
+            [Compare("Password", ErrorMessage = "Identity.Validation.PasswordMismatch")]
             public string ConfirmPassword { get; set; } = string.Empty;
 
-            [Required]
+            [Required(ErrorMessage = "Identity.Validation.Required")]
             public string Code { get; set; } = string.Empty;
         }
 
@@ -94,6 +95,8 @@ namespace Confirmai.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // C38 F1: ErrorMessage carrega a chave i18n; traduz antes de renderizar.
+            Confirmai.Services.Identity.ModelStateLocalizer.Translate(ModelState, _t);
             if (!ModelState.IsValid)
             {
                 return Page();

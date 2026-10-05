@@ -236,6 +236,10 @@ var isDevelopment = builder.Environment.IsDevelopment() || builder.Environment.I
 var securityPolicy = SecurityPolicyDefaults.Create(isDevelopment);
 var emailEnabled = builder.Configuration.GetSection("Email").GetValue<bool>("Enabled");
 
+// Snapshot ativo em DI: a tela de cadastro/reset gera os requisitos de senha
+// a partir dele (C38 F1) — nada de regra hardcoded na view.
+builder.Services.AddSingleton(securityPolicy);
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedEmail = securityPolicy.RequireConfirmedEmail && emailEnabled;
@@ -254,6 +258,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders()
+    .AddErrorDescriber<Confirmai.Services.Identity.LocalizedIdentityErrorDescriber>()
     .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>();
 
 builder.Services.AddAuthorization(options =>
