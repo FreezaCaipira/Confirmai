@@ -18,6 +18,13 @@ public partial class VenueSelector
     [Parameter]
     public EventCallback<int> OnVenueChanged { get; set; }
 
+    /// <summary>C38 F4 — "Cidade/UF" do grupo para o aviso de cidade sem quadra.</summary>
+    [Parameter]
+    public string? GroupCityLabel { get; set; }
+
+    private string NoVenueText =>
+        Ui.Get("FutsalForm.NoVenueInCity", GroupCityLabel ?? "-");
+
     private async Task HandleVenueChanged(ChangeEventArgs e)
     {
         var venueId = int.Parse(e.Value?.ToString() ?? "0");

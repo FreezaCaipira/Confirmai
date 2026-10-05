@@ -36,7 +36,7 @@ public class FutsalCreateServiceTests
         await using var db = factory.CreateDbContext();
         db.Users.Add(new ApplicationUser { Id = userId, UserName = "Admin", PixKey = "admin@pix" });
         db.Venues.Add(new Venue { Id = 1, Name = "Quadra Test", City = "SP", StateCode = "SP", Address = "Rua 1", IsActive = true });
-        var group = new Group { Id = 1, Name = "Grupo Test", Sport = Sport.Futsal, CreatedByUserId = userId, InviteCode = "ABC123" };
+        var group = new Group { Id = 1, Name = "Grupo Test", Sport = Sport.Futsal, City = "SP", StateCode = "SP", CreatedByUserId = userId, InviteCode = "ABC123" };
         db.Groups.Add(group);
         db.GroupMembers.Add(new GroupMember { UserId = userId, GroupId = 1, Role = GroupMemberRole.Admin });
         await db.SaveChangesAsync();

@@ -164,6 +164,8 @@
 
 .et-tip-meta {
     color: var(--text-2);
+    /* C38 F2: nome da quadra/local e dado do usuario — quebra em 320px. */
+    overflow-wrap: anywhere;
 }
 
 /* Em touch nao existe hover: o detalhe vira linha visivel abaixo da data. */

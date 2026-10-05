@@ -191,6 +191,7 @@ internal static class FutsalTexts
         ["Futsal.JoinRequestSendError"] = "Não foi possível enviar a solicitação agora.",
         ["Futsal.JoinRequestCancelError"] = "Não foi possível cancelar a solicitação.",
         ["Futsal.InvalidVenue"] = "Quadra inválida.",
+        ["Futsal.InvalidVenueForCity"] = "Esta quadra não fica na cidade do grupo. Escolha uma quadra de {0} ou fale com o suporte.",
     };
 
     /// <summary>EN-US English (United States) strings</summary>
@@ -379,6 +380,7 @@ internal static class FutsalTexts
         ["Futsal.JoinRequestSendError"] = "Could not send the request now.",
         ["Futsal.JoinRequestCancelError"] = "Could not cancel the request.",
         ["Futsal.InvalidVenue"] = "Invalid court.",
+        ["Futsal.InvalidVenueForCity"] = "This venue is not in the group's city. Pick a venue in {0} or contact support.",
     };
 
     /// <summary>ES-ES Spanish (Spain) strings</summary>
@@ -567,6 +569,7 @@ internal static class FutsalTexts
         ["Futsal.JoinRequestSendError"] = "No se pudo enviar la solicitud ahora.",
         ["Futsal.JoinRequestCancelError"] = "No se pudo cancelar la solicitud.",
         ["Futsal.InvalidVenue"] = "Cancha inválida.",
+        ["Futsal.InvalidVenueForCity"] = "Esta cancha no está en la ciudad del grupo. Elige una cancha en {0} o contacta al soporte.",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>

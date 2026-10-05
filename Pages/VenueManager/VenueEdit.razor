@@ -11,6 +11,7 @@
 @using Microsoft.JSInterop
 @using System.Linq
 @using System.Security.Claims
+@using Confirmai.Pages.Groups.Components
 
 @implements IAsyncDisposable
 
@@ -86,13 +87,10 @@
                         }
                         else
                         {
-                            <InputSelect class="input" @bind-Value="model.City">
-                                <option value="">@T["VenueEdit.SelectCity"]</option>
-                                @foreach (var city in citiesByState[model.StateCode])
-                                {
-                                    <option value="@city">@city</option>
-                                }
-                            </InputSelect>
+                            <CityAutocomplete
+                                Cities="@citiesByState[model.StateCode]"
+                                @bind-Value="model.City"
+                                Placeholder="@T["VenueEdit.SelectCity"]" />
                         }
                         <ValidationMessage For="@(() => model.City)" class="validation-message" />
                     </div>

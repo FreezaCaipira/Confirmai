@@ -66,6 +66,10 @@ else
     var newEventHref = group.Sport == Sport.Futsal
         ? $"/futsal/create?groupId={group.Id}"
         : $"/poker/create?groupId={group.Id}";
+    // C38 F5: selo informativo "sem Pix" no botao Nova partida quando o grupo
+    // nao tem recebedor (mesma regra do QR: recebedor escolhido -> admin).
+    var groupNeedsPix = !group.EnablePaymentGateways
+        && Confirmai.Services.Payment.EventPaymentService.GetGroupAdminPixKey(group) is null;
 
     <div class="detail-page">
         <div class="hub-stack">
@@ -100,6 +104,12 @@ else
                             <a href="@newEventHref" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> @Ui["Groups.NovaPartida"]
                             </a>
+                            @if (groupNeedsPix)
+                            {
+                                <span class="status-badge status-badge--pending" title="@Ui["Group.PixNotConfigured"]">
+                                    <i class="fas fa-triangle-exclamation"></i> @Ui["Group.NoPixSeal"]
+                                </span>
+                            }
                         </div>
                     }
                 </div>

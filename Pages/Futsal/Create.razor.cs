@@ -44,11 +44,22 @@ public partial class Create
     private Group? preselectedGroup;
     private bool groupHasPixKey;
     private string? adminUserId;
-    private bool PixRequiredBlocking =>
-        form.Price > 0
-        && preselectedGroup is not null
+    // C38 F5: sem Pix no grupo o aviso vem no topo e o valor fica travado
+    // em 0 (partida gratuita continua possivel) — o organizador nao preenche
+    // o formulario inteiro para descobrir o bloqueio no fim.
+    private bool GroupNeedsPix =>
+        preselectedGroup is not null
         && !preselectedGroup.EnablePaymentGateways
         && !groupHasPixKey;
+    private string PixReturnUrl =>
+        Uri.EscapeDataString($"/futsal/create?groupId={GroupId}");
+    // C38 F4: cidade do grupo sem quadra — aviso no topo, nao no submit.
+    private string GroupCityLabel =>
+        preselectedGroup is null
+            ? "-"
+            : $"{preselectedGroup.City}/{(preselectedGroup.StateCode == "EX" ? Ui["Group.ForeignUF"] : preselectedGroup.StateCode)}";
+    private bool NoVenueInGroupCity =>
+        preselectedGroup is not null && !venues.Any();
     private bool isLoading = true;
     private bool isSaving;
     private string saveError = string.Empty;
@@ -88,6 +99,7 @@ public partial class Create
         venues = data.Venues;
         groupHasPixKey = data.GroupHasPixKey;
         adminUserId = data.AdminUserId;
+        if (GroupNeedsPix) form.Price = 0;
         isLoading = false;
     }
 

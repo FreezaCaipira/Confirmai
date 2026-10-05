@@ -13,6 +13,7 @@ using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
+using Confirmai.Services.Identity;
 using Confirmai.Services.Utility;
 
 namespace Confirmai.Areas.Identity.Pages.Account
@@ -48,17 +49,17 @@ namespace Confirmai.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "Identity.Validation.Required")]
+            [EmailAddress(ErrorMessage = "Identity.Validation.Email")]
             public string Email { get; set; } = string.Empty;
 
-            [Required]
+            [Required(ErrorMessage = "Identity.Validation.Required")]
             [DataType(DataType.Password)]
             public string Password { get; set; } = string.Empty;
 
-            [Required]
+            [Required(ErrorMessage = "Identity.Validation.Required")]
             [DataType(DataType.Password)]
-            [Compare("Password", ErrorMessage = "Passwords do not match.")]
+            [Compare("Password", ErrorMessage = "Identity.Validation.PasswordMismatch")]
             public string ConfirmPassword { get; set; } = string.Empty;
         }
 
@@ -74,6 +75,8 @@ namespace Confirmai.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // C38 F1: ErrorMessage carrega a chave i18n; traduz antes de renderizar.
+            Confirmai.Services.Identity.ModelStateLocalizer.Translate(ModelState, _t);
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser

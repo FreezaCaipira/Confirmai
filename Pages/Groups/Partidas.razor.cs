@@ -49,6 +49,7 @@ public partial class Partidas
 
         group = await db.Groups
             .Include(g => g.Members)
+                .ThenInclude(m => m.User)
             .FirstOrDefaultAsync(g => g.Id == Id);
 
         if (group is null) { isLoading = false; return; }

@@ -69,6 +69,10 @@ else
     // dados, some quando completo. "Convite enviado" ~ alguem alem do criador.
     var adminHasPix    = group.Members.Any(m => m.Role == GroupMemberRole.Admin
         && !string.IsNullOrWhiteSpace(m.User?.PixKey));
+    // C38 F5: selo "sem Pix" no botao Nova partida (regra do QR: recebedor
+    // escolhido -> qualquer admin com Pix).
+    var groupNeedsPix  = !group.EnablePaymentGateways
+        && Confirmai.Services.Payment.EventPaymentService.GetGroupAdminPixKey(group) is null;
     var inviteSent     = group.Members.Count > 1;
     var checklistDone  = adminHasPix && hasAnyEvent && inviteSent;
 
@@ -250,6 +254,12 @@ else
                                 <a href="@(group.Sport == Sport.Futsal ? $"/futsal/create?groupId={group.Id}" : $"/poker/create?groupId={group.Id}")" class="btn btn-primary">
                                     <i class="fas fa-plus"></i> @Ui["Groups.NovaPartida"]
                                 </a>
+                                @if (groupNeedsPix)
+                                {
+                                    <span class="status-badge status-badge--pending" title="@Ui["Group.PixNotConfigured"]">
+                                        <i class="fas fa-triangle-exclamation"></i> @Ui["Group.NoPixSeal"]
+                                    </span>
+                                }
                             }
                             else
                             {

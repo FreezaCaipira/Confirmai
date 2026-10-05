@@ -5,6 +5,7 @@ using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Core;
 using Confirmai.Services.Events;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,8 @@ namespace Confirmai.Services.Poker;
 public sealed class PokerCreateInitData
 {
     public Group? PreselectedGroup { get; set; }
+    public bool GroupHasPixKey { get; set; }
+    public string? AdminUserId { get; set; }
 }
 
 public sealed record PokerCreateResult(bool Success, string? Error, string? CollisionHref, int? EventId);
@@ -22,15 +25,18 @@ public sealed class PokerCreateService
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly AuthenticationStateProvider _authStateProvider;
     private readonly EventCollisionService _collisionService;
+    private readonly UiTextService _ui;
 
     public PokerCreateService(
         IDbContextFactory<AppDbContext> dbFactory,
         AuthenticationStateProvider authStateProvider,
-        EventCollisionService collisionService)
+        EventCollisionService collisionService,
+        UiTextService ui)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
         _collisionService = collisionService;
+        _ui = ui;
     }
 
     public async Task<string?> GetCurrentUserIdAsync()
@@ -49,11 +55,30 @@ public sealed class PokerCreateService
 
         var group = await db.Groups
             .Include(g => g.Members)
+                .ThenInclude(m => m.User)
             .FirstOrDefaultAsync(g => g.Id == groupId.Value
                 && g.Members.Any(m => m.UserId == userId && m.Role == GroupMemberRole.Admin));
 
-        return new PokerCreateInitData { PreselectedGroup = group };
+        if (group is null)
+            return new PokerCreateInitData();
+
+        return new PokerCreateInitData
+        {
+            PreselectedGroup = group,
+            GroupHasPixKey = !string.IsNullOrWhiteSpace(
+                EventPaymentService.GetGroupAdminPixKey(group)),
+            AdminUserId = userId,
+        };
     }
+
+    /// <summary>Valor anunciado do evento: buy-in do torneio, stack minimo do
+    /// cash game; home game nunca cobra.</summary>
+    private static decimal ChargedAmount(PokerCreateFormData form) => form.EventType switch
+    {
+        PokerEventType.Tournament => form.BuyInAmount,
+        PokerEventType.CashGame   => form.CashMinBuyIn,
+        _ => 0,
+    };
 
     public async Task<PokerCreateResult> SaveAsync(PokerCreateFormData form, Group? preselectedGroup)
     {
@@ -65,10 +90,39 @@ public sealed class PokerCreateService
 
         await using var db = await _dbFactory.CreateDbContextAsync();
 
-        Group group;
+        // Mesma regra do futsal (C36-E): evento com valor exige Pix resolvivel
+        // no nivel do GRUPO (recebedor escolhido -> qualquer admin com Pix).
+        // A checagem vem antes de qualquer SaveChanges para nao deixar grupo
+        // orfao quando o grupo e criado inline.
+        Group? existingGroup = null;
         if (preselectedGroup is not null)
         {
-            group = preselectedGroup;
+            existingGroup = await db.Groups
+                .Include(g => g.Members)
+                    .ThenInclude(m => m.User)
+                .FirstOrDefaultAsync(g => g.Id == preselectedGroup.Id)
+                ?? preselectedGroup;
+        }
+
+        if (ChargedAmount(form) > 0 && !(existingGroup?.EnablePaymentGateways ?? false))
+        {
+            var pixKey = existingGroup is not null
+                ? EventPaymentService.GetGroupAdminPixKey(existingGroup)
+                : (await db.Users.FirstOrDefaultAsync(u => u.Id == userId))?.PixKey;
+
+            if (string.IsNullOrWhiteSpace(pixKey))
+            {
+                return new(false,
+                    _ui["Poker.Create.PixRequired"],
+                    "/profile/" + userId + "?intent=pix",
+                    null);
+            }
+        }
+
+        Group group;
+        if (existingGroup is not null)
+        {
+            group = existingGroup;
         }
         else
         {

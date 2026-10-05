@@ -93,6 +93,20 @@ public partial class Create
                 return;
             }
 
+            // C38 F3: UF brasileira aceita so grafia oficial do cities.json —
+            // digitação normalizada e resolvida para o nome canonico.
+            if (form.StateCode != "EX"
+                && citiesByState.TryGetValue(form.StateCode, out var stateCities))
+            {
+                if (!CitySearch.TryGetCanonical(stateCities, form.City, out var officialCity))
+                {
+                    saveError = Ui.Get("Group.CityNotInState", form.City);
+                    isSaving  = false;
+                    return;
+                }
+                form.City = officialCity;
+            }
+
             await using var db = await DbFactory.CreateDbContextAsync();
 
             var group = new Group

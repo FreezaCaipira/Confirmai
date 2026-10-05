@@ -129,6 +129,19 @@ public partial class VenueEdit : IAsyncDisposable
             var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var isAdmin = auth.User.IsInRole("admin");
 
+            // C38 F3: UF brasileira aceita so grafia oficial do cities.json.
+            if (model.StateCode != "EX"
+                && citiesByState.TryGetValue(model.StateCode, out var stateCities))
+            {
+                if (!CitySearch.TryGetCanonical(stateCities, model.City, out var officialCity))
+                {
+                    saveError = T.Get("Group.CityNotInState", model.City);
+                    isSaving  = false;
+                    return;
+                }
+                model.City = officialCity;
+            }
+
             await using var db = await DbFactory.CreateDbContextAsync();
 
             if (IsNew)

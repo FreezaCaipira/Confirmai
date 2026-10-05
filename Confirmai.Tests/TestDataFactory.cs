@@ -83,7 +83,9 @@ internal static class TestDataFactory
 
     public static Group CreateGroup(string name, bool enablePaymentGateways = false)
     {
-        return new Group { Name = name, EnablePaymentGateways = enablePaymentGateways };
+        // C38 F4: grupos de teste ganham cidade/UF porque o Create/Edit de
+        // futsal filtra quadras pela cidade do grupo.
+        return new Group { Name = name, EnablePaymentGateways = enablePaymentGateways, City = "SP", StateCode = "SP" };
     }
 
     public static GroupPayoutAccount CreateGroupPayoutAccount(int groupId, string pixKey, PixKeyType keyType = PixKeyType.Email)
