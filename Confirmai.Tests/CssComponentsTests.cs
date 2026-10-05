@@ -120,4 +120,32 @@ public class CssComponentsTests
         // hit the Google variant.
         Assert.Contains("button:not(.google-signin-btn)", css);
     }
+
+    /// <summary>
+    /// C38 Fase 2 (testador externo): .seg-toggle mede ~350px de largura minima
+    /// e estoura /grupo/{id}/partidas em 320px — os itens precisam quebrar de
+    /// linha, e dados do usuario (nome do grupo, local da partida) ganham
+    /// overflow-wrap onde sao renderizados.
+    /// </summary>
+    [Fact]
+    public void SegToggle_Wraps_AndUserData_BreaksAt320px()
+    {
+        var root = RepoRoot().FullName;
+        var components = File.ReadAllText(Path.Combine(root, "wwwroot", "css", "components.css"));
+
+        var segToggle = Regex.Match(components, @"\.seg-toggle\s*\{([^}]*)");
+        Assert.True(segToggle.Success, ".seg-toggle rule not found in components.css");
+        Assert.Contains("flex-wrap: wrap", segToggle.Groups[1].Value);
+        Assert.Contains("max-width: 100%", segToggle.Groups[1].Value);
+
+        var groupHeader = File.ReadAllText(Path.Combine(root, "Shared", "Components", "Groups", "GroupHeader.razor.css"));
+        var title = Regex.Match(groupHeader, @"\.group-header-title\s*\{([^}]*)");
+        Assert.True(title.Success);
+        Assert.Contains("overflow-wrap: anywhere", title.Groups[1].Value);
+
+        var events = File.ReadAllText(Path.Combine(root, "Shared", "Components", "Groups", "GroupDetailEvents.razor.css"));
+        var tipMeta = Regex.Match(events, @"\.et-tip-meta\s*\{([^}]*)");
+        Assert.True(tipMeta.Success);
+        Assert.Contains("overflow-wrap: anywhere", tipMeta.Groups[1].Value);
+    }
 }

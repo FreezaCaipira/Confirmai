@@ -143,6 +143,10 @@
     background: var(--surface-2);
     border: 1px solid var(--border-2);
     border-radius: var(--radius-sm);
+    /* C38 F2: ~350px de largura minima estoura viewports de 320px —
+       os itens quebram de linha em vez de causar scroll horizontal. */
+    flex-wrap: wrap;
+    max-width: 100%;
 }
 
 .seg-item {
