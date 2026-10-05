@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/05/2026 - 04:14:40 |
-| Coverage date: | 10/05/2026 - 04:14:35 |
+| Generated on: | 10/05/2026 - 05:31:21 |
+| Coverage date: | 10/05/2026 - 05:31:16 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 542 |
 | Files: | 637 |
-| **Line coverage:** | 93.6% (142208 of 151865) |
-| Covered lines: | 142208 |
-| Uncovered lines: | 9657 |
+| **Line coverage:** | 93.6% (142204 of 151865) |
+| Covered lines: | 142204 |
+| Uncovered lines: | 9661 |
 | Coverable lines: | 151865 |
 | Total lines: | 185609 |
-| **Branch coverage:** | 46.1% (4303 of 9323) |
-| Covered branches: | 4303 |
+| **Branch coverage:** | 46.1% (4301 of 9323) |
+| Covered branches: | 4301 |
 | Total branches: | 9323 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 432_37262437984 |
+| Tag: | 435_37267948546 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **142208** | **9657** | **151865** | **204828** | **93.6%** | **4303** | **9323** | **46.1%** |
+| **Confirmai** | **142204** | **9661** | **151865** | **204828** | **93.6%** | **4301** | **9323** | **46.1%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -397,7 +397,7 @@
 | Confirmai.Services.Events.HomeToday | 27 | 0 | 27 | 64 | 100% | 10 | 12 | 83.3% |
 | Confirmai.Services.Events.HomeTodayMatch | 1 | 0 | 1 | 64 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.HomeTodaySummary | 6 | 0 | 6 | 64 | 100% | 0 | 0 |  |
-| Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
+| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
@@ -556,7 +556,7 @@
 | Confirmai.Shared.Components.Groups.RankingTable | 4 | 21 | 25 | 65 | 16% | 2 | 22 | 9% |
 | Confirmai.Shared.Components.Groups.RankingViewSelector | 5 | 3 | 8 | 28 | 62.5% | 5 | 8 | 62.5% |
 | Confirmai.Shared.Components.Header | 0 | 3 | 3 | 23 | 0% | 0 | 0 |  |
-| Confirmai.Shared.Components.HomeTodayPanel | 39 | 11 | 50 | 126 | 78% | 8 | 22 | 36.3% |
+| Confirmai.Shared.Components.HomeTodayPanel | 39 | 11 | 50 | 126 | 78% | 7 | 22 | 31.8% |
 | Confirmai.Shared.Components.Poker.PokerDetailInfo | 7 | 49 | 56 | 149 | 12.5% | 7 | 42 | 16.6% |
 | Confirmai.Shared.Components.QRCode | 0 | 8 | 8 | 21 | 0% | 0 | 2 | 0% |
 | Confirmai.Shared.Components.Skeleton | 2 | 0 | 2 | 9 | 100% | 0 | 0 |  |
