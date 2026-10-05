@@ -27,7 +27,7 @@ Regras:
 3. Borda clareia junto com o nível (`--border` em L0/L1, `--border-2` em
    L2/L3). Sombra só em L3 flutuante (`--shadow-card`).
 4. Hover sobe um nível (`L2 → --surface-3`); nunca desce nem muda de matiz.
-5. Sem gradiente de fundo. Sem cor por esporte/categoria em fundo ou borda. **Excecao unica**: o hero de pagina (`.home-hero`), que pode usar o degrade de acento para se distinguir dos paineis de conteudo — e L1 sem filhos-card (so texto + toggle) e e o unico elemento da tela cujo papel e orientar. Decisao do Senior no C36-D Fase 3.
+5. Sem gradiente de fundo. Sem cor por esporte/categoria em fundo ou borda. **Excecoes**: (a) o hero de pagina (`.home-hero`), que pode usar o degrade de acento para se distinguir dos paineis de conteudo — e L1 sem filhos-card (so texto + toggle) e e o unico elemento da tela cujo papel e orientar. Decisao do Senior no C36-D Fase 3. (b) o header do shell, via token `--header-gradient` — degrade sutil L1→L0 (tom-para-tom, sem matiz), so chrome; o texto mantem o contraste AA medido sobre --surface/--bg. C37 Fase 7.
 
 ## 2. Azul: direcionamento, não decoração
 

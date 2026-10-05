@@ -102,6 +102,12 @@ public class CssNoLegacyVarsTests
         @"\.home-hero[^{}]*\{[^{}]*\}",
         RegexOptions.Compiled);
 
+    // Documented gradient tokens (--header-gradient, C37 F7) live in
+    // tokens.css as custom properties — strip the declaration itself.
+    private static readonly Regex GradientTokenRegex = new(
+        @"--[\w-]*gradient[\w-]*\s*:[^;]+;",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
     private static DirectoryInfo RepoRoot()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
@@ -149,9 +155,10 @@ public class CssNoLegacyVarsTests
         {
             var path = Path.Combine(root, file);
             if (!File.Exists(path)) continue;
-            // .home-hero is the documented gradient exception: strip its
-            // rules before checking for linear-gradient.
+            // .home-hero and --*-gradient tokens are the documented gradient
+            // exceptions: strip them before checking for linear-gradient.
             var css = HomeHeroRuleRegex.Replace(File.ReadAllText(path), string.Empty);
+            css = GradientTokenRegex.Replace(css, string.Empty);
             if (css.Contains("linear-gradient", StringComparison.Ordinal))
                 violations.Add(file);
         }
