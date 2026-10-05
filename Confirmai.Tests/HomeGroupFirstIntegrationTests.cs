@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Confirmai.Tests;
 
@@ -91,5 +92,38 @@ public class HomeGroupFirstIntegrationTests : IClassFixture<IntegrationTestWebAp
         Assert.Equal(4, System.Text.RegularExpressions.Regex.Matches(content, "role=\"tab\"").Count);
         Assert.Contains("home-section--history", content);
         Assert.DoesNotContain("group-entry-input", content);
+    }
+
+    [Fact]
+    public async Task Home_GroupChip_ShowsScheduleSummary_WhenGroupHasSchedule()
+    {
+        var groupId = await _factory.SeedGroupWithAdminAsync("home-sched-user", "Racha da Quarta");
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<Confirmai.Data.AppDbContext>();
+            var venue = new Confirmai.Models.Venue
+            {
+                Name = "Arena Central", Type = Confirmai.Enums.VenueType.Society,
+                Address = "Rua 1", City = "Pouso Alegre", StateCode = "MG",
+            };
+            db.Venues.Add(venue);
+            await db.SaveChangesAsync();
+            db.RachaSchedules.Add(new Confirmai.Models.MatchSchedule
+            {
+                GroupId = groupId, VenueId = venue.Id,
+                DayOfWeek = DayOfWeek.Wednesday, TimeOfDay = new TimeOnly(19, 30),
+            });
+            await db.SaveChangesAsync();
+        }
+
+        var response = await AuthenticatedClient("home-sched-user").GetAsync("/");
+        var content = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("home-group-chip-meta", content);
+        Assert.Contains("Qua", content);
+        Assert.Contains("Arena Central", content);
+        Assert.Contains("19:30", content);
     }
 }

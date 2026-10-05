@@ -82,7 +82,15 @@
                         {
                             <a href="/grupo/@g.Id" class="home-group-chip">
                                 <span class="home-group-chip-icon" aria-hidden="true">@(g.Sport == Sport.Poker ? "🃏" : "⚽")</span>
-                                <span class="home-group-chip-name">@g.Name</span>
+                                <span class="home-group-chip-text">
+                                    <span class="home-group-chip-name">@g.Name</span>
+                                    @if (g.Schedule is { } sched)
+                                    {
+                                        <span class="home-group-chip-meta">
+                                            @(string.Join(" · ", sched.Days.Select(DayShort)))@(sched.CommonTime is { } t ? $" {t:HH\\:mm}" : "")@(sched.VenueName is { } v ? $" — {v}" : "")
+                                        </span>
+                                    }
+                                </span>
                                 @if (g.IsAdmin)
                                 {
                                     <span class="home-group-chip-role">@Ui["Index.RoleAdmin"]</span>
