@@ -22,21 +22,5 @@
 
 /* .switch-label -> components.css (vocabulario global) */
 
-/* form-actions, save-btn, cancel-btn, validation-* ? events.css */
-
-/* Pix obrigatorio: banner bloqueante quando a partida tem preco e o
-   organizador nao tem chave Pix (grupo sem gateway) */
-.pix-required-banner {
-    display: flex;
-    gap: 0.6rem;
-    align-items: flex-start;
-    background: var(--warning-soft);
-    border: 1px solid var(--warning);
-    border-radius: var(--radius);
-    padding: 0.75rem 1rem;
-    color: var(--text);
-}
-
-.pix-required-banner i { color: var(--warning); margin-top: 0.15rem; }
-.pix-required-banner p { margin: 0.15rem 0 0.4rem; color: var(--text-2); font-size: 0.85rem; }
-.pix-required-link { color: var(--accent-text); font-weight: 700; font-size: 0.85rem; }
+/* form-actions, save-btn, cancel-btn, validation-* -> events.css */
+/* pix-required-banner/link -> event-create.css (compartilhado futsal+poker, C38) */

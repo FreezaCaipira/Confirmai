@@ -47,6 +47,18 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary class="validation-summary" />
 
+                @if (GroupNeedsPix)
+                {
+                    <div class="pix-required-banner" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>@Ui["Group.PixNotConfigured"]</strong>
+                            <p>@Ui["Futsal.Create.PixRequired"]</p>
+                            <a href="/profile/@adminUserId?intent=pix&returnUrl=@PixReturnUrl" class="pix-required-link">@Ui["Group.ConfigureNow"]</a>
+                        </div>
+                    </div>
+                }
+
                 @* ── Identidade da partida ─────────────────────────────────────────────────── *@
                 <FutsalMatchIdentity
                     Form="@form"
@@ -72,19 +84,9 @@
                     OnRotateInGoalChanged="@RotateInGoalChangedCallback" />
 
                 @* ── Valor ──────────────────────────────────────────────────────────────────── *@
-                <PriceInput Form="@form" />
-
-                @if (PixRequiredBlocking)
-                {
-                    <div class="pix-required-banner" role="alert">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <div>
-                            <strong>@Ui["Group.PixNotConfigured"]</strong>
-                            <p>@Ui["Futsal.Create.PixRequired"]</p>
-                            <a href="/profile/@adminUserId?intent=pix" class="pix-required-link">@Ui["Group.ConfigureNow"]</a>
-                        </div>
-                    </div>
-                }
+                <PriceInput Form="@form"
+                            Disabled="@GroupNeedsPix"
+                            Hint="@(GroupNeedsPix ? Ui["Group.PixFreeMatchHint"] : null)" />
 
                 @* ── Periodicidade ──────────────────────────────────────────────────────────── *@
                 <RecurrenceScheduler
@@ -109,7 +111,7 @@
                             @onclick='() => NavigationManager.NavigateTo(preselectedGroup is not null ? $"/grupo/{preselectedGroup.Id}" : "/grupos")'>
                         @Ui["Common.Cancel"]
                     </button>
-                    <button class="btn btn-primary" type="submit" disabled="@(isSaving || !venues.Any() || PixRequiredBlocking)">
+                    <button class="btn btn-primary" type="submit" disabled="@(isSaving || !venues.Any())">
                         @(isSaving ? @Ui["Futsal.Creating"] : @Ui["Futsal.CreateMatch"])
                     </button>
                 </div>

@@ -69,9 +69,20 @@ public partial class Create
 
     private CreatePokerEventForm form = new();
     private Group? preselectedGroup;
+    private bool groupHasPixKey;
+    private string? adminUserId;
     private bool isSaving;
     private string saveError = string.Empty;
     private string? collisionHref;
+
+    // C38 F5: mesma regra do futsal — sem Pix no grupo o aviso vem no topo e
+    // buy-in/stack ficam travados em 0 (evento gratis continua possivel).
+    private bool GroupNeedsPix =>
+        preselectedGroup is not null
+        && !preselectedGroup.EnablePaymentGateways
+        && !groupHasPixKey;
+    private string PixReturnUrl =>
+        Uri.EscapeDataString($"/poker/create?groupId={GroupId}");
 
     private static readonly string[] BrazilianStates =
         ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
@@ -103,6 +114,9 @@ public partial class Create
         }
 
         preselectedGroup = data.PreselectedGroup;
+        groupHasPixKey = data.GroupHasPixKey;
+        adminUserId = data.AdminUserId;
+        if (GroupNeedsPix) { form.BuyInAmount = 0; form.CashMinBuyIn = 0; form.CashMaxBuyIn = 0; }
         form.Name = preselectedGroup.Name;
         form.City = preselectedGroup.City;
         form.StateCode = preselectedGroup.StateCode;

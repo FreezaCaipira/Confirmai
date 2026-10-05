@@ -144,6 +144,7 @@ internal static class PokerTexts
 
         // Code-behind error messages
         ["Poker.CreateEventError"] = "Erro ao criar evento.",
+        ["Poker.Create.PixRequired"] = "Nenhum administrador do grupo tem chave Pix. Cadastre a sua no perfil antes de criar um evento com buy-in.",
         ["Poker.AlreadyRegistered"] = "Você já está inscrito.",
         ["Poker.JoinRequestSendError"] = "Não foi possível enviar a solicitação agora. Tente novamente em instantes.",
         ["Poker.JoinRequestCancelError"] = "Não foi possível cancelar a solicitação agora. Tente novamente em instantes.",
@@ -288,6 +289,7 @@ internal static class PokerTexts
 
         // Code-behind error messages
         ["Poker.CreateEventError"] = "Error creating event.",
+        ["Poker.Create.PixRequired"] = "No group admin has a Pix key. Register yours in the profile before creating an event with a buy-in.",
         ["Poker.AlreadyRegistered"] = "You are already registered.",
         ["Poker.JoinRequestSendError"] = "Could not send the request now. Please try again in a moment.",
         ["Poker.JoinRequestCancelError"] = "Could not cancel the request now. Please try again in a moment.",
@@ -432,6 +434,7 @@ internal static class PokerTexts
 
         // Code-behind error messages
         ["Poker.CreateEventError"] = "Error al crear el evento.",
+        ["Poker.Create.PixRequired"] = "Ningún administrador del grupo tiene clave Pix. Registra la tuya en el perfil antes de crear un evento con buy-in.",
         ["Poker.AlreadyRegistered"] = "Ya está inscrito.",
         ["Poker.JoinRequestSendError"] = "No se pudo enviar la solicitud ahora. Inténtelo de nuevo en unos instantes.",
         ["Poker.JoinRequestCancelError"] = "No se pudo cancelar la solicitud ahora. Inténtelo de nuevo en unos instantes.",

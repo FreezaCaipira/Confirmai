@@ -31,6 +31,7 @@ public partial class Profile
     private string? avatarFeedback;
     private bool isSavingAvatar;
     private bool _highlightPix;
+    private string? _returnUrl;
     private List<ProfileChatThread.ProfileChatMessageView> chatMessages = new();
 
     private Sport activeSport = Sport.Futsal;
@@ -89,6 +90,14 @@ public partial class Profile
         {
             _highlightPix = true;
         }
+        // C38 F5: ?returnUrl= devolve o usuario ao formulario de origem
+        // (ex.: criar partida) depois de salvar o Pix. So caminho local —
+        // nunca redirect aberto.
+        if (query.TryGetValue("returnUrl", out var returnUrl)
+            && Confirmai.Services.Core.LocalUrls.IsLocal(returnUrl))
+        {
+            _returnUrl = returnUrl.ToString();
+        }
     }
 
     private async Task SendMailboxMessageAsync(string body)
@@ -123,6 +132,8 @@ public partial class Profile
             NormalizeOptional(profileEditModel.PixKey));
         isSavingProfile = false;
         profileSaveFeedback = succeeded ? T["Profile.SaveSuccess"] : T["Profile.SaveGenericError"];
+        if (succeeded && _returnUrl is not null)
+            NavigationManager.NavigateTo(_returnUrl);
     }
 
     private static string? NormalizeOptional(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

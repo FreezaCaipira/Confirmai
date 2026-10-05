@@ -23,14 +23,16 @@ public class PokerCreateServiceTests
         authMock
             .Setup(x => x.GetAuthenticationStateAsync())
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(identity)));
-        var svc = new PokerCreateService(factory, authMock.Object, collisionService);
+        var svc = new PokerCreateService(factory, authMock.Object, collisionService,
+            new Confirmai.Services.Core.UiTextService(new Confirmai.Services.User.LanguagePreferenceService()));
         return (factory, svc);
     }
 
     private static async Task SeedGroupAsync(IDbContextFactory<AppDbContext> factory, string userId)
     {
         await using var db = factory.CreateDbContext();
-        db.Users.Add(new ApplicationUser { Id = userId, UserName = "Admin" });
+        // Pix do admin: eventos com buy-in exigem recebedor do grupo (C38 F5).
+        db.Users.Add(new ApplicationUser { Id = userId, UserName = "Admin", PixKey = "admin@pix.com" });
         db.Groups.Add(new Group { Id = 1, Name = "Poker Group", Sport = Sport.Poker, CreatedByUserId = userId, InviteCode = "XYZ789" });
         db.GroupMembers.Add(new GroupMember { UserId = userId, GroupId = 1, Role = GroupMemberRole.Admin });
         await db.SaveChangesAsync();
