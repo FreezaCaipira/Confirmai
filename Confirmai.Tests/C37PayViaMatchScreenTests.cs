@@ -112,9 +112,11 @@ public class C37PayViaMatchScreenTests : IClassFixture<IntegrationTestWebAppFact
     }
 
     [Fact]
-    public async Task MyPayments_PayButton_LinksToMatchScreen_NotCheckout()
+    public async Task MyPayments_PayButton_KeepsCheckoutLink_InPaymentsTab()
     {
-        var (eventId, _) = await SeedPokerEventAsync("c37-admin-3", "c37-player-3");
+        // A aba "Meus pagamentos" é contexto de pagamento: o link direto para
+        // /pagamento/evento/{id} é legítimo aqui (spec C37 F6).
+        var (_, confId) = await SeedPokerEventAsync("c37-admin-3", "c37-player-3");
 
         var client = ClientFor(_factory, "c37-player-3");
 
@@ -122,14 +124,47 @@ public class C37PayViaMatchScreenTests : IClassFixture<IntegrationTestWebAppFact
         using (var scope = _factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            groupId = await db.Events.Where(e => e.Id == eventId).Select(e => e.GroupId).SingleAsync();
+            groupId = await db.EventConfirmations
+                .Where(c => c.Id == confId).Select(c => c.Event.GroupId).SingleAsync();
         }
 
         var html = await (await client.GetAsync($"/grupo/{groupId}/pagamentos"))
             .Content.ReadAsStringAsync();
 
-        // O botão Pagar abre a partida — nunca o checkout direto.
-        Assert.Contains($"href=\"/poker/{eventId}\" class=\"btn-pay\"", html);
-        Assert.DoesNotContain("btn-pay\" href=\"/pagamento/", html);
+        Assert.Contains($"href=\"/pagamento/evento/{confId}\" class=\"btn-pay\"", html);
+    }
+
+    [Fact]
+    public void HomeAndHub_ContainNoDirectCheckoutLinks()
+    {
+        // C37 F6: fora das telas de partida e da aba de pagamentos, nenhum
+        // componente de home/hub pode linkar /pagamento/evento diretamente.
+        var root = RepoRoot();
+        string[] forbidden =
+        {
+            "Pages/Index.razor", "Pages/Index.razor.cs",
+            "Pages/Groups/Detail.razor",
+            "Shared/Components/ConfirmationCard.razor",
+            "Shared/Components/HomeTodayPanel.razor",
+        };
+
+        foreach (var rel in forbidden)
+        {
+            var path = Path.Combine(root, rel);
+            Assert.True(File.Exists(path), $"missing file {rel}");
+            Assert.DoesNotContain("/pagamento/evento", File.ReadAllText(path));
+        }
+    }
+
+    private static string RepoRoot()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null)
+        {
+            if (dir.GetFiles("*.csproj").Any() && Directory.Exists(Path.Combine(dir.FullName, "Pages")))
+                return dir.FullName;
+            dir = dir.Parent;
+        }
+        throw new InvalidOperationException("repo root not found");
     }
 }

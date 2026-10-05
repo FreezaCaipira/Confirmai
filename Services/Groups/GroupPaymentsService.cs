@@ -31,7 +31,8 @@ public record MyPaymentEntry(
     decimal TotalToPay,
     bool HasPaid,
     bool ProofPending,
-    string EventHref);
+    string EventHref,
+    string PayHref);
 
 public sealed class GroupPaymentsService
 {
@@ -164,7 +165,7 @@ public sealed class GroupPaymentsService
             return new MyPaymentEntry(
                 c.Id, c.EventId, c.Event.StartsAt, total,
                 c.HasPaid, c.PixProofUploadedAt != null && !c.HasPaid,
-                href);
+                href, $"/pagamento/evento/{c.Id}");
         }).ToList();
     }
 

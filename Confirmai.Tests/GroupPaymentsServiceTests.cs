@@ -724,8 +724,7 @@ public class GroupPaymentsServiceTests
         Assert.Equal("player-1", "player-1"); // rows carry no other user's data
         Assert.Equal(15m, mine[0].TotalToPay);
         Assert.False(mine[0].HasPaid);
-        // C37 F6: "Pagar" abre a tela da partida — o checkout só é alcançável por lá.
-        Assert.Equal($"/futsal/{mine[0].EventId}", mine[0].EventHref);
+        Assert.Equal($"/pagamento/evento/{mine[0].ConfirmationId}", mine[0].PayHref);
     }
 
     [Fact]
