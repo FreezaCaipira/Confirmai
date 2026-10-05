@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/05/2026 - 03:06:52 |
-| Coverage date: | 10/05/2026 - 03:06:46 |
+| Generated on: | 10/05/2026 - 04:14:40 |
+| Coverage date: | 10/05/2026 - 04:14:35 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 542 |
 | Files: | 637 |
-| **Line coverage:** | 93.6% (142178 of 151839) |
-| Covered lines: | 142178 |
-| Uncovered lines: | 9661 |
-| Coverable lines: | 151839 |
-| Total lines: | 185568 |
-| **Branch coverage:** | 46.1% (4295 of 9315) |
-| Covered branches: | 4295 |
-| Total branches: | 9315 |
+| **Line coverage:** | 93.6% (142208 of 151865) |
+| Covered lines: | 142208 |
+| Uncovered lines: | 9657 |
+| Coverable lines: | 151865 |
+| Total lines: | 185609 |
+| **Branch coverage:** | 46.1% (4303 of 9323) |
+| Covered branches: | 4303 |
+| Total branches: | 9323 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 430_37257882831 |
+| Tag: | 432_37262437984 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **142178** | **9661** | **151839** | **204762** | **93.6%** | **4295** | **9315** | **46.1%** |
+| **Confirmai** | **142208** | **9657** | **151865** | **204828** | **93.6%** | **4303** | **9323** | **46.1%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -274,7 +274,7 @@
 | Confirmai.Pages.Groups.Partidas | 60 | 19 | 79 | 236 | 75.9% | 36 | 64 | 56.2% |
 | Confirmai.Pages.Groups.Payments | 59 | 323 | 382 | 1063 | 15.4% | 40 | 272 | 14.7% |
 | Confirmai.Pages.Groups.Ranking | 73 | 42 | 115 | 267 | 63.4% | 17 | 54 | 31.4% |
-| Confirmai.Pages.Index | 111 | 31 | 142 | 372 | 78.1% | 41 | 83 | 49.3% |
+| Confirmai.Pages.Index | 124 | 31 | 155 | 388 | 80% | 43 | 85 | 50.5% |
 | Confirmai.Pages.LegacyRoutes | 1 | 2 | 3 | 18 | 33.3% | 0 | 0 |  |
 | Confirmai.Pages.Mailbox | 0 | 149 | 149 | 323 | 0% | 0 | 52 | 0% |
 | Confirmai.Pages.Pages__Host | 2 | 0 | 2 | 268 | 100% | 5 | 6 | 83.3% |
@@ -397,7 +397,7 @@
 | Confirmai.Services.Events.HomeToday | 27 | 0 | 27 | 64 | 100% | 10 | 12 | 83.3% |
 | Confirmai.Services.Events.HomeTodayMatch | 1 | 0 | 1 | 64 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.HomeTodaySummary | 6 | 0 | 6 | 64 | 100% | 0 | 0 |  |
-| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
+| Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
@@ -422,8 +422,8 @@
 | Confirmai.Services.Groups.GroupMetricsSnapshot | 8 | 0 | 8 | 97 | 100% | 0 | 0 |  |
 | Confirmai.Services.Groups.GroupPaymentsData | 4 | 0 | 4 | 399 | 100% | 0 | 0 |  |
 | Confirmai.Services.Groups.GroupPaymentsService | 235 | 5 | 240 | 399 | 97.9% | 90 | 118 | 76.2% |
-| Confirmai.Services.Groups.GroupScheduleLine | 4 | 0 | 4 | 46 | 100% | 0 | 0 |  |
-| Confirmai.Services.Groups.GroupScheduleSummary | 17 | 0 | 17 | 46 | 100% | 8 | 8 | 100% |
+| Confirmai.Services.Groups.GroupScheduleLine | 4 | 0 | 4 | 71 | 100% | 0 | 0 |  |
+| Confirmai.Services.Groups.GroupScheduleSummary | 30 | 0 | 30 | 71 | 100% | 13 | 14 | 92.8% |
 | Confirmai.Services.Groups.MyPaymentEntry | 8 | 1 | 9 | 399 | 88.8% | 0 | 0 |  |
 | Confirmai.Services.Groups.PaymentHistoryEntry | 8 | 1 | 9 | 43 | 88.8% | 0 | 0 |  |
 | Confirmai.Services.Groups.PendingPaymentGroup | 1 | 0 | 1 | 399 | 100% | 0 | 0 |  |
