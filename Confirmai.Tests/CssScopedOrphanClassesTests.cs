@@ -34,23 +34,6 @@ public class CssScopedOrphanClassesTests
                 "payments-empty", "payments-user-item", "payments-user-list",
                 "payments-user-name"
             },
-            ["Pages/Groups/Components/WhatsAppGroupJidEditor.razor"] = new[]
-            {
-                "feat-pix-form", "feat-pix-label", "feat-pix-save-btn",
-                "feat-pix-select", "features-save-msg", "features-section-sub"
-            },
-            ["Pages/Groups/Components/PixReceiverSelector.razor"] = new[]
-            {
-                "features-section-sub"
-            },
-            ["Pages/Groups/Components/PayoutAccountEditor.razor"] = new[]
-            {
-                "features-section-sub"
-            },
-            ["Pages/Groups/Components/MembersManager.razor"] = new[]
-            {
-                "features-save-msg", "features-section-sub"
-            },
             ["Shared/Components/Poker/PokerDetailInfo.razor"] = new[]
             {
                 "cash-includes-block", "cash-includes-label",
@@ -61,19 +44,7 @@ public class CssScopedOrphanClassesTests
             },
             ["Pages/Futsal/Components/RecurrenceScheduler.razor"] = new[]
             {
-                "switch-label", "weekday-chip", "weekday-grid"
-            },
-            ["Pages/Futsal/Components/SlotsAndGoalkeeperConfig.razor"] = new[]
-            {
-                "switch-label"
-            },
-            ["Pages/Futsal/Components/EditEventForm.razor"] = new[]
-            {
-                "switch-label"
-            },
-            ["Pages/VenueManager/VenueEdit.razor"] = new[]
-            {
-                "switch-label"
+                "weekday-chip", "weekday-grid"
             },
             ["Pages/Poker/Edit.razor"] = new[]
             {
@@ -120,10 +91,6 @@ public class CssScopedOrphanClassesTests
             ["Pages/Admin/AdminAuditTimeline.razor"] = new[]
             {
                 "logs-empty-state"
-            },
-            ["Pages/Admin/AdminVenueEdit.razor"] = new[]
-            {
-                "switch-label"
             },
             ["Pages/Admin/AdminVenues.razor"] = new[]
             {

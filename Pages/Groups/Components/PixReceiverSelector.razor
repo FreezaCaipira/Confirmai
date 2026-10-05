@@ -2,14 +2,17 @@
 @using Confirmai.Services.Core
 @inject UiTextService Ui
 
-<section class="detail-section features-section">
-    <h2 class="detail-section-title">
-        <i class="fas fa-qrcode"></i> @Ui["Payment.PixOrganizer"]
-    </h2>
-    <p class="features-section-sub">
-        @Ui["Payment.SelectReceiver"]
-        @Ui["Payment.SelectReceiverSub"]
-    </p>
+<section class="settings-section feat--payments">
+    <div class="settings-section-head">
+        <span class="feat-icon"><i class="fas fa-qrcode"></i></span>
+        <div>
+            <h2 class="settings-section-title">@Ui["Payment.PixOrganizer"]</h2>
+            <p class="settings-section-sub">
+                @Ui["Payment.SelectReceiver"]
+                @Ui["Payment.SelectReceiverSub"]
+            </p>
+        </div>
+    </div>
 
     @if (PixAdmins.Count == 0)
     {
@@ -33,7 +36,7 @@
                     <option value="@a.UserId">@(a.User?.FullName ?? a.User?.UserName) — @a.User?.PixKey</option>
                 }
             </select>
-            <button class="feat-pix-save-btn" type="button"
+            <button class="btn btn-primary btn-sm" type="button"
                     disabled="@IsSaving"
                     @onclick="HandleSavePixReceiver">
                 <i class="fas fa-save"></i> @(IsSaving ? Ui["Payment.Saving"] : Ui["Payment.Save"])

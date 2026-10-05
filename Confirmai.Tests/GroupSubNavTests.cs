@@ -131,4 +131,25 @@ public class GroupSubNavTests : IClassFixture<IntegrationTestWebAppFactory>
         Assert.Contains("breadcrumb-nav", html);
         Assert.Contains("Racha Subnav", html);
     }
+
+    [Fact]
+    public async Task Configuracoes_RendersSettingsSections_WithFeatureIcons()
+    {
+        const string adminUserId = "subnav-admin-5";
+        const string memberUserId = "subnav-member-5";
+        var groupId = await SeedGroupAsync(adminUserId, memberUserId);
+
+        var client = ClientFor(_factory, adminUserId, "admin");
+        var html = await (await client.GetAsync($"/grupo/{groupId}/configuracoes"))
+            .Content.ReadAsStringAsync();
+
+        // C37 F3: cada secao e um card L2 com feat-icon; divisores <hr> sairam.
+        Assert.Contains("settings-section feat--invite", html);
+        Assert.Contains("settings-section feat--payments", html);
+        Assert.Contains("settings-section feat--members", html);
+        Assert.Contains("feat-icon", html);
+        Assert.Contains("whatsapp-jid-input", html);
+        Assert.Contains("feat-pix-input", html);
+        Assert.DoesNotContain("detail-divider", html);
+    }
 }

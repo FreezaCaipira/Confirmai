@@ -2,13 +2,13 @@
 .feat-pix-warning {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     font-size: 0.85rem;
     color: var(--warning);
     background: var(--warning-soft);
     border: 1px solid var(--warning-soft);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-4);
     flex-wrap: wrap;
 }
 
@@ -16,86 +16,4 @@
     color: var(--accent-text);
     text-decoration: underline;
     font-size: 0.85rem;
-}
-
-.feat-pix-form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.feat-pix-label {
-    font-size: 0.85rem;
-    color: var(--text-2);
-    white-space: nowrap;
-}
-
-.feat-pix-select {
-    flex: 1;
-    min-width: 200px;
-    background: var(--surface-2);
-    border: 1px solid var(--border-2);
-    border-radius: 7px;
-    color: var(--text-3);
-    font-size: 0.875rem;
-    padding: 0.45rem 0.7rem;
-}
-
-.feat-pix-select:disabled {
-    opacity: 0.5;
-}
-
-.feat-pix-save-btn {
-    background: var(--success-soft);
-    border: 1px solid var(--success);
-    color: var(--success);
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 0.4rem 0.9rem;
-    border-radius: 7px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    transition: opacity 0.15s;
-    white-space: nowrap;
-}
-
-.feat-pix-save-btn:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-.feat-pix-save-btn:not(:disabled):hover {
-    background: var(--success-soft);
-    border-color: var(--success);
-    color: var(--success);
-}
-
-.features-save-msg {
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    background: var(--success-soft);
-    border: 1px solid var(--success);
-    color: var(--success);
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.features-save-msg i {
-    font-size: 1rem;
-}
-
-.features-save-msg--error {
-    background: var(--danger-soft);
-    border-color: var(--danger);
-    color: var(--danger);
-}
-
-.features-save-msg--error i {
-    color: var(--danger);
 }

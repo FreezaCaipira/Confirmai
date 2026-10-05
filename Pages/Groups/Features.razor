@@ -66,14 +66,15 @@ else
                 </div>
 
             @* ── Convite ────────────────────────────────────────────── *@
-            <section class="detail-section">
-                <h2 class="detail-section-title">
-                    <i class="fas fa-user-plus"></i> @Ui["Group.Invite"]
-                </h2>
+            <section class="settings-section feat--invite">
+                <div class="settings-section-head">
+                    <span class="feat-icon"><i class="fas fa-user-plus"></i></span>
+                    <div>
+                        <h2 class="settings-section-title">@Ui["Group.Invite"]</h2>
+                    </div>
+                </div>
                 <GroupInviteBlock InviteCode="@(group.InviteCode ?? string.Empty)" />
             </section>
-
-            <hr class="detail-divider">
 
             @* ── Pagamentos & Funcionalidades ─────────────────────────── *@
             <FeaturesToggles
@@ -85,8 +86,6 @@ else
                 OnTogglePostMatchRanking="@TogglePostMatchRankingCallback"
                 OnToggleBestPlayerVoting="@ToggleBestPlayerVotingCallback"
                 OnTogglePaymentGateways="@TogglePaymentGatewaysCallback" />
-
-            <hr class="detail-divider">
 
             @* ── Configuração de Pagamento (condicional) ──────────────── *@
             @if (group.EnablePaymentGateways)
@@ -110,8 +109,6 @@ else
                     OnSavePixReceiver="@SavePixReceiverCallback" />
             }
 
-            <hr class="detail-divider">
-
             @* ── WhatsApp (C31) ────────────────────────────────────── *@
             <WhatsAppGroupJidEditor
                 CurrentJid="@group.WhatsAppGroupJid"
@@ -119,8 +116,6 @@ else
                 Message="@whatsAppMessage"
                 IsError="@whatsAppError"
                 OnSaveJid="@SaveWhatsAppJidCallback" />
-
-            <hr class="detail-divider">
 
             @* ── Membros & Permissões ───────────────────────────────── *@
             <MembersManager

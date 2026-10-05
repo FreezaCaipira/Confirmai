@@ -3,13 +3,14 @@
 @using Confirmai.Services.Core
 @inject UiTextService Ui
 
-<section class="detail-section features-section">
-    <h2 class="detail-section-title">
-        <i class="fas fa-qrcode"></i> @Ui["Group.PayoutTitle"]
-    </h2>
-    <p class="features-section-sub">
-        @Ui["Group.PayoutSub"]
-    </p>
+<section class="settings-section feat--payments">
+    <div class="settings-section-head">
+        <span class="feat-icon"><i class="fas fa-qrcode"></i></span>
+        <div>
+            <h2 class="settings-section-title">@Ui["Group.PayoutTitle"]</h2>
+            <p class="settings-section-sub">@Ui["Group.PayoutSub"]</p>
+        </div>
+    </div>
 
     @if (ExistingAccount != null)
     {
@@ -21,7 +22,7 @@
             </div>
             @if (!IsEditing)
             {
-                <button class="feat-payout-edit-btn" type="button"
+                <button class="btn btn-secondary btn-sm" type="button"
                         disabled="@IsSaving"
                         @onclick="HandleEdit">
                     <i class="fas fa-edit"></i> @Ui["Common.Edit"]
@@ -84,20 +85,20 @@
             </div>
 
             <div class="feat-payout-actions">
-                <button class="feat-payout-test-btn" type="button"
+                <button class="btn btn-ghost btn-sm" type="button"
                         disabled="@IsSaving"
                         @onclick="FillTestData">
                     <i class="fas fa-flask"></i> @Ui["Group.TestData"]
                 </button>
                 @if (ExistingAccount != null)
                 {
-                    <button class="feat-payout-cancel-btn" type="button"
+                    <button class="btn btn-secondary btn-sm" type="button"
                             disabled="@IsSaving"
                             @onclick="HandleCancel">
                         <i class="fas fa-times"></i> @Ui["Common.Cancel"]
                     </button>
                 }
-                <button class="feat-payout-save-btn" type="button"
+                <button class="btn btn-primary btn-sm" type="button"
                         disabled="@IsSaving"
                         @onclick="HandleSave">
                     <i class="fas fa-save"></i> @(IsSaving ? @Ui["Group.PayoutSaving"] : @Ui["Common.Save"])

@@ -73,6 +73,9 @@ public class CssNoLegacyVarsTests
         "Shared/Components/Groups/GroupDetailPaymentsModal.razor.css",
         "Pages/Groups/Components/PixReceiverSelector.razor.css",
         "Pages/Groups/Components/PayoutAccountEditor.razor.css",
+        // Group settings screen (C37 Fase 3 — secoes L2 + feat-icon)
+        "Pages/Groups/Components/FeaturesToggles.razor.css",
+        "Pages/Groups/Components/MembersManager.razor.css",
         // Groups create + cookie banner + Identity + Admin (C36-B Fase 4)
         "Pages/Groups/Create.razor.css",
         "Shared/Components/CookieConsent.razor.css",

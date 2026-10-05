@@ -3,11 +3,14 @@
 @using Confirmai.Services.Core
 @inject UiTextService Ui
 
-<section class="detail-section features-section">
-    <h2 class="detail-section-title">
-        <i class="fas fa-user-shield"></i> @Ui["Group.MembersPermissions"]
-    </h2>
-    <p class="features-section-sub">@Ui["Group.MembersPermissionsSub"]</p>
+<section class="settings-section feat--members">
+    <div class="settings-section-head">
+        <span class="feat-icon"><i class="fas fa-user-shield"></i></span>
+        <div>
+            <h2 class="settings-section-title">@Ui["Group.MembersPermissions"]</h2>
+            <p class="settings-section-sub">@Ui["Group.MembersPermissionsSub"]</p>
+        </div>
+    </div>
     @if (!CanManageAdminRoles)
     {
         <p class="feat-role-note">
