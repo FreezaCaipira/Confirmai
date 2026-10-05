@@ -144,6 +144,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
+0. **C38 (Pleno) -- achados do testador externo em prod [PLANEJADO -- EXECUTAVEL AGORA; F4 aguarda decisao do Robson]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Ver "Ciclo 38".
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
 2. **C32 -- pre-producao [EXECUTADO -- ver review].** Fases A-E em `feat/ciclo32`. Resumo na Linha do Tempo. Fase F (remover telas legadas) pendente de aprovacao do Robson.
@@ -200,6 +201,68 @@ validado na Brevo.
 
 Qualquer desvio nos passos 2-4 e **bloqueador de go-live**: e nesses caminhos que um bug funde contas
 ou da acesso a conta de outra pessoa, sem aparecer como erro.
+
+---
+
+## Ciclo 38 (Pleno) -- Achados do testador externo em producao (cadastro, mobile, cidade, quadra, Pix) [PLANEJADO -- EXECUTAVEL AGORA]
+
+> Origem: teste de um amigo/dev do Robson em prod (print no chat da sessao). Diagnostico feito pelo Senior na `main` pos-#142, com o app local + Playwright em 390/360/320 px. **Prioridade: funcional.** Branch `feat/ciclo38`, um commit por fase, `CssStructureTests`/`CssScopedOrphanClassesTests`/i18n verdes.
+
+### Diagnostico (o que o Senior confirmou no codigo)
+
+| # | Relato | Causa confirmada | Gravidade |
+|---|---|---|---|
+| 1 | "Cadastro: faz submit e volta tudo em branco; validar enquanto digita" | (a) `Areas/Identity/Pages/Shared/_ValidationScriptsPartial.cshtml` esta **vazio** (so um comentario) e nao existe `wwwroot/lib` -> **zero validacao no cliente**. (b) A politica de senha de **producao** (`SecurityPolicyDefaults`, nao-dev) exige 10+ caracteres, maiuscula, minuscula, digito e simbolo, e **nada na tela avisa isso**. (c) No erro o servidor devolve a pagina com as 2 senhas apagadas (comportamento padrao) -- o email fica, mas o usuario percebe "voltou em branco". (d) As mensagens saem **em ingles**: `[Compare(... ErrorMessage = "Passwords do not match.")]` e os erros do Identity (nao ha `IdentityErrorDescriber` traduzido). | **Alta** -- e a porta de entrada, perde usuario no primeiro minuto. |
+| 2/3 | "Texto vazando / scroll horizontal no mobile" | **Nao reproduzido** na `main` em 390 e 360 px (20 telas, logado e deslogado, inclusive com nome de grupo/quadra/cidade longos). Em **320 px** so `/grupo/{id}/partidas` estoura: o `.seg-toggle` (Proximas/Realizadas, `inline-flex` sem quebra) mede 350 px. Hipotese: o teste foi antes do deploy da #139 (que corrigiu os overflows de 390 px) ou num aparelho estreito. **Pedir ao Robson print + modelo do celular + data do teste.** | Media |
+| 4 | "Campo de cidade: scrolla muito no celular, misclick perde a posicao" | `Pages/Groups/Create.razor`: cidade e um `<select>` nativo com **todas** as cidades da UF (`wwwroot/data/cities.json`; MG tem ~850). No celular vira uma roleta enorme. | Media |
+| 5 | "Em local aparece quadra de Pouso Alegre, mas criei o grupo em Muzambinho" | `FutsalCreateService.InitializeAsync` lista **todas** as `Venues` ativas do sistema (`Where(v => v.IsActive)`), sem filtrar pela cidade do grupo. **E pior:** se filtrarmos, um grupo numa cidade sem quadra cadastrada **nao consegue criar partida** (o botao fica `disabled` com `!venues.Any()`, e o texto "Solicite ao administrador do sistema" esta hardcoded em PT). Hoje so o admin do sistema/gestor de quadra cadastra `Venue`. Obs.: os dados estao inconsistentes ("Sao Paulo" vs "São Paulo") -> comparar sem acento/caixa. | **Alta** -- bloqueia o uso fora das cidades ja cadastradas. |
+| 6 | "Pix obrigatorio: nem deixa iniciar o form de Nova Partida" | `Pages/Futsal/Create.razor`: o aviso so aparece **depois** de preencher o valor (`PixRequiredBlocking` depende de `form.Price > 0`) e fica no meio do formulario. O link `/profile/{id}?intent=pix` **nao volta** para a criacao da partida. **Achado extra:** `Pages/Poker/Create` + `PokerCreateService` **nao checam Pix em lugar nenhum** -- da para criar poker com buy-in sem recebedor, e o jogador cai na tela de pagar sem chave. | **Alta** (poker) / Media (futsal) |
+
+### Opiniao do Senior sobre o item 6
+
+Bloquear o formulario inteiro, como o testador sugeriu, impediria **partida gratuita**, que nao precisa de Pix. A proposta e checar na entrada sem bloquear o gratis: o aviso vem **no topo, antes de qualquer campo**, o campo de valor fica travado em 0 com o motivo ao lado, e o "Configurar Pix" volta direto para o formulario. Assim o organizador nunca preenche tudo para so no fim descobrir que nao pode salvar.
+
+### Fases
+
+**F1 -- Cadastro que nao frustra (Identity)**
+- `Register.cshtml`: abaixo do campo senha, uma lista de requisitos **gerada a partir da `SecurityPolicySnapshot` ativa** (nao hardcoded: dev = 6+, prod = 10+ etc.), com cada item marcando verde enquanto digita; "as senhas conferem" ao vivo no campo de confirmacao; botao "mostrar senha".
+- JS em arquivo estatico `wwwroot/js/identity-register.js` (o CSP so aceita script `'self'` ou com nonce -- **nada inline**), vanilla, sem jQuery Validate. Serve de ajuda; a validacao de verdade continua no servidor.
+- Validacao de email no `blur` (formato), sem consultar se o email existe (evita enumeracao de contas).
+- Traduzir: `ErrorMessage` do `[Compare]`/`[Required]`/`[EmailAddress]`/`[StringLength]` via chaves `Identity.Register.*` e um `LocalizedIdentityErrorDescriber : IdentityErrorDescriber` usando `UiTextService` (PasswordTooShort, PasswordRequiresUpper/Lower/Digit/NonAlphanumeric, DuplicateUserName/Email, InvalidEmail) registrado com `.AddErrorDescriber<...>()`. PT/EN/ES.
+- Mesmo tratamento em `ResetPassword.cshtml` (mesma politica), reaproveitando o mesmo partial/JS.
+- Testes: (1) requisitos renderizados batem com a politica dev e prod; (2) POST com senhas diferentes devolve mensagem traduzida (PT) e mantem o email; (3) describer traduz os codigos de senha nas 3 linguas; (4) script referenciado como arquivo, sem `<script>` inline.
+
+**F2 -- Overflow mobile**
+- `.seg-toggle`: `flex-wrap: wrap; max-width: 100%;` e `.seg-item { min-width: 0; }` (ou rolagem horizontal propria como a `.group-subnav`). Conferir em 320 px.
+- Defesa geral para texto do usuario (nome de grupo, quadra, email, cidade) em cards/titulos: `overflow-wrap: anywhere; min-width: 0` nos containers flex que exibem esses campos -- **so onde o markup mostra dado do usuario**, sem `overflow-x: hidden` no body (esconde o bug em vez de corrigir).
+- Se o Robson mandar print, corrigir a tela especifica do print.
+
+**F3 -- Seletor de cidade com busca**
+- Trocar o `<select>` por um campo de texto com sugestoes: digita 2+ letras -> ate 8 cidades da UF, busca **sem acento e sem caixa** ("muza" -> Muzambinho), toque escolhe. Componente `CityAutocomplete` (Blazor, sem lib nova), com navegacao por teclado e `aria-*` de combobox.
+- No submit, aceitar so cidade existente na UF (normalizada para a grafia oficial do `cities.json`); "Exterior" continua texto livre.
+- Usar o mesmo componente onde houver cidade (`Groups/Create`, configuracoes do grupo se editar cidade).
+- Testes: normalizacao/busca (unit) + validacao server-side rejeitando cidade fora da UF.
+
+**F4 -- Quadra da cidade do grupo + cadastro pelo organizador** (**decisao do Robson**, ver abaixo)
+- `FutsalCreateService.InitializeAsync`: quadras da **mesma UF e cidade do grupo** primeiro (comparacao normalizada), as demais nao aparecem por padrao (link "ver quadras de outras cidades" opcional).
+- Opcao recomendada pelo Senior: **o organizador cadastra a quadra ali mesmo** ("+ Nova quadra": nome, tipo, endereco; cidade/UF herdadas do grupo). A quadra nasce `IsActive`, vinculada ao grupo/criador (`CreatedByUserId`, `GroupId` opcional -> migration), e entra na lista desse grupo; o admin do sistema pode mesclar/desativar depois. Autorizacao no service: so admin do grupo.
+- Texto "Nenhuma quadra cadastrada..." vira chave i18n e passa a oferecer o cadastro em vez de "solicite ao administrador".
+- `SaveAsync` valida que a quadra escolhida pertence a lista permitida para o grupo (nao confiar no id vindo do form).
+- Testes: grupo de Muzambinho nao ve quadra de Pouso Alegre; "São Paulo" casa com "Sao Paulo"; admin do grupo cria quadra; nao-admin recebe recusa; SaveAsync rejeita quadra de fora.
+
+**F5 -- Pix checado na entrada (futsal e poker)**
+- `Futsal/Create`: se `!groupHasPixKey && !EnablePaymentGateways`, o aviso vai para o **topo** (antes de "Identidade da partida"), o campo de valor fica travado em 0 com hint "Partida gratuita -- cadastre o Pix para cobrar", e o botao salvar continua habilitado para gratuita.
+- Link do aviso: `/profile/{id}?intent=pix&returnUrl=/futsal/create?groupId={id}`; o Profile, apos salvar o Pix com `returnUrl` **local** (`Url.IsLocalUrl`/`NavigationManager.ToBaseRelativePath`, nunca redirect aberto), volta para o formulario.
+- **Poker:** aplicar a **mesma regra** em `PokerCreateService` (buy-in/valor > 0 sem Pix do grupo e sem gateway -> recusa no service, nao so na tela) + o mesmo aviso no topo de `Poker/Create`. Reusar `EventPaymentService.GetGroupAdminPixKey` -- nao duplicar a regra.
+- No hub/`/grupo/{id}/partidas`, o botao "Nova partida" mostra um selo "sem Pix" quando o grupo nao tem recebedor (so informativo).
+- Testes: poker pago sem Pix recusado no service; poker gratis sem Pix aceito; futsal idem (ja existe -- manter); `returnUrl` externo ignorado.
+
+### Ordem e criterio de pronto
+F5 (poker sem Pix e buraco de dinheiro) -> F1 -> F4 -> F3 -> F2. Build 0 warning; testes novos listados acima; nenhuma regra financeira alterada alem de **estender ao poker a regra que ja existe no futsal**; i18n PT/EN/ES com paridade; nenhum `<script>` inline; `CssScopedOrphanClassesTests` sem crescer a allowlist.
+
+### Decisoes do Robson antes da F4
+1. Organizador pode cadastrar quadra (recomendado) **ou** campo de local em texto livre (mais simples, perde mapa/endereco padronizado) **ou** manter so admin do sistema cadastrando (bloqueia novas cidades).
+2. Print/modelo do celular do testador para o scroll horizontal (F2).
 
 ---
 
