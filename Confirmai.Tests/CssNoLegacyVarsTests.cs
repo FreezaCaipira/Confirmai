@@ -76,6 +76,7 @@ public class CssNoLegacyVarsTests
         // Group settings screen (C37 Fase 3 — secoes L2 + feat-icon)
         "Pages/Groups/Components/FeaturesToggles.razor.css",
         "Pages/Groups/Components/MembersManager.razor.css",
+        "Shared/Components/Groups/MyPaymentsList.razor.css",
         // Groups create + cookie banner + Identity + Admin (C36-B Fase 4)
         "Pages/Groups/Create.razor.css",
         "Shared/Components/CookieConsent.razor.css",

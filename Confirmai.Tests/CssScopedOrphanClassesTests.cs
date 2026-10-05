@@ -27,13 +27,6 @@ public class CssScopedOrphanClassesTests
         new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
         {
             // === In-flow orphans — zerados ao longo do C37 (fases 3-5) ===
-            ["Shared/Components/Groups/MyPaymentsList.razor"] = new[]
-            {
-                "mypay-section", "mypay-section--due", "mypay-section--paid",
-                "mypay-section--review", "mypay-total", "payments-badge",
-                "payments-empty", "payments-user-item", "payments-user-list",
-                "payments-user-name"
-            },
             ["Shared/Components/Poker/PokerDetailInfo.razor"] = new[]
             {
                 "cash-includes-block", "cash-includes-label",
