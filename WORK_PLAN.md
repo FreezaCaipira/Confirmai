@@ -144,7 +144,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
-0. **C38 (Pleno) -- achados do testador externo em prod [PLANEJADO -- EXECUTAVEL AGORA; F4 aguarda decisao do Robson]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Ver "Ciclo 38".
+0. **C38 (Pleno) -- achados do testador externo em prod [PLANEJADO -- EXECUTAVEL AGORA]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Ver "Ciclo 38".
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
 2. **C32 -- pre-producao [EXECUTADO -- ver review].** Fases A-E em `feat/ciclo32`. Resumo na Linha do Tempo. Fase F (remover telas legadas) pendente de aprovacao do Robson.
@@ -243,12 +243,14 @@ Bloquear o formulario inteiro, como o testador sugeriu, impediria **partida grat
 - Usar o mesmo componente onde houver cidade (`Groups/Create`, configuracoes do grupo se editar cidade).
 - Testes: normalizacao/busca (unit) + validacao server-side rejeitando cidade fora da UF.
 
-**F4 -- Quadra da cidade do grupo + cadastro pelo organizador** (**decisao do Robson**, ver abaixo)
-- `FutsalCreateService.InitializeAsync`: quadras da **mesma UF e cidade do grupo** primeiro (comparacao normalizada), as demais nao aparecem por padrao (link "ver quadras de outras cidades" opcional).
-- Opcao recomendada pelo Senior: **o organizador cadastra a quadra ali mesmo** ("+ Nova quadra": nome, tipo, endereco; cidade/UF herdadas do grupo). A quadra nasce `IsActive`, vinculada ao grupo/criador (`CreatedByUserId`, `GroupId` opcional -> migration), e entra na lista desse grupo; o admin do sistema pode mesclar/desativar depois. Autorizacao no service: so admin do grupo.
-- Texto "Nenhuma quadra cadastrada..." vira chave i18n e passa a oferecer o cadastro em vez de "solicite ao administrador".
-- `SaveAsync` valida que a quadra escolhida pertence a lista permitida para o grupo (nao confiar no id vindo do form).
-- Testes: grupo de Muzambinho nao ve quadra de Pouso Alegre; "São Paulo" casa com "Sao Paulo"; admin do grupo cria quadra; nao-admin recebe recusa; SaveAsync rejeita quadra de fora.
+**F4 -- Quadra so da cidade do grupo** (**decisao do Robson: so o admin do sistema cadastra quadra, como hoje** -- sem cadastro pelo organizador, sem migration)
+- `FutsalCreateService.InitializeAsync`: listar so `Venues` ativas da **mesma UF e cidade do grupo**, comparacao normalizada (sem acento/caixa/espacos -- "São Paulo" == "Sao Paulo"). Grupo "Exterior" (`StateCode == "EX"`): comparar so a cidade.
+- O `<option>` deixa de repetir "— Cidade/UF" (todas sao da mesma cidade).
+- Cidade sem quadra: o texto hardcoded "Nenhuma quadra cadastrada ainda. Solicite ao administrador do sistema." vira chave i18n `FutsalForm.NoVenueInCity` com a cidade: "Ainda nao ha quadra cadastrada em {cidade}/{UF}. Fale com o suporte do Confirmai para cadastrarmos." (PT/EN/ES). Mostrar esse aviso **no topo** do formulario (mesmo padrao do aviso de Pix da F5), nao no meio, para o organizador nao preencher tudo a toa.
+- `SaveAsync` valida que a quadra escolhida pertence a cidade do grupo (nao confiar no `VenueId` do form) -> erro i18n.
+- `Futsal/Edit`: mesma lista filtrada (manter a quadra atual da partida na lista mesmo se for de outra cidade, para nao quebrar partidas antigas).
+- Testes: grupo de Muzambinho nao ve quadra de Pouso Alegre; "São Paulo" casa com "Sao Paulo"; cidade sem quadra -> lista vazia + aviso; `SaveAsync` rejeita quadra de outra cidade; Edit mantem a quadra atual.
+- **Risco aceito pelo Robson:** grupo em cidade nova fica sem conseguir criar partida de futsal ate o admin cadastrar uma quadra la (`/admin/venues`). Operacional: o Robson acompanha grupos novos em cidades sem quadra.
 
 **F5 -- Pix checado na entrada (futsal e poker)**
 - `Futsal/Create`: se `!groupHasPixKey && !EnablePaymentGateways`, o aviso vai para o **topo** (antes de "Identidade da partida"), o campo de valor fica travado em 0 com hint "Partida gratuita -- cadastre o Pix para cobrar", e o botao salvar continua habilitado para gratuita.
@@ -260,9 +262,9 @@ Bloquear o formulario inteiro, como o testador sugeriu, impediria **partida grat
 ### Ordem e criterio de pronto
 F5 (poker sem Pix e buraco de dinheiro) -> F1 -> F4 -> F3 -> F2. Build 0 warning; testes novos listados acima; nenhuma regra financeira alterada alem de **estender ao poker a regra que ja existe no futsal**; i18n PT/EN/ES com paridade; nenhum `<script>` inline; `CssScopedOrphanClassesTests` sem crescer a allowlist.
 
-### Decisoes do Robson antes da F4
-1. Organizador pode cadastrar quadra (recomendado) **ou** campo de local em texto livre (mais simples, perde mapa/endereco padronizado) **ou** manter so admin do sistema cadastrando (bloqueia novas cidades).
-2. Print/modelo do celular do testador para o scroll horizontal (F2).
+### Decisoes do Robson
+1. F4: **so o admin do sistema cadastra quadra** (decidido) -- o C38 so filtra pela cidade do grupo e avisa quando nao ha quadra.
+2. Pendente: print/modelo do celular do testador para o scroll horizontal (F2). Sem isso, a F2 cobre o que foi reproduzido (320 px) e a defesa geral.
 
 ---
 
