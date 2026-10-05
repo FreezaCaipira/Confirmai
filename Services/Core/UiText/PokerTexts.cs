@@ -55,6 +55,9 @@ internal static class PokerTexts
         ["Poker.EnterToParticipate"] = "Entrar para participar",
         ["Poker.YouAreInscribed"] = "✅ Você está inscrito neste evento.",
         ["Poker.CancelInscription"] = "Cancelar inscrição",
+        ["Poker.PayAmount"] = "Pagar R$ {0}",
+        ["Poker.PaidAmount"] = "Pago R$ {0}",
+        ["Poker.ProofSent"] = "Comprovante enviado",
         ["Poker.JoinQueue"] = "Entrar na fila",
         ["Poker.ConfirmPresence"] = "Confirmar presença",
 
@@ -196,6 +199,9 @@ internal static class PokerTexts
         ["Poker.EnterToParticipate"] = "Join to participate",
         ["Poker.YouAreInscribed"] = "✅ You are registered for this event.",
         ["Poker.CancelInscription"] = "Cancel registration",
+        ["Poker.PayAmount"] = "Pay R$ {0}",
+        ["Poker.PaidAmount"] = "Paid R$ {0}",
+        ["Poker.ProofSent"] = "Receipt sent",
         ["Poker.JoinQueue"] = "Join waitlist",
         ["Poker.ConfirmPresence"] = "Confirm attendance",
 
@@ -337,6 +343,9 @@ internal static class PokerTexts
         ["Poker.EnterToParticipate"] = "Unirse para participar",
         ["Poker.YouAreInscribed"] = "✅ Usted está inscrito en este evento.",
         ["Poker.CancelInscription"] = "Cancelar inscripción",
+        ["Poker.PayAmount"] = "Pagar R$ {0}",
+        ["Poker.PaidAmount"] = "Pagado R$ {0}",
+        ["Poker.ProofSent"] = "Comprobante enviado",
         ["Poker.JoinQueue"] = "Unirse a la lista de espera",
         ["Poker.ConfirmPresence"] = "Confirmar asistencia",
 
