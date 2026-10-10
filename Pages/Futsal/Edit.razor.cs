@@ -40,6 +40,7 @@ public partial class Edit
     [Inject] private EventCollisionService EventCollisionService { get; set; } = default!;
     [Inject] private LogService LogService { get; set; } = default!;
     [Inject] private EventCancellationService EventCancellation { get; set; } = default!;
+    [Inject] private PlatformFeePolicy FeePolicy { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -134,6 +135,7 @@ public partial class Edit
                 .Include(e => e.Group)
                     .ThenInclude(g => g.Members)
                         .ThenInclude(m => m.User)
+                .Include(e => e.Confirmations)
                 .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
 
             if (ev is null || !EventCancellationService.CanManage(ev, userId, auth.User.IsInRole("admin")))
@@ -174,7 +176,10 @@ public partial class Edit
             ev.MaxPlayers     = form.MaxPlayers;
             ev.MaxGoalkeepers = form.MaxGoalkeepers > 0 ? form.MaxGoalkeepers : null;
             ev.PlayersPerSide = form.PlayersPerSide;
+            var priceChanged  = form.Price != ev.Price;
             ev.Price          = form.Price;
+            if (priceChanged)
+                FeePolicy.RestampUnpaid(ev);
 
             // Propagate MaxGoalkeepers back to the parent recurring schedule
             if (ev.RachaScheduleId.HasValue)

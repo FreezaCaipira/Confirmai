@@ -144,7 +144,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
-0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [C39-A EXECUTADO em `feat/ciclo39a`, aguardando PR/review]** -- ver secao "Ciclo 39". 3 PRs (torneio, cash, parceria). Fecha tambem lista de espera que paga e cancelamento de inscricao paga. PR 1 (torneio): F1-F7 entregues -- `EventCharge.PriceOf` + carimbo `ChargedPrice`, `PokerDetailService`, `Event.Price = BuyIn` com % na faixa do FeeOptions validada no service, guardas do `Poker/Edit` (Pix + valor congelado), lista de espera nao paga, cancelamento de inscricao paga bloqueado, taxa % ponta a ponta ate o repasse. Build 0/0, suite 2703 -> 2738.
+0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [C39-A EXECUTADO (#147) -- review Senior APROVADO c/ 2 correcoes; C39-B (cash) liberado]** -- ver secao "Ciclo 39". 3 PRs (torneio, cash, parceria). Fecha tambem lista de espera que paga e cancelamento de inscricao paga. PR 1 (torneio): F1-F7 entregues -- `EventCharge.PriceOf` + carimbo `ChargedPrice`, `PokerDetailService`, `Event.Price = BuyIn` com % na faixa do FeeOptions validada no service, guardas do `Poker/Edit` (Pix + valor congelado), lista de espera nao paga, cancelamento de inscricao paga bloqueado, taxa % ponta a ponta ate o repasse. Build 0/0, suite 2703 -> 2738.
 0. **C38 (Pleno) -- achados do testador externo em prod [CONCLUIDO -- PR #144, review do Senior com 1 correcao (#145: edicao do futsal checa Pix)]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
@@ -157,7 +157,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
    - **hero (Fase 7 do C36-B)**: texto do Robson + enfeite proposto pelo Senior -- landing deslogada com padrao de icones de varios esportes (Font Awesome, traco branco ~10% sobre o azul, sem cor por esporte, AA mantido); hero logado com marca d'agua do esporte da proxima partida (sem partida -> padrao misto). Opcoes de texto ja enviadas ao Robson (favorita do Senior: "Bora jogar? A gente cuida da lista e do Pix.").
 6. **V2 Pix automatico** -- depois do go-live e das pendencias Efi/fiscal.
 
-**Decisoes pendentes do Robson**: a faixa da taxa do poker (`FeeOptions__PokerFeePercentMin`/`Max`) no EasyPanel antes do deploy do C39-A -- a trava de Pix do poker **fica** (decisao do Robson pos-#145); Fase 0 da Evolution (servico + chip); remover ou manter as telas legadas fora do fluxo (`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration` -- Senior recomenda remover); texto do hero (so na lapidacao visual).
+**Decisoes pendentes do Robson**: a faixa da taxa do poker (`Fee__PokerFeePercentMin`/`Max` -- a secao e `Fee`, nao `FeeOptions`; sem elas a taxa do poker fica 0%) no EasyPanel antes do deploy do C39-A -- a trava de Pix do poker **fica** (decisao do Robson pos-#145); Fase 0 da Evolution (servico + chip); remover ou manter as telas legadas fora do fluxo (`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration` -- Senior recomenda remover); texto do hero (so na lapidacao visual).
 
 **Higiene de repo (Robson, opcional)**: branches mergeadas sobrando no remoto (`feat/ciclo36d-fase*`, `feat/ciclo36c-pagamentos-grupo`, `docs/review-c36c`, `refactor/*`, `feature/*` antigas).
 
@@ -205,7 +205,7 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
-## Ciclo 39 (Pleno) -- Poker cobra pelo app (torneio + cash) com taxa percentual por evento [PLANEJADO -- decisoes fechadas, liberado para o Pleno]
+## Ciclo 39 (Pleno) -- Poker cobra pelo app (torneio + cash) com taxa percentual por evento [C39-A EXECUTADO -- ver review; C39-B/C liberados]
 
 Decisoes do Robson (pos-#145/#146):
 - **manter a trava de Pix do C38 e fazer o poker cobrar pelo app**;
@@ -308,6 +308,34 @@ troca de mesa depois de pago.
 Build sem warnings; suite verde no CI; teste novo em cada fase; o futsal so muda no carimbo do preco (comportamento igual) e na F6.
 Roteiro do Robson em prod: torneio R$ 100 com 10% -> jogador paga R$ 110 e envia comprovante -> organizador aprova -> taxa R$ 10
 na aba do grupo; jogador na espera nao ve "Pagar"; cash com 2 mesas -> jogador escolhe a de R$ 300 e o QR sai com o valor dela + taxa.
+
+### Review Senior do C39-A (PR #147) -- APROVADO c/ 2 correcoes do Senior
+
+Rodado na `main` (285b197): build Release 0 warnings / 0 erros; suite 2738, 2714 passam, 24 falham so por credencial do Postgres
+local (`ProgramConfigurationTests`, 28P01). Conferido fase por fase: F1-F7 batem com o plano. `EventCharge.PriceOf` cobre todos os
+leitores do caminho do dinheiro (busca global por `Event.Price` fora dele so acha exibicao); espera do poker excluida no QR, na
+pagina de pagar, em "Meus pagamentos", inadimplencia, badge e saida-com-divida; cancelamento pago/comprovante bloqueado no service
+dos dois esportes; % validado no service; migration aditiva sem backfill; `EventPriceOption` criada mas sem leitor (ok para o C39-B).
+
+Correcoes do Senior (PR de review):
+1. **Carimbo travava a divida errada apos edicao.** Com `ChargedPrice` carimbado, editar o valor sem ninguem ter pago mudava o
+   anuncio mas nao o que os inscritos deviam: futsal R$ 100 corrigido para R$ 10 seguia cobrando R$ 100 de quem ja tinha confirmado
+   (regressao: antes do C39-A o futsal seguia o valor novo). `PlatformFeePolicy.RestampUnpaid(ev)` recarimba preco e taxa de quem
+   ainda deve (sem pagamento, sem comprovante, status Pending), com a isencao vigente na data de cada confirmacao; quem pagou ou
+   mandou comprovante fica com o carimbo. Chamado no `Futsal/Edit` e no `Poker/Edit` antes do `SaveChanges`, so quando o valor muda.
+2. **Torneio antigo virava pago ao ser editado, sem checar Pix.** O `Poker/Edit` gravava `Price = BuyInAmount` em qualquer save;
+   como o buy-in nao mudava, a guarda de Pix (que comparava `BuyInAmount`) nao disparava -- editar so o horario de um torneio
+   pre-C39 ligava a cobranca de todos os inscritos, mesmo sem recebedor. Agora `EventCharge.TournamentPrice(ev, buyIn)`: torneio com
+   buy-in anunciado e `Price` nulo (pre-C39) segue pago na mesa; as guardas de Pix e de valor congelado comparam o preco efetivo
+   (`newPrice`/`newFeePercent` contra `ev.Price`/`ev.PlatformFeePercent`). De quebra some o falso "valor congelado" de evento antigo
+   (`% null` vs. minimo do form). +10 testes (`C39ReviewRestampTests`).
+
+Ressalvas (nao bloqueiam; entram no C39-B):
+- `PokerDetailService.ConfirmAsync`: `priceOptionId` de outro evento ou inativo cai no preco do evento e ainda grava o id. No C39-B,
+  opcao invalida tem que **recusar** a inscricao, e cash sem opcao escolhida tambem.
+- Espera por ordem de chegada: reduzir `MaxPlayers` no edit pode jogar para a espera alguem que ja pagou (ele some da cobranca, mas o
+  pagamento continua registrado). Raro; tratar se aparecer em prod (guarda no edit: nao reduzir abaixo do numero de pagos).
+- Default `PokerFeePercentMin/Max = 0/0` boota e zera a taxa do poker: a variavel no EasyPanel e `Fee__PokerFeePercentMin`/`Max`.
 
 ### Decisoes do Robson
 
