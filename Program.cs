@@ -152,6 +152,7 @@ builder.Services.AddScoped<Confirmai.Services.Payment.PaymentCommandService>();
 builder.Services.AddScoped<Confirmai.Services.Groups.GroupFeaturesService>();
 builder.Services.AddScoped<Confirmai.Services.Futsal.EscalacaoService>();
 builder.Services.AddScoped<Confirmai.Services.Futsal.EventDetailService>();
+builder.Services.AddScoped<Confirmai.Services.Poker.PokerDetailService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.SummaryAgeTracker>();
 builder.Services.AddScoped<ReconciliationSeverityEvaluator>();
 builder.Services.AddScoped<PixProofUploadService>();
@@ -290,7 +291,12 @@ builder.Services.Configure<BtcPayOptions>(builder.Configuration.GetSection("BtcP
 builder.Services.Configure<AbacatePayOptions>(builder.Configuration.GetSection(AbacatePayOptions.Section));
 builder.Services.Configure<EfiBankOptions>(builder.Configuration.GetSection(EfiBankOptions.Section));
 builder.Services.Configure<AppmaxOptions>(builder.Configuration.GetSection(AppmaxOptions.Section));
-builder.Services.Configure<FeeOptions>(builder.Configuration.GetSection(FeeOptions.Section));
+builder.Services.AddOptions<FeeOptions>()
+    .Bind(builder.Configuration.GetSection(FeeOptions.Section))
+    // C39-A (D3): a faixa da taxa do poker é contrato do admin do sistema — boot falha se inconsistente.
+    .Validate(o => o.PokerFeePercentMin >= 0 && o.PokerFeePercentMin <= o.PokerFeePercentMax && o.PokerFeePercentMax <= 100,
+        "FeeOptions: exige 0 <= PokerFeePercentMin <= PokerFeePercentMax <= 100.")
+    .ValidateOnStart();
 builder.Services.AddHttpClient("AbacatePay", (sp, client) =>
 {
     var opts = sp.GetRequiredService<IOptions<AbacatePayOptions>>().Value;
