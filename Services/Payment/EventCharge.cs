@@ -36,4 +36,24 @@ public static class EventCharge
     /// </summary>
     public static bool IsWaitlisted(Event ev, EventConfirmation conf)
         => ev.MaxPlayers > 0 && !SlotIds(ev.Confirmations, ev.MaxPlayers).Contains(conf.Id);
+
+    /// <summary>
+    /// Ids das confirmacoes em lista de espera, dado um lote que contem TODAS
+    /// as confirmacoes dos eventos de poker em questao (nao so o subconjunto
+    /// filtrado pelo caller). Usado por inadimplencia/saida-com-divida para
+    /// ignorar quem esta na espera — quem nao tem vaga nao deve (F5).
+    /// </summary>
+    public static HashSet<int> WaitlistedIds(
+        IEnumerable<(int Id, int EventId, DateTime ConfirmedAt)> confirmations,
+        IReadOnlyDictionary<int, int> maxPlayersByEvent)
+    {
+        var set = new HashSet<int>();
+        foreach (var g in confirmations.GroupBy(c => c.EventId))
+        {
+            if (!maxPlayersByEvent.TryGetValue(g.Key, out var max) || max <= 0) continue;
+            foreach (var c in g.OrderBy(c => c.ConfirmedAt).ThenBy(c => c.Id).Skip(max))
+                set.Add(c.Id);
+        }
+        return set;
+    }
 }

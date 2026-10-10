@@ -3,6 +3,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Core;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -189,15 +190,35 @@ public sealed class GroupDetailService
         // the organizer's sight. The player resolves it first: pays (or has
         // the proof reviewed) via "Meus pagamentos", or cancels presence on
         // the match. Cancelled events carry no debt and never block.
-        var hasPendingPayment = await db.EventConfirmations
-            .AnyAsync(c =>
+        var debtCandidates = await db.EventConfirmations
+            .Where(c =>
                 c.UserId == userId &&
                 c.Event.GroupId == groupId &&
                 c.Event.IsActive &&
                 (c.ChargedPrice ?? c.Event.Price) > 0 &&
                 c.Position != FutsalPosition.Goalkeeper &&
                 !c.HasPaid &&
-                c.PaymentStatus == EventConfirmationPaymentStatus.Pending);
+                c.PaymentStatus == EventConfirmationPaymentStatus.Pending)
+            .Select(c => new { c.Id, c.EventId, Sport = c.Event.Sport, MaxPlayers = c.Event.MaxPlayers })
+            .ToListAsync();
+
+        // C39-A F5: quem esta na espera do poker nao deve — nao segura a
+        // saida do grupo.
+        var hasPendingPayment = debtCandidates.Count > 0;
+        var pokerEvents = debtCandidates
+            .Where(c => c.Sport == Sport.Poker && c.MaxPlayers > 0)
+            .GroupBy(c => c.EventId)
+            .ToDictionary(g => g.Key, g => g.First().MaxPlayers);
+        if (hasPendingPayment && pokerEvents.Count > 0)
+        {
+            var all = (await db.EventConfirmations
+                .Where(c => pokerEvents.Keys.Contains(c.EventId))
+                .Select(c => new { c.Id, c.EventId, c.ConfirmedAt })
+                .ToListAsync())
+                .Select(c => (c.Id, c.EventId, c.ConfirmedAt));
+            var waitlisted = EventCharge.WaitlistedIds(all, pokerEvents);
+            hasPendingPayment = debtCandidates.Any(c => !waitlisted.Contains(c.Id));
+        }
         if (hasPendingPayment)
         {
             return LeaveGroupResult.PendingPayment;

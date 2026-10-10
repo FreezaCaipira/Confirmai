@@ -114,8 +114,8 @@ public sealed class GroupPaymentsService
 
         // C39-A: preco canonico — carimbo da confirmacao vence (cash cobra
         // pela mesa sem Event.Price); EF traduz para COALESCE.
-        return await db.EventConfirmations
-            .CountAsync(c =>
+        var candidates = await db.EventConfirmations
+            .Where(c =>
                 c.Event.GroupId == groupId &&
                 c.UserId == currentUserId &&
                 c.Event.IsActive &&
@@ -123,7 +123,36 @@ public sealed class GroupPaymentsService
                 c.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
                 !c.HasPaid &&
                 c.Position != FutsalPosition.Goalkeeper &&
-                c.PixProofUploadedAt == null);
+                c.PixProofUploadedAt == null)
+            .Select(c => new { c.Id, c.EventId, Sport = c.Event.Sport, MaxPlayers = c.Event.MaxPlayers })
+            .ToListAsync();
+
+        // C39-A F5: quem esta na espera do poker nao conta como pendente.
+        var waitlisted = await PokerWaitlistedIdsAsync(db, candidates.Select(c => (c.EventId, c.Sport, c.MaxPlayers)));
+        return candidates.Count(c => !waitlisted.Contains(c.Id));
+    }
+
+    /// <summary>
+    /// C39-A F5: ids das confirmacoes alem do MaxPlayers nos eventos de poker
+    /// do lote — inadimplencia, saida-com-divida e "Meus pagamentos" ignoram
+    /// quem esta na espera (sem vaga, sem divida).
+    /// </summary>
+    private static async Task<HashSet<int>> PokerWaitlistedIdsAsync(
+        AppDbContext db,
+        IEnumerable<(int EventId, Sport Sport, int MaxPlayers)> events)
+    {
+        var pokerEvents = events
+            .Where(e => e.Sport == Sport.Poker && e.MaxPlayers > 0)
+            .GroupBy(e => e.EventId)
+            .ToDictionary(g => g.Key, g => g.First().MaxPlayers);
+        if (pokerEvents.Count == 0) return new HashSet<int>();
+
+        var all = (await db.EventConfirmations
+            .Where(c => pokerEvents.Keys.Contains(c.EventId))
+            .Select(c => new { c.Id, c.EventId, c.ConfirmedAt })
+            .ToListAsync())
+            .Select(c => (c.Id, c.EventId, c.ConfirmedAt));
+        return EventCharge.WaitlistedIds(all, pokerEvents);
     }
 
     /// <summary>
@@ -152,6 +181,11 @@ public sealed class GroupPaymentsService
             .OrderByDescending(c => c.Event.StartsAt)
             .Take(100)
             .ToListAsync();
+
+        // C39-A F5: inscricao na espera nao aparece como pagamento devido.
+        var waitlisted = await PokerWaitlistedIdsAsync(db,
+            confirmations.Select(c => (c.EventId, c.Event.Sport, c.Event.MaxPlayers)));
+        confirmations = confirmations.Where(c => !waitlisted.Contains(c.Id)).ToList();
 
         var isFutsal = group.Sport == Sport.Futsal;
         return confirmations.Select(c =>
@@ -216,7 +250,12 @@ public sealed class GroupPaymentsService
             })
             .ToListAsync();
 
+        // C39-A F5: quem esta na espera do poker nao e inadimplente.
+        var waitlistedIds = await PokerWaitlistedIdsAsync(db,
+            unpaidConfirmations.Select(c => (c.EventId, c.Event!.Sport, c.Event.MaxPlayers)));
+
         var delinquencyList = unpaidConfirmations
+            .Where(c => !waitlistedIds.Contains(c.Id))
             .GroupBy(c => c.UserId)
             .Select(g =>
             {

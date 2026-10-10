@@ -6,6 +6,7 @@
 @using Confirmai.Enums
 @using Confirmai.Models
 @using Confirmai.Shared.Components.Poker
+@using Confirmai.Services.Payment
 @using Microsoft.EntityFrameworkCore
 
 @inject IDbContextFactory<AppDbContext> DbFactory
@@ -263,11 +264,17 @@ else
                     {
                         <div class="confirmed-block">
                             <p class="confirmed-label confirmed-label--poker">@Ui["Poker.YouAreInscribed"]</p>
-                            @if (ev.Price.HasValue && ev.Price.Value > 0)
+                            @{
+                                // C39-A: o valor cobrado vem do carimbo da
+                                // confirmacao; F5: quem esta na espera nao paga.
+                                var chargedPrice = EventCharge.PriceOf(userConf);
+                                var isWaitlisted = EventCharge.IsWaitlisted(ev, userConf);
+                            }
+                            @if (chargedPrice > 0 && !isWaitlisted)
                             {
                                 @if (userConf.HasPaid)
                                 {
-                                    <span class="payment-done-label"><i class="fas fa-check-circle"></i> @Ui.Get("Poker.PaidAmount", ev.Price.Value.ToString("N2"))</span>
+                                    <span class="payment-done-label"><i class="fas fa-check-circle"></i> @Ui.Get("Poker.PaidAmount", chargedPrice.Value.ToString("N2"))</span>
                                 }
                                 else if (userConf.PixProofUploadedAt.HasValue)
                                 {
@@ -276,7 +283,7 @@ else
                                 else
                                 {
                                     <a href="/pagamento/evento/@userConf.Id" class="pay-btn pay-btn--sm">
-                                        @Ui.Get("Poker.PayAmount", ev.Price.Value.ToString("N2"))
+                                        @Ui.Get("Poker.PayAmount", chargedPrice.Value.ToString("N2"))
                                     </a>
                                 }
                             }
