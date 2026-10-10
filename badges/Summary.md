@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/10/2026 - 23:07:02 |
-| Coverage date: | 10/10/2026 - 23:06:58 |
+| Generated on: | 10/10/2026 - 23:16:57 |
+| Coverage date: | 10/10/2026 - 23:16:51 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 564 |
 | Files: | 654 |
-| **Line coverage:** | 93.6% (146639 of 156635) |
-| Covered lines: | 146639 |
-| Uncovered lines: | 9996 |
-| Coverable lines: | 156635 |
-| Total lines: | 191640 |
-| **Branch coverage:** | 46.5% (4587 of 9849) |
-| Covered branches: | 4587 |
-| Total branches: | 9849 |
+| **Line coverage:** | 93.6% (146645 of 156637) |
+| Covered lines: | 146645 |
+| Uncovered lines: | 9992 |
+| Coverable lines: | 156637 |
+| Total lines: | 191646 |
+| **Branch coverage:** | 46.5% (4590 of 9851) |
+| Covered branches: | 4590 |
+| Total branches: | 9851 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 456_38093743364 |
+| Tag: | 458_38094300949 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **146639** | **9996** | **156635** | **213154** | **93.6%** | **4587** | **9849** | **46.5%** |
+| **Confirmai** | **146645** | **9992** | **156637** | **213160** | **93.6%** | **4590** | **9851** | **46.5%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -210,7 +210,7 @@
 | Confirmai.Pages.Admin.AdminLanguages | 40 | 22 | 62 | 185 | 64.5% | 10 | 24 | 41.6% |
 | Confirmai.Pages.Admin.AdminLogs | 46 | 93 | 139 | 333 | 33% | 12 | 50 | 24% |
 | Confirmai.Pages.Admin.AdminPayments | 56 | 70 | 126 | 357 | 44.4% | 6 | 44 | 13.6% |
-| Confirmai.Pages.Admin.AdminRevenue | 0 | 251 | 251 | 645 | 0% | 0 | 115 | 0% |
+| Confirmai.Pages.Admin.AdminRevenue | 1 | 252 | 253 | 651 | 0.3% | 2 | 117 | 1.7% |
 | Confirmai.Pages.Admin.AdminUserEdit | 0 | 50 | 50 | 141 | 0% | 0 | 16 | 0% |
 | Confirmai.Pages.Admin.AdminUsers | 0 | 88 | 88 | 203 | 0% | 0 | 46 | 0% |
 | Confirmai.Pages.Admin.AdminUserView | 0 | 66 | 66 | 196 | 0% | 0 | 58 | 0% |
@@ -405,7 +405,7 @@
 | Confirmai.Services.Events.HomeToday | 27 | 0 | 27 | 64 | 100% | 10 | 12 | 83.3% |
 | Confirmai.Services.Events.HomeTodayMatch | 1 | 0 | 1 | 64 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.HomeTodaySummary | 6 | 0 | 6 | 64 | 100% | 0 | 0 |  |
-| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
+| Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
@@ -485,7 +485,7 @@
 | Confirmai.Services.Payment.GeneratePaymentResult | 0 | 6 | 6 | 166 | 0% | 0 | 0 |  |
 | Confirmai.Services.Payment.GroupFeeWaivedStats | 1 | 0 | 1 | 263 | 100% | 0 | 0 |  |
 | Confirmai.Services.Payment.GroupFeeWaiverRow | 3 | 3 | 6 | 263 | 50% | 0 | 0 |  |
-| Confirmai.Services.Payment.GroupPartnerShareRow | 0 | 1 | 1 | 263 | 0% | 0 | 0 |  |
+| Confirmai.Services.Payment.GroupPartnerShareRow | 1 | 0 | 1 | 263 | 100% | 0 | 0 |  |
 | Confirmai.Services.Payment.ImageSignatureValidator | 13 | 1 | 14 | 28 | 92.8% | 24 | 34 | 70.5% |
 | Confirmai.Services.Payment.LimitedStream | 33 | 1 | 34 | 353 | 97% | 3 | 6 | 50% |
 | Confirmai.Services.Payment.ManualPlatformFee | 2 | 0 | 2 | 20 | 100% | 6 | 6 | 100% |
