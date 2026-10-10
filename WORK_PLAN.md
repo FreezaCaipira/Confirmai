@@ -138,14 +138,14 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 | Layout / design system L0-L3 | **~80%** -- header, home, hub/subnav, `/grupos`, mailbox, profile, partida futsal/poker, pagamento/repasse do grupo, Identity, admin, cookie banner migrados; 63 arquivos guardados pelo `CssNoLegacyVarsTests` | Lapidacao visual (fim da fila, passo 5): **tela do jogador pagar** (`/pagamento/evento/{id}`) ainda no visual antigo; `buttons.css`/`entity-shell.css`/`MainLayout.razor.css` ainda consomem `--ci-*`; Fase 7 (texto do hero). |
 | Pre-producao (C32) | **CONCLUIDO** (PR #134, review na secao abaixo) -- pen-test do dinheiro, CSP sem `ws:` em prod, meter `Confirmai.Ops` + 4 alertas, secao EasyPanel no checklist | Fase F (telas legadas) aguarda decisao do Robson. Configurar no EasyPanel as variaveis da secao 0 do `production-checklist.md`. |
 | WhatsApp (C31, Evolution no grupo) | **CODIGO CONCLUIDO e REVISADO** (PR #137; review do Senior com 3 correcoes -- reagendamento, lembrete do dia apos o de 1h, timeout HTTP) | Tudo em dry-run por default. Falta so a Fase 0 do Robson (Evolution no EasyPanel + chip dedicado aquecido + JID do grupo de teste) para o primeiro envio real. |
-| Poker cobra pelo app (C39) | **TORNEIO + CASH CONCLUIDOS** (C39-A #147 + review #148; C39-B em `feat/ciclo39b`): buy-in/mesa pelo app, taxa % na faixa `Fee__PokerFeePercentMin/Max`, preco carimbado e recarimbado em quem ainda deve ao editar, espera nao paga, inscricao paga nao cancela | C39-C (parceria). Robson: configurar a faixa no EasyPanel antes do deploy. |
+| Poker cobra pelo app (C39) | **TORNEIO + CASH CONCLUIDOS** (C39-A #147 + review #148; C39-B #150 + review): buy-in/mesa pelo app, taxa % na faixa `Fee__PokerFeePercentMin/Max`, preco carimbado e recarimbado em quem ainda deve ao editar, espera nao paga, inscricao paga nao cancela | C39-C (parceria). Robson: configurar a faixa no EasyPanel antes do deploy. |
 | Pix automatico (V2) | Codigo preservado atras do toggle | Pendencias Efi/fiscal do Robson; so depois do go-live do V1. |
 
 ### Proximos passos, em ordem
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
-0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [C39-A CONCLUIDO (#147 + review #148); C39-B EXECUTADO em `feat/ciclo39b` -- aguardando PR/review; proximo: C39-C (parceria)]** -- ver secao "Ciclo 39". 3 PRs (torneio, cash, parceria). PR 1 (torneio): F1-F7 entregues (suite 2703 -> 2738). PR 2 (cash): F8-F10 + delta da review entregues -- `EventPriceOption` com telas, `ConfirmAsync` exige mesa valida no cash, troca de mesa recarimba quem nao pagou, `CashTableEdit` no Edit com congelo por mesa e recarimbo por mesa, guarda MaxPlayers >= pagos. Build 0/0, suite 2738 -> 2769.
+0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [C39-A CONCLUIDO (#147 + review #148); C39-B CONCLUIDO (#150 + review); proximo: C39-C (parceria)]** -- ver secao "Ciclo 39". 3 PRs (torneio, cash, parceria). PR 1 (torneio): F1-F7 entregues (suite 2703 -> 2738). PR 2 (cash): F8-F10 + delta da review entregues -- `EventPriceOption` com telas, `ConfirmAsync` exige mesa valida no cash, troca de mesa recarimba quem nao pagou, `CashTableEdit` no Edit com congelo por mesa e recarimbo por mesa, guarda MaxPlayers >= pagos. Build 0/0, suite 2738 -> 2769.
 0. **C38 (Pleno) -- achados do testador externo em prod [CONCLUIDO -- PR #144, review do Senior com 1 correcao (#145: edicao do futsal checa Pix)]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
@@ -206,7 +206,7 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
-## Ciclo 39 (Pleno) -- Poker cobra pelo app (torneio + cash) com taxa percentual por evento [C39-A EXECUTADO -- ver review; C39-B EXECUTADO -- aguardando PR/review; C39-C liberado]
+## Ciclo 39 (Pleno) -- Poker cobra pelo app (torneio + cash) com taxa percentual por evento [C39-A EXECUTADO -- ver review; C39-B EXECUTADO -- ver review; C39-C liberado]
 
 Decisoes do Robson (pos-#145/#146):
 - **manter a trava de Pix do C38 e fazer o poker cobrar pelo app**;
@@ -345,6 +345,31 @@ Ressalvas (nao bloqueiam; entram no C39-B):
 - Espera por ordem de chegada: reduzir `MaxPlayers` no edit pode jogar para a espera alguem que ja pagou (ele some da cobranca, mas o
   pagamento continua registrado). Raro; tratar se aparecer em prod (guarda no edit: nao reduzir abaixo do numero de pagos).
 - Default `PokerFeePercentMin/Max = 0/0` boota e zera a taxa do poker: a variavel no EasyPanel e `Fee__PokerFeePercentMin`/`Max`.
+
+### Review Senior do C39-B (PR #150) -- APROVADO c/ 1 correcao do Senior
+
+Rodado na `main` (2d0d9fb): build Release 0 warnings / 0 erros; suite 2769, 2745 passam, 24 falham so por credencial do Postgres
+local (`ProgramConfigurationTests`, 28P01). F8-F10 e o delta da review do C39-A batem com o plano: criacao grava uma
+`EventPriceOption` por mesa (cash com `Price` nulo, min/max derivados); `ConfirmAsync` recusa mesa inexistente/inativa/de outro
+evento e cash com mesa ativa sem escolha; carimbo de preco e % da mesa; troca de mesa so antes de pagar/comprovante, com recarimbo;
+`CashTableEdit` valida antes de qualquer mutacao (rotulo, preco >= 0, % na faixa, preco/% congelados em mesa com pago/comprovante),
+mesa com inscrito desativa e sem inscrito sai; `RestampUnpaidForTable` generaliza o mesmo criterio do torneio; guarda de Pix compara
+a cobranca efetiva (nenhuma mesa paga -> alguma mesa paga); `MaxPlayers` nao fica abaixo dos pagantes no torneio. Migration nenhuma
+(a tabela veio no C39-A). i18n PT/EN/ES com paridade.
+
+Correcao do Senior (PR de review):
+1. **Leitores de "deve/valor" fora do caminho do dinheiro ainda liam `Event.Price`, que no cash e nulo.** O QR e a pagina de pagar
+   ja usavam `EventCharge.PriceOf`, mas: o card da home (`ConfirmationCard`) nao mostrava o valor nem o "Pagar"/"Comprovante
+   enviado" de quem deve uma mesa; o hub do grupo nao sinalizava a proxima partida de cash como pendente; e a pagina de pagar com
+   gateways ligados fazia `ev.Price!.Value` -> excecao no cash. Os tres passam a ler o preco carimbado (`ChargedPrice ?? Event.Price`).
+   +5 testes (`C39BReviewChargedPriceReadersTests`).
+
+Ressalvas (nao bloqueiam):
+- `ChangeTableAsync` nao checa evento cancelado nem inscrito na espera; a espera ja nao paga, entao trocar de mesa la so muda o
+  carimbo. Tratar se aparecer em prod.
+- Cash legado (pre-C39-B, sem mesas) perdeu os campos de stack minimo/maximo no edit; salvar sem mesas ativas preserva os valores
+  antigos (so sao recalculados quando ha mesa ativa) e a tela da partida segue mostrando a faixa. Para cobrar, o organizador adiciona mesas.
+- Guarda de `MaxPlayers` >= pagantes vale so no torneio (cash por mesa raramente tem limite que importe).
 
 ### Decisoes do Robson
 
