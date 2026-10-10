@@ -66,6 +66,18 @@ namespace Confirmai.Models
         /// </summary>
         public decimal? PlatformFeeAmount { get; set; }
 
+        /// <summary>
+        /// C39-A: carimbo do preco cobrado deste jogador no momento da
+        /// confirmacao (entrada do torneio ou mesa do cash). Null = legado —
+        /// a leitura canonica cai para Event.Price (EventCharge.PriceOf).
+        /// Editar o evento depois nao muda o que este jogador ja deve.
+        /// </summary>
+        public decimal? ChargedPrice { get; set; }
+
+        /// <summary>C39-B: mesa/faixa de preco escolhida na inscricao (cash).</summary>
+        public int? PriceOptionId { get; set; }
+        public EventPriceOption? PriceOption { get; set; }
+
         public bool IsPaymentPending => PaymentStatus == EventConfirmationPaymentStatus.Pending;
         public bool IsPaymentPaid => PaymentStatus == EventConfirmationPaymentStatus.Paid;
     }

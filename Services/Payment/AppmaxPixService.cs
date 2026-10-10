@@ -322,7 +322,7 @@ public sealed class AppmaxPixService
         if (string.IsNullOrWhiteSpace(ip))
             ip = "127.0.0.1";
 
-        var amountCents = ToCents(confirmation.Event.Price ?? 0m);
+        var amountCents = ToCents(EventCharge.PriceOf(confirmation) ?? 0m);
         var productSku = $"event-{confirmation.EventId}";
         var productName = string.IsNullOrWhiteSpace(confirmation.Event.Group?.Name)
             ? $"Evento #{confirmation.EventId}"

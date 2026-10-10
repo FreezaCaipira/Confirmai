@@ -184,6 +184,9 @@ public class EventDetailService
                 UserId = userId,
                 Position = eventEntity.MaxGoalkeepers > 0 ? chosenPos : FutsalPosition.Outfield,
                 ConfirmedAt = DateTime.UtcNow,
+                // C39-A: carimbo do preco — editar a partida depois nao muda o
+                // que este jogador ja deve.
+                ChargedPrice = eventEntity.Price,
                 PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(
                     eventEntity.Group, eventEntity.Price, DateTime.UtcNow),
             });
@@ -311,6 +314,7 @@ public class EventDetailService
             UserId = next.UserId,
             Position = position,
             ConfirmedAt = DateTime.UtcNow,
+            ChargedPrice = ev?.Price,
             PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(
                 ev?.Group, ev?.Price, DateTime.UtcNow),
         });

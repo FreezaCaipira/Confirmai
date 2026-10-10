@@ -20,26 +20,32 @@ public partial class EventPaymentSummary
 
     private CultureInfo PtBr { get; } = new CultureInfo("pt-BR");
 
-    private decimal BasePrice => Confirmation?.Event?.Price ?? 0m;
+    private decimal BasePrice => Confirmation is not null ? EventCharge.PriceOf(Confirmation) ?? 0m : 0m;
 
+    // C39-A: para o nao-carimbado a taxa resolve pela regra do esporte
+    // (futsal = fixa; poker = % do evento), isencao incluida.
     private decimal ManualFee
         => Confirmation?.PlatformFeeAmount
-           ?? FeePolicy.ResolveManualFee(Confirmation?.Event?.Group, Confirmation?.ConfirmedAt ?? DateTime.UtcNow);
+           ?? FeePolicy.ResolveStampForNewConfirmation(
+                  Confirmation?.Event?.Group,
+                  Confirmation is not null ? EventCharge.PriceOf(Confirmation) : null,
+                  Confirmation?.ConfirmedAt ?? DateTime.UtcNow,
+                  Confirmation?.Event?.PlatformFeePercent)
+           ?? 0m;
 
     private decimal GetTotalAmount()
     {
-        if (Confirmation?.Event?.Price is null or <= 0m)
+        if (BasePrice <= 0m)
             return 0m;
 
-        var basePrice = Confirmation.Event.Price.Value;
+        var basePrice = BasePrice;
 
         // V1 manual flow (no gateways): total via ManualPlatformFee so the fee
-        // only applies to futsal and resolves to 0 while the group is waived —
+        // resolves by sport and to 0 while the group is waived —
         // never the V2 fee fields.
-        if (Confirmation.Event?.Group is { EnablePaymentGateways: false })
+        if (Confirmation?.Event?.Group is { EnablePaymentGateways: false })
             return ManualPlatformFee.TotalToPay(
                 gatewaysEnabled: false,
-                isFutsal: Confirmation.Event.Sport == Sport.Futsal,
                 basePrice,
                 ManualFee);
 

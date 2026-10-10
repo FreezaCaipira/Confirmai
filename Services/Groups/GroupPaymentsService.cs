@@ -112,13 +112,14 @@ public sealed class GroupPaymentsService
             !await GroupAccess.IsMemberAsync(db, groupId, currentUserId))
             return 0;
 
+        // C39-A: preco canonico — carimbo da confirmacao vence (cash cobra
+        // pela mesa sem Event.Price); EF traduz para COALESCE.
         return await db.EventConfirmations
             .CountAsync(c =>
                 c.Event.GroupId == groupId &&
                 c.UserId == currentUserId &&
                 c.Event.IsActive &&
-                c.Event.Price != null &&
-                c.Event.Price > 0 &&
+                (c.ChargedPrice ?? c.Event.Price) > 0 &&
                 c.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
                 !c.HasPaid &&
                 c.Position != FutsalPosition.Goalkeeper &&
@@ -145,8 +146,7 @@ public sealed class GroupPaymentsService
             .Where(c =>
                 c.Event.GroupId == groupId &&
                 c.UserId == currentUserId &&
-                c.Event.Price != null &&
-                c.Event.Price > 0 &&
+                (c.ChargedPrice ?? c.Event.Price) > 0 &&
                 c.Position != FutsalPosition.Goalkeeper)
             .Include(c => c.Event)
             .OrderByDescending(c => c.Event.StartsAt)
@@ -158,10 +158,12 @@ public sealed class GroupPaymentsService
         {
             var href = isFutsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
             // The stamp is what the player was charged — it always wins.
+            var price = EventCharge.PriceOf(c)!.Value;
             var total = c.PlatformFeeAmount.HasValue
-                ? c.Event.Price!.Value + c.PlatformFeeAmount.Value
-                : ManualPlatformFee.TotalToPay(group.EnablePaymentGateways, isFutsal,
-                    c.Event.Price!.Value, _feePolicy.ResolveManualFee(group, c.ConfirmedAt));
+                ? price + c.PlatformFeeAmount.Value
+                : ManualPlatformFee.TotalToPay(group.EnablePaymentGateways, price,
+                    _feePolicy.ResolveStampForNewConfirmation(
+                        group, price, c.ConfirmedAt, c.Event.PlatformFeePercent) ?? 0m);
             return new MyPaymentEntry(
                 c.Id, c.EventId, c.Event.StartsAt, total,
                 c.HasPaid, c.PixProofUploadedAt != null && !c.HasPaid,
@@ -188,18 +190,18 @@ public sealed class GroupPaymentsService
         // C36-C Fase 0 / review: a stamped fee is what the player was actually
         // charged — it always wins, even if the group later enables gateways.
         // Only unstamped (legacy) rows go through the live Applies() check.
-        decimal TotalToPay(decimal basePrice, DateTime confirmedAt, decimal? stampedFee)
+        decimal TotalToPay(decimal basePrice, DateTime confirmedAt, decimal? stampedFee, decimal? feePercent = null)
             => stampedFee.HasValue
                 ? basePrice + stampedFee.Value
-                : ManualPlatformFee.TotalToPay(gatewaysEnabled, isFutsal, basePrice,
-                    _feePolicy.ResolveManualFee(group, confirmedAt));
+                : ManualPlatformFee.TotalToPay(gatewaysEnabled, basePrice,
+                    _feePolicy.ResolveStampForNewConfirmation(
+                        group, basePrice, confirmedAt, feePercent) ?? 0m);
 
         var unpaidConfirmations = await db.EventConfirmations
             .Where(c =>
                 c.Event.GroupId == groupId &&
                 c.Event.StartsAt < nowUtc &&
-                c.Event.Price != null &&
-                c.Event.Price > 0 &&
+                (c.ChargedPrice ?? c.Event.Price) > 0 &&
                 !c.HasPaid &&
                 c.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
                 c.Position != FutsalPosition.Goalkeeper &&
@@ -209,7 +211,7 @@ public sealed class GroupPaymentsService
             .OrderBy(c => c.Event.StartsAt)
             .Select(c => new {
                 c.Id, c.UserId, c.EventId, c.Event, c.User, c.PaymentGatewayName, c.Position,
-                c.PlatformFeeAmount, c.ConfirmedAt,
+                c.PlatformFeeAmount, c.ConfirmedAt, c.ChargedPrice,
                 HasProof = c.PixProofUploadedAt != null,
             })
             .ToListAsync();
@@ -224,7 +226,7 @@ public sealed class GroupPaymentsService
                 {
                     var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
                     return new DelinquencyEntry(c.Id, c.EventId, c.Event.StartsAt,
-                        TotalToPay(c.Event.Price!.Value, c.ConfirmedAt, c.PlatformFeeAmount), href, c.HasProof);
+                        TotalToPay((c.ChargedPrice ?? c.Event!.Price)!.Value, c.ConfirmedAt, c.PlatformFeeAmount, c.Event!.PlatformFeePercent), href, c.HasProof);
                 }).ToList();
                 return new UserDelinquency(g.Key, userName, entries);
             })
@@ -257,7 +259,7 @@ public sealed class GroupPaymentsService
             var adminName = adminMap.TryGetValue(c.MarkedPaidByUserId!, out var n) ? n : "Admin";
             // History shows what was actually charged: the stamped fee snapshot when
             // it exists (a waiver granted later must not rewrite past charges).
-            var amount = TotalToPay(c.Event.Price ?? 0, c.ConfirmedAt, c.PlatformFeeAmount);
+            var amount = TotalToPay(EventCharge.PriceOf(c) ?? 0, c.ConfirmedAt, c.PlatformFeeAmount, c.Event?.PlatformFeePercent);
             return new PaymentHistoryEntry(userName, c.Event.StartsAt, amount, href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
         }).ToList();
 
@@ -279,7 +281,7 @@ public sealed class GroupPaymentsService
             var href = sport == Sport.Futsal ? $"/futsal/{c.EventId}" : $"/poker/{c.EventId}";
             var userName = c.User?.FullName ?? c.User?.UserName ?? "Jogador";
             var eventName = c.Event?.Location ?? "Partida";
-            return new PendingProofEntry(c.Id, c.UserId, userName, c.EventId, eventName, group.Name, c.Event!.StartsAt, TotalToPay(c.Event.Price ?? 0, c.ConfirmedAt, c.PlatformFeeAmount), href, c.PixProofUploadedAt!.Value);
+            return new PendingProofEntry(c.Id, c.UserId, userName, c.EventId, eventName, group.Name, c.Event!.StartsAt, TotalToPay(EventCharge.PriceOf(c) ?? 0, c.ConfirmedAt, c.PlatformFeeAmount, c.Event!.PlatformFeePercent), href, c.PixProofUploadedAt!.Value);
         }).ToList();
 
         return new GroupPaymentsData(delinquencyList, paymentHistory, pendingProofList);
@@ -295,7 +297,7 @@ public sealed class GroupPaymentsService
     public static List<PendingPaymentGroup> PendingByGroup(IEnumerable<EventConfirmation> confirmations)
         => confirmations
             .Where(c => c.Event.IsActive &&
-                        c.Event.Price.HasValue && c.Event.Price.Value > 0 &&
+                        EventCharge.PriceOf(c) > 0 &&
                         c.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
                         !c.HasPaid &&
                         c.Position != FutsalPosition.Goalkeeper &&

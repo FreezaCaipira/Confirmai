@@ -48,16 +48,20 @@ public class PlatformFeeLedgerService
 
         var group = conf.Event?.Group;
         if (group is null) return false;
-        if (!PlatformFeePolicy.AppliesTo(group, conf.Event!.Price)) return false;
+
+        // C39-A: preco canonico (carimbo da confirmacao vence; cash cobra pela
+        // mesa sem Event.Price) e % do poker no stamp tardio.
+        var price = EventCharge.PriceOf(conf);
+        if (!PlatformFeePolicy.AppliesTo(group, price)) return false;
 
         // Legado sem carimbo (criada antes do C36-C): resolve pelo instante da
         // confirmacao, nao do stamp — a isencao concedida depois nao retroage.
         var asOf = conf.ConfirmedAt;
         var waived = _feePolicy.IsWaived(group, asOf);
-        var fee = _feePolicy.ResolveManualFee(group, asOf);
-        if (!waived && fee <= 0) return false; // configured fee off and not waived: nothing to stamp
+        var fee = _feePolicy.ResolveStampForNewConfirmation(group, price, asOf, conf.Event!.PlatformFeePercent);
+        if (!waived && fee is null or <= 0) return false; // configured fee off and not waived: nothing to stamp
 
-        conf.PlatformFeeAmount = fee;
+        conf.PlatformFeeAmount = fee ?? 0m;
         await db.SaveChangesAsync();
         return true;
     }

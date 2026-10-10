@@ -37,18 +37,39 @@ public sealed class PlatformFeePolicy
     public decimal ResolveManualFee(Group? group, DateTime nowUtc)
         => group is not null && IsWaived(group, nowUtc) ? 0m : _feeOptions.Value.ManualPlatformFeeFixed;
 
-    /// <summary>O fluxo manual V1 cobra taxa: futsal, sem gateways, preco > 0.</summary>
+    /// <summary>
+    /// O fluxo manual V1 cobra taxa: futsal ou poker, sem gateways, preco > 0
+    /// (C39-A — o poker passa a cobrar pelo app).
+    /// </summary>
     public static bool AppliesTo(Group? group, decimal? price)
-        => group is { Sport: Sport.Futsal, EnablePaymentGateways: false }
+        => group is { Sport: Sport.Futsal or Sport.Poker, EnablePaymentGateways: false }
            && price.GetValueOrDefault() > 0m;
+
+    /// <summary>
+    /// C39-A (D3): o service recusa % fora da faixa configurada pelo admin do
+    /// sistema — a tela so sugere o minimo.
+    /// </summary>
+    public bool IsPokerFeePercentInRange(decimal percent)
+        => percent >= _feeOptions.Value.PokerFeePercentMin
+           && percent <= _feeOptions.Value.PokerFeePercentMax;
 
     /// <summary>
     /// Carimbo na criacao da confirmacao (C36-C Fase 0 — ressalva de dinheiro
     /// do C34): a taxa e resolvida UMA vez, aqui. QR, resumo do organizador e
     /// stamp do repasse leem o valor carimbado — a isencao concedida depois
     /// nao retroage, e a expirada depois nao surpreende. Fora do fluxo manual
-    /// (poker, gateways, gratis) devolve null e o stamp tardio decide.
+    /// (gateways ligados ou preco 0) devolve null e o stamp tardio decide.
+    /// C39-A: poker resolve % da entrada configurada no evento/mesa; futsal
+    /// segue com a taxa fixa configurada.
     /// </summary>
-    public decimal? ResolveStampForNewConfirmation(Group? group, decimal? price, DateTime nowUtc)
-        => AppliesTo(group, price) ? ResolveManualFee(group, nowUtc) : null;
+    public decimal? ResolveStampForNewConfirmation(
+        Group? group, decimal? price, DateTime nowUtc, decimal? feePercent = null)
+    {
+        if (!AppliesTo(group, price)) return null;
+        if (group is not null && IsWaived(group, nowUtc)) return 0m;
+
+        return group!.Sport == Sport.Poker
+            ? Math.Round(price!.Value * (feePercent ?? 0m) / 100m, 2, MidpointRounding.AwayFromZero)
+            : ResolveManualFee(group, nowUtc);
+    }
 }

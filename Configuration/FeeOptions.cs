@@ -42,6 +42,15 @@ public class FeeOptions
     /// <summary>Cidade da plataforma para o payload Pix estático (campo 60 do BR Code).</summary>
     public string? PlatformPixCity { get; set; }
 
+    /// <summary>
+    /// C39-A (D3): faixa da taxa percentual que o organizador pode configurar
+    /// num torneio de poker. So o admin do sistema muda, via env
+    /// (Fee__PokerFeePercentMin/Max). Default 0/0 = taxa zerada ate configurar.
+    /// Validada no boot: 0 &lt;= Min &lt;= Max &lt;= 100.
+    /// </summary>
+    public decimal PokerFeePercentMin { get; set; } = 0;
+    public decimal PokerFeePercentMax { get; set; } = 0;
+
     /// <summary>True quando a taxa está configurada e habilitada.</summary>
     public bool IsConfigured => Enabled && (AppFeeFixed > 0 || GatewayFeeFixed > 0);
 }

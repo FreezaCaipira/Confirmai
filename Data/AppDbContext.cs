@@ -24,6 +24,7 @@ namespace Confirmai.Data
         public DbSet<GroupPayoutAccount> GroupPayoutAccounts { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventConfirmation> EventConfirmations { get; set; }
+        public DbSet<EventPriceOption> EventPriceOptions { get; set; }
         public DbSet<WaitingList> WaitingLists { get; set; }
         public DbSet<Venue> Venues { get; set; }
         public DbSet<MatchSchedule> RachaSchedules { get; set; }
@@ -394,6 +395,22 @@ namespace Confirmai.Data
                 .WithMany()
                 .HasForeignKey(ec => ec.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // C39-A/B: mesas do cash game — apagar o evento apaga as faixas;
+            // desativar uma mesa (nao apagar) preserva o carimbo das
+            // confirmacoes que a escolheram (SetNull no legado/edge case).
+            modelBuilder.Entity<EventPriceOption>()
+                .HasOne(o => o.Event)
+                .WithMany(e => e.PriceOptions)
+                .HasForeignKey(o => o.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<EventConfirmation>()
+                .HasOne(c => c.PriceOption)
+                .WithMany()
+                .HasForeignKey(c => c.PriceOptionId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<WaitingList>()
                 .HasIndex(w => new { w.EventId, w.UserId })

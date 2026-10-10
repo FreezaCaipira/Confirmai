@@ -194,8 +194,7 @@ public sealed class GroupDetailService
                 c.UserId == userId &&
                 c.Event.GroupId == groupId &&
                 c.Event.IsActive &&
-                c.Event.Price != null &&
-                c.Event.Price > 0 &&
+                (c.ChargedPrice ?? c.Event.Price) > 0 &&
                 c.Position != FutsalPosition.Goalkeeper &&
                 !c.HasPaid &&
                 c.PaymentStatus == EventConfirmationPaymentStatus.Pending);

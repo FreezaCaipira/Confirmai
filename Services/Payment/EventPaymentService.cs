@@ -74,7 +74,7 @@ public sealed class EventPaymentService
         }
 
         string? redirectUrl = null;
-        if (conf is not null && !isAdminViewing && (conf.Event.Price is null || conf.Position == FutsalPosition.Goalkeeper))
+        if (conf is not null && !isAdminViewing && (EventCharge.PriceOf(conf) is null || conf.Position == FutsalPosition.Goalkeeper))
         {
             redirectUrl = conf.Event.Sport == Sport.Futsal
                 ? $"/futsal/{conf.Event.Id}"
@@ -135,7 +135,8 @@ public sealed class EventPaymentService
             .Include(c => c.Event)
             .FirstOrDefaultAsync(c => c.Id == confirmationId);
 
-        if (conf is null || conf.Event.Price is null)
+        var chargePrice = conf is null ? null : EventCharge.PriceOf(conf);
+        if (conf is null || chargePrice is null)
         {
             return new EventPaymentGenerateResult(false, null, null, null, "Confirmação não encontrada.");
         }
@@ -161,7 +162,7 @@ public sealed class EventPaymentService
                 "Gateway indisponível ou desativado pelo administrador.");
         }
 
-        var chargeAmount = conf.Event.Price.Value;
+        var chargeAmount = chargePrice.Value;
         GroupPayoutAccount? payoutAccount = null;
 
         if (_feeOptions.IsConfigured &&
