@@ -119,7 +119,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Mapa de Progresso e Proximos Passos (atualizado pos-#139, cor por feature + painel Hoje)
+## Mapa de Progresso e Proximos Passos (atualizado pos-C38, #144/#145)
 
 ### Progresso por eixo
 
@@ -127,12 +127,12 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 |---|---|---|
 | Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
 | Casos de uso / UML (C33) | **CONCLUIDO** -- `docs/uml/` (~102 UCs por ator, estados, sequencia do pagamento manual) | Manter a coluna Teste atualizada a cada ciclo. |
-| Cobertura de testes | **BOM** -- 2636 testes, integracao em **Postgres real** (C33), CI verde; `CssStructureTests` guarda todo CSS proprio (#132) | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
+| Cobertura de testes | **BOM** -- 2708 testes, integracao em **Postgres real** (C33), CI verde; `CssStructureTests` guarda todo CSS proprio (#132) | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
 | i18n PT/EN/ES | **COMPLETO** -- allowlist zerada, paridade + chaves referenciadas testadas | Validacao visual EN/ES em prod (Robson). |
 | Pagamento V1 manual + taxa + repasse | **CONCLUIDO e VALIDADO EM PRODUCAO**; taxa carimbada na confirmacao, receita so com `Paid` (#122), isencao por grupo com janela `[From,Until)` (C34/C36-C), saida do grupo bloqueada com divida (#125); regra do Pix unica no criar partida (C36-E, #131/#132) | Nada funcional. |
 | Seguranca / autorizacao | **BOM** -- authz no service (C34), `GroupAccess` membro/admin (C36-C), IDORs fechados, rate limiter corrigido, magic bytes no upload | Nada funcional. C32 Fase A fechou o pen-test do dinheiro; `style-src 'unsafe-inline'` e risco aceito (Blazor). |
 | Auditoria | **CONCLUIDO** no caminho do dinheiro (C34) | Nada. |
-| Login/identidade | **VALIDADO EM PRODUCAO**; botao Google oficial (variante clara) no login **e** no cadastro (#129) | Rotacao de credenciais (checklist pre-producao). |
+| Login/identidade | **VALIDADO EM PRODUCAO**; botao Google oficial (variante clara) no login **e** no cadastro (#129); cadastro/reset com requisitos de senha da politica ativa, feedback ao digitar e erros do Identity em PT/EN/ES (C38) | Rotacao de credenciais (checklist pre-producao). |
 | Produto: grupo como porta de entrada | **CONCLUIDO** (C36-A/C/D) -- home = minhas partidas, `/grupos` = gestao, hub + subnav, pagamentos no escopo do grupo | Nada. |
 | Onboarding por empty state | **CONCLUIDO** (C36-B F6 + C36-E) -- checklist do admin e o aviso unico, Pix bloqueante pela regra do grupo | Nada. |
 | Layout / design system L0-L3 | **~80%** -- header, home, hub/subnav, `/grupos`, mailbox, profile, partida futsal/poker, pagamento/repasse do grupo, Identity, admin, cookie banner migrados; 63 arquivos guardados pelo `CssNoLegacyVarsTests` | Lapidacao visual (fim da fila, passo 5): **tela do jogador pagar** (`/pagamento/evento/{id}`) ainda no visual antigo; `buttons.css`/`entity-shell.css`/`MainLayout.razor.css` ainda consomem `--ci-*`; Fase 7 (texto do hero). |
@@ -144,7 +144,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
-0. **C38 (Pleno) -- achados do testador externo em prod [REVISADO -- APROVADO c/ 1 correcao; poker aguarda decisao do Robson]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
+0. **C38 (Pleno) -- achados do testador externo em prod [CONCLUIDO -- PR #144, review do Senior com 1 correcao (#145: edicao do futsal checa Pix)]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
 2. **C32 -- pre-producao [EXECUTADO -- ver review].** Fases A-E em `feat/ciclo32`. Resumo na Linha do Tempo. Fase F (remover telas legadas) pendente de aprovacao do Robson.
@@ -156,7 +156,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
    - **hero (Fase 7 do C36-B)**: texto do Robson + enfeite proposto pelo Senior -- landing deslogada com padrao de icones de varios esportes (Font Awesome, traco branco ~10% sobre o azul, sem cor por esporte, AA mantido); hero logado com marca d'agua do esporte da proxima partida (sem partida -> padrao misto). Opcoes de texto ja enviadas ao Robson (favorita do Senior: "Bora jogar? A gente cuida da lista e do Pix.").
 6. **V2 Pix automatico** -- depois do go-live e das pendencias Efi/fiscal.
 
-**Decisoes pendentes do Robson**: Fase 0 da Evolution (servico + chip); remover ou manter as telas legadas fora do fluxo (`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration` -- Senior recomenda remover); texto do hero (so na lapidacao visual).
+**Decisoes pendentes do Robson**: **trava de Pix no poker** (o poker nao cobra pelo app -- `Event.Price` nunca e gravado --, entao a trava do C38 so impede anunciar o buy-in; Senior recomenda tirar, ~1 commit; a alternativa e um ciclo para o poker cobrar pelo app); Fase 0 da Evolution (servico + chip); remover ou manter as telas legadas fora do fluxo (`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration` -- Senior recomenda remover); texto do hero (so na lapidacao visual).
 
 **Higiene de repo (Robson, opcional)**: branches mergeadas sobrando no remoto (`feat/ciclo36d-fase*`, `feat/ciclo36c-pagamentos-grupo`, `docs/review-c36c`, `refactor/*`, `feature/*` antigas).
 
