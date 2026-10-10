@@ -78,6 +78,15 @@ namespace Confirmai.Models
         public int? PriceOptionId { get; set; }
         public EventPriceOption? PriceOption { get; set; }
 
+        /// <summary>
+        /// C39-C (D4): carimbo da fatia da taxa que o jogador paga
+        /// (<c>PlatformFeeAmount × (1 - PartnerFeeSharePercent/100)</c>).
+        /// Null = sem carimbo de parceria — o total a pagar cai para a taxa
+        /// inteira (PlatformFeeAmount). Mudar a parceria do grupo depois nao
+        /// altera o que este jogador ja deve.
+        /// </summary>
+        public decimal? PlayerFeeAmount { get; set; }
+
         public bool IsPaymentPending => PaymentStatus == EventConfirmationPaymentStatus.Pending;
         public bool IsPaymentPaid => PaymentStatus == EventConfirmationPaymentStatus.Paid;
     }

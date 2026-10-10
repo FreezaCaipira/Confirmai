@@ -112,6 +112,57 @@ public sealed class PlatformFeeWaiverService
         return new PlatformFeeWaiverResult(true, PlatformFeeWaiverError.None);
     }
 
+    /// <summary>
+    /// C39-C (D4): define a fatia da taxa que o grupo parceiro absorve (0-100).
+    /// So o admin do sistema edita e toda mudanca e auditada. Confirmacoes ja
+    /// carimbadas nao mudam — a parceria vale para as proximas inscricoes.
+    /// </summary>
+    public async Task<PlatformFeeWaiverResult> SetPartnerFeeShareAsync(
+        int groupId, string adminUserId, decimal percent)
+    {
+        if (percent < 0m || percent > 100m)
+            return new PlatformFeeWaiverResult(false, PlatformFeeWaiverError.InvalidPercent);
+
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        if (!await IsSystemAdminAsync(db, adminUserId))
+            return new PlatformFeeWaiverResult(false, PlatformFeeWaiverError.NotAuthorized);
+
+        var group = await db.Groups.FirstOrDefaultAsync(g => g.Id == groupId);
+        if (group is null)
+            return new PlatformFeeWaiverResult(false, PlatformFeeWaiverError.GroupNotFound);
+
+        var previous = group.PartnerFeeSharePercent;
+        if (previous == percent)
+            return new PlatformFeeWaiverResult(true, PlatformFeeWaiverError.None);
+
+        group.PartnerFeeSharePercent = percent;
+        await db.SaveChangesAsync();
+
+        await _log.AuditAsync(
+            AuditEvents.GroupPartnerFeeShareChanged,
+            AuditEntities.Group,
+            groupId.ToString(),
+            $"Parceria de taxa alterada de {previous}% para {percent}%",
+            actorUserId: adminUserId,
+            metadata: new { groupId, previous, percent });
+
+        return new PlatformFeeWaiverResult(true, PlatformFeeWaiverError.None);
+    }
+
+    /// <summary>Grupos com parceria de taxa configurada (share > 0), para a tela do admin.</summary>
+    public async Task<IReadOnlyList<GroupPartnerShareRow>> GetPartnerSharesAsync()
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        var rows = await db.Groups
+            .AsNoTracking()
+            .Where(g => g.PartnerFeeSharePercent > 0m)
+            .OrderBy(g => g.Name)
+            .Select(g => new { g.Id, g.Name, g.PartnerFeeSharePercent })
+            .ToListAsync();
+        return rows.Select(r => new GroupPartnerShareRow(r.Id, r.Name, r.PartnerFeeSharePercent)).ToList();
+    }
+
     /// <summary>All groups (id + name) for the admin waiver group picker.</summary>
     public async Task<IReadOnlyList<(int Id, string Name)>> GetGroupsAsync()
     {
@@ -194,6 +245,7 @@ public enum PlatformFeeWaiverError
     ExpirationNotFuture,
     ReasonRequired,
     ReasonTooLong,
+    InvalidPercent,
 }
 
 /// <summary>Linha da tela do admin: grupo com isenção configurada (ativa ou expirada).</summary>
@@ -206,3 +258,6 @@ public record GroupFeeWaiverRow(
 
 /// <summary>Métrica "isento no período" para o AdminRevenue.</summary>
 public record GroupFeeWaivedStats(int WaivedConfirmations, decimal WaivedAmount);
+
+/// <summary>C39-C: linha da tela do admin — grupo com parceria de taxa.</summary>
+public record GroupPartnerShareRow(int GroupId, string GroupName, decimal SharePercent);

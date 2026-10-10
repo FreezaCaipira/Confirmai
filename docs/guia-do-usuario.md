@@ -93,6 +93,9 @@ flowchart TD
   o primeiro admin do grupo que tem Pix. Sem Pix válido, não dá para criar partida paga.
 - **Taxa da plataforma:** só conta sobre confirmações **pagas** (aprovadas). Confirmar sem
   pagar não gera dívida para o organizador.
+- **Parceria de taxa (opcional, só o admin do sistema):** o grupo pode absorver uma parte
+  da taxa da plataforma. O jogador paga só a fatia dele; o repasse do organizador continua
+  sobre a taxa cheia. Configurado em `/admin/revenue`.
 
 ## 5. Ciclo de uma confirmação
 

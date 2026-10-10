@@ -103,6 +103,7 @@ public static class AuditEvents
     public const string GroupPayoutAccountCreated = "group.payout.account.created";
     public const string GroupPayoutAccountUpdated = "group.payout.account.updated";
     public const string GroupFeeWaiverChanged    = "group.fee.waiver.changed";
+    public const string GroupPartnerFeeShareChanged = "group.partner.fee.share.changed";
     public const string GroupJoinRequested       = "group.join.requested";
     public const string GroupJoinApproved        = "group.join.approved";
     public const string GroupJoinRejected        = "group.join.rejected";

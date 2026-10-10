@@ -42,19 +42,21 @@ public partial class EventPayment : IAsyncDisposable
     internal bool ShouldShowManualPix => !groupGatewaysEnabled || FeeOptions.Value.ShowDirectPixToOrganizer;
 
     /// <summary>
-    /// Manual fee: the stamped value wins (C36-C Fase 0 — the fee is resolved
-    /// once, at confirmation creation). Legacy unstamped rows resolve by
-    /// ConfirmedAt so what the player sees matches what the stamp will record.
+    /// Manual fee the player pays: the stamped value wins (C36-C Fase 0 — the
+    /// fee is resolved once, at confirmation creation). C39-C: the partner
+    /// share stamp (<see cref="EventConfirmation.PlayerFeeAmount"/>) wins over
+    /// the full platform fee; legacy unstamped rows resolve by ConfirmedAt so
+    /// what the player sees matches what the stamp will record.
     /// </summary>
     private decimal ResolvedManualFee
-        => conf?.PlatformFeeAmount
+        => conf?.PlayerFeeAmount ?? conf?.PlatformFeeAmount
            ?? (conf is null
                ? 0m
-               : FeePolicy.ResolveStampForNewConfirmation(
+               : FeePolicy.ResolveStampsForNewConfirmation(
                      conf.Event?.Group,
                      EventCharge.PriceOf(conf),
                      conf.ConfirmedAt,
-                     conf.Event?.PlatformFeePercent) ?? 0m);
+                     conf.Event?.PlatformFeePercent).PlayerFee ?? 0m);
 
     /// <summary>
     /// True when the platform fee is charged on top of the entry price (V1 manual).

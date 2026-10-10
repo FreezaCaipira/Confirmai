@@ -72,6 +72,14 @@ namespace Confirmai.Models
         [StringLength(200)]
         public string? PlatformFeeWaiverReason { get; set; }
 
+        /// <summary>
+        /// C39-C (D4): fatia da taxa da plataforma que o grupo parceiro absorve
+        /// (0-100). O jogador paga `taxa × (1 - share/100)`; a taxa acumulada no
+        /// ledger e o repasse seguem com o valor cheio. Só o admin do sistema
+        /// edita, com auditoria.
+        /// </summary>
+        public decimal PartnerFeeSharePercent { get; set; }
+
         [StringLength(450)]
         public string? CreatedByUserId { get; set; }
 

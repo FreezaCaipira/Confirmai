@@ -23,14 +23,16 @@ public partial class EventPaymentSummary
     private decimal BasePrice => Confirmation is not null ? EventCharge.PriceOf(Confirmation) ?? 0m : 0m;
 
     // C39-A: para o nao-carimbado a taxa resolve pela regra do esporte
-    // (futsal = fixa; poker = % do evento), isencao incluida.
+    // (futsal = fixa; poker = % do evento/mesa), isencao incluida.
+    // C39-C: o breakdown mostra o que o jogador paga — carimbo da parceria
+    // vence a taxa cheia.
     private decimal ManualFee
-        => Confirmation?.PlatformFeeAmount
-           ?? FeePolicy.ResolveStampForNewConfirmation(
+        => Confirmation?.PlayerFeeAmount ?? Confirmation?.PlatformFeeAmount
+           ?? FeePolicy.ResolveStampsForNewConfirmation(
                   Confirmation?.Event?.Group,
                   Confirmation is not null ? EventCharge.PriceOf(Confirmation) : null,
                   Confirmation?.ConfirmedAt ?? DateTime.UtcNow,
-                  Confirmation?.Event?.PlatformFeePercent)
+                  Confirmation?.Event?.PlatformFeePercent).PlayerFee
            ?? 0m;
 
     private decimal GetTotalAmount()

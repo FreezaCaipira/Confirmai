@@ -4,6 +4,11 @@ O caminho do dinheiro no V1 (gateways desligados para o grupo):
 jogador confirma → ve Pix do organizador → paga no banco → envia comprovante →
 organizador confirma → taxa e carimbada no ledger → organizador repassa → admin confirma.
 
+Desde o C39, a confirmacao carimba `ChargedPrice` (preco anunciado; cash = preco
+da mesa escolhida em `PriceOptionId`), `PlatformFeeAmount` (taxa cheia, vai para
+o repasse) e `PlayerFeeAmount` (parte do jogador; C39-C — igual a taxa cheia
+quando o grupo nao tem parceria). O QR cobra `ChargedPrice + PlayerFeeAmount`.
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -19,10 +24,11 @@ sequenceDiagram
     actor A as Admin plataforma
     participant DB as PostgreSQL
 
-    J->>EP: confirmou presenca (EventConfirmation Pending)
+    J->>EP: confirmou presenca (EventConfirmation Pending + carimbo)
+    Note over EP,DB: ChargedPrice / PlatformFeeAmount / PlayerFeeAmount<br>carimbados na confirmacao; edicao posterior so recarimba quem ainda deve
     EP->>EPS: GetGroupAdminPixKey / BuildPixStaticPayload
     EPS-->>EP: chave Pix do admin + QR estatico (brcode)
-    EP-->>J: exibe QR + copia-e-cola
+    EP-->>J: exibe QR + copia-e-cola (ChargedPrice + PlayerFeeAmount)
     Note over J: paga no app do banco (fora do sistema)
 
     J->>EP: upload do comprovante (<=5MB, jpg/png/webp)
@@ -49,7 +55,7 @@ sequenceDiagram
         Note over J: pode re-enviar novo comprovante
     end
 
-    Note over O,A: Nivel 2 — repasse da taxa acumulada
+    Note over O,A: Nivel 2 — repasse da taxa acumulada<br>(soma de PlatformFeeAmount — a taxa cheia;<br>parceria nao reduz o repasse)
     O->>GP: aba taxa → GetGroupFeeOverviewAsync
     GP-->>O: partidas com taxa devida + Pix da plataforma
     Note over O: paga ao Pix da plataforma no banco
