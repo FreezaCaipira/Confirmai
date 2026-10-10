@@ -5,6 +5,7 @@ using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Events;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -171,11 +172,40 @@ public partial class Edit
 
             var ev = await db.Events
                 .Include(e => e.Group)
+                    .ThenInclude(g => g.Members)
+                        .ThenInclude(m => m.User)
+                .Include(e => e.Confirmations)
                 .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Poker);
 
             if (ev is null || !EventCancellationService.CanManage(ev, userId, auth.User.IsInRole("admin")))
             {
                 saveError = Ui["Poker.AccessDenied"];
+                isSaving  = false;
+                return;
+            }
+
+            // C39-A F4 (a): subir o buy-in exige recebedor do grupo — mesmo
+            // bypass fechado no futsal pela review do C38.
+            if (eventType == PokerEventType.Tournament
+                && form.BuyInAmount > 0
+                && form.BuyInAmount != (ev.BuyInAmount ?? 0)
+                && !EventPaymentService.GroupCanCharge(ev.Group))
+            {
+                saveError = Ui["Poker.Edit.PixRequired"];
+                isSaving  = false;
+                return;
+            }
+
+            // C39-A F4 (b): com alguem que ja pagou ou enviou comprovante, o
+            // anuncio do valor fica congelado — mudar buy-in ou % mudaria a
+            // divida de quem ja quitou (o carimbo protege o historico, mas o
+            // valor anunciado nao pode virar outra coisa).
+            if (eventType == PokerEventType.Tournament
+                && (form.BuyInAmount != (ev.BuyInAmount ?? 0)
+                    || form.PlatformFeePercent != (ev.PlatformFeePercent ?? 0))
+                && ev.Confirmations.Any(c => c.HasPaid || c.PixProofUploadedAt != null))
+            {
+                saveError = Ui["Poker.Edit.PriceLockedPaid"];
                 isSaving  = false;
                 return;
             }
