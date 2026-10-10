@@ -37,6 +37,13 @@ public partial class AdminRevenue
     private string waiverMessage = string.Empty;
     private bool waiverSaving;
 
+    // ── Partner fee share (C39-C) ─────────────────────────────────────────
+    private IReadOnlyList<GroupPartnerShareRow> partnerShares = Array.Empty<GroupPartnerShareRow>();
+    private int partnerGroupId;
+    private decimal partnerPercent;
+    private string partnerMessage = string.Empty;
+    private bool partnerSaving;
+
     [Inject] private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
     [Inject] private AdminRevenueReportService RevenueReportService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -153,6 +160,27 @@ public partial class AdminRevenue
         waiverGroupOptions = await FeeWaiver.GetGroupsAsync();
         waiverRows = await FeeWaiver.GetWaiverOverviewAsync();
         waivedStats = await FeeWaiver.GetWaivedStatsAsync(startDate, endDate);
+        partnerShares = await FeeWaiver.GetPartnerSharesAsync();
+    }
+
+    private async Task SavePartnerShareAsync()
+    {
+        if (currentUserId is null || partnerGroupId <= 0 || partnerSaving) return;
+        partnerSaving = true;
+        partnerMessage = string.Empty;
+        try
+        {
+            var result = await FeeWaiver.SetPartnerFeeShareAsync(partnerGroupId, currentUserId, partnerPercent);
+            partnerMessage = result.Success
+                ? T["AdminRevenue.PartnerShareSaved"]
+                : WaiverErrorText(result.Error);
+            if (result.Success)
+                await LoadWaiverAsync();
+        }
+        finally
+        {
+            partnerSaving = false;
+        }
     }
 
     private async Task SaveWaiverAsync()
@@ -204,6 +232,7 @@ public partial class AdminRevenue
         PlatformFeeWaiverError.ReasonRequired => T["AdminRevenue.FeeWaiverErrReason"],
         PlatformFeeWaiverError.ReasonTooLong => T["AdminRevenue.FeeWaiverErrReasonTooLong"],
         PlatformFeeWaiverError.GroupNotFound => T["AdminRevenue.FeeWaiverErrGroupNotFound"],
+        PlatformFeeWaiverError.InvalidPercent => T["AdminRevenue.PartnerShareErrPercent"],
         _ => T["AdminRevenue.SettlementError"],
     };
 

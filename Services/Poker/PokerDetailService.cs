@@ -105,6 +105,7 @@ public sealed class PokerDetailService
         }
 
         var now = DateTime.UtcNow;
+        var stamps = _feePolicy.ResolveStampsForNewConfirmation(ev.Group, price, now, feePercent);
         var conf = new EventConfirmation
         {
             EventId = eventId,
@@ -112,7 +113,8 @@ public sealed class PokerDetailService
             ConfirmedAt = now,
             ChargedPrice = price,
             PriceOptionId = priceOptionId,
-            PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(ev.Group, price, now, feePercent),
+            PlatformFeeAmount = stamps.PlatformFee,
+            PlayerFeeAmount = stamps.PlayerFee,
         };
         db.EventConfirmations.Add(conf);
         await db.SaveChangesAsync();
@@ -169,8 +171,10 @@ public sealed class PokerDetailService
 
         conf.PriceOptionId = option.Id;
         conf.ChargedPrice = option.Price;
-        conf.PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(
+        var stamps = _feePolicy.ResolveStampsForNewConfirmation(
             ev.Group, option.Price, conf.ConfirmedAt, option.PlatformFeePercent);
+        conf.PlatformFeeAmount = stamps.PlatformFee;
+        conf.PlayerFeeAmount = stamps.PlayerFee;
         await db.SaveChangesAsync();
         return new PokerChangeTableResult(PokerChangeTableStatus.Changed);
     }

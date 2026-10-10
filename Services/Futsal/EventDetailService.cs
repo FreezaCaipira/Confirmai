@@ -178,6 +178,8 @@ public class EventDetailService
         }
         else
         {
+            var feeStamps = _feePolicy.ResolveStampsForNewConfirmation(
+                eventEntity.Group, eventEntity.Price, DateTime.UtcNow);
             db.EventConfirmations.Add(new EventConfirmation
             {
                 EventId = eventId,
@@ -185,10 +187,10 @@ public class EventDetailService
                 Position = eventEntity.MaxGoalkeepers > 0 ? chosenPos : FutsalPosition.Outfield,
                 ConfirmedAt = DateTime.UtcNow,
                 // C39-A: carimbo do preco — editar a partida depois nao muda o
-                // que este jogador ja deve.
+                // que este jogador ja deve. C39-C: e da parte da taxa que ele paga.
                 ChargedPrice = eventEntity.Price,
-                PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(
-                    eventEntity.Group, eventEntity.Price, DateTime.UtcNow),
+                PlatformFeeAmount = feeStamps.PlatformFee,
+                PlayerFeeAmount = feeStamps.PlayerFee,
             });
             await db.SaveChangesAsync();
             return new ConfirmPresenceResult(true, null, false);
@@ -316,6 +318,8 @@ public class EventDetailService
         if (next is null) return;
 
         var ev = await db.Events.Include(e => e.Group).FirstOrDefaultAsync(e => e.Id == eventId);
+        var feeStamps = _feePolicy.ResolveStampsForNewConfirmation(
+            ev?.Group, ev?.Price, DateTime.UtcNow);
         db.EventConfirmations.Add(new EventConfirmation
         {
             EventId = eventId,
@@ -323,8 +327,8 @@ public class EventDetailService
             Position = position,
             ConfirmedAt = DateTime.UtcNow,
             ChargedPrice = ev?.Price,
-            PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(
-                ev?.Group, ev?.Price, DateTime.UtcNow),
+            PlatformFeeAmount = feeStamps.PlatformFee,
+            PlayerFeeAmount = feeStamps.PlayerFee,
         });
         db.WaitingLists.Remove(next);
         await db.SaveChangesAsync();

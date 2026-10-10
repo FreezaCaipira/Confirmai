@@ -324,6 +324,64 @@
                     </table>
                 }
             </div>
+
+            @* ── Partner fee share (C39-C) ── *@
+            <div class="admin-revenue-settlement-queue">
+                <h2 class="admin-revenue-section-title">@T["AdminRevenue.PartnerShareTitle"]</h2>
+                <p class="admin-revenue-settlement-message">@T["AdminRevenue.PartnerShareHint"]</p>
+
+                @if (!string.IsNullOrWhiteSpace(partnerMessage))
+                {
+                    <p class="admin-revenue-settlement-message">@partnerMessage</p>
+                }
+
+                <div class="admin-revenue-reject-cell">
+                    <select class="admin-revenue-input" @bind="partnerGroupId" aria-label="@T["AdminRevenue.FeeWaiverGroup"]">
+                        <option value="0">@T["AdminRevenue.FeeWaiverGroup"]</option>
+                        @foreach (var g in waiverGroupOptions)
+                        {
+                            <option value="@g.Id">@g.Name</option>
+                        }
+                    </select>
+                    <input type="number" class="admin-revenue-input" @bind="partnerPercent"
+                           min="0" max="100" step="1"
+                           aria-label="@T["AdminRevenue.PartnerSharePercent"]" />
+                    <button class="admin-revenue-btn admin-revenue-btn--success" type="button"
+                            disabled="@(partnerSaving || partnerGroupId <= 0)"
+                            @onclick="SavePartnerShareAsync">
+                        @if (partnerSaving)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                        }
+                        @T["AdminRevenue.PartnerShareSave"]
+                    </button>
+                </div>
+
+                @if (partnerShares.Count == 0)
+                {
+                    <p class="listing-state">@T["AdminRevenue.PartnerShareEmpty"]</p>
+                }
+                else
+                {
+                    <table class="admin-revenue-table">
+                        <thead>
+                            <tr>
+                                <th>@T["AdminRevenue.FeeWaiverGroup"]</th>
+                                <th>@T["AdminRevenue.PartnerSharePercent"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in partnerShares)
+                            {
+                                <tr>
+                                    <td>@s.GroupName</td>
+                                    <td>@s.SharePercent.ToString("N0")%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
         </article>
     </section>
 

@@ -62,6 +62,9 @@ public class PlatformFeeLedgerService
         if (!waived && fee is null or <= 0) return false; // configured fee off and not waived: nothing to stamp
 
         conf.PlatformFeeAmount = fee ?? 0m;
+        // C39-C: a parte do jogador vem junto no stamp tardio — a parceria vale
+        // a partir do instante em que ela existe no grupo.
+        conf.PlayerFeeAmount = _feePolicy.ResolvePlayerFee(group, conf.PlatformFeeAmount);
         await db.SaveChangesAsync();
         return true;
     }

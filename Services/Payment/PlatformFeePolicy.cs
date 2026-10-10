@@ -84,7 +84,9 @@ public sealed class PlatformFeePolicy
                      && c.PaymentStatus == EventConfirmationPaymentStatus.Pending))
         {
             c.ChargedPrice = price;
-            c.PlatformFeeAmount = ResolveStampForNewConfirmation(group, price, c.ConfirmedAt, feePercent);
+            var stamps = ResolveStampsForNewConfirmation(group, price, c.ConfirmedAt, feePercent);
+            c.PlatformFeeAmount = stamps.PlatformFee;
+            c.PlayerFeeAmount = stamps.PlayerFee;
         }
     }
 
@@ -107,4 +109,41 @@ public sealed class PlatformFeePolicy
             ? Math.Round(price!.Value * (feePercent ?? 0m) / 100m, 2, MidpointRounding.AwayFromZero)
             : ResolveManualFee(group, nowUtc);
     }
+
+    /// <summary>
+    /// C39-C (D4): fatia da taxa que o GRUPO PARCEIRO absorve, 0-100 clampado.
+    /// Grupo sem parceria (0) devolve a taxa inteira para o jogador.
+    /// </summary>
+    public static decimal PartnerShare(Group? group)
+        => Math.Clamp(group?.PartnerFeeSharePercent ?? 0m, 0m, 100m);
+
+    /// <summary>
+    /// C39-C: parte da taxa da plataforma que o jogador paga. A taxa cheia
+    /// (<see cref="PlatformFeeAmount"/>) continua indo para o ledger e para o
+    /// repasse — a parceria so muda o que o jogador transfere.
+    /// </summary>
+    public decimal? ResolvePlayerFee(Group? group, decimal? platformFee)
+        => platformFee is null
+            ? null
+            : Math.Round(platformFee.Value * (1m - PartnerShare(group) / 100m), 2, MidpointRounding.AwayFromZero);
+
+    /// <summary>
+    /// Par de carimbos da confirmacao: taxa cheia da plataforma (ledger/repasse)
+    /// e a parte que o jogador paga (QR/telas). Resolve junto para os dois
+    /// nunca divergirem.
+    /// </summary>
+    public (decimal? PlatformFee, decimal? PlayerFee) ResolveStampsForNewConfirmation(
+        Group? group, decimal? price, DateTime nowUtc, decimal? feePercent = null)
+    {
+        var platform = ResolveStampForNewConfirmation(group, price, nowUtc, feePercent);
+        return (platform, ResolvePlayerFee(group, platform));
+    }
+
+    /// <summary>
+    /// Leitura canonica da taxa que o jogador paga: o carimbo de parceria
+    /// vence; linha sem ele (pre-C39-C) paga a taxa inteira — mesmo valor de
+    /// antes da parceria existir.
+    /// </summary>
+    public static decimal? FeeChargedToPlayer(EventConfirmation conf)
+        => conf.PlayerFeeAmount ?? conf.PlatformFeeAmount;
 }
