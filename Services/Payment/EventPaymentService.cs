@@ -235,6 +235,10 @@ public sealed class EventPaymentService
             .FirstOrDefault();
     }
 
+    public static bool GroupCanCharge(Group group)
+        => group.EnablePaymentGateways
+        || !string.IsNullOrWhiteSpace(GetGroupAdminPixKey(group));
+
     public static string BuildPixStaticPayload(string pixKey, string groupName, string? city, decimal amount)
     {
         if (string.IsNullOrWhiteSpace(pixKey))
