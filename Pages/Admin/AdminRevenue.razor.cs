@@ -163,6 +163,12 @@ public partial class AdminRevenue
         partnerShares = await FeeWaiver.GetPartnerSharesAsync();
     }
 
+    private void OnPartnerGroupChanged()
+        => partnerPercent = CurrentPartnerShare(partnerShares, partnerGroupId);
+
+    internal static decimal CurrentPartnerShare(IReadOnlyList<GroupPartnerShareRow> shares, int groupId)
+        => shares.FirstOrDefault(s => s.GroupId == groupId)?.SharePercent ?? 0m;
+
     private async Task SavePartnerShareAsync()
     {
         if (currentUserId is null || partnerGroupId <= 0 || partnerSaving) return;
