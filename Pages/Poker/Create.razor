@@ -227,6 +227,13 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label>@Ui["Poker.FeePercent"]</label>
+                        <InputNumber class="input" @bind-Value="form.PlatformFeePercent" min="@feePercentMin" max="@feePercentMax" step="0.5" disabled="@GroupNeedsPix" />
+                        <ValidationMessage For="@(() => form.PlatformFeePercent)" class="validation-message" />
+                        <small class="form-hint">@Ui.Get("Poker.FeePercentHint", feePercentMin, feePercentMax)</small>
+                    </div>
+
                     <div class="form-row-2">
                         <div class="form-group">
                             <label>@Ui["Poker.Rebuy"]</label>

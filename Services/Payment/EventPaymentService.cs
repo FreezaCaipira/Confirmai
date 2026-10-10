@@ -73,8 +73,13 @@ public sealed class EventPaymentService
             availableGateways = (await _gatewayFactory.GetAvailableAsync()).ToList();
         }
 
+        // C39-A F5: quem esta na espera do poker (posicao > MaxPlayers) nao
+        // deve — nao ha cobranca para abrir.
+        var pokerWaitlisted = conf is not null && await IsPokerWaitlistedAsync(db, conf);
+
         string? redirectUrl = null;
-        if (conf is not null && !isAdminViewing && (conf.Event.Price is null || conf.Position == FutsalPosition.Goalkeeper))
+        if (conf is not null && (pokerWaitlisted
+            || (!isAdminViewing && (EventCharge.PriceOf(conf) is null || conf.Position == FutsalPosition.Goalkeeper))))
         {
             redirectUrl = conf.Event.Sport == Sport.Futsal
                 ? $"/futsal/{conf.Event.Id}"
@@ -135,9 +140,18 @@ public sealed class EventPaymentService
             .Include(c => c.Event)
             .FirstOrDefaultAsync(c => c.Id == confirmationId);
 
-        if (conf is null || conf.Event.Price is null)
+        var chargePrice = conf is null ? null : EventCharge.PriceOf(conf);
+        if (conf is null || chargePrice is null)
         {
             return new EventPaymentGenerateResult(false, null, null, null, "Confirmação não encontrada.");
+        }
+
+        // C39-A F5: lista de espera do poker nao gera cobranca no servidor.
+        if (await IsPokerWaitlistedAsync(db, conf))
+        {
+            return new EventPaymentGenerateResult(
+                false, null, null, null,
+                "Inscrição na lista de espera — a cobrança abre quando a vaga for confirmada.");
         }
 
         if (_feeOptions.IsConfigured)
@@ -161,7 +175,7 @@ public sealed class EventPaymentService
                 "Gateway indisponível ou desativado pelo administrador.");
         }
 
-        var chargeAmount = conf.Event.Price.Value;
+        var chargeAmount = chargePrice.Value;
         GroupPayoutAccount? payoutAccount = null;
 
         if (_feeOptions.IsConfigured &&
@@ -216,6 +230,20 @@ public sealed class EventPaymentService
         }
 
         return new EventPaymentPollResult(false);
+    }
+
+    /// <summary>
+    /// C39-A F5: rank 1-based da confirmacao na ordem de chegada do evento;
+    /// alem do MaxPlayers (so no poker — o futsal tem WaitingList propria)
+    /// a confirmacao e espera e nunca gera cobranca.
+    /// </summary>
+    private static async Task<bool> IsPokerWaitlistedAsync(AppDbContext db, EventConfirmation conf)
+    {
+        if (conf.Event.Sport != Sport.Poker || conf.Event.MaxPlayers <= 0) return false;
+        var rank = await db.EventConfirmations.CountAsync(c =>
+            c.EventId == conf.EventId &&
+            (c.ConfirmedAt < conf.ConfirmedAt || (c.ConfirmedAt == conf.ConfirmedAt && c.Id <= conf.Id)));
+        return rank > conf.Event.MaxPlayers;
     }
 
     public static string? GetGroupAdminPixKey(Group group)

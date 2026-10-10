@@ -3,6 +3,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services.Events;
+using Confirmai.Services.Poker;
 using Confirmai.Shared.Helpers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -151,18 +152,15 @@ public partial class Detail
         if (currentUserId is null || ev is null) return;
         actionError = string.Empty;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var existing = await db.EventConfirmations
-            .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
-        if (existing is not null) { actionError = Ui["Poker.AlreadyRegistered"]; return; }
-
-        db.EventConfirmations.Add(new EventConfirmation
+        var result = await PokerDetail.ConfirmAsync(Id, currentUserId);
+        actionError = result.Status switch
         {
-            EventId = Id,
-            UserId = currentUserId,
-            ConfirmedAt = DateTime.UtcNow,
-        });
-        await db.SaveChangesAsync();
+            PokerConfirmStatus.Confirmed => string.Empty,
+            PokerConfirmStatus.AlreadyRegistered => Ui["Poker.AlreadyRegistered"],
+            PokerConfirmStatus.EventCancelled => Ui["Poker.EventCancelled"],
+            PokerConfirmStatus.NotGroupMember => Ui["Poker.PrivateGroup"],
+            _ => Ui["Poker.EventNotFound"],
+        };
         await LoadEvent();
     }
 
@@ -171,14 +169,9 @@ public partial class Detail
         if (currentUserId is null) return;
         actionError = string.Empty;
 
-        await using var db = await DbFactory.CreateDbContextAsync();
-        var conf = await db.EventConfirmations
-            .FirstOrDefaultAsync(c => c.EventId == Id && c.UserId == currentUserId);
-        if (conf is not null)
-        {
-            db.EventConfirmations.Remove(conf);
-            await db.SaveChangesAsync();
-        }
+        var result = await PokerDetail.CancelAsync(Id, currentUserId);
+        if (result.Status == PokerCancelStatus.PaidOrProofSent)
+            actionError = Ui["Poker.CancelPaidBlocked"];
         await LoadEvent();
     }
 

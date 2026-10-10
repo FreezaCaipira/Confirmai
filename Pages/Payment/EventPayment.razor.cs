@@ -48,15 +48,20 @@ public partial class EventPayment : IAsyncDisposable
     /// </summary>
     private decimal ResolvedManualFee
         => conf?.PlatformFeeAmount
-           ?? FeePolicy.ResolveManualFee(conf?.Event?.Group, conf?.ConfirmedAt ?? DateTime.UtcNow);
+           ?? (conf is null
+               ? 0m
+               : FeePolicy.ResolveStampForNewConfirmation(
+                     conf.Event?.Group,
+                     EventCharge.PriceOf(conf),
+                     conf.ConfirmedAt,
+                     conf.Event?.PlatformFeePercent) ?? 0m);
 
     /// <summary>
-    /// True when the fixed platform fee is charged on top of the match price (V1 manual, futsal).
+    /// True when the platform fee is charged on top of the entry price (V1 manual).
     /// </summary>
     internal bool ManualFeeApplies => ManualPlatformFee.Applies(
         groupGatewaysEnabled,
-        conf?.Event?.Sport == Sport.Futsal,
-        conf?.Event?.Price ?? 0m,
+        conf is null ? 0m : EventCharge.PriceOf(conf) ?? 0m,
         ResolvedManualFee);
 
     /// <summary>
@@ -64,8 +69,7 @@ public partial class EventPayment : IAsyncDisposable
     /// </summary>
     internal decimal ManualAmountToPay => ManualPlatformFee.TotalToPay(
         groupGatewaysEnabled,
-        conf?.Event?.Sport == Sport.Futsal,
-        conf?.Event?.Price ?? 0m,
+        conf is null ? 0m : EventCharge.PriceOf(conf) ?? 0m,
         ResolvedManualFee);
 
     private PayState payState = PayState.Idle;
@@ -113,7 +117,7 @@ public partial class EventPayment : IAsyncDisposable
 
     private async Task GeneratePixCharge()
     {
-        if (conf is null || conf.Event.Price is null) return;
+        if (conf is null || EventCharge.PriceOf(conf) is null) return;
         payState = PayState.Generating;
         errorMsg = string.Empty;
 

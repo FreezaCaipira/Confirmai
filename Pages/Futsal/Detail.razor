@@ -308,7 +308,8 @@ else
                                             }
                                         }
                                     }
-                                    @if (ev!.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid)
+                                    @* C39-A F6: pago ou com comprovante — cancelar some; fale com o organizador. *@
+                                    @if (ev!.IsActive && !isPastEvent && c.UserId == currentUserId && !c.HasPaid && c.PixProofUploadedAt == null)
                                     {
                                         @if (confirmCancel)
                                         {

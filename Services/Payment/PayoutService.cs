@@ -79,7 +79,7 @@ public sealed class PayoutService
             return;
         }
 
-        var amount = confirmation.Event.Price;
+        var amount = EventCharge.PriceOf(confirmation);
         if (amount is null || amount <= 0)
         {
             await _log.LogAsync(

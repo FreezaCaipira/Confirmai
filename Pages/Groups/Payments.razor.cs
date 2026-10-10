@@ -99,9 +99,9 @@ public partial class Payments
         showAllFeeMatches = !showAllFeeMatches;
     }
 
-    /// <summary>True when the platform fee tab should be offered (futsal, manual mode).</summary>
+    /// <summary>True when the platform fee tab should be offered (manual mode; C39-A: futsal e poker).</summary>
     private bool ShouldShowPlatformFeeTab =>
-        group is not null && group.Sport == Sport.Futsal && !group.EnablePaymentGateways;
+        group is not null && group.Sport is Sport.Futsal or Sport.Poker && !group.EnablePaymentGateways;
 
     /// <summary>Pix BR Code payload for the platform key, charging the due amount.</summary>
     private string? PlatformFeePixPayload

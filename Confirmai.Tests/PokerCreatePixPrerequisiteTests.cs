@@ -37,7 +37,15 @@ public class PokerCreatePixPrerequisiteTests
             factory,
             new TestAuthStateProvider(userId),
             collisionService,
-            new UiTextService(new LanguagePreferenceService()));
+            new UiTextService(new LanguagePreferenceService()),
+            new Confirmai.Services.Payment.PlatformFeePolicy(
+                Microsoft.Extensions.Options.Options.Create(
+                    new Confirmai.Configuration.FeeOptions
+                    {
+                        ManualPlatformFeeFixed = 0.75m,
+                        PokerFeePercentMin = 5m,
+                        PokerFeePercentMax = 10m,
+                    })));
         return (factory, svc);
     }
 
@@ -72,6 +80,8 @@ public class PokerCreatePixPrerequisiteTests
         City = "Muzambinho",
         StateCode = "MG",
         BuyInAmount = buyIn,
+        // C39-A F3: % dentro da faixa para nao esbarrar na validacao nova.
+        PlatformFeePercent = 5m,
         CashMinBuyIn = cashMin,
         CashMaxBuyIn = cashMin > 0 ? cashMin * 10 : 0,
         MaxPlayers = 9,

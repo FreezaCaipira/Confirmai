@@ -215,6 +215,66 @@ public class EventDetailServiceTests
     }
 
     [Fact]
+    public async Task CancelConfirmationAsync_Blocked_WhenPaid()
+    {
+        var (factory, svc, eventId, _) = await SetupWithEventAsync();
+        await using var db = factory.CreateDbContext();
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId = eventId, UserId = "user-1", ConfirmedAt = DateTime.UtcNow,
+            Position = FutsalPosition.Outfield, HasPaid = true,
+            PaymentStatus = EventConfirmationPaymentStatus.Paid,
+        });
+        await db.SaveChangesAsync();
+
+        var cancelled = await svc.CancelConfirmationAsync(eventId, "user-1");
+
+        Assert.False(cancelled);
+        await using var db2 = factory.CreateDbContext();
+        Assert.NotNull(await db2.EventConfirmations.FirstOrDefaultAsync(c => c.EventId == eventId && c.UserId == "user-1"));
+    }
+
+    [Fact]
+    public async Task CancelConfirmationAsync_Blocked_WhenProofSent()
+    {
+        var (factory, svc, eventId, _) = await SetupWithEventAsync();
+        await using var db = factory.CreateDbContext();
+        db.EventConfirmations.Add(new EventConfirmation
+        {
+            EventId = eventId, UserId = "user-1", ConfirmedAt = DateTime.UtcNow,
+            Position = FutsalPosition.Outfield, PixProofUploadedAt = DateTime.UtcNow,
+            PixProofImageData = new byte[] { 1 },
+        });
+        await db.SaveChangesAsync();
+
+        var cancelled = await svc.CancelConfirmationAsync(eventId, "user-1");
+
+        Assert.False(cancelled);
+        await using var db2 = factory.CreateDbContext();
+        Assert.NotNull(await db2.EventConfirmations.FirstOrDefaultAsync(c => c.EventId == eventId && c.UserId == "user-1"));
+    }
+
+    [Fact]
+    public async Task AdminRemoveConfirmationAsync_StillRemoves_PaidConfirmation()
+    {
+        var (factory, svc, eventId, groupId) = await SetupWithEventAsync();
+        await using var db = factory.CreateDbContext();
+        var conf = new EventConfirmation
+        {
+            EventId = eventId, UserId = "user-1", ConfirmedAt = DateTime.UtcNow,
+            Position = FutsalPosition.Outfield, HasPaid = true,
+            PaymentStatus = EventConfirmationPaymentStatus.Paid,
+        };
+        db.EventConfirmations.Add(conf);
+        await db.SaveChangesAsync();
+
+        await svc.AdminRemoveConfirmationAsync(conf.Id, "admin-1", eventId);
+
+        await using var db2 = factory.CreateDbContext();
+        Assert.Null(await db2.EventConfirmations.FindAsync(conf.Id));
+    }
+
+    [Fact]
     public async Task CancelConfirmationAsync_PromotesFromWaitlist()
     {
         var (factory, svc, eventId, _) = await SetupWithEventAsync();

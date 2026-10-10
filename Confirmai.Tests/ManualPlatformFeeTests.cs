@@ -11,45 +11,38 @@ namespace Confirmai.Tests;
 public class ManualPlatformFeeTests
 {
     [Fact]
-    public void Applies_ManualFutsalWithPrice_IsTrue()
+    public void Applies_ManualChargeWithPrice_IsTrue()
     {
         Assert.True(ManualPlatformFee.Applies(
-            gatewaysEnabled: false, isFutsal: true, basePrice: 15m, manualFee: 0.75m));
+            gatewaysEnabled: false, basePrice: 15m, fee: 0.75m));
     }
 
     [Fact]
     public void Applies_GatewaysEnabled_IsFalse()
     {
         Assert.False(ManualPlatformFee.Applies(
-            gatewaysEnabled: true, isFutsal: true, basePrice: 15m, manualFee: 0.75m));
-    }
-
-    [Fact]
-    public void Applies_NonFutsal_IsFalse()
-    {
-        Assert.False(ManualPlatformFee.Applies(
-            gatewaysEnabled: false, isFutsal: false, basePrice: 15m, manualFee: 0.75m));
+            gatewaysEnabled: true, basePrice: 15m, fee: 0.75m));
     }
 
     [Fact]
     public void Applies_FreeMatch_IsFalse()
     {
         Assert.False(ManualPlatformFee.Applies(
-            gatewaysEnabled: false, isFutsal: true, basePrice: 0m, manualFee: 0.75m));
+            gatewaysEnabled: false, basePrice: 0m, fee: 0.75m));
     }
 
     [Fact]
     public void Applies_FeeNotConfigured_IsFalse()
     {
         Assert.False(ManualPlatformFee.Applies(
-            gatewaysEnabled: false, isFutsal: true, basePrice: 15m, manualFee: 0m));
+            gatewaysEnabled: false, basePrice: 15m, fee: 0m));
     }
 
     [Fact]
     public void TotalToPay_WhenFeeApplies_AddsFeeOnTop()
     {
         var total = ManualPlatformFee.TotalToPay(
-            gatewaysEnabled: false, isFutsal: true, basePrice: 15m, manualFee: 0.75m);
+            gatewaysEnabled: false, basePrice: 15m, fee: 0.75m);
 
         Assert.Equal(15.75m, total);
     }
@@ -58,7 +51,7 @@ public class ManualPlatformFeeTests
     public void TotalToPay_WhenFeeDoesNotApply_IsBasePrice()
     {
         var total = ManualPlatformFee.TotalToPay(
-            gatewaysEnabled: false, isFutsal: false, basePrice: 15m, manualFee: 0.75m);
+            gatewaysEnabled: true, basePrice: 15m, fee: 0.75m);
 
         Assert.Equal(15m, total);
     }
@@ -67,7 +60,7 @@ public class ManualPlatformFeeTests
     public void PixPayload_EncodesTheSameTotalShownToThePlayer()
     {
         var total = ManualPlatformFee.TotalToPay(
-            gatewaysEnabled: false, isFutsal: true, basePrice: 15m, manualFee: 0.75m);
+            gatewaysEnabled: false, basePrice: 15m, fee: 0.75m);
 
         var payload = EventPaymentService.BuildPixStaticPayload("pix@org", "Racha", "Sao Paulo", total);
 

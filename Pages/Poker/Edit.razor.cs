@@ -5,6 +5,7 @@ using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Events;
+using Confirmai.Services.Payment;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +57,9 @@ public partial class Edit
         [Range(0, 1000000, ErrorMessage = "Valor inválido.")]
         public decimal BuyInAmount { get; set; } = 0;
 
+        [Range(0, 100, ErrorMessage = "Taxa inválida.")]
+        public decimal PlatformFeePercent { get; set; }
+
         public decimal? GTD               { get; set; }
         public decimal? RebuyAmount       { get; set; }
         public decimal? RebuyDoubleAmount { get; set; }
@@ -73,6 +77,8 @@ public partial class Edit
 
     private EditPokerEventForm form              = new();
     private PokerEventType     eventType         = PokerEventType.Tournament;
+    private decimal            feePercentMin;
+    private decimal            feePercentMax;
     private string?            currentHomeGameCode;
     private bool               isLoading         = true;
     private bool               notFound          = false;
@@ -108,6 +114,8 @@ public partial class Edit
 
         eventType         = ev.PokerEventType ?? PokerEventType.Tournament;
         currentHomeGameCode = ev.HomeGameCode;
+        feePercentMin     = FeePolicy.PokerFeePercentMin;
+        feePercentMax     = FeePolicy.PokerFeePercentMax;
 
         var startsLocal = ev.StartsAt.ToLocalTime();
         form = new EditPokerEventForm
@@ -124,6 +132,8 @@ public partial class Edit
             InitialBlindBB = ev.InitialBlindBB ?? 50,
             MaxPlayers    = ev.MaxPlayers,
             BuyInAmount   = ev.BuyInAmount ?? 0,
+            // C39-A (D3): evento antigo sem % abre no minimo da faixa.
+            PlatformFeePercent = ev.PlatformFeePercent ?? FeePolicy.PokerFeePercentMin,
             GTD           = ev.GTD,
             RebuyAmount   = ev.RebuyAmount,
             RebuyDoubleAmount = ev.RebuyDoubleAmount,
@@ -162,11 +172,40 @@ public partial class Edit
 
             var ev = await db.Events
                 .Include(e => e.Group)
+                    .ThenInclude(g => g.Members)
+                        .ThenInclude(m => m.User)
+                .Include(e => e.Confirmations)
                 .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Poker);
 
             if (ev is null || !EventCancellationService.CanManage(ev, userId, auth.User.IsInRole("admin")))
             {
                 saveError = Ui["Poker.AccessDenied"];
+                isSaving  = false;
+                return;
+            }
+
+            // C39-A F4 (a): subir o buy-in exige recebedor do grupo — mesmo
+            // bypass fechado no futsal pela review do C38.
+            if (eventType == PokerEventType.Tournament
+                && form.BuyInAmount > 0
+                && form.BuyInAmount != (ev.BuyInAmount ?? 0)
+                && !EventPaymentService.GroupCanCharge(ev.Group))
+            {
+                saveError = Ui["Poker.Edit.PixRequired"];
+                isSaving  = false;
+                return;
+            }
+
+            // C39-A F4 (b): com alguem que ja pagou ou enviou comprovante, o
+            // anuncio do valor fica congelado — mudar buy-in ou % mudaria a
+            // divida de quem ja quitou (o carimbo protege o historico, mas o
+            // valor anunciado nao pode virar outra coisa).
+            if (eventType == PokerEventType.Tournament
+                && (form.BuyInAmount != (ev.BuyInAmount ?? 0)
+                    || form.PlatformFeePercent != (ev.PlatformFeePercent ?? 0))
+                && ev.Confirmations.Any(c => c.HasPaid || c.PixProofUploadedAt != null))
+            {
+                saveError = Ui["Poker.Edit.PriceLockedPaid"];
                 isSaving  = false;
                 return;
             }
@@ -194,11 +233,20 @@ public partial class Edit
             switch (eventType)
             {
                 case PokerEventType.Tournament:
+                    // C39-A F3 (D3): o service-side recusa % fora da faixa.
+                    if (form.BuyInAmount > 0 && !FeePolicy.IsPokerFeePercentInRange(form.PlatformFeePercent))
+                    {
+                        saveError = Ui.Get("Poker.Create.FeePercentOutOfRange", feePercentMin, feePercentMax);
+                        isSaving  = false;
+                        return;
+                    }
                     ev.Modality        = form.Modality;
                     ev.StartingStack   = form.StartingStack;
                     ev.InitialBlindBB  = form.InitialBlindBB;
                     ev.MaxPlayers      = form.MaxPlayers;
                     ev.BuyInAmount     = form.BuyInAmount;
+                    ev.Price           = form.BuyInAmount > 0 ? form.BuyInAmount : null;
+                    ev.PlatformFeePercent = form.BuyInAmount > 0 ? form.PlatformFeePercent : null;
                     ev.GTD             = form.GTD;
                     ev.RebuyAmount     = form.RebuyAmount;
                     ev.RebuyDoubleAmount = form.RebuyDoubleAmount;

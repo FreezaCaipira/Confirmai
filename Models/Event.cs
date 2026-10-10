@@ -48,6 +48,16 @@ namespace Confirmai.Models
         /// <summary>Valor cobrado por jogador (R$)</summary>
         public decimal? Price { get; set; }
 
+        /// <summary>
+        /// C39-A: taxa da plataforma em % da entrada para torneios de poker
+        /// (0-100, 2 casas). Null = taxa fixa do futsal / sem taxa percentual.
+        /// O valor carregado fica carimbado na confirmacao (PlatformFeeAmount).
+        /// </summary>
+        public decimal? PlatformFeePercent { get; set; }
+
+        /// <summary>C39-B: mesas/faixas de preco do cash game.</summary>
+        public ICollection<EventPriceOption> PriceOptions { get; set; } = new List<EventPriceOption>();
+
         /// <summary>Se gerado por periodicidade, referência ao schedule de origem</summary>
         public int? RachaScheduleId { get; set; }
         public MatchSchedule? RachaSchedule { get; set; }
