@@ -181,7 +181,7 @@ public class C39TournamentFeeE2ETests
         Assert.Equal(200m, conf.ChargedPrice);
         Assert.Equal(0m, conf.PlatformFeeAmount); // isencao carimbada, nao pulada
 
-        var total = ManualPlatformFee.TotalToPay(false, 200m, conf.PlatformFeeAmount.Value);
+        var total = ManualPlatformFee.TotalToPay(false, 200m, conf.PlatformFeeAmount!.Value);
         Assert.Equal(200m, total); // jogador paga so a entrada
     }
 

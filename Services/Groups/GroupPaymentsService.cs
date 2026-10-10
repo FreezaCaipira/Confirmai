@@ -299,7 +299,7 @@ public sealed class GroupPaymentsService
             // History shows what was actually charged: the stamped fee snapshot when
             // it exists (a waiver granted later must not rewrite past charges).
             var amount = TotalToPay(EventCharge.PriceOf(c) ?? 0, c.ConfirmedAt, c.PlatformFeeAmount, c.Event?.PlatformFeePercent);
-            return new PaymentHistoryEntry(userName, c.Event.StartsAt, amount, href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
+            return new PaymentHistoryEntry(userName, c.Event!.StartsAt, amount, href, adminName, c.MarkedPaidAt!.Value, c.Id, c.PixProofImageData != null && c.PixProofImageData.Length > 0);
         }).ToList();
 
         var pendingProofs = await db.EventConfirmations
