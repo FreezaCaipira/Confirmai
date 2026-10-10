@@ -144,7 +144,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
-0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [PLANEJADO -- aguarda D3/D4 do Robson]** -- ver secao "Ciclo 39". 2 PRs (torneio, depois cash). Fecha tambem lista de espera que paga e cancelamento de inscricao paga.
+0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [PLANEJADO -- liberado]** -- ver secao "Ciclo 39". 3 PRs (torneio, cash, parceria). Fecha tambem lista de espera que paga e cancelamento de inscricao paga.
 0. **C38 (Pleno) -- achados do testador externo em prod [CONCLUIDO -- PR #144, review do Senior com 1 correcao (#145: edicao do futsal checa Pix)]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
@@ -157,7 +157,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
    - **hero (Fase 7 do C36-B)**: texto do Robson + enfeite proposto pelo Senior -- landing deslogada com padrao de icones de varios esportes (Font Awesome, traco branco ~10% sobre o azul, sem cor por esporte, AA mantido); hero logado com marca d'agua do esporte da proxima partida (sem partida -> padrao misto). Opcoes de texto ja enviadas ao Robson (favorita do Senior: "Bora jogar? A gente cuida da lista e do Pix.").
 6. **V2 Pix automatico** -- depois do go-live e das pendencias Efi/fiscal.
 
-**Decisoes pendentes do Robson**: D3 (quem define o % da taxa do poker) e D4 (taxa somada ou descontada da entrada) do C39 -- a trava de Pix do poker **fica** (decisao do Robson pos-#145); Fase 0 da Evolution (servico + chip); remover ou manter as telas legadas fora do fluxo (`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration` -- Senior recomenda remover); texto do hero (so na lapidacao visual).
+**Decisoes pendentes do Robson**: a faixa da taxa do poker (`FeeOptions__PokerFeePercentMin`/`Max`) no EasyPanel antes do deploy do C39-A -- a trava de Pix do poker **fica** (decisao do Robson pos-#145); Fase 0 da Evolution (servico + chip); remover ou manter as telas legadas fora do fluxo (`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration` -- Senior recomenda remover); texto do hero (so na lapidacao visual).
 
 **Higiene de repo (Robson, opcional)**: branches mergeadas sobrando no remoto (`feat/ciclo36d-fase*`, `feat/ciclo36c-pagamentos-grupo`, `docs/review-c36c`, `refactor/*`, `feature/*` antigas).
 
@@ -205,7 +205,7 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
-## Ciclo 39 (Pleno) -- Poker cobra pelo app (torneio + cash) com taxa percentual por evento [PLANEJADO -- aguarda 2 decisoes do Robson (D3, D4)]
+## Ciclo 39 (Pleno) -- Poker cobra pelo app (torneio + cash) com taxa percentual por evento [PLANEJADO -- decisoes fechadas, liberado para o Pleno]
 
 Decisoes do Robson (pos-#145/#146):
 - **manter a trava de Pix do C38 e fazer o poker cobrar pelo app**;
@@ -247,7 +247,14 @@ Hoje o poker nunca grava `Event.Price`, e todo o caminho do dinheiro (`EventPaym
   futsal -> taxa fixa de hoje (inalterado); poker -> `Math.Round(price * pct / 100, 2, MidpointRounding.AwayFromZero)`;
   isencao do grupo -> 0 (carimbada, como hoje); gateways ligados ou preco 0 -> null. `ManualPlatformFee.Applies` deixa de receber
   `isFutsal` e passa a olhar o carimbo/esporte pela mesma regra; `ShouldShowPlatformFeeTab` vale para futsal e poker.
-- Jogador paga **entrada + taxa** (igual ao futsal: o organizador recebe a entrada cheia, a taxa vai para o repasse) -- ver D4.
+- Faixa da taxa do poker (D3): `FeeOptions.PokerFeePercentMin`/`PokerFeePercentMax` (env vars, so o admin do sistema muda).
+  O formulario abre no minimo; o **service** recusa % fora da faixa (nao so a tela). Validacao de startup: `0 <= Min <= Max <= 100`.
+- Jogador paga **entrada + taxa** por padrao (D4). **Parceria (D4):** `Group.PartnerFeeSharePercent` (`decimal`, 0-100, default 0),
+  editavel **so pelo admin do sistema** (tela de admin do grupo, auditado): parte da taxa que a casa parceira absorve.
+  A taxa carimbada (`PlatformFeeAmount`) e o repasse **nao mudam** -- o organizador sempre deve a taxa inteira; muda so quanto o
+  jogador paga: `total = preco + taxa * (1 - share/100)`. A parte do jogador e carimbada na confirmacao
+  (`EventConfirmation.PlayerFeeAmount`, `decimal?`; null = legado = taxa inteira) para a parceria nova nao mudar QR ja gerado.
+  0 = somada (padrao), 100 = descontada da entrada, 50 = dividida.
 
 ### Fases (TDD: teste primeiro em todas; 2 PRs)
 
@@ -280,7 +287,13 @@ Hoje o poker nunca grava `Event.Price`, e todo o caminho do dinheiro (`EventPaym
 - **F10 -- `Poker/Edit` do cash**: mesmas guardas da F4 por mesa (nao muda preco/% de mesa com pagamento; nao apaga mesa com
   confirmacao -- desativa).
 
-**Os dois PRs**
+**PR 3 -- parceria (C39-C, pequeno, depois do PR 2)**
+- **F12 -- `PartnerFeeSharePercent`.** Migration (`Group.PartnerFeeSharePercent`, `EventConfirmation.PlayerFeeAmount`), campo na
+  tela de admin do sistema (organizador nao ve nem edita -- teste de authz no service), carimbo da parte do jogador na
+  confirmacao e `ManualPlatformFee.TotalToPay` lendo o carimbo. Testes: share 0/50/100 -> QR de 110/105/100 numa entrada de 100
+  com 10%; taxa acumulada e repasse iguais nos 3 casos; mudar a parceria nao altera confirmacao ja carimbada.
+
+**Os tres PRs**
 - **F11 -- textos e docs.** Chaves PT/EN/ES (`I18nKeyParityTests`); `docs/uml/casos-de-uso.md` (UCs de pagar torneio/cash e
   configurar taxa), `docs/uml/sequencia-pagamento-manual.md` (taxa fixa x %), `docs/guia-do-usuario.md` (o que o poker cobra e
   o que fica na mesa) e `production-checklist.md` se surgir config nova.
@@ -300,11 +313,13 @@ na aba do grupo; jogador na espera nao ve "Pagar"; cash com 2 mesas -> jogador e
 
 - D1 (**decidido**): taxa do poker = % da entrada, por torneio.
 - D2 (**decidido**): cash cobra pelo app, preco e taxa por mesa/faixa.
-- **D3 -- quem define o % da taxa?** Senior: **o organizador escolhe dentro de uma faixa que so o admin do sistema define**
+- D3 (**decidido**): o organizador escolhe o % dentro de uma faixa que so o admin do sistema define; formulario abre no minimo.
+- D4 (**decidido**): taxa somada a entrada, salvo casa parceira com divisao combinada (F12, configurada so pelo admin do sistema).
+- Historico das opcoes -- D3: Senior recomendou **o organizador escolhe dentro de uma faixa que so o admin do sistema define**
   (`FeeOptions.PokerFeePercentMin`/`Max`, ex. 3%-10%; o formulario ja vem no minimo). O organizador ajusta por evento sem depender
   de voce, e a plataforma nunca recebe menos que o piso. Alternativa: so o admin do sistema define o % de cada evento (controle total,
   mas cada torneio novo espera voce).
-- **D4 -- a taxa e somada a entrada ou descontada dela?** Senior: **somada** (jogador paga R$ 100 + 10%), igual ao futsal hoje --
+- Historico -- D4: Senior: **somada** (jogador paga R$ 100 + 10%), igual ao futsal hoje --
   o organizador recebe a entrada cheia e o fluxo de repasse nao muda. Descontada (jogador paga R$ 100, organizador fica com R$ 90)
   mudaria o repasse e o que o organizador ve como recebido.
 
