@@ -248,26 +248,55 @@
                 @if (eventType == PokerEventType.CashGame)
                 {
                     <fieldset class="form-section">
-                        <legend>@Ui["Poker.Stacks"]</legend>
+                        <legend>@Ui["Poker.CashTables"]</legend>
+                        <small class="form-hint">@Ui["Poker.CashTablesHint"]</small>
 
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label>@Ui["Poker.StackMin"] <span class="required">*</span></label>
-                                <div class="input-prefix-wrap">
-                                    <span class="input-prefix">R$</span>
-                                    <InputNumber class="input" @bind-Value="form.CashMinBuyIn" min="0" step="50" />
+                        @* C39-B F10: mesa com inscrito nao apaga (desativa);
+                           mesa com pago/comprovante tem preco e % congelados. *@
+                        @foreach (var t in form.CashTables)
+                        {
+                            var locked = t.Id is int lid && lockedTableIds.Contains(lid);
+                            var used   = t.Id is int uid && usedTableIds.Contains(uid);
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label>@Ui["Poker.TableLabel"]</label>
+                                    <input class="input" @bind="t.Label" maxlength="60" />
                                 </div>
-                                <ValidationMessage For="@(() => form.CashMinBuyIn)" class="validation-message" />
+                                <div class="form-group">
+                                    <label>@Ui["Poker.TablePrice"]</label>
+                                    <div class="input-prefix-wrap">
+                                        <span class="input-prefix">R$</span>
+                                        <InputNumber class="input" @bind-Value="t.Price" min="0" step="50" disabled="@locked" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>@Ui["Poker.TableFeePercent"]</label>
+                                    <InputNumber class="input" @bind-Value="t.FeePercent" min="@feePercentMin" max="@feePercentMax" step="0.5" disabled="@locked" />
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>@Ui["Poker.StackMax"] <span class="required">*</span></label>
-                                <div class="input-prefix-wrap">
-                                    <span class="input-prefix">R$</span>
-                                    <InputNumber class="input" @bind-Value="form.CashMaxBuyIn" min="0" step="50" />
-                                </div>
-                                <ValidationMessage For="@(() => form.CashMaxBuyIn)" class="validation-message" />
+                                @if (used)
+                                {
+                                    <label class="switch-label">
+                                        <input type="checkbox" @bind="t.IsActive" /> @Ui["Poker.TableActive"]
+                                    </label>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary" type="button" @onclick="() => form.CashTables.Remove(t)">
+                                        @Ui["Poker.RemoveTable"]
+                                    </button>
+                                }
+                                @if (locked)
+                                {
+                                    <small class="form-hint">@Ui["Poker.TableHasPaid"] — @Ui["Poker.Edit.PriceLockedPaid"]</small>
+                                }
                             </div>
-                        </div>
+                        }
+
+                        <button class="btn btn-secondary" type="button" @onclick="AddCashTable">
+                            <i class="fas fa-plus"></i> @Ui["Poker.AddTable"]
+                        </button>
 
                         <div class="form-group">
                             <label>@Ui["Poker.CashIncludes"]</label>

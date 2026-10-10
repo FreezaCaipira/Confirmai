@@ -37,6 +37,30 @@ public class C39PokerEditGuardsTests
         Assert.Contains("PixProofUploadedAt", code);
     }
 
+    [Fact]
+    public void PokerEdit_CashTables_ValidateEApplyAntesDeSalvar()
+    {
+        var code = File.ReadAllText(Path.Combine(RepoRoot(), "Pages", "Poker", "Edit.razor.cs"));
+        var validate = code.IndexOf("CashTableEdit.Validate", StringComparison.Ordinal);
+        var apply = code.IndexOf("CashTableEdit.Apply", StringComparison.Ordinal);
+        var save = code.IndexOf("await db.SaveChangesAsync()", StringComparison.Ordinal);
+        Assert.True(validate > 0, "Poker/Edit precisa validar o diff das mesas (rotulo/preco/%/congelo)");
+        Assert.True(apply > 0, "Poker/Edit precisa aplicar o diff das mesas via CashTableEdit.Apply");
+        Assert.True(validate < apply && apply < save, "validacao -> diff -> recarimbo -> SaveChanges, nessa ordem");
+        // recarimbo por mesa so dos devedores
+        Assert.Contains("RestampUnpaidForTable", code);
+    }
+
+    [Fact]
+    public void PokerEdit_NaoReduzMaxPlayersAbaixoDosPagos()
+    {
+        var code = File.ReadAllText(Path.Combine(RepoRoot(), "Pages", "Poker", "Edit.razor.cs"));
+        var guard = code.IndexOf("Poker.Edit.MaxPlayersBelowPaid", StringComparison.Ordinal);
+        var save = code.IndexOf("await db.SaveChangesAsync()", StringComparison.Ordinal);
+        Assert.True(guard > 0, "Poker/Edit precisa impedir MaxPlayers abaixo dos pagos");
+        Assert.True(guard < save, "a guarda de MaxPlayers precisa vir antes do SaveChanges");
+    }
+
     private static string RepoRoot()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);

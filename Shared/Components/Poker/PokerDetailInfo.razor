@@ -90,7 +90,7 @@
     else if (Ev.PokerEventType == PokerEventType.CashGame)
     {
         <section class="detail-section">
-            <h2 class="detail-section-title">Stacks</h2>
+            <h2 class="detail-section-title">@(Ev.PriceOptions.Any() ? Ui["Poker.CashTables"] : "Stacks")</h2>
             <div class="poker-details-grid">
                 @if (Ev.Modality.HasValue)
                 {
@@ -99,19 +99,33 @@
                         <span class="poker-detail-value">@ModalityLabel(Ev.Modality.Value)</span>
                     </div>
                 }
-                @if (Ev.CashMinBuyIn.HasValue)
+                @if (Ev.PriceOptions.Any(o => o.IsActive))
                 {
-                    <div class="poker-detail-item">
-                        <span class="poker-detail-label">@Ui["Poker.StackMinShort"]</span>
-                        <span class="poker-detail-value poker-detail-value--price">R$ @Ev.CashMinBuyIn.Value.ToString("N2")</span>
-                    </div>
+                    @foreach (var t in Ev.PriceOptions.Where(o => o.IsActive).OrderBy(o => o.SortOrder))
+                    {
+                        <div class="poker-detail-item">
+                            <span class="poker-detail-label">@t.Label</span>
+                            <span class="poker-detail-value poker-detail-value--price">R$ @t.Price.ToString("N2")</span>
+                        </div>
+                    }
                 }
-                @if (Ev.CashMaxBuyIn.HasValue)
+                else
                 {
-                    <div class="poker-detail-item">
-                        <span class="poker-detail-label">@Ui["Poker.StackMaxShort"]</span>
-                        <span class="poker-detail-value poker-detail-value--price">R$ @Ev.CashMaxBuyIn.Value.ToString("N2")</span>
-                    </div>
+                    @* Legado pre-C39-B: cash sem mesas mostra a faixa de stacks. *@
+                    @if (Ev.CashMinBuyIn.HasValue)
+                    {
+                        <div class="poker-detail-item">
+                            <span class="poker-detail-label">@Ui["Poker.StackMinShort"]</span>
+                            <span class="poker-detail-value poker-detail-value--price">R$ @Ev.CashMinBuyIn.Value.ToString("N2")</span>
+                        </div>
+                    }
+                    @if (Ev.CashMaxBuyIn.HasValue)
+                    {
+                        <div class="poker-detail-item">
+                            <span class="poker-detail-label">@Ui["Poker.StackMaxShort"]</span>
+                            <span class="poker-detail-value poker-detail-value--price">R$ @Ev.CashMaxBuyIn.Value.ToString("N2")</span>
+                        </div>
+                    }
                 }
             </div>
             @if (!string.IsNullOrWhiteSpace(Ev.CashIncludes))

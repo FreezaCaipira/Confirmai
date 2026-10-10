@@ -24,6 +24,9 @@ public sealed class PokerCreateInitData
 
 public sealed record PokerCreateResult(bool Success, string? Error, string? CollisionHref, int? EventId);
 
+/// <summary>C39-B: mesa/faixa de preco de um cash game vinda do formulario.</summary>
+public sealed record CashTableInput(string Label, decimal Price, decimal PlatformFeePercent);
+
 public sealed class PokerCreateService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
@@ -88,12 +91,15 @@ public sealed class PokerCreateService
         };
     }
 
-    /// <summary>Valor anunciado do evento: buy-in do torneio, stack minimo do
-    /// cash game; home game nunca cobra.</summary>
+    /// <summary>Valor anunciado do evento: buy-in do torneio, maior preco de
+    /// mesa do cash game (legado sem mesas cai para o stack minimo); home
+    /// game nunca cobra.</summary>
     private static decimal ChargedAmount(PokerCreateFormData form) => form.EventType switch
     {
         PokerEventType.Tournament => form.BuyInAmount,
-        PokerEventType.CashGame   => form.CashMinBuyIn,
+        PokerEventType.CashGame   => Math.Max(
+            form.CashTables.Count > 0 ? form.CashTables.Max(t => t.Price) : 0m,
+            form.CashMinBuyIn),
         _ => 0,
     };
 
@@ -131,6 +137,23 @@ public sealed class PokerCreateService
                 _ui.Get("Poker.Create.FeePercentOutOfRange",
                     _feePolicy.PokerFeePercentMin, _feePolicy.PokerFeePercentMax),
                 null, null);
+        }
+
+        // C39-B F8: mesas do cash — rotulo obrigatorio e % de cada mesa
+        // dentro da mesma faixa do torneio. Validado antes de persistir.
+        if (form.EventType == PokerEventType.CashGame)
+        {
+            if (form.CashTables.Any(t => string.IsNullOrWhiteSpace(t.Label)))
+                return new(false, _ui["Poker.Create.TableLabelRequired"], null, null);
+            if (form.CashTables.Any(t => t.Price < 0m))
+                return new(false, _ui["Poker.Create.TablePriceInvalid"], null, null);
+            if (form.CashTables.Any(t => t.Price > 0m && !_feePolicy.IsPokerFeePercentInRange(t.PlatformFeePercent)))
+            {
+                return new(false,
+                    _ui.Get("Poker.Create.FeePercentOutOfRange",
+                        _feePolicy.PokerFeePercentMin, _feePolicy.PokerFeePercentMax),
+                    null, null);
+            }
         }
 
         if (ChargedAmount(form) > 0 && !(existingGroup?.EnablePaymentGateways ?? false))
@@ -210,8 +233,31 @@ public sealed class PokerCreateService
                         form.LateRegDate.Value.ToDateTime(form.LateRegTime.Value), DateTimeKind.Utc);
                 break;
             case PokerEventType.CashGame:
-                ev.CashMinBuyIn = form.CashMinBuyIn;
-                ev.CashMaxBuyIn = form.CashMaxBuyIn;
+                // C39-B F8: o cash cobra por mesa (EventPriceOption); sem mesas
+                // o evento segue sem cobranca pelo app. CashMin/CashMax viram
+                // informativos derivados das mesas quando elas existem.
+                if (form.CashTables.Count > 0)
+                {
+                    var sort = 0;
+                    foreach (var t in form.CashTables)
+                    {
+                        ev.PriceOptions.Add(new EventPriceOption
+                        {
+                            Label = t.Label.Trim(),
+                            Price = t.Price,
+                            PlatformFeePercent = t.PlatformFeePercent,
+                            SortOrder = sort++,
+                            IsActive = true,
+                        });
+                    }
+                    ev.CashMinBuyIn = form.CashTables.Min(t => t.Price);
+                    ev.CashMaxBuyIn = form.CashTables.Max(t => t.Price);
+                }
+                else
+                {
+                    ev.CashMinBuyIn = form.CashMinBuyIn;
+                    ev.CashMaxBuyIn = form.CashMaxBuyIn;
+                }
                 ev.CashIncludes = form.CashIncludes;
                 break;
             case PokerEventType.HomeGame:
@@ -258,6 +304,10 @@ public sealed class PokerCreateFormData
     public decimal? AddonDoubleAmount { get; set; }
     public decimal CashMinBuyIn { get; set; }
     public decimal CashMaxBuyIn { get; set; }
+
+    /// <summary>C39-B: mesas do cash game (rotulo, preco, % da taxa).</summary>
+    public List<CashTableInput> CashTables { get; set; } = new();
+
     public string? CashIncludes { get; set; }
     public bool IsPrivate { get; set; } = true;
 }
