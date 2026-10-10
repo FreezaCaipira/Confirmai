@@ -198,6 +198,46 @@ public class C39PokerDetailServiceTests
     }
 
     [Fact]
+    public async Task CancelAsync_Blocked_WhenPaid()
+    {
+        var (factory, svc) = Setup();
+        var eventId = await SeedEventAsync(factory);
+        await svc.ConfirmAsync(eventId, "player-1");
+        await using (var db = factory.CreateDbContext())
+        {
+            var conf = await db.EventConfirmations.SingleAsync();
+            conf.HasPaid = true;
+            conf.PaymentStatus = EventConfirmationPaymentStatus.Paid;
+            await db.SaveChangesAsync();
+        }
+
+        var result = await svc.CancelAsync(eventId, "player-1");
+
+        Assert.Equal(PokerCancelStatus.PaidOrProofSent, result.Status);
+        await using var check = factory.CreateDbContext();
+        Assert.Equal(1, await check.EventConfirmations.CountAsync());
+    }
+
+    [Fact]
+    public async Task CancelAsync_Blocked_WhenProofSent()
+    {
+        var (factory, svc) = Setup();
+        var eventId = await SeedEventAsync(factory);
+        await svc.ConfirmAsync(eventId, "player-1");
+        await using (var db = factory.CreateDbContext())
+        {
+            var conf = await db.EventConfirmations.SingleAsync();
+            conf.PixProofUploadedAt = DateTime.UtcNow;
+            conf.PixProofImageData = new byte[] { 1 };
+            await db.SaveChangesAsync();
+        }
+
+        var result = await svc.CancelAsync(eventId, "player-1");
+
+        Assert.Equal(PokerCancelStatus.PaidOrProofSent, result.Status);
+    }
+
+    [Fact]
     public async Task CancelAsync_NotRegistered_IsNoop()
     {
         var (factory, svc) = Setup();

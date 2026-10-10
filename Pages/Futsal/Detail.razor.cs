@@ -104,7 +104,9 @@ public partial class Detail
     {
         if (currentUserId is null) return;
         actionError = string.Empty;
-        await EventDetailSvc.CancelConfirmationAsync(Id, currentUserId);
+        // C39-A F6: false = pago ou comprovante enviado — nao cancela sozinho.
+        var cancelled = await EventDetailSvc.CancelConfirmationAsync(Id, currentUserId);
+        if (!cancelled) actionError = Ui["Futsal.CancelPaidBlocked"];
         confirmCancel = false;
         await LoadEvent();
     }

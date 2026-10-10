@@ -195,18 +195,26 @@ public class EventDetailService
         }
     }
 
-    public async Task CancelConfirmationAsync(int eventId, string userId)
+    /// <summary>
+    /// Cancelamento pelo proprio jogador. C39-A F6: confirmacao paga ou com
+    /// comprovante enviado nao pode ser apagada pelo jogador — o pagamento
+    /// sumiria do controle do organizador. A remocao por admin segue em
+    /// <see cref="AdminRemoveConfirmationAsync"/> (auditada). Devolve false
+    /// quando bloqueado para a tela exibir o motivo.
+    /// </summary>
+    public async Task<bool> CancelConfirmationAsync(int eventId, string userId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
         var conf = await db.EventConfirmations
             .FirstOrDefaultAsync(c => c.EventId == eventId && c.UserId == userId);
-        if (conf is not null)
-        {
-            var position = conf.Position ?? FutsalPosition.Outfield;
-            db.EventConfirmations.Remove(conf);
-            await db.SaveChangesAsync();
-            await PromoteFromWaitlistAsync(db, eventId, position);
-        }
+        if (conf is null) return true;
+        if (conf.HasPaid || conf.PixProofUploadedAt is not null) return false;
+
+        var position = conf.Position ?? FutsalPosition.Outfield;
+        db.EventConfirmations.Remove(conf);
+        await db.SaveChangesAsync();
+        await PromoteFromWaitlistAsync(db, eventId, position);
+        return true;
     }
 
     public async Task LeaveWaitlistAsync(int eventId, string userId)
