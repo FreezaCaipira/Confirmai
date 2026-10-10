@@ -30,9 +30,9 @@
         @if (!IsPast)
         {
             <p class="my-conf-meta">📍 @Confirmation.Event.Location &nbsp;·&nbsp; 👥 @Confirmation.Event.Confirmations.Count @Ui["Index.ConfirmedCount"]</p>
-            @if (Confirmation.Event.Price.HasValue && Confirmation.Event.Price.Value > 0)
+            @if (Price is > 0)
             {
-                <p class="my-conf-meta my-conf-price">💰 R$ @Confirmation.Event.Price.Value.ToString("F2")</p>
+                <p class="my-conf-meta my-conf-price">💰 R$ @Price.Value.ToString("F2")</p>
             }
             @if (Confirmation.PaymentStatus != EventConfirmationPaymentStatus.Pending)
             {
@@ -81,8 +81,10 @@
 
     // The card belongs to the signed-in player, so it may surface their own
     // unpaid priced confirmation — goalkeepers and free events never pay.
+    private decimal? Price => EventCharge.PriceOf(Confirmation);
+
     private bool OwesPayment => !IsCancelled &&
-        Confirmation.Event.Price.HasValue && Confirmation.Event.Price.Value > 0 &&
+        Price is > 0 &&
         Confirmation.PaymentStatus == EventConfirmationPaymentStatus.Pending &&
         !Confirmation.HasPaid &&
         Confirmation.Position != FutsalPosition.Goalkeeper;

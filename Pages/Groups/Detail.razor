@@ -197,7 +197,7 @@ else
                             : $"/poker/{nextEvent.Id}";
                         var owes = myConfirmation is not null && !myConfirmation.HasPaid
                             && myConfirmation.PaymentStatus == EventConfirmationPaymentStatus.Pending
-                            && nextEvent.Price.HasValue && nextEvent.Price.Value > 0
+                            && (myConfirmation.ChargedPrice ?? nextEvent.Price) is > 0
                             && myConfirmation.Position != FutsalPosition.Goalkeeper;
                         var proofSent = owes && myConfirmation!.PixProofUploadedAt is not null;
                         <div class="event-row">

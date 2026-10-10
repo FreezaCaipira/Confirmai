@@ -169,7 +169,7 @@
                             GroupGatewaysEnabled="@groupGatewaysEnabled"
                             IsGenerating="@(payState == PayState.Generating)"
                             ErrorMsg="@errorMsg"
-                            Price="@(ev.Price!.Value)"
+                            Price="@(conf is null ? 0m : EventCharge.PriceOf(conf) ?? 0m)"
                             SelectedGatewayDisplayName="@GetSelectedGatewayDisplayName()"
                             OnSelectGateway="@SelectGatewayCallback"
                             OnGenerateCharge="@GeneratePixChargeCallback" />
