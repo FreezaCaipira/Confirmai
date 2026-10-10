@@ -57,6 +57,24 @@ public sealed class PlatformFeePolicy
     public decimal PokerFeePercentMax => _feeOptions.Value.PokerFeePercentMax;
 
     /// <summary>
+    /// Recarimba preco e taxa das inscricoes ainda devidas (sem pagamento e sem
+    /// comprovante) com o valor atual do evento, mantendo a isencao vigente na
+    /// data de cada confirmacao. Quem ja pagou ou mandou comprovante fica com o
+    /// carimbo original. Requer <c>ev.Group</c> e <c>ev.Confirmations</c> carregadas.
+    /// </summary>
+    public void RestampUnpaid(Event ev)
+    {
+        foreach (var c in ev.Confirmations.Where(c =>
+                     !c.HasPaid
+                     && c.PixProofUploadedAt is null
+                     && c.PaymentStatus == EventConfirmationPaymentStatus.Pending))
+        {
+            c.ChargedPrice = ev.Price;
+            c.PlatformFeeAmount = ResolveStampForNewConfirmation(ev.Group, ev.Price, c.ConfirmedAt, ev.PlatformFeePercent);
+        }
+    }
+
+    /// <summary>
     /// Carimbo na criacao da confirmacao (C36-C Fase 0 — ressalva de dinheiro
     /// do C34): a taxa e resolvida UMA vez, aqui. QR, resumo do organizador e
     /// stamp do repasse leem o valor carimbado — a isencao concedida depois

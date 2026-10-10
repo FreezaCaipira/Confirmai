@@ -184,11 +184,16 @@ public partial class Edit
                 return;
             }
 
-            // C39-A F4 (a): subir o buy-in exige recebedor do grupo — mesmo
-            // bypass fechado no futsal pela review do C38.
-            if (eventType == PokerEventType.Tournament
-                && form.BuyInAmount > 0
-                && form.BuyInAmount != (ev.BuyInAmount ?? 0)
+            var isTournament = eventType == PokerEventType.Tournament;
+            var newPrice = isTournament ? EventCharge.TournamentPrice(ev, form.BuyInAmount) : ev.Price;
+            var newFeePercent = isTournament
+                ? (newPrice is > 0 ? form.PlatformFeePercent : (decimal?)null)
+                : ev.PlatformFeePercent;
+            var chargeChanged = newPrice != ev.Price || newFeePercent != ev.PlatformFeePercent;
+
+            // C39-A F4 (a): passar a cobrar ou subir o valor exige recebedor do grupo.
+            if (newPrice is > 0
+                && newPrice != ev.Price
                 && !EventPaymentService.GroupCanCharge(ev.Group))
             {
                 saveError = Ui["Poker.Edit.PixRequired"];
@@ -200,9 +205,7 @@ public partial class Edit
             // anuncio do valor fica congelado — mudar buy-in ou % mudaria a
             // divida de quem ja quitou (o carimbo protege o historico, mas o
             // valor anunciado nao pode virar outra coisa).
-            if (eventType == PokerEventType.Tournament
-                && (form.BuyInAmount != (ev.BuyInAmount ?? 0)
-                    || form.PlatformFeePercent != (ev.PlatformFeePercent ?? 0))
+            if (chargeChanged
                 && ev.Confirmations.Any(c => c.HasPaid || c.PixProofUploadedAt != null))
             {
                 saveError = Ui["Poker.Edit.PriceLockedPaid"];
@@ -234,7 +237,7 @@ public partial class Edit
             {
                 case PokerEventType.Tournament:
                     // C39-A F3 (D3): o service-side recusa % fora da faixa.
-                    if (form.BuyInAmount > 0 && !FeePolicy.IsPokerFeePercentInRange(form.PlatformFeePercent))
+                    if (newPrice is > 0 && !FeePolicy.IsPokerFeePercentInRange(form.PlatformFeePercent))
                     {
                         saveError = Ui.Get("Poker.Create.FeePercentOutOfRange", feePercentMin, feePercentMax);
                         isSaving  = false;
@@ -245,8 +248,8 @@ public partial class Edit
                     ev.InitialBlindBB  = form.InitialBlindBB;
                     ev.MaxPlayers      = form.MaxPlayers;
                     ev.BuyInAmount     = form.BuyInAmount;
-                    ev.Price           = form.BuyInAmount > 0 ? form.BuyInAmount : null;
-                    ev.PlatformFeePercent = form.BuyInAmount > 0 ? form.PlatformFeePercent : null;
+                    ev.Price           = newPrice;
+                    ev.PlatformFeePercent = newFeePercent;
                     ev.GTD             = form.GTD;
                     ev.RebuyAmount     = form.RebuyAmount;
                     ev.RebuyDoubleAmount = form.RebuyDoubleAmount;
@@ -266,6 +269,9 @@ public partial class Edit
 
                 // HomeGame: apenas identidade e data/hora são editáveis; código mantido
             }
+
+            if (chargeChanged)
+                FeePolicy.RestampUnpaid(ev);
 
             await db.SaveChangesAsync();
             await NotificationService.NotifyEventUpdatedAsync(Id, userId!, oldStartsAt);

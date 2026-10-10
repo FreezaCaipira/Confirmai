@@ -16,6 +16,16 @@ public static class EventCharge
         => conf.ChargedPrice ?? conf.Event?.Price;
 
     /// <summary>
+    /// Preco cobrado pelo app para um torneio com o buy-in informado. Torneio
+    /// anterior ao C39 (buy-in anunciado e <see cref="Event.Price"/> nulo) segue
+    /// pago na mesa: editar a partida nao liga a cobranca de quem ja se inscreveu.
+    /// </summary>
+    public static decimal? TournamentPrice(Event ev, decimal buyIn)
+        => buyIn <= 0 || (ev.Price is null && ev.BuyInAmount.GetValueOrDefault() > 0)
+            ? null
+            : buyIn;
+
+    /// <summary>
     /// Confirmacoes que ocupam vaga, na ordem de chegada. No poker a "lista
     /// de espera" e so visual (posicao > MaxPlayers nao tem direito a pagar).
     /// </summary>
