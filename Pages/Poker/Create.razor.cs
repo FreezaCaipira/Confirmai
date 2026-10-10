@@ -64,8 +64,18 @@ public partial class Create
         [Range(0, 1000000, ErrorMessage = "Valor invalido.")]
         public decimal CashMaxBuyIn { get; set; }
 
+        /// <summary>C39-B: mesas do cash game (rotulo, preco, % da taxa).</summary>
+        public List<CashTableRow> CashTables { get; set; } = new();
+
         public string? CashIncludes { get; set; }
         public bool IsPrivate { get; set; } = true;
+    }
+
+    private sealed class CashTableRow
+    {
+        public string Label { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public decimal FeePercent { get; set; }
     }
 
     [Inject] private PokerCreateService CreateService { get; set; } = default!;
@@ -125,7 +135,7 @@ public partial class Create
         feePercentMin = data.FeePercentMin;
         feePercentMax = data.FeePercentMax;
         form.PlatformFeePercent = data.FeePercentMin;
-        if (GroupNeedsPix) { form.BuyInAmount = 0; form.CashMinBuyIn = 0; form.CashMaxBuyIn = 0; }
+        if (GroupNeedsPix) { form.BuyInAmount = 0; form.CashTables.Clear(); }
         form.Name = preselectedGroup.Name;
         form.City = preselectedGroup.City;
         form.StateCode = preselectedGroup.StateCode;
@@ -164,6 +174,9 @@ public partial class Create
                 AddonDoubleAmount = form.AddonDoubleAmount,
                 CashMinBuyIn = form.CashMinBuyIn,
                 CashMaxBuyIn = form.CashMaxBuyIn,
+                CashTables = form.CashTables
+                    .Select(t => new CashTableInput(t.Label, t.Price, t.FeePercent))
+                    .ToList(),
                 CashIncludes = form.CashIncludes,
                 IsPrivate = form.IsPrivate,
             };
@@ -188,6 +201,9 @@ public partial class Create
             isSaving = false;
         }
     }
+
+    private void AddCashTable()
+        => form.CashTables.Add(new CashTableRow { FeePercent = feePercentMin });
 
     private void OnTimeChange(ChangeEventArgs e) =>
         form.Time = TimeOnly.TryParse(e.Value?.ToString(), out var t) ? t : new TimeOnly(19, 0);
