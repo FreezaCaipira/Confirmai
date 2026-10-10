@@ -6,6 +6,7 @@ using Confirmai.Models;
 using Confirmai.Services;
 using Confirmai.Services.Events;
 using Confirmai.Services.Payment;
+using Confirmai.Services.Poker;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -72,7 +73,19 @@ public partial class Edit
         [Range(0, 1000000, ErrorMessage = "Valor inválido.")]
         public decimal CashMaxBuyIn { get; set; } = 0;
 
+        /// <summary>C39-B F10: mesas do cash (Id nulo = mesa nova).</summary>
+        public List<EditCashTableRow> CashTables { get; set; } = new();
+
         public string? CashIncludes { get; set; }
+    }
+
+    private sealed class EditCashTableRow
+    {
+        public int? Id { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public decimal FeePercent { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 
     private EditPokerEventForm form              = new();
@@ -86,6 +99,10 @@ public partial class Edit
     private bool               isSaving          = false;
     private string             saveError         = string.Empty;
     private string?            collisionHref;
+    // C39-B F10: mesas com inscritos (nao apaga, so desativa) e com
+    // pagante/comprovante (preco e % congelados).
+    private HashSet<int>       usedTableIds      = new();
+    private HashSet<int>       lockedTableIds    = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,6 +113,9 @@ public partial class Edit
 
         var ev = await db.Events
             .Include(e => e.Group)
+            .Include(e => e.PriceOptions)
+            .Include(e => e.Confirmations)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Poker);
 
         if (ev is null)
@@ -141,8 +161,22 @@ public partial class Edit
             AddonDoubleAmount = ev.AddonDoubleAmount,
             CashMinBuyIn  = ev.CashMinBuyIn ?? 0,
             CashMaxBuyIn  = ev.CashMaxBuyIn ?? 0,
+            CashTables    = ev.PriceOptions
+                .OrderBy(o => o.SortOrder)
+                .Select(o => new EditCashTableRow
+                {
+                    Id = o.Id, Label = o.Label,
+                    Price = o.Price, FeePercent = o.PlatformFeePercent,
+                    IsActive = o.IsActive,
+                }).ToList(),
             CashIncludes  = ev.CashIncludes,
         };
+
+        usedTableIds   = ev.Confirmations.Where(c => c.PriceOptionId is not null)
+            .Select(c => c.PriceOptionId!.Value).ToHashSet();
+        lockedTableIds = ev.Confirmations
+            .Where(c => c.PriceOptionId is not null && (c.HasPaid || c.PixProofUploadedAt != null))
+            .Select(c => c.PriceOptionId!.Value).ToHashSet();
 
         if (ev.LateRegEndsAt.HasValue)
         {
@@ -153,6 +187,9 @@ public partial class Edit
 
         isLoading = false;
     }
+
+    private void AddCashTable()
+        => form.CashTables.Add(new EditCashTableRow { FeePercent = feePercentMin });
 
     private void OnTimeChange(ChangeEventArgs e)
         => form.Time = TimeOnly.TryParse(e.Value?.ToString(), out var t) ? t : form.Time;
@@ -175,6 +212,8 @@ public partial class Edit
                     .ThenInclude(g => g.Members)
                         .ThenInclude(m => m.User)
                 .Include(e => e.Confirmations)
+                .Include(e => e.PriceOptions)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Poker);
 
             if (ev is null || !EventCancellationService.CanManage(ev, userId, auth.User.IsInRole("admin")))
@@ -185,15 +224,49 @@ public partial class Edit
             }
 
             var isTournament = eventType == PokerEventType.Tournament;
+            var isCash       = eventType == PokerEventType.CashGame;
             var newPrice = isTournament ? EventCharge.TournamentPrice(ev, form.BuyInAmount) : ev.Price;
             var newFeePercent = isTournament
                 ? (newPrice is > 0 ? form.PlatformFeePercent : (decimal?)null)
                 : ev.PlatformFeePercent;
             var chargeChanged = newPrice != ev.Price || newFeePercent != ev.PlatformFeePercent;
 
+            // C39-B F10: diff das mesas validado antes de qualquer mutacao.
+            var cashRows = isCash
+                ? form.CashTables
+                    .Select(r => new CashTableFormRow(r.Id, r.Label, r.Price, r.FeePercent, r.IsActive))
+                    .ToList()
+                : new List<CashTableFormRow>();
+            if (isCash)
+            {
+                var usedOpts   = ev.Confirmations.Where(c => c.PriceOptionId is not null)
+                    .Select(c => c.PriceOptionId!.Value).ToHashSet();
+                var lockedOpts = ev.Confirmations
+                    .Where(c => c.PriceOptionId is not null && (c.HasPaid || c.PixProofUploadedAt != null))
+                    .Select(c => c.PriceOptionId!.Value).ToHashSet();
+                var tableError = CashTableEdit.Validate(cashRows,
+                    ev.PriceOptions.ToDictionary(o => o.Id), lockedOpts, FeePolicy);
+                if (tableError is not null)
+                {
+                    saveError = tableError == "Poker.Create.FeePercentOutOfRange"
+                        ? Ui.Get(tableError, feePercentMin, feePercentMax)
+                        : Ui[tableError];
+                    isSaving  = false;
+                    return;
+                }
+            }
+            var wasCharging = isCash
+                ? ev.PriceOptions.Any(o => o.IsActive && o.Price > 0m)
+                : ev.Price is > 0;
+            var willCharge = isCash
+                ? CashTableEdit.WillCharge(cashRows)
+                : newPrice is > 0;
+
             // C39-A F4 (a): passar a cobrar ou subir o valor exige recebedor do grupo.
-            if (newPrice is > 0
-                && newPrice != ev.Price
+            // C39-B F10: no cash a regra e a transicao gratis -> alguma mesa com preco.
+            if ((isCash
+                    ? (willCharge && !wasCharging)
+                    : (newPrice is > 0 && newPrice != ev.Price))
                 && !EventPaymentService.GroupCanCharge(ev.Group))
             {
                 saveError = Ui["Poker.Edit.PixRequired"];
@@ -204,11 +277,24 @@ public partial class Edit
             // C39-A F4 (b): com alguem que ja pagou ou enviou comprovante, o
             // anuncio do valor fica congelado — mudar buy-in ou % mudaria a
             // divida de quem ja quitou (o carimbo protege o historico, mas o
-            // valor anunciado nao pode virar outra coisa).
-            if (chargeChanged
+            // valor anunciado nao pode virar outra coisa). No cash o congelo
+            // e por mesa e ja foi validado acima.
+            if (!isCash
+                && chargeChanged
                 && ev.Confirmations.Any(c => c.HasPaid || c.PixProofUploadedAt != null))
             {
                 saveError = Ui["Poker.Edit.PriceLockedPaid"];
+                isSaving  = false;
+                return;
+            }
+
+            // Delta pos-review (opcional): nao reduzir MaxPlayers abaixo dos
+            // inscritos que ja pagaram/mandaram comprovante — jogaria um
+            // pagante para a espera.
+            var paidCount = ev.Confirmations.Count(c => c.HasPaid || c.PixProofUploadedAt != null);
+            if (isTournament && form.MaxPlayers > 0 && form.MaxPlayers < paidCount)
+            {
+                saveError = Ui.Get("Poker.Edit.MaxPlayersBelowPaid", paidCount);
                 isSaving  = false;
                 return;
             }
@@ -261,11 +347,26 @@ public partial class Edit
                     break;
 
                 case PokerEventType.CashGame:
+                {
                     ev.Modality      = form.Modality;
-                    ev.CashMinBuyIn  = form.CashMinBuyIn;
-                    ev.CashMaxBuyIn  = form.CashMaxBuyIn;
                     ev.CashIncludes  = form.CashIncludes;
+
+                    var usedOpts = ev.Confirmations.Where(c => c.PriceOptionId is not null)
+                        .Select(c => c.PriceOptionId!.Value).ToHashSet();
+                    var plan = CashTableEdit.Apply(ev, cashRows, usedOpts);
+                    // C39-B F10: mesa com preco/% alterado recarimba so quem
+                    // ainda deve nela (mesma regra do RestampUnpaid).
+                    foreach (var opt in ev.PriceOptions.Where(o => plan.RestampedOptionIds.Contains(o.Id)))
+                        FeePolicy.RestampUnpaidForTable(ev, opt);
+                    // CashMin/CashMax seguem informativos, derivados das mesas ativas.
+                    var activePrices = ev.PriceOptions.Where(o => o.IsActive).Select(o => o.Price).ToList();
+                    if (activePrices.Count > 0)
+                    {
+                        ev.CashMinBuyIn = activePrices.Min();
+                        ev.CashMaxBuyIn = activePrices.Max();
+                    }
                     break;
+                }
 
                 // HomeGame: apenas identidade e data/hora são editáveis; código mantido
             }

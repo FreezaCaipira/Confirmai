@@ -63,14 +63,28 @@ public sealed class PlatformFeePolicy
     /// carimbo original. Requer <c>ev.Group</c> e <c>ev.Confirmations</c> carregadas.
     /// </summary>
     public void RestampUnpaid(Event ev)
+        => RestampUnpaid(ev.Confirmations, ev.Group, ev.Price, ev.PlatformFeePercent);
+
+    /// <summary>
+    /// C39-B F10: mesmo recarimbo, limitado aos devedores de UMA mesa do cash —
+    /// editar preco/% da mesa muda so a divida de quem ainda nao pagou nela.
+    /// Requer <c>ev.Group</c> e <c>ev.Confirmations</c> carregadas.
+    /// </summary>
+    public void RestampUnpaidForTable(Event ev, EventPriceOption option)
+        => RestampUnpaid(
+            ev.Confirmations.Where(c => c.PriceOptionId == option.Id),
+            ev.Group, option.Price, option.PlatformFeePercent);
+
+    private void RestampUnpaid(
+        IEnumerable<EventConfirmation> confirmations, Group? group, decimal? price, decimal? feePercent)
     {
-        foreach (var c in ev.Confirmations.Where(c =>
+        foreach (var c in confirmations.Where(c =>
                      !c.HasPaid
                      && c.PixProofUploadedAt is null
                      && c.PaymentStatus == EventConfirmationPaymentStatus.Pending))
         {
-            c.ChargedPrice = ev.Price;
-            c.PlatformFeeAmount = ResolveStampForNewConfirmation(ev.Group, ev.Price, c.ConfirmedAt, ev.PlatformFeePercent);
+            c.ChargedPrice = price;
+            c.PlatformFeeAmount = ResolveStampForNewConfirmation(group, price, c.ConfirmedAt, feePercent);
         }
     }
 
