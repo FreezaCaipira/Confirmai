@@ -144,7 +144,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
-0. **C39 (Pleno) -- poker cobra pelo app (buy-in do torneio) [PLANEJADO -- aguarda D1/D2 do Robson]** -- ver secao "Ciclo 39". Fecha a trava de Pix do C38 com cobranca de verdade, lista de espera que nao paga e cancelamento de inscricao paga bloqueado.
+0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [PLANEJADO -- aguarda D3/D4 do Robson]** -- ver secao "Ciclo 39". 2 PRs (torneio, depois cash). Fecha tambem lista de espera que paga e cancelamento de inscricao paga.
 0. **C38 (Pleno) -- achados do testador externo em prod [CONCLUIDO -- PR #144, review do Senior com 1 correcao (#145: edicao do futsal checa Pix)]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
@@ -157,7 +157,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
    - **hero (Fase 7 do C36-B)**: texto do Robson + enfeite proposto pelo Senior -- landing deslogada com padrao de icones de varios esportes (Font Awesome, traco branco ~10% sobre o azul, sem cor por esporte, AA mantido); hero logado com marca d'agua do esporte da proxima partida (sem partida -> padrao misto). Opcoes de texto ja enviadas ao Robson (favorita do Senior: "Bora jogar? A gente cuida da lista e do Pix.").
 6. **V2 Pix automatico** -- depois do go-live e das pendencias Efi/fiscal.
 
-**Decisoes pendentes do Robson**: D1 (taxa no torneio) e D2 (cash game cobra?) do C39 -- a trava de Pix do poker **fica** (decisao do Robson pos-#145); Fase 0 da Evolution (servico + chip); remover ou manter as telas legadas fora do fluxo (`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration` -- Senior recomenda remover); texto do hero (so na lapidacao visual).
+**Decisoes pendentes do Robson**: D3 (quem define o % da taxa do poker) e D4 (taxa somada ou descontada da entrada) do C39 -- a trava de Pix do poker **fica** (decisao do Robson pos-#145); Fase 0 da Evolution (servico + chip); remover ou manter as telas legadas fora do fluxo (`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration` -- Senior recomenda remover); texto do hero (so na lapidacao visual).
 
 **Higiene de repo (Robson, opcional)**: branches mergeadas sobrando no remoto (`feat/ciclo36d-fase*`, `feat/ciclo36c-pagamentos-grupo`, `docs/review-c36c`, `refactor/*`, `feature/*` antigas).
 
@@ -205,81 +205,108 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
-## Ciclo 39 (Pleno) -- Poker cobra pelo app (buy-in do torneio no fluxo de pagamento manual) [PLANEJADO -- aguarda 2 decisoes do Robson]
+## Ciclo 39 (Pleno) -- Poker cobra pelo app (torneio + cash) com taxa percentual por evento [PLANEJADO -- aguarda 2 decisoes do Robson (D3, D4)]
 
-Decisao do Robson (pos-#145): **manter a trava de Pix do C38 e fazer o poker cobrar pelo app**.
-Hoje a trava existe, mas o poker nao cobra: `PokerCreateService`/`Poker/Edit` gravam `BuyInAmount`/`CashMinBuyIn`
-e nunca `Event.Price`, e todo o caminho do dinheiro (`EventPaymentService`, `/pagamento/evento/{id}`,
-`GroupPaymentsService`, inadimplencia, saida do grupo com divida, botao "Pagar" do `Poker/Detail`) le so `Event.Price`.
+Decisoes do Robson (pos-#145/#146):
+- **manter a trava de Pix do C38 e fazer o poker cobrar pelo app**;
+- **D1: taxa no poker = percentual da entrada, configurado em cada torneio.** No futsal o valor fica em R$ 10-15 e a taxa fixa
+  funciona; no poker a entrada varia demais;
+- **D2: o cash game tambem cobra pelo app, com preco e taxa configurados por mesa / faixa de preco.**
+
+Hoje o poker nunca grava `Event.Price`, e todo o caminho do dinheiro (`EventPaymentService`, `/pagamento/evento/{id}`,
+`GroupPaymentsService`, inadimplencia, saida do grupo com divida, botao "Pagar" do `Poker/Detail`) le so esse campo.
 
 ### Diagnostico (o que o Senior confirmou no codigo)
 
-1. **Infra de pagamento ja e generica** (le `Event.Price`, monta href por esporte). Basta o poker gravar `Price` para o
-   jogador ver QR, enviar comprovante e o organizador aprovar -- inclusive o botao "Pagar" do `Poker/Detail` (C37).
-2. **Taxa da plataforma e futsal-only por regra**: `PlatformFeePolicy.AppliesTo` exige `Sport.Futsal`,
-   `ManualPlatformFee.Applies(isFutsal...)`, e a aba "Taxa da plataforma" (`Groups/Payments.razor.cs` `ShouldShowPlatformFeeTab`)
-   so aparece no futsal. Ver decisao D1.
+1. **Infra de pagamento ja e generica no esporte** (le `Event.Price`, monta href por esporte), mas assume **1 preco por partida**.
+   O torneio cabe nisso; o cash com varias mesas nao.
+2. **Taxa da plataforma e fixa e futsal-only**: `FeeOptions.ManualPlatformFeeFixed`, `PlatformFeePolicy.AppliesTo` exige
+   `Sport.Futsal`, `ManualPlatformFee.Applies(isFutsal...)`, aba "Taxa da plataforma" (`Groups/Payments.razor.cs`
+   `ShouldShowPlatformFeeTab`) so no futsal. O que salva: o valor ja e **carimbado na confirmacao** (`PlatformFeeAmount`), e o
+   QR, o resumo do organizador, o ledger e o repasse leem o carimbo. Basta carimbar o percentual convertido em reais.
 3. **Inscricao do poker nao passa por service**: `Poker/Detail.razor.cs` `ConfirmPresence`/`CancelConfirmation` falam direto
-   com o `DbContext`, sem carimbo de taxa (`ResolveStampForNewConfirmation`) e sem teste.
-4. **Lista de espera do poker e so visual**: quem passa de `MaxPlayers` e marcado "lista de espera" pela posicao na lista,
-   mas tem `EventConfirmation` igual aos outros -- sem cuidado, **quem esta na espera conseguiria pagar**.
+   com o `DbContext`, sem carimbo de taxa e sem teste.
+4. **Lista de espera do poker e so visual**: quem passa de `MaxPlayers` tem `EventConfirmation` igual aos outros -- sem cuidado,
+   **quem esta na espera conseguiria pagar**.
 5. **Cancelar inscricao apaga a linha**, mesmo paga ou com comprovante enviado (poker **e futsal**:
-   `EventDetailService.CancelConfirmationAsync`). Com dinheiro no poker, o pagamento some do controle do organizador.
-6. **`Poker/Edit` nao checa Pix ao mudar o buy-in** (mesmo bypass que a #145 fechou no futsal) e deixa mudar o valor
-   com gente que ja pagou.
+   `EventDetailService.CancelConfirmationAsync`). Com mais dinheiro passando pelo app, o pagamento some do controle do organizador.
+6. **`Poker/Edit` nao checa Pix ao mudar o valor** (mesmo bypass que a #145 fechou no futsal) e deixa mudar valor com gente que ja pagou.
 
-### Escopo (recomendacao do Senior -- D2 pode mudar a F2)
+### Modelo (regra unica, sem `if poker` espalhado)
 
-| Tipo | O app cobra | Por que |
-|---|---|---|
-| Torneio | **buy-in** (`Event.Price = BuyInAmount`) | valor fixo, um por jogador, encaixa no fluxo de hoje (1 confirmacao = 1 cobranca) |
-| Rebuy / add-on (simples e duplo) | **nao** -- continua na mesa, so informativo | quantidade variavel durante o jogo; exigiria varias cobrancas por confirmacao (entidade nova, aprovacao por item, taxa por item). Fica para um ciclo proprio se fizer falta em prod |
-| Cash game | **nao** (D2) -- min/max informativos, sem trava de Pix | ficha e compra/recompra variavel na mesa; cobrar o minimo pelo app criaria um "credito" que o app nao controla |
-| Home game | nao | gratis por definicao |
+- `Event.PlatformFeePercent` (`decimal?`, 0-100, 2 casas) -- taxa do **torneio**.
+- `EventPriceOption` (nova tabela): `Id, EventId, Label` (ex. "Mesa 1/2"), `Price`, `PlatformFeePercent`, `SortOrder`, `IsActive` --
+  as **mesas/faixas do cash**. FK cascade com `Event`.
+- `EventConfirmation.ChargedPrice` (`decimal?`) + `EventConfirmation.PriceOptionId` (`int?`) -- **carimbo do preco** escolhido,
+  igual ao carimbo da taxa (C36-C): editar o evento depois nao muda o que o jogador ja deve.
+- Leitura canonica do preco: `EventCharge.PriceOf(conf) => conf.ChargedPrice ?? conf.Event.Price` (helper novo em
+  `Services/Payment`). **Todos** os leitores de `conf.Event.Price` no caminho do dinheiro passam a usar o helper
+  (`EventPaymentService`, `EventPayment.razor.cs`, `EventPaymentSummary`, `GroupPaymentsService`, `GroupDetailService`
+  saida-com-divida, `AppmaxPixService`, `PlatformFeeLedgerService`). Futsal antigo sem carimbo segue funcionando pelo fallback.
+- Taxa: `PlatformFeePolicy` ganha `ResolveStamp(group, price, feePercent?, now)`:
+  futsal -> taxa fixa de hoje (inalterado); poker -> `Math.Round(price * pct / 100, 2, MidpointRounding.AwayFromZero)`;
+  isencao do grupo -> 0 (carimbada, como hoje); gateways ligados ou preco 0 -> null. `ManualPlatformFee.Applies` deixa de receber
+  `isFutsal` e passa a olhar o carimbo/esporte pela mesma regra; `ShouldShowPlatformFeeTab` vale para futsal e poker.
+- Jogador paga **entrada + taxa** (igual ao futsal: o organizador recebe a entrada cheia, a taxa vai para o repasse) -- ver D4.
 
-### Fases (TDD: teste primeiro em todas)
+### Fases (TDD: teste primeiro em todas; 2 PRs)
 
+**PR 1 -- torneio (C39-A)**
 - **F1 -- service de inscricao do poker.** Extrair `ConfirmPresence`/`CancelConfirmation` de `Poker/Detail.razor.cs` para
-  `Services/Poker/PokerDetailService` (mesmo padrao do `EventDetailService`). Na criacao da confirmacao, carimbar
-  `PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(group, ev.Price, now)`. Testes de service.
-- **F2 -- torneio grava `Price`.** `PokerCreateService.SaveAsync` e `Poker/Edit`: `ev.Price = BuyInAmount > 0 ? BuyInAmount : null`
-  so para `Tournament`; cash e home game ficam com `Price = null`. A trava de Pix (`ChargedAmount`) passa a valer **so para torneio**
-  (cash sem Pix volta a poder anunciar min/max). No `Poker/Create.razor.cs`, `GroupNeedsPix` zera so o `BuyInAmount`.
-  Migration de dados: **nenhuma** -- poker antigo continua sem `Price` (sem cobranca retroativa). Testes: torneio com buy-in grava
-  `Price`; cash/home game nao; torneio sem Pix e sem gateway e recusado no service.
-- **F3 -- `Poker/Edit` com as mesmas guardas do futsal.** Antes do `SaveChangesAsync`:
-  (a) buy-in novo > 0 e diferente do atual sem `EventPaymentService.GroupCanCharge(ev.Group)` -> erro i18n (incluir
-  `Group.Members.User` na query); (b) mudar o buy-in com alguma confirmacao `HasPaid` ou com comprovante enviado -> erro i18n
-  ("ja ha pagamentos; cancele e recrie a partida"). Mesmo teste estrutural de ordem do `C38ReviewFutsalEditPixTests`.
-- **F4 -- lista de espera nao paga.** Quem esta alem de `MaxPlayers` (ordenado por `ConfirmedAt`) nao ve "Pagar" e
-  `EventPaymentService.LoadAsync`/`GenerateAsync` recusam a confirmacao (servidor, nao so tela). Ao sair alguem, o primeiro da
-  espera passa a poder pagar (a regra e posicional, entao isso vem de graca -- testar). A inadimplencia
-  (`GroupPaymentsService`) e o bloqueio de saida do grupo (`GroupDetailService`) tambem ignoram quem esta na espera.
-- **F5 -- cancelar inscricao paga.** Jogador nao cancela sozinho confirmacao com `HasPaid` ou `PixProofUploadedAt` --
-  mensagem i18n "fale com o organizador" (servidor + botao escondido). **Vale para futsal e poker** (o furo do futsal e
-  anterior ao C39, mas so fica grave com mais dinheiro passando pelo app). Remocao pelo admin continua possivel e auditada.
-- **F6 -- taxa no poker (so se D1 = sim).** `PlatformFeePolicy.AppliesTo`, `ManualPlatformFee` (trocar `isFutsal` por
-  "esporte cobra taxa"), `ShouldShowPlatformFeeTab` e o resumo do `EventPaymentSummary` passam a aceitar poker.
-  Uma regra so, sem `if poker` espalhado. Testes do ledger/repasse com uma partida de poker. Se D1 = nao, a F6 nao existe
-  e o poker cobra o buy-in sem taxa (o organizador recebe 100%).
-- **F7 -- textos e docs.** Chaves novas PT/EN/ES (`I18nKeyParityTests`); `docs/uml/casos-de-uso.md` (UC de pagar torneio),
-  `docs/guia-do-usuario.md` (o que o poker cobra e o que fica na mesa) e o diagrama de pagamento manual.
+  `Services/Poker/PokerDetailService` (padrao do `EventDetailService`). Carimbar `ChargedPrice` e `PlatformFeeAmount` na criacao.
+- **F2 -- `EventCharge.PriceOf` + carimbo do preco.** Migration (`ChargedPrice`, `PriceOptionId`, `Event.PlatformFeePercent`,
+  tabela `EventPriceOption` ja nesta migration para nao ter duas). Trocar os leitores listados acima. Futsal: carimbar
+  `ChargedPrice = Event.Price` nas confirmacoes novas (`EventDetailService`). Sem backfill: o fallback cobre as antigas.
+- **F3 -- torneio cobra.** `PokerCreateService` e `Poker/Edit`: `ev.Price = BuyInAmount > 0 ? BuyInAmount : null` so para `Tournament`;
+  campo "Taxa da plataforma (%)" no formulario do torneio (D3 define quem edita e os limites). Trava de Pix do C38 continua.
+  Home game: nada muda. Poker antigo continua sem `Price` (sem cobranca retroativa).
+- **F4 -- `Poker/Edit` com as guardas do futsal**, antes do `SaveChangesAsync`: (a) valor novo > 0 e diferente sem
+  `EventPaymentService.GroupCanCharge(ev.Group)` -> erro i18n (incluir `Group.Members.User` na query); (b) mudar buy-in ou % com
+  alguma confirmacao `HasPaid`/comprovante enviado -> erro i18n. Teste estrutural de ordem igual ao `C38ReviewFutsalEditPixTests`.
+- **F5 -- lista de espera nao paga.** Alem de `MaxPlayers` (ordem por `ConfirmedAt`) nao ve "Pagar", e
+  `EventPaymentService.LoadAsync`/`GenerateAsync` recusam no servidor. Inadimplencia e saida-com-divida ignoram quem esta na espera.
+- **F6 -- cancelar inscricao paga.** Jogador nao cancela sozinho confirmacao `HasPaid` ou com `PixProofUploadedAt`
+  (servidor + botao escondido, mensagem "fale com o organizador"). **Futsal e poker.** Remocao pelo admin segue possivel e auditada.
+- **F7 -- taxa percentual no ledger.** Testes de ponta a ponta do service: torneio R$ 200 com 5% -> QR de R$ 210, comprovante,
+  aprovacao, taxa de R$ 10 acumulada na aba "Taxa da plataforma" do grupo de poker, repasse aprovado pelo admin. Grupo isento -> taxa 0 carimbada.
+
+**PR 2 -- cash (C39-B)**
+- **F8 -- mesas do cash.** Formulario do cash: lista editavel de mesas (rotulo, preco, % da taxa; minimo 1 mesa com preco > 0
+  para cobrar; trava de Pix se alguma mesa tem preco). `CashMinBuyIn`/`CashMaxBuyIn` viram informativos derivados das mesas
+  (ou saem da tela -- o Pleno propoe na entrega). `Event.Price` do cash fica **null**: o preco vem da mesa.
+- **F9 -- jogador escolhe a mesa.** Na inscricao do cash o jogador escolhe a mesa; a confirmacao carimba `PriceOptionId`,
+  `ChargedPrice` e a taxa da mesa. Trocar de mesa antes de pagar = recarimbar; depois de pagar ou com comprovante, nao.
+  Mesa desativada nao aparece para novas inscricoes, mas confirmacoes carimbadas continuam validas.
+- **F10 -- `Poker/Edit` do cash**: mesmas guardas da F4 por mesa (nao muda preco/% de mesa com pagamento; nao apaga mesa com
+  confirmacao -- desativa).
+
+**Os dois PRs**
+- **F11 -- textos e docs.** Chaves PT/EN/ES (`I18nKeyParityTests`); `docs/uml/casos-de-uso.md` (UCs de pagar torneio/cash e
+  configurar taxa), `docs/uml/sequencia-pagamento-manual.md` (taxa fixa x %), `docs/guia-do-usuario.md` (o que o poker cobra e
+  o que fica na mesa) e `production-checklist.md` se surgir config nova.
 
 ### Fora do escopo
 
-Rebuy/add-on pelo app, cobranca de cash game, gateways (V2), reembolso pelo app.
+Rebuy/add-on pelo app (varias cobrancas por jogador -- ciclo proprio se fizer falta), gateways (V2), reembolso pelo app,
+troca de mesa depois de pago.
 
 ### Criterio de pronto
 
-Build sem warnings; suite verde no CI; teste novo para cada fase; nada muda no fluxo do futsal alem da F5.
-Roteiro do Robson em prod: torneio de R$ 10 num grupo com Pix -> jogador inscrito paga e envia comprovante ->
-organizador aprova -> aparece pago; jogador na espera nao ve "Pagar"; cash game sem Pix anuncia min/max.
+Build sem warnings; suite verde no CI; teste novo em cada fase; o futsal so muda no carimbo do preco (comportamento igual) e na F6.
+Roteiro do Robson em prod: torneio R$ 100 com 10% -> jogador paga R$ 110 e envia comprovante -> organizador aprova -> taxa R$ 10
+na aba do grupo; jogador na espera nao ve "Pagar"; cash com 2 mesas -> jogador escolhe a de R$ 300 e o QR sai com o valor dela + taxa.
 
-### Decisoes do Robson (antes de o Pleno comecar a F2/F6)
+### Decisoes do Robson
 
-- **D1 -- a taxa da plataforma vale no torneio?** Senior: **sim**, mesma taxa fixa do futsal -- e o modelo de receita, e o
-  buy-in passa pelo mesmo fluxo de comprovante/repasse. (Nao: o organizador recebe 100% e a taxa fica so no futsal.)
-- **D2 -- cash game cobra pelo app?** Senior: **nao** (ver tabela). (Sim: cobra o buy-in minimo como entrada.)
+- D1 (**decidido**): taxa do poker = % da entrada, por torneio.
+- D2 (**decidido**): cash cobra pelo app, preco e taxa por mesa/faixa.
+- **D3 -- quem define o % da taxa?** Senior: **o organizador escolhe dentro de uma faixa que so o admin do sistema define**
+  (`FeeOptions.PokerFeePercentMin`/`Max`, ex. 3%-10%; o formulario ja vem no minimo). O organizador ajusta por evento sem depender
+  de voce, e a plataforma nunca recebe menos que o piso. Alternativa: so o admin do sistema define o % de cada evento (controle total,
+  mas cada torneio novo espera voce).
+- **D4 -- a taxa e somada a entrada ou descontada dela?** Senior: **somada** (jogador paga R$ 100 + 10%), igual ao futsal hoje --
+  o organizador recebe a entrada cheia e o fluxo de repasse nao muda. Descontada (jogador paga R$ 100, organizador fica com R$ 90)
+  mudaria o repasse e o que o organizador ve como recebido.
 
 ---
 
