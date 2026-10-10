@@ -119,7 +119,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Mapa de Progresso e Proximos Passos (atualizado pos-C38, #144/#145)
+## Mapa de Progresso e Proximos Passos (atualizado pos-C39-A, #147/#148)
 
 ### Progresso por eixo
 
@@ -127,7 +127,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 |---|---|---|
 | Refatoracao estrutural (SOLID, code-behinds, CSS modular) | **CONCLUIDO** (C20-C22) | Nada. Manutencao natural. |
 | Casos de uso / UML (C33) | **CONCLUIDO** -- `docs/uml/` (~102 UCs por ator, estados, sequencia do pagamento manual) | Manter a coluna Teste atualizada a cada ciclo. |
-| Cobertura de testes | **BOM** -- 2708 testes, integracao em **Postgres real** (C33), CI verde; `CssStructureTests` guarda todo CSS proprio (#132) | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
+| Cobertura de testes | **BOM** -- 2748 testes, integracao em **Postgres real** (C33), CI verde; `CssStructureTests` guarda todo CSS proprio (#132) | As 24 `ProgramConfigurationTests` falham so no ambiente local do Senior (credencial `28P01`); E2E em navegador fora da fila (Robson valida em prod). |
 | i18n PT/EN/ES | **COMPLETO** -- allowlist zerada, paridade + chaves referenciadas testadas | Validacao visual EN/ES em prod (Robson). |
 | Pagamento V1 manual + taxa + repasse | **CONCLUIDO e VALIDADO EM PRODUCAO**; taxa carimbada na confirmacao, receita so com `Paid` (#122), isencao por grupo com janela `[From,Until)` (C34/C36-C), saida do grupo bloqueada com divida (#125); regra do Pix unica no criar partida (C36-E, #131/#132) | Nada funcional. |
 | Seguranca / autorizacao | **BOM** -- authz no service (C34), `GroupAccess` membro/admin (C36-C), IDORs fechados, rate limiter corrigido, magic bytes no upload | Nada funcional. C32 Fase A fechou o pen-test do dinheiro; `style-src 'unsafe-inline'` e risco aceito (Blazor). |
@@ -138,13 +138,14 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 | Layout / design system L0-L3 | **~80%** -- header, home, hub/subnav, `/grupos`, mailbox, profile, partida futsal/poker, pagamento/repasse do grupo, Identity, admin, cookie banner migrados; 63 arquivos guardados pelo `CssNoLegacyVarsTests` | Lapidacao visual (fim da fila, passo 5): **tela do jogador pagar** (`/pagamento/evento/{id}`) ainda no visual antigo; `buttons.css`/`entity-shell.css`/`MainLayout.razor.css` ainda consomem `--ci-*`; Fase 7 (texto do hero). |
 | Pre-producao (C32) | **CONCLUIDO** (PR #134, review na secao abaixo) -- pen-test do dinheiro, CSP sem `ws:` em prod, meter `Confirmai.Ops` + 4 alertas, secao EasyPanel no checklist | Fase F (telas legadas) aguarda decisao do Robson. Configurar no EasyPanel as variaveis da secao 0 do `production-checklist.md`. |
 | WhatsApp (C31, Evolution no grupo) | **CODIGO CONCLUIDO e REVISADO** (PR #137; review do Senior com 3 correcoes -- reagendamento, lembrete do dia apos o de 1h, timeout HTTP) | Tudo em dry-run por default. Falta so a Fase 0 do Robson (Evolution no EasyPanel + chip dedicado aquecido + JID do grupo de teste) para o primeiro envio real. |
+| Poker cobra pelo app (C39) | **TORNEIO CONCLUIDO** (C39-A, #147 + review #148): buy-in pelo app, taxa % na faixa `Fee__PokerFeePercentMin/Max`, preco carimbado e recarimbado em quem ainda deve ao editar, espera nao paga, inscricao paga nao cancela | C39-B (cash por mesa) e C39-C (parceria). Robson: configurar a faixa no EasyPanel antes do deploy. |
 | Pix automatico (V2) | Codigo preservado atras do toggle | Pendencias Efi/fiscal do Robson; so depois do go-live do V1. |
 
 ### Proximos passos, em ordem
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
-0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [C39-A EXECUTADO (#147) -- review Senior APROVADO c/ 2 correcoes; C39-B (cash) liberado]** -- ver secao "Ciclo 39". 3 PRs (torneio, cash, parceria). Fecha tambem lista de espera que paga e cancelamento de inscricao paga. PR 1 (torneio): F1-F7 entregues -- `EventCharge.PriceOf` + carimbo `ChargedPrice`, `PokerDetailService`, `Event.Price = BuyIn` com % na faixa do FeeOptions validada no service, guardas do `Poker/Edit` (Pix + valor congelado), lista de espera nao paga, cancelamento de inscricao paga bloqueado, taxa % ponta a ponta ate o repasse. Build 0/0, suite 2703 -> 2738.
+0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [C39-A CONCLUIDO (#147 + review #148); proximo: C39-B (cash), liberado para o Pleno -- ler o "Delta pos-review" no PR 2]** -- ver secao "Ciclo 39". 3 PRs (torneio, cash, parceria). Fecha tambem lista de espera que paga e cancelamento de inscricao paga. PR 1 (torneio): F1-F7 entregues -- `EventCharge.PriceOf` + carimbo `ChargedPrice`, `PokerDetailService`, `Event.Price = BuyIn` com % na faixa do FeeOptions validada no service, guardas do `Poker/Edit` (Pix + valor congelado), lista de espera nao paga, cancelamento de inscricao paga bloqueado, taxa % ponta a ponta ate o repasse. Build 0/0, suite 2703 -> 2738.
 0. **C38 (Pleno) -- achados do testador externo em prod [CONCLUIDO -- PR #144, review do Senior com 1 correcao (#145: edicao do futsal checa Pix)]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
 1. **C36-E (Pleno) [CONCLUIDO -- PR #131, review do Senior com 2 correcoes].** Regra do Pix unica + aviso duplicado removido.
@@ -286,6 +287,14 @@ Hoje o poker nunca grava `Event.Price`, e todo o caminho do dinheiro (`EventPaym
   Mesa desativada nao aparece para novas inscricoes, mas confirmacoes carimbadas continuam validas.
 - **F10 -- `Poker/Edit` do cash**: mesmas guardas da F4 por mesa (nao muda preco/% de mesa com pagamento; nao apaga mesa com
   confirmacao -- desativa).
+- **Delta pos-review do C39-A (obrigatorio no PR 2):**
+  - `PokerDetailService.ConfirmAsync` hoje aceita `priceOptionId` de outro evento ou inativo (cai no `Event.Price` e grava o id):
+    no cash, opcao invalida/inativa **recusa** a inscricao, e cash sem opcao escolhida tambem (teste para cada caso).
+  - Editar preco/% de uma mesa recarimba so quem ainda deve naquela mesa -- mesmo criterio do `PlatformFeePolicy.RestampUnpaid`
+    (sem pagamento, sem comprovante, `Pending`); generalizar o metodo para a mesa em vez de duplicar a regra.
+  - Guarda de Pix e de valor congelado comparam o valor efetivo (como `newPrice`/`newFeePercent` no torneio), nunca o campo do form.
+  - Opcional: `Poker/Edit` nao deixa reduzir `MaxPlayers` abaixo do numero de inscritos que ja pagaram/mandaram comprovante
+    (hoje isso jogaria um pagante para a espera).
 
 **PR 3 -- parceria (C39-C, pequeno, depois do PR 2)**
 - **F12 -- `PartnerFeeSharePercent`.** Migration (`Group.PartnerFeeSharePercent`, `EventConfirmation.PlayerFeeAmount`), campo na
