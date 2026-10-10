@@ -13,6 +13,8 @@ public enum PokerConfirmStatus
     EventCancelled,
     AlreadyRegistered,
     NotGroupMember,
+    PriceOptionRequired,
+    InvalidPriceOption,
 }
 
 public enum PokerCancelStatus
@@ -30,6 +32,20 @@ public sealed record PokerConfirmResult(PokerConfirmStatus Status, bool IsWaitli
 public sealed record PokerCancelResult(PokerCancelStatus Status)
 {
     public bool Success => Status == PokerCancelStatus.Cancelled;
+}
+
+public enum PokerChangeTableStatus
+{
+    Changed,
+    NotRegistered,
+    PaidOrProofSent,
+    InvalidPriceOption,
+    EventNotFound,
+}
+
+public sealed record PokerChangeTableResult(PokerChangeTableStatus Status)
+{
+    public bool Success => Status == PokerChangeTableStatus.Changed;
 }
 
 /// <summary>
@@ -57,6 +73,7 @@ public sealed class PokerDetailService
             .Include(e => e.Group)
                 .ThenInclude(g => g.Members)
             .Include(e => e.Confirmations)
+            .Include(e => e.PriceOptions)
             .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == eventId && e.Sport == Sport.Poker);
 
@@ -67,19 +84,24 @@ public sealed class PokerDetailService
         if (ev.Group.IsPrivate && !ev.Group.Members.Any(m => m.UserId == userId))
             return new PokerConfirmResult(PokerConfirmStatus.NotGroupMember, false);
 
-        // Cash game (C39-B) resolve o preco pela mesa escolhida; torneio pelo
-        // Event.Price. Home game nao cobra.
+        // C39-B F9: no cash o preco vem da mesa escolhida. Opcao invalida,
+        // inativa ou de outro evento recusa a inscricao (delta da review
+        // C39-A — antes gravava o id e caia no preco do evento). Cash com
+        // mesas ativas exige escolha; sem mesas segue sem cobranca.
         var price = ev.Price;
         var feePercent = ev.PlatformFeePercent;
+        var activeOptions = ev.PriceOptions.Where(o => o.IsActive).ToList();
         if (priceOptionId is int optionId)
         {
-            var option = await db.EventPriceOptions
-                .FirstOrDefaultAsync(o => o.Id == optionId && o.EventId == eventId && o.IsActive);
-            if (option is not null)
-            {
-                price = option.Price;
-                feePercent = option.PlatformFeePercent;
-            }
+            var option = activeOptions.FirstOrDefault(o => o.Id == optionId);
+            if (option is null)
+                return new PokerConfirmResult(PokerConfirmStatus.InvalidPriceOption, false);
+            price = option.Price;
+            feePercent = option.PlatformFeePercent;
+        }
+        else if (ev.PokerEventType == PokerEventType.CashGame && activeOptions.Count > 0)
+        {
+            return new PokerConfirmResult(PokerConfirmStatus.PriceOptionRequired, false);
         }
 
         var now = DateTime.UtcNow;
@@ -118,5 +140,38 @@ public sealed class PokerDetailService
         db.EventConfirmations.Remove(conf);
         await db.SaveChangesAsync();
         return new PokerCancelResult(PokerCancelStatus.Cancelled);
+    }
+
+    /// <summary>
+    /// C39-B F9: troca de mesa no cash — recarimba preco e taxa de quem ainda
+    /// nao pagou nem enviou comprovante; depois disso a mesa fica travada.
+    /// </summary>
+    public async Task<PokerChangeTableResult> ChangeTableAsync(int eventId, string userId, int priceOptionId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        var ev = await db.Events
+            .Include(e => e.Group)
+            .Include(e => e.PriceOptions)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(e => e.Id == eventId && e.Sport == Sport.Poker);
+        if (ev is null || ev.PokerEventType != PokerEventType.CashGame)
+            return new PokerChangeTableResult(PokerChangeTableStatus.EventNotFound);
+
+        var conf = await db.EventConfirmations
+            .FirstOrDefaultAsync(c => c.EventId == eventId && c.UserId == userId);
+        if (conf is null) return new PokerChangeTableResult(PokerChangeTableStatus.NotRegistered);
+        if (conf.HasPaid || conf.PixProofUploadedAt is not null)
+            return new PokerChangeTableResult(PokerChangeTableStatus.PaidOrProofSent);
+
+        var option = ev.PriceOptions.FirstOrDefault(o => o.Id == priceOptionId && o.IsActive);
+        if (option is null) return new PokerChangeTableResult(PokerChangeTableStatus.InvalidPriceOption);
+
+        conf.PriceOptionId = option.Id;
+        conf.ChargedPrice = option.Price;
+        conf.PlatformFeeAmount = _feePolicy.ResolveStampForNewConfirmation(
+            ev.Group, option.Price, conf.ConfirmedAt, option.PlatformFeePercent);
+        await db.SaveChangesAsync();
+        return new PokerChangeTableResult(PokerChangeTableStatus.Changed);
     }
 }

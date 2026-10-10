@@ -287,6 +287,27 @@ else
                                     </a>
                                 }
                             }
+                            @* C39-B F9: quem ainda nao pagou pode trocar de mesa; o carimbo e refeito no service. *@
+                            @if (ev.PokerEventType == PokerEventType.CashGame
+                                && !userConf.HasPaid && userConf.PixProofUploadedAt == null)
+                            {
+                                var otherTables = ev.PriceOptions
+                                    .Where(o => o.IsActive && o.Id != userConf.PriceOptionId)
+                                    .OrderBy(o => o.SortOrder).ToList();
+                                @if (otherTables.Count > 0)
+                                {
+                                    <select class="input" @onchange="async e =>
+                                        {
+                                            if (int.TryParse(e.Value?.ToString(), out var oid)) await ChangeTable(oid);
+                                        }">
+                                        <option value="">@Ui["Poker.SwitchTable"]</option>
+                                        @foreach (var t in otherTables)
+                                        {
+                                            <option value="@t.Id">@t.Label — R$ @t.Price.ToString("N2")</option>
+                                        }
+                                    </select>
+                                }
+                            }
                             @* C39-A F6: pago ou com comprovante — cancelar some; fale com o organizador. *@
                             @if (!userConf.HasPaid && userConf.PixProofUploadedAt == null)
                             {
@@ -336,6 +357,24 @@ else
                     else
                     {
                         var isFull = ev.MaxPlayers > 0 && ev.Confirmations.Count >= ev.MaxPlayers;
+                        var activeTables = ev.PriceOptions
+                            .Where(o => o.IsActive).OrderBy(o => o.SortOrder).ToList();
+                        @* C39-B F9: cash com mesas exige escolha na inscricao. *@
+                        @if (ev.PokerEventType == PokerEventType.CashGame && activeTables.Count > 0)
+                        {
+                            <div class="form-group">
+                                <label>@Ui["Poker.ChooseTable"]</label>
+                                @foreach (var t in activeTables)
+                                {
+                                    <label class="switch-label">
+                                        <input type="radio" name="cashTable"
+                                               checked="@(selectedTableId == t.Id)"
+                                               @onchange="() => selectedTableId = t.Id" />
+                                        @t.Label — R$ @t.Price.ToString("N2")
+                                    </label>
+                                }
+                            </div>
+                        }
                         <button class="confirm-btn confirm-btn--poker confirm-btn--full-width" @onclick="ConfirmPresence">
                             @(isFull ? @Ui["Poker.JoinQueue"] : @Ui["Poker.ConfirmPresence"]) ✓
                         </button>

@@ -29,6 +29,7 @@ public partial class Detail
     private bool requestingJoin = false;
     private bool cancellingJoin = false;
     private string joinRequestError = string.Empty;
+    private int? selectedTableId = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -47,6 +48,7 @@ public partial class Detail
                 .ThenInclude(g => g.Members)
             .Include(e => e.Confirmations)
                 .ThenInclude(c => c.User)
+            .Include(e => e.PriceOptions)
             .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Poker);
 
@@ -152,13 +154,31 @@ public partial class Detail
         if (currentUserId is null || ev is null) return;
         actionError = string.Empty;
 
-        var result = await PokerDetail.ConfirmAsync(Id, currentUserId);
+        var result = await PokerDetail.ConfirmAsync(Id, currentUserId, selectedTableId);
         actionError = result.Status switch
         {
             PokerConfirmStatus.Confirmed => string.Empty,
             PokerConfirmStatus.AlreadyRegistered => Ui["Poker.AlreadyRegistered"],
             PokerConfirmStatus.EventCancelled => Ui["Poker.EventCancelled"],
             PokerConfirmStatus.NotGroupMember => Ui["Poker.PrivateGroup"],
+            PokerConfirmStatus.PriceOptionRequired => Ui["Poker.TableRequired"],
+            PokerConfirmStatus.InvalidPriceOption => Ui["Poker.TableInvalid"],
+            _ => Ui["Poker.EventNotFound"],
+        };
+        await LoadEvent();
+    }
+
+    private async Task ChangeTable(int priceOptionId)
+    {
+        if (currentUserId is null || ev is null) return;
+        actionError = string.Empty;
+
+        var result = await PokerDetail.ChangeTableAsync(Id, currentUserId, priceOptionId);
+        actionError = result.Status switch
+        {
+            PokerChangeTableStatus.Changed => string.Empty,
+            PokerChangeTableStatus.PaidOrProofSent => Ui["Poker.CancelPaidBlocked"],
+            PokerChangeTableStatus.InvalidPriceOption => Ui["Poker.TableInvalid"],
             _ => Ui["Poker.EventNotFound"],
         };
         await LoadEvent();
