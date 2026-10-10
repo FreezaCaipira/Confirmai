@@ -16,6 +16,10 @@ public sealed class PokerCreateInitData
     public Group? PreselectedGroup { get; set; }
     public bool GroupHasPixKey { get; set; }
     public string? AdminUserId { get; set; }
+
+    /// <summary>C39-A (D3): faixa da taxa % do torneio; o form abre no minimo.</summary>
+    public decimal FeePercentMin { get; set; }
+    public decimal FeePercentMax { get; set; }
 }
 
 public sealed record PokerCreateResult(bool Success, string? Error, string? CollisionHref, int? EventId);
@@ -26,17 +30,20 @@ public sealed class PokerCreateService
     private readonly AuthenticationStateProvider _authStateProvider;
     private readonly EventCollisionService _collisionService;
     private readonly UiTextService _ui;
+    private readonly PlatformFeePolicy _feePolicy;
 
     public PokerCreateService(
         IDbContextFactory<AppDbContext> dbFactory,
         AuthenticationStateProvider authStateProvider,
         EventCollisionService collisionService,
-        UiTextService ui)
+        UiTextService ui,
+        PlatformFeePolicy feePolicy)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
         _collisionService = collisionService;
         _ui = ui;
+        _feePolicy = feePolicy;
     }
 
     public async Task<string?> GetCurrentUserIdAsync()
@@ -48,7 +55,11 @@ public sealed class PokerCreateService
     public async Task<PokerCreateInitData> InitializeAsync(int? groupId, string eventName, string city, string stateCode)
     {
         if (!groupId.HasValue)
-            return new PokerCreateInitData();
+            return new PokerCreateInitData
+            {
+                FeePercentMin = _feePolicy.PokerFeePercentMin,
+                FeePercentMax = _feePolicy.PokerFeePercentMax,
+            };
 
         var userId = await GetCurrentUserIdAsync();
         await using var db = await _dbFactory.CreateDbContextAsync();
@@ -60,7 +71,11 @@ public sealed class PokerCreateService
                 && g.Members.Any(m => m.UserId == userId && m.Role == GroupMemberRole.Admin));
 
         if (group is null)
-            return new PokerCreateInitData();
+            return new PokerCreateInitData
+            {
+                FeePercentMin = _feePolicy.PokerFeePercentMin,
+                FeePercentMax = _feePolicy.PokerFeePercentMax,
+            };
 
         return new PokerCreateInitData
         {
@@ -68,6 +83,8 @@ public sealed class PokerCreateService
             GroupHasPixKey = !string.IsNullOrWhiteSpace(
                 EventPaymentService.GetGroupAdminPixKey(group)),
             AdminUserId = userId,
+            FeePercentMin = _feePolicy.PokerFeePercentMin,
+            FeePercentMax = _feePolicy.PokerFeePercentMax,
         };
     }
 
@@ -102,6 +119,18 @@ public sealed class PokerCreateService
                     .ThenInclude(m => m.User)
                 .FirstOrDefaultAsync(g => g.Id == preselectedGroup.Id)
                 ?? preselectedGroup;
+        }
+
+        // C39-A F3 (D3): a taxa % do torneio e validada no service dentro da
+        // faixa do FeeOptions — a tela so sugere o minimo.
+        if (form.EventType == PokerEventType.Tournament
+            && form.BuyInAmount > 0
+            && !_feePolicy.IsPokerFeePercentInRange(form.PlatformFeePercent))
+        {
+            return new(false,
+                _ui.Get("Poker.Create.FeePercentOutOfRange",
+                    _feePolicy.PokerFeePercentMin, _feePolicy.PokerFeePercentMax),
+                null, null);
         }
 
         if (ChargedAmount(form) > 0 && !(existingGroup?.EnablePaymentGateways ?? false))
@@ -164,6 +193,11 @@ public sealed class PokerCreateService
         {
             case PokerEventType.Tournament:
                 ev.BuyInAmount = form.BuyInAmount;
+                // C39-A F3: o torneio cobra pelo app — Price alimenta todo o
+                // caminho do dinheiro; cash cobra por mesa (C39-B) e home
+                // game nunca cobra. Poker antigo sem Price nao cobra retroativo.
+                ev.Price = form.BuyInAmount > 0 ? form.BuyInAmount : null;
+                ev.PlatformFeePercent = form.BuyInAmount > 0 ? form.PlatformFeePercent : null;
                 ev.GTD = form.GTD;
                 ev.RebuyAmount = form.RebuyAmount;
                 ev.RebuyDoubleAmount = form.RebuyDoubleAmount;
@@ -216,6 +250,7 @@ public sealed class PokerCreateFormData
     public int InitialBlindBB { get; set; } = 50;
     public int MaxPlayers { get; set; }
     public decimal BuyInAmount { get; set; }
+    public decimal PlatformFeePercent { get; set; }
     public decimal? GTD { get; set; }
     public decimal? RebuyAmount { get; set; }
     public decimal? RebuyDoubleAmount { get; set; }

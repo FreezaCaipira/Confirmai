@@ -24,7 +24,15 @@ public class PokerCreateServiceTests
             .Setup(x => x.GetAuthenticationStateAsync())
             .ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(identity)));
         var svc = new PokerCreateService(factory, authMock.Object, collisionService,
-            new Confirmai.Services.Core.UiTextService(new Confirmai.Services.User.LanguagePreferenceService()));
+            new Confirmai.Services.Core.UiTextService(new Confirmai.Services.User.LanguagePreferenceService()),
+            new Confirmai.Services.Payment.PlatformFeePolicy(
+                Microsoft.Extensions.Options.Options.Create(
+                    new Confirmai.Configuration.FeeOptions
+                    {
+                        ManualPlatformFeeFixed = 0.75m,
+                        PokerFeePercentMin = 5m,
+                        PokerFeePercentMax = 10m,
+                    })));
         return (factory, svc);
     }
 
@@ -101,6 +109,7 @@ public class PokerCreateServiceTests
             Time = new TimeOnly(19, 0),
             MaxPlayers = 30,
             BuyInAmount = 100m,
+            PlatformFeePercent = 5m,
             GTD = 500m,
             Modality = PokerModality.Vanilla
         };

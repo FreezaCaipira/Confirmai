@@ -49,6 +49,9 @@ public partial class Create
         [Range(0, 1000000, ErrorMessage = "Valor invalido.")]
         public decimal BuyInAmount { get; set; }
 
+        [Range(0, 100, ErrorMessage = "Taxa invalida.")]
+        public decimal PlatformFeePercent { get; set; }
+
         public decimal? GTD { get; set; }
         public decimal? RebuyAmount { get; set; }
         public decimal? RebuyDoubleAmount { get; set; }
@@ -71,6 +74,8 @@ public partial class Create
     private Group? preselectedGroup;
     private bool groupHasPixKey;
     private string? adminUserId;
+    private decimal feePercentMin;
+    private decimal feePercentMax;
     private bool isSaving;
     private string saveError = string.Empty;
     private string? collisionHref;
@@ -116,6 +121,10 @@ public partial class Create
         preselectedGroup = data.PreselectedGroup;
         groupHasPixKey = data.GroupHasPixKey;
         adminUserId = data.AdminUserId;
+        // C39-A (D3): o campo abre no minimo da faixa definida pelo admin do sistema.
+        feePercentMin = data.FeePercentMin;
+        feePercentMax = data.FeePercentMax;
+        form.PlatformFeePercent = data.FeePercentMin;
         if (GroupNeedsPix) { form.BuyInAmount = 0; form.CashMinBuyIn = 0; form.CashMaxBuyIn = 0; }
         form.Name = preselectedGroup.Name;
         form.City = preselectedGroup.City;
@@ -147,6 +156,7 @@ public partial class Create
                 InitialBlindBB = form.InitialBlindBB,
                 MaxPlayers = form.MaxPlayers,
                 BuyInAmount = form.BuyInAmount,
+                PlatformFeePercent = form.PlatformFeePercent,
                 GTD = form.GTD,
                 RebuyAmount = form.RebuyAmount,
                 RebuyDoubleAmount = form.RebuyDoubleAmount,

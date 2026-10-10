@@ -56,6 +56,9 @@ public partial class Edit
         [Range(0, 1000000, ErrorMessage = "Valor inválido.")]
         public decimal BuyInAmount { get; set; } = 0;
 
+        [Range(0, 100, ErrorMessage = "Taxa inválida.")]
+        public decimal PlatformFeePercent { get; set; }
+
         public decimal? GTD               { get; set; }
         public decimal? RebuyAmount       { get; set; }
         public decimal? RebuyDoubleAmount { get; set; }
@@ -73,6 +76,8 @@ public partial class Edit
 
     private EditPokerEventForm form              = new();
     private PokerEventType     eventType         = PokerEventType.Tournament;
+    private decimal            feePercentMin;
+    private decimal            feePercentMax;
     private string?            currentHomeGameCode;
     private bool               isLoading         = true;
     private bool               notFound          = false;
@@ -108,6 +113,8 @@ public partial class Edit
 
         eventType         = ev.PokerEventType ?? PokerEventType.Tournament;
         currentHomeGameCode = ev.HomeGameCode;
+        feePercentMin     = FeePolicy.PokerFeePercentMin;
+        feePercentMax     = FeePolicy.PokerFeePercentMax;
 
         var startsLocal = ev.StartsAt.ToLocalTime();
         form = new EditPokerEventForm
@@ -124,6 +131,8 @@ public partial class Edit
             InitialBlindBB = ev.InitialBlindBB ?? 50,
             MaxPlayers    = ev.MaxPlayers,
             BuyInAmount   = ev.BuyInAmount ?? 0,
+            // C39-A (D3): evento antigo sem % abre no minimo da faixa.
+            PlatformFeePercent = ev.PlatformFeePercent ?? FeePolicy.PokerFeePercentMin,
             GTD           = ev.GTD,
             RebuyAmount   = ev.RebuyAmount,
             RebuyDoubleAmount = ev.RebuyDoubleAmount,
@@ -194,11 +203,20 @@ public partial class Edit
             switch (eventType)
             {
                 case PokerEventType.Tournament:
+                    // C39-A F3 (D3): o service-side recusa % fora da faixa.
+                    if (form.BuyInAmount > 0 && !FeePolicy.IsPokerFeePercentInRange(form.PlatformFeePercent))
+                    {
+                        saveError = Ui.Get("Poker.Create.FeePercentOutOfRange", feePercentMin, feePercentMax);
+                        isSaving  = false;
+                        return;
+                    }
                     ev.Modality        = form.Modality;
                     ev.StartingStack   = form.StartingStack;
                     ev.InitialBlindBB  = form.InitialBlindBB;
                     ev.MaxPlayers      = form.MaxPlayers;
                     ev.BuyInAmount     = form.BuyInAmount;
+                    ev.Price           = form.BuyInAmount > 0 ? form.BuyInAmount : null;
+                    ev.PlatformFeePercent = form.BuyInAmount > 0 ? form.PlatformFeePercent : null;
                     ev.GTD             = form.GTD;
                     ev.RebuyAmount     = form.RebuyAmount;
                     ev.RebuyDoubleAmount = form.RebuyDoubleAmount;

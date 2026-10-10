@@ -53,6 +53,9 @@ public sealed class PlatformFeePolicy
         => percent >= _feeOptions.Value.PokerFeePercentMin
            && percent <= _feeOptions.Value.PokerFeePercentMax;
 
+    public decimal PokerFeePercentMin => _feeOptions.Value.PokerFeePercentMin;
+    public decimal PokerFeePercentMax => _feeOptions.Value.PokerFeePercentMax;
+
     /// <summary>
     /// Carimbo na criacao da confirmacao (C36-C Fase 0 — ressalva de dinheiro
     /// do C34): a taxa e resolvida UMA vez, aqui. QR, resumo do organizador e
