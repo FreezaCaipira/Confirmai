@@ -14,17 +14,7 @@
 <div class="home">
     <AuthorizeView>
         <NotAuthorized>
-            <header class="home-hero home-hero--landing">
-                <div class="home-hero-text">
-                    <h1 class="home-hero-title">@Ui["Index.LandingTitle"]</h1>
-                    <p class="home-hero-sub">@Ui["Index.LandingSubtitle"]</p>
-                </div>
-                <div class="home-hero-actions">
-                    <a href="/Identity/Account/Login" class="home-btn home-btn--primary">@Ui["Nav.Login"]</a>
-                    <a href="/Identity/Account/Register" class="home-btn">@Ui["Nav.Register"]</a>
-                </div>
-            </header>
-            <NoGroupsHint />
+            <Landing />
         </NotAuthorized>
 
         <Authorized>

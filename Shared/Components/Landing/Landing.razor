@@ -1,0 +1,137 @@
+@inject Confirmai.Services.Core.UiTextService Ui
+
+<div class="landing">
+
+    @* ── Hero ─────────────────────────────────────────────────────────── *@
+    <section class="landing-hero">
+        <div class="landing-hero-text">
+            <h1 class="landing-hero-title">
+                @Ui["Landing.HeroTitlePre"] <span class="landing-accent">@Ui["Landing.HeroTitleAccent"]</span>@Ui["Landing.HeroTitlePost"]
+            </h1>
+            <p class="landing-hero-sub">@Ui["Landing.HeroSub"]</p>
+            <div class="landing-hero-actions">
+                <a href="/Identity/Account/Register" class="landing-btn landing-btn--primary">@Ui["Nav.Register"]</a>
+                <a href="/Identity/Account/Login" class="landing-btn landing-btn--ghost">@Ui["Nav.Login"]</a>
+            </div>
+        </div>
+
+        @* mockup do produto: card de partida (HTML/CSS, sem imagem) *@
+        <div class="landing-mock" aria-hidden="true">
+            <div class="landing-mock-card">
+                <span class="landing-mock-sport">⚽</span>
+                <div class="landing-mock-body">
+                    <strong class="landing-mock-group">@Ui["Landing.MockGroup"]</strong>
+                    <span class="landing-mock-meta">@Ui["Landing.MockWhen"] · @Ui["Landing.MockVenue"]</span>
+                    <span class="landing-mock-meta">👥 @Ui["Landing.MockConfirmed"]</span>
+                </div>
+                <span class="landing-mock-pay">@Ui["Landing.MockPay"]</span>
+            </div>
+            <div class="landing-mock-card landing-mock-card--done">
+                <span class="landing-mock-check">✓</span>
+                <span class="landing-mock-meta">@Ui["Landing.MockDone"]</span>
+            </div>
+        </div>
+    </section>
+
+    @* ── Como funciona ────────────────────────────────────────────────── *@
+    <section class="landing-section">
+        <h2 class="landing-section-title">@Ui["Landing.StepsTitle"]</h2>
+        <div class="landing-steps">
+            <div class="landing-step">
+                <span class="landing-step-num">1</span>
+                <h3 class="landing-step-title">@Ui["Landing.Step1Title"]</h3>
+                <p class="landing-step-desc">@Ui["Landing.Step1Desc"]</p>
+            </div>
+            <div class="landing-step">
+                <span class="landing-step-num">2</span>
+                <h3 class="landing-step-title">@Ui["Landing.Step2Title"]</h3>
+                <p class="landing-step-desc">@Ui["Landing.Step2Desc"]</p>
+            </div>
+            <div class="landing-step">
+                <span class="landing-step-num">3</span>
+                <h3 class="landing-step-title">@Ui["Landing.Step3Title"]</h3>
+                <p class="landing-step-desc">@Ui["Landing.Step3Desc"]</p>
+            </div>
+        </div>
+    </section>
+
+    @* ── Recursos ─────────────────────────────────────────────────────── *@
+    <section class="landing-section">
+        <h2 class="landing-section-title">@Ui["Landing.FeaturesTitle"]</h2>
+        <div class="landing-features">
+            <div class="landing-feature">
+                <i class="fas fa-clipboard-check" aria-hidden="true"></i>
+                <h3>@Ui["Landing.Feat1Title"]</h3>
+                <p>@Ui["Landing.Feat1Desc"]</p>
+            </div>
+            <div class="landing-feature">
+                <i class="fas fa-people-arrows" aria-hidden="true"></i>
+                <h3>@Ui["Landing.Feat2Title"]</h3>
+                <p>@Ui["Landing.Feat2Desc"]</p>
+            </div>
+            <div class="landing-feature">
+                <i class="fas fa-qrcode" aria-hidden="true"></i>
+                <h3>@Ui["Landing.Feat3Title"]</h3>
+                <p>@Ui["Landing.Feat3Desc"]</p>
+            </div>
+            <div class="landing-feature">
+                <i class="fas fa-trophy" aria-hidden="true"></i>
+                <h3>@Ui["Landing.Feat4Title"]</h3>
+                <p>@Ui["Landing.Feat4Desc"]</p>
+            </div>
+            <div class="landing-feature">
+                <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                <h3>@Ui["Landing.Feat5Title"]</h3>
+                <p>@Ui["Landing.Feat5Desc"]</p>
+            </div>
+            <div class="landing-feature">
+                <i class="fas fa-dice" aria-hidden="true"></i>
+                <h3>@Ui["Landing.Feat6Title"]</h3>
+                <p>@Ui["Landing.Feat6Desc"]</p>
+            </div>
+        </div>
+    </section>
+
+    @* ── WhatsApp ─────────────────────────────────────────────────────── *@
+    <section class="landing-section landing-split">
+        <div class="landing-split-text">
+            <h2 class="landing-section-title">@Ui["Landing.WhatsAppTitle"]</h2>
+            <p class="landing-section-desc">@Ui["Landing.WhatsAppDesc"]</p>
+        </div>
+        <div class="landing-chat" aria-hidden="true">
+            <div class="landing-chat-bubble">
+                <strong>@Ui["Landing.WhatsAppPreview1"]</strong><br />
+                @Ui["Landing.WhatsAppPreview2"]<br />
+                @Ui["Landing.WhatsAppPreview3"]
+            </div>
+        </div>
+    </section>
+
+    @* ── Ranking ──────────────────────────────────────────────────────── *@
+    <section class="landing-section landing-split landing-split--rev">
+        <div class="landing-split-text">
+            <h2 class="landing-section-title">@Ui["Landing.RankingTitle"]</h2>
+            <p class="landing-section-desc">@Ui["Landing.RankingDesc"]</p>
+        </div>
+        <div class="landing-rank" aria-hidden="true">
+            <div class="landing-rank-row landing-rank-row--1"><span class="landing-rank-pos">1</span><span>@Ui["Landing.RankRow1"]</span><strong>18</strong></div>
+            <div class="landing-rank-row landing-rank-row--2"><span class="landing-rank-pos">2</span><span>@Ui["Landing.RankRow2"]</span><strong>15</strong></div>
+            <div class="landing-rank-row landing-rank-row--3"><span class="landing-rank-pos">3</span><span>@Ui["Landing.RankRow3"]</span><strong>13</strong></div>
+        </div>
+    </section>
+
+    @* ── CTA final ────────────────────────────────────────────────────── *@
+    <section class="landing-cta">
+        <h2 class="landing-cta-title">@Ui["Landing.CtaTitle"]</h2>
+        <p class="landing-hero-sub">@Ui["Landing.CtaSub"]</p>
+        <a href="/Identity/Account/Register" class="landing-btn landing-btn--primary">@Ui["Landing.CtaButton"]</a>
+    </section>
+
+    <footer class="landing-footer">
+        <span class="landing-footer-brand">Confirmai</span>
+        <nav class="landing-footer-links" aria-label="@Ui["Landing.FooterNav"]">
+            <a href="/about">@Ui["Landing.FooterAbout"]</a>
+            <a href="/contact">@Ui["Landing.FooterContact"]</a>
+        </nav>
+    </footer>
+</div>

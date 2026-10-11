@@ -1,0 +1,402 @@
+/* C40 F3 — landing deslogada (referencia Coachwise; tokens dark+zinc+azul).
+   Gradiente so no hero. Sem imagem externa, sem JS. */
+
+.landing {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+    padding: 1rem 0 2rem;
+}
+
+/* ── Hero ──────────────────────────────────────────────────────── */
+.landing-hero {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2.5rem;
+    align-items: center;
+    padding: 3rem 2rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--surface) 0%, #12233f 55%, #0b1a33 100%);
+    border: 1px solid var(--accent-border);
+}
+
+.landing-hero-title {
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.08;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.02em;
+}
+
+.landing-accent {
+    color: var(--accent-text);
+}
+
+.landing-hero-sub {
+    margin: 0 0 1.75rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--accent-fg-2);
+    max-width: 34rem;
+}
+
+.landing-hero-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.landing-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.75rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.landing-btn--primary {
+    background: var(--accent);
+    color: var(--accent-fg);
+}
+
+.landing-btn--primary:hover {
+    background: var(--accent-hover);
+    color: var(--accent-fg);
+    transform: translateY(-1px);
+}
+
+.landing-btn--ghost {
+    border: 1px solid var(--accent-border);
+    color: var(--text);
+}
+
+.landing-btn--ghost:hover {
+    background: var(--accent-soft);
+    color: var(--text);
+}
+
+/* ── Mockup do produto ─────────────────────────────────────────── */
+.landing-mock {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.landing-mock-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.landing-mock-sport {
+    font-size: 1.6rem;
+}
+
+.landing-mock-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.landing-mock-group {
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.landing-mock-meta {
+    color: var(--text-3);
+    font-size: 0.8rem;
+}
+
+.landing-mock-pay {
+    flex-shrink: 0;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--accent-fg);
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.landing-mock-card--done {
+    align-self: flex-end;
+    gap: 0.6rem;
+    padding: 0.7rem 1.1rem;
+    border-color: var(--accent-border);
+    background: var(--accent-soft);
+}
+
+.landing-mock-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-fg);
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.landing-mock-card--done .landing-mock-meta {
+    color: var(--accent-fg-2);
+}
+
+/* ── Seções ────────────────────────────────────────────────────── */
+.landing-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.landing-section-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.01em;
+}
+
+.landing-section-desc {
+    margin: 0;
+    color: var(--text-2);
+    line-height: 1.6;
+    max-width: 32rem;
+}
+
+/* ── 3 passos ──────────────────────────────────────────────────── */
+.landing-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.landing-step {
+    padding: 1.4rem;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.landing-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+}
+
+.landing-step-title {
+    margin: 0 0 0.4rem;
+    font-size: 1.05rem;
+    color: var(--text);
+}
+
+.landing-step-desc {
+    margin: 0;
+    color: var(--text-3);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+/* ── Grade de recursos 3x2 ─────────────────────────────────────── */
+.landing-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.landing-feature {
+    padding: 1.4rem;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.landing-feature i {
+    font-size: 1.3rem;
+    color: var(--accent-text);
+    margin-bottom: 0.6rem;
+    display: inline-block;
+}
+
+.landing-feature h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1rem;
+    color: var(--text);
+}
+
+.landing-feature p {
+    margin: 0;
+    color: var(--text-3);
+    font-size: 0.88rem;
+    line-height: 1.55;
+}
+
+/* ── Split (WhatsApp / Ranking) ────────────────────────────────── */
+.landing-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.landing-chat {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.landing-chat-bubble {
+    max-width: 22rem;
+    padding: 1rem 1.2rem;
+    border-radius: 14px 14px 4px 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    color: var(--text-2);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.landing-chat-bubble strong {
+    color: var(--text);
+}
+
+.landing-rank {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.landing-rank-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    font-size: 0.9rem;
+}
+
+.landing-rank-row strong {
+    margin-left: auto;
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.landing-rank-pos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--text-3);
+    font-weight: 800;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.landing-rank-row--1 .landing-rank-pos { background: var(--accent-soft); color: var(--accent-text); }
+.landing-rank-row--2 .landing-rank-pos { background: var(--surface-3); color: var(--text-2); }
+.landing-rank-row--3 .landing-rank-pos { background: var(--surface-3); color: var(--text-3); }
+
+/* ── CTA final ─────────────────────────────────────────────────── */
+.landing-cta {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.landing-cta-title {
+    margin: 0 0 0.6rem;
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.landing-cta .landing-hero-sub {
+    color: var(--text-2);
+    margin: 0 auto 1.5rem;
+}
+
+/* ── Footer ────────────────────────────────────────────────────── */
+.landing-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.landing-footer-brand {
+    font-weight: 800;
+    color: var(--text);
+}
+
+.landing-footer-links {
+    display: flex;
+    gap: 1.25rem;
+}
+
+.landing-footer-links a {
+    color: var(--accent-text);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.landing-footer-links a:hover {
+    text-decoration: underline;
+}
+
+/* ── Responsivo ────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+    .landing-hero {
+        grid-template-columns: 1fr;
+        padding: 2rem 1.25rem;
+    }
+
+    .landing-steps,
+    .landing-features {
+        grid-template-columns: 1fr;
+    }
+
+    .landing-split {
+        grid-template-columns: 1fr;
+    }
+
+    .landing-split--rev .landing-chat,
+    .landing-split--rev .landing-rank {
+        order: -1;
+    }
+
+    .landing-chat {
+        justify-content: flex-start;
+    }
+}
