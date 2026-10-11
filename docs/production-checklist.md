@@ -32,15 +32,28 @@ juntar com o "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" do `WORK_PLAN.md
 - [ ] BTCPay, AbacatePay e Efi estão **V2 / desligados**: sem credenciais de gateway nas env vars e `EnablePaymentGateways=false` em todos os grupos (o toggle é por grupo, no banco). O caminho do dinheiro do V1 é 100% manual (Pix do admin + comprovante).
 - [ ] Webhook Efi mTLS — só quando o V2 for ativado; hoje não há endpoint esperando webhook externo de gateway.
 
-### WhatsApp / Evolution API (C31 — desligado até liberação)
+### WhatsApp / whatsapp-bridge (C41 — desligado até liberação)
 
-O C31 já está no código, mas **tudo é no-op** sem as variáveis abaixo. Ordem de ativação: subir a Evolution no EasyPanel → parear o chip dedicado (já aquecido, fora de automação prévia) → `Enabled=true` + `DryRun=true` por alguns dias → `AllowedGroupJids` com o(s) JID(s) reais → só então `DryRun=false`.
+O envio de WhatsApp já está no código, mas **tudo é no-op** sem as variáveis abaixo. O `whatsapp-bridge/` é um serviço Go próprio (whatsmeow + sqlite) que substitui a Evolution API — nada do lado da aplicação chama a Meta/Evolution.
+
+Ordem de ativação: subir o bridge no EasyPanel → parear o chip dedicado via `GET /pair` → `Enabled=true` + `DryRun=true` por alguns dias → `AllowedGroupJids` com o(s) JID(s) reais → só então `DryRun=false`.
+
+Deploy do bridge (serviço separado, imagem `whatsapp-bridge/Dockerfile`):
+
+- [ ] Volume montado em `/data` — a sessão pareada do WhatsApp vive no sqlite (`BRIDGE_DB_PATH=/data/session.db`), sem volume o pareamento se perde a cada redeploy.
+- [ ] `BRIDGE_TOKEN` — token Bearer aleatório longo, via env var. Todos os endpoints do bridge exigem `Authorization: Bearer $BRIDGE_TOKEN` (comparação em tempo constante).
+- [ ] `BRIDGE_ALLOWED_GROUP_JIDS` — CSV de JIDs `...@g.us` que o bridge aceita enviar; envio para JID fora da lista é `403`.
+- [ ] Rede interna apenas — o bridge não deve expor porta pública.
+- [ ] Pareamento (primeira vez): `curl -H "Authorization: Bearer $BRIDGE_TOKEN" http://<bridge>:8090/pair` → PNG do QR; escanear com o WhatsApp do chip dedicado. Depois de pareado `/pair` responde `409`.
+- [ ] `GET /groups` (mesmo token) lista `{"jid","name"}` dos grupos — é daqui que saem os JIDs para `BRIDGE_ALLOWED_GROUP_JIDS` e `WhatsApp__AllowedGroupJids`.
+- [ ] `GET /health` → `{"connected":true,"loggedIn":true}` antes de liberar o envio real.
+
+Na aplicação:
 
 - [ ] `WhatsApp__Enabled=false` (default) — sem as demais variáveis o app funciona normalmente; nenhuma mensagem é tentada.
-- [ ] `WhatsApp__DryRun=true` (default) — com `Enabled=true` registra cada mensagem como `dry_run` na tabela `WhatsAppDispatches` e na métrica `confirmai_whatsapp_send_total{result="dry_run"}` **sem chamar a Evolution**. Fase de aquecimento/observação.
-- [ ] `WhatsApp__BaseUrl` — URL **interna** da Evolution no EasyPanel (ex.: `http://evolution:8080`), nunca domínio público. Ausente com `DryRun=false` = **boot falha** (guard rail).
-- [ ] `WhatsApp__Instance` — nome da instância pareada (o chip dedicado). Mesma trava de boot.
-- [ ] `WhatsApp__ApiKey` — `AUTHENTICATION_API_KEY` da Evolution, via env var, **nunca** em appsettings versionado. Mesma trava de boot.
+- [ ] `WhatsApp__DryRun=true` (default) — com `Enabled=true` registra cada mensagem como `dry_run` na tabela `WhatsAppDispatches` e na métrica `confirmai_whatsapp_send_total{result="dry_run"}` **sem chamar o bridge**. Fase de aquecimento/observação.
+- [ ] `WhatsApp__BaseUrl` — URL **interna** do bridge no EasyPanel (ex.: `http://whatsapp-bridge:8090`), nunca domínio público. Ausente com `DryRun=false` = **boot falha** (guard rail).
+- [ ] `WhatsApp__ApiKey` — **o mesmo `BRIDGE_TOKEN` do bridge**, via env var, **nunca** em appsettings versionado. Ausente com `DryRun=false` = boot falha.
 - [ ] `WhatsApp__AllowedGroupJids` — CSV de JIDs `...@g.us` permitidos. Com `Enabled=true` + `DryRun=false` fora de dev, lista **vazia falha o boot**; JID fora da lista é bloqueado (`result=blocked_allowlist`).
 - [ ] `WhatsApp__PublicBaseUrl` — URL pública do app (ex.: `https://confirmai.com`) para os links das mensagens. Vazio = mensagem vai **sem link** (não falha).
 - [ ] `App__PublicBaseUrl` (C40) — URL pública do app para os **links dos emails** (partida, grupo, pagamentos). Vazio = email sai sem CTA (não falha). `WhatsApp__PublicBaseUrl` continua valendo como base; `App__PublicBaseUrl` é o fallback.

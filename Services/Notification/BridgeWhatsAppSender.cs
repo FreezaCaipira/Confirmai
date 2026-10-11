@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Confirmai.Configuration;
 using Microsoft.Extensions.Options;
@@ -5,19 +6,21 @@ using Microsoft.Extensions.Options;
 namespace Confirmai.Services.Notification;
 
 /// <summary>
-/// C31 — Evolution API sender. Contract: POST {BaseUrl}/message/sendText/{Instance},
-/// header "apikey", body { number = group JID, text }.
+/// C41 — whatsapp-bridge sender. Contract: POST {BaseUrl}/send/group-text,
+/// header "Authorization: Bearer {ApiKey}", body { jid, text }.
+/// The bridge (whatsapp-bridge/ in this repo, whatsmeow under the hood) owns
+/// the WhatsApp session — no instance name needed here.
 /// </summary>
-public sealed class EvolutionWhatsAppSender : IWhatsAppSender
+public sealed class BridgeWhatsAppSender : IWhatsAppSender
 {
     private readonly HttpClient _httpClient;
     private readonly WhatsAppOptions _options;
-    private readonly ILogger<EvolutionWhatsAppSender> _logger;
+    private readonly ILogger<BridgeWhatsAppSender> _logger;
 
-    public EvolutionWhatsAppSender(
+    public BridgeWhatsAppSender(
         HttpClient httpClient,
         IOptions<WhatsAppOptions> options,
-        ILogger<EvolutionWhatsAppSender> logger)
+        ILogger<BridgeWhatsAppSender> logger)
     {
         _httpClient = httpClient;
         _options = options.Value;
@@ -27,7 +30,6 @@ public sealed class EvolutionWhatsAppSender : IWhatsAppSender
     public async Task<WhatsAppSendResult> SendGroupTextAsync(string groupJid, string text, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(_options.BaseUrl) ||
-            string.IsNullOrWhiteSpace(_options.Instance) ||
             string.IsNullOrWhiteSpace(_options.ApiKey))
         {
             return WhatsAppSendResult.Failed("missing_config");
@@ -35,12 +37,12 @@ public sealed class EvolutionWhatsAppSender : IWhatsAppSender
 
         try
         {
-            var url = $"{_options.BaseUrl.TrimEnd('/')}/message/sendText/{_options.Instance}";
+            var url = $"{_options.BaseUrl.TrimEnd('/')}/send/group-text";
             using var request = new HttpRequestMessage(HttpMethod.Post, url)
             {
-                Content = JsonContent.Create(new { number = groupJid, text })
+                Content = JsonContent.Create(new { jid = groupJid, text })
             };
-            request.Headers.TryAddWithoutValidation("apikey", _options.ApiKey);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
 
             using var response = await _httpClient.SendAsync(request, ct);
             if (!response.IsSuccessStatusCode)
@@ -52,7 +54,7 @@ public sealed class EvolutionWhatsAppSender : IWhatsAppSender
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Evolution: falha ao enviar texto para grupo {GroupJid}", groupJid);
+            _logger.LogWarning(ex, "WhatsApp bridge: falha ao enviar texto para grupo {GroupJid}", groupJid);
             return WhatsAppSendResult.Failed("exception");
         }
     }

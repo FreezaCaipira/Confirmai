@@ -6,8 +6,8 @@ using Xunit;
 namespace Confirmai.Tests;
 
 /// <summary>
-/// C31 Fase 4 — boot guard: real WhatsApp sends (Enabled + !DryRun) must fail
-/// the boot on incomplete Evolution config, and outside dev/test on an empty
+/// C31/C41 — boot guard: real WhatsApp sends (Enabled + !DryRun) must fail
+/// the boot on incomplete bridge config, and outside dev/test on an empty
 /// allowlist.
 /// </summary>
 public class C31WhatsAppBootGuardTests : IClassFixture<IntegrationTestWebAppFactory>
@@ -17,7 +17,7 @@ public class C31WhatsAppBootGuardTests : IClassFixture<IntegrationTestWebAppFact
     public C31WhatsAppBootGuardTests(IntegrationTestWebAppFactory factory) => _factory = factory;
 
     [Fact]
-    public void RealSend_WithoutEvolutionConfig_FailsBoot()
+    public void RealSend_WithoutBridgeConfig_FailsBoot()
     {
         using var factory = _factory.WithWebHostBuilder(builder =>
             builder.ConfigureAppConfiguration((_, cfg) => cfg.AddInMemoryCollection(
@@ -26,7 +26,7 @@ public class C31WhatsAppBootGuardTests : IClassFixture<IntegrationTestWebAppFact
                     ["WhatsApp:Enabled"] = "true",
                     ["WhatsApp:DryRun"] = "false",
                     ["WhatsApp:AllowedGroupJids"] = "111@g.us"
-                    // BaseUrl / Instance / ApiKey deliberately missing
+                    // BaseUrl / ApiKey deliberately missing
                 })));
 
         var ex = Assert.ThrowsAny<Exception>(() => factory.CreateClient());
@@ -44,9 +44,8 @@ public class C31WhatsAppBootGuardTests : IClassFixture<IntegrationTestWebAppFact
                 {
                     ["WhatsApp:Enabled"] = "true",
                     ["WhatsApp:DryRun"] = "false",
-                    ["WhatsApp:BaseUrl"] = "http://evolution:8080",
-                    ["WhatsApp:Instance"] = "Confirmai-Bot",
-                    ["WhatsApp:ApiKey"] = "some-key"
+                    ["WhatsApp:BaseUrl"] = "http://whatsapp-bridge:8090",
+                    ["WhatsApp:ApiKey"] = "bridge-token"
                     // AllowedGroupJids deliberately absent
                 }));
         });
@@ -66,9 +65,8 @@ public class C31WhatsAppBootGuardTests : IClassFixture<IntegrationTestWebAppFact
                 {
                     ["WhatsApp:Enabled"] = "true",
                     ["WhatsApp:DryRun"] = "false",
-                    ["WhatsApp:BaseUrl"] = "http://evolution:8080",
-                    ["WhatsApp:Instance"] = "Confirmai-Bot",
-                    ["WhatsApp:ApiKey"] = "some-key"
+                    ["WhatsApp:BaseUrl"] = "http://whatsapp-bridge:8090",
+                    ["WhatsApp:ApiKey"] = "bridge-token"
                 })));
 
         using var client = factory.CreateClient(new WebApplicationFactoryClientOptions

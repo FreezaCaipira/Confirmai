@@ -2,7 +2,7 @@ namespace Confirmai.Services.Notification;
 
 /// <summary>
 /// C31 — default sender: logs the would-be message instead of calling the
-/// Evolution API. Lets every trigger ship and be tested before the service
+/// whatsapp-bridge. Lets every trigger ship and be tested before the service
 /// exists in production.
 /// </summary>
 public sealed class DryRunWhatsAppSender : IWhatsAppSender
