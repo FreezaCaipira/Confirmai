@@ -10,34 +10,38 @@
 else
 {
     <div class="ranking-header">
-        <span class="ranking-pos"></span>
+        <span class="ranking-pos ranking-col--label">@Ui["Ranking.ColPos"]</span>
         <span class="ranking-name ranking-col-label"><i class="fas fa-user"></i> @Ui["Common.Name"]</span>
-        <span class="ranking-col ranking-col--label ranking-col--label-games"><i class="fas fa-futbol"></i> @Ui["Ranking.ColGames"]</span>
-        <span class="ranking-col ranking-col--label ranking-col--label-highlight"><i class="fas fa-star"></i> @Ui["Ranking.ColHighlights"]</span>
-        <span class="ranking-col ranking-col--label ranking-col--label-wins"><i class="fas fa-trophy"></i> @Ui["Group.Wins"]</span>
+        <span class="ranking-col ranking-col--label" title="@Ui["Ranking.ColGamesTitle"]">@Ui["Ranking.ColGames"]</span>
+        <span class="ranking-col ranking-col--label" title="@Ui["Group.Wins"]">@Ui["Ranking.ColWins"]</span>
+        <span class="ranking-col ranking-col--label" title="@Ui["Group.RankingDraws"]">@Ui["Ranking.ColDraws"]</span>
+        <span class="ranking-col ranking-col--label ranking-col--optional" title="@Ui["Group.RankingLosses"]">@Ui["Ranking.ColLosses"]</span>
+        <span class="ranking-col ranking-col--label ranking-col--label-wins" title="@Ui["Group.RankingPoints"]">@Ui["Ranking.ColPoints"]</span>
+        <span class="ranking-col ranking-col--label ranking-col--optional ranking-col--label-highlight" title="@Ui["Group.RankingHighlights"]">@Ui["Ranking.ColHighlights"]</span>
     </div>
     <ol class="ranking-list">
-        @{ int pos = 0; }
         @foreach (var row in RankingRows ?? new())
         {
-            pos++;
             bool isMe = row.UserId == CurrentUserId;
-            string medalClass = pos switch { 1 => "ranking-medal--gold", 2 => "ranking-medal--silver", 3 => "ranking-medal--bronze", _ => "" };
+            string medalClass = row.Position switch { 1 => "ranking-medal--gold", 2 => "ranking-medal--silver", 3 => "ranking-medal--bronze", _ => "" };
             <li class="ranking-row @(isMe ? "ranking-row--me" : "")" @onclick="() => ToggleExpanded(row.UserId)">
                 <span class="ranking-pos @medalClass">
-                    @if (pos <= 3)
+                    @if (row.Position <= 3)
                     {
                         <i class="fas fa-medal"></i>
                     }
                     else
                     {
-                        @pos
+                        @row.Position
                     }
                 </span>
                 <span class="ranking-name">@row.UserName @if (isMe) { <span class="player-tag player-tag--me">@Ui["Group.You"]</span> }</span>
-                <span class="ranking-col" title="@Ui["Group.RankingGames"]">@row.GamesPlayed</span>
-                <span class="ranking-col ranking-col--highlight" title="@Ui["Group.RankingHighlights"]">@row.Highlights</span>
+                <span class="ranking-col" title="@Ui["Ranking.ColGamesTitle"]">@row.GamesPlayed</span>
                 <span class="ranking-col ranking-col--wins" title="@Ui["Group.Wins"]">@row.Wins</span>
+                <span class="ranking-col" title="@Ui["Group.RankingDraws"]">@row.Draws</span>
+                <span class="ranking-col ranking-col--optional" title="@Ui["Group.RankingLosses"]">@row.Losses</span>
+                <span class="ranking-col ranking-col--points" title="@Ui["Group.RankingPoints"]">@row.Points</span>
+                <span class="ranking-col ranking-col--optional ranking-col--highlight" title="@Ui["Group.RankingHighlights"]">@row.Highlights</span>
                 @if (expandedUserId == row.UserId)
                 {
                     <div class="ranking-name-tooltip">@row.UserName</div>
@@ -48,7 +52,16 @@ else
 }
 
 @code {
-    public record RankingRow(string UserId, string UserName, int GamesPlayed, int Highlights, int Wins);
+    public record RankingRow(
+        string UserId,
+        string UserName,
+        int Position,
+        int GamesPlayed,
+        int Wins,
+        int Draws,
+        int Losses,
+        int Points,
+        int Highlights);
 
     [Parameter]
     public List<RankingRow>? RankingRows { get; set; }
@@ -62,4 +75,3 @@ else
         expandedUserId = expandedUserId == userId ? null : userId;
     }
 }
-

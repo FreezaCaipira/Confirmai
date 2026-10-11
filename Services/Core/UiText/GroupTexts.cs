@@ -332,6 +332,16 @@ internal static class GroupTexts
         ["Group.RankingGames"] = "Partidas",
         ["Group.RankingHighlights"] = "Destaques",
         ["Group.WeeklyRecurrences"] = "Recorrências semanais",
+        ["Group.RankingDraws"] = "Empates",
+        ["Group.RankingLosses"] = "Derrotas",
+        ["Group.RankingPoints"] = "Pontos",
+        ["Group.RankingCopyWhatsApp"] = "Copiar para o WhatsApp",
+        ["Ranking.ColPos"] = "Pos",
+        ["Ranking.ColWins"] = "V",
+        ["Ranking.ColDraws"] = "E",
+        ["Ranking.ColLosses"] = "D",
+        ["Ranking.ColPoints"] = "Pts",
+        ["Ranking.ColGamesTitle"] = "Jogos",
     };
 
     /// <summary>EN-US English (United States) strings</summary>
@@ -660,6 +670,16 @@ internal static class GroupTexts
         ["Group.Wins"] = "Wins",
         ["Group.RankingGames"] = "Matches",
         ["Group.RankingHighlights"] = "Highlights",
+        ["Group.RankingDraws"] = "Draws",
+        ["Group.RankingLosses"] = "Losses",
+        ["Group.RankingPoints"] = "Points",
+        ["Group.RankingCopyWhatsApp"] = "Copy for WhatsApp",
+        ["Ranking.ColPos"] = "Pos",
+        ["Ranking.ColWins"] = "W",
+        ["Ranking.ColDraws"] = "D",
+        ["Ranking.ColLosses"] = "L",
+        ["Ranking.ColPoints"] = "Pts",
+        ["Ranking.ColGamesTitle"] = "Matches played",
         ["Group.WeeklyRecurrences"] = "Weekly recurrences",
     };
 
@@ -990,6 +1010,16 @@ internal static class GroupTexts
         ["Group.RankingGames"] = "Partidas",
         ["Group.RankingHighlights"] = "Destaques",
         ["Group.WeeklyRecurrences"] = "Recurrencias semanales",
+        ["Group.RankingDraws"] = "Empates",
+        ["Group.RankingLosses"] = "Derrotas",
+        ["Group.RankingPoints"] = "Puntos",
+        ["Group.RankingCopyWhatsApp"] = "Copiar para WhatsApp",
+        ["Ranking.ColPos"] = "Pos",
+        ["Ranking.ColWins"] = "G",
+        ["Ranking.ColDraws"] = "E",
+        ["Ranking.ColLosses"] = "D",
+        ["Ranking.ColPoints"] = "Pts",
+        ["Ranking.ColGamesTitle"] = "Partidos jugados",
     };
 
     /// <summary>Get combined dictionary for all languages</summary>
