@@ -1,7 +1,10 @@
+using System.Web;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Core;
 using Confirmai.Services.Notification;
+using Confirmai.Services.Utility;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,17 +21,67 @@ public class EventNotificationService
     private readonly IEmailSender                   _emailSender;
     private readonly ILogger<EventNotificationService> _logger;
     private readonly WhatsAppDispatchService?       _whatsApp;
+    private readonly EmailTemplateService?          _emailTemplate;
+    private readonly UiTextService?                 _uiText;
+    private readonly AppLinks?                      _links;
 
     public EventNotificationService(
         IDbContextFactory<AppDbContext> dbFactory,
         IEmailSender emailSender,
         ILogger<EventNotificationService> logger,
-        WhatsAppDispatchService? whatsApp = null)
+        WhatsAppDispatchService? whatsApp = null,
+        EmailTemplateService? emailTemplate = null,
+        UiTextService? uiText = null,
+        AppLinks? links = null)
     {
         _dbFactory   = dbFactory;
         _emailSender = emailSender;
         _logger      = logger;
         _whatsApp    = whatsApp;
+        _emailTemplate = emailTemplate;
+        _uiText      = uiText;
+        _links       = links;
+    }
+
+    // ── C40 F1 — link + CTA nos emails ──────────────────────────────────────
+
+    private string? EventCtaUrl(Event ev) => _links?.EventUrl(ev);
+
+    private string CtaText(string key, string fallback) => _uiText?[key] ?? fallback;
+
+    /// <summary>Linha do link no corpo do mailbox (texto puro) quando ha base.</summary>
+    private static string MailboxLinkLine(string? ctaText, string? ctaUrl)
+        => string.IsNullOrWhiteSpace(ctaUrl) ? string.Empty : $"\n\n{ctaText}: {ctaUrl}";
+
+    /// <summary>Paragrafos do corpo — codificados (o template nao encoda paragrafos).</summary>
+    private static IEnumerable<string> BodyParagraphs(string bodyText)
+        => bodyText.Split("\n\n", StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => HttpUtility.HtmlEncode(p).Replace("\n", "<br/>"));
+
+    private (string Html, string? Text) RenderEmail(
+        string subject, string bodyText, string? ctaText, string? ctaUrl)
+    {
+        var paragraphs = BodyParagraphs(bodyText).ToList();
+        if (_emailTemplate is null)
+            return ($"<p>{string.Join("</p><p>", paragraphs)}</p>", null);
+
+        return (
+            _emailTemplate.RenderHtml(subject, preheader: null, paragraphs, ctaText, ctaUrl),
+            _emailTemplate.RenderText(subject, paragraphs, ctaText, ctaUrl));
+    }
+
+    private async Task SendEmailBestEffortAsync(
+        string email, string subject, string bodyText, string? ctaText, string? ctaUrl, string context)
+    {
+        var (html, text) = RenderEmail(subject, bodyText, ctaText, ctaUrl);
+        try
+        {
+            if (_emailSender is IdentityEmailSender sender && text is not null)
+                await sender.SendEmailAsync(email, subject, html, text);
+            else
+                await _emailSender.SendEmailAsync(email, subject, html);
+        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail ({Context}) para {Email}", context, email); }
     }
 
     /// <summary>
@@ -56,8 +109,10 @@ public class EventNotificationService
                        $"A {sportLabel} \"{ev.Group.Name}\", " +
                        $"que estava marcada para {startsStr}, foi cancelada pelo organizador.\n\n" +
                        $"Equipe Confirmai";
+        var ctaText  = CtaText("Email.Cta.OpenGroup", "Abrir o grupo");
+        var ctaUrl   = _links?.GroupUrl(ev.GroupId);
 
-        await SendToParticipantsAsync(db, ev, cancelledByUserId, subject, bodyText);
+        await SendToParticipantsAsync(db, ev, cancelledByUserId, subject, bodyText, ctaText, ctaUrl);
 
         if (_whatsApp is not null)
             await _whatsApp.DispatchAsync(ev.Id, WhatsAppMessageKind.EventCancelled,
@@ -95,8 +150,10 @@ public class EventNotificationService
                        $"• Data anterior: {oldStr}\n" +
                        $"• Nova data:     {newStr}\n\n" +
                        $"Equipe Confirmai";
+        var ctaText  = CtaText("Email.Cta.ViewEvent", "Ver partida e confirmar");
+        var ctaUrl   = EventCtaUrl(ev);
 
-        await SendToParticipantsAsync(db, ev, updatedByUserId, subject, bodyText);
+        await SendToParticipantsAsync(db, ev, updatedByUserId, subject, bodyText, ctaText, ctaUrl);
 
         if (_whatsApp is not null)
             await _whatsApp.DispatchAsync(ev.Id, WhatsAppMessageKind.EventUpdated,
@@ -140,7 +197,9 @@ public class EventNotificationService
                         $"📍 {location}\n\n" +
                         $"Acesse o Confirmai para confirmar sua presença.\n\n" +
                         $"Equipe Confirmai";
-        var bodyHtml  = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
+        var ctaText   = CtaText("Email.Cta.ViewEvent", "Ver partida e confirmar");
+        var ctaUrl    = EventCtaUrl(ev);
+        var mailboxBody = bodyText + MailboxLinkLine(ctaText, ctaUrl);
 
         foreach (var member in members)
         {
@@ -151,7 +210,7 @@ public class EventNotificationService
                 RecipientUserId   = member.UserId,
                 RecipientDisplayName = member.User?.UserName,
                 Subject           = subject,
-                Body              = bodyText,
+                Body              = mailboxBody,
                 CreatedAt         = DateTime.UtcNow,
             });
         }
@@ -161,8 +220,7 @@ public class EventNotificationService
         foreach (var member in members)
         {
             if (string.IsNullOrWhiteSpace(member.User?.Email)) continue;
-            try   { await _emailSender.SendEmailAsync(member.User.Email, subject, bodyHtml); }
-            catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de notificação para {Email}", member.User.Email); }
+            await SendEmailBestEffortAsync(member.User.Email, subject, bodyText, ctaText, ctaUrl, "nova partida");
         }
 
         if (_whatsApp is not null)
@@ -171,7 +229,8 @@ public class EventNotificationService
     }
 
     private async Task SendToParticipantsAsync(
-        AppDbContext db, Event ev, string senderId, string subject, string bodyText)
+        AppDbContext db, Event ev, string senderId, string subject, string bodyText,
+        string? ctaText = null, string? ctaUrl = null)
     {
         var recipients = ev.Confirmations
             .Where(c => c.UserId != senderId && c.User is not null)
@@ -182,6 +241,7 @@ public class EventNotificationService
 
         var senderUser = await db.Users.FindAsync(senderId) as ApplicationUser;
         var senderDisplayName = senderUser?.UserName;
+        var mailboxBody = bodyText + MailboxLinkLine(ctaText, ctaUrl);
 
         foreach (var user in recipients)
         {
@@ -192,7 +252,7 @@ public class EventNotificationService
                 RecipientUserId      = user.Id,
                 RecipientDisplayName = user.UserName,
                 Subject              = subject,
-                Body                 = bodyText,
+                Body                 = mailboxBody,
                 CreatedAt            = DateTime.UtcNow,
             });
         }
@@ -200,12 +260,10 @@ public class EventNotificationService
         await db.SaveChangesAsync();
 
         // Email best-effort — falhas são silenciosas para não bloquear o fluxo principal
-        var bodyHtml = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
         foreach (var user in recipients)
         {
             if (string.IsNullOrWhiteSpace(user.Email)) continue;
-            try   { await _emailSender.SendEmailAsync(user.Email, subject, bodyHtml); }
-            catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de notificação para {Email}", user.Email); }
+            await SendEmailBestEffortAsync(user.Email, subject, bodyText, ctaText, ctaUrl, "notificação de evento");
         }
     }
 
@@ -231,6 +289,8 @@ public class EventNotificationService
                         $"Uma vaga abriu e você foi promovido da lista de espera para a partida " +
                         $"\"{ev.Group.Name}\" em {startsStr}.\n\n" +
                         $"Equipe Confirmai";
+        var ctaText = CtaText("Email.Cta.ViewEvent", "Ver partida e confirmar");
+        var ctaUrl  = EventCtaUrl(ev);
 
         db.UserMailboxMessages.Add(new UserMailboxMessage
         {
@@ -239,17 +299,13 @@ public class EventNotificationService
             RecipientUserId      = promotedUserId,
             RecipientDisplayName = user.UserName,
             Subject              = subject,
-            Body                 = bodyText,
+            Body                 = bodyText + MailboxLinkLine(ctaText, ctaUrl),
             CreatedAt            = DateTime.UtcNow,
         });
         await db.SaveChangesAsync();
 
         if (!string.IsNullOrWhiteSpace(user.Email))
-        {
-            var bodyHtml = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
-            try { await _emailSender.SendEmailAsync(user.Email, subject, bodyHtml); }
-            catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de promoção de espera para {Email}", user.Email); }
-        }
+            await SendEmailBestEffortAsync(user.Email, subject, bodyText, ctaText, ctaUrl, "promoção de espera");
 
         if (_whatsApp is not null)
             await _whatsApp.DispatchAsync(ev.Id, WhatsAppMessageKind.WaitlistPromoted,
@@ -265,6 +321,7 @@ public class EventNotificationService
         string adminUserId,
         string targetUserId,
         string groupName,
+        int groupId,
         IReadOnlyList<(DateTime Date, decimal Price)> entries)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
@@ -287,25 +344,25 @@ public class EventNotificationService
             $"Por favor, regularize o quanto antes.\n\n" +
             $"Equipe Confirmai";
 
+        var subject  = $"[Confirmai] Pagamentos pendentes — {groupName}";
+        var ctaText  = CtaText("Email.Cta.MyPayments", "Ver meus pagamentos");
+        var ctaUrl   = _links?.GroupPaymentsUrl(groupId);
+
         db.UserMailboxMessages.Add(new UserMailboxMessage
         {
             SenderUserId         = adminUserId,
             SenderDisplayName    = (await db.Users.FindAsync(adminUserId) as ApplicationUser)?.UserName,
             RecipientUserId      = targetUserId,
             RecipientDisplayName = user.UserName,
-            Subject              = $"[Confirmai] Pagamentos pendentes — {groupName}",
-            Body                 = bodyText,
+            Subject              = subject,
+            Body                 = bodyText + MailboxLinkLine(ctaText, ctaUrl),
             CreatedAt            = DateTime.UtcNow,
         });
         await db.SaveChangesAsync();
 
         // E-mail best-effort — falhas são silenciosas para não bloquear o fluxo principal
         if (!string.IsNullOrWhiteSpace(user.Email))
-        {
-            var bodyHtml = $"<p>{bodyText.Replace("\n", "<br/>")}</p>";
-            try { await _emailSender.SendEmailAsync(user.Email, $"[Confirmai] Pagamentos pendentes — {groupName}", bodyHtml); }
-            catch (Exception ex) { _logger.LogWarning(ex, "Falha ao enviar e-mail de cobrança para {Email}", user.Email); }
-        }
+            await SendEmailBestEffortAsync(user.Email, subject, bodyText, ctaText, ctaUrl, "cobrança");
 
         return (userName, user.Email, user.PhoneNumber);
     }

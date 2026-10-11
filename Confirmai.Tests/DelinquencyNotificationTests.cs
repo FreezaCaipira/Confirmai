@@ -42,7 +42,7 @@ public class DelinquencyNotificationTests
         };
 
         // Act
-        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         // Assert
         var mailbox = db.UserMailboxMessages.Single();
@@ -70,7 +70,7 @@ public class DelinquencyNotificationTests
         };
 
         // Act
-        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         // Assert
         emailMock.Verify(
@@ -98,7 +98,7 @@ public class DelinquencyNotificationTests
         };
 
         // Act
-        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         // Assert
         emailMock.Verify(
@@ -129,7 +129,7 @@ public class DelinquencyNotificationTests
         };
 
         // Act & Assert - Should not throw
-        var result = await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        var result = await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         Assert.Equal("João Silva", result.UserName);
         Assert.Equal("joao@example.com", result.Email);
@@ -159,7 +159,7 @@ public class DelinquencyNotificationTests
         };
 
         // Act
-        var (userName, email, phone) = await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        var (userName, email, phone) = await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         // Assert
         Assert.Equal("João Silva", userName);
@@ -178,7 +178,7 @@ public class DelinquencyNotificationTests
         };
 
         // Act
-        var (userName, email, phone) = await svc.NotifyDelinquencyAsync("admin-1", "user-999", "Grupo A", entries);
+        var (userName, email, phone) = await svc.NotifyDelinquencyAsync("admin-1", "user-999", "Grupo A", 1, entries);
 
         // Assert
         Assert.Empty(userName);
@@ -206,7 +206,7 @@ public class DelinquencyNotificationTests
         };
 
         // Act
-        await svc1.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", singleEntry);
+        await svc1.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, singleEntry);
 
         // Assert
         var mailbox1 = db1.UserMailboxMessages.Single();
@@ -228,7 +228,7 @@ public class DelinquencyNotificationTests
         };
 
         // Act
-        await svc2.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", multipleEntries);
+        await svc2.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, multipleEntries);
 
         // Assert
         var mailbox2 = db2.UserMailboxMessages.Single();
@@ -254,7 +254,7 @@ public class DelinquencyNotificationTests
         };
 
         // Act
-        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         // Assert
         var mailbox = db.UserMailboxMessages.Single();
@@ -284,7 +284,7 @@ public class DelinquencyNotificationTests
         var entries = new List<(DateTime, decimal)> { (DateTime.UtcNow.AddDays(-5), 50m) };
 
         // Act
-        var (userName, _, _) = await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        var (userName, _, _) = await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         // Assert
         Assert.Equal("João Silva", userName);
@@ -313,7 +313,7 @@ public class DelinquencyNotificationTests
         var entries = new List<(DateTime, decimal)> { (DateTime.UtcNow.AddDays(-5), 50m) };
 
         // Act
-        var (userName, _, _) = await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        var (userName, _, _) = await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         // Assert
         Assert.Equal("joao", userName);
@@ -333,8 +333,8 @@ public class DelinquencyNotificationTests
         var entries = new List<(DateTime, decimal)> { (DateTime.UtcNow.AddDays(-5), 50m) };
 
         // Act - Call twice
-        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
-        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
+        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         // Assert - Should have 2 separate mailbox entries
         var mailboxCount = db.UserMailboxMessages.Count();
@@ -355,7 +355,7 @@ public class DelinquencyNotificationTests
         var entries = new List<(DateTime, decimal)> { (DateTime.UtcNow.AddDays(-5), 50m) };
 
         // Act
-        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Racha do Zé", entries);
+        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Racha do Zé", 1, entries);
 
         // Assert
         var mailbox = db.UserMailboxMessages.Single();
@@ -377,7 +377,7 @@ public class DelinquencyNotificationTests
         var entries = new List<(DateTime, decimal)> { (DateTime.UtcNow.AddDays(-5), 50m) };
 
         // Act
-        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Racha do Zé", entries);
+        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Racha do Zé", 1, entries);
 
         // Assert
         var mailbox = db.UserMailboxMessages.Single();
@@ -399,7 +399,7 @@ public class DelinquencyNotificationTests
         var beforeCall = DateTime.UtcNow;
 
         // Act
-        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", entries);
+        await svc.NotifyDelinquencyAsync("admin-1", "user-1", "Grupo A", 1, entries);
 
         var afterCall = DateTime.UtcNow;
 

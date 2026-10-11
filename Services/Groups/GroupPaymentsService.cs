@@ -401,6 +401,7 @@ public sealed class GroupPaymentsService
             adminUserId: currentUserId,
             targetUserId: d.UserId,
             groupName: groupName,
+            groupId: groupId,
             entries: entries);
 
         await _logService.AuditAsync(
