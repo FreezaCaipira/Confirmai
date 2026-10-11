@@ -145,7 +145,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
-0. **C40 (Pleno) -- feedback de grupo real [PLANEJADO]** -- F1 link da partida nos 5 emails (CTA + `App__PublicBaseUrl`), F2 ranking com Pos/J/V/E/D/Pts (3V+1E) num service testado, F3 landing de apresentacao. Ver secao "Ciclo 40". Decisao pendente: temporada no ranking.
+0. **C40 (Pleno) -- feedback de grupo real [PLANEJADO]** -- F1 link da partida nos 5 emails (CTA + `App__PublicBaseUrl`), F2 ranking com Pos/J/V/E/D/Pts (3V+1E) num service testado, F3 landing de apresentacao. Ver secao "Ciclo 40". Sem temporada (decisao do Robson).
 0. **C41 (Pleno) -- bridge proprio sobre whatsmeow no lugar do Evolution [PLANEJADO -- depois do C40]** -- substitui so o sender do C31; a Fase 0 do Robson passa a ser com o bridge. Ver secao "Ciclo 41".
 0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [C39-A CONCLUIDO (#147 + review #148); C39-B CONCLUIDO (#150 + review #151); C39-C CONCLUIDO (#152 + review)]** -- ver secao "Ciclo 39". 3 PRs (torneio, cash, parceria). PR 1 (torneio): F1-F7 entregues (suite 2703 -> 2738). PR 2 (cash): F8-F10 + delta da review entregues -- `EventPriceOption` com telas, `ConfirmAsync` exige mesa valida no cash, troca de mesa recarimba quem nao pagou, `CashTableEdit` no Edit com congelo por mesa e recarimbo por mesa, guarda MaxPlayers >= pagos. PR 3 (parceria): F12 + F11 entregues -- `Group.PartnerFeeSharePercent`/`EventConfirmation.PlayerFeeAmount`, carimbo da parte do jogador (QR = preco + taxa*(1-share/100)), taxa cheia inalterada no repasse, campo so para admin do sistema em `/admin/revenue` com audit. Build 0/0, suite 2738 -> 2769 -> 2783.
 0. **C38 (Pleno) -- achados do testador externo em prod [CONCLUIDO -- PR #144, review do Senior com 1 correcao (#145: edicao do futsal checa Pix)]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
@@ -208,7 +208,7 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
-## Ciclo 40 (Pleno) -- Feedback de grupo real: ranking com pontos, link da partida nos emails, landing de apresentacao [PLANEJADO -- aguarda 1 decisao do Robson (temporada, F2)]
+## Ciclo 40 (Pleno) -- Feedback de grupo real: ranking com pontos, link da partida nos emails, landing de apresentacao [PLANEJADO -- liberado para o Pleno]
 
 > Origem: feedback do Robson (11/10/2026) com 4 pontos: (1) tabela de um grupo real (Pos/Jogador/Jogos/Vitorias/Empates/Pontos, "1a temporada", premiacao); (2) usuaria pediu para clicar no email "Nova partida" e cair direto na partida; (3) landing de referencia https://coachwise.com.br/; (4) trocar Evolution pelo whatsmeow -- este vira o **C41** (secao seguinte), porque mexe na infra do C31 e nao no app.
 > Ordem do C40: **F1 (email) -> F2 (ranking) -> F3 (landing)**. F1 e F2 sao funcionais; F3 e apresentacao. 1 PR, 1 assunto por commit, TDD, regras 26/28 do PR.
@@ -241,11 +241,11 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
    - V/E/D pelo placar do time dele; **Pontos = 3 x V + 1 x E** (padrao de campeonato, igual a tabela do grupo);
    - ordem: Pontos desc, Vitorias desc, Destaques desc, Nome asc; **posicao compartilhada no empate** (1, 2, 2, 4).
 3. Colunas: Pos / Jogador / J / V / E / D / Pts / Destaques. Em 390px ficam Pos, Jogador, J, V, E, Pts (D e Destaques escondem). Linha do "voce" continua marcada. Top 3 com destaque discreto (sem cor por esporte; laranja do ranking ja aprovado na #139).
-4. Periodo: filtros atuais (mes/ano/geral) + **temporada** conforme a decisao do Robson (abaixo).
+4. Periodo: so os filtros atuais (mes/ano/geral). **Sem temporada e sem premiacao** (decisao do Robson, 11/10/2026) -- nenhuma migration neste ciclo.
 5. "Copiar para o WhatsApp": botao que copia a tabela em texto (Pos, nome, Pts, J-V-E) no padrao do `EscalacaoTextFormatter`. Imagem para compartilhar fica para a lapidacao.
-6. Testes: regra de jogo contado, pontos, empate de posicao, poker excluido, partida sem placar excluida, filtro por periodo/temporada.
+6. Testes: regra de jogo contado, pontos, empate de posicao, poker excluido, partida sem placar excluida, filtro por periodo (mes/ano/geral).
 
-**Decisao pendente do Robson -- temporada.** Recomendacao do Senior: o admin do grupo cria a temporada (nome, inicio, fim opcional, premiacao em texto livre, ex. "R$ 150 + trofeu"); o ranking abre na temporada atual, e mes/ano/geral continuam como filtro. Exige `GroupSeason` (migration aditiva) + tela simples em `/grupo/{id}/configuracoes`. Alternativa sem migration: so mes/ano/geral com pontos, sem premiacao.
+**Decisao do Robson (11/10/2026): sem temporada.** Ranking so com mes/ano/geral e pontos; premiacao fica fora (o grupo continua divulgando por conta propria).
 
 ### Fase 3 -- Landing de apresentacao (referencia Coachwise)
 
@@ -265,6 +265,7 @@ Estrutura da referencia que vale copiar: hero com titulo forte e **uma palavra e
 ### Fora do C40
 - Imagem compartilhavel do ranking (lapidacao).
 - Idioma por usuario nos emails.
+- Temporada/premiacao no ranking (descartado pelo Robson).
 - C41 (whatsmeow), abaixo.
 
 ---
