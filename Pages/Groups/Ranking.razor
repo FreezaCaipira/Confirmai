@@ -67,6 +67,11 @@ else
             <section class="panel feat--ranking">
                 <div class="panel-head">
                     <h2 class="panel-title"><i class="fas fa-trophy"></i> @Ui["Group.RankingTitle"]</h2>
+                    <button class="btn btn-ghost btn-sm" @onclick="CopyRankingAsync"
+                            disabled="@(rankingRows.Count == 0)">
+                        <i class="fas @(copied ? "fa-check" : "fa-copy")"></i>
+                        @Ui["Group.RankingCopyWhatsApp"]
+                    </button>
                 </div>
 
             @* ── Filtro ────────────────────────────────────────────────── *@

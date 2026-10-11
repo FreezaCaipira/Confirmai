@@ -70,14 +70,18 @@
     font-weight: 700;
     color: var(--link-info);
     flex-shrink: 0;
-    min-width: 5.5rem;
+    min-width: 2.2rem;
     text-align: center;
+}
+
+.ranking-col--points {
+    color: var(--amber);
+    font-weight: 800;
 }
 
 .ranking-col--label {
     color: var(--slate-mid);
     font-size: 0.75rem;
-    min-width: 5.5rem;
 }
 
 .ranking-col--label-games {
@@ -144,5 +148,12 @@
 
     .ranking-name-tooltip {
         display: block;
+    }
+}
+
+/* ≤480px (C40 F2): Pos, Jogador, J, V, E, Pts visiveis; D e Destaques escondem */
+@media (max-width: 480px) {
+    .ranking-col--optional {
+        display: none;
     }
 }

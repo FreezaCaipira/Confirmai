@@ -27,38 +27,31 @@ public sealed class WhatsAppDispatchService
     private readonly IOptions<WhatsAppOptions> _options;
     private readonly OperationalMetrics? _ops;
     private readonly ILogger<WhatsAppDispatchService> _logger;
+    private readonly AppLinks _links;
 
     public WhatsAppDispatchService(
         IDbContextFactory<AppDbContext> dbFactory,
         IWhatsAppSender sender,
         IOptions<WhatsAppOptions> options,
         ILogger<WhatsAppDispatchService> logger,
-        OperationalMetrics? ops = null)
+        OperationalMetrics? ops = null,
+        AppLinks? links = null)
     {
         _dbFactory = dbFactory;
         _sender = sender;
         _options = options;
         _logger = logger;
         _ops = ops;
+        // C40 F1: link building lives in AppLinks (shared with email); the
+        // fallback keeps callers/tests that only provide WhatsAppOptions.
+        _links = links ?? new AppLinks(Options.Create(new AppOptions()), options);
     }
 
     /// <summary>Absolute URL of the event page, or null when PublicBaseUrl is unset.</summary>
-    public string? EventLink(Event ev)
-    {
-        var baseUrl = _options.Value.PublicBaseUrl;
-        if (string.IsNullOrWhiteSpace(baseUrl)) return null;
-        var path = ev.Sport == Sport.Poker ? "poker" : "futsal";
-        return $"{baseUrl.TrimEnd('/')}/{path}/{ev.Id}";
-    }
+    public string? EventLink(Event ev) => _links.EventUrl(ev);
 
     /// <summary>Absolute URL of the group payments page, or null when PublicBaseUrl is unset.</summary>
-    public string? GroupPaymentsLink(int groupId)
-    {
-        var baseUrl = _options.Value.PublicBaseUrl;
-        return string.IsNullOrWhiteSpace(baseUrl)
-            ? null
-            : $"{baseUrl.TrimEnd('/')}/grupo/{groupId}/pagamentos";
-    }
+    public string? GroupPaymentsLink(int groupId) => _links.GroupPaymentsUrl(groupId);
 
     /// <summary>
     /// C31 itens 2-3 — 15-minute sweep run by WhatsAppReminderSchedulerService.

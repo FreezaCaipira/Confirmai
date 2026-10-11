@@ -150,6 +150,7 @@ builder.Services.AddScoped<Confirmai.Services.Utility.MailboxQueryService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentInitializationService>();
 builder.Services.AddScoped<Confirmai.Services.Payment.PaymentCommandService>();
 builder.Services.AddScoped<Confirmai.Services.Groups.GroupFeaturesService>();
+builder.Services.AddScoped<Confirmai.Services.Groups.GroupRankingService>();
 builder.Services.AddScoped<Confirmai.Services.Futsal.EscalacaoService>();
 builder.Services.AddScoped<Confirmai.Services.Futsal.EventDetailService>();
 builder.Services.AddScoped<Confirmai.Services.Poker.PokerDetailService>();
@@ -177,6 +178,8 @@ builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<GroupMetricsService>();
 // C31 — WhatsApp via Evolution API (grupo, nunca DM). DryRun is the default;
 // real sends only happen with DryRun=false + JID allowlist (boot guard below).
+builder.Services.Configure<AppOptions>(builder.Configuration.GetSection("App"));
+builder.Services.AddSingleton<AppLinks>();
 builder.Services.Configure<WhatsAppOptions>(builder.Configuration.GetSection("WhatsApp"));
 builder.Services.AddHttpClient<EvolutionWhatsAppSender>(c => c.Timeout = TimeSpan.FromSeconds(10));
 builder.Services.AddScoped<DryRunWhatsAppSender>();
