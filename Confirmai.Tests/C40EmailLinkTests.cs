@@ -225,4 +225,19 @@ public class C40EmailLinkTests
         Assert.Matches($"href=\"{Base.Replace(".", "\\.")}/futsal/{ev.Id}\"", html);
         Assert.DoesNotContain("p1@test.com", html.Split("href=")[1]);
     }
+
+    [Fact]
+    public void RenderEmail_PlainText_KeepsAccentsWithoutHtmlEntities()
+    {
+        var (_, svc, _) = Build();
+
+        var (html, text) = svc.RenderEmail(
+            "Partida atualizada", "Novo horário às 20h, D'Ávila & cia", "Ver partida", $"{Base}/futsal/1");
+
+        Assert.NotNull(text);
+        Assert.Contains("Novo horário às 20h, D'Ávila & cia", text);
+        Assert.DoesNotContain("&#", text);
+        Assert.DoesNotContain("&amp;", text);
+        Assert.Contains("&amp; cia", html);
+    }
 }

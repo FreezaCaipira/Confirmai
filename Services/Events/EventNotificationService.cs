@@ -53,20 +53,23 @@ public class EventNotificationService
     private static string MailboxLinkLine(string? ctaText, string? ctaUrl)
         => string.IsNullOrWhiteSpace(ctaUrl) ? string.Empty : $"\n\n{ctaText}: {ctaUrl}";
 
-    /// <summary>Paragrafos do corpo — codificados (o template nao encoda paragrafos).</summary>
-    private static IEnumerable<string> BodyParagraphs(string bodyText)
-        => bodyText.Split("\n\n", StringSplitOptions.RemoveEmptyEntries)
-            .Select(p => HttpUtility.HtmlEncode(p).Replace("\n", "<br/>"));
+    private static List<string> BodyParagraphs(string bodyText)
+        => bodyText.Split("\n\n", StringSplitOptions.RemoveEmptyEntries).ToList();
 
-    private (string Html, string? Text) RenderEmail(
+    /// <summary>Paragrafos do corpo — codificados (o template nao encoda paragrafos).</summary>
+    private static List<string> HtmlParagraphs(IEnumerable<string> paragraphs)
+        => paragraphs.Select(p => HttpUtility.HtmlEncode(p).Replace("\n", "<br/>")).ToList();
+
+    internal (string Html, string? Text) RenderEmail(
         string subject, string bodyText, string? ctaText, string? ctaUrl)
     {
-        var paragraphs = BodyParagraphs(bodyText).ToList();
+        var paragraphs = BodyParagraphs(bodyText);
+        var htmlParagraphs = HtmlParagraphs(paragraphs);
         if (_emailTemplate is null)
-            return ($"<p>{string.Join("</p><p>", paragraphs)}</p>", null);
+            return ($"<p>{string.Join("</p><p>", htmlParagraphs)}</p>", null);
 
         return (
-            _emailTemplate.RenderHtml(subject, preheader: null, paragraphs, ctaText, ctaUrl),
+            _emailTemplate.RenderHtml(subject, preheader: null, htmlParagraphs, ctaText, ctaUrl),
             _emailTemplate.RenderText(subject, paragraphs, ctaText, ctaUrl));
     }
 

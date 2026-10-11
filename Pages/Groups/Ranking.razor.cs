@@ -110,8 +110,15 @@ public partial class Ranking
     private async Task CopyRankingAsync()
     {
         if (group is null || rankingRows.Count == 0) return;
-        await JS.InvokeVoidAsync("navigator.clipboard.writeText",
-            GroupRanking.BuildWhatsAppText(rankingRows, group.Name));
-        copied = true;
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText",
+                GroupRanking.BuildWhatsAppText(rankingRows, group.Name));
+            copied = true;
+        }
+        catch (JSException)
+        {
+            copied = false;
+        }
     }
 }
