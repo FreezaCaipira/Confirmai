@@ -255,7 +255,7 @@ Estrutura da referencia que vale copiar: hero com titulo forte e **uma palavra e
 2. Secoes:
    - **Hero**: "Sua pelada **organizada**" + subtitulo (confirmacao, lista de espera, Pix e ranking num lugar so) + Entrar / Criar conta; mockup em HTML/CSS de um card de partida (Quarta 21h, 12/14 confirmados, "Pagar R$ 15").
    - **Como funciona** (3 passos): crie o grupo -> marque a partida -> o grupo confirma e paga.
-   - **Recursos** (grade 3x2): confirmacao e lista de espera; escalacao e placar; Pix com comprovante; ranking da temporada; aviso no grupo do WhatsApp; poker (torneio e cash).
+   - **Recursos** (grade 3x2): confirmacao e lista de espera; escalacao e placar; Pix com comprovante; ranking com pontos; aviso no grupo do WhatsApp; poker (torneio e cash).
    - **WhatsApp**: preview com o texto real de "Nova partida agendada" do `WhatsAppTexts`.
    - **Ranking**: mini tabela Pos/Jogador/Pts (mesmo visual da F2).
    - **CTA final** + footer (Sobre, Contato; Termos/Privacidade so se as paginas existirem).
