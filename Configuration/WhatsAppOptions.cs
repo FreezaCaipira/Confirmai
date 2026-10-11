@@ -1,26 +1,24 @@
 namespace Confirmai.Configuration;
 
 /// <summary>
-/// C31 — WhatsApp via Evolution API, disparo no grupo do WhatsApp do grupo
-/// do sistema (nunca DM). Canal secundario: nada critico depende dele.
+/// C31/C41 — WhatsApp via whatsapp-bridge (whatsmeow), disparo no grupo do
+/// WhatsApp do grupo do sistema (nunca DM). Canal secundario: nada critico
+/// depende dele.
 /// </summary>
 public sealed class WhatsAppOptions
 {
     /// <summary>Feature flag global. Desligada = nenhum envio e nenhum log.</summary>
     public bool Enabled { get; set; } = false;
 
-    /// <summary>Base interna da Evolution, ex.: http://evolution:8080 (sem dominio publico).</summary>
+    /// <summary>Base interna do bridge, ex.: http://whatsapp-bridge:8090 (sem dominio publico).</summary>
     public string? BaseUrl { get; set; }
 
-    /// <summary>Nome da instancia pareada (o chip dedicado).</summary>
-    public string? Instance { get; set; }
-
-    /// <summary>AUTHENTICATION_API_KEY da Evolution — somente via env var, nunca em appsettings versionado.</summary>
+    /// <summary>Token Bearer do bridge (BRIDGE_TOKEN) — somente via env var, nunca em appsettings versionado.</summary>
     public string? ApiKey { get; set; }
 
     /// <summary>
-    /// Default true: o sender registra/loga a mensagem em vez de chamar a
-    /// Evolution. So vira envio real quando o Robson liberar (DryRun=false).
+    /// Default true: o sender registra/loga a mensagem em vez de chamar o
+    /// bridge. So vira envio real quando o Robson liberar (DryRun=false).
     /// </summary>
     public bool DryRun { get; set; } = true;
 

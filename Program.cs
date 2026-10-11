@@ -176,17 +176,17 @@ builder.Services.AddScoped<LanguagePreferenceService>();
 builder.Services.AddScoped<UiTextService>(sp => new UiTextService(sp.GetRequiredService<LanguagePreferenceService>()));
 builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<GroupMetricsService>();
-// C31 — WhatsApp via Evolution API (grupo, nunca DM). DryRun is the default;
-// real sends only happen with DryRun=false + JID allowlist (boot guard below).
+// C31/C41 — WhatsApp via whatsapp-bridge (grupo, nunca DM). DryRun is the
+// default; real sends only happen with DryRun=false + JID allowlist (guard below).
 builder.Services.Configure<AppOptions>(builder.Configuration.GetSection("App"));
 builder.Services.AddSingleton<AppLinks>();
 builder.Services.Configure<WhatsAppOptions>(builder.Configuration.GetSection("WhatsApp"));
-builder.Services.AddHttpClient<EvolutionWhatsAppSender>(c => c.Timeout = TimeSpan.FromSeconds(10));
+builder.Services.AddHttpClient<BridgeWhatsAppSender>(c => c.Timeout = TimeSpan.FromSeconds(10));
 builder.Services.AddScoped<DryRunWhatsAppSender>();
 builder.Services.AddScoped<IWhatsAppSender>(sp =>
     sp.GetRequiredService<IOptions<WhatsAppOptions>>().Value.DryRun
         ? sp.GetRequiredService<DryRunWhatsAppSender>()
-        : sp.GetRequiredService<EvolutionWhatsAppSender>());
+        : sp.GetRequiredService<BridgeWhatsAppSender>());
 builder.Services.AddScoped<WhatsAppDispatchService>();
 builder.Services.AddHostedService<WhatsAppReminderSchedulerService>();
 builder.Services.AddScoped<AdminSettingsService>();
@@ -471,18 +471,17 @@ if (!isDevelopment)
     }
 }
 
-// C31 guard: envio real de WhatsApp (Enabled=true + DryRun=false) exige a
-// Evolution completa; fora de Development/Testing a allowlist nao pode estar
+// C31/C41 guard: envio real de WhatsApp (Enabled=true + DryRun=false) exige o
+// bridge configurado; fora de Development/Testing a allowlist nao pode estar
 // vazia — preferimos falhar o boot a mandar mensagem para grupo errado.
 var waOpts = app.Services.GetRequiredService<IOptions<WhatsAppOptions>>().Value;
 if (waOpts.Enabled && !waOpts.DryRun)
 {
     if (string.IsNullOrWhiteSpace(waOpts.BaseUrl) ||
-        string.IsNullOrWhiteSpace(waOpts.Instance) ||
         string.IsNullOrWhiteSpace(waOpts.ApiKey))
         throw new InvalidOperationException(
-            "WhatsApp: Enabled=true e DryRun=false exigem WhatsApp__BaseUrl, " +
-            "WhatsApp__Instance e WhatsApp__ApiKey configurados.");
+            "WhatsApp: Enabled=true e DryRun=false exigem WhatsApp__BaseUrl " +
+            "e WhatsApp__ApiKey configurados.");
 
     if (!isDevelopment && waOpts.ParseAllowedGroupJids().Count == 0)
         throw new InvalidOperationException(

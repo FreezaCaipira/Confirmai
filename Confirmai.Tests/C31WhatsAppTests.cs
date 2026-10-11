@@ -17,7 +17,7 @@ using Xunit;
 namespace Confirmai.Tests;
 
 /// <summary>
-/// C31 Fase 1 — sender abstraction (Evolution contract + dry-run), JID
+/// C31 Fase 1 — sender abstraction (bridge contract + dry-run), JID
 /// validation, and the group-admin-gated JID save.
 /// </summary>
 public class C31WhatsAppTests
@@ -49,10 +49,10 @@ public class C31WhatsAppTests
     public void JidValidator_RejectsNonGroupJids(string jid) =>
         Assert.False(WhatsAppGroupJid.IsValid(jid));
 
-    // ── EvolutionWhatsAppSender contract ─────────────────────────────────────
+    // ── BridgeWhatsAppSender contract (C41) ──────────────────────────────────
 
     [Fact]
-    public async Task EvolutionSender_PostsSendTextWithGroupJidAndApiKeyHeader()
+    public async Task BridgeSender_PostsGroupTextWithBearerToken()
     {
         HttpRequestMessage? captured = null;
         string capturedBody = string.Empty;
@@ -60,45 +60,82 @@ public class C31WhatsAppTests
         {
             captured = req;
             capturedBody = req.Content!.ReadAsStringAsync().GetAwaiter().GetResult();
-            return HttpTestResponses.Json("{}");
+            return HttpTestResponses.Json("{\"messageId\":\"3EB0abc\"}");
         }));
         var options = Options.Create(new WhatsAppOptions
         {
             Enabled = true,
             DryRun = false,
-            BaseUrl = "http://evolution:8080/",
-            Instance = "Confirmai-Bot",
-            ApiKey = "secret-key"
+            BaseUrl = "http://whatsapp-bridge:8090/",
+            ApiKey = "bridge-token"
         });
-        var sender = new EvolutionWhatsAppSender(client, options,
-            NullLogger<EvolutionWhatsAppSender>.Instance);
+        var sender = new BridgeWhatsAppSender(client, options,
+            NullLogger<BridgeWhatsAppSender>.Instance);
 
         var result = await sender.SendGroupTextAsync("1203630@g.us", "oi grupo");
 
         Assert.Equal(WhatsAppSendStatus.Sent, result.Status);
         Assert.NotNull(captured);
         Assert.Equal(HttpMethod.Post, captured!.Method);
-        Assert.Equal("http://evolution:8080/message/sendText/Confirmai-Bot",
+        Assert.Equal("http://whatsapp-bridge:8090/send/group-text",
             captured.RequestUri!.ToString());
-        Assert.True(captured.Headers.TryGetValues("apikey", out var key));
-        Assert.Equal("secret-key", Assert.Single(key));
+        Assert.Equal("Bearer", captured.Headers.Authorization?.Scheme);
+        Assert.Equal("bridge-token", captured.Headers.Authorization?.Parameter);
 
-        Assert.Contains("\"number\":\"1203630@g.us\"", capturedBody);
+        Assert.Contains("\"jid\":\"1203630@g.us\"", capturedBody);
         Assert.Contains("\"text\":\"oi grupo\"", capturedBody);
     }
 
     [Fact]
-    public async Task EvolutionSender_HttpError_ReturnsFailed()
+    public async Task BridgeSender_401_ReturnsFailed()
     {
         var client = new HttpClient(new RoutingHandler(_ =>
-            new HttpResponseMessage(HttpStatusCode.InternalServerError)));
+            new HttpResponseMessage(HttpStatusCode.Unauthorized)));
         var options = Options.Create(new WhatsAppOptions
         {
             Enabled = true, DryRun = false,
-            BaseUrl = "http://evolution:8080", Instance = "i", ApiKey = "k"
+            BaseUrl = "http://whatsapp-bridge:8090", ApiKey = "wrong-token"
         });
-        var sender = new EvolutionWhatsAppSender(client, options,
-            NullLogger<EvolutionWhatsAppSender>.Instance);
+        var sender = new BridgeWhatsAppSender(client, options,
+            NullLogger<BridgeWhatsAppSender>.Instance);
+
+        var result = await sender.SendGroupTextAsync("1@g.us", "t");
+
+        Assert.Equal(WhatsAppSendStatus.Failed, result.Status);
+        Assert.Equal("http_401", result.Error);
+    }
+
+    [Fact]
+    public async Task BridgeSender_Other4xx_ReturnsFailed()
+    {
+        var client = new HttpClient(new RoutingHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.Forbidden)));
+        var options = Options.Create(new WhatsAppOptions
+        {
+            Enabled = true, DryRun = false,
+            BaseUrl = "http://whatsapp-bridge:8090", ApiKey = "k"
+        });
+        var sender = new BridgeWhatsAppSender(client, options,
+            NullLogger<BridgeWhatsAppSender>.Instance);
+
+        var result = await sender.SendGroupTextAsync("1@g.us", "t");
+
+        Assert.Equal(WhatsAppSendStatus.Failed, result.Status);
+        Assert.Equal("http_403", result.Error);
+    }
+
+    [Fact]
+    public async Task BridgeSender_Timeout_ReturnsFailed_WithoutThrowing()
+    {
+        var client = new HttpClient(new RoutingHandler(_ =>
+            throw new TaskCanceledException("timed out")));
+        var options = Options.Create(new WhatsAppOptions
+        {
+            Enabled = true, DryRun = false,
+            BaseUrl = "http://whatsapp-bridge:8090", ApiKey = "k"
+        });
+        var sender = new BridgeWhatsAppSender(client, options,
+            NullLogger<BridgeWhatsAppSender>.Instance);
 
         var result = await sender.SendGroupTextAsync("1@g.us", "t");
 
@@ -106,17 +143,18 @@ public class C31WhatsAppTests
     }
 
     [Fact]
-    public async Task EvolutionSender_MissingConfig_ReturnsFailed_WithoutHttp()
+    public async Task BridgeSender_MissingConfig_ReturnsFailed_WithoutHttp()
     {
         var client = new HttpClient(new RoutingHandler(_ =>
             throw new InvalidOperationException("must not call HTTP")));
         var options = Options.Create(new WhatsAppOptions { Enabled = true, DryRun = false });
-        var sender = new EvolutionWhatsAppSender(client, options,
-            NullLogger<EvolutionWhatsAppSender>.Instance);
+        var sender = new BridgeWhatsAppSender(client, options,
+            NullLogger<BridgeWhatsAppSender>.Instance);
 
         var result = await sender.SendGroupTextAsync("1@g.us", "t");
 
         Assert.Equal(WhatsAppSendStatus.Failed, result.Status);
+        Assert.Equal("missing_config", result.Error);
     }
 
     [Fact]
