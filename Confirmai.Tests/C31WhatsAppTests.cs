@@ -143,6 +143,27 @@ public class C31WhatsAppTests
     }
 
     [Fact]
+    public async Task BridgeSender_CallerCancellation_Propagates()
+    {
+        using var cts = new CancellationTokenSource();
+        var client = new HttpClient(new RoutingHandler(_ =>
+        {
+            cts.Cancel();
+            throw new TaskCanceledException("caller cancelled");
+        }));
+        var options = Options.Create(new WhatsAppOptions
+        {
+            Enabled = true, DryRun = false,
+            BaseUrl = "http://whatsapp-bridge:8090", ApiKey = "k"
+        });
+        var sender = new BridgeWhatsAppSender(client, options,
+            NullLogger<BridgeWhatsAppSender>.Instance);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            sender.SendGroupTextAsync("1@g.us", "t", cts.Token));
+    }
+
+    [Fact]
     public async Task BridgeSender_MissingConfig_ReturnsFailed_WithoutHttp()
     {
         var client = new HttpClient(new RoutingHandler(_ =>

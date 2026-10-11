@@ -11,7 +11,7 @@ import (
 type config struct {
 	Addr    string   // BRIDGE_ADDR — listen address (default :8090)
 	Token   string   // BRIDGE_TOKEN — required; Bearer credential for every endpoint
-	DBPath  string   // BRIDGE_DB_PATH — sqlite file persisted on a volume
+	DBPath  string   // BRIDGE_DB_PATH — sqlite file path persisted on a volume
 	Allowed []string // BRIDGE_ALLOWED_GROUP_JIDS — comma-separated @g.us allowlist
 }
 
@@ -19,7 +19,7 @@ func loadConfig() (config, error) {
 	cfg := config{
 		Addr:   envOr("BRIDGE_ADDR", ":8090"),
 		Token:  os.Getenv("BRIDGE_TOKEN"),
-		DBPath: envOr("BRIDGE_DB_PATH", "file:session.db?cache=shared&_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)"),
+		DBPath: envOr("BRIDGE_DB_PATH", "session.db"),
 	}
 	if cfg.Token == "" {
 		return config{}, fmt.Errorf("BRIDGE_TOKEN is required")
@@ -38,6 +38,16 @@ func loadConfig() (config, error) {
 		return config{}, fmt.Errorf("BRIDGE_ALLOWED_GROUP_JIDS must allow at least one group")
 	}
 	return cfg, nil
+}
+
+// sqliteDSN turns a plain file path into a modernc DSN with the pragmas
+// whatsmeow's sqlstore requires (it refuses to start without foreign keys).
+// A value already in "file:" URI form is passed through untouched.
+func sqliteDSN(path string) string {
+	if strings.HasPrefix(path, "file:") {
+		return path
+	}
+	return "file:" + path + "?_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)"
 }
 
 func envOr(key, fallback string) string {

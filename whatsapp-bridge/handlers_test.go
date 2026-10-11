@@ -233,3 +233,16 @@ func TestValidGroupJID(t *testing.T) {
 		}
 	}
 }
+
+func TestSQLiteDSN(t *testing.T) {
+	cases := map[string]string{
+		"/data/session.db":                  "file:/data/session.db?_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)",
+		"session.db":                        "file:session.db?_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)",
+		"file:x.db?_pragma=foreign_keys(1)": "file:x.db?_pragma=foreign_keys(1)",
+	}
+	for in, want := range cases {
+		if got := sqliteDSN(in); got != want {
+			t.Errorf("sqliteDSN(%q) = %q, want %q", in, got, want)
+		}
+	}
+}

@@ -52,6 +52,10 @@ public sealed class BridgeWhatsAppSender : IWhatsAppSender
 
             return WhatsAppSendResult.Sent;
         }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "WhatsApp bridge: falha ao enviar texto para grupo {GroupJid}", groupJid);
