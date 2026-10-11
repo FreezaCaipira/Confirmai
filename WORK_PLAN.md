@@ -119,7 +119,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 ---
 
-## Mapa de Progresso e Proximos Passos (atualizado pos-C39-A, #147/#148)
+## Mapa de Progresso e Proximos Passos (atualizado pos-C39, #153 -- C40/C41 planejados)
 
 ### Progresso por eixo
 
@@ -145,6 +145,8 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
 
 **Diretriz do Robson (pos-C36): a prioridade e a parte FUNCIONAL; tudo que e visual ("perfumaria") vai para o fim da fila.**
 
+0. **C40 (Pleno) -- feedback de grupo real [PLANEJADO]** -- F1 link da partida nos 5 emails (CTA + `App__PublicBaseUrl`), F2 ranking com Pos/J/V/E/D/Pts (3V+1E) num service testado, F3 landing de apresentacao. Ver secao "Ciclo 40". Decisao pendente: temporada no ranking.
+0. **C41 (Pleno) -- bridge proprio sobre whatsmeow no lugar do Evolution [PLANEJADO -- depois do C40]** -- substitui so o sender do C31; a Fase 0 do Robson passa a ser com o bridge. Ver secao "Ciclo 41".
 0. **C39 (Pleno) -- poker cobra pelo app: torneio + cash, taxa % por evento [C39-A CONCLUIDO (#147 + review #148); C39-B CONCLUIDO (#150 + review #151); C39-C CONCLUIDO (#152 + review)]** -- ver secao "Ciclo 39". 3 PRs (torneio, cash, parceria). PR 1 (torneio): F1-F7 entregues (suite 2703 -> 2738). PR 2 (cash): F8-F10 + delta da review entregues -- `EventPriceOption` com telas, `ConfirmAsync` exige mesa valida no cash, troca de mesa recarimba quem nao pagou, `CashTableEdit` no Edit com congelo por mesa e recarimbo por mesa, guarda MaxPlayers >= pagos. PR 3 (parceria): F12 + F11 entregues -- `Group.PartnerFeeSharePercent`/`EventConfirmation.PlayerFeeAmount`, carimbo da parte do jogador (QR = preco + taxa*(1-share/100)), taxa cheia inalterada no repasse, campo so para admin do sistema em `/admin/revenue` com audit. Build 0/0, suite 2738 -> 2769 -> 2783.
 0. **C38 (Pleno) -- achados do testador externo em prod [CONCLUIDO -- PR #144, review do Senior com 1 correcao (#145: edicao do futsal checa Pix)]** -- cadastro sem validacao/regras de senha e em ingles, poker criando partida paga sem Pix, quadras de outras cidades, seletor de cidade, overflow em 320 px. Resumo na Linha do Tempo. Pendente do Robson: print/modelo do celular do testador (F2 cobriu o reproduzido em 320 px).
 0. **C37 (Pleno) -- achados do Robson em producao pos-#139 [CONCLUIDO -- PR #141, review do Senior com 2 correcoes]** -- F0-F8. Ver "Review Senior do Ciclo 37".
@@ -203,6 +205,90 @@ validado na Brevo.
 
 Qualquer desvio nos passos 2-4 e **bloqueador de go-live**: e nesses caminhos que um bug funde contas
 ou da acesso a conta de outra pessoa, sem aparecer como erro.
+
+---
+
+## Ciclo 40 (Pleno) -- Feedback de grupo real: ranking com pontos, link da partida nos emails, landing de apresentacao [PLANEJADO -- aguarda 1 decisao do Robson (temporada, F2)]
+
+> Origem: feedback do Robson (11/10/2026) com 4 pontos: (1) tabela de um grupo real (Pos/Jogador/Jogos/Vitorias/Empates/Pontos, "1a temporada", premiacao); (2) usuaria pediu para clicar no email "Nova partida" e cair direto na partida; (3) landing de referencia https://coachwise.com.br/; (4) trocar Evolution pelo whatsmeow -- este vira o **C41** (secao seguinte), porque mexe na infra do C31 e nao no app.
+> Ordem do C40: **F1 (email) -> F2 (ranking) -> F3 (landing)**. F1 e F2 sao funcionais; F3 e apresentacao. 1 PR, 1 assunto por commit, TDD, regras 26/28 do PR.
+
+### Diagnostico do Senior (codigo na `main` pos-#153)
+
+1. **Emails sem link nenhum.** `Services/Events/EventNotificationService.cs` monta 5 emails como texto puro virado `<p>` (`Cancelamento`, `Atualizacao`, `Nova partida`, `Vaga aberta`, `Pagamentos pendentes`) e termina em "Acesse o Confirmai...". O `EmailTemplateService.RenderHtml(title, preheader, paragraphs, ctaText, ctaUrl)` do C30-B (botao CTA, usado no cadastro/reset) **nao e usado** aqui. A URL publica so existe em `WhatsAppOptions.PublicBaseUrl`, e o montador de link (`EventLink`/`GroupPaymentsLink`) esta preso ao `WhatsAppDispatchService`. Os schedulers rodam fora de request, entao a base tem que vir de configuracao.
+2. **Ranking incompleto vs. o que o grupo usa hoje.** `/grupo/{id}/ranking` (`Pages/Groups/Ranking.razor.cs`) mostra Nome / Jogos / Destaques / Vitorias. `Draws` e calculado e **nao e exibido**; nao ha posicao, derrotas nem pontos; ordena por vitorias. "Jogos" conta **toda confirmacao em partida passada** -- inclusive reserva sem time, partida sem placar e **poker** -- entao o numero nao bate com "jogos disputados". Calculo inteiro no code-behind, sem teste.
+3. **Landing deslogada e so um hero** (`Pages/Index.razor`, `<NotAuthorized>`: titulo + subtitulo + Entrar/Cadastrar + `NoGroupsHint`). Nao explica o produto.
+
+### Fase 1 -- Link da partida nos emails (e na mailbox)
+
+1. `Configuration/AppOptions.cs` (secao `App`): `PublicBaseUrl` (env `App__PublicBaseUrl`, ex. `https://confirmai.com`). `WhatsApp__PublicBaseUrl` continua valendo; quando vazio, cai no `App__PublicBaseUrl` (nao quebrar config existente).
+2. `Services/Core/AppLinks.cs` (singleton): `EventUrl(Event)` (`/poker/{id}` ou `/futsal/{id}`), `GroupUrl(id)` (`/grupo/{id}`), `GroupPaymentsUrl(id)` (`/grupo/{id}/pagamentos`). Retorna `null` sem base -- **nunca** link relativo em email. `WhatsAppDispatchService.EventLink/GroupPaymentsLink` passam a delegar para ele (remover a duplicacao, testes do C31 continuam verdes).
+3. `EventNotificationService`: os 5 emails passam pelo `EmailTemplateService` (HTML **e** texto). CTA por email:
+   - Nova partida / Atualizacao / Vaga aberta -> `EventUrl` com "Ver partida e confirmar";
+   - Cancelamento -> `GroupUrl` com "Abrir o grupo";
+   - Pagamentos pendentes -> `GroupPaymentsUrl` com "Ver meus pagamentos".
+   Textos novos em chaves `Email.*` PT/EN/ES (paridade testada). O email continua saindo em PT (nao existe idioma por usuario no modelo -- nao criar agora).
+4. Mailbox: acrescentar a linha do link ao `Body` quando houver base. Se o `MailboxFormatter` nao transformar URL em link clicavel, **nao** inventar autolink neste ciclo (ressalva no PR).
+5. Usuario deslogado clicando no link: a pagina e `[Authorize]`, entao o Identity manda para o login com `ReturnUrl` e volta para a partida. **Verificar** (teste de integracao ou manual listado no PR); se o `ReturnUrl` se perder no login Google, corrigir.
+6. Testes: cada um dos 5 emails contem o CTA com a URL certa; sem base -> sem CTA e sem URL relativa; URL nao carrega token/PII (so id). `docs/production-checklist.md`: adicionar `App__PublicBaseUrl`.
+
+### Fase 2 -- Ranking com pontos (o que o grupo real usa)
+
+1. Extrair `Services/Groups/GroupRankingService.cs` + calculo puro `GroupRanking.Build(...)` (testavel sem banco). O code-behind so chama o service.
+2. Regras (testes primeiro):
+   - conta **so futsal**, evento ativo, ja iniciado, **com placar registrado** (`ScoreTeamA` e `ScoreTeamB` != null);
+   - jogador so conta jogo se estava escalado (`TeamId` 0 ou 1) -- reserva/sem time nao conta jogo;
+   - V/E/D pelo placar do time dele; **Pontos = 3 x V + 1 x E** (padrao de campeonato, igual a tabela do grupo);
+   - ordem: Pontos desc, Vitorias desc, Destaques desc, Nome asc; **posicao compartilhada no empate** (1, 2, 2, 4).
+3. Colunas: Pos / Jogador / J / V / E / D / Pts / Destaques. Em 390px ficam Pos, Jogador, J, V, E, Pts (D e Destaques escondem). Linha do "voce" continua marcada. Top 3 com destaque discreto (sem cor por esporte; laranja do ranking ja aprovado na #139).
+4. Periodo: filtros atuais (mes/ano/geral) + **temporada** conforme a decisao do Robson (abaixo).
+5. "Copiar para o WhatsApp": botao que copia a tabela em texto (Pos, nome, Pts, J-V-E) no padrao do `EscalacaoTextFormatter`. Imagem para compartilhar fica para a lapidacao.
+6. Testes: regra de jogo contado, pontos, empate de posicao, poker excluido, partida sem placar excluida, filtro por periodo/temporada.
+
+**Decisao pendente do Robson -- temporada.** Recomendacao do Senior: o admin do grupo cria a temporada (nome, inicio, fim opcional, premiacao em texto livre, ex. "R$ 150 + trofeu"); o ranking abre na temporada atual, e mes/ano/geral continuam como filtro. Exige `GroupSeason` (migration aditiva) + tela simples em `/grupo/{id}/configuracoes`. Alternativa sem migration: so mes/ano/geral com pontos, sem premiacao.
+
+### Fase 3 -- Landing de apresentacao (referencia Coachwise)
+
+Estrutura da referencia que vale copiar: hero com titulo forte e **uma palavra em destaque** + mockup do produto ao lado; grade de recursos (icone + titulo + 1 frase + chips); secao "mensagens que se enviam sozinhas" com preview do WhatsApp; secao de metricas com um card de evolucao; CTA final; footer. **Nao copiar** a cor laranja: usar os tokens (dark zinc + azul, L0-L3, gradiente so no hero).
+
+1. `Shared/Components/Landing/Landing.razor` (+ `.razor.css` proprio; `CssStructureTests` tem que pegar). `Pages/Index.razor` `<NotAuthorized>` passa a renderizar `<Landing />`.
+2. Secoes:
+   - **Hero**: "Sua pelada **organizada**" + subtitulo (confirmacao, lista de espera, Pix e ranking num lugar so) + Entrar / Criar conta; mockup em HTML/CSS de um card de partida (Quarta 21h, 12/14 confirmados, "Pagar R$ 15").
+   - **Como funciona** (3 passos): crie o grupo -> marque a partida -> o grupo confirma e paga.
+   - **Recursos** (grade 3x2): confirmacao e lista de espera; escalacao e placar; Pix com comprovante; ranking da temporada; aviso no grupo do WhatsApp; poker (torneio e cash).
+   - **WhatsApp**: preview com o texto real de "Nova partida agendada" do `WhatsAppTexts`.
+   - **Ranking**: mini tabela Pos/Jogador/Pts (mesmo visual da F2).
+   - **CTA final** + footer (Sobre, Contato; Termos/Privacidade so se as paginas existirem).
+3. Sem imagem externa, sem JS, mockups em HTML. Textos PT/EN/ES (os acima sao proposta; Robson ajusta no PR). AA de contraste testado como nos tokens.
+4. Prints 1366 e 390 no PR.
+
+### Fora do C40
+- Imagem compartilhavel do ranking (lapidacao).
+- Idioma por usuario nos emails.
+- C41 (whatsmeow), abaixo.
+
+---
+
+## Ciclo 41 (Pleno) -- Trocar Evolution por um bridge proprio sobre whatsmeow [PLANEJADO -- depois do C40]
+
+> Decisao do Robson (11/10/2026): usar https://github.com/tulir/whatsmeow em vez do Evolution.
+
+### Diagnostico do Senior
+- **O Evolution Go ja e construido sobre o whatsmeow.** A troca tira uma camada (e um painel com dezenas de endpoints que nao usamos), mas o whatsmeow e **biblioteca Go, nao servidor**: alguem tem que manter um servico Go. Por isso o bridge tem que ser minimo.
+- **O lado C# quase nao muda.** Todo o C31 depende de um metodo so: `IWhatsAppSender.SendGroupTextAsync(groupJid, text)`. Dry-run, allowlist de JID, tabela `WhatsAppDispatches`, schedulers, textos e metricas ficam como estao. Muda so o sender e as opcoes.
+- Risco igual ao do Evolution: protocolo nao oficial (risco de ban). Continua valendo o chip dedicado e aquecido, e o WhatsApp continua canal secundario.
+- Licenca: whatsmeow e MPL-2.0 -- usar como dependencia e ok; o nosso codigo nao herda a licenca.
+
+### Fases
+1. **`whatsapp-bridge/`** (Go 1.22+, modulo proprio no repo): whatsmeow + `sqlstore` em SQLite num volume do EasyPanel (sessao pareada sobrevive a redeploy). Endpoints, **todos** com `Authorization: Bearer $BRIDGE_TOKEN` (comparacao em tempo constante), ouvindo so na rede interna:
+   - `GET /health` -> `{connected, loggedIn}`;
+   - `GET /pair` -> QR do pareamento (PNG) enquanto nao pareado; 409 depois;
+   - `GET /groups` -> grupos em que o chip esta (`jid`, `name`) -- e como o Robson descobre o JID na Fase 0;
+   - `POST /send/group-text` `{jid, text}` -> 200 `{messageId}`; recusa JID que nao termina em `@g.us` e JID fora de `BRIDGE_ALLOWED_GROUP_JIDS` (defesa em profundidade; a allowlist do app continua).
+   Sem logar o texto das mensagens nem o token. `Dockerfile` multi-stage com imagem final distroless. `go test` cobre auth, validacao de JID e allowlist (handler com o cliente whatsmeow atras de uma interface).
+2. **C#**: `BridgeWhatsAppSender` substitui o `EvolutionWhatsAppSender` (remover o Evolution, nao manter os dois). Mantem `WhatsApp__BaseUrl` (URL interna do bridge) e `WhatsApp__ApiKey` (= `BRIDGE_TOKEN`); `WhatsApp__Instance` sai, junto com a trava de boot dela. Timeout de 10s e travas de boot do C31 continuam. Testes de contrato com `HttpMessageHandler` fake (sucesso, 401, 4xx, timeout -> `Failed` sem excecao).
+3. **CI**: job `go test ./...` em `whatsapp-bridge/` no workflow.
+4. **Docs**: reescrever a Fase 0 no `docs/production-checklist.md`: subir o bridge no EasyPanel (volume + `BRIDGE_TOKEN` + allowlist), parear pelo `/pair`, pegar o JID no `/groups`, ligar o app em dry-run e so depois `WhatsApp__DryRun=false`.
 
 ---
 
