@@ -40,11 +40,11 @@ Ordem de ativação: subir o bridge no EasyPanel → parear o chip dedicado via 
 
 Deploy do bridge (serviço separado, imagem `whatsapp-bridge/Dockerfile`):
 
-- [ ] Volume montado em `/data` — a sessão pareada do WhatsApp vive no sqlite (`BRIDGE_DB_PATH=/data/session.db`), sem volume o pareamento se perde a cada redeploy.
+- [ ] Volume (nomeado, não bind) montado em `/data` — a sessão pareada do WhatsApp vive no sqlite em `/data/session.db` (default da imagem; não precisa setar `BRIDGE_DB_PATH`). Sem volume o pareamento se perde a cada redeploy. Se setar `BRIDGE_DB_PATH`, use só o caminho do arquivo.
 - [ ] `BRIDGE_TOKEN` — token Bearer aleatório longo, via env var. Todos os endpoints do bridge exigem `Authorization: Bearer $BRIDGE_TOKEN` (comparação em tempo constante).
 - [ ] `BRIDGE_ALLOWED_GROUP_JIDS` — CSV de JIDs `...@g.us` que o bridge aceita enviar; envio para JID fora da lista é `403`.
 - [ ] Rede interna apenas — o bridge não deve expor porta pública.
-- [ ] Pareamento (primeira vez): `curl -H "Authorization: Bearer $BRIDGE_TOKEN" http://<bridge>:8090/pair` → PNG do QR; escanear com o WhatsApp do chip dedicado. Depois de pareado `/pair` responde `409`.
+- [ ] Pareamento (primeira vez): `curl -H "Authorization: Bearer $BRIDGE_TOKEN" http://<bridge>:8090/pair` → PNG do QR; escanear com o WhatsApp do chip dedicado. Depois de pareado `/pair` responde `409`. O QR expira em poucos minutos: se `/pair` responder `503`, reinicie o serviço e tente de novo. Como o bridge não tem porta pública, o curl roda de dentro da rede do EasyPanel (console de outro serviço) ou por um domínio temporário que você remove logo após o pareamento.
 - [ ] `GET /groups` (mesmo token) lista `{"jid","name"}` dos grupos — é daqui que saem os JIDs para `BRIDGE_ALLOWED_GROUP_JIDS` e `WhatsApp__AllowedGroupJids`.
 - [ ] `GET /health` → `{"connected":true,"loggedIn":true}` antes de liberar o envio real.
 

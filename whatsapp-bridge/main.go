@@ -33,7 +33,7 @@ func run() error {
 	defer stop()
 
 	dbLog := waLog.Stdout("DB", "WARN", true)
-	container, err := sqlstore.New(ctx, "sqlite", cfg.DBPath, dbLog)
+	container, err := sqlstore.New(ctx, "sqlite", sqliteDSN(cfg.DBPath), dbLog)
 	if err != nil {
 		return err
 	}
