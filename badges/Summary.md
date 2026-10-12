@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/11/2026 - 14:44:44 |
-| Coverage date: | 10/11/2026 - 14:44:38 |
+| Generated on: | 10/12/2026 - 23:56:46 |
+| Coverage date: | 10/12/2026 - 23:56:42 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 569 |
 | Files: | 659 |
-| **Line coverage:** | 93.6% (146993 of 156967) |
-| Covered lines: | 146993 |
-| Uncovered lines: | 9974 |
-| Coverable lines: | 156967 |
-| Total lines: | 192193 |
-| **Branch coverage:** | 46.9% (4646 of 9893) |
-| Covered branches: | 4646 |
+| **Line coverage:** | 93.6% (146994 of 156969) |
+| Covered lines: | 146994 |
+| Uncovered lines: | 9975 |
+| Coverable lines: | 156969 |
+| Total lines: | 192197 |
+| **Branch coverage:** | 46.9% (4645 of 9893) |
+| Covered branches: | 4645 |
 | Total branches: | 9893 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 468_38148223266 |
+| Tag: | 470_38324546508 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **146993** | **9974** | **156967** | **213710** | **93.6%** | **4646** | **9893** | **46.9%** |
+| **Confirmai** | **146994** | **9975** | **156969** | **213714** | **93.6%** | **4645** | **9893** | **46.9%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -388,7 +388,7 @@
 | Confirmai.Services.Core.UiText.PokerTexts | 507 | 0 | 507 | 525 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.ServerTexts | 342 | 0 | 342 | 362 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.UtilityTexts | 1243 | 0 | 1243 | 1258 | 100% | 0 | 0 |  |
-| Confirmai.Services.Core.UiTextService | 103 | 20 | 123 | 357 | 83.7% | 105 | 126 | 83.3% |
+| Confirmai.Services.Core.UiTextService | 102 | 21 | 123 | 357 | 82.9% | 104 | 126 | 82.5% |
 | Confirmai.Services.Crypto.BitcoinQuoteService | 40 | 19 | 59 | 116 | 67.7% | 14 | 20 | 70% |
 | Confirmai.Services.Crypto.CryptoQuoteService | 47 | 28 | 75 | 149 | 62.6% | 18 | 30 | 60% |
 | Confirmai.Services.EventPayments.AbacatePayEventPaymentGateway | 6 | 5 | 11 | 29 | 54.5% | 0 | 0 |  |
@@ -446,7 +446,7 @@
 | Confirmai.Services.Identity.ModelStateLocalizer | 10 | 0 | 10 | 49 | 100% | 8 | 10 | 80% |
 | Confirmai.Services.Identity.PasswordRequirements | 18 | 0 | 18 | 37 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Interfaces.EventPaymentChargeResult | 1 | 0 | 1 | 15 | 100% | 0 | 0 |  |
-| Confirmai.Services.Notification.BridgeWhatsAppSender | 25 | 0 | 25 | 61 | 100% | 6 | 6 | 100% |
+| Confirmai.Services.Notification.BridgeWhatsAppSender | 27 | 0 | 27 | 65 | 100% | 6 | 6 | 100% |
 | Confirmai.Services.Notification.DryRunWhatsAppSender | 5 | 0 | 5 | 22 | 100% | 0 | 0 |  |
 | Confirmai.Services.Notification.WhatsAppDispatchService | 137 | 13 | 150 | 281 | 91.3% | 70 | 82 | 85.3% |
 | Confirmai.Services.Notification.WhatsAppGroupJid | 3 | 0 | 3 | 16 | 100% | 3 | 4 | 75% |
