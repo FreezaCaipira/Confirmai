@@ -203,12 +203,30 @@ header {
 }
 
 footer.oldsite-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
     background: transparent;
     color: var(--text-3);
-    text-align: center;
-    padding: var(--space-4) 0 0;
+    padding: var(--space-4) 0;
     border: none;
     border-top: 1px solid var(--border);
+}
+
+.oldsite-footer-links {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.oldsite-footer-links a {
+    color: var(--text-3);
+    text-decoration: none;
+}
+
+.oldsite-footer-links a:hover {
+    color: var(--accent-text);
 }
 
 .logout-btn {
