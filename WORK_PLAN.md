@@ -163,6 +163,14 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
    - **Admin do sistema:** `/admin/revenue` (receita so com pago, parceria carregando a parcela atual), isencao por grupo, auditoria.
    - **Transversal:** emails (botao leva a partida, deslogado volta pra partida, texto puro sem `&#...;`), ranking (pontos 3V+1E, copiar pro WhatsApp), landing deslogada, EN/ES, 320/390 px.
 3b. **Ressalvas conhecidas (nao bloqueiam; viram ciclo so se a bateria confirmar)** -- troca de mesa nao checa partida cancelada/espera (C39-B); reduzir o limite de vagas pode mandar quem ja pagou pra espera (C39-A); `/pair` do bridge exige reiniciar o servico quando o QR expira (C41); helper de taxa do jogador sem uso fora do teste (C39-C).
+3c. **Furos de auditoria levantados pelo Senior (pos-C41) -- entram no C42 junto com os achados da bateria (decisao do Robson: planejar tudo junto)** -- fonte: coluna "Audit" de `docs/uml/casos-de-uso.md` cruzada com `AuditEvents` no codigo:
+    1. jogador confirmar presenca (futsal e poker) nao audita -- `AuditEvents.EventConfirmationAdded` existe e nunca e usado (UC-J-15/17);
+    2. poker criar/editar (torneio e cash) sem audit: % da taxa, mesas, troca de mesa e recarimbo de devedores (UC-O-25/26, UC-J-17);
+    3. promocao automatica da espera e mudanca de vagas sem audit (UC-O-28 "vagas nao");
+    4. placar e voto de MVP sem audit -- o ranking (C40) deriva pontos do placar (UC-J-18/19);
+    5. politica de seguranca e liga/desliga de gateway vao so para log tecnico, nao `AuditAsync` (UC-A-31/33);
+    6. `LogService.AuditAsync` grava em `DbContext` proprio, fora da transacao da acao -- auditar so depois do `SaveChanges` de negocio.
+    Regra de classificacao: **auditoria** = mexe com dinheiro, permissao ou dado de terceiro, ou gera disputa ("eu nao fiz"/"eu fiz e sumiu"), com antes/depois no `MetadataJson` e sem chave Pix/comprovante em claro; **log tecnico** = falhas, jobs, integracoes (email, WhatsApp, webhook); **metrica** = contagens e alertas. Guardiao: teste que falha se uma constante de `AuditEvents` nao for usada no codigo de producao (hoje ~20 mortas, maioria do marketplace legado -- remover junto com as telas legadas ou marcar como legado). Opcional, decisao do Robson no C42: "historico da partida" visivel para o organizador.
 4. **Go-live real**: "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" (rotacao de todas as credenciais).
 5. **Lapidacao visual (fim da fila)** -- um ciclo so, quando o funcional fechar:
    - tela do jogador pagar (`Pages/Payment/EventPayment.razor` + `Components/EventPayment*.razor.css`) no vocabulario do C36-B Fase 3 -- so CSS/classe, entra no `CssNoLegacyVarsTests`;
