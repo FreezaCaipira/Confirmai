@@ -122,6 +122,23 @@ public class CssComponentsTests
     }
 
     /// <summary>
+    /// Botao "Mostrar senha" do cadastro: o generico .identity-container button
+    /// (margem, min-width 180px/220px no mobile) desalinhava o toggle do campo.
+    /// </summary>
+    [Fact]
+    public void IdentityPasswordToggle_ResetsGenericButtonRule()
+    {
+        var css = File.ReadAllText(Path.Combine(RepoRoot().FullName, "wwwroot", "css", "identity.css"));
+
+        var block = Regex.Match(css, @"\.identity-container\s+\.pwd-toggle\s*\{([^}]*)");
+        Assert.True(block.Success);
+        foreach (var decl in new[] { "min-width: 0", "margin: 0", "width: auto" })
+            Assert.Contains(decl, block.Groups[1].Value);
+
+        Assert.Contains("button:not(.google-signin-btn):not(.pwd-toggle)", css);
+    }
+
+    /// <summary>
     /// C38 Fase 2 (testador externo): .seg-toggle mede ~350px de largura minima
     /// e estoura /grupo/{id}/partidas em 320px — os itens precisam quebrar de
     /// linha, e dados do usuario (nome do grupo, local da partida) ganham
