@@ -1,10 +1,12 @@
-﻿@using Confirmai.Data
+﻿@using System.Security.Claims
+@using Confirmai.Data
 @using Confirmai.Services
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.EntityFrameworkCore
 @inject NavigationManager NavigationManager
 @inject UiTextService T
 @inject IDbContextFactory<AppDbContext> DbFactory
+@inject AuthenticationStateProvider AuthState
 
 @if (BackHref is not null)
 {
@@ -161,9 +163,16 @@
 
     private async Task<(int EventId, int GroupId, string GroupName, Sport Sport)?> LoadConfirmationEventAsync(int confirmationId)
     {
+        var user = (await AuthState.GetAuthenticationStateAsync()).User;
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return null;
+
         await using var db = await DbFactory.CreateDbContextAsync();
         var row = await db.EventConfirmations
-            .Where(c => c.Id == confirmationId)
+            .Where(c => c.Id == confirmationId
+                && (c.UserId == userId
+                    || c.Event.Group.Members.Any(m => m.UserId == userId && m.Role == GroupMemberRole.Admin)))
             .Select(c => new { c.EventId, GroupId = c.Event.GroupId, GroupName = c.Event.Group.Name, c.Event.Sport })
             .FirstOrDefaultAsync();
         return row is null ? null : (row.EventId, row.GroupId, row.GroupName, row.Sport);

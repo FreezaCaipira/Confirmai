@@ -232,7 +232,7 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
-## Ciclo 42 (Pleno) -- Achados da bateria do Robson (10 itens) + auditoria/metricas de produto [C42-A EXECUTADO -- aguardando PR/review; C42-B PLANEJADO]
+## Ciclo 42 (Pleno) -- Achados da bateria do Robson (10 itens) + auditoria/metricas de produto [C42-A APROVADO c/ ressalvas (review Senior da PR #164); C42-B PLANEJADO -- EXECUTAVEL AGORA]
 
 **Origem:** bateria do Robson em prod (15/10), 10 achados com print. Fecha o ciclo nesses 10 (decisao do Robson). Landing (3d) ja foi entregue pelo Senior na #161 e o cadastro na #162 -- **nao refazer**.
 **Entrega em 2 PRs (uma branch cada):** C42-A = UI (itens 1-4, 6-10). C42-B = auditoria + metricas (item 5 + os 6 furos do passo 3c). C42-A primeiro (menor risco, Robson valida em prod).
@@ -274,6 +274,20 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 10. **Menu mobile**: `display:contents` nos wrappers + `order` nas classes marcadoras (Partidas 0, Grupos 1, Mailbox 2, Perfil 3, Integracao 4, Admin 5, Idioma 6, Sair 7); itens 48px alinhados a esquerda com icone de 20px; ativo = barra azul `inset 3px` + `--accent-soft`; painel `--surface-3` com sombra; bandeiras numa linha com rotulo "Idioma"; Sair por ultimo em `--danger`; separadores por `border-top`; Esc fecha (`@onkeydown` no nav); desktop intocado.
 
 Testes novos: `C42ABreadcrumbTests` (4) + `C42AppVersionTests` + `C42MobileMenuTests` (3) + 2 guardioes em `CssComponentsTests` + 1 em `DesignTokensContrastTests`. `dotnet build --no-incremental` 0/0; suite 2808 -> **2822**.
+
+### C42-A -- Review Senior (PR #164): APROVADO c/ ressalvas
+
+Os 9 itens batem com o plano. Build 0 warnings; suite 2798 ok (24 falhas so de `ProgramConfigurationTests`, senha do Postgres local -- ambiental, preexistente).
+
+Corrigido pelo Senior na PR de review:
+1. **Regressao no header:** `.shell-brand-mark` perdeu o quadrado azul (display/width/height/radius/background removidos sem estar no plano) -- o check branco ficava solto. Restaurado + guardiao `ShellCss_BrandMark_KeepsAccentTile`.
+2. **Vazamento no breadcrumb:** `LoadConfirmationEventAsync` buscava qualquer confirmacao pelo id, entao `/pagamento/evento/{id}` de outra pessoa mostrava nome do grupo e esporte na trilha (a pagina dizia "nao encontrado", a trilha nao). Agora filtra igual ao `EventPaymentService.LoadConfirmationAsync`: dono da confirmacao ou admin do grupo. Teste `PaymentPage_StrangerDoesNotSeeGroupNameInTrail` (falha sem o fix).
+
+Ressalvas p/ o Pleno (entram no C42-B, sem PR separada):
+- **Regra:** query nova em componente compartilhado (breadcrumb, header, widget) aplica o mesmo filtro de acesso da pagina; nao confiar que "a pagina ja barra".
+- **Regra:** nao remover declaracoes de CSS fora do escopo do item; se precisar, justificar no WORK_PLAN.
+- Versao em 2 lugares (`<Version>` no csproj + `AssemblyInformationalVersion` no `AssemblyInfo.cs`): ao trocar de ciclo, mudar os dois (o teste `AppVersion_Current_IsSemverWithoutBuildSuffix` fixa `0.42.0` e vai acusar).
+- `invite-feedback` repete "Copiado" (botao + linha de baixo). Aceitavel; se incomodar em prod, deixar so o `aria-live` visualmente oculto.
 
 ### C42-B -- Auditoria + metricas de produto
 
