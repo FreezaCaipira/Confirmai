@@ -35,19 +35,25 @@ public partial class AdminAuditTimeline
             entries = await AdminLogsQueryService.GetEntityTimelineAsync(EntityType, EntityId);
 
             // C42-B: quem viu a trilha de auditoria tambem e auditado.
-            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-            var adminUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await LogService.AuditAsync(
-                AuditEvents.AdminAuditViewed,
-                AuditEntities.Setting,
-                $"{EntityType}/{EntityId}",
-                $"Trilha de auditoria consultada: {EntityType}/{EntityId}.",
-                actorUserId: adminUserId,
-                source: "AdminAudit",
-                metadata: new { entityType = EntityType, entityId = EntityId });
+            if (RendererInfo.IsInteractive)
+                await AuditViewedAsync();
         }
 
         isLoading = false;
+    }
+
+    private async Task AuditViewedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        var adminUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await LogService.AuditAsync(
+            AuditEvents.AdminAuditViewed,
+            AuditEntities.Setting,
+            $"{EntityType}/{EntityId}",
+            $"Trilha de auditoria consultada: {EntityType}/{EntityId}.",
+            actorUserId: adminUserId,
+            source: "AdminAudit",
+            metadata: new { entityType = EntityType, entityId = EntityId });
     }
 
     private async Task ExportCsvAsync()

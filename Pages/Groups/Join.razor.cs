@@ -47,16 +47,18 @@ public partial class Join
 
         // C42-B: evento de metrica — abertura do convite (funil H2).
         // Sem o codigo nem o usuario anonimo: so o grupo quando valido.
-        await LogService.AuditAsync(
-            AuditEvents.GroupInviteOpened,
-            AuditEntities.Group,
-            group?.Id.ToString(),
-            group is not null
-                ? $"Invite page opened for group #{group.Id}."
-                : "Invite page opened with an invalid code.",
-            actorUserId: currentUserId,
-            source: "Metrics",
-            metadata: new { groupId = group?.Id, valid = group is not null, loggedIn = currentUserId is not null });
+        // So no circuito interativo: o prerender roda OnInitialized de novo.
+        if (RendererInfo.IsInteractive)
+            await LogService.AuditAsync(
+                AuditEvents.GroupInviteOpened,
+                AuditEntities.Group,
+                group?.Id.ToString(),
+                group is not null
+                    ? $"Invite page opened for group #{group.Id}."
+                    : "Invite page opened with an invalid code.",
+                actorUserId: currentUserId,
+                source: "Metrics",
+                metadata: new { groupId = group?.Id, valid = group is not null, loggedIn = currentUserId is not null });
 
         if (group is not null)
         {
