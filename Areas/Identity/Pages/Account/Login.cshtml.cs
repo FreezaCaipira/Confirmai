@@ -105,7 +105,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
                     $"Login bem-sucedido: {user.UserName}.",
                     actorUserId: user.Id,
                     source: AdminAuditSources.Identity,
-                    metadata: new { user.Id, user.UserName, Input.RememberMe });
+                    metadata: new { user.Id, user.UserName, Input.RememberMe, method = "password" });
 
                 var target = !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
                     ? returnUrl

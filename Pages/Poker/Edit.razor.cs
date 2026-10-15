@@ -230,6 +230,7 @@ public partial class Edit
                 ? (newPrice is > 0 ? form.PlatformFeePercent : (decimal?)null)
                 : ev.PlatformFeePercent;
             var chargeChanged = newPrice != ev.Price || newFeePercent != ev.PlatformFeePercent;
+            List<int>? restampedOptionIds = null;
 
             // C39-B F10: diff das mesas validado antes de qualquer mutacao.
             var cashRows = isCash
@@ -306,6 +307,11 @@ public partial class Edit
             ev.Location      = eventType != PokerEventType.HomeGame ? (form.Address ?? string.Empty) : string.Empty;
 
             var oldStartsAt = ev.StartsAt;
+            var oldMaxPlayers = ev.MaxPlayers;
+            var oldPrice = ev.Price;
+            var oldFeePercent = ev.PlatformFeePercent;
+            var oldGroupName = ev.Group.Name;
+            var oldGroupCity = ev.Group.City;
             var newStartsAt = DateTime.SpecifyKind(form.Date.ToDateTime(form.Time), DateTimeKind.Utc);
 
             var collision = await EventCollisionService.FindGroupTimeCollisionAsync(ev.GroupId, newStartsAt, ev.Id);
@@ -354,6 +360,7 @@ public partial class Edit
                     var usedOpts = ev.Confirmations.Where(c => c.PriceOptionId is not null)
                         .Select(c => c.PriceOptionId!.Value).ToHashSet();
                     var plan = CashTableEdit.Apply(ev, cashRows, usedOpts);
+                    restampedOptionIds = plan.RestampedOptionIds.ToList();
                     // C39-B F10: mesa com preco/% alterado recarimba so quem
                     // ainda deve nela (mesma regra do RestampUnpaid).
                     foreach (var opt in ev.PriceOptions.Where(o => plan.RestampedOptionIds.Contains(o.Id)))
@@ -376,6 +383,67 @@ public partial class Edit
 
             await db.SaveChangesAsync();
             await NotificationService.NotifyEventUpdatedAsync(Id, userId!, oldStartsAt);
+
+            // C42-B: auditoria da edicao (antes era so a notificacao).
+            await LogService.AuditAsync(
+                Confirmai.Services.Core.AuditEvents.EventUpdated,
+                Confirmai.Services.Core.AuditEntities.Event,
+                Id.ToString(),
+                $"Evento de poker #{Id} editado.",
+                actorUserId: userId,
+                source: "PokerEdit",
+                metadata: new
+                {
+                    eventId = Id,
+                    eventType = eventType.ToString(),
+                    startsAt = new { before = oldStartsAt, after = newStartsAt },
+                    price = new { before = oldPrice, after = ev.Price },
+                    platformFeePercent = new { before = oldFeePercent, after = ev.PlatformFeePercent },
+                    maxPlayers = new { before = oldMaxPlayers, after = ev.MaxPlayers },
+                });
+
+            if (oldGroupName != ev.Group.Name || oldGroupCity != ev.Group.City)
+            {
+                await LogService.AuditAsync(
+                    Confirmai.Services.Core.AuditEvents.GroupUpdated,
+                    Confirmai.Services.Core.AuditEntities.Group,
+                    ev.GroupId.ToString(),
+                    $"Grupo #{ev.GroupId} atualizado junto com a edicao do evento #{Id}.",
+                    actorUserId: userId,
+                    source: "PokerEdit",
+                    metadata: new
+                    {
+                        groupId = ev.GroupId,
+                        eventId = Id,
+                        name = new { before = oldGroupName, after = ev.Group.Name },
+                        city = new { before = oldGroupCity, after = ev.Group.City },
+                    });
+            }
+
+            if (oldMaxPlayers != ev.MaxPlayers)
+            {
+                await LogService.AuditAsync(
+                    Confirmai.Services.Core.AuditEvents.EventCapacityChanged,
+                    Confirmai.Services.Core.AuditEntities.Event,
+                    Id.ToString(),
+                    $"Vagas do evento de poker #{Id} alteradas de {oldMaxPlayers} para {ev.MaxPlayers}.",
+                    actorUserId: userId,
+                    source: "PokerEdit",
+                    metadata: new { eventId = Id, previousMaxPlayers = oldMaxPlayers, newMaxPlayers = ev.MaxPlayers });
+            }
+
+            if (chargeChanged || (restampedOptionIds?.Count ?? 0) > 0)
+            {
+                await LogService.AuditAsync(
+                    Confirmai.Services.Core.AuditEvents.EventConfirmationRestamped,
+                    Confirmai.Services.Core.AuditEntities.Event,
+                    Id.ToString(),
+                    $"Carimbos de preco/taxa recalculados para devedores do evento #{Id}.",
+                    actorUserId: userId,
+                    source: "PokerEdit",
+                    metadata: new { eventId = Id, chargeChanged, restampedOptionIds });
+            }
+
             NavigationManager.NavigateTo($"/poker/{Id}");
         }
         catch (Exception ex)

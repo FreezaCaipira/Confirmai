@@ -80,7 +80,7 @@ public class C39TournamentFeeE2ETests
         var logService = new LogService(factory, NullLogger<LogService>.Instance);
         return new Wired(
             db, factory,
-            new PokerDetailService(factory, policy),
+            new PokerDetailService(factory, policy, TestLogService.Create(factory)),
             new PixProofUploadService(factory, NullLogger<PixProofUploadService>.Instance, logService),
             new PlatformFeeLedgerService(factory, policy),
             new AdminConfirmationService(factory, logService,

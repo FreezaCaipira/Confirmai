@@ -310,6 +310,16 @@ public sealed class GroupDetailService
             actorUserId: userId,
             metadata: new { groupId, memberUserId = userId, via = "invite-code" });
 
+        // C42-B: evento de metrica de produto (funil convite -> membro, H2).
+        await _log.AuditAsync(
+            AuditEvents.GroupMemberJoined,
+            AuditEntities.Group,
+            groupId.ToString(),
+            "Membro entrou no grupo via convite",
+            actorUserId: userId,
+            source: "Metrics",
+            metadata: new { groupId, via = "invite" });
+
         return JoinWithCodeResult.Joined;
     }
 
@@ -357,6 +367,16 @@ public sealed class GroupDetailService
             $"Solicitação aprovada no grupo \"{groupName}\"",
             actorUserId: approverUserId,
             metadata: new { requestId = req.Id, req.GroupId, req.UserId });
+
+        // C42-B: evento de metrica de produto.
+        await _log.AuditAsync(
+            AuditEvents.GroupMemberJoined,
+            AuditEntities.Group,
+            req.GroupId.ToString(),
+            "Membro entrou no grupo via aprovação",
+            actorUserId: req.UserId,
+            source: "Metrics",
+            metadata: new { groupId = req.GroupId, via = "approval" });
     }
 
     public async Task RejectRequestAsync(int requestId, string rejecterUserId)
@@ -433,6 +453,14 @@ public sealed class GroupDetailService
                 $"Solicitação aprovada no grupo \"{groupName}\"",
                 actorUserId: approverUserId,
                 metadata: new { requestId = req.Id, req.GroupId, req.UserId });
+            await _log.AuditAsync(
+                AuditEvents.GroupMemberJoined,
+                AuditEntities.Group,
+                req.GroupId.ToString(),
+                "Membro entrou no grupo via aprovação",
+                actorUserId: req.UserId,
+                source: "Metrics",
+                metadata: new { groupId = req.GroupId, via = "approval" });
         }
     }
 
@@ -532,6 +560,14 @@ public sealed class GroupDetailService
                 $"Solicitação aprovada no grupo \"{group.Name}\"",
                 actorUserId: approverUserId,
                 metadata: new { requestId = req.Id, req.GroupId, req.UserId });
+            await _log.AuditAsync(
+                AuditEvents.GroupMemberJoined,
+                AuditEntities.Group,
+                req.GroupId.ToString(),
+                "Membro entrou no grupo via aprovação",
+                actorUserId: req.UserId,
+                source: "Metrics",
+                metadata: new { groupId = req.GroupId, via = "approval" });
         }
     }
 }

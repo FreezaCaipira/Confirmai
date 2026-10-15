@@ -156,6 +156,10 @@ public partial class Edit
             if (venue is null) { saveError = Ui["Futsal.InvalidVenue"]; isSaving = false; return; }
 
             var oldStartsAt = ev.StartsAt;
+            var oldMaxPlayers = ev.MaxPlayers;
+            var oldMaxGoalkeepers = ev.MaxGoalkeepers;
+            var oldGroupName = ev.Group.Name;
+            var oldPrice = ev.Price;
             var newStartsAt = DateTime.SpecifyKind(form.Date.ToDateTime(form.Time), DateTimeKind.Utc);
 
             var collision = await EventCollisionService.FindGroupTimeCollisionAsync(ev.GroupId, newStartsAt, ev.Id);
@@ -196,7 +200,53 @@ public partial class Edit
                 AuditEntities.Event,
                 Id.ToString(),
                 $"Partida #{Id} editada (novo horário: {newStartsAt:dd/MM/yyyy HH:mm})",
-                userId, "EventEdit");
+                userId, "EventEdit",
+                metadata: new
+                {
+                    eventId = Id,
+                    startsAt = new { before = oldStartsAt, after = newStartsAt },
+                    price = new { before = oldPrice, after = ev.Price },
+                    maxPlayers = new { before = oldMaxPlayers, after = ev.MaxPlayers },
+                });
+
+            // C42-B: vagas e identidade do grupo viram eventos proprios —
+            // a disputa "quem mudou as vagas/o nome" fica rastreavel.
+            if (oldMaxPlayers != ev.MaxPlayers || oldMaxGoalkeepers != ev.MaxGoalkeepers)
+            {
+                await LogService.AuditAsync(
+                    AuditEvents.EventCapacityChanged,
+                    AuditEntities.Event,
+                    Id.ToString(),
+                    $"Vagas da partida #{Id} alteradas.",
+                    actorUserId: userId,
+                    source: "EventEdit",
+                    metadata: new
+                    {
+                        eventId = Id,
+                        previousMaxPlayers = oldMaxPlayers,
+                        newMaxPlayers = ev.MaxPlayers,
+                        previousMaxGoalkeepers = oldMaxGoalkeepers,
+                        newMaxGoalkeepers = ev.MaxGoalkeepers,
+                    });
+            }
+
+            if (oldGroupName != ev.Group.Name)
+            {
+                await LogService.AuditAsync(
+                    AuditEvents.GroupUpdated,
+                    AuditEntities.Group,
+                    ev.GroupId.ToString(),
+                    $"Grupo #{ev.GroupId} atualizado junto com a edicao da partida #{Id}.",
+                    actorUserId: userId,
+                    source: "EventEdit",
+                    metadata: new
+                    {
+                        groupId = ev.GroupId,
+                        eventId = Id,
+                        name = new { before = oldGroupName, after = ev.Group.Name },
+                    });
+            }
+
             NavigationManager.NavigateTo($"/futsal/{Id}");
         }
         catch (Exception ex)

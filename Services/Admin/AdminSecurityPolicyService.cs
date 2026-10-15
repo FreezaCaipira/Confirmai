@@ -85,11 +85,20 @@ public class AdminSecurityPolicyService
         await db.SaveChangesAsync();
 
         var adminUserId = user?.FindFirstValue(ClaimTypes.NameIdentifier);
-        await _logService.LogAsync(
+        await _logService.AuditAsync(
+            AuditEvents.AdminSecurityPolicyChanged,
+            AuditEntities.Setting,
+            "SecurityPolicy",
             message: BuildAuditMessage(currentPolicy, policy),
+            actorUserId: adminUserId,
             source: AdminAuditSources.SecurityPolicy,
             level: AdminAuditLevels.Success,
-            userId: adminUserId);
+            metadata: new
+            {
+                requireConfirmedEmail = new { before = currentPolicy.RequireConfirmedEmail, after = policy.RequireConfirmedEmail },
+                lockoutMaxFailedAccessAttempts = new { before = currentPolicy.LockoutMaxFailedAccessAttempts, after = policy.LockoutMaxFailedAccessAttempts },
+                lockoutMinutes = new { before = currentPolicy.LockoutMinutes, after = policy.LockoutMinutes },
+            });
 
         return true;
     }

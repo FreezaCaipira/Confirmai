@@ -2,6 +2,7 @@ using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
 using Confirmai.Pages.Components;
+using Confirmai.Services.Core;
 using Confirmai.Services.Notification;
 using Confirmai.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -23,12 +24,15 @@ public class EscalacaoService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly WhatsAppDispatchService? _whatsApp;
+    private readonly LogService _logService;
 
     public EscalacaoService(IDbContextFactory<AppDbContext> dbFactory,
+        LogService logService,
         WhatsAppDispatchService? whatsApp = null)
     {
         _dbFactory = dbFactory;
         _whatsApp = whatsApp;
+        _logService = logService;
     }
 
     public async Task<EscalacaoLoadResult> LoadAsync(int eventId, string? currentUserId)
@@ -168,6 +172,15 @@ public class EscalacaoService
             });
         }
         await db.SaveChangesAsync();
+
+        await _logService.AuditAsync(
+            AuditEvents.EventPostMatchVoteCast,
+            AuditEntities.Event,
+            eventId.ToString(),
+            $"Voto de destaque registrado na partida #{eventId}.",
+            actorUserId: voterUserId,
+            source: "Escalacao",
+            metadata: new { eventId, voterUserId, votedForUserId, changed = existing is not null });
     }
 
     public async Task SaveScoreAsync(int eventId, int scoreA, int scoreB, string? userId)
@@ -176,11 +189,22 @@ public class EscalacaoService
         var dbEv = await db.Events.FindAsync(eventId);
         if (dbEv is not null)
         {
+            var previousA = dbEv.ScoreTeamA;
+            var previousB = dbEv.ScoreTeamB;
             dbEv.ScoreTeamA = scoreA;
             dbEv.ScoreTeamB = scoreB;
             dbEv.ScoreRegisteredByUserId = userId;
             dbEv.ScoreRegisteredAt = DateTime.UtcNow;
             await db.SaveChangesAsync();
+
+            await _logService.AuditAsync(
+                AuditEvents.EventScoreRegistered,
+                AuditEntities.Event,
+                eventId.ToString(),
+                $"Placar da partida #{eventId} registrado: {scoreA} x {scoreB}.",
+                actorUserId: userId,
+                source: "Escalacao",
+                metadata: new { eventId, scoreA, scoreB, previousScoreA = previousA, previousScoreB = previousB });
         }
     }
 }

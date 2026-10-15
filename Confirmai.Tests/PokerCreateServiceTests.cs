@@ -32,7 +32,7 @@ public class PokerCreateServiceTests
                         ManualPlatformFeeFixed = 0.75m,
                         PokerFeePercentMin = 5m,
                         PokerFeePercentMax = 10m,
-                    })));
+                    })), TestLogService.Create(factory));
         return (factory, svc);
     }
 

@@ -34,3 +34,14 @@ public class TestDbContextFactory : IDbContextFactory<AppDbContext>
         return new TestDbContextFactory(options);
     }
 }
+
+/// <summary>
+/// Convenience factory for a LogService backed by the same test DbContext
+/// factory — lets services that require LogService run in unit tests and
+/// keeps audit rows queryable afterwards.
+/// </summary>
+public static class TestLogService
+{
+    public static Confirmai.Services.Core.LogService Create(IDbContextFactory<AppDbContext> factory) =>
+        new(factory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance);
+}

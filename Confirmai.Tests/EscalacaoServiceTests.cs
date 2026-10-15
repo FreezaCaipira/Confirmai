@@ -14,7 +14,7 @@ public class EscalacaoServiceTests
     private static async Task<(IDbContextFactory<AppDbContext> factory, EscalacaoService svc, int eventId, int groupId)> SetupWithEventAsync()
     {
         var factory = CreateFactory();
-        var svc = new EscalacaoService(factory);
+        var svc = new EscalacaoService(factory, new Confirmai.Services.Core.LogService(factory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance));
 
         await using var db = factory.CreateDbContext();
         var group = new Group { Name = "Test Group" };
@@ -40,7 +40,7 @@ public class EscalacaoServiceTests
     public async Task LoadAsync_ReturnsNullEvent_WhenNotFound()
     {
         var factory = CreateFactory();
-        var svc = new EscalacaoService(factory);
+        var svc = new EscalacaoService(factory, new Confirmai.Services.Core.LogService(factory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance));
 
         var result = await svc.LoadAsync(999, "user-1");
 
@@ -199,7 +199,7 @@ public class EscalacaoServiceTests
     public async Task SaveScoreAsync_DoesNothing_WhenEventNotFound()
     {
         var factory = CreateFactory();
-        var svc = new EscalacaoService(factory);
+        var svc = new EscalacaoService(factory, new Confirmai.Services.Core.LogService(factory, Microsoft.Extensions.Logging.Abstractions.NullLogger<Confirmai.Services.Core.LogService>.Instance));
         await svc.SaveScoreAsync(999, 3, 2, "user-1");
     }
 }

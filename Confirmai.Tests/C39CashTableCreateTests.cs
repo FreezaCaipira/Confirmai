@@ -47,7 +47,7 @@ public class C39CashTableCreateTests
             new TestAuthStateProvider(userId),
             new EventCollisionService(factory),
             new UiTextService(new Confirmai.Services.User.LanguagePreferenceService()),
-            policy);
+            policy, TestLogService.Create(factory));
         return (factory, svc);
     }
 

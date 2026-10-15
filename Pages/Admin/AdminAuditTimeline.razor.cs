@@ -3,7 +3,9 @@ using Confirmai.Services;
 using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+using System.Security.Claims;
 
 namespace Confirmai.Pages.Admin;
 
@@ -20,6 +22,8 @@ public partial class AdminAuditTimeline
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
     [Inject] private UiTextService T { get; set; } = default!;
+    [Inject] private LogService LogService { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -29,6 +33,18 @@ public partial class AdminAuditTimeline
         if (!string.IsNullOrWhiteSpace(EntityType) && !string.IsNullOrWhiteSpace(EntityId))
         {
             entries = await AdminLogsQueryService.GetEntityTimelineAsync(EntityType, EntityId);
+
+            // C42-B: quem viu a trilha de auditoria tambem e auditado.
+            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+            var adminUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await LogService.AuditAsync(
+                AuditEvents.AdminAuditViewed,
+                AuditEntities.Setting,
+                $"{EntityType}/{EntityId}",
+                $"Trilha de auditoria consultada: {EntityType}/{EntityId}.",
+                actorUserId: adminUserId,
+                source: "AdminAudit",
+                metadata: new { entityType = EntityType, entityId = EntityId });
         }
 
         isLoading = false;

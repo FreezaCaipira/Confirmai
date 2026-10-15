@@ -141,7 +141,7 @@ public class AuditLoggingHooksTests
         var log = new LogService(dbFactory, NullLogger<LogService>.Instance);
 
         await log.AuditAsync(
-            AuditEvents.PaymentInvalid,
+            AuditEvents.PaymentFailed,
             AuditEntities.Payment,
             entityId: "inv-bad",
             message: "Invalid payment payload",

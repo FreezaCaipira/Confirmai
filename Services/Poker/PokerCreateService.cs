@@ -34,19 +34,22 @@ public sealed class PokerCreateService
     private readonly EventCollisionService _collisionService;
     private readonly UiTextService _ui;
     private readonly PlatformFeePolicy _feePolicy;
+    private readonly LogService _logService;
 
     public PokerCreateService(
         IDbContextFactory<AppDbContext> dbFactory,
         AuthenticationStateProvider authStateProvider,
         EventCollisionService collisionService,
         UiTextService ui,
-        PlatformFeePolicy feePolicy)
+        PlatformFeePolicy feePolicy,
+        LogService logService)
     {
         _dbFactory = dbFactory;
         _authStateProvider = authStateProvider;
         _collisionService = collisionService;
         _ui = ui;
         _feePolicy = feePolicy;
+        _logService = logService;
     }
 
     public async Task<string?> GetCurrentUserIdAsync()
@@ -267,6 +270,27 @@ public sealed class PokerCreateService
 
         db.Events.Add(ev);
         await db.SaveChangesAsync();
+
+        await _logService.AuditAsync(
+            AuditEvents.EventCreated,
+            AuditEntities.Event,
+            ev.Id.ToString(),
+            $"Evento de poker #{ev.Id} criado ({form.EventType}).",
+            actorUserId: userId,
+            source: "PokerCreate",
+            metadata: new
+            {
+                ev.Id,
+                ev.GroupId,
+                sport = "Poker",
+                eventType = form.EventType.ToString(),
+                ev.Price,
+                ev.PlatformFeePercent,
+                maxPlayers = ev.MaxPlayers,
+                cashTables = ev.PriceOptions.Count,
+                createdNewGroup = preselectedGroup is null,
+            });
+
         return new(true, null, null, ev.Id);
     }
 

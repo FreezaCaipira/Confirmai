@@ -102,6 +102,9 @@ builder.Services.AddSingleton<CryptoQuoteService>();
 builder.Services.AddSingleton<PaymentEventBus>();
 builder.Services.AddSingleton<PaymentDomainMetrics>();
 builder.Services.AddSingleton<OperationalMetrics>();
+builder.Services.Configure<Confirmai.Configuration.MetricsOptions>(
+    builder.Configuration.GetSection(Confirmai.Configuration.MetricsOptions.Section));
+builder.Services.AddScoped<PageViewTracker>();
 builder.Services.AddScoped<Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler, MetricsCircuitHandler>();
 
 builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>();
@@ -176,6 +179,7 @@ builder.Services.AddScoped<LanguagePreferenceService>();
 builder.Services.AddScoped<UiTextService>(sp => new UiTextService(sp.GetRequiredService<LanguagePreferenceService>()));
 builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<GroupMetricsService>();
+builder.Services.AddScoped<Confirmai.Services.Admin.AdminProductMetricsService>();
 // C31/C41 — WhatsApp via whatsapp-bridge (grupo, nunca DM). DryRun is the
 // default; real sends only happen with DryRun=false + JID allowlist (guard below).
 builder.Services.Configure<AppOptions>(builder.Configuration.GetSection("App"));

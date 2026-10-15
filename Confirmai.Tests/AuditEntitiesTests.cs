@@ -26,34 +26,6 @@ public class AuditEntitiesTests
     }
 
     [Fact]
-    public void Server_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("Server", AuditEntities.Server);
-    }
-
-    [Fact]
-    public void ItemOffer_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("ItemOffer", AuditEntities.ItemOffer);
-    }
-
-    [Fact]
-    public void Webhook_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("Webhook", AuditEntities.Webhook);
-    }
-
-    [Fact]
-    public void ApiKey_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("ApiKey", AuditEntities.ApiKey);
-    }
-
-    [Fact]
     public void Setting_ConstantValue()
     {
         // Act & Assert
@@ -79,5 +51,12 @@ public class AuditEntitiesTests
     {
         // Act & Assert
         Assert.Equal("EventConfirmation", AuditEntities.EventConfirmation);
+    }
+
+    [Fact]
+    public void PageView_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("PageView", AuditEntities.PageView);
     }
 }
