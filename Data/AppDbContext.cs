@@ -283,6 +283,11 @@ namespace Confirmai.Data
             modelBuilder.Entity<AppLog>()
                 .HasIndex(l => new { l.EntityType, l.EntityId });
 
+            // C42-B: consultas de metricas de produto filtram por EventType +
+            // janela de tempo (page.view, login, convites).
+            modelBuilder.Entity<AppLog>()
+                .HasIndex(l => new { l.EventType, l.Timestamp });
+
             // S-4: Use PostgreSQL xmin as optimistic concurrency token
             modelBuilder.Entity<PaymentRecord>()
                 .Property<uint>("xmin")

@@ -84,6 +84,8 @@ namespace Confirmai.Migrations
 
                     b.HasIndex("EntityType", "EntityId");
 
+                    b.HasIndex("EventType", "Timestamp");
+
                     b.ToTable("Logs");
                 });
 

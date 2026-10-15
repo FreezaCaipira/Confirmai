@@ -23,7 +23,7 @@ public class C39PokerDetailServiceTests
             PokerFeePercentMin = feeMin,
             PokerFeePercentMax = feeMax,
         });
-        return (factory, new PokerDetailService(factory, new PlatformFeePolicy(feeOptions)));
+        return (factory, new PokerDetailService(factory, new PlatformFeePolicy(feeOptions), TestLogService.Create(factory)));
     }
 
     private static async Task<int> SeedEventAsync(

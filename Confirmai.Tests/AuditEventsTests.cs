@@ -1,4 +1,5 @@
 using Confirmai.Services.Core;
+using System.Reflection;
 
 namespace Confirmai.Tests;
 
@@ -96,118 +97,6 @@ public class AuditEventsTests
     }
 
     [Fact]
-    public void ItemOfferCreated_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("itemoffer.created", AuditEvents.ItemOfferCreated);
-    }
-
-    [Fact]
-    public void ItemOfferCancelled_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("itemoffer.cancelled", AuditEvents.ItemOfferCancelled);
-    }
-
-    [Fact]
-    public void ItemOfferSold_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("itemoffer.sold", AuditEvents.ItemOfferSold);
-    }
-
-    [Fact]
-    public void ServerRequested_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.requested", AuditEvents.ServerRequested);
-    }
-
-    [Fact]
-    public void ServerRequestApproved_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.request.approved", AuditEvents.ServerRequestApproved);
-    }
-
-    [Fact]
-    public void ServerRequestRejected_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.request.rejected", AuditEvents.ServerRequestRejected);
-    }
-
-    [Fact]
-    public void ServerCreated_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.created", AuditEvents.ServerCreated);
-    }
-
-    [Fact]
-    public void ServerUpdated_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.updated", AuditEvents.ServerUpdated);
-    }
-
-    [Fact]
-    public void ServerDeleted_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.deleted", AuditEvents.ServerDeleted);
-    }
-
-    [Fact]
-    public void ServerMemberAdded_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.member.added", AuditEvents.ServerMemberAdded);
-    }
-
-    [Fact]
-    public void ServerMemberRemoved_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.member.removed", AuditEvents.ServerMemberRemoved);
-    }
-
-    [Fact]
-    public void ServerMemberUpdated_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.member.updated", AuditEvents.ServerMemberUpdated);
-    }
-
-    [Fact]
-    public void ServerApiKeyIssued_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.apikey.issued", AuditEvents.ServerApiKeyIssued);
-    }
-
-    [Fact]
-    public void ServerApiKeyRevoked_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("server.apikey.revoked", AuditEvents.ServerApiKeyRevoked);
-    }
-
-    [Fact]
-    public void PaymentInvoiceCreated_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("payment.invoice.created", AuditEvents.PaymentInvoiceCreated);
-    }
-
-    [Fact]
-    public void PaymentReceived_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("payment.received", AuditEvents.PaymentReceived);
-    }
-
-    [Fact]
     public void PaymentConfirmed_ConstantValue()
     {
         // Act & Assert
@@ -247,27 +136,6 @@ public class AuditEventsTests
     {
         // Act & Assert
         Assert.Equal("payment.reconciliation.panel.stale", AuditEvents.PaymentReconciliationPanelStale);
-    }
-
-    [Fact]
-    public void PaymentReplayed_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("payment.replayed", AuditEvents.PaymentReplayed);
-    }
-
-    [Fact]
-    public void PaymentInvalid_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("payment.invalid", AuditEvents.PaymentInvalid);
-    }
-
-    [Fact]
-    public void PaymentRefused_ConstantValue()
-    {
-        // Act & Assert
-        Assert.Equal("payment.refused", AuditEvents.PaymentRefused);
     }
 
     [Fact]
@@ -313,6 +181,27 @@ public class AuditEventsTests
     }
 
     [Fact]
+    public void EventCapacityChanged_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("event.capacity.changed", AuditEvents.EventCapacityChanged);
+    }
+
+    [Fact]
+    public void EventScoreRegistered_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("event.score.registered", AuditEvents.EventScoreRegistered);
+    }
+
+    [Fact]
+    public void EventPostMatchVoteCast_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("event.vote.cast", AuditEvents.EventPostMatchVoteCast);
+    }
+
+    [Fact]
     public void EventConfirmationAdded_ConstantValue()
     {
         // Act & Assert
@@ -338,6 +227,34 @@ public class AuditEventsTests
     {
         // Act & Assert
         Assert.Equal("event.confirmation.unpaid.manual", AuditEvents.EventConfirmationUnpaidManual);
+    }
+
+    [Fact]
+    public void EventConfirmationTableChanged_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("event.confirmation.table.changed", AuditEvents.EventConfirmationTableChanged);
+    }
+
+    [Fact]
+    public void EventConfirmationRestamped_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("event.confirmation.restamped", AuditEvents.EventConfirmationRestamped);
+    }
+
+    [Fact]
+    public void EventWaitlistJoined_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("event.waitlist.joined", AuditEvents.EventWaitlistJoined);
+    }
+
+    [Fact]
+    public void EventWaitlistPromoted_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("event.waitlist.promoted", AuditEvents.EventWaitlistPromoted);
     }
 
     [Fact]
@@ -404,30 +321,81 @@ public class AuditEventsTests
     }
 
     [Fact]
+    public void GroupInviteOpened_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("group.invite.opened", AuditEvents.GroupInviteOpened);
+    }
+
+    [Fact]
+    public void GroupMemberJoined_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("group.member.joined", AuditEvents.GroupMemberJoined);
+    }
+
+    [Fact]
+    public void PageView_ConstantValue()
+    {
+        // Act & Assert
+        Assert.Equal("page.view", AuditEvents.PageView);
+    }
+
+    [Fact]
     public void DelinquencyNotified_ConstantValue()
     {
         // Act & Assert
         Assert.Equal("delinquency.notified", AuditEvents.DelinquencyNotified);
     }
 
+    /// <summary>
+    /// C42-B guardian: every constant in <see cref="AuditEvents"/> must be
+    /// referenced by production source code. A constant nobody emits is dead
+    /// weight that suggests audit coverage where none exists — remove it or
+    /// wire it. Marketplace-era constants were already pruned in C42-B.
+    /// </summary>
     [Fact]
-    public void WebhookReceived_ConstantValue()
+    public void EveryConstant_IsReferencedByProductionCode()
     {
-        // Act & Assert
-        Assert.Equal("webhook.received", AuditEvents.WebhookReceived);
+        var root = RepoRoot();
+        var source = CollectProductionSource(root);
+
+        var dead = typeof(AuditEvents)
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(f => f.IsLiteral)
+            .Where(f => !source.Contains($"AuditEvents.{f.Name}", StringComparison.Ordinal))
+            .Select(f => f.Name)
+            .ToList();
+
+        Assert.True(dead.Count == 0,
+            "AuditEvents constants not referenced by production code: " + string.Join(", ", dead));
     }
 
-    [Fact]
-    public void WebhookUnauthorized_ConstantValue()
+    private static DirectoryInfo RepoRoot()
     {
-        // Act & Assert
-        Assert.Equal("webhook.unauthorized", AuditEvents.WebhookUnauthorized);
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null)
+        {
+            if (dir.GetFiles("*.csproj").Any() && Directory.Exists(Path.Combine(dir.FullName, "Pages")))
+                return dir;
+            dir = dir.Parent;
+        }
+        throw new InvalidOperationException("repo root not found");
     }
 
-    [Fact]
-    public void WebhookOversize_ConstantValue()
+    private static string CollectProductionSource(DirectoryInfo root)
     {
-        // Act & Assert
-        Assert.Equal("webhook.oversize", AuditEvents.WebhookOversize);
+        var dirs = new[] { "Areas", "Pages", "Services", "Shared", "Components", "Controllers", "Data" };
+        var files = dirs
+            .Select(d => Path.Combine(root.FullName, d))
+            .Where(Directory.Exists)
+            .SelectMany(d => Directory.EnumerateFiles(d, "*.*", SearchOption.AllDirectories))
+            .Where(f => f.EndsWith(".cs", StringComparison.Ordinal) || f.EndsWith(".razor", StringComparison.Ordinal))
+            .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")
+                     && !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"));
+
+        var program = Path.Combine(root.FullName, "Program.cs");
+        var all = files.Append(program).Where(File.Exists);
+        return string.Join("\n", all.Select(File.ReadAllText));
     }
 }

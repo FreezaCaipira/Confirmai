@@ -1,6 +1,7 @@
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Core;
 using Confirmai.Services.Payment;
 using Microsoft.EntityFrameworkCore;
 
@@ -58,11 +59,13 @@ public sealed class PokerDetailService
 {
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly PlatformFeePolicy _feePolicy;
+    private readonly LogService _logService;
 
-    public PokerDetailService(IDbContextFactory<AppDbContext> dbFactory, PlatformFeePolicy feePolicy)
+    public PokerDetailService(IDbContextFactory<AppDbContext> dbFactory, PlatformFeePolicy feePolicy, LogService logService)
     {
         _dbFactory = dbFactory;
         _feePolicy = feePolicy;
+        _logService = logService;
     }
 
     public async Task<PokerConfirmResult> ConfirmAsync(int eventId, string userId, int? priceOptionId = null)
@@ -119,6 +122,15 @@ public sealed class PokerDetailService
         db.EventConfirmations.Add(conf);
         await db.SaveChangesAsync();
 
+        await _logService.AuditAsync(
+            AuditEvents.EventConfirmationAdded,
+            AuditEntities.Event,
+            eventId.ToString(),
+            $"Inscrição confirmada no evento de poker #{eventId}.",
+            actorUserId: userId,
+            source: "PokerDetail",
+            metadata: new { eventId, userId, priceOptionId, chargedPrice = price, platformFee = stamps.PlatformFee });
+
         ev.Confirmations.Add(conf);
         return new PokerConfirmResult(PokerConfirmStatus.Confirmed, EventCharge.IsWaitlisted(ev, conf));
     }
@@ -169,6 +181,8 @@ public sealed class PokerDetailService
         var option = ev.PriceOptions.FirstOrDefault(o => o.Id == priceOptionId && o.IsActive);
         if (option is null) return new PokerChangeTableResult(PokerChangeTableStatus.InvalidPriceOption);
 
+        var previousOptionId = conf.PriceOptionId;
+        var previousPrice = conf.ChargedPrice;
         conf.PriceOptionId = option.Id;
         conf.ChargedPrice = option.Price;
         var stamps = _feePolicy.ResolveStampsForNewConfirmation(
@@ -176,6 +190,16 @@ public sealed class PokerDetailService
         conf.PlatformFeeAmount = stamps.PlatformFee;
         conf.PlayerFeeAmount = stamps.PlayerFee;
         await db.SaveChangesAsync();
+
+        await _logService.AuditAsync(
+            AuditEvents.EventConfirmationTableChanged,
+            AuditEntities.EventConfirmation,
+            conf.Id.ToString(),
+            $"Jogador trocou de mesa no evento de poker #{eventId}.",
+            actorUserId: userId,
+            source: "PokerDetail",
+            metadata: new { eventId, userId, previousPriceOptionId = previousOptionId, newPriceOptionId = option.Id, previousPrice, newPrice = option.Price });
+
         return new PokerChangeTableResult(PokerChangeTableStatus.Changed);
     }
 }

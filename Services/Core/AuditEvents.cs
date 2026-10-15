@@ -1,12 +1,15 @@
-﻿using Confirmai.Services.Admin;
+﻿﻿using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 namespace Confirmai.Services.Core;
 
 /// <summary>
 /// Stable, machine-readable audit event names. Stored in
 /// <c>AppLog.EventType</c>. Use dot-separated <c>entity.action</c> pattern.
-/// Renaming a constant is a BREAKING change for log analytics � only add new
+/// Renaming a constant is a BREAKING change for log analytics — only add new
 /// values, never repurpose existing ones.
+///
+/// C42-B: guardian test fails if a constant here is not referenced by
+/// production code — dead constants are removed, not kept around.
 /// </summary>
 public static class AuditEvents
 {
@@ -29,36 +32,13 @@ public static class AuditEvents
     public const string ProductDeleted  = "product.deleted";
     public const string ProductArchived = "product.archived";
 
-    // -- Item Offer (in-game item listing) --
-    public const string ItemOfferCreated   = "itemoffer.created";
-    public const string ItemOfferCancelled = "itemoffer.cancelled";
-    public const string ItemOfferSold      = "itemoffer.sold";
-
-    // -- Server --
-    public const string ServerRequested      = "server.requested";
-    public const string ServerRequestApproved = "server.request.approved";
-    public const string ServerRequestRejected = "server.request.rejected";
-    public const string ServerCreated        = "server.created";
-    public const string ServerUpdated        = "server.updated";
-    public const string ServerDeleted        = "server.deleted";
-    public const string ServerMemberAdded    = "server.member.added";
-    public const string ServerMemberRemoved  = "server.member.removed";
-    public const string ServerMemberUpdated  = "server.member.updated";
-    public const string ServerApiKeyIssued   = "server.apikey.issued";
-    public const string ServerApiKeyRevoked  = "server.apikey.revoked";
-
     // -- Payment --
-    public const string PaymentInvoiceCreated = "payment.invoice.created";
-    public const string PaymentReceived       = "payment.received";       // webhook arrived
     public const string PaymentConfirmed      = "payment.confirmed";      // settled / IsPaid=true
     public const string PaymentFailed         = "payment.failed";
     public const string PaymentRefunded       = "payment.refunded";
     public const string PaymentStatusChanged  = "payment.status.changed";
     public const string PaymentReconciliationSweep = "payment.reconciliation.sweep";
     public const string PaymentReconciliationPanelStale = "payment.reconciliation.panel.stale";
-    public const string PaymentReplayed       = "payment.replayed";       // duplicate delivery rejected
-    public const string PaymentInvalid        = "payment.invalid";        // bad payload / signature
-    public const string PaymentRefused        = "payment.refused";        // missing/expired/etc.
 
     // -- Admin / Security --
     public const string AdminSecurityPolicyChanged = "admin.security_policy.changed";
@@ -77,17 +57,24 @@ public static class AuditEvents
     // -- User --
     public const string UserProfileUpdated = "user.profile.updated"; // dados de recebimento (PixKey)
 
-    // -- Event (partida/sess�o) --
+    // -- Event (partida/sessão) --
     public const string EventCreated = "event.created";
     public const string EventUpdated = "event.updated";
     public const string EventCancelled = "event.cancelled";
+    public const string EventCapacityChanged = "event.capacity.changed";   // vagas / goleiros (C42-B)
+    public const string EventScoreRegistered = "event.score.registered";   // placar (C42-B)
+    public const string EventPostMatchVoteCast = "event.vote.cast";        // voto destaque/MVP (C42-B)
 
-    // -- EventConfirmation (presen�a / pagamento) --
+    // -- EventConfirmation (presença / pagamento) --
     public const string EventConfirmationAdded         = "event.confirmation.added";
     public const string EventConfirmationRemoved       = "event.confirmation.removed";
     public const string EventConfirmationPaidManual    = "event.confirmation.paid.manual";    // admin marcou pago manualmente
     public const string EventConfirmationUnpaidManual  = "event.confirmation.unpaid.manual";  // admin desconfirmou pagamento manual
     public const string EventConfirmationProofRejected = "event.confirmation.proof.rejected"; // admin rejeitou comprovante pix
+    public const string EventConfirmationTableChanged  = "event.confirmation.table.changed";  // troca de mesa no cash (C42-B)
+    public const string EventConfirmationRestamped     = "event.confirmation.restamped";      // recarimbo de devedores (C42-B)
+    public const string EventWaitlistJoined            = "event.waitlist.joined";             // entrou na espera (C42-B)
+    public const string EventWaitlistPromoted          = "event.waitlist.promoted";           // promovido da espera (C42-B)
     public const string EventWaitlistRemoved           = "event.waitlist.removed";
 
     // -- Group --
@@ -108,13 +95,13 @@ public static class AuditEvents
     public const string GroupJoinApproved        = "group.join.approved";
     public const string GroupJoinRejected        = "group.join.rejected";
 
-    // -- Delinqu�ncia --
-    public const string DelinquencyNotified = "delinquency.notified";
+    // -- Product metrics (C42-B: alimentam /admin/metrics; nunca PII desnecessaria) --
+    public const string GroupInviteOpened  = "group.invite.opened";  // pagina /convite/{code} aberta
+    public const string GroupMemberJoined  = "group.member.joined";  // membro entrou — metadata via: code|approval|admin
+    public const string PageView           = "page.view";            // Message = template de rota; metadata: device
 
-    // -- Webhook / integration --
-    public const string WebhookReceived     = "webhook.received";
-    public const string WebhookUnauthorized = "webhook.unauthorized";
-    public const string WebhookOversize     = "webhook.oversize";
+    // -- Delinquência --
+    public const string DelinquencyNotified = "delinquency.notified";
 }
 
 /// <summary>
@@ -126,10 +113,6 @@ public static class AuditEntities
     public const string User              = "User";
     public const string Product           = "Product";
     public const string Payment           = "Payment";
-    public const string Server            = "Server";
-    public const string ItemOffer         = "ItemOffer";
-    public const string Webhook           = "Webhook";
-    public const string ApiKey            = "ApiKey";
     public const string Setting           = "Setting";
     public const string Event             = "Event";
     public const string Group             = "Group";
@@ -137,4 +120,5 @@ public static class AuditEntities
     public const string PlatformFeeSettlement = "PlatformFeeSettlement";
     public const string GroupJoinRequest  = "GroupJoinRequest";
     public const string GroupMember       = "GroupMember";
+    public const string PageView          = "PageView";
 }

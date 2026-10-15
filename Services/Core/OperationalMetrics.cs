@@ -30,6 +30,9 @@ public sealed class OperationalMetrics
     private readonly Counter<long> _whatsAppSend =
         Meter.CreateCounter<long>("confirmai_whatsapp_send_total");
 
+    private readonly Histogram<double> _pageRenderMs =
+        Meter.CreateHistogram<double>("confirmai_page_render_ms", unit: "ms");
+
     private int _staleFeeSettlements;
 
     public OperationalMetrics()
@@ -58,4 +61,12 @@ public sealed class OperationalMetrics
     /// <summary>Latest stale-settlement count, refreshed by StaleSettlementMetricsService.</summary>
     public void RecordStaleFeeSettlements(int count) =>
         Interlocked.Exchange(ref _staleFeeSettlements, count);
+
+    /// <summary>
+    /// C42-B: tempo de render da navegação (H6: p95 &lt; 1,5 s). O tag
+    /// <c>route</c> recebe o template de rota (<see cref="PageRoutes"/>),
+    /// nunca a URL crua.
+    /// </summary>
+    public void PageRendered(string routeTemplate, double milliseconds) =>
+        _pageRenderMs.Record(milliseconds, new KeyValuePair<string, object?>("route", routeTemplate));
 }

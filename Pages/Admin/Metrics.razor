@@ -1,0 +1,123 @@
+@page "/admin/metrics"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Confirmai.Services.Admin
+@using Microsoft.AspNetCore.Authorization
+
+@inject AdminProductMetricsService MetricsService
+@inject UiTextService T
+
+<div class="entity-shell admin-page admin-metrics-shell">
+
+    <section class="entity-shell-grid" aria-label="@T["AdminMetrics.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <p class="page-section-kicker">@T["AdminMetrics.Kicker"]</p>
+            <h1 class="page-section-title">@T["AdminMetrics.Title"]</h1>
+            <p class="page-section-subtitle">@T["AdminMetrics.Subtitle"]</p>
+
+            @if (result is null)
+            {
+                <div class="loading-spinner">@T["AdminMetrics.Loading"]</div>
+            }
+            else
+            {
+                <div class="metrics-grid">
+
+                    <div class="metric-card">
+                        <h2 class="metric-title">@T["AdminMetrics.H1Title"]</h2>
+                        <p class="metric-hypothesis">@T["AdminMetrics.H1Hypothesis"]</p>
+                        @RenderRatio(result.Last7.LoginGoogle, result.Last7.LoginGoogle + result.Last7.LoginPassword, 0.90, result.Last7.Days)
+                        @RenderRatio(result.Last30.LoginGoogle, result.Last30.LoginGoogle + result.Last30.LoginPassword, 0.90, result.Last30.Days)
+                    </div>
+
+                    <div class="metric-card">
+                        <h2 class="metric-title">@T["AdminMetrics.H2Title"]</h2>
+                        <p class="metric-hypothesis">@T["AdminMetrics.H2Hypothesis"]</p>
+                        @RenderRatio(result.Last7.MembersJoined, result.Last7.InvitesOpened, 0.60, result.Last7.Days)
+                        @RenderRatio(result.Last30.MembersJoined, result.Last30.InvitesOpened, 0.60, result.Last30.Days)
+                    </div>
+
+                    <div class="metric-card">
+                        <h2 class="metric-title">@T["AdminMetrics.H3Title"]</h2>
+                        <p class="metric-hypothesis">@T["AdminMetrics.H3Hypothesis"]</p>
+                        @RenderRatio(result.Last30.FullyPaidEvents, result.Last30.ChargeableEvents, 0.70, result.Last30.Days)
+                    </div>
+
+                    <div class="metric-card">
+                        <h2 class="metric-title">@T["AdminMetrics.H4Title"]</h2>
+                        <p class="metric-hypothesis">@T["AdminMetrics.H4Hypothesis"]</p>
+                        @RenderRatio(result.Last7.PageViewsMobile, result.Last7.PageViewsMobile + result.Last7.PageViewsDesktop, 0.80, result.Last7.Days)
+                        @RenderRatio(result.Last30.PageViewsMobile, result.Last30.PageViewsMobile + result.Last30.PageViewsDesktop, 0.80, result.Last30.Days)
+                    </div>
+
+                    <div class="metric-card">
+                        <h2 class="metric-title">@T["AdminMetrics.H6Title"]</h2>
+                        <p class="metric-hypothesis">@T["AdminMetrics.H6Hypothesis"]</p>
+                        <p class="metric-note">@T["AdminMetrics.H6Note"]</p>
+                    </div>
+
+                    <div class="metric-card">
+                        <h2 class="metric-title">@T["AdminMetrics.ExtraTitle"]</h2>
+                        <p class="metric-value">@result.Registrations30</p>
+                        <p class="metric-note">@T["AdminMetrics.ExtraRegistrations"]</p>
+                        <p class="metric-value">@result.TotalPageViewRows</p>
+                        <p class="metric-note">@T["AdminMetrics.ExtraPageViews"]</p>
+                    </div>
+
+                </div>
+
+                @if (result.TopRoutes30.Count > 0)
+                {
+                    <h2 class="metric-section-title">@T["AdminMetrics.TopRoutes"]</h2>
+                    <table class="admin-table metrics-routes-table">
+                        <thead>
+                            <tr>
+                                <th>@T["AdminMetrics.RouteColumn"]</th>
+                                <th class="text-end">@T["AdminMetrics.ViewsColumn"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in result.TopRoutes30)
+                            {
+                                <tr>
+                                    <td><code>@r.Route</code></td>
+                                    <td class="text-end">@r.Views</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            }
+        </article>
+    </section>
+</div>
+
+@code {
+    /// <summary>
+    /// Razão numerador/denominador com chip de status:
+    /// verde = hipótese confirmada, vermelho = não confirmada,
+    /// neutro = sem dados na janela.
+    /// </summary>
+    private RenderFragment RenderRatio(int numerator, int denominator, double target, int days) => __builder =>
+    {
+        if (denominator <= 0)
+        {
+            <div class="metric-window">
+                <span class="metric-window-label">@T.Get("AdminMetrics.WindowDays", days)</span>
+                <span class="metric-chip metric-chip--empty">@T["AdminMetrics.NoData"]</span>
+            </div>
+            return;
+        }
+
+        var ratio = (double)numerator / denominator;
+        var confirmed = ratio >= target;
+        <div class="metric-window">
+            <span class="metric-window-label">@T.Get("AdminMetrics.WindowDays", days)</span>
+            <span class="metric-value">@($"{ratio:P0}") <small>(@numerator/@denominator)</small></span>
+            <span class="metric-chip @(confirmed ? "metric-chip--ok" : "metric-chip--fail")">
+                @(confirmed ? T["AdminMetrics.Confirmed"] : T["AdminMetrics.NotConfirmed"])
+            </span>
+        </div>
+    };
+}

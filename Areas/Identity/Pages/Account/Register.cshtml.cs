@@ -100,7 +100,7 @@ namespace Confirmai.Areas.Identity.Pages.Account
                         $"Novo usuário registrado: {user.Email}.",
                         actorUserId: userId,
                         source: AdminAuditSources.Identity,
-                        metadata: new { UserId = userId, user.Email, HasPixKey = !string.IsNullOrEmpty(user.PixKey) });
+                        metadata: new { UserId = userId, user.Email, HasPixKey = !string.IsNullOrEmpty(user.PixKey), method = "password" });
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

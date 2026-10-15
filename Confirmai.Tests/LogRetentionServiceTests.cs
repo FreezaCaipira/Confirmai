@@ -241,6 +241,43 @@ public class LogRetentionServiceTests : IClassFixture<IntegrationTestWebAppFacto
         Assert.True(exists);
     }
 
+    // C42-B: page.view expira em 90 dias como qualquer log operacional —
+    // guardiao explicito da retencao definida no docs/metricas-produto.md.
+    [Fact]
+    public async Task RunAsync_Purges_PageViewOlderThan90Days()
+    {
+        var marker = Guid.NewGuid().ToString("N");
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Logs.Add(new AppLog
+            {
+                Timestamp = DateTime.UtcNow.AddDays(-100),
+                Message = $"old-pageview-{marker}",
+                Source = "PageView",
+                Level = "Info",
+                EventType = Confirmai.Services.Core.AuditEvents.PageView
+            });
+            db.Logs.Add(new AppLog
+            {
+                Timestamp = DateTime.UtcNow.AddDays(-10),
+                Message = $"fresh-pageview-{marker}",
+                Source = "PageView",
+                Level = "Info",
+                EventType = Confirmai.Services.Core.AuditEvents.PageView
+            });
+            await db.SaveChangesAsync();
+        }
+
+        await RunRetentionAsync();
+
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyDb = verifyScope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Assert.False(verifyDb.Logs.Any(l => l.Message == $"old-pageview-{marker}"));
+        Assert.True(verifyDb.Logs.Any(l => l.Message == $"fresh-pageview-{marker}"));
+    }
+
     // -------------------------------------------------------------------------
     // Financial log protection
     // -------------------------------------------------------------------------

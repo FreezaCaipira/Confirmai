@@ -129,7 +129,7 @@ public class C31WhatsAppFlowsTests
             await db.SaveChangesAsync();
         }
 
-        var svc = new Services.Futsal.EscalacaoService(factory, dispatch);
+        var svc = new Services.Futsal.EscalacaoService(factory, TestLogService.Create(factory), dispatch);
         await svc.ConfirmLineupAsync(eventId, new Dictionary<string, int?> { ["u1"] = 0 });
 
         var (_, text) = Assert.Single(sender.Calls);

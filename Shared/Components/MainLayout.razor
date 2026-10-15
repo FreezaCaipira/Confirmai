@@ -22,6 +22,7 @@
 @inject UiTextService T
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IDbContextFactory<AppDbContext> DbContextFactory
+@inject Confirmai.Services.Core.PageViewTracker PageViewTracker
 
 <Toast @ref="ToastRef" />
 <CookieConsent @key="selectedLanguage" />
@@ -244,6 +245,7 @@
         {
             // Finish the navigation progress bar now that Blazor has rendered the new page.
             try { await JSRuntime.InvokeVoidAsync("navProgress.finish"); } catch { }
+            await RecordPageViewAsync();
             return;
         }
 
@@ -269,6 +271,29 @@
 
         // Ensure descendants receive the @ref-backed toast cascade after first render.
         StateHasChanged();
+
+        await RecordPageViewAsync();
+    }
+
+    // C42-B: page.view + confirmai_page_render_ms. O tracker grava o template
+    // de rota (nunca a URL crua), com debounce por circuito e amostragem.
+    private DateTime navStartedUtc = DateTime.UtcNow;
+
+    private async Task RecordPageViewAsync()
+    {
+        try
+        {
+            var renderMs = (long)(DateTime.UtcNow - navStartedUtc).TotalMilliseconds;
+            navStartedUtc = DateTime.UtcNow;
+            await PageViewTracker.RecordAsync(
+                NavigationManager.Uri,
+                string.IsNullOrEmpty(currentUserId) ? null : currentUserId,
+                renderMs);
+        }
+        catch
+        {
+            // Telemetria nunca derruba o circuito.
+        }
     }
 
     private string BuildLanguageUrl(string languageCode)
@@ -376,6 +401,7 @@
     {
         _ = LoadCurrentUserAndUnreadCountSafeAsync();
         isMobileMenuOpen = false;
+        navStartedUtc = DateTime.UtcNow;   // C42-B: inicio da render (page.render_ms)
     }
 
     private void ToggleMobileMenu()

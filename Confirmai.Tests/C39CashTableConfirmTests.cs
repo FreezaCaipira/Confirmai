@@ -27,7 +27,7 @@ public class C39CashTableConfirmTests
             PokerFeePercentMin = 5m,
             PokerFeePercentMax = 10m,
         }));
-        return (factory, new PokerDetailService(factory, policy));
+        return (factory, new PokerDetailService(factory, policy, TestLogService.Create(factory)));
     }
 
     private static async Task<(int eventId, int table1Id, int table2Id)> SeedCashAsync(

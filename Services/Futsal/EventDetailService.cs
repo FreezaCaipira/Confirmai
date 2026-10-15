@@ -174,6 +174,16 @@ public class EventDetailService
                 JoinedAt = DateTime.UtcNow,
             });
             await db.SaveChangesAsync();
+
+            await _logService.AuditAsync(
+                AuditEvents.EventWaitlistJoined,
+                AuditEntities.Event,
+                eventId.ToString(),
+                $"Jogador entrou na lista de espera da partida #{eventId} (posição {wCount + 1}).",
+                actorUserId: userId,
+                source: "EventDetail",
+                metadata: new { eventId, userId, waitlistPosition = wCount + 1, desiredPosition = chosenPos.ToString() });
+
             return new ConfirmPresenceResult(true, null, true);
         }
         else
@@ -193,6 +203,16 @@ public class EventDetailService
                 PlayerFeeAmount = feeStamps.PlayerFee,
             });
             await db.SaveChangesAsync();
+
+            await _logService.AuditAsync(
+                AuditEvents.EventConfirmationAdded,
+                AuditEntities.Event,
+                eventId.ToString(),
+                $"Presença confirmada na partida #{eventId}.",
+                actorUserId: userId,
+                source: "EventDetail",
+                metadata: new { eventId, userId, position = chosenPos.ToString(), chargedPrice = eventEntity.Price, platformFee = feeStamps.PlatformFee });
+
             return new ConfirmPresenceResult(true, null, false);
         }
     }
@@ -303,8 +323,18 @@ public class EventDetailService
         var evt = await db.Events.FindAsync(eventId);
         if (evt is null ||
             !await GroupAccess.IsGroupAdminAsync(db, evt.GroupId, currentUserId)) return;
+        var previous = evt.MaxGoalkeepers;
         evt.MaxGoalkeepers = newMaxGk;
         await db.SaveChangesAsync();
+
+        await _logService.AuditAsync(
+            AuditEvents.EventCapacityChanged,
+            AuditEntities.Event,
+            eventId.ToString(),
+            $"Vagas de goleiro da partida #{eventId} alteradas de {previous} para {newMaxGk}.",
+            actorUserId: currentUserId,
+            source: "EventDetail",
+            metadata: new { eventId, previousMaxGoalkeepers = previous, newMaxGoalkeepers = newMaxGk });
     }
 
     private async Task PromoteFromWaitlistAsync(AppDbContext db, int eventId, FutsalPosition position)
@@ -332,6 +362,15 @@ public class EventDetailService
         });
         db.WaitingLists.Remove(next);
         await db.SaveChangesAsync();
+
+        await _logService.AuditAsync(
+            AuditEvents.EventWaitlistPromoted,
+            AuditEntities.Event,
+            eventId.ToString(),
+            $"Jogador promovido automaticamente da lista de espera da partida #{eventId}.",
+            actorUserId: next.UserId,
+            source: "EventDetail",
+            metadata: new { eventId, promotedUserId = next.UserId, position = position.ToString() });
 
         _ = Task.Run(() => _notificationService.NotifyWaitlistPromotedAsync(eventId, next.UserId));
     }

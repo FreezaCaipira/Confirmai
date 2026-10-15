@@ -12,3 +12,10 @@ window.ConfirmaiScrollToElement = (elementId) => {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 };
+
+/**
+ * C42-B: largura atual do viewport em px, para classificar device
+ * (mobile/desktop) no evento page.view. Sem fingerprint, so a largura.
+ * @returns {number} window.innerWidth
+ */
+window.ConfirmaiViewportWidth = () => window.innerWidth || 0;

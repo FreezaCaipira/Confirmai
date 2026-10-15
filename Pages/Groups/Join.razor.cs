@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Confirmai.Data;
 using Confirmai.Enums;
 using Confirmai.Models;
+using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ public partial class Join
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private Confirmai.Services.Groups.GroupDetailService GroupDetailService { get; set; } = default!;
+    [Inject] private LogService LogService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,6 +44,19 @@ public partial class Join
                 .ThenInclude(m => m.User)
             .AsSplitQuery()
             .FirstOrDefaultAsync(g => g.InviteCode == Code && g.IsActive);
+
+        // C42-B: evento de metrica — abertura do convite (funil H2).
+        // Sem o codigo nem o usuario anonimo: so o grupo quando valido.
+        await LogService.AuditAsync(
+            AuditEvents.GroupInviteOpened,
+            AuditEntities.Group,
+            group?.Id.ToString(),
+            group is not null
+                ? $"Invite page opened for group #{group.Id}."
+                : "Invite page opened with an invalid code.",
+            actorUserId: currentUserId,
+            source: "Metrics",
+            metadata: new { groupId = group?.Id, valid = group is not null, loggedIn = currentUserId is not null });
 
         if (group is not null)
         {

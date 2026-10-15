@@ -29,7 +29,7 @@ public class C39PartnerShareTests
             PokerFeePercentMin = 5m,
             PokerFeePercentMax = 10m,
         }));
-        return (factory, new PokerDetailService(factory, policy), policy);
+        return (factory, new PokerDetailService(factory, policy, TestLogService.Create(factory)), policy);
     }
 
     private static async Task<int> SeedTournamentAsync(

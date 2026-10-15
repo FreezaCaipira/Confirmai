@@ -108,7 +108,8 @@ namespace Confirmai.Areas.Identity.Pages.Account
                     signedInUser?.Id ?? info.ProviderKey,
                     $"Login externo bem-sucedido: {info.LoginProvider}.",
                     actorUserId: signedInUser?.Id,
-                    source: AdminAuditSources.Identity);
+                    source: AdminAuditSources.Identity,
+                    metadata: new { method = info.LoginProvider.ToLowerInvariant() });
 
                 return LocalRedirect(returnUrl);
             }
@@ -218,7 +219,8 @@ namespace Confirmai.Areas.Identity.Pages.Account
                 newUser.Id,
                 $"Novo usuário registrado via {info.LoginProvider}: {email}.",
                 actorUserId: newUser.Id,
-                source: AdminAuditSources.Identity);
+                source: AdminAuditSources.Identity,
+                metadata: new { method = info.LoginProvider.ToLowerInvariant() });
 
             return LocalRedirect(returnUrl);
         }
