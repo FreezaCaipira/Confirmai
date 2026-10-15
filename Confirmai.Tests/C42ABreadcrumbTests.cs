@@ -99,6 +99,52 @@ public class C42ABreadcrumbTests : IClassFixture<IntegrationTestWebAppFactory>
         Assert.DoesNotContain("breadcrumb-back", html);
     }
 
+    private async Task<int> SeedConfirmationAsync(string adminId, string ownerId, string groupName)
+    {
+        var groupId = await _factory.SeedGroupWithAdminAsync(adminId, groupName);
+        await _factory.EnsureUserAsync(ownerId);
+
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.GroupMembers.Add(new GroupMember { GroupId = groupId, UserId = ownerId, Role = GroupMemberRole.Member });
+        var ev = new Event
+        {
+            GroupId = groupId,
+            Sport = Sport.Futsal,
+            Location = "Quadra C42",
+            StartsAt = DateTime.UtcNow.AddDays(1),
+            MaxPlayers = 12,
+            MaxGoalkeepers = 2,
+            IsActive = true,
+            CreatedByUserId = adminId,
+        };
+        db.Events.Add(ev);
+        await db.SaveChangesAsync();
+        var conf = new EventConfirmation
+        {
+            EventId = ev.Id,
+            UserId = ownerId,
+            PaymentStatus = EventConfirmationPaymentStatus.Pending,
+            HasPaid = false,
+            Position = FutsalPosition.Outfield,
+        };
+        db.EventConfirmations.Add(conf);
+        await db.SaveChangesAsync();
+        return conf.Id;
+    }
+
+    [Fact]
+    public async Task PaymentPage_StrangerDoesNotSeeGroupNameInTrail()
+    {
+        var confId = await SeedConfirmationAsync("c42-pay-admin2", "c42-pay-owner2", "Racha Secreto C42");
+        await _factory.EnsureUserAsync("c42-pay-stranger");
+        var client = ClientFor(_factory, "c42-pay-stranger", "stranger");
+
+        var html = await (await client.GetAsync($"/pagamento/evento/{confId}")).Content.ReadAsStringAsync();
+
+        Assert.DoesNotContain("Racha Secreto C42", html);
+    }
+
     [Fact]
     public async Task Header_RendersAppVersion()
     {
@@ -169,6 +215,17 @@ public class C42MobileMenuTests
         Assert.Contains("invite-field-text", razor);
         Assert.Contains("aria-live=\"polite\"", razor);
         Assert.Contains("Group.InviteWhatsApp", razor);
+    }
+
+    [Fact]
+    public void ShellCss_BrandMark_KeepsAccentTile()
+    {
+        var css = RepoFile("wwwroot", "css", "shell.css");
+        var start = css.IndexOf(".shell-brand-mark {", StringComparison.Ordinal);
+        var rule = css.Substring(start, css.IndexOf('}', start) - start);
+
+        Assert.Contains("background: var(--accent)", rule);
+        Assert.Contains("width: 28px", rule);
     }
 
     [Fact]
