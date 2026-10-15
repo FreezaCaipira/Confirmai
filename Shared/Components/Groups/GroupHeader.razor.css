@@ -14,7 +14,10 @@
     padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-full);
     background: var(--accent-soft);
-    color: var(--accent-text);
+    /* C42-A: accent-text sobre accent-soft nao fecha AA — texto em --text
+       (12:1 sobre o fundo tinted) + borda accent-border dão o destaque. */
+    border: 1px solid var(--accent-border);
+    color: var(--text);
     font-size: 0.75rem;
     font-weight: var(--fw-semibold);
     text-transform: uppercase;

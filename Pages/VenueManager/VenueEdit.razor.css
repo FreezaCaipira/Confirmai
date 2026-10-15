@@ -1,0 +1,5 @@
+/* C42-A: .entity-shell-card { overflow: hidden } cortava o dropdown do
+   CityAutocomplete (position:absolute dentro do card). */
+::deep .entity-shell-card.form-card {
+    overflow: visible;
+}

@@ -6,6 +6,12 @@
 @inject UiTextService T
 @inject IDbContextFactory<AppDbContext> DbFactory
 
+@if (BackHref is not null)
+{
+    @* C42-A: no celular a trilha completa some e fica so "<- {pai}" com link real *@
+    <a class="breadcrumb-back" href="@BackHref"><i class="fas fa-arrow-left" aria-hidden="true"></i> @BackLabel</a>
+}
+
 @if (Segments.Count >= 2)
 {
     <nav class="breadcrumb-nav">
@@ -28,6 +34,8 @@
     private List<string> Segments = new();
     private List<string> Hrefs = new();
     private List<string> OriginalSegments = new();
+    private string? BackHref;
+    private string? BackLabel;
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,6 +54,8 @@
         var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         var pathOnly = uri.Split('?', '#')[0];
         var rawSegments = pathOnly.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        BackHref = null;
+        BackLabel = null;
         var allSegments = rawSegments
             .Where(s => !IsIdSegment(s))
             .ToList();
@@ -85,8 +95,88 @@
             }
         }
 
+        // Event detail (/futsal/{id}, /poker/{id}): the id is filtered out, so
+        // the trail would be a single "Futsal". Resolve the event's group and
+        // show "Grupos > {grupo} > {esporte}" — on mobile the back link points
+        // at the group (the real parent), never history.back().
+        if (rawSegments.Length == 2
+            && (string.Equals(rawSegments[0], "futsal", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(rawSegments[0], "poker", StringComparison.OrdinalIgnoreCase))
+            && int.TryParse(rawSegments[1], out var eventId))
+        {
+            var evt = await LoadEventGroupAsync(eventId);
+            if (evt is not null)
+            {
+                Segments = new List<string>
+                {
+                    T["Breadcrumb.Groups"],
+                    evt.Value.GroupName,
+                    MapSegment(rawSegments[0])
+                };
+                Hrefs = new List<string> { "/grupos", $"/grupo/{evt.Value.GroupId}", "" };
+            }
+        }
+
+        // Payment page (/pagamento/evento/{confirmationId}): the id is the
+        // confirmation's, and "Pagamento > Evento" would be a meaningless
+        // trail — resolve the confirmation and point the parent at the event.
+        if (rawSegments.Length == 3
+            && string.Equals(rawSegments[0], "pagamento", StringComparison.OrdinalIgnoreCase)
+            && string.Equals(rawSegments[1], "evento", StringComparison.OrdinalIgnoreCase)
+            && int.TryParse(rawSegments[2], out var confirmationId))
+        {
+            var evt = await LoadConfirmationEventAsync(confirmationId);
+            if (evt is not null)
+            {
+                var eventUrl = evt.Value.Sport == Sport.Poker ? $"/poker/{evt.Value.EventId}" : $"/futsal/{evt.Value.EventId}";
+                Segments = new List<string>
+                {
+                    T["Breadcrumb.Groups"],
+                    evt.Value.GroupName,
+                    MapSegment(evt.Value.Sport.ToString()),
+                    T["Breadcrumb.Payments"]
+                };
+                Hrefs = new List<string> { "/grupos", $"/grupo/{evt.Value.GroupId}", eventUrl, "" };
+            }
+        }
+
         if (Segments.Count == 0)
             Segments.Add(T["Breadcrumb.Home"]);
+
+        // Mobile back link: "<- {pai}" with a real URL (desktop keeps the trail).
+        if (rawSegments.Length > 0)
+        {
+            if (Segments.Count >= 2)
+            {
+                BackHref = Hrefs[Segments.Count - 2];
+                BackLabel = Segments[Segments.Count - 2];
+            }
+            else
+            {
+                BackHref = "/";
+                BackLabel = T["Breadcrumb.Home"];
+            }
+        }
+    }
+
+    private async Task<(int EventId, int GroupId, string GroupName, Sport Sport)?> LoadConfirmationEventAsync(int confirmationId)
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var row = await db.EventConfirmations
+            .Where(c => c.Id == confirmationId)
+            .Select(c => new { c.EventId, GroupId = c.Event.GroupId, GroupName = c.Event.Group.Name, c.Event.Sport })
+            .FirstOrDefaultAsync();
+        return row is null ? null : (row.EventId, row.GroupId, row.GroupName, row.Sport);
+    }
+
+    private async Task<(int GroupId, string GroupName, Sport Sport)?> LoadEventGroupAsync(int eventId)
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var row = await db.Events
+            .Where(e => e.Id == eventId)
+            .Select(e => new { e.GroupId, GroupName = e.Group.Name, e.Sport })
+            .FirstOrDefaultAsync();
+        return row is null ? null : (row.GroupId, row.GroupName, row.Sport);
     }
 
     private bool IsIdSegment(string s)

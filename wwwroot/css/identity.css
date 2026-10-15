@@ -18,7 +18,7 @@
     --identity-rhythm-loose: 1.2rem;
     width: min(480px, 100%);
     margin: 0;
-    background: var(--bg);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-top: 2px solid var(--border-2);
     border-radius: 14px;
@@ -322,10 +322,11 @@
    ".identity-container button" (0,1,1) vence a variante (0,1,0) e o botao
    herda o azul/min-width do "Entrar" (achado do Robson, C37 item 1). */
 .identity-container .google-signin-btn {
-    width: 100%;
+    width: min(85%, 340px);
     min-width: 0;
     min-height: 40px;
     margin: 0;
+    margin-inline: auto;
     background: #ffffff;
     color: #1f1f1f;
     border: 1px solid #747775;
@@ -336,7 +337,7 @@
     font-weight: 500;
     line-height: 20px;
     cursor: pointer;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;

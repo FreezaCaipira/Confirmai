@@ -91,6 +91,29 @@ public class DesignTokensContrastTests
             $"--{fg} ({tokens[fg]}) on --{bg} ({tokens[bg]}) = {ratio:F2}:1, expected >= {minimum}:1");
     }
 
+    /// <summary>
+    /// C42-A item 6: sport badges (accent-text/success on *-soft) fell below
+    /// AA on dark surfaces. The badges must use --text over the soft tint
+    /// (effective pair = text on surface-2, already asserted above) + a border.
+    /// </summary>
+    [Fact]
+    public void SportBadges_UseAaSafeTextToken()
+    {
+        var root = RepoRoot().FullName;
+
+        var headerBadge = File.ReadAllText(Path.Combine(root,
+            "Shared", "Components", "Groups", "GroupHeader.razor.css"));
+        var badgeBlock = Regex.Match(headerBadge, @"\.group-header-sport\s*\{([^}]*)");
+        Assert.True(badgeBlock.Success);
+        Assert.Contains("color: var(--text)", badgeBlock.Groups[1].Value);
+        Assert.Contains("border: 1px solid var(--accent-border)", badgeBlock.Groups[1].Value);
+
+        var detailCss = File.ReadAllText(Path.Combine(root, "wwwroot", "css", "event-detail.css"));
+        var detailBlock = Regex.Match(detailCss, @"\.detail-sport-badge\s*\{([^}]*)");
+        Assert.True(detailBlock.Success);
+        Assert.Contains("color: var(--text)", detailBlock.Groups[1].Value);
+    }
+
     [Fact]
     public void Tokens_DefineTheSemanticSet()
     {

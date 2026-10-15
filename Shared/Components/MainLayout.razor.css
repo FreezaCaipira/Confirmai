@@ -408,6 +408,11 @@ footer.oldsite-footer {
     display: none;
 }
 
+/* C42-A: rotulo "Idioma" so aparece no painel mobile (ver shell.css) */
+.nav-language-label {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .mobile-menu-toggle {
         display: inline-flex;
@@ -422,6 +427,10 @@ footer.oldsite-footer {
     .mobile-nav-text {
         display: inline;
         margin-left: 0.5rem;
+    }
+
+    .nav-language-label {
+        display: inline;
     }
 
 }

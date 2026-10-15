@@ -8,30 +8,32 @@
 
 <div class="invite-block">
     @{ var inviteUrl = $"{BaseUrl}/convite/{InviteCode}"; }
+
+    @* CTA primeiro: e o caminho mais usado (C42-A item 8) *@
+    <button class="btn btn-primary invite-cta" type="button"
+            @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
+        <i class="fab fa-whatsapp" aria-hidden="true"></i> @Ui["Group.InviteWhatsApp"]
+    </button>
+
     <div class="invite-row">
-        <span class="invite-label"><i class="fas fa-link"></i> @Ui["Group.InviteLink"]</span>
-        <code class="invite-code-display" id="invite-url-text">@inviteUrl</code>
-        <button class="btn btn-ghost btn-sm" type="button"
-                @onclick="() => CopyInviteLink(inviteUrl)">
-            <i class="fas fa-copy"></i> @(copiedInvite ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
-        </button>
+        <span class="invite-label"><i class="fas fa-link" aria-hidden="true"></i> @Ui["Group.InviteLink"]</span>
+        <div class="invite-field">
+            <code class="invite-field-text" id="invite-url-text">@inviteUrl</code>
+            <button class="btn btn-secondary btn-sm" type="button"
+                    @onclick="() => CopyInviteLink(inviteUrl)">
+                <i class="fas fa-copy" aria-hidden="true"></i> @(copiedInvite ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
+            </button>
+        </div>
     </div>
-    <hr class="invite-row-divider" />
     <div class="invite-row">
-        <span class="invite-label"><i class="fas fa-key"></i> @Ui["Group.Code"]</span>
+        <span class="invite-label"><i class="fas fa-key" aria-hidden="true"></i> @Ui["Group.Code"]</span>
         <code class="invite-code-display invite-code-only">@InviteCode</code>
-        <button class="btn btn-ghost btn-sm" type="button"
+        <button class="btn btn-secondary btn-sm" type="button"
                 @onclick="() => CopyCode(InviteCode)">
-            <i class="fas fa-copy"></i> @(copiedCode ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
+            <i class="fas fa-copy" aria-hidden="true"></i> @(copiedCode ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
         </button>
     </div>
-    <hr class="invite-row-divider" />
-    <div class="invite-block-actions">
-        <button class="btn btn-secondary" type="button"
-                @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
-            <i class="fab fa-whatsapp"></i> @Ui["Group.Invite"]
-        </button>
-    </div>
+    <p class="invite-feedback" aria-live="polite">@((copiedInvite || copiedCode) ? Ui["Group.Copied"] : "\u00a0")</p>
 </div>
 
 @code {
