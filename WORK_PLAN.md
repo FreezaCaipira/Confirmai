@@ -171,7 +171,7 @@ Criar uma secao `## Review Senior do Ciclo N (PR #XX) -- <VEREDITO>` contendo, d
     5. politica de seguranca e liga/desliga de gateway vao so para log tecnico, nao `AuditAsync` (UC-A-31/33);
     6. `LogService.AuditAsync` grava em `DbContext` proprio, fora da transacao da acao -- auditar so depois do `SaveChanges` de negocio.
     Regra de classificacao: **auditoria** = mexe com dinheiro, permissao ou dado de terceiro, ou gera disputa ("eu nao fiz"/"eu fiz e sumiu"), com antes/depois no `MetadataJson` e sem chave Pix/comprovante em claro; **log tecnico** = falhas, jobs, integracoes (email, WhatsApp, webhook); **metrica** = contagens e alertas. Guardiao: teste que falha se uma constante de `AuditEvents` nao for usada no codigo de producao (hoje ~20 mortas, maioria do marketplace legado -- remover junto com as telas legadas ou marcar como legado). Opcional, decisao do Robson no C42: "historico da partida" visivel para o organizador.
-3d. **Achados da bateria -- landing deslogada (Robson, pos-C40) -- entram no C42** -- `Shared/Components/Landing/Landing.razor(.css)` + chaves `Landing.*` em `CoreTexts.cs` (PT/EN/ES):
+3d. **[FEITO pelo Senior -- #161 landing, #162 cadastro; NAO entra no C42] Achados da bateria -- landing deslogada (Robson, pos-C40)** -- `Shared/Components/Landing/Landing.razor(.css)` + chaves `Landing.*` em `CoreTexts.cs` (PT/EN/ES):
     1. **Hero sub sem o WhatsApp:** `Landing.HeroSub` cita confirmacao, espera, Pix e ranking, mas nao os avisos automaticos no grupo do WhatsApp -- incluir.
     2. **"Como funciona" pula o convite:** hoje 3 passos (criar grupo / marcar partida / confirma e paga). Passa a 4: criar o grupo -> convidar os amigos (link de convite) -> marcar a partida -> o grupo confirma e paga.
     3. **Poker como "em breve":** a landing nao vende poker por enquanto. `Landing.Feat6*` vira card "Poker -- em breve" (visual atenuado, sem CTA); nenhum outro texto da landing cita poker. So a landing -- o app continua com poker.
@@ -231,6 +231,58 @@ Qualquer desvio nos passos 2-4 e **bloqueador de go-live**: e nesses caminhos qu
 ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
+
+## Ciclo 42 (Pleno) -- Achados da bateria do Robson (10 itens) + auditoria/metricas de produto [PLANEJADO -- EXECUTAVEL AGORA]
+
+**Origem:** bateria do Robson em prod (15/10), 10 achados com print. Fecha o ciclo nesses 10 (decisao do Robson). Landing (3d) ja foi entregue pelo Senior na #161 e o cadastro na #162 -- **nao refazer**.
+**Entrega em 2 PRs (uma branch cada):** C42-A = UI (itens 1-4, 6-10). C42-B = auditoria + metricas (item 5 + os 6 furos do passo 3c). C42-A primeiro (menor risco, Robson valida em prod).
+**Regras de sempre:** design system L0-L3, azul so em CTA/ativo/foco, cor de feature nunca em botao, i18n PT/EN/ES (regra 25), sem `<footer>` novo, guardiao de CSS orfao verde, 0 warnings. Prints antes/depois em 1366 e 390 px na PR.
+
+### C42-A -- UI
+
+1. **Login: card e fundo da mesma cor.** Causa: `wwwroot/css/identity.css` -- `.identity-body` e `.identity-container` usam `background: var(--bg)`. Fix: card em `var(--surface)` (L1); inputs continuam afundados (`--bg`/`--surface-3`). Vale pra todas as telas do Identity (mesmo layout). Teste: `CssComponentsTests` garante que o bloco `.identity-container {` nao usa `var(--bg)`.
+2. **Botao Google ~15% mais curto, alinhado aos links de baixo.** Causa: `.identity-container .google-signin-btn { width: 100% }`. Fix: `width: min(85%, 340px); margin-inline: auto;` (centralizado, mesma largura visual da linha `.identity-actions`). Conferir Login, Register e ExternalLogin; nao mexer nas cores oficiais do botao.
+3. **/grupos: card "Criar novo grupo" mal distribuido.** Componente `Shared/Components/Groups/GroupEntryPanel.razor` em `Compact="true"` (`Pages/Groups/Index.razor:200`): titulo + hint + botao empilhados a esquerda e o resto vazio. Fix (so no compact): cada `.group-entry-option` vira linha -- icone+titulo+hint a esquerda, botao a direita (`margin-left:auto`, `align-items:center`); abaixo de 480 px volta a empilhar com botao 100%. O modo nao-compact (usuario sem grupo) fica como esta.
+4. **Botao de voltar (opiniao do Senior: SIM, mas como breadcrumb, nao `history.back`).** O `<Breadcrumb />` global ja existe em `MainLayout.razor`. Fix: (a) em telas de nivel 2+ (perfil, pagar, comprovante, editar partida, escalacao, configuracoes do grupo, mailbox) o breadcrumb mostra no celular so `<- {pai logico}` (link real pro pai: partida -> grupo, grupo -> /grupos, perfil -> /); no desktop mantem a trilha; (b) nada de `history.back()` (quebra quem chega por link do email/WhatsApp). Teste bUnit: perfil renderiza link de voltar para `/`; partida aponta pro grupo.
+5. *(no C42-B)*
+6. **Badge FUTSAL quase invisivel no header do grupo.** `Shared/Components/Groups/GroupHeader.razor` (`.group-header-sport`, css em `GroupHeader.razor.css`). Fix: contraste AA -- texto `var(--text)` ou `--accent-text` sobre `--accent-soft` mais forte + borda `--accent-border`; incluir o par no `DesignTokensContrastTests` (>= 4.5:1). Mesma regra no `.detail-sport-badge` se o par falhar.
+7. **Criar grupo: dropdown de cidades cortado pelo card.** Causa: `Pages/Groups/Create.razor.css` -- `::deep .form-section--narrow { overflow: hidden; }` corta o `CityAutocomplete` (`position:absolute; z-index:30`). Fix: remover o `overflow: hidden` (ou `overflow: visible`) e, se algo vazar, conter so a imagem/preview que precisava dele. Conferir o mesmo padrao na edicao do grupo e nos forms de partida que usam `CityAutocomplete`. Teste CSS: nenhum ancestral do autocomplete com `overflow: hidden` em `Create.razor.css`.
+8. **Card de convite opaco (fluxo crucial).** `Shared/Components/Groups/GroupInviteBlock.razor` + `.invite-*` em `wwwroot/css/events.css`. Fix:
+   - CTA primeiro: botao **primario** "Convidar pelo WhatsApp" (`btn-primary`, icone whatsapp), largura cheia no celular -- e o caminho mais usado;
+   - link em campo tipo input (`--surface-3`, borda `--border-2`, mono, 1 linha com `text-overflow: ellipsis`) + "Copiar" `btn-secondary` do lado;
+   - codigo em chip grande espacado (mantem `.invite-code-only`), "Copiar" ao lado;
+   - labels em `--text-2` (hoje tudo em `--accent-text` = ruido azul), so o codigo em destaque;
+   - painel com `.feat--invite` (filete/icone verde, nunca no botao); feedback "Copiado!" com `aria-live="polite"`.
+   - nova chave i18n `Group.InviteWhatsApp` (PT/EN/ES).
+9. **Versao do app no header, ao lado de "Confirma Ai!".** Hoje nao ha `<Version>` no `Confirmai.csproj` e `Otel:ServiceVersion` e fixo "1.0.0". Fix: `<Version>0.42.0</Version>` no csproj (minor = numero do ciclo ate o go-live; 1.0.0 no go-live); `AppVersion` estatico lendo `AssemblyInformationalVersionAttribute` sem o sufixo `+sha`; `MainLayout.razor` mostra `<span class="shell-version">v0.42.0</span>` pequeno em `--text-3` (some abaixo de 360 px); `OtelOptions.ServiceVersion` passa a usar o mesmo valor por padrao. Teste: `AppVersion.Current` casa `^\d+\.\d+\.\d+$`.
+10. **Menu mobile (visual + ordem).** `MainLayout.razor` + `MainLayout.razor.css` (@media 768). Hoje: itens centralizados, Admin no meio, bandeiras soltas, Sair igual aos outros. Fix:
+    - ordem: Partidas, Grupos, Caixa de entrada (badge), Perfil (nome) | separador | Admin (so admin) | Idioma (bandeiras numa linha com rotulo) | Sair (por ultimo, `--danger` em texto, separado);
+    - itens alinhados a esquerda, icone de largura fixa, 48 px de altura, ativo com barra azul a esquerda + `--accent-soft` (nao borda inteira);
+    - painel L3 (`--surface-3`) com sombra, fecha ao navegar e no Esc; `aria-expanded` ja existe.
+    - Desktop nao muda.
+
+### C42-B -- Auditoria + metricas de produto
+
+**Item 5 do Robson:** alem de auditoria, gerar dados pra provar/derrubar hipoteses. Hoje existem: tabela `Logs` (auditoria, `/admin/logs`), OTel com OTLP (so funciona se `Otel:Endpoint` estiver configurado em prod) e 2 meters (`PaymentDomainMetrics`, `OperationalMetrics`). **Decisao do Senior:** as metricas de produto saem da tabela `Logs` (ja persistida, sem depender de coletor externo) e sao lidas numa tela de admin.
+
+1. **Hipoteses registradas** em `docs/metricas-produto.md` (cada uma com a consulta que a prova):
+   - H1: >= 90% dos logins via Google (Robson aposta 99%);
+   - H2: >= 60% dos convites abertos viram membro;
+   - H3: >= 70% das partidas pagas fecham com todos pagos antes do horario;
+   - H4: >= 80% dos acessos vem de celular;
+   - H5: tempo mediano criar partida -> lotar < 24 h;
+   - H6: p95 de carregamento das telas principais < 1,5 s.
+2. **Eventos novos/ajustados (constantes em `AuditEvents`, `MetadataJson` sem PII):**
+   - `user.login.success`/`user.register` com `{"method":"google"|"password"}` (hoje o metodo so aparece no texto);
+   - `group.invite.opened` (convite aberto, logado ou nao -- sem user id se deslogado), `group.member.joined` com `{"via":"invite"|"code"|"approval"}`;
+   - `page.view` com `{"route":"/grupo/{id}"...,"device":"mobile"|"desktop"}` -- **template da rota, nunca a URL crua** (cardinalidade + privacidade), gravado no `LocationChanged` do `MainLayout` com debounce e sem gravar F5 repetido; amostragem configuravel `Metrics:PageViewSampleRate` (default 1.0);
+   - `Metrics`: histograma `confirmai_page_render_ms` por rota no `OperationalMetrics` (vai pro OTLP quando houver).
+3. **Os 6 furos do passo 3c** (confirmacao, poker criar/editar/mesa, espera/vagas, placar/MVP, politica/gateway, `AuditAsync` fora da transacao) -- exatamente como descritos la, com o teste guardiao de constante morta (constantes do marketplace antigo: remover).
+4. **Tela `/admin/metrics`** (policy admin, L1/L2): cards 7/30 dias -- logins por metodo (H1), funil convite aberto -> membro (H2), partidas pagas 100% pagas (H3), acessos por device (H4), top 10 rotas por `page.view`, cadastro por dia. Cada card mostra a hipotese e "confirmada / nao confirmada / sem dados". Consultas agregadas no banco (nada de carregar `Logs` inteiro), indice em `(EventType, CreatedAtUtc)` se ainda nao existir (migration gerada pelo EF).
+5. **Retencao:** `page.view` some apos 90 dias (job existente de limpeza ou novo `BackgroundService` diario); auditoria de dinheiro nunca expira.
+6. **Testes:** integracao em Postgres pros eventos novos (padrao `C34AuditTrailTests`), teste do template de rota (nao vaza id/email), teste da tela com usuario comum = negado.
+
+**Fora do C42:** WhatsApp real (chip), remocao das 4 telas antigas (aguarda ok do Robson), Pix automatico V2.
 
 ## Ciclo 40 (Pleno) -- Feedback de grupo real: ranking com pontos, link da partida nos emails, landing de apresentacao [EXECUTADO -- PR #155, review do Senior com 2 correcoes (#156): texto puro dos emails sem entidades HTML (BodyParagraphs cru pro texto, HtmlParagraphs pro HTML); copia do ranking com try/catch de JSException (clipboard negado nao derruba o circuito); suite 2783 -> 2805]
 
