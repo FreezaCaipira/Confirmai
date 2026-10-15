@@ -4,8 +4,10 @@
 
 <div class="group-entry @(Compact ? "group-entry--compact" : "")">
     <div class="group-entry-option">
-        <p class="group-entry-label"><i class="fas fa-key" aria-hidden="true"></i> @Ui["Groups.JoinCode"]</p>
-        <p class="group-entry-hint">@Ui["Group.JoinCodeHint"]</p>
+        <div class="group-entry-text">
+            <p class="group-entry-label"><i class="fas fa-key" aria-hidden="true"></i> @Ui["Groups.JoinCode"]</p>
+            <p class="group-entry-hint">@Ui["Group.JoinCodeHint"]</p>
+        </div>
         <form class="group-entry-row" @onsubmit="JoinWithCode" @onsubmit:preventDefault>
             <input class="group-entry-input" type="text" maxlength="8"
                    placeholder="Ex: ABCD1234" aria-label="@Ui["Groups.JoinCode"]"
@@ -23,8 +25,10 @@
     <div class="group-entry-divider" aria-hidden="true"><span>@Ui["Groups.Or"]</span></div>
 
     <div class="group-entry-option">
-        <p class="group-entry-label"><i class="fas fa-plus" aria-hidden="true"></i> @Ui["Groups.CreateNew"]</p>
-        <p class="group-entry-hint">@Ui["GroupEntry.CreateHint"]</p>
+        <div class="group-entry-text">
+            <p class="group-entry-label"><i class="fas fa-plus" aria-hidden="true"></i> @Ui["Groups.CreateNew"]</p>
+            <p class="group-entry-hint">@Ui["GroupEntry.CreateHint"]</p>
+        </div>
         <a href="/grupos/criar" class="btn @(Compact ? "btn-primary" : "btn-secondary")">
             @Ui["Groups.Create"]
         </a>

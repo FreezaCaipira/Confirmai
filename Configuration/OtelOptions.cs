@@ -42,7 +42,7 @@ public sealed class OtelOptions
     /// Service version reported to the telemetry backend.
     /// Defaults to the assembly informational version.
     /// </summary>
-    public string ServiceVersion { get; init; } = "1.0.0";
+    public string ServiceVersion { get; init; } = Services.Core.AppVersion.Current;
 
     /// <summary>
     /// Environment tag (e.g. "production", "staging"). Reported as

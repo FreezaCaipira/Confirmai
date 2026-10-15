@@ -206,7 +206,7 @@ public class OtelOptionsTests
         Assert.Equal(string.Empty, options.Endpoint);
         Assert.Equal(string.Empty, options.Headers);
         Assert.Equal("Confirmai", options.ServiceName);
-        Assert.Equal("1.0.0", options.ServiceVersion);
+        Assert.Equal(Confirmai.Services.Core.AppVersion.Current, options.ServiceVersion);
         Assert.Equal("production", options.Environment);
     }
 }

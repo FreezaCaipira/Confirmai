@@ -15,10 +15,73 @@
     border-radius: var(--radius);
 }
 
+.group-entry-text {
+    display: contents;
+}
+
+/* Compacto (quem ja tem grupo): cada opcao vira uma linha --
+   icone+titulo+hint a esquerda, acao a direita. */
+.group-entry--compact {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+}
+
 .group-entry--compact .group-entry-option {
-    padding: var(--space-4);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
     background: var(--surface-2);
     border-color: var(--border-2);
+}
+
+.group-entry--compact .group-entry-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 0;
+}
+
+.group-entry--compact .group-entry-hint {
+    margin: 0;
+}
+
+.group-entry--compact .group-entry-row,
+.group-entry--compact .group-entry-option > .btn {
+    margin: 0;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.group-entry--compact .group-entry-divider::before {
+    top: 50%;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    border-left: none;
+    border-top: 1px solid var(--border-2);
+}
+
+.group-entry--compact .group-entry-divider span {
+    background: var(--surface-2);
+}
+
+@media (max-width: 480px) {
+    .group-entry--compact .group-entry-option {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .group-entry--compact .group-entry-row,
+    .group-entry--compact .group-entry-option > .btn {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .group-entry--compact .group-entry-option > .btn {
+        text-align: center;
+    }
 }
 
 .group-entry-label {

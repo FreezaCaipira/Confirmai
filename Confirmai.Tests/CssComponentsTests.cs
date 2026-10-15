@@ -122,6 +122,59 @@ public class CssComponentsTests
     }
 
     /// <summary>
+    /// C42-A item 1: o card do Identity usava var(--bg) — mesma cor do fundo,
+    /// o card sumia. O card fica em --surface (L1); o body segue em --bg.
+    /// </summary>
+    [Fact]
+    public void IdentityCard_UsesSurface_NotPageBackground()
+    {
+        var css = File.ReadAllText(Path.Combine(RepoRoot().FullName, "wwwroot", "css", "identity.css"));
+
+        var card = Regex.Match(css, @"\.identity-container\s*\{([^}]*)");
+        Assert.True(card.Success, "identity-container block not found");
+        Assert.DoesNotContain("background: var(--bg)", card.Groups[1].Value);
+        Assert.Contains("background: var(--surface)", card.Groups[1].Value);
+
+        var body = Regex.Match(css, @"\.identity-body\s*\{([^}]*)");
+        Assert.True(body.Success);
+        Assert.Contains("background: var(--bg)", body.Groups[1].Value);
+    }
+
+    /// <summary>
+    /// C42-A item 2: o botao do Google a 100% ficava desalinhado dos links de
+    /// baixo — agora ~85% (teto 340px), centralizado.
+    /// </summary>
+    [Fact]
+    public void GoogleSignInButton_IsNarrower_AndCentered()
+    {
+        var css = File.ReadAllText(Path.Combine(RepoRoot().FullName, "wwwroot", "css", "identity.css"));
+        var block = Regex.Match(css,
+            @"\.identity-container\s+\.google-signin-btn\s*\{([^}]*)");
+        Assert.True(block.Success);
+        Assert.Contains("width: min(85%, 340px)", block.Groups[1].Value);
+        Assert.Contains("margin-inline: auto", block.Groups[1].Value);
+    }
+
+    /// <summary>
+    /// C42-A item 7: o dropdown do CityAutocomplete (position:absolute) era
+    /// cortado por ancestrais com overflow:hidden — criar grupo
+    /// (.form-section--narrow) e editar quadra (.entity-shell-card.form-card).
+    /// </summary>
+    [Fact]
+    public void CityAutocomplete_AncestorsDoNotClipTheDropdown()
+    {
+        var root = RepoRoot().FullName;
+
+        var createCss = File.ReadAllText(Path.Combine(root, "Pages", "Groups", "Create.razor.css"));
+        var section = Regex.Match(createCss, @"\.form-section--narrow\s*\{([^}]*)");
+        Assert.True(section.Success);
+        Assert.DoesNotContain("overflow: hidden", section.Groups[1].Value);
+
+        var venueCss = File.ReadAllText(Path.Combine(root, "Pages", "VenueManager", "VenueEdit.razor.css"));
+        Assert.Contains("overflow: visible", venueCss);
+    }
+
+    /// <summary>
     /// Botao "Mostrar senha" do cadastro: o generico .identity-container button
     /// (margem, min-width 180px/220px no mobile) desalinhava o toggle do campo.
     /// </summary>

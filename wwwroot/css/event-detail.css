@@ -115,7 +115,8 @@ body .entity-shell-card.evpay-main {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--success);
+    /* C42-A: --success sobre --success-soft nao fecha AA — --text + borda. */
+    color: var(--text);
     background: var(--success-soft);
     border: 1px solid var(--success);
     border-radius: 20px;

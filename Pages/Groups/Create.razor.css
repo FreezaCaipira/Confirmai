@@ -1,8 +1,9 @@
 /* Layout overrides — afinar secoes (desktop only, mobile full width) */
+/* C42-A: sem overflow:hidden aqui — cortava o dropdown do CityAutocomplete
+   (position:absolute). O upload-preview tem o proprio contorno. */
 ::deep .form-section--narrow {
     width: 100%;
     box-sizing: border-box;
-    overflow: hidden;
 }
 
 @media (min-width: 769px) {

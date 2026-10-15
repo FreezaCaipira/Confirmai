@@ -33,31 +33,32 @@
                     <a href="/" class="oldsite-logo-wrap" aria-label="@T["Group.Home"]">
                         <span class="shell-brand-mark" aria-hidden="true"><i class="fas fa-check"></i></span>
                         <span class="oldsite-logo">Confirma Aí!</span>
+                        <span class="shell-version" aria-hidden="true">v@(Services.Core.AppVersion.Current)</span>
                     </a>
                     <button class="mobile-menu-toggle" @onclick="ToggleMobileMenu" aria-label="Toggle menu" aria-expanded="@isMobileMenuOpen">
                         <i class="fas fa-bars"></i>
                         <span class="mobile-menu-label">Menu</span>
                     </button>
-                    <nav class="oldsite-top-nav @(isMobileMenuOpen ? "mobile-menu-open" : "")" aria-label="Main menu">
+                    <nav class="oldsite-top-nav @(isMobileMenuOpen ? "mobile-menu-open" : "")" aria-label="Main menu" @onkeydown="OnNavKeyDown">
                         <AuthorizeView>
                             <Authorized>
                                 <div class="shell-nav-main">
-                                    <NavLink href="/" Match="NavLinkMatch.All" class="oldsite-top-nav-link" ActiveClass="active"><i class="fas fa-calendar-check" aria-hidden="true"></i> @T["Nav.Sports"]</NavLink>
-                                    <NavLink href="/grupos" class="oldsite-top-nav-link" ActiveClass="active"><i class="fas fa-users" aria-hidden="true"></i> @T["Groups.Title"]</NavLink>
+                                    <NavLink href="/" Match="NavLinkMatch.All" class="oldsite-top-nav-link nav-item--home" ActiveClass="active"><i class="fas fa-calendar-check" aria-hidden="true"></i> @T["Nav.Sports"]</NavLink>
+                                    <NavLink href="/grupos" class="oldsite-top-nav-link nav-item--groups" ActiveClass="active"><i class="fas fa-users" aria-hidden="true"></i> @T["Groups.Title"]</NavLink>
                                     <AuthorizeView Policy="ServerAdmin">
                                         <Authorized Context="gmContext">
-                                            <NavLink href="/docs/integration" class="oldsite-top-nav-link" ActiveClass="active">@T["Nav.Integration"]</NavLink>
+                                            <NavLink href="/docs/integration" class="oldsite-top-nav-link nav-item--integration" ActiveClass="active">@T["Nav.Integration"]</NavLink>
                                         </Authorized>
                                     </AuthorizeView>
                                     <AuthorizeView Roles="admin">
                                         <Authorized Context="adminContext">
-                                            <NavLink href="/admin" class="oldsite-top-nav-link" ActiveClass="active"><i class="fas fa-shield-alt" aria-hidden="true"></i> @T["Nav.Admin"]</NavLink>
+                                            <NavLink href="/admin" class="oldsite-top-nav-link nav-item--admin" ActiveClass="active"><i class="fas fa-shield-alt" aria-hidden="true"></i> @T["Nav.Admin"]</NavLink>
                                         </Authorized>
                                     </AuthorizeView>
                                 </div>
                                 <div class="shell-nav-user">
                                     @LanguageFlags
-                                    <a href="/mailbox" class="oldsite-top-nav-link oldsite-top-nav-mailbox-icon" title="@T["Nav.Mailbox"]" aria-label="@T["Nav.Mailbox"]">
+                                    <a href="/mailbox" class="oldsite-top-nav-link oldsite-top-nav-mailbox-icon nav-item--mailbox" title="@T["Nav.Mailbox"]" aria-label="@T["Nav.Mailbox"]">
                                         <span class="oldsite-mailbox-wrap">
                                             <img class="oldsite-mailbox-glyph" src="/images/icons/mail-letter.svg" alt="" aria-hidden="true" />
                                             @if (unreadMailboxCount > 0)
@@ -69,12 +70,12 @@
                                     </a>
                                     @if (!string.IsNullOrWhiteSpace(currentUserId))
                                     {
-                                        <a href="/profile/@currentUserId" class="oldsite-top-nav-link oldsite-top-nav-profile-link" title="@DisplayName(context.User)" aria-label="@T["Nav.Profile"]">
+                                        <a href="/profile/@currentUserId" class="oldsite-top-nav-link oldsite-top-nav-profile-link nav-item--profile" title="@DisplayName(context.User)" aria-label="@T["Nav.Profile"]">
                                             <img class="oldsite-profile-glyph" src="/images/icons/user-profile.svg" alt="" aria-hidden="true" />
                                             <span class="shell-nav-username">@DisplayName(context.User)</span>
                                         </a>
                                     }
-                                    <a href="/Identity/Account/Logout" class="oldsite-top-nav-link oldsite-top-nav-logout">@T["Layout.Logout"]</a>
+                                    <a href="/Identity/Account/Logout" class="oldsite-top-nav-link oldsite-top-nav-logout nav-item--logout">@T["Layout.Logout"]</a>
                                 </div>
                             </Authorized>
                             <NotAuthorized>
@@ -134,6 +135,7 @@
     private RenderFragment LanguageFlags => __builder =>
     {
         <div class="nav-language-flags" role="group" aria-label="@T["Layout.Language"]">
+            <span class="nav-language-label">@T["Layout.Language"]</span>
             <a class="language-flag-card lang-br @(IsLanguageSelected("pt-BR") ? "active" : string.Empty)"
                title="@T["Layout.LanguagePtBr"]"
                aria-label="@T["Layout.LanguagePtBr"]"
@@ -379,6 +381,13 @@
     private void ToggleMobileMenu()
     {
         isMobileMenuOpen = !isMobileMenuOpen;
+    }
+
+    // C42-A: Esc fecha o menu mobile quando o foco esta dentro dele.
+    private void OnNavKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape" && isMobileMenuOpen)
+            isMobileMenuOpen = false;
     }
 
     public void Dispose()
