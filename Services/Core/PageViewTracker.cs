@@ -11,8 +11,8 @@ namespace Confirmai.Services.Core;
 ///  - Message carrega o <b>template de rota</b> (<see cref="PageRoutes"/>),
 ///    nunca a URL crua — sem ids, códigos de convite nem query strings.
 ///  - Metadata: apenas { route, device, renderMs } — nada de PII.
-///  - Debounce: repetição do mesmo template no mesmo circuito (F5, rerender)
-///    grava uma vez.
+///  - Debounce: o mesmo path repetido no mesmo circuito (rerender) grava uma
+///    vez; ids diferentes no mesmo template (/grupo/1 → /grupo/2) contam.
 ///  - Amostragem: <c>Metrics:PageViewSampleRate</c> (default 1.0). O
 ///    histograma OTel <c>confirmai_page_render_ms</c> sempre registra.
 /// </summary>
@@ -24,7 +24,7 @@ public sealed class PageViewTracker
     private readonly MetricsOptions _options;
     private readonly Random _rng = new();
 
-    private string? _lastTemplate;
+    private string? _lastPath;
     private string? _device;
 
     public PageViewTracker(
@@ -45,20 +45,21 @@ public sealed class PageViewTracker
     /// </summary>
     public async Task RecordAsync(string absoluteUri, string? userId, long renderMs)
     {
-        string template;
+        string path;
         try
         {
-            template = PageRoutes.Normalize(new Uri(absoluteUri).LocalPath);
+            path = new Uri(absoluteUri).LocalPath;
         }
         catch
         {
             return;
         }
 
-        _ops.PageRendered(template, renderMs);
+        if (path == _lastPath) return;
+        _lastPath = path;
 
-        if (template == _lastTemplate) return;
-        _lastTemplate = template;
+        var template = PageRoutes.Normalize(path);
+        _ops.PageRendered(template, renderMs);
 
         var rate = _options.PageViewSampleRate;
         if (rate < 1.0 && _rng.NextDouble() >= rate) return;

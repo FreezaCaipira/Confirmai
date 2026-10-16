@@ -245,7 +245,8 @@
         {
             // Finish the navigation progress bar now that Blazor has rendered the new page.
             try { await JSRuntime.InvokeVoidAsync("navProgress.finish"); } catch { }
-            await RecordPageViewAsync();
+            if (pageViewPending)
+                await RecordPageViewAsync();
             return;
         }
 
@@ -278,9 +279,11 @@
     // C42-B: page.view + confirmai_page_render_ms. O tracker grava o template
     // de rota (nunca a URL crua), com debounce por circuito e amostragem.
     private DateTime navStartedUtc = DateTime.UtcNow;
+    private bool pageViewPending = true;
 
     private async Task RecordPageViewAsync()
     {
+        pageViewPending = false;
         try
         {
             var renderMs = (long)(DateTime.UtcNow - navStartedUtc).TotalMilliseconds;
@@ -402,6 +405,7 @@
         _ = LoadCurrentUserAndUnreadCountSafeAsync();
         isMobileMenuOpen = false;
         navStartedUtc = DateTime.UtcNow;   // C42-B: inicio da render (page.render_ms)
+        pageViewPending = true;
     }
 
     private void ToggleMobileMenu()

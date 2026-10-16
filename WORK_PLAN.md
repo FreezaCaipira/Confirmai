@@ -232,7 +232,7 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
-## Ciclo 42 (Pleno) -- Achados da bateria do Robson (10 itens) + auditoria/metricas de produto [C42-A APROVADO c/ ressalvas (review Senior da PR #164); C42-B EXECUTADO -- aguardando PR/review]
+## Ciclo 42 (Pleno) -- Achados da bateria do Robson (10 itens) + auditoria/metricas de produto [C42-A APROVADO c/ ressalvas (review Senior da PR #164); C42-B APROVADO c/ ressalvas (review Senior da PR #166)]
 
 **Origem:** bateria do Robson em prod (15/10), 10 achados com print. Fecha o ciclo nesses 10 (decisao do Robson). Landing (3d) ja foi entregue pelo Senior na #161 e o cadastro na #162 -- **nao refazer**.
 **Entrega em 2 PRs (uma branch cada):** C42-A = UI (itens 1-4, 6-10). C42-B = auditoria + metricas (item 5 + os 6 furos do passo 3c). C42-A primeiro (menor risco, Robson valida em prod).
@@ -331,6 +331,25 @@ Ressalvas p/ o Pleno (entram no C42-B, sem PR separada):
 Testes novos: `C42BAuditAndMetricsTests` (14 — normalize sem id/email/guid/codigo, confirmacao futsal+poker, espera join/promote, placar, voto, troca de mesa, politica, member.joined via invite, `/admin/metrics` exige admin), guardiao de constante morta, retencao de page.view. `dotnet build --no-incremental` **0/0**; suite **2822 -> 2832** (0 falhas; as ~20 falhas locais conhecidas de `ProgramConfigurationTests`/28P01 nao rodaram neste ambiente).
 
 **Fora do C42:** WhatsApp real (chip), remocao das 4 telas antigas (aguarda ok do Robson), Pix automatico V2.
+
+
+### C42-B -- Review Senior (PR #166) -- APROVADO c/ ressalvas
+
+Conferido: 6 furos fechados (audit depois do SaveChanges), guardiao de constante morta, `method` no login/cadastro, `page.view` so com template de rota, `/admin/metrics` com `[Authorize(Roles="admin")]`, indice `(EventType, Timestamp)`, retencao de 90 dias. Build 0/0; suite 2812 ok + 24 `ProgramConfigurationTests` (senha do Postgres local, ambiental).
+
+Corrigido na review (as 3 distorciam as metricas que o ciclo existe pra medir):
+1. **H6 (render) poluido:** o `MainLayout` re-renderiza a cada 4 s (ticker) e a cada 15 s (caixa de entrada); cada re-render chamava o tracker, que gravava no histograma `confirmai_page_render_ms` um "tempo de render" de ~4 s. Agora so registra depois de uma navegacao (`pageViewPending`, ligado no `LocationChanged`).
+2. **Debounce por template subcontava:** `/grupo/1` -> `/grupo/2` virava 1 view. O debounce passou a ser pelo path; o template continua sendo o que se grava.
+3. **Prerender dobrava eventos:** `_Host` usa `ServerPrerendered`, entao `OnInitialized`/`OnParametersSet` rodam 2x. `group.invite.opened` contava 2 por abertura (H2 caia pela metade) e `admin.audit.viewed` gravava 2 linhas. Os dois so gravam com `RendererInfo.IsInteractive`.
+
+Testes: `C42BPageViewTrackerTests` (mesmo path 1x, ids diferentes 2x, guardas do layout e do convite).
+
+Regra pro Pleno: **evento de metrica/auditoria disparado de componente precisa considerar prerender** (`RendererInfo.IsInteractive` ou `OnAfterRenderAsync(firstRender)`) e **nunca ser chamado de um caminho de re-render** (timer, StateHasChanged). Teste de servico nao pega isso; pensar no ciclo de vida do componente.
+
+Ressalvas abertas (baixo risco, nao bloqueiam):
+- `/convite/{code}` em minusculas so com letras (a-f) escapa do `{code}` no `PageRoutes` (~0,04% dos codigos hex de 8). Se incomodar: tratar o segmento depois de `convite` sempre como `{code}`.
+- `_device` cacheia `"unknown"` se o primeiro JS interop falhar.
+- H3 carrega as partidas da janela em memoria; ok na escala atual.
 
 ## Ciclo 40 (Pleno) -- Feedback de grupo real: ranking com pontos, link da partida nos emails, landing de apresentacao [EXECUTADO -- PR #155, review do Senior com 2 correcoes (#156): texto puro dos emails sem entidades HTML (BodyParagraphs cru pro texto, HtmlParagraphs pro HTML); copia do ranking com try/catch de JSException (clipboard negado nao derruba o circuito); suite 2783 -> 2805]
 
