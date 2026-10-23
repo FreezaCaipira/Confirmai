@@ -353,7 +353,7 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 
 ## Ciclo 43 (Pleno) -- Bateria do Robson em prod pos-C42 (18 itens) + preenchimento de teste da partida [PLANEJADO]
 
-**Origem:** testes do Robson em prod depois do C42. Todos os itens abaixo tem a causa achada no codigo pelo Senior. **Entrega em 2 PRs (uma branch cada):** C43-A = UI (itens L, H, C, I, G, D), C43-B = preenchimento de teste da partida (item P, mexe em dados, migration e dinheiro). C43-A primeiro.
+**Origem:** testes do Robson em prod depois do C42. O item "Landing 1 - movido" nao e pedido de mudanca (o Robson so registrou que um bloco mudou de posicao) -- **nada a fazer**. Todos os itens abaixo tem a causa achada no codigo pelo Senior. **Entrega em 2 PRs (uma branch cada):** C43-A = UI (itens L, H, C, I, G, D), C43-B = preenchimento de teste da partida (item P, mexe em dados, migration e dinheiro). C43-A primeiro.
 
 **Regras herdadas que valem aqui (reviews C42):** nao mexer fora do item (C42-A apagou o quadrado da marca); query nova em componente compartilhado repete o filtro da pagina; evento de auditoria em componente respeita prerender (`RendererInfo.IsInteractive`) e rerender; `JS.InvokeVoidAsync` em handler sempre em `try/catch` (`JSException` derruba o circuito).
 
@@ -366,7 +366,7 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 - L5. Footer + paginas Sobre/Contato:
   - **Bug achado pelo Senior:** `Pages/About.razor.cs` e `Pages/Contact.razor.cs` fazem `NavigateTo("/servers")` no `OnAfterRender` -- rota que **nao existe** (legado do marketplace). Os links do rodape levam a "nao encontrado". Remover o redirect.
   - `/about` (Sobre): pagina estatica `entity-shell` com o que e o Confirmai (3-4 paragrafos: problema do organizador, grupo como porta de entrada, Pix com comprovante, WhatsApp), versao (`AppVersion`), link para a landing. `[AllowAnonymous]`.
-  - `/contact` (Contato): email de contato vindo de configuracao nova `App:ContactEmail` (env `App__ContactEmail`), renderizado como `mailto:`; sem a configuracao, a pagina mostra so o texto "em breve" (nunca email fixo no codigo). **Sem formulario** (evita spam/SMTP e captcha agora). `[AllowAnonymous]`. Adicionar `App__ContactEmail` em `docs/production-checklist.md`.
+  - `/contact` (Contato): email de contato vindo de configuracao nova `App:ContactEmail` (env `App__ContactEmail`), renderizado como `mailto:`; **valor padrao em `appsettings.json` = `robson.developer95@gmail.com`** (decisao do Robson; email publico de contato, nao e secret). Quando existir o email do dominio (ex.: `confirmai@freezacaipira.com`) basta trocar o valor/env, sem codigo. Sem a configuracao (vazia), a pagina mostra so o texto "em breve". Nunca email fixo no `.razor`. **Sem formulario** (evita spam/SMTP e captcha agora). `[AllowAnonymous]`. Adicionar `App__ContactEmail` em `docs/production-checklist.md`.
   - Chaves `About.*`/`Contact.*` ja existem em `UtilityTexts.cs`, mas com texto do marketplace legado ("Infraestrutura de comercio com Bitcoin"...). **Reescrever** PT/EN/ES para o Confirmai e apagar as chaves que ficarem sem uso.
   - Rodape (`footer.oldsite-footer` em `Shared/Components/MainLayout.razor.css`): hoje tudo em `--text-3` 0.8rem numa linha. Passa a: esquerda "Confirma Aí!" (`--text`, semibold) + "© {ano} Confirmai" (`--text-2`); direita links Sobre / Contato em `--text-2`, area de toque >= 44px (`min-height` + padding), hover `--accent-text`; no mobile (<=768px) empilha centralizado. Continua UM footer so (regra do rodape global).
 
