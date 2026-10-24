@@ -1,4 +1,4 @@
-﻿﻿using Confirmai.Services.Admin;
+﻿using Confirmai.Services.Admin;
 using Confirmai.Services.Core;
 namespace Confirmai.Services.Core;
 
@@ -76,6 +76,8 @@ public static class AuditEvents
     public const string EventWaitlistJoined            = "event.waitlist.joined";             // entrou na espera (C42-B)
     public const string EventWaitlistPromoted          = "event.waitlist.promoted";           // promovido da espera (C42-B)
     public const string EventWaitlistRemoved           = "event.waitlist.removed";
+    public const string EventMockFilled              = "event.mock.filled";      // C43-B
+    public const string EventMockCleared             = "event.mock.cleared";     // C43-B
 
     // -- Group --
     public const string GroupCreated       = "group.created";

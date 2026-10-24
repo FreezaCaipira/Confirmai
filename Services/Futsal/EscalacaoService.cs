@@ -155,6 +155,11 @@ public class EscalacaoService
     public async Task CastVoteAsync(int eventId, string voterUserId, string votedForUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
+
+        // C43-B: o destaque tem que ser pessoa real — voto em mock e recusado.
+        var votedUser = await db.Users.FirstOrDefaultAsync(u => u.Id == votedForUserId);
+        if (votedUser?.IsMock == true) return;
+
         var existing = await db.PostMatchVotes
             .FirstOrDefaultAsync(v => v.EventId == eventId && v.VoterUserId == voterUserId);
         if (existing is not null)

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace Confirmai.Models
@@ -32,6 +32,11 @@ namespace Confirmai.Models
 
         /// <summary>Whether user has opted in to receive WhatsApp notifications</summary>
         public bool WhatsAppOptIn { get; set; } = false;
+
+        /// <summary>C43-B: usuario de teste (mockNN@confirmai.invalid) criado
+        /// pelo preenchimento de partida. Fora do ranking, sem email, apagavel
+        /// no reset de pre-producao.</summary>
+        public bool IsMock { get; set; } = false;
 
         /// <summary>Relative path to uploaded avatar, e.g. /uploads/avatars/{guid}.png</summary>
         [StringLength(260)]

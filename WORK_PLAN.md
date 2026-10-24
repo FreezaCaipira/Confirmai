@@ -351,7 +351,7 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 - `_device` cacheia `"unknown"` se o primeiro JS interop falhar.
 - H3 carrega as partidas da janela em memoria; ok na escala atual.
 
-## Ciclo 43 (Pleno) -- Bateria do Robson em prod pos-C42 (18 itens) + preenchimento de teste da partida [C43-A CONCLUIDO (#169 + review); C43-B PLANEJADO]
+## Ciclo 43 (Pleno) -- Bateria do Robson em prod pos-C42 (18 itens) + preenchimento de teste da partida [C43-A CONCLUIDO (#169 + review); C43-B EXECUTADO -- aguardando PR/review]
 
 **Origem:** testes do Robson em prod depois do C42. O item "Landing 1 - movido" nao e pedido de mudanca (o Robson so registrou que um bloco mudou de posicao) -- **nada a fazer**. Todos os itens abaixo tem a causa achada no codigo pelo Senior. **Entrega em 2 PRs (uma branch cada):** C43-A = UI (itens L, H, C, I, G, D), C43-B = preenchimento de teste da partida (item P, mexe em dados, migration e dinheiro). C43-A primeiro.
 
@@ -408,6 +408,17 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 6. **Desfazer:** botao "Remover jogadores de teste" (mesmas regras de acesso) apaga as confirmacoes `IsMock` daquela partida (e votos/escalacao ligados a elas). Sem apagar os usuarios do pool.
 7. **Auditoria:** `AuditEvents.EventMockFilled` e `EventMockCleared` (metadata: eventId, quantidade), gravados depois do `SaveChanges`; o guardiao de constantes mortas exige uso real.
 8. **Go-live:** no "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" adicionar: `Testing__MockFillEnabled` removido/false e apagar usuarios `IsMock` e seus vinculos.
+
+**Testes do C43-B:** `C43BMockFillTests` (6): recusa sem flag, sem admin, partida passada; preenche ate lotar (GK+linha), idempotente, taxa 0, auditoria apos save; remover limpa so mocks.
+
+### C43-B -- Execucao (branch `feat/ciclo43b`)
+
+- `ApplicationUser.IsMock` (migration `Ciclo43B_UserIsMock`); `TestingOptions` (`Testing:MockFillEnabled`, default false) + `MockFillService` scoped.
+- `MockFillControls` (botoes so pra role admin + flag; futsal `Detail` na area de vagas, poker `Detail` na barra admin); service revalida flag+admin+evento ativo/futuro; idempotente; `ChargedPrice=0`/`PlatformFee=0`/`Paid`.
+- Filtros: ranking fora (`!User.IsMock` nas 2 queries), voto em mock recusado (`CastVoteAsync`), `/admin/metrics` H3 ignora partidas com mock, `IdentityEmailSender` pula `.invalid`.
+- Auditoria `event.mock.filled`/`event.mock.cleared` depois do `SaveChanges`; guardiao de constante morta segue verde (as duas em uso real).
+- Checklist: `Testing__MockFillEnabled` no reset pre-prod.
+- Build `--no-incremental` **0/0**; suite **2843 -> 2849** verdes, 0 falhas.
 
 **Testes do C43-B:** service recusa sem flag, sem role `admin`, partida passada/cancelada; preenche ate lotar e e idempotente; mocks com taxa 0 nao aparecem no ledger; ranking ignora mocks e voto em mock e recusado; nenhum email enviado para `.invalid`; remover limpa so os mocks; auditoria apos o save.
 

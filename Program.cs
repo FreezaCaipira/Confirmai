@@ -183,6 +183,9 @@ builder.Services.AddScoped<Confirmai.Services.Admin.AdminProductMetricsService>(
 // C31/C41 — WhatsApp via whatsapp-bridge (grupo, nunca DM). DryRun is the
 // default; real sends only happen with DryRun=false + JID allowlist (guard below).
 builder.Services.Configure<AppOptions>(builder.Configuration.GetSection("App"));
+builder.Services.Configure<Confirmai.Configuration.TestingOptions>(
+    builder.Configuration.GetSection(Confirmai.Configuration.TestingOptions.Section));
+builder.Services.AddScoped<Confirmai.Services.Testing.MockFillService>();
 builder.Services.Configure<Confirmai.Configuration.PromoOptions>(
     builder.Configuration.GetSection(Confirmai.Configuration.PromoOptions.Section));
 builder.Services.AddSingleton<AppLinks>();
