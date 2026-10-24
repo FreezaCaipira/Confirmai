@@ -45,8 +45,17 @@
     border-color: var(--feat-border, var(--accent-border));
 }
 
-.today-tile--alert {
-    border-color: var(--warning);
+/* C43-A I2: borda amarela parada parecia hover quebrado — alerta vira
+   um ponto --warning ao lado do numero. */
+.today-tile--alert .today-tile-value::after {
+    content: "";
+    display: inline-block;
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-left: 0.4rem;
+    border-radius: 50%;
+    background: var(--warning);
+    vertical-align: middle;
 }
 
 .today-tile-body {

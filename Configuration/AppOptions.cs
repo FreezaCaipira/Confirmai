@@ -12,4 +12,11 @@ public sealed class AppOptions
     /// nunca se monta link relativo para fora do app.
     /// </summary>
     public string? PublicBaseUrl { get; set; }
+
+    /// <summary>
+    /// C43-A L5 — email publico de contato (env <c>App__ContactEmail</c>),
+    /// exibido na pagina /contact como mailto:. Vazio = pagina mostra
+    /// "em breve"; nunca um email fixo no codigo da pagina.
+    /// </summary>
+    public string? ContactEmail { get; set; }
 }

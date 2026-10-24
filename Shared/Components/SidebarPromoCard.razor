@@ -1,0 +1,26 @@
+@using Confirmai.Configuration
+@using Microsoft.Extensions.Options
+@inject IOptions<PromoOptions> Promo
+@inject UiTextService T
+
+@* C43-A C2: card de divulgacao. Sem Promo__Title nao renderiza nada. *@
+
+@if (Promo.Value.IsConfigured)
+{
+    <section class="oldsite-widget sidebar-promo" aria-label="@T["SidebarPromo.Label"]">
+        <span class="sidebar-promo-label">@T["SidebarPromo.Label"]</span>
+        @if (!string.IsNullOrWhiteSpace(Promo.Value.ImageUrl))
+        {
+            <img class="sidebar-promo-img" src="@Promo.Value.ImageUrl" alt="" loading="lazy" />
+        }
+        <p class="sidebar-promo-title">@Promo.Value.Title</p>
+        @if (!string.IsNullOrWhiteSpace(Promo.Value.Text))
+        {
+            <p class="sidebar-promo-text">@Promo.Value.Text</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Promo.Value.Url))
+        {
+            <a class="sidebar-promo-link" href="@Promo.Value.Url" target="_blank" rel="noopener sponsored">@T["SidebarPromo.Open"]</a>
+        }
+    </section>
+}

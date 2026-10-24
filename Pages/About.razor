@@ -1,12 +1,25 @@
 @page "/about"
 
+@attribute [AllowAnonymous]
 
-<PageTitle>@T["Common.Redirecting"]</PageTitle>
+@using Microsoft.AspNetCore.Authorization
+
+<PageTitle>@T["About.PageTitle"]</PageTitle>
 
 <div class="entity-shell parchment-a">
-    <section class="entity-shell-grid" aria-label="@T["Common.Redirecting"]">
+    <section class="entity-shell-grid" aria-label="@T["About.Aria"]">
         <article class="entity-shell-card entity-shell-main">
-            <p class="identity-muted">@T["Common.Redirecting"]</p>
+            <p class="page-section-kicker">@T["About.Kicker"]</p>
+            <h1 class="page-section-title">@T["About.Title"]</h1>
+
+            <p class="page-section-subtitle">@T["About.P1"]</p>
+            <p>@T["About.P2"]</p>
+            <p>@T["About.P3"]</p>
+            <p>@T["About.P4"]</p>
+
+            <p class="about-version">@T["About.Version"]: v@Confirmai.Services.Core.AppVersion.Current</p>
+
+            <a class="btn btn-secondary" href="/">@T["About.BackToLanding"]</a>
         </article>
     </section>
 </div>

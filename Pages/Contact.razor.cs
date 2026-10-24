@@ -1,18 +1,19 @@
+using Confirmai.Configuration;
 using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Options;
 
 namespace Confirmai.Pages;
 
 public partial class Contact
 {
-    [Inject] private NavigationManager Navigation { get; set; } = default!;
     [Inject] private UiTextService T { get; set; } = default!;
+    [Inject] private IOptions<AppOptions> AppOptions { get; set; } = default!;
 
-    protected override void OnAfterRender(bool firstRender)
+    private string? contactEmail;
+
+    protected override void OnInitialized()
     {
-        if (firstRender)
-        {
-            Navigation.NavigateTo("/servers", replace: true);
-        }
+        contactEmail = AppOptions.Value.ContactEmail;
     }
 }

@@ -50,6 +50,21 @@
     color: var(--text);
 }
 
+/* C43-A D3.2: marca WhatsApp — excecao explicita a "sem botao verde"
+   (o usuario reconhece pela cor). Texto escuro: branco sobre #25d366
+   reprova AA (~2:1); --whatsapp-fg passa de 7:1. Registrado em
+   docs/design-system.md. */
+.btn-whatsapp {
+    background: var(--whatsapp);
+    color: var(--whatsapp-fg);
+    border: 1px solid transparent;
+}
+
+.btn-whatsapp:hover {
+    background: var(--whatsapp-hover);
+    color: var(--whatsapp-fg);
+}
+
 /* Navegacao discreta — Voltar, cancelar, acoes de baixa prioridade. */
 .btn-ghost {
     background: transparent;
@@ -169,12 +184,14 @@
 
 .seg-item:hover {
     color: var(--text);
+    background: var(--surface-3);
 }
 
+/* C43-A D1: ativo preenchido — o soft+border parecia apagado. Azul cheio
+   e permitido em estado ativo (AA --accent-fg x --accent testado). */
 .seg-item--active {
-    background: var(--accent-soft);
-    color: var(--accent-text);
-    box-shadow: inset 0 0 0 1px var(--accent-border);
+    background: var(--accent);
+    color: var(--accent-fg);
 }
 
 .seg-count {

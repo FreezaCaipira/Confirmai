@@ -208,7 +208,7 @@ public class C42MobileMenuTests
     {
         var razor = RepoFile("Shared", "Components", "Groups", "GroupInviteBlock.razor");
         // CTA primario e o primeiro elemento interativo do bloco
-        Assert.Contains("btn btn-primary invite-cta", razor);
+        Assert.Contains("btn btn-whatsapp invite-cta", razor);
         Assert.True(razor.IndexOf("invite-cta", StringComparison.Ordinal)
                     < razor.IndexOf("invite-field", StringComparison.Ordinal),
             "WhatsApp CTA must come before the link field");

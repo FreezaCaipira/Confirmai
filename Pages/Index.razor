@@ -43,21 +43,6 @@
                         <h1 class="home-hero-title">@Ui["Index.PageTitle"]</h1>
                         <p class="home-hero-sub">@Ui["Index.MyMatchesSubtitle"]</p>
                     </div>
-                    <div class="home-view-toggle" role="tablist" aria-label="@Ui["Index.PageTitle"]">
-                        <button type="button" role="tab" aria-selected="@(view == ViewPlaying)"
-                                class="home-view-btn @(view == ViewPlaying ? "home-view-btn--active" : string.Empty)"
-                                @onclick="() => SetView(ViewPlaying)">
-                            @Ui["Index.ViewPlaying"] <span class="home-view-count">@upcoming.Count</span>
-                        </button>
-                        @if (organizesAny)
-                        {
-                            <button type="button" role="tab" aria-selected="@(view == ViewOrganizing)"
-                                    class="home-view-btn @(view == ViewOrganizing ? "home-view-btn--active" : string.Empty)"
-                                    @onclick="() => SetView(ViewOrganizing)">
-                                @Ui["Index.ViewOrganizing"] <span class="home-view-count">@organizing.Count</span>
-                            </button>
-                        }
-                    </div>
                 </header>
 
                 <HomeTodayPanel Summary="@today" LocalNow="@localNow" PendingGroups="@pendingPaymentGroups" FallbackGroupId="@myGroups[0].Id" />
@@ -65,7 +50,7 @@
                 <section class="home-groups feat--members" aria-label="@Ui["Groups.MyGroups"]">
                     <div class="home-section-head">
                         <h2 class="home-section-title">@Ui["Groups.MyGroups"] <span class="panel-count">@myGroups.Count</span></h2>
-                        <a href="/grupos" class="home-link">@Ui["Index.ManageGroups"] →</a>
+                        <a href="/grupos" class="btn btn-secondary btn-sm"><i class="fas fa-gear" aria-hidden="true"></i> @Ui["Index.ManageGroups"]</a>
                     </div>
                     <div class="home-section-body home-group-chips">
                         @foreach (var g in myGroups)
@@ -141,6 +126,22 @@
                     <section class="home-section feat--matches" aria-label="@Ui["Index.ViewPlaying"]">
                         <div class="home-section-head">
                             <h2 class="home-section-title">@Ui["Index.Upcoming"] <span class="panel-count">@upcoming.Count</span></h2>
+                            @* C43-A I1: o toggle Jogo/Organizo fica junto da secao que ele muda *@
+                            <div class="home-view-toggle home-view-toggle--small" role="tablist" aria-label="@Ui["Index.PageTitle"]">
+                                <button type="button" role="tab" aria-selected="@(view == ViewPlaying)"
+                                        class="home-view-btn @(view == ViewPlaying ? "home-view-btn--active" : string.Empty)"
+                                        @onclick="() => SetView(ViewPlaying)">
+                                    @Ui["Index.ViewPlaying"] <span class="home-view-count">@upcoming.Count</span>
+                                </button>
+                                @if (organizesAny)
+                                {
+                                    <button type="button" role="tab" aria-selected="@(view == ViewOrganizing)"
+                                            class="home-view-btn @(view == ViewOrganizing ? "home-view-btn--active" : string.Empty)"
+                                            @onclick="() => SetView(ViewOrganizing)">
+                                        @Ui["Index.ViewOrganizing"] <span class="home-view-count">@organizing.Count</span>
+                                    </button>
+                                }
+                            </div>
                         </div>
                         <div class="home-section-body">
                         @if (upcoming.Count == 0)

@@ -57,6 +57,7 @@ Na aplicação:
 - [ ] `WhatsApp__AllowedGroupJids` — CSV de JIDs `...@g.us` permitidos. Com `Enabled=true` + `DryRun=false` fora de dev, lista **vazia falha o boot**; JID fora da lista é bloqueado (`result=blocked_allowlist`).
 - [ ] `WhatsApp__PublicBaseUrl` — URL pública do app (ex.: `https://confirmai.com`) para os links das mensagens. Vazio = mensagem vai **sem link** (não falha).
 - [ ] `App__PublicBaseUrl` (C40) — URL pública do app para os **links dos emails** (partida, grupo, pagamentos). Vazio = email sai sem CTA (não falha). `WhatsApp__PublicBaseUrl` continua valendo como base; `App__PublicBaseUrl` é o fallback.
+- [ ] `App__ContactEmail` (C43) — email público exibido em `/contact` como `mailto:`. Default em `appsettings.json` = `robson.developer95@gmail.com`; quando houver email do domínio, trocar a env. Vazio = página mostra "em breve".
 - [ ] `TZ=America/Sao_Paulo` — os lembretes ("hoje tem", "falta 1h") e os horários das mensagens usam a TZ do container; sem ela sobem em UTC.
 - [ ] JID do grupo configurado em `/grupo/{id}/configuracoes` **pelo admin do grupo** (o campo valida `...@g.us`; a guarda é no service, não só na tela).
 - [ ] Rollback do WhatsApp = `WhatsApp__Enabled=false` + redeploy. Nada crítico depende do canal (é o desenho: canal secundário).

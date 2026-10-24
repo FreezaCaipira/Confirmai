@@ -76,6 +76,14 @@ botão, fundo de painel ou texto corrido. Azul continua sendo ação/foco/ativo.
 | Presença | `.feat--attendance` | `--feat-attendance` (verde) |
 | Convite WhatsApp | `.feat--invite` | `--feat-invite` (verde da marca) |
 
+### 4.1 Botão de marca de terceiro (exceção)
+
+`.btn-whatsapp` (`--whatsapp`/`--whatsapp-hover`/`--whatsapp-fg`) é a única
+exceção à regra "um azul por tela / sem botão verde": é a cor de marca do
+WhatsApp, reconhecida pelo usuário no CTA de convite. Texto escuro
+`--whatsapp-fg` (#0b141a) — branco sobre #25d366 reprova AA (~2:1); o escuro
+passa de 7:1 e é coberto por `DesignTokensContrastTests`.
+
 Uso: a classe vai no container (`<section class="panel feat--payments">`,
 `<a class="hub-action feat--matches">`) e define `--feat`, `--feat-soft` e
 `--feat-border`; os filhos leem `var(--feat, var(--accent-text))`, então
@@ -86,7 +94,7 @@ Status (sucesso/atenção/erro) continua semântico e vence a cor da feature.
 
 `Shared/Components/HomeTodayPanel.razor` é um painel L1 com tiles L2, um por
 feature (`.feat--matches`, `.feat--payments`, `.feat--settings` para a caixa
-postal). O tile de pagamentos ganha borda `--warning` quando há pendência
+postal). O tile de pagamentos ganha um ponto `--warning` ao lado do número quando há pendência (C43-A I2: a borda parada parecia hover quebrado)
 (status vence feature). Os dados vêm de `HomeToday.Build` (puro, testado em
 `HomeTodayTests`), calculado sobre o que a home já carrega + 1 `COUNT` de
 mensagens não lidas. A dica do dia é um carrossel sem JS (`TipKeys`).

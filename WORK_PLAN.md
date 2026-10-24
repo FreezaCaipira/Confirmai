@@ -351,7 +351,7 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 - `_device` cacheia `"unknown"` se o primeiro JS interop falhar.
 - H3 carrega as partidas da janela em memoria; ok na escala atual.
 
-## Ciclo 43 (Pleno) -- Bateria do Robson em prod pos-C42 (18 itens) + preenchimento de teste da partida [PLANEJADO]
+## Ciclo 43 (Pleno) -- Bateria do Robson em prod pos-C42 (18 itens) + preenchimento de teste da partida [C43-A EXECUTADO -- aguardando PR/review; C43-B PLANEJADO]
 
 **Origem:** testes do Robson em prod depois do C42. O item "Landing 1 - movido" nao e pedido de mudanca (o Robson so registrou que um bloco mudou de posicao) -- **nada a fazer**. Todos os itens abaixo tem a causa achada no codigo pelo Senior. **Entrega em 2 PRs (uma branch cada):** C43-A = UI (itens L, H, C, I, G, D), C43-B = preenchimento de teste da partida (item P, mexe em dados, migration e dinheiro). C43-A primeiro.
 
@@ -410,6 +410,22 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 8. **Go-live:** no "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" adicionar: `Testing__MockFillEnabled` removido/false e apagar usuarios `IsMock` e seus vinculos.
 
 **Testes do C43-B:** service recusa sem flag, sem role `admin`, partida passada/cancelada; preenche ate lotar e e idempotente; mocks com taxa 0 nao aparecem no ledger; ranking ignora mocks e voto em mock e recusado; nenhum email enviado para `.invalid`; remover limpa so os mocks; auditoria apos o save.
+
+### C43-A -- Execucao (branch `feat/ciclo43a`)
+
+- **L2/L3/L4**: mock generico "Racha do Marcao" (PT) e `RankRow1` "Marcao" (PT/ES); subcard confirmado azul->verde (`--success`/`--success-soft`, check `--success` com texto `--bg`); secao WhatsApp com titulo/desc novos x3.
+- **L5**: `/about` e `/contact` reescritos (redirect legado para `/servers` removido); `About` estatico com 4 paragrafos + `AppVersion`; `Contact` com `App:ContactEmail` (env `App__ContactEmail`, default `robson.developer95@gmail.com` em appsettings, mailto:, vazio -> "em breve"); checklist de producao atualizado; footer unico com marca + links >=44px, empilha no mobile.
+- **H1**: `.shell-nav-cta` movido para depois da regra geral e dos hovers em `shell.css`; guardiao `ShellNavCta_ComesAfterGeneralLinkRule_AndDeclaresAccentFg`.
+- **C1**: widget de pagamentos estatico — so Pix (icone + nota), sem query de gateway por navegacao.
+- **C2**: `SidebarPromoCard` (`Promo:*` config; sem `Promo__Title` nao renderiza; `rel="noopener sponsored"`, `target="_blank"`, rotulo "Divulgacao").
+- **C3**: `SidebarNextMatchCard` no topo da coluna (logado): grupo, dia/hora local, "N/Max confirmados", link para a partida; no mobile o card de pagamentos some e os outros dois ficam.
+- **I1-I4**: toggle Jogo/Organizo movido do hero para o cabecalho de "Proximas" (`home-view-toggle--small`); tile de pagamentos com ponto `--warning` no lugar da borda parada; "Gerenciar grupos" vira `btn btn-secondary btn-sm` com `fa-gear`; `.my-conf-actions` com `align-items: flex-end` (`flex-start` no mobile).
+- **G1**: `GroupEntryPanel` compact = duas opcoes lado a lado, centralizadas (max 720px), conteudo centrado, input+botao empilhados; empilha <=640px. Modo nao-compacto inalterado.
+- **D1**: `.seg-item--active` preenchido (`--accent` + `--accent-fg`), hover do inativo com `--surface-3`.
+- **D2**: "Ver partida" vira `btn-secondary` com texto + aria-label (antes ghost so com icone).
+- **D3**: `.invite-field` em grid (`minmax(0,1fr) auto`, 44px — Copiar nunca sobrepoe); codigo dentro da mesma caixa (mono, tracking); **`btn-whatsapp`** com tokens `--whatsapp`/`--whatsapp-hover`/`--whatsapp-fg` (texto escuro, AA testado; excecao registrada em `docs/design-system.md`); `ShareInviteOnWhatsApp` com try/catch (popup bloqueado nao derruba o circuito); CTA largura automatica no desktop, 100% <=480px.
+
+Testes: `C43ACssGuardianTests` (5) + 2 pares whatsapp no `DesignTokensContrastTests`; guardiao do convite C42 atualizado para `btn-whatsapp`. Build `--no-incremental` **0/0**; suite **2843** verdes, 0 falhas.
 
 **O que NAO fazer no C43:** nao mexer no fluxo real de pagamento nem em gateway; nao criar formulario de contato; nao criar admin UI de anuncios; nao remover as telas legadas (`/marketplace`, `/admin/parchment-lab`, `/futsal/schedule`, `/docs/integration`) sem ok do Robson; nao habilitar o preenchimento para organizador comum.
 
