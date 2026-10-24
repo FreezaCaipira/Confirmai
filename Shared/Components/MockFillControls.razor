@@ -1,0 +1,62 @@
+@using Confirmai.Services.Testing
+@using Microsoft.AspNetCore.Components.Authorization
+@inject MockFillService MockFill
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UiTextService T
+
+@* C43-B: "Completar com jogadores de teste" — so admin e so com
+   Testing:MockFillEnabled; o service revalida as duas coisas. *@
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+        @if (MockFill.Enabled)
+        {
+            <div class="mockfill">
+                <button class="btn btn-secondary btn-sm" type="button" disabled="@busy" @onclick="Fill">
+                    <i class="fas fa-user-plus" aria-hidden="true"></i> @T["MockFill.Fill"]
+                </button>
+                <button class="btn btn-ghost btn-sm" type="button" disabled="@busy" @onclick="Clear">
+                    <i class="fas fa-user-minus" aria-hidden="true"></i> @T["MockFill.Clear"]
+                </button>
+                @if (!string.IsNullOrEmpty(message))
+                {
+                    <span class="mockfill-msg" role="status">@message</span>
+                }
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    [Parameter] public int EventId { get; set; }
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private bool busy;
+    private string? message;
+
+    private async Task Fill()
+    {
+        busy = true; message = null;
+        try
+        {
+            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+            var (status, count) = await MockFill.FillAsync(EventId, auth.User);
+            message = T.Get($"MockFill.Result.{status}", count);
+            await OnChanged.InvokeAsync();
+        }
+        finally { busy = false; }
+    }
+
+    private async Task Clear()
+    {
+        busy = true; message = null;
+        try
+        {
+            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+            var (status, count) = await MockFill.ClearAsync(EventId, auth.User);
+            message = T.Get($"MockFill.Result.{status}", count);
+            await OnChanged.InvokeAsync();
+        }
+        finally { busy = false; }
+    }
+}

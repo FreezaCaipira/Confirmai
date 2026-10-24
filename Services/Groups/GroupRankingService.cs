@@ -32,7 +32,7 @@ public sealed class GroupRankingService
                      && c.Event.ScoreTeamA != null
                      && c.Event.ScoreTeamB != null
                      && (c.TeamId == 0 || c.TeamId == 1)
-                     && c.User != null)
+                     && c.User != null && !c.User.IsMock)
             .Select(c => new GroupRanking.Entry(
                 c.UserId,
                 c.User!.FullName ?? c.User.UserName ?? c.UserId,
@@ -48,7 +48,8 @@ public sealed class GroupRankingService
             .Where(v => v.Event.GroupId == groupId
                      && v.Event.Sport == Sport.Futsal
                      && v.Event.IsActive
-                     && v.Event.StartsAt < utcNow)
+                     && v.Event.StartsAt < utcNow
+                     && !v.VotedFor.IsMock)
             .Select(v => new { v.EventId, v.VotedForUserId, v.Event.StartsAt })
             .ToListAsync();
 

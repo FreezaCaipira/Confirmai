@@ -46,6 +46,9 @@ public class IdentityEmailSender : IEmailSender
     /// </summary>
     public async Task SendEmailAsync(string email, string subject, string htmlMessage, string? textMessage)
     {
+        // C43-B: usuarios mock (.invalid) nunca recebem email real.
+        if (email.EndsWith(".invalid", StringComparison.OrdinalIgnoreCase)) return;
+
         if (!IsSmtpEnabled())
         {
             await PersistFallbackEmailAsync(email, subject, htmlMessage, textMessage);

@@ -1,0 +1,12 @@
+.mockfill {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-top: var(--space-2);
+}
+
+.mockfill-msg {
+    font-size: 0.8rem;
+    color: var(--text-2);
+}

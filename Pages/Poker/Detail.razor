@@ -162,6 +162,11 @@ else
                 </div>
             }
 
+            @if (isAdmin && ev.IsActive && ev.StartsAt > DateTime.UtcNow)
+            {
+                <MockFillControls EventId="@ev.Id" OnChanged="@LoadEvent" />
+            }
+
             @if (!ev.IsActive)
             {
                 <div class="cancelled-banner">

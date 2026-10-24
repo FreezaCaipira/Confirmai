@@ -71,7 +71,8 @@ public sealed class AdminProductMetricsService
         // toda confirmacao esta paga.
         var chargeable = await db.Events
             .Where(e => e.StartsAt >= cutoff && e.StartsAt <= DateTime.UtcNow
-                && e.IsActive && e.Price != null && e.Price > 0)
+                && e.IsActive && e.Price != null && e.Price > 0
+                && !e.Confirmations.Any(c => c.User!.IsMock))
             .Select(e => new { e.Id, Unpaid = e.Confirmations.Count(c => !c.HasPaid) })
             .ToListAsync(ct);
 
