@@ -172,6 +172,17 @@ public sealed class MockFillService
         var confsToDelete = await db.EventConfirmations
             .Where(c => confIds.Contains(c.Id))
             .ToListAsync();
+        // Mock sem confirmacao em outra partida do grupo sai do grupo: senao
+        // fica em membros, contagens e convite como "Teste NN".
+        var stillUsedInGroup = await db.EventConfirmations
+            .Where(c => c.Event.GroupId == ev.GroupId && c.EventId != ev.Id && mockIds.Contains(c.UserId))
+            .Select(c => c.UserId)
+            .Distinct()
+            .ToListAsync();
+        var memberships = await db.GroupMembers
+            .Where(m => m.GroupId == ev.GroupId && mockIds.Contains(m.UserId) && !stillUsedInGroup.Contains(m.UserId))
+            .ToListAsync();
+        db.GroupMembers.RemoveRange(memberships);
         db.PostMatchVotes.RemoveRange(votes);
         db.EventConfirmations.RemoveRange(confsToDelete);
 

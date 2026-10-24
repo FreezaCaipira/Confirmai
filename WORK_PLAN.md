@@ -351,7 +351,7 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 - `_device` cacheia `"unknown"` se o primeiro JS interop falhar.
 - H3 carrega as partidas da janela em memoria; ok na escala atual.
 
-## Ciclo 43 (Pleno) -- Bateria do Robson em prod pos-C42 (18 itens) + preenchimento de teste da partida [C43-A CONCLUIDO (#169 + review); C43-B EXECUTADO -- aguardando PR/review]
+## Ciclo 43 (Pleno) -- Bateria do Robson em prod pos-C42 (18 itens) + preenchimento de teste da partida [C43-A CONCLUIDO (#169 + review); C43-B CONCLUIDO (#171 + review)]
 
 **Origem:** testes do Robson em prod depois do C42. O item "Landing 1 - movido" nao e pedido de mudanca (o Robson so registrou que um bloco mudou de posicao) -- **nada a fazer**. Todos os itens abaixo tem a causa achada no codigo pelo Senior. **Entrega em 2 PRs (uma branch cada):** C43-A = UI (itens L, H, C, I, G, D), C43-B = preenchimento de teste da partida (item P, mexe em dados, migration e dinheiro). C43-A primeiro.
 
@@ -421,6 +421,13 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 - Build `--no-incremental` **0/0**; suite **2843 -> 2849** verdes, 0 falhas.
 
 **Testes do C43-B:** service recusa sem flag, sem role `admin`, partida passada/cancelada; preenche ate lotar e e idempotente; mocks com taxa 0 nao aparecem no ledger; ranking ignora mocks e voto em mock e recusado; nenhum email enviado para `.invalid`; remover limpa so os mocks; auditoria apos o save.
+
+### C43-B -- Review do Senior (pos-#171)
+
+- `ClearAsync` apagava confirmacoes e votos, mas deixava os mocks como `GroupMember`: o grupo seguia com "Teste 01..NN" na lista de membros, na contagem de `/grupos`, no convite (`/grupos/entrar`, visto por quem vai entrar) e no total de `GroupMetricsService`. Agora o remover tira do grupo o mock que nao tem confirmacao em outra partida do mesmo grupo (o pool de usuarios fica). Testes: `Clear_RemovesOnlyMockConfirmations_AndAudits` (sem membro mock no fim) + `Clear_KeepsMockMembership_WhenConfirmedInAnotherEventOfGroup`.
+- **Pendencia nao bloqueante (Pleno, proximo ciclo que tocar no tema):** o paragrafo "Testes do C43-B" da execucao lista ledger, ranking, voto em mock e email `.invalid`, mas `C43BMockFillTests` nao tem esses testes. O codigo dos filtros esta certo; falta o teste que impede regressao.
+- **Ressalva aceita:** em partida com mocks, a mensagem de escalacao no grupo do WhatsApp lista "Teste NN" (hoje em dry-run). Vale so pra staging; o reset pre-prod apaga os mocks.
+- **Regra:** "remover" de dado de teste desfaz tudo que o "criar" criou (aqui: confirmacao, voto **e** vinculo ao grupo). Teste do remover confere cada tabela tocada pelo criar. E a secao "Testes" so lista teste que existe.
 
 ### C43-A -- Review do Senior (pos-#169)
 
