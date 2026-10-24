@@ -379,8 +379,10 @@
     margin-bottom: 0.75rem;
 }
 
+/* C43-A D3.2: largura automatica no desktop; 100% so <=480px. */
 .invite-cta {
     justify-content: center;
+    align-self: flex-start;
 }
 
 .invite-row {
@@ -390,16 +392,31 @@
     gap: 0.5rem 0.75rem;
 }
 
+/* C43-A D3: grid — o botao Copiar nunca sobrepoe o texto, URL longa
+   corta no ellipsis da primeira coluna. */
 .invite-field {
     flex: 1;
     min-width: 0;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
     align-items: center;
     gap: 0.5rem;
+    min-height: 44px;
     background: var(--surface-3);
     border: 1px solid var(--border-2);
     border-radius: var(--radius-sm);
-    padding: 0.3rem 0.3rem 0.3rem 0.65rem;
+    padding: 0.3rem;
+    padding-left: 0.65rem;
+}
+
+.invite-field .btn { flex-shrink: 0; }
+
+/* C43-A D3.1: codigo na mesma caixa do link, mono + tracking. */
+.invite-field-text--code {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--text);
 }
 
 .invite-field-text {

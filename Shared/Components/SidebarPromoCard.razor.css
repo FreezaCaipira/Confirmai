@@ -1,0 +1,42 @@
+.sidebar-promo {
+    padding: var(--space-3);
+}
+
+.sidebar-promo-label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: var(--space-2);
+}
+
+.sidebar-promo-img {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-2);
+}
+
+.sidebar-promo-title {
+    color: var(--text) !important;
+    font-weight: var(--fw-semibold);
+    font-size: 0.9rem !important;
+}
+
+.sidebar-promo-text {
+    font-size: 0.8rem !important;
+}
+
+.sidebar-promo-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    color: var(--accent-text);
+    font-size: 0.85rem;
+    font-weight: var(--fw-medium);
+    text-decoration: none;
+}
+
+.sidebar-promo-link:hover {
+    text-decoration: underline;
+}

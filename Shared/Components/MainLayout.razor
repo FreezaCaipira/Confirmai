@@ -112,15 +112,17 @@
                 </div>
 
                 <aside class="oldsite-right-column">
+                    <SidebarNextMatchCard />
                     <ActivePaymentMethodsWidget />
-
-
-
+                    <SidebarPromoCard />
                 </aside>
             </div>
 
             <footer class="oldsite-footer">
-                <span>&copy; @DateTime.UtcNow.Year Confirmai</span>
+                <div class="footer-brand">
+                    <span class="footer-brand-name">Confirma Aí!</span>
+                    <span class="footer-copy">&copy; @DateTime.UtcNow.Year Confirmai</span>
+                </div>
                 <nav class="oldsite-footer-links" aria-label="@T["Footer.Nav"]">
                     <a href="/about">@T["Footer.About"]</a>
                     <a href="/contact">@T["Footer.Contact"]</a>

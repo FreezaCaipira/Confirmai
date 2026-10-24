@@ -1,12 +1,29 @@
 @page "/contact"
 
+@attribute [AllowAnonymous]
 
-<PageTitle>@T["Common.Redirecting"]</PageTitle>
+@using Microsoft.AspNetCore.Authorization
+
+<PageTitle>@T["Contact.PageTitle"]</PageTitle>
 
 <div class="entity-shell parchment-a">
-    <section class="entity-shell-grid" aria-label="@T["Common.Redirecting"]">
+    <section class="entity-shell-grid" aria-label="@T["Contact.Aria"]">
         <article class="entity-shell-card entity-shell-main">
-            <p class="identity-muted">@T["Common.Redirecting"]</p>
+            <p class="page-section-kicker">@T["Contact.Kicker"]</p>
+            <h1 class="page-section-title">@T["Contact.Title"]</h1>
+
+            <p class="page-section-subtitle">@T["Contact.Hero"]</p>
+
+            @if (!string.IsNullOrWhiteSpace(contactEmail))
+            {
+                <a class="btn btn-secondary" href="mailto:@contactEmail">
+                    <i class="fas fa-envelope" aria-hidden="true"></i> @contactEmail
+                </a>
+            }
+            else
+            {
+                <p class="identity-muted">@T["Contact.ComingSoon"]</p>
+            }
         </article>
     </section>
 </div>

@@ -154,17 +154,6 @@ body .oldsite-top-nav .oldsite-top-nav-link.active:hover {
     white-space: nowrap;
 }
 
-body .oldsite-top-nav .shell-nav-cta {
-    background: var(--accent);
-    color: var(--accent-fg);
-}
-
-body .oldsite-top-nav .shell-nav-cta:hover,
-body .oldsite-top-nav .shell-nav-cta:focus-visible {
-    background: var(--accent-hover);
-    color: var(--accent-fg);
-}
-
 body .oldsite-top-nav a,
 body .oldsite-top-nav .oldsite-top-nav-link,
 body .oldsite-top-nav .oldsite-top-nav-user,
@@ -194,6 +183,20 @@ body .oldsite-top-nav .oldsite-top-nav-profile-link:hover .oldsite-profile-glyph
 body .oldsite-top-nav a:focus-visible {
     outline: 2px solid var(--accent-ring);
     outline-offset: 1px;
+}
+
+/* C43-A H1: o CTA fica DEPOIS da regra geral e dos hovers — mesma
+   especificidade (0,2,1), quem vem por ultimo vence o color dos links. */
+body .oldsite-top-nav .shell-nav-cta {
+    background: var(--accent);
+    color: var(--accent-fg);
+    font-weight: var(--fw-semibold);
+}
+
+body .oldsite-top-nav .shell-nav-cta:hover,
+body .oldsite-top-nav .shell-nav-cta:focus-visible {
+    background: var(--accent-hover);
+    color: var(--accent-fg);
 }
 
 body .oldsite-top-nav .oldsite-top-nav-user {

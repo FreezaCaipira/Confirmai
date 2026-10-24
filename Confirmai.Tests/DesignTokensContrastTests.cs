@@ -68,6 +68,8 @@ public class DesignTokensContrastTests
     [InlineData("accent-fg-2", "accent", 4.5)]
     [InlineData("accent-fg", "accent-hover", 4.5)]
     [InlineData("accent-fg-2", "accent-hover", 4.5)]
+    [InlineData("whatsapp-fg", "whatsapp", 7.0)]
+    [InlineData("whatsapp-fg", "whatsapp-hover", 4.5)]
     [InlineData("text", "accent", 4.5)]
     [InlineData("text", "accent-hover", 4.5)]
     [InlineData("accent-text", "bg", 4.5)]

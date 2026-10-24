@@ -1090,6 +1090,13 @@ body .oldsite-footer {
         grid-template-columns: minmax(0, 1fr);
     }
 
+    /* C43-A C3: no mobile a coluna cai abaixo do conteudo — o card de
+       pagamentos some pra nao empurrar o footer; proxima partida e
+       divulgacao ficam. */
+    body .oldsite-right-column .widget-payment-methods {
+        display: none;
+    }
+
     body .oldsite-utility-row {
         flex-direction: column;
         align-items: flex-start;

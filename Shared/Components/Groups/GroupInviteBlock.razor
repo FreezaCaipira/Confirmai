@@ -9,8 +9,9 @@
 <div class="invite-block">
     @{ var inviteUrl = $"{BaseUrl}/convite/{InviteCode}"; }
 
-    @* CTA primeiro: e o caminho mais usado (C42-A item 8) *@
-    <button class="btn btn-primary invite-cta" type="button"
+    @* CTA primeiro: e o caminho mais usado (C42-A item 8). C43-A D3.2:
+       variante btn-whatsapp — cor de marca de terceiro, excecao registrada. *@
+    <button class="btn btn-whatsapp invite-cta" type="button"
             @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
         <i class="fab fa-whatsapp" aria-hidden="true"></i> @Ui["Group.InviteWhatsApp"]
     </button>
@@ -27,11 +28,13 @@
     </div>
     <div class="invite-row">
         <span class="invite-label"><i class="fas fa-key" aria-hidden="true"></i> @Ui["Group.Code"]</span>
-        <code class="invite-code-display invite-code-only">@InviteCode</code>
-        <button class="btn btn-secondary btn-sm" type="button"
-                @onclick="() => CopyCode(InviteCode)">
-            <i class="fas fa-copy" aria-hidden="true"></i> @(copiedCode ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
-        </button>
+        <div class="invite-field">
+            <code class="invite-field-text invite-field-text--code">@InviteCode</code>
+            <button class="btn btn-secondary btn-sm" type="button"
+                    @onclick="() => CopyCode(InviteCode)">
+                <i class="fas fa-copy" aria-hidden="true"></i> @(copiedCode ? @Ui["Group.Copied"] : @Ui["Group.Copy"])
+            </button>
+        </div>
     </div>
     <p class="invite-feedback" aria-live="polite">@((copiedInvite || copiedCode) ? Ui["Group.Copied"] : "\u00a0")</p>
 </div>
@@ -88,7 +91,14 @@
     private async Task ShareInviteOnWhatsApp(string url)
     {
         var shareUrl = $"https://wa.me/?text={Uri.EscapeDataString(url)}";
-        await JS.InvokeVoidAsync("open", shareUrl, "_blank", "noopener,noreferrer");
+        try
+        {
+            await JS.InvokeVoidAsync("open", shareUrl, "_blank", "noopener,noreferrer");
+        }
+        catch
+        {
+            // C43-A D3.2: popup bloqueado / JSException nao derruba o circuito.
+        }
     }
 
     public ValueTask DisposeAsync()

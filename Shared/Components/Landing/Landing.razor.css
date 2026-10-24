@@ -135,8 +135,8 @@
     align-self: flex-end;
     gap: 0.6rem;
     padding: 0.7rem 1.1rem;
-    border-color: var(--accent-border);
-    background: var(--accent-soft);
+    border-color: var(--success);
+    background: var(--success-soft);
 }
 
 .landing-mock-check {
@@ -146,14 +146,14 @@
     width: 1.4rem;
     height: 1.4rem;
     border-radius: 50%;
-    background: var(--accent);
-    color: var(--accent-fg);
+    background: var(--success);
+    color: var(--bg);
     font-size: 0.75rem;
     font-weight: 800;
 }
 
 .landing-mock-card--done .landing-mock-meta {
-    color: var(--accent-fg-2);
+    color: var(--text-2);
 }
 
 /* ── Seções ────────────────────────────────────────────────────── */
