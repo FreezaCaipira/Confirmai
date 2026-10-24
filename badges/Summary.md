@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/16/2026 - 00:07:33 |
-| Coverage date: | 10/16/2026 - 00:07:27 |
+| Generated on: | 10/24/2026 - 00:05:44 |
+| Coverage date: | 10/24/2026 - 00:05:39 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 576 |
 | Files: | 668 |
-| **Line coverage:** | 93.5% (149286 of 159518) |
-| Covered lines: | 149286 |
-| Uncovered lines: | 10232 |
+| **Line coverage:** | 93.5% (149288 of 159518) |
+| Covered lines: | 149288 |
+| Uncovered lines: | 10230 |
 | Coverable lines: | 159518 |
 | Total lines: | 195111 |
-| **Branch coverage:** | 47.2% (4743 of 10031) |
-| Covered branches: | 4743 |
+| **Branch coverage:** | 47.3% (4745 of 10031) |
+| Covered branches: | 4745 |
 | Total branches: | 10031 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 491_38827377264 |
+| Tag: | 494_40043011312 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **149286** | **10232** | **159518** | **216943** | **93.5%** | **4743** | **10031** | **47.2%** |
+| **Confirmai** | **149288** | **10230** | **159518** | **216943** | **93.5%** | **4745** | **10031** | **47.3%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -285,7 +285,7 @@
 | Confirmai.Pages.Groups.Ranking | 50 | 25 | 75 | 220 | 66.6% | 18 | 46 | 39.1% |
 | Confirmai.Pages.Index | 120 | 31 | 151 | 378 | 79.4% | 43 | 85 | 50.5% |
 | Confirmai.Pages.LegacyRoutes | 1 | 2 | 3 | 18 | 33.3% | 0 | 0 |  |
-| Confirmai.Pages.Mailbox | 49 | 100 | 149 | 323 | 32.8% | 8 | 52 | 15.3% |
+| Confirmai.Pages.Mailbox | 50 | 99 | 149 | 323 | 33.5% | 9 | 52 | 17.3% |
 | Confirmai.Pages.Pages__Host | 2 | 0 | 2 | 268 | 100% | 5 | 6 | 83.3% |
 | Confirmai.Pages.Pages_Error | 4 | 0 | 4 | 36 | 100% | 7 | 8 | 87.5% |
 | Confirmai.Pages.Payment.Components.EventPaymentGateways | 0 | 52 | 52 | 166 | 0% | 0 | 32 | 0% |
@@ -395,7 +395,7 @@
 | Confirmai.Services.Core.UiText.PokerTexts | 507 | 0 | 507 | 525 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.ServerTexts | 342 | 0 | 342 | 362 | 100% | 0 | 0 |  |
 | Confirmai.Services.Core.UiText.UtilityTexts | 1243 | 0 | 1243 | 1258 | 100% | 0 | 0 |  |
-| Confirmai.Services.Core.UiTextService | 102 | 21 | 123 | 357 | 82.9% | 104 | 126 | 82.5% |
+| Confirmai.Services.Core.UiTextService | 103 | 20 | 123 | 357 | 83.7% | 105 | 126 | 83.3% |
 | Confirmai.Services.Crypto.BitcoinQuoteService | 40 | 19 | 59 | 116 | 67.7% | 14 | 20 | 70% |
 | Confirmai.Services.Crypto.CryptoQuoteService | 47 | 28 | 75 | 149 | 62.6% | 18 | 30 | 60% |
 | Confirmai.Services.EventPayments.AbacatePayEventPaymentGateway | 6 | 5 | 11 | 29 | 54.5% | 0 | 0 |  |
