@@ -6,6 +6,8 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject AuthenticationStateProvider AuthStateProvider
 @inject UiTextService T
+@inject NavigationManager Navigation
+@implements IDisposable
 
 @* C43-A C3: proxima partida do usuario logado (membro ou organizador).
    So renderiza autenticado e quando existe partida futura. *@
@@ -19,7 +21,7 @@
                 <p class="sidebar-next-group">@match.GroupName</p>
                 <p class="sidebar-next-when">
                     <i class="fas fa-calendar" aria-hidden="true"></i>
-                    @match.StartsLocal.ToString("ddd dd/MM HH:mm")
+                    @T.FormatDateTime(match.StartsLocal, "DateTimeFullShort")
                 </p>
                 <p class="sidebar-next-count">@match.Confirmed/@match.MaxPlayers @T["SidebarNext.Confirmed"]</p>
                 <a class="btn btn-secondary btn-sm sidebar-next-link"
@@ -38,6 +40,27 @@
     private NextMatch? match;
 
     protected override async Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        await LoadAsync();
+    }
+
+    // O layout persiste entre navegacoes: sem recarregar, a contagem
+    // ficaria parada depois de confirmar/sair de uma partida.
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        try
+        {
+            await LoadAsync();
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception)
+        {
+            // card decorativo: falha ao recarregar nao derruba o circuito
+        }
+    }
+
+    private async Task LoadAsync()
     {
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -62,4 +85,6 @@
 
         match = ev;
     }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
 }

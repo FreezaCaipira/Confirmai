@@ -11,6 +11,7 @@ public sealed class PromoOptions
     public string? Title { get; set; }
     public string? Text { get; set; }
     public string? Url { get; set; }
+    /// <summary>Caminho local (ex.: /images/promo/x.webp): o CSP img-src so aceita 'self'.</summary>
     public string? ImageUrl { get; set; }
 
     public bool IsConfigured => !string.IsNullOrWhiteSpace(Title);

@@ -74,4 +74,14 @@ public class C43ACssGuardianTests
         var block = css.Substring(i, css.IndexOf('}', i) - i);
         Assert.Contains("align-items: flex-end", block);
     }
+
+    [Fact]
+    public void SidebarNextMatch_FormatsDateViaUiText_AndReloadsOnNavigation()
+    {
+        var razor = Css("Shared/Components/SidebarNextMatchCard.razor");
+        Assert.Contains("T.FormatDateTime(", razor);
+        Assert.DoesNotContain(".ToString(\"ddd", razor);
+        Assert.Contains("LocationChanged +=", razor);
+        Assert.Contains("LocationChanged -=", razor);
+    }
 }

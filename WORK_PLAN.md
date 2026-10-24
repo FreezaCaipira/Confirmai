@@ -351,7 +351,7 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 - `_device` cacheia `"unknown"` se o primeiro JS interop falhar.
 - H3 carrega as partidas da janela em memoria; ok na escala atual.
 
-## Ciclo 43 (Pleno) -- Bateria do Robson em prod pos-C42 (18 itens) + preenchimento de teste da partida [C43-A EXECUTADO -- aguardando PR/review; C43-B PLANEJADO]
+## Ciclo 43 (Pleno) -- Bateria do Robson em prod pos-C42 (18 itens) + preenchimento de teste da partida [C43-A CONCLUIDO (#169 + review); C43-B PLANEJADO]
 
 **Origem:** testes do Robson em prod depois do C42. O item "Landing 1 - movido" nao e pedido de mudanca (o Robson so registrou que um bloco mudou de posicao) -- **nada a fazer**. Todos os itens abaixo tem a causa achada no codigo pelo Senior. **Entrega em 2 PRs (uma branch cada):** C43-A = UI (itens L, H, C, I, G, D), C43-B = preenchimento de teste da partida (item P, mexe em dados, migration e dinheiro). C43-A primeiro.
 
@@ -410,6 +410,13 @@ Ressalvas abertas (baixo risco, nao bloqueiam):
 8. **Go-live:** no "CHECKLIST OBRIGATORIO DE RESET PRE-PRODUCAO REAL" adicionar: `Testing__MockFillEnabled` removido/false e apagar usuarios `IsMock` e seus vinculos.
 
 **Testes do C43-B:** service recusa sem flag, sem role `admin`, partida passada/cancelada; preenche ate lotar e e idempotente; mocks com taxa 0 nao aparecem no ledger; ranking ignora mocks e voto em mock e recusado; nenhum email enviado para `.invalid`; remover limpa so os mocks; auditoria apos o save.
+
+### C43-A -- Review do Senior (pos-#169)
+
+- `SidebarNextMatchCard` formatava a data com `ToString("ddd dd/MM HH:mm")` (cultura do servidor, fora do i18n) -> `T.FormatDateTime(..., "DateTimeFullShort")`.
+- O card fica no layout, que persiste entre navegacoes: a contagem ficava parada depois de confirmar/sair. Agora recarrega em `LocationChanged` (e desinscreve no `Dispose`).
+- `Promo__ImageUrl` externo e bloqueado pelo CSP (`img-src 'self'`): documentado em `PromoOptions` e no checklist de prod (usar caminho local).
+- **Regra pro C43-B:** componente de layout (`MainLayout`/coluna lateral) nao e recriado na navegacao -- todo dado dele que muda com acao do usuario precisa recarregar.
 
 ### C43-A -- Execucao (branch `feat/ciclo43a`)
 
