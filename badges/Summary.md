@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/24/2026 - 03:09:58 |
-| Coverage date: | 10/24/2026 - 03:09:53 |
+| Generated on: | 10/24/2026 - 03:26:22 |
+| Coverage date: | 10/24/2026 - 03:26:17 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 583 |
 | Files: | 676 |
-| **Line coverage:** | 93.6% (151263 of 161533) |
-| Covered lines: | 151263 |
+| **Line coverage:** | 93.6% (151272 of 161542) |
+| Covered lines: | 151272 |
 | Uncovered lines: | 10270 |
-| Coverable lines: | 161533 |
-| Total lines: | 197466 |
-| **Branch coverage:** | 47.4% (4787 of 10087) |
-| Covered branches: | 4787 |
+| Coverable lines: | 161542 |
+| Total lines: | 197477 |
+| **Branch coverage:** | 47.4% (4788 of 10087) |
+| Covered branches: | 4788 |
 | Total branches: | 10087 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 500_40056996291 |
+| Tag: | 502_40058132266 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **151263** | **10270** | **161533** | **219303** | **93.6%** | **4787** | **10087** | **47.4%** |
+| **Confirmai** | **151272** | **10270** | **161542** | **219314** | **93.6%** | **4788** | **10087** | **47.4%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -549,7 +549,7 @@
 | Confirmai.Services.Poker.PokerCreateResult | 1 | 0 | 1 | 337 | 100% | 0 | 0 |  |
 | Confirmai.Services.Poker.PokerCreateService | 173 | 9 | 182 | 337 | 95% | 61 | 66 | 92.4% |
 | Confirmai.Services.Poker.PokerDetailService | 98 | 1 | 99 | 205 | 98.9% | 33 | 38 | 86.8% |
-| Confirmai.Services.Testing.MockFillService | 126 | 1 | 127 | 221 | 99.2% | 36 | 42 | 85.7% |
+| Confirmai.Services.Testing.MockFillService | 135 | 1 | 136 | 232 | 99.2% | 37 | 42 | 88% |
 | Confirmai.Services.User.CurrencyPreferenceService | 7 | 0 | 7 | 20 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.User.CustomClaimsPrincipalFactory | 5 | 0 | 5 | 31 | 100% | 0 | 0 |  |
 | Confirmai.Services.User.ExternalLoginClaimsExtractor | 41 | 5 | 46 | 119 | 89.1% | 22 | 32 | 68.7% |
