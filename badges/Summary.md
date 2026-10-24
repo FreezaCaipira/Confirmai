@@ -2,22 +2,22 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/24/2026 - 01:42:18 |
-| Coverage date: | 10/24/2026 - 01:42:12 |
+| Generated on: | 10/24/2026 - 01:52:25 |
+| Coverage date: | 10/24/2026 - 01:52:21 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 579 |
 | Files: | 671 |
-| **Line coverage:** | 93.5% (149283 of 159514) |
+| **Line coverage:** | 93.5% (149283 of 159524) |
 | Covered lines: | 149283 |
-| Uncovered lines: | 10231 |
-| Coverable lines: | 159514 |
-| Total lines: | 195172 |
-| **Branch coverage:** | 47.3% (4745 of 10029) |
-| Covered branches: | 4745 |
+| Uncovered lines: | 10241 |
+| Coverable lines: | 159524 |
+| Total lines: | 195198 |
+| **Branch coverage:** | 47.2% (4743 of 10029) |
+| Covered branches: | 4743 |
 | Total branches: | 10029 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 496_40050777172 |
+| Tag: | 498_40051590470 |
 
 # Risk Hotspots
 
@@ -28,7 +28,7 @@
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Confirmai** | **149283** | **10231** | **159514** | **217004** | **93.5%** | **4745** | **10029** | **47.3%** |
+| **Confirmai** | **149283** | **10241** | **159524** | **217030** | **93.5%** | **4743** | **10029** | **47.2%** |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__Layout | 2 | 0 | 2 | 25 | 100% | 5 | 6 | 83.3% |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages__ViewStart | 1 | 0 | 1 | 3 | 100% | 0 | 0 |  |
 | AspNetCoreGeneratedDocument.Areas_Identity_Pages_Account_ChangePassword | 1 | 0 | 1 | 51 | 100% | 4 | 4 | 100% |
@@ -68,7 +68,7 @@
 | Confirmai.Configuration.FeeOptions | 11 | 0 | 11 | 56 | 100% | 4 | 4 | 100% |
 | Confirmai.Configuration.MetricsOptions | 2 | 0 | 2 | 22 | 100% | 0 | 0 |  |
 | Confirmai.Configuration.OtelOptions | 13 | 0 | 13 | 78 | 100% | 6 | 6 | 100% |
-| Confirmai.Configuration.PromoOptions | 2 | 3 | 5 | 17 | 40% | 0 | 0 |  |
+| Confirmai.Configuration.PromoOptions | 2 | 3 | 5 | 18 | 40% | 0 | 0 |  |
 | Confirmai.Configuration.SecurityPolicyDefaults | 23 | 0 | 23 | 48 | 100% | 2 | 2 | 100% |
 | Confirmai.Configuration.SecurityPolicySnapshot | 11 | 0 | 11 | 48 | 100% | 0 | 0 |  |
 | Confirmai.Configuration.WhatsAppOptions | 9 | 0 | 9 | 41 | 100% | 2 | 2 | 100% |
@@ -415,7 +415,7 @@
 | Confirmai.Services.Events.HomeToday | 27 | 0 | 27 | 64 | 100% | 10 | 12 | 83.3% |
 | Confirmai.Services.Events.HomeTodayMatch | 1 | 0 | 1 | 64 | 100% | 0 | 0 |  |
 | Confirmai.Services.Events.HomeTodaySummary | 6 | 0 | 6 | 64 | 100% | 0 | 0 |  |
-| Confirmai.Services.Events.RachaSchedulerService | 62 | 6 | 68 | 134 | 91.1% | 14 | 16 | 87.5% |
+| Confirmai.Services.Events.RachaSchedulerService | 58 | 10 | 68 | 134 | 85.2% | 13 | 16 | 81.2% |
 | Confirmai.Services.Factories.BitcoinPaymentFactory | 6 | 0 | 6 | 21 | 100% | 2 | 2 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayFactory | 32 | 0 | 32 | 70 | 100% | 10 | 10 | 100% |
 | Confirmai.Services.Factories.EventPaymentGatewayOption | 1 | 0 | 1 | 70 | 100% | 0 | 0 |  |
@@ -563,7 +563,7 @@
 | Confirmai.Services.Utility.MailboxMessageView | 11 | 0 | 11 | 327 | 100% | 0 | 0 |  |
 | Confirmai.Services.Utility.MailboxQueryService | 171 | 11 | 182 | 327 | 93.9% | 69 | 114 | 60.5% |
 | Confirmai.Services.Utility.PiiSanitizer | 13 | 2 | 15 | 157 | 86.6% | 6 | 6 | 100% |
-| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 49 | 52 | 94.2% |
+| Confirmai.Services.Utility.ProductService | 137 | 17 | 154 | 269 | 88.9% | 48 | 52 | 92.3% |
 | Confirmai.Services.Utility.TestnetBitcoinPaymentService | 49 | 18 | 67 | 132 | 73.1% | 16 | 24 | 66.6% |
 | Confirmai.Shared.Components.ActivePaymentMethodsWidget | 2 | 0 | 2 | 17 | 100% | 0 | 0 |  |
 | Confirmai.Shared.Components.Admin.AdminLogsFilterBar | 38 | 10 | 48 | 124 | 79.1% | 2 | 4 | 50% |
@@ -594,7 +594,7 @@
 | Confirmai.Shared.Components.Landing.Landing | 44 | 0 | 44 | 140 | 100% | 0 | 0 |  |
 | Confirmai.Shared.Components.Poker.PokerDetailInfo | 9 | 52 | 61 | 163 | 14.7% | 9 | 48 | 18.7% |
 | Confirmai.Shared.Components.QRCode | 0 | 8 | 8 | 21 | 0% | 0 | 2 | 0% |
-| Confirmai.Shared.Components.SidebarNextMatchCard | 28 | 0 | 28 | 65 | 100% | 8 | 8 | 100% |
+| Confirmai.Shared.Components.SidebarNextMatchCard | 32 | 6 | 38 | 90 | 84.2% | 8 | 8 | 100% |
 | Confirmai.Shared.Components.SidebarPromoCard | 1 | 7 | 8 | 26 | 12.5% | 1 | 8 | 12.5% |
 | Confirmai.Shared.Components.Skeleton | 2 | 0 | 2 | 9 | 100% | 0 | 0 |  |
 | Confirmai.Shared.Components.Toast | 1 | 21 | 22 | 37 | 4.5% | 1 | 12 | 8.3% |
