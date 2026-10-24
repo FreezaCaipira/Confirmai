@@ -109,6 +109,35 @@ public class C43BMockFillTests
         await using var db = factory.CreateDbContext();
         Assert.Empty(await db.EventConfirmations.Where(c => c.EventId == eventId).ToListAsync());
         Assert.Equal(4, await db.Users.CountAsync(u => u.IsMock)); // pool fica
+        Assert.Empty(await db.GroupMembers.Where(m => m.GroupId == 1 && m.User.IsMock).ToListAsync());
         Assert.Single(await db.Logs.Where(l => l.EventType == Confirmai.Services.Core.AuditEvents.EventMockCleared).ToListAsync());
+    }
+
+    [Fact]
+    public async Task Clear_KeepsMockMembership_WhenConfirmedInAnotherEventOfGroup()
+    {
+        var factory = CreateFactory();
+        var eventId = await SeedEventAsync(factory);
+        int otherId;
+        await using (var db = factory.CreateDbContext())
+        {
+            var other = new Event
+            {
+                GroupId = 1, Sport = Sport.Futsal, MaxPlayers = 4, MaxGoalkeepers = 1,
+                StartsAt = DateTime.UtcNow.AddDays(2), IsActive = true,
+            };
+            db.Events.Add(other);
+            await db.SaveChangesAsync();
+            otherId = other.Id;
+        }
+        var svc = Create(factory, enabled: true);
+        await svc.FillAsync(eventId, Admin());
+        await svc.FillAsync(otherId, Admin());
+
+        await svc.ClearAsync(eventId, Admin());
+
+        await using var check = factory.CreateDbContext();
+        Assert.Equal(4, await check.EventConfirmations.CountAsync(c => c.EventId == otherId));
+        Assert.Equal(4, await check.GroupMembers.CountAsync(m => m.GroupId == 1 && m.User.IsMock));
     }
 }
