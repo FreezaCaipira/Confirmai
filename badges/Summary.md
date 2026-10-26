@@ -2,8 +2,8 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/24/2026 - 03:26:22 |
-| Coverage date: | 10/24/2026 - 03:26:17 |
+| Generated on: | 10/26/2026 - 17:45:23 |
+| Coverage date: | 10/26/2026 - 17:45:17 |
 | Parser: | Cobertura |
 | Assemblies: | 1 |
 | Classes: | 583 |
@@ -17,7 +17,7 @@
 | Covered branches: | 4788 |
 | Total branches: | 10087 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
-| Tag: | 502_40058132266 |
+| Tag: | 504_40371123658 |
 
 # Risk Hotspots
 
