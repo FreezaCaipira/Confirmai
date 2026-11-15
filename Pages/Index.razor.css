@@ -83,7 +83,6 @@
 }
 
 .home-btn:focus-visible,
-.home-group-chip:focus-visible,
 .home-event:focus-visible {
     outline: 2px solid var(--accent-ring);
     outline-offset: 2px;
@@ -233,8 +232,7 @@
 /* -- Sections ----------------------------------------------------- */
 /* Each sector is an L1 panel; its head is a title strip (same tone,
    divider only) and the cards inside sit one level up (L2). */
-.home-section,
-.home-groups {
+.home-section {
     display: flex;
     flex-direction: column;
     background: var(--surface);
@@ -283,80 +281,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-}
-
-/* -- Group chips -------------------------------------------------- */
-.home-group-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-}
-
-.home-group-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    min-height: 36px;
-    padding: 0 var(--space-3) 0 var(--space-2);
-    border: 1px solid var(--border-2);
-    border-radius: var(--radius-full);
-    background: var(--surface-2);
-    color: var(--text);
-    font-size: 0.875rem;
-    font-weight: var(--fw-medium);
-    text-decoration: none;
-    transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.home-group-chip:hover {
-    border-color: var(--accent-border);
-    background: var(--accent-soft);
-    color: var(--accent-text);
-}
-
-.home-group-chip-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: var(--radius-full);
-    background: var(--feat-members-soft);
-    color: var(--feat-members);
-    font-size: 0.8125rem;
-}
-
-.home-group-chip-text {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1px;
-    min-width: 0;
-}
-
-.home-group-chip-meta {
-    font-size: 0.7rem;
-    font-weight: var(--fw-regular);
-    color: var(--text-3);
-    max-width: 28ch;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.home-group-chip:hover .home-group-chip-meta {
-    color: var(--accent-text);
-}
-
-.home-group-chip-role {
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
-    background: var(--accent);
-    color: var(--accent-fg);
-    font-size: 0.6875rem;
-    font-weight: var(--fw-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
 }
 
 /* -- Organizer event row ------------------------------------------ */

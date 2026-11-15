@@ -87,6 +87,10 @@
                                         <span><i class="fas fa-map-marker-alt"></i> @g.City@(!string.IsNullOrWhiteSpace(g.StateCode) ? $"/{g.StateCode}" : "")</span>
                                     }
                                     <span><i class="fas fa-users"></i> @g.Members.Count @Ui["Group.Member" + (g.Members.Count != 1 ? "s" : "")]</span>
+                                    @if (schedulesByGroup.TryGetValue(g.Id, out var sched))
+                                    {
+                                        <span class="group-row-schedule"><i class="fas fa-calendar-week"></i> @ScheduleText(sched)</span>
+                                    }
                                 </span>
                             </span>
                             <span class="group-row-badges">

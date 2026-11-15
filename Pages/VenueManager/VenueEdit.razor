@@ -1,4 +1,4 @@
-@page "/venue-manager/venues/edit/{Id:int}"
+﻿@page "/venue-manager/venues/edit/{Id:int}"
 
 @attribute [Authorize(Roles = "venue_manager,admin")]
 
@@ -100,6 +100,17 @@
                         <InputText class="input" @bind-Value="model.Address"
                                    placeholder="@(hasMapsApiKey ? T["VenueEdit.AddressAutoPlaceholder"] : T["VenueEdit.AddressPlaceholder"])" />
                         <ValidationMessage For="@(() => model.Address)" class="validation-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="venue-logo-input">@T["VenueEdit.Logo"]</label>
+                        <InputText id="venue-logo-input" class="input" @bind-Value="model.LogoPath"
+                                   placeholder="/images/venues/..." autocomplete="off" />
+                        <small class="form-hint">@T["VenueEdit.LogoHint"]</small>
+                        @if (!string.IsNullOrWhiteSpace(model.LogoPath) && VenueLogo.IsLocalPath(model.LogoPath))
+                        {
+                            <img class="venue-logo-preview" src="@model.LogoPath" alt="" />
+                        }
                     </div>
 
                     @if (!IsNew)

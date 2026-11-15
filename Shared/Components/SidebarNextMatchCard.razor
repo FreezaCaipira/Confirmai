@@ -16,18 +16,46 @@
     <Authorized>
         @if (match is not null)
         {
+            var pct = match.MaxPlayers > 0 ? Math.Min(100, match.Confirmed * 100 / match.MaxPlayers) : 0;
             <section class="oldsite-widget sidebar-next-match">
-                <h3>@T["SidebarNext.Title"]</h3>
-                <p class="sidebar-next-group">@match.GroupName</p>
-                <p class="sidebar-next-when">
-                    <i class="fas fa-calendar" aria-hidden="true"></i>
-                    @T.FormatDateTime(match.StartsLocal, "DateTimeFullShort")
-                </p>
-                <p class="sidebar-next-count">@match.Confirmed/@match.MaxPlayers @T["SidebarNext.Confirmed"]</p>
-                <a class="btn btn-secondary btn-sm sidebar-next-link"
-                   href="@(match.Sport == Sport.Poker ? $"/poker/{match.EventId}" : $"/futsal/{match.EventId}")">
-                    @T["SidebarNext.Open"]
-                </a>
+                <h3><i class="fas fa-calendar-day" aria-hidden="true"></i> @T["SidebarNext.Title"]</h3>
+                <div class="sidebar-next-body">
+                    <div class="sidebar-next-top">
+                        <span class="sidebar-next-date" aria-hidden="true">
+                            <span class="sidebar-next-day">@match.StartsLocal.Day</span>
+                            <span class="sidebar-next-month">@T.FormatDateTime(match.StartsLocal, "DateWeekday").Split(' ')[0].TrimEnd('.')</span>
+                        </span>
+                        <span class="sidebar-next-info">
+                            <span class="sidebar-next-group">
+                                <i class="fas @(match.Sport == Sport.Poker ? "fa-coins" : "fa-futbol")" aria-hidden="true"></i>
+                                @match.GroupName
+                            </span>
+                            <span class="sidebar-next-when">
+                                <i class="fas fa-clock" aria-hidden="true"></i>
+                                @T.FormatDateTime(match.StartsLocal, "DateTimeFullShort")
+                            </span>
+                        </span>
+                    </div>
+                    @if (match.MaxPlayers > 0)
+                    {
+                        <div class="sidebar-next-progress">
+                            <span class="sidebar-next-count">
+                                <strong>@match.Confirmed/@match.MaxPlayers</strong> @T["SidebarNext.Confirmed"]
+                            </span>
+                            <span class="sidebar-next-bar" role="presentation">
+                                <span class="sidebar-next-bar-fill @(pct >= 100 ? "is-full" : string.Empty)" style="width: @(pct)%"></span>
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="sidebar-next-count"><strong>@match.Confirmed</strong> @T["SidebarNext.Confirmed"]</span>
+                    }
+                    <a class="btn btn-primary btn-sm sidebar-next-link"
+                       href="@(match.Sport == Sport.Poker ? $"/poker/{match.EventId}" : $"/futsal/{match.EventId}")">
+                        @T["SidebarNext.Open"] <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
             </section>
         }
     </Authorized>

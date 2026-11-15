@@ -1,0 +1,79 @@
+@using Confirmai.Data
+@using Confirmai.Shared.Helpers
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject UiTextService T
+@implements IDisposable
+
+@* C45 #7: alterna as quadras ativas que tem logo (logo, nome e cidade).
+   Sem nenhuma quadra com logo, nao renderiza. *@
+
+@if (venues.Count > 0)
+{
+    var v = venues[index % venues.Count];
+    <section class="oldsite-widget sidebar-venues" aria-label="@T["SidebarVenues.Title"]">
+        <h3><i class="fas fa-map-marked-alt" aria-hidden="true"></i> @T["SidebarVenues.Title"]</h3>
+        <div class="sidebar-venues-body" aria-live="polite">
+            <span class="sidebar-venues-logo">
+                <img src="@v.LogoPath" alt="@v.Name" loading="lazy" />
+            </span>
+            <span class="sidebar-venues-name">@v.Name</span>
+            <span class="sidebar-venues-city">
+                <i class="fas fa-map-marker-alt" aria-hidden="true"></i> @v.City/@v.StateCode
+            </span>
+            @if (venues.Count > 1)
+            {
+                <span class="sidebar-venues-dots" aria-hidden="true">
+                    @for (var i = 0; i < venues.Count; i++)
+                    {
+                        <span class="sidebar-venues-dot @(i == index % venues.Count ? "is-active" : string.Empty)"></span>
+                    }
+                </span>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    private sealed record VenueCard(string Name, string City, string StateCode, string LogoPath);
+
+    private const int RotateSeconds = 6;
+    private List<VenueCard> venues = new();
+    private int index;
+    private Timer? timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var rows = await db.Venues
+                .AsNoTracking()
+                .Where(v => v.IsActive && v.LogoPath != null && v.LogoPath != "")
+                .OrderBy(v => v.Name)
+                .Select(v => new VenueCard(v.Name, v.City, v.StateCode, v.LogoPath!))
+                .ToListAsync();
+            venues = rows.Where(v => VenueLogo.IsLocalPath(v.LogoPath)).ToList();
+        }
+        catch (Exception)
+        {
+            // card decorativo: falha ao carregar nao derruba o layout
+            venues = new();
+        }
+    }
+
+    // So no circuito interativo: no prerender o timer nao teria pra quem renderizar.
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && venues.Count > 1)
+        {
+            timer = new Timer(_ => InvokeAsync(() =>
+            {
+                index = (index + 1) % venues.Count;
+                StateHasChanged();
+            }), null, TimeSpan.FromSeconds(RotateSeconds), TimeSpan.FromSeconds(RotateSeconds));
+        }
+    }
+
+    public void Dispose() => timer?.Dispose();
+}

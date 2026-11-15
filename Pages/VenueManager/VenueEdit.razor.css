@@ -3,3 +3,14 @@
 ::deep .entity-shell-card.form-card {
     overflow: visible;
 }
+
+.venue-logo-preview {
+    display: block;
+    max-width: 160px;
+    max-height: 100px;
+    margin-top: var(--space-2);
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    object-fit: contain;
+}

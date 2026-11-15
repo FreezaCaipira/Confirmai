@@ -17,6 +17,7 @@ public partial class Index
     private List<GroupJoinRequest> myPendingRequests = new();
     private bool         isLoading     = true;
     private Dictionary<int, int> pendingJoinRequestsByGroup = new();
+    private Dictionary<int, GroupScheduleLine> schedulesByGroup = new();
 
     private int?    openMenuGroupId;
     private int?    confirmLeaveGroupId;
@@ -82,6 +83,9 @@ public partial class Index
                 .Select(g => new { GroupId = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.GroupId, x => x.Count);
 
+        // C45 #4: agenda fixa (dias, horario, local) saiu da home e vem pra ca.
+        schedulesByGroup = await LoadSchedulesAsync(db, groups.Select(g => g.Id).ToList());
+
         myPendingRequests = await GroupDetailService.GetMyPendingRequestsAsync(currentUserId);
 
         groups = groups
@@ -92,6 +96,57 @@ public partial class Index
 
         isLoading = false;
     }
+
+    private static async Task<Dictionary<int, GroupScheduleLine>> LoadSchedulesAsync(AppDbContext db, List<int> groupIds)
+    {
+        var result = new Dictionary<int, GroupScheduleLine>();
+        if (groupIds.Count == 0) return result;
+
+        var schedules = await db.RachaSchedules
+            .AsNoTracking()
+            .Include(s => s.Venue)
+            .Where(s => s.IsActive && groupIds.Contains(s.GroupId))
+            .ToListAsync();
+        foreach (var g in schedules.GroupBy(s => s.GroupId))
+        {
+            if (GroupScheduleSummary.Build(g) is { } line)
+                result[g.Key] = line;
+        }
+
+        var withoutSchedule = groupIds.Where(id => !result.ContainsKey(id)).ToList();
+        if (withoutSchedule.Count == 0) return result;
+
+        var now = DateTime.UtcNow;
+        var horizon = now.AddDays(14);
+        var upcoming = await db.Events
+            .AsNoTracking()
+            .Include(e => e.Venue)
+            .Where(e => e.IsActive && e.StartsAt > now && e.StartsAt <= horizon
+                        && withoutSchedule.Contains(e.GroupId))
+            .ToListAsync();
+        foreach (var g in upcoming.GroupBy(e => e.GroupId))
+        {
+            if (GroupScheduleSummary.BuildFromUpcoming(g) is { } line)
+                result[g.Key] = line;
+        }
+        return result;
+    }
+
+    private string ScheduleText(GroupScheduleLine sched) =>
+        string.Join(" · ", sched.Days.Select(DayShort))
+        + (sched.CommonTime is { } t ? $" {t:HH\\:mm}" : string.Empty)
+        + (sched.VenueName is { } v ? $" — {v}" : string.Empty);
+
+    private string DayShort(DayOfWeek d) => d switch
+    {
+        DayOfWeek.Sunday    => Ui["Index.DaySun"],
+        DayOfWeek.Monday    => Ui["Index.DayMon"],
+        DayOfWeek.Tuesday   => Ui["Index.DayTue"],
+        DayOfWeek.Wednesday => Ui["Index.DayWed"],
+        DayOfWeek.Thursday  => Ui["Index.DayThu"],
+        DayOfWeek.Friday    => Ui["Index.DayFri"],
+        _                   => Ui["Index.DaySat"],
+    };
 
     private bool IsCurrentUserAdmin(Group group)
         => currentUserId is not null && group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);

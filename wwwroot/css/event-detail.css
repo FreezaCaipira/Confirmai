@@ -533,16 +533,23 @@ body .entity-shell-card.evpay-main {
     margin-bottom: 0;
 }
 
-/* Make section headers clearly distinct from row backgrounds */
-.players-group--gk .players-group-header {
-    background: var(--accent-soft);
-    border-color: var(--accent-border);
+/* C45 #9: goleiro e linha no mesmo padrao — fundo tinted + contorno da
+   mesma cor do grupo, continuando na lista. */
+.players-group--gk {
+    --players-tone: var(--accent-text);
+    --players-soft: var(--accent-soft);
+    --players-border: var(--accent-border);
 }
 
-.players-group--line .players-group-header {
-    background: var(--surface-2);
-    border-color: var(--success);
-    
+.players-group--line {
+    --players-tone: var(--success);
+    --players-soft: var(--success-soft);
+    --players-border: rgba(34, 197, 94, 0.40);
+}
+
+.players-group .players-group-header {
+    background: var(--players-soft);
+    border-color: var(--players-border);
 }
 
 .players-label {
@@ -555,12 +562,8 @@ body .entity-shell-card.evpay-main {
     text-align: center;
 }
 
-.players-group--gk .players-label {
-    color: var(--accent-text);
-}
-
-.players-group--line .players-label {
-    color: var(--success);
+.players-group .players-label {
+    color: var(--players-tone);
 }
 
 .players-count {
@@ -573,16 +576,10 @@ body .entity-shell-card.evpay-main {
     padding: 0.08rem 0.55rem;
 }
 
-.players-group--gk .players-count:not(.is-full) {
-    color: var(--accent-text);
+.players-group .players-count:not(.is-full) {
+    color: var(--players-tone);
     background: var(--surface);
-    border-color: var(--accent-text);
-}
-
-.players-group--line .players-count:not(.is-full) {
-    color: var(--success);
-    background: var(--surface-2);
-    border-color: var(--success);
+    border-color: var(--players-border);
 }
 
 .players-count.is-full {
@@ -611,12 +608,8 @@ body .entity-shell-card.evpay-main {
     border-radius: 0 0 8px 8px;
 }
 
-.players-group--gk .players-list {
-    border-color: var(--accent-text);
-}
-
-.players-group--line .players-list {
-    border-color: var(--success);
+.players-group .players-list {
+    border-color: var(--players-border);
 }
 
 .player-item {

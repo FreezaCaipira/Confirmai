@@ -32,6 +32,11 @@ public static class HomeToday
 
     public static int TipOfTheDay(DateTime localNow) => localNow.DayOfYear % TipCount;
 
+    public const int GreetingCount = 5;
+
+    // Same greeting for the whole day: prerender and the interactive render agree.
+    public static int GreetingOfTheDay(DateTime localNow) => localNow.DayOfYear % GreetingCount;
+
     public static HomeTodaySummary Build(
         IEnumerable<EventConfirmation> playing,
         IEnumerable<Event> organizing,

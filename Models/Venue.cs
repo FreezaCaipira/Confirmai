@@ -28,6 +28,10 @@ namespace Confirmai.Models
 
         public bool IsActive { get; set; } = true;
 
+        /// <summary>Logo local (ex.: /images/venues/x.webp), exibida no card de quadras da coluna lateral.</summary>
+        [StringLength(300)]
+        public string? LogoPath { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>Usuário que criou o registro (apenas auditoria).</summary>

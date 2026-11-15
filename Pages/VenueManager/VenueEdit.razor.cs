@@ -6,6 +6,7 @@ using Confirmai.Services.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Confirmai.Shared.Helpers;
 using Microsoft.JSInterop;
 using System.Text.Json;
 
@@ -140,6 +141,15 @@ public partial class VenueEdit : IAsyncDisposable
                     return;
                 }
                 model.City = officialCity;
+            }
+
+            // C45 #7: a CSP so libera imagens do proprio site.
+            model.LogoPath = string.IsNullOrWhiteSpace(model.LogoPath) ? null : model.LogoPath.Trim();
+            if (model.LogoPath is not null && !VenueLogo.IsLocalPath(model.LogoPath))
+            {
+                saveError = T["VenueEdit.LogoInvalid"];
+                isSaving  = false;
+                return;
             }
 
             await using var db = await DbFactory.CreateDbContextAsync();

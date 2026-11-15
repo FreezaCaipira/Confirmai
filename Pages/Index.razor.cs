@@ -24,10 +24,7 @@ public partial class Index
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private UiTextService Ui { get; set; } = default!;
 
-    private sealed record GroupSummary(int Id, string Name, Sport Sport, bool IsAdmin)
-    {
-        public GroupScheduleLine? Schedule { get; set; }
-    }
+    private sealed record GroupSummary(int Id, string Name, Sport Sport, bool IsAdmin);
 
     private bool isLoading = true;
     private string view = ViewPlaying;
@@ -77,34 +74,6 @@ public partial class Index
             return;
         }
 
-        // C37 F8: agenda fixa por grupo nos cards da home (dias + local).
-        var myGroupIds = myGroups.Select(g => g.Id).ToList();
-        var schedules = await db.RachaSchedules
-            .AsNoTracking()
-            .Include(s => s.Venue)
-            .Where(s => s.IsActive && myGroupIds.Contains(s.GroupId))
-            .ToListAsync();
-        var schedulesByGroup = schedules.GroupBy(s => s.GroupId)
-            .ToDictionary(g => g.Key, g => GroupScheduleSummary.Build(g));
-        foreach (var g in myGroups)
-            g.Schedule = schedulesByGroup.GetValueOrDefault(g.Id);
-
-        var withoutSchedule = myGroups.Where(g => g.Schedule is null).Select(g => g.Id).ToList();
-        if (withoutSchedule.Count > 0)
-        {
-            var horizon = now.AddDays(14);
-            var upcoming = await db.Events
-                .AsNoTracking()
-                .Include(e => e.Venue)
-                .Where(e => e.IsActive && e.StartsAt > now && e.StartsAt <= horizon
-                            && withoutSchedule.Contains(e.GroupId))
-                .ToListAsync();
-            var upcomingByGroup = upcoming.GroupBy(e => e.GroupId)
-                .ToDictionary(g => g.Key, g => GroupScheduleSummary.BuildFromUpcoming(g));
-            foreach (var g in myGroups.Where(g => g.Schedule is null))
-                g.Schedule = upcomingByGroup.GetValueOrDefault(g.Id);
-        }
-
         // Tracking query: Confirmation -> Event -> Confirmations is a cycle EF rejects with AsNoTracking.
         var confs = await db.EventConfirmations
             .Include(c => c.Event).ThenInclude(e => e.Group)
@@ -149,15 +118,4 @@ public partial class Index
 
     private static string DetailUrl(Event ev) =>
         ev.Sport == Sport.Poker ? $"/poker/{ev.Id}" : $"/futsal/{ev.Id}";
-
-    private string DayShort(DayOfWeek d) => d switch
-    {
-        DayOfWeek.Sunday    => Ui["Index.DaySun"],
-        DayOfWeek.Monday    => Ui["Index.DayMon"],
-        DayOfWeek.Tuesday   => Ui["Index.DayTue"],
-        DayOfWeek.Wednesday => Ui["Index.DayWed"],
-        DayOfWeek.Thursday  => Ui["Index.DayThu"],
-        DayOfWeek.Friday    => Ui["Index.DayFri"],
-        _                   => Ui["Index.DaySat"],
-    };
 }

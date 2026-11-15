@@ -12,7 +12,7 @@
             <input class="group-entry-input" type="text" maxlength="8"
                    placeholder="Ex: ABCD1234" aria-label="@Ui["Groups.JoinCode"]"
                    @bind="joinCode" @bind:event="oninput" />
-            <button class="btn @(Compact ? "btn-secondary" : "btn-primary")" type="submit" disabled="@(joinCode.Trim().Length == 0)">
+            <button class="btn @(Compact ? "btn-secondary group-entry-submit" : "btn-primary")" type="submit" disabled="@(joinCode.Trim().Length == 0)">
                 @Ui["Groups.Enter"]
             </button>
         </form>

@@ -2,8 +2,14 @@
 @using Confirmai.Models
 @using Confirmai.Services.Core
 @inject UiTextService Ui
+@inject NavigationManager NavigationManager
 
 <header class="panel group-header">
+    @* C45 #3: voltar no canto superior direito do hero, com URL real do pai
+       (overview -> /grupos; subpaginas -> overview do grupo). *@
+    <a class="btn btn-secondary btn-sm group-header-back" href="@BackHref">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i> @BackLabel
+    </a>
     <div class="group-header-body">
         <span class="group-header-sport">
             @(Group.Sport == Sport.Futsal ? Ui["Group.SportFutsal"] : Ui["Group.SportPoker"])
@@ -23,4 +29,17 @@
 @code {
     [Parameter] public Group Group { get; set; } = default!;
     [Parameter] public bool IsAdmin { get; set; }
+
+    private bool IsOverview
+    {
+        get
+        {
+            var path = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0].TrimEnd('/');
+            return string.Equals(path, $"grupo/{Group.Id}", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    private string BackHref => IsOverview ? "/grupos" : $"/grupo/{Group.Id}";
+
+    private string BackLabel => IsOverview ? Ui["Breadcrumb.Groups"] : Ui["Group.NavOverview"];
 }
