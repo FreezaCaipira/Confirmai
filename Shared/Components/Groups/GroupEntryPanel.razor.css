@@ -49,10 +49,48 @@
     margin: 0;
 }
 
+/* C45 #6: as duas opcoes centradas tambem na vertical (texto + acao
+   no meio do card, sem o margin-top:auto empurrar a acao pro fundo). */
+.group-entry--compact .group-entry-option {
+    justify-content: center;
+    min-width: 0;
+}
+
+.group-entry--compact .group-entry-option > .btn,
+.group-entry--compact .group-entry-row {
+    margin-top: 0;
+    align-self: center;
+}
+
+/* C45 #5: o input ficava com a largura do card e encostava na borda;
+   limita a largura do bloco e usa o fundo do campo do sistema. */
+.group-entry--compact .group-entry-row {
+    max-width: 260px;
+}
+
+.group-entry--compact .group-entry-input {
+    box-sizing: border-box;
+    background: var(--surface);
+    text-align: center;
+}
+
+.group-entry-submit {
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+    color: var(--text);
+}
+
+.group-entry-submit:hover:not(:disabled) {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-fg);
+}
+
 .group-entry--compact .group-entry-row {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .group-entry--compact .group-entry-input {

@@ -98,12 +98,7 @@
 
     protected override void OnInitialized() => tipIndex = HomeToday.TipOfTheDay(LocalNow);
 
-    private string GreetingKey => Summary.Greeting switch
-    {
-        HomeGreeting.Morning   => "Index.GreetingMorning",
-        HomeGreeting.Afternoon => "Index.GreetingAfternoon",
-        _                      => "Index.GreetingEvening",
-    };
+    private string GreetingKey => $"Index.Greeting{HomeToday.GreetingOfTheDay(LocalNow) + 1}";
 
     private string NextText => Summary.Next is { } next
         ? Ui.Get("Index.TodayNext", $"{Ui.FormatDateTime(next.StartsLocal, "DateWeekday")} {next.StartsLocal:HH:mm}")

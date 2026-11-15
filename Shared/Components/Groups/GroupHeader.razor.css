@@ -1,5 +1,32 @@
 /* ── Cabecalho do grupo compartilhado (C36-D Fase 8) ──────────── */
 
+.group-header {
+    position: relative;
+}
+
+/* C45 #3: canto superior direito do hero; o corpo reserva o espaco
+   pra o nome longo nao passar por baixo do botao. */
+.group-header-back {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+}
+
+.group-header-body {
+    padding-right: 120px;
+}
+
+/* No celular o "<- {pai}" do breadcrumb ja aparece acima do hero. */
+@media (max-width: 768px) {
+    .group-header-back {
+        display: none;
+    }
+
+    .group-header-body {
+        padding-right: 0;
+    }
+}
+
 .group-header-body {
     display: flex;
     flex-direction: column;

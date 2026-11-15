@@ -201,3 +201,95 @@
 .hub-checklist-step.is-done i { color: var(--success); }
 .hub-checklist-step.is-done span { color: var(--text-2); text-decoration: line-through; }
 .hub-checklist-step .btn { margin-left: auto; }
+
+/* C45 #8: proxima partida — calendario + relogio, acoes empilhadas. */
+.event-row--next {
+    grid-template-columns: minmax(0, auto) 1fr minmax(150px, auto);
+}
+
+.next-when {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.next-cal {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 56px;
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--surface);
+    line-height: 1;
+}
+
+.next-cal-weekday {
+    width: 100%;
+    padding: 4px 0;
+    background: var(--accent);
+    color: var(--accent-fg);
+    font-size: 0.65rem;
+    font-weight: var(--fw-semibold);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.next-cal-day {
+    padding: 6px 0 8px;
+    font-size: 1.4rem;
+    font-weight: var(--fw-bold);
+    color: var(--text);
+}
+
+.next-when-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.8125rem;
+    color: var(--text-2);
+}
+
+.next-when-date,
+.next-when-time {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    white-space: nowrap;
+}
+
+.next-when-date {
+    color: var(--text);
+    font-weight: var(--fw-semibold);
+}
+
+.next-when-text i {
+    width: 14px;
+    color: var(--accent-text);
+    font-size: 0.75rem;
+}
+
+.next-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+}
+
+.next-actions > .btn,
+.next-actions > .status-badge {
+    justify-content: center;
+    width: 100%;
+}
+
+@media (max-width: 640px) {
+    .event-row--next {
+        grid-template-columns: 1fr;
+    }
+
+    .next-when-date {
+        white-space: normal;
+    }
+}

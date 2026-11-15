@@ -95,7 +95,7 @@ public class HomeGroupFirstIntegrationTests : IClassFixture<IntegrationTestWebAp
     }
 
     [Fact]
-    public async Task Home_GroupChip_ShowsScheduleSummary_WhenGroupHasSchedule()
+    public async Task GroupsList_ShowsScheduleSummary_WhenGroupHasSchedule()
     {
         var groupId = await _factory.SeedGroupWithAdminAsync("home-sched-user", "Racha da Quarta");
 
@@ -117,11 +117,11 @@ public class HomeGroupFirstIntegrationTests : IClassFixture<IntegrationTestWebAp
             await db.SaveChangesAsync();
         }
 
-        var response = await AuthenticatedClient("home-sched-user").GetAsync("/");
+        var response = await AuthenticatedClient("home-sched-user").GetAsync("/grupos");
         var content = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("home-group-chip-meta", content);
+        Assert.Contains("group-row-schedule", content);
         Assert.Contains("Qua", content);
         Assert.Contains("Arena Central", content);
         Assert.Contains("19:30", content);

@@ -1226,6 +1226,10 @@ namespace Confirmai.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("LogoPath")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)

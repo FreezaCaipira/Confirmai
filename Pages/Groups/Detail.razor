@@ -200,9 +200,18 @@ else
                             && (myConfirmation.ChargedPrice ?? nextEvent.Price) is > 0
                             && myConfirmation.Position != FutsalPosition.Goalkeeper;
                         var proofSent = owes && myConfirmation!.PixProofUploadedAt is not null;
-                        <div class="event-row">
-                            <div class="event-row-when">
-                                <span class="event-row-day">@Ui.FormatDateTime(nextEvent.StartsAt.ToLocalTime(), "DateTimeFullShort")</span>
+                        var nextLocal = nextEvent.StartsAt.ToLocalTime();
+                        <div class="event-row event-row--next">
+                            @* C45 #8: data em bloco de calendario + hora com relogio *@
+                            <div class="event-row-when next-when">
+                                <span class="next-cal" aria-hidden="true">
+                                    <span class="next-cal-weekday">@Ui.FormatDateTime(nextLocal, "DateWeekday").Split(' ')[0].TrimEnd('.')</span>
+                                    <span class="next-cal-day">@nextLocal.Day</span>
+                                </span>
+                                <span class="next-when-text">
+                                    <span class="next-when-date"><i class="fas fa-calendar" aria-hidden="true"></i> @Ui.FormatDateTime(nextLocal, "DateLong")</span>
+                                    <span class="next-when-time"><i class="fas fa-clock" aria-hidden="true"></i> @Ui.FormatDateTime(nextLocal, "TimeDefault")</span>
+                                </span>
                             </div>
                             <div class="event-row-body">
                                 <span class="event-row-title">@group.Name</span>
@@ -214,7 +223,7 @@ else
                                     <span>👥 @nextEvent.Confirmations.Count@(nextEvent.MaxPlayers > 0 ? $"/{nextEvent.MaxPlayers}" : string.Empty) @Ui["Index.ConfirmedCount"]</span>
                                 </span>
                             </div>
-                            <div class="event-row-side">
+                            <div class="event-row-side next-actions">
                                 @if (proofSent)
                                 {
                                     <span class="status-badge status-badge--pending">

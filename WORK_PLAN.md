@@ -214,6 +214,23 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
+## Ciclo 45 (Senior direto, a pedido do Robson) -- 9 pontos de UI em prod [EXECUTADO -- implementado pelo Senior, sem Pleno; o C44 (remocao do legado + achados da bateria) continua reservado]
+
+Numerado C45 porque o C44 ja tem o plano da remocao do legado. Itens do Robson e o que entrou:
+
+1. **Saudacao** -- "Bom dia/Boa tarde" virou lista rotativa por dia (`Index.Greeting1..5`, `HomeToday.GreetingOfTheDay`): PT com "Fala, jogadô!" e girias; EN/ES provisorios (Robson vai pesquisar as girias). Mesma saudacao no dia todo -> prerender e circuito batem.
+2. **Card "Sua proxima partida"** (coluna direita) -- faixa de titulo, data em bloco, relogio, barra de vagas (verde quando lota) e CTA azul de largura total.
+3. **Voltar no hero do grupo** -- `GroupHeader` ganhou botao no canto superior direito com URL real (overview -> `/grupos`; subpaginas -> overview). No celular fica so o "<- {pai}" do breadcrumb.
+4. **Home sem lista de grupos** -- a home e a agenda (hoje, proximas, historico); os grupos ficam em `/grupos`. A agenda fixa (dias, horario, local) que so a home mostrava passou pra linha do grupo em `/grupos` (`group-row-schedule`).
+5/6. **`GroupEntryPanel` compacto** -- opcoes centradas na horizontal e vertical; campo do codigo limitado (260px) com fundo do sistema; "Entrar" em accent-soft (azul cheio no hover).
+7. **Card de quadras** -- `Venue.LogoPath` (migration `Ciclo45_VenueLogoPath`), campo na edicao da quadra (so caminho local, por causa da CSP), `SidebarVenuesCard` alterna logo/nome/cidade a cada 6s (timer so apos o primeiro render). Logo do Bandolim em `/images/venues/bandolim.webp`. **Robson:** em `/venue-manager/venues`, editar a quadra Bandolim e colar esse caminho no campo Logo.
+8. **Proxima partida no grupo** -- bloco de calendario (dia da semana + dia), data longa com icone e hora com relogio; acoes empilhadas na direita.
+9. **Cabecalhos goleiro/linha** -- mesmo padrao (fundo tinted + contorno da cor do grupo, continuando na lista) via `--players-tone/soft/border`; icone da linha sem emoji.
+
+Testes: `C45UiPolishTests` (chaves da saudacao nos 3 idiomas, rotacao, `VenueLogo.IsLocalPath`, guardioes CSS); teste da agenda movido da home pra `/grupos`.
+
+**Ressalva (critica):** logos de grupo enviadas por upload vao pra `wwwroot/uploads`, fora de volume no container -- somem a cada deploy. Por isso a logo da quadra e caminho de arquivo versionado. Resolver no pre-prod (volume ou storage) antes de voltar com os cards de grupo com imagem.
+
 ## Ciclo 42 (Pleno) -- Achados da bateria do Robson (10 itens) + auditoria/metricas de produto [C42-A APROVADO c/ ressalvas (review Senior da PR #164); C42-B APROVADO c/ ressalvas (review Senior da PR #166)]
 
 **Origem:** bateria do Robson em prod (15/10), 10 achados com print. Fecha o ciclo nesses 10 (decisao do Robson). Landing (3d) ja foi entregue pelo Senior na #161 e o cadastro na #162 -- **nao refazer**.

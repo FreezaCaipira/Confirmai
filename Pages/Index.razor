@@ -1,4 +1,4 @@
-@page "/"
+﻿@page "/"
 @page "/eventos"
 @page "/jogos"
 @attribute [AllowAnonymous]
@@ -46,34 +46,6 @@
                 </header>
 
                 <HomeTodayPanel Summary="@today" LocalNow="@localNow" PendingGroups="@pendingPaymentGroups" FallbackGroupId="@myGroups[0].Id" />
-
-                <section class="home-groups feat--members" aria-label="@Ui["Groups.MyGroups"]">
-                    <div class="home-section-head">
-                        <h2 class="home-section-title">@Ui["Groups.MyGroups"] <span class="panel-count">@myGroups.Count</span></h2>
-                        <a href="/grupos" class="btn btn-secondary btn-sm"><i class="fas fa-gear" aria-hidden="true"></i> @Ui["Index.ManageGroups"]</a>
-                    </div>
-                    <div class="home-section-body home-group-chips">
-                        @foreach (var g in myGroups)
-                        {
-                            <a href="/grupo/@g.Id" class="home-group-chip">
-                                <span class="home-group-chip-icon" aria-hidden="true">@(g.Sport == Sport.Poker ? "🃏" : "⚽")</span>
-                                <span class="home-group-chip-text">
-                                    <span class="home-group-chip-name">@g.Name</span>
-                                    @if (g.Schedule is { } sched)
-                                    {
-                                        <span class="home-group-chip-meta">
-                                            @(string.Join(" · ", sched.Days.Select(DayShort)))@(sched.CommonTime is { } t ? $" {t:HH\\:mm}" : "")@(sched.VenueName is { } v ? $" — {v}" : "")
-                                        </span>
-                                    }
-                                </span>
-                                @if (g.IsAdmin)
-                                {
-                                    <span class="home-group-chip-role">@Ui["Index.RoleAdmin"]</span>
-                                }
-                            </a>
-                        }
-                    </div>
-                </section>
 
                 @if (view == ViewOrganizing && organizesAny)
                 {
