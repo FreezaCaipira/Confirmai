@@ -93,7 +93,13 @@
 
     private void EnsureTimer()
     {
-        if (timer is not null || venues.Count < 2) return;
+        if (venues.Count < 2)
+        {
+            timer?.Dispose();
+            timer = null;
+            return;
+        }
+        if (timer is not null) return;
         timer = new Timer(_ => InvokeAsync(() =>
         {
             if (venues.Count == 0) return;
