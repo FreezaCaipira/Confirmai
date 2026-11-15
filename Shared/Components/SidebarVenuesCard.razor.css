@@ -36,7 +36,7 @@
     margin-bottom: var(--space-2);
     padding: var(--space-2);
     border-radius: var(--radius-sm);
-    background: #fff;
+    background: var(--logo-bg);
 }
 
 .sidebar-venues-logo img {

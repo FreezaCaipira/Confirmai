@@ -80,6 +80,17 @@ public class C45UiPolishTests
         Assert.Contains("border-color: var(--players-border);", header);
         Assert.DoesNotContain(".players-group--line .players-group-header", css);
         Assert.DoesNotContain(".players-group--gk .players-group-header", css);
+        Assert.DoesNotContain("rgba(", Block(css, ".players-group--line {"));
+    }
+
+    [Theory]
+    [InlineData("Shared/Components/SidebarVenuesCard.razor.css")]
+    [InlineData("Pages/VenueManager/VenueEdit.razor.css")]
+    public void LogoFrames_UseToken_NotHardcodedWhite(string rel)
+    {
+        var css = Read(rel);
+        Assert.Contains("var(--logo-bg)", css);
+        Assert.DoesNotContain("#fff", css);
     }
 
     [Fact]
@@ -109,10 +120,13 @@ public class C45UiPolishTests
     }
 
     [Fact]
-    public void SidebarVenuesCard_StartsTimerOnlyAfterFirstRender_AndDisposesIt()
+    public void SidebarVenuesCard_TimerNotTiedToFirstRender_ReloadsOnNavigation_AndDisposes()
     {
         var razor = Read("Shared/Components/SidebarVenuesCard.razor");
-        Assert.Contains("OnAfterRender(bool firstRender)", razor);
+        Assert.Contains("OnAfterRender(bool firstRender) => EnsureTimer();", razor);
+        Assert.DoesNotContain("if (firstRender", razor);
+        Assert.Contains("Navigation.LocationChanged += OnLocationChanged;", razor);
+        Assert.Contains("Navigation.LocationChanged -= OnLocationChanged;", razor);
         Assert.Contains("timer?.Dispose()", razor);
         Assert.Contains("VenueLogo.IsLocalPath", razor);
     }

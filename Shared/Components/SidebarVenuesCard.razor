@@ -3,6 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject UiTextService T
+@inject NavigationManager Navigation
 @implements IDisposable
 
 @* C45 #7: alterna as quadras ativas que tem logo (logo, nome e cidade).
@@ -44,6 +45,30 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Navigation.LocationChanged += OnLocationChanged;
+        await LoadAsync();
+    }
+
+    // O layout persiste entre navegacoes: recarrega pra pegar logo recem-salva.
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        try
+        {
+            await LoadAsync();
+            await InvokeAsync(() =>
+            {
+                EnsureTimer();
+                StateHasChanged();
+            });
+        }
+        catch (Exception)
+        {
+            // card decorativo: falha ao recarregar nao derruba o circuito
+        }
+    }
+
+    private async Task LoadAsync()
+    {
         try
         {
             await using var db = await DbFactory.CreateDbContextAsync();
@@ -62,18 +87,24 @@
         }
     }
 
-    // So no circuito interativo: no prerender o timer nao teria pra quem renderizar.
-    protected override void OnAfterRender(bool firstRender)
+    // OnAfterRender so roda no circuito interativo (nunca no prerender). Nao
+    // depende de firstRender: o load pode terminar depois do primeiro render.
+    protected override void OnAfterRender(bool firstRender) => EnsureTimer();
+
+    private void EnsureTimer()
     {
-        if (firstRender && venues.Count > 1)
+        if (timer is not null || venues.Count < 2) return;
+        timer = new Timer(_ => InvokeAsync(() =>
         {
-            timer = new Timer(_ => InvokeAsync(() =>
-            {
-                index = (index + 1) % venues.Count;
-                StateHasChanged();
-            }), null, TimeSpan.FromSeconds(RotateSeconds), TimeSpan.FromSeconds(RotateSeconds));
-        }
+            if (venues.Count == 0) return;
+            index = (index + 1) % venues.Count;
+            StateHasChanged();
+        }), null, TimeSpan.FromSeconds(RotateSeconds), TimeSpan.FromSeconds(RotateSeconds));
     }
 
-    public void Dispose() => timer?.Dispose();
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+        timer?.Dispose();
+    }
 }

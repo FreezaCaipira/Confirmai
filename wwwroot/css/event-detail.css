@@ -544,7 +544,7 @@ body .entity-shell-card.evpay-main {
 .players-group--line {
     --players-tone: var(--success);
     --players-soft: var(--success-soft);
-    --players-border: rgba(34, 197, 94, 0.40);
+    --players-border: var(--success-border);
 }
 
 .players-group .players-group-header {
