@@ -214,7 +214,7 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
-## Ciclo 46 (Pleno) -- 16 pontos do Robson em prod: niveis de acesso, estouros de layout, hero do grupo, convite pra todos, home e coluna lateral [PLANEJADO -- liberado; itens marcados DECISAO aguardam o Robson]
+## Ciclo 46 (Pleno) -- 16 pontos do Robson em prod: niveis de acesso, estouros de layout, hero do grupo, convite pra todos, home e coluna lateral [PLANEJADO -- liberado; decisoes do Robson de 21/11 ja incorporadas (1.0, 1.5, 3.3)]
 
 **Objetivo:** fechar os 16 pontos que o Robson levantou em prod (21/11/2026). O Senior so planejou e leu o codigo; **nada foi implementado**. Ordem: funcional (acesso) primeiro, depois bug de layout, depois lapidacao. 1 branch, 1 PR, commits por fase. O C44 (remocao do legado) continua reservado e independente.
 
@@ -224,16 +224,27 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 **Estado lido no codigo (importante):** os itens 10 e 11 **nao reproduzem por leitura**. `Pages/Groups/Features.razor` mostra o cadeado quando `!isAdmin` (`GroupFeaturesService.LoadAsync` exige `GroupMemberRole.Admin`); `Pages/Groups/Payments.razor` so mostra abas (inclusive a de % da plataforma) no ramo `isAdmin` -- membro comum ve apenas `MyPaymentsList`; `GroupSubNav` so mostra "Configuracoes" com `IsAdmin`. Entao **1.0 e obrigatorio antes de mexer**.
 
-- **1.0 Reproduzir.** Teste (bUnit ou integracao Postgres) com 1 grupo, 1 admin, 1 membro `Member`: membro abre `/grupo/{id}/configuracoes` e `/grupo/{id}/pagamentos`. Se passar (cadeado / so "Meus pagamentos"), registrar em "Problemas Encontrados pelo Pleno" e seguir -- o Senior confirma com o Robson qual conta/caminho ele usou (hipoteses: a conta e Admin no banco; ou o furo 1.2).
+- **1.0 Reproduzir -- hipotese principal: troca de conta.** O Robson confirmou (21/11) que logou primeiro com uma conta **admin** e depois com uma **nao-admin** no mesmo navegador. Num Blazor Server a identidade do circuito e fixada na conexao: `RevalidatingIdentityAuthenticationStateProvider` so revalida o security stamp **do mesmo usuario** (a cada 30s), nao percebe que o cookie agora e de outra conta. Uma aba antiga (ou pagina restaurada pelo voltar/bfcache que reconecta o circuito) segue operando como o admin. Passos:
+  - (a) Teste (bUnit ou integracao Postgres) com 1 grupo, 1 admin, 1 membro `Member`: membro abre `/grupo/{id}/configuracoes` e `/grupo/{id}/pagamentos` -> cadeado / so "Meus pagamentos". Fixa o comportamento correto.
+  - (b) Reproduzir manualmente em dev: aba A logada como admin em `/grupo/{id}/configuracoes`; aba B faz logout e login como membro; voltar a aba A e navegar pelo menu. Repetir numa aba so, usando o voltar do navegador depois do login. Registrar no PR o que reproduziu.
+  - (c) Correcao: arquivo estatico em `wwwroot/js` (CSP nao aceita inline) que (1) nas paginas de Login/Logout do Identity publica um aviso `auth-changed` via `BroadcastChannel` (fallback `localStorage`), (2) nas demais abas escuta o aviso e faz `location.reload()`, (3) em `pageshow` com `event.persisted` tambem recarrega. **Nao** usar `UpdateSecurityStampAsync` no logout (derrubaria os outros aparelhos do usuario).
+  - (d) Conferir se algum estado de `isAdmin` vive fora do componente (service `Scoped` com campo, `static`, `IMemoryCache`): o Senior nao achou nenhum em `Services/Groups`, mas o Pleno confirma por grep e registra.
+  - (e) Achado lateral: `Areas/Identity/Pages/Account/Logout.cshtml.cs` desloga em **GET** (`OnGet` chama `SignOutAsync`) e o menu usa `<a href>`. Trocar por form POST com antiforgery e fazer o `OnGet` so mostrar a pagina de confirmacao.
+  - Se nada reproduzir, registrar em "Problemas Encontrados pelo Pleno" e seguir; 1.2 continua valendo de qualquer forma.
 - **1.1 Mutacoes de config sem checagem no service** (furo real, hoje so a UI protege): em `Services/Groups/GroupFeaturesService.cs`, `TogglePostMatchRankingAsync`, `ToggleBestPlayerVotingAsync`, `TogglePaymentGatewaysAsync`, `SavePixReceiverAsync` e `SavePayoutAccountAsync` nao chamam `GroupAccess.IsGroupAdminAsync` (so `SaveWhatsAppGroupJidAsync` chama). Adicionar a checagem **antes** de qualquer leitura/`SaveChanges`, retornando falha com chave i18n; auditar a tentativa negada (padrao `GroupMemberRoleChangeDenied`). Teste por metodo: membro comum e nao-membro -> negado e nada persistido.
 - **1.2 Estado velho ao trocar de grupo.** `Features`, `Payments` (e conferir `Detail`, `Partidas`, `Ranking`) carregam so em `OnInitializedAsync`. O Blazor reusa a instancia quando so o `Id` da rota muda (voltar/avancar do navegador entre dois grupos): a tela do grupo B aparece com dados e `isAdmin` do grupo A. Mover a carga para `OnParametersSetAsync` com guarda `if (Id == loadedId) return;` e resetar o estado (aba, selecoes). Teste bUnit: render com Id=A (admin), `SetParametersAndRender(Id=B)` (membro) -> cadeado.
 - **1.3 Nao-membro ve o menu do grupo.** `Pages/Groups/Detail.razor` (`AllowAnonymous`) renderiza `GroupHeader` com `GroupSubNav` antes de checar `isMember`; os links levam a telas de cadeado. Novo parametro `ShowNav` no `GroupHeader` (default true); `Detail` passa `isMember`.
 - **1.4 Matriz de acesso (entrega de documento + teste).** Criar `docs/matriz-acesso.md`: linha por rota (`@page`), coluna por ator (anonimo, logado nao-membro, membro, admin do grupo, admin do sistema), celula = ve / ve parcial (o que) / negado. Cobrir tambem as acoes (confirmar, pagar, marcar pago, editar, cancelar, escalar, votar). Cada celula "negado" ganha teste. **So mapear, nao mudar comportamento**, nos pontos abaixo -- reportar o que encontrar:
   - `/futsal/{id}`, `/poker/{id}`, `/futsal/{id}/escalacao` sao anonimas: o que um nao-membro de grupo privado enxerga (nomes, pagamentos)?
   - `/profile/{Id}` nao tem `[Authorize]`: quais campos de outro usuario aparecem (email, chave Pix)?
-- **1.5 DECISAO (Robson) -- regra unica de "quem administra a partida".** Hoje existem 3 regras: `EventAccess.IsAdmin` (criador **ou** admin do grupo), `EventCancellationService.CanManage` usado em `Futsal/Edit` e `Poker/Edit` (criador **ou** admin do sistema -- co-admin do grupo nao edita nem cancela), e `Futsal/Schedule/*` (so o criador). Efeito: admin rebaixado continua administrando (inclusive marcar pago) as partidas que criou; co-admin nao consegue editar. **Recomendacao do Senior:** regra unica `admin do grupo OU admin do sistema`; ser criador nao da poder sozinho. **Nao implementar sem o ok** -- so listar os call sites na matriz.
+- **1.5 Regra unica de "quem administra a partida" -- DECIDIDO (Robson, 21/11): `admin do grupo OU admin do sistema`.** Ser criador nao da poder sozinho. Hoje existem 3 regras: `EventAccess.IsAdmin` (criador **ou** admin do grupo), `EventCancellationService.CanManage` usado em `Futsal/Edit` e `Poker/Edit` (criador **ou** admin do sistema -- co-admin do grupo nao edita nem cancela), e `Futsal/Schedule/*` (so o criador). Procedimento:
+  - TDD: testes de caracterizacao das 3 regras atuais; depois a tabela nova (criador rebaixado -> negado; co-admin -> permitido; admin do sistema -> permitido; membro -> negado; nao-membro -> negado).
+  - Uma fonte so: `EventAccess.CanManage(Event ev, string? userId, bool isSystemAdmin)` para evento ja carregado com `Group.Members`, e uma versao async em service (via `GroupAccess.IsGroupAdminAsync`) para quem nao tem o grafo carregado. `EventAccess.IsAdmin` e `EventCancellationService.CanManage` passam a delegar pra ela (ou somem). `IsCreator` fica so para exibicao ("criado por"), nunca para autorizar.
+  - Trocar todos os call sites (~18 ocorrencias de `EventAccess.IsAdmin`, `.CanManage(` e `CreatedByUserId ==/!=` em `Pages`, `Services`, `Shared`): editar, cancelar, escalacao, marcar pago, pos-partida, e `Futsal/Schedule/Index|Edit` (a listagem passa a mostrar as recorrencias dos grupos que o usuario administra, nao so as que ele criou).
+  - **Caso de borda -- PARE e pergunte:** se existir evento/recorrencia **sem grupo** (`GroupId` nulo), manter o criador como dono nesses casos e registrar no PR quantos existem; nao inventar outra regra.
+  - Toda checagem fica no service (a UI so esconde botao). Atualizar a matriz 1.4 com a regra nova.
 
-Aceite: 1.1-1.3 com testes; matriz commitada; 0 mudanca de regra de negocio alem do descrito.
+Aceite: 1.0 com resultado da reproducao no PR; 1.1-1.3 e 1.5 com testes; matriz commitada; 0 mudanca de regra de negocio alem do descrito.
 
 ### Fase 2 -- Estouros de layout (itens 1, 9, 14, 15)
 
@@ -255,7 +266,7 @@ Aceite: probe de overflow sem elemento passando da viewport em `/`, `/grupo/{id}
   - `Pages/Groups/Detail.razor`: tirar o botao `hub-action feat--invite` de dentro do `@if (isAdmin)`; fica pra `isMember`. Clique abre modal (nao abre mais o `wa.me` direto). Icone `fa-user-plus`, rotulo `Group.Invite`.
   - Novo `Shared/Components/Groups/GroupInviteModal.razor` reaproveitando o `GroupInviteBlock` (link + copiar, codigo + copiar, botao `.btn-whatsapp`). Acrescentar "Compartilhar..." com `navigator.share` quando existir: funcao em arquivo estatico `wwwroot/js` (CSP nao aceita inline), chamada com `try/catch` de `JSException`. Modal: L3, fecha por X, Esc e clique fora, `role="dialog"` + `aria-modal`, foco no primeiro botao.
   - `Pages/Groups/Features.razor`: remover a secao "Convite". `Detail.razor` checklist do admin: o passo "convite enviado" hoje aponta pra `/configuracoes` -- passa a abrir o modal. `Pages/Groups/Index.razor` (~linha 127) mostra o convite so com `isAdmin`: alinhar pra membro.
-  - **DECISAO (Robson):** o codigo de convite **entra direto no grupo, sem aprovacao** (`GroupDetailService.JoinWithCodeAsync`). Com todo membro compartilhando, qualquer membro passa a colocar gente no grupo. Recomendacao: aceitar (e o objetivo do item) e, se incomodar, criar depois um toggle "convite exige aprovacao" na config. Implementar como descrito; nao criar o toggle agora.
+  - **DECIDIDO (Robson, 21/11):** o codigo de convite continua entrando direto no grupo, **sem aprovacao** (`GroupDetailService.JoinWithCodeAsync`), mesmo com todo membro compartilhando. Motivo dele: alguem do grupo precisa compartilhar o codigo manualmente e o admin pode remover quem entrar indevidamente. Nao criar toggle de aprovacao. Conferir apenas que a remocao de membro pelo admin funciona e esta coberta por teste (se nao estiver, adicionar).
 
 Aceite: hero em 1 linha >= 1100px, 2 linhas entre 769-1099, centralizado no mobile; nome de 40+ caracteres nao estoura; membro comum abre o modal e copia; config sem a secao; chaves novas em PT/EN/ES.
 
@@ -283,11 +294,11 @@ Aceite: screenshots web + mobile de cada item no PR; `CssScopedOrphanClassesTest
 Aceite: testes do `PromoOptions` (compatibilidade + demo ligado/desligado); card nao dispara evento de metrica em re-render (ver regra do `MainLayout` com timers).
 
 ### Testes e evidencia
-- Novos: authz dos 5 metodos (1.1), troca de `Id` (1.2), `ShowNav` (1.3), guardiao do `box-sizing` (2.2), `PromoOptions` (5.2), chaves i18n novas nos 3 idiomas.
+- Novos: membro comum nas telas de config/pagamentos (1.0a), tabela da regra unica de admin da partida (1.5), authz dos 5 metodos (1.1), troca de `Id` (1.2), `ShowNav` (1.3), guardiao do `box-sizing` (2.2), `PromoOptions` (5.2), chaves i18n novas nos 3 idiomas.
 - PR com `dotnet build --no-incremental` (0 warning) + suite completa (numeros colados), screenshots antes/depois por item em 1280 e 390px.
 
 ### O que NAO fazer
-- Nao mudar a regra de quem administra partida (1.5) nem a visibilidade das telas anonimas (1.4) sem decisao do Robson.
+- Nao mudar a visibilidade das telas anonimas (1.4) sem decisao do Robson -- so mapear. A regra de quem administra partida (1.5) **ja esta decidida** e entra neste ciclo.
 - Nao aplicar `box-sizing` global em `*`.
 - Nao criar verde cheio em botao; nao usar hex fora de `tokens.css`; nao carregar imagem externa (CSP).
 - Nao gravar teste de UI em video (o Robson testa em prod).
