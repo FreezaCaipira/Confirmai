@@ -3456,6 +3456,8 @@ herdar em silencio uma credencial de teste ja vazada, ou um banco com dados de t
 - [ ] Porta SMTP **587** (STARTTLS): o `IdentityEmailSender` usa `SmtpClient`, que
       **nao** suporta SSL implicito na 465.
 - [ ] Webhooks (`BtcPay__WebhookUrl`, `EfiBank__WebhookUrl`) apontando para o dominio novo.
+- [ ] `Promo__ShowDemo=false` ou anuncios reais configurados — sem isso a home
+      mostra os 3 anuncios de demonstracao do C46.
 
 ---
 

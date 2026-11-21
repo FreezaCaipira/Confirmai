@@ -1,8 +1,10 @@
-﻿@inject UiTextService T
+@inject UiTextService T
 
 @* C43-A C1: o V1 so tem Pix manual — o widget mostra so ele, sem consultar
    GatewayService a cada navegacao. Quando o V2 (Pix automatico) entrar,
-   volta a ser dinamico. *@
+   volta a ser dinamico.
+   C46 (item 4): cartao de credito/debito aparecem como "em breve"
+   (opacidade reduzida, sem hover, badge Common.ComingSoon). *@
 
 <section class="oldsite-widget widget-payment-methods">
     <h3>@T["Widget.PaymentMethods.Title"]</h3>
@@ -11,6 +13,16 @@
         <div class="oldsite-payment-chip" title="Pix">
             <img src="/images/payment-methods/pix.svg" alt="" aria-hidden="true" />
             <span>Pix</span>
+        </div>
+        <div class="oldsite-payment-chip oldsite-payment-chip--soon">
+            <i class="fas fa-credit-card" aria-hidden="true"></i>
+            <span>@T["Widget.PaymentMethods.CreditCard"]</span>
+            <span class="oldsite-payment-soon">@T["Common.ComingSoon"]</span>
+        </div>
+        <div class="oldsite-payment-chip oldsite-payment-chip--soon">
+            <i class="fas fa-credit-card" aria-hidden="true"></i>
+            <span>@T["Widget.PaymentMethods.DebitCard"]</span>
+            <span class="oldsite-payment-soon">@T["Common.ComingSoon"]</span>
         </div>
     </div>
     <p class="oldsite-widget-note">@T["Widget.PaymentMethods.PixNote"]</p>

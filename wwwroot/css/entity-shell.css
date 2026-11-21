@@ -1713,6 +1713,38 @@ body .oldsite-payment-chip span {
     letter-spacing: 0;
 }
 
+/* C46 (item 4): chip "em breve" — opaco, sem hover, badge minusculo. */
+body .oldsite-payment-chip--soon {
+    opacity: 0.55;
+    cursor: default;
+}
+
+body .oldsite-payment-chip--soon:hover {
+    background: transparent;
+}
+
+body .oldsite-payment-chip--soon:nth-child(even):hover {
+    background: var(--white-opacity-2xs);
+}
+
+body .oldsite-payment-chip--soon i {
+    font-size: 0.8rem;
+    color: var(--ci-text-blue);
+    opacity: 0.85;
+    flex-shrink: 0;
+}
+
+body .oldsite-payment-soon {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ci-text-blue);
+    border: 1px solid var(--accent-opacity-md);
+    border-radius: 999px;
+    padding: 0.05rem 0.4rem;
+    margin-left: auto;
+}
+
 body .oldsite-cta-btn {
     min-height: 34px;
     font-size: 0.78rem;
