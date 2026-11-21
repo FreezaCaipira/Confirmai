@@ -124,7 +124,7 @@
                                     @if (openMenuGroupId == g.Id)
                                     {
                                         <span class="group-menu-pop">
-                                            @if (isAdmin && !string.IsNullOrWhiteSpace(g.InviteCode))
+                                            @if (!string.IsNullOrWhiteSpace(g.InviteCode))
                                             {
                                                 <button class="group-menu-item" type="button"
                                                         @onclick="() => CopyInvite(g)">

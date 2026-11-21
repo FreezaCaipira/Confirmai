@@ -7,9 +7,12 @@
 @if (IsOpen)
 {
     <div class="invite-overlay" @onclick="async () => await OnClose.InvokeAsync()">
-        <div class="invite-modal" @onclick:stopPropagation="true">
+        <div class="invite-modal" role="dialog" aria-modal="true"
+             aria-labelledby="invite-modal-title"
+             @onclick:stopPropagation="true"
+             @onkeydown="HandleKeyDown">
             <div class="invite-modal-header">
-                <h2 class="invite-modal-title">
+                <h2 class="invite-modal-title" id="invite-modal-title">
                     <i class="fas fa-user-plus"></i> @Ui["Group.Invite"]
                 </h2>
                 <button class="invite-close-btn" type="button"
@@ -21,6 +24,7 @@
 
             <div class="invite-modal-body">
                 <button class="btn btn-primary invite-share-btn" type="button"
+                        @ref="shareButton"
                         @onclick="ShareAsync">
                     <i class="fas fa-share-alt"></i> @Ui["Group.ShareInvite"]
                 </button>
@@ -34,6 +38,32 @@
     [Parameter] public bool IsOpen { get; set; }
     [Parameter] public string InviteCode { get; set; } = string.Empty;
     [Parameter] public EventCallback OnClose { get; set; }
+
+    private ElementReference shareButton;
+    private bool focusPending;
+
+    protected override void OnParametersSet()
+    {
+        if (IsOpen) focusPending = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (focusPending && IsOpen)
+        {
+            focusPending = false;
+            try { await shareButton.FocusAsync(); }
+            catch (JSException) { }
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            await OnClose.InvokeAsync();
+        }
+    }
 
     private async Task ShareAsync()
     {

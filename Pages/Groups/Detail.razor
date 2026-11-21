@@ -113,7 +113,8 @@ else
                             <span>@Ui["Group.Checklist.InviteSent"]</span>
                             @if (!inviteSent)
                             {
-                                <a href="/grupo/@group.Id/configuracoes" class="btn btn-primary btn-sm">@Ui["Group.CopyInvite"]</a>
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                        @onclick="() => showInviteModal = true">@Ui["Group.CopyInvite"]</button>
                             }
                         </li>
                     </ul>
