@@ -596,6 +596,9 @@ body .entity-shell-card.evpay-main {
     display: flex;
     flex-direction: column;
     gap: 0;
+    --players-tone: var(--accent-text);
+    --players-soft: var(--accent-soft);
+    --players-border: var(--accent-border);
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
@@ -704,13 +707,13 @@ body .entity-shell-card.evpay-main {
     width: 1.5rem;
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--players-tone, var(--accent-text));
+    color: var(--players-tone);
     text-align: right;
     flex-shrink: 0;
 }
 
 .player-name        { flex: 1; font-size: 0.9rem; color: var(--text); font-weight: 500; }
-.player-slot-empty  { flex: 1; color: var(--players-tone, var(--accent-text)); font-size: 0.85rem; }
+.player-slot-empty  { flex: 1; color: var(--players-tone); font-size: 0.85rem; }
 
 /* -- Admin: adicionar / remover vaga --------------------------- */
 .slot-controls {
@@ -840,10 +843,10 @@ body .entity-shell-card.evpay-main {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    background: var(--players-soft, var(--accent-soft));
-    border: 1px solid var(--players-border, var(--accent-border));
+    background: var(--players-soft);
+    border: 1px solid var(--players-border);
     border-radius: 999px;
-    color: var(--players-tone, var(--accent-text));
+    color: var(--players-tone);
     font-size: 0.78rem;
     font-weight: 700;
     padding: 0.2rem 0.85rem;
@@ -853,9 +856,9 @@ body .entity-shell-card.evpay-main {
     white-space: nowrap;
 }
 .player-slot-btn:hover {
-    background: var(--players-soft, var(--accent-soft));
-    border-color: var(--players-tone, var(--accent));
-    color: var(--players-tone, var(--accent-text));
+    background: var(--players-soft);
+    border-color: var(--players-tone);
+    color: var(--players-tone);
 }
 
 .player-tag {

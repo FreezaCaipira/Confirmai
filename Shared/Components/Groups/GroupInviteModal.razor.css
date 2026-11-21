@@ -59,7 +59,7 @@
 }
 
 .invite-close-btn:hover {
-    background: var(--surface-2, var(--surface));
+    background: var(--surface-2);
     color: var(--text);
 }
 
