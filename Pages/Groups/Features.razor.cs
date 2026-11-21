@@ -52,12 +52,49 @@ public partial class Features
     private string  whatsAppMessage    = string.Empty;
     private bool    whatsAppError      = false;
 
-    protected override async Task OnInitializedAsync()
+    private int? loadedId;
+
+    // C46 (1.2): load on OnParametersSetAsync — Blazor reuses the component
+    // instance when only the route Id changes, so OnInitializedAsync alone
+    // would keep showing the previous group's data/permissions.
+    protected override async Task OnParametersSetAsync()
     {
+        if (loadedId == Id) return;
+        loadedId = Id;
+        ResetState();
+
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
         currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         await LoadAsync();
+    }
+
+    private void ResetState()
+    {
+        group = null;
+        members = new();
+        availableGatewayOptions = new();
+        isLoading = true;
+        isAdmin = false;
+        isCreator = false;
+        isSaving = false;
+        saveMessage = string.Empty;
+        saveError = false;
+        isSavingRole = false;
+        roleMessage = string.Empty;
+        roleError = false;
+        confirmPromoteMemberId = null;
+        isSavingPix = false;
+        pixMessage = string.Empty;
+        pixError = false;
+        selectedPixReceiverId = string.Empty;
+        isSavingPayout = false;
+        payoutMessage = string.Empty;
+        payoutError = false;
+        payoutAccount = null;
+        isSavingWhatsApp = false;
+        whatsAppMessage = string.Empty;
+        whatsAppError = false;
     }
 
     private async Task LoadAsync()
@@ -84,11 +121,11 @@ public partial class Features
         saveError   = false;
         try
         {
-            var newValue = await FeaturesService.TogglePostMatchRankingAsync(group.Id, group.EnablePostMatchRanking, currentUserId);
-            group.EnablePostMatchRanking = newValue;
-            saveMessage = newValue
-                ? Ui["Group.RankingPostMatchEnabled"]
-                : Ui["Group.RankingPostMatchDisabled"];
+            var (success, newValue, message) = await FeaturesService.TogglePostMatchRankingAsync(group.Id, group.EnablePostMatchRanking, currentUserId);
+            if (success)
+                group.EnablePostMatchRanking = newValue;
+            saveMessage = message;
+            saveError = !success;
         }
         catch
         {
@@ -106,11 +143,11 @@ public partial class Features
         saveError   = false;
         try
         {
-            var newValue = await FeaturesService.ToggleBestPlayerVotingAsync(group.Id, group.EnableBestPlayerVoting, currentUserId);
-            group.EnableBestPlayerVoting = newValue;
-            saveMessage = newValue
-                ? Ui["Group.BestPlayerVotingEnabled"]
-                : Ui["Group.BestPlayerVotingDisabled"];
+            var (success, newValue, message) = await FeaturesService.ToggleBestPlayerVotingAsync(group.Id, group.EnableBestPlayerVoting, currentUserId);
+            if (success)
+                group.EnableBestPlayerVoting = newValue;
+            saveMessage = message;
+            saveError = !success;
         }
         catch
         {

@@ -391,9 +391,11 @@
             unreadMailboxCount = await db.UserMailboxMessages
                 .AsNoTracking()
                 .CountAsync(m => m.RecipientUserId == currentUserId && !m.IsRead);
+            // C46 (1.5): organizer = group admin (or system admin) with events.
             isEventOrganizer = isAdmin || await db.Events
                 .AsNoTracking()
-                .AnyAsync(e => e.CreatedByUserId == currentUserId);
+                .AnyAsync(e => e.Group.Members.Any(m =>
+                    m.UserId == currentUserId && m.Role == GroupMemberRole.Admin));
 
             await InvokeAsync(StateHasChanged);
         }

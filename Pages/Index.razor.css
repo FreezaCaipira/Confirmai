@@ -8,19 +8,36 @@
 
 /* -- Hero --------------------------------------------------------- */
 /* Unica excecao a regra "sem gradiente" (design-system §1 regra 5):
-   o hero e L1 sem filhos-card e orienta a tela. Degrade sutil que
-   termina em --accent (o ponto mais claro --accent-light reprovaria
-   o texto em AA, entao ele nao entra no degrade). */
+   o hero e L1 sem filhos-card e orienta a tela. C46 (item 3): degrade
+   metalico de 4 paradas + faixa diagonal de brilho + aresta escovada. */
 .home-hero {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--space-5);
     padding: var(--space-6);
-    background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent) 100%);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg,
+        var(--hero-metal-1) 0%,
+        var(--hero-metal-2) 35%,
+        var(--hero-metal-3) 60%,
+        var(--hero-metal-4) 100%);
     border: 1px solid var(--accent-border);
     border-radius: var(--radius-lg);
+    box-shadow: inset 0 1px 0 var(--hero-metal-sheen);
     color: var(--accent-fg);
+}
+
+.home-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg,
+        transparent 35%,
+        var(--hero-metal-sheen) 50%,
+        transparent 65%);
+    pointer-events: none;
 }
 
 .home-hero--landing {
@@ -284,9 +301,10 @@
 }
 
 /* -- Organizer event row ------------------------------------------ */
+/* C46 (item 16): cabecalho nome+data, meta embaixo, CTA na ponta. */
 .home-event {
     display: grid;
-    grid-template-columns: 160px 1fr auto;
+    grid-template-columns: 1fr auto;
     align-items: center;
     gap: var(--space-4);
     padding: var(--space-4) var(--space-5);
@@ -308,10 +326,20 @@
     text-decoration: underline;
 }
 
+.home-event-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    min-width: 0;
+}
+
 .home-event-day {
     font-size: 0.875rem;
     font-weight: var(--fw-semibold);
     color: var(--accent-text);
+    white-space: nowrap;
 }
 
 .home-event-body {
@@ -360,11 +388,8 @@
     color: var(--text-2);
 }
 
-.home-empty-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-2);
+.home-empty .feat-icon {
+    align-self: center;
 }
 
 .home-skeleton {

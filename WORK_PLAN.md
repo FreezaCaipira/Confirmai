@@ -214,7 +214,7 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
-## Ciclo 46 (Pleno) -- 16 pontos do Robson em prod: niveis de acesso, estouros de layout, hero do grupo, convite pra todos, home e coluna lateral [PLANEJADO -- liberado; decisoes do Robson de 21/11 ja incorporadas (1.0, 1.5, 3.3)]
+## Ciclo 46 (Pleno) -- 16 pontos do Robson em prod: niveis de acesso, estouros de layout, hero do grupo, convite pra todos, home e coluna lateral [EXECUTADO -- ver review]
 
 **Objetivo:** fechar os 16 pontos que o Robson levantou em prod (21/11/2026). O Senior so planejou e leu o codigo; **nada foi implementado**. Ordem: funcional (acesso) primeiro, depois bug de layout, depois lapidacao. 1 branch, 1 PR, commits por fase. O C44 (remocao do legado) continua reservado e independente.
 
@@ -1100,6 +1100,7 @@ Historico enxuto. Cada linha: ciclo, entrega, PR e veredito da review. Detalhes 
 |||| 42-B | Auditoria + metricas de produto | 1 branch `feat/ciclo42b`. 6 furos fechados (presenca futsal+poker, poker criar/editar/mesa/recarimbo, espera/vagas, placar/MVP, politica admin, audit.viewed) — audit sempre apos o SaveChanges; `group.updated` ligado nos edits; 21 constantes mortas removidas + guardiao. Eventos novos: `method` no login/register, `group.invite.opened`, `group.member.joined` (via), `page.view` com template de rota + device + amostragem; histograma `confirmai_page_render_ms`. Tela `/admin/metrics` (admin): cards H1-H4 + extras + top 10 rotas, 7/30d. Indice `(EventType, Timestamp)` via migration; retencao page.view 90d travada por teste; `docs/metricas-produto.md`. 2822 -> 2832 testes; build 0/0. | #166 (impl), #167 (review) | APROVADO c/ 3 correcoes do Senior |
 |||| 43-A | Bateria do Robson em prod pos-C42 -- UI (18 itens) | Landing (exemplo generico, confirmado em verde, bloco WhatsApp, footer), Sobre/Contato reescritas (`App__ContactEmail`), Registrar legivel, coluna lateral (so Pix, card de divulgacao `Promo__*`, "Sua proxima partida"), switch jogo/organizo junto da lista, hover dos cards, Gerenciar grupos secundario, Entrar alinhado no historico, `/grupos` centralizado, aba ativa azul cheio, convite com codigo em caixa e botao WhatsApp verde (texto escuro, AA). Review: data do card no i18n, card recarrega em `LocationChanged`, `Promo__ImageUrl` local (CSP). 2819 testes. | #168 (plano), #169 (impl), #170 (review) | APROVADO c/ 3 correcoes do Senior |
 |||| 43-B | Preencher partida com jogadores de teste | `ApplicationUser.IsMock` + `MockFillService` (admin + `Testing__MockFillEnabled`, revalidado no service; partida ativa e futura; GK+linha ate lotar; idempotente; taxa 0/paid fora do ledger; auditoria apos save); filtros em ranking, voto, `/admin/metrics` e email `.invalid`. Review: remover tira os mocks do grupo (sobravam em membros/contagens/convite). 2850 testes. | #171 (impl), #172 (review) | APROVADO c/ 1 correcao do Senior |
+|||| 46 | 16 pontos do Robson em prod (acesso, layout, hero, convite, home, lateral) | 1 branch `feat/ciclo46`, commits por fase. **F1** auth-changed cross-tab (BroadcastChannel + fingerprint no `_Host`/`_Layout`), logout so POST (GET = pagina de confirmacao, sem sign-out), `GroupAccess.IsGroupAdminAsync` em 5 metodos de mutacao, `OnParametersSetAsync` reload em 5 pages, `ShowNav` no `GroupHeader`, `docs/matriz-acesso.md` (so mapeamento), `EventAccess.CanManage` unificado (~18 call sites: admin do grupo OU admin de sistema; criador sem privilegio). **F2** `box-sizing: border-box` em `.btn`/`.status-badge` + guardiao, `/grupo/{id}/partidas` tabela -> `.event-row` (prefixo `.gde-*`), `platform-fee-table` cards mobile <=768px. **F3** `group-header-grid` 3 colunas (nav/identity/back, breakpoint 1100px registrado design-system §4.2), `GroupInviteModal` (navigator.share com try/catch JSException, Esc, role=dialog, foco) para todo membro, convite fora do bloco admin no hub e no Index/checklist. **F4** vazios com 1 CTA, hero metalico (`--hero-metal-*`, ~5.1:1), `.home-event` reestruturado (head name+date, `1fr auto`), lista linha verde via `var(--players-*)`. **F5** chips "em breve" de pagamento, `PromoOptions.Items`/`ShowDemo` (default true, legado -> item 0), `SidebarPromoCard` rotacao 8s apos primeiro render interativo (pausa hover/foco, bolinhas, Dispose), 3 ads demo (CTA -> /contact, arte so CSS+icone), `Promo__ShowDemo=false` no checklist pre-prod. 2872 passam / 2897 (24 falhas ambientais `ProgramConfigurationTests` Postgres + 1 flake que passa isolada); build `--no-incremental` 0/0. | #177 | [EXECUTADO -- ver review] |
 
 > As secoes detalhadas de **plano** e **review** dos Ciclos 20, 21 e 22 seguem logo abaixo (mantidas na integra por serem recentes). Ciclos anteriores foram condensados nesta tabela.
 
@@ -3456,6 +3457,8 @@ herdar em silencio uma credencial de teste ja vazada, ou um banco com dados de t
 - [ ] Porta SMTP **587** (STARTTLS): o `IdentityEmailSender` usa `SmtpClient`, que
       **nao** suporta SSL implicito na 465.
 - [ ] Webhooks (`BtcPay__WebhookUrl`, `EfiBank__WebhookUrl`) apontando para o dominio novo.
+- [ ] `Promo__ShowDemo=false` ou anuncios reais configurados — sem isso a home
+      mostra os 3 anuncios de demonstracao do C46.
 
 ---
 
@@ -3532,6 +3535,14 @@ for p in ['wwwroot/css/*.css']:
 - **`AvatarUploadSection` era componente morto** (so auto-referencia) -- apagado na Fase 6.
 - **CSS morto acumulado**: `.group-card*`/`.groups-*` inteiro sem uso apos a Fase 4 (`event-listing.css` 322->76, `events.css` 1551->1218); `onboarding-hint` duplicado no `Index.razor.css`; `detail-header`/`detail-actions` apos a Fase 8.
 - **Conflito de spec**: a secao de metricas do C36-D pedia "uma PR por fase", as regras 9/10 pedem 1 branch + 1 PR por ciclo. Resolvido pelo Robson: PR unico na branch `feat/ciclo36d` (commits separados por fase). **Sugiro alinhar o texto do plano para nao repetir o desvio.**
+
+### C46 -- achados durante a execucao
+
+- **Item 1.5 (evento sem grupo): contagem = 0 e impossivel por schema** — `Event.GroupId` e `MatchSchedule.GroupId` sao `int` nao-nulos; nao existe caminho pra partida sem grupo. Os ~18 call sites migrados pro `EventAccess.CanManage` cobrem a regra decidida (admin do grupo OU admin de sistema). Nada a agendar.
+- **`FutsalIntegrationTests.FutsalEdit_..._WhenCreatorAccesses` precisou de ajuste de fixture** — com a regra unica, o criador so edita se for admin do grupo; o teste passou a inserir `GroupMember{Role=Admin}` pro criador. Comportamento do usuario final preservado na pratica (criador vira admin do grupo ao criar), mas fica registrado pra review conferir.
+- **Falhas da suite sao ambientais, nao do ciclo** — os 24 `ProgramConfigurationTests` exigem Postgres local estavel ("connection refused"/"53300 too many clients" sob saturacao paralela); `AdminPaymentsDeepLinkIntegrationTests` e `ExternalLoginIntegrationTests` falharam intermitentes no mesmo motivo e **passam isoladas**. Numeros exatos no corpo do PR.
+- **Desvio registrado (nao bloqueante):** GET `/Identity/Account/Logout` virou pagina de confirmacao (nao redireciona mais pra `/`); o teste critico foi atualizado pra asserir `OK` + seguir autenticado. Se a UX de confirmacao incomodar, decidir na review.
+- **Breakpoint 1100px no `GroupHeader`** — excecao documentada no design-system §4.2 (subnav ~480px nao cabe ate 768px). So vale pro hero do grupo.
 
 ### Cores sem Var correspondente
 <!-- Liste aqui rgba() ou hex que nao tem var equivalente na lista -->

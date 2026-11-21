@@ -4,31 +4,43 @@
 @inject UiTextService Ui
 @inject NavigationManager NavigationManager
 
+@* C46 Fase 3: hero em 3 colunas — subnav esquerda, identidade centro,
+   voltar direita. Em <=1100px cai para duas linhas; mobile centraliza. *@
 <header class="panel group-header">
-    @* C45 #3: voltar no canto superior direito do hero, com URL real do pai
-       (overview -> /grupos; subpaginas -> overview do grupo). *@
-    <a class="btn btn-secondary btn-sm group-header-back" href="@BackHref">
-        <i class="fas fa-arrow-left" aria-hidden="true"></i> @BackLabel
-    </a>
-    <div class="group-header-body">
-        <span class="group-header-sport">
-            @(Group.Sport == Sport.Futsal ? Ui["Group.SportFutsal"] : Ui["Group.SportPoker"])
-        </span>
-        <h1 class="group-header-title">@Group.Name</h1>
-        @if (!string.IsNullOrWhiteSpace(Group.City))
-        {
-            <p class="group-header-location">
-                <i class="fas fa-map-marker-alt"></i>
-                @Group.City@(!string.IsNullOrWhiteSpace(Group.StateCode) ? $"/{Group.StateCode}" : string.Empty)
-            </p>
-        }
+    <div class="group-header-grid">
+        <div class="group-header-col group-header-col--nav">
+            @if (ShowNav)
+            {
+                <GroupSubNav GroupId="@Group.Id" IsAdmin="@IsAdmin" ShowRanking="@Group.EnablePostMatchRanking" />
+            }
+        </div>
+        <div class="group-header-col group-header-col--identity">
+            <span class="group-header-sport">
+                @(Group.Sport == Sport.Futsal ? Ui["Group.SportFutsal"] : Ui["Group.SportPoker"])
+            </span>
+            <h1 class="group-header-title">@Group.Name</h1>
+            @if (!string.IsNullOrWhiteSpace(Group.City))
+            {
+                <p class="group-header-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    @Group.City@(!string.IsNullOrWhiteSpace(Group.StateCode) ? $"/{Group.StateCode}" : string.Empty)
+                </p>
+            }
+        </div>
+        <div class="group-header-col group-header-col--back">
+            <a class="btn btn-secondary btn-sm group-header-back" href="@BackHref">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> @BackLabel
+            </a>
+        </div>
     </div>
-    <GroupSubNav GroupId="@Group.Id" IsAdmin="@IsAdmin" ShowRanking="@Group.EnablePostMatchRanking" />
 </header>
 
 @code {
     [Parameter] public Group Group { get; set; } = default!;
     [Parameter] public bool IsAdmin { get; set; }
+    // C46 (1.3): non-members see the header without the group nav
+    // (its links lead to padlocked screens).
+    [Parameter] public bool ShowNav { get; set; } = true;
 
     private bool IsOverview
     {

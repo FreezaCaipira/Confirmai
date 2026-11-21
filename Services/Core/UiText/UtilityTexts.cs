@@ -151,6 +151,8 @@ internal static class UtilityTexts
 
         ["Widget.PaymentMethods.Title"] = "Formas de pagamento",
         ["Widget.PaymentMethods.PixNote"] = "Pix com comprovante, direto para o organizador.",
+        ["Widget.PaymentMethods.CreditCard"] = "Cartão de crédito",
+        ["Widget.PaymentMethods.DebitCard"] = "Cartão de débito",
         ["Widget.PaymentMethods.Loading"] = "Carregando metodos ativos...",
         ["Widget.PaymentMethods.Empty"] = "Nenhuma forma de pagamento ativa no painel admin.",
 
@@ -550,6 +552,8 @@ internal static class UtilityTexts
 
         ["Widget.PaymentMethods.Title"] = "Payment methods",
         ["Widget.PaymentMethods.PixNote"] = "Pix with receipt, straight to the organizer.",
+        ["Widget.PaymentMethods.CreditCard"] = "Credit card",
+        ["Widget.PaymentMethods.DebitCard"] = "Debit card",
         ["Widget.PaymentMethods.Loading"] = "Loading active methods...",
         ["Widget.PaymentMethods.Empty"] = "No active payment methods in the admin panel.",
 
@@ -951,6 +955,8 @@ internal static class UtilityTexts
 
         ["Widget.PaymentMethods.Title"] = "Métodos de pago",
         ["Widget.PaymentMethods.PixNote"] = "Pix con comprobante, directo al organizador.",
+        ["Widget.PaymentMethods.CreditCard"] = "Tarjeta de crédito",
+        ["Widget.PaymentMethods.DebitCard"] = "Tarjeta de débito",
         ["Widget.PaymentMethods.Loading"] = "Cargando metodos activos...",
         ["Widget.PaymentMethods.Empty"] = "No hay metodos de pago activos en el panel admin.",
 

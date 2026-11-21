@@ -95,8 +95,10 @@ public partial class Index
             .AsNoTracking()
             .Include(e => e.Group)
             .Include(e => e.Confirmations)
+            // C46 (1.5): "Organizo" = events of groups the user administers;
+            // creating an event no longer grants management rights.
             .Where(e => e.IsActive && e.StartsAt >= now
-                        && (e.CreatedByUserId == userId || adminGroupIds.Contains(e.GroupId)))
+                        && adminGroupIds.Contains(e.GroupId))
             .OrderBy(e => e.StartsAt)
             .ToListAsync();
 

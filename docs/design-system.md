@@ -27,7 +27,7 @@ Regras:
 3. Borda clareia junto com o nível (`--border` em L0/L1, `--border-2` em
    L2/L3). Sombra só em L3 flutuante (`--shadow-card`).
 4. Hover sobe um nível (`L2 → --surface-3`); nunca desce nem muda de matiz.
-5. Sem gradiente de fundo. Sem cor por esporte/categoria em fundo ou borda. **Excecoes**: (a) o hero de pagina (`.home-hero`), que pode usar o degrade de acento para se distinguir dos paineis de conteudo — e L1 sem filhos-card (so texto + toggle) e e o unico elemento da tela cujo papel e orientar. Decisao do Senior no C36-D Fase 3. (b) o header do shell, via token `--header-gradient` — degrade sutil L1→L0 (tom-para-tom, sem matiz), so chrome; o texto mantem o contraste AA medido sobre --surface/--bg. C37 Fase 7.
+5. Sem gradiente de fundo. Sem cor por esporte/categoria em fundo ou borda. **Excecoes**: (a) o hero de pagina (`.home-hero`), que pode usar degrade para se distinguir dos paineis de conteudo — e L1 sem filhos-card (so texto + toggle) e e o unico elemento da tela cujo papel e orientar. C46 (item 3): o degrade virou **metalico** — 4 paradas `--hero-metal-1..4` (aco escuro -> azul -> realce -> azul escuro), faixa diagonal de brilho via `::before` e aresta escovada (`inset 0 1px 0 --hero-metal-sheen`); contraste do titulo/subtitulo >= 4.5:1 sobre a parada mais clara. Decisao do Senior no C36-D Fase 3, revisada no C46. (b) o header do shell, via token `--header-gradient` — degrade sutil L1→L0 (tom-para-tom, sem matiz), so chrome; o texto mantem o contraste AA medido sobre --surface/--bg. C37 Fase 7.
 
 ## 2. Azul: direcionamento, não decoração
 
@@ -89,6 +89,18 @@ Uso: a classe vai no container (`<section class="panel feat--payments">`,
 `--feat-border`; os filhos leem `var(--feat, var(--accent-text))`, então
 sem classe tudo cai no azul padrão. `.feat-icon` é o quadrado de ícone pronto.
 Status (sucesso/atenção/erro) continua semântico e vence a cor da feature.
+
+### 4.2 Breakpoint 1100px do hero do grupo (exceção)
+
+Regra do projeto: mobile-first com breakpoint único em 768px. O hero do
+grupo (`Shared/Components/Groups/GroupHeader.razor`, C46 Fase 3) usa um
+segundo breakpoint em **1100px**: a subnav inteira não cabe ao lado da
+identidade (sport + nome + cidade) em larguras entre 768px e ~1100px, então
+o grid de 3 colunas (subnav | identidade | voltar) cai para duas linhas —
+identidade + voltar na primeira, subnav centralizada na segunda. Abaixo de
+768px volta ao padrão (identidade centralizada, subnav embaixo, voltar
+oculto pelo breadcrumb). Exceção justificada por largura real do conteúdo,
+não por device.
 
 ### 5.1 Painel "Hoje" (home)
 

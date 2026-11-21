@@ -214,7 +214,7 @@ public class CssComponentsTests
         Assert.Contains("overflow-wrap: anywhere", title.Groups[1].Value);
 
         var events = File.ReadAllText(Path.Combine(root, "Shared", "Components", "Groups", "GroupDetailEvents.razor.css"));
-        var tipMeta = Regex.Match(events, @"\.et-tip-meta\s*\{([^}]*)");
+        var tipMeta = Regex.Match(events, @"\.gde-tip-meta\s*\{([^}]*)");
         Assert.True(tipMeta.Success);
         Assert.Contains("overflow-wrap: anywhere", tipMeta.Groups[1].Value);
     }

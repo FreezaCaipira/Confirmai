@@ -1,38 +1,33 @@
-/* ── Cabecalho do grupo compartilhado (C36-D Fase 8) ──────────── */
+/* ── Cabecalho do grupo compartilhado (C36-D Fase 8) ────────────
+   C46 Fase 3: hero em grid de 3 colunas — subnav | identidade | voltar. */
 
-.group-header {
-    position: relative;
+.group-header-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: "nav identity back";
+    align-items: center;
+    gap: var(--space-4);
 }
 
-/* C45 #3: canto superior direito do hero; o corpo reserva o espaco
-   pra o nome longo nao passar por baixo do botao. */
-.group-header-back {
-    position: absolute;
-    top: var(--space-4);
-    right: var(--space-4);
+.group-header-col--nav {
+    grid-area: nav;
+    min-width: 0;
+    justify-self: start;
 }
 
-.group-header-body {
-    padding-right: 120px;
-}
-
-/* No celular o "<- {pai}" do breadcrumb ja aparece acima do hero. */
-@media (max-width: 768px) {
-    .group-header-back {
-        display: none;
-    }
-
-    .group-header-body {
-        padding-right: 0;
-    }
-}
-
-.group-header-body {
+.group-header-col--identity {
+    grid-area: identity;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: var(--space-2);
-    align-items: flex-start;
-    margin-bottom: var(--space-4);
+    min-width: 0;
+    text-align: center;
+}
+
+.group-header-col--back {
+    grid-area: back;
+    justify-self: end;
 }
 
 .group-header-sport {
@@ -67,6 +62,7 @@
     color: var(--text-2);
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2);
     overflow-wrap: anywhere;
 }
@@ -74,4 +70,36 @@
 .group-subnav {
     max-width: 100%;
     overflow-x: auto;
+}
+
+/* C46 Fase 3 (excecao registrada): breakpoint 1100px — quando a subnav
+   inteira nao cabe ao lado da identidade, o hero cai para duas linhas:
+   identidade + voltar na primeira, subnav na segunda. */
+@media (max-width: 1100px) {
+    .group-header-grid {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "identity back"
+            "nav      nav";
+        row-gap: var(--space-3);
+    }
+
+    .group-header-col--nav {
+        justify-self: center;
+    }
+}
+
+/* No celular o "<- {pai}" do breadcrumb ja aparece acima do hero e a
+   identidade fica centralizada com a subnav embaixo. */
+@media (max-width: 768px) {
+    .group-header-col--back {
+        display: none;
+    }
+
+    .group-header-grid {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "identity"
+            "nav";
+    }
 }

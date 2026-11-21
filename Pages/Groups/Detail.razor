@@ -62,8 +62,6 @@ else
                    group.Members.Any(m => m.UserId == currentUserId && m.Role == GroupMemberRole.Admin);
     var isMember  = currentUserId is not null &&
                    group.Members.Any(m => m.UserId == currentUserId);
-    var baseUrl   = (Config["App:BaseUrl"]?.TrimEnd('/'))  ?? NavigationManager.BaseUri.TrimEnd('/');
-    var inviteUrl = $"{baseUrl}/convite/{group.InviteCode}";
 
     // Checklist de onboarding do admin (C36-B Fase 6): estado derivado dos
     // dados, some quando completo. "Convite enviado" ~ alguem alem do criador.
@@ -80,7 +78,7 @@ else
         <div class="hub-stack">
 
             @* ── Cabeçalho do grupo (compartilhado, com sub-nav) ──────── *@
-            <GroupHeader Group="@group" IsAdmin="@isAdmin" />
+            <GroupHeader Group="@group" IsAdmin="@isAdmin" ShowNav="@isMember" />
 
             @if (!group.IsActive)
             {
@@ -115,7 +113,8 @@ else
                             <span>@Ui["Group.Checklist.InviteSent"]</span>
                             @if (!inviteSent)
                             {
-                                <a href="/grupo/@group.Id/configuracoes" class="btn btn-primary btn-sm">@Ui["Group.CopyInvite"]</a>
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                        @onclick="() => showInviteModal = true">@Ui["Group.CopyInvite"]</button>
                             }
                         </li>
                     </ul>
@@ -160,6 +159,16 @@ else
                                 </span>
                             </a>
                         }
+                        @* C46 Fase 3: todo membro convida — modal com
+                           navigator.share + copiar link (era so admin). *@
+                        <button class="hub-action feat--invite" type="button"
+                                @onclick="() => showInviteModal = true">
+                            <span class="hub-action-icon"><i class="fas fa-user-plus"></i></span>
+                            <span class="hub-action-text">
+                                <span class="hub-action-label">@Ui["Group.Invite"]</span>
+                                <span class="hub-action-sub">@Ui["Group.InviteSub"]</span>
+                            </span>
+                        </button>
                         @if (isAdmin)
                         {
                             <a class="hub-action feat--settings" href="/grupo/@group.Id/configuracoes">
@@ -169,14 +178,6 @@ else
                                     <span class="hub-action-sub">@Ui["Group.SettingsSub"]</span>
                                 </span>
                             </a>
-                            <button class="hub-action feat--invite" type="button"
-                                    @onclick="() => ShareInviteOnWhatsApp(inviteUrl)">
-                                <span class="hub-action-icon"><i class="fab fa-whatsapp"></i></span>
-                                <span class="hub-action-text">
-                                    <span class="hub-action-label">@Ui["Group.Invite"]</span>
-                                    <span class="hub-action-sub">@Ui["Group.InviteSub"]</span>
-                                </span>
-                            </button>
                         }
                     </div>
                 </section>
@@ -388,6 +389,10 @@ else
 
         </div>
     </div>
+
+    <GroupInviteModal IsOpen="@showInviteModal"
+                      InviteCode="@(group.InviteCode ?? string.Empty)"
+                      OnClose="() => showInviteModal = false" />
 }
 
 

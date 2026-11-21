@@ -2,25 +2,110 @@
 @using Microsoft.Extensions.Options
 @inject IOptions<PromoOptions> Promo
 @inject UiTextService T
+@implements IDisposable
 
-@* C43-A C2: card de divulgacao. Sem Promo__Title nao renderiza nada. *@
+@* C43-A C2: card de divulgacao.
+   C46 (item 5): rotacao de anuncios — Promo__Items + Promo__Title legado
+   (item 0); sem config e Promo__ShowDemo=true (default), 3 demos em codigo.
+   Timer so depois do primeiro render interativo, pausa no hover/foco. *@
 
-@if (Promo.Value.IsConfigured)
+@if (cards.Count > 0)
 {
-    <section class="oldsite-widget sidebar-promo" aria-label="@T["SidebarPromo.Label"]">
+    var card = cards[index % cards.Count];
+    <section class="oldsite-widget sidebar-promo" aria-label="@T["SidebarPromo.Label"]"
+             @onmouseenter="Pause" @onmouseleave="Resume"
+             @onfocusin="Pause" @onfocusout="Resume">
         <span class="sidebar-promo-label">@T["SidebarPromo.Label"]</span>
-        @if (!string.IsNullOrWhiteSpace(Promo.Value.ImageUrl))
+        @if (!string.IsNullOrWhiteSpace(card.ImageUrl))
         {
-            <img class="sidebar-promo-img" src="@Promo.Value.ImageUrl" alt="" loading="lazy" />
+            <img class="sidebar-promo-img" src="@card.ImageUrl" alt="" loading="lazy" />
         }
-        <p class="sidebar-promo-title">@Promo.Value.Title</p>
-        @if (!string.IsNullOrWhiteSpace(Promo.Value.Text))
+        else if (!string.IsNullOrWhiteSpace(card.Icon))
         {
-            <p class="sidebar-promo-text">@Promo.Value.Text</p>
+            <span class="sidebar-promo-art" aria-hidden="true"><i class="fas @card.Icon"></i></span>
         }
-        @if (!string.IsNullOrWhiteSpace(Promo.Value.Url))
+        <p class="sidebar-promo-title">@card.Title</p>
+        @if (!string.IsNullOrWhiteSpace(card.Text))
         {
-            <a class="sidebar-promo-link" href="@Promo.Value.Url" target="_blank" rel="noopener sponsored">@T["SidebarPromo.Open"]</a>
+            <p class="sidebar-promo-text">@card.Text</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(card.Url))
+        {
+            var external = card.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase);
+            <a class="sidebar-promo-link" href="@card.Url"
+               target="@(external ? "_blank" : null)"
+               rel="@(external ? "noopener sponsored" : null)">
+                @(card.Cta ?? T["SidebarPromo.Open"])
+            </a>
+        }
+        @if (cards.Count > 1)
+        {
+            <span class="sidebar-promo-dots" aria-hidden="true">
+                @for (var i = 0; i < cards.Count; i++)
+                {
+                    <span class="sidebar-promo-dot @(i == index % cards.Count ? "is-active" : string.Empty)"></span>
+                }
+            </span>
         }
     </section>
+}
+
+@code {
+    private sealed record Card(string Title, string? Text, string? Url,
+        string? ImageUrl, string? Icon, string? Cta);
+
+    private const int RotateSeconds = 8;
+    // Rebuilt per access so post-init language restore (localStorage)
+    // is reflected — caching froze demo text in the prerender locale.
+    private List<Card> cards => BuildCards();
+    private int index;
+    private bool paused;
+    private Timer? timer;
+
+    private List<Card> BuildCards()
+    {
+        var configured = Promo.Value.ConfiguredItems()
+            .Select(i => new Card(i.Title!, i.Text, i.Url, i.ImageUrl, null, i.Cta))
+            .ToList();
+        if (configured.Count > 0 || !Promo.Value.ShowDemo)
+        {
+            return configured;
+        }
+
+        // Demos: nunca link externo — o CTA leva pra /contact (C46, sem CSP).
+        return
+        [
+            new Card(T["SidebarPromo.Demo1Title"], T["SidebarPromo.Demo1Text"],
+                "/contact", null, "fa-shoe-prints", T["SidebarPromo.DemoCta"]),
+            new Card(T["SidebarPromo.Demo2Title"], T["SidebarPromo.Demo2Text"],
+                "/contact", null, "fa-futbol", T["SidebarPromo.DemoCta"]),
+            new Card(T["SidebarPromo.Demo3Title"], T["SidebarPromo.Demo3Text"],
+                "/contact", null, "fa-bullhorn", T["SidebarPromo.DemoCta"]),
+        ];
+    }
+
+    // OnAfterRender so roda no circuito interativo (nunca no prerender).
+    protected override void OnAfterRender(bool firstRender) => EnsureTimer();
+
+    private void EnsureTimer()
+    {
+        if (cards.Count < 2)
+        {
+            timer?.Dispose();
+            timer = null;
+            return;
+        }
+        if (timer is not null) return;
+        timer = new Timer(_ => InvokeAsync(() =>
+        {
+            if (paused || cards.Count == 0) return;
+            index = (index + 1) % cards.Count;
+            StateHasChanged();
+        }), null, TimeSpan.FromSeconds(RotateSeconds), TimeSpan.FromSeconds(RotateSeconds));
+    }
+
+    private void Pause() => paused = true;
+    private void Resume() => paused = false;
+
+    public void Dispose() => timer?.Dispose();
 }

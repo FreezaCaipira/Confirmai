@@ -93,4 +93,37 @@ public class CssStructureTests
     public void FindStructuralError_AcceptsAtRulesAndNesting()
         => Assert.Null(FindStructuralError(
             "@import url('x.css');\n@media (max-width: 600px) { .a { color: red; } }\n/* .x { */ .b:hover { color: blue; }"));
+
+    // ── C46 Fase 2: guardiões anti-estouro ────────────────────────────
+
+    /// <summary>
+    /// C46 Fase 2: .btn e .status-badge devem declarar box-sizing: border-box
+    /// (estouro de botões/badges em telas estreitas) — nunca um seletor `*`.
+    /// </summary>
+    [Fact]
+    public void ComponentsCss_BtnAndStatusBadge_DeclareBoxSizing()
+    {
+        var root = RepoRoot().FullName;
+        var css = File.ReadAllText(Path.Combine(root, "wwwroot/css/components.css"));
+        var clean = CommentRegex.Replace(css, " ");
+
+        Assert.Matches(new Regex(@"\.btn\s*\{[^}]*box-sizing:\s*border-box"), clean);
+        Assert.Matches(new Regex(@"\.status-badge\s*\{[^}]*box-sizing:\s*border-box"), clean);
+    }
+
+    /// <summary>
+    /// C46 Fase 2: o requisito do plano proíbe `box-sizing` global via `*`.
+    /// Garante que nenhum CSS first-party use o seletor universal para isso.
+    /// </summary>
+    [Fact]
+    public void FirstPartyCss_NoUniversalBoxSizing()
+    {
+        var root = RepoRoot().FullName;
+        var universal = new Regex(@"(^|[},\s])\*\s*(?:,[^\{]*)?\{[^}]*box-sizing", RegexOptions.Singleline);
+        var violations = FirstPartyCssFiles(root)
+            .Where(f => universal.IsMatch(CommentRegex.Replace(File.ReadAllText(f), " ")))
+            .Select(f => Path.GetRelativePath(root, f))
+            .ToList();
+        Assert.True(violations.Count == 0, "box-sizing global via '*' em: " + string.Join(", ", violations));
+    }
 }

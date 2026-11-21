@@ -182,6 +182,22 @@ public class FutsalIntegrationTests : IClassFixture<IntegrationTestWebAppFactory
         const string creatorId = "edit-form-creator";
         var eventId = await _factory.SeedFutsalEventAsync(creatorId: creatorId);
 
+        // C46 (1.5): criador sem papel no grupo nao gerencia mais — quem
+        // gerencia e o admin do grupo. O criador aqui tambem e admin.
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var groupId = db.Events.Single(e => e.Id == eventId).GroupId;
+            db.GroupMembers.Add(new GroupMember
+            {
+                GroupId = groupId,
+                UserId = creatorId,
+                Role = GroupMemberRole.Admin,
+                CreatedAt = DateTime.UtcNow,
+            });
+            await db.SaveChangesAsync();
+        }
+
         var client = AuthenticatedClient(creatorId);
 
         var response = await client.GetAsync($"/futsal/{eventId}/edit");

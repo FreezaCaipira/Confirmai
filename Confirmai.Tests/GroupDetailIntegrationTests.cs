@@ -89,10 +89,11 @@ public class GroupDetailIntegrationTests : IClassFixture<IntegrationTestWebAppFa
         Assert.Contains($"href=\"/grupo/{groupId}/ranking\"", html);
         Assert.Contains($"href=\"/grupo/{groupId}/configuracoes\"", html);
 
-        // Invite stays available as an action (WhatsApp share button),
-        // but the permanent invite block moved to Configuracoes.
+        // Invite stays available as an action — C46 Fase 3: abre o modal
+        // (fa-user-plus), nao mais o wa.me direto. O bloco permanente de
+        // convite saiu de Configuracoes para o modal.
         Assert.Contains("hub-action", html);
-        Assert.Contains("fa-whatsapp", html);
+        Assert.Contains("fa-user-plus", html);
         Assert.DoesNotContain("invite-code-display", html);
 
         // Upcoming count shown in the Partidas action sub-line

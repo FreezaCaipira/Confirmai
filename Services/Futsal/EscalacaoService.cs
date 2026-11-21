@@ -47,7 +47,8 @@ public class EscalacaoService
             .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == eventId && e.Sport == Sport.Futsal);
 
-        var isAdmin = EventAccess.IsAdmin(ev, currentUserId);
+        // C46 (1.5): manage = group admin OR system admin (async covers sysadmin via roles).
+        var isAdmin = await EventAccess.CanManageAsync(db, ev, currentUserId);
 
         bool isPastEvent = false;
         bool isMember = false;

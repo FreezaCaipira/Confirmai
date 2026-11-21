@@ -40,3 +40,35 @@
 .sidebar-promo-link:hover {
     text-decoration: underline;
 }
+
+/* C46 (item 5): arte do demo — so CSS + icone sobre --surface-2 (CSP). */
+.sidebar-promo-art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 72px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    margin-bottom: var(--space-2);
+    font-size: 1.6rem;
+    color: var(--accent-text);
+}
+
+.sidebar-promo-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+    margin-top: var(--space-2);
+}
+
+.sidebar-promo-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border-2);
+}
+
+.sidebar-promo-dot.is-active {
+    background: var(--accent-text);
+}

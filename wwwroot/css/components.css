@@ -9,6 +9,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
     gap: var(--space-2);
     min-height: 40px;
     padding: 0 var(--space-4);
@@ -220,6 +221,7 @@
 .status-badge {
     display: inline-flex;
     align-items: center;
+    box-sizing: border-box;
     gap: var(--space-1);
     padding: 2px var(--space-2);
     border-radius: var(--radius-full);
@@ -236,6 +238,27 @@
 .status-badge--pending {
     background: var(--warning-soft);
     color: var(--warning);
+}
+
+/* Variantes de estado de partida (C46 Fase 2 — ex .et-status). */
+.status-badge--open {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.status-badge--full {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.status-badge--cancelled {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.status-badge--next {
+    background: var(--accent-soft);
+    color: var(--accent-text);
 }
 
 .status-badge--accent {
@@ -311,6 +334,13 @@
         grid-template-columns: 1fr;
         gap: var(--space-3);
     }
+}
+
+/* Lista vertical de .event-row (C46 Fase 2 — lista de partidas do grupo). */
+.event-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
 }
 
 /* --------------------------------------------------------------------------

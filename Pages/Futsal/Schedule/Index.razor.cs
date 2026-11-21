@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Confirmai.Data;
+using Confirmai.Enums;
 using Confirmai.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -39,10 +40,13 @@ public partial class Index : ComponentBase
         await using var db = await DbFactory.CreateDbContextAsync();
         var now = DateTime.UtcNow;
 
+        // C46 (1.5): recurrences of the groups the user administers (system admin sees all).
+        var isSystemAdmin = auth.User.IsInRole("admin");
         schedules = await db.RachaSchedules
             .Include(s => s.Venue)
             .Include(s => s.Group)
-            .Where(s => s.CreatedByUserId == userId && (GroupId == null || s.GroupId == GroupId.Value))
+            .Where(s => (isSystemAdmin || s.Group.Members.Any(m => m.UserId == userId && m.Role == GroupMemberRole.Admin))
+                     && (GroupId == null || s.GroupId == GroupId.Value))
             .OrderByDescending(s => s.IsActive)
             .ThenBy(s => s.DayOfWeek)
             .ThenBy(s => s.TimeOfDay)

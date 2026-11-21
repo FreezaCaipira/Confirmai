@@ -15,17 +15,22 @@ namespace Confirmai.Areas.Identity.Pages.Account
             _signInManager = signInManager;
         }
 
-        public async Task<IActionResult> OnGet(string? returnUrl = null)
+        // C46 (1.0e): GET never signs out — it only renders the confirmation
+        // page (a GET endpoint mutating auth is a CSRF/prefetch footgun).
+        // The actual logout is the POST below with antiforgery validation.
+        public IActionResult OnGet(string? returnUrl = null)
         {
-            await _signInManager.SignOutAsync();
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
-                return LocalRedirect(returnUrl);
+                ReturnUrl = returnUrl;
             }
-            return Redirect("~/");
+            return Page();
         }
 
-        public async Task<IActionResult> OnPost(string? returnUrl = null)
+        [BindProperty]
+        public string? ReturnUrl { get; set; }
+
+        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))

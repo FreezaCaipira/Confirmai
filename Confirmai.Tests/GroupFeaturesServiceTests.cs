@@ -5,6 +5,7 @@ using Confirmai.Services.Core;
 using Confirmai.Services.Factories;
 using Confirmai.Services.Groups;
 using Confirmai.Services.Payment;
+using Confirmai.Services.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -19,7 +20,9 @@ public class GroupFeaturesServiceTests
         var gatewayFactory = new EventPaymentGatewayFactory(
             new List<Services.Interfaces.IEventPaymentGateway>(),
             new GatewayService(factory));
-        var svc = new GroupFeaturesService(factory, logService, gatewayFactory);
+        var svc = new GroupFeaturesService(
+            factory, logService, gatewayFactory,
+            new UiTextService(new LanguagePreferenceService()));
         return (factory, svc);
     }
 
@@ -29,6 +32,7 @@ public class GroupFeaturesServiceTests
         await using var db = factory.CreateDbContext();
         var group = new Group { Name = "Test Group", CreatedByUserId = creatorId };
         db.Groups.Add(group);
+        db.GroupMembers.Add(new GroupMember { UserId = creatorId, Group = group, Role = GroupMemberRole.Admin });
         await db.SaveChangesAsync();
         return (factory, svc, group.Id);
     }
@@ -79,8 +83,9 @@ public class GroupFeaturesServiceTests
         group!.EnablePostMatchRanking = false;
         await db.SaveChangesAsync();
 
-        var newValue = await svc.TogglePostMatchRankingAsync(groupId, false, "user-1");
+        var (success, newValue, _) = await svc.TogglePostMatchRankingAsync(groupId, false, "creator-1");
 
+        Assert.True(success);
         Assert.True(newValue);
         await using var db2 = factory.CreateDbContext();
         var dbGroup = await db2.Groups.FindAsync(groupId);
@@ -92,9 +97,9 @@ public class GroupFeaturesServiceTests
     {
         var (factory, svc) = Setup();
 
-        var result = await svc.TogglePostMatchRankingAsync(999, false, "user-1");
+        var (success, _, _) = await svc.TogglePostMatchRankingAsync(999, false, "user-1");
 
-        Assert.False(result);
+        Assert.False(success);
     }
 
     [Fact]
@@ -106,8 +111,9 @@ public class GroupFeaturesServiceTests
         group!.EnableBestPlayerVoting = false;
         await db.SaveChangesAsync();
 
-        var newValue = await svc.ToggleBestPlayerVotingAsync(groupId, false, "user-1");
+        var (success, newValue, _) = await svc.ToggleBestPlayerVotingAsync(groupId, false, "creator-1");
 
+        Assert.True(success);
         Assert.True(newValue);
         await using var db2 = factory.CreateDbContext();
         var dbGroup = await db2.Groups.FindAsync(groupId);
@@ -123,7 +129,7 @@ public class GroupFeaturesServiceTests
         group!.EnablePaymentGateways = false;
         await db.SaveChangesAsync();
 
-        var (success, newValue, message) = await svc.TogglePaymentGatewaysAsync(groupId, false, "user-1");
+        var (success, newValue, message) = await svc.TogglePaymentGatewaysAsync(groupId, false, "creator-1");
 
         Assert.True(success);
         Assert.True(newValue);
@@ -141,7 +147,7 @@ public class GroupFeaturesServiceTests
         group.EnableBestPlayerVoting = true;
         await db.SaveChangesAsync();
 
-        var (success, newValue, message) = await svc.TogglePaymentGatewaysAsync(groupId, true, "user-1");
+        var (success, newValue, message) = await svc.TogglePaymentGatewaysAsync(groupId, true, "creator-1");
 
         Assert.True(success);
         Assert.False(newValue);
@@ -192,10 +198,8 @@ public class GroupFeaturesServiceTests
     {
         var (factory, svc, groupId) = await SetupWithGroupAsync("creator-1");
         await using var db = factory.CreateDbContext();
-        db.Users.Add(new ApplicationUser { Id = "admin-1", UserName = "Admin" });
-        var member = new GroupMember { UserId = "admin-1", GroupId = groupId, Role = GroupMemberRole.Admin };
-        db.GroupMembers.Add(member);
-        await db.SaveChangesAsync();
+        // creator-1 is the only admin (seeded in SetupWithGroupAsync)
+        var member = await db.GroupMembers.SingleAsync(m => m.GroupId == groupId && m.UserId == "creator-1");
 
         var (success, msg) = await svc.SetMemberRoleAsync(groupId, member.Id, GroupMemberRole.Member, "creator-1");
 
@@ -303,5 +307,116 @@ public class GroupFeaturesServiceTests
         var account = await db2.GroupPayoutAccounts.FindAsync(existing.Id);
         Assert.Equal("+5511999999999", account!.PixKeyValue);
         Assert.Equal(PixKeyType.Phone, account.PixKeyType);
+    }
+
+    // ── C46 (1.1): service-level admin gate on config mutations ─────────
+
+    private static async Task<IDbContextFactory<AppDbContext>> SeedActorAsync(
+        IDbContextFactory<AppDbContext> factory, int groupId, string userId, GroupMemberRole? role)
+    {
+        await using var db = factory.CreateDbContext();
+        db.Users.Add(new ApplicationUser { Id = userId, UserName = userId });
+        if (role is not null)
+            db.GroupMembers.Add(new GroupMember { UserId = userId, GroupId = groupId, Role = role.Value });
+        await db.SaveChangesAsync();
+        return factory;
+    }
+
+    private static async Task AssertDeniedAndAuditedAsync(IDbContextFactory<AppDbContext> factory)
+    {
+        await using var db = factory.CreateDbContext();
+        Assert.True(await db.Logs.AnyAsync(l => l.EventType == AuditEvents.GroupConfigChangeDenied));
+    }
+
+    [Theory]
+    [InlineData(GroupMemberRole.Member)]
+    [InlineData(null)]
+    public async Task TogglePostMatchRankingAsync_Denies_WhenNotGroupAdmin(GroupMemberRole? role)
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedActorAsync(factory, groupId, "actor-1", role);
+        await using var db = factory.CreateDbContext();
+        var before = (await db.Groups.FindAsync(groupId))!.EnablePostMatchRanking;
+
+        var (success, _, _) = await svc.TogglePostMatchRankingAsync(groupId, before, "actor-1");
+
+        Assert.False(success);
+        await AssertDeniedAndAuditedAsync(factory);
+        await using var db2 = factory.CreateDbContext();
+        Assert.Equal(before, (await db2.Groups.FindAsync(groupId))!.EnablePostMatchRanking);
+    }
+
+    [Theory]
+    [InlineData(GroupMemberRole.Member)]
+    [InlineData(null)]
+    public async Task ToggleBestPlayerVotingAsync_Denies_WhenNotGroupAdmin(GroupMemberRole? role)
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedActorAsync(factory, groupId, "actor-1", role);
+        await using var db = factory.CreateDbContext();
+        var before = (await db.Groups.FindAsync(groupId))!.EnableBestPlayerVoting;
+
+        var (success, _, _) = await svc.ToggleBestPlayerVotingAsync(groupId, before, "actor-1");
+
+        Assert.False(success);
+        await AssertDeniedAndAuditedAsync(factory);
+        await using var db2 = factory.CreateDbContext();
+        Assert.Equal(before, (await db2.Groups.FindAsync(groupId))!.EnableBestPlayerVoting);
+    }
+
+    [Theory]
+    [InlineData(GroupMemberRole.Member)]
+    [InlineData(null)]
+    public async Task TogglePaymentGatewaysAsync_Denies_WhenNotGroupAdmin(GroupMemberRole? role)
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedActorAsync(factory, groupId, "actor-1", role);
+        await using var db = factory.CreateDbContext();
+        var before = (await db.Groups.FindAsync(groupId))!.EnablePaymentGateways;
+
+        var (success, _, _) = await svc.TogglePaymentGatewaysAsync(groupId, before, "actor-1");
+
+        Assert.False(success);
+        await AssertDeniedAndAuditedAsync(factory);
+        await using var db2 = factory.CreateDbContext();
+        Assert.Equal(before, (await db2.Groups.FindAsync(groupId))!.EnablePaymentGateways);
+    }
+
+    [Theory]
+    [InlineData(GroupMemberRole.Member)]
+    [InlineData(null)]
+    public async Task SavePixReceiverAsync_Denies_WhenNotGroupAdmin(GroupMemberRole? role)
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedActorAsync(factory, groupId, "actor-1", role);
+
+        var (success, _) = await svc.SavePixReceiverAsync(groupId, "creator-1", "actor-1");
+
+        Assert.False(success);
+        await AssertDeniedAndAuditedAsync(factory);
+        await using var db = factory.CreateDbContext();
+        Assert.Null((await db.Groups.FindAsync(groupId))!.PixReceiverUserId);
+    }
+
+    [Theory]
+    [InlineData(GroupMemberRole.Member)]
+    [InlineData(null)]
+    public async Task SavePayoutAccountAsync_Denies_WhenNotGroupAdmin(GroupMemberRole? role)
+    {
+        var (factory, svc, groupId) = await SetupWithGroupAsync();
+        await SeedActorAsync(factory, groupId, "actor-1", role);
+
+        var formData = new GroupPayoutAccount
+        {
+            PixKeyType = PixKeyType.Email,
+            PixKeyValue = "denied@pix.com",
+            BeneficiaryName = "Denied"
+        };
+        var (success, _) = await svc.SavePayoutAccountAsync(groupId, formData, null, "actor-1");
+
+        Assert.False(success);
+        await AssertDeniedAndAuditedAsync(factory);
+        await using var db = factory.CreateDbContext();
+        Assert.False(await db.GroupPayoutAccounts.AnyAsync(a => a.GroupId == groupId));
     }
 }

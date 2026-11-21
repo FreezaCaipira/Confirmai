@@ -2,172 +2,92 @@
 @using Confirmai.Models
 @using Confirmai.Services
 @using Confirmai.Services.Events
-@inject NavigationManager NavigationManager
 @inject UiTextService Ui
 
-<table class="events-table">
-    <thead>
-        <tr>
-            <!-- Web headers -->
-            <th class="web-only"></th>
-            <th class="web-only">@Ui["Group.DateTimeHeader"]</th>
-            <th class="web-only">@Ui["Group.PlayersHeader"]</th>
-            <th class="web-only">@Ui["Group.StatusHeader"]</th>
-            <th class="events-access-col web-only"></th>
-            <!-- Mobile: no headers -->
-        </tr>
-    </thead>
-    <tbody>
-        @if (DisplayedEvents.Count == 0)
+@* C46 Fase 2: tabela substituida por lista .event-row (estouro mobile 390px).
+   Data em coluna fixa, corpo com numero/local/jogadores, lado com status. *@
+@if (DisplayedEvents.Count == 0)
+{
+    <div class="empty-state">
+        <i class="fas fa-calendar-plus empty-state-icon"></i>
+        @if (ShowPastEvents)
         {
-            <tr>
-                <td colspan="6" class="et-empty">
-                    @if (ShowPastEvents)
-                    {
-                        <div class="et-empty-banner">
-                            <i class="fas fa-calendar-plus"></i>
-                            <span class="et-empty-text">@Ui["Group.NoMatchPlayed"]</span>
-                        </div>
-                    }
-                    else if (IsAdmin)
-                    {
-                        <div class="et-empty-banner">
-                            <i class="fas fa-calendar-plus"></i>
-                            <span class="et-empty-text">@Ui["Group.NoMatchScheduledEmpty"]</span>
-                            <a href="@NewEventHref" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> @Ui["Group.CreateFirstMatch"]
-                            </a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="et-empty-banner">
-                            <i class="fas fa-calendar-plus"></i>
-                            <span class="et-empty-text">@Ui["Group.NoMatchOrganizer"]</span>
-                        </div>
-                    }
-                </td>
-            </tr>
+            <span>@Ui["Group.NoMatchPlayed"]</span>
+        }
+        else if (IsAdmin)
+        {
+            <span>@Ui["Group.NoMatchScheduledEmpty"]</span>
+            <a href="@NewEventHref" class="btn btn-primary">
+                <i class="fas fa-plus"></i> @Ui["Group.CreateFirstMatch"]
+            </a>
         }
         else
         {
-            var nextUpcomingEventId = UpcomingEvents.FirstOrDefault()?.Id;
-            @foreach (var ev in DisplayedEvents)
-            {
-                var href   = Group!.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
-                var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
-                var isNextUpcoming = !ShowPastEvents && nextUpcomingEventId.HasValue && ev.Id == nextUpcomingEventId.Value;
-                var eventNum = EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0;
-                <tr class="events-table-row" @onclick="() => NavigationManager.NavigateTo(href)">
-                    <!-- Web: ID column -->
-                    <td class="web-only">
-                        <span class="et-num">#@eventNum</span>
-                    </td>
-                    
-                    <!-- Web: Date column -->
-                    <td class="web-only">
-                        <span class="et-when" tabindex="0" aria-describedby="et-tip-@ev.Id">
-                            @if (ev.RachaScheduleId.HasValue)
-                            {
-                                <i class="fas fa-sync-alt et-recurring-icon" title="@Ui["Group.WeeklyTitle"]"></i>
-                            }
-                            <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateWeekday")</span>
-                            <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
-                            <span role="tooltip" id="et-tip-@ev.Id" class="et-tooltip">
-                                <span class="et-tip-line">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateLong")</span>
-                                <span class="et-tip-line et-tip-relative">@RelativeText(ev)</span>
-                                @if (TipMeta(ev) is { } tipMeta)
-                                {
-                                    <span class="et-tip-line et-tip-meta">@tipMeta</span>
-                                }
-                            </span>
-                        </span>
-                    </td>
-                    
-                    <!-- Web: Players column -->
-                    <td class="web-only">
-                        <span class="et-players @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">@ev.Confirmations.Count / @ev.MaxPlayers</span>
-                    </td>
-                    
-                    <!-- Web: Status column -->
-                    <td class="web-only et-status-col">
-                        @if (!ev.IsActive)
-                        {
-                            <span class="et-status et-status--cancelled">@Ui["Group.EventCancelled"]</span>
-                        }
-                        else if (isFull)
-                        {
-                            <span class="et-status et-status--full">@Ui["Group.EventFull"]</span>
-                        }
-                        else
-                        {
-                            <span class="et-status et-status--open">@Ui["Group.EventOpen"]</span>
-                        }
-                        @if (isNextUpcoming)
-                        {
-                            <span class="et-status et-status--next">@Ui["Group.EventNext"]</span>
-                        }
-                    </td>
-                    
-                    <!-- Web: Access column -->
-                    <td class="events-access-col web-only">
-                        <button class="btn btn-secondary btn-sm"
-                                type="button"
-                                @onclick:stopPropagation="true"
-                                @onclick="() => NavigationManager.NavigateTo(href)">
-                            @Ui["Group.Access"]
-                        </button>
-                    </td>
-                    
-                    <!-- Mobile: Card with all info -->
-                    <td class="mobile-only">
-                        <span class="et-num">#@eventNum</span>
-                        <div class="et-cell">
-                            <div class="et-cell-header">
-                                <div class="et-cell-right">
-                                    <span class="et-when" tabindex="0" aria-describedby="et-tip-m-@ev.Id">
-                                        @if (ev.RachaScheduleId.HasValue)
-                                        {
-                                            <i class="fas fa-sync-alt et-recurring-icon" title="@Ui["Group.WeeklyTitle"]"></i>
-                                        }
-                                        <span class="et-date">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateWeekday")</span>
-                                        <span class="et-time">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
-                                        <span role="tooltip" id="et-tip-m-@ev.Id" class="et-tooltip">
-                                            <span class="et-tip-line">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateLong")</span>
-                                            <span class="et-tip-line et-tip-relative">@RelativeText(ev)</span>
-                                            @if (TipMeta(ev) is { } tipMetaMobile)
-                                            {
-                                                <span class="et-tip-line et-tip-meta">@tipMetaMobile</span>
-                                            }
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="et-cell-meta">
-                                <span class="et-players-mobile @(isFull ? "et-players--full" : string.Empty) @(ev.Confirmations.Count == 0 ? "et-players--empty" : string.Empty)">
-                                    <i class="fas fa-users"></i> @ev.Confirmations.Count / @ev.MaxPlayers
-                                </span>
-                                @if (!ev.IsActive)
-                                {
-                                    <span class="et-status et-status--cancelled">@Ui["Group.EventCancelled"]</span>
-                                }
-                                else if (isFull)
-                                {
-                                    <span class="et-status et-status--full">@Ui["Group.EventFull"]</span>
-                                }
-                                else
-                                {
-                                    <span class="et-status et-status--open">@Ui["Group.EventOpen"]</span>
-                                }
-                            </div>
-                        </div>
-                        <i class="fas fa-chevron-right et-chevron-icon"></i>
-                    </td>
-                </tr>
-            }
+            <span>@Ui["Group.NoMatchOrganizer"]</span>
         }
-    </tbody>
-</table>
+    </div>
+}
+else
+{
+    var nextUpcomingEventId = UpcomingEvents.FirstOrDefault()?.Id;
+    <div class="event-list">
+        @foreach (var ev in DisplayedEvents)
+        {
+            var href   = Group!.Sport == Sport.Futsal ? $"/futsal/{ev.Id}" : $"/poker/{ev.Id}";
+            var isFull = ev.Confirmations.Count >= ev.MaxPlayers;
+            var isNextUpcoming = !ShowPastEvents && nextUpcomingEventId.HasValue && ev.Id == nextUpcomingEventId.Value;
+            var eventNum = EventNumbers.TryGetValue(ev.Id, out var n) ? n : 0;
+            var venue = !string.IsNullOrWhiteSpace(ev.Venue?.Name) ? ev.Venue!.Name : ev.Location;
+            <a class="event-row" href="@href">
+                <span class="event-row-when gde-when" tabindex="0" aria-describedby="gde-tip-@ev.Id">
+                    <span class="event-row-day">
+                        @if (ev.RachaScheduleId.HasValue)
+                        {
+                            <i class="fas fa-sync-alt gde-recurring" title="@Ui["Group.WeeklyTitle"]"></i>
+                        }
+                        @Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateWeekday")
+                    </span>
+                    <span class="gde-time"><i class="fas fa-clock" aria-hidden="true"></i> @Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "TimeDefault")</span>
+                    <span role="tooltip" id="gde-tip-@ev.Id" class="gde-tooltip">
+                        <span class="gde-tip-line">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateLong")</span>
+                        <span class="gde-tip-line gde-tip-relative">@RelativeText(ev)</span>
+                        @if (TipMeta(ev) is { } tipMeta)
+                        {
+                            <span class="gde-tip-line gde-tip-meta">@tipMeta</span>
+                        }
+                    </span>
+                </span>
+                <span class="event-row-body">
+                    <span class="event-row-title">#@eventNum@(string.IsNullOrWhiteSpace(venue) ? string.Empty : $" · {venue}")</span>
+                    <span class="event-row-meta">
+                        <span class="@(isFull ? "gde-players gde-players--full" : ev.Confirmations.Count == 0 ? "gde-players gde-players--empty" : "gde-players")">
+                            <i class="fas fa-users"></i> @ev.Confirmations.Count / @ev.MaxPlayers
+                        </span>
+                    </span>
+                </span>
+                <span class="event-row-side">
+                    @if (!ev.IsActive)
+                    {
+                        <span class="status-badge status-badge--cancelled">@Ui["Group.EventCancelled"]</span>
+                    }
+                    else if (isFull)
+                    {
+                        <span class="status-badge status-badge--full">@Ui["Group.EventFull"]</span>
+                    }
+                    else
+                    {
+                        <span class="status-badge status-badge--open">@Ui["Group.EventOpen"]</span>
+                    }
+                    @if (isNextUpcoming)
+                    {
+                        <span class="status-badge status-badge--next">@Ui["Group.EventNext"]</span>
+                    }
+                    <i class="fas fa-chevron-right gde-chevron" aria-hidden="true"></i>
+                </span>
+            </a>
+        }
+    </div>
+}
 
 @code {
     [Parameter] public Group?                    Group            { get; set; }

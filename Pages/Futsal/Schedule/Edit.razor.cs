@@ -83,6 +83,7 @@ public partial class Edit
     {
         var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var isSystemAdmin = auth.User.IsInRole("admin");
 
         await using var db = await DbFactory.CreateDbContextAsync();
 
@@ -95,7 +96,8 @@ public partial class Edit
             return;
         }
 
-        if (schedule.CreatedByUserId != userId)
+        // C46 (1.5): manage = group admin OR system admin.
+        if (!isSystemAdmin && !await Services.Groups.GroupAccess.IsGroupAdminAsync(db, schedule.GroupId, userId))
         {
             accessDenied = true;
             isLoading    = false;
@@ -137,12 +139,15 @@ public partial class Edit
         {
             var auth   = await AuthStateProvider.GetAuthenticationStateAsync();
             var userId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isSystemAdmin = auth.User.IsInRole("admin");
 
             await using var db = await DbFactory.CreateDbContextAsync();
             var schedule = await db.RachaSchedules.FindAsync(Id);
 
             if (schedule is null)      { notFound = true; return; }
-            if (schedule.CreatedByUserId != userId) { accessDenied = true; return; }
+            // C46 (1.5): manage = group admin OR system admin.
+            if (!isSystemAdmin && !await Services.Groups.GroupAccess.IsGroupAdminAsync(db, schedule.GroupId, userId))
+            { accessDenied = true; return; }
 
             schedule.LocalName       = form.LocalName;
             schedule.DayOfWeek       = form.DayOfWeek;
