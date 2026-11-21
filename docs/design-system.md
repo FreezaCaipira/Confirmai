@@ -27,7 +27,7 @@ Regras:
 3. Borda clareia junto com o nível (`--border` em L0/L1, `--border-2` em
    L2/L3). Sombra só em L3 flutuante (`--shadow-card`).
 4. Hover sobe um nível (`L2 → --surface-3`); nunca desce nem muda de matiz.
-5. Sem gradiente de fundo. Sem cor por esporte/categoria em fundo ou borda. **Excecoes**: (a) o hero de pagina (`.home-hero`), que pode usar o degrade de acento para se distinguir dos paineis de conteudo — e L1 sem filhos-card (so texto + toggle) e e o unico elemento da tela cujo papel e orientar. Decisao do Senior no C36-D Fase 3. (b) o header do shell, via token `--header-gradient` — degrade sutil L1→L0 (tom-para-tom, sem matiz), so chrome; o texto mantem o contraste AA medido sobre --surface/--bg. C37 Fase 7.
+5. Sem gradiente de fundo. Sem cor por esporte/categoria em fundo ou borda. **Excecoes**: (a) o hero de pagina (`.home-hero`), que pode usar degrade para se distinguir dos paineis de conteudo — e L1 sem filhos-card (so texto + toggle) e e o unico elemento da tela cujo papel e orientar. C46 (item 3): o degrade virou **metalico** — 4 paradas `--hero-metal-1..4` (aco escuro -> azul -> realce -> azul escuro), faixa diagonal de brilho via `::before` e aresta escovada (`inset 0 1px 0 --hero-metal-sheen`); contraste do titulo/subtitulo >= 4.5:1 sobre a parada mais clara. Decisao do Senior no C36-D Fase 3, revisada no C46. (b) o header do shell, via token `--header-gradient` — degrade sutil L1→L0 (tom-para-tom, sem matiz), so chrome; o texto mantem o contraste AA medido sobre --surface/--bg. C37 Fase 7.
 
 ## 2. Azul: direcionamento, não decoração
 

@@ -704,13 +704,13 @@ body .entity-shell-card.evpay-main {
     width: 1.5rem;
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--accent-text);
+    color: var(--players-tone, var(--accent-text));
     text-align: right;
     flex-shrink: 0;
 }
 
 .player-name        { flex: 1; font-size: 0.9rem; color: var(--text); font-weight: 500; }
-.player-slot-empty  { flex: 1; color: var(--accent-text); font-size: 0.85rem; }
+.player-slot-empty  { flex: 1; color: var(--players-tone, var(--accent-text)); font-size: 0.85rem; }
 
 /* -- Admin: adicionar / remover vaga --------------------------- */
 .slot-controls {
@@ -831,6 +831,8 @@ body .entity-shell-card.evpay-main {
 }
 
 
+/* C46 (item 6): o botao de vaga segue o tom do grupo (--players-*)
+   — goleiro azul, linha verde tinted (sem botao verde cheio). */
 .player-slot-btn {
     position: absolute;
     left: 50%;
@@ -838,10 +840,10 @@ body .entity-shell-card.evpay-main {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    background: var(--surface-3);
-    border: 1px solid var(--accent-border);
+    background: var(--players-soft, var(--accent-soft));
+    border: 1px solid var(--players-border, var(--accent-border));
     border-radius: 999px;
-    color: var(--accent-text);
+    color: var(--players-tone, var(--accent-text));
     font-size: 0.78rem;
     font-weight: 700;
     padding: 0.2rem 0.85rem;
@@ -851,19 +853,9 @@ body .entity-shell-card.evpay-main {
     white-space: nowrap;
 }
 .player-slot-btn:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-    color: var(--accent-text);
-}
-.player-slot-btn--gk {
-    background: var(--accent-soft);
-    border-color: var(--accent-border);
-    color: var(--accent-text);
-}
-.player-slot-btn--gk:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-    color: var(--accent-text);
+    background: var(--players-soft, var(--accent-soft));
+    border-color: var(--players-tone, var(--accent));
+    color: var(--players-tone, var(--accent-text));
 }
 
 .player-tag {

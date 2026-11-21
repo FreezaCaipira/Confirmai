@@ -56,14 +56,23 @@
                         <div class="home-section-body">
                         @if (organizing.Count == 0)
                         {
+                            var adminGroups = myGroups.Where(g => g.IsAdmin).ToList();
                             <div class="home-empty">
+                                <span class="feat-icon"><i class="fas fa-calendar-check"></i></span>
                                 <p>@Ui["Index.NoOrganizing"]</p>
-                                <div class="home-empty-actions">
-                                    @foreach (var g in myGroups.Where(g => g.IsAdmin))
-                                    {
-                                        <a href="/grupo/@g.Id/partidas" class="home-btn">@Ui["Index.CreateMatchIn"] @g.Name</a>
-                                    }
-                                </div>
+                                @* C46 (item 2): 1 CTA so — criar direto quando ha 1 grupo admin. *@
+                                @if (adminGroups.Count == 1)
+                                {
+                                    var g = adminGroups[0];
+                                    var createUrl = g.Sport == Sport.Futsal
+                                        ? $"/futsal/create?groupId={g.Id}"
+                                        : $"/poker/create?groupId={g.Id}";
+                                    <a href="@createUrl" class="btn btn-secondary">@Ui["Index.CreateMatchIn"] @g.Name</a>
+                                }
+                                else
+                                {
+                                    <a href="/grupos" class="btn btn-secondary">@Ui["Index.SeeMyGroups"]</a>
+                                }
                             </div>
                         }
                         else
@@ -72,11 +81,11 @@
                                 @foreach (var ev in organizing)
                                 {
                                     <a href="@DetailUrl(ev)" class="home-event">
-                                        <div class="home-event-when">
-                                            <span class="home-event-day">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateTimeFullShort")</span>
-                                        </div>
                                         <div class="home-event-body">
-                                            <strong class="home-event-group">@ev.Group.Name</strong>
+                                            <div class="home-event-head">
+                                                <strong class="home-event-group">@ev.Group.Name</strong>
+                                                <span class="home-event-day">@Ui.FormatDateTime(ev.StartsAt.ToLocalTime(), "DateTimeFullShort")</span>
+                                            </div>
                                             <span class="home-event-meta">
                                                 @if (!string.IsNullOrWhiteSpace(ev.Location))
                                                 {
@@ -119,13 +128,18 @@
                         @if (upcoming.Count == 0)
                         {
                             <div class="home-empty">
+                                <span class="feat-icon"><i class="fas fa-calendar-check"></i></span>
                                 <p>@Ui["Index.NoUpcoming"]</p>
-                                <div class="home-empty-actions">
-                                    @foreach (var g in myGroups)
-                                    {
-                                        <a href="/grupo/@g.Id/partidas" class="home-btn">@g.Name →</a>
-                                    }
-                                </div>
+                                @* C46 (item 2): 1 CTA so — link direto quando ha 1 grupo. *@
+                                @if (myGroups.Count == 1)
+                                {
+                                    var g = myGroups[0];
+                                    <a href="/grupo/@g.Id/partidas" class="btn btn-secondary">@Ui["Index.ViewGroupMatches"] @g.Name</a>
+                                }
+                                else
+                                {
+                                    <a href="/grupos" class="btn btn-secondary">@Ui["Index.SeeMyGroups"]</a>
+                                }
                             </div>
                         }
                         else
