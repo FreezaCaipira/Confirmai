@@ -545,11 +545,16 @@ public class C33CriticalUseCaseTests : IClassFixture<IntegrationTestWebAppFactor
             AllowAutoRedirect = false
         });
 
-        // OnGet de Logout ja faz sign-out e redireciona — o token antiforgery
-        // vem de outra pagina (o par token+cookie e valido para o site inteiro),
-        // mas deve ser emitido ja autenticado: o token e bound ao usuario.
+        // C46 (1.0): GET de Logout NAO desloga — so mostra a confirmacao
+        // (logout virou POST-only). O token antiforgery vem de outra pagina
+        // (o par token+cookie e valido para o site inteiro), mas deve ser
+        // emitido ja autenticado: o token e bound ao usuario.
         var getResponse = await client.SendAsync(AuthedGet("/Identity/Account/Logout", userId));
-        Assert.Equal(HttpStatusCode.Redirect, getResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        // O GET nao deslogou: uma pagina autenticada continua respondendo.
+        var stillAuthed = await client.SendAsync(AuthedGet("/Identity/Account/Logout", userId));
+        Assert.Equal(HttpStatusCode.OK, stillAuthed.StatusCode);
 
         var loginPage = await client.SendAsync(AuthedGet("/Identity/Account/Login", userId));
         var token = ExtractAntiforgeryToken(await loginPage.Content.ReadAsStringAsync());

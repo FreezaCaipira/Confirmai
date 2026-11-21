@@ -48,13 +48,13 @@ public class PartidasDateTooltipIntegrationTests : IClassFixture<IntegrationTest
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         // Accessible tooltip wired to the date
         Assert.Contains("role=\"tooltip\"", html);
-        Assert.Contains("aria-describedby=\"et-tip-", html);
+        Assert.Contains("aria-describedby=\"gde-tip-", html);
         // Weekday always visible in the date cell: "ddd dd/MM" -> e.g. "seg. 23/06".
         // Accented weekdays ("sáb.") arrive HTML-encoded ("s&#xE1;b"), so the
         // weekday part is matched loosely — only the trailing dd/MM is strict.
-        Assert.Matches("class=\"et-date\"[^>]*>[^<]*\\d{2}/\\d{2}", html);
+        Assert.Matches("class=\"event-row-day\"[^>]*>[^<]*\\d{2}/\\d{2}", html);
         // Tooltip carries the long date + relative line + venue
-        Assert.Contains("et-tip-relative", html);
+        Assert.Contains("gde-tip-relative", html);
         Assert.Contains("Quadra do Bairro", html);
     }
 }
