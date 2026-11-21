@@ -1,0 +1,56 @@
+@using Confirmai.Services.Core
+@using Microsoft.JSInterop
+@inject UiTextService Ui
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+@if (IsOpen)
+{
+    <div class="invite-overlay" @onclick="async () => await OnClose.InvokeAsync()">
+        <div class="invite-modal" @onclick:stopPropagation="true">
+            <div class="invite-modal-header">
+                <h2 class="invite-modal-title">
+                    <i class="fas fa-user-plus"></i> @Ui["Group.Invite"]
+                </h2>
+                <button class="invite-close-btn" type="button"
+                        aria-label="@Ui["Common.Close"]"
+                        @onclick="async () => await OnClose.InvokeAsync()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="invite-modal-body">
+                <button class="btn btn-primary invite-share-btn" type="button"
+                        @onclick="ShareAsync">
+                    <i class="fas fa-share-alt"></i> @Ui["Group.ShareInvite"]
+                </button>
+                <GroupInviteBlock InviteCode="@InviteCode" />
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public string InviteCode { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task ShareAsync()
+    {
+        try
+        {
+            var absolute = $"{NavigationManager.BaseUri.TrimEnd('/')}/convite/{InviteCode}";
+            var shared = await JS.InvokeAsync<bool>(
+                "confirmaiShare.share", Ui["Group.Invite"], absolute, absolute);
+            if (shared)
+            {
+                await OnClose.InvokeAsync();
+            }
+        }
+        catch (JSException)
+        {
+            // Sem Web Share API (desktop antigo, contexto inseguro):
+            // usuario copia o link/codigo no bloco abaixo.
+        }
+    }
+}

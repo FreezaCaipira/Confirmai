@@ -65,17 +65,6 @@ else
                     <h2 class="panel-title"><i class="fas fa-cog"></i> @Ui["Group.ConfigTitle"]</h2>
                 </div>
 
-            @* ── Convite ────────────────────────────────────────────── *@
-            <section class="settings-section feat--invite">
-                <div class="settings-section-head">
-                    <span class="feat-icon"><i class="fas fa-user-plus"></i></span>
-                    <div>
-                        <h2 class="settings-section-title">@Ui["Group.Invite"]</h2>
-                    </div>
-                </div>
-                <GroupInviteBlock InviteCode="@(group.InviteCode ?? string.Empty)" />
-            </section>
-
             @* ── Pagamentos & Funcionalidades ─────────────────────────── *@
             <FeaturesToggles
                 Group="@group"

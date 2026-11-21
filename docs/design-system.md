@@ -90,6 +90,18 @@ Uso: a classe vai no container (`<section class="panel feat--payments">`,
 sem classe tudo cai no azul padrão. `.feat-icon` é o quadrado de ícone pronto.
 Status (sucesso/atenção/erro) continua semântico e vence a cor da feature.
 
+### 4.2 Breakpoint 1100px do hero do grupo (exceção)
+
+Regra do projeto: mobile-first com breakpoint único em 768px. O hero do
+grupo (`Shared/Components/Groups/GroupHeader.razor`, C46 Fase 3) usa um
+segundo breakpoint em **1100px**: a subnav inteira não cabe ao lado da
+identidade (sport + nome + cidade) em larguras entre 768px e ~1100px, então
+o grid de 3 colunas (subnav | identidade | voltar) cai para duas linhas —
+identidade + voltar na primeira, subnav centralizada na segunda. Abaixo de
+768px volta ao padrão (identidade centralizada, subnav embaixo, voltar
+oculto pelo breadcrumb). Exceção justificada por largura real do conteúdo,
+não por device.
+
 ### 5.1 Painel "Hoje" (home)
 
 `Shared/Components/HomeTodayPanel.razor` é um painel L1 com tiles L2, um por

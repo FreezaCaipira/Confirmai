@@ -72,11 +72,7 @@ public partial class Detail
 
     private void ToggleMembersView() => showAllMembers = !showAllMembers;
 
-    private async Task ShareInviteOnWhatsApp(string url)
-    {
-        var shareUrl = $"https://wa.me/?text={Uri.EscapeDataString(url)}";
-        await JS.InvokeVoidAsync("open", shareUrl, "_blank", "noopener,noreferrer");
-    }
+    private bool showInviteModal;
 
     private async Task RequestToJoin()
     {
