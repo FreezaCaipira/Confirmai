@@ -55,12 +55,12 @@
         string? ImageUrl, string? Icon, string? Cta);
 
     private const int RotateSeconds = 8;
-    private List<Card> cards = new();
+    // Rebuilt per access so post-init language restore (localStorage)
+    // is reflected — caching froze demo text in the prerender locale.
+    private List<Card> cards => BuildCards();
     private int index;
     private bool paused;
     private Timer? timer;
-
-    protected override void OnInitialized() => cards = BuildCards();
 
     private List<Card> BuildCards()
     {
