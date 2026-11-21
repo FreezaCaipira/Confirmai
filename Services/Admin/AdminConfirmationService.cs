@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Confirmai.Services.Core;
 using Confirmai.Services.Groups;
 using Confirmai.Services.Payment;
+using Confirmai.Shared.Helpers;
 
 namespace Confirmai.Services.Admin;
 
@@ -49,7 +50,7 @@ public class AdminConfirmationService
         // Only a group admin of the event's group may mark a manual payment.
         // The UI also guards this, but the service cannot trust the caller.
         if (conf.Event is null ||
-            !await GroupAccess.IsGroupAdminAsync(db, conf.Event.GroupId, currentUserId))
+            !await EventAccess.CanManageAsync(db, conf.Event, currentUserId))
         {
             return new AdminTogglePaidResult
             {
@@ -157,7 +158,7 @@ public class AdminConfirmationService
             return new AdminRemoveConfirmationResult { Found = false };
 
         if (conf.Event is null ||
-            !await GroupAccess.IsGroupAdminAsync(db, conf.Event.GroupId, currentUserId))
+            !await EventAccess.CanManageAsync(db, conf.Event, currentUserId))
         {
             return new AdminRemoveConfirmationResult
             {

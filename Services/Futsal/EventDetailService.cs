@@ -259,7 +259,7 @@ public class EventDetailService
             .FirstOrDefaultAsync(c => c.Id == confirmationId);
         if (conf is null) return;
         if (conf.Event is null ||
-            !await GroupAccess.IsGroupAdminAsync(db, conf.Event.GroupId, currentUserId)) return;
+            !await EventAccess.CanManageAsync(db, conf.Event, currentUserId)) return;
         var position = conf.Position ?? FutsalPosition.Outfield;
         var targetUserId = conf.UserId;
         db.EventConfirmations.Remove(conf);
@@ -277,7 +277,7 @@ public class EventDetailService
             .FirstOrDefaultAsync(w => w.Id == waitlistId);
         if (entry is null) return;
         if (entry.Event is null ||
-            !await GroupAccess.IsGroupAdminAsync(db, entry.Event.GroupId, currentUserId)) return;
+            !await EventAccess.CanManageAsync(db, entry.Event, currentUserId)) return;
         var wlUserId = entry.UserId;
         db.WaitingLists.Remove(entry);
         await db.SaveChangesAsync();
@@ -290,7 +290,7 @@ public class EventDetailService
         await using var db = await _dbFactory.CreateDbContextAsync();
         var evt = await db.Events.FindAsync(eventId);
         if (evt is null ||
-            !await GroupAccess.IsGroupAdminAsync(db, evt.GroupId, currentUserId)) return;
+            !await EventAccess.CanManageAsync(db, evt, currentUserId)) return;
         evt.MaxPlayers += 1;
         await db.SaveChangesAsync();
         await PromoteFromWaitlistAsync(db, eventId, FutsalPosition.Outfield);
@@ -301,7 +301,7 @@ public class EventDetailService
         await using var db = await _dbFactory.CreateDbContextAsync();
         var evt = await db.Events.FindAsync(eventId);
         if (evt is null ||
-            !await GroupAccess.IsGroupAdminAsync(db, evt.GroupId, currentUserId)) return;
+            !await EventAccess.CanManageAsync(db, evt, currentUserId)) return;
         evt.MaxPlayers -= 1;
         await db.SaveChangesAsync();
     }
@@ -311,7 +311,7 @@ public class EventDetailService
         await using var db = await _dbFactory.CreateDbContextAsync();
         var evt = await db.Events.FindAsync(eventId);
         if (evt is null ||
-            !await GroupAccess.IsGroupAdminAsync(db, evt.GroupId, currentUserId)) return;
+            !await EventAccess.CanManageAsync(db, evt, currentUserId)) return;
         evt.MaxGoalkeepers = (evt.MaxGoalkeepers ?? 0) + 1;
         await db.SaveChangesAsync();
         await PromoteFromWaitlistAsync(db, eventId, FutsalPosition.Goalkeeper);
@@ -322,7 +322,7 @@ public class EventDetailService
         await using var db = await _dbFactory.CreateDbContextAsync();
         var evt = await db.Events.FindAsync(eventId);
         if (evt is null ||
-            !await GroupAccess.IsGroupAdminAsync(db, evt.GroupId, currentUserId)) return;
+            !await EventAccess.CanManageAsync(db, evt, currentUserId)) return;
         var previous = evt.MaxGoalkeepers;
         evt.MaxGoalkeepers = newMaxGk;
         await db.SaveChangesAsync();
