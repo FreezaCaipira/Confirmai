@@ -214,6 +214,97 @@ ou da acesso a conta de outra pessoa, sem aparecer como erro.
 
 ---
 
+## Ciclo 46 (Pleno) -- 16 pontos do Robson em prod: niveis de acesso, estouros de layout, hero do grupo, convite pra todos, home e coluna lateral [PLANEJADO -- liberado; decisoes do Robson de 21/11 ja incorporadas (1.0, 1.5, 3.3)]
+
+**Objetivo:** fechar os 16 pontos que o Robson levantou em prod (21/11/2026). O Senior so planejou e leu o codigo; **nada foi implementado**. Ordem: funcional (acesso) primeiro, depois bug de layout, depois lapidacao. 1 branch, 1 PR, commits por fase. O C44 (remocao do legado) continua reservado e independente.
+
+**Mapa item do Robson -> fase:** 10, 11, 12 -> Fase 1 | 1, 9, 14, 15 -> Fase 2 | 7, 8, 13 -> Fase 3 | 2, 3, 16, 6 -> Fase 4 | 4, 5 -> Fase 5.
+
+### Fase 1 -- Niveis de acesso (itens 10, 11, 12)
+
+**Estado lido no codigo (importante):** os itens 10 e 11 **nao reproduzem por leitura**. `Pages/Groups/Features.razor` mostra o cadeado quando `!isAdmin` (`GroupFeaturesService.LoadAsync` exige `GroupMemberRole.Admin`); `Pages/Groups/Payments.razor` so mostra abas (inclusive a de % da plataforma) no ramo `isAdmin` -- membro comum ve apenas `MyPaymentsList`; `GroupSubNav` so mostra "Configuracoes" com `IsAdmin`. Entao **1.0 e obrigatorio antes de mexer**.
+
+- **1.0 Reproduzir -- hipotese principal: troca de conta.** O Robson confirmou (21/11) que logou primeiro com uma conta **admin** e depois com uma **nao-admin** no mesmo navegador. Num Blazor Server a identidade do circuito e fixada na conexao: `RevalidatingIdentityAuthenticationStateProvider` so revalida o security stamp **do mesmo usuario** (a cada 30s), nao percebe que o cookie agora e de outra conta. Uma aba antiga (ou pagina restaurada pelo voltar/bfcache que reconecta o circuito) segue operando como o admin. Passos:
+  - (a) Teste (bUnit ou integracao Postgres) com 1 grupo, 1 admin, 1 membro `Member`: membro abre `/grupo/{id}/configuracoes` e `/grupo/{id}/pagamentos` -> cadeado / so "Meus pagamentos". Fixa o comportamento correto.
+  - (b) Reproduzir manualmente em dev: aba A logada como admin em `/grupo/{id}/configuracoes`; aba B faz logout e login como membro; voltar a aba A e navegar pelo menu. Repetir numa aba so, usando o voltar do navegador depois do login. Registrar no PR o que reproduziu.
+  - (c) Correcao: arquivo estatico em `wwwroot/js` (CSP nao aceita inline) que (1) nas paginas de Login/Logout do Identity publica um aviso `auth-changed` via `BroadcastChannel` (fallback `localStorage`), (2) nas demais abas escuta o aviso e faz `location.reload()`, (3) em `pageshow` com `event.persisted` tambem recarrega. **Nao** usar `UpdateSecurityStampAsync` no logout (derrubaria os outros aparelhos do usuario).
+  - (d) Conferir se algum estado de `isAdmin` vive fora do componente (service `Scoped` com campo, `static`, `IMemoryCache`): o Senior nao achou nenhum em `Services/Groups`, mas o Pleno confirma por grep e registra.
+  - (e) Achado lateral: `Areas/Identity/Pages/Account/Logout.cshtml.cs` desloga em **GET** (`OnGet` chama `SignOutAsync`) e o menu usa `<a href>`. Trocar por form POST com antiforgery e fazer o `OnGet` so mostrar a pagina de confirmacao.
+  - Se nada reproduzir, registrar em "Problemas Encontrados pelo Pleno" e seguir; 1.2 continua valendo de qualquer forma.
+- **1.1 Mutacoes de config sem checagem no service** (furo real, hoje so a UI protege): em `Services/Groups/GroupFeaturesService.cs`, `TogglePostMatchRankingAsync`, `ToggleBestPlayerVotingAsync`, `TogglePaymentGatewaysAsync`, `SavePixReceiverAsync` e `SavePayoutAccountAsync` nao chamam `GroupAccess.IsGroupAdminAsync` (so `SaveWhatsAppGroupJidAsync` chama). Adicionar a checagem **antes** de qualquer leitura/`SaveChanges`, retornando falha com chave i18n; auditar a tentativa negada (padrao `GroupMemberRoleChangeDenied`). Teste por metodo: membro comum e nao-membro -> negado e nada persistido.
+- **1.2 Estado velho ao trocar de grupo.** `Features`, `Payments` (e conferir `Detail`, `Partidas`, `Ranking`) carregam so em `OnInitializedAsync`. O Blazor reusa a instancia quando so o `Id` da rota muda (voltar/avancar do navegador entre dois grupos): a tela do grupo B aparece com dados e `isAdmin` do grupo A. Mover a carga para `OnParametersSetAsync` com guarda `if (Id == loadedId) return;` e resetar o estado (aba, selecoes). Teste bUnit: render com Id=A (admin), `SetParametersAndRender(Id=B)` (membro) -> cadeado.
+- **1.3 Nao-membro ve o menu do grupo.** `Pages/Groups/Detail.razor` (`AllowAnonymous`) renderiza `GroupHeader` com `GroupSubNav` antes de checar `isMember`; os links levam a telas de cadeado. Novo parametro `ShowNav` no `GroupHeader` (default true); `Detail` passa `isMember`.
+- **1.4 Matriz de acesso (entrega de documento + teste).** Criar `docs/matriz-acesso.md`: linha por rota (`@page`), coluna por ator (anonimo, logado nao-membro, membro, admin do grupo, admin do sistema), celula = ve / ve parcial (o que) / negado. Cobrir tambem as acoes (confirmar, pagar, marcar pago, editar, cancelar, escalar, votar). Cada celula "negado" ganha teste. **So mapear, nao mudar comportamento**, nos pontos abaixo -- reportar o que encontrar:
+  - `/futsal/{id}`, `/poker/{id}`, `/futsal/{id}/escalacao` sao anonimas: o que um nao-membro de grupo privado enxerga (nomes, pagamentos)?
+  - `/profile/{Id}` nao tem `[Authorize]`: quais campos de outro usuario aparecem (email, chave Pix)?
+- **1.5 Regra unica de "quem administra a partida" -- DECIDIDO (Robson, 21/11): `admin do grupo OU admin do sistema`.** Ser criador nao da poder sozinho. Hoje existem 3 regras: `EventAccess.IsAdmin` (criador **ou** admin do grupo), `EventCancellationService.CanManage` usado em `Futsal/Edit` e `Poker/Edit` (criador **ou** admin do sistema -- co-admin do grupo nao edita nem cancela), e `Futsal/Schedule/*` (so o criador). Procedimento:
+  - TDD: testes de caracterizacao das 3 regras atuais; depois a tabela nova (criador rebaixado -> negado; co-admin -> permitido; admin do sistema -> permitido; membro -> negado; nao-membro -> negado).
+  - Uma fonte so: `EventAccess.CanManage(Event ev, string? userId, bool isSystemAdmin)` para evento ja carregado com `Group.Members`, e uma versao async em service (via `GroupAccess.IsGroupAdminAsync`) para quem nao tem o grafo carregado. `EventAccess.IsAdmin` e `EventCancellationService.CanManage` passam a delegar pra ela (ou somem). `IsCreator` fica so para exibicao ("criado por"), nunca para autorizar.
+  - Trocar todos os call sites (~18 ocorrencias de `EventAccess.IsAdmin`, `.CanManage(` e `CreatedByUserId ==/!=` em `Pages`, `Services`, `Shared`): editar, cancelar, escalacao, marcar pago, pos-partida, e `Futsal/Schedule/Index|Edit` (a listagem passa a mostrar as recorrencias dos grupos que o usuario administra, nao so as que ele criou).
+  - **Caso de borda -- PARE e pergunte:** se existir evento/recorrencia **sem grupo** (`GroupId` nulo), manter o criador como dono nesses casos e registrar no PR quantos existem; nao inventar outra regra.
+  - Toda checagem fica no service (a UI so esconde botao). Atualizar a matriz 1.4 com a regra nova.
+
+Aceite: 1.0 com resultado da reproducao no PR; 1.1-1.3 e 1.5 com testes; matriz commitada; 0 mudanca de regra de negocio alem do descrito.
+
+### Fase 2 -- Estouros de layout (itens 1, 9, 14, 15)
+
+- **2.1 Causa raiz dos itens 1 e 9 (confirmada):** nao existe `box-sizing: border-box` global e `.btn` (`wwwroot/css/components.css`) e content-box. `.sidebar-next-link { width: 100% }` (`SidebarNextMatchCard.razor.css`) e `.next-actions > .btn { width: 100% }` (`Pages/Groups/Detail.razor.css`) somam padding (2 x `--space-4`) + borda e passam ~34px do container. **Correcao:** `box-sizing: border-box` em `.btn` e `.status-badge` no `components.css` (nao aplicar `*` global: o CSS legado depende de content-box). Depois, grep de `width: 100%` em seletores de botao (`.platform-fee-fill-btn`, `.invite-cta` etc.) e conferir cada um.
+- **2.2 Guardiao:** teste em `CssStructureTests` (ou novo) que falha se `.btn` perder o `box-sizing`.
+- **2.3 Item 14 -- `/grupo/{id}/partidas` web, itens sobrepostos.** Nao deu pra apontar a linha so lendo. Antes de corrigir: screenshot Playwright em 1280, 1024 e 800px, com 1 partida semanal (icone) + status "proxima". Suspeitos: (a) `GroupDetailEvents.razor` tem marcacao dupla por linha (`td.web-only` x5 + `td.mobile-only`), e o CSS escopado `tr.events-table-row td:last-child` cai na celula mobile escondida -- a ultima celula visivel fica sem borda/raio; (b) `events.css` (legado, `@media max-width:768px`) posiciona `.et-num` e `.et-chevron-icon` em `absolute` por cima do conteudo. **Correcao recomendada (estrutural):** trocar a tabela por lista de `.event-row` (mesmo componente visual do hub e da home), marcacao unica, sem `web-only/mobile-only`: `[#n + data/hora] [vagas + status] [Acessar]`; no mobile empilha via grid. Remover de `events.css`/`events-table.css` as regras `.et-*` que ficarem orfas (cuidado com declaracoes orfas -- `CssStructureTests`). `Join.razor` usa `.events-table` tambem: conferir.
+- **2.4 Item 15 -- `/grupo/{id}/pagamentos` mobile.** Confirmado: `.platform-fee-table` (6 colunas: check, data, partida, jogadores, taxa, status; `Payments.razor` linhas ~360 e ~496) nao tem modo mobile nem container com scroll -- estoura em 390px. **Correcao:** em `max-width:768px` cada `tr` vira card (grid 2 colunas: check + data/partida em cima; jogadores, taxa, status embaixo; `thead` oculto com rotulo via `data-label`). Nao usar scroll horizontal. **Averiguar o resto da tela** com o probe de overflow (390/360/320px, nomes longos) em todas as abas: `.payments-tabs` (5 abas), `.platform-fee-summary-grid`, `.payments-detail-item`, `.platform-fee-submit-card`. Listar no PR o que achou e corrigiu.
+
+Aceite: probe de overflow sem elemento passando da viewport em `/`, `/grupo/{id}`, `/grupo/{id}/partidas`, `/grupo/{id}/pagamentos` (todas as abas) em 390/360/320; screenshots antes/depois no PR.
+
+### Fase 3 -- Tela do grupo: hero em 3 colunas e convite pra todo membro (itens 7, 8, 13)
+
+- **3.1 Item 7 -- hero web em uma linha.** `Shared/Components/Groups/GroupHeader.razor(.css)`. Hoje: voltar em `absolute`, identidade empilhada a esquerda, menu embaixo -- 3 linhas de altura e metade vazia. Novo: `.group-header { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: var(--space-4); }` -> **col 1** `GroupSubNav` (alinhado a esquerda), **col 2** identidade centralizada, **col 3** voltar (`justify-self: end`). Tirar o `position: absolute` e o `padding-right: 120px`.
+  - **Identidade como unidade** (`.group-header-body`, `text-align: center`): linha 1 = nome (`h1`, `--fs-xl`, 1 linha com ellipsis + `title`); linha 2 = selo do esporte + cidade/UF lado a lado.
+  - **Opiniao do Senior sobre o voltar:** fica na col 3 **da mesma linha**. Uma linha acima so pro botao recria o espaco vazio que estamos removendo. No mobile continua oculto (o breadcrumb ja tem o "<- pai").
+  - **Risco:** o menu tem ate 5 itens (~480px). Se a coluna central da pagina tiver menos de ~900px (769-1100px de viewport), cair pra 2 linhas: identidade + voltar em cima, menu embaixo. Usar container query no `.group-header` (ou `@media` 1100px se preferir -- registrar a excecao ao breakpoint unico).
+- **3.2 Item 8 -- hero mobile.** Em `max-width:768px`: grid de 1 coluna, identidade centralizada em cima, `GroupSubNav` centralizado embaixo (`justify-self: center`; mantem `overflow-x: auto`).
+- **3.3 Item 13 -- convite sai da config e vira modal pra todo membro.**
+  - `Pages/Groups/Detail.razor`: tirar o botao `hub-action feat--invite` de dentro do `@if (isAdmin)`; fica pra `isMember`. Clique abre modal (nao abre mais o `wa.me` direto). Icone `fa-user-plus`, rotulo `Group.Invite`.
+  - Novo `Shared/Components/Groups/GroupInviteModal.razor` reaproveitando o `GroupInviteBlock` (link + copiar, codigo + copiar, botao `.btn-whatsapp`). Acrescentar "Compartilhar..." com `navigator.share` quando existir: funcao em arquivo estatico `wwwroot/js` (CSP nao aceita inline), chamada com `try/catch` de `JSException`. Modal: L3, fecha por X, Esc e clique fora, `role="dialog"` + `aria-modal`, foco no primeiro botao.
+  - `Pages/Groups/Features.razor`: remover a secao "Convite". `Detail.razor` checklist do admin: o passo "convite enviado" hoje aponta pra `/configuracoes` -- passa a abrir o modal. `Pages/Groups/Index.razor` (~linha 127) mostra o convite so com `isAdmin`: alinhar pra membro.
+  - **DECIDIDO (Robson, 21/11):** o codigo de convite continua entrando direto no grupo, **sem aprovacao** (`GroupDetailService.JoinWithCodeAsync`), mesmo com todo membro compartilhando. Motivo dele: alguem do grupo precisa compartilhar o codigo manualmente e o admin pode remover quem entrar indevidamente. Nao criar toggle de aprovacao. Conferir apenas que a remocao de membro pelo admin funciona e esta coberta por teste (se nao estiver, adicionar).
+
+Aceite: hero em 1 linha >= 1100px, 2 linhas entre 769-1099, centralizado no mobile; nome de 40+ caracteres nao estoura; membro comum abre o modal e copia; config sem a secao; chaves novas em PT/EN/ES.
+
+### Fase 4 -- Home e partida (itens 2, 3, 16, 6)
+
+- **4.1 Item 2 -- vazio de "Proximas" sem lista de grupos.** `Pages/Index.razor`, bloco `upcoming.Count == 0` (hoje um `.home-btn` por grupo, redundante com `/grupos`). Novo vazio: icone `fa-calendar-check` em `feat-icon`, texto, **um** CTA `.btn btn-secondary`:
+  - 1 grupo so -> `/grupo/{id}/partidas`, rotulo "Ver partidas de {nome}";
+  - 2+ grupos -> `/grupos`, rotulo "Ver meus grupos".
+  Mesmo tratamento no vazio de "Organizo" (`organizing.Count == 0`): 1 grupo admin -> link direto de criar partida; 2+ -> `/grupos`. Remover `.home-empty-actions` se ficar orfa.
+- **4.2 Item 3 -- hero "Minhas partidas" metalico.** `Pages/Index.razor.css` `.home-hero` (hoje `linear-gradient(135deg, --accent-hover, --accent)`). Tokens novos em `tokens.css` (unico lugar com hex): `--hero-metal-1..4` (azul aco escuro -> azul -> realce claro -> azul escuro) e `--hero-metal-sheen` (branco ~14%). Receita: degrade linear 135deg de 4 paradas + `::before` com faixa diagonal de brilho (`linear-gradient(115deg, transparent 35%, var(--hero-metal-sheen) 50%, transparent 65%)`, `pointer-events: none`) + `box-shadow: inset 0 1px 0 var(--hero-metal-sheen)` (aresta escovada) + borda `--accent-border`. Sem animacao. **Contraste:** titulo e subtitulo >= 4.5:1 sobre a parada mais clara (medir e colar no PR; se nao fechar, escurecer a parada 3). Atualizar `docs/design-system.md`: o hero da home segue sendo a unica excecao de degrade, agora metalico. Vale pros dois estados (com e sem grupo); a landing (`.home-hero--landing`) nao muda.
+- **4.3 Item 16 -- `/?view=organizo`.** `.home-event` hoje e grid `160px 1fr auto` com a data na coluna da esquerda. Novo: corpo com cabecalho `.home-event-head { display:flex; justify-content:space-between; gap }` -> nome do grupo a esquerda, data e hora a direita (`white-space: nowrap`, `--accent-text`); meta (local, confirmados) na linha de baixo; CTA "Gerenciar" continua na ponta. Grid vira `1fr auto`. No mobile a data quebra pra baixo do nome se nao couber (`flex-wrap`).
+- **4.4 Item 6 -- lista "Linha" em verde.** `wwwroot/css/event-detail.css`: `.player-num`, `.player-slot-btn` e `.player-slot-empty` usam `--accent-text` fixo. Trocar por `var(--players-tone, var(--accent-text))`; no botao, fundo `var(--players-soft)` e borda `var(--players-border)` (hover: borda `--players-tone`). Assim goleiro segue azul e linha fica verde, igual aos cabecalhos do C45 #9. `.player-slot-btn--gk` vira redundante -- remover. **Tinted, nao verde cheio** (regra "sem botao verde cheio" continua). `.player-item--me .player-num` segue azul (destaque do proprio usuario).
+
+Aceite: screenshots web + mobile de cada item no PR; `CssScopedOrphanClassesTests` e `CssStructureTests` verdes.
+
+### Fase 5 -- Coluna direita (itens 4, 5)
+
+- **5.1 Item 4 -- cartoes "em breve".** `Shared/Components/ActivePaymentMethodsWidget.razor`: depois do chip Pix, chips "Cartao de credito" e "Cartao de debito" com classe `oldsite-payment-chip--soon` (opacidade reduzida, sem hover) + badge `Common.ComingSoon` ("em breve"). Icone FontAwesome (`fa-credit-card`), sem imagem externa (CSP). Chaves PT/EN/ES.
+- **5.2 Item 5 -- card de anuncio com rotacao.** Evoluir o `SidebarPromoCard` (hoje 1 anuncio via `Promo__Title`, some sem config):
+  - `PromoOptions` ganha `Items` (lista: `Title`, `Text`, `Url`, `ImageUrl`, `Cta`) e `ShowDemo` (default `true`). Compatibilidade: `Promo__Title` antigo vira o item 0.
+  - Sem itens configurados e `ShowDemo=true`, usa 3 anuncios de demonstracao definidos em codigo (textos via i18n): (1) loja ficticia "Craque Sports" -- chuteiras, coletes e bolas, "10% pra quem joga no Confirmai"; (2) "Arena Parceira" -- horario avulso de quadra; (3) da casa: "Anuncie aqui" -> `/contact`. Os ficticios **nao tem link externo** (CTA leva pra `/contact`) e a arte e so CSS + icone (`fa-shoe-prints`, `fa-futbol`, `fa-bullhorn`) sobre `--surface-2` -- sem imagem.
+  - Rotacao igual ao `SidebarVenuesCard`: timer so depois do primeiro render interativo, 8s, pausa no hover/foco, bolinhas de posicao, `Dispose` do timer. Rotulo "Publicidade" sempre visivel.
+  - **Checklist de reset pre-producao:** acrescentar "`Promo__ShowDemo=false` ou anuncios reais configurados".
+
+Aceite: testes do `PromoOptions` (compatibilidade + demo ligado/desligado); card nao dispara evento de metrica em re-render (ver regra do `MainLayout` com timers).
+
+### Testes e evidencia
+- Novos: membro comum nas telas de config/pagamentos (1.0a), tabela da regra unica de admin da partida (1.5), authz dos 5 metodos (1.1), troca de `Id` (1.2), `ShowNav` (1.3), guardiao do `box-sizing` (2.2), `PromoOptions` (5.2), chaves i18n novas nos 3 idiomas.
+- PR com `dotnet build --no-incremental` (0 warning) + suite completa (numeros colados), screenshots antes/depois por item em 1280 e 390px.
+
+### O que NAO fazer
+- Nao mudar a visibilidade das telas anonimas (1.4) sem decisao do Robson -- so mapear. A regra de quem administra partida (1.5) **ja esta decidida** e entra neste ciclo.
+- Nao aplicar `box-sizing` global em `*`.
+- Nao criar verde cheio em botao; nao usar hex fora de `tokens.css`; nao carregar imagem externa (CSP).
+- Nao gravar teste de UI em video (o Robson testa em prod).
+
+---
+
 ## Ciclo 45 (Senior direto, a pedido do Robson) -- 9 pontos de UI em prod [EXECUTADO -- implementado pelo Senior, sem Pleno; o C44 (remocao do legado + achados da bateria) continua reservado]
 
 Numerado C45 porque o C44 ja tem o plano da remocao do legado. Itens do Robson e o que entrou:
