@@ -26,8 +26,29 @@ public partial class Detail
     private Event? nextEvent;
     private bool hasAnyEvent;
 
-    protected override async Task OnInitializedAsync()
+    private int? loadedId;
+
+    // C46 (1.2): load on OnParametersSetAsync — Blazor reuses the component
+    // instance when only the route Id changes (back/forward between groups),
+    // so OnInitializedAsync alone would keep showing the previous group's data.
+    protected override async Task OnParametersSetAsync()
     {
+        if (loadedId == Id) return;
+        loadedId = Id;
+
+        group = null;
+        pendingRequests = new();
+        userJoinRequest = null;
+        isLoading = true;
+        requestingJoin = false;
+        cancellingJoin = false;
+        isBulkProcessing = false;
+        showAllMembers = false;
+        myPendingPayments = 0;
+        upcomingEventsCount = 0;
+        nextEvent = null;
+        hasAnyEvent = false;
+
         currentUserId = await GroupService.GetCurrentUserIdAsync();
         await LoadGroup();
     }

@@ -142,8 +142,17 @@ public partial class Payments
             .OrderByDescending(g => g.TotalAmount)
             .ToList();
 
-    protected override async Task OnInitializedAsync()
+    private int? loadedId;
+
+    // C46 (1.2): load on OnParametersSetAsync — Blazor reuses the component
+    // instance when only the route Id changes (back/forward between groups),
+    // so OnInitializedAsync alone would keep showing the previous group's data.
+    protected override async Task OnParametersSetAsync()
     {
+        if (loadedId == Id) return;
+        loadedId = Id;
+        ResetState();
+
         currentUserId = await GroupPayments.GetCurrentUserIdAsync();
         (group, isAdmin, isMember) = await GroupPayments.LoadGroupAccessAsync(Id, currentUserId);
         if (group is null || !isMember)
@@ -158,6 +167,37 @@ public partial class Payments
         myPayments = await GroupPayments.LoadMyPaymentsAsync(Id, currentUserId);
         if (!isAdmin) paymentTab = "mine";
         isLoading = false;
+    }
+
+    private void ResetState()
+    {
+        group = null;
+        isLoading = true;
+        isAdmin = false;
+        isMember = false;
+        myPayments = new();
+        isLoadingPayments = false;
+        delinquencyList = new();
+        paymentHistory = new();
+        pendingProofList = new();
+        paymentTab = "proofs";
+        selectedPaymentUserId = null;
+        markingPaidId = null;
+        notifyingUserId = null;
+        notifiedUserIds = new();
+        viewingProofConfirmationId = null;
+        historyFilterUserId = "";
+        rejectingProofId = null;
+        feeOverview = null;
+        isLoadingFee = false;
+        settlementError = string.Empty;
+        settlementSuccess = string.Empty;
+        isSubmittingSettlement = false;
+        viewingSettlementProofId = null;
+        showAllFeeMatches = false;
+        selectedFeeEventIds = new();
+        selectedProofFile = null;
+        showSettlementConfirmModal = false;
     }
 
     private async Task HandleTabChange(string tab)

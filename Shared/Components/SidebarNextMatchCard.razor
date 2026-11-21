@@ -99,8 +99,7 @@
 
         var ev = await db.Events
             .Where(e => e.IsActive && e.StartsAt >= now
-                && (e.Group.Members.Any(m => m.UserId == userId)
-                    || e.CreatedByUserId == userId))
+                && e.Group.Members.Any(m => m.UserId == userId))
             .OrderBy(e => e.StartsAt)
             .Select(e => new NextMatch(
                 e.Id,

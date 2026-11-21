@@ -9,6 +9,7 @@ using Confirmai.Services.Factories;
 using Confirmai.Services.Groups;
 using Confirmai.Services.Notification;
 using Confirmai.Services.Payment;
+using Confirmai.Services.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -29,7 +30,9 @@ public class C31WhatsAppTests
         var gatewayFactory = new EventPaymentGatewayFactory(
             new List<Services.Interfaces.IEventPaymentGateway>(),
             new GatewayService(factory));
-        return (factory, new GroupFeaturesService(factory, logService, gatewayFactory));
+        return (factory, new GroupFeaturesService(
+            factory, logService, gatewayFactory,
+            new UiTextService(new LanguagePreferenceService())));
     }
 
     // ── WhatsAppGroupJid validator ───────────────────────────────────────────

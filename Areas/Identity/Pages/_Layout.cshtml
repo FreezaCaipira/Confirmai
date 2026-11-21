@@ -1,6 +1,15 @@
 ﻿@{
     Layout = null;
     var title = ViewData["Title"] ?? "Confirmai";
+    var cspNonce = (Context.Items["csp-nonce"] as string) ?? string.Empty;
+    // C46 (1.0): auth fingerprint for cross-tab auth-change detection.
+    var authFp = "anon";
+    var authUid = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    if (!string.IsNullOrEmpty(authUid))
+    {
+        var hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(authUid));
+        authFp = Convert.ToHexString(hash)[..16].ToLowerInvariant();
+    }
 }
 @inject Confirmai.Services.User.LanguagePreferenceService LanguagePreferenceService
 <!DOCTYPE html>
@@ -19,6 +28,10 @@
     <div class="identity-container">
         @RenderBody()
     </div>
+    <script nonce="@cspNonce">
+        window.__confirmaiAuthFp = "@authFp";
+    </script>
+    <script src="~/js/auth-changed.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

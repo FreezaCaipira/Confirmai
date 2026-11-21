@@ -53,6 +53,7 @@ public partial class Edit
 
         ev = await db.Events
             .Include(e => e.Group)
+                .ThenInclude(g => g.Members)
             .Include(e => e.Venue)
             .FirstOrDefaultAsync(e => e.Id == Id && e.Sport == Sport.Futsal);
 

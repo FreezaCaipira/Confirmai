@@ -63,19 +63,40 @@ public class C34PermissionTests
     }
 
     [Fact]
-    public async Task CancelEvent_Creator_Succeeds_AndAudits()
+    public async Task CancelEvent_CreatorOnly_Forbidden_EventStaysActive()
     {
+        // C46 (1.5): criador sem papel de admin no grupo não gerencia mais.
         var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
         var eventId = await SeedEventAsync(db, "creator-1");
         var svc = NewCancellation(factory);
 
         var result = await svc.CancelAsync(eventId, "creator-1", isAdmin: false);
 
+        Assert.Equal(EventCancellationResult.Forbidden, result);
+        await using var verify = await factory.CreateDbContextAsync();
+        Assert.True(verify.Events.Find(eventId)!.IsActive);
+    }
+
+    [Fact]
+    public async Task CancelEvent_GroupAdmin_Succeeds_AndAudits()
+    {
+        // C46 (1.5): admin do grupo cancela mesmo sem ser o criador do evento.
+        var (db, factory) = TestDataFactory.CreateDbContextWithFactory();
+        var eventId = await SeedEventAsync(db, "creator-1");
+        db.GroupMembers.Add(new GroupMember
+        {
+            GroupId = 900, UserId = "gadmin-1", Role = Enums.GroupMemberRole.Admin,
+        });
+        await db.SaveChangesAsync();
+        var svc = NewCancellation(factory);
+
+        var result = await svc.CancelAsync(eventId, "gadmin-1", isAdmin: false);
+
         Assert.Equal(EventCancellationResult.Success, result);
         await using var verify = await factory.CreateDbContextAsync();
         Assert.False(verify.Events.Find(eventId)!.IsActive);
         var audit = Assert.Single(verify.Logs.Where(l => l.EventType == AuditEvents.EventCancelled));
-        Assert.Equal("creator-1", audit.UserId);
+        Assert.Equal("gadmin-1", audit.UserId);
         Assert.Equal(eventId.ToString(), audit.EntityId);
     }
 
@@ -106,11 +127,13 @@ public class C34PermissionTests
     }
 
     [Theory]
-    [InlineData("creator-1", false, true)]   // criador
+    // C46 (1.5): regra = admin do grupo OU sysadmin. Sem grafo carregado
+    // (ev.Group null), só sysadmin passa — criador sozinho perde o direito.
+    [InlineData("creator-1", false, false)] // criador sem papel
     [InlineData("other-1",    true,  true)]  // sysadmin
     [InlineData("other-1",    false, false)] // terceiro
     [InlineData(null,         false, false)] // anônimo
-    public void CanManage_CreatorOrAdminOnly(string? userId, bool isAdmin, bool expected)
+    public void CanManage_GroupAdminOrSysAdminOnly(string? userId, bool isAdmin, bool expected)
     {
         var ev = new Event { CreatedByUserId = "creator-1" };
         Assert.Equal(expected, EventCancellationService.CanManage(ev, userId, isAdmin));

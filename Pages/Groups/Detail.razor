@@ -80,7 +80,7 @@ else
         <div class="hub-stack">
 
             @* ── Cabeçalho do grupo (compartilhado, com sub-nav) ──────── *@
-            <GroupHeader Group="@group" IsAdmin="@isAdmin" />
+            <GroupHeader Group="@group" IsAdmin="@isAdmin" ShowNav="@isMember" />
 
             @if (!group.IsActive)
             {

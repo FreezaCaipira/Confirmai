@@ -42,8 +42,27 @@ public partial class Ranking
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
+    private int? loadedId;
+
+    // C46 (1.2): load on OnParametersSetAsync — Blazor reuses the component
+    // instance when only the route Id changes, so OnInitializedAsync alone
+    // would keep showing the previous group's data.
+    protected override async Task OnParametersSetAsync()
     {
+        if (loadedId == Id) return;
+        loadedId = Id;
+
+        group = null;
+        isLoading = true;
+        isMember = false;
+        isAdmin = false;
+        copied = false;
+        viewMode = RankingView.Month;
+        currentYear = DateTime.Now.Year;
+        rankingRows = new();
+        allEntries = new();
+        allMvpWinners = new();
+
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
         currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
 

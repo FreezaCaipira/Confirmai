@@ -113,6 +113,7 @@ public partial class Edit
 
         var ev = await db.Events
             .Include(e => e.Group)
+                .ThenInclude(g => g.Members)
             .Include(e => e.PriceOptions)
             .Include(e => e.Confirmations)
             .AsSplitQuery()

@@ -79,7 +79,7 @@ else
     var isUnlocked  = !isHomeGame || homeGameUnlocked;
     var isMember    = currentUserId is not null && ev.Group.Members.Any(m => m.UserId == currentUserId);
     var userConf    = currentUserId is not null ? ev.Confirmations.FirstOrDefault(c => c.UserId == currentUserId) : null;
-    var isAdmin     = EventAccess.IsAdmin(ev, currentUserId);
+    var isAdmin     = EventAccess.CanManage(ev, currentUserId, isSystemAdmin);
 
     <div class="detail-page">
         <div class="detail-card">

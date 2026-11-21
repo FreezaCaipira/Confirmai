@@ -5,7 +5,7 @@
     ViewData["Title"] = T["Layout.Logout"];
 }
 
-<form id="logoutForm" method="post">
+<form id="logoutForm" method="post" asp-route-returnUrl="@Model.ReturnUrl">
     <button type="submit" class="identity-btn-primary">@T["Layout.Logout"]</button>
 </form>
 

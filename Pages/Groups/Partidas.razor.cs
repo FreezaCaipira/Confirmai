@@ -40,8 +40,26 @@ public partial class Partidas
         ? eventItem.StartsAt.ToLocalTime().Year
         : DateTime.Now.Year;
 
-    protected override async Task OnInitializedAsync()
+    private int? loadedId;
+
+    // C46 (1.2): load on OnParametersSetAsync — Blazor reuses the component
+    // instance when only the route Id changes, so OnInitializedAsync alone
+    // would keep showing the previous group's data.
+    protected override async Task OnParametersSetAsync()
     {
+        if (loadedId == Id) return;
+        loadedId = Id;
+
+        group = null;
+        isLoading = true;
+        isMember = false;
+        showPastEvents = false;
+        showAllUpcoming = false;
+        recentEvents = new();
+        upcomingEvents = new();
+        pastEvents = new();
+        eventNumbers = new();
+
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
         currentUserId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
 

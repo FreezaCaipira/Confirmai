@@ -23,15 +23,28 @@ public class EventCancellationService(
     LogService log)
 {
     /// <summary>Regra de quem pode gerenciar (editar/cancelar) o evento carregado.</summary>
+    /// <summary>
+    /// Delegates to <see cref="Shared.Helpers.EventAccess.CanManage"/> — the
+    /// single source of the rule (group admin OR system admin).
+    /// </summary>
     public static bool CanManage(Event ev, string? userId, bool isAdmin)
-        => ev.CreatedByUserId == userId || isAdmin;
+        => Shared.Helpers.EventAccess.CanManage(ev, userId, isAdmin);
+
+    /// <summary>
+    /// C46 (1.5): async variant for callers without the loaded Members graph.
+    /// Creator-only falls back to the old rule ONLY when the event's Members
+    /// graph is unavailable — handled by CanManageAsync in EventAccess.
+    /// </summary>
+    public static async Task<bool> CanManageAsync(Data.AppDbContext db, Event ev, string? userId, bool isAdmin)
+        => isAdmin || await Shared.Helpers.EventAccess.CanManageAsync(db, ev, userId);
 
     public async Task<EventCancellationResult> CancelAsync(int eventId, string? userId, bool isAdmin)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         var ev = await db.Events.FirstOrDefaultAsync(e => e.Id == eventId);
         if (ev is null) return EventCancellationResult.NotFound;
-        if (!CanManage(ev, userId, isAdmin)) return EventCancellationResult.Forbidden;
+        // C46 (1.5): rule is group admin OR system admin (loaded graph absent → async check).
+        if (!await CanManageAsync(db, ev, userId, isAdmin)) return EventCancellationResult.Forbidden;
 
 
         ev.IsActive = false;

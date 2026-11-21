@@ -87,7 +87,8 @@ public partial class Detail
         finally { cancellingJoin = false; }
     }
 
-    private bool IsGroupAdmin() => EventAccess.IsAdmin(ev, currentUserId);
+    // C46 (1.5): manage = group admin OR system admin (creator alone gets nothing).
+    private bool IsGroupAdmin() => EventAccess.CanManage(ev, currentUserId, isSystemAdmin);
 
     private async Task ConfirmAs(FutsalPosition pos) { chosenPos = pos; await ConfirmPresence(); }
 

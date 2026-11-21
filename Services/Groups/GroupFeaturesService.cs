@@ -24,15 +24,48 @@ public sealed class GroupFeaturesService
     private readonly IDbContextFactory<AppDbContext> _dbFactory;
     private readonly LogService _logService;
     private readonly EventPaymentGatewayFactory _gatewayFactory;
+    private readonly UiTextService _ui;
 
     public GroupFeaturesService(
         IDbContextFactory<AppDbContext> dbFactory,
         LogService logService,
-        EventPaymentGatewayFactory gatewayFactory)
+        EventPaymentGatewayFactory gatewayFactory,
+        UiTextService ui)
     {
         _dbFactory = dbFactory;
         _logService = logService;
         _gatewayFactory = gatewayFactory;
+        _ui = ui;
+    }
+
+    /// <summary>
+    /// C46 — service-level admin gate for group config mutations. The page's
+    /// isAdmin check is not an authorization boundary. Returns true (and audits
+    /// a warning) when the caller is not an admin of the group.
+    /// </summary>
+    private async Task<bool> DenyIfNotGroupAdminAsync(
+        AppDbContext db, int groupId, string? currentUserId, string action)
+    {
+        if (await GroupAccess.IsGroupAdminAsync(db, groupId, currentUserId))
+            return false;
+
+        await _logService.AuditAsync(
+            AuditEvents.GroupConfigChangeDenied,
+            AuditEntities.Group,
+            groupId.ToString(),
+            $"Tentativa negada de alterar configuração do grupo ({action}).",
+            currentUserId,
+            source: "GroupFeatures",
+            level: "Warning",
+            metadata: new
+            {
+                GroupId = groupId,
+                Action = action,
+                ActorUserId = currentUserId,
+                OccurredAtUtc = DateTime.UtcNow,
+            });
+
+        return true;
     }
 
     public async Task<GroupFeaturesLoadResult> LoadAsync(int groupId, string? currentUserId)
@@ -63,11 +96,16 @@ public sealed class GroupFeaturesService
         };
     }
 
-    public async Task<bool> TogglePostMatchRankingAsync(int groupId, bool currentValue, string? currentUserId)
+    public async Task<(bool Success, bool NewValue, string Message)> TogglePostMatchRankingAsync(
+        int groupId, bool currentValue, string? currentUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
+
+        if (await DenyIfNotGroupAdminAsync(db, groupId, currentUserId, "TogglePostMatchRanking"))
+            return (false, currentValue, _ui["Group.OnlyAdminsCanChangeConfig"]);
+
         var dbGroup = await db.Groups.FindAsync(groupId);
-        if (dbGroup is null) return false;
+        if (dbGroup is null) return (false, currentValue, "Grupo não encontrado.");
 
         var previous = dbGroup.EnablePostMatchRanking;
         dbGroup.EnablePostMatchRanking = !currentValue;
@@ -89,14 +127,20 @@ public sealed class GroupFeaturesService
                 ChangedAtUtc = DateTime.UtcNow,
             });
 
-        return dbGroup.EnablePostMatchRanking;
+        return (true, dbGroup.EnablePostMatchRanking,
+            dbGroup.EnablePostMatchRanking ? _ui["Group.RankingPostMatchEnabled"] : _ui["Group.RankingPostMatchDisabled"]);
     }
 
-    public async Task<bool> ToggleBestPlayerVotingAsync(int groupId, bool currentValue, string? currentUserId)
+    public async Task<(bool Success, bool NewValue, string Message)> ToggleBestPlayerVotingAsync(
+        int groupId, bool currentValue, string? currentUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
+
+        if (await DenyIfNotGroupAdminAsync(db, groupId, currentUserId, "ToggleBestPlayerVoting"))
+            return (false, currentValue, _ui["Group.OnlyAdminsCanChangeConfig"]);
+
         var dbGroup = await db.Groups.FindAsync(groupId);
-        if (dbGroup is null) return false;
+        if (dbGroup is null) return (false, currentValue, "Grupo não encontrado.");
 
         var previous = dbGroup.EnableBestPlayerVoting;
         dbGroup.EnableBestPlayerVoting = !currentValue;
@@ -118,13 +162,18 @@ public sealed class GroupFeaturesService
                 ChangedAtUtc = DateTime.UtcNow,
             });
 
-        return dbGroup.EnableBestPlayerVoting;
+        return (true, dbGroup.EnableBestPlayerVoting,
+            dbGroup.EnableBestPlayerVoting ? _ui["Group.BestPlayerVotingEnabled"] : _ui["Group.BestPlayerVotingDisabled"]);
     }
 
     public async Task<(bool Success, bool NewValue, string Message)> TogglePaymentGatewaysAsync(
         int groupId, bool currentValue, string? currentUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
+
+        if (await DenyIfNotGroupAdminAsync(db, groupId, currentUserId, "TogglePaymentGateways"))
+            return (false, currentValue, _ui["Group.OnlyAdminsCanChangeConfig"]);
+
         var dbGroup = await db.Groups.FindAsync(groupId);
         if (dbGroup is null) return (false, currentValue, "Grupo não encontrado.");
 
@@ -231,6 +280,10 @@ public sealed class GroupFeaturesService
         int groupId, string selectedPixReceiverId, string? currentUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
+
+        if (await DenyIfNotGroupAdminAsync(db, groupId, currentUserId, "SavePixReceiver"))
+            return (false, _ui["Group.OnlyAdminsCanChangeConfig"]);
+
         var dbGroup = await db.Groups.FindAsync(groupId);
         if (dbGroup is null) return (false, "Grupo não encontrado.");
 
@@ -344,6 +397,9 @@ public sealed class GroupFeaturesService
         int groupId, GroupPayoutAccount formData, int? existingAccountId, string? currentUserId)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
+
+        if (await DenyIfNotGroupAdminAsync(db, groupId, currentUserId, "SavePayoutAccount"))
+            return (false, _ui["Group.OnlyAdminsCanChangeConfig"]);
 
         if (existingAccountId is null)
         {
