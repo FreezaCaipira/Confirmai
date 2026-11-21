@@ -385,11 +385,11 @@ else
                                                     <input type="checkbox" checked="@isChecked" @onchange="@(e => ToggleFeeMatchSelection(m.EventId))" />
                                                 }
                                             </td>
-                                            <td data-th="@feeThPlatformFeeMatchDate"">@Ui.FormatDateTime(m.StartsAt.ToLocalTime(), "DateDefault")</td>
-                                            <td data-th="@feeThPlatformFeeMatchName"">#@m.EventId — @m.GroupName</td>
-                                            <td data-th="@feeThPlatformFeeMatchPlayers"">@m.PaidPlayers</td>
-                                            <td data-th="@feeThPlatformFeeMatchFee"">R$ @m.FeeAmount.ToString("F2")</td>
-                                            <td data-th="@feeThPlatformFeeMatchStatus"">
+                                            <td data-th="@feeThPlatformFeeMatchDate">@Ui.FormatDateTime(m.StartsAt.ToLocalTime(), "DateDefault")</td>
+                                            <td data-th="@feeThPlatformFeeMatchName">#@m.EventId — @m.GroupName</td>
+                                            <td data-th="@feeThPlatformFeeMatchPlayers">@m.PaidPlayers</td>
+                                            <td data-th="@feeThPlatformFeeMatchFee">R$ @m.FeeAmount.ToString("F2")</td>
+                                            <td data-th="@feeThPlatformFeeMatchStatus">
                                                 <span class="platform-fee-status platform-fee-status--@(m.Status == PlatformFeeMatchStatus.Pago ? "paid" : "pending")">
                                                     @(m.Status == PlatformFeeMatchStatus.Pago ? Ui["Group.PlatformFeeStatusPaid"] : Ui["Group.PlatformFeeStatusPending"])
                                                 </span>
@@ -410,7 +410,7 @@ else
                                         <tr class="platform-fee-table-total">
                                             <td></td>
                                             <td colspan="3">@Ui["Group.PlatformFeeMatchTotal"]</td>
-                                            <td data-th="@feeThPlatformFeeMatchFee"">R$ @feeOverview.Matches.Sum(m => m.FeeAmount).ToString("F2")</td>
+                                            <td data-th="@feeThPlatformFeeMatchFee">R$ @feeOverview.Matches.Sum(m => m.FeeAmount).ToString("F2")</td>
                                             <td></td>
                                         </tr>
                                     </tfoot>
@@ -421,7 +421,7 @@ else
                                         <tr class="platform-fee-table-total">
                                             <td></td>
                                             <td colspan="3">@Ui["Group.PlatformFeeMatchTotal"]</td>
-                                            <td data-th="@feeThPlatformFeeMatchFee"">R$ @feeOverview.Matches.Sum(m => m.FeeAmount).ToString("F2")</td>
+                                            <td data-th="@feeThPlatformFeeMatchFee">R$ @feeOverview.Matches.Sum(m => m.FeeAmount).ToString("F2")</td>
                                             <td></td>
                                         </tr>
                                     </tfoot>
@@ -519,16 +519,16 @@ else
                                         var feeThPlatformFeeHistoryNote       = Ui["Group.PlatformFeeHistoryNote"];
                                         var feeThPlatformFeeHistoryProof      = Ui["Group.PlatformFeeHistoryProof"];
                                         <tr>
-                                            <td data-th="@feeThPlatformFeeHistoryDate"">@Ui.FormatDateTime(s.SubmittedAt.ToLocalTime(), "DateDefault")</td>
-                                            <td data-th="@feeThPlatformFeeHistoryAmount"">R$ @s.Amount.ToString("F2")</td>
-                                            <td data-th="@feeThPlatformFeeHistoryStatus"">
+                                            <td data-th="@feeThPlatformFeeHistoryDate">@Ui.FormatDateTime(s.SubmittedAt.ToLocalTime(), "DateDefault")</td>
+                                            <td data-th="@feeThPlatformFeeHistoryAmount">R$ @s.Amount.ToString("F2")</td>
+                                            <td data-th="@feeThPlatformFeeHistoryStatus">
                                                 <span class="platform-fee-status platform-fee-status--@(s.Status == PlatformFeeSettlementStatus.Pago ? "paid" : s.Status == PlatformFeeSettlementStatus.Rejeitado ? "rejected" : "pending")">
                                                     @(s.Status == PlatformFeeSettlementStatus.Pago ? Ui["Group.PlatformFeeStatusPaid"] : s.Status == PlatformFeeSettlementStatus.Rejeitado ? Ui["Group.PlatformFeeStatusRejected"] : Ui["Group.PlatformFeeStatusPending"])
                                                 </span>
                                             </td>
-                                            <td data-th="@feeThPlatformFeeHistoryReviewedAt"">@(s.ReviewedAt.HasValue ? Ui.FormatDateTime(s.ReviewedAt.Value.ToLocalTime(), "DateDefault") : "—")</td>
-                                            <td data-th="@feeThPlatformFeeHistoryNote"">@(string.IsNullOrWhiteSpace(s.ReviewNote) ? "—" : s.ReviewNote)</td>
-                                            <td data-th="@feeThPlatformFeeHistoryProof"">
+                                            <td data-th="@feeThPlatformFeeHistoryReviewedAt">@(s.ReviewedAt.HasValue ? Ui.FormatDateTime(s.ReviewedAt.Value.ToLocalTime(), "DateDefault") : "—")</td>
+                                            <td data-th="@feeThPlatformFeeHistoryNote">@(string.IsNullOrWhiteSpace(s.ReviewNote) ? "—" : s.ReviewNote)</td>
+                                            <td data-th="@feeThPlatformFeeHistoryProof">
                                                 @if (s.HasProof)
                                                 {
                                                     <button class="payments-view-proof-btn" type="button"
